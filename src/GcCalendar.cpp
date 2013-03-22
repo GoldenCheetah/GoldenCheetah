@@ -635,7 +635,6 @@ GcMiniCalendar::previous()
             month = date.month();
             year = date.year();
             calendarModel->setMonth(date.month(), date.year());
-            emit dateChanged(month,year);
 
             // find the day in the calendar...
             for (int day=42; day>0;day--) {
@@ -648,6 +647,7 @@ GcMiniCalendar::previous()
                     if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
+            emit dateChanged(month,year);
             break;
         }
     }
@@ -668,7 +668,6 @@ GcMiniCalendar::next()
             month = date.month();
             year = date.year();
             calendarModel->setMonth(date.month(), date.year());
-            emit dateChanged(month,year);
 
             // find the day in the calendar...
             for (int day=0; day<42;day++) {
@@ -681,6 +680,7 @@ GcMiniCalendar::next()
                     if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
+            emit dateChanged(month,year);
             break;
         }
     }
