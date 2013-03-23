@@ -77,7 +77,7 @@ class GcMiniCalendar : public QWidget
         void getDate(int &_month, int &_year) { _month = month; _year = year; }
         void clearRide();
 
-        void setFilter(QList<QString> filter);
+        void setFilter(QStringList filter);
         void clearFilter();
 
     public slots:
@@ -114,7 +114,7 @@ class GcMiniCalendar : public QWidget
         GcCalendarModel *calendarModel;
         bool master;
 
-        QList<QString> filters;
+        QStringList filters;
 };
 
 class GcMultiCalendar : public QScrollArea
@@ -130,7 +130,7 @@ class GcMultiCalendar : public QScrollArea
         void dateChanged(int month, int year);
         void setRide(RideItem *ride);
         void resizeEvent(QResizeEvent*);
-        void setFilter(QList<QString> filter);
+        void setFilter(QStringList filter);
         void clearFilter();
 
 
@@ -156,7 +156,7 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         void refresh(); 
         void setSummary(); // set the summary at the bottom
 
-        void setFilter(QList<QString> filters) { multiCalendar->setFilter(filters);}
+        void setFilter(QStringList filters) { multiCalendar->setFilter(filters);}
         void clearFilter() { multiCalendar->clearFilter();}
 
     signals:

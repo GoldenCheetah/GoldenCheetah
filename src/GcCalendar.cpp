@@ -716,7 +716,7 @@ GcMiniCalendar::clearRide()
 }
 
 void
-GcMiniCalendar::setFilter(QList<QString>filter)
+GcMiniCalendar::setFilter(QStringList filter)
 {
     filters = filter;
 }
@@ -822,7 +822,7 @@ GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(mai
 }
 
 void
-GcMultiCalendar::setFilter(QList<QString>filter)
+GcMultiCalendar::setFilter(QStringList filter)
 {
     for (int i=0; i<calendars.count();i++) {
         calendars.at(i)->setFilter(filter);
