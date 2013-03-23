@@ -399,7 +399,7 @@ StravaUploadDialog::requestUpload()
 
         params.addQueryItem("token", token);
         params.addQueryItem("type", "tcx");
-        params.addQueryItem("data", reader.toByteArray(mainWindow, ride->ride()));
+        params.addQueryItem("data", reader.toByteArray(mainWindow, ride->ride(), altitudeChk->isChecked(), powerChk->isChecked(), heartrateChk->isChecked(), cadenceChk->isChecked()));
         data = params.encodedQuery();
 
         QUrl url = QUrl(STRAVA_URL2 + "/upload");
