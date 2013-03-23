@@ -164,7 +164,10 @@ GcLabel::paintEvent(QPaintEvent *)
 
         // setup a painter and the area to paint
         if (!underMouse()) painter.fillRect(all, bgColor);
-        else painter.fillRect(all, Qt::lightGray);
+        else {
+            if (filtered) painter.fillRect(all, QColor(255,200,200));
+            else painter.fillRect(all, Qt::lightGray);
+        }
 
         painter.setPen(Qt::gray);
         painter.drawRect(QRect(0,0,width(),height()));
