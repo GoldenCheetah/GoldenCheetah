@@ -11,6 +11,8 @@ Copyright @copyright{} 2013 Mark Liversedge
 @end copying
 
 @titlepage
+@image{"image/0-icon",140pt,140pt}
+@vskip 20pt
 @title Golden Cheetah User Manual
 @c @subtitle subtitle-if-any
 @c @subtitle second-subtitle
@@ -270,13 +272,13 @@ Intro and explain opening the Preferences Pane
 @c ********************************************************************************
 @c Appendices
 @c ********************************************************************************
-@chapter APPENDICES
-@node APPENDICES
+@unnumbered Appendix A Supported Devices, Formats & Services
+@unnumbered B Metrics Reference
+@unnumbered B Data Filtering Reference
+@unnumbered C Glossary & Resources
+@unnumbered D OS Specifics (Directories, Drivers and Permissions)
 
-@section A Supported Devices, File Formats and Services
-@section B Metrics Reference
-@section B Data Filtering Reference
-@section C Glossary and Useful Resources (incl. link to FAQ)
-@section D OS Specifics (Directories, Drivers and Permissions)
+@unnumbered Index
+@printindex cp
 
 @bye

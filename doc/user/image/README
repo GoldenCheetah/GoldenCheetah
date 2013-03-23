@@ -1,0 +1,10 @@
+We only have images for the Manual since they are so large and
+consume lots of disk space etc.
+
+Each image must be a PDF file, and to make it easier to manage
+and find images we name them;
+
+section-keyword.pdf
+
+e.g.
+0-icon.pdf       - the gc icon image on the first page (section 0)
