@@ -25,7 +25,7 @@
 
 struct TcxFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-    QByteArray toByteArray(MainWindow *mainWindow, const RideFile *ride) const;
+    QByteArray toByteArray(MainWindow *mainWindow, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const;
     bool writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const;
     bool hasWrite() const { return true; }
 };

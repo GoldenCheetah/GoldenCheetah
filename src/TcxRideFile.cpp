@@ -51,7 +51,7 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 }
 
 QByteArray
-TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride) const
+TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
 {
     QDomText text;
     QDomDocument doc;
@@ -187,8 +187,9 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride) const
                 position.appendChild(lon);
             }
 
+
             // alt
-            if (ride->areDataPresent()->alt && point->alt != 0.0) {
+            if (withAlt && ride->areDataPresent()->alt && point->alt != 0.0) {
                 QDomElement alt = doc.createElement("AltitudeMeters");
                 text = doc.createTextNode(QString("%1").arg(point->alt));
                 alt.appendChild(text);
@@ -203,25 +204,27 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride) const
                 trackpoint.appendChild(dist);
             }
 
-            // HeartRate hack for Garmin Training Center
-            // It needs an hr datapoint for every trackpoint or else the
-            // hr graph in TC won't display. Schema defines the datapoint
-            // as a positive int (> 0)
+            if (withHr)  {
+                // HeartRate hack for Garmin Training Center
+                // It needs an hr datapoint for every trackpoint or else the
+                // hr graph in TC won't display. Schema defines the datapoint
+                // as a positive int (> 0)
 
-            int tHr = 1;
-            if (ride->areDataPresent()->hr && point->hr >0.00) {
-                tHr = (int)point->hr;
+                int tHr = 1;
+                if (ride->areDataPresent()->hr && point->hr >0.00) {
+                    tHr = (int)point->hr;
+                }
+                QDomElement hr = doc.createElement("HeartRateBpm");
+                hr.setAttribute("xsi:type", "HeartRateInBeatsPerMinute_t");
+                QDomElement value = doc.createElement("Value");
+                text = doc.createTextNode(QString("%1").arg(tHr));
+                value.appendChild(text);
+                hr.appendChild(value);
+                trackpoint.appendChild(hr);
             }
-            QDomElement hr = doc.createElement("HeartRateBpm");
-            hr.setAttribute("xsi:type", "HeartRateInBeatsPerMinute_t");
-            QDomElement value = doc.createElement("Value");
-            text = doc.createTextNode(QString("%1").arg(tHr));
-            value.appendChild(text);
-            hr.appendChild(value);
-            trackpoint.appendChild(hr);
 
             // cad
-            if (ride->areDataPresent()->cad && point->cad < 255) { //xsd maxInclusive value="254"
+            if (withCad && ride->areDataPresent()->cad && point->cad < 255) { //xsd maxInclusive value="254"
                 QDomElement cad = doc.createElement("Cadence");
                 text = doc.createTextNode(QString("%1").arg((int)(point->cad)));
                 cad.appendChild(text);
@@ -243,7 +246,7 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride) const
                     tpx.appendChild(spd);
                 }
                 // pwr
-                if (ride->areDataPresent()->watts) {
+                if (withWatts && ride->areDataPresent()->watts) {
                     QDomElement pwr = doc.createElement("Watts");
                     text = doc.createTextNode(QString("%1").arg((int)point->watts));
                     pwr.appendChild(text);
@@ -396,7 +399,7 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride) const
 bool
 TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const
 {
-    QByteArray xml = toByteArray(mainWindow, ride);
+    QByteArray xml = toByteArray(mainWindow, ride, true, true, true, true);
 
     if (!file.open(QIODevice::WriteOnly)) return(false);
     if (file.write(xml) != xml.size()) return(false);
