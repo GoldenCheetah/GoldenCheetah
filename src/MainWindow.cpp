@@ -565,7 +565,11 @@ MainWindow::MainWindow(const QDir &home) :
     // we need to connect the search box on Linux/Windows
 #if !defined (Q_OS_MAC) && defined (GC_HAVE_LUCENE)
     connect(searchBox, SIGNAL(searchResults(QStringList)), listView, SLOT(searchStrings(QStringList)));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), gcCalendar, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), gcMultiCalendar, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), listView, SLOT(clearSearch()));
+    connect(searchBox, SIGNAL(searchClear()), gcCalendar, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchClear()), gcMultiCalendar, SLOT(clearFilter()));
 #endif
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(cyclist, GC_NAVHEADINGS, "").toString() != "") {
@@ -2773,9 +2777,13 @@ MainWindow::searchTextChanged(QString text)
     // clear or set...
     if (text == "") {
         listView->clearSearch();
+        gcCalendar->clearFilter();
+        gcMultiCalendar->clearFilter();
     } else {
         lucene->search(text);
         listView->searchStrings(lucene->files());
+        gcCalendar->setFilter(lucene->files());
+        gcMultiCalendar->setFilter(lucene->files());
     }
 #endif
 }

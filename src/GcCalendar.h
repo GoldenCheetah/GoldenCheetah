@@ -38,10 +38,10 @@ class GcLabel : public QLabel
     Q_OBJECT
 
     int xoff, yoff;
-    bool bg, selected; // bg = highlighted, selected = user selected too
+    bool bg, selected, filtered; // bg = highlighted, selected = user selected too
 
 public:
-    GcLabel(const QString & text, QWidget * parent = 0) : QLabel(text, parent), xoff(0), yoff(0), bg(false), selected(false), bgColor(Qt::lightGray) {}
+    GcLabel(const QString & text, QWidget * parent = 0) : QLabel(text, parent), xoff(0), yoff(0), bg(false), selected(false), filtered(false), bgColor(Qt::lightGray) {}
     ~GcLabel(){}
  
 signals:
@@ -54,6 +54,7 @@ public slots:
     bool getBg() { return bg; }
     void setBgColor(QColor bg) { bgColor = bg; }
     void setSelected(bool x) { selected = x; }
+    void setFiltered(bool x) { filtered = x; }
     bool event(QEvent *e);
 
 protected:
@@ -75,6 +76,9 @@ class GcMiniCalendar : public QWidget
         void setDate(int month, int year);
         void getDate(int &_month, int &_year) { _month = month; _year = year; }
         void clearRide();
+
+        void setFilter(QList<QString> filter);
+        void clearFilter();
 
     public slots:
 
@@ -109,6 +113,8 @@ class GcMiniCalendar : public QWidget
         QList<FieldDefinition> fieldDefinitions;
         GcCalendarModel *calendarModel;
         bool master;
+
+        QList<QString> filters;
 };
 
 class GcMultiCalendar : public QScrollArea
@@ -124,6 +130,9 @@ class GcMultiCalendar : public QScrollArea
         void dateChanged(int month, int year);
         void setRide(RideItem *ride);
         void resizeEvent(QResizeEvent*);
+        void setFilter(QList<QString> filter);
+        void clearFilter();
+
 
     private:
         QVBoxLayout *layout;
@@ -146,6 +155,9 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         void setRide(RideItem *ride);
         void refresh(); 
         void setSummary(); // set the summary at the bottom
+
+        void setFilter(QList<QString> filters) { multiCalendar->setFilter(filters);}
+        void clearFilter() { multiCalendar->clearFilter();}
 
     signals:
         void dateRangeChanged(DateRange);
