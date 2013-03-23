@@ -42,7 +42,24 @@ will also include TSS as a metric you can override here.
 to allow it to be shown.  This is simple to do and described in 3.9
 below.
 
-1.2 Can I enter my weight and track/plot it?
+1.2 How do I add or remove a chart?
+===================================
+
+To add a new chart to the view you can select from the + menu on the
+right hand side of the scope bar (the scope bar is underneath the
+toolbar and lets you select from Home, Analysis, Train etc).
+
+   Depending upon which view you are on the charts available will
+differ. For example realtime plots only appear on the Train view,
+whilst charts that work with individual rides will only appear on the
+analysis view.
+
+   To remove a chart, when you mouse over a chart (in tabbed or tiled
+mode) a small triangle will appear in the top left of the chart. This
+is a menu drop down, if you click on it you will see a `Close' option.
+This is the option to remove (close) the chart.
+
+1.3 Can I enter my weight and track/plot it?
 ============================================
 
 Weight can be maintained in 3 ways;
@@ -67,7 +84,7 @@ athlete.
    The weight from withings and weight from the activity can both be
 plotted separately in the LTM plots.
 
-1.3 How do I plot x sec power best?
+1.4 How do I plot x sec power best?
 ===================================
 
 As of v3.0 it is still not possible to plot custom durations for power
@@ -75,7 +92,7 @@ bests. We are looking to add this in version 3.1, but for now you can
 only plot 1s, 5s, 10s, 15s, 20s, 30s, 1min, 2min, 5min, 10min, 20min,
 30min and 60min bests.
 
-1.4 I can't find Aerolab / Performance Manager?
+1.5 I can't find Aerolab / Performance Manager?
 ===============================================
 
 By default we do not add these charts to the layout. Aerolab can be
@@ -87,7 +104,7 @@ via the '+' menu. We may deprecate this chart in the near future since
 the LTM charts can be used to plot a PMC and we expect to implement an
 interactive PMC for planning in v3.1.
 
-1.5 What happened to weekly summary?
+1.6 What happened to weekly summary?
 ====================================
 
 It has been deprecated since the Diary view allows you to summarise by
@@ -101,7 +118,7 @@ summary - they offer the same functionality. We expect the diary view
 to extend to planned workouts when we implement planning functionality
 in v3.1.
 
-1.6 Where are all the chart settings?
+1.7 Where are all the chart settings?
 =====================================
 
 All chart settings can be found under the drop down menu that appears
@@ -112,7 +129,16 @@ will appear as a popup dialog box.
 in a view that is tabbed (not tiled) then a small selection of the most
 important settings for the chart will appear for convenience.
 
-1.7 How do I change the colour of the rides on the calendar/list?
+1.8 Where is the preferences / options panel?
+=============================================
+
+On a Mac the configurations page can be found under 'GoldenCheetah ->
+Preferences' on the main menu. Whilst on all other platforms it is
+found via 'Tools -> Options'.
+
+   We do this to match the general guidelines for the operating system.
+
+1.9 How do I change the colour of the rides on the calendar/list?
 =================================================================
 
 Activities are coloured according to keywords embedded in their details
@@ -666,21 +692,23 @@ Index
  [index ]
 * Menu:
 
+* add:                                   MOST COMMON QUESTIONS OF ALL.
+                                                              (line  21)
 * adhoc:                                 SEASONS AND EVENTS.  (line   9)
 * Aerolab <1>:                           CHARTS.              (line  33)
 * Aerolab:                               MOST COMMON QUESTIONS OF ALL.
-                                                              (line  54)
+                                                              (line  71)
 * algorithm:                             CHARTS.              (line  19)
 * anomalies:                             DATA.                (line  23)
 * AP:                                    METRICS.             (line  81)
 * best:                                  MOST COMMON QUESTIONS OF ALL.
-                                                              (line  46)
+                                                              (line  63)
 * bug:                                   GENERAL.             (line  66)
 * Chung:                                 CHARTS.              (line  33)
 * clone:                                 GENERAL.             (line  40)
 * colour <1>:                            CHARTS.              (line  84)
 * colour:                                MOST COMMON QUESTIONS OF ALL.
-                                                              (line  91)
+                                                              (line 117)
 * contribute:                            GENERAL.             (line  73)
 * CP <1>:                                CHARTS.              (line  19)
 * CP:                                    METRICS.             (line  22)
@@ -711,16 +739,22 @@ Index
 * merge:                                 DATA.                (line   9)
 * month:                                 CHARTS.              (line   9)
 * NP:                                    METRICS.             (line   9)
+* options:                               MOST COMMON QUESTIONS OF ALL.
+                                                              (line 108)
 * override:                              METRICS.             (line 111)
 * PMC <1>:                               METRICS.             (line  64)
 * PMC:                                   MOST COMMON QUESTIONS OF ALL.
-                                                              (line  54)
+                                                              (line  71)
+* preferences:                           MOST COMMON QUESTIONS OF ALL.
+                                                              (line 108)
 * prior:                                 CHARTS.              (line   9)
 * PWX:                                   DATA.                (line  88)
+* remove:                                MOST COMMON QUESTIONS OF ALL.
+                                                              (line  21)
 * report:                                GENERAL.             (line  66)
 * season:                                SEASONS AND EVENTS.  (line   9)
 * settings:                              MOST COMMON QUESTIONS OF ALL.
-                                                              (line  80)
+                                                              (line  97)
 * source:                                GENERAL.             (line  40)
 * spikes:                                DATA.                (line  23)
 * split:                                 DATA.                (line   9)
@@ -740,9 +774,9 @@ Index
                                                               (line   9)
 * VE:                                    CHARTS.              (line  33)
 * weekly summary:                        MOST COMMON QUESTIONS OF ALL.
-                                                              (line  66)
+                                                              (line  83)
 * weight:                                MOST COMMON QUESTIONS OF ALL.
-                                                              (line  21)
+                                                              (line  38)
 * xPower:                                METRICS.             (line   9)
 * zoom:                                  CHARTS.              (line  97)
 
@@ -751,12 +785,12 @@ Index
 Tag Table:
 Node: Top167
 Node: MOST COMMON QUESTIONS OF ALL612
-Node: GENERAL4989
-Node: METRICS8636
-Node: DATA15662
-Node: UPLOADING AND DOWNLOADING19619
-Node: SEASONS AND EVENTS21391
-Node: CHARTS22250
-Node: INDEX27079
+Node: GENERAL6071
+Node: METRICS9718
+Node: DATA16744
+Node: UPLOADING AND DOWNLOADING20701
+Node: SEASONS AND EVENTS22473
+Node: CHARTS23332
+Node: INDEX28161
 
 End Tag Table

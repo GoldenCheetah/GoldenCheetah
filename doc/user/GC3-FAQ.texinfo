@@ -59,8 +59,22 @@ From v3.0 the default setup will also include TSS as a metric you can override h
 If the metric is not there you will need to configure GoldenCheetah to allow it to be shown.
 This is simple to do and described in 3.9 below.
 
+@section How do I add or remove a chart?
+@cindex add
+@cindex remove
 
- 
+To add a new chart to the view you can select from the + menu on the right hand side of 
+the scope bar (the scope bar is underneath the toolbar and lets you select from Home,
+Analysis, Train etc).
+
+Depending upon which view you are on the charts available will differ. For example realtime
+plots only appear on the Train view, whilst charts that work with individual rides will only
+appear on the analysis view.
+
+To remove a chart, when you mouse over a chart (in tabbed or tiled mode) a small triangle
+will appear in the top left of the chart. This is a menu drop down, if you click on it
+you will see a `Close' option. This is the option to remove (close) the chart.
+
 @section Can I enter my weight and track/plot it?
 @cindex weight
 
@@ -132,6 +146,14 @@ Additionally, when you move the cursor towards the title of a chart in a view th
 (not tiled) then a small selection of the most important settings for the chart will appear
 for convenience.
 
+@section Where is the preferences / options panel?
+@cindex preferences
+@cindex options
+
+On a Mac the configurations page can be found under 'GoldenCheetah -> Preferences' on the
+main menu. Whilst on all other platforms it is found via 'Tools -> Options'.
+
+We do this to match the general guidelines for the operating system.
 
 @section How do I change the colour of the rides on the calendar/list?
 @cindex colour
