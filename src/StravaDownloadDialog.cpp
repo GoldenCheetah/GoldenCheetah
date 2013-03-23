@@ -112,7 +112,7 @@ StravaDownloadDialog::requestRideDetail()
 {
     show();
 
-    tmp = new QTemporaryFile(mainWindow->home.absoluteFilePath(".download."+activityId+".XXXXXX.strava"));
+    tmp = new QTemporaryFile(QDir(QDir::tempPath()).absoluteFilePath(".download."+activityId+".XXXXXX.strava"));
     //QString tmpl = mainWindow->home.absoluteFilePath(".download.XXXXXX."+activityId+".strava"); //
     //tmp.setFileTemplate(tmpl);
     tmp->setAutoRemove(true);
