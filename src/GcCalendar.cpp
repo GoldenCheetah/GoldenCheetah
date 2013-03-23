@@ -185,7 +185,9 @@ GcLabel::paintEvent(QPaintEvent *)
             painter.drawText(off, alignment(), text());
         }
 
-        painter.setPen(QColor(0,0,0,170));
+        if (filtered) painter.setPen(QColor(180,0,0,255));
+        else painter.setPen(QColor(0,0,0,170));
+
         painter.drawText(norm, alignment(), text());
     } else {
 
@@ -196,6 +198,13 @@ GcLabel::paintEvent(QPaintEvent *)
         icon.paint(&painter, all, alignment|Qt::AlignVCenter);
     }
 
+    if (text() != ""  && filtered) {
+        QPen pen;
+        pen.setColor(QColor(180,0,0,255));
+        pen.setWidth(2);
+        painter.setPen(pen);
+        painter.drawRect(QRect(0,0,width(),height()));
+    }
     painter.restore();
 }
 
@@ -707,6 +716,18 @@ GcMiniCalendar::clearRide()
 }
 
 void
+GcMiniCalendar::setFilter(QList<QString>filter)
+{
+    filters = filter;
+}
+
+void
+GcMiniCalendar::clearFilter()
+{
+    filters.clear();
+}
+
+void
 GcMiniCalendar::setDate(int _month, int _year)
 {
 
@@ -725,6 +746,12 @@ GcMiniCalendar::setDate(int _month, int _year)
             GcLabel *d = dayLabels.at(row*7+col);
             QModelIndex p = calendarModel->index(row,col);
             QDate date = calendarModel->date(p);
+
+            // filtered dates surrounded in light blue
+            d->setFiltered(false);
+            foreach (QString file, calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList()) {
+                if (filters.contains(file)) d->setFiltered(true);
+            }
 
             if (date.month() != month || date.year() != year) {
                 d->setText("");
@@ -795,12 +822,39 @@ GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(mai
 }
 
 void
+GcMultiCalendar::setFilter(QList<QString>filter)
+{
+    for (int i=0; i<calendars.count();i++) {
+        calendars.at(i)->setFilter(filter);
+    }
+
+    // refresh
+    int month, year;
+    calendars.at(0)->getDate(month,year);
+    dateChanged(month,year);
+}
+
+void
+GcMultiCalendar::clearFilter()
+{
+    for (int i=0; i<calendars.count();i++) {
+        calendars.at(i)->clearFilter();
+    }
+
+    // refresh
+    int month, year;
+    calendars.at(0)->getDate(month,year);
+    dateChanged(month,year);
+}
+
+void
 GcMultiCalendar::dateChanged(int month, int year)
 {
     setUpdatesEnabled(false);
 
     // master changed make all the others change too
     QDate date(year,month,01);
+    calendars.at(0)->setDate(month, year);
     for (int i=1; i<calendars.count();i++) {
         QDate ours = date.addMonths(i);
         calendars.at(i)->setDate(ours.month(), ours.year());
