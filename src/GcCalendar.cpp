@@ -17,6 +17,7 @@
  */
 
 #include "GcCalendar.h"
+#include "GcWindowLayout.h"
 #include "Settings.h"
 #include <QWebSettings>
 #include <QWebFrame>
@@ -798,17 +799,12 @@ GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(mai
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setContentsMargins(0,0,0,0);
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(10,10,0,0);
 
     setFrameStyle(QFrame::NoFrame);
 
-    layout = new QVBoxLayout;
+    layout = new GcWindowLayout(this, 0, 4, 0);
     layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,0);
-    mainLayout->addLayout(layout);
-    mainLayout->addStretch();
+    layout->setContentsMargins(10,10,0,0);
 
     QPalette pal;
     pal.setColor(QPalette::Window, Qt::white);
@@ -827,6 +823,8 @@ GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(mai
 void
 GcMultiCalendar::setFilter(QStringList filter)
 {
+    this->filters = filter;
+
     for (int i=0; i<calendars.count();i++) {
         calendars.at(i)->setFilter(filter);
     }
@@ -840,6 +838,8 @@ GcMultiCalendar::setFilter(QStringList filter)
 void
 GcMultiCalendar::clearFilter()
 {
+    this->filters.clear();
+
     for (int i=0; i<calendars.count();i++) {
         calendars.at(i)->clearFilter();
     }
@@ -868,21 +868,28 @@ GcMultiCalendar::dateChanged(int month, int year)
 void
 GcMultiCalendar::resizeEvent(QResizeEvent*)
 {
-    showing = height() < 180 ? 1 : height() / 180;
+    // we expand x and y
+    showing = height() < 180 ? 1 : (int)(height() / 180);
+    showing *= width() < 180 ? 1 : (int)(width() / 180);
+
     int have = calendars.count();
 
     if (showing > calendars.count()) {
 
         for (int i=have; i<showing; i++) {
             GcMiniCalendar *mini = new GcMiniCalendar(main, false);
+            mini->setFilter(this->filters);
             calendars.append(mini);
-            layout->insertWidget(i, mini);
+            layout->insert(i, mini);
         }
         
     } else {
 
         for (int i=0; i<have; i++) {
-            if (i<showing) calendars.at(i)->show();
+            if (i<showing) {
+                calendars.at(i)->setFilter(this->filters);
+                calendars.at(i)->show();
+            }
             else calendars.at(i)->hide();
         }
     }
