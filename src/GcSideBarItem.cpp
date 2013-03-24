@@ -264,14 +264,6 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     titleLayout->addWidget(titleLabel);
     titleLayout->addStretch();
 
-    titleToolbar = new QToolBar(this);
-    titleToolbar->setFixedHeight(23);
-    titleToolbar->setIconSize(QSize(10,10));
-    titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    titleToolbar->setAutoFillBackground(false);
-
-    titleLayout->addWidget(titleToolbar);
-
     setCursor(Qt::ArrowCursor);
 }
 
@@ -288,15 +280,23 @@ GcSplitterHandle::splitter() const
 }
 
 void
-GcSplitterHandle::addAction(QAction *action)
+GcSplitterHandle::addAction(QAction *)
 {
-    titleToolbar->addAction(action);
+    //not used anyway titleToolbar->addAction(action);
 }
 
 void
 GcSplitterHandle::addActions(QList<QAction*> actions)
 {
-    titleToolbar->addActions(actions);
+    foreach(QAction *action, actions) {
+        QPushButton *p = new QPushButton(action->icon(), "", this);
+        p->setAutoFillBackground(false);
+        p->setFlat(true);
+        p->setFixedSize(20,20);
+        p->setIconSize(QSize(10,10));
+        titleLayout->addWidget(p);
+        connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
+    }
 }
 
 void

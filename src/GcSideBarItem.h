@@ -110,7 +110,6 @@ private:
 
     QHBoxLayout *titleLayout;
     GcLabel *titleLabel;
-    QToolBar *titleToolbar;
 
     QString title;
     int fullHeight;
