@@ -294,6 +294,7 @@ GcSplitterHandle::addActions(QList<QAction*> actions)
         p->setFlat(true);
         p->setFixedSize(20,20);
         p->setIconSize(QSize(10,10));
+        p->setFocusPolicy(Qt::NoFocus);
         titleLayout->addWidget(p);
         connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
     }
