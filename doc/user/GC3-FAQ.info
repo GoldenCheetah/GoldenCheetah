@@ -695,11 +695,11 @@ Index
 * add:                                   MOST COMMON QUESTIONS OF ALL.
                                                               (line  21)
 * adhoc:                                 SEASONS AND EVENTS.  (line   9)
-* Aerolab <1>:                           CHARTS.              (line  33)
-* Aerolab:                               MOST COMMON QUESTIONS OF ALL.
+* Aerolab <1>:                           MOST COMMON QUESTIONS OF ALL.
                                                               (line  71)
+* Aerolab:                               CHARTS.              (line  33)
 * algorithm:                             CHARTS.              (line  19)
-* anomalies:                             DATA.                (line  23)
+* anomalies:                             DATA.                (line  38)
 * AP:                                    METRICS.             (line  81)
 * best:                                  MOST COMMON QUESTIONS OF ALL.
                                                               (line  63)
@@ -710,22 +710,23 @@ Index
 * colour:                                MOST COMMON QUESTIONS OF ALL.
                                                               (line 117)
 * contribute:                            GENERAL.             (line  73)
-* CP <1>:                                CHARTS.              (line  19)
-* CP:                                    METRICS.             (line  22)
+* CP <1>:                                METRICS.             (line  22)
+* CP <2>:                                CHARTS.              (line  19)
+* CP:                                    METRICS.             (line  50)
 * CSV:                                   DATA.                (line  88)
 * CTL:                                   METRICS.             (line  64)
 * cycle:                                 SEASONS AND EVENTS.  (line   9)
 * Daniels:                               METRICS.             (line   9)
 * donate:                                GENERAL.             (line  85)
-* download <1>:                          UPLOADING AND DOWNLOADING.
+* download <1>:                          GENERAL.             (line  31)
+* download:                              UPLOADING AND DOWNLOADING.
                                                               (line  16)
-* download:                              GENERAL.             (line  31)
 * elevation:                             METRICS.             (line  72)
 * EqP:                                   METRICS.             (line   9)
 * event:                                 SEASONS AND EVENTS.  (line  18)
 * feature:                               GENERAL.             (line  66)
 * FITLOG:                                DATA.                (line  88)
-* FTP:                                   METRICS.             (line  22)
+* FTP:                                   METRICS.             (line  50)
 * Garmin Connect:                        METRICS.             (line  81)
 * github:                                GENERAL.             (line  40)
 * Google:                                UPLOADING AND DOWNLOADING.
@@ -763,7 +764,7 @@ Index
 * TCX:                                   DATA.                (line  88)
 * trainer:                               METRICS.             (line  50)
 * TrainingPeaks:                         UPLOADING AND DOWNLOADING.
-                                                              (line   9)
+                                                              (line  16)
 * treemap:                               CHARTS.              (line  77)
 * triathlete:                            GENERAL.             (line  47)
 * TSS <1>:                               METRICS.             (line  81)
@@ -778,7 +779,7 @@ Index
 * weight:                                MOST COMMON QUESTIONS OF ALL.
                                                               (line  38)
 * xPower:                                METRICS.             (line   9)
-* zoom:                                  CHARTS.              (line  97)
+* zoom:                                  CHARTS.              (line 109)
 
 
 
