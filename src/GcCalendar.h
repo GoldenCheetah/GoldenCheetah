@@ -32,6 +32,8 @@
 
 #include "GcSideBarItem.h"
 
+class GcWindowLayout;
+
 // Catch signal, no background and do embossed text
 class GcLabel : public QLabel
 {
@@ -135,10 +137,11 @@ class GcMultiCalendar : public QScrollArea
 
 
     private:
-        QVBoxLayout *layout;
+        GcWindowLayout *layout;
         QVector<GcMiniCalendar*> calendars;
         MainWindow *main;
         int showing;
+        QStringList filters;
 };
 
 class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
