@@ -54,6 +54,12 @@ RideMetadata::RideMetadata(MainWindow *parent, bool singlecolumn) :
     tabs->setMovable(true);
     tabs->setPalette(palette);
     tabs->setAutoFillBackground(false);
+#ifdef WIN32
+    tabs->setStyleSheet("QTabWidget::pane { "
+		    " margin: 0px,0px,0px,0px;"
+		    " border: 0px;"
+		    " border-top: 0px; }");
+#endif
     mainLayout->addWidget(tabs);
 
     // read in metadata.xml and setup the tabs etc
