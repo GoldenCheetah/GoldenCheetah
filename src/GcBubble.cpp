@@ -175,6 +175,9 @@ GcBubble::paintEvent(QPaintEvent *)
     // Init paint settings
     QPainter painter(this);
 
+    // we need smooth curves
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
+
     // outline border, adjust to offset, for now we outline
     painter.setBrush(Qt::NoBrush);
     QColor shadow = QColor(0,0,0,alpha);
