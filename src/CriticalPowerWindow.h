@@ -60,7 +60,7 @@ class CriticalPowerWindow : public GcChartWindow
         CriticalPowerWindow(const QDir &home, MainWindow *parent, bool range = false);
 
         // reveal
-        bool hasReveal() { return true; }
+        bool hasReveal() { return false; }
 
         void deleteCpiFile(QString filename);
 
