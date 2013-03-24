@@ -60,6 +60,12 @@
 
 %%
 
+// Older versions of flex (prior to 2.5.9) do not have the destroy function
+// Or We're not using GNU flex then we also won't have a destroy function
+#if !defined(FLEX_SCANNER) || (YY_FLEX_SUBMINOR_VERSION < 9)
+int DataFilterlex_destroy(void) { return 0; }
+#endif
+
 void DataFilter_setString(QString p)
 {
     DataFilter_scan_string(p.toLatin1().data());
