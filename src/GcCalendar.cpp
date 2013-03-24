@@ -275,8 +275,7 @@ GcCalendar::setSummary()
             break;
     }
 
-    if (newFrom == from && newTo == to) return;
-    else {
+    if (newFrom != from || newTo != to) {
 
         // date range changed lets refresh
         from = newFrom;
@@ -368,16 +367,19 @@ GcCalendar::setSummary()
 
         // set webview contents
         summary->page()->mainFrame()->setHtml(summaryText);
-
-        // tell everyone the date range changed
-        QString name;
-        if (summarySelect->currentIndex() == 0) name = tr("Day of ") + from.toString("dddd MMMM d");
-        else if (summarySelect->currentIndex() == 1) name = QString(tr("Week Commencing %1")).arg(from.toString("dddd MMMM d"));
-        else if (summarySelect->currentIndex() == 2) name = from.toString(tr("MMMM yyyy"));
-        
-        emit dateRangeChanged(DateRange(from, to, name));
-
     }
+
+    // we always tell everyone the date range changed
+    QString name;
+
+    if (summarySelect->currentIndex() == 0)
+        name = tr("Day of ") + from.toString("dddd MMMM d");
+    else if (summarySelect->currentIndex() == 1)
+        name = QString(tr("Week Commencing %1")).arg(from.toString("dddd MMMM d"));
+    else if (summarySelect->currentIndex() == 2)
+        name = from.toString(tr("MMMM yyyy"));
+
+    emit dateRangeChanged(DateRange(from, to, name));
 }
 
 //********************************************************************************
