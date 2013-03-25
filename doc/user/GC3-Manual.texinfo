@@ -55,11 +55,12 @@ In this manual we will be explaining how to use and configure the functions with
 We will be describing it from the perspective of a bike rider. In all cases we will be describing
 how the functions within GoldenCheetah work, and how to configure them.
  
-This is not a manual on how to train with power. We would urge you to read other books
-for that kind of information (and would recommend `Racing and Training with a Power Meter' by
+This is not a manual on how to train with power. We would urge you to read other books for that
+kind of information and would recommend `Racing and Training with a Power Meter' by
 Dr Andrew Coggan and Hunter Allan.
  
 @section About this latest version, V3.0
+
 This manual has been written as a companion to the latest release of GoldenCheetah, v3.0.
 Released in Spring 2013, it represented an overhaul of the code and was a major update.
  
@@ -83,7 +84,7 @@ initial help screens for new users through to the redesigned preferences
 pane for advanced users, it is slicker and more professional.
  
 There are 4 views available with specific and detailed sidebars for
-peformancee tracking (home), short term tracking (diary) as well as
+performance tracking (home), short term tracking (diary) as well as
 the well known analysis and training views from earlier releases.
  
 It now allows you to view charts tabbed and tiled, you can resize and
@@ -138,7 +139,7 @@ your ANT+ powermeter on your Computrainer, Kickr or Fortius.
  
 @heading Advanced search and data filtering
  
-It introduces free text search across all ativities and a data filter (using the same search box)
+It introduces free text search across all activities and a data filter (using the same search box)
 to filter activities with specific properties. Some examples of using the filter might be
 finding all rides with a TSS > 300 or perhaps those with an IF >0.9 and a duration of > 1hr.
  
@@ -158,7 +159,7 @@ xPower, VAM and NP.
 @heading New metrics, including TrainingPeaks' TSS and NP
  
 The TrainingPeaks metrics have been added to both the analysis functions as well as the
-training funcitons (e.g. track TSS as you ride the trainer).
+training functions (e.g. track TSS as you ride the trainer).
  
 There are now over 100 different metrics and measures you can work with including things
 like; Pace, Maximums, Gradient, VAM, wpk, time in HR Zones and many, many more.
@@ -175,7 +176,7 @@ people have contributed new features and fixes in the 7 years since then.
 @heading Mailing list
  
 As you would expect there is an active community of users and developers, you can join the
-discussion and contribute. The main GoldenCheetah website is http://www.goldencheetah.org
+discussion and contribute. The main GoldenCheetah website is @url{www.goldencheetah.org}
 and the main mailing list is hosted on Google Groups and is called golden-cheetah-users.
  
 @heading Reporting bugs and requesting new features
@@ -184,7 +185,7 @@ The code is hosted in a repository at GitHub. Github is an internet service host
 source and commercial code repositories for thousands of projects. In addition to hosting
 projects GitHub also provides an issue tracker.
  
-The issue tracker URL is: https://github.com/GoldenCheetah/GoldenCheetah/issues
+The issue tracker URL is: @url{github.com/GoldenCheetah/GoldenCheetah/issues}.
  
 We use the GitHub issue tracker to manage all bug reports and feature requests. If you are
 looking for a new feature or have experienced a problem using the software then you should
@@ -263,24 +264,123 @@ Version 3.1, hopefully, will not take so long to come to fruition and is current
 @c ********************************************************************************
 @chapter QUICK START GUIDE
 @node QUICK
+
+For those of you that are new to GoldenCheetah this section gets you up and running
+with the software and using its basic features. For those of you with experience of
+GoldenCheetah from previous releases, you might like to skip this chapter.
  
-@section downloading and installing
-downloading, installing, 
+@section Downloading and Installing
+There are four ways to get GoldenCheetah onto your PC and available for use:
+@itemize @bullet
+
+@item @strong{Download a Stable release build} - We maintain a stable release binary for download and installation
+on the GoldenCheetah website, at @url{www.goldencheetah.org/download}.
+
+@item @strong{Download a Development build}  - We also provide regular build updated of the
+very latest code on the GoldenCheetah development build website, at @url{www.stand2surf.net}.
+
+@item @strong{Build from Source} - Since we provide the source code for the program
+you can get the source from GitHub and build your own.  But unless you plan on
+contributing to the project this is probably a pointless exercise. You
+could just use the pre-built binaries described above.
+
+@item @strong{Apt-get install} - If you are running a Linux distro you can get the GoldenCheetah
+binary and dependencies installed via apt-get. It is worth noting that at the time of writing
+the V3 build has not yet been packaged.
+
+@end itemize
+
+Once you have the binary installed you can go ahead and run it, it doesn't need any
+configuration before you start.
  
-@section basic configuration
-open up with running for the first time, adding an athlete, bank state screens et
-setting seasons, CP, LTHR
+@section Running for the first time
+
+When you run GoldenCheetah for the very first time it will prompt you with the Athlete 
+selection dialog box. In GoldenCheetah we allow you to create as many athletes as you
+like. This may sound like it is only useful for coaches, but in fact you may want to
+set up a scratch athlete to play and learn.
+
+Either way in this first run you will not have an athlete created, and will see a blank
+dialog, asking you to select or create an athlete to work with:
+
+@vskip 12pt
+@center @image{"image/1-noathlete",140pt}
+@center @emph{Figure 1: Initial Dialog}
+@vskip 6pt
+
+At this point you should go ahead and click 'New...'. This will open another dialog
+window to create a new athlete and set some basic data. 
+
+@vskip 12pt
+@center @image{"image/1-newathlete",140pt}
+@center @emph{Figure 2: New Athlete Dialog}
+@vskip 6pt
+
+Whilst it is possible to configure these values in preferences or within an individual activity
+you should go ahead and set up as much of the data as accurately as possible. These values
+are used as defaults in many metric calculations. 
+
+If you click on the blank athlete icon on the right it is possible to set an image for the athlete
+too. This isn't used anywhere at present, but that may change in the future.
+
+The LTHR value is the HR at which the onset of blood lactate accumulates, whilst the CP value is
+the maximum theoretical watts you can hold for an hour. It is very similar to your FTP (if that
+is a term you understand).
+
+Once you're happy with the settings click save and you will then be able to select your new athlete
+in that initial dialog (except of course there is now an athlete listed). Go ahead and open that
+athlete and you wil be greeted with GoldenCheetah, but a splash page.
+
+@vskip 12pt
+@center @image{"image/1-blankstate",280pt}
+@center @emph{Figure 3: Analysis view splash screen}
+@vskip 6pt
+
+This page is shown because there is no data associated with this athlete. We need to go ahead and
+download some data from your bike computer or import some data from disk or USB.
+
+@section Downloading a ride from device
+
+If you use a Powertap, SRM, Joule, Joule GPS or Macro-X device you will be able to download from
+it directly. Please make sure the device is conected and plugged in correctly. For example, if you
+are downloading from a Powertap please make sure the computer is firmly connected and displays
+'HOST' on its screen.
+
+@vskip 12pt
+@center @image{"image/1-download",210pt}
+@center @emph{Figure 4: Download Dialog}
+@vskip 6pt
+
+To start the download go ahead and click the download from device button. This will open up the 
+download dialog. Select the right kind of device and serial port before clicking on the 'Download'
+button. If no serial port is listed, or the port is not correct you can click on the 'Rescan' 
+button to look again for your device. This is sometimes required if you click on 'Download' before
+the device is connected.
+
+Any ride files will then be downloaded and imported into GoldenCheetah and the splash screen will
+disappear to reveal the Analysis view of GoldenCheetah. Congratulations - you can now start using
+GoldenCheetah to analyse and track your performance.
  
-@section importing a ride from device
-download dialog
+@section Importing data from file 
+
+To import files into GoldenCheetah you have a couple of options. You can drag and drop them from 
+a file explorer or from the desktop into the main GoldenCheetah window, or you can select them via 
+the import files button on the splash screen.  Once you have done either the import activity 
+wizard will appear to process the selected files.
+
+@vskip 12pt
+@center @image{"image/1-import",280pt}
+@center @emph{Figure 4: Import Activity Wizard}
+@vskip 6pt
+
+You will notice that the files are opened first to ensure you have the required permissions to 
+read them before being validated. Once validated the dialog will prompt you to edit any of the dates 
+(some file formats do not include date information). Once you have set the dates (if needed) you can 
+click on save to complete the import and save the files to disk.
  
-@section importing data from file or other applications
-drag and drop
- 
-@section uploading and sending your data
-upload to TP.com, export file
- 
- 
+The splash screen will now disapper and reveal the main GoldenCheetah analysis view and you can
+now start analysing and tracking your performance.
+
 @c ********************************************************************************
 @c Basic Navigation
 @c ********************************************************************************
