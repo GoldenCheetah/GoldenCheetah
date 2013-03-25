@@ -3,6 +3,7 @@
 @setfilename FAQ.texinfo
 @settitle Golden Cheetah FAQ
 @c %**end of header
+@paragraphindent 0
 
 @copying
 This manual is for Golden Cheetah, version 3.0.
@@ -80,16 +81,19 @@ you will see a `Close' option. This is the option to remove (close) the chart.
 
 Weight can be maintained in 3 ways;
 
-    i. Every athlete is setup with a weight value -- this is the fallback value should no
+@itemize @bullet
+
+@item Every athlete is setup with a weight value -- this is the fallback value should no
     other weight measure be available. It can be found under preferences and athlete.
 
-    ii. The 'Weight' field can be maintained in the details screen. This is found on the 
+@item The 'Weight' field can be maintained in the details screen. This is found on the 
     'Workout' tab in the details screen by default. Any entry here will be used for this ride
     ONLY.
 
-    iii. You can download weight from a withings scale. This is performed manually via the
+@item You can download weight from a withings scale. This is performed manually via the
     menu option Tools->Get Withings Data. This is then used to update the local measures
     database.
+@end itemize
 
 When calculating W/KG the Activity value is used if present, if not we then fall back to
 the last Withing measure that was collected, and if that is not available we then fall

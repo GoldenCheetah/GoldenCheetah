@@ -3,6 +3,7 @@
 @setfilename Release Notes.texinfo
 @settitle Golden Cheetah v3.0 Release Notes
 @c %**end of header
+@paragraphindent 0
 
 @titlepage
 @title Golden Cheetah v3.0 Release Notes
