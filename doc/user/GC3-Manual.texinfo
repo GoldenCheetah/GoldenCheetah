@@ -3,6 +3,7 @@
 @setfilename GC3-Manual.texinfo
 @settitle Golden Cheetah User Manual
 @c %**end of header
+@paragraphindent 0
  
 @copying
 This manual is for Golden Cheetah, version 3.0.
