@@ -1,0 +1,18 @@
+@c gnupress.tex -- Common Texinfo macros for GNU Press books.
+@c
+@c Print in 7" x 9.25" format.
+@smallbook
+@advance@voffset by -0.25in
+@special{papersize=7in,9.25in}
+@c
+@c Since we are using @smallbook, we ought to use @smallfonts
+@tex
+\global\let\lisporig=\lisp
+\gdef\lisp{\smallexamplefonts\lisporig}%
+\global\let\exampleorig=\example
+\gdef\example{\smallexamplefonts\exampleorig}%
+\global\let\displayorig=\display
+\gdef\display{\smallexamplefonts\displayorig}%
+\global\let\formatorig=\format
+\gdef\format{\smallexamplefonts\formatorig}%
+@end tex

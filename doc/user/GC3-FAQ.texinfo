@@ -1,4 +1,5 @@
 \input texinfo   @c -*-texinfo-*-
+@input palatino
 @c %**start of header
 @setfilename FAQ.texinfo
 @settitle Golden Cheetah FAQ

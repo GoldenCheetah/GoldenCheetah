@@ -1,4 +1,5 @@
 \input texinfo   @c -*-texinfo-*-
+@input palatino
 @c %**start of header
 @setfilename Release Notes.texinfo
 @settitle Golden Cheetah v3.0 Release Notes

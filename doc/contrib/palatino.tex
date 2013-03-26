@@ -1,0 +1,161 @@
+@c palatino.tex -- TeXinfo macros to set the default Roman font to Palatino
+@c
+@def@palatinoversion{2003-04-01.00}
+@c
+@c Copyright (C) 2003  Free Software Foundation, Inc.
+@c
+@c This palatino.tex file is free software; you can redistribute it and/or
+@c modify it under the terms of the GNU General Public License as
+@c published by the Free Software Foundation; either version 2, or (at
+@c your option) any later version.
+@c
+@c This palatino.tex file is distributed in the hope that it will be
+@c useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+@c of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+@c General Public License for more details.
+@c
+@c You should have received a copy of the GNU General Public License
+@c along with this texinfo.tex file; see the file COPYING.  If not, write
+@c to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+@c Boston, MA 02111-1307, USA.
+@c
+@c You should use this module, go to your root .texi file and make sure
+@c it reads like this:
+@c     \input texinfo  @c -*-texinfo-*-
+@c     @input palatino
+
+@message{Loading palatino [version @palatinoversion]:}
+
+@c Turn on the normal TeX command characters.
+@catcode`\=0
+\catcode`\%=14
+% Set the font macro #1 to the font named #2#3. #4 is the point size.
+% We save \setfont as \setfontorig, so we can restore it at the end of this
+% section.
+\catcode`\#=6
+\let\setfontorig=\setfont
+\def\setfont#1#2#3#4{\font#1=#2#3 at #4}
+\catcode`\#=\other
+
+% Set Palatino as the default roman font face
+\def\rmfontprefix{ppl}
+
+% Only define roman font attributes here.
+\def\rmshape{r}
+\def\rmbshape{b}
+\def\bfshape{b}
+\def\bxshape{b}
+\def\itshape{ri}
+\def\itbshape{bi}
+\def\slshape{ro}
+\def\slbshape{bo}
+\def\scshape{rc}
+\def\scbshape{bc}
+
+\ifx\bigger\relax
+  % not really supported.
+  \def\mainmagstep{12pt}
+  \setfont\textrm\rmfontprefix\rmshape{\mainmagstep}
+\else
+  \def\mainmagstep{10pt}
+  \setfont\textrm\rmfontprefix\rmshape{\mainmagstep}
+\fi
+% Instead of cmb10, you many want to use cmbx10.
+% cmbx10 is a prettier font on its own, but cmb10
+% looks better when embedded in a line with cmr10.
+\setfont\textbf\rmfontprefix\bfshape{\mainmagstep}
+\setfont\textit\rmfontprefix\itshape{\mainmagstep}
+\setfont\textsl\rmfontprefix\slshape{\mainmagstep}
+\setfont\textsc\rmfontprefix\scshape{\mainmagstep}
+\font\texti=zppler7m at \mainmagstep
+\font\textsy=zppler7y at \mainmagstep
+
+% A few fonts for \defun, etc.
+\setfont\defbf\rmfontprefix\bxshape{10pt} %was 1314
+\def\df{\let\tentt=\deftt \let\tenbf = \defbf \bf}
+
+% Fonts for indices, footnotes, small examples (9pt).
+\setfont\smallrm\rmfontprefix\rmshape{9pt}
+\setfont\smallbf\rmfontprefix\bfshape{9pt}
+\setfont\smallit\rmfontprefix\itshape{9pt}
+\setfont\smallsl\rmfontprefix\slshape{9pt}
+\setfont\smallsc\rmfontprefix\scshape{9pt}
+\font\smalli=zppler7m at 9pt
+\font\smallsy=zppler7y at 9pt
+
+% Fonts for small examples (8pt).
+\setfont\smallerrm\rmfontprefix\rmshape{8pt}
+\setfont\smallerbf\rmfontprefix\bfshape{8pt}
+\setfont\smallerit\rmfontprefix\itshape{8pt}
+\setfont\smallersl\rmfontprefix\slshape{8pt}
+\setfont\smallersc\rmfontprefix\scshape{8pt}
+\font\smalleri=zppler7m at 8pt
+\font\smallersy=zppler7y at 8pt
+
+% Fonts for title page:
+\setfont\titlerm\rmfontprefix\rmbshape{18pt}
+\setfont\titleit\rmfontprefix\itbshape{18pt}
+\setfont\titlesl\rmfontprefix\slbshape{18pt}
+\let\titlebf=\titlerm
+\setfont\titlesc\rmfontprefix\scbshape{18pt}
+\font\titlei=zppler7m at 18pt
+\font\titlesy=zppler7y at 18pt
+\def\authorrm{\secrm}
+\def\authortt{\sectt}
+
+% Chapter (and unnumbered) fonts (17.28pt).
+\setfont\chaprm\rmfontprefix\rmbshape{17.28pt}
+\setfont\chapit\rmfontprefix\itbshape{17.28pt}
+\setfont\chapsl\rmfontprefix\slbshape{17.28pt}
+\let\chapbf=\chaprm
+\setfont\chapsc\rmfontprefix\scbshape{17.28pt}
+\font\chapi=zppler7m at 17.28pt
+\font\chapsy=zppler7y at 17.28pt
+
+% Section fonts (14.4pt).
+\setfont\secrm\rmfontprefix\rmbshape{14.4pt}
+\setfont\secit\rmfontprefix\itbshape{14.4pt}
+\setfont\secsl\rmfontprefix\slbshape{14.4pt}
+\let\secbf\secrm
+\setfont\secsc\rmfontprefix\scbshape{14.4pt}
+\font\seci=zppler7m at 14.4pt
+\font\secsy=zppler7y at 14.4pt
+
+% Subsection fonts (13.15pt).
+\setfont\ssecrm\rmfontprefix\rmbshape{13.15pt}
+\setfont\ssecit\rmfontprefix\itbshape{13.15pt}
+\setfont\ssecsl\rmfontprefix\slbshape{13.15pt}
+\let\ssecbf\ssecrm
+\setfont\ssecsc\rmfontprefix\scbshape{13.15pt}
+\font\sseci=zppler7m at 13.15pt
+\font\ssecsy=zppler7y at 13.15pt
+% The smallcaps and symbol fonts should actually be scaled \magstep1.5,
+% but that is not a standard magnification.
+
+% Fonts for short table of contents.
+\setfont\shortcontrm\rmfontprefix\rmshape{12pt}
+\setfont\shortcontbf\rmfontprefix\bxshape{12pt}
+\setfont\shortcontsl\rmfontprefix\slshape{12pt}
+
+% Set keyfont as well.
+\setfont\keyrm\rmfontprefix\rmshape{8pt}
+\font\keysy=zppler7y at 9pt
+
+\let\setfont=\setfontorig
+\def\setfontorig{\relax}
+
+% Restore the TeXinfo character set.
+\catcode`\\=\active
+@catcode`@%=@other
+
+@c Set initial fonts (again)
+@textfonts
+@rm
+
+@c Local variables:
+@c eval: (add-hook 'write-file-hooks 'time-stamp)
+@c page-delimiter: "^\\\\message"
+@c time-stamp-start: "def\\\\palatinoversion{"
+@c time-stamp-format: "%:y-%02m-%02d.%02H"
+@c time-stamp-end: "}"
+@c End:

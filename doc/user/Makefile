@@ -26,7 +26,7 @@ MAKEINFO    = makeinfo
 	${MAKEINFO} $< -o $@ >/dev/null 2>&1
 
 .texinfo.pdf:
-	${TEXI2PDF} $< -o $@  >/dev/null 2>&1
+	${TEXI2PDF} -I ../contrib $< -o $@  >/dev/null 2>&1
 
 .texinfo.html:
 	${TEXI2HTML} $< -o $@ >/dev/null 2>&1

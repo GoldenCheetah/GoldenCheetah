@@ -1,4 +1,5 @@
 \input texinfo   @c -*-texinfo-*-
+@input palatino
 @c %**start of header
 @setfilename GC3-Manual.texinfo
 @settitle Golden Cheetah User Manual
@@ -203,7 +204,7 @@ Sean was a bit of a geek.
  
 He set about reverse engineering the protocol the Powertap used to communicate with the PC and
 he developed a couple of command line utilities in the C programming language; `ptdl' and `ptunpk'.
-These utilities downloaded data from a Powertap via its serial interface saving to 'raw' files
+These utilities downloaded data from a Powertap via its serial interface saving to `raw' files
 on disk, and then read that raw file and formatted the output for inputting into GNU plot.
  
 But it soon became clear that using the command line was not at all user friendly. A GUI was
@@ -218,7 +219,7 @@ were introduced; support for SRM using the libsrm project written by Rainer Clas
 Linux, Windows, Metrics, File Formats, Power Zones and a large number of new charts including
 a Performance Manager written by Eric Murray. Google Map written by Greg Lonnon.
  
-During this time the project moved from a 'hack' project to a fully fledged open source development
+During this time the project moved from a `hack' project to a fully fledged open source development
 project and saw Jamie Kimberley, Robert Carlsen and Justin Knotzke assist Sean in managing development
 with the introduction of a bugs database and more formalised releases for Linux, Mac and Windows.
  
@@ -247,12 +248,12 @@ where you set target events and physical adaptations or performance targets with
 daily stress and long term stress.
  
 @item Interval Analysis and Comparison across separate rides, to compare efforts and track and rank
-performance in intervals or 'segments' of rides and routes.
+performance in intervals or `segments' of rides and routes.
  
 @item Season by Season progression to compare and rank performance development in cycles and seasons
 across the long term charts, but also the critical power and distribution charts.
  
-@item Separation of the training view into a separate program 'OpenTrainer' to enable more advanced
+@item Separation of the training view into a separate program `OpenTrainer' to enable more advanced
 graphical displays including video with overlay and animations.
 @end itemize
  
@@ -308,7 +309,7 @@ dialog, asking you to select or create an athlete to work with:
 @center @emph{Figure 1: Initial Dialog}
 @vskip 6pt
 
-At this point you should go ahead and click 'New...'. This will open another dialog
+At this point you should go ahead and click `New...'. This will open another dialog
 window to create a new athlete and set some basic data. 
 
 @vskip 12pt
@@ -344,7 +345,7 @@ download some data from your bike computer or import some data from disk or USB.
 If you use a Powertap, SRM, Joule, Joule GPS or Macro-X device you will be able to download from
 it directly. Please make sure the device is conected and plugged in correctly. For example, if you
 are downloading from a Powertap please make sure the computer is firmly connected and displays
-'HOST' on its screen.
+`HOST' on its screen.
 
 @vskip 12pt
 @center @image{"image/1-download",210pt}
@@ -352,9 +353,9 @@ are downloading from a Powertap please make sure the computer is firmly connecte
 @vskip 6pt
 
 To start the download go ahead and click the download from device button. This will open up the 
-download dialog. Select the right kind of device and serial port before clicking on the 'Download'
-button. If no serial port is listed, or the port is not correct you can click on the 'Rescan' 
-button to look again for your device. This is sometimes required if you click on 'Download' before
+download dialog. Select the right kind of device and serial port before clicking on the `Download'
+button. If no serial port is listed, or the port is not correct you can click on the `Rescan' 
+button to look again for your device. This is sometimes required if you click on `Download' before
 the device is connected.
 
 Any ride files will then be downloaded and imported into GoldenCheetah and the splash screen will
@@ -370,7 +371,7 @@ wizard will appear to process the selected files.
 
 @vskip 12pt
 @center @image{"image/1-import",280pt}
-@center @emph{Figure 4: Import Activity Wizard}
+@center @emph{Figure 5: Import Activity Wizard}
 @vskip 6pt
 
 You will notice that the files are opened first to ensure you have the required permissions to 
@@ -387,8 +388,115 @@ now start analysing and tracking your performance.
 @chapter GETTING AROUND GOLDENCHEETAH
 @node NAVIGATION
  
-open up with screen shot and a description of all the basic ui elements, one per athlete etc
- 
+@vskip 12pt
+@center @image{"image/2-mainwindow",280pt}
+@center @emph{Figure 6: Main window elements}
+@vskip 6pt
+
+Regardless of whether you are training with your bike trainer, reviewing recent activities in the diary
+or tracking long term performance in the home view, the GoldenCheetah layout is always the same.
+
+Looking at the figure above you will see the following components;
+@itemize @bullet
+
+@item @strong{Menu Bar} - this contains all the menu options for GoldenCheetah. The screenshot shown is
+from the Mac OSX version, but the menu bar is similar in modern Linux distributions. On Windows the menu
+bar will be seen within the main window rather than at the top of the screen.
+
+@item @strong{Tool Bar} - the toolbar contains buttons to get quick access to functions that also available
+within the menu bar. We place them in the toolbar because they are used very commonly, and it is handy to be
+able to get at them quickly and easily.
+
+In V3 the toolbar is biased towards functions used during analysis, but this may change as we get more feedback
+from users about what they use most commonly in the other views.
+
+@item @strong{Scope Bar} - the scope bar is used to select the view. Each view offers different functionality as
+their names suggest. Additionally there is a `+' menu to the right of the scope bar for adding charts to the view
+selected.
+
+@item @strong{Side Bar} - the side bar contains selections and lists that are most appropriate for what the user
+is currently doing. It changes as different views are selected in the scope bar.
+
+@item @strong{Main View} - selected via the scope bar the main view shows the charts and windows relevant to the
+view in question. Analysis View contains analysis functions and so on. Note that the view can be shown in a tabbed
+style or a scrolling set of tiles.
+
+@end itemize
+
+The only time the main window looks different to that shown above is when running for the first time or when no
+data is available. In this case a `splash' screen is shown to assist new users in importing data or setting up
+devices etc.
+
+@section The Menu Bar
+
+The GoldenCheetah menu bar is no different to any other application. The only slight confusion is the location of the
+preferences pane across platform. On Windows and Linux the preferences pane can be found as Tools->Options whilst
+on a Mac it is found as GoldenCheetah->Preferences.
+
+@strong{NOTE:} Each menu is now explained in the section below, but depending upon the options installed when
+the program was built you may not see all the menu options listed. If you installed a stable build from the 
+GoldenCheetah website it will have all available options compiled in @emph{this is not the case for Development builds}.
+
+@heading The @emph{Athlete} menu
+
+The Athlete menu is largely about opening and closing new windows. Since in GoldenCheetah we open a new window to
+work with a specific athlete (you cannot switch athlete in the main window, you need to open another window). As a
+result this menu is rather trivial:
+
+@itemize @bullet
+
+@item @strong{New...} - Opens the new athlete dialog we saw in the quick start guide and then proceeds to open a
+@item @strong{Open...} - Opens the choose athlete dialog in order that you select an athlete to open in a new window.
+@item @strong{Close} - Closes the current athlete window.
+@end itemize
+
+@strong{NOTE:} When you restart GoldenCheetah it will always open the athlete you last opened, so if you open up an
+athlete and close to go back to a previous window the last Athlete that was opened will be displayed, rather than the
+last one you closed. You can specify which athlete to open on the command line e.g. @code{$ ./GoldenCheetah "Mark Liversedge"}.
+
+@heading The @emph{Activity} menu
+
+In GoldenCheetah we refer to a ride file or any file that contains data related to an exercise you have completed as an `Activity'
+this is because simply referring to it as a `ride' wouldn't be valid if, for example, it was a run!
+
+Additionally, a prescribed activity plan (e.g. 2x20 mins at L4) we refer to as a `workout'. This may be confusing to users
+that come to us from TrainingPeaks WKO+ where a workout refers to a past activity. We refer to future activities as planned
+activities and past activities as just activities. 
+
+So, this menu contains functions for working with activities -- past exercises that have been recorded and imported into GoldenCheetah.
+
+@itemize @bullet
+@item @strong{Download from device...} - Also available from the tool bar this function opens the dialog to download data 
+directly from a device. We support SRM Powercontrol, Powertap LYC, Joule and Macro-X devices.
+@item @strong{Import from file...} - This option will open a file selecton box to select one @emph{or more} files to import. Once 
+selected the files will be processed by the import wizard.  You can also import files by just dragging and dropping them 
+on the analysis view.
+
+@strong{NOTE:} If you try and drag and drop on the training view we will try and import videos and workouts (not activities).
+@item @strong{Manual activity entry...} - This will open up a dialog box to create a manual entry. There is also a button on
+the toolbar that does this. A manual activity gives you the opportunity to estimate time, distance, stress and other metrics
+for an activity that wasn't record (for example on a gym bike). @xref{Importing Exporting Downloading and Creating Data, Manual activity}.
+@item @strong{Export...} - Will open a dialog box to export the currently selected activity. You can select the directory
+to export to and the file format to write the export as. This is particularly useful if you want to send your data to a 
+coach who requires data in a format his software understands.
+
+For example; PWX files can be read by WKO+ and Garmin TCX files can be read by almost all sports software. 
+
+@strong{NOTE:} Whilst we offer FITLOG format for SportsTracks we would not recommend it, since the fidelity of the 
+file format is very suspect. 
+@item @strong{Batch export...} - 
+@item @strong{Export Metrics as CSV...} - 
+@item @strong{Upload to TrainingPeaks} - 
+@item @strong{Download from TrainingPeaks...} - 
+@item @strong{Upload to Strava...} - 
+@item @strong{Download from Strava...} - 
+@item @strong{Upload to RideWithGPS...} - 
+@item @strong{Upload to Trainingstagebuch...} - 
+@item @strong{Save activity} - 
+@item @strong{Delete activity...} - 
+@item @strong{Split activity...} - 
+@end itemize
+
 @section The Toolbar
 what the buttons do
  
@@ -414,7 +522,7 @@ why, what, where, refreshing, exporting
 @c ********************************************************************************
  
 @chapter IMPORTING EXPORTING DOWNLOADING AND CREATING DATA
-@node DATA
+@node Importing Exporting Downloading and Creating Data
  
 @section Download from device
 download dialog, basics for each device (plugging in etc)
@@ -455,7 +563,7 @@ the manual activity dialog and refer to details screen for more "indepth" (need 
       ii anomalies
      iii find
      o advanced editor functions
-       i the 'fix' tools
+       i the `fix' tools
       ii copying, cutting and pasting
  
 @c ********************************************************************************
