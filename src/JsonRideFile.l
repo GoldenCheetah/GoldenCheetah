@@ -82,5 +82,5 @@ int JsonRideFilelex_destroy(void) { return 0; }
 
 void JsonRideFile_setString(QString p)
 {
-    JsonRideFile_scan_string(p.toLatin1().data());
+    JsonRideFile_scan_string(p.toLocal8Bit().data());
 }
