@@ -90,11 +90,11 @@ public slots:
         for (int i=0; i<sourceModel()->columnCount(); i++) {
             QString column = sourceModel()->headerData (i, Qt::Horizontal, Qt::DisplayRole).toString();
             columns << column;
-            if (column == tr("Duration")) durationIndex = i;
-            if (column == tr("Date")) dateIndex = i;
-            if (column == tr("File")) filenameIndex = i;
-            if (column == tr("Calendar Text")) textIndex = i;
-            if (column == "color") colorIndex = i;
+            if (durationIndex == -1 && column == tr("Duration")) durationIndex = i;
+            if (dateIndex == -1 && column == tr("Date")) dateIndex = i;
+            if (filenameIndex == -1 && column == tr("File")) filenameIndex = i;
+            if (textIndex == -1 && column == tr("Calendar Text")) textIndex = i;
+            if (colorIndex == -1 && column == "color") colorIndex = i;
         }
 
         // we need to build a list of all the rides
