@@ -85,7 +85,7 @@ public slots:
 
         rows = ndays / 7;
 
-        filenameIndex = dateIndex = durationIndex = -1;
+        textIndex = colorIndex = filenameIndex = dateIndex = durationIndex = -1;
         columns.clear();
         for (int i=0; i<sourceModel()->columnCount(); i++) {
             QString column = sourceModel()->headerData (i, Qt::Horizontal, Qt::DisplayRole).toString();
