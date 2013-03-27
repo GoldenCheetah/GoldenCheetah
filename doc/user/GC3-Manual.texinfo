@@ -36,8 +36,10 @@ Copyright @copyright{} 2013 Mark Liversedge
 @c ********************************************************************************
 @chapter WELCOME TO GOLDENCHEETAH
 @node WELCOME
- 
-GoldenCheetah is an open source program for cyclists.
+
+@vskip 6pt 
+@center @strong{GoldenCheetah is an open source program for cyclists.}
+@vskip 12pt
  
 In fact, it is primarily a program for cyclists with a power meter. It provides functions
 to download, import, edit, upload and analyse rides containing power data.
@@ -46,7 +48,9 @@ It can be used to analyse bike rides that do not contain power, perhaps containi
 cadence or GPS data. It can be used to analyse other kinds of workouts, perhaps run or
 swim activities. It can be used purely as a log or journal for any activity.
  
-But, it is primarily an open source program for cyclists that own a power meter.
+@vskip 12pt 
+@center @strong{GoldenCheetah is primarily an open source program for cyclists that own a power meter.}
+@vskip 12pt
  
 In addition to the post-workout analysis it can also be used as a desktop application to
 record and monitor workouts on a cycle trainer. It captures telemetry from ANT+ sensors
@@ -426,7 +430,7 @@ style or a scrolling set of tiles.
 The only time the main window looks different to that shown above is when running for the first time or when no
 data is available. In this case a `splash' screen is shown to assist new users in importing data or setting up
 devices etc.
-
+@page
 @section The Menu Bar
 
 The GoldenCheetah menu bar is no different to any other application. The only slight confusion is the location of the
@@ -484,20 +488,114 @@ For example; PWX files can be read by WKO+ and Garmin TCX files can be read by a
 
 @strong{NOTE:} Whilst we offer FITLOG format for SportsTracks we would not recommend it, since the fidelity of the 
 file format is very suspect. 
-@item @strong{Batch export...} - 
-@item @strong{Export Metrics as CSV...} - 
-@item @strong{Upload to TrainingPeaks} - 
-@item @strong{Download from TrainingPeaks...} - 
-@item @strong{Upload to Strava...} - 
-@item @strong{Download from Strava...} - 
-@item @strong{Upload to RideWithGPS...} - 
-@item @strong{Upload to Trainingstagebuch...} - 
-@item @strong{Save activity} - 
-@item @strong{Delete activity...} - 
-@item @strong{Split activity...} - 
+@item @strong{Batch export...} - This opens the batch export dialog, it provides the ability to select the output
+directory and format to export to as well as select the activities you wish to export. Since this functions is
+typically used to export data for import into another program there is a select all option too.
+@item @strong{Export Metrics as CSV...} - Although the metric database is a sqlite file it can be useful to export
+all the metrics as a comma separated variable format to work with in a spreadsheet. This function will export all
+columns and rows to a CSV file of your choice.
+@item @strong{Upload to TrainingPeaks} - This will upload the currently selected ride to TrainingPeaks.com. There are
+no options since the account and password need to be defined in the preferences pane before you start.
+@item @strong{Download from TrainingPeaks...} - This will open the download dialog for TrainingPeaks.com. It allows
+you to select the specific activities you want to download and will match the available activities to any existing
+activities by examining their date and time.
+@item @strong{Upload to Strava...} - This opens the upload to strava dialog to allow you to select which data
+series you want included.
+@item @strong{Download from Strava...} - Download from Strava requires a Strava activity ID. Once you provide this
+the activity will be downloaded and imported into your activity library. Note that there is no option to select
+activities from a list since Strava do not support this (data lock-in).
+@item @strong{Upload to RideWithGPS...} - This will upload the currently selected ride to RideWithGPS.com. There
+are no options required.
+@item @strong{Upload to Trainingstagebuch...} - This will upload the currently selected ride to TrainingStageBuch.com.
+The user id and password need to be configured in the preferences pane in order for this to work.
+@item @strong{Save activity} - We do not automatically save changes to activities, if you want to update the
+activity you must save it. The metrics for the activity will only be updated when it is saved.
+@item @strong{Delete activity...} - Permanently deletes the ride from the ride library. There is no undo so use
+with caution. It will prompt to confirm you really mean it.
+@item @strong{Split activity...} - Will open the split activity wizard, this wizard will allow you to find
+breaks in an activity and split it into separate activities. This is of particular use when you forget to
+stop recording and end up with multiple activites downloaded as a single activity.
 @end itemize
 
-@section The Toolbar
+@heading The @emph{Tools} menu
+
+The Tools menu contains a selection of `handy' utilities, its a bit of a catch all for functions that are
+either related to manipulating activities or don't really fit in anywhere else.
+
+@itemize @bullet
+@item @strong{Options...} - Only on Linux and Windows this opens the preferences pane. Note that the preferences
+pane is an application in its own right and will remain open even when you have closed the main windows. You can
+also have multiple preferences panes open at once @strong{we recommend you do not do this}.
+@item @strong{Critical Power Estimator...} - Opens a dialog to estimate your CP based upon a short and long
+power best or result from a specific test. We recommend using 3 minutes and 20 minutes since that aligns
+with the algorithm used (Monod/Scherer).
+@item @strong{Air Density (Rho) Estimator...} - Opens a tool for estimating Air Density based upon temperature
+and air pressure. This is useful when working with Aerolab.
+@item @strong{Get Withings Data...} - Downloads all measures for you Withings weight scale, but the user id
+and public key need to be configured in the passwords section of the preferences pane.
+@item @strong{Get Zeo Data...} - Downloads sleep data for your Zeo sleep monitor. You will need to have
+configured the user id and pasword in the preferences pane.
+@item @strong{Create a new workout...} - Opens the workout wizard for creating a training view workout. This
+will create a `.erg' or `.crs' workout.
+@item @strong{Download workouts from ErgDB...} - Opens a dialog to select and download training view workouts
+from the internet ErgDB website.
+@item @strong{Import workouts or videos...} - Opens a file dialog to select and import a workout or video into
+the training view library.
+@item @strong{Scan disk for videos and workouts...} - Opens a dialog to scan directoris for workouts and
+videos and import into the training view library.
+@item @strong{Upload Activity to Calendar} - Will create a calendar entry to any CalDAV based calendar service.
+You will need to configure the URL, user and password in the preferences pane before using this.
+@item @strong{Refresh Calendar} - Will read any entries from your CalDAV internet calendar to display on the 
+calendar view.
+@item @strong{Find intervals...} - Opens a dialog to find intervals in the current activity. This menu option
+is here since it has always been on the tools menu. It should really be moved to the @emph{Activity} menu.
+@item @strong{Adjust Torque Values...} - An editor tool for adjusting the torque data series. This is useful
+when using a Powertap without calibrating.
+@item @strong{Fix GPS Errors...} - An editor tool for extrapolating and adjusting GPS values, this is useful
+when your GPS device lost its satellite connection or after importing from other software and the data
+contains invalide values.
+@item @strong{Fix Gaps In Recording...} - GoldenCheetah expects all data series samples to have timestamps
+separated by a consistent recording interval (e.g. every 1 second). This tool dialog allows you to
+extrapolate values where there are gaps in recording. In future releases we may remove the need for the 
+data series to have regular timestamps.
+@item @strong{Fix HR Spikes...} - Find and smooth out spikes in HR, usually caused by loss of conection or
+iterference from overhead power lines.
+@item @strong{Fix Power Spikes...} - Find and smooth out spikes in Power, usually caused by reed switch
+being double triggered or recording interference.
+@end itemize
+
+@heading The @emph{View} menu
+
+The View menu provides a menu access to the view configuration, showing and hiding UI elements as well as
+switching fullscreen and adding charts to the layout.
+
+@itemize @bullet
+@item @strong{Toggle Full Screen} - As the name suggests toggles between normal and full screen. On
+Linux and Mac this is also available from the F11 key (and you can use the ESC key to leave full
+screen mode too). On Mac Lion we use the standard toolbar button for switching between normal and
+full screen mode.
+@item @strong{Show Left Sidebar} - Toggles the display of the sidebar.The button on the toolbar also
+does the same. You can also drag and close the sidebar by hand.
+@item @strong{Show Toolbar} -  Toggles showing or hiding the tool bar.
+@item @strong{Tabbed View} - Toggles tabbed or tiled mode for the current view.
+@item @strong{Analysis} - Switch to the Analysis view.
+@item @strong{Home} - Switch to the Home view.
+@item @strong{Train} - Switch to the Training view.
+@item @strong{Diary} - Switch to the Diary view.
+@item @strong{Add Chart} - Opens a submenu to select a chart to add. When selected an add chart dialog
+will be open showing the chart and allowing you to adjust the chart settings before it is added to the
+current view.
+@item @strong{Reset Layout} - Will reset the current view layout to the application default. This is
+useful if you spoil your setup, or want to fall back to the current application default. Note that the
+application default will change and improve over time.
+@end itemize
+
+@heading The @emph{Window} menu
+
+Simply lists the current windows you have open and allows you to select the window to raise and make 
+the current window focus.
+@page
+@section The Toolbar and Scope bar
 what the buttons do
  
 @section Views & Sidebar
