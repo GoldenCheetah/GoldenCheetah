@@ -32,12 +32,11 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     setFixedHeight(23);
     //clear button
     clearButton = new QToolButton(this);
-    QPixmap pixmap(":images/toolbar/clear.png");
-    pixmap = pixmap.scaled(16,16);
-    clearButton->setIcon(QIcon(pixmap));
-    clearButton->setIconSize(pixmap.size());
-    clearButton->setCursor(Qt::ArrowCursor);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    QPixmap pixmap(":images/toolbar/clear.png");
+    clearButton->setIcon(QIcon(pixmap));
+    clearButton->setIconSize(QSize(16,16));
+    clearButton->setCursor(Qt::ArrowCursor);
     clearButton->hide();
     //connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clearClicked()));
@@ -45,6 +44,7 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
 
     // make sure its underneath the toggle button
     toolButton = new QToolButton(this);
+    toolButton->setFixedSize(QSize(16,16));
     toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     toolButton->setCursor(Qt::ArrowCursor);
     toolButton->setPopupMode(QToolButton::InstantPopup);
@@ -52,11 +52,10 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     // search button
     searchButton = new QToolButton(this);
     QPixmap search(":images/toolbar/search.png");
-    search = search.scaled(16,16);
-    searchButton->setIcon(QIcon(search));
-    searchButton->setIconSize(search.size());
-    searchButton->setCursor(Qt::ArrowCursor);
     searchButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    searchButton->setIcon(QIcon(search));
+    searchButton->setIconSize(QSize(16,16));
+    searchButton->setCursor(Qt::ArrowCursor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
     dropMenu = new QMenu(this);
@@ -73,7 +72,7 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
                           "QLineEdit#SearchBox {"
                           "    padding: 0px %1px;"
                           "}"
-                 ).arg(clearButton->sizeHint().width() + frameWidth + 8));
+                 ).arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     setPlaceholderText("Search...");
     mode = Search;
