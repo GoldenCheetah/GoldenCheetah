@@ -221,7 +221,15 @@ MainWindow::MainWindow(const QDir &home) :
         font.setPointSize(app.defaultFont);
         QApplication::setFont(font);
 
-    } else setGeometry(geom.toRect());
+    } else {
+        QRect size = desktop->availableGeometry();
+
+        // ensure saved geometry isn't greater than current screen size
+        if ((geom.toRect().height() > size.height()) || (geom.toRect().width() > size.width()))
+            setGeometry(size);
+        else
+            setGeometry(geom.toRect());
+    }
 
 
 #ifdef Q_OS_MAC // MAC NATIVE TOOLBAR
