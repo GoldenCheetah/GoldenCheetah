@@ -289,10 +289,11 @@ void
 GcSplitterHandle::addActions(QList<QAction*> actions)
 {
     foreach(QAction *action, actions) {
-        QPushButton *p = new QPushButton(action->icon(), "", this);
+        QToolButton *p = new QToolButton(this);
+        p->setStyleSheet("QToolButton { border: none; padding: 0px; }");
         p->setAutoFillBackground(false);
-        p->setFlat(true);
         p->setFixedSize(20,20);
+        p->setIcon(action->icon());
         p->setIconSize(QSize(10,10));
         p->setFocusPolicy(Qt::NoFocus);
         titleLayout->addWidget(p);
