@@ -297,6 +297,18 @@ RideFileCache::refreshCache()
         // all done now, phew
         cacheFile.close();
 
+        // invalidate any incore cache of aggregate
+        // that contains this ride in its date range
+        QDate date = ride->startTime().date();
+        for (int i=0; i<main->cpxCache.count();) {
+            if (date >= main->cpxCache.at(i)->start &&
+                date <= main->cpxCache.at(i)->end) {
+                delete main->cpxCache.at(i);
+                main->cpxCache.removeAt(i);
+            } else i++;
+        }
+
+
     } else if (writeerror == false) {
 
         // popup the first time...
