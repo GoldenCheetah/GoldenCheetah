@@ -222,8 +222,8 @@ class MainWindow : public QMainWindow
                                     // signal emitted to notify its children
         void notifyRideSelected();  // used by RideItem to notify when
                                     // rideItem date/time changes
-        void notifyRideClean() { rideClean(); }
-        void notifyRideDirty() { rideDirty(); }
+        void notifyRideClean() { rideClean(ride); }
+        void notifyRideDirty() { rideDirty(ride); }
         void notifyZonesChanged() { zonesChanged(); }
 
         // realtime signals
@@ -263,8 +263,8 @@ class MainWindow : public QMainWindow
         void configChanged();
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
-        void rideDirty();
-        void rideClean();
+        void rideDirty(RideItem*);
+        void rideClean(RideItem*);
 
         // realtime
         void telemetryUpdate(RealtimeData rtData);

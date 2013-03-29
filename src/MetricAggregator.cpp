@@ -41,7 +41,7 @@ MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zon
     connect(main, SIGNAL(configChanged()), this, SLOT(update()));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
-    connect(main, SIGNAL(rideClean()), this, SLOT(update(void)));
+    connect(main, SIGNAL(rideClean(RideItem*)), this, SLOT(update(void)));
 }
 
 MetricAggregator::~MetricAggregator()

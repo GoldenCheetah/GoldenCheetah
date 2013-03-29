@@ -18,6 +18,7 @@
 
 #include "CriticalPowerWindow.h"
 #include "SearchFilterBox.h"
+#include "MetricAggregator.h"
 #include "CpintPlot.h"
 #include "MainWindow.h"
 #include "RideItem.h"
@@ -192,6 +193,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     // redraw on config change -- this seems the simplest approach
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(rideSelected()));
+    connect(mainWindow->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
@@ -199,6 +201,22 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
+}
+
+void
+CriticalPowerWindow::refreshRideSaved()
+{
+    const RideItem *current = mainWindow->rideItem();
+    if (!current) return;
+
+    // if the saved ride is in the aggregated time period
+    QDate date = current->dateTime.date();
+    if (date >= cpintPlot->startDate &&
+        date <= cpintPlot->endDate) {
+
+        // force a redraw next time visible
+        cpintPlot->changeSeason(cpintPlot->startDate, cpintPlot->endDate);
+    }
 }
 
 void
