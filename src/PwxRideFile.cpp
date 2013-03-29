@@ -254,14 +254,34 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
         delete rideFile;
         return NULL;
     } else {
+
         // need to determine the recIntSecs - first - second sample?
-        rideFile->setRecIntSecs(rideFile->dataPoints()[1]->secs -
-                                rideFile->dataPoints()[0]->secs);
+        // To estimate the recording interval, take the median of the
+        // first 1000 samples and round to nearest millisecond.
+        int n = rideFile->dataPoints().size();
+        n = qMin(n, 1000);
+        if (n >= 2) {
+            QVector<double> secs(n-1);
+            for (int i = 0; i < n-1; ++i) {
+                double now = rideFile->dataPoints()[i]->secs;
+                double then = rideFile->dataPoints()[i+1]->secs;
+                secs[i] = then - now;
+            }
+            std::sort(secs.begin(), secs.end());
+            int mid = n / 2 - 1;
+            double recint = round(secs[mid] * 1000.0) / 1000.0;
+            rideFile->setRecIntSecs(recint);
+        } else {
+            // zero or one sample just make it a second
+            rideFile->setRecIntSecs(1);
+        }
+
 
         // if its a daft number then make it 1s -- there is probably
         // a gap in recording in there.
         switch ((int)rideFile->recIntSecs()) {
             case 1 : // lots!
+            case 2 : // Timex
             case 4 : // garmin smart recording
             case 5 : // polar sometimes
             case 10 : // polar and others
