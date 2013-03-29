@@ -58,3 +58,8 @@
 2010-04-05-21-45-04.tcx
     A Garmin Training Centre ride with short stops to test handling of
     smart recording in Tcx RideFile. 
+
+lgulseth...pwx
+    A PWX file from a Timex GPS with a permanent recording interval of
+    2 seconds claimed. But looks more like 2.02s.
+
