@@ -142,8 +142,8 @@ RideEditor::RideEditor(MainWindow *main) : GcChartWindow(main), data(NULL), ride
     connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(main, SIGNAL(rideDirty()), this, SLOT(rideDirty()));
-    connect(main, SIGNAL(rideClean()), this, SLOT(rideClean()));
+    connect(main, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
+    connect(main, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);

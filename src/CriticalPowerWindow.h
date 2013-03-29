@@ -128,6 +128,8 @@ class CriticalPowerWindow : public GcChartWindow
         void useStandardRange();
         void useThruToday();
 
+        void refreshRideSaved();
+
     private:
         // reveal controls
         QPushButton *rCpintSetCPButton;

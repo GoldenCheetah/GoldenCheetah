@@ -93,9 +93,11 @@ class CpintPlot : public QwtPlot
         void setAxisTitle(int axis, QString label);
         void setSeries(RideFile::SeriesType);
 
-
         QVector<double> getBests() { return bests->meanMaxArray(series); }
         QVector<QDate> getBestDates() { return bests->meanMaxDates(series); }
+
+        QDate startDate;
+        QDate endDate;
 
     public slots:
 
@@ -122,8 +124,6 @@ class CpintPlot : public QwtPlot
         void clear_CP_Curves();
         QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
         QwtPlotGrid *grid;
-        QDate startDate;
-        QDate endDate;
         const Zones *zones;
         int dateCP;
         RideFile::SeriesType series;

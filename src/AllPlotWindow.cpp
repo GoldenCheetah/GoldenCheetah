@@ -430,7 +430,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     // GC signals
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(rideDirty()), this, SLOT(rideSelected()));
+    connect(mainWindow, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
