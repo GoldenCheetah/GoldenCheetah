@@ -70,7 +70,7 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
 
         if (remoteCacheFile.exists()) {
             QMessageBox msgBox;
-            msgBox.setText("Remote Calendar not available, reverting to cached workouts.");
+            msgBox.setText(tr("Remote Calendar not available, reverting to cached workouts."));
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
 

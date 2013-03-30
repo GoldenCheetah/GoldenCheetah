@@ -47,23 +47,23 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
 #endif
 
     // now set the text for each one
-    home->setText("Home");
+    home->setText(tr("Home"));
     layout->addWidget(home);
     connect(home, SIGNAL(clicked(bool)), this, SLOT(clickedHome()));
 
 #ifdef GC_HAVE_ICAL
-    diary->setText("Diary");
+    diary->setText(tr("Diary"));
     layout->addWidget(diary);
     connect(diary, SIGNAL(clicked(bool)), this, SLOT(clickedDiary()));
 #endif
 
-    anal->setText("Analysis");
+    anal->setText(tr("Analysis"));
     anal->setWidth(70);
     anal->setChecked(true);
     layout->addWidget(anal);
     connect(anal, SIGNAL(clicked(bool)), this, SLOT(clickedAnal()));
 
-    train->setText("Train");
+    train->setText(tr("Train"));
     layout->addWidget(train);
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
 

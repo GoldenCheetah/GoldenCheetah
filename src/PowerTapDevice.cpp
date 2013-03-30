@@ -172,9 +172,9 @@ PowerTapDevice::download( const QDir &tmpdir,
     bool hwecho = version.indexOf('V') < veridx;
     if (PT_DEBUG) printf("hwecho=%s\n", hwecho ? "true" : "false");
 
-    emit updateStatus( "Reading header..." );
+    emit updateStatus( tr("Reading header...") );
     if(m_Cancelled) {
-        err = "download cancelled";
+        err = tr("download cancelled");
         return false;
     }
 
@@ -184,9 +184,9 @@ PowerTapDevice::download( const QDir &tmpdir,
     int header_len = dev->read(header, sizeof(header), err);
     if (header_len != 6) {
         if (header_len < 0)
-            err = "ERROR: reading header: " + err;
+            err = tr("ERROR: reading header: ") + err;
         else
-            err = "ERROR: timeout reading header";
+            err = tr("ERROR: timeout reading header");
         return false;
     }
     if (PT_DEBUG) {
@@ -198,9 +198,9 @@ PowerTapDevice::download( const QDir &tmpdir,
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
-    emit updateStatus( "Reading ride data..." );
+    emit updateStatus( tr("Reading ride data...") );
     if(m_Cancelled) {
-        err = "download cancelled";
+        err = tr("download cancelled");
         return false;
     }
     double recIntSecs = 0.0;
@@ -212,9 +212,9 @@ PowerTapDevice::download( const QDir &tmpdir,
         int n = dev->read(buf, 2, err);
         if (n < 2) {
             if (n < 0)
-                err = "ERROR: reading first two: " + err;
+                err = tr("ERROR: reading first two: ") + err;
             else
-                err = "ERROR: timeout reading first two";
+                err = tr("ERROR: timeout reading first two");
             return false;
         }
         if (PT_DEBUG) {
@@ -269,7 +269,7 @@ PowerTapDevice::download( const QDir &tmpdir,
                 .arg(min % 60, 2, 10, QLatin1Char('0')));
         }
         if(m_Cancelled){
-            err = "download cancelled";
+            err = tr("download cancelled");
             return false;
         }
         if (!doWrite(dev, 0x71, hwecho, err)) // 'q'
