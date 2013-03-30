@@ -33,7 +33,7 @@
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
-     GcChartWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false), useToToday(false)
+     GcChartWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false), useToToday(false), filtered(false)
 {
     setInstanceName("Ride Summary Window");
     setRideItem(NULL);
@@ -53,6 +53,15 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
         cl->setContentsMargins(0,0,0,0);
         cl->setSpacing(0);
         setControls(c);
+
+#ifdef GC_HAVE_LUCENE
+        // filter / searchbox
+        searchBox = new SearchFilterBox(this, mainWindow);
+        connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+        connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
+        cl->addRow(new QLabel(tr("Filter")), searchBox);
+        cl->addWidget(new QLabel("")); //spacing
+#endif
 
         cl->addRow(new QLabel(tr("Date range")), dateSetting);
     }
@@ -91,6 +100,22 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
 
     }
     setChartLayout(vlayout);
+}
+
+void
+RideSummaryWindow::clearFilter()
+{
+    filters.clear();
+    filtered = false;
+    refresh();
+}
+
+void
+RideSummaryWindow::setFilter(QStringList list)
+{
+    filters = list;
+    filtered = true;
+    refresh();
 }
 
 void
@@ -312,7 +337,7 @@ RideSummaryWindow::htmlSummary() const
 
                  // get the value - from metrics or from data array
                  if (ridesummary) s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
-                 else s = s.arg(SummaryMetrics::getAggregated(symbol, data, useMetricUnits));
+                 else s = s.arg(SummaryMetrics::getAggregated(symbol, data, filters, filtered, useMetricUnits));
 
              } else {
                  if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
@@ -328,7 +353,7 @@ RideSummaryWindow::htmlSummary() const
 
                     double pace;
                     if (ridesummary) pace  = metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion()) + (useMetricUnits ? 0 : m->conversionSum());
-                    else pace = SummaryMetrics::getAggregated(symbol, data, useMetricUnits).toDouble();
+                    else pace = SummaryMetrics::getAggregated(symbol, data, filters, filtered, useMetricUnits).toDouble();
 
                     s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
 
@@ -337,7 +362,7 @@ RideSummaryWindow::htmlSummary() const
                     // get the value - from metrics or from data array
                     if (ridesummary) s = s.arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
                                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
-                    else s = s.arg(SummaryMetrics::getAggregated(symbol, data, useMetricUnits));
+                    else s = s.arg(SummaryMetrics::getAggregated(symbol, data, filters, filtered, useMetricUnits));
                  }
             }
 
@@ -356,7 +381,7 @@ RideSummaryWindow::htmlSummary() const
 
             // if using metrics or data
             if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
-            else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZones[i], data, useMetricUnits, true).toDouble();
+            else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZones[i], data, filters, filtered, useMetricUnits, true).toDouble();
         }
         summary += tr("<h3>Power Zones</h3>");
         summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone); //aggregating
@@ -371,7 +396,7 @@ RideSummaryWindow::htmlSummary() const
 
             // if using metrics or data
             if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
-            else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZonesHR[i], data, useMetricUnits, true).toDouble();
+            else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZonesHR[i], data, filters, filtered, useMetricUnits, true).toDouble();
         }
 
         summary += tr("<h3>Heart Rate Zones</h3>");

@@ -680,7 +680,8 @@ LTMSidebar::setSummary(DateRange dateRange)
 
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
-                QString value = SummaryMetrics::getAggregated(metricname, results, main->useMetricUnits);
+                QStringList empty; // filter list not used at present
+                QString value = SummaryMetrics::getAggregated(metricname, results, empty, false, main->useMetricUnits);
 
                 // Maximum Max and Average Average looks nasty, remove from name for display
                 QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";

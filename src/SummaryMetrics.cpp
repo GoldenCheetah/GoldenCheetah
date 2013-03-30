@@ -100,7 +100,8 @@ SummaryMetrics::getUnitsForSymbol(QString symbol, bool UseMetric) const
     else return QString("units");
 }
 
-QString SummaryMetrics::getAggregated(QString name, const QList<SummaryMetrics> &results, bool useMetricUnits, bool nofmt)
+QString SummaryMetrics::getAggregated(QString name, const QList<SummaryMetrics> &results, const QStringList &filters, 
+                                      bool filtered, bool useMetricUnits, bool nofmt)
 {
     // get the metric details, so we can convert etc
     const RideMetric *metric = RideMetricFactory::instance().rideMetric(name);
@@ -112,6 +113,9 @@ QString SummaryMetrics::getAggregated(QString name, const QList<SummaryMetrics> 
 
     // loop through and aggregate
     foreach (SummaryMetrics rideMetrics, results) {
+
+        // skip filtered rides
+        if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
 
         // get this value
         double value = rideMetrics.getForSymbol(name);
