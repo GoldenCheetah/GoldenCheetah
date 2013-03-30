@@ -277,8 +277,8 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
     active = false;
 
 
-    label = new QLabel("Please make sure your device is connected, switched on and working. "
-                               "We will scan for the device type you have selected at known ports.\n\n");
+    label = new QLabel(tr("Please make sure your device is connected, switched on and working. "
+                               "We will scan for the device type you have selected at known ports.\n\n"));
     label->setWordWrap(true);
     layout->addWidget(label);
 
@@ -290,17 +290,17 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
     layout->addWidget(bar);
 
     QHBoxLayout *hlayout2 = new QHBoxLayout;
-    stop = new QPushButton("Search", this);
+    stop = new QPushButton(tr("Search"), this);
     hlayout2->addStretch();
     hlayout2->addWidget(stop);
     layout->addLayout(hlayout2);
 
-    label1 = new QLabel("If your device is not found you can select the device port "
-                               "manually by using the selection box below."); 
+    label1 = new QLabel(tr("If your device is not found you can select the device port "
+                               "manually by using the selection box below.")); 
     label1->setWordWrap(true);
     layout->addWidget(label1);
 
-    label2 = new QLabel("\nDevice found.\nClick Next to Continue\n");
+    label2 = new QLabel(tr("\nDevice found.\nClick Next to Continue\n"));
     label2->hide();
     label2->setWordWrap(true);
     layout->addWidget(label2);
@@ -354,7 +354,7 @@ AddSearch::initializePage()
         for (int i=manual->count(); i > 0; i--) manual->removeItem(0);
 
         // add in the items we have..
-        manual->addItem("Select COM port");
+        manual->addItem(tr("Select COM port"));
         QString error;
         foreach (CommPortPtr port, Serial::myListCommPorts(error)) manual->addItem(port->name());
         manual->show();
@@ -382,7 +382,7 @@ AddSearch::scanFinished(bool result)
     bar->setMaximum(100);
     bar->setMinimum(0);
     bar->setValue(0);
-    stop->setText("Search Again");
+    stop->setText(tr("Search Again"));
 
     if (result == true) { // woohoo we found one
 
@@ -398,9 +398,9 @@ AddSearch::scanFinished(bool result)
             label->hide();
             label1->hide();
             if (wizard->portSpec != "")
-                label2->setText(QString("\nDevice found (%1).\nPress Next to Continue\n").arg(wizard->portSpec));
+                label2->setText(QString(tr("\nDevice found (%1).\nPress Next to Continue\n")).arg(wizard->portSpec));
             else
-                label2->setText("\nDevice found.\nPress Next to Continue\n");
+                label2->setText(tr("\nDevice found.\nPress Next to Continue\n"));
             label2->show();
         }
     } 
@@ -417,7 +417,7 @@ AddSearch::doScan()
         bar->setMaximum(0);
         bar->setMinimum(0);
         bar->setValue(0);
-        stop->setText("Stop Searching");
+        stop->setText(tr("Stop Searching"));
         isSearching = true;
         manual->setCurrentIndex(0); //deselect any chosen port
         wizard->found = false;
@@ -432,7 +432,7 @@ AddSearch::doScan()
         bar->setMaximum(100);
         bar->setMinimum(0);
         bar->setValue(0);
-        stop->setText("Search again");
+        stop->setText(tr("Search again"));
 
         wizard->scanner->stop();
     }
@@ -487,13 +487,13 @@ AddFirmware::AddFirmware(AddDeviceWizard *parent) : QWizardPage(parent), wizard(
     setSubTitle(tr("Select Firmware for Tacx Fortius"));
 
     // create widgets
-    browse = new QPushButton("Browse", this);
-    copy = new QCheckBox("Copy to Library");
+    browse = new QPushButton(tr("Browse"), this);
+    copy = new QCheckBox(tr("Copy to Library"));
     copy->setChecked(true);
 
     help = new QLabel(this);
     help->setWordWrap(true);
-    help->setText("Tacx Fortius trainers require a firmware file "
+    help->setText(tr("Tacx Fortius trainers require a firmware file "
                   "which is provided by Tacx BV. This file is a "
                   "copyrighted file and cannot be distributed with "
                   "GoldenCheetah.\n\n"
@@ -509,9 +509,9 @@ AddFirmware::AddFirmware(AddDeviceWizard *parent) : QWizardPage(parent), wizard(
                   "Please take care to ensure that the file is the latest version "
                   "of the Firmware file.\n\n"
                   "If you choose to copy to library the file will be copied into the "
-                  "GoldenCheetah library, otherwise we will reference it. ");
+                  "GoldenCheetah library, otherwise we will reference it. "));
 
-    file = new QLabel("File:", this);
+    file = new QLabel(tr("File:"), this);
 
     name= new QLineEdit(this);
     name->setEnabled(false);
@@ -690,7 +690,7 @@ AddPair::initializePage()
         // sensor id
         QLineEdit *sensorId = new QLineEdit(this);
         sensorId->setEnabled(false);
-        sensorId->setText("none");
+        sensorId->setText(tr("none"));
         channelWidget->setItemWidget(add, 1, sensorId);
 
         // value
@@ -704,7 +704,7 @@ AddPair::initializePage()
 
         // status
         QLabel *status = new QLabel(this);
-        status->setText("Un-Paired");
+        status->setText(tr("Un-Paired"));
         channelWidget->setItemWidget(add, 3, status);
 
         //channelWidget->verticalHeader()->resizeSection(i,40)
@@ -734,16 +734,16 @@ AddPair::sensorChanged(int channel)
 
     // first off lets unassign this channel
     dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setChannel(channel, -1, 0);
-    dynamic_cast<QLineEdit*>(channelWidget->itemWidget(item,1))->setText("none");
+    dynamic_cast<QLineEdit*>(channelWidget->itemWidget(item,1))->setText(tr("none"));
     dynamic_cast<QLabel*>(channelWidget->itemWidget(item,2))->setText(0);
 
     // what is it then? unused or restart scan?
     QComboBox *p = dynamic_cast<QComboBox *>(channelWidget->itemWidget(item,0));
     int channel_type = p->itemData(p->currentIndex()).toInt();
     if (channel_type == ANTChannel::CHANNEL_TYPE_UNUSED) {
-        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText("Unused");
+        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText(tr("Unused"));
     } else {
-        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText("Searching...");
+        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText(tr("Searching..."));
     dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setChannel(channel, 0, channel_type);
     }
 }
@@ -754,7 +754,7 @@ AddPair::channelInfo(int channel, int device_number, int device_id)
     Q_UNUSED(device_id);
     QTreeWidgetItem *item = channelWidget->invisibleRootItem()->child(channel);
     dynamic_cast<QLineEdit *>(channelWidget->itemWidget(item,1))->setText(QString("%1").arg(device_number));
-    dynamic_cast<QLabel *>(channelWidget->itemWidget(item,3))->setText(QString("Paired"));
+    dynamic_cast<QLabel *>(channelWidget->itemWidget(item,3))->setText(QString(tr("Paired")));
 }
 
 void
@@ -918,7 +918,7 @@ qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
         // sensor id
         QLineEdit *sensorId = new QLineEdit(this);
         sensorId->setEnabled(false);
-        sensorId->setText("none");
+        sensorId->setText(tr("none"));
         channelWidget->setItemWidget(add, 1, sensorId);
 
         // value
@@ -932,7 +932,7 @@ qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
 
         // status
         QLabel *status = new QLabel(this);
-        status->setText("Un-Paired");
+        status->setText(tr("Un-Paired"));
         channelWidget->setItemWidget(add, 3, status);
 
         //channelWidget->verticalHeader()->resizeSection(i,40)
@@ -962,16 +962,16 @@ AddPairBTLE::sensorChanged(int channel)
 
     // first off lets unassign this channel
     dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setChannel(channel, -1, 0);
-    dynamic_cast<QLineEdit*>(channelWidget->itemWidget(item,1))->setText("none");
+    dynamic_cast<QLineEdit*>(channelWidget->itemWidget(item,1))->setText(tr("none"));
     dynamic_cast<QLabel*>(channelWidget->itemWidget(item,2))->setText(0);
 
     // what is it then? unused or restart scan?
     QComboBox *p = dynamic_cast<QComboBox *>(channelWidget->itemWidget(item,0));
     int channel_type = p->itemData(p->currentIndex()).toInt();
     if (channel_type == ANTChannel::CHANNEL_TYPE_UNUSED) {
-        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText("Unused");
+        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText(tr("Unused"));
     } else {
-        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText("Searching...");
+        dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText(tr("Searching..."));
     dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setChannel(channel, 0, channel_type);
     }
 }
@@ -982,7 +982,7 @@ AddPairBTLE::channelInfo(int channel, int device_number, int device_id)
     Q_UNUSED(device_id);
     QTreeWidgetItem *item = channelWidget->invisibleRootItem()->child(channel);
     dynamic_cast<QLineEdit *>(channelWidget->itemWidget(item,1))->setText(QString("%1").arg(device_number));
-    dynamic_cast<QLabel *>(channelWidget->itemWidget(item,3))->setText(QString("Paired"));
+    dynamic_cast<QLabel *>(channelWidget->itemWidget(item,3))->setText(QString(tr("Paired")));
 }
 
 void
@@ -1059,10 +1059,10 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel("We will now add a new device with the configuration shown "
+    QLabel *label = new QLabel(tr("We will now add a new device with the configuration shown "
                                "below. Please take a moment to review and then click Finish "
                                "to add the device and complete this wizard, or press the Back "
-                               "button to make amendments.\n\n");
+                               "button to make amendments.\n\n"));
     label->setWordWrap(true);
     layout->addWidget(label);
 
@@ -1070,9 +1070,9 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     layout->addLayout(hlayout);
 
     QFormLayout *formlayout = new QFormLayout;
-    formlayout->addRow(new QLabel("Name*", this), (name=new QLineEdit(this)));
-    formlayout->addRow(new QLabel("Port", this), (port=new QLineEdit(this)));
-    formlayout->addRow(new QLabel("Profile", this), (profile=new QLineEdit(this)));
+    formlayout->addRow(new QLabel(tr("Name*"), this), (name=new QLineEdit(this)));
+    formlayout->addRow(new QLabel(tr("Port"), this), (port=new QLineEdit(this)));
+    formlayout->addRow(new QLabel(tr("Profile"), this), (profile=new QLineEdit(this)));
     formlayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     //profile->setFixedWidth(200);
     port->setFixedWidth(150);
@@ -1081,56 +1081,56 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     hlayout->addLayout(formlayout);
 
     QFormLayout *form2layout = new QFormLayout;
-    form2layout->addRow(new QLabel("Virtual", this), (virtualPower=new QComboBox(this)));
-    form2layout->addRow(new QLabel("Wheel Size", this), (wheelSize=new QComboBox(this)));
+    form2layout->addRow(new QLabel(tr("Virtual"), this), (virtualPower=new QComboBox(this)));
+    form2layout->addRow(new QLabel(tr("Wheel Size"), this), (wheelSize=new QComboBox(this)));
 
     // NOTE: These must correspond to the code in RealtimeController.cpp that
     //       post-processes inbound telemetry.
-    virtualPower->addItem("None");
-    virtualPower->addItem("Power - Kurt Kinetic Cyclone");
-    virtualPower->addItem("Power - Kurt Kinetic Road Machine");
-    virtualPower->addItem("Power - Cyclops Fluid 2");
-    virtualPower->addItem("Power - BT Advanced Training System");
-    virtualPower->addItem("Power - LeMond Revolution");
-    virtualPower->addItem("Power - 1UP USA Trainer");
-    virtualPower->addItem("Power - Minoura V100 Trainer (H)");
-    virtualPower->addItem("Power - Minoura V100 Trainer (5)");
-    virtualPower->addItem("Power - Minoura V100 Trainer (4)");
-    virtualPower->addItem("Power - Minoura V100 Trainer (3)");
-    virtualPower->addItem("Power - Minoura V100 Trainer (2)");
-    virtualPower->addItem("Power - Minoura V100 Trainer (1)");
-    virtualPower->addItem("Power - Minoura V100 Trainer (L)");
-    virtualPower->addItem("Power - Saris Powerbeam Pro");
-    virtualPower->addItem("Power - Tacx Satori (2)");
-    virtualPower->addItem("Power - Tacx Satori (4)");
-    virtualPower->addItem("Power - Tacx Satori (6)");
-    virtualPower->addItem("Power - Tacx Satori (8)");
-    virtualPower->addItem("Power - Tacx Satori (10)");
-    virtualPower->addItem("Power - Tacx Flow (0)");
-    virtualPower->addItem("Power - Tacx Flow (2)");
-    virtualPower->addItem("Power - Tacx Flow (4)");
-    virtualPower->addItem("Power - Tacx Flow (6)");
-    virtualPower->addItem("Power - Tacx Flow (8)");
+    virtualPower->addItem(tr("None"));
+    virtualPower->addItem(tr("Power - Kurt Kinetic Cyclone"));
+    virtualPower->addItem(tr("Power - Kurt Kinetic Road Machine"));
+    virtualPower->addItem(tr("Power - Cyclops Fluid 2"));
+    virtualPower->addItem(tr("Power - BT Advanced Training System"));
+    virtualPower->addItem(tr("Power - LeMond Revolution"));
+    virtualPower->addItem(tr("Power - 1UP USA Trainer"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (H)"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (5)"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (4)"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (3)"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (2)"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (1)"));
+    virtualPower->addItem(tr("Power - Minoura V100 Trainer (L)"));
+    virtualPower->addItem(tr("Power - Saris Powerbeam Pro"));
+    virtualPower->addItem(tr("Power - Tacx Satori (2)"));
+    virtualPower->addItem(tr("Power - Tacx Satori (4)"));
+    virtualPower->addItem(tr("Power - Tacx Satori (6)"));
+    virtualPower->addItem(tr("Power - Tacx Satori (8)"));
+    virtualPower->addItem(tr("Power - Tacx Satori (10)"));
+    virtualPower->addItem(tr("Power - Tacx Flow (0)"));
+    virtualPower->addItem(tr("Power - Tacx Flow (2)"));
+    virtualPower->addItem(tr("Power - Tacx Flow (4)"));
+    virtualPower->addItem(tr("Power - Tacx Flow (6)"));
+    virtualPower->addItem(tr("Power - Tacx Flow (8)"));
 
-    wheelSize->addItem("Road/Cross (700C/622)"); // 2100mm
-    wheelSize->addItem("Tri/TT (650C)"); // 1960mm
-    wheelSize->addItem("Mountain (26\")"); // 1985mm
-    wheelSize->addItem("BMX (20\")"); // 1750mm
+    wheelSize->addItem(tr("Road/Cross (700C/622)")); // 2100mm
+    wheelSize->addItem(tr("Tri/TT (650C)")); // 1960mm
+    wheelSize->addItem(tr("Mountain (26\")")); // 1985mm
+    wheelSize->addItem(tr("BMX (20\")")); // 1750mm
 
     hlayout->addLayout(form2layout);
     layout->addStretch();
 
-    selectDefault = new QGroupBox("Selected by default", this);
+    selectDefault = new QGroupBox(tr("Selected by default"), this);
     selectDefault->setCheckable(true);
     selectDefault->setChecked(false);
     layout->addWidget(selectDefault);
 
     QGridLayout *grid = new QGridLayout;
     selectDefault->setLayout(grid);
-    grid->addWidget((defWatts=new QCheckBox("Power")), 0,0, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defBPM=new QCheckBox("Heartrate")), 1,0, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defKPH=new QCheckBox("Speed")), 0,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defRPM=new QCheckBox("Cadence")), 1,1, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget((defWatts=new QCheckBox(tr("Power"))), 0,0, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget((defBPM=new QCheckBox(tr("Heartrate"))), 1,0, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget((defKPH=new QCheckBox(tr("Speed"))), 0,1, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget((defRPM=new QCheckBox(tr("Cadence"))), 1,1, Qt::AlignVCenter|Qt::AlignLeft);
     layout->addStretch();
 }
 
