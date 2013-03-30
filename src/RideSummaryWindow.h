@@ -27,12 +27,19 @@
 
 #include "SummaryMetrics.h"
 
+#ifdef GC_HAVE_LUCENE
+#include "SearchFilterBox.h"
+#endif
+
 
 class RideSummaryWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
 
+#ifdef GC_HAVE_LUCENE
+    Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
+#endif
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
     Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
@@ -61,6 +68,11 @@ class RideSummaryWindow : public GcChartWindow
         void setLastNX(int x) { dateSetting->setLastNX(x); }
         int prevN() { return dateSetting->prevN(); }
         void setPrevN(int x) { dateSetting->setPrevN(x); }
+#ifdef GC_HAVE_LUCENE
+        // filter
+        QString filter() const { return ridesummary ? "" : searchBox->filter(); }
+        void setFilter(QString x) { if (!ridesummary) searchBox->setFilter(x); }
+#endif
 
     protected slots:
 
@@ -74,6 +86,11 @@ class RideSummaryWindow : public GcChartWindow
         void useCustomRange(DateRange);
         void useStandardRange();
         void useThruToday();
+
+#ifdef GC_HAVE_LUCENE
+        void clearFilter();
+        void setFilter(QStringList);
+#endif
 
     protected:
 
@@ -92,6 +109,11 @@ class RideSummaryWindow : public GcChartWindow
         bool useCustom;
         bool useToToday;
         DateRange custom;
+#ifdef GC_HAVE_LUCENE
+        SearchFilterBox *searchBox;
+#endif
+        QStringList filters; // empty when no lucene
+        bool filtered; // are we using a filter?
 };
 
 #endif // _GC_RideSummaryWindow_h
