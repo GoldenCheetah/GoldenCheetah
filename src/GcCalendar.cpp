@@ -914,6 +914,8 @@ void
 GcMultiCalendar::setRide(RideItem *ride)
 {
     if (active) return;
+
+    setUpdatesEnabled(false);
     active = true; // avoid multiple calls
 
     // whats the date on the first calendar?
@@ -951,6 +953,8 @@ GcMultiCalendar::setRide(RideItem *ride)
             calendars.at(i)->setDate(first.addMonths(i).month(), first.addMonths(i).year());
         }
     }
+
+    setUpdatesEnabled(true);
     active = false;
 }
 
