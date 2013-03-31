@@ -39,9 +39,9 @@ has been improved considerably. One of the major criticisms of the
 software was it crashing.
 
 We have fixed 46 serious issues and over 400 bugs in over 1,500 different
-commits. GoldenCheetah is now over 100,000 lines of code and is used by
-1000s of users around the world, from Santiago to Singapore and Auckland
-to Aberdeen.
+commits. GoldenCheetah is now over 120,000 lines of code compared to 
+61,000 of the previous v2.1 release. It is used by 1000s of users around 
+the world, from Santiago to Singapore and Auckland to Aberdeen.
 
 In addition to addressing stability issues we have also looked closely at
 performance. Whilst the new metric functionality and database means that
@@ -62,7 +62,8 @@ In short, we've squashed the big bugs and made it run much faster.
 One of the most immediate changes you will notice with v3.0 are the 
 major changes to the user experience and user interface. From the
 initial help screens for new users through to the redesigned preferences
-pane for advanced users, it is slicker and more professional.
+pane for advanced users, it provides a  more complete user experience
+with a slicker and more professional user interface.
 
 We wanted an elegant and clean user interface that was intuitive to
 use and revealed complexity when it was required. We think we've
@@ -146,9 +147,9 @@ your ANT+ powermeter on your Computrainer, Kickr or Fortius.
 
 @section Advanced search and data filtering
 
-We now offer the ability to use free text search across all ativities, enabling
-lightning quick searches for past activities.  We use a well proven and lightning fast
-indexing tool (CLucene) to index all the details of your activities seamlessly.
+We now offer the ability to use free text search across all activities, enabling
+lightning quick searches for past activities.  We use a well proven and fast
+search and indexing tool called CLucene to provide search as you type functionality.
 
 Additionally we have introduced a data filter (using the same search box) to allow
 you to filter activities for specific properties, for example for all rides with a

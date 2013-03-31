@@ -75,7 +75,7 @@ for existing users, version 3.0 had introduced;
 @heading 500+ bug fixes and minor enhancements
  
 It fixed 46 serious issues and over 400 bugs in over 1,500 different
-commits. GoldenCheetah is now over 100,000 lines of code.  In addition
+commits. GoldenCheetah is now over 120,000 lines of code.  In addition
 to addressing stability issues it also addressed a number of performance
 related issues.  Whilst the new metric functionality and database means that
 a modern PC is recommended, the code is still efficient enough to run on
@@ -86,7 +86,7 @@ a netbook.
 One of the most immediate changes you will notice with v3.0 are the
 major changes to the user experience and user interface. From the
 initial help screens for new users through to the redesigned preferences
-pane for advanced users, it is slicker and more professional.
+pane for advanced users, it is more complete and more professional.
  
 There are 4 views available with specific and detailed sidebars for
 performance tracking (home), short term tracking (diary) as well as
@@ -601,6 +601,47 @@ the current window focus.
 @center @image{"image/2-toolbar",350pt}
 @center @emph{Figure 7: Tool Bar and Scope Bar}
 @vskip 6pt
+
+Working from left to right in the toolbar, there are a number of buttons to download and import
+activities that are mostly relevant to the analysis view;
+and lastly a search box;
+@itemize @bullet
+@item @strong{Download Activity} - 
+@item @strong{Compose Manual Activity} - 
+@item @strong{Find Intervals} - 
+@item @strong{Split Activity} - 
+@item @strong{Delete Activity} - 
+@end itemize
+
+Then to the right of the toolbar there are a trio of buttons to control the way the 
+main window is laid out;
+@itemize @bullet
+@item @strong{Show/Hide Sidebar} - 
+@item @strong{Tabbed Mode} - 
+@item @strong{Tiled Mode} - 
+@end itemize
+
+Lastly to the right of the toolbar there is a search/filter box;
+@itemize @bullet
+@item @strong{Mac OSX only Search box} - 
+@item @strong{Windows/Linux Search/Filter box} - 
+@end itemize
+
+Beneath the toolbar is the scope bar, this is a selector to choose from one
+of four views in main view -- essentially its a selector for choosing what
+you want to do with GoldenCheetah, it offers four views;
+
+@itemize @bullet
+@item @strong{Home} - 
+@item @strong{Diary} - 
+@item @strong{Analysis} - 
+@item @strong{Train} - 
+@end itemize
+
+To the right of the scope bar is a `+' menu button;
+@itemize @bullet
+@item @strong{Add Chart (`+') Menu} - yada
+@end itemize
  
 @section Views & Sidebar
 scopebar, sidebar, tab/tiled, add chart menu
