@@ -58,6 +58,7 @@ class GcCalendarModel : public QAbstractProxyModel
 
 private:
     int month, year; // current month and year, default to this month
+    bool stale;
     QVector<QDate> dates; // dates for each cell from zero onwards
     int rows;
 
@@ -68,6 +69,14 @@ private:
     int filenameIndex, durationIndex, dateIndex, textIndex, colorIndex;
 
 public slots:
+
+    void rideChange(RideItem *rideItem) {
+        if (rideItem) {
+            QDate date = rideItem->dateTime.date();
+            if (month && year && date.month() == month && date.year() == year) stale = true;
+        }
+    }
+
     void refresh() {
 
         if (!sourceModel()) return; // no model yet!
@@ -127,15 +136,24 @@ public:
     GcCalendarModel(QWidget *parent, QList<FieldDefinition> *, MainWindow *main) : QAbstractProxyModel(parent), mainWindow(main) {
         setParent(parent);
 
+        stale = true;
         QDate today = QDateTime::currentDateTime().date();
         setMonth(today.month(), today.year());
+
+        // invalidate model if rides added or deleted
+        connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
+        connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
+
     }
     ~GcCalendarModel() {}
 
     void setMonth(int month, int year) {
-        this->month = month;
-        this->year  = year;
-        refresh();
+
+        if (stale || this->month != month || this->year != year) {
+            this->month = month;
+            this->year  = year;
+            refresh();
+        }
     }
 
     int getMonth() { return month; }
