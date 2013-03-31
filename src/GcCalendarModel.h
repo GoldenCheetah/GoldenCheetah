@@ -129,6 +129,7 @@ public slots:
             dateToRows.insert(dateTime.date(), arr);
         }
         reset();
+
     }
 
 public:

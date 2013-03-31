@@ -134,6 +134,7 @@ class GcMultiCalendar : public QScrollArea
         void resizeEvent(QResizeEvent*);
         void setFilter(QStringList filter);
         void clearFilter();
+        void showEvent(QShowEvent*);
 
 
     private:
@@ -143,6 +144,8 @@ class GcMultiCalendar : public QScrollArea
         int showing;
         QStringList filters;
         bool active;
+        bool stale; // we need to redraw when shown
+        RideItem *_ride;
 };
 
 class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
