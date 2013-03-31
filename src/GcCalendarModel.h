@@ -150,6 +150,7 @@ public:
     void setMonth(int month, int year) {
 
         if (stale || this->month != month || this->year != year) {
+            stale = false;
             this->month = month;
             this->year  = year;
             refresh();
