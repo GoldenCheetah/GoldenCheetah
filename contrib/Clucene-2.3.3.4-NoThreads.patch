@@ -1,0 +1,107 @@
+From 44a403d45ae049e7ade3e9b47a39778dcacf4382 Mon Sep 17 00:00:00 2001
+From: Mark Liversedge <liversedge@gmail.com>
+Date: Thu, 28 Mar 2013 22:03:35 +0000
+Subject: [PATCH] Fixup no threads for GC
+
+---
+ src/core/CLucene/debug/lucenebase.h |    2 +-
+ src/shared/CLucene/LuceneThreads.h  |   21 ++++++++++++++++++---
+ src/shared/CLucene/util/Misc.cpp    |    2 ++
+ src/shared/CLucene/util/Misc.h      |    2 ++
+ 4 files changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/src/core/CLucene/debug/lucenebase.h b/src/core/CLucene/debug/lucenebase.h
+index c053f11..9732ce6 100644
+--- a/src/core/CLucene/debug/lucenebase.h
++++ b/src/core/CLucene/debug/lucenebase.h
+@@ -6,7 +6,7 @@
+ ------------------------------------------------------------------------------*/
+ #ifndef _lucene_debug_lucenebase_
+ #define _lucene_debug_lucenebase_
+-
++#define _CL_DISABLE_MULTITHREADING
+ #include "CLucene/LuceneThreads.h"
+ 
+ CL_NS_DEF(debug)
+diff --git a/src/shared/CLucene/LuceneThreads.h b/src/shared/CLucene/LuceneThreads.h
+index 97072ee..662ff2f 100644
+--- a/src/shared/CLucene/LuceneThreads.h
++++ b/src/shared/CLucene/LuceneThreads.h
+@@ -13,10 +13,10 @@ class CLuceneThreadIdCompare;
+ 
+ #if defined(_CL_DISABLE_MULTITHREADING)
+ 	#define SCOPED_LOCK_MUTEX(theMutex)
+-	#define DEFINE_MUTEX(x)
++	//#define DEFINE_MUTEX(x)
+ 	#define DEFINE_MUTABLE_MUTEX(x)
+ 	#define DEFINE_CONDITION(x)
+-	#define STATIC_DEFINE_MUTEX(x)
++	//#define STATIC_DEFINE_MUTEX(x)
+ 	#define CONDITION_WAIT(theMutex, theCondition)
+ 	#define CONDITION_NOTIFYALL(theCondition)
+ 	#define _LUCENE_CURRTHREADID 1
+@@ -25,11 +25,26 @@ class CLuceneThreadIdCompare;
+ 	#define _LUCENE_THREAD_FUNC_RETURN(val) return (int)val;
+ 	#define _LUCENE_THREAD_CREATE(func, arg) (*func)(arg)
+ 	#define _LUCENE_THREAD_JOIN(value) //nothing to do...
+-	#define _LUCENE_THREADMUTEX void*
++	//#define _LUCENE_THREADMUTEX void*
+ 
+   #define _LUCENE_ATOMIC_INC(theInteger) (++(*theInteger))
+   #define _LUCENE_ATOMIC_DEC(theInteger) (--(*theInteger))
+   #define _LUCENE_ATOMIC_INT int
++#define _LUCENE_ATOMIC_INT_SET(x,v) x=v
++#define _LUCENE_ATOMIC_INT_GET(x) x
++
++struct CLUCENE_SHARED_EXPORT mutex_thread
++{
++	void lock() {}
++	void unlock() {}
++};
++#define _LUCENE_THREADMUTEX CL_NS(util)::mutex_thread
++
++#define DEFINE_MUTEX(theMutex) _LUCENE_THREADMUTEX theMutex;
++#define STATIC_DEFINE_MUTEX(theMutex) static _LUCENE_THREADMUTEX theMutex;
++
++#define CONDITION_WAIT(theMutex, theCondition)	
++#define CONDITION_NOTIFYALL(theCondition)	
+ #else
+ 	#if defined(_LUCENE_DONTIMPLEMENT_THREADMUTEX)
+ 		//do nothing
+diff --git a/src/shared/CLucene/util/Misc.cpp b/src/shared/CLucene/util/Misc.cpp
+index 240b827..ec9eabd 100644
+--- a/src/shared/CLucene/util/Misc.cpp
++++ b/src/shared/CLucene/util/Misc.cpp
+@@ -466,6 +466,7 @@ bool Misc::listFiles(const char* directory, std::vector<std::string>& files, boo
+ std::string Misc::toString(const bool value){
+   return value ? "true" : "false";
+ }
++#ifndef _CL_DISABLE_MULTITHREADING
+ std::string Misc::toString(_LUCENE_THREADID_TYPE value){
+   static int32_t nextindex = 0;
+   static std::map<_LUCENE_THREADID_TYPE, int32_t> ids;
+@@ -474,6 +475,7 @@ std::string Misc::toString(_LUCENE_THREADID_TYPE value){
+   }
+   return toString(ids[value]);
+ }
++#endif
+ std::string Misc::toString(const int32_t value){
+   char buf[20];
+   TCHAR tbuf[20];
+diff --git a/src/shared/CLucene/util/Misc.h b/src/shared/CLucene/util/Misc.h
+index aea7c42..4196e24 100644
+--- a/src/shared/CLucene/util/Misc.h
++++ b/src/shared/CLucene/util/Misc.h
+@@ -67,7 +67,9 @@ CL_NS_DEF(util)
+ 
+   static std::string toString(const int32_t value);
+   static std::string toString(const int64_t value);
++#ifndef _CL_DISABLE_MULTITHREADING
+   static std::string toString(const _LUCENE_THREADID_TYPE value);
++#endif
+   static std::string toString(const bool value);
+   static std::string toString(const float_t value);
+   static std::string toString(const TCHAR* s, int32_t len=-1);
+-- 
+1.7.8.msysgit.0
+
