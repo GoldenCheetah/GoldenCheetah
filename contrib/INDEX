@@ -1,0 +1,5 @@
+Clucene-2.3.3.4-NoThreads.patch         - To patch Clucene on Windows to remove patching
+Fortius USB Driver Stubs.zip            - Drivers for use with Fortius without Tacx software
+Install_D2XX_drivers.mpkg.zip           - D2XX installer for Windows
+Universal_D2XX0.1.6.dmg                 - D2XX installer for Mac OSX
+libusb-0.1.12.tar.gz                    - Libusb (patched) to work with GoldenCheetah
