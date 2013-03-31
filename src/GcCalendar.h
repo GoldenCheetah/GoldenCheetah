@@ -142,6 +142,7 @@ class GcMultiCalendar : public QScrollArea
         MainWindow *main;
         int showing;
         QStringList filters;
+        bool active;
 };
 
 class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
