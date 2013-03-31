@@ -596,7 +596,11 @@ Simply lists the current windows you have open and allows you to select the wind
 the current window focus.
 @page
 @section The Toolbar and Scope bar
-what the buttons do
+
+@vskip 12pt
+@center @image{"image/2-toolbar",350pt}
+@center @emph{Figure 7: Tool Bar and Scope Bar}
+@vskip 6pt
  
 @section Views & Sidebar
 scopebar, sidebar, tab/tiled, add chart menu
@@ -667,7 +671,7 @@ the manual activity dialog and refer to details screen for more "indepth" (need 
 @c ********************************************************************************
 @c ANALYSIS CHARTS
 @c ********************************************************************************
-@chapter Analysis View Charts
+@chapter ANALYSIS VIEW CHARTS
 @node ANALYSIS CHARTS
        i Activity Summary
       ii Details
@@ -695,7 +699,7 @@ the manual activity dialog and refer to details screen for more "indepth" (need 
 @c ********************************************************************************
 @c HOME CHARTS
 @c ********************************************************************************
-@chapter Performance Tracking Charts
+@chapter PERFORMANCE TRACKING CHARTS
 @node HOME CHARTS
        i Long Term Metrics
          - indepth howto incl. setting up a PMC++
@@ -740,7 +744,7 @@ the manual activity dialog and refer to details screen for more "indepth" (need 
 @c ********************************************************************************
 @c TRAIN CHARTS
 @c ********************************************************************************
-@chapter Training View Charts
+@chapter TRAINING VIEW CHARTS
 @node TRAIN CHARTS
         i Telemetry
        ii Workout
@@ -788,11 +792,11 @@ Intro and explain opening the Preferences Pane
 @c ********************************************************************************
 @c Appendices
 @c ********************************************************************************
-@unnumbered Appendix A Supported Devices, Formats & Services
-@unnumbered B Metrics Reference
-@unnumbered B Data Filtering Reference
-@unnumbered C Glossary & Resources
-@unnumbered D OS Specifics (Directories, Drivers and Permissions)
+@unnumbered A - Supported Devices, Formats & Services
+@unnumbered B - Metrics Reference
+@unnumbered B - Data Filtering Reference
+@unnumbered C - Glossary & Resources
+@unnumbered D - OS Specifics (Directories, Drivers and Permissions)
  
 @unnumbered Index
 @printindex cp
