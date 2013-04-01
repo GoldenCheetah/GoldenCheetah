@@ -124,6 +124,7 @@ DiaryWindow::rideSelected()
     when = when.addDays(Qt::Monday - when.dayOfWeek());
 
     title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
+    repaint();
     next->show();
     prev->show();
 }

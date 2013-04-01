@@ -1815,7 +1815,7 @@ MainWindow::dropEvent(QDropEvent *event)
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::addRide(QString name, bool /* bSelect =true*/)
+MainWindow::addRide(QString name, bool dosignal)
 {
     QDateTime dt;
     if (!parseRideFileName(name, &dt)) {
@@ -1838,7 +1838,7 @@ MainWindow::addRide(QString name, bool /* bSelect =true*/)
         }
         ++index;
     }
-    rideAdded(last); // here so emitted BEFORE rideSelected is emitted!
+    if (dosignal) rideAdded(last); // here so emitted BEFORE rideSelected is emitted!
     allRides->insertChild(index, last);
 
     // if it is the very first ride, we need to select it

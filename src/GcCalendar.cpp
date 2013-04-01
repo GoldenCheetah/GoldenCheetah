@@ -570,7 +570,7 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
 void
 GcMiniCalendar::refresh()
 {
-    setDate(month, year);
+    if (month && year) setDate(month, year);
 }
 
 bool
@@ -705,21 +705,27 @@ GcMiniCalendar::next()
 void
 GcMiniCalendar::setRide(RideItem *ride)
 {
-    _ride = ride;
 
-    QDate when;
-    if (_ride && _ride->ride()) when = _ride->dateTime.date();
-    else when = QDate::currentDate();
+    if (ride != _ride) {
+        _ride = ride;
 
-    // refresh the model
-    setDate(when.month(), when.year());
+
+        QDate when;
+        if (_ride && _ride->ride()) when = _ride->dateTime.date();
+        else when = QDate::currentDate();
+
+        // refresh the model
+        setDate(when.month(), when.year());
+    }
 }
 
 void
 GcMiniCalendar::clearRide()
 {
-    _ride = NULL;
-    setDate(month,year);
+    if (_ride) {
+        _ride = NULL;
+        setDate(month,year);
+    }
 }
 
 void
@@ -798,7 +804,7 @@ GcMiniCalendar::setDate(int _month, int _year)
 //********************************************************************************
 // MULTI CALENDAR (GcMultiCalendar)
 //********************************************************************************
-GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(main)
+GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(main), active(false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setContentsMargins(0,0,0,0);
@@ -828,6 +834,11 @@ GcMultiCalendar::setFilter(QStringList filter)
 {
     this->filters = filter;
 
+    if (!isVisible()) {
+        stale = true;
+        return;
+    }
+
     for (int i=0; i<calendars.count();i++) {
         calendars.at(i)->setFilter(filter);
     }
@@ -843,6 +854,11 @@ GcMultiCalendar::clearFilter()
 {
     this->filters.clear();
 
+    if (!isVisible()) {
+        stale = true;
+        return;
+    }
+
     for (int i=0; i<calendars.count();i++) {
         calendars.at(i)->clearFilter();
     }
@@ -856,6 +872,11 @@ GcMultiCalendar::clearFilter()
 void
 GcMultiCalendar::dateChanged(int month, int year)
 {
+    if (!isVisible()) {
+        stale = true;
+        return;
+    }
+
     setUpdatesEnabled(false);
 
     // master changed make all the others change too
@@ -871,11 +892,21 @@ GcMultiCalendar::dateChanged(int month, int year)
 void
 GcMultiCalendar::resizeEvent(QResizeEvent*)
 {
+    if (!isVisible()) {
+        stale = true;
+        return;
+    }
+
     // we expand x and y
+    int oldshowing = showing;
     showing = height() < 180 ? 1 : (int)(height() / 180);
     showing *= width() < 180 ? 1 : (int)(width() / 180);
 
     int have = calendars.count();
+
+    int m,y;
+    calendars.at(0)->getDate(m,y);
+    QDate first(y, m, 01);
 
     if (showing > calendars.count()) {
 
@@ -884,32 +915,41 @@ GcMultiCalendar::resizeEvent(QResizeEvent*)
             mini->setFilter(this->filters);
             calendars.append(mini);
             layout->insert(i, mini);
+            calendars.at(i)->setDate(first.addMonths(i).month(), first.addMonths(i).year());
         }
         
     } else {
 
-        for (int i=0; i<have; i++) {
-            if (i<showing) {
+        for (int i=0; i<calendars.count(); i++) {
+            if (i>=oldshowing && i<showing) {
                 calendars.at(i)->setFilter(this->filters);
+                calendars.at(i)->setDate(first.addMonths(i).month(), first.addMonths(i).year());
                 calendars.at(i)->show();
             }
-            else calendars.at(i)->hide();
+            else if (i>=showing) {
+                GcMiniCalendar *p = calendars.at(i);
+                delete p;
+                calendars.remove(i);
+                i--; // i is incremented in loop, but we just deleted
+            }
         }
-    }
-
-    // set the calendars to the right month etc
-    // they will ignore if they already have that date
-    int m,y;
-    calendars.at(0)->getDate(m,y);
-    QDate first(y, m, 01);
-    for (int i=1; i<calendars.count();i++) {
-        calendars.at(i)->setDate(first.addMonths(i).month(), first.addMonths(i).year());
     }
 }
 
 void
 GcMultiCalendar::setRide(RideItem *ride)
 {
+    _ride = ride;
+
+    if (active) return;
+    if (!isVisible()) {
+        stale = true;
+        return;
+    }
+
+    setUpdatesEnabled(false);
+    active = true; // avoid multiple calls
+
     // whats the date on the first calendar?
     int month, year;
     calendars.at(0)->getDate(month,year);
@@ -945,6 +985,9 @@ GcMultiCalendar::setRide(RideItem *ride)
             calendars.at(i)->setDate(first.addMonths(i).month(), first.addMonths(i).year());
         }
     }
+
+    setUpdatesEnabled(true);
+    active = false;
 }
 
 void
@@ -955,4 +998,12 @@ GcMultiCalendar::refresh()
         calendars.at(i)->refresh();
     }
     setUpdatesEnabled(true);
+}
+
+void
+GcMultiCalendar::showEvent(QShowEvent*)
+{
+    setFilter(filters);
+    resizeEvent(NULL);
+    setRide(_ride);
 }
