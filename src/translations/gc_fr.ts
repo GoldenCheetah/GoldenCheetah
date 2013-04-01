@@ -1331,6 +1331,17 @@ Press Next to Continue
 <context>
     <name>BlankStateAnalysisPage</name>
     <message>
+        <location filename="../BlankState.cpp" line="131"/>
+        <source>Analysis</source>
+        <translation type="unfinished">Analyse</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="132"/>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../BlankState.cpp" line="138"/>
         <source>Import files from your disk or usb device</source>
         <translation type="unfinished"></translation>
@@ -1354,6 +1365,17 @@ Press Next to Continue
 <context>
     <name>BlankStateDiaryPage</name>
     <message>
+        <location filename="../BlankState.cpp" line="186"/>
+        <source>Diary</source>
+        <translation type="unfinished">Journal</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="187"/>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../BlankState.cpp" line="193"/>
         <source>Import files from your disk or usb device</source>
         <translation type="unfinished"></translation>
@@ -1376,6 +1398,17 @@ Press Next to Continue
 </context>
 <context>
     <name>BlankStateHomePage</name>
+    <message>
+        <location filename="../BlankState.cpp" line="159"/>
+        <source>Home</source>
+        <translation type="unfinished">Home</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="160"/>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../BlankState.cpp" line="166"/>
         <source>Import files from your disk or usb device</source>
@@ -1412,6 +1445,17 @@ Press Next to Continue
 </context>
 <context>
     <name>BlankStateTrainPage</name>
+    <message>
+        <location filename="../BlankState.cpp" line="213"/>
+        <source>Train</source>
+        <translation type="unfinished">Entraînement</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="214"/>
+        <source>No devices or workouts ?
+Let&apos;s get you setup.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../BlankState.cpp" line="222"/>
         <source>Find and add training devices.</source>
@@ -3952,22 +3996,22 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
 <context>
     <name>GcCalendarModel</name>
     <message>
-        <location filename="../GcCalendarModel.h" line="93"/>
+        <location filename="../GcCalendarModel.h" line="102"/>
         <source>Duration</source>
         <translation>Durée</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="94"/>
+        <location filename="../GcCalendarModel.h" line="103"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="95"/>
+        <location filename="../GcCalendarModel.h" line="104"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="96"/>
+        <location filename="../GcCalendarModel.h" line="105"/>
         <source>Calendar Text</source>
         <translation>Texte du calendrier</translation>
     </message>
@@ -4257,6 +4301,11 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../Pages.cpp" line="87"/>
         <source>Crank Length:</source>
         <translation>Longueur des manivelles:</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="119"/>
+        <source>Wheelsize:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="144"/>
@@ -9992,9 +10041,9 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideDelegate</name>
     <message>
-        <location filename="../RideImportWizard.cpp" line="969"/>
-        <location filename="../RideImportWizard.cpp" line="1006"/>
-        <location filename="../RideImportWizard.cpp" line="1022"/>
+        <location filename="../RideImportWizard.cpp" line="968"/>
+        <location filename="../RideImportWizard.cpp" line="1005"/>
+        <location filename="../RideImportWizard.cpp" line="1021"/>
         <source>dd MMM yyyy</source>
         <translation>dd MMM yyyy</translation>
     </message>
@@ -10636,7 +10685,7 @@ Watts par kg</translation>
         <location filename="../RideImportWizard.cpp" line="509"/>
         <location filename="../RideImportWizard.cpp" line="720"/>
         <location filename="../RideImportWizard.cpp" line="759"/>
-        <location filename="../RideImportWizard.cpp" line="892"/>
+        <location filename="../RideImportWizard.cpp" line="891"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
@@ -10770,7 +10819,7 @@ Watts par kg</translation>
         <translation>Fichier sauvé</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="880"/>
+        <location filename="../RideImportWizard.cpp" line="879"/>
         <source>Error - copy failed</source>
         <translation>Erreur - La copie a échouée</translation>
     </message>
@@ -10787,13 +10836,13 @@ Watts par kg</translation>
         <translation type="obsolete">Accompli.</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="897"/>
+        <location filename="../RideImportWizard.cpp" line="896"/>
         <source>Import Complete. %1 of %2 successful.</source>
         <translation>Importation terminée. %1 sur %2 avec succès.</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="707"/>
-        <location filename="../RideImportWizard.cpp" line="902"/>
+        <location filename="../RideImportWizard.cpp" line="901"/>
         <source>Finish</source>
         <translation>Terminé</translation>
     </message>
@@ -10884,64 +10933,76 @@ Watts par kg</translation>
         <translation>Type d&apos;appareil: </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="208"/>
+        <location filename="../RideSummaryWindow.cpp" line="501"/>
         <source> activity</source>
         <translation>activité</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="208"/>
+        <location filename="../RideSummaryWindow.cpp" line="501"/>
         <source> activities</source>
         <translation> activités</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Totals</source>
         <translation>Totals</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Averages</source>
         <translation>Moyennes</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Maximums</source>
         <translation>Maximums</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Metrics*</source>
         <translation>Metriques*</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="332"/>
+        <location filename="../RideSummaryWindow.cpp" line="335"/>
         <source>^(Average|Max) </source>
         <translation>^(Moyenne|Max)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="335"/>
-        <location filename="../RideSummaryWindow.cpp" line="448"/>
-        <location filename="../RideSummaryWindow.cpp" line="470"/>
+        <location filename="../RideSummaryWindow.cpp" line="338"/>
+        <location filename="../RideSummaryWindow.cpp" line="451"/>
+        <location filename="../RideSummaryWindow.cpp" line="473"/>
+        <location filename="../RideSummaryWindow.cpp" line="532"/>
+        <location filename="../RideSummaryWindow.cpp" line="540"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="386"/>
+        <location filename="../RideSummaryWindow.cpp" line="389"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zones de Puissance&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="402"/>
+        <location filename="../RideSummaryWindow.cpp" line="405"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zones de fréquence cardiaque&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="494"/>
+        <location filename="../RideSummaryWindow.cpp" line="509"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="526"/>
+        <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="593"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore est une marque déposée par Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="497"/>
+        <location filename="../RideSummaryWindow.cpp" line="596"/>
         <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation>&lt;br&gt;TSS, NP et IF sont des marques déposées par Peaksware LLC&lt;/center&gt;</translation>
     </message>
@@ -10954,12 +11015,12 @@ Watts par kg</translation>
         <translation type="obsolete">&lt;h2&gt;Zones de Puissance&lt;/h2&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="420"/>
+        <location filename="../RideSummaryWindow.cpp" line="423"/>
         <source>Intervals</source>
         <translation>Intervales</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="484"/>
+        <location filename="../RideSummaryWindow.cpp" line="583"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Erreurs à la lecture du fichier:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
