@@ -26,50 +26,50 @@
 // As a result, only Realtime uses this feature at present (and the associated
 // configuration DeviceConfiguration class and preferences pane
 
-static DeviceType SupportedDevices[] =
+
+DeviceTypes::DeviceTypes()
 {
+    static DeviceType SupportedDevices[] =
+    {
 #ifdef Q_OS_WIN32
       { DEV_ANTLOCAL, DEV_USB,     (char *) "Native ANT+",            true,    false,
-        "ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
-        "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick",
+        tr("ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+        "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick"),
         ":images/devices/garminusb.png" },
 #else
       { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false,
-        "ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
-        "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick" ,
+        tr("ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+        "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick") ,
         ":images/devices/garminusb.png" },
 #endif
 #ifdef GC_HAVE_WFAPI
 #if 0 //!!! Deferred until v3.1 or as an update to v3.0 when Wahoo support ANT+
       { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
-        "Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC",
+        tr("Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC"),
         ":images/devices/btle.png" },
 #endif
       { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
-        "The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. ",
+        tr("The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. "),
         ":images/devices/kickr.png" },
 #endif
       { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false,
-        "Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "
-        "connected via a USB adaptor or directly connected to a local serial port." ,
+        tr("Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "
+        "connected via a USB adaptor or directly connected to a local serial port.") ,
         ":images/devices/computrainer.png"                                        },
 #ifdef GC_HAVE_LIBUSB
       { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,
-        "Tacx Fortius/iMagic bike trainer with the handlebar controller connected "
-        "to a USB port. Please make sure you have device firmware to hand." ,
+        tr("Tacx Fortius/iMagic bike trainer with the handlebar controller connected "
+        "to a USB port. Please make sure you have device firmware to hand.") ,
         ":images/devices/fortius.png" },
 #endif
 #ifdef GC_WANT_ROBOT
       { DEV_NULL,     DEV_TCP,     (char *) "Robot", false,   false,
-        "Testing device used for development only. If an ERG file is selected it will "
-        "replay back, with a little randomness thrown in.",
+        tr("Testing device used for development only. If an ERG file is selected it will "
+        "replay back, with a little randomness thrown in."),
         "" },
 #endif
       { 0, 0, NULL, 0, 0, "", "" }
-};
-
-DeviceTypes::DeviceTypes()
-{
+    };
     for (int i=0; SupportedDevices[i].type;i++)
          Supported.append(SupportedDevices[i]);
 }
