@@ -118,7 +118,7 @@ JouleDevice::download( const QDir &tmpdir,
     if (JOULE_DEBUG) printf("download Joule 1.0 or GPS");
 
     if (!dev->open(err)) {
-        err = "ERROR: open failed: " + err;
+        err = tr("ERROR: open failed: ") + err;
         return false;
     }
     dev->setBaudRate(57600, err);
@@ -135,14 +135,14 @@ JouleDevice::download( const QDir &tmpdir,
     }
 
     bool isJouleGPS = getJouleGPS(versionResponse);
-    emit updateStatus(QString("Joule %1 indentified").arg(isJouleGPS?"GPS":"1.0"));
+    emit updateStatus(QString(tr("Joule %1 indentified")).arg(isJouleGPS?"GPS":"1.0"));
 
     QList<DeviceStoredRideItem> trainings;
     if (!getDownloadableRides(trainings, isJouleGPS, err))
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        emit updateProgress(QString("Read ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
+        emit updateProgress(QString(tr("Read ride detail for ride %1/%2")).arg(i+1).arg(trainings.count()));
         JoulePacket request(READ_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);
@@ -156,7 +156,7 @@ JouleDevice::download( const QDir &tmpdir,
 
         if(m_Cancelled)
         {
-            err = "download cancelled";
+            err = tr("download cancelled");
             return false;
         }
 
@@ -165,7 +165,7 @@ JouleDevice::download( const QDir &tmpdir,
 
             if (response.payload.size() < 4096)
             {
-                err = "no data";
+                err = tr("no data");
                 return false;
             }
 
@@ -183,7 +183,7 @@ JouleDevice::download( const QDir &tmpdir,
                 tmp.setAutoRemove(false);
 
                 if (!tmp.open()) {
-                    err = "Failed to create temporary file "
+                    err = tr("Failed to create temporary file ")
                         + tmpl + ": " + tmp.error();
                     return false;
                 }
@@ -274,7 +274,7 @@ JouleDevice::download( const QDir &tmpdir,
 bool
 JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
 {
-    emit updateStatus("Get Unit Software Version...");
+    emit updateStatus(tr("Get Unit Software Version..."));
     if (JOULE_DEBUG) printf("Get Unit Software Version\n");
 
     JoulePacket request(READ_UNIT_VERSION);
@@ -293,7 +293,7 @@ JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
                 data_version = qByteArray2Int(response.payload.right(2));
 
             QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
-            emit updateStatus("Version"+version);
+            emit updateStatus(tr("Version")+version);
             return true;
         }
     }
@@ -303,7 +303,7 @@ JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
 bool
 JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
 {
-    emit updateStatus("Get System info...");
+    emit updateStatus(tr("Get System info..."));
     if (JOULE_DEBUG) printf("Get System info\n");
 
     JoulePacket request(READ_SYSTEM_INFO);
@@ -327,7 +327,7 @@ JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
 bool
 JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 {
-    emit updateStatus("Get Unit Free Space...");
+    emit updateStatus(tr("Get Unit Free Space..."));
     if (JOULE_DEBUG) printf("Get Unit Free Space\n");
 
     JoulePacket request1(GET_FREE_SPACE);
@@ -352,7 +352,7 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 bool
 JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err)
 {
-    emit updateStatus("Read ride summary...");
+    emit updateStatus(tr("Read ride summary..."));
     if (JOULE_DEBUG) printf("Read ride summary\n");
 
     JoulePacket request(READ_RIDE_SUMMARY);
@@ -384,7 +384,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
                 rides.append(ride);
             }
         }
-        emit updateStatus(QString("%1 detailled rides").arg(rides.count()));
+        emit updateStatus(QString(tr("%1 detailled rides")).arg(rides.count()));
         return true;
     }
     return false;
@@ -392,11 +392,11 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
 
 bool
 JouleDevice::cleanup( QString &err ) {
-    emit updateStatus("Erase all records on computer");
+    emit updateStatus(tr("Erase all records on computer"));
     if (JOULE_DEBUG) printf("Erase all records on computer\n");
 
     if (!dev->open(err)) {
-        err = "ERROR: open failed: " + err;
+        err = tr("ERROR: open failed: ") + err;
     }
 
     dev->setBaudRate(57600, err);
@@ -410,7 +410,7 @@ JouleDevice::cleanup( QString &err ) {
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        emit updateStatus(QString("Delete ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
+        emit updateStatus(QString(tr("Delete ride detail for ride %1/%2")).arg(i+1).arg(trainings.count()));
         JoulePacket request(ERASE_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);
@@ -493,7 +493,7 @@ JoulePacket::verifyCheckSum(CommPortPtr dev, QString &err)
     if (JOULE_DEBUG) printf("reading checksum from device\n");
     int n = dev->read(&_checksum, 1, err);
     if (n <= 0) {
-        err = (n < 0) ? ("read checksum error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read checksum error: ") + err) : tr("read timeout");
         return false;
     }
     if (JOULE_DEBUG) printf("CheckSum1 %d CheckSum2 %d", (0xff & (unsigned) checksum) , (0xff & (unsigned) _checksum));
@@ -551,11 +551,11 @@ JoulePacket::write(CommPortPtr dev, QString &err)
     if (n != bytes.count()) {
         if (n < 0) {
             if (JOULE_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toAscii().constData());
-            err = QString("failed to write to device: %1").arg(err);
+            err = QString(tr("failed to write to device: %1")).arg(err);
         }
         else {
             if (JOULE_DEBUG) printf("timeout writing %s to device\n", msg);
-            err = QString("timeout writing to device");
+            err = QString(tr("timeout writing to device"));
         }
         return false;
     }
@@ -572,17 +572,17 @@ JoulePacket::read(CommPortPtr dev, QString &err)
     if (JOULE_DEBUG) printf("reading from device\n");
     int n = dev->read(&startpattern, 2, err);
     if (n <= 0) {
-        err = (n < 0) ? ("read header error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read header error: ") + err) : tr("read timeout");
         return false;
     }
 
     uint16_t _command = 0;
     n = readOneByOne(dev, &_command, 2, err);
     if (n <= 0) {
-        err = (n < 0) ? ("read command error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read command error: ") + err) : tr("read timeout");
         return false;
     } else if (_command != command) {
-        err = "wrong response";
+        err = tr("wrong response");
         return false;
     }
     //if (JOULE_DEBUG) printf("command %s\n" , command);
@@ -590,7 +590,7 @@ JoulePacket::read(CommPortPtr dev, QString &err)
 
     n = readOneByOne(dev, &length, 2, err);
     if (n <= 0) {
-        err = (n < 0) ? ("read length error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read length error: ") + err) : tr("read timeout");
         return false;
     }
     if (JOULE_DEBUG) printf("length %d\n" ,length);
@@ -602,10 +602,10 @@ JoulePacket::read(CommPortPtr dev, QString &err)
     n = readOneByOne(dev, &buf, length, err);
 
     if (n <= 0) {
-        err = (n < 0) ? ("read error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
         return false;
     } else if (n < length) {
-        err += QString(", read only %1 bytes insteed of: %2")
+        err += QString(tr(", read only %1 bytes insteed of: %2"))
             .arg(n).arg(length);
         return false;
     }
@@ -616,10 +616,10 @@ JoulePacket::read(CommPortPtr dev, QString &err)
     char _checksum;
     n = readOneByOne(dev, &_checksum, 1, err);
     if (n <= 0) {
-        err = (n < 0) ? ("read checksum error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read checksum error: ") + err) : tr("read timeout");
         return false;
     } else if (_checksum != checksum) {
-        err = "wrong _checksum";
+        err = tr("wrong _checksum");
         return false;
     }
 
