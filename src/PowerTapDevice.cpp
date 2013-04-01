@@ -75,16 +75,16 @@ cEscape(const char *buf, int len)
     return result;
 }
 
-static bool
-doWrite(CommPortPtr dev, char c, bool hwecho, QString &err)
+bool
+PowerTapDevice::doWrite(CommPortPtr dev, char c, bool hwecho, QString &err)
 {
     if (PT_DEBUG) printf("writing '%c' to device\n", c);
     int n = dev->write(&c, 1, err);
     if (n != 1) {
         if (n < 0)
-            err = QString("failed to write %1 to device: %2").arg(c).arg(err);
+            err = QString(tr("failed to write %1 to device: %2")).arg(c).arg(err);
         else
-            err = QString("timeout writing %1 to device").arg(c);
+            err = QString(tr("timeout writing %1 to device")).arg(c);
         return false;
     }
     if (hwecho) {
@@ -92,17 +92,17 @@ doWrite(CommPortPtr dev, char c, bool hwecho, QString &err)
         int n = dev->read(&c, 1, err);
         if (n != 1) {
             if (n < 0)
-                err = QString("failed to read back hardware echo: %2").arg(err);
+                err = QString(tr("failed to read back hardware echo: %2")).arg(err);
             else
-                err = "timeout reading back hardware echo";
+                err = tr("timeout reading back hardware echo");
             return false;
         }
     }
     return true;
 }
 
-static int
-readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
+int
+PowerTapDevice::readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 {
     int sofar = 0;
     while (!hasNewline(buf, sofar)) {
@@ -110,8 +110,8 @@ readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
         // Read one byte at a time to avoid waiting for timeout.
         int n = dev->read(buf + sofar, 1, err);
         if (n <= 0) {
-            err = (n < 0) ? ("read error: " + err) : "read timeout";
-            err += QString(", read %1 bytes so far: \"%2\"")
+            err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
+            err += QString(tr(", read %1 bytes so far: \"%2\""))
                 .arg(sofar).arg(cEscape(buf, sofar));
             return -1;
         }
@@ -126,7 +126,7 @@ PowerTapDevice::download( const QDir &tmpdir,
                          QString &err)
 {
     if (!dev->open(err)) {
-        err = "ERROR: open failed: " + err;
+        err = tr("ERROR: open failed: ") + err;
         return false;
     }
     // make several attempts at reading the version
@@ -140,15 +140,15 @@ PowerTapDevice::download( const QDir &tmpdir,
 	if (!doWrite(dev, 0x56, false, err)) // 'V'
 	    return false;
 
-    emit updateStatus( "Reading version..." );
+    emit updateStatus( tr("Reading version...") );
     if(m_Cancelled) {
-        err = "download cancelled";
+        err = tr("download cancelled");
 	    return false;
 	}
 
 	version_len = readUntilNewline(dev, vbuf, sizeof(vbuf), err);
 	if (version_len < 0) {
-	    err = "Error reading version: " + err;
+	    err = tr("Error reading version: ") + err;
 	    return false;
 	}
 	if (PT_DEBUG) {
@@ -165,7 +165,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     } while ((--attempts > 0) && (veridx < 0));
 
     if (veridx < 0) {
-	err = QString("Unrecognized version \"%1\"")
+	err = QString(tr("Unrecognized version \"%1\""))
 	    .arg(cEscape(vbuf, version_len));
 	return false;
     }
@@ -227,11 +227,11 @@ PowerTapDevice::download( const QDir &tmpdir,
         while (count < sizeof(buf)) {
             n = dev->read(buf + count, sizeof(buf) - count, err);
             if (n < 0) {
-                err = "ERROR: reading block: " + err;
+                err = tr("ERROR: reading block: ") + err;
                 return false;
             }
             if (n == 0) {
-                err = "ERROR: timeout reading block";
+                err = tr("ERROR: timeout reading block");
                 return false;
             }
             if (PT_DEBUG) {
@@ -244,7 +244,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         for (int i = 0; i < ((int) sizeof(buf)) - 1; ++i)
             csum += buf[i];
         if ((csum % 256) != buf[sizeof(buf) - 1]) {
-            err = "ERROR: bad checksum";
+            err = tr("ERROR: bad checksum");
             return false;
         }
         if (PT_DEBUG) printf("good checksum\n");
@@ -280,7 +280,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     QTemporaryFile tmp(tmpl);
     tmp.setAutoRemove(false);
     if (!tmp.open()) {
-        err = "Failed to create temporary file "
+        err = tr("Failed to create temporary file ")
             + tmpl + ": " + tmp.error();
         return false;
     }
@@ -319,7 +319,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         }
     }
     if (!time_set) {
-        err = "Failed to find ride time.";
+        err = tr("Failed to find ride time.");
         tmp.setAutoRemove(true);
         return false;
     }
