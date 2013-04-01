@@ -116,7 +116,7 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     //
     // Wheel size
     //
-    QLabel *wheelSizeLabel = new QLabel("Wheelsize:", this);
+    QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize:"), this);
     int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
 
     wheelSizeCombo = new QComboBox();

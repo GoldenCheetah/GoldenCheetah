@@ -110,127 +110,127 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1090"/>
         <source>Power - Kurt Kinetic Cyclone</source>
-        <translation>Potencia - Kurt Kinetic Cyclone</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1091"/>
         <source>Power - Kurt Kinetic Road Machine</source>
-        <translation>Potencia - Kurt Kinetic Road Machine</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1092"/>
         <source>Power - Cyclops Fluid 2</source>
-        <translation>Potencia - Cyclops Fluid 2</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1093"/>
         <source>Power - BT Advanced Training System</source>
-        <translation>Potencia - BT Advanced Training System</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1094"/>
         <source>Power - LeMond Revolution</source>
-        <translation>Potencia - LeMond Revolution</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1095"/>
         <source>Power - 1UP USA Trainer</source>
-        <translation>Potencia - 1UP USA Trainer</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1096"/>
         <source>Power - Minoura V100 Trainer (H)</source>
-        <translation>Potencia - Minoura V100 Trainer (H)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1097"/>
         <source>Power - Minoura V100 Trainer (5)</source>
-        <translation>Potencia - Minoura V100 Trainer (5)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1098"/>
         <source>Power - Minoura V100 Trainer (4)</source>
-        <translation>Potencia - Minoura V100 Trainer (4)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1099"/>
         <source>Power - Minoura V100 Trainer (3)</source>
-        <translation>Potencia - Minoura V100 Trainer (3)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1100"/>
         <source>Power - Minoura V100 Trainer (2)</source>
-        <translation>Potencia - Minoura V100 Trainer (2)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1101"/>
         <source>Power - Minoura V100 Trainer (1)</source>
-        <translation>Potencia - Minoura V100 Trainer (1)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1102"/>
         <source>Power - Minoura V100 Trainer (L)</source>
-        <translation>Potencia - Minoura V100 Trainer (L)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1103"/>
         <source>Power - Saris Powerbeam Pro</source>
-        <translation>Potencia - Saris Powerbeam Pro</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1104"/>
         <source>Power - Tacx Satori (2)</source>
-        <translation>Potencia - Tacx Satori (2)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1105"/>
         <source>Power - Tacx Satori (4)</source>
-        <translation>Potencia - Tacx Satori (4)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1106"/>
         <source>Power - Tacx Satori (6)</source>
-        <translation>Potencia - Tacx Satori (6)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1107"/>
         <source>Power - Tacx Satori (8)</source>
-        <translation>Potencia - Tacx Satori (8)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1108"/>
         <source>Power - Tacx Satori (10)</source>
-        <translation>Potencia - Tacx Satori (10)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1109"/>
         <source>Power - Tacx Flow (0)</source>
-        <translation>Potencia - Tacx Flow (0)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1110"/>
         <source>Power - Tacx Flow (2)</source>
-        <translation>Potencia - Tacx Flow (2)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1111"/>
         <source>Power - Tacx Flow (4)</source>
-        <translation>Potencia - Tacx Flow (4)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1112"/>
         <source>Power - Tacx Flow (6)</source>
-        <translation>Potencia - Tacx Flow (6)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1113"/>
         <source>Power - Tacx Flow (8)</source>
-        <translation>Potencia - Tacx Flow (8)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1115"/>
         <source>Road/Cross (700C/622)</source>
-        <translation>Ruta/Cross (700C/622)</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1116"/>
@@ -1333,6 +1333,18 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>BlankStateAnalysisPage</name>
     <message>
+        <location filename="../BlankState.cpp" line="131"/>
+        <source>Analysis</source>
+        <translation>Análisis</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="132"/>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation>¿Ninguna actividad?
+Comencemos con algunos datos.</translation>
+    </message>
+    <message>
         <location filename="../BlankState.cpp" line="138"/>
         <source>Import files from your disk or usb device</source>
         <translation>Importar archivos desde disco o dispositivo USB</translation>
@@ -1356,6 +1368,18 @@ Presione Siguiente para Continuar</translation>
 <context>
     <name>BlankStateDiaryPage</name>
     <message>
+        <location filename="../BlankState.cpp" line="186"/>
+        <source>Diary</source>
+        <translation>Agenda</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="187"/>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation>¿Ninguna actividad?
+Comencemos con algunos datos.</translation>
+    </message>
+    <message>
         <location filename="../BlankState.cpp" line="193"/>
         <source>Import files from your disk or usb device</source>
         <translation>Importar archivos desde disco o dispositivo USB</translation>
@@ -1378,6 +1402,18 @@ Presione Siguiente para Continuar</translation>
 </context>
 <context>
     <name>BlankStateHomePage</name>
+    <message>
+        <location filename="../BlankState.cpp" line="159"/>
+        <source>Home</source>
+        <translation>Inicio</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="160"/>
+        <source>No ride ?
+Let&apos;s start with some data.</source>
+        <translation>¿Ninguna actividad?
+Comencemos con algunos datos.</translation>
+    </message>
     <message>
         <location filename="../BlankState.cpp" line="166"/>
         <source>Import files from your disk or usb device</source>
@@ -1414,6 +1450,18 @@ Presione Siguiente para Continuar</translation>
 </context>
 <context>
     <name>BlankStateTrainPage</name>
+    <message>
+        <location filename="../BlankState.cpp" line="213"/>
+        <source>Train</source>
+        <translation>Rodillo</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="214"/>
+        <source>No devices or workouts ?
+Let&apos;s get you setup.</source>
+        <translation>¿Ningún dispositivo o entrenamiento?
+Comencemos la configuración.</translation>
+    </message>
     <message>
         <location filename="../BlankState.cpp" line="222"/>
         <source>Find and add training devices.</source>
@@ -3978,22 +4026,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>GcCalendarModel</name>
     <message>
-        <location filename="../GcCalendarModel.h" line="93"/>
+        <location filename="../GcCalendarModel.h" line="102"/>
         <source>Duration</source>
         <translation>Duración</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="94"/>
+        <location filename="../GcCalendarModel.h" line="103"/>
         <source>Date</source>
         <translation>Fecha</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="95"/>
+        <location filename="../GcCalendarModel.h" line="104"/>
         <source>File</source>
         <translation>Archivo</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="96"/>
+        <location filename="../GcCalendarModel.h" line="105"/>
         <source>Calendar Text</source>
         <translation>Texto en Calendario</translation>
     </message>
@@ -4291,6 +4339,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../Pages.cpp" line="87"/>
         <source>Crank Length:</source>
         <translation>Largo de Palancas/Bielas:</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="119"/>
+        <source>Wheelsize:</source>
+        <translation>Tamaño de rueda:</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="144"/>
@@ -10188,9 +10241,9 @@ y que muestra la palabra &quot;Host&quot;</translation>
 <context>
     <name>RideDelegate</name>
     <message>
-        <location filename="../RideImportWizard.cpp" line="969"/>
-        <location filename="../RideImportWizard.cpp" line="1006"/>
-        <location filename="../RideImportWizard.cpp" line="1022"/>
+        <location filename="../RideImportWizard.cpp" line="968"/>
+        <location filename="../RideImportWizard.cpp" line="1005"/>
+        <location filename="../RideImportWizard.cpp" line="1021"/>
         <source>dd MMM yyyy</source>
         <translation></translation>
     </message>
@@ -10831,7 +10884,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <location filename="../RideImportWizard.cpp" line="509"/>
         <location filename="../RideImportWizard.cpp" line="720"/>
         <location filename="../RideImportWizard.cpp" line="759"/>
-        <location filename="../RideImportWizard.cpp" line="892"/>
+        <location filename="../RideImportWizard.cpp" line="891"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -10965,7 +11018,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>Archivo Guardado</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="880"/>
+        <location filename="../RideImportWizard.cpp" line="879"/>
         <source>Error - copy failed</source>
         <translation>Error - falló la copia</translation>
     </message>
@@ -10982,13 +11035,13 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation type="obsolete">Finalizado.</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="897"/>
+        <location filename="../RideImportWizard.cpp" line="896"/>
         <source>Import Complete. %1 of %2 successful.</source>
         <translation>Importación Finalizada. %1 de %2 con éxito.</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="707"/>
-        <location filename="../RideImportWizard.cpp" line="902"/>
+        <location filename="../RideImportWizard.cpp" line="901"/>
         <source>Finish</source>
         <translation>Fin</translation>
     </message>
@@ -11079,74 +11132,86 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <translation>Tipo de Dispositivo: </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="208"/>
+        <location filename="../RideSummaryWindow.cpp" line="501"/>
         <source> activity</source>
         <translation> actividad</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="208"/>
+        <location filename="../RideSummaryWindow.cpp" line="501"/>
         <source> activities</source>
         <translation> actividades</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Totals</source>
         <translation>Totales</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Averages</source>
         <translation>Promedios</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Metrics*</source>
         <translation>Métricas*</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="212"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Maximums</source>
         <translation>Máximos</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="332"/>
+        <location filename="../RideSummaryWindow.cpp" line="335"/>
         <source>^(Average|Max) </source>
         <translation>( Media| Máx)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="386"/>
+        <location filename="../RideSummaryWindow.cpp" line="389"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zonas de Potencia&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="402"/>
+        <location filename="../RideSummaryWindow.cpp" line="405"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zonas de Frecuencia Cardíaca&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="494"/>
+        <location filename="../RideSummaryWindow.cpp" line="509"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
+        <translation>&lt;td align=&quot;center&quot;&gt;Fecha&lt;/td&gt;</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="526"/>
+        <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="593"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore es una marca registrada del Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="497"/>
+        <location filename="../RideSummaryWindow.cpp" line="596"/>
         <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation>&lt;br&gt;TSS, NP e IF son marcas registradas de Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="335"/>
-        <location filename="../RideSummaryWindow.cpp" line="448"/>
-        <location filename="../RideSummaryWindow.cpp" line="470"/>
+        <location filename="../RideSummaryWindow.cpp" line="338"/>
+        <location filename="../RideSummaryWindow.cpp" line="451"/>
+        <location filename="../RideSummaryWindow.cpp" line="473"/>
+        <location filename="../RideSummaryWindow.cpp" line="532"/>
+        <location filename="../RideSummaryWindow.cpp" line="540"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="420"/>
+        <location filename="../RideSummaryWindow.cpp" line="423"/>
         <source>Intervals</source>
         <translation>Intervalos</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="484"/>
+        <location filename="../RideSummaryWindow.cpp" line="583"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Errores leyendo archivo:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
@@ -14194,12 +14259,12 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../Pages.cpp" line="833"/>
         <source>Device Name</source>
-        <translation>Nombre del Dispositivo</translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="835"/>
         <source>Device Type</source>
-        <translation>Tipo de Dispositivo</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="837"/>
