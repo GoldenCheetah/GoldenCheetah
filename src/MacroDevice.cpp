@@ -98,11 +98,11 @@ MacroDevice::download( const QDir &tmpdir,
     if (MACRO_DEBUG) printf("download O-Synce Macro");
 
     if (!dev->open(err)) {
-        err = "ERROR: open failed: " + err;
+        err = tr("ERROR: open failed: ") + err;
         return false;
     }
 
-    emit updateStatus("Request number of training...");
+    emit updateStatus(tr("Request number of training..."));
     if (MACRO_DEBUG) printf("Request number of training\n");
 
     MacroPacket cmd(NUMBER_OF_TRAINING_REQUESTS);
@@ -112,7 +112,7 @@ MacroDevice::download( const QDir &tmpdir,
 
     if(m_Cancelled)
     {
-        err = "download cancelled";
+        err = tr("download cancelled");
         return false;
     }
 
@@ -121,7 +121,7 @@ MacroDevice::download( const QDir &tmpdir,
 
     if (response.payload.size() == 0)
     {
-        err = "no data";
+        err = tr("no data");
         return false;
     }
 
@@ -129,7 +129,7 @@ MacroDevice::download( const QDir &tmpdir,
 
     if (count == 0)
     {
-        err = "no data";
+        err = tr("no data");
         return false;
     }
 
@@ -137,13 +137,13 @@ MacroDevice::download( const QDir &tmpdir,
 
     if (!response.verifyCheckSum(dev, err))
     {
-        err = "data error";
+        err = tr("data error");
         return false;
     }
 
     if(m_Cancelled)
     {
-        err = "download cancelled";
+        err = tr("download cancelled");
         return false;
     }
 
@@ -153,7 +153,7 @@ MacroDevice::download( const QDir &tmpdir,
     tmp.setAutoRemove(false);
 
     if (!tmp.open()) {
-        err = "Failed to create temporary file "
+        err = tr("Failed to create temporary file ")
             + tmpl + ": " + tmp.error();
         return false;
     }
@@ -185,12 +185,12 @@ MacroDevice::download( const QDir &tmpdir,
     for (int i = 0; i < count; i++)
     {
         if (MACRO_DEBUG) printf("Request training %d\n",i);
-        emit updateStatus( QString("Request datas of training %1 / %2...")
+        emit updateStatus( QString(tr("Request datas of training %1 / %2..."))
             .arg(i+1).arg((int)count) );
 
         if(m_Cancelled)
         {
-            err = "download cancelled";
+            err = tr("download cancelled");
             return false;
         }
 
@@ -200,7 +200,7 @@ MacroDevice::download( const QDir &tmpdir,
 
         if(m_Cancelled)
         {
-            err = "download cancelled";
+            err = tr("download cancelled");
             return false;
         }
         bool lastpage = false;
@@ -211,7 +211,7 @@ MacroDevice::download( const QDir &tmpdir,
 
             if (!response2.verifyCheckSum(dev, err))
             {
-                err = "data error";
+                err = tr("data error");
                 return false;
             }
 
@@ -220,13 +220,13 @@ MacroDevice::download( const QDir &tmpdir,
 
             //int training_flag = hex2Int(response2.payload.at(43));
             tmp.write(response2.dataArray());
-            emit updateProgress( QString("training %1/%2... (%3 Bytes)")
+            emit updateProgress( QString(tr("training %1/%2... (%3 Bytes)"))
                 .arg(i+1)
                 .arg((int)count)
                 .arg(tmp.size()) );
             if(m_Cancelled)
             {
-                err = "download cancelled";
+                err = tr("download cancelled");
                 return false;
             }
 
@@ -259,7 +259,7 @@ MacroDevice::cleanup( QString &err ){
     if (MACRO_DEBUG) printf("Erase all records on computer\n");
 
     if (!dev->open(err)) {
-        err = "ERROR: open failed: " + err;
+        err = tr("ERROR: open failed: ") + err;
     }
 
     MacroPacket cmd(ERASE_ALL_RECORDS);
@@ -319,7 +319,7 @@ MacroPacket::verifyCheckSum(CommPortPtr dev, QString &err)
     if (MACRO_DEBUG) printf("reading checksum from device\n");
     int n = dev->read(&_checksum, 1, err);
     if (n <= 0) {
-        err = (n < 0) ? ("read checksum error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read checksum error: ") + err) : tr("read timeout");
         return false;
     }
     if (MACRO_DEBUG) printf("CheckSum1 %d CheckSum2 %d", (0xff & (unsigned) checksum) , (0xff & (unsigned) _checksum));
@@ -360,11 +360,11 @@ MacroPacket::write(CommPortPtr dev, QString &err)
     if (n != payload.count()+2) {
         if (n < 0) {
             if (MACRO_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toAscii().constData());
-            err = QString("failed to write to device: %1").arg(err);
+            err = QString(tr("failed to write to device: %1")).arg(err);
         }
         else {
             if (MACRO_DEBUG) printf("timeout writing %s to device\n", msg);
-            err = QString("timeout writing to device");
+            err = QString(tr("timeout writing to device"));
         }
         return false;
     }
@@ -380,7 +380,7 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
         if (MACRO_DEBUG) printf("reading command from device\n");
         int n = dev->read(&command, 1, err);
         if (n <= 0) {
-            err = (n < 0) ? ("read command error: " + err) : "read timeout";
+            err = (n < 0) ? (tr("read command error: ") + err) : tr("read timeout");
             return false;
         }
         checksum += command;
@@ -393,10 +393,10 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
     int n = dev->read(&buf, len, err);
 
     if (n <= 0) {
-        err = (n < 0) ? ("read error: " + err) : "read timeout";
+        err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
         return false;
     } else if (n < len) {
-        err += QString(", read only %1 bytes insteed of: %2")
+        err += QString(tr(", read only %1 bytes insteed of: %2"))
             .arg(n).arg(len);
         return false;
     }

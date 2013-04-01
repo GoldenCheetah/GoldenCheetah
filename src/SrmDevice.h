@@ -70,6 +70,9 @@ private:
 
     bool open ( QString &err );
     bool close( void );
+
+    static bool
+    get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err);
 };
 
 #endif // _GC_SrmDevice_h

@@ -44,6 +44,8 @@ struct JouleDevice : public Device
 
 class JoulePacket
 {
+    Q_DECLARE_TR_FUNCTIONS(JoulePacket)
+
     public:
         JoulePacket();
         JoulePacket(uint16_t command);

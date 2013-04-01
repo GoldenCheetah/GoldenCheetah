@@ -33,6 +33,7 @@ struct MacroDevice : public Device
 
 class MacroPacket
 {
+    Q_DECLARE_TR_FUNCTIONS(MacroPacket)
     public:
         MacroPacket();
         MacroPacket(char command);

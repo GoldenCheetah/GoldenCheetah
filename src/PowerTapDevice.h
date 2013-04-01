@@ -42,6 +42,12 @@ struct PowerTapDevice : public Device
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
                           QString &err);
+
+    private:
+    static bool
+    doWrite(CommPortPtr dev, char c, bool hwecho, QString &err);
+    static int
+    readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err);
 };
 
 #endif // _GC_PowerTapDevice_h
