@@ -72,6 +72,7 @@ Section "Golden Cheetah (required)"
   File "..\release\libclucene-core.dll"
   File "..\release\libclucene-shared.dll"
   File "..\release\qwtplot3d.dll"
+  File "..\release\libusb0.dll"
 
   ;
   ; vlc is a mighty pain in the ass
