@@ -128,8 +128,8 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
 BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePage(main)
 {  
     dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_ANALYSIS, false).toBool());
-    welcomeTitle->setText("Analysis");
-    welcomeText->setText("No ride ?\nLet's start with some data.");
+    welcomeTitle->setText(tr("Analysis"));
+    welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/analysis.png"));
     img->setIconSize(QSize(800,330));
@@ -156,8 +156,8 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePag
 BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
 {
     dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_HOME, false).toBool());
-    welcomeTitle->setText("Home");
-    welcomeText->setText("No ride ?\nLet's start with some data.");
+    welcomeTitle->setText(tr("Home"));
+    welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/home.png"));
     img->setIconSize(QSize(800,330));
@@ -183,8 +183,8 @@ BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
 BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main)
 {
     dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_DIARY, false).toBool());
-    welcomeTitle->setText("Diary");
-    welcomeText->setText("No ride ?\nLet's start with some data.");
+    welcomeTitle->setText(tr("Diary"));
+    welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/diary.png"));
     img->setIconSize(QSize(800,330));
@@ -210,8 +210,8 @@ BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main
 BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main)
 {
     dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_TRAIN, false).toBool());
-    welcomeTitle->setText("Train");
-    welcomeText->setText("No devices or workouts ?\nLet's get you setup.");
+    welcomeTitle->setText(tr("Train"));
+    welcomeText->setText(tr("No devices or workouts ?\nLet's get you setup."));
 
     img->setIcon(QPixmap(":images/train.png"));
     img->setIconSize(QSize(800,330));
