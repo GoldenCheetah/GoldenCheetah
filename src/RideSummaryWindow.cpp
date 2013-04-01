@@ -102,6 +102,7 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
     setChartLayout(vlayout);
 }
 
+#ifdef GC_HAVE_LUCENE
 void
 RideSummaryWindow::clearFilter()
 {
@@ -117,6 +118,7 @@ RideSummaryWindow::setFilter(QStringList list)
     filtered = true;
     refresh();
 }
+#endif
 
 void
 RideSummaryWindow::rideSelected()

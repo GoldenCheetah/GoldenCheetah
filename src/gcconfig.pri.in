@@ -179,7 +179,7 @@
 #two lines once you habve installed clucene developer libraries
 #and runtimes. See the INSTALL guide for your platform. 
 #CLUCENE_INCLUDE = /usr/include/CLucene
-#CLUCENE_LIBS    = -lclucene
+#CLUCENE_LIBS    = -lclucene-core
 
 
 # *** Mac users NOTE ***

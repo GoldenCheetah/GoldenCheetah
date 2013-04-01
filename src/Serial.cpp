@@ -75,7 +75,6 @@ bool
 Serial::open(QString &err)
 {
 #ifndef Q_OS_WIN32
-Q_UNUSED(err);
     //
     // Linux and Mac OSX use stdio / termio / tcsetattr
     //
@@ -115,7 +114,7 @@ Q_UNUSED(err);
     }
     return true;
 #else
-
+Q_UNUSED(err);
     //
     // Windows uses CreateFile / DCB / SetCommState
     //
@@ -216,7 +215,6 @@ int
 Serial::read(void *buf, size_t nbyte, QString &err)
 {
 #ifndef Q_OS_WIN32
-Q_UNUSED(err);
     //
     // Mac and Linux use select and timevals to
     // do non-blocking reads with a timeout
@@ -256,6 +254,7 @@ Q_UNUSED(err);
     }
     return count;
 #else
+Q_UNUSED(err);
 
     //
     // Win32 API uses readfile
