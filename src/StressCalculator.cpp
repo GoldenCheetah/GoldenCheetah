@@ -107,8 +107,8 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
     foreach(Season x, main->seasons->seasons) {
         if (x.getSeed()) {
             int offset = startDate.date().daysTo(x.getStart());
-            ltsvalues[offset] = x.getSeed();
-            stsvalues[offset] = x.getSeed();
+            ltsvalues[offset] = x.getSeed() * -1;
+            stsvalues[offset] = x.getSeed() * -1;
         }
     }
 
@@ -193,7 +193,7 @@ void StressCalculator::calculate(int daysIndex) {
     double lastLTS, lastSTS;
 
     // if its seeded leave it alone
-    if (!ltsvalues[daysIndex] || !stsvalues[daysIndex]) {
+    if (ltsvalues[daysIndex] >=0 || stsvalues[daysIndex]>=0) {
         // LTS
         if (daysIndex == 0)
             lastLTS = initialLTS;
@@ -209,6 +209,10 @@ void StressCalculator::calculate(int daysIndex) {
             lastSTS = stsvalues[daysIndex-1];
 
         stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
+    } else if (ltsvalues[daysIndex]< 0|| stsvalues[daysIndex]<0) {
+
+        ltsvalues[daysIndex] *= -1;
+        stsvalues[daysIndex] *= -1;
     }
 
     // SB (stress balance)  long term - short term
