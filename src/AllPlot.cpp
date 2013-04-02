@@ -985,7 +985,7 @@ AllPlot::setYMax()
             ymin = referencePlot->altCurve->minYValue();
             ymax = qMax(ymin + 100, 1.05 * referencePlot->altCurve->maxYValue());
         }
-        ymin = ( qRound(ymin) / 100 ) * 100;
+        ymin = (ymin < 0 ? -100 : 0) + ( qRound(ymin) / 100 ) * 100;
 
         int axisHeight = qRound( plotLayout()->canvasRect().height() );
         QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
