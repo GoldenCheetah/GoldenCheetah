@@ -2654,6 +2654,40 @@ Klicken Sie auf &quot;Abbrechen&quot; um dieses Fenster zu schließen.</translat
     </message>
 </context>
 <context>
+    <name>DeviceTypes</name>
+    <message>
+        <location filename="../DeviceTypes.cpp" line="36"/>
+        <location filename="../DeviceTypes.cpp" line="41"/>
+        <source>ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DeviceTypes.cpp" line="48"/>
+        <source>Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DeviceTypes.cpp" line="52"/>
+        <source>The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DeviceTypes.cpp" line="56"/>
+        <source>Racermate Computrainer Lab or Pro bike trainer with the handlebar controller connected via a USB adaptor or directly connected to a local serial port.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DeviceTypes.cpp" line="61"/>
+        <source>Tacx Fortius/iMagic bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DeviceTypes.cpp" line="67"/>
+        <source>Testing device used for development only. If an ERG file is selected it will replay back, with a little randomness thrown in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DialWindow</name>
     <message>
         <location filename="../DialWindow.cpp" line="41"/>
@@ -11016,12 +11050,12 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideSummaryWindow</name>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="194"/>
+        <location filename="../RideSummaryWindow.cpp" line="196"/>
         <source>&lt;p&gt;Couldn&apos;t read file &quot;</source>
         <translation>&lt;p&gt;Datei kann nicht gelesen werden &quot;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="163"/>
+        <location filename="../RideSummaryWindow.cpp" line="165"/>
         <source>dddd MMMM d, yyyy, h:mm AP</source>
         <translation>dddd, d.MMMM.yyyy, hh:mm</translation>
     </message>
@@ -11036,81 +11070,81 @@ on and that its display says, &quot;Host&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="206"/>
+        <location filename="../RideSummaryWindow.cpp" line="208"/>
         <source>Device Type: </source>
         <translation>Gerätetyp:</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="501"/>
+        <location filename="../RideSummaryWindow.cpp" line="503"/>
         <source> activity</source>
         <translation> Trainingseinheit</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="501"/>
+        <location filename="../RideSummaryWindow.cpp" line="503"/>
         <source> activities</source>
         <translation> Trainingseinheiten</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="209"/>
+        <location filename="../RideSummaryWindow.cpp" line="211"/>
         <source>Totals</source>
         <translation>Summen</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="209"/>
+        <location filename="../RideSummaryWindow.cpp" line="211"/>
         <source>Averages</source>
         <translation>Durchschnitte</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="209"/>
+        <location filename="../RideSummaryWindow.cpp" line="211"/>
         <source>Maximums</source>
         <translation>Maxima</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="209"/>
+        <location filename="../RideSummaryWindow.cpp" line="211"/>
         <source>Metrics*</source>
         <translation>Metriken*</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="335"/>
+        <location filename="../RideSummaryWindow.cpp" line="337"/>
         <source>^(Average|Max) </source>
         <translation>^(durchschnittlich|Max) </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="338"/>
-        <location filename="../RideSummaryWindow.cpp" line="451"/>
-        <location filename="../RideSummaryWindow.cpp" line="473"/>
-        <location filename="../RideSummaryWindow.cpp" line="532"/>
-        <location filename="../RideSummaryWindow.cpp" line="540"/>
+        <location filename="../RideSummaryWindow.cpp" line="340"/>
+        <location filename="../RideSummaryWindow.cpp" line="453"/>
+        <location filename="../RideSummaryWindow.cpp" line="475"/>
+        <location filename="../RideSummaryWindow.cpp" line="534"/>
+        <location filename="../RideSummaryWindow.cpp" line="542"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="389"/>
+        <location filename="../RideSummaryWindow.cpp" line="391"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Leistungszonen&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="405"/>
+        <location filename="../RideSummaryWindow.cpp" line="407"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Herzfrequenzzonen&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="509"/>
+        <location filename="../RideSummaryWindow.cpp" line="511"/>
         <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="526"/>
+        <location filename="../RideSummaryWindow.cpp" line="528"/>
         <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="593"/>
+        <location filename="../RideSummaryWindow.cpp" line="595"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore ist ein Warenzeichen von Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="596"/>
+        <location filename="../RideSummaryWindow.cpp" line="598"/>
         <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation>&lt;br&gt;TSS, NP and IF sind Warenzeichen von Peaksware LLC&lt;/center&gt;</translation>
     </message>
@@ -11123,12 +11157,12 @@ on and that its display says, &quot;Host&quot;</source>
         <translation type="obsolete">&lt;h2;&gt;Herzfrequenzzonen&lt;/h2&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="423"/>
+        <location filename="../RideSummaryWindow.cpp" line="425"/>
         <source>Intervals</source>
         <translation>Intervalle</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="583"/>
+        <location filename="../RideSummaryWindow.cpp" line="585"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Fehler beim Einlesen der Datei:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
