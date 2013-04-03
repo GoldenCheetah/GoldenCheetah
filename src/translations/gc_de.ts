@@ -11382,6 +11382,184 @@ Möchten Sie fortfahren?</translation>
     </message>
 </context>
 <context>
+    <name>ScatterPlot</name>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="92"/>
+        <source>Power (watts)</source>
+        <translation type="unfinished">Leistung (Watt)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="93"/>
+        <source>Cadence (rpm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="94"/>
+        <source>Heartrate (bpm)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="97"/>
+        <source>Speed (kph)</source>
+        <translation type="unfinished">Geschwindigkeit (km/h)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="99"/>
+        <source>Speed (mph)</source>
+        <translation type="unfinished">Geschwindigkeit (mi/h)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="103"/>
+        <source>Altitude (meters)</source>
+        <translation type="unfinished">Höhe (m)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="105"/>
+        <source>Altitude (feet)</source>
+        <translation type="unfinished">Höhe (Fuß)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="107"/>
+        <source>Torque (N)</source>
+        <translation type="unfinished">Drehmoment (Nm)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="108"/>
+        <source>Elapsed Time (secs)</source>
+        <translation type="unfinished">vergangene Zeit (sek)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="111"/>
+        <source>Elapsed Distance (km)</source>
+        <translation type="unfinished">zurückgelegte Entfernung (km)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="113"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation type="unfinished">zurückgelegte Entfernung (mi)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="115"/>
+        <source>Interval Number</source>
+        <translation type="unfinished">Intervallnummer</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="116"/>
+        <source>Latitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="117"/>
+        <source>Longitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="118"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation type="unfinished">Pedalgeschwindigkeit (cm/sek)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="119"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="123"/>
+        <source>Time at X/Y (%)</source>
+        <translation type="unfinished">Zeit bei X/Y (%)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="124"/>
+        <source>Power Zone</source>
+        <translation type="unfinished">Leistungszone</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="126"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Unbekannt</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="130"/>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="131"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Trittfrequenz</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="132"/>
+        <source>Heartrate</source>
+        <translation type="unfinished">Herzfrequenz</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="133"/>
+        <source>Speed</source>
+        <translation type="unfinished">Geschwindigkeit</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="134"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Höhe</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="135"/>
+        <source>Pedal Force</source>
+        <translation type="unfinished">Pedalkraft</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="136"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="137"/>
+        <source>Distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="138"/>
+        <source>Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="139"/>
+        <source>Latitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="140"/>
+        <source>Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="141"/>
+        <source>Time at X/Y</source>
+        <translation type="unfinished">Zeit bei X/Y</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="142"/>
+        <source>Zone</source>
+        <translation type="unfinished">Zone</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="143"/>
+        <source>CPV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="144"/>
+        <source>AEPF</source>
+        <translation type="unfinished">AEPF</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="146"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ScatterWindow</name>
     <message>
         <location filename="../ScatterWindow.cpp" line="33"/>

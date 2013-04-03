@@ -10600,6 +10600,184 @@ native format. Should we do so?
     </message>
 </context>
 <context>
+    <name>ScatterPlot</name>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="92"/>
+        <source>Power (watts)</source>
+        <translation type="unfinished">Potenza (watt)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="93"/>
+        <source>Cadence (rpm)</source>
+        <translation type="unfinished">Cadenza (rpm)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="94"/>
+        <source>Heartrate (bpm)</source>
+        <translation type="unfinished">Frequenza Cardiaca (bpm)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="97"/>
+        <source>Speed (kph)</source>
+        <translation type="unfinished">Velocita&apos; (km/h)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="99"/>
+        <source>Speed (mph)</source>
+        <translation type="unfinished">Velocita&apos; (km/h)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="103"/>
+        <source>Altitude (meters)</source>
+        <translation type="unfinished">Altitudine (metri)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="105"/>
+        <source>Altitude (feet)</source>
+        <translation type="unfinished">Altitudine (piedi)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="107"/>
+        <source>Torque (N)</source>
+        <translation type="unfinished">Coppia (N)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="108"/>
+        <source>Elapsed Time (secs)</source>
+        <translation type="unfinished">Tempo Trascorso (sec)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="111"/>
+        <source>Elapsed Distance (km)</source>
+        <translation type="unfinished">Distanza Percorsa (km)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="113"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation type="unfinished">Distanza Percorsa (miglia)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="115"/>
+        <source>Interval Number</source>
+        <translation type="unfinished">Numero intervalli</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="116"/>
+        <source>Latitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="117"/>
+        <source>Longitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="118"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation type="unfinished">Velocita&apos; Circonferenzaziale Padalata (cm/s)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="119"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished">Forza Media Effettiva Pedalata (N)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="123"/>
+        <source>Time at X/Y (%)</source>
+        <translation type="unfinished">Tempo a X/Y (%)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="124"/>
+        <source>Power Zone</source>
+        <translation type="unfinished">Zona Potenza</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="126"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Sconosciuto</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="130"/>
+        <source>Power</source>
+        <translation type="unfinished">Potenza</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="131"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Cadenza</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="132"/>
+        <source>Heartrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="133"/>
+        <source>Speed</source>
+        <translation type="unfinished">Velocità</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="134"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Altitudine</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="135"/>
+        <source>Pedal Force</source>
+        <translation type="unfinished">Forza Pedalata</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="136"/>
+        <source>Time</source>
+        <translation type="unfinished">Tempo</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="137"/>
+        <source>Distance</source>
+        <translation type="unfinished">Distanza</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="138"/>
+        <source>Interval</source>
+        <translation type="unfinished">Intervallo</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="139"/>
+        <source>Latitude</source>
+        <translation type="unfinished">Latitudine</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="140"/>
+        <source>Longitude</source>
+        <translation type="unfinished">Longitudine</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="141"/>
+        <source>Time at X/Y</source>
+        <translation type="unfinished">Tempo a X/Y</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="142"/>
+        <source>Zone</source>
+        <translation type="unfinished">Zona</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="143"/>
+        <source>CPV</source>
+        <translation type="unfinished">CPV</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="144"/>
+        <source>AEPF</source>
+        <translation type="unfinished">AEPF</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="146"/>
+        <source>None</source>
+        <translation type="unfinished">Nessuno</translation>
+    </message>
+</context>
+<context>
     <name>ScatterWindow</name>
     <message>
         <location filename="../ScatterWindow.cpp" line="33"/>
