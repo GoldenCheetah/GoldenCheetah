@@ -82,5 +82,8 @@ class ScatterPlot : public QwtPlot
 
         QwtPlotCurve *all;
         QwtPlotGrid *grid;
+
+    private:
+        static QString describeType(int type, bool longer, bool useMetricUnits);
 };
 #endif // _GC_ScatterPlot_h
