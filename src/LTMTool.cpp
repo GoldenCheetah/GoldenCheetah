@@ -898,7 +898,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->curveStyle = styleMap[curveStyle->currentIndex()];
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
-    metricDetail->fillCurve = fillCurve;
+    metricDetail->fillCurve = fillCurve->isChecked();
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();
