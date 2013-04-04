@@ -5854,6 +5854,51 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="90"/>
+        <source>Days</source>
+        <translation type="unfinished">Dias</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="91"/>
+        <source>Weeks</source>
+        <translation type="unfinished">Semanas</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="92"/>
+        <source>Months</source>
+        <translation type="unfinished">Meses</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="93"/>
+        <source>Years</source>
+        <translation type="unfinished">Anos</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="94"/>
+        <source>Time Of Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="96"/>
+        <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="99"/>
+        <source>Shade Zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="102"/>
+        <source>Show Legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="105"/>
+        <source>Show Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="109"/>
         <source>Add</source>
         <translation type="unfinished">Adicionar</translation>
@@ -6178,24 +6223,33 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
         <translation type="obsolete">Gráfico</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="60"/>
         <source>Days</source>
-        <translation type="obsolete">Dias</translation>
+        <translation type="unfinished">Dias</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="61"/>
         <source>Weeks</source>
-        <translation type="obsolete">Semanas</translation>
+        <translation type="unfinished">Semanas</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="62"/>
         <source>Months</source>
-        <translation type="obsolete">Meses</translation>
+        <translation type="unfinished">Meses</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="63"/>
         <source>Years</source>
-        <translation type="obsolete">Anos</translation>
+        <translation type="unfinished">Anos</translation>
     </message>
     <message>
         <location filename="../LTMWindow.cpp" line="56"/>
         <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="64"/>
+        <source>Time Of Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11078,6 +11132,17 @@ native format. Should we do so?
 </context>
 <context>
     <name>SearchBox</name>
+    <message>
+        <location filename="../SearchBox.cpp" line="77"/>
+        <location filename="../SearchBox.cpp" line="127"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SearchBox.cpp" line="117"/>
+        <source>Filter...</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../SearchBox.cpp" line="169"/>
         <location filename="../SearchBox.cpp" line="181"/>
