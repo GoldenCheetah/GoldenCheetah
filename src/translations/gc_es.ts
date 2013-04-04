@@ -6416,6 +6416,51 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Rango de Fechas</translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="90"/>
+        <source>Days</source>
+        <translation>Dias</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="91"/>
+        <source>Weeks</source>
+        <translation>Semanas</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="92"/>
+        <source>Months</source>
+        <translation>Meses</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="93"/>
+        <source>Years</source>
+        <translation>Años</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="94"/>
+        <source>Time Of Day</source>
+        <translation>Hora del día</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="96"/>
+        <source>Group by</source>
+        <translation>Agrupar por</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="99"/>
+        <source>Shade Zones</source>
+        <translation>Sombrear Zonas</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="102"/>
+        <source>Show Legend</source>
+        <translation>Mostrar Leyenda</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="105"/>
+        <source>Show Events</source>
+        <translation>Mostrar Eventos</translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="109"/>
         <source>Add</source>
         <translation>Agregar</translation>
@@ -6586,20 +6631,24 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Gráfico</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="60"/>
         <source>Days</source>
-        <translation type="obsolete">Dias</translation>
+        <translation>Dias</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="61"/>
         <source>Weeks</source>
-        <translation type="obsolete">Semanas</translation>
+        <translation>Semanas</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="62"/>
         <source>Months</source>
-        <translation type="obsolete">Meses</translation>
+        <translation>Meses</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="63"/>
         <source>Years</source>
-        <translation type="obsolete">Años</translation>
+        <translation>Años</translation>
     </message>
     <message>
         <source>Shade Zones</source>
@@ -6609,6 +6658,11 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../LTMWindow.cpp" line="56"/>
         <source>Group by</source>
         <translation>Agrupar por</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="64"/>
+        <source>Time Of Day</source>
+        <translation>Hora del día</translation>
     </message>
     <message>
         <location filename="../LTMWindow.cpp" line="69"/>
@@ -11781,6 +11835,17 @@ formato GoldenCheetah. ¿Confirmar?</translation>
 </context>
 <context>
     <name>SearchBox</name>
+    <message>
+        <location filename="../SearchBox.cpp" line="77"/>
+        <location filename="../SearchBox.cpp" line="127"/>
+        <source>Search...</source>
+        <translation>Buscar...</translation>
+    </message>
+    <message>
+        <location filename="../SearchBox.cpp" line="117"/>
+        <source>Filter...</source>
+        <translation>Filtrar...</translation>
+    </message>
     <message>
         <location filename="../SearchBox.cpp" line="169"/>
         <location filename="../SearchBox.cpp" line="181"/>
