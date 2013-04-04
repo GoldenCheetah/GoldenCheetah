@@ -74,7 +74,7 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
                           "}"
                  ).arg(clearButton->sizeHint().width() + frameWidth + 12));
 
-    setPlaceholderText("Search...");
+    setPlaceholderText(tr("Search..."));
     mode = Search;
     setDragEnabled(true);
     checkMenu();
@@ -114,7 +114,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             QPixmap filter(":images/toolbar/filter.png");
             searchButton->setIcon(QIcon(filter));
             searchButton->setIconSize(filter.size());
-            setPlaceholderText("Filter...");
+            setPlaceholderText(tr("Filter..."));
         }
         break;
 
@@ -124,7 +124,7 @@ void SearchBox::setMode(SearchBoxMode mode)
             QPixmap search(":images/toolbar/search.png");
             searchButton->setIcon(QIcon(search));
             searchButton->setIconSize(search.size());
-            setPlaceholderText("Search...");
+            setPlaceholderText(tr("Search..."));
         }
         break;
     }

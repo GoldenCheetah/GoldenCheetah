@@ -57,11 +57,11 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     rGroupBy = new QxtStringSpinBox(this);
     QStringList strings;
-    strings << "Days"
-            << "Weeks"
-            << "Months"
-            << "Years"
-            << "Time Of Day";
+    strings << tr("Days")
+            << tr("Weeks")
+            << tr("Months")
+            << tr("Years")
+            << tr("Time Of Day");
     rGroupBy->setStrings(strings);
     rGroupBy->setValue(0);
 

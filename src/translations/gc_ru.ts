@@ -6097,6 +6097,51 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="90"/>
+        <source>Days</source>
+        <translation type="unfinished">Дни</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="91"/>
+        <source>Weeks</source>
+        <translation type="unfinished">Недели</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="92"/>
+        <source>Months</source>
+        <translation type="unfinished">Месяцы</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="93"/>
+        <source>Years</source>
+        <translation type="unfinished">Годы</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="94"/>
+        <source>Time Of Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="96"/>
+        <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="99"/>
+        <source>Shade Zones</source>
+        <translation type="unfinished">Показать уровни</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="102"/>
+        <source>Show Legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="105"/>
+        <source>Show Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="109"/>
         <source>Add</source>
         <translation type="unfinished">Добавить</translation>
@@ -6421,20 +6466,24 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">График</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="60"/>
         <source>Days</source>
-        <translation type="obsolete">Дни</translation>
+        <translation type="unfinished">Дни</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="61"/>
         <source>Weeks</source>
-        <translation type="obsolete">Недели</translation>
+        <translation type="unfinished">Недели</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="62"/>
         <source>Months</source>
-        <translation type="obsolete">Месяцы</translation>
+        <translation type="unfinished">Месяцы</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="63"/>
         <source>Years</source>
-        <translation type="obsolete">Годы</translation>
+        <translation type="unfinished">Годы</translation>
     </message>
     <message>
         <source>Shade Zones</source>
@@ -6443,6 +6492,11 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../LTMWindow.cpp" line="56"/>
         <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="64"/>
+        <source>Time Of Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11565,6 +11619,17 @@ native format. Should we do so?
 </context>
 <context>
     <name>SearchBox</name>
+    <message>
+        <location filename="../SearchBox.cpp" line="77"/>
+        <location filename="../SearchBox.cpp" line="127"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SearchBox.cpp" line="117"/>
+        <source>Filter...</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../SearchBox.cpp" line="169"/>
         <location filename="../SearchBox.cpp" line="181"/>
