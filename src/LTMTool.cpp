@@ -778,12 +778,12 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     curveStyle->addItem(tr("Dots"), QwtPlotCurve::Dots);
     curveStyle->setCurrentIndex(curveStyle->findData(metricDetail->curveStyle));
 
-    QLabel *stackLabel = new QLabel("Stack");
+    QLabel *stackLabel = new QLabel(tr("Stack"));
     stack = new QCheckBox("", this);
     stack->setChecked(metricDetail->stack);
 
 
-    QLabel *symbol = new QLabel("Symbol");
+    QLabel *symbol = new QLabel(tr("Symbol"));
     curveSymbol = new QComboBox(this);
     curveSymbol->addItem(tr("None"), QwtSymbol::NoSymbol);
     curveSymbol->addItem(tr("Circle"), QwtSymbol::Ellipse);

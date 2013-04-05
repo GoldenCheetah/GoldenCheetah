@@ -2221,9 +2221,9 @@ Prosím o strpení, bude chvíli trvat.
         <location filename="../CriticalPowerWindow.cpp" line="92"/>
         <location filename="../CriticalPowerWindow.cpp" line="94"/>
         <location filename="../CriticalPowerWindow.cpp" line="96"/>
-        <location filename="../CriticalPowerWindow.cpp" line="379"/>
-        <location filename="../CriticalPowerWindow.cpp" line="390"/>
-        <location filename="../CriticalPowerWindow.cpp" line="409"/>
+        <location filename="../CriticalPowerWindow.cpp" line="389"/>
+        <location filename="../CriticalPowerWindow.cpp" line="400"/>
+        <location filename="../CriticalPowerWindow.cpp" line="419"/>
         <source>no data</source>
         <translation>nejsou data</translation>
     </message>
@@ -2279,7 +2279,7 @@ Prosím o strpení, bude chvíli trvat.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="445"/>
+        <location filename="../CriticalPowerWindow.cpp" line="455"/>
         <source>Energy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2292,29 +2292,29 @@ Prosím o strpení, bude chvíli trvat.
         <translation type="obsolete">Osa Y - Práce</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="293"/>
+        <location filename="../CriticalPowerWindow.cpp" line="303"/>
         <source>Set CP value to extracted value</source>
         <translation>Nastav CP na vybranou hodnotu</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="294"/>
+        <location filename="../CriticalPowerWindow.cpp" line="304"/>
         <source>No non-zero extracted value was identified:
 </source>
         <translation>Nenalezena žádná nenulová hodnota:
 </translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="295"/>
+        <location filename="../CriticalPowerWindow.cpp" line="305"/>
         <source>Zones were unchanged.</source>
         <translation>Zóny nebyly změněny.</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="406"/>
+        <location filename="../CriticalPowerWindow.cpp" line="416"/>
         <source>no date</source>
         <translation>žádné datum</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="406"/>
+        <location filename="../CriticalPowerWindow.cpp" line="416"/>
         <source>MM/dd/yyyy</source>
         <translation>mm/dd/rrrr</translation>
     </message>
@@ -2962,6 +2962,16 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation type="unfinished">Spojnicový</translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="781"/>
+        <source>Stack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="786"/>
+        <source>Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="788"/>
         <source>None</source>
         <translation type="unfinished"></translation>
@@ -3060,6 +3070,26 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation>Uprav časový rozsah</translation>
     </message>
     <message>
+        <location filename="../Season.cpp" line="96"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="97"/>
+        <source>Type</source>
+        <translation type="unfinished">Typ</translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="98"/>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="99"/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../Season.cpp" line="100"/>
         <source>Starting LTS</source>
         <translation type="unfinished">Začátek LTS</translation>
@@ -3081,6 +3111,16 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../Season.cpp" line="176"/>
         <source>Edit Event</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="181"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="182"/>
+        <source>Date</source>
+        <translation type="unfinished">Datum</translation>
     </message>
     <message>
         <location filename="../Season.cpp" line="200"/>
@@ -3940,22 +3980,22 @@ NEJASNE</translation>
 <context>
     <name>GcCalendarModel</name>
     <message>
-        <location filename="../GcCalendarModel.h" line="102"/>
+        <location filename="../GcCalendarModel.h" line="103"/>
         <source>Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="103"/>
+        <location filename="../GcCalendarModel.h" line="104"/>
         <source>Date</source>
         <translation type="unfinished">Datum</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="104"/>
+        <location filename="../GcCalendarModel.h" line="105"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="105"/>
+        <location filename="../GcCalendarModel.h" line="106"/>
         <source>Calendar Text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5896,26 +5936,26 @@ NEJASNE
         <translation>waty</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="802"/>
-        <location filename="../LTMPlot.cpp" line="882"/>
-        <location filename="../LTMPlot.cpp" line="1010"/>
-        <location filename="../LTMPlot.cpp" line="1094"/>
+        <location filename="../LTMPlot.cpp" line="805"/>
+        <location filename="../LTMPlot.cpp" line="890"/>
+        <location filename="../LTMPlot.cpp" line="1018"/>
+        <location filename="../LTMPlot.cpp" line="1102"/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="809"/>
-        <location filename="../LTMPlot.cpp" line="907"/>
+        <location filename="../LTMPlot.cpp" line="812"/>
+        <location filename="../LTMPlot.cpp" line="915"/>
         <source>Ramp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1010"/>
+        <location filename="../LTMPlot.cpp" line="1018"/>
         <source>hours</source>
         <translation type="unfinished">hodiny</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1062"/>
+        <location filename="../LTMPlot.cpp" line="1070"/>
         <source>Week Commencing %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6822,7 +6862,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation type="obsolete">Špatný název souboru se záznamem</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2642"/>
+        <location filename="../MainWindow.cpp" line="2665"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -6832,13 +6872,13 @@ Přeskakuji soubor...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="363"/>
-        <location filename="../MainWindow.cpp" line="2661"/>
+        <location filename="../MainWindow.cpp" line="2684"/>
         <source>Zones File Error</source>
         <translation>Chyba v souboru se zónami</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="366"/>
-        <location filename="../MainWindow.cpp" line="2665"/>
+        <location filename="../MainWindow.cpp" line="2688"/>
         <source>Reading Zones File</source>
         <translation>Načítám soubor se zónami</translation>
     </message>
@@ -6847,9 +6887,9 @@ Přeskakuji soubor...</translation>
         <translation type="obsolete">Všechny jízdy/záznamy</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="613"/>
-        <location filename="../MainWindow.cpp" line="643"/>
-        <location filename="../MainWindow.cpp" line="1402"/>
+        <location filename="../MainWindow.cpp" line="619"/>
+        <location filename="../MainWindow.cpp" line="649"/>
+        <location filename="../MainWindow.cpp" line="1408"/>
         <source>Intervals</source>
         <translation>Intervaly</translation>
     </message>
@@ -6874,22 +6914,22 @@ Přeskakuji soubor...</translation>
         <translation type="obsolete">&amp;Cyklista</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="832"/>
+        <location filename="../MainWindow.cpp" line="838"/>
         <source>&amp;New...</source>
         <translation>&amp;Nový...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="832"/>
+        <location filename="../MainWindow.cpp" line="838"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="833"/>
+        <location filename="../MainWindow.cpp" line="839"/>
         <source>&amp;Open...</source>
         <translation>&amp;Otevřít...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="833"/>
+        <location filename="../MainWindow.cpp" line="839"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
@@ -6898,7 +6938,7 @@ Přeskakuji soubor...</translation>
         <translation type="obsolete">&amp;Konec</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="835"/>
+        <location filename="../MainWindow.cpp" line="841"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
@@ -6907,50 +6947,50 @@ Přeskakuji soubor...</translation>
         <translation type="obsolete">&amp;Jízda</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="865"/>
+        <location filename="../MainWindow.cpp" line="871"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="838"/>
+        <location filename="../MainWindow.cpp" line="844"/>
         <source>&amp;Download from device...</source>
         <translation>&amp;Stáhnout z přístroje...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="373"/>
-        <location filename="../MainWindow.cpp" line="2672"/>
+        <location filename="../MainWindow.cpp" line="2695"/>
         <source>HR Zones File Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="376"/>
-        <location filename="../MainWindow.cpp" line="2676"/>
+        <location filename="../MainWindow.cpp" line="2699"/>
         <source>Reading HR Zones File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="938"/>
+        <location filename="../MainWindow.cpp" line="944"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="941"/>
+        <location filename="../MainWindow.cpp" line="947"/>
         <source>Diary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="937"/>
+        <location filename="../MainWindow.cpp" line="943"/>
         <source>Analysis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="939"/>
+        <location filename="../MainWindow.cpp" line="945"/>
         <source>Train</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="538"/>
-        <location filename="../MainWindow.cpp" line="944"/>
+        <location filename="../MainWindow.cpp" line="950"/>
         <source>Add Chart</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6981,280 +7021,280 @@ Přeskakuji soubor...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="565"/>
-        <location filename="../MainWindow.cpp" line="1269"/>
+        <location filename="../MainWindow.cpp" line="1275"/>
         <source>All Activities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="634"/>
+        <location filename="../MainWindow.cpp" line="640"/>
         <source>Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="637"/>
+        <location filename="../MainWindow.cpp" line="643"/>
         <source>Activities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="638"/>
         <location filename="../MainWindow.cpp" line="644"/>
+        <location filename="../MainWindow.cpp" line="650"/>
         <source>Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="831"/>
+        <location filename="../MainWindow.cpp" line="837"/>
         <source>&amp;Athlete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="834"/>
+        <location filename="../MainWindow.cpp" line="840"/>
         <source>&amp;Close Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="834"/>
+        <location filename="../MainWindow.cpp" line="840"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="835"/>
+        <location filename="../MainWindow.cpp" line="841"/>
         <source>&amp;Quit All Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="837"/>
+        <location filename="../MainWindow.cpp" line="843"/>
         <source>A&amp;ctivity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="838"/>
+        <location filename="../MainWindow.cpp" line="844"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="840"/>
+        <location filename="../MainWindow.cpp" line="846"/>
         <source>&amp;Manual activity entry...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="842"/>
+        <location filename="../MainWindow.cpp" line="848"/>
         <source>&amp;Export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="843"/>
+        <location filename="../MainWindow.cpp" line="849"/>
         <source>&amp;Batch export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="844"/>
+        <location filename="../MainWindow.cpp" line="850"/>
         <source>Export Metrics as CSV...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="847"/>
+        <location filename="../MainWindow.cpp" line="853"/>
         <source>&amp;Upload to TrainingPeaks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="847"/>
+        <location filename="../MainWindow.cpp" line="853"/>
         <source>Ctrl+U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="848"/>
+        <location filename="../MainWindow.cpp" line="854"/>
         <source>Down&amp;load from TrainingPeaks...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="848"/>
+        <location filename="../MainWindow.cpp" line="854"/>
         <source>Ctrl+L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="851"/>
+        <location filename="../MainWindow.cpp" line="857"/>
         <source>Upload to Strava...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="854"/>
+        <location filename="../MainWindow.cpp" line="860"/>
         <source>Download from Strava...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="856"/>
+        <location filename="../MainWindow.cpp" line="862"/>
         <source>Upload to RideWithGPS...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="860"/>
+        <location filename="../MainWindow.cpp" line="866"/>
         <source>Upload to Trainingstagebuch...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="865"/>
+        <location filename="../MainWindow.cpp" line="871"/>
         <source>&amp;Save activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="866"/>
+        <location filename="../MainWindow.cpp" line="872"/>
         <source>D&amp;elete activity...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="867"/>
+        <location filename="../MainWindow.cpp" line="873"/>
         <source>Split &amp;activity...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="872"/>
+        <location filename="../MainWindow.cpp" line="878"/>
         <source>Critical Power Estimator...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="881"/>
+        <location filename="../MainWindow.cpp" line="887"/>
         <source>Create a new workout...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="882"/>
+        <location filename="../MainWindow.cpp" line="888"/>
         <source>Download workouts from ErgDB...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="883"/>
+        <location filename="../MainWindow.cpp" line="889"/>
         <source>Import workouts or videos...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="884"/>
+        <location filename="../MainWindow.cpp" line="890"/>
         <source>Scan disk for videos and workouts...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="873"/>
+        <location filename="../MainWindow.cpp" line="879"/>
         <source>Air Density (Rho) Estimator...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="876"/>
+        <location filename="../MainWindow.cpp" line="882"/>
         <source>Get &amp;Withings Data...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="878"/>
+        <location filename="../MainWindow.cpp" line="884"/>
         <source>Get &amp;Zeo Data...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="888"/>
-        <location filename="../MainWindow.cpp" line="1298"/>
+        <location filename="../MainWindow.cpp" line="894"/>
+        <location filename="../MainWindow.cpp" line="1304"/>
         <source>Upload Activity to Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="891"/>
+        <location filename="../MainWindow.cpp" line="897"/>
         <source>Refresh Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="894"/>
+        <location filename="../MainWindow.cpp" line="900"/>
         <source>Find intervals...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1305"/>
+        <location filename="../MainWindow.cpp" line="1311"/>
         <source>Show Column Chooser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1318"/>
         <source>Do Not Show In Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1318"/>
+        <location filename="../MainWindow.cpp" line="1324"/>
         <source>Group By</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1351"/>
+        <location filename="../MainWindow.cpp" line="1357"/>
         <source>Find Peak Intervals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1360"/>
+        <location filename="../MainWindow.cpp" line="1366"/>
         <source>Sort Intervals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1373"/>
-        <location filename="../MainWindow.cpp" line="1407"/>
+        <location filename="../MainWindow.cpp" line="1379"/>
+        <location filename="../MainWindow.cpp" line="1413"/>
         <source>Edit interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1386"/>
+        <location filename="../MainWindow.cpp" line="1392"/>
         <source>Rename selected intervals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1388"/>
+        <location filename="../MainWindow.cpp" line="1394"/>
         <source>Delete selected intervals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1969"/>
+        <location filename="../MainWindow.cpp" line="1992"/>
         <source>Select Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1969"/>
-        <location filename="../MainWindow.cpp" line="2066"/>
+        <location filename="../MainWindow.cpp" line="1992"/>
+        <location filename="../MainWindow.cpp" line="2089"/>
         <source>No activity selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1980"/>
+        <location filename="../MainWindow.cpp" line="2003"/>
         <source>Export Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1993"/>
+        <location filename="../MainWindow.cpp" line="2016"/>
         <source>Export Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1994"/>
+        <location filename="../MainWindow.cpp" line="2017"/>
         <source>Failed to export ride, please check permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2055"/>
-        <location filename="../MainWindow.cpp" line="2303"/>
-        <location filename="../MainWindow.cpp" line="2356"/>
+        <location filename="../MainWindow.cpp" line="2078"/>
+        <location filename="../MainWindow.cpp" line="2326"/>
+        <location filename="../MainWindow.cpp" line="2379"/>
         <source>No activity selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2057"/>
+        <location filename="../MainWindow.cpp" line="2080"/>
         <source>Current activity contains no data to split</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2305"/>
-        <location filename="../MainWindow.cpp" line="2358"/>
+        <location filename="../MainWindow.cpp" line="2328"/>
+        <location filename="../MainWindow.cpp" line="2381"/>
         <source>Current activity contains no data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2620"/>
+        <location filename="../MainWindow.cpp" line="2643"/>
         <source>Range from %1 to %2
 Athlete CP set to %3 watts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2641"/>
+        <location filename="../MainWindow.cpp" line="2664"/>
         <source>Invalid Activity File Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7263,12 +7303,12 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">&amp;Exportovat to CSV...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="842"/>
+        <location filename="../MainWindow.cpp" line="848"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="839"/>
+        <location filename="../MainWindow.cpp" line="845"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
@@ -7277,7 +7317,7 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Nalézt &amp;nejlepší intervaly...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="843"/>
+        <location filename="../MainWindow.cpp" line="849"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
     </message>
@@ -7346,12 +7386,12 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Editor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="839"/>
+        <location filename="../MainWindow.cpp" line="845"/>
         <source>&amp;Import from file...</source>
         <translation>&amp;Import ze souboru...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="840"/>
+        <location filename="../MainWindow.cpp" line="846"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
@@ -7372,12 +7412,12 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">&amp;Uložit záznam</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="870"/>
+        <location filename="../MainWindow.cpp" line="876"/>
         <source>&amp;Tools</source>
         <translation>&amp;Nástroje</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="871"/>
+        <location filename="../MainWindow.cpp" line="877"/>
         <source>&amp;Options...</source>
         <translation>&amp;Volby...</translation>
     </message>
@@ -7386,93 +7426,93 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Výpočet kritického výkonu</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="918"/>
+        <location filename="../MainWindow.cpp" line="924"/>
         <source>&amp;View</source>
         <translation>&amp;Pohled</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="920"/>
+        <location filename="../MainWindow.cpp" line="926"/>
         <source>Toggle Full Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="922"/>
+        <location filename="../MainWindow.cpp" line="928"/>
         <source>Show Left Sidebar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="926"/>
+        <location filename="../MainWindow.cpp" line="932"/>
         <source>Show Toolbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="486"/>
-        <location filename="../MainWindow.cpp" line="931"/>
+        <location filename="../MainWindow.cpp" line="937"/>
         <source>Tabbed View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="945"/>
+        <location filename="../MainWindow.cpp" line="951"/>
         <source>Reset Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="947"/>
+        <location filename="../MainWindow.cpp" line="953"/>
         <source>&amp;Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="954"/>
+        <location filename="../MainWindow.cpp" line="960"/>
         <source>&amp;Help</source>
         <translation>&amp;Nápověda</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="955"/>
+        <location filename="../MainWindow.cpp" line="961"/>
         <source>&amp;User Guide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="956"/>
+        <location filename="../MainWindow.cpp" line="962"/>
         <source>&amp;Log a bug or feature request</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="958"/>
+        <location filename="../MainWindow.cpp" line="964"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>&amp; O aplikaci GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1273"/>
+        <location filename="../MainWindow.cpp" line="1279"/>
         <source>Save Changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1276"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Revert to Saved version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="476"/>
-        <location filename="../MainWindow.cpp" line="1279"/>
-        <location filename="../MainWindow.cpp" line="2066"/>
+        <location filename="../MainWindow.cpp" line="1285"/>
+        <location filename="../MainWindow.cpp" line="2089"/>
         <source>Delete Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="475"/>
-        <location filename="../MainWindow.cpp" line="1282"/>
-        <location filename="../MainWindow.cpp" line="2055"/>
-        <location filename="../MainWindow.cpp" line="2057"/>
+        <location filename="../MainWindow.cpp" line="1288"/>
+        <location filename="../MainWindow.cpp" line="2078"/>
+        <location filename="../MainWindow.cpp" line="2080"/>
         <source>Split Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1293"/>
+        <location filename="../MainWindow.cpp" line="1299"/>
         <source>Tweet Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1892"/>
+        <location filename="../MainWindow.cpp" line="1915"/>
         <source>Can&apos;t rename %1 to %2</source>
         <translation>Nelze přejmenovat %1 na %2</translation>
     </message>
@@ -7541,43 +7581,43 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Soubor %1 nelze otevřít pro zápis</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2015"/>
-        <location filename="../MainWindow.cpp" line="2218"/>
+        <location filename="../MainWindow.cpp" line="2038"/>
+        <location filename="../MainWindow.cpp" line="2241"/>
         <source>Import from File</source>
         <translation>Import ze soubouru</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2031"/>
+        <location filename="../MainWindow.cpp" line="2054"/>
         <source>No Activity To Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2032"/>
+        <location filename="../MainWindow.cpp" line="2055"/>
         <source>There is no currently selected ride to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2071"/>
+        <location filename="../MainWindow.cpp" line="2094"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2137"/>
+        <location filename="../MainWindow.cpp" line="2160"/>
         <source>Export Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2137"/>
+        <location filename="../MainWindow.cpp" line="2160"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2248"/>
+        <location filename="../MainWindow.cpp" line="2271"/>
         <source>Workout Directory Invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2317"/>
+        <location filename="../MainWindow.cpp" line="2340"/>
         <source> (%1 watts)</source>
         <translation> (%1 wattů)</translation>
     </message>
@@ -7594,15 +7634,15 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Smazat záznam</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1352"/>
-        <location filename="../MainWindow.cpp" line="2303"/>
-        <location filename="../MainWindow.cpp" line="2305"/>
+        <location filename="../MainWindow.cpp" line="1358"/>
+        <location filename="../MainWindow.cpp" line="2326"/>
+        <location filename="../MainWindow.cpp" line="2328"/>
         <source>Find Best Intervals</source>
         <translation>Nalézt nejlepší interval</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2356"/>
-        <location filename="../MainWindow.cpp" line="2358"/>
+        <location filename="../MainWindow.cpp" line="2379"/>
+        <location filename="../MainWindow.cpp" line="2381"/>
         <source>Find Power Peaks</source>
         <translation>Nalézt špičku výkonu</translation>
     </message>
@@ -7615,24 +7655,24 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Přejmenovat interval</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1374"/>
-        <location filename="../MainWindow.cpp" line="1408"/>
+        <location filename="../MainWindow.cpp" line="1380"/>
+        <location filename="../MainWindow.cpp" line="1414"/>
         <source>Delete interval</source>
         <translation>Smazat interval</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1372"/>
-        <location filename="../MainWindow.cpp" line="1409"/>
+        <location filename="../MainWindow.cpp" line="1378"/>
+        <location filename="../MainWindow.cpp" line="1415"/>
         <source>Zoom to interval</source>
         <translation>Zoom intervalu</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1410"/>
+        <location filename="../MainWindow.cpp" line="1416"/>
         <source>Bring to Front</source>
         <translation>Do popředí</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1411"/>
+        <location filename="../MainWindow.cpp" line="1417"/>
         <source>Send to back</source>
         <translation>Do pozadí</translation>
     </message>
@@ -7667,7 +7707,7 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Nemohu zapsat poznámky do %1</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2619"/>
+        <location filename="../MainWindow.cpp" line="2642"/>
         <source>CP saved</source>
         <translation>CP uložen</translation>
     </message>
@@ -7690,7 +7730,7 @@ CP závodníka nastaven na %3 wattů</translation>
         <translation type="obsolete">Opravdu chceš smazat záznam?:</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2073"/>
+        <location filename="../MainWindow.cpp" line="2096"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
@@ -10959,12 +10999,12 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideSummaryWindow</name>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="196"/>
+        <location filename="../RideSummaryWindow.cpp" line="197"/>
         <source>&lt;p&gt;Couldn&apos;t read file &quot;</source>
         <translation>&lt;p&gt;Nelze načíst soubor &quot;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="165"/>
+        <location filename="../RideSummaryWindow.cpp" line="166"/>
         <source>dddd MMMM d, yyyy, h:mm AP</source>
         <translation>dddd MMMM d, yyyy, h:mm AP</translation>
     </message>
@@ -10979,81 +11019,83 @@ on and that its display says, &quot;Host&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="208"/>
+        <location filename="../RideSummaryWindow.cpp" line="209"/>
         <source>Device Type: </source>
         <translation>Typ zařízení:</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="503"/>
+        <location filename="../RideSummaryWindow.cpp" line="522"/>
+        <location filename="../RideSummaryWindow.cpp" line="528"/>
         <source> activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="503"/>
+        <location filename="../RideSummaryWindow.cpp" line="522"/>
+        <location filename="../RideSummaryWindow.cpp" line="528"/>
         <source> activities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="211"/>
+        <location filename="../RideSummaryWindow.cpp" line="212"/>
         <source>Totals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="211"/>
+        <location filename="../RideSummaryWindow.cpp" line="212"/>
         <source>Averages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="211"/>
+        <location filename="../RideSummaryWindow.cpp" line="212"/>
         <source>Maximums</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="211"/>
+        <location filename="../RideSummaryWindow.cpp" line="212"/>
         <source>Metrics*</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="337"/>
+        <location filename="../RideSummaryWindow.cpp" line="338"/>
         <source>^(Average|Max) </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="340"/>
-        <location filename="../RideSummaryWindow.cpp" line="453"/>
-        <location filename="../RideSummaryWindow.cpp" line="475"/>
-        <location filename="../RideSummaryWindow.cpp" line="534"/>
-        <location filename="../RideSummaryWindow.cpp" line="542"/>
+        <location filename="../RideSummaryWindow.cpp" line="341"/>
+        <location filename="../RideSummaryWindow.cpp" line="454"/>
+        <location filename="../RideSummaryWindow.cpp" line="476"/>
+        <location filename="../RideSummaryWindow.cpp" line="560"/>
+        <location filename="../RideSummaryWindow.cpp" line="568"/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="391"/>
+        <location filename="../RideSummaryWindow.cpp" line="392"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation type="unfinished">&lt;h2&gt;  Zóny výkon &lt;/ h2&gt; {3&gt;?} {3&gt;?}</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="407"/>
+        <location filename="../RideSummaryWindow.cpp" line="408"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="511"/>
+        <location filename="../RideSummaryWindow.cpp" line="537"/>
         <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="528"/>
+        <location filename="../RideSummaryWindow.cpp" line="554"/>
         <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="595"/>
+        <location filename="../RideSummaryWindow.cpp" line="625"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="598"/>
+        <location filename="../RideSummaryWindow.cpp" line="628"/>
         <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11066,12 +11108,12 @@ on and that its display says, &quot;Host&quot;</source>
         <translation type="obsolete">&lt;h2&gt;TF zóny&lt;/h2&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="425"/>
+        <location filename="../RideSummaryWindow.cpp" line="426"/>
         <source>Intervals</source>
         <translation>Intervaly</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="585"/>
+        <location filename="../RideSummaryWindow.cpp" line="615"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt; &lt;h2&gt; Chyby při čtení ze souboru: &lt;/ h2&gt; &lt;ul&gt;</translation>
     </message>
@@ -11624,18 +11666,18 @@ Chceš to udělat?
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="169"/>
-        <location filename="../SearchBox.cpp" line="181"/>
+        <location filename="../SearchBox.cpp" line="170"/>
+        <location filename="../SearchBox.cpp" line="182"/>
         <source>Add Favourite</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="244"/>
+        <location filename="../SearchBox.cpp" line="245"/>
         <source>Add new search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="245"/>
+        <location filename="../SearchBox.cpp" line="246"/>
         <source>Name:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12607,8 +12649,8 @@ If the newly created activity clashes with an existing activity (same date and t
 <context>
     <name>SummaryMetrics</name>
     <message>
-        <location filename="../SummaryMetrics.cpp" line="78"/>
-        <location filename="../SummaryMetrics.cpp" line="164"/>
+        <location filename="../SummaryMetrics.cpp" line="79"/>
+        <location filename="../SummaryMetrics.cpp" line="166"/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
