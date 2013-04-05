@@ -30,7 +30,7 @@
 SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     : QLineEdit(parent), main(main)
 {
-    setFixedHeight(23);
+    setFixedHeight(21);
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
