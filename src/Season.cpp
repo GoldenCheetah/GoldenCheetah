@@ -93,10 +93,10 @@ EditSeasonDialog::EditSeasonDialog(MainWindow *mainWindow, Season *season) :
 
     // Grid
     QGridLayout *grid = new QGridLayout;
-    QLabel *name = new QLabel("Name");
-    QLabel *type = new QLabel("Type");
-    QLabel *from = new QLabel("From");
-    QLabel *to = new QLabel("To");
+    QLabel *name = new QLabel(tr("Name"));
+    QLabel *type = new QLabel(tr("Type"));
+    QLabel *from = new QLabel(tr("From"));
+    QLabel *to = new QLabel(tr("To"));
     QLabel *seed = new QLabel(tr("Starting LTS"));
 
     nameEdit = new QLineEdit(this);
@@ -178,8 +178,8 @@ EditSeasonEventDialog::EditSeasonEventDialog(MainWindow *mainWindow, SeasonEvent
 
     // Grid
     QGridLayout *grid = new QGridLayout;
-    QLabel *name = new QLabel("Name");
-    QLabel *date = new QLabel("Date");
+    QLabel *name = new QLabel(tr("Name"));
+    QLabel *date = new QLabel(tr("Date"));
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(event->name);
