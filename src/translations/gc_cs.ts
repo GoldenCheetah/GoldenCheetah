@@ -6112,6 +6112,51 @@ NEJASNE
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="90"/>
+        <source>Days</source>
+        <translation type="unfinished">Dny</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="91"/>
+        <source>Weeks</source>
+        <translation type="unfinished">Týdny</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="92"/>
+        <source>Months</source>
+        <translation type="unfinished">Měsíce</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="93"/>
+        <source>Years</source>
+        <translation type="unfinished">Roky</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="94"/>
+        <source>Time Of Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="96"/>
+        <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="99"/>
+        <source>Shade Zones</source>
+        <translation type="unfinished">Schovej zónu</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="102"/>
+        <source>Show Legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="105"/>
+        <source>Show Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="109"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
@@ -6436,20 +6481,24 @@ NEJASNE
         <translation type="obsolete">Graf</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="60"/>
         <source>Days</source>
-        <translation type="obsolete">Dny</translation>
+        <translation type="unfinished">Dny</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="61"/>
         <source>Weeks</source>
-        <translation type="obsolete">Týdny</translation>
+        <translation type="unfinished">Týdny</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="62"/>
         <source>Months</source>
-        <translation type="obsolete">Měsíce</translation>
+        <translation type="unfinished">Měsíce</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="63"/>
         <source>Years</source>
-        <translation type="obsolete">Roky</translation>
+        <translation type="unfinished">Roky</translation>
     </message>
     <message>
         <source>Shade Zones</source>
@@ -6458,6 +6507,11 @@ NEJASNE
     <message>
         <location filename="../LTMWindow.cpp" line="56"/>
         <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="64"/>
+        <source>Time Of Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11238,6 +11292,184 @@ Chceš to udělat?
     </message>
 </context>
 <context>
+    <name>ScatterPlot</name>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="92"/>
+        <source>Power (watts)</source>
+        <translation type="unfinished">Výkon (watty)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="93"/>
+        <source>Cadence (rpm)</source>
+        <translation type="unfinished">Kadence (ot/m)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="94"/>
+        <source>Heartrate (bpm)</source>
+        <translation type="unfinished">Tepové frekvence (tepy/m)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="97"/>
+        <source>Speed (kph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="99"/>
+        <source>Speed (mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="103"/>
+        <source>Altitude (meters)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="105"/>
+        <source>Altitude (feet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="107"/>
+        <source>Torque (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="108"/>
+        <source>Elapsed Time (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="111"/>
+        <source>Elapsed Distance (km)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="113"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="115"/>
+        <source>Interval Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="116"/>
+        <source>Latitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="117"/>
+        <source>Longitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="118"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="119"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished">Průměrná efektivní síla na pedál (N)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="123"/>
+        <source>Time at X/Y (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="124"/>
+        <source>Power Zone</source>
+        <translation type="unfinished">Zóny výkonu</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="126"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Neznámý</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="130"/>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="131"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Kadence</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="132"/>
+        <source>Heartrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="133"/>
+        <source>Speed</source>
+        <translation type="unfinished">Rychlost</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="134"/>
+        <source>Altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="135"/>
+        <source>Pedal Force</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="136"/>
+        <source>Time</source>
+        <translation type="unfinished">Čas</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="137"/>
+        <source>Distance</source>
+        <translation type="unfinished">Vzdálenost</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="138"/>
+        <source>Interval</source>
+        <translation type="unfinished">Interval</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="139"/>
+        <source>Latitude</source>
+        <translation type="unfinished">Zeměpisná šířka</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="140"/>
+        <source>Longitude</source>
+        <translation type="unfinished">Zeměpisná délka</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="141"/>
+        <source>Time at X/Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="142"/>
+        <source>Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="143"/>
+        <source>CPV</source>
+        <translation type="unfinished">CPV</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="144"/>
+        <source>AEPF</source>
+        <translation type="unfinished">AEPF</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="146"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ScatterWindow</name>
     <message>
         <location filename="../ScatterWindow.cpp" line="33"/>
@@ -11380,6 +11612,17 @@ Chceš to udělat?
 </context>
 <context>
     <name>SearchBox</name>
+    <message>
+        <location filename="../SearchBox.cpp" line="77"/>
+        <location filename="../SearchBox.cpp" line="127"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SearchBox.cpp" line="117"/>
+        <source>Filter...</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../SearchBox.cpp" line="169"/>
         <location filename="../SearchBox.cpp" line="181"/>

@@ -87,22 +87,22 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 
     groupBy = new QComboBox;
-    groupBy->addItem("Days", LTM_DAY);
-    groupBy->addItem("Weeks", LTM_WEEK);
-    groupBy->addItem("Months", LTM_MONTH);
-    groupBy->addItem("Years", LTM_YEAR);
-    groupBy->addItem("Time Of Day", LTM_TOD);
+    groupBy->addItem(tr("Days"), LTM_DAY);
+    groupBy->addItem(tr("Weeks"), LTM_WEEK);
+    groupBy->addItem(tr("Months"), LTM_MONTH);
+    groupBy->addItem(tr("Years"), LTM_YEAR);
+    groupBy->addItem(tr("Time Of Day"), LTM_TOD);
     groupBy->setCurrentIndex(0);
-    basicsettingsLayout->addRow(new QLabel("Group by"), groupBy);
+    basicsettingsLayout->addRow(new QLabel(tr("Group by")), groupBy);
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 
-    shadeZones = new QCheckBox("Shade Zones");
+    shadeZones = new QCheckBox(tr("Shade Zones"));
     basicsettingsLayout->addRow(new QLabel(""), shadeZones);
 
-    showLegend = new QCheckBox("Show Legend");
+    showLegend = new QCheckBox(tr("Show Legend"));
     basicsettingsLayout->addRow(new QLabel(""), showLegend);
 
-    showEvents = new QCheckBox("Show Events");
+    showEvents = new QCheckBox(tr("Show Events"));
     basicsettingsLayout->addRow(new QLabel(""), showEvents);
 
     // controls
@@ -898,7 +898,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->curveStyle = styleMap[curveStyle->currentIndex()];
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
-    metricDetail->fillCurve = fillCurve;
+    metricDetail->fillCurve = fillCurve->isChecked();
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();
