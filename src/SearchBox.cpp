@@ -70,6 +70,10 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     setObjectName("SearchBox");
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                           "QLineEdit#SearchBox {"
+#ifdef Q_OS_MAC
+                          "    border-radius: 10px; "
+                          "    border: 1px solid rgba(127,127,127,127);"
+#endif
                           "    padding: 0px %1px;"
                           "}"
                  ).arg(clearButton->sizeHint().width() + frameWidth + 12));

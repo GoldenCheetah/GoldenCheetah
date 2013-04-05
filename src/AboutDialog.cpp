@@ -5,7 +5,7 @@
 #include <QtSql>
 
 #ifndef GC_VERSION
-#define GC_VERSION "(developer build)"
+#define GC_VERSION "V3.0 RC1 (April 1st)"
 #endif
 
 
