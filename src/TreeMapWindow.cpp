@@ -136,6 +136,8 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
+    connect(main, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh(void)));
+
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
 
     // user clicked on a cell in the plot

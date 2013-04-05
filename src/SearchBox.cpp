@@ -136,7 +136,8 @@ void SearchBox::updateCloseButton(const QString& text)
     if (clearButton->isVisible() && text.isEmpty()) mode == Search ? clearQuery() : clearFilter();
     clearButton->setVisible(!text.isEmpty());
 
-    if (mode == Search) searchSubmit(); // only do search as you type in search mode
+    //REMOVED SINCE TOO HEAVY NOW AFFECTS CHARTS TOO
+    //if (mode == Search) searchSubmit(); // only do search as you type in search mode
 
     setGood(); // if user changing then don't stay red - wait till resubmitted
     checkMenu();

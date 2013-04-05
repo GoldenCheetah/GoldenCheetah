@@ -177,6 +177,10 @@ class MainWindow : public QMainWindow
         bool isclean;
         bool ismultisave;
 
+        // global filters
+        bool isfiltered;
+        QStringList filters;
+
         void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 
 #ifdef GC_HAVE_LUCENE
@@ -241,6 +245,7 @@ class MainWindow : public QMainWindow
         void notifyPause() { emit pause(); }
         void notifyStop() { emit stop(); }
         void notifySeek(long x) { emit seek(x); }
+        void notifyFilter(QStringList f) { filters = f; emit filterChanged(f); }
 
     protected:
 
@@ -279,6 +284,8 @@ class MainWindow : public QMainWindow
         void unpause();
         void pause();
         void stop();
+
+        void filterChanged(QStringList&);
 
     public slots:
         void checkCPX(RideItem*);
@@ -402,6 +409,10 @@ class MainWindow : public QMainWindow
 
         void dateRangeChangedDiary(DateRange);
         void dateRangeChangedLTM(DateRange);
+
+        // from global search
+        void searchResults(QStringList);
+        void searchClear();
 
     protected:
 

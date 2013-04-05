@@ -188,6 +188,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
 
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
 }
 
 void
@@ -387,6 +388,13 @@ HistogramWindow::setShade(int x)
 {
     rShade->setCheckState((Qt::CheckState)x);
     shadeZones->setCheckState((Qt::CheckState)x);
+}
+
+void
+HistogramWindow::forceReplot()
+{
+    stale = true;
+    if (amVisible()) updateChart();
 }
 
 void

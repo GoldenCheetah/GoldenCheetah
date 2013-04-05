@@ -83,6 +83,17 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
         results = filteredresults;
     }
 
+    // and honour the global one too!
+    if (main->isfiltered) {
+        // remove any we don't have filtered
+        QList<SummaryMetrics> filteredresults;
+        foreach (SummaryMetrics x, results) {
+            if (main->filters.contains(x.getFileName()))
+                filteredresults << x;
+        }
+        results = filteredresults;
+    }
+
     if (results.count() == 0) return; // no ride files found
 
     // set start and enddate to maximum maximum required date range

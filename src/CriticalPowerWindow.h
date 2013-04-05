@@ -112,6 +112,7 @@ class CriticalPowerWindow : public GcChartWindow
         void setShading(int x) { return shadeCombo->setCurrentIndex(x); }
 
     protected slots:
+        void forceReplot();
         void newRideAdded(RideItem*);
         void cpintTimeValueEntered();
         void cpintSetCPButtonClicked();
