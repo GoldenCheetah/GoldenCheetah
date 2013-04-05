@@ -240,7 +240,7 @@ struct FitFileReaderState
         else  if (manu == 38) {
             switch (prod) {
                 case 1: rideFile->setDeviceType("o_synce navi2coach"); break;
-                default: rideFile->setDeviceType(QString("Garmin %1").arg(prod));
+                default: rideFile->setDeviceType(QString("o_synce %1").arg(prod));
             }
         }
         else {
@@ -373,6 +373,7 @@ struct FitFileReaderState
                 case 12: break; // "cycle_length"
                 case 13: temperature = value; break;
                 case 29: // ACCUMULATED_POWER
+                         break;
                 case 30: lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);break;
 
                 default: unknown_record_fields.insert(field.num);
