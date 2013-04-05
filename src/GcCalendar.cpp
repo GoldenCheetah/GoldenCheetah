@@ -334,7 +334,7 @@ GcCalendar::setSummary()
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
                 QStringList empty; // usually for filters, but we don't do that
-                QString value = SummaryMetrics::getAggregated(metricname, results, empty, false, useMetricUnits);
+                QString value = SummaryMetrics::getAggregated(main, metricname, results, empty, false, useMetricUnits);
 
 
                 // Maximum Max and Average Average looks nasty, remove from name for display

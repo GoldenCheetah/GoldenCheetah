@@ -81,6 +81,7 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultView(int)));
     //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(rideSelected()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
@@ -119,6 +120,7 @@ DiaryWindow::rideSelected()
     int year = when.year();
 
     // monthly view updates
+    calendarModel->setStale();
     calendarModel->setMonth(when.month(), when.year());
 
     when = when.addDays(Qt::Monday - when.dayOfWeek());
@@ -187,6 +189,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
         }
 
         // force a repaint 
+        calendarModel->setStale();
         calendarModel->setMonth(calendarModel->getMonth(), calendarModel->getYear());
         return true;
         }

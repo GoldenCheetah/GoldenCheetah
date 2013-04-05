@@ -124,6 +124,7 @@ class HistogramWindow : public GcChartWindow
         void setrBinWidthFromLineEdit();
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
+        void forceReplot();
         void updateChart();
 
     private:

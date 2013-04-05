@@ -192,6 +192,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     connect(mainWindow, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
     // redraw on config change -- this seems the simplest approach
+    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(rideSelected()));
     connect(mainWindow->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
@@ -220,31 +221,40 @@ CriticalPowerWindow::refreshRideSaved()
 }
 
 void
-CriticalPowerWindow::newRideAdded(RideItem *here)
+CriticalPowerWindow::forceReplot()
 {
-    // any plots we already have are now stale
-    stale = true;
-
-    // mine just got Zapped, a new rideitem would not be my current item
-    if (here == currentRide) currentRide = NULL;
-
+    stale = true; // we must become stale
     if (rangemode) {
 
         // force replot...
-        stale = true;
         dateRangeChanged(myDateRange); 
 
     } else {
         Season season = seasons->seasons.at(cComboSeason->currentIndex());
 
-        // Refresh global curve if a ride is added during those dates
-        if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
-            && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate()))
-            cpintPlot->changeSeason(season.getStart(), season.getEnd());
+        // Refresh aggregated curve (ride added/filter changed)
+        cpintPlot->changeSeason(season.getStart(), season.getEnd());
 
         // if visible make the changes visible
         // rideSelected is easiest way
         if (amVisible()) rideSelected();
+    }
+}
+
+void
+CriticalPowerWindow::newRideAdded(RideItem *here)
+{
+    // any plots we already have are now stale
+    Season season = seasons->seasons.at(cComboSeason->currentIndex());
+    stale = true;
+
+    // mine just got Zapped, a new rideitem would not be my current item
+    if (here == currentRide) currentRide = NULL;
+
+    if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
+            && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate())) {
+        // replot
+        forceReplot();
     }
 }
 
