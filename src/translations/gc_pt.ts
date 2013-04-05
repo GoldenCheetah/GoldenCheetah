@@ -6333,6 +6333,51 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="90"/>
+        <source>Days</source>
+        <translation type="unfinished">Dias</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="91"/>
+        <source>Weeks</source>
+        <translation type="unfinished">Semanas</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="92"/>
+        <source>Months</source>
+        <translation type="unfinished">Mêses</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="93"/>
+        <source>Years</source>
+        <translation type="unfinished">Anos</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="94"/>
+        <source>Time Of Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="96"/>
+        <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="99"/>
+        <source>Shade Zones</source>
+        <translation type="unfinished">Zonas sombreadas</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="102"/>
+        <source>Show Legend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="105"/>
+        <source>Show Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="109"/>
         <source>Add</source>
         <translation type="unfinished">Adicionar</translation>
@@ -6503,20 +6548,24 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
         <translation type="obsolete">Gráfico</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="60"/>
         <source>Days</source>
-        <translation type="obsolete">Dias</translation>
+        <translation type="unfinished">Dias</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="61"/>
         <source>Weeks</source>
-        <translation type="obsolete">Semanas</translation>
+        <translation type="unfinished">Semanas</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="62"/>
         <source>Months</source>
-        <translation type="obsolete">Mêses</translation>
+        <translation type="unfinished">Mêses</translation>
     </message>
     <message>
+        <location filename="../LTMWindow.cpp" line="63"/>
         <source>Years</source>
-        <translation type="obsolete">Anos</translation>
+        <translation type="unfinished">Anos</translation>
     </message>
     <message>
         <source>Shade Zones</source>
@@ -6525,6 +6574,11 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
     <message>
         <location filename="../LTMWindow.cpp" line="56"/>
         <source>Group by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="64"/>
+        <source>Time Of Day</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11326,6 +11380,184 @@ Quer continuar?</translation>
     </message>
 </context>
 <context>
+    <name>ScatterPlot</name>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="92"/>
+        <source>Power (watts)</source>
+        <translation type="unfinished">Potência (Watts)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="93"/>
+        <source>Cadence (rpm)</source>
+        <translation type="unfinished">Cadência (rpm)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="94"/>
+        <source>Heartrate (bpm)</source>
+        <translation type="unfinished">Frequência Cardíaca (bpm)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="97"/>
+        <source>Speed (kph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="99"/>
+        <source>Speed (mph)</source>
+        <translation type="unfinished">Velocidade (mph)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="103"/>
+        <source>Altitude (meters)</source>
+        <translation type="unfinished">Altitude (metros)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="105"/>
+        <source>Altitude (feet)</source>
+        <translation type="unfinished">Altitude (pés)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="107"/>
+        <source>Torque (N)</source>
+        <translation type="unfinished">Torque (N)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="108"/>
+        <source>Elapsed Time (secs)</source>
+        <translation type="unfinished">Tempo decorrido (segs)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="111"/>
+        <source>Elapsed Distance (km)</source>
+        <translation type="unfinished">Distância decorrido (km)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="113"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation type="unfinished">Distância decorrido (mi)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="115"/>
+        <source>Interval Number</source>
+        <translation type="unfinished">Número do intervalo</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="116"/>
+        <source>Latitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="117"/>
+        <source>Longitude (degree offset)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="118"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation type="unfinished">Velocity de pedal circunferencial (m / s)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="119"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished">Força Pedal efectiva média (N)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="123"/>
+        <source>Time at X/Y (%)</source>
+        <translation type="unfinished">Tempo em X/Y (%)</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="124"/>
+        <source>Power Zone</source>
+        <translation type="unfinished">Zona de potência</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="126"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Desconhecido</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="130"/>
+        <source>Power</source>
+        <translation type="unfinished">Potência</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="131"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Cadência</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="132"/>
+        <source>Heartrate</source>
+        <translation type="unfinished">Frequência Cardíaca</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="133"/>
+        <source>Speed</source>
+        <translation type="unfinished">Velocidade</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="134"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Altitude</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="135"/>
+        <source>Pedal Force</source>
+        <translation type="unfinished">Força Pedal</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="136"/>
+        <source>Time</source>
+        <translation type="unfinished">Tempo</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="137"/>
+        <source>Distance</source>
+        <translation type="unfinished">Distância</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="138"/>
+        <source>Interval</source>
+        <translation type="unfinished">Intervalo</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="139"/>
+        <source>Latitude</source>
+        <translation type="unfinished">Latitude</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="140"/>
+        <source>Longitude</source>
+        <translation type="unfinished">Longitude</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="141"/>
+        <source>Time at X/Y</source>
+        <translation type="unfinished">Tempo em X/Y</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="142"/>
+        <source>Zone</source>
+        <translation type="unfinished">Zona</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="143"/>
+        <source>CPV</source>
+        <translation type="unfinished">CPV</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="144"/>
+        <source>AEPF</source>
+        <translation type="unfinished">AEPF</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="146"/>
+        <source>None</source>
+        <translation type="unfinished">Nenhum</translation>
+    </message>
+</context>
+<context>
     <name>ScatterWindow</name>
     <message>
         <location filename="../ScatterWindow.cpp" line="33"/>
@@ -11468,6 +11700,17 @@ Quer continuar?</translation>
 </context>
 <context>
     <name>SearchBox</name>
+    <message>
+        <location filename="../SearchBox.cpp" line="77"/>
+        <location filename="../SearchBox.cpp" line="127"/>
+        <source>Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SearchBox.cpp" line="117"/>
+        <source>Filter...</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../SearchBox.cpp" line="169"/>
         <location filename="../SearchBox.cpp" line="181"/>
