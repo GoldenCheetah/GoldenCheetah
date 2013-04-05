@@ -19,6 +19,7 @@
 #include "SearchBox.h"
 #include "MainWindow.h"
 #include "NamedSearch.h"
+#include "GcSideBarItem.h"
 #include <QToolButton>
 #include <QInputDialog>
 
@@ -33,7 +34,7 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    QPixmap pixmap(":images/toolbar/clear.png");
+    QIcon pixmap(":images/toolbar/clear.png");
     clearButton->setIcon(QIcon(pixmap));
     clearButton->setIconSize(QSize(16,16));
     clearButton->setCursor(Qt::ArrowCursor);
@@ -51,10 +52,10 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
 
     // search button
     searchButton = new QToolButton(this);
-    QPixmap search(":images/toolbar/search.png");
+    QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
     searchButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    searchButton->setIcon(QIcon(search));
-    searchButton->setIconSize(QSize(16,16));
+    searchButton->setIcon(search);
+    searchButton->setIconSize(QSize(11,11));
     searchButton->setCursor(Qt::ArrowCursor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
@@ -93,10 +94,8 @@ void SearchBox::resizeEvent(QResizeEvent *)
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     clearButton->move(rect().right() - frameWidth - sz.width(),
                       (rect().bottom() + 1 - sz.height())/2);
-    searchButton->move(rect().left() + frameWidth,
-                      (rect().bottom() + 1 - sz.height())/2);
-    toolButton->move(rect().left() + frameWidth + 18,
-                      (rect().bottom() + 1 - sz.height())/2);
+    searchButton->move(5, 5);
+    toolButton->move(13, 3);
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
     checkMenu();
@@ -115,9 +114,9 @@ void SearchBox::setMode(SearchBoxMode mode)
 
         case Filter:
         {
-            QPixmap filter(":images/toolbar/filter.png");
-            searchButton->setIcon(QIcon(filter));
-            searchButton->setIconSize(filter.size());
+            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", false);
+            searchButton->setIcon(filter);
+            searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Filter..."));
         }
         break;
@@ -125,9 +124,9 @@ void SearchBox::setMode(SearchBoxMode mode)
         case Search:
         default:
         {
-            QPixmap search(":images/toolbar/search.png");
-            searchButton->setIcon(QIcon(search));
-            searchButton->setIconSize(search.size());
+            QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
+            searchButton->setIcon(search);
+            searchButton->setIconSize(QSize(11,11));
             setPlaceholderText(tr("Search..."));
         }
         break;

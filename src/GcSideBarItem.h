@@ -160,5 +160,5 @@ private:
 
 };
 
-extern QIcon iconFromPNG(QString filename);
+extern QIcon iconFromPNG(QString filename, bool emboss = true);
 #endif

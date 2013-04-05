@@ -19,7 +19,7 @@
 #include "GcSideBarItem.h"
 #include "GcCalendar.h"
 
-QIcon iconFromPNG(QString filename)
+QIcon iconFromPNG(QString filename, bool emboss)
 {
     QImage pngImage;
     pngImage.load(filename);
@@ -37,7 +37,8 @@ QIcon iconFromPNG(QString filename)
     QPainter painter;
     painter.begin(&white);
     painter.setBackgroundMode(Qt::TransparentMode);
-    painter.drawImage(0,-1, gray);
+    if (emboss) painter.drawImage(0,-1, gray);
+    else painter.drawImage(0,0, gray);
     painter.end();
 
     QIcon icon(QPixmap::fromImage(white));
