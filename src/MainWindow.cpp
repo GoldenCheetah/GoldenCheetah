@@ -145,7 +145,7 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home) :
-    home(home), session(0), isclean(false), ismultisave(false),
+    home(home), session(0), isclean(false), ismultisave(false), isfiltered(false),
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL), groupByMapper(NULL)
 {
@@ -576,12 +576,18 @@ MainWindow::MainWindow(const QDir &home) :
 
     // we need to connect the search box on Linux/Windows
 #if !defined (Q_OS_MAC) && defined (GC_HAVE_LUCENE)
+
+    // link to the sidebars
     connect(searchBox, SIGNAL(searchResults(QStringList)), listView, SLOT(searchStrings(QStringList)));
     connect(searchBox, SIGNAL(searchResults(QStringList)), gcCalendar, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchResults(QStringList)), gcMultiCalendar, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), listView, SLOT(clearSearch()));
     connect(searchBox, SIGNAL(searchClear()), gcCalendar, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchClear()), gcMultiCalendar, SLOT(clearFilter()));
+
+    // and global for charts AFTER sidebars
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchResults(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(searchClear()));
 #endif
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(cyclist, GC_NAVHEADINGS, "").toString() != "") {
@@ -1496,6 +1502,23 @@ MainWindow::closeEvent(QCloseEvent* event)
             qDebug()<<"closeEvent: mainwindows list error";
 
     }
+}
+
+// global search/data filter
+void
+MainWindow::searchResults(QStringList f)
+{
+    filters = f;
+    isfiltered = true;
+    emit filterChanged(filters);
+}
+
+void
+MainWindow::searchClear()
+{
+    filters.clear();
+    isfiltered = false;
+    emit filterChanged(filters);
 }
 
 void

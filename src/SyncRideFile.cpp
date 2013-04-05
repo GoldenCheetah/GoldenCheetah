@@ -214,7 +214,7 @@ struct SyncFileReaderState
     RideFile * run() {
         errors.clear();
         rideFile = new RideFile;
-        rideFile->setDeviceType("Macro Sync");
+        rideFile->setDeviceType("o_synce macro/macrox");
         rideFile->setFileFormat("Macro GoldenCheetah Sync File (osyn)");
 
         if (!file.open(QIODevice::ReadOnly)) {

@@ -784,6 +784,9 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
 
     foreach (SummaryMetrics rideMetrics, *(settings->data)) {
 
+        // filter out unwanted rides
+        if (main->isfiltered && !main->filters.contains(rideMetrics.getFileName())) continue;
+
         double value = rideMetrics.getForSymbol(metricDetail.symbol);
 
         // check values are bounded to stop QWT going berserk
@@ -855,6 +858,11 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
     unsigned long secondsPerGroupBy=0;
     bool wantZero = (metricDetail.curveStyle == QwtPlotCurve::Steps);
     foreach (SummaryMetrics rideMetrics, *data) {
+
+        // filter out unwanted rides but not for PMC type metrics
+        // because that needs to be done in the stress calculator
+        if (metricDetail.type != METRIC_PM && main->isfiltered && 
+            !main->filters.contains(rideMetrics.getFileName())) continue;
 
         // day we are on
         int currentDay = groupForDate(rideMetrics.getRideDate().date(), settings->groupBy);
