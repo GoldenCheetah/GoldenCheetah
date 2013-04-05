@@ -70,6 +70,7 @@ private:
 
 public slots:
 
+    void setStale() { stale = true; }
     void rideChange(RideItem *rideItem) {
         if (rideItem) {
             QDate date = rideItem->dateTime.date();
@@ -141,9 +142,10 @@ public:
         QDate today = QDateTime::currentDateTime().date();
         setMonth(today.month(), today.year());
 
-        // invalidate model if rides added or deleted
+        // invalidate model if rides added or deleted or filter applier
         connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
         connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
+        connect(main, SIGNAL(filterChanged(QStringList&)), this, SLOT(setStale()));
 
     }
     ~GcCalendarModel() {}
@@ -254,9 +256,28 @@ public:
             }
             break;
 
-        case Qt::ForegroundRole: // XXX Should return a list for each ride
-                                 // XXX within the cell
-            return Qt::black;
+        case Qt::ForegroundRole:
+            {
+            QList<QColor> colors;
+            QVector<int> *arr = dateToRows.value(date(proxyIndex), NULL);
+            if (arr) {
+                foreach (int i, *arr) {
+                    QString filename = sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
+                    if (mainWindow->isfiltered && mainWindow->filters.contains(filename))
+                        colors << QColor(0.4*255,0.6*255,0.7*255,255);
+                    else
+                        colors << QColor(Qt::black);
+                }
+            }
+
+#ifdef GC_HAVE_ICAL
+            // added planned workouts
+            for (int k= mainWindow->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
+                colors.append(Qt::black);
+#endif
+
+            return QVariant::fromValue<QList<QColor> >(colors);
+            }
             break;
 
         case Qt::FontRole:       // XXX Should return a list for each ride
@@ -430,6 +451,8 @@ class GcCalendarDelegate : public QItemDelegate
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const {
 
+        painter->save();
+
         // font
         QVariant vfont = index.data(Qt::FontRole);
         painter->setFont(vfont.value<QFont>());
@@ -455,12 +478,13 @@ class GcCalendarDelegate : public QItemDelegate
         // text
         QStringList texts = index.data(Qt::DisplayRole).toStringList();
         QList<QColor> colors = index.data(Qt::BackgroundRole).value<QList<QColor> >();
+        QList<QColor> pens =  index.data(Qt::ForegroundRole).value<QList<QColor> >();
         if (texts.count()) {
 
-                int height = (option.rect.height()-21) / texts.count();
-                int y = option.rect.y()+17;
-                int i=0;
-                foreach (QString text, texts) {
+            int height = (option.rect.height()-21) / texts.count();
+            int y = option.rect.y()+17;
+            int i=0;
+            foreach (QString text, texts) {
 
                 QRect bd(option.rect.x()+2, y, option.rect.width()-4, height);
                 y += height+2;
@@ -469,18 +493,24 @@ class GcCalendarDelegate : public QItemDelegate
                 createPainterPath(cachePath, bd, 4, 4);
 
                 QPen pen;
-                pen.setColor(Qt::black);
-                painter->setPen(Qt::NoPen);
+                QColor color = pens[i];
+                pen.setColor(color);
+
+                // if not black use it for border
+                if (color != QColor(Qt::black)) painter->setPen(pen);
+                else painter->setPen(Qt::NoPen);
                 QColor fillColor = colors[i++];
                 fillColor.setAlpha(200);
                 painter->setBrush(fillColor);
                 painter->setRenderHint(QPainter::Antialiasing);
                 painter->drawPath(cachePath);
+
+                // text always needs a pen
                 painter->setPen(pen);
                 painter->drawText(bd, text);
             }
         }
-
+        painter->restore();
     }
 
 };

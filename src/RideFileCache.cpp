@@ -892,11 +892,13 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
                : start(start), end(end), main(main), rideFileName(""), ride(0) 
 {
 
-    // Oh lets get from the cache if we can
-    foreach(RideFileCache *p, main->cpxCache) {
-        if (p->start == start && p->end == end) {
-            *this = *p;
-            return;
+    // Oh lets get from the cache if we can -- but not if filtered
+    if (!filter && !main->isfiltered) {
+        foreach(RideFileCache *p, main->cpxCache) {
+            if (p->start == start && p->end == end) {
+                *this = *p;
+                return;
+            }
         }
     }
 
@@ -936,6 +938,9 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
         if (((filter == true && files.contains(rideFileName)) || filter == false) &&
             rideDate >= start && rideDate <= end) {
 
+            // skip globally filtered values
+            if (main->isfiltered && !main->filters.contains(rideFileName)) continue;
+
             // get its cached values (will refresh if needed...)
             RideFileCache rideCache(main, main->home.absolutePath() + "/" + rideFileName);
 
@@ -970,12 +975,14 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
     // set the cursor back to normal
     main->setCursor(Qt::ArrowCursor);
 
-    // lets add to the cache for others to re-use
-    if (main->cpxCache.count() > maxcache) {
-        delete(main->cpxCache.at(0));
-        main->cpxCache.removeAt(0);
+    // lets add to the cache for others to re-use -- but not if filtered
+    if (!main->isfiltered && !filter) {
+        if (main->cpxCache.count() > maxcache) {
+            delete(main->cpxCache.at(0));
+            main->cpxCache.removeAt(0);
+        }
+        main->cpxCache.append(new RideFileCache(this));
     }
-    main->cpxCache.append(new RideFileCache(this));
 
 }
 
