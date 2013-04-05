@@ -490,6 +490,19 @@ RideSummaryWindow::htmlSummary() const
 
         int j;
 
+        // if we are filtered we need to count the number of activities
+        // we have after filtering has been applied, otherwise it is just
+        // the number of entries
+        int activities = 0;
+        if (filtered) {
+
+            foreach (SummaryMetrics activity, data) {
+                if (!filters.contains(activity.getFileName())) continue;
+                activities++;
+            }
+
+        } else activities = data.count();
+
         // some people have a LOT of metrics, so we only show so many since
         // you quickly run out of screen space, but if they have > 4 we can
         // take out elevation and work from the totals/
@@ -499,9 +512,20 @@ RideSummaryWindow::htmlSummary() const
         else totalCols = rtotalColumn.count();
         int metricCols = metricColumn.count() > 7 ? 7 : metricColumn.count();
 
-        summary += ("<p><h3>" + 
-                    QString("%1").arg(data.count()) + (data.count() == 1 ? tr(" activity") : tr(" activities")) +
-                    "</h3><p>");
+        if (filtered) {
+
+            // "n of x activities" shown in header of list when filtered
+            summary += ("<p><h3>" + 
+                        QString("%1 of %2").arg(activities).arg(data.count()) 
+                                           + (data.count() == 1 ? tr(" activity") : tr(" activities")) +
+                        "</h3><p>");
+        } else {
+
+            // just "n activities" shown in header of list when not filtered
+            summary += ("<p><h3>" + 
+                        QString("%1").arg(activities) + (activities == 1 ? tr(" activity") : tr(" activities")) +
+                        "</h3><p>");
+        }
         
         // table of activities
         summary += "<table align=\"center\" width=\"80%\" border=\"0\">";
@@ -547,6 +571,9 @@ RideSummaryWindow::htmlSummary() const
         // activities 1 per row
         bool even = false;
         foreach (SummaryMetrics rideMetrics, data) {
+
+            // apply the filter if there is one active
+            if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
 
             if (even) summary += "<tr>";
             else {
