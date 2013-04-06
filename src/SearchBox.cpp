@@ -34,9 +34,9 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    QIcon pixmap(":images/toolbar/clear.png");
+    QIcon pixmap(":images/toolbar/popbutton.png");
     clearButton->setIcon(QIcon(pixmap));
-    clearButton->setIconSize(QSize(16,16));
+    clearButton->setIconSize(QSize(12,12));
     clearButton->setCursor(Qt::ArrowCursor);
     clearButton->hide();
     //connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
@@ -90,8 +90,7 @@ void SearchBox::resizeEvent(QResizeEvent *)
 {
     QSize sz = clearButton->sizeHint();
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
-    clearButton->move(rect().right() - frameWidth - sz.width(),
-                      (rect().bottom() + 1 - sz.height())/2);
+    clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
     searchButton->move(5, 3);
     toolButton->move(13, 0);
 
