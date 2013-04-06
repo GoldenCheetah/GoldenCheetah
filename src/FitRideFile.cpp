@@ -339,7 +339,7 @@ struct FitFileReaderState
         if (time_offset > 0)
             time = last_time + time_offset;
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
-        double kph = 0, temperature = RideFile::noTemp, watts = 0;
+        double kph = 0, temperature = RideFile::noTemp, watts = 0, slope = 0;
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -364,7 +364,7 @@ struct FitFileReaderState
                 case 6: kph = value * 3.6 / 1000.0; break;
                 case 7: watts = value; break;
                 case 8: break; // packed speed/dist
-                case 9: //grade = value / 100.0;
+                case 9: slope = value / 100.0;
                         break;
                 case 10: //resistance = value;
                         break;
@@ -441,6 +441,7 @@ struct FitFileReaderState
             double deltaLon = lng - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
             double deltaHeadwind = headwind - prevPoint->headwind;
+            double deltaSlope = headwind - prevPoint->slope;
             double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
 
             for (int i = 1; i < deltaSecs; i++) {
@@ -457,7 +458,7 @@ struct FitFileReaderState
                     (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
                     (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
                     prevPoint->headwind + (deltaHeadwind * weight),
-                    0,
+                    prevPoint->slope + (deltaSlope * weight),
                     temperature,
                     prevPoint->lrbalance + (deltaLeftRightBalance * weight),
                     interval);
@@ -466,7 +467,7 @@ struct FitFileReaderState
         }
 
         if (km < 0.00001f) km = last_distance;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, 0, temperature, lrbalance, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature, lrbalance, interval);
         last_time = time;
         last_distance = km;
     }
