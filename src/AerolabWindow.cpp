@@ -48,7 +48,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QLabel *crrLabel = new QLabel(tr("Crr"), this);
   crrLabel->setFixedWidth(labelWidth1);
   crrLineEdit = new QLineEdit();
-  crrLineEdit->setFixedWidth(70);
+  crrLineEdit->setFixedWidth(75);
   crrLineEdit->setText(QString("%1").arg(aerolab->getCrr()) );
   /*crrQLCDNumber    = new QLCDNumber(7);
   crrQLCDNumber->setMode(QLCDNumber::Dec);
@@ -71,7 +71,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QLabel *cdaLabel = new QLabel(tr("CdA"), this);
   cdaLabel->setFixedWidth(labelWidth1);
   cdaLineEdit = new QLineEdit();
-  cdaLineEdit->setFixedWidth(70);
+  cdaLineEdit->setFixedWidth(75);
   cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
   /*cdaQLCDNumber    = new QLCDNumber(7);
   cdaQLCDNumber->setMode(QLCDNumber::Dec);
@@ -94,7 +94,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QLabel *etaLabel = new QLabel(tr("Eta"), this);
   etaLabel->setFixedWidth(labelWidth1);
   etaLineEdit = new QLineEdit();
-  etaLineEdit->setFixedWidth(70);
+  etaLineEdit->setFixedWidth(75);
   etaLineEdit->setText(QString("%1").arg(aerolab->getEta()) );
   /*etaQLCDNumber    = new QLCDNumber(7);
   etaQLCDNumber->setMode(QLCDNumber::Dec);
