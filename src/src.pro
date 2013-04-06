@@ -140,15 +140,13 @@ macx {
                 LionFullScreen.h \
                 QtMacSegmentedButton.h \
                 QtMacButton.h \
-                QtMacPopUpButton.h \
-                QtMacSearchBox.h \
+                QtMacPopUpButton.h
 
     OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
                             LionFullScreen.mm \
                             QtMacSegmentedButton.mm \
                             QtMacButton.mm \
-                            QtMacPopUpButton.mm \
-                            QtMacSearchBox.mm
+                            QtMacPopUpButton.mm
 
     # on a mac we need to install the Wahoo API for BTLE/Kickr support
     # This requires **v3.0 (beta)** of the WF API which is not yet
