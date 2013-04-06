@@ -984,10 +984,11 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         // indent first column and draw all in bold
         myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
         myOption.font.setWeight(QFont::Bold);
+        QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
         if (myOption.rect.x() == 0) {
-            QRect indented(myOption.rect.x()+5, myOption.rect.y(), myOption.rect.width()-5, myOption.rect.height());
+            QRect indented(myOption.rect.x()+5, myOption.rect.y()+1, myOption.rect.width()-5, myOption.rect.height());
             drawDisplay(painter, myOption, indented, value); //added
-        } else drawDisplay(painter, myOption, myOption.rect, value); //added
+        } else drawDisplay(painter, myOption, normal, value); //added
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
