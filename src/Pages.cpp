@@ -1176,14 +1176,14 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, 7+(chartmarkersSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, 7+(chartlabelsSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CALENDAR_SIZE, 7+(calendarSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_POPUP_SIZE, 7+(calendarSize->currentIndex()*2));
+    appsettings->setValue(GC_FONT_POPUP_SIZE, 7+(popupSize->currentIndex()*2));
 #else
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, 6+(defaultSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_TITLES_SIZE, 6+(titlesSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, 6+(chartmarkersSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, 6+(chartlabelsSize->currentIndex()*2));
     appsettings->setValue(GC_FONT_CALENDAR_SIZE, 6+(calendarSize->currentIndex()*2));
-    appsettings->setValue(GC_FONT_POPUP_SIZE, 6+(calendarSize->currentIndex()*2));
+    appsettings->setValue(GC_FONT_POPUP_SIZE, 6+(popupSize->currentIndex()*2));
 #endif
 
     QFont font;
