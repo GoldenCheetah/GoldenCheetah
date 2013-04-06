@@ -200,6 +200,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
     case QEvent::MouseButtonDblClick:
         return true;
     case QEvent::ToolTip:
+        return true; // disabled for now, its just too fugly.
         {
             QModelIndex index = monthlyView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
             if (index.isValid()) {
