@@ -921,16 +921,18 @@ GcMultiCalendar::resizeEvent(QResizeEvent*)
     } else {
 
         for (int i=0; i<calendars.count(); i++) {
+
             if (i>=oldshowing && i<showing) {
+
                 calendars.at(i)->setFilter(this->filters);
                 calendars.at(i)->setDate(first.addMonths(i).month(), first.addMonths(i).year());
                 calendars.at(i)->show();
-            }
-            else if (i>=showing) {
+ 
+            // We no longer delete unused calendars we just hide them
+            } else if (i && i>=showing) {
+
                 GcMiniCalendar *p = calendars.at(i);
-                delete p;
-                calendars.remove(i);
-                i--; // i is incremented in loop, but we just deleted
+                p->hide();
             }
         }
     }
