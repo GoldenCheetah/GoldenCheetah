@@ -98,7 +98,6 @@
 #include "QtMacButton.h" // mac
 #include "QtMacPopUpButton.h" // mac
 #include "QtMacSegmentedButton.h" // mac
-#include "QtMacSearchBox.h" // mac
 #else
 #include "QTFullScreen.h" // not mac!
 #include "../qtsolutions/segmentcontrol/qtsegmentcontrol.h"
