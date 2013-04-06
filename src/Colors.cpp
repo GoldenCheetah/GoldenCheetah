@@ -91,7 +91,7 @@ void GCColor::setupColors()
         { tr("Aerolab Elevation"), "COLORAEROEL", Qt::green },
         { tr("Calendar background"), "CCALCELL", Qt::white },
         { tr("Calendar heading"), "CCALHEAD", QColor(230,230,230) },
-        { tr("Calendar Current Selection"), "CCALCURRENT", Qt::darkBlue },
+        { tr("Calendar Current Selection"), "CCALCURRENT", QColor(255,213,0) },
         { tr("Calendar Actual Workout"), "CCALACTUAL", Qt::green },
         { tr("Calendar Planned Workout"), "CCALPLANNED", Qt::yellow },
         { tr("Calendar Today"), "CCALTODAY", Qt::cyan },
