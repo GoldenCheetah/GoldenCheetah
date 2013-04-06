@@ -92,7 +92,11 @@ void SearchBox::resizeEvent(QResizeEvent *)
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
     searchButton->move(5, 3);
+#ifndef Q_OS_MAC
+    toolButton->move(15, 0);
+#else
     toolButton->move(13, 0);
+#endif
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
     checkMenu();
