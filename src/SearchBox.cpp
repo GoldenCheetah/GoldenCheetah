@@ -78,7 +78,11 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
                           "}"
                           "QLineEdit#SearchBox:focus {"
                           "    border-radius: 10px; "
+#ifdef WIN32
+                          "    border: 1px solid rgba(%2,%3,%4,255);"
+#else
                           "    border: 2px solid rgba(%2,%3,%4,255);"
+#endif
                           "    padding: 0px %5px;"
                           "}"
                  ).arg(clearButton->sizeHint().width() + frameWidth + 12)
