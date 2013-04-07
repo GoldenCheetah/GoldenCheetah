@@ -264,7 +264,7 @@ public:
                 foreach (int i, *arr) {
                     QString filename = sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
                     if (mainWindow->isfiltered && mainWindow->filters.contains(filename))
-                        colors << QColor(0.4*255,0.6*255,0.7*255,255);
+                        colors << GColor(CCALCURRENT);
                     else
                         colors << QColor(Qt::black);
                 }

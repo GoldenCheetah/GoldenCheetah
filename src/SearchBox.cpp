@@ -69,13 +69,21 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     setObjectName("SearchBox");
+    QColor color = QPalette().color(QPalette::Highlight);
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                           "QLineEdit#SearchBox {"
                           "    border-radius: 10px; "
                           "    border: 1px solid rgba(127,127,127,127);"
                           "    padding: 0px %1px;"
                           "}"
-                 ).arg(clearButton->sizeHint().width() + frameWidth + 12));
+                          "QLineEdit#SearchBox:focus {"
+                          "    border-radius: 10px; "
+                          "    border: 2px solid rgba(%2,%3,%4,255);"
+                          "    padding: 0px %5px;"
+                          "}"
+                 ).arg(clearButton->sizeHint().width() + frameWidth + 12)
+                  .arg(color.red()).arg(color.green()).arg(color.blue())
+                  .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     setPlaceholderText(tr("Search..."));
     mode = Search;
