@@ -166,7 +166,7 @@ GcLabel::paintEvent(QPaintEvent *)
         // setup a painter and the area to paint
         if (!underMouse()) painter.fillRect(all, bgColor);
         else {
-            if (filtered) painter.fillRect(all, QColor(0.4 *255,0.6*255,0.77*255,60));
+            if (filtered) painter.fillRect(all, GColor(CCALCURRENT));
             else painter.fillRect(all, Qt::lightGray);
         }
 
@@ -189,7 +189,7 @@ GcLabel::paintEvent(QPaintEvent *)
             painter.drawText(off, alignment(), text());
         }
 
-        if (filtered) painter.setPen(QColor(0.4*255,0.6*255,0.7*255,255));
+        if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
         else painter.setPen(QColor(0,0,0,170));
 
         painter.drawText(norm, alignment(), text());
@@ -204,7 +204,7 @@ GcLabel::paintEvent(QPaintEvent *)
 
     if (text() != ""  && filtered) {
         QPen pen;
-        pen.setColor(QColor(0.4*255,0.6*255,0.77*255,255));
+        pen.setColor(GColor(CCALCURRENT));
         pen.setWidth(3);
         painter.setPen(pen);
         painter.drawRect(QRect(0,0,width(),height()));

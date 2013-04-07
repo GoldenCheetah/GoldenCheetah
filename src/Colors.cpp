@@ -111,6 +111,10 @@ void GCColor::setupColors()
         { "", "", QColor(0,0,0) },
     };
 
+    // set the defaults to system detaults
+    init[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
+    init[CTOOLBAR].color = QPalette().color(QPalette::Window);
+
     copyArray(init, DefaultColorList);
     copyArray(init, ColorList);
 }
@@ -193,6 +197,11 @@ GCColor::readConfig()
             if (ColorList[i].name == "CTOOLBAR") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Window);
+            }
+            if (ColorList[i].name == "CCALCURRENT") {
+                QPalette def;
+                ColorList[i].color = def.color(QPalette::Highlight);
+
             }
         }
     }
