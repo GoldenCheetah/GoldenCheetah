@@ -1006,7 +1006,7 @@ HomeWindow::drawCursor()
 GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindow(mainWindow), type(type)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
     setMinimumHeight(500);
     setMinimumWidth(800);
