@@ -28,6 +28,7 @@
 
 #include <QtGui>
 #include <QString>
+#include <QDebug>
 
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
@@ -244,19 +245,18 @@ LTMWindow::metricSelected()
 void
 LTMWindow::dateRangeChanged(DateRange range)
 {
+    // do we need to use custom range?
     if (useCustom || useToToday) range = custom;
 
-    if (!amVisible() && !dirty) return;
-
     // we already plotted that date range
-    if (range.from == plotted.from &&
-        range.to  == plotted.to) return;
+    if (amVisible() || dirty || range.from != plotted.from || range.to  != plotted.to) {
 
-    settings.data = &results;
-    settings.measures = &measures;
+         settings.data = &results;
+         settings.measures = &measures;
 
-    // apply filter to new date range too -- will also refresh plot
-    filterChanged();
+        // apply filter to new date range too -- will also refresh plot
+        filterChanged();
+    }
 }
 
 void
