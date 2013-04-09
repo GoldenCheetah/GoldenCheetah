@@ -961,10 +961,8 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
             main->cyclist,
 		    settings->start,
 		    settings->end,
-		    (appsettings->value(this, GC_INITIAL_STS)).toInt(),
-		    (appsettings->value(this, GC_INITIAL_LTS)).toInt(),
 		    (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
-		    (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
+            (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
 
     sc->calculateStress(main, home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
 

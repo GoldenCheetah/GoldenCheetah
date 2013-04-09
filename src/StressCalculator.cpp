@@ -14,13 +14,11 @@ StressCalculator::StressCalculator (
     QString cyclist,
 	QDateTime startDate,
 	QDateTime endDate,
-        double initialSTS = 0,
-	double initialLTS = 0,
 	int shortTermDays = 7,
 	int longTermDays = 42) :
 	startDate(startDate), endDate(endDate), shortTermDays(shortTermDays),
 	longTermDays(longTermDays),
-	initialSTS(initialSTS), initialLTS(initialLTS), lastDaysIndex(-1)
+	lastDaysIndex(-1)
 {
     // calc SB for today or tomorrow?
     showSBToday = appsettings->cvalue(cyclist, GC_SB_TODAY).toInt();
@@ -173,7 +171,6 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
  */
 void StressCalculator::addRideData(double BS, QDateTime rideDate) {
     int daysIndex = startDate.daysTo(rideDate);
-
     // fill in any missing days before today
     int d;
     for (d = lastDaysIndex + 1; d < daysIndex ; d++) {
@@ -205,21 +202,19 @@ void StressCalculator::calculate(int daysIndex) {
 
     // if its seeded leave it alone
     if (ltsvalues[daysIndex] >=0 || stsvalues[daysIndex]>=0) {
+
         // LTS
-        if (daysIndex == 0)
-            lastLTS = initialLTS;
-        else
-            lastLTS = ltsvalues[daysIndex-1];
+        if (daysIndex) lastLTS = ltsvalues[daysIndex-1];
+        else lastLTS = 0;
 
         ltsvalues[daysIndex] = (list[daysIndex] * (1.0 - lte)) + (lastLTS * lte);
 
         // STS
-        if (daysIndex == 0)
-            lastSTS = initialSTS;
-        else
-            lastSTS = stsvalues[daysIndex-1];
+        if (daysIndex) lastSTS = stsvalues[daysIndex-1];
+        else lastSTS = 0;
 
         stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
+
     } else if (ltsvalues[daysIndex]< 0|| stsvalues[daysIndex]<0) {
 
         ltsvalues[daysIndex] *= -1;

@@ -191,8 +191,6 @@ void PerformanceManagerWindow::replot()
             mainWindow->cyclist,
 		    firstRideItem->dateTime,
 		    endTime,
-		    (appsettings->cvalue(mainWindow->cyclist, GC_INITIAL_STS)).toInt(),
-		    (appsettings->cvalue(mainWindow->cyclist, GC_INITIAL_LTS)).toInt(),
 		    (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt(),
 		    (appsettings->cvalue(mainWindow->cyclist, GC_LTS_DAYS,42)).toInt());
 
