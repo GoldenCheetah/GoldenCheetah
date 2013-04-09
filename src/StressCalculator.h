@@ -29,9 +29,7 @@ class StressCalculator:public QObject {
 	QDateTime startDate, endDate;  // start date
 	int shortTermDays;
 	int longTermDays;
-	double initialSTS;
-	double initialLTS;
-        double ste, lte;
+    double ste, lte;
 
 	int lastDaysIndex;
     bool showSBToday;
@@ -53,9 +51,7 @@ class StressCalculator:public QObject {
 
     public:
 
-	StressCalculator(QString cyclist, QDateTime startDate, QDateTime endDate,
-		double initialSTS, double initialLTS,
-		int shortTermDays, int longTermDays);
+	StressCalculator(QString cyclist, QDateTime startDate, QDateTime endDate, int shortTermDays, int longTermDays);
 
 	void calculateStress(MainWindow *, QString, const QString &metric, bool filter = false, QStringList files = QStringList());
 
