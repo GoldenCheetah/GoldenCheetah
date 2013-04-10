@@ -56,7 +56,30 @@ Section "Golden Cheetah (required)"
   
   ; Put file there
   File "..\release\GoldenCheetah.exe"
+
+  ; MingW2 libs 4.8.4 uses MingW32 with GCC 4.4
+  ; including all the runtime
   File "..\release\mingwm10.dll"
+  File "..\release\libgcc_s_dw2-1.dll"
+  File "..\release\libcharset-1.dll"
+  File "..\release\libexpat-1.dll"
+  File "..\release\libgcc_s_dw2-1.dll"
+  File "..\release\libgmp-3.dll"
+  File "..\release\libgmpxx-4.dll"
+  File "..\release\libgomp-1.dll"
+  File "..\release\libiconv-2.dll"
+  File "..\release\libmpfr-1.dll"
+  File "..\release\libssp-0.dll"
+  File "..\release\libstdc++-6.dll"
+  File "..\release\mingwm10.dll"
+  File "..\release\msvcm90.dll"
+  File "..\release\msvcp90.dll"
+  File "..\release\msvcr90.dll"
+ 
+
+  ;
+  ; QT Libs
+  ;
   File "..\release\QtCore4.dll"
   File "..\release\QtScript4.dll"
   File "..\release\QtGui4.dll"
@@ -67,20 +90,36 @@ Section "Golden Cheetah (required)"
   File "..\release\phonon4.dll"
   File "..\release\QtNetwork4.dll"
   File "..\release\QtOpenGL4.dll"
-  File "..\release\libgcc_s_dw2-1.dll"
-  File "..\release\SiUSBXp.dll"
+
+  ; ssl
+  File "..\release\libeay32.dll"
+  File "..\release\ssleay32.dll"
+
+  ; search / data filters
   File "..\release\libclucene-core.dll"
   File "..\release\libclucene-shared.dll"
+
+  ; 3d plotting
   File "..\release\qwtplot3d.dll"
+  
+  ; USB1 and USB2 Garmin ANT support
+  File "..\release\SiUSBXp.dll"
   File "..\release\libusb0.dll"
 
-  ;
   ; vlc is a mighty pain in the ass
-  ;
   File "..\release\axvlc.dll"
   File "..\release\libvlc.dll"
   File "..\release\libvlccore.dll"
 
+  ; SQLite for metric and training DB
+  SetOutPath $INSTDIR\sqldrivers
+  File "..\release\qsqlite4.dll"
+
+  ; jpegs for Google maps
+  SetOutPath $INSTDIR\imageformats
+  File "..\release\qjpeg4.dll"
+
+  ; the rest of the VLC libs
   SetOutPath $INSTDIR\plugins
   SetOutPath $INSTDIR\plugins\access
   File "..\release\plugins\access\libaccess_attachment_plugin.dll"
@@ -241,11 +280,6 @@ Section "Golden Cheetah (required)"
   File "..\release\plugins\video_output\libwingdi_plugin.dll"
   File "..\release\plugins\video_output\libyuv_plugin.dll"
 
-  SetOutPath $INSTDIR\sqldrivers
-  File "..\release\qsqlite4.dll"
-
-  SetOutPath $INSTDIR\imageformats
-  File "..\release\qjpeg4.dll"
 
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GoldenCheetah "Install_Dir" "$INSTDIR"
