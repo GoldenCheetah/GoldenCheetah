@@ -244,17 +244,25 @@ CriticalPowerWindow::forceReplot()
 void
 CriticalPowerWindow::newRideAdded(RideItem *here)
 {
-    // any plots we already have are now stale
-    Season season = seasons->seasons.at(cComboSeason->currentIndex());
-    stale = true;
-
     // mine just got Zapped, a new rideitem would not be my current item
     if (here == currentRide) currentRide = NULL;
 
-    if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
-            && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate())) {
-        // replot
+    // any plots we already have are now stale
+    if (!rangemode) {
+
+        Season season = seasons->seasons.at(cComboSeason->currentIndex());
+        stale = true;
+
+        if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
+                && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate())) {
+            // replot
+            forceReplot();
+        }
+
+    } else {
+
         forceReplot();
+
     }
 }
 
