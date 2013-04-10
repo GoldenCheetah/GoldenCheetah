@@ -335,6 +335,11 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
 <context>
     <name>AddIntervalDialog</name>
     <message>
+        <location filename="../AddIntervalDialog.cpp" line="31"/>
+        <source>Add Intervals</source>
+        <translation>Agregar Intervalos</translation>
+    </message>
+    <message>
         <location filename="../AddIntervalDialog.cpp" line="36"/>
         <source>Method: </source>
         <translation>Método: </translation>
@@ -575,7 +580,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     <message>
         <location filename="../AddDeviceWizard.cpp" line="298"/>
         <source>If your device is not found you can select the device port manually by using the selection box below.</source>
-        <translation>Si su dispositivo no fué enconrado usted puede seleccionar el puerto manualmente utilizando el cuadro de selección más abajo.</translation>
+        <translation>Si su dispositivo no fué encontrado usted puede seleccionar el puerto manualmente utilizando el diálogo de selección más abajo.</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="303"/>
@@ -1251,9 +1256,103 @@ Presione Siguiente para Continuar</translation>
         <translation></translation>
     </message>
     <message>
+        <location filename="../BatchExportDialog.cpp" line="73"/>
+        <location filename="../BatchExportDialog.cpp" line="105"/>
+        <location filename="../BatchExportDialog.cpp" line="154"/>
+        <source>Export</source>
+        <translation>Exportar</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="78"/>
+        <source>Export as</source>
+        <translation>Exportar como</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="84"/>
+        <source>Browse</source>
+        <translation>Buscar</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="85"/>
+        <source>Export to</source>
+        <translation>Exportar a</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="87"/>
+        <source>check/uncheck all</source>
+        <translation>marcar/desmarcar todo</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="103"/>
+        <source>Overwrite existing files</source>
+        <translation>Sobreescribir archivo existente</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="104"/>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
         <location filename="../BatchExportDialog.cpp" line="129"/>
         <source>Select Target Directory</source>
         <translation>Seleccionar Directorio Destino</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="158"/>
+        <source>Exporting...</source>
+        <translation>Exportando...</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="161"/>
+        <location filename="../BatchExportDialog.cpp" line="166"/>
+        <source>Abort</source>
+        <translation>Abortar</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="163"/>
+        <source>%1 activities exported, %2 failed or skipped.</source>
+        <translation>%1 actividades exportadas, %2 fallaron o fueron salteadas.</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="164"/>
+        <location filename="../BatchExportDialog.cpp" line="168"/>
+        <source>Finish</source>
+        <translation>Finalizar</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="206"/>
+        <source>Exists - not exported</source>
+        <translation>Existe - no se exporta</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="214"/>
+        <source>Removing...</source>
+        <translation>Eliminando...</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="219"/>
+        <source>Reading...</source>
+        <translation>Leyendo...</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="231"/>
+        <source>Writing...</source>
+        <translation>Grabando...</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="237"/>
+        <source>Exported</source>
+        <translation>Exportado</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="240"/>
+        <source>Write failed</source>
+        <translation>Falló Escritura</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="248"/>
+        <source>Read error</source>
+        <translation>Error de Lectura</translation>
     </message>
 </context>
 <context>
@@ -1276,7 +1375,7 @@ Presione Siguiente para Continuar</translation>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="90"/>
         <source>&amp;Find Intervals</source>
-        <translation>&amp;Encontrar Intervalos</translation>
+        <translation>&amp;Buscar Intervalos</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="92"/>
@@ -1747,12 +1846,12 @@ Comencemos la configuración.</translation>
     <message>
         <location filename="../Pages.cpp" line="1001"/>
         <source>Chart Markers</source>
-        <translation>Marcadores de Cuadro</translation>
+        <translation>Marcadores de Gráfico</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1002"/>
         <source>Chart Labels</source>
-        <translation>Rótulos de Cuadro</translation>
+        <translation>Rótulos de Gráfico</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1003"/>
@@ -1768,7 +1867,7 @@ Comencemos la configuración.</translation>
 <context>
     <name>ColumnChooser</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="1027"/>
+        <location filename="../RideNavigator.cpp" line="1028"/>
         <source>Column Chooser</source>
         <translation>Elegir Columna</translation>
     </message>
@@ -3917,12 +4016,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Colors.cpp" line="100"/>
         <source>Chart Bar Unselected</source>
-        <translation>Título de Cuadro No Seleccionado</translation>
+        <translation>Título de Gráfico No Seleccionado</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="101"/>
         <source>Chart Bar Selected</source>
-        <translation>Título de Cuadro Seleccionado</translation>
+        <translation>Título de Gráfico Seleccionado</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="102"/>
@@ -4345,7 +4444,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcWindowTool.cpp" line="42"/>
         <source>Chart</source>
-        <translation>Cuadro</translation>
+        <translation>Gráfico</translation>
     </message>
 </context>
 <context>
@@ -6087,8 +6186,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../LTMPlot.cpp" line="805"/>
         <location filename="../LTMPlot.cpp" line="890"/>
-        <location filename="../LTMPlot.cpp" line="1018"/>
-        <location filename="../LTMPlot.cpp" line="1102"/>
+        <location filename="../LTMPlot.cpp" line="1016"/>
+        <location filename="../LTMPlot.cpp" line="1100"/>
         <source>seconds</source>
         <translation>segundos</translation>
     </message>
@@ -6099,12 +6198,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1018"/>
+        <location filename="../LTMPlot.cpp" line="1016"/>
         <source>hours</source>
         <translation>horas</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1070"/>
+        <location filename="../LTMPlot.cpp" line="1068"/>
         <source>Week Commencing %1</source>
         <translation>Semana Comenzando el %1</translation>
     </message>
@@ -6444,7 +6543,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../LTMTool.cpp" line="71"/>
         <source>Chart</source>
-        <translation>Cuadro</translation>
+        <translation>Gráfico</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="86"/>
@@ -6667,22 +6766,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Gráfico</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="60"/>
+        <location filename="../LTMWindow.cpp" line="61"/>
         <source>Days</source>
         <translation>Dias</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="61"/>
+        <location filename="../LTMWindow.cpp" line="62"/>
         <source>Weeks</source>
         <translation>Semanas</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="62"/>
+        <location filename="../LTMWindow.cpp" line="63"/>
         <source>Months</source>
         <translation>Meses</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="63"/>
+        <location filename="../LTMWindow.cpp" line="64"/>
         <source>Years</source>
         <translation>Años</translation>
     </message>
@@ -6691,22 +6790,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Sombrear Zonas</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="56"/>
+        <location filename="../LTMWindow.cpp" line="57"/>
         <source>Group by</source>
         <translation>Agrupar por</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="64"/>
+        <location filename="../LTMWindow.cpp" line="65"/>
         <source>Time Of Day</source>
         <translation>Hora del día</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="69"/>
+        <location filename="../LTMWindow.cpp" line="70"/>
         <source>Shade zones</source>
         <translation>Sombrear zonas</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="70"/>
+        <location filename="../LTMWindow.cpp" line="71"/>
         <source>Show events</source>
         <translation>Mostrar eventos</translation>
     </message>
@@ -7015,7 +7114,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation type="obsolete">Nombre de archivo inválido</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2665"/>
+        <location filename="../MainWindow.cpp" line="2669"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -7024,14 +7123,14 @@ Skipping file...</source>
 Saltando archivo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="363"/>
-        <location filename="../MainWindow.cpp" line="2684"/>
+        <location filename="../MainWindow.cpp" line="373"/>
+        <location filename="../MainWindow.cpp" line="2688"/>
         <source>Zones File Error</source>
         <translation>Error en Archivo de Zonas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="366"/>
-        <location filename="../MainWindow.cpp" line="2688"/>
+        <location filename="../MainWindow.cpp" line="376"/>
+        <location filename="../MainWindow.cpp" line="2692"/>
         <source>Reading Zones File</source>
         <translation>Leyendo Archivo de Zonas</translation>
     </message>
@@ -7040,9 +7139,9 @@ Saltando archivo...</translation>
         <translation type="obsolete">Todos los Entrenamientos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="619"/>
-        <location filename="../MainWindow.cpp" line="649"/>
-        <location filename="../MainWindow.cpp" line="1408"/>
+        <location filename="../MainWindow.cpp" line="623"/>
+        <location filename="../MainWindow.cpp" line="653"/>
+        <location filename="../MainWindow.cpp" line="1412"/>
         <source>Intervals</source>
         <translation>Intervalos</translation>
     </message>
@@ -7067,22 +7166,22 @@ Saltando archivo...</translation>
         <translation type="obsolete">&amp;Ciclista</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="838"/>
+        <location filename="../MainWindow.cpp" line="842"/>
         <source>&amp;New...</source>
         <translation>&amp;Nuevo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="838"/>
+        <location filename="../MainWindow.cpp" line="842"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="839"/>
+        <location filename="../MainWindow.cpp" line="843"/>
         <source>&amp;Open...</source>
         <translation>&amp;Abrir...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="839"/>
+        <location filename="../MainWindow.cpp" line="843"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
@@ -7091,7 +7190,7 @@ Saltando archivo...</translation>
         <translation type="obsolete">&amp;Salir</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="841"/>
+        <location filename="../MainWindow.cpp" line="845"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
@@ -7100,24 +7199,24 @@ Saltando archivo...</translation>
         <translation type="obsolete">&amp;Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="871"/>
+        <location filename="../MainWindow.cpp" line="875"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="844"/>
+        <location filename="../MainWindow.cpp" line="848"/>
         <source>&amp;Download from device...</source>
         <translation>&amp;Descargar del dispositivo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="373"/>
-        <location filename="../MainWindow.cpp" line="2695"/>
+        <location filename="../MainWindow.cpp" line="383"/>
+        <location filename="../MainWindow.cpp" line="2699"/>
         <source>HR Zones File Error</source>
         <translation>Error en Archivo de Zonas de FC</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="376"/>
-        <location filename="../MainWindow.cpp" line="2699"/>
+        <location filename="../MainWindow.cpp" line="386"/>
+        <location filename="../MainWindow.cpp" line="2703"/>
         <source>Reading HR Zones File</source>
         <translation>Leyendo Archivo de Zonas de FC</translation>
     </message>
@@ -7134,205 +7233,205 @@ Saltando archivo...</translation>
         <translation type="obsolete">Actividad Manual</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="944"/>
+        <location filename="../MainWindow.cpp" line="948"/>
         <source>Home</source>
         <translation>Inicio</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="947"/>
+        <location filename="../MainWindow.cpp" line="951"/>
         <source>Diary</source>
         <translation>Agenda</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="943"/>
+        <location filename="../MainWindow.cpp" line="947"/>
         <source>Analysis</source>
         <translation>Análisis</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="945"/>
+        <location filename="../MainWindow.cpp" line="949"/>
         <source>Train</source>
         <translation>Rodillo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="538"/>
-        <location filename="../MainWindow.cpp" line="950"/>
+        <location filename="../MainWindow.cpp" line="542"/>
+        <location filename="../MainWindow.cpp" line="954"/>
         <source>Add Chart</source>
-        <translation>Agregar Cuadro</translation>
+        <translation>Agregar Gráfico</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="443"/>
+        <location filename="../MainWindow.cpp" line="447"/>
         <source>Download from Device</source>
         <translation>Descargar del dispositivo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="452"/>
+        <location filename="../MainWindow.cpp" line="456"/>
         <source>Create Manual Activity</source>
         <translation>Ingreso Manual de Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="461"/>
+        <location filename="../MainWindow.cpp" line="465"/>
         <source>Toggle Sidebar</source>
         <translation>Mostrar/Ocultar barra lateral</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="474"/>
+        <location filename="../MainWindow.cpp" line="478"/>
         <source>Find Intervals</source>
         <translation>Buscar Intervalos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="487"/>
+        <location filename="../MainWindow.cpp" line="491"/>
         <source>Tiled View</source>
         <translation>Vista desplegada</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="565"/>
-        <location filename="../MainWindow.cpp" line="1275"/>
+        <location filename="../MainWindow.cpp" line="569"/>
+        <location filename="../MainWindow.cpp" line="1279"/>
         <source>All Activities</source>
         <translation>Todas las Actividades</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="640"/>
+        <location filename="../MainWindow.cpp" line="644"/>
         <source>Calendar</source>
         <translation>Calendario</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="643"/>
+        <location filename="../MainWindow.cpp" line="647"/>
         <source>Activities</source>
         <translation>Actividades</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="644"/>
-        <location filename="../MainWindow.cpp" line="650"/>
+        <location filename="../MainWindow.cpp" line="648"/>
+        <location filename="../MainWindow.cpp" line="654"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="837"/>
+        <location filename="../MainWindow.cpp" line="841"/>
         <source>&amp;Athlete</source>
         <translation>&amp;Atleta</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="840"/>
+        <location filename="../MainWindow.cpp" line="844"/>
         <source>&amp;Close Window</source>
         <translation>&amp;Cerrar Ventana</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="840"/>
+        <location filename="../MainWindow.cpp" line="844"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="841"/>
+        <location filename="../MainWindow.cpp" line="845"/>
         <source>&amp;Quit All Windows</source>
         <translation>Cerrar todas las &amp;Ventanas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="843"/>
+        <location filename="../MainWindow.cpp" line="847"/>
         <source>A&amp;ctivity</source>
         <translation>A&amp;ctividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="844"/>
+        <location filename="../MainWindow.cpp" line="848"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="846"/>
+        <location filename="../MainWindow.cpp" line="850"/>
         <source>&amp;Manual activity entry...</source>
         <translation>Ingreso &amp;Manual de actividad...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="848"/>
+        <location filename="../MainWindow.cpp" line="852"/>
         <source>&amp;Export...</source>
         <translation>&amp;Exportar...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="849"/>
+        <location filename="../MainWindow.cpp" line="853"/>
         <source>&amp;Batch export...</source>
         <translation>Exportar en &amp;Bloque...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="850"/>
+        <location filename="../MainWindow.cpp" line="854"/>
         <source>Export Metrics as CSV...</source>
         <translation>Exportar Métricas como CSV...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="853"/>
+        <location filename="../MainWindow.cpp" line="857"/>
         <source>&amp;Upload to TrainingPeaks</source>
         <translation>&amp;Cargar a TrainingPeaks</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="853"/>
+        <location filename="../MainWindow.cpp" line="857"/>
         <source>Ctrl+U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="854"/>
+        <location filename="../MainWindow.cpp" line="858"/>
         <source>Down&amp;load from TrainingPeaks...</source>
         <translation>&amp;Descargar desde TrainingPeaks...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="854"/>
+        <location filename="../MainWindow.cpp" line="858"/>
         <source>Ctrl+L</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="857"/>
+        <location filename="../MainWindow.cpp" line="861"/>
         <source>Upload to Strava...</source>
         <translation>Cargar a Strava...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="860"/>
+        <location filename="../MainWindow.cpp" line="864"/>
         <source>Download from Strava...</source>
         <translation>Descargar desde Strava...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="862"/>
+        <location filename="../MainWindow.cpp" line="866"/>
         <source>Upload to RideWithGPS...</source>
         <translation>Cargar a RideWithGPS...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="866"/>
+        <location filename="../MainWindow.cpp" line="870"/>
         <source>Upload to Trainingstagebuch...</source>
         <translation>Cargar a Trainingstagebuch...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="871"/>
+        <location filename="../MainWindow.cpp" line="875"/>
         <source>&amp;Save activity</source>
         <translation>&amp;Guardar actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="872"/>
+        <location filename="../MainWindow.cpp" line="876"/>
         <source>D&amp;elete activity...</source>
         <translation>&amp;Eliminar actividad...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="873"/>
+        <location filename="../MainWindow.cpp" line="877"/>
         <source>Split &amp;activity...</source>
         <translation>&amp;Dividir actividad...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="878"/>
+        <location filename="../MainWindow.cpp" line="882"/>
         <source>Critical Power Estimator...</source>
         <translation>Estimador de Potencia Crítica...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="887"/>
+        <location filename="../MainWindow.cpp" line="891"/>
         <source>Create a new workout...</source>
         <translation>Crear nuevo entrenamiento...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="888"/>
+        <location filename="../MainWindow.cpp" line="892"/>
         <source>Download workouts from ErgDB...</source>
         <translation>Descargar entrenamientos desde ErgDB...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="889"/>
+        <location filename="../MainWindow.cpp" line="893"/>
         <source>Import workouts or videos...</source>
         <translation>Importar entrenamientos o videos...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="890"/>
+        <location filename="../MainWindow.cpp" line="894"/>
         <source>Scan disk for videos and workouts...</source>
         <translation>Buscar videos y entrenamientos en el disco...</translation>
     </message>
@@ -7341,17 +7440,17 @@ Saltando archivo...</translation>
         <translation type="obsolete">Calculadora de Potencia Crítica...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="879"/>
+        <location filename="../MainWindow.cpp" line="883"/>
         <source>Air Density (Rho) Estimator...</source>
         <translation>Estimador de la Densidad del Aire...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="882"/>
+        <location filename="../MainWindow.cpp" line="886"/>
         <source>Get &amp;Withings Data...</source>
         <translation>Obtener Datos &amp;Withings...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="884"/>
+        <location filename="../MainWindow.cpp" line="888"/>
         <source>Get &amp;Zeo Data...</source>
         <translation>Obtener Datos &amp;Zeo...</translation>
     </message>
@@ -7368,8 +7467,8 @@ Saltando archivo...</translation>
         <translation type="obsolete">Administrar Biblioteca de Medios/Entrenamientos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="894"/>
-        <location filename="../MainWindow.cpp" line="1304"/>
+        <location filename="../MainWindow.cpp" line="898"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
         <source>Upload Activity to Calendar</source>
         <translation>Cargar Actividad al Calendario</translation>
     </message>
@@ -7382,109 +7481,109 @@ Saltando archivo...</translation>
         <translation type="obsolete">Exportar Calendario...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="897"/>
+        <location filename="../MainWindow.cpp" line="901"/>
         <source>Refresh Calendar</source>
         <translation>Actualizar Calendario</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="900"/>
+        <location filename="../MainWindow.cpp" line="904"/>
         <source>Find intervals...</source>
         <translation>Buscar intervalos...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1311"/>
+        <location filename="../MainWindow.cpp" line="1315"/>
         <source>Show Column Chooser</source>
         <translation>Mostrar Selección de Columnas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1318"/>
+        <location filename="../MainWindow.cpp" line="1322"/>
         <source>Do Not Show In Groups</source>
         <translation>No mostrar en Grupos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1324"/>
+        <location filename="../MainWindow.cpp" line="1328"/>
         <source>Group By</source>
         <translation>Agrupar Por</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1357"/>
+        <location filename="../MainWindow.cpp" line="1361"/>
         <source>Find Peak Intervals</source>
-        <translation>Buscar Mejores Intervalos</translation>
+        <translation>Buscar Intervalos Pico</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1366"/>
+        <location filename="../MainWindow.cpp" line="1370"/>
         <source>Sort Intervals</source>
         <translation>Ordenar inervalos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1379"/>
-        <location filename="../MainWindow.cpp" line="1413"/>
+        <location filename="../MainWindow.cpp" line="1383"/>
+        <location filename="../MainWindow.cpp" line="1417"/>
         <source>Edit interval</source>
         <translation>Editar Intervalo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1392"/>
+        <location filename="../MainWindow.cpp" line="1396"/>
         <source>Rename selected intervals</source>
         <translation>Renombrar intervalo seleccionado</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1394"/>
+        <location filename="../MainWindow.cpp" line="1398"/>
         <source>Delete selected intervals</source>
         <translation>Borrar intervalo seleccionado</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1992"/>
+        <location filename="../MainWindow.cpp" line="1996"/>
         <source>Select Activity</source>
         <translation>Elegir Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1992"/>
-        <location filename="../MainWindow.cpp" line="2089"/>
+        <location filename="../MainWindow.cpp" line="1996"/>
+        <location filename="../MainWindow.cpp" line="2093"/>
         <source>No activity selected!</source>
         <translation>No hay actividad seleccionada!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2003"/>
+        <location filename="../MainWindow.cpp" line="2007"/>
         <source>Export Activity</source>
         <translation>Exportar Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2016"/>
+        <location filename="../MainWindow.cpp" line="2020"/>
         <source>Export Failed</source>
         <translation>Falló la Exportación</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2017"/>
+        <location filename="../MainWindow.cpp" line="2021"/>
         <source>Failed to export ride, please check permissions</source>
         <translation>Error al exportar actividad, verifique los permisos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2078"/>
-        <location filename="../MainWindow.cpp" line="2326"/>
-        <location filename="../MainWindow.cpp" line="2379"/>
+        <location filename="../MainWindow.cpp" line="2082"/>
+        <location filename="../MainWindow.cpp" line="2330"/>
+        <location filename="../MainWindow.cpp" line="2383"/>
         <source>No activity selected</source>
         <translation>No hay actividad seleccionada</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2080"/>
+        <location filename="../MainWindow.cpp" line="2084"/>
         <source>Current activity contains no data to split</source>
         <translation>La actividad seleccionada no tiene datos para dividir</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2328"/>
-        <location filename="../MainWindow.cpp" line="2381"/>
+        <location filename="../MainWindow.cpp" line="2332"/>
+        <location filename="../MainWindow.cpp" line="2385"/>
         <source>Current activity contains no data</source>
         <translation>La actividad seleccionada no tiene datos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2643"/>
+        <location filename="../MainWindow.cpp" line="2647"/>
         <source>Range from %1 to %2
 Athlete CP set to %3 watts</source>
         <translation>Rango desde %1 a %2
 PC del Atleta en %3 vatios</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2664"/>
+        <location filename="../MainWindow.cpp" line="2668"/>
         <source>Invalid Activity File Name</source>
         <translation>Nombre de Archivo de Actividad Inválido</translation>
     </message>
@@ -7493,12 +7592,12 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">&amp;Exportar a CSV...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="848"/>
+        <location filename="../MainWindow.cpp" line="852"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="845"/>
+        <location filename="../MainWindow.cpp" line="849"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
@@ -7507,7 +7606,7 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">&amp;Encontrar los mejores intervalos...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="849"/>
+        <location filename="../MainWindow.cpp" line="853"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
     </message>
@@ -7572,12 +7671,12 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Editor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="845"/>
+        <location filename="../MainWindow.cpp" line="849"/>
         <source>&amp;Import from file...</source>
         <translation>&amp;Importar de archivo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="846"/>
+        <location filename="../MainWindow.cpp" line="850"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
@@ -7602,12 +7701,12 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">&amp;Guardar entrenamiento</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="876"/>
+        <location filename="../MainWindow.cpp" line="880"/>
         <source>&amp;Tools</source>
         <translation>&amp;Herramientas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="877"/>
+        <location filename="../MainWindow.cpp" line="881"/>
         <source>&amp;Options...</source>
         <translation>&amp;Opciones...</translation>
     </message>
@@ -7620,93 +7719,93 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Estimador de la Densidad del Aire (Rho)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="924"/>
+        <location filename="../MainWindow.cpp" line="928"/>
         <source>&amp;View</source>
         <translation>&amp;Ver</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="926"/>
+        <location filename="../MainWindow.cpp" line="930"/>
         <source>Toggle Full Screen</source>
         <translation>Cambiar a Pantalla Completa</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="928"/>
+        <location filename="../MainWindow.cpp" line="932"/>
         <source>Show Left Sidebar</source>
         <translation>Mostrar barra lateral Izq</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="932"/>
+        <location filename="../MainWindow.cpp" line="936"/>
         <source>Show Toolbar</source>
         <translation>Mostrar Barra de Herramientas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="486"/>
-        <location filename="../MainWindow.cpp" line="937"/>
+        <location filename="../MainWindow.cpp" line="490"/>
+        <location filename="../MainWindow.cpp" line="941"/>
         <source>Tabbed View</source>
         <translation>Vista con Pestañas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="951"/>
+        <location filename="../MainWindow.cpp" line="955"/>
         <source>Reset Layout</source>
         <translation>Restablecer Diseño</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="953"/>
+        <location filename="../MainWindow.cpp" line="957"/>
         <source>&amp;Window</source>
         <translation>&amp;Ventana</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="960"/>
+        <location filename="../MainWindow.cpp" line="964"/>
         <source>&amp;Help</source>
         <translation>&amp;Ayuda</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="961"/>
+        <location filename="../MainWindow.cpp" line="965"/>
         <source>&amp;User Guide</source>
         <translation>Guía de &amp;Usuario</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="962"/>
+        <location filename="../MainWindow.cpp" line="966"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>&amp;Registrar un error o requerimiento</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="964"/>
+        <location filename="../MainWindow.cpp" line="968"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>&amp;Acerca de GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1279"/>
+        <location filename="../MainWindow.cpp" line="1283"/>
         <source>Save Changes</source>
         <translation>Guardar Cambios</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1282"/>
+        <location filename="../MainWindow.cpp" line="1286"/>
         <source>Revert to Saved version</source>
         <translation>Volver a la versión guardada</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="476"/>
-        <location filename="../MainWindow.cpp" line="1285"/>
-        <location filename="../MainWindow.cpp" line="2089"/>
+        <location filename="../MainWindow.cpp" line="480"/>
+        <location filename="../MainWindow.cpp" line="1289"/>
+        <location filename="../MainWindow.cpp" line="2093"/>
         <source>Delete Activity</source>
         <translation>Eliminar Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="475"/>
-        <location filename="../MainWindow.cpp" line="1288"/>
-        <location filename="../MainWindow.cpp" line="2078"/>
-        <location filename="../MainWindow.cpp" line="2080"/>
+        <location filename="../MainWindow.cpp" line="479"/>
+        <location filename="../MainWindow.cpp" line="1292"/>
+        <location filename="../MainWindow.cpp" line="2082"/>
+        <location filename="../MainWindow.cpp" line="2084"/>
         <source>Split Activity</source>
         <translation>Dividir Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1299"/>
+        <location filename="../MainWindow.cpp" line="1303"/>
         <source>Tweet Activity</source>
         <translation>Twitear Actividad</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1915"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
         <source>Can&apos;t rename %1 to %2</source>
         <translation>Imposible renombrar %1 a %2</translation>
     </message>
@@ -7779,43 +7878,43 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">El archivo %1 no se puede abrir para escritura</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2038"/>
-        <location filename="../MainWindow.cpp" line="2241"/>
+        <location filename="../MainWindow.cpp" line="2042"/>
+        <location filename="../MainWindow.cpp" line="2245"/>
         <source>Import from File</source>
         <translation>Importar de Archivo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2054"/>
+        <location filename="../MainWindow.cpp" line="2058"/>
         <source>No Activity To Save</source>
         <translation>No hay actividad para Guardar</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2055"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
         <source>There is no currently selected ride to save.</source>
         <translation>No hay actividad seleccionada para guardar.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2094"/>
+        <location filename="../MainWindow.cpp" line="2098"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Confirma que quiere eliminar la actividad: </translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2160"/>
+        <location filename="../MainWindow.cpp" line="2164"/>
         <source>Export Metrics</source>
         <translation>Exportar Métricas</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2160"/>
+        <location filename="../MainWindow.cpp" line="2164"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Variables Separada por Comas (*.csv)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2271"/>
+        <location filename="../MainWindow.cpp" line="2275"/>
         <source>Workout Directory Invalid</source>
         <translation>Directorio de Entrenamientos Inválido</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2340"/>
+        <location filename="../MainWindow.cpp" line="2344"/>
         <source> (%1 watts)</source>
         <translation> (%1 vatios)</translation>
     </message>
@@ -7832,17 +7931,17 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Borrar Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1358"/>
-        <location filename="../MainWindow.cpp" line="2326"/>
-        <location filename="../MainWindow.cpp" line="2328"/>
+        <location filename="../MainWindow.cpp" line="1362"/>
+        <location filename="../MainWindow.cpp" line="2330"/>
+        <location filename="../MainWindow.cpp" line="2332"/>
         <source>Find Best Intervals</source>
-        <translation>Encontrar Mejores Intervalos</translation>
+        <translation>Buscar Mejores Intervalos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2379"/>
-        <location filename="../MainWindow.cpp" line="2381"/>
+        <location filename="../MainWindow.cpp" line="2383"/>
+        <location filename="../MainWindow.cpp" line="2385"/>
         <source>Find Power Peaks</source>
-        <translation>Encontrar Máximos de Potencia</translation>
+        <translation>Buscar Máximos de Potencia</translation>
     </message>
     <message>
         <source>Tweet Ride</source>
@@ -7853,24 +7952,24 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">Renombrar intervalo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1380"/>
-        <location filename="../MainWindow.cpp" line="1414"/>
+        <location filename="../MainWindow.cpp" line="1384"/>
+        <location filename="../MainWindow.cpp" line="1418"/>
         <source>Delete interval</source>
         <translation>Borrar intervalo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1378"/>
-        <location filename="../MainWindow.cpp" line="1415"/>
+        <location filename="../MainWindow.cpp" line="1382"/>
+        <location filename="../MainWindow.cpp" line="1419"/>
         <source>Zoom to interval</source>
         <translation>Enfocar intervalo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1416"/>
+        <location filename="../MainWindow.cpp" line="1420"/>
         <source>Bring to Front</source>
         <translation>Traer al Frente</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1417"/>
+        <location filename="../MainWindow.cpp" line="1421"/>
         <source>Send to back</source>
         <translation>Mandar al fondo</translation>
     </message>
@@ -7905,7 +8004,7 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">No se puede grabar el archivo de notas %1</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2642"/>
+        <location filename="../MainWindow.cpp" line="2646"/>
         <source>CP saved</source>
         <translation>PC guardado</translation>
     </message>
@@ -7928,7 +8027,7 @@ PC del ciclista %3 vatios</translation>
         <translation type="obsolete">¿Esta seguro de querer borrar el entrenamiento?:</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2096"/>
+        <location filename="../MainWindow.cpp" line="2100"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
@@ -9594,9 +9693,9 @@ Do you want to continue?</source>
         <translation>a</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="256"/>
+        <location filename="../PerformanceManagerWindow.cpp" line="254"/>
+        <location filename="../PerformanceManagerWindow.cpp" line="284"/>
         <location filename="../PerformanceManagerWindow.cpp" line="286"/>
-        <location filename="../PerformanceManagerWindow.cpp" line="288"/>
         <source>MMM d yyyy</source>
         <translation></translation>
     </message>
@@ -11874,29 +11973,29 @@ formato GoldenCheetah. ¿Confirmar?</translation>
 <context>
     <name>SearchBox</name>
     <message>
-        <location filename="../SearchBox.cpp" line="77"/>
-        <location filename="../SearchBox.cpp" line="127"/>
+        <location filename="../SearchBox.cpp" line="92"/>
+        <location filename="../SearchBox.cpp" line="143"/>
         <source>Search...</source>
         <translation>Buscar...</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="117"/>
+        <location filename="../SearchBox.cpp" line="133"/>
         <source>Filter...</source>
         <translation>Filtrar...</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="170"/>
-        <location filename="../SearchBox.cpp" line="182"/>
+        <location filename="../SearchBox.cpp" line="186"/>
+        <location filename="../SearchBox.cpp" line="198"/>
         <source>Add Favourite</source>
         <translation>Agregar Favorito</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="245"/>
+        <location filename="../SearchBox.cpp" line="261"/>
         <source>Add new search</source>
         <translation>Agregar nueva búsqueda</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="246"/>
+        <location filename="../SearchBox.cpp" line="262"/>
         <source>Name:</source>
         <translation>Nombre:</translation>
     </message>
