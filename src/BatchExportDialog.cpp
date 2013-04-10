@@ -70,21 +70,21 @@ BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(mai
         add->setText(3, rideItem->dateTime.toString(tr("hh:mm:ss ap")));
 
         // interval action
-        add->setText(4, "Export");
+        add->setText(4, tr("Export"));
     }
 
     // format and directory
     QGridLayout *grid = new QGridLayout;
-    formatLabel = new QLabel("Export as", this);
+    formatLabel = new QLabel(tr("Export as"), this);
     format = new QComboBox(this);
 
     const RideFileFactory &rff = RideFileFactory::instance();
     foreach(QString suffix, rff.writeSuffixes()) format->addItem(rff.description(suffix));
 
-    selectDir = new QPushButton("Browse", this);
-    dirLabel = new QLabel ("Export to", this);
+    selectDir = new QPushButton(tr("Browse"), this);
+    dirLabel = new QLabel (tr("Export to"), this);
     dirName = new QLabel(QDir::home().absolutePath(), this);
-    all = new QCheckBox("check/uncheck all", this);
+    all = new QCheckBox(tr("check/uncheck all"), this);
     all->setChecked(true);
 
     grid->addWidget(formatLabel, 0,0, Qt::AlignLeft);
@@ -100,9 +100,9 @@ BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(mai
     QHBoxLayout *buttons = new QHBoxLayout;
     status = new QLabel("", this);
     status->hide();
-    overwrite = new QCheckBox("Overwrite existing files", this);
-    cancel = new QPushButton("Cancel", this);
-    ok = new QPushButton("Export", this);
+    overwrite = new QCheckBox(tr("Overwrite existing files"), this);
+    cancel = new QPushButton(tr("Cancel"), this);
+    ok = new QPushButton(tr("Export"), this);
     buttons->addWidget(overwrite);
     buttons->addWidget(status);
     buttons->addStretch();
@@ -151,21 +151,21 @@ BatchExportDialog::allClicked()
 void
 BatchExportDialog::okClicked()
 {
-    if (ok->text() == "Export") {
+    if (ok->text() == "Export" || ok->text() == tr("Export")) {
         aborted = false;
 
         overwrite->hide();
-        status->setText("Exporting...");
+        status->setText(tr("Exporting..."));
         status->show();
         cancel->hide();
-        ok->setText("Abort");
+        ok->setText(tr("Abort"));
         exportFiles();
-        status->setText(QString("%1 activities exported, %2 failed or skipped.").arg(exports).arg(fails));
-        ok->setText("Finish");
+        status->setText(QString(tr("%1 activities exported, %2 failed or skipped.")).arg(exports).arg(fails));
+        ok->setText(tr("Finish"));
 
-    } else if (ok->text() == "Abort") {
+    } else if (ok->text() == "Abort" || ok->text() == tr("Abort")) {
         aborted = true;
-    } else if (ok->text() == "Finish") {
+    } else if (ok->text() == "Finish" || ok->text() == tr("Finish")) {
         accept(); // our work is done!
     }
 }
@@ -203,7 +203,7 @@ BatchExportDialog::exportFiles()
             if (QFile(filename).exists()) {
                 if (overwrite->isChecked() == false) {
                     // skip existing files
-                    current->setText(4, "Exists - not exported"); QApplication::processEvents();
+                    current->setText(4, tr("Exists - not exported")); QApplication::processEvents();
                     fails++;
                     continue;
 
@@ -211,12 +211,12 @@ BatchExportDialog::exportFiles()
 
                     // remove existing
                     QFile(filename).remove();
-                    current->setText(4, "Removing..."); QApplication::processEvents();
+                    current->setText(4, tr("Removing...")); QApplication::processEvents();
                 }
 
             }
             // this one then
-            current->setText(4, "Reading..."); QApplication::processEvents();
+            current->setText(4, tr("Reading...")); QApplication::processEvents();
 
             // open it..
             QStringList errors;
@@ -228,16 +228,16 @@ BatchExportDialog::exportFiles()
             if (ride) {
 
 
-                current->setText(4, "Writing..."); QApplication::processEvents();
+                current->setText(4, tr("Writing...")); QApplication::processEvents();
                 QFile out(filename);
                 bool success = RideFileFactory::instance().writeRideFile(main, ride, out, type);
 
                 if (success) {
                     exports++;
-                    current->setText(4, "Exported"); QApplication::processEvents();
+                    current->setText(4, tr("Exported")); QApplication::processEvents();
                 } else {
                     fails++;
-                    current->setText(4, "Write failed"); QApplication::processEvents();
+                    current->setText(4, tr("Write failed")); QApplication::processEvents();
                 }
 
                 delete ride; // free memory!
@@ -245,7 +245,7 @@ BatchExportDialog::exportFiles()
             // open failed
             } else {
 
-                current->setText(4, "Read error"); QApplication::processEvents();
+                current->setText(4, tr("Read error")); QApplication::processEvents();
 
             }
         }
