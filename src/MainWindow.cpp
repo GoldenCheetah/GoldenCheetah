@@ -2543,6 +2543,7 @@ MainWindow::editInterval()
     if (dialog.exec()) {
         *activeInterval = temp;
         updateRideFileIntervals(); // will emit intervalChanged() signal
+        intervalWidget->update();
     }
 }
 
