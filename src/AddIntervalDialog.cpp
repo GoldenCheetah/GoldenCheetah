@@ -28,7 +28,7 @@ AddIntervalDialog::AddIntervalDialog(MainWindow *mainWindow) :
     mainWindow(mainWindow)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Add Intervals");
+    setWindowTitle(tr("Add Intervals"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     intervalMethodWidget = new QWidget();
