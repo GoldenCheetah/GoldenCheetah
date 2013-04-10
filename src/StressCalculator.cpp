@@ -101,6 +101,14 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
     startDate = startDate < results[0].getRideDate() ? startDate : results[0].getRideDate();
     endDate   = endDate > results[results.count()-1].getRideDate() ? endDate : results[results.count()-1].getRideDate();
 
+    // but we need to also take into account the earliest
+    // start date for any season -- since it may be seeded
+    // so lets run through the seasons and set start date
+    // to the very earliest date set
+    foreach(Season x, main->seasons->seasons)
+        if (x.getStart() < startDate.date())
+            startDate = QDateTime(x.getStart(), QTime(0,0,0));
+    
     int maxarray = startDate.daysTo(endDate) +2; // from zero plus tomorrows SB!
     stsvalues.resize(maxarray);
     ltsvalues.resize(maxarray);
