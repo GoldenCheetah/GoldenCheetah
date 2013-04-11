@@ -722,7 +722,7 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
                 else if (range.low != 0.0 && range.high == 0.0 && number >= range.low) return range.name;
                 else if (number < range.high && number >= range.low) return range.name;
             }
-            return "Undefined";
+            return tr("Undefined");
         }
     }
 
@@ -731,12 +731,12 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
 
         double quartile = rank / count;
 
-        if (value.toDouble() == 0) return QString("Zero or not present");
-        else if (rank < 10) return QString("Best 10");
-        else if (quartile <= 0.25) return QString ("Quartile 1:  0% -  25%");
-        else if (quartile <= 0.50) return QString ("Quartile 2: 25% -  50%");
-        else if (quartile <= 0.75) return QString ("Quartile 3: 50% -  75%");
-        else if (quartile <= 1) return QString    ("Quartile 4: 75% - 100%");
+        if (value.toDouble() == 0) return QString(tr("Zero or not present"));
+        else if (rank < 10) return QString(tr("Best 10"));
+        else if (quartile <= 0.25) return QString (tr("Quartile 1:  0% -  25%"));
+        else if (quartile <= 0.50) return QString (tr("Quartile 2: 25% -  50%"));
+        else if (quartile <= 0.75) return QString (tr("Quartile 3: 50% -  75%"));
+        else if (quartile <= 1) return QString    (tr("Quartile 4: 75% - 100%"));
 
     } else {
 
@@ -748,15 +748,15 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
 
             if (today.date().weekNumber() == dateTime.date().weekNumber()
                 && today.date().year() == dateTime.date().year())
-                return "This week";
+                return tr("This week");
             else if (today.date().month() == dateTime.date().month()
                     && today.date().year() == dateTime.date().year())
-                return "This month";
+                return tr("This month");
             else if (today.date().month() == (dateTime.date().month()+1)
                     && today.date().year() == dateTime.date().year())
-                return "Last month";
+                return tr("Last month");
             else {
-                return dateTime.toString("yyyy-MM (MMMM)");
+                return dateTime.toString(tr("yyyy-MM (MMMM)"));
             }
         }
 
@@ -940,14 +940,14 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         value = index.model()->data(index, Qt::DisplayRole).toString();
         if (columnName == tr("Date")) {
             QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
-            value = dateTime.toString("MMM d, yyyy"); // same format as ride list
+            value = dateTime.toString(tr("MMM d, yyyy")); // same format as ride list
         } else if (columnName == tr("Time")) {
             QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
             value = dateTime.toString("hh:mm:ss"); // same format as ride list
         } else if (columnName == tr("Last updated")) {
             QDateTime dateTime;
             dateTime.setTime_t(index.model()->data(index, Qt::DisplayRole).toInt());
-            value = dateTime.toString("ddd MMM d, yyyy h:mm AP"); // same format as ride list
+            value = dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")); // same format as ride list
         }
     }
 

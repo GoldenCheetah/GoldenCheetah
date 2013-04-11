@@ -2320,9 +2320,9 @@ Prosím o strpení, bude chvíli trvat.
         <location filename="../CriticalPowerWindow.cpp" line="92"/>
         <location filename="../CriticalPowerWindow.cpp" line="94"/>
         <location filename="../CriticalPowerWindow.cpp" line="96"/>
-        <location filename="../CriticalPowerWindow.cpp" line="389"/>
-        <location filename="../CriticalPowerWindow.cpp" line="400"/>
-        <location filename="../CriticalPowerWindow.cpp" line="419"/>
+        <location filename="../CriticalPowerWindow.cpp" line="397"/>
+        <location filename="../CriticalPowerWindow.cpp" line="408"/>
+        <location filename="../CriticalPowerWindow.cpp" line="427"/>
         <source>no data</source>
         <translation>nejsou data</translation>
     </message>
@@ -2378,7 +2378,7 @@ Prosím o strpení, bude chvíli trvat.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="455"/>
+        <location filename="../CriticalPowerWindow.cpp" line="463"/>
         <source>Energy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2391,29 +2391,29 @@ Prosím o strpení, bude chvíli trvat.
         <translation type="obsolete">Osa Y - Práce</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="303"/>
+        <location filename="../CriticalPowerWindow.cpp" line="311"/>
         <source>Set CP value to extracted value</source>
         <translation>Nastav CP na vybranou hodnotu</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="304"/>
+        <location filename="../CriticalPowerWindow.cpp" line="312"/>
         <source>No non-zero extracted value was identified:
 </source>
         <translation>Nenalezena žádná nenulová hodnota:
 </translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="305"/>
+        <location filename="../CriticalPowerWindow.cpp" line="313"/>
         <source>Zones were unchanged.</source>
         <translation>Zóny nebyly změněny.</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="416"/>
+        <location filename="../CriticalPowerWindow.cpp" line="424"/>
         <source>no date</source>
         <translation>žádné datum</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="416"/>
+        <location filename="../CriticalPowerWindow.cpp" line="424"/>
         <source>MM/dd/yyyy</source>
         <translation>mm/dd/rrrr</translation>
     </message>
@@ -4522,6 +4522,7 @@ NEJASNE</translation>
         <location filename="../RideNavigator.cpp" line="656"/>
         <location filename="../RideNavigator.cpp" line="670"/>
         <location filename="../RideNavigator.cpp" line="692"/>
+        <location filename="../RideNavigator.cpp" line="734"/>
         <source>Zero or not present</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4646,9 +4647,69 @@ NEJASNE</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../RideNavigator.cpp" line="725"/>
+        <source>Undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="735"/>
+        <source>Best 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="736"/>
+        <source>Quartile 1:  0% -  25%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="737"/>
+        <source>Quartile 2: 25% -  50%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="738"/>
+        <source>Quartile 3: 50% -  75%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="739"/>
+        <source>Quartile 4: 75% - 100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../RideNavigator.cpp" line="743"/>
         <source>Date</source>
         <translation type="unfinished">Datum</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="751"/>
+        <source>This week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="754"/>
+        <source>This month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="757"/>
+        <source>Last month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="759"/>
+        <source>yyyy-MM (MMMM)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="302"/>
+        <source>%1: %2 (%3 activities)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="308"/>
+        <source>%1 activities</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideNavigatorProxy.h" line="398"/>
@@ -6961,7 +7022,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation type="obsolete">Špatný název souboru se záznamem</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2669"/>
+        <location filename="../MainWindow.cpp" line="2670"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -6971,13 +7032,13 @@ Přeskakuji soubor...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="373"/>
-        <location filename="../MainWindow.cpp" line="2688"/>
+        <location filename="../MainWindow.cpp" line="2689"/>
         <source>Zones File Error</source>
         <translation>Chyba v souboru se zónami</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="376"/>
-        <location filename="../MainWindow.cpp" line="2692"/>
+        <location filename="../MainWindow.cpp" line="2693"/>
         <source>Reading Zones File</source>
         <translation>Načítám soubor se zónami</translation>
     </message>
@@ -7057,13 +7118,13 @@ Přeskakuji soubor...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="383"/>
-        <location filename="../MainWindow.cpp" line="2699"/>
+        <location filename="../MainWindow.cpp" line="2700"/>
         <source>HR Zones File Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="386"/>
-        <location filename="../MainWindow.cpp" line="2703"/>
+        <location filename="../MainWindow.cpp" line="2704"/>
         <source>Reading HR Zones File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7387,13 +7448,13 @@ Přeskakuji soubor...</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2647"/>
+        <location filename="../MainWindow.cpp" line="2648"/>
         <source>Range from %1 to %2
 Athlete CP set to %3 watts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2668"/>
+        <location filename="../MainWindow.cpp" line="2669"/>
         <source>Invalid Activity File Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7806,7 +7867,7 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Nemohu zapsat poznámky do %1</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2646"/>
+        <location filename="../MainWindow.cpp" line="2647"/>
         <source>CP saved</source>
         <translation>CP uložen</translation>
     </message>
@@ -8701,6 +8762,11 @@ Elapsed: %1
         <translation type="unfinished">Datum</translation>
     </message>
     <message>
+        <location filename="../RideNavigator.cpp" line="943"/>
+        <source>MMM d, yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../RideNavigator.cpp" line="944"/>
         <source>Time</source>
         <translation type="unfinished">Čas</translation>
@@ -8709,6 +8775,11 @@ Elapsed: %1
         <location filename="../RideNavigator.cpp" line="947"/>
         <source>Last updated</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="950"/>
+        <source>ddd MMM d, yyyy h:mm AP</source>
+        <translation type="unfinished">ddd MMM d, yyyy h:mm AP</translation>
     </message>
 </context>
 <context>
