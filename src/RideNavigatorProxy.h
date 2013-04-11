@@ -299,13 +299,13 @@ public:
 
                 // format the group by with ride count etc
                 if (groupBy != -1) {
-                    QString returnString = QString("%1: %2 (%3 activities)")
+                    QString returnString = QString(tr("%1: %2 (%3 activities)"))
                                            .arg(sourceModel()->headerData(groupBy, Qt::Horizontal).toString())
                                            .arg(group)
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 } else {
-                    QString returnString = QString("%1 activities")
+                    QString returnString = QString(tr("%1 activities"))
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 }

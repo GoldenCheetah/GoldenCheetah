@@ -2386,9 +2386,9 @@ Puede demorar.
         <location filename="../CriticalPowerWindow.cpp" line="92"/>
         <location filename="../CriticalPowerWindow.cpp" line="94"/>
         <location filename="../CriticalPowerWindow.cpp" line="96"/>
-        <location filename="../CriticalPowerWindow.cpp" line="389"/>
-        <location filename="../CriticalPowerWindow.cpp" line="400"/>
-        <location filename="../CriticalPowerWindow.cpp" line="419"/>
+        <location filename="../CriticalPowerWindow.cpp" line="397"/>
+        <location filename="../CriticalPowerWindow.cpp" line="408"/>
+        <location filename="../CriticalPowerWindow.cpp" line="427"/>
         <source>no data</source>
         <translation>sin datos</translation>
     </message>
@@ -2439,7 +2439,7 @@ Puede demorar.
         <translation>Sombreado de Potencia</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="455"/>
+        <location filename="../CriticalPowerWindow.cpp" line="463"/>
         <source>Energy</source>
         <translation>Energía</translation>
     </message>
@@ -2452,29 +2452,29 @@ Puede demorar.
         <translation type="obsolete">Eje Y muestra Energía</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="303"/>
+        <location filename="../CriticalPowerWindow.cpp" line="311"/>
         <source>Set CP value to extracted value</source>
         <translation>Establecer valor calculado como PC</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="304"/>
+        <location filename="../CriticalPowerWindow.cpp" line="312"/>
         <source>No non-zero extracted value was identified:
 </source>
         <translation>No se identificó ningún valor distinto de cero:
 </translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="305"/>
+        <location filename="../CriticalPowerWindow.cpp" line="313"/>
         <source>Zones were unchanged.</source>
         <translation>Las Zonas no cambiaron.</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="416"/>
+        <location filename="../CriticalPowerWindow.cpp" line="424"/>
         <source>no date</source>
         <translation>sin fecha</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="416"/>
+        <location filename="../CriticalPowerWindow.cpp" line="424"/>
         <source>MM/dd/yyyy</source>
         <translation></translation>
     </message>
@@ -4666,6 +4666,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <location filename="../RideNavigator.cpp" line="656"/>
         <location filename="../RideNavigator.cpp" line="670"/>
         <location filename="../RideNavigator.cpp" line="692"/>
+        <location filename="../RideNavigator.cpp" line="734"/>
         <source>Zero or not present</source>
         <translation>Cero o ausente</translation>
     </message>
@@ -4790,9 +4791,69 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Muy Largo</translation>
     </message>
     <message>
+        <location filename="../RideNavigator.cpp" line="725"/>
+        <source>Undefined</source>
+        <translation>No definido</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="735"/>
+        <source>Best 10</source>
+        <translation>Mejores 10</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="736"/>
+        <source>Quartile 1:  0% -  25%</source>
+        <translation>Cuartil 1:  0% -  25%</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="737"/>
+        <source>Quartile 2: 25% -  50%</source>
+        <translation>Cuartil 2: 25% -  50%</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="738"/>
+        <source>Quartile 3: 50% -  75%</source>
+        <translation>Cuartil 3: 50% -  75%</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="739"/>
+        <source>Quartile 4: 75% - 100%</source>
+        <translation>Cuartil 4: 75% - 100%</translation>
+    </message>
+    <message>
         <location filename="../RideNavigator.cpp" line="743"/>
         <source>Date</source>
         <translation>Fecha</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="751"/>
+        <source>This week</source>
+        <translation>Esta Semana</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="754"/>
+        <source>This month</source>
+        <translation>Este Mes</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="757"/>
+        <source>Last month</source>
+        <translation>Último Mes</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="759"/>
+        <source>yyyy-MM (MMMM)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="302"/>
+        <source>%1: %2 (%3 activities)</source>
+        <translation>%1: %2 (%3 actividades)</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="308"/>
+        <source>%1 activities</source>
+        <translation>%1 actividades</translation>
     </message>
     <message>
         <location filename="../RideNavigatorProxy.h" line="398"/>
@@ -7114,7 +7175,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
         <translation type="obsolete">Nombre de archivo inválido</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2669"/>
+        <location filename="../MainWindow.cpp" line="2670"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -7124,13 +7185,13 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="373"/>
-        <location filename="../MainWindow.cpp" line="2688"/>
+        <location filename="../MainWindow.cpp" line="2689"/>
         <source>Zones File Error</source>
         <translation>Error en Archivo de Zonas</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="376"/>
-        <location filename="../MainWindow.cpp" line="2692"/>
+        <location filename="../MainWindow.cpp" line="2693"/>
         <source>Reading Zones File</source>
         <translation>Leyendo Archivo de Zonas</translation>
     </message>
@@ -7210,13 +7271,13 @@ Saltando archivo...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="383"/>
-        <location filename="../MainWindow.cpp" line="2699"/>
+        <location filename="../MainWindow.cpp" line="2700"/>
         <source>HR Zones File Error</source>
         <translation>Error en Archivo de Zonas de FC</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="386"/>
-        <location filename="../MainWindow.cpp" line="2703"/>
+        <location filename="../MainWindow.cpp" line="2704"/>
         <source>Reading HR Zones File</source>
         <translation>Leyendo Archivo de Zonas de FC</translation>
     </message>
@@ -7576,14 +7637,14 @@ Saltando archivo...</translation>
         <translation>La actividad seleccionada no tiene datos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2647"/>
+        <location filename="../MainWindow.cpp" line="2648"/>
         <source>Range from %1 to %2
 Athlete CP set to %3 watts</source>
         <translation>Rango desde %1 a %2
 PC del Atleta en %3 vatios</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2668"/>
+        <location filename="../MainWindow.cpp" line="2669"/>
         <source>Invalid Activity File Name</source>
         <translation>Nombre de Archivo de Actividad Inválido</translation>
     </message>
@@ -8004,7 +8065,7 @@ PC del Atleta en %3 vatios</translation>
         <translation type="obsolete">No se puede grabar el archivo de notas %1</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2646"/>
+        <location filename="../MainWindow.cpp" line="2647"/>
         <source>CP saved</source>
         <translation>PC guardado</translation>
     </message>
@@ -8911,6 +8972,11 @@ Tiempo empleado: %1
         <translation>Fecha</translation>
     </message>
     <message>
+        <location filename="../RideNavigator.cpp" line="943"/>
+        <source>MMM d, yyyy</source>
+        <translation></translation>
+    </message>
+    <message>
         <location filename="../RideNavigator.cpp" line="944"/>
         <source>Time</source>
         <translation>Hora</translation>
@@ -8919,6 +8985,11 @@ Tiempo empleado: %1
         <location filename="../RideNavigator.cpp" line="947"/>
         <source>Last updated</source>
         <translation>Última actualización</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="950"/>
+        <source>ddd MMM d, yyyy h:mm AP</source>
+        <translation>ddd MMM d, yyyy h:mm AP</translation>
     </message>
 </context>
 <context>
