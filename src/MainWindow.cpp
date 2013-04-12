@@ -1023,9 +1023,16 @@ MainWindow::showSidebar(bool want)
 
         toolBox->show();
 
+        // Restore sizes
+        QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES);
+        if (splitterSizes.toByteArray().size() > 1 ) {
+            splitter->restoreState(splitterSizes.toByteArray());
+            splitter->setOpaqueResize(true); // redraw when released, snappier UI
+        }
+
         // if it was collapsed we need set to at least 200
         // unless the mainwindow isn't big enough
-        /*if (toolBox->width()<10) {
+        if (toolBox->width()<10) {
             int size = width() - 200;
             if (size>200) size = 200;
 
@@ -1033,7 +1040,7 @@ MainWindow::showSidebar(bool want)
             sizes.append(size);
             sizes.append(width()-size);
             splitter->setSizes(sizes);
-        }*/
+        }
 
     } else {
 
