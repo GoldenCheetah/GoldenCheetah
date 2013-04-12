@@ -157,7 +157,10 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
         ltsramp.remove(0, firstindex);
         stsramp.remove(0, firstindex);
         sbvalues.remove(0, firstindex);
-        xdays.remove(0, firstindex);
+        //!! no! days always start from 0
+        //!! so we do not do the bwlow ..
+        //!! left commented out as an explanation
+        // xdays.remove(0, firstindex);
         list.remove(0, firstindex);
     }
 
