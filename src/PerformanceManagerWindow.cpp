@@ -57,6 +57,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     metricCombo->addItem(tr("Use TRIMP 100"), "trimp_100_points");
     metricCombo->addItem(tr("Use Trimp Zonal"), "trimp_zonal_points");
     metricCombo->addItem(tr("Use Work (Kj)"), "total_work");
+    metricCombo->addItem(tr("Use Distance (km/mi)"), "total_distance");
     QString metricName =
         appsettings->value(this, GC_PERF_MAN_METRIC, "skiba_bike_score").toString();
     for (int i = 0; i < metricCombo->count(); ++i) {

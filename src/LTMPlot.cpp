@@ -955,6 +955,8 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
         scoreType = "trimp_points";
     } else if (metricDetail.symbol.startsWith("work")) {
         scoreType = "total_work";
+    } else if (metricDetail.symbol.startsWith("distance")) {
+        scoreType = "total_distance";
     }
 
     // create the Stress Calculation List
@@ -1004,6 +1006,12 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
             add.setForSymbol("work_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("work_sr", sc->getSRvalues()[i]);
             add.setForSymbol("work_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "total_distance") {
+            add.setForSymbol("distance_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("distance_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("distance_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("distance_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("distance_lr", sc->getLRvalues()[i]);
         }
         add.setForSymbol("workout_time", 1.0); // averaging is per day
         customData << add;
