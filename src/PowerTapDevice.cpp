@@ -264,7 +264,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         }
         if (recIntSecs != 0.0) {
             int min = (int) round(records.size() / 6 * recIntSecs);
-            emit updateProgress( QString("progress: %1:%2")
+            emit updateProgress( QString(tr("progress: %1:%2"))
                 .arg(min / 60)
                 .arg(min % 60, 2, 10, QLatin1Char('0')));
         }
