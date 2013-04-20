@@ -636,7 +636,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
 
     // how big should the array be?
     double multiplier = pow(10, m->precision());
-    int max = 0, min = 0;
+    double max = 0, min = 0;
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE BELOW
     // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
@@ -674,7 +674,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
 
     // now run thru the data again, but this time
     // populate the metricArray
-    metricArray.resize(max-min);
+    // we add 1 to account for possible rounding up
+    metricArray.resize(1 + (int)(max)-(int)(min));
     metricArray.fill(0);
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE ABOVE
