@@ -147,6 +147,7 @@ public:
         switch(bezelStyle) {
             case QtMacButton::Recessed:
                 [nsButton setButtonType:NSOnOffButton];
+                [[nsButton cell] setGradientType:NSGradientConvexStrong ];
                 [nsButton setShowsBorderOnlyWhileMouseInside:true ];
                 [[nsButton cell] setBackgroundStyle:NSBackgroundStyleRaised];
                 //[nsButton setButtonType:NSPushOnPushOffButton];

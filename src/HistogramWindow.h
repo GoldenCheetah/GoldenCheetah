@@ -20,6 +20,7 @@
 #ifndef _GC_HistogramWindow_h
 #define _GC_HistogramWindow_h 1
 #include "GoldenCheetah.h"
+#include "SummaryMetrics.h"
 
 #include "Season.h"
 #include "SeasonParser.h"
@@ -33,6 +34,7 @@ class MainWindow;
 class PowerHist;
 class RideItem;
 class RideFileCache;
+class ColorButton;
 
 class HistogramWindow : public GcChartWindow
 {
@@ -41,7 +43,6 @@ class HistogramWindow : public GcChartWindow
 
     Q_PROPERTY(int series READ series WRITE setSeries USER true)
     Q_PROPERTY(int percent READ percent WRITE setPercent USER true)
-    Q_PROPERTY(double bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool logY READ logY WRITE setLogY USER true)
     Q_PROPERTY(bool zeroes READ zeroes WRITE setZeroes USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
@@ -55,6 +56,11 @@ class HistogramWindow : public GcChartWindow
     Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
     Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
     Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
+    Q_PROPERTY(QString plotColor READ plotColor WRITE setPlotColor USER true)
+    Q_PROPERTY(QString distmetric READ distMetric WRITE setDistMetric USER true)
+    Q_PROPERTY(QString totalmetric READ totalMetric WRITE setTotalMetric USER true)
+    Q_PROPERTY(bool dataMode READ dataMode WRITE setDataMode USER true)
+    Q_PROPERTY(double bin READ bin WRITE setBin USER true)
     Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
@@ -69,8 +75,8 @@ class HistogramWindow : public GcChartWindow
         void setSeries(int x) { seriesCombo->setCurrentIndex(x); }
         int percent() const { return showSumY->currentIndex(); }
         void setPercent(int x) { showSumY->setCurrentIndex(x); }
-        double bin() const { return binWidthSlider->value(); }
-        void setBin(double x) { binWidthSlider->setValue(x); }
+        double bin() const { return binWidthLineEdit->text().toDouble(); }
+        void setBin(double x);
         bool logY() const { return showLnY->isChecked(); }
         void setLogY(bool x) { showLnY->setChecked(x); }
         bool zeroes() const { return showZeroes->isChecked(); }
@@ -98,6 +104,21 @@ class HistogramWindow : public GcChartWindow
         void setLastNX(int x) { dateSetting->setLastNX(x); }
         int prevN() { return dateSetting->prevN(); }
         void setPrevN(int x) { dateSetting->setPrevN(x); }
+        bool dataMode() const;
+        void setDataMode(bool);
+        QString totalMetric() const;
+        void setTotalMetric(QString);
+        QString distMetric() const;
+        void setDistMetric(QString);
+        void setPlotColor(QString);
+        QString plotColor() const;
+
+        // for metric or data series
+        double getDelta();
+        int getDigits();
+
+        // bin width editor
+        void setBinEditors();
 
     public slots:
 
@@ -115,6 +136,14 @@ class HistogramWindow : public GcChartWindow
         void useThruToday();
         void dateRangeChanged(DateRange);
 
+        // we changed the series to plot
+        void seriesChanged();
+
+        // in rangemode we choose data series or metric
+        void metricToggled(bool);
+        void dataToggled(bool);
+        void switchMode();
+
         void setZoned(int);
         void setShade(int);
 
@@ -127,10 +156,10 @@ class HistogramWindow : public GcChartWindow
         void forceReplot();
         void updateChart();
 
-    private:
+        void treeSelectionChanged();
+        void treeSelectionTimeout();
 
-        void setHistTextValidator();
-        void setHistBinWidthText();
+    private:
 
         MainWindow *mainWindow;
         PowerHist *powerHist;
@@ -165,11 +194,42 @@ class HistogramWindow : public GcChartWindow
         QStringList files;
 #endif
 
+        bool active,  // active switching mode between data series and metric
+             bactive; // active setting binwidth
         bool rangemode;
         DateSettingsEdit *dateSetting;
         bool useCustom;
         bool useToToday;
         DateRange custom;
+        int precision;
+
+        // labels we need to remember so we can show/hide
+        // when switching between data series and range mode
+        QLabel *comboLabel, *metricLabel1, *metricLabel2, *showLabel,
+               *blankLabel1, *blankLabel2,
+               *blankLabel3, *blankLabel4, *blankLabel5, *blankLabel6,
+               *colorLabel;
+
+        // in range mode we can also plot a distribution chart
+        // based upon metrics and not just data series
+        QRadioButton *data, *metric;
+
+        // total value (y-axis)
+        QTreeWidget *totalMetricTree;
+        void selectTotal(QString);
+
+        // distribution value (y-axis)
+        QTreeWidget *distMetricTree;
+        void selectMetric(QString);
+
+        // One shot timer.. delay before refreshing as user
+        // scrolls up and down metric/total treewidget. This is
+        // to have a slight lag before redrawing since it is expensive
+        // and users are likely to move up and down with the arrow keys
+        QTimer *lagger;
+        ColorButton *colorButton;
+        QList<SummaryMetrics> results;
+        DateRange last;
 };
 
 #endif // _GC_HistogramWindow_h

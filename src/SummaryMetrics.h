@@ -47,7 +47,7 @@ class SummaryMetrics
 
         // metric values
         void setForSymbol(QString symbol, double v) { value.insert(symbol, v); }
-        double getForSymbol(QString symbol) const { return value.value(symbol, 0.0); }
+        double getForSymbol(QString symbol, bool metric=true) const;
 
         void setText(QString name, QString v) { text.insert(name, v); }
         QString getText(QString name, QString fallback) { return text.value(name, fallback); }

@@ -681,10 +681,20 @@ below in the secion @emph{Adding and adjusting charts}.
 @center @image{"image/2-chartmenu",180pt}
 @center @emph{Figure 9: The `+' Add Chart Menu}
 @vskip 6pt
-
+@strong{NOTE:} Only the windows that are relevant for the current view will be listed. You cannot, for example, add a long term
+metric chart to the analysis view, or a performance chart (all plot) to the diary view.
 @end itemize
  
 @section Views & Sidebar
+@vskip 12pt
+@noindent @image{"image/2-sideactivity",70pt}
+@noindent @image{"image/2-sideinterval",70pt}
+@noindent @image{"image/2-sidediary",70pt}
+@noindent @image{"image/2-sidehome",70pt}
+@noindent @image{"image/2-sidesummary",70pt}
+@noindent @image{"image/2-sidetrain",70pt}
+@center @emph{Figure 10: Sidebars}
+@vskip 6pt
 scopebar, sidebar, tab/tiled, add chart menu
  
 @section Searching and Filtering

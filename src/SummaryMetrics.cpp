@@ -57,6 +57,19 @@ const RideMetric *metricForSymbol(QString symbol)
     return factory.rideMetric(symbol);
 }
 
+double
+SummaryMetrics::getForSymbol(QString symbol, bool metric) const
+{
+    if (metric) return value.value(symbol, 0.0);
+    else {
+        const RideMetric *m = metricForSymbol(symbol);
+        double metricValue = value.value(symbol, 0.0);
+        metricValue *= m->conversion();
+        metricValue += m->conversionSum();
+        return metricValue;
+    }
+}
+
 QString
 SummaryMetrics::getStringForSymbol(QString symbol, bool UseMetric) const
 {

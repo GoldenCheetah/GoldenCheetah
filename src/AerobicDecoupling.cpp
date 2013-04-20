@@ -53,7 +53,7 @@ class AerobicDecoupling : public RideMetric {
         setType(RideMetric::Average);
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
-        setPrecision(2);
+        setPrecision(1);
     }
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
