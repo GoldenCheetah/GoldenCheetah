@@ -876,6 +876,9 @@ HistogramWindow::updateChart()
 
                 }
 
+		if (results.count() == 0) setIsBlank(true);
+		else setIsBlank(false);
+
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
                 powerHist->setSeries(RideFile::none);
