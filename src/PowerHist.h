@@ -28,6 +28,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_compat.h>
+#include <qwt_scale_draw.h>
 #include <qsettings.h>
 #include <qvariant.h>
 
@@ -45,7 +46,7 @@ class HrHistBackground;
 class HrHistZoneLabel;
 class LTMCanvasPicker;
 class ZoneScaleDraw;
-
+class SummaryMetrics;
 
 class penTooltip: public QwtPlotZoomer
 {
@@ -99,14 +100,24 @@ class PowerHist : public QwtPlot
         ~PowerHist();
 
         double minX;
+        double maxX;
 
     public slots:
 
         // public setters
         void setShading(bool x) { shade=x; }
         void setSeries(RideFile::SeriesType series);
+
+        // set data from a ride
         void setData(RideItem *_rideItem, bool force=false);
+
+        // set data from a ridefile cache
         void setData(RideFileCache *source);
+
+        // set data from metrics
+        void setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
+                     bool isFiltered, QStringList files);
+
         void setlnY(bool value);
         void setWithZeros(bool value);
         void setZoned(bool value);
@@ -115,12 +126,11 @@ class PowerHist : public QwtPlot
         void setAxisTitle(int axis, QString label);
         void setYMax();
         void setBinWidth(double value);
-        int setBinWidthRealUnits(double value);
+        void setColor(QColor color) { metricColor = color; }
 
         // public getters
-        double getDelta();
-        double getBinWidthRealUnits();
-        int getDigits();
+        void setDelta(double delta) { this->delta = delta; }
+        void setDigits(int digits) { this->digits = digits; }
         inline bool islnY() const { return lny; }
         inline bool withZeros() const { return withz; }
         inline double binWidth() const { return binw; }
@@ -168,13 +178,16 @@ class PowerHist : public QwtPlot
         QwtPlotCurve *curve, *curveSelected;
         QList <PowerHistZoneLabel *> zoneLabels;
         QList <HrHistZoneLabel *> hrzoneLabels;
+        QString metricX, metricY;
+        int digits;
+        double delta;
 
         // source cache
         RideFileCache *cache;
 
         // storage for data counts
         QVector<unsigned int> wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
-                              hrZoneArray, kphArray, cadArray;
+                              hrZoneArray, kphArray, cadArray, metricArray;
 
         // storage for data counts in interval selected
         QVector<unsigned int> wattsSelectedArray, wattsZoneSelectedArray,
@@ -183,7 +196,8 @@ class PowerHist : public QwtPlot
                               hrZoneSelectedArray, kphSelectedArray,
                               cadSelectedArray;
 
-        enum Source { Ride, Cache } source, LASTsource;
+        enum Source { Ride, Cache, Metric } source, LASTsource;
+        QColor metricColor;
 
         // last plot settings - to avoid lots of uneeded recalcs
         RideItem *LASTrideItem;
@@ -493,4 +507,19 @@ public:
     }
 };
 
+class HTimeScaleDraw: public QwtScaleDraw
+{
+
+    public:
+
+    HTimeScaleDraw() : QwtScaleDraw() {}
+
+    virtual QwtText label(double v) const
+    {
+        QTime t = QTime().addSecs(v*60.00);
+        if (scaleMap().sDist() > 5)
+            return t.toString("hh:mm");
+        return t.toString("hh:mm:ss");
+    }
+};
 #endif // _GC_PowerHist_h

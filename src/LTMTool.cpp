@@ -76,6 +76,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     presetPicker = new QComboBox;
     presetPicker->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     QHBoxLayout *presetrow = new QHBoxLayout;
+    presetrow->setSpacing(5);
     presetrow->addWidget(presetLabel);
     presetrow->addWidget(presetPicker);
     presetrow->addStretch();
@@ -125,7 +126,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     else
         metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
     metricTree->header()->hide();
-    metricTree->setFrameStyle(QFrame::NoFrame);
+    //metricTree->setFrameStyle(QFrame::NoFrame);
     //metricTree->setAlternatingRowColors (true);
     metricTree->setIndentation(5);
     allMetrics = new QTreeWidgetItem(metricTree, ROOT_TYPE);

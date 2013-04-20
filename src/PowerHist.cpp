@@ -23,6 +23,7 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
+#include "SummaryMetrics.h"
 #include "Settings.h"
 #include "Zones.h"
 #include "HrZones.h"
@@ -42,24 +43,9 @@
 
 #include "LTMCanvasPicker.h" // for tooltip
 
-// discritized unit for smoothing
-static const double wattsDelta = 1.0;
-static const double wattsKgDelta = 0.01;
-static const double nmDelta    = 0.1;
-static const double hrDelta    = 1.0;
-static const double kphDelta   = 0.1;
-static const double cadDelta   = 1.0;
-
-// digits for text entry validator
-static const int wattsDigits = 0;
-static const int wattsKgDigits = 2;
-static const int nmDigits    = 1;
-static const int hrDigits    = 0;
-static const int kphDigits   = 1;
-static const int cadDigits   = 0;
-
 PowerHist::PowerHist(MainWindow *mainWindow):
     minX(0),
+    maxX(0),
     rideItem(NULL),
     mainWindow(mainWindow),
     series(RideFile::watts),
@@ -129,29 +115,37 @@ PowerHist::configChanged()
     QPen pen;
     QColor brush_color;
 
-    switch (series) {
-    case RideFile::watts:
-    case RideFile::wattsKg:
-        pen.setColor(GColor(CPOWER).darker(200));
-        brush_color = GColor(CPOWER);
-        break;
-    case RideFile::nm:
-        pen.setColor(GColor(CTORQUE).darker(200));
-        brush_color = GColor(CTORQUE);
-        break;
-    case RideFile::kph:
-        pen.setColor(GColor(CSPEED).darker(200));
-        brush_color = GColor(CSPEED);
-        break;
-    case RideFile::cad:
-        pen.setColor(GColor(CCADENCE).darker(200));
-        brush_color = GColor(CCADENCE);
-        break;
-    default:
-    case RideFile::hr:
-        pen.setColor(GColor(CHEARTRATE).darker(200));
-        brush_color = GColor(CHEARTRATE);
-        break;
+    if (source == Metric) {
+
+        pen.setColor(metricColor.darker(200));
+        brush_color = metricColor;
+
+    } else {
+
+        switch (series) {
+        case RideFile::watts:
+        case RideFile::wattsKg:
+            pen.setColor(GColor(CPOWER).darker(200));
+            brush_color = GColor(CPOWER);
+            break;
+        case RideFile::nm:
+            pen.setColor(GColor(CTORQUE).darker(200));
+            brush_color = GColor(CTORQUE);
+            break;
+        case RideFile::kph:
+            pen.setColor(GColor(CSPEED).darker(200));
+            brush_color = GColor(CSPEED);
+            break;
+        case RideFile::cad:
+            pen.setColor(GColor(CCADENCE).darker(200));
+            brush_color = GColor(CCADENCE);
+            break;
+        default:
+        case RideFile::hr:
+            pen.setColor(GColor(CHEARTRATE).darker(200));
+            brush_color = GColor(CHEARTRATE);
+            break;
+        }
     }
 
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
@@ -270,7 +264,6 @@ PowerHist::recalc(bool force)
     QVector<unsigned int> *array = NULL;
     QVector<unsigned int> *selectedArray = NULL;
     int arrayLength = 0;
-    double delta = 0;
 
     // lets make sure we need to recalculate
     if (force == false &&
@@ -308,61 +301,60 @@ PowerHist::recalc(bool force)
 
     if (source == Ride && !rideItem) return;
 
-    // make sure the interval length is set
-    if (dt <= 0) return;
+    // make sure the interval length is set if not plotting metrics
+    if (source != Metric && dt <= 0) return;
 
-    if (series == RideFile::watts && zoned == false) {
+    if (source == Metric) {
+
+        // we use the metricArray
+        array = &metricArray;
+        arrayLength = metricArray.size();
+        selectedArray = NULL;
+
+    } else if (series == RideFile::watts && zoned == false) {
 
         array = &wattsArray;
-        delta = wattsDelta;
         arrayLength = wattsArray.size();
         selectedArray = &wattsSelectedArray;
 
     } else if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned == true) {
 
         array = &wattsZoneArray;
-        delta = 1;
         arrayLength = wattsZoneArray.size();
         selectedArray = &wattsZoneSelectedArray;
 
     } else if (series == RideFile::wattsKg && zoned == false) {
 
         array = &wattsKgArray;
-        delta = wattsKgDelta;
         arrayLength = wattsKgArray.size();
         selectedArray = &wattsKgSelectedArray;
 
     } else if (series == RideFile::nm) {
 
         array = &nmArray;
-        delta = nmDelta;
         arrayLength = nmArray.size();
         selectedArray = &nmSelectedArray;
 
     } else if (series == RideFile::hr && zoned == false) {
 
         array = &hrArray;
-        delta = hrDelta;
         arrayLength = hrArray.size();
         selectedArray = &hrSelectedArray;
 
     } else if (series == RideFile::hr && zoned == true) {
 
         array = &hrZoneArray;
-        delta = 1;
         arrayLength = hrZoneArray.size();
         selectedArray = &hrZoneSelectedArray;
 
     } else if (series == RideFile::kph) {
 
         array = &kphArray;
-        delta = kphDelta;
         arrayLength = kphArray.size();
         selectedArray = &kphSelectedArray;
 
     } else if (series == RideFile::cad) {
         array = &cadArray;
-        delta = cadDelta;
         arrayLength = cadArray.size();
         selectedArray = &cadSelectedArray;
     }
@@ -549,6 +541,7 @@ PowerHist::setYMax()
 {
     double MaxY = curve->maxYValue();
     if (MaxY < curveSelected->maxYValue()) MaxY = curveSelected->maxYValue();
+
     static const double tmin = 1.0/60;
     setAxisScale(yLeft, (lny ? tmin : 0.0), MaxY * 1.1);
 
@@ -626,6 +619,136 @@ PowerHist::setData(RideFileCache *cache)
     curveSelected->hide();
 }
 
+void 
+PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
+                     bool isFiltered, QStringList files)
+{
+    // what metrics are we plotting?
+    source = Metric;
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *m = factory.rideMetric(distMetric);
+    const RideMetric *tm = factory.rideMetric(totalMetric);
+    if (m == NULL || tm == NULL) return;
+
+    // metricX, metricY
+    metricX = distMetric;
+    metricY = totalMetric;
+
+    // how big should the array be?
+    double multiplier = pow(10, m->precision());
+    int max = 0, min = 0;
+
+    // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE BELOW
+    // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
+    foreach(SummaryMetrics x, results) { 
+
+        // skip filtered values
+        if (isFiltered && !files.contains(x.getFileName())) continue;
+
+        // and global filter too
+        if (mainWindow->isfiltered && !mainWindow->filters.contains(x.getFileName())) continue;
+
+        // get computed value
+        double v = x.getForSymbol(distMetric, mainWindow->useMetricUnits);
+
+        // ignore no temp files
+        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::noTemp) continue;
+
+        // clean up dodgy values
+        if (isnan(v) || isinf(v)) v = 0;
+
+        // seconds to minutes
+        if (m->units(mainWindow->useMetricUnits) == tr("seconds")) v /= 60;
+
+        // apply multiplier
+        v *= multiplier;
+
+        if (v>max) max = v;
+        if (v<min) min = v;
+    }
+
+    // lets truncate the data if there are very high
+    // or very low max/min values, to ensure we don't exhaust memory
+    if (max > 100000) max = 100000;
+    if (min < -100000) min = -100000;
+
+    // now run thru the data again, but this time
+    // populate the metricArray
+    metricArray.resize(max-min);
+    metricArray.fill(0);
+
+    // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE ABOVE
+    // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
+    foreach(SummaryMetrics x, results) { 
+
+        // skip filtered values
+        if (isFiltered && !files.contains(x.getFileName())) continue;
+
+        // and global filter too
+        if (mainWindow->isfiltered && !mainWindow->filters.contains(x.getFileName())) continue;
+
+        // get computed value
+        double v = x.getForSymbol(distMetric, mainWindow->useMetricUnits);
+
+        // ignore no temp files
+        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::noTemp) continue;
+
+        // clean up dodgy values
+        if (isnan(v) || isinf(v)) v = 0;
+
+        // seconds to minutes
+        if (m->units(mainWindow->useMetricUnits) == tr("seconds")) v /= 60;
+
+        // apply multiplier
+        v *= multiplier;
+
+        // ignore out of bounds data
+        if ((int)(v)<min || (int)(v)>max) continue;
+
+        // increment value, are intitialised to zero above
+        // there will be some loss of precision due to totalising
+        // a double in an int, but frankly that should be minimal
+        // since most values of note are integer based anyway.
+        double t = x.getForSymbol(totalMetric, mainWindow->useMetricUnits);
+
+        // totalise in minutes
+        if (tm->units(mainWindow->useMetricUnits) == tr("seconds")) t /= 60;
+
+        // sum up
+        metricArray[(int)(v)-min] += t;
+    }
+
+    // we certainly don't want the interval curve when plotting
+    // metrics across rides!
+    curveSelected->hide();
+
+    // now set all the plot paramaters to match the data
+    source = Metric;
+    zoned = false;
+    rideItem = NULL;
+    lny = false;
+    shade = false;
+    withz = false;
+    dt = 1;
+    absolutetime = true;
+
+    // and the plot itself
+    QString yunits = tm->units(mainWindow->useMetricUnits);
+    if (yunits == tr("seconds")) yunits = tr("minutes");
+    QString xunits = m->units(mainWindow->useMetricUnits);
+    if (xunits == tr("seconds")) xunits = tr("minutes");
+
+    if (tm->units(mainWindow->useMetricUnits) != "")
+        setAxisTitle(yLeft, QString(tr("Total %1 (%2)")).arg(tm->name()).arg(yunits));
+    else
+        setAxisTitle(yLeft, QString(tr("Total %1")).arg(tm->name()));
+    
+    if (m->units(mainWindow->useMetricUnits) != "")
+        setAxisTitle(xBottom, QString(tr("%1 of Activity (%2)")).arg(m->name()).arg(xunits));
+    else
+        setAxisTitle(xBottom, QString(tr("%1 of Activity")).arg(m->name()));
+}
+
 void
 PowerHist::updatePlot()
 {
@@ -636,6 +759,14 @@ PowerHist::updatePlot()
 void
 PowerHist::setData(RideItem *_rideItem, bool force)
 {
+    // predefined deltas for each series
+    static const double wattsDelta = 1.0;
+    static const double wattsKgDelta = 0.01;
+    static const double nmDelta    = 0.1;
+    static const double hrDelta    = 1.0;
+    static const double kphDelta   = 0.1;
+    static const double cadDelta   = 1.0;
+
     source = Ride;
 
     // we set with this data already
@@ -832,48 +963,6 @@ PowerHist::setZoned(bool value)
     zoned = value;
 }
 
-double
-PowerHist::getDelta()
-{
-    switch (series) {
-        case RideFile::watts: return wattsDelta;
-        case RideFile::wattsKg: return wattsKgDelta;
-        case RideFile::nm: return nmDelta;
-        case RideFile::hr: return hrDelta;
-        case RideFile::kph: return kphDelta;
-        case RideFile::cad: return cadDelta;
-        default: return 1;
-    }
-}
-
-int
-PowerHist::getDigits()
-{
-    switch (series) {
-        case RideFile::watts: return wattsDigits;
-        case RideFile::wattsKg: return wattsKgDigits;
-        case RideFile::nm: return nmDigits;
-        case RideFile::hr: return hrDigits;
-        case RideFile::kph: return kphDigits;
-        case RideFile::cad: return cadDigits;
-        default: return 1;
-    }
-}
-
-int
-PowerHist::setBinWidthRealUnits(double value)
-{
-    setBinWidth(round(value / getDelta()));
-    if (!binw) binw = 1; // must be nonzero
-    return binw;
-}
-
-double
-PowerHist::getBinWidthRealUnits()
-{
-    return binw * getDelta();
-}
-
 void
 PowerHist::setWithZeros(bool value)
 {
@@ -967,7 +1056,8 @@ PowerHist::setAxisTitle(int axis, QString label)
 }
 
 void
-PowerHist::setSeries(RideFile::SeriesType x) {
+PowerHist::setSeries(RideFile::SeriesType x)
+{
     // user selected a different series to plot
     series = x;
     configChanged(); // set colors
@@ -1017,12 +1107,20 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
 
         } else if (yvalue > 0) {
 
-            // output the tooltip
-            text = QString("%1 %2\n%3 %4")
-                        .arg(xvalue, 0, 'f', getDigits())
-                        .arg(this->axisTitle(curve->xAxis()).text())
-                        .arg(yvalue, 0, 'f', 1)
-                        .arg(absolutetime ? tr("minutes") : tr("%"));
+            if (source != Metric) {
+                // output the tooltip
+                text = QString("%1 %2\n%3 %4")
+                            .arg(xvalue, 0, 'f', digits)
+                            .arg(this->axisTitle(curve->xAxis()).text())
+                            .arg(yvalue, 0, 'f', 1)
+                            .arg(absolutetime ? tr("minutes") : tr("%"));
+            } else {
+                text = QString("%1 %2\n%3 %4")
+                            .arg(xvalue, 0, 'f', digits)
+                            .arg(this->axisTitle(curve->xAxis()).text())
+                            .arg(yvalue, 0, 'f', 1)
+                            .arg(this->axisTitle(curve->yAxis()).text());
+            }
 
             // set that text up
             zoomer->setText(text);

@@ -60,6 +60,7 @@
 // 41  27  Oct 2012 Mark Liversedge    Lucene switched to StandardAnalyzer and search all texts by default
 // 42  03  Dec 2012 Mark Liversedge    W/KG ridefilecache changes - force a rebuild.
 // 43  24  Jan 2012 Mark Liversedge    TRIMP update
+// 44  19  Apr 2013 Mark Liversedge    Aerobic Decoupling precision reduced to 1pt
 
 static int DBSchemaVersion = 43;
 

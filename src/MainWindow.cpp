@@ -764,6 +764,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Chart Settings now in their own dialog box
     chartSettings = new ChartSettings(this, masterControls);
+    chartSettings->setMaximumWidth(450);
+    chartSettings->setMaximumHeight(600);
+
     //toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
     chartSettings->hide();
 
