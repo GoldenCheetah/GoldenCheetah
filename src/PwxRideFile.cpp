@@ -58,7 +58,6 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
     // can arrive at any time, so lets cache them
     // and sort out at the end
     QDateTime rideDate;
-    QString rideNotes;
 
     int intervals = 0;
     int samples = 0;
@@ -103,8 +102,9 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
         // notes
         } else if (node.nodeName() == "cmt") {
 
+            // Add the PWX cmt tag as notes
             QDomElement notes = node.toElement();
-            rideNotes = notes.text();
+            rideFile->setTag("Notes", notes.text());
 
         // device type and info
         } else if (node.nodeName() == "device") {
