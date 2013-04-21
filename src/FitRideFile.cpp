@@ -22,6 +22,7 @@
 #include <QSet>
 #include <QtEndian>
 #include <QDebug>
+#include <QTime>
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -444,26 +445,32 @@ struct FitFileReaderState
             double deltaSlope = headwind - prevPoint->slope;
             double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
 
-            for (int i = 1; i < deltaSecs; i++) {
-                double weight = 1.0 * i / deltaSecs;
-                rideFile->appendPoint(
-                    prevPoint->secs + (deltaSecs * weight),
-                    prevPoint->cad + (deltaCad * weight),
-                    prevPoint->hr + (deltaHr * weight),
-                    prevPoint->km + (deltaDist * weight),
-                    prevPoint->kph + (deltaSpeed * weight),
-                    prevPoint->nm + (deltaTorque * weight),
-                    prevPoint->watts + (deltaPower * weight),
-                    prevPoint->alt + (deltaAlt * weight),
-                    (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
-                    (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
-                    prevPoint->headwind + (deltaHeadwind * weight),
-                    prevPoint->slope + (deltaSlope * weight),
-                    temperature,
-                    prevPoint->lrbalance + (deltaLeftRightBalance * weight),
-                    interval);
+            // only smooth for less than 30 minutes
+            // we don't want to crash / stall on bad
+            // or corrupt files
+            if (deltaSecs > 0 && deltaSecs < (60*30)) {
+
+                for (int i = 1; i < deltaSecs; i++) {
+                    double weight = 1.0 * i / deltaSecs;
+                    rideFile->appendPoint(
+                        prevPoint->secs + (deltaSecs * weight),
+                        prevPoint->cad + (deltaCad * weight),
+                        prevPoint->hr + (deltaHr * weight),
+                        prevPoint->km + (deltaDist * weight),
+                        prevPoint->kph + (deltaSpeed * weight),
+                        prevPoint->nm + (deltaTorque * weight),
+                        prevPoint->watts + (deltaPower * weight),
+                        prevPoint->alt + (deltaAlt * weight),
+                        (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
+                        (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
+                        prevPoint->headwind + (deltaHeadwind * weight),
+                        prevPoint->slope + (deltaSlope * weight),
+                        temperature,
+                        prevPoint->lrbalance + (deltaLeftRightBalance * weight),
+                        interval);
+                }
+                prevPoint = rideFile->dataPoints().back();
             }
-            prevPoint = rideFile->dataPoints().back();
         }
 
         if (km < 0.00001f) km = last_distance;

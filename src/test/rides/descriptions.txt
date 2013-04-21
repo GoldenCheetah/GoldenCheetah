@@ -63,3 +63,6 @@ lgulseth...pwx
     A PWX file from a Timex GPS with a permanent recording interval of
     2 seconds claimed. But looks more like 2.02s.
 
+2013-04-11-17-32-50.fit
+   A FIT file with a massive gap in recording at the end.
+
