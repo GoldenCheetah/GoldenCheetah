@@ -1059,7 +1059,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
 
         // update layout
         x++;
-        if (x > 3) {
+        if (x > 5) {
             y++;
             x = 0;
         }
