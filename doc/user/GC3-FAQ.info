@@ -1,4 +1,4 @@
-This is GC3-FAQ.info, produced by makeinfo version 4.13 from
+This is GC3-FAQ.info, produced by makeinfo version 4.8 from
 GC3-FAQ.texinfo.
 
 This manual is for Golden Cheetah, version 3.0.
@@ -70,7 +70,7 @@ Weight can be maintained in 3 ways;
      is found on the     'Workout' tab in the details screen by
      default. Any entry here will be used for this ride     ONLY.
 
-   * You can download weight from a withings scale. This is performed
+   * You can download weight from a Withings scale. This is performed
      manually via the     menu option Tools->Get Withings Data. This is
      then used to update the local measures     database.
 
@@ -79,7 +79,7 @@ then fall back to the last Withing measure that was collected, and if
 that is not available we then fall back to the default value for the
 athlete.
 
-The weight from withings and weight from the activity can both be
+The weight from Withings and weight from the activity can both be
 plotted separately in the LTM plots.
 
 1.4 How do I plot x sec power best?
@@ -531,7 +531,7 @@ have less functionality.
 The upload to Google Calendar uses their CalDAV API, and as such needs
 to specify a collection. This means when entering the details in the
 passwords pane of preferences you should use the following for the
-caldav url:
+CalDAV url:
 
 https://www.google.com/calendar/dav/xxxx@gmail.com/events/
 
@@ -780,14 +780,14 @@ Index
 
 
 Tag Table:
-Node: Top164
-Node: MOST COMMON QUESTIONS OF ALL609
-Node: GENERAL6062
-Node: METRICS9703
-Node: DATA16693
-Node: UPLOADING AND DOWNLOADING20623
-Node: SEASONS AND EVENTS22386
-Node: CHARTS23245
-Node: INDEX28042
+Node: Top163
+Node: MOST COMMON QUESTIONS OF ALL608
+Node: GENERAL6061
+Node: METRICS9702
+Node: DATA16692
+Node: UPLOADING AND DOWNLOADING20622
+Node: SEASONS AND EVENTS22385
+Node: CHARTS23244
+Node: INDEX28041
 
 End Tag Table

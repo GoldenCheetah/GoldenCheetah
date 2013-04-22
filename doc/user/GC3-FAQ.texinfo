@@ -91,7 +91,7 @@ Weight can be maintained in 3 ways;
     'Workout' tab in the details screen by default. Any entry here will be used for this ride
     ONLY.
 
-@item You can download weight from a withings scale. This is performed manually via the
+@item You can download weight from a Withings scale. This is performed manually via the
     menu option Tools->Get Withings Data. This is then used to update the local measures
     database.
 @end itemize
@@ -100,7 +100,7 @@ When calculating W/KG the Activity value is used if present, if not we then fall
 the last Withing measure that was collected, and if that is not available we then fall
 back to the default value for the athlete.
 
-The weight from withings and weight from the activity can both be plotted separately in
+The weight from Withings and weight from the activity can both be plotted separately in
 the LTM plots.
 
 
@@ -583,7 +583,7 @@ functionality.
 
 The upload to Google Calendar uses their CalDAV API, and as such needs to specify a
 collection. This means when entering the details in the passwords pane of preferences
-you should use the following for the caldav url:
+you should use the following for the CalDAV url:
     
     https://www.google.com/calendar/dav/xxxx@@gmail.com/events/
 
