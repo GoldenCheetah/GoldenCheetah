@@ -121,7 +121,7 @@ SLF/SMF file formats. We have also added legacy WKO+ file format support
 @heading Support for a wide selection of internet services
  
 It can upload and download data from; Withings, Zeo, Strava, TrainingPeaks,
-Training Stage Buch, RideWithGPS as well as Internet based calendars (calDAV)
+Training Stage Buch, RideWithGPS as well as Internet based calendars (CalDAV)
 such as Google Calendar.
  
 @heading Realtime training significantly enhanced
@@ -233,7 +233,7 @@ the 3d plot. Over the next 12 months v2.0 was developed introducing the training
 as well as the editor and tools, metadata and long term plotting charts.
  
 At the tail end of 2010 Sean handed leadership of the project to Mark. Sean was no longer racing and most
-develpoment was now being delivered by others anyway. So in January 2011 Mark merged a number of features
+development was now being delivered by others anyway. So in January 2011 Mark merged a number of features
 that were being developed in private into the main repository and thus V3 development began.
  
 In Spring 2013, after 3 years of development version 3 was released, along with this user guide.
@@ -261,7 +261,7 @@ across the long term charts, but also the critical power and distribution charts
 graphical displays including video with overlay and animations.
 @end itemize
  
-Version 3.1, hopefully, will not take so long to come to fruition and is currently targetted for Spring
+Version 3.1, hopefully, will not take so long to come to fruition and is currently targeted for Spring
 2014.
  
 @c ********************************************************************************
@@ -334,7 +334,7 @@ is a term you understand).
 
 Once you're happy with the settings click save and you will then be able to select your new athlete
 in that initial dialog (except of course there is now an athlete listed). Go ahead and open that
-athlete and you wil be greeted with GoldenCheetah, but a splash page.
+athlete and you will be greeted with GoldenCheetah, but a splash page.
 
 @vskip 12pt
 @center @image{"image/1-blankstate",280pt}
@@ -347,7 +347,7 @@ download some data from your bike computer or import some data from disk or USB.
 @section Downloading a ride from device
 
 If you use a Powertap, SRM, Joule, Joule GPS or Macro-X device you will be able to download from
-it directly. Please make sure the device is conected and plugged in correctly. For example, if you
+it directly. Please make sure the device is connected and plugged in correctly. For example, if you
 are downloading from a Powertap please make sure the computer is firmly connected and displays
 `HOST' on its screen.
 
@@ -383,7 +383,7 @@ read them before being validated. Once validated the dialog will prompt you to e
 (some file formats do not include date information). Once you have set the dates (if needed) you can 
 click on save to complete the import and save the files to disk.
  
-The splash screen will now disapper and reveal the main GoldenCheetah analysis view and you can
+The splash screen will now disappear and reveal the main GoldenCheetah analysis view and you can
 now start analysing and tracking your performance.
 
 @c ********************************************************************************
@@ -534,14 +534,14 @@ and air pressure. This is useful when working with Aerolab.
 @item @strong{Get Withings Data...} - Downloads all measures for you Withings weight scale, but the user id
 and public key need to be configured in the passwords section of the preferences pane.
 @item @strong{Get Zeo Data...} - Downloads sleep data for your Zeo sleep monitor. You will need to have
-configured the user id and pasword in the preferences pane.
+configured the user id and password in the preferences pane.
 @item @strong{Create a new workout...} - Opens the workout wizard for creating a training view workout. This
 will create a `.erg' or `.crs' workout.
 @item @strong{Download workouts from ErgDB...} - Opens a dialog to select and download training view workouts
 from the internet ErgDB website.
 @item @strong{Import workouts or videos...} - Opens a file dialog to select and import a workout or video into
 the training view library.
-@item @strong{Scan disk for videos and workouts...} - Opens a dialog to scan directoris for workouts and
+@item @strong{Scan disk for videos and workouts...} - Opens a dialog to scan directories for workouts and
 videos and import into the training view library.
 @item @strong{Upload Activity to Calendar} - Will create a calendar entry to any CalDAV based calendar service.
 You will need to configure the URL, user and password in the preferences pane before using this.
@@ -553,13 +553,13 @@ is here since it has always been on the tools menu. It should really be moved to
 when using a Powertap without calibrating.
 @item @strong{Fix GPS Errors...} - An editor tool for extrapolating and adjusting GPS values, this is useful
 when your GPS device lost its satellite connection or after importing from other software and the data
-contains invalide values.
+contains invalid values.
 @item @strong{Fix Gaps In Recording...} - GoldenCheetah expects all data series samples to have timestamps
 separated by a consistent recording interval (e.g. every 1 second). This tool dialog allows you to
 extrapolate values where there are gaps in recording. In future releases we may remove the need for the 
 data series to have regular timestamps.
-@item @strong{Fix HR Spikes...} - Find and smooth out spikes in HR, usually caused by loss of conection or
-iterference from overhead power lines.
+@item @strong{Fix HR Spikes...} - Find and smooth out spikes in HR, usually caused by loss of connection or
+interference from overhead power lines.
 @item @strong{Fix Power Spikes...} - Find and smooth out spikes in Power, usually caused by reed switch
 being double triggered or recording interference.
 @end itemize
@@ -612,7 +612,7 @@ device (including Powertap Cervo, SRM Powercontrol, O-Synce Macro, Saris Joule).
 example when you worked out at a gym and could not record the data.
 @item @strong{Find Intervals} - Will open a dialog to find peak and best intervals in an activity.
 @item @strong{Split Activity} - Will open a dialog to split an activity into separate activities.
-This is useful when you have an activity that spans mutiple days.
+This is useful when you have an activity that spans multiple days.
 @item @strong{Delete Activity} - Deletes the currently selected activity. Will prompt the user to
 confirm before doing so.
 @end itemize
@@ -623,7 +623,7 @@ main window is laid out;
 @item @strong{Show/Hide Sidebar} - Will toggle the visibility of the sidebar, if it is hidden it
 will how it. If it is shown it will hide it.
 @item @strong{Tabbed Mode} - Switch the main view into tabbed mode. See Views and the Sidebar below.
-@item @strong{Tiled Mode} - Switch the main view into tiled mode. See Views and the Siidebat below.
+@item @strong{Tiled Mode} - Switch the main view into tiled mode. See Views and the Sidebar below.
 @end itemize
 
 Lastly to the right of the toolbar there is a search/filter box;
@@ -648,13 +648,13 @@ In this view the scope is @emph{generally} limited to the date range or season s
 sidebar -- the currently selected ride is not relevant in this view.
 
 @item @strong{Diary} - The diary view is for tracking recent rides - looking at the data in terms of the 
-last day, week or month. As planning functions arrive in v3.1 this view will become more funcitonally
+last day, week or month. As planning functions arrive in v3.1 this view will become more functionally
 rich, but for now it is more or less a configurable version of the old @emph{Weekly Chart}.
 
 In this view the scope is limited to the day, week or month of the currently selected activity. As you
 select different activities the date range changes to reflect this.
 
-To select the summarisation level (day, week or month) the summary sidebar contains a drop down selector.
+To select the summary level (day, week or month) the summary sidebar contains a drop down selector.
 See Figure 8 below.
 
 @vskip 12pt
@@ -675,7 +675,7 @@ To the right of the scope bar is a `+' menu button;
 @item @strong{Add Chart (`+') Menu} - The charts on each view can be configured and added or deleted.
 The `+' menu to the right of the scope bar lists all the charts that are available for the currently
 selected view, see Figure 9 below. Selecting a chart from this menu will open the add chart dialog, which is described 
-below in the secion @emph{Adding and adjusting charts}.
+below in the section @emph{Adding and adjusting charts}.
 
 @vskip 12pt
 @center @image{"image/2-chartmenu",180pt}
@@ -866,7 +866,7 @@ Intro and explain opening the Preferences Pane
     i General
    ii Withings
   iii Zeo
-   iv Google Calendar (calDAV)
+   iv Google Calendar (CalDAV)
  
 @section Appearance
  

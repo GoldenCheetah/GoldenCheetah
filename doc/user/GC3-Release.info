@@ -1,4 +1,5 @@
-This is GC3-Release.info, produced by makeinfo version 4.13 from GC3-Release.texinfo.
+This is GC3-Release.info, produced by makeinfo version 4.8 from
+GC3-Release.texinfo.
 
 
 File: GC3-Release.info,  Node: Top,  Next: Top,  Prev: Top
@@ -60,7 +61,7 @@ and revealed complexity when it was required. We think we've come
 pretty close.
 
 There are 4 views available with specific and detailed sidebars for
-peformancee tracking (home), short term tracking (diary) as well as the
+performance tracking (home), short term tracking (diary) as well as the
 well known analysis and training views from earlier releases.
 
 We now allow you to view charts tabbed and tiled, you can resize and
@@ -101,7 +102,7 @@ Balance, Temperature and Slope.
 
 We will now export and batch export your data to a wide variety of file
 formats. We believe it is your data and it should not be locked into any
-sotfware. We support open formats such as TCX, PWX, JSON and XML as well
+software. We support open formats such as TCX, PWX, JSON and XML as well
 as FITLOG and GPX.
 
 We have also added support for reading files from SportTracks, GPX, Tacx
@@ -114,7 +115,7 @@ exports.
 
 We can now upload and download data from cloud services offered by;
 Withings, Zeo, Strava, TrainingPeaks, Training Stage Buch, RideWithGPS
-as well as Internet based calendars (calDAV) such as Google Calendar.
+as well as Internet based calendars (CalDAV) such as Google Calendar.
 
 1.7 Improvements to Aerolab
 ===========================
@@ -197,7 +198,7 @@ xPower, NP et al. And we even added VAM too, for you mountain goats.
 =====================================================
 
 Yes, we've been granted permission by our friends at TrainingPeaks to
-use their cylcing metrics in the latest version of GoldenCheetah. We
+use their cycling metrics in the latest version of GoldenCheetah. We
 know that it is one of the most popular additions.
 
 Not only have we added them as metrics to plot and track, we've also
@@ -219,7 +220,7 @@ installed (we will support QT5 in v3.1).  We now support OpenBSD and
 have moved to using version 6.1 of the QWT library.
 
 On a related note, you can see all the versions used, contributors
-involved and build settigs as we have improved the about box to give
+involved and build settings as we have improved the about box to give
 much more useful information to developers.
 
 1.13 We wrote some documentation!
@@ -314,8 +315,8 @@ not be forgotten. Cheers Guys.
 
 
 Tag Table:
-Node: Top0
-Node: WHATS NEW310
+Node: Top86
+Node: WHATS NEW309
 Node: CONTRIBUTORS9906
 
 End Tag Table
