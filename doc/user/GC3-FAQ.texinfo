@@ -204,8 +204,8 @@ most of the functions of note are also available in GoldenCheetah.
 @cindex download
 @cindex install
 
-Stable releases are available from www.goldencheetah.org whilst the latest and greatest
-code build is available from goldencheetah.stand2surf.net. Development builds are for the
+Stable releases are available from @url{http://www.goldencheetah.org} whilst the latest and greatest
+code build is available from @url{http://goldencheetah.stand2surf.net}. Development builds are for the
 brave, since they may contain bugs. In reality the development builds are a changing feast
 and often contain latest fixes too.
 
@@ -216,9 +216,8 @@ and often contain latest fixes too.
 @cindex github
 @cindex clone
 
-The GoldenCheetah source code is hosted on github here:
-www.github.com/GoldenCheetah/GoldenCheetah. It can be cloned locally using 
-'git clone git://github.com/GoldenCheetah/GoldenCheetah.git'.
+The GoldenCheetah source code is hosted on github and can be cloned using the following url;
+@code{git://github.com/GoldenCheetah/GoldenCheetah.git}
 
 
 
@@ -236,7 +235,7 @@ aspects of triathlon, or working on the trainer.
 @cindex mail
 
 The mailing list for GoldenCheetah users is maintained via Google Groups at
-http://groups.google.com/forum/?fromgroups=#forum/golden-cheetah-uers the first post you
+@url{http://groups.google.com/forum/?fromgroups=#forum/golden-cheetah-users} the first post you
 make is moderated and may take a while to appear. Once your first post is made you can
 make future posts without moderation.
 
@@ -249,7 +248,7 @@ make future posts without moderation.
 
 We use Github issues to record bugs and feature requests. You will need to create an
 account on github and then post a new request or bug at 
-www.github.com/GoldenCheetah/GoldenCheetah/issues
+@url{http://www.github.com/GoldenCheetah/GoldenCheetah/issues}
 
 
 
@@ -291,7 +290,7 @@ the ride and therefore the training stress of the ride.
 
 In practice, NP and xPower are largely the same, whilst Daniels EqP place much higher
 emphasise on upper intensity work. For more info on xPower see Dr Skiba's paper on BikeScore
-http://www.physfarm.com/bikescore.pdf
+@url{http://www.physfarm.com/bikescore.pdf}
 
 
 
@@ -585,7 +584,7 @@ The upload to Google Calendar uses their CalDAV API, and as such needs to specif
 collection. This means when entering the details in the passwords pane of preferences
 you should use the following for the caldav url:
     
-    https://www.google.com/calendar/dav/xxxx@@gmail.com/events/
+    @url{https://www.google.com/calendar/dav/xxxx@@gmail.com/events/}
 
 Where xxxx is your username. The username will need to be repeated in the username
 field and obviously set the password too.
@@ -677,12 +676,12 @@ There is also an overview of Virtual Elevation to measure aerodynamics in this
 YouTube video from the power seminar at Interbike 2011 given by Jim Meyer the founder
 of Quarq:
 
-    http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s
+    @url{http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s}
 
 Finally, Robert Chung's original paper is included in the docs section of the GoldenCheetah
 repository, you can it up here (click on 'View Raw' to download):
 
-    https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf
+    @url{https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf}
 
 
 
