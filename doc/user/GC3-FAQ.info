@@ -182,18 +182,18 @@ the functions of note are also available in GoldenCheetah.
 2.3 Where can I download the installer for GoldenCheetah ?
 ==========================================================
 
-Stable releases are available from www.goldencheetah.org whilst the
-latest and greatest code build is available from
-goldencheetah.stand2surf.net. Development builds are for the brave,
-since they may contain bugs. In reality the development builds are a
-changing feast and often contain latest fixes too.
+Stable releases are available from `http://www.goldencheetah.org'
+whilst the latest and greatest code build is available from
+`http://goldencheetah.stand2surf.net'. Development builds are for the
+brave, since they may contain bugs. In reality the development builds
+are a changing feast and often contain latest fixes too.
 
 2.4 Where can I get the source code?
 ====================================
 
-The GoldenCheetah source code is hosted on github here:
-www.github.com/GoldenCheetah/GoldenCheetah. It can be cloned locally
-using 'git clone git://github.com/GoldenCheetah/GoldenCheetah.git'.
+The GoldenCheetah source code is hosted on github and can be cloned
+using the following url;
+`git://github.com/GoldenCheetah/GoldenCheetah.git'
 
 2.5 I am a triathlete is GoldenCheetah appropriate for me?
 ==========================================================
@@ -209,7 +209,7 @@ triathlon, or working on the trainer.
 
 The mailing list for GoldenCheetah users is maintained via Google
 Groups at
-http://groups.google.com/forum/?fromgroups=#forum/golden-cheetah-uers
+`http://groups.google.com/forum/?fromgroups=#forum/golden-cheetah-users'
 the first post you make is moderated and may take a while to appear.
 Once your first post is made you can make future posts without
 moderation.
@@ -219,7 +219,7 @@ moderation.
 
 We use Github issues to record bugs and feature requests. You will need
 to create an account on github and then post a new request or bug at
-www.github.com/GoldenCheetah/GoldenCheetah/issues
+`http://www.github.com/GoldenCheetah/GoldenCheetah/issues'
 
 2.8 How can I contribute?
 =========================
@@ -259,7 +259,7 @@ training stress of the ride.
 In practice, NP and xPower are largely the same, whilst Daniels EqP
 place much higher emphasise on upper intensity work. For more info on
 xPower see Dr Skiba's paper on BikeScore
-http://www.physfarm.com/bikescore.pdf
+`http://www.physfarm.com/bikescore.pdf'
 
 3.2 What is the difference between CP and FTP?
 ==============================================
@@ -533,7 +533,7 @@ to specify a collection. This means when entering the details in the
 passwords pane of preferences you should use the following for the
 caldav url:
 
-https://www.google.com/calendar/dav/xxxx@gmail.com/events/
+`https://www.google.com/calendar/dav/xxxx@gmail.com/events/'
 
 Where xxxx is your username. The username will need to be repeated in
 the username field and obviously set the password too.
@@ -619,13 +619,13 @@ There is also an overview of Virtual Elevation to measure aerodynamics
 in this YouTube video from the power seminar at Interbike 2011 given by
 Jim Meyer the founder of Quarq:
 
-http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s
+`http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s'
 
 Finally, Robert Chung's original paper is included in the docs section
 of the GoldenCheetah repository, you can it up here (click on 'View
 Raw' to download):
 
-https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf
+`https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf'
 
 7.4 My map doesn't show?
 ========================
@@ -783,11 +783,11 @@ Tag Table:
 Node: Top164
 Node: MOST COMMON QUESTIONS OF ALL609
 Node: GENERAL6062
-Node: METRICS9703
-Node: DATA16693
-Node: UPLOADING AND DOWNLOADING20623
-Node: SEASONS AND EVENTS22386
-Node: CHARTS23245
-Node: INDEX28042
+Node: METRICS9684
+Node: DATA16676
+Node: UPLOADING AND DOWNLOADING20606
+Node: SEASONS AND EVENTS22371
+Node: CHARTS23230
+Node: INDEX28031
 
 End Tag Table

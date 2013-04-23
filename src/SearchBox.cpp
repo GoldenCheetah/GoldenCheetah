@@ -185,6 +185,7 @@ void SearchBox::setMenu()
     dropMenu->clear();
     if (text() != "") dropMenu->addAction(tr("Add Favourite"));
     if (main->namedSearches->getList().count()) {
+        dropMenu->addAction(tr("Edit Favourites"));
         dropMenu->addSeparator();
         foreach(NamedSearch x, main->namedSearches->getList()) {
             dropMenu->addAction(x.name);
