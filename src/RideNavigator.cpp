@@ -1037,7 +1037,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     buttons->setContentsMargins(0,0,0,0);
 
     QFont small;
-    small.setPointSize(10);
+    small.setPointSize(8);
 
     QList<QString> buttonNames = logicalHeadings;
     qSort(buttonNames);
