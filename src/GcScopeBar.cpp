@@ -18,15 +18,36 @@
 
 #include "GcScopeBar.h"
 #include "GcCalendar.h"
+#include "MainWindow.h"
 #include "QtMacButton.h"
 
-GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
+GcScopeBar::GcScopeBar(MainWindow *main, QWidget *traintool) : QWidget(main), mainWindow(main)
 {
     setFixedHeight(23);
     setContentsMargins(10,0,10,0);
     layout = new QHBoxLayout(this);
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
+
+    searchLabel = new GcLabel(tr("Search/Filter:"));
+    searchLabel->setYOff(1);
+    searchLabel->setFixedHeight(20);
+    searchLabel->setHighlighted(true);
+    QFont font;
+    font.setFamily("Helvetica");
+#ifdef WIN32
+    font.setPointSize(8);
+#else
+    font.setPointSize(10);
+#endif
+    font.setWeight(QFont::Black);
+    searchLabel->setFont(font);
+    layout->addWidget(searchLabel);
+    searchLabel->hide();
+
+#ifdef GC_HAVE_LUCENE
+    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setHighlighted()));
+#endif
 
     // Mac uses QtMacButton - recessed etc
 #ifdef Q_OS_MAC
@@ -70,6 +91,34 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     layout->addStretch();
     layout->addWidget(traintool);
     layout->addStretch();
+}
+
+void
+GcScopeBar::setHighlighted()
+{
+#ifdef GC_HAVE_LUCENE
+    if (mainWindow->isfiltered) {
+        searchLabel->setHighlighted(true);
+        searchLabel->show();
+#ifndef Q_OS_MAC
+        home->setHighlighted(true);
+        anal->setHighlighted(true);
+#ifdef GC_HAVE_ICAL
+        diary->setHighlighted(true);
+#endif
+#endif
+    } else {
+        searchLabel->setHighlighted(false);
+        searchLabel->hide();
+#ifndef Q_OS_MAC
+        home->setHighlighted(false);
+        anal->setHighlighted(false);
+#ifdef GC_HAVE_ICAL
+        diary->setHighlighted(false);
+#endif
+#endif
+    }
+#endif
 }
 
 void
@@ -203,7 +252,7 @@ GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(20);
     setFixedWidth(60);
-    checked = false;
+    highlighted = checked = false;
     QFont font;
     font.setFamily("Helvetica");
 #ifdef WIN32
@@ -235,9 +284,21 @@ GcScopeButton::paintEvent(QPaintEvent *)
     if (checked && underMouse()) {
         painter.setBrush(QBrush(QColor(150,150,150)));     
         painter.drawRoundedRect(body, 19, 11);
+        if (highlighted) {
+            QColor over = GColor(CCALCURRENT);
+            over.setAlpha(180);
+            painter.setBrush(over);
+            painter.drawRoundedRect(body, 19, 11);
+        }
     } else if (checked && !underMouse()) {
         painter.setBrush(QBrush(QColor(120,120,120)));     
         painter.drawRoundedRect(body, 19, 11);
+        if (highlighted) {
+            QColor over = GColor(CCALCURRENT);
+            over.setAlpha(180);
+            painter.setBrush(over);
+            painter.drawRoundedRect(body, 19, 11);
+        }
     } else if (!checked && underMouse()) {
         painter.setBrush(QBrush(QColor(180,180,180)));     
         painter.drawRoundedRect(body, 19, 11);

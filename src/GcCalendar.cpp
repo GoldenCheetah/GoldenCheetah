@@ -193,6 +193,14 @@ GcLabel::paintEvent(QPaintEvent *)
         else painter.setPen(QColor(0,0,0,170));
 
         painter.drawText(norm, alignment(), text());
+
+        if (highlighted) {
+            QColor over = GColor(CCALCURRENT);
+            over.setAlpha(180);
+            painter.setPen(over);
+
+            painter.drawText(norm, alignment(), text());
+        }
     } else {
 
         // use standard icons

@@ -41,9 +41,10 @@ class GcLabel : public QLabel
 
     int xoff, yoff;
     bool bg, selected, filtered; // bg = highlighted, selected = user selected too
+    bool highlighted;            // highlighed uses highlighter color overlay when painting
 
 public:
-    GcLabel(const QString & text, QWidget * parent = 0) : QLabel(text, parent), xoff(0), yoff(0), bg(false), selected(false), filtered(false), bgColor(Qt::lightGray) {}
+    GcLabel(const QString & text, QWidget * parent = 0) : QLabel(text, parent), xoff(0), yoff(0), bg(false), selected(false), filtered(false), highlighted(false), bgColor(Qt::lightGray) {}
     ~GcLabel(){}
  
 signals:
@@ -57,6 +58,7 @@ public slots:
     void setBgColor(QColor bg) { bgColor = bg; }
     void setSelected(bool x) { selected = x; }
     void setFiltered(bool x) { filtered = x; }
+    void setHighlighted(bool x) { highlighted = x; }
     bool event(QEvent *e);
 
 protected:
