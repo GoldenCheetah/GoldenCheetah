@@ -23,6 +23,7 @@
 #include <QList>
 #include <QAction>
 
+class MainWindow;
 #ifdef Q_OS_MAC
 class QtMacButton;
 #else
@@ -35,6 +36,7 @@ class GcScopeButton : public QWidget
         void setText(QString _text) { text = _text; }
         void setChecked(bool _checked) { checked = _checked; repaint(); }
         void setWidth(int x) { setFixedWidth(x); }
+        void setHighlighted(bool x) { highlighted = x; }
 
     signals:
         void clicked(bool);
@@ -45,18 +47,19 @@ class GcScopeButton : public QWidget
 
     private:
         bool checked;
+        bool highlighted;
         QString text;
 };
 
 #endif
-
+class GcLabel;
 class GcScopeBar : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    GcScopeBar(QWidget *parent, QWidget *traintool);
+    GcScopeBar(MainWindow *parent, QWidget *traintool);
     ~GcScopeBar();
 
 public slots:
@@ -71,6 +74,8 @@ public slots:
     void selected(int index);
     void addWidget(QWidget*);
 
+    void setHighlighted();
+
 signals:
     void selectHome();
     void selectAnal();
@@ -82,7 +87,9 @@ signals:
 private:
     void paintBackground(QPaintEvent *);
 
+    MainWindow *mainWindow;
     QHBoxLayout *layout;
+    GcLabel *searchLabel;
 #ifdef Q_OS_MAC
     QtMacButton *home, *diary, *anal, *train;
 #else
