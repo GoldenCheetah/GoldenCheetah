@@ -19,6 +19,7 @@
 #include "SearchBox.h"
 #include "MainWindow.h"
 #include "NamedSearch.h"
+#include "RideNavigator.h"
 #include "GcSideBarItem.h"
 #include <QToolButton>
 #include <QInputDialog>
@@ -190,14 +191,19 @@ void SearchBox::setMenu()
         foreach(NamedSearch x, main->namedSearches->getList()) {
             dropMenu->addAction(x.name);
         }
+        dropMenu->addSeparator();
     }
+    dropMenu->addAction(tr("Column Chooser"));
 }
 
 void SearchBox::runMenu(QAction *x)
 {
     // just qdebug for now
     if (x->text() == tr("Add Favourite")) addNamed();
-    else {
+    else if (x->text() == tr("Column Chooser")) {
+        ColumnChooser *selector = new ColumnChooser(main->listView->logicalHeadings);
+        selector->show();
+    } else {
         NamedSearch get = main->namedSearches->get(x->text());
         if (get.name == x->text()) {
             setMode(static_cast<SearchBox::SearchBoxMode>(get.type));
