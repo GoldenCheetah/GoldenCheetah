@@ -86,7 +86,7 @@ class GoogleMapControl : public GcChartWindow
 
     public:
         GoogleMapControl(MainWindow *);
-        virtual ~GoogleMapControl() {}
+        ~GoogleMapControl();
         bool first;
 
     public slots:

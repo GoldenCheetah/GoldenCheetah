@@ -64,6 +64,11 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcChartWindow(mw), main(mw)
     first = true;
 }
 
+GoogleMapControl::~GoogleMapControl()
+{
+    delete webBridge;
+}
+
 void
 GoogleMapControl::rideSelected()
 {
@@ -437,6 +442,7 @@ GoogleMapControl::createMarkers()
         laststoptime = rfp->secs;
     }
 
+
     //
     // INTERVAL MARKERS
     //
@@ -452,12 +458,17 @@ GoogleMapControl::createMarkers()
             "   var marker = new google.maps.Marker({ title: '%3', animation: google.maps.Animation.DROP, position: latlng });"
             "   marker.setMap(map);"
             "   markerList.push(marker);" // keep track of those suckers
+#if 0
             "   google.maps.event.addListener(marker, 'click', function(event) { webBridge.toggleInterval(%4); });"
+#endif
             "}")
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
                                     .arg(x.name)
-                                    .arg(interval);
+#if 0
+                                    .arg(interval)
+#endif
+                                    ;
         view->page()->mainFrame()->evaluateJavaScript(code);
         interval++;
     }
@@ -600,6 +611,7 @@ WebBridge::drawOverlays()
 void
 WebBridge::toggleInterval(int x)
 {
+return;
     IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(x));
     if (current) current->setSelected(!current->isSelected());
 }
