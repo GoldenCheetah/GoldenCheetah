@@ -36,7 +36,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
-    GcChartWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true), useCustom(false), useToToday(false)
+    GcChartWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Critical Power Window");
 
@@ -239,6 +239,7 @@ CriticalPowerWindow::forceReplot()
         // rideSelected is easiest way
         if (amVisible()) rideSelected();
     }
+    repaint();
 }
 
 void

@@ -171,6 +171,9 @@ public:
     virtual void unreveal() {}
     bool revealed;
 
+    // is filtered?
+    virtual bool isFiltered() const { return false;}
+
     // for sorting... we look at x
     bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
 

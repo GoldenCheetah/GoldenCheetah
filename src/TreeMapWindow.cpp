@@ -237,6 +237,7 @@ TreeMapWindow::refresh()
 
         refreshPlot();
     }
+    repaint(); // get title repainted
 }
 
 void

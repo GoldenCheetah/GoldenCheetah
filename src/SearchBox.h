@@ -43,6 +43,7 @@ public:
     void setMode(SearchBoxMode mode);
     void setText(QString);
     SearchBoxMode getMode() { return mode; }
+    bool isFiltered() const { return filtered; }
 
 protected:
     void resizeEvent(QResizeEvent *);
@@ -78,6 +79,7 @@ signals:
 
 private:
     MainWindow *main;
+    bool filtered;
     QToolButton *clearButton, *searchButton, *toolButton;
     QMenu *dropMenu;
     SearchBoxMode mode;

@@ -20,6 +20,7 @@
 #ifndef _GC_PerformanceManagerWindow_h
 #define _GC_PerformanceManagerWindow_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
 
 #include <QtGui>
 #include <QSlider>
@@ -29,7 +30,6 @@
 
 
 class AllPlot;
-class MainWindow;
 class QwtPlotPanner;
 class QwtPlotZoomer;
 class QSlider;
@@ -53,6 +53,10 @@ class PerformanceManagerWindow : public GcWindow
     int scheme() const { return metricCombo->currentIndex(); }
     void setScheme(int x) const { metricCombo->setCurrentIndex(x); }
 
+#ifdef GC_HAVE_LUCENE
+    bool isFiltered() const { return isfiltered; }
+#endif
+
     public slots:
 
 	void PMpickerMoved(const QPoint &pos);
@@ -61,6 +65,10 @@ class PerformanceManagerWindow : public GcWindow
         void configChanged();
         void metricChanged();
         void rideSelected();
+
+#ifdef GC_HAVE_LUCENE
+    void filterChanged(QStringList&);
+#endif
 
     protected:
 
@@ -83,6 +91,8 @@ class PerformanceManagerWindow : public GcWindow
 	QSharedPointer<QSettings> settings;
 
 	void setPMSliderDates();
+    QStringList filter;
+    bool isfiltered;
 
 };
 

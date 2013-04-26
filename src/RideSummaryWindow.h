@@ -69,6 +69,8 @@ class RideSummaryWindow : public GcChartWindow
         int prevN() { return dateSetting->prevN(); }
         void setPrevN(int x) { dateSetting->setPrevN(x); }
 #ifdef GC_HAVE_LUCENE
+        bool isFiltered() const { if (!ridesummary) return (filtered || mainWindow->isfiltered);
+                                  else return false; }
         // filter
         QString filter() const { return ridesummary ? "" : searchBox->filter(); }
         void setFilter(QString x) { if (!ridesummary) searchBox->setFilter(x); }

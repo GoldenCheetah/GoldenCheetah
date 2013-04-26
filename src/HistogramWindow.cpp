@@ -106,7 +106,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
 
 #ifdef GC_HAVE_LUCENE
     // search filter box
-    isFiltered = false;
+    isfiltered = false;
     searchBox = new SearchFilterBox(this, mainWindow);
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
@@ -840,7 +840,7 @@ HistogramWindow::updateChart()
                 // plotting a data series, so refresh the ridefilecache
 
 #ifdef GC_HAVE_LUCENE
-                source = new RideFileCache(mainWindow, use.from, use.to, isFiltered, files);
+                source = new RideFileCache(mainWindow, use.from, use.to, isfiltered, files);
 #else
                 source = new RideFileCache(mainWindow, use.from, use.to);
 #endif
@@ -884,7 +884,7 @@ HistogramWindow::updateChart()
                 powerHist->setSeries(RideFile::none);
                 powerHist->setDelta(getDelta());
                 powerHist->setDigits(getDigits());
-                powerHist->setData(results, totalMetric(), distMetric(), isFiltered, files);
+                powerHist->setData(results, totalMetric(), distMetric(), isfiltered, files);
                 powerHist->setColor(colorButton->getColor());
 
             }
@@ -922,19 +922,21 @@ HistogramWindow::updateChart()
 void 
 HistogramWindow::clearFilter()
 {
-    isFiltered = false;
+    isfiltered = false;
     files.clear();
     stale = true;
     updateChart();
+    repaint();
 }
 
 void
 HistogramWindow::setFilter(QStringList list)
 {
-    isFiltered = true;
+    isfiltered = true;
     files = list;
     stale = true;
     updateChart();
+    repaint();
 }
 
 double

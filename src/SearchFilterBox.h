@@ -35,6 +35,7 @@ public:
 
     QString filter();
     void setFilter(QString); // filter:text or search:text
+    bool isFiltered() const { return searchbox->isFiltered(); }
 
 private slots:
 

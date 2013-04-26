@@ -221,6 +221,7 @@ LTMWindow::refresh()
         measures.clear(); // clear any old data
         measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
         refreshPlot();
+        repaint(); // title changes color when filters change
         dirty = false;
     } else {
         dirty = true;
