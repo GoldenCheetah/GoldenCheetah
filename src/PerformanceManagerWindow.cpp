@@ -111,9 +111,11 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
-    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+#ifdef GC_HAVE_LUCENE
+    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));
+#endif
 }
 
 PerformanceManagerWindow::~PerformanceManagerWindow()
