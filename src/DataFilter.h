@@ -26,21 +26,8 @@ class MainWindow;
 class RideMetric;
 class FieldDefinition;
 class SummaryMetrics;
-
-class SymbolDef {
-
-    public:
-
-        enum { Float, Integer, String } type;
-        union {
-
-            RideMetric *metric;    // into ride factory
-            FieldDefinition *meta; // into field definitions in MainWindow
-
-        } def;
-};
-
 class DataFilter;
+
 class Leaf {
 
     public:
