@@ -99,7 +99,6 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // if so set the type to meta or metric
             // and save the technical name used to do
             // a lookup at execution time
-
             QString lookup = df->lookupMap.value(*(leaf->lvalue.n), "");
             if (lookup == "") {
                 DataFiltererrors << QString("%1 is unknown").arg(*(leaf->lvalue.n));

@@ -115,7 +115,12 @@ lop   : AND
       ;
 
 value : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
-                                      $$->lvalue.n = new QString(DataFiltertext); }
+                                      if (QString(DataFiltertext) == "BikeScore")
+                                        $$->lvalue.n = new QString("BikeScore&#8482;");
+                                      else
+                                        $$->lvalue.n = new QString(DataFiltertext);
+                                    }
+
       | STRING                      { $$ = new Leaf(); $$->type = Leaf::String;
                                       QString s2(DataFiltertext);
                                       $$->lvalue.s = new QString(s2.mid(1,s2.length()-2)); }
