@@ -108,8 +108,13 @@ class LTMWindow : public GcChartWindow
         ~LTMWindow();
         LTMToolTip *toolTip() { return picker; }
 
-        // reveal
+        // reveal / filters
         bool hasReveal() { return true; }
+#ifdef GC_HAVE_LUCENE
+        bool isFiltered() const { return (ltmTool->isFiltered() || main->isfiltered); }
+#else
+        bool isFiltered() const { return ;}
+#endif
 
         // used by children
         MainWindow *main;

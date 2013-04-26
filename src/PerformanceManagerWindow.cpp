@@ -9,7 +9,7 @@
 
 
 PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false)
+    GcWindow(mainWindow), mainWindow(mainWindow), active(false), isfiltered(false)
 {
     setInstanceName("PM Window");
     setControls(NULL);
@@ -111,6 +111,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
+    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }
@@ -120,6 +121,18 @@ PerformanceManagerWindow::~PerformanceManagerWindow()
     if (sc)
 	delete sc;
 }
+
+#ifdef GC_HAVE_LUCENE
+void 
+PerformanceManagerWindow::filterChanged(QStringList &list)
+{
+    filter = list;
+    isfiltered = mainWindow->isfiltered;
+    days = 0; // force it
+    replot();
+    repaint();
+}
+#endif
 
 void PerformanceManagerWindow::configChanged()
 {
@@ -195,8 +208,11 @@ void PerformanceManagerWindow::replot()
 		    endTime,
 		    (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt(),
 		    (appsettings->cvalue(mainWindow->cyclist, GC_LTS_DAYS,42)).toInt());
-
+#ifdef GC_HAVE_LUCENE
+            sc->calculateStress(mainWindow,home.absolutePath(),newMetric,isfiltered,filter);
+#else
             sc->calculateStress(mainWindow,home.absolutePath(),newMetric);
+#endif
 
 	    perfplot->setStressCalculator(sc);
 
@@ -241,6 +257,7 @@ void PerformanceManagerWindow::replot()
 	}
 	perfplot->plot();
     }
+    repaint();
 }
 
 // performance manager picker callback

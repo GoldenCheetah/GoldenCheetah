@@ -71,6 +71,7 @@ class CriticalPowerWindow : public GcChartWindow
 
 #ifdef GC_HAVE_LUCENE
         // filter
+        bool isFiltered() const { return (searchBox->isFiltered() || mainWindow->isfiltered); }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif
@@ -162,6 +163,7 @@ class CriticalPowerWindow : public GcChartWindow
 #endif
 
         bool rangemode;
+        bool isfiltered;
         QDate cfrom, cto;
         bool stale;
         bool useCustom;

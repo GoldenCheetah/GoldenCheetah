@@ -283,6 +283,14 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         painter.setPen(fgColor);
         painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
 
+        if (isFiltered()) {
+            // overlay in highlight color
+            QColor over = GColor(CCALCURRENT);
+            over.setAlpha(220);
+            painter.setPen(over);
+            painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
+        }
+
         // border
         painter.setBrush(Qt::NoBrush);
         if (underMouse()) {

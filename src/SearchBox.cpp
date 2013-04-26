@@ -29,7 +29,7 @@
 #include <QDebug>
 
 SearchBox::SearchBox(MainWindow *main, QWidget *parent)
-    : QLineEdit(parent), main(main)
+    : QLineEdit(parent), main(main), filtered(false)
 {
     setFixedHeight(21);
     //clear button
@@ -164,6 +164,7 @@ void SearchBox::searchSubmit()
 {
     // return hit / key pressed
     if (text() != "") {
+        filtered = true;
         mode == Search ? submitQuery(text()) : submitFilter(text());
     }
 }
@@ -171,6 +172,7 @@ void SearchBox::searchSubmit()
 void SearchBox::clearClicked()
 {
     setText("");
+    filtered = false;
     //mode == Search ? clearQuery() : clearFilter();
     setGood();
 }

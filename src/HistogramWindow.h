@@ -86,6 +86,8 @@ class HistogramWindow : public GcChartWindow
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
 #ifdef GC_HAVE_LUCENE
+        bool isFiltered() const { if (rangemode) return (isfiltered || mainWindow->isfiltered);
+                                  else return false; }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif
@@ -190,7 +192,7 @@ class HistogramWindow : public GcChartWindow
         bool interval;
 #ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
-        bool isFiltered;
+        bool isfiltered;
         QStringList files;
 #endif
 
