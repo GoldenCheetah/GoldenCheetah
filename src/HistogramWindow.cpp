@@ -884,7 +884,11 @@ HistogramWindow::updateChart()
                 powerHist->setSeries(RideFile::none);
                 powerHist->setDelta(getDelta());
                 powerHist->setDigits(getDigits());
+#ifdef GC_HAVE_LUCENE
                 powerHist->setData(results, totalMetric(), distMetric(), isfiltered, files);
+#else
+                powerHist->setData(results, totalMetric(), distMetric(), false, QStringList());
+#endif
                 powerHist->setColor(colorButton->getColor());
 
             }
@@ -938,6 +942,7 @@ HistogramWindow::setFilter(QStringList list)
     updateChart();
     repaint();
 }
+#endif
 
 double
 HistogramWindow::getDelta()
@@ -993,4 +998,3 @@ HistogramWindow::getDigits()
         }
     }
 }
-#endif
