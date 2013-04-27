@@ -188,7 +188,11 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialo
     setWindowFlags(windowFlags() | Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowModality(Qt::NonModal);
+#ifdef Q_OS_MAC
+    setFixedSize(350,400);
+#else
     setFixedSize(450,400);
+#endif
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -231,7 +235,11 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialo
     searchList->setHeaderLabels(headings);
     searchList->header()->setMinimumSectionSize(30);
     searchList->header()->resizeSection(0, 30);
+#ifdef Q_OS_MAC
+    searchList->header()->resizeSection(1, 120);
+#else
     searchList->header()->resizeSection(1, 150);
+#endif
     searchList->header()->setStretchLastSection(true);
 
     // delete button
