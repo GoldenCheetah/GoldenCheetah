@@ -184,7 +184,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialo
     filterIcon = iconFromPNG(":images/toolbar/filter3.png", false);
     searchIcon = iconFromPNG(":images/toolbar/search3.png", false);
 
-    setWindowTitle(tr("Edit Favourites"));
+    setWindowTitle(tr("Manage Favourites"));
     setWindowFlags(windowFlags() | Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowModality(Qt::NonModal);

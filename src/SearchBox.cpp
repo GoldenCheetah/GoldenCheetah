@@ -187,14 +187,14 @@ void SearchBox::setMenu()
 {
     dropMenu->clear();
     if (!nomenu) {
-        if (text() != "") dropMenu->addAction(tr("Add Favourite"));
+        if (text() != "") dropMenu->addAction(tr("Add to Favourites"));
         if (main->namedSearches->getList().count()) {
-            dropMenu->addAction(tr("Edit Favourites"));
-            dropMenu->addSeparator();
+            if (text() != "") dropMenu->addSeparator();
             foreach(NamedSearch x, main->namedSearches->getList()) {
                 dropMenu->addAction(x.name);
             }
             dropMenu->addSeparator();
+            dropMenu->addAction(tr("Manage Favourites"));
         }
     }
     dropMenu->addAction(tr("Column Chooser"));
@@ -203,8 +203,8 @@ void SearchBox::setMenu()
 void SearchBox::runMenu(QAction *x)
 {
     // just qdebug for now
-    if (x->text() == tr("Add Favourite")) addNamed();
-    else if (x->text() == tr("Edit Favourites")) {
+    if (x->text() == tr("Add to Favourites")) addNamed();
+    else if (x->text() == tr("Manage Favourites")) {
 
         EditNamedSearches *editor = new EditNamedSearches(this, main);
         editor->move(QCursor::pos()-QPoint(230,-5));
