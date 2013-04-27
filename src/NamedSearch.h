@@ -80,7 +80,7 @@ protected:
     int loadcount;
 
 };
-#if 0
+
 class EditNamedSearches : public QDialog
 {
     Q_OBJECT
@@ -95,19 +95,22 @@ class EditNamedSearches : public QDialog
         void reject(); // write away on close
 
     private:
-        MainWindow *main;
+        MainWindow *mainWindow;
+        bool active;
         QLineEdit *editName;
         SearchBox *editSearch;
         QTreeWidget *searchList;
         QPushButton *addButton,
                     *updateButton,
                     *deleteButton;
+        QIcon searchIcon, filterIcon;
 
     private slots:
         void addClicked();
         void updateClicked();
         void deleteClicked();
+        void selectionChanged();
 };
-#endif
+
 
 #endif
