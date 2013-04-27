@@ -34,7 +34,11 @@ GcScopeBar::GcScopeBar(MainWindow *main, QWidget *traintool) : QWidget(main), ma
     searchLabel->setFixedHeight(20);
     searchLabel->setHighlighted(true);
     QFont font;
+#ifdef Q_OS_MAC
+    font.setFamily("Lucida Grande");
+#else
     font.setFamily("Helvetica");
+#endif
 #ifdef WIN32
     font.setPointSize(8);
 #else
