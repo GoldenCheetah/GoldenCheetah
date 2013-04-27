@@ -323,7 +323,7 @@ MainWindow::MainWindow(const QDir &home) :
     SearchFilterBox *searchBox = new SearchFilterBox(this,this);
     QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(250);
+    searchBox->setFixedWidth(300);
     head->addWidget(searchBox);
 #endif
 
