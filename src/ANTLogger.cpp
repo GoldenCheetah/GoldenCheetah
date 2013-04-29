@@ -11,6 +11,7 @@ void ANTLogger::logRawAntMessage(const ANTMessage *message, const struct timeval
         if (isLogging) {
             // close debug file
             antlog.close();
+            isLogging=false;
         }
         return;
     }
