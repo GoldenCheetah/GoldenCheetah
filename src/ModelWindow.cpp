@@ -144,8 +144,8 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     legend->setChecked(true);
     cl->addRow(legend);
 
-    resetView = new QPushButton(tr("Reset View"));
-    cl->addRow(resetView);
+    //resetView = new QPushButton(tr("Reset View"));
+    //cl->addRow(resetView);
 
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
@@ -163,7 +163,7 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     connect(ignore, SIGNAL(stateChanged(int)), this, SLOT(setDirty()));
     connect(binWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
-    connect(resetView, SIGNAL(clicked()), this, SLOT(resetViewPoint()));
+    //connect(resetView, SIGNAL(clicked()), this, SLOT(resetViewPoint()));
     connect(zpane, SIGNAL(valueChanged(int)), this, SLOT(setZPane(int)));
 }
 
@@ -267,14 +267,13 @@ void
 ModelWindow::setBinWidthFromSlider()
 {
     binWidthLineEdit->setText(QString("%1").arg(binWidthSlider->value()));
-    setDirty();
+    setData(false);
 }
 
 void
 ModelWindow::setBinWidthFromLineEdit()
 {
     binWidthSlider->setValue(binWidthLineEdit->text().toInt());
-    setDirty();
 }
 
 void
@@ -289,14 +288,13 @@ void
 ModelWindow::setDirty()
 {
     dirty = true;
-    resetView->setText(tr("Plot"));
+    setData(false);
 }
 
 void
 ModelWindow::setClean()
 {
     dirty = false;
-    resetView->setText(tr("Reset View"));
 }
 
 //
