@@ -19,6 +19,7 @@
 #include "NewCyclistDialog.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "GcUpgrade.h"
 
 NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
 {
@@ -180,6 +181,9 @@ NewCyclistDialog::saveClicked()
     if (!name->text().isEmpty()) {
         if (!home.exists(name->text())) {
             if (home.mkdir(name->text())) {
+
+                // set the last version to the latest version
+                appsettings->setCValue(name->text(), GC_VERSION_USED, GcUpgrade::version());
 
                 // lets setup!
                 if (unitCombo->currentIndex()==0)
