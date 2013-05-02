@@ -176,6 +176,7 @@ class MainWindow : public QMainWindow
         int session;
         bool isclean;
         bool ismultisave;
+        bool init; // we built children (i.e. didn't quit at upgrade)
 
         // global filters
         bool isfiltered;

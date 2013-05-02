@@ -279,6 +279,7 @@ HEADERS += \
         GcScopeBar.h \
         GcSideBarItem.h \
         GcToolBar.h \
+        GcUpgrade.h \
         GcWindowLayout.h \
         GcWindowRegistry.h \
         GcWindowTool.h \
@@ -468,6 +469,7 @@ SOURCES += \
         GcScopeBar.cpp \
         GcSideBarItem.cpp \
         GcToolBar.cpp \
+        GcUpgrade.cpp \
         GcWindowLayout.cpp \
         GcWindowRegistry.cpp \
         GcWindowTool.cpp \

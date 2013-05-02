@@ -129,6 +129,8 @@
 #include "WFApi.h"
 #endif
 
+#include "GcUpgrade.h" // upgrade wizard
+
 // handy spacer
 class Spacer : public QWidget
 {
@@ -144,10 +146,20 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home) :
-    home(home), session(0), isclean(false), ismultisave(false), isfiltered(false),
+    home(home), session(0), isclean(false), ismultisave(false), init(false), isfiltered(false),
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL), groupByMapper(NULL)
 {
+    // Before we initialise we need to run the upgrade wizard
+    GcUpgrade v3;
+    if (v3.upgrade(home) != 0) {
+        hide();
+        QTimer::singleShot(0, this, SLOT(close())); // wait for event loop
+    } else { // don't indent since it would change entire file
+    init=true;
+    // !!! the code below is not indented since it would change the entire
+    //     constructor for this small update. Please bear this in mind
+
     cyclist = home.dirName();
     setInstanceName(cyclist);
 
@@ -1004,6 +1016,7 @@ MainWindow::MainWindow(const QDir &home) :
     rideTreeWidgetSelectionChanged();
     selectAnalysis();
     setStyle();
+} // upgrade from first line of constructor
 }
 
 /*----------------------------------------------------------------------
@@ -1478,6 +1491,9 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
+    // do nothing on upgrade exit
+    if (init == false) return;
+
     if (saveRideExitDialog() == false) event->ignore();
     else {
 
