@@ -44,10 +44,8 @@ login and open a terminal to get a shell prompt
 
 Download MANDATORY DEPENDENCIES (browser)
 -----------------------------------------
-Download Qt-sdk1.1 from http://developer.qt.nokia.com/prereleases, chose Linux 64-bit
-Run the Qt installer (need to chmod +x it first) and install to default location (home)
-Put qmake in path (e.g. sudo cp ~/QtSDK/Desktop/Qt/473/gcc/bin/qmake /usr/local/bin)
-Test qmake is ok with: qmake --version (should report 4.7.0 or higher)
+Download and install the Qt 4.8 SDK from http://qt-project.org/
+Once that is completed test qmake is ok with: qmake --version (should report 4.7.0 or higher)
 
 Install git with:
 $ sudo apt-get install git
