@@ -1023,6 +1023,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
 
     win = GcWindowRegistry::newGcWindow(type, mainWindow);
     chartLayout->addWidget(win);
+    win->setFrameStyle(QFrame::Box);
 
     // lets not have space for controls if there aren't any
     layout->setStretch(0, 100);
