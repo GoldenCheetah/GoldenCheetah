@@ -173,39 +173,9 @@ void ANT::run()
 
     if (openPort() == 0) {
 
-        sendMessage(ANTMessage::resetSystem());
-
-        // specs say wait 500ms after reset before sending any more host commands
-        msleep(500);
-
-        sendMessage(ANTMessage::setNetworkKey(1, key));
-
-        // pair with specified devices on next available channel
-        if (antIDs.count()) {
-
-            foreach(QString antid, antIDs) {
-
-                if (antid.length()) {
-                    unsigned char c = antid.at(antid.length()-1).toLatin1();
-                    int ch_type = interpretSuffix(c);
-                    int device_number = antid.mid(0, antid.length()-1).toInt();
-
-                    addDevice(device_number, ch_type, -1);
-                }
-           }
-
-        } else {
-
-            if (!configuring) {
-                // not configured, just pair with whatever you can find
-                addDevice(0, ANTChannel::CHANNEL_TYPE_SPEED, 0);
-                addDevice(0, ANTChannel::CHANNEL_TYPE_POWER, 1);
-                addDevice(0, ANTChannel::CHANNEL_TYPE_CADENCE, 2);
-                addDevice(0, ANTChannel::CHANNEL_TYPE_HR, 3);
-
-                if (channels > 4) addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
-            }
-        }
+        // Moved early setup code (reset, network key, device pairing) to ANT::setup() so that
+        // the receive loop is already running when these early messages are transmitted. This
+        // will enable us to check responses to these messages in the future.
 
     } else {
         quit(0);
@@ -246,6 +216,50 @@ int
 ANT::start()
 {
     QThread::start();
+    return 0;
+}
+
+int
+ANT::setup()
+{
+    // Give the thread a chance to start.
+    // fixme: better synchronisation?
+    msleep(500);
+
+    sendMessage(ANTMessage::resetSystem());
+
+    // specs say wait 500ms after reset before sending any more host commands
+    msleep(500);
+
+    sendMessage(ANTMessage::setNetworkKey(1, key));
+
+    // pair with specified devices on next available channel
+    if (antIDs.count()) {
+
+        foreach(QString antid, antIDs) {
+
+            if (antid.length()) {
+                unsigned char c = antid.at(antid.length()-1).toLatin1();
+                int ch_type = interpretSuffix(c);
+                int device_number = antid.mid(0, antid.length()-1).toInt();
+
+                addDevice(device_number, ch_type, -1);
+            }
+        }
+
+    } else {
+
+        if (!configuring) {
+            // not configured, just pair with whatever you can find
+            addDevice(0, ANTChannel::CHANNEL_TYPE_SPEED, 0);
+            addDevice(0, ANTChannel::CHANNEL_TYPE_POWER, 1);
+            addDevice(0, ANTChannel::CHANNEL_TYPE_CADENCE, 2);
+            addDevice(0, ANTChannel::CHANNEL_TYPE_HR, 3);
+
+            if (channels > 4) addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
+        }
+    }
+
     return 0;
 }
 

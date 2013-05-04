@@ -44,6 +44,7 @@ int
 ANTlocalController::start()
 {
     myANTlocal->start();
+    myANTlocal->setup();
     return 0;
 }
 

@@ -271,6 +271,7 @@ public slots:
     int quit(int error);                        // called by thread before exiting
 
     // configuration and channel management
+    int setup();                                // reset system, network key and device pairing - moved out of start()
     bool isConfiguring() { return configuring; }
     void setConfigurationMode(bool x) { configuring = x; }
     void setChannel(int channel, int device_number, int channel_type) {
