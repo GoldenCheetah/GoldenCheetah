@@ -310,6 +310,22 @@ ANT::pause()
 int
 ANT::stop()
 {
+	// Close the connections to ANT devices before we stop. Sending the
+	// "close channel" ANT message seems to resolve an intermittent
+	// issue of unresponsive USB2 stick on subsequent opens.
+
+	if (antIDs.count()) {
+	    foreach(QString antid, antIDs) {
+	        if (antid.length()) {
+	            unsigned char c = antid.at(antid.length()-1).toLatin1();
+	            int ch_type = interpretSuffix(c);
+	            int device_number = antid.mid(0, antid.length()-1).toInt();
+
+	            removeDevice(device_number, ch_type);
+	        }
+	    }
+	}
+
     // what state are we in anyway?
     pvars.lock();
     Status = 0; // Terminate it!
