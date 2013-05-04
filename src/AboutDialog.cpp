@@ -334,6 +334,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Jamie Kimberley");
     contributors.append("Jim Ley");
     contributors.append("John Ehrlinger");
+    contributors.append("Jon Escombe");
     contributors.append("Josef Gebel");
     contributors.append("Julian Baumgartner");
     contributors.append("Julian Simioni");
