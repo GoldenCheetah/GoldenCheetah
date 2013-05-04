@@ -174,6 +174,10 @@ void ANT::run()
     if (openPort() == 0) {
 
         sendMessage(ANTMessage::resetSystem());
+
+        // specs say wait 500ms after reset before sending any more host commands
+        msleep(500);
+
         sendMessage(ANTMessage::setNetworkKey(1, key));
 
         // pair with specified devices on next available channel
