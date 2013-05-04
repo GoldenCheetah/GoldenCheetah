@@ -132,7 +132,7 @@ int LibUsb::read(char *buf, int bytes)
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 10);
+    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 125);
     if (rc < 0)
     {
         // don't report timeouts - lots of noise so commented out
