@@ -331,8 +331,6 @@ ANT::stop()
     Status = 0; // Terminate it!
     pvars.unlock();
 
-    // Signal to stop logging
-    emit receivedAntMessage(NULL, NULL);
     return 0;
 }
 
@@ -341,6 +339,11 @@ ANT::quit(int code)
 {
     // event code goes here!
     closePort();
+
+    // Signal to stop logging. Moved to the end of the reading thread to
+    // ensure no more messages can arrive and re-open the log file.
+    emit receivedAntMessage(NULL, NULL);
+
     exit(code);
     return 0;
 }
