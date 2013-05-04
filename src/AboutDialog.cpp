@@ -23,11 +23,6 @@
 #include "MetricAggregator.h"
 #include <QtSql>
 
-#ifndef GC_VERSION
-#define GC_VERSION "(developer build)"
-#endif
-
-
 #define GCC_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
 
 #ifdef GC_HAVE_QWTPLOT3D
@@ -61,14 +56,17 @@ AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWin
     aboutPage = new AboutPage(mainWindow, home);
     versionPage = new VersionPage(mainWindow, home);
     contributorsPage = new ContributorsPage(mainWindow, home);
+#ifndef GC_VERSION
     configPage = new ConfigPage(mainWindow, home);
+#endif
 
     tabWidget = new QTabWidget;
     tabWidget->setContentsMargins(0,0,0,0);
-
     tabWidget->addTab(aboutPage, tr("About"));
     tabWidget->addTab(versionPage, tr("Version"));
+#ifndef GC_VERSION
     tabWidget->addTab(configPage, tr("Config"));
+#endif
     tabWidget->addTab(contributorsPage, tr("Contributors"));
 
     mainLayout = new QVBoxLayout;
@@ -245,7 +243,11 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
             .arg(__DATE__)
             .arg(__TIME__)
             .arg(GcUpgrade::version())
+#ifdef GC_VERSION
             .arg(GC_VERSION)
+#else
+            .arg("(developer build)")
+#endif
             .arg(schemaVersion)
             .arg(os);
 
