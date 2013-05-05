@@ -136,10 +136,10 @@ struct Bin2FileReaderState
         int watts = read_bytes(2, bytes_read, sum);
         int nm = read_bytes(2, bytes_read, sum);
         double kph = read_bytes(2, bytes_read, sum);
-        int alt = read_bytes(2, bytes_read, sum);
-        double temp = read_bytes(2, bytes_read, sum); // °C × 10
-        double lat = read_bytes(4, bytes_read, sum);
-        double lng = read_bytes(4, bytes_read, sum);
+        int alt = read_bytes(2, bytes_read, sum); // todo this value is signed
+        double temp = read_bytes(2, bytes_read, sum); // °C × 10 todo this value is signed
+        double lat = read_bytes(4, bytes_read, sum); // todo this value is signed
+        double lng = read_bytes(4, bytes_read, sum); // todo this value is signed
         double km = read_bytes(8, bytes_read, sum)/1000.0/1000.0;
 
         // Validations
@@ -162,23 +162,29 @@ struct Bin2FileReaderState
         else
             kph = kph/10.0;
 
-        if (temp == 0x8000) //0x8000
+        if (temp == 0x8000) //0x8000 = invalid
             temp = RideFile::noTemp;
         else if (temp > 0x7FFF) // Negative
-            temp = (temp-0xFFFF)/10.0; //199A
+            temp = (temp-0xFFFF)/10.0;
         else
             temp = temp/10.0;
 
         if (alt == 0x8000)
             alt = 0;
+        else if (alt > 0x7FFF) // Negative
+            alt = (alt-0xFFFF);
 
-        if ((long)lat == (long)0x80000000) //2147483648
+        if ((long)lat == (long)0x80000000) //0x80000000 = invalid
             lat = 0;
+        else if (lat > 0x7FFFFFFF) // Negative
+            lat = (lat-0xFFFFFFFF)/10000000.0;
         else
             lat = lat/10000000.0;
 
-        if ((long)lng == (long)0x80000000) //0x80000000
+        if ((long)lng == (long)0x80000000) //0x80000000 = invalid
             lng = 0;
+        else if (lng > 0x7FFFFFFF) // Negative
+            lng = (lng-0xFFFFFFFF)/10000000.0;
         else
             lng = lng/10000000.0;
 
