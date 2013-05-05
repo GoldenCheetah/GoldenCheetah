@@ -55,7 +55,8 @@
 [-+]?[0-9]+\.[-e0-9]*                       return FLOAT;
 \"([^\"]|\\\")*\"                           return STRING;  /* contains non-quotes or escaped-quotes */
 
-"TRIMP(100)_Points"                         return SYMBOL; /* special case for trimp 100 */
+"TRIMP(100)_Points"                         return SYMBOL; /* special case */
+"Left/Right_Balance"                        return SYMBOL; /* special case */
 [a-zA-Z0-9][a-zA-Z0-9_%™]+                  return SYMBOL; /* symbols can start with 0-9 */
 
 [ \n\t\r]                                   ;               /* we just ignore whitespace */
