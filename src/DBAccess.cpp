@@ -62,7 +62,7 @@
 // 43  24  Jan 2012 Mark Liversedge    TRIMP update
 // 44  19  Apr 2013 Mark Liversedge    Aerobic Decoupling precision reduced to 1pt
 
-static int DBSchemaVersion = 43;
+static int DBSchemaVersion = 44;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
