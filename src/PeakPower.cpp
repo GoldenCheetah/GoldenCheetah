@@ -188,6 +188,40 @@ class PeakPower1m : public PeakPower {
         RideMetric *clone() const { return new PeakPower1m(*this); }
 };
 
+class PeakPower2m : public PeakPower {
+    Q_DECLARE_TR_FUNCTIONS(PeakPower2m)
+    public:
+        PeakPower2m()
+        {
+            setSecs(120);
+            setSymbol("2m_critical_power");
+            setInternalName("2 min Peak Power");
+        }
+        void initialize () {
+            setName(tr("2 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
+        }
+        RideMetric *clone() const { return new PeakPower2m(*this); }
+};
+
+class PeakPower3m : public PeakPower {
+    Q_DECLARE_TR_FUNCTIONS(PeakPower3m)
+    public:
+        PeakPower3m()
+        {
+            setSecs(180);
+            setSymbol("3m_critical_power");
+            setInternalName("3 min Peak Power");
+        }
+        void initialize () {
+            setName(tr("3 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
+        }
+        RideMetric *clone() const { return new PeakPower3m(*this); }
+};
+
 class PeakPower5m : public PeakPower {
     Q_DECLARE_TR_FUNCTIONS(PeakPower5m)
     public:
@@ -203,6 +237,23 @@ class PeakPower5m : public PeakPower {
             setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower5m(*this); }
+};
+
+class PeakPower8m : public PeakPower {
+    Q_DECLARE_TR_FUNCTIONS(PeakPower8m)
+    public:
+        PeakPower8m()
+        {
+            setSecs(8*60);
+            setSymbol("8m_critical_power");
+            setInternalName("8 min Peak Power");
+        }
+        void initialize () {
+            setName(tr("8 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
+        }
+        RideMetric *clone() const { return new PeakPower8m(*this); }
 };
 
 class PeakPower10m : public PeakPower {
@@ -254,6 +305,23 @@ class PeakPower30m : public PeakPower {
             setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower30m(*this); }
+};
+
+class PeakPower90m : public PeakPower {
+    Q_DECLARE_TR_FUNCTIONS(PeakPower90m)
+    public:
+        PeakPower90m()
+        {
+            setSecs(90*60);
+            setSymbol("90m_critical_power");
+            setInternalName("90 min Peak Power");
+        }
+        void initialize () {
+            setName(tr("90 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
+        }
+        RideMetric *clone() const { return new PeakPower90m(*this); }
 };
 
 class PeakPowerHr : public RideMetric {
@@ -413,11 +481,15 @@ static bool addAllPeaks() {
     RideMetricFactory::instance().addMetric(PeakPower20s());
     RideMetricFactory::instance().addMetric(PeakPower30s());
     RideMetricFactory::instance().addMetric(PeakPower1m());
+    RideMetricFactory::instance().addMetric(PeakPower2m());
+    RideMetricFactory::instance().addMetric(PeakPower3m());
     RideMetricFactory::instance().addMetric(PeakPower5m());
+    RideMetricFactory::instance().addMetric(PeakPower8m());
     RideMetricFactory::instance().addMetric(PeakPower10m());
     RideMetricFactory::instance().addMetric(PeakPower20m());
     RideMetricFactory::instance().addMetric(PeakPower30m());
     RideMetricFactory::instance().addMetric(CriticalPower());
+    RideMetricFactory::instance().addMetric(PeakPower90m());
     RideMetricFactory::instance().addMetric(PeakPowerHr1m());
     RideMetricFactory::instance().addMetric(PeakPowerHr5m());
     RideMetricFactory::instance().addMetric(PeakPowerHr10m());
