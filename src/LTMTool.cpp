@@ -150,7 +150,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
         adds.symbolStyle = symbolStyle(factory.metricType(i));
         adds.smooth = false;
         adds.trend = false;
-        adds.topN = 5; // show top 5 by default always
+        adds.topN = 1; // show top 1 by default always
         QTextEdit processHTML(adds.metric->name()); // process html encoding of(TM)
         adds.name   = processHTML.toPlainText();
 
