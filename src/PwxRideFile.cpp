@@ -365,18 +365,25 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
         root.appendChild(goal);
     }
 
+    // device type 
+    if (ride->deviceType() != "") { 
 
-    // device type
-    if (ride->deviceType() != "") {
-        QDomElement device = doc.createElement("device");
+        QDomElement device = doc.createElement("device"); 
         device.setAttribute("id", ride->deviceType());
-        QDomElement make = doc.createElement("make");
-        text = doc.createTextNode(ride->deviceType());
-        make.appendChild(text);
-        device.appendChild(make);
-        root.appendChild(device);
-    }
 
+        QDomElement make = doc.createElement("make"); 
+        text = doc.createTextNode("Golden Cheetah"); 
+        make.appendChild(text); 
+        device.appendChild(make);
+
+        QDomElement model = doc.createElement("model"); 
+        text = doc.createTextNode(ride->deviceType());
+        model.appendChild(text); 
+        device.appendChild(model);
+
+        root.appendChild(device); 
+    }
+    
     // time
     QDomElement time = doc.createElement("time");
     text = doc.createTextNode(ride->startTime().toString(Qt::ISODate));
