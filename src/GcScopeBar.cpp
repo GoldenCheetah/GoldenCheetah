@@ -23,6 +23,7 @@
 
 GcScopeBar::GcScopeBar(MainWindow *main, QWidget *traintool) : QWidget(main), mainWindow(main)
 {
+
     setFixedHeight(23);
     setContentsMargins(10,0,10,0);
     layout = new QHBoxLayout(this);
@@ -95,6 +96,24 @@ GcScopeBar::GcScopeBar(MainWindow *main, QWidget *traintool) : QWidget(main), ma
     layout->addStretch();
     layout->addWidget(traintool);
     layout->addStretch();
+
+    // we now need to adjust the buttons according to their text size
+    // this is particularly bad for German's who, as a nation, must
+    // suffer from RSI from typing and writing more than any other nation ;)
+    QFontMetrics fontMetric(font);
+    int width = fontMetric.width(tr("Home"));
+    home->setWidth(width+20);
+
+    width = fontMetric.width(tr("Analysis"));
+    anal->setWidth(width+20);
+
+    width = fontMetric.width(tr("Train"));
+    train->setWidth(width+20);
+
+#ifdef GC_HAVE_ICAL
+    width = fontMetric.width(tr("Diary"));
+    diary->setWidth(width+20);
+#endif
 }
 
 void
