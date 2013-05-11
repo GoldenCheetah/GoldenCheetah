@@ -1431,7 +1431,7 @@ Press Next to Continue
     <message>
         <location filename="../BlankState.cpp" line="131"/>
         <source>Analysis</source>
-        <translation type="unfinished">TE Analyse</translation>
+        <translation type="unfinished">Analyse</translation>
     </message>
     <message>
         <location filename="../BlankState.cpp" line="132"/>
@@ -4181,7 +4181,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <message>
         <location filename="../GcScopeBar.cpp" line="60"/>
         <source>Analysis</source>
-        <translation type="unfinished">TE Analyse</translation>
+        <translation type="unfinished">Analyse</translation>
     </message>
     <message>
         <location filename="../GcScopeBar.cpp" line="66"/>
@@ -7311,7 +7311,7 @@ Skipping file...</source>
     <message>
         <location filename="../MainWindow.cpp" line="947"/>
         <source>Analysis</source>
-        <translation>TE Analyse</translation>
+        <translation>Analyse</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="949"/>
