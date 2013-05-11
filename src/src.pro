@@ -274,6 +274,7 @@ HEADERS += \
         GcBubble.h \
         GcCalendar.h \
         GcCalendarModel.h \
+        GcCrashDialog.h \
         GcPane.h \
         GcRideFile.h \
         GcScopeBar.h \
@@ -464,6 +465,7 @@ SOURCES += \
         FixHRSpikes.cpp \
         GcBubble.cpp \
         GcCalendar.cpp \
+        GcCrashDialog.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
         GcScopeBar.cpp \
