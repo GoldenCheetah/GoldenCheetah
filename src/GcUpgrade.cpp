@@ -53,9 +53,6 @@ GcUpgrade::upgrade(const QDir &home)
             QFile db(QString("%1/metricDBv3").arg(home.canonicalPath()));
             if (db.exists()) db.remove();
         }
-
-        // set to latest so we don't repeat
-        appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
     }
     return 0;
 }

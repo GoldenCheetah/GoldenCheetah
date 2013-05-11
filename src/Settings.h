@@ -22,6 +22,7 @@
 #include <QDebug>
 
 #define GC_VERSION_USED             "versionused"
+#define GC_SAFEEXIT                 "safeexit"
 #define GC_SETTINGS_CO              "goldencheetah.org"
 #define GC_SETTINGS_APP             "GoldenCheetah"
 #define GC_SETTINGS_LAST            "mainwindow/lastOpened"

@@ -130,6 +130,7 @@
 #endif
 
 #include "GcUpgrade.h" // upgrade wizard
+#include "GcCrashDialog.h" // recovering from a crash?
 
 // handy spacer
 class Spacer : public QWidget
@@ -150,6 +151,25 @@ MainWindow::MainWindow(const QDir &home) :
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL), groupByMapper(NULL)
 {
+    // who are you?
+    cyclist = home.dirName();
+    setInstanceName(cyclist);
+
+    //
+    // CRASH PROCESSING
+    //
+
+    // Recovering from a crash?
+    if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
+        GcCrashDialog *crashed = new GcCrashDialog(home);
+        crashed->exec();
+    }
+    appsettings->setCValue(home.dirName(), GC_SAFEEXIT, false); // will be set to true on exit
+
+    //
+    // UPGRADE PROCESSING
+    //
+
     // Before we initialise we need to run the upgrade wizard
     GcUpgrade v3;
     if (v3.upgrade(home) != 0) {
@@ -160,9 +180,9 @@ MainWindow::MainWindow(const QDir &home) :
     // !!! the code below is not indented since it would change the entire
     //     constructor for this small update. Please bear this in mind
 
-    cyclist = home.dirName();
-    setInstanceName(cyclist);
-
+    //
+    // NORMAL PROCESSING (CONSTRUCTOR)
+    //
     #ifdef Q_OS_MAC
     // get an autorelease pool setup
     static CocoaInitializer cocoaInitializer;
@@ -1526,6 +1546,10 @@ MainWindow::closeEvent(QCloseEvent* event)
         appsettings->setCValue(cyclist, GC_BLANK_DIARY, blankStateDiaryPage->dontShow->isChecked());
         appsettings->setCValue(cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
         appsettings->setCValue(cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
+
+        // set to latest so we don't repeat
+        appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
+        appsettings->setCValue(home.dirName(), GC_SAFEEXIT, true);
 
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
