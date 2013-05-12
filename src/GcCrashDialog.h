@@ -30,6 +30,7 @@ class GcCrashDialog : public QDialog
     public:
         GcCrashDialog(QDir);
         QDir home;
+        static QString versionHTML();
 
     public slots:
         void setHTML();
