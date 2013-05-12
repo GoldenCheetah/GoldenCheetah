@@ -18,8 +18,39 @@
 
 #include "GcCrashDialog.h"
 #include "Settings.h"
+#include "GcUpgrade.h"
 #include <QtGui>
 #include <QWebFrame>
+
+#include "DBAccess.h"
+#include "MetricAggregator.h"
+#include <QtSql>
+
+#define GCC_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
+
+#ifdef GC_HAVE_QWTPLOT3D
+#include "qwt3d_global.h"
+#endif
+
+#ifdef GC_HAVE_ICAL
+#include "ICalendar.h"
+#endif
+
+#ifdef GC_HAVE_D2XX
+#include "D2XX.h"
+#endif
+
+#ifdef GC_HAVE_LIBOAUTH
+#include <oauth.h>
+#endif
+
+#ifdef GC_HAVE_LUCENE
+#include "Lucene.h"
+#endif
+
+#ifdef GC_HAVE_WFAPI
+#include "WFApi.h"
+#endif
 
 GcCrashDialog::GcCrashDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
 {
@@ -79,6 +110,178 @@ GcCrashDialog::GcCrashDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
     setHTML();
 }
 
+QString GcCrashDialog::versionHTML()
+{
+    // -- OS ----
+    QString os = "";
+
+    #ifdef Q_OS_LINUX
+    os = "Linux";
+    #endif
+
+    #ifdef WIN32
+    os = "Win";
+    #endif
+
+    #ifdef Q_OS_MAC
+    os = QString("Mac OS X 10.%1").arg(QSysInfo::MacintoshVersion - 2);
+    if (QSysInfo::MacintoshVersion == QSysInfo::MV_SNOWLEOPARD)
+        os += " Snow Leopard";
+    else if (QSysInfo::MacintoshVersion == QSysInfo::MV_LION)
+        os += " Lion";
+    else if (QSysInfo::MacintoshVersion == 10)
+        os += " Mountain Lion";
+
+    #endif
+
+    // -- SCHEMA VERSION ----
+    QString schemaVersion = QString("%1").arg(DBSchemaVersion);
+
+    // -- SRMIO ----
+    QString srmio = "none";
+
+    #ifdef GC_HAVE_SRMIO
+    srmio = "yes";
+    #endif
+
+    // -- D2XX ----
+    QString d2xx = "none";
+
+    #ifdef GC_HAVE_D2XX
+    d2xx = "yes";
+    #endif
+
+    // -- LIBOAUTH ----
+    QString oauth = "none";
+
+    #ifdef GC_HAVE_LIBOAUTH
+    oauth = LIBOAUTH_VERSION;
+    #endif
+
+    // -- QWTPLOT3D ----
+    QString qwtplot3d = "none";
+
+    #ifdef GC_HAVE_QWTPLOT3D
+    qwtplot3d = QString::number(QWT3D_MAJOR_VERSION) + "."
+            + QString::number(QWT3D_MINOR_VERSION) + "."
+            + QString::number(QWT3D_PATCH_VERSION);
+    #endif
+
+    // -- KML ----
+    QString kml = "none";
+
+    #ifdef GC_HAVE_KML
+    kml = "yes";
+    #endif
+
+    // -- ICAL ----
+    QString ical = "none";
+
+    #ifdef GC_HAVE_ICAL
+    ical = ICAL_VERSION;
+    #endif
+
+    // -- USBXPRESS ----
+    QString usbxpress = "none";
+    #ifdef GC_HAVE_USBXPRESS
+    usbxpress = "yes";
+    #endif
+
+    // -- LIBUSB ----
+    QString libusb = "none";
+    #ifdef GC_HAVE_LIBUSB
+    libusb = "yes";
+    #endif
+
+    // -- VLC ----
+    QString vlc = "none";
+    #ifdef GC_HAVE_VLC
+    vlc = "yes";
+    #endif
+
+    // -- LUCENE ----
+    QString clucene = "none";
+    #ifdef GC_HAVE_LUCENE
+    clucene = _CL_VERSION;
+    #endif
+
+    // -- LION SUPPORT ----
+    #ifdef Q_OS_MAC
+    QString lionSupport = "no";
+    #ifdef GC_HAVE_LION
+    lionSupport = "yes";
+    #endif
+    #endif
+
+    #ifdef GC_HAVE_WFAPI
+    QString wfapi = WFApi::getInstance()->apiVersion();
+    #else
+    QString wfapi = QString("none");
+    #endif
+
+    QString gc_version = tr(
+            "<p>Build date: %1 %2"
+            "<br>Build id: %3"
+            "<br>Version: %4"
+            "<br>DB Schema: %5"
+            "<br>OS: %6"
+            "<br>")
+            .arg(__DATE__)
+            .arg(__TIME__)
+            .arg(GcUpgrade::version())
+#ifdef GC_VERSION
+            .arg(GC_VERSION)
+#else
+            .arg("(developer build)")
+#endif
+            .arg(schemaVersion)
+            .arg(os);
+
+    QString lib_version = tr(
+            "<table>"
+            "<tr><td colspan=\"2\">QT</td><td>%1</td></tr>"
+            "<tr><td colspan=\"2\">QWT</td><td>%2</td></tr>"
+            "<tr><td colspan=\"2\">GCC</td><td>%3</td></tr>"
+            "<tr><td colspan=\"2\">SRMIO</td><td>%4</td></tr>"
+            "<tr><td colspan=\"2\">OAUTH</td><td>%5</td></tr>"
+            "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
+            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
+            "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
+            "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
+            "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
+            "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
+            #ifdef Q_OS_MAC
+            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%15</td></tr>"
+            #endif
+            "</table>"
+            )
+            .arg(QT_VERSION_STR)
+            .arg(QWT_VERSION_STR)
+            .arg(GCC_VERSION)
+            .arg(srmio)
+            .arg(oauth)
+            .arg(d2xx)
+            .arg(qwtplot3d)
+            .arg(kml)
+            .arg(ical)
+            .arg(usbxpress)
+            .arg(libusb)
+            .arg(wfapi)
+            .arg(vlc)
+            .arg(clucene)
+            #ifdef Q_OS_MAC
+            .arg(lionSupport)
+            #endif
+            ;
+
+    QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");
+
+    return versionText;
+}
+
 void
 GcCrashDialog::setHTML()
 {
@@ -86,6 +289,10 @@ GcCrashDialog::setHTML()
 
     // the cyclist...
     text += QString("<center><h3>Cyclist: \"%1\"</h3></center><br>").arg(home.dirName());
+
+    // version info
+    text += "<center><h3>Version Info</h3></center>";
+    text += versionHTML();
 
     // metric log...
     text += "<center><h3>Metric Log</h3></center>";
