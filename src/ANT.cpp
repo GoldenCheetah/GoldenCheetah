@@ -344,6 +344,9 @@ ANT::quit(int code)
     // ensure no more messages can arrive and re-open the log file.
     emit receivedAntMessage(NULL, NULL);
 
+    // Give queued messages a chance to be written to the log before thread terminates.
+    msleep(500);
+
     exit(code);
     return 0;
 }
