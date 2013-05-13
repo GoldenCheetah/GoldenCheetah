@@ -111,10 +111,13 @@ class TimeRiding : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *) {
+
         secsMovingOrPedaling = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
-            if ((point->kph > 0.0) || (point->cad > 0.0))
-                secsMovingOrPedaling += ride->recIntSecs();
+        if (ride->areDataPresent()->kph) {
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                if ((point->kph > 0.0) || (point->cad > 0.0))
+                    secsMovingOrPedaling += ride->recIntSecs();
+            }
         }
         setValue(secsMovingOrPedaling);
     }
@@ -153,14 +156,21 @@ class TotalDistance : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *) {
+
         // Note: The 'km' in each sample is the distance travelled by the
         // *end* of the sampling period.  The last term in this equation
         // accounts for the distance traveled *during* the first sample.
-        if (!ride->dataPoints().isEmpty()) {
-            km = ride->dataPoints().back()->km - ride->dataPoints().front()->km
-                + ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
+        if (ride->dataPoints().count() > 1 && ride->areDataPresent()->km) {
+
+            km = ride->dataPoints().back()->km - ride->dataPoints().front()->km;
+
+            if (ride->areDataPresent()->kph)
+                km += ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
+
         } else {
+
             km = 0;
+
         }
         setValue(km);
     }
@@ -287,10 +297,19 @@ class AvgSpeed : public RideMetric {
                  const MainWindow *) {
         assert(deps.contains("total_distance"));
         km = deps.value("total_distance")->value(true);
-        foreach (const RideFilePoint *point, ride->dataPoints())
-            if (point->kph > 0.0) secsMoving += ride->recIntSecs();
 
-        setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+        if (ride->areDataPresent()->kph) {
+
+            secsMoving = 0;
+            foreach (const RideFilePoint *point, ride->dataPoints())
+                if (point->kph > 0.0) secsMoving += ride->recIntSecs();
+
+            setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+
+        } else {
+
+            setValue(0);
+        }
     }
 
     void aggregateWith(const RideMetric &other) {
@@ -655,8 +674,11 @@ class MaxSpeed : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *) {
         double max = 0.0;
-        foreach (const RideFilePoint *point, ride->dataPoints())
-            if (point->kph > max) max = point->kph;
+
+        if (ride->areDataPresent()->kph) {
+            foreach (const RideFilePoint *point, ride->dataPoints())
+                if (point->kph > max) max = point->kph;
+        }
 
         setValue(max);
     }
