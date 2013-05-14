@@ -342,7 +342,7 @@ ANT::quit(int code)
 
     // Signal to stop logging. Moved to the end of the reading thread to
     // ensure no more messages can arrive and re-open the log file.
-    emit receivedAntMessage(NULL, NULL);
+    //!!! close .. emit receivedAntMessage(NULL, NULL);
 
     exit(code);
     return 0;
@@ -711,7 +711,7 @@ ANT::processMessage(void) {
 
     struct timeval timestamp;
     gettimeofday (&timestamp, NULL);
-    emit receivedAntMessage(&m, &timestamp);
+    emit receivedAntMessage(m, timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {
         case ANT_ACK_DATA:

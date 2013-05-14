@@ -1,5 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
+@ifnotinfo
 @input palatino
+@end ifnotinfo
 @c %**start of header
 @setfilename GC3-Manual.texinfo
 @settitle Golden Cheetah User Manual

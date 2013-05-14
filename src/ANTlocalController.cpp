@@ -31,7 +31,7 @@ ANTlocalController::ANTlocalController(TrainTool *parent, DeviceConfiguration *d
     connect(myANTlocal, SIGNAL(searchTimeout(int)), this, SIGNAL(searchTimeout(int)));
 
     // Connect a logger
-    connect(myANTlocal, SIGNAL(receivedAntMessage(const ANTMessage *,const timeval *)), &logger, SLOT(logRawAntMessage(const ANTMessage *,const timeval *)));
+    connect(myANTlocal, SIGNAL(receivedAntMessage(const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const ANTMessage ,const timeval)));
 }
 
 void

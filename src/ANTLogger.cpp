@@ -5,8 +5,9 @@ ANTLogger::ANTLogger(QObject *parent) : QObject(parent)
     isLogging=false;
 }
 
-void ANTLogger::logRawAntMessage(const ANTMessage *message, const struct timeval *timestamp)
+void ANTLogger::logRawAntMessage(const ANTMessage message, const struct timeval timestamp)
 {
+    /* !!!
     if (message==NULL && timestamp==NULL) {
         if (isLogging) {
             // close debug file
@@ -22,11 +23,14 @@ void ANTLogger::logRawAntMessage(const ANTMessage *message, const struct timeval
         isLogging = true;
     }
 
-    QDataStream out(&antlog);
+    */
 
-    for (int i=0; i<ANT_MAX_MESSAGE_SIZE; i++)
-        out<<message->data[i];
+    if (isLogging) {
+        QDataStream out(&antlog);
 
+        for (int i=0; i<ANT_MAX_MESSAGE_SIZE; i++)
+            out<<message.data[i];
+    }
 
 }
 
