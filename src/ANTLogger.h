@@ -14,7 +14,7 @@ public:
 signals:
     
 public slots:
-    void logRawAntMessage(const ANTMessage *message, const struct timeval *timestamp);
+    void logRawAntMessage(const ANTMessage message, const struct timeval timestamp);
 
 private:
     // antlog.bin ant message stream

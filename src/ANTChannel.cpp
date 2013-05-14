@@ -17,7 +17,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "ANTChannel.h"
+#include "ANT.h"
 #include <QDebug>
 
 static float timeout_blanking=2.0;  // time before reporting stale data, seconds
