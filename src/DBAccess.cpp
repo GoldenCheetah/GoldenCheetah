@@ -62,8 +62,9 @@
 // 43  24  Jan 2012 Mark Liversedge    TRIMP update
 // 44  19  Apr 2013 Mark Liversedge    Aerobic Decoupling precision reduced to 1pt
 // 45  09  May 2013 Mark Liversedge    Added 2,3,8 and 90m peak power for fatigue profiling
+// 46  13  May 2013 Mark Liversedge    Handle absence of speed in metric calculations
 
-int DBSchemaVersion = 45;
+int DBSchemaVersion = 46;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
