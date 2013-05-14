@@ -72,6 +72,9 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 //
 ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devConf(devConf)
 {
+    qRegisterMetaType<ANTMessage>("ANTMessage");
+    qRegisterMetaType<struct timeval>("struct timeval");
+
     // device status and settings
     Status=0;
     deviceFilename = devConf ? devConf->portSpec : "";

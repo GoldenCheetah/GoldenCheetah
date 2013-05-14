@@ -67,8 +67,9 @@ ANTlocalController::pause()
 int
 ANTlocalController::stop()
 {
-    return myANTlocal->stop();
+    int rc =  myANTlocal->stop();
     logger.close();
+    return rc;
 }
 
 bool
@@ -104,6 +105,7 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);
+        logger.close();
         return;
     }
     // get latest telemetry
