@@ -43,6 +43,7 @@ ANTlocalController::setDevice(QString device)
 int
 ANTlocalController::start()
 {
+    logger.open();
     myANTlocal->start();
     myANTlocal->setup();
     return 0;
@@ -67,6 +68,7 @@ int
 ANTlocalController::stop()
 {
     return myANTlocal->stop();
+    logger.close();
 }
 
 bool

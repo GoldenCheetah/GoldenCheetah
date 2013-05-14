@@ -342,8 +342,6 @@ ANT::quit(int code)
 
     // Signal to stop logging. Moved to the end of the reading thread to
     // ensure no more messages can arrive and re-open the log file.
-    //!!! close .. emit receivedAntMessage(NULL, NULL);
-
     exit(code);
     return 0;
 }
