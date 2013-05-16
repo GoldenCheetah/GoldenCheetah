@@ -279,7 +279,9 @@ Thats not to say that there aren't many other significant contributions
 too; Ale Martinez has masterminded and developed multi-language support
 in V3. Translations have been undertaken by Ale himself, but also by
 Til Schmiedeberg, Keisuke Yamaguchi, Marco Piccirilli, Sergei
-Chekhovskii and Rafael Oliveira Ribeiro.
+Chekhovskii and Rafael Oliveira Ribeiro. And a huge thanks to Satoru
+Kurashiki who has worked tirelessly to get a Debian (and hence Ubuntu)
+package created for GoldenCheetah since v2.1.
 
 A large number of developers have contributed small and large bits of
 code, and many clever coaches and athletes have donated their ideas and
