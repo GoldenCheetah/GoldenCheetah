@@ -156,6 +156,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Robert Carlsen");
     contributors.append("Roberto Massa");
     contributors.append("Ron Alford");
+    contributors.append("Satoru Kurashiki");
     contributors.append("Sean Rhea");
     contributors.append("Steven Gribble");
     contributors.append("Thomas Weichmann");
