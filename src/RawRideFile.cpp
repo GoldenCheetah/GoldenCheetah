@@ -215,9 +215,19 @@ RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         return NULL;
     }
     FILE *f = fdopen(file.handle(), "r");
-    assert(f);
+
+    // failed to associate a stream!
+    if (f==NULL) {
+        file.close();
+        delete rideFile;
+        return NULL;
+    }
+
     ReadState state(rideFile, errors);
     pt_read_raw(f, &state, config_cb, time_cb, data_cb, error_cb);
+    fclose(f);
+    file.close();
+
     return rideFile;
 }
 
