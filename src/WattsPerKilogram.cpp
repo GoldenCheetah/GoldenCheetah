@@ -24,26 +24,6 @@
 #include <math.h>
 #include <QApplication>
 
-// first use RideFile::startTime, then Measure then fallback to Global Setting
-static double
-getWeight(const MainWindow *main, const RideFile *ride)
-{
-    // ride
-    double weight;
-    if ((weight = ride->getTag("Weight", "0.0").toDouble()) > 0) {
-        return weight;
-    }
-
-    // withings?
-    QList<SummaryMetrics> measures = main->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), ride->startTime());
-    if (measures.count()) {
-        return measures.last().getText("Weight", "0.0").toDouble();
-    }
-
-    // global options
-    return appsettings->cvalue(main->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
-}
-
 class AverageWPK : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(AverageWPK)
 
@@ -65,11 +45,14 @@ class AverageWPK : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *main) {
+                 const MainWindow *) {
+
+        // unconst naughty boy
+        RideFile *uride = const_cast<RideFile*>(ride);
 
         // get thos dependencies
         double secs = deps.value("workout_time")->value(true);
-        double weight = getWeight(main, ride);
+        double weight = uride->getWeight();
         double ap = deps.value("average_power")->value(true);
 
         // calclate watts per kilo
@@ -98,10 +81,13 @@ class PeakWPK : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *main) {
+                 const MainWindow *) {
+
+        // unconst naughty boy
+        RideFile *uride = const_cast<RideFile*>(ride);
 
         if (!ride->dataPoints().isEmpty()) {
-            weight = getWeight(main, ride);
+            weight = uride->getWeight();
             //weight = ride->getTag("Weight", appsettings->cvalue(GC_WEIGHT, "75.0").toString()).toDouble(); // default to 75kg
             QList<BestIntervalDialog::BestInterval> results;
             BestIntervalDialog::findBests(ride, secs, 1, results);

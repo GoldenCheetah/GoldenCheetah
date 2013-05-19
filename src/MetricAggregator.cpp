@@ -165,6 +165,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
             if (ride != NULL) {
 
+                out << "Getting weight: " << name << "\r\n";
+                ride->getWeight();
                 out << "Updating statistics: " << name << "\r\n";
                 importRide(home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
 
