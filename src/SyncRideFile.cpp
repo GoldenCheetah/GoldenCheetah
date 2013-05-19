@@ -231,10 +231,12 @@ struct SyncFileReaderState
         }
 
         if (stop) {
+            file.close();
             delete rideFile;
             return NULL;
-        }
-        else {
+
+        } else {
+            file.close();
             return rideFile;
         }
     }
