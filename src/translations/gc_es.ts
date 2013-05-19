@@ -9272,6 +9272,16 @@ Tiempo empleado: %1
         <translation>Imperial</translation>
     </message>
     <message>
+        <location filename="../NewCyclistDialog.cpp" line="127"/>
+        <source>Save</source>
+        <translation>Guardar</translation>
+    </message>
+    <message>
+        <location filename="../NewCyclistDialog.cpp" line="128"/>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
         <location filename="../NewCyclistDialog.cpp" line="144"/>
         <source>Choose Picture</source>
         <translation>Seleccionar foto</translation>

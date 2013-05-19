@@ -124,8 +124,8 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     all->addStretch();
 
     // dialog buttons
-    save = new QPushButton("Save", this);
-    cancel = new QPushButton("Cancel", this);
+    save = new QPushButton(tr("Save"), this);
+    cancel = new QPushButton(tr("Cancel"), this);
     QHBoxLayout *h = new QHBoxLayout;
     h->addStretch();
     h->addWidget(cancel);
