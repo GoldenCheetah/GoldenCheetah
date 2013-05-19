@@ -102,6 +102,7 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
         ride = RideFileFactory::instance().openRideFile(main, file, errors);
 
         if (ride) {
+            ride->getWeight(); // before threads are created
             refreshCache();
             delete ride;
         }
