@@ -690,5 +690,11 @@ RideFile::getWeight()
 
 
     // global options
-    return weight_ = appsettings->cvalue(mainwindow->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+    weight_ = appsettings->cvalue(mainwindow->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+
+    // if set to zero in global options then override it.
+    // it must not be zero!!!
+    if (weight_ <= 0.00) weight_ = 75.00;
+
+    return weight_;
 }
