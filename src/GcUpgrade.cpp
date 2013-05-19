@@ -52,6 +52,10 @@ GcUpgrade::upgrade(const QDir &home)
             // 3. Remove metricDBv3 - force rebuild including the search index
             QFile db(QString("%1/metricDBv3").arg(home.canonicalPath()));
             if (db.exists()) db.remove();
+
+            // 4. Set default weight to 75kg if currently zero
+            double weight_ = appsettings->cvalue(home.dirName(), GC_WEIGHT, "75.0").toString().toDouble();
+            if (weight_ <= 0.00) appsettings->setCValue(home.dirName(), GC_WEIGHT, "75.0");
         }
     }
     return 0;
