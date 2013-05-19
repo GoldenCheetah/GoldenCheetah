@@ -730,10 +730,12 @@ struct BinFileReaderState
             rideFile->addInterval(last_interval_secs, rideFile->dataPoints().last()->secs, QString("%1").arg(interval));
         }
         if (stop) {
+            file.close();
             delete rideFile;
             return NULL;
         }
         else {
+            file.close();
             foreach(int num, unknown_record_types) {
                 errors << QString("unknow record type %1; ignoring it").arg(num);
             }

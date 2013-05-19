@@ -435,10 +435,12 @@ struct Bin2FileReaderState
         rideFile->setTag("Device Info", deviceInfo);
 
         if (stop) {
+            file.close();
             delete rideFile;
             return NULL;
-        }
-        else {
+
+        } else {
+            file.close();
             return rideFile;
         }
     }

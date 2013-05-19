@@ -33,15 +33,16 @@ StravaParser::StravaParser (RideFile* rideFile, QFile* file)
 void
 StravaParser::parse()
 {
+    QScriptValue sc;
+    QScriptEngine se;
+
     if (!file->open(QIODevice::ReadOnly)) {
         delete rideFile;
         return;
     }
 
-    QScriptValue sc;
-    QScriptEngine se;
-
     QByteArray content = file->readAll();
+    file->close();
 
     sc = se.evaluate("("+content+")");
 

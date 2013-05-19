@@ -629,14 +629,17 @@ struct FitFileReaderState
         }
         catch (TruncatedRead &e) {
             errors << "truncated file body";
+            file.close();
             delete rideFile;
             return NULL;
         }
         if (stop) {
+            file.close();
             delete rideFile;
             return NULL;
         }
         else {
+            file.close();
             int crc = read_uint16( false ); // always littleEndian
             (void) crc;
             foreach(int num, unknown_global_msg_nums)
