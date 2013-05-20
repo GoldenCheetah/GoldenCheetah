@@ -593,6 +593,7 @@ struct FitFileReaderState
         int header_size = read_uint8();
         if (header_size != 12 && header_size != 14) {
             errors << QString("bad header size: %1").arg(header_size);
+            file.close();
             delete rideFile;
             return NULL;
         }
@@ -608,12 +609,14 @@ struct FitFileReaderState
         char fit_str[5];
         if (file.read(fit_str, 4) != 4) {
             errors << "truncated header";
+            file.close();
             delete rideFile;
             return NULL;
         }
         fit_str[4] = '\0';
         if (strcmp(fit_str, ".FIT") != 0) {
             errors << QString("bad header, expected \".FIT\" but got \"%1\"").arg(fit_str);
+            file.close();
             delete rideFile;
             return NULL;
         }
@@ -639,7 +642,6 @@ struct FitFileReaderState
             return NULL;
         }
         else {
-            file.close();
             int crc = read_uint16( false ); // always littleEndian
             (void) crc;
             foreach(int num, unknown_global_msg_nums)
@@ -649,6 +651,7 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
+            file.close();
             return rideFile;
         }
     }
