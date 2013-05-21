@@ -188,18 +188,22 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         }
     }
 
-    // stop logging
-    out << "METRIC REFRESH ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
-    log.close();
-
     // end LUW -- now syncs DB
+    out << "COMMIT: " << QDateTime::currentDateTime().toString() + "\r\n";
     dbaccess->connection().commit();
+
 #ifdef GC_HAVE_LUCENE
+    out << "OPTIMISE: " << QDateTime::currentDateTime().toString() + "\r\n";
     main->lucene->optimise();
 #endif
     main->isclean = true;
 
+    // stop logging
+    out << "SIGNAL DATA CHANGED: " << QDateTime::currentDateTime().toString() + "\r\n";
     dataChanged(); // notify models/views
+
+    out << "METRIC REFRESH ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
+    log.close();
 }
 
 /*----------------------------------------------------------------------
