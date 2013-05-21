@@ -56,6 +56,9 @@ GcUpgrade::upgrade(const QDir &home)
             // 4. Set default weight to 75kg if currently zero
             double weight_ = appsettings->cvalue(home.dirName(), GC_WEIGHT, "75.0").toString().toDouble();
             if (weight_ <= 0.00) appsettings->setCValue(home.dirName(), GC_WEIGHT, "75.0");
+
+            // 5. Set latest version - so only tries to upgrade once
+            appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
         }
     }
     return 0;
