@@ -193,8 +193,10 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     dbaccess->connection().commit();
 
 #ifdef GC_HAVE_LUCENE
+#ifndef WIN32 // windows crashes here....
     out << "OPTIMISE: " << QDateTime::currentDateTime().toString() + "\r\n";
     main->lucene->optimise();
+#endif
 #endif
     main->isclean = true;
 
