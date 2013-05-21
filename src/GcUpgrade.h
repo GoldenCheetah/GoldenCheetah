@@ -26,8 +26,8 @@
 // 3001 - V3 RC1
 // 3002 - V3 RC2
 // 3003 - V3 RC3
-// 3004 - V3 RC4
-// 300n - V3 RCn
+// 3004 - V3 RC4 / 4X
+// 3005 - V3 RC5
 // 3010 - V3.0 Full Release
 // 3011 - V3.0 SP1
 // 301n - V3.0 SPn
@@ -35,8 +35,8 @@
 // 310n - V3.1 RCn
 //
 
-#define VERSION_LATEST 3004
-#define VERSION_STRING "V3.0 RC4"
+#define VERSION_LATEST 3005
+#define VERSION_STRING "V3.0 RC5"
 
 class GcUpgrade
 {
