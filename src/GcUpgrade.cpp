@@ -57,7 +57,28 @@ GcUpgrade::upgrade(const QDir &home)
             double weight_ = appsettings->cvalue(home.dirName(), GC_WEIGHT, "75.0").toString().toDouble();
             if (weight_ <= 0.00) appsettings->setCValue(home.dirName(), GC_WEIGHT, "75.0");
 
-            // 5. Set latest version - so only tries to upgrade once
+            // 5. startup with common sidebars shown (less ugly)
+            appsettings->setCValue(home.dirName(), "splitter/LTM/hide", true);
+            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/0", false);
+            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/1", false);
+            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/2", false);
+            appsettings->setCValue(home.dirName(), "splitter/LTM/hide/3", true);
+            appsettings->setCValue(home.dirName(), "splitter/analysis/hide", true);
+            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/0", false);
+            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/1", true);
+            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/2", false);
+            appsettings->setCValue(home.dirName(), "splitter/analysis/hide/3", true);
+            appsettings->setCValue(home.dirName(), "splitter/diary/hide", true);
+            appsettings->setCValue(home.dirName(), "splitter/diary/hide/0", false);
+            appsettings->setCValue(home.dirName(), "splitter/diary/hide/1", false);
+            appsettings->setCValue(home.dirName(), "splitter/diary/hide/2", true);
+            appsettings->setCValue(home.dirName(), "splitter/train/hide", true);
+            appsettings->setCValue(home.dirName(), "splitter/train/hide/0", false);
+            appsettings->setCValue(home.dirName(), "splitter/train/hide/1", false);
+            appsettings->setCValue(home.dirName(), "splitter/train/hide/2", false);
+            appsettings->setCValue(home.dirName(), "splitter/train/hide/3", false);
+
+            // FINALLY -- Set latest version - so only tries to upgrade once
             appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
         }
     }
