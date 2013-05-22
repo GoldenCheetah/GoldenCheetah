@@ -64,18 +64,15 @@
 // 45  09  May 2013 Mark Liversedge    Added 2,3,8 and 90m peak power for fatigue profiling
 // 46  13  May 2013 Mark Liversedge    Handle absence of speed in metric calculations
 // 47  17  May 2013 Mark Liversedge    Reimplementation of w/kg and ride->getWeight()
+// 48  22  May 2013 Mark Liversedge    Removing local measures.xml, till v3.1
 
-int DBSchemaVersion = 47;
+int DBSchemaVersion = 48;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
-	initDatabase(home);
-
     // check we have one and use built in if not there
-    QString filename = main->home.absolutePath()+"/measures.xml";
-    if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, mkeywordDefinitions, mfieldDefinitions, mcolorfield);
-
+    RideMetadata::readXML(":/xml/measures.xml", mkeywordDefinitions, mfieldDefinitions, mcolorfield);
+	initDatabase(home);
 }
 
 void DBAccess::closeConnection()
@@ -241,25 +238,15 @@ bool DBAccess::createMeasuresTable()
     // we need to create it!
     if (rc && createTables) {
 
-        // read definitions from measures.xml
-        QList<FieldDefinition> fieldDefinitions;
-        QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
-        QString colorfield;
-
-        // check we have one and use built in if not there
-        QString filename = main->home.absolutePath()+"/measures.xml";
-        if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
-
         QString createMeasuresTable = "create table measures (timestamp integer primary key,"
                                       "measure_date date";
 
         // And all the metadata texts
-        foreach(FieldDefinition field, fieldDefinitions)
+        foreach(FieldDefinition field, mfieldDefinitions)
             if (field.type < 3 || field.type == 7) createMeasuresTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
 
         // And all the metadata measures
-        foreach(FieldDefinition field, fieldDefinitions)
+        foreach(FieldDefinition field, mfieldDefinitions)
             if (field.type == 3 || field.type == 4)
                 createMeasuresTable += QString(", Z%1 double").arg(main->specialFields.makeTechName(field.name));
 
@@ -269,8 +256,8 @@ bool DBAccess::createMeasuresTable()
         //if (!rc) qDebug()<<"create table failed!"  << query.lastError();
 
         // add row to version database
-        QString measuresXML =  QString(home.absolutePath()) + "/measures.xml";
-        int measurescrcnow = computeFileCRC(measuresXML);
+        //QString measuresXML =  QString(home.absolutePath()) + "/measures.xml";
+        int measurescrcnow = 0; //computeFileCRC(measuresXML); //no crc since we don't allow definition
         QDateTime timestamp = QDateTime::currentDateTime();
 
         // wipe current version row
@@ -315,8 +302,8 @@ void DBAccess::checkDBVersion()
     int metadatacrcnow = computeFileCRC(metadataXML);
 
     // get a CRC for measures.xml
-    QString measuresXML =  QString(home.absolutePath()) + "/measures.xml";
-    int measurescrcnow = computeFileCRC(measuresXML);
+    //QString measuresXML =  QString(home.absolutePath()) + "/measures.xml";
+    int measurescrcnow = 0; //computeFileCRC(measuresXML);// we don't allow user to edit
 
     // can we get a version number?
     QSqlQuery query("SELECT table_name, schema_version, creation_date, metadata_crc from version;", dbconn);
@@ -719,15 +706,6 @@ bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
 
 QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end)
 {
-    QList<FieldDefinition> fieldDefinitions;
-    QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
-    QString colorfield;
-
-    // check we have one and use built in if not there
-    QString filename = main->home.absolutePath()+"/measures.xml";
-    if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
-
     QList<SummaryMetrics> measures;
 
     // null date range fetches all, but not currently used by application code
@@ -737,7 +715,7 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
 
     // construct the select statement
     QString selectStatement = "SELECT timestamp, measure_date";
-    foreach(FieldDefinition field, fieldDefinitions) {
+    foreach(FieldDefinition field, mfieldDefinitions) {
         if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
@@ -758,7 +736,7 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
         add.setDateTime(query.value(1).toDateTime());
         // the values
         int i=2;
-        foreach(FieldDefinition field, fieldDefinitions) {
+        foreach(FieldDefinition field, mfieldDefinitions) {
             if (field.type == 3 || field.type == 4) {
                 add.setText(field.name, query.value(i).toString());
                 i++;

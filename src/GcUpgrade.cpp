@@ -78,6 +78,10 @@ GcUpgrade::upgrade(const QDir &home)
             appsettings->setCValue(home.dirName(), "splitter/train/hide/2", false);
             appsettings->setCValue(home.dirName(), "splitter/train/hide/3", false);
 
+            // 6. Delete any old measures.xml -- its for withings only
+            QFile msxml(QString("%1/measures.xml").arg(home.canonicalPath()));
+            if (msxml.exists()) msxml.remove();
+
             // FINALLY -- Set latest version - so only tries to upgrade once
             appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
         }
