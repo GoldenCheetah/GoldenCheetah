@@ -20,23 +20,17 @@
 #define Gc_GcUpgrade_h
 #include "GoldenCheetah.h"
 
-// Version management was introduced in V3.0 RC3
-// We expect number series to be along the lines of;
+// Build ID History
 //
 // 3001 - V3 RC1
 // 3002 - V3 RC2
 // 3003 - V3 RC3
 // 3004 - V3 RC4 / 4X
 // 3005 - V3 RC5 / 5X
-// 3010 - V3.0 Full Release
-// 3011 - V3.0 SP1
-// 301n - V3.0 SPn
-// 3101 - V3.1 RC1
-// 310n - V3.1 RCn
-//
+// 3006 - V3 RC6
 
-#define VERSION_LATEST 3005
-#define VERSION_STRING "V3.0 RC5X"
+#define VERSION_LATEST 3006
+#define VERSION_STRING "V3.0 RC6"
 
 class GcUpgrade
 {
