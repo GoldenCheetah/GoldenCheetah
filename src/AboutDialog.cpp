@@ -150,6 +150,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Mark Rages");
     contributors.append("Mitsukuni Sato");
     contributors.append("Ned Harding");
+    contributors.append("Okano Takayoshi");
     contributors.append("Patrick McNerthney");
     contributors.append("Rainer Clasen");
     contributors.append("Robb Romans");
