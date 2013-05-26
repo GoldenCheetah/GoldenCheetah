@@ -161,6 +161,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Sean Rhea");
     contributors.append("Steven Gribble");
     contributors.append("Thomas Weichmann");
+    contributors.append("Tilman Schmiedeberg");
     contributors.append("Walter B&#252;rki");
 
     QString contributorsTable = "<center><table><tr>";
