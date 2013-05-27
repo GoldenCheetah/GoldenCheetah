@@ -204,6 +204,7 @@ HrPwPlot::recalc()
 
     // Find Hr Delay
     if (delay == -1) delay = hrPwWindow->findDelay(clipWatts, clipHr, clipWatts.size());
+    else if (delay>rideTimeSecs) delay=rideTimeSecs;
 
     // Apply delay
     QVector<double> delayWatts(rideTimeSecs-delay);
