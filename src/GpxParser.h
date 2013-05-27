@@ -57,6 +57,7 @@ private:
     double      alt;
     double      lat;
     double      lon;
+    int         hr;
 
     // set to false after the first time element is seen (not in metadata)
     bool firstTime;

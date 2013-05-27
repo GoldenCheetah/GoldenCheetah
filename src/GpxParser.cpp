@@ -43,6 +43,7 @@ GpxParser::GpxParser (RideFile* rideFile)
     alt =0;
     lon = 0;
     lat = 0;
+    hr = 0;
     firstTime = true;
     metadata = false;
 
@@ -119,6 +120,10 @@ bool
     {
         alt = buffer.toDouble();  // metric
     }
+    else if (qName == "gpxtpx:hr")
+    {
+        hr = buffer.toInt();  // metric
+    }
 
     else if (qName == "trkpt")
     {
@@ -172,7 +177,7 @@ bool
 
 	if(rideFile->dataPoints().empty()) {
 	    // first point
-            rideFile->appendPoint(secs, 0, 0, distance, speed, 0, 0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
+            rideFile->appendPoint(secs, 0, hr, distance, speed, 0, 0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
 	}
 	else {
 	    // assumption that the change in ride is linear...  :)
@@ -191,7 +196,7 @@ bool
                 (secs == 0)) {
 
                 // no smart recording, or delta exceeds HW treshold, or no time elements; just insert the data
-                rideFile->appendPoint(secs, 0, 0, distance, speed, 0,0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
+                rideFile->appendPoint(secs, 0, hr, distance, speed, 0,0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
 
 	    } else {
 
@@ -206,7 +211,7 @@ bool
 		    rideFile->appendPoint(
 			    prevPoint->secs + (deltaSecs * weight),
 			    0,
-			    0,
+			    hr,
 			    prevPoint->km + (deltaDist * weight),
 			    kph,
 			    0,
