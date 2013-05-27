@@ -66,3 +66,7 @@ lgulseth...pwx
 2013-04-11-17-32-50.fit
    A FIT file with a massive gap in recording at the end.
 
+2013_05_27_08_56_35.json
+   A very short ride (12 seconds) to test array processing and general
+   bounds checking in the GC codebase.
+
