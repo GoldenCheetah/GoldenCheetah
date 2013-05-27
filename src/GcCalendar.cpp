@@ -131,10 +131,6 @@ GcCalendar::setRide(RideItem *ride)
 {
     _ride = ride;
 
-    QDate when;
-    if (_ride && _ride->ride()) when = _ride->dateTime.date();
-    else when = QDate::currentDate();
-
     multiCalendar->setRide(ride);
     setSummary();
 }
@@ -829,6 +825,7 @@ GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(mai
 
     GcMiniCalendar *mini = new GcMiniCalendar(main, true);
     calendars.append(mini);
+    mini->setDate(QDate::currentDate().month(), QDate::currentDate().year()); // default to this month
     layout->addWidget(mini);
 
     // only 1 months are visible right now
