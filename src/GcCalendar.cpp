@@ -1013,7 +1013,7 @@ GcMultiCalendar::refresh()
 void
 GcMultiCalendar::showEvent(QShowEvent*)
 {
+    setRide(_ride);
     setFilter(filters);
     resizeEvent(NULL);
-    setRide(_ride);
 }
