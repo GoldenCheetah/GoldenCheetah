@@ -323,26 +323,29 @@ HrPwWindow::findDelay(QVector<double> &wattsArray, QVector<double> &hrArray, int
     int delay = 0;
     double maxr = 0;
 
-    for (int a = 10; a <=60; ++a) {
+    if (rideTimeSecs>= 60) {
 
-        QVector<double> delayHr(rideTimeSecs);
+        for (int a = 10; a <=60; ++a) {
 
-        for (int j = a; j<rideTimeSecs; ++j) {
-            delayHr[j-a] = hrArray[j];
+            QVector<double> delayHr(rideTimeSecs);
+
+            for (int j = a; j<rideTimeSecs; ++j) {
+                delayHr[j-a] = hrArray[j];
+            }
+            for (int j = rideTimeSecs-a; j<rideTimeSecs; ++j) {
+                delayHr[j] = 0.0;
+            }
+
+            double r = corr(wattsArray, delayHr, rideTimeSecs-a);
+            //fprintf(stderr, "findDelay %d: %.2f \n", a, r);
+
+            if (r>maxr) {
+                maxr = r;
+                delay = a;
+            }
         }
-        for (int j = rideTimeSecs-a; j<rideTimeSecs; ++j) {
-            delayHr[j] = 0.0;
-        }
+    } 
 
-        double r = corr(wattsArray, delayHr, rideTimeSecs-a);
-        //fprintf(stderr, "findDelay %d: %.2f \n", a, r);
-
-
-        if (r>maxr) {
-            maxr = r;
-            delay = a;
-        }
-    }
     delayEdit->setText(QString("%1").arg(delay));
     rDelayEdit->setText(QString("%1").arg(delay));
     delaySlider->setValue(delay);
