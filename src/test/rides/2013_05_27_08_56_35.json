@@ -1,0 +1,39 @@
+{
+	"RIDE":{
+		"STARTTIME":"2013\/05\/27 07:56:35 UTC",
+		"RECINTSECS":1,
+		"DEVICETYPE":"PowerTap",
+		"IDENTIFIER":"",
+		"TAGS":{
+			"Athlete":"Mark Liversedge",
+			"Calendar Text":"An incredibly short ride to test bugs in array offset processing in GC\nTest Bugs in GC\n",
+			"Change History":"Changes on Mon May 27 08:57:42 2013:\n",
+			"Data":"TDSPHC------",
+			"Device":"PowerTap",
+			"Device Info":"Generated in train mode",
+			"File Format":"PowerTap CSV (csv)",
+			"Filename":"2013_05_27_08_56_35.csv",
+			"Month":"May",
+			"Notes":"An incredibly short ride to test bugs in array offset processing in GC",
+			"Objective":"Test Bugs in GC",
+			"Sport":"Bike",
+			"Weekday":"Mon",
+			"Workout Code":"Short",
+			"Year":"2013"
+		},
+		"SAMPLES":[
+			{ "SECS":1.003, "KM":0.00427778, "WATTS":95, "CAD":84, "KPH":27, "HR":143 },
+			{ "SECS":2.003, "KM":0.0112778, "WATTS":65, "CAD":84, "KPH":25, "HR":144 },
+			{ "SECS":3.003, "KM":0.0181111, "WATTS":59, "CAD":82, "KPH":25, "HR":143 },
+			{ "SECS":4.003, "KM":0.0250556, "WATTS":77, "CAD":82, "KPH":27, "HR":144 },
+			{ "SECS":5.003, "KM":0.0321111, "WATTS":55, "CAD":81, "KPH":23, "HR":145 },
+			{ "SECS":6.003, "KM":0.0386667, "WATTS":57, "CAD":84, "KPH":27, "HR":145 },
+			{ "SECS":7.00302, "KM":0.0458889, "WATTS":57, "CAD":81, "KPH":26, "HR":144 },
+			{ "SECS":8.00298, "KM":0.0529444, "WATTS":77, "CAD":87, "KPH":27, "HR":143 },
+			{ "SECS":9.003, "KM":0.06, "WATTS":55, "CAD":81, "KPH":26, "HR":144 },
+			{ "SECS":10.003, "KM":0.0671667, "WATTS":70, "CAD":82, "KPH":23, "HR":145 },
+			{ "SECS":11.003, "KM":0.0741667, "WATTS":72, "CAD":88, "KPH":23, "HR":143 },
+			{ "SECS":12.003, "KM":0.0809444, "WATTS":79, "CAD":86, "KPH":25, "HR":144 }
+		]
+	}
+}
