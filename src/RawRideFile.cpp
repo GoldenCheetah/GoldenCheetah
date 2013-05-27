@@ -225,9 +225,11 @@ RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
     ReadState state(rideFile, errors);
     pt_read_raw(f, &state, config_cb, time_cb, data_cb, error_cb);
-    fclose(f);
     file.close();
-
+    // fclose can handle the file being closed already, QFile crashes on Windows
+    // we need to do both because fclose needs to release its stream buffers and
+    // fclose maintains local state that causes a crash when out of sync on Windows
+    fclose(f);
     return rideFile;
 }
 
