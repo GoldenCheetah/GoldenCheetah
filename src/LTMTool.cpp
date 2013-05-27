@@ -178,7 +178,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaLTS.symbolStyle = QwtSymbol::NoSymbol;
     skibaLTS.smooth = false;
     skibaLTS.trend = false;
-    skibaLTS.topN = 5;
+    skibaLTS.topN = 1;
     skibaLTS.uname = skibaLTS.name = tr("Skiba Long Term Stress");
     skibaLTS.units = "Stress";
     skibaLTS.uunits = tr("Stress");
@@ -193,7 +193,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaSTS.symbolStyle = QwtSymbol::NoSymbol;
     skibaSTS.smooth = false;
     skibaSTS.trend = false;
-    skibaSTS.topN = 5;
+    skibaSTS.topN = 1;
     skibaSTS.uname = skibaSTS.name = tr("Skiba Short Term Stress");
     skibaSTS.units = "Stress";
     skibaSTS.uunits = tr("Stress");
@@ -254,7 +254,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsLTS.symbolStyle = QwtSymbol::NoSymbol;
     danielsLTS.smooth = false;
     danielsLTS.trend = false;
-    danielsLTS.topN = 5;
+    danielsLTS.topN = 1;
     danielsLTS.uname = danielsLTS.name = tr("Daniels Long Term Stress");
     danielsLTS.units = "Stress";
     danielsLTS.uunits = tr("Stress");
@@ -269,7 +269,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsSTS.symbolStyle = QwtSymbol::NoSymbol;
     danielsSTS.smooth = false;
     danielsSTS.trend = false;
-    danielsSTS.topN = 5;
+    danielsSTS.topN = 1;
     danielsSTS.uname = danielsSTS.name = tr("Daniels Short Term Stress");
     danielsSTS.units = "Stress";
     danielsSTS.uunits = tr("Stress");
@@ -330,7 +330,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     workLTS.symbolStyle = QwtSymbol::NoSymbol;
     workLTS.smooth = false;
     workLTS.trend = false;
-    workLTS.topN = 5;
+    workLTS.topN = 1;
     workLTS.uname = workLTS.name = tr("Work (Kj) Long Term Stress");
     workLTS.units = "Stress (Kj)";
     workLTS.uunits = tr("Stress (Kj)");
@@ -345,7 +345,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     workSTS.symbolStyle = QwtSymbol::NoSymbol;
     workSTS.smooth = false;
     workSTS.trend = false;
-    workSTS.topN = 5;
+    workSTS.topN = 1;
     workSTS.uname = workSTS.name = tr("Work (Kj) Short Term Stress");
     workSTS.units = "Stress (Kj)";
     workSTS.uunits = tr("Stress (Kj)");
@@ -406,7 +406,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     distanceLTS.symbolStyle = QwtSymbol::NoSymbol;
     distanceLTS.smooth = false;
     distanceLTS.trend = false;
-    distanceLTS.topN = 5;
+    distanceLTS.topN = 1;
     distanceLTS.uname = distanceLTS.name = tr("Distance (km|mi) Long Term Stress");
     distanceLTS.units = "Stress (km|mi)";
     distanceLTS.uunits = tr("Stress (km|mi)");
@@ -421,7 +421,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     distanceSTS.symbolStyle = QwtSymbol::NoSymbol;
     distanceSTS.smooth = false;
     distanceSTS.trend = false;
-    distanceSTS.topN = 5;
+    distanceSTS.topN = 1;
     distanceSTS.uname = distanceSTS.name = tr("Distance (km|mi) Short Term Stress");
     distanceSTS.units = "Stress (km|mi)";
     distanceSTS.uunits = tr("Stress (km|mi)");
@@ -482,7 +482,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganCTL.symbolStyle = QwtSymbol::NoSymbol;
     cogganCTL.smooth = false;
     cogganCTL.trend = false;
-    cogganCTL.topN = 5;
+    cogganCTL.topN = 1;
     cogganCTL.uname = cogganCTL.name = tr("Coggan Chronic Training Load");
     cogganCTL.units = "CTL";
     cogganCTL.uunits = "CTL";
@@ -497,7 +497,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganATL.symbolStyle = QwtSymbol::NoSymbol;
     cogganATL.smooth = false;
     cogganATL.trend = false;
-    cogganATL.topN = 5;
+    cogganATL.topN = 1;
     cogganATL.uname = cogganATL.name = tr("Coggan Acute Training Load");
     cogganATL.units = "ATL";
     cogganATL.uunits = "ATL";
@@ -558,7 +558,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     trimpLTS.symbolStyle = QwtSymbol::NoSymbol;
     trimpLTS.smooth = false;
     trimpLTS.trend = false;
-    trimpLTS.topN = 5;
+    trimpLTS.topN = 1;
     trimpLTS.uname = trimpLTS.name = tr("TRIMP Long Term Stress");
     trimpLTS.uunits = tr("Stress");
     metrics.append(trimpLTS);
@@ -572,7 +572,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     trimpSTS.symbolStyle = QwtSymbol::NoSymbol;
     trimpSTS.smooth = false;
     trimpSTS.trend = false;
-    trimpSTS.topN = 5;
+    trimpSTS.topN = 1;
     trimpSTS.uname = trimpSTS.name = tr("TRIMP Short Term Stress");
     trimpSTS.units = "Stress";
     trimpSTS.uunits = tr("Stress");
@@ -637,7 +637,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             metametric.symbolStyle = QwtSymbol::NoSymbol;
             metametric.smooth = false;
             metametric.trend = false;
-            metametric.topN = 5;
+            metametric.topN = 1;
             metametric.uname = metametric.name = sp.displayName(field.name);
             metametric.units = "";
             metametric.uunits = "";
@@ -665,7 +665,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             measure.symbolStyle = QwtSymbol::NoSymbol;
             measure.smooth = false;
             measure.trend = false;
-            measure.topN = 5;
+            measure.topN = 1;
             measure.uname = "";
             measure.name = QString("%1 (m)").arg(sp.displayName(field.name));
             measure.units = "";

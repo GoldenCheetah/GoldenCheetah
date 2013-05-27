@@ -330,8 +330,8 @@ GcCrashDialog::setHTML()
     foreach(QString key, appsettings->allKeys()) {
 
         // RESPECT PRIVACY
-        // we do not disclose user names and passwords
-        if (key.endsWith("/user") || key.endsWith("/pass")) continue;
+        // we do not disclose user names and passwords or key ids
+        if (key.endsWith("/user") || key.endsWith("/pass") || key.endsWith("/key")) continue;
 
         // we do not disclose personally identifiable information
         if (key.endsWith("/dob") || key.endsWith("/weight") ||
