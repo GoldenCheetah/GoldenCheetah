@@ -631,6 +631,16 @@ a particular date. There are no rules about what constitutes and event. It could
 race, a training camp or just a day that was particularly meaningful e.g. illness, crash.
 
 
+@section How do create/edit/delete seasons and events?
+@cindex event
+@cindex season
+
+Seasons and Events are created and edited in the sidebar for the Home view. Seasons are
+listed under date ranges, whilst events are listed under the events sidebar item. In
+both cases they can be created and deleted from the sidebar item's drop down menu.
+
+Please note that in v3.0 events can only be created when a user season is selected, since
+events are associated with a particular season. This constraint will be removed in v3.1.
 
 @node CHARTS,INDEX,SEASONS AND EVENTS,Top
 @chapter CHARTS

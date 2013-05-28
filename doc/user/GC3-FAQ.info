@@ -552,7 +552,7 @@ the top right hand corner there will be a box containing the user id
 and public key. These are the two values you need to enter into the
 options dialog.
 
-You will now be able to retrieve withings data from the tools menu.
+You will now be able to retrieve withings data via the tools menu.
 
 
 File: GC3-FAQ.info,  Node: SEASONS AND EVENTS,  Next: CHARTS,  Prev: UPLOADING AND DOWNLOADING,  Up: Top
@@ -576,6 +576,18 @@ It is only used to annotate a LTM chart - so you can show an 'event'
 that happened at a particular date. There are no rules about what
 constitutes and event. It could be a race, a training camp or just a
 day that was particularly meaningful e.g. illness, crash.
+
+6.3 How do create/edit/delete seasons and events?
+=================================================
+
+Seasons and Events are created and edited in the sidebar for the Home
+view. Seasons are listed under date ranges, whilst events are listed
+under the events sidebar item. In both cases they can be created and
+deleted from the sidebar item's drop down menu.
+
+Please note that in v3.0 events can only be created when a user season
+is selected, since events are associated with a particular season. This
+constraint will be removed in v3.1.
 
 
 File: GC3-FAQ.info,  Node: CHARTS,  Next: INDEX,  Prev: SEASONS AND EVENTS,  Up: Top
@@ -803,8 +815,8 @@ Node: GENERAL6062
 Node: METRICS9684
 Node: DATA16676
 Node: UPLOADING AND DOWNLOADING20606
-Node: SEASONS AND EVENTS23091
-Node: CHARTS23950
-Node: INDEX28751
+Node: SEASONS AND EVENTS23090
+Node: CHARTS24487
+Node: INDEX29288
 
 End Tag Table
