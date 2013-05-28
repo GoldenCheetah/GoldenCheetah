@@ -203,6 +203,7 @@ class AllPlotWindow : public GcChartWindow
 
         bool active;
         bool stale;
+        bool setupStack; // we optimise this out, its costly
 
     private slots:
 
