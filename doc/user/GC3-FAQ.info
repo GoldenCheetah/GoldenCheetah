@@ -538,6 +538,22 @@ caldav url:
 Where xxxx is your username. The username will need to be repeated in
 the username field and obviously set the password too.
 
+5.5 When setting up my Withings wifi scales where do I get the userid and key ?
+===============================================================================
+
+You will need to login to your Withings account
+(`http://my.withings.com') and click on the `share' button at the top
+of the dashboard. From there you will get a popup box with lots of
+options.
+
+If you click on `share on my website' you will be greeted with a number
+of code snippets you can embed in a web page. If you look closely in
+the top right hand corner there will be a box containing the user id
+and public key. These are the two values you need to enter into the
+options dialog.
+
+You will now be able to retrieve withings data from the tools menu.
+
 
 File: GC3-FAQ.info,  Node: SEASONS AND EVENTS,  Next: CHARTS,  Prev: UPLOADING AND DOWNLOADING,  Up: Top
 
@@ -773,6 +789,8 @@ Index
                                                               (line  81)
 * weight:                                MOST COMMON QUESTIONS OF ALL.
                                                               (line  36)
+* Withings:                              UPLOADING AND DOWNLOADING.
+                                                              (line  46)
 * xPower:                                METRICS.             (line   9)
 * zoom:                                  CHARTS.              (line  97)
 
@@ -785,8 +803,8 @@ Node: GENERAL6062
 Node: METRICS9684
 Node: DATA16676
 Node: UPLOADING AND DOWNLOADING20606
-Node: SEASONS AND EVENTS22371
-Node: CHARTS23230
-Node: INDEX28031
+Node: SEASONS AND EVENTS23091
+Node: CHARTS23950
+Node: INDEX28751
 
 End Tag Table

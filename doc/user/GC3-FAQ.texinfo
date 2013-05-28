@@ -592,6 +592,19 @@ Where xxxx is your username. The username will need to be repeated in the userna
 field and obviously set the password too.
 
 
+@section When setting up my Withings wifi scales where do I get the userid and key ?
+@cindex Withings
+
+You will need to login to your Withings account (@url{http://my.withings.com}) and
+click on the `share' button at the top of the dashboard. From there you will get a
+popup box with lots of options.
+
+If you click on `share on my website' you will be greeted with a number of code
+snippets you can embed in a web page. If you look closely in the top right hand
+corner there will be a box containing the user id and public key. These are the
+two values you need to enter into the options dialog.
+
+You will now be able to retrieve withings data via the tools menu.
 
 @node SEASONS AND EVENTS,CHARTS,UPLOADING AND DOWNLOADING,Top
 @chapter SEASONS AND EVENTS
