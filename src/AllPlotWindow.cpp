@@ -49,7 +49,7 @@
 #include "LTMWindow.h"
 
 AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
-    GcChartWindow(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true)
+    GcChartWindow(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true), setupStack(false)
 {
     setInstanceName("Ride Plot Window");
 
@@ -588,6 +588,7 @@ AllPlotWindow::rideSelected()
     // ignore if not active
     if (!amVisible()) {
         stale = true;
+        setupStack = false;
         return;
     }
 
@@ -634,6 +635,10 @@ AllPlotWindow::rideSelected()
     // and only redraw if neccessary
     redrawFullPlot();
     redrawAllPlot();
+
+    // we need to reset the stacks as the ride has changed
+    // but it may ignore if not in stacked mode.
+    setupStack = false;
     setupStackPlots();
 
     stale = false;
@@ -1493,6 +1498,10 @@ AllPlotWindow::showStackChanged(int value)
     // to make sure all the controls are setup
     // and the right widgets are hidden/shown.
     if (value) {
+
+        // setup the stack plots if needed
+        setupStackPlots();
+
         // refresh plots
         resetStackedDatas();
 
@@ -1518,6 +1527,11 @@ AllPlotWindow::setupStackPlots()
     // with a new one. This is to avoid some
     // nasty flickers and simplifies the code
     // for refreshing.
+    if (!showStack->isChecked() || setupStack) return;
+
+    // since we cache out above we need to
+    // track and manage via below
+    setupStack = true;
 
     // ************************************
     // EDIT WITH CAUTION -- THIS HAS BEEN
