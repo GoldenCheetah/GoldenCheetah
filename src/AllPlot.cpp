@@ -390,7 +390,7 @@ AllPlot::configChanged()
     ihlPen.setWidth(width);
     intervalHighlighterCurve->setPen(ihlPen);
     QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
-    ihlbrush.setAlpha(64);
+    ihlbrush.setAlpha(128);
     intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
     QPen gridPen(GColor(CPLOTGRID));
