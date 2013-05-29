@@ -33,14 +33,6 @@
 #include <QDir>
 #include <QtGui>
 
-// tree widget types
-#define ROOT_TYPE   1
-#define DATE_TYPE   2
-#define METRIC_TYPE 3
-
-#define SYS_DATE    1
-#define USER_DATE   2
-
 class QWebView;
 class LTMSidebar : public QWidget
 {
