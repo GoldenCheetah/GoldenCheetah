@@ -79,7 +79,7 @@
 #define FORMAT_ID__UNKNOW_43 43
 #define FORMAT_ID__UNKNOW_44 44
 #define FORMAT_ID__UNKNOW_45 45
-#define FORMAT_ID__UNKNOW_46 46
+#define FORMAT_ID__POWER_PEDAL_BALANCE 46
 #define FORMAT_ID__UNKNOW_47 47
 
 static int binFileReaderRegistered =
@@ -185,7 +185,7 @@ struct BinFileReaderState
             global_format_identifiers.insert(FORMAT_ID__UNKNOW_43,  "Unknow 43");
             global_format_identifiers.insert(FORMAT_ID__UNKNOW_44,  "Unknow 44");
             global_format_identifiers.insert(FORMAT_ID__UNKNOW_45,  "Unknow 45");
-            global_format_identifiers.insert(FORMAT_ID__UNKNOW_46,  "Unknow 46");
+            global_format_identifiers.insert(FORMAT_ID__POWER_PEDAL_BALANCE,  "Power Pedal Balance");
             global_format_identifiers.insert(FORMAT_ID__UNKNOW_47,  "Unknow 47");
 
         }
@@ -406,6 +406,7 @@ struct BinFileReaderState
         double secs = 0, alt = 0, cad = 0, km = 0, grade = 0, hr = 0;
         double nm = 0, kph = 0, watts = 0;
         double temperature = RideFile::noTemp;
+        double lrbalance = 0.0;
 
         foreach(const BinField &field, def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
@@ -426,7 +427,8 @@ struct BinFileReaderState
                             watts = value;
                         break;
                     case FORMAT_ID__TORQUE :
-                        nm = value;
+                        if (value < 4095) // no value
+                            nm = value;
                         break;
                     case FORMAT_ID__SPEED :
                         kph = value*3.6/100.0;
@@ -455,12 +457,22 @@ struct BinFileReaderState
                             alt = value/10.0;
                         break;
                     case FORMAT_ID__UNKNOW_44 :
+                        //qDebug() << "44 : " << value;
                         break;
                     case FORMAT_ID__UNKNOW_45 :
+                        //qDebug() << "45 : " << value;
                         break;
-                    case FORMAT_ID__UNKNOW_46 :
+                    case FORMAT_ID__POWER_PEDAL_BALANCE :
+                        if (value < 0xff) {  // no value
+                            int pedalIndex = (0x40 & value);
+                            value = (0x3f & value);
+                            if (pedalIndex == 0x40)
+                                value = 100-value;
+                            lrbalance = value;
+                        }
                         break;
                     case FORMAT_ID__UNKNOW_47 :
+                        //qDebug() << "47 : " << value;
                         break;
                     default:
                         unexpected_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
@@ -469,7 +481,7 @@ struct BinFileReaderState
         }
 
         double headwind = 0.0;
-        double lrbalance = 0.0;
+
 
         int interval = 0;
         int lng = 0;
