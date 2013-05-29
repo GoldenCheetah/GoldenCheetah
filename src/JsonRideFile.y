@@ -108,6 +108,7 @@ static QString unprotect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
+%token REFERENCES
 %token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE
 
 %start document
@@ -135,6 +136,7 @@ rideelement: starttime
             | overrides
             | tags
             | intervals
+            | references
             | samples
             ;
 
@@ -191,6 +193,19 @@ interval: '{' NAME ':' string ','       { JsonInterval.name = JsonString; }
                                                                 JsonInterval.name);
                                           JsonInterval = RideFileInterval();
                                         }
+
+/*
+ * Ride references
+ */
+references: REFERENCES ':' '[' reference_list ']'
+                                        {
+                                          JsonPoint = RideFilePoint();
+                                        }
+reference_list: reference | reference_list ',' reference;
+reference: '{' series '}'               { //JsonRide->appendReference(JsonPoint);
+                                          //JsonPoint = RideFilePoint();
+                                        }
+
 /*
  * Ride datapoints
  */
