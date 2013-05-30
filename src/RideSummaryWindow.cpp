@@ -186,7 +186,7 @@ RideSummaryWindow::htmlSummary() const
     RideFile *ride;
 
     if (!rideItem && !ridesummary) return ""; // nothing selected!
-    else ride = rideItem->ride();
+    else ride = rideItem ? rideItem->ride() : NULL;
 
     if (!ride && !ridesummary) return ""; // didn't parse!
 
@@ -381,7 +381,7 @@ RideSummaryWindow::htmlSummary() const
     //
     // Time In Zones
     //
-    if (rideItem->numZones() > 0) {
+    if (rideItem && rideItem->numZones() > 0) {
         QVector<double> time_in_zone(rideItem->numZones());
         for (int i = 0; i < rideItem->numZones(); ++i) {
 
@@ -396,7 +396,7 @@ RideSummaryWindow::htmlSummary() const
     //
     // Time In Zones HR
     //
-    if (rideItem->numHrZones() > 0) {
+    if (rideItem && rideItem->numHrZones() > 0) {
         QVector<double> time_in_zone(rideItem->numHrZones());
         for (int i = 0; i < rideItem->numHrZones(); ++i) {
 

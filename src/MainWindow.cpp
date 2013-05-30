@@ -1249,13 +1249,13 @@ MainWindow::rideTreeWidgetSelectionChanged()
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride
+    gcCalendar->setRide(ride);
+    gcMultiCalendar->setRide(ride);
     _rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    gcCalendar->setRide(ride);
-    gcMultiCalendar->setRide(ride);
 
     if (!ride) return;
 
@@ -1990,6 +1990,8 @@ MainWindow::removeCurrentRide()
     if (allRides->childCount() == 0) {
         ride = NULL;
         rideTreeWidgetSelectionChanged(); // notifies children
+        gcCalendar->setRide(ride); // and the pesky calendars
+        gcMultiCalendar->setRide(ride);
     }
 
     treeWidget->setCurrentItem(itemToSelect);

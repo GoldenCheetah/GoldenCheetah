@@ -951,6 +951,13 @@ GcMultiCalendar::setRide(RideItem *ride)
     if (active) return;
     if (!isVisible()) {
         stale = true;
+
+        // notify of ride gone though as not repeated
+        if (!_ride) {
+            for (int i=0; i<showing; i++) {
+                calendars.at(i)->setRide(_ride); // current ride is on this one
+            }
+        }
         return;
     }
 
