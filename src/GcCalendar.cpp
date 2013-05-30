@@ -121,9 +121,11 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 void
 GcCalendar::refresh()
 {
-    multiCalendar->refresh();
-    setSummary();
-    repaint();
+    if (!isHidden()) {
+        multiCalendar->refresh();
+        setSummary();
+        repaint();
+    }
 }
 
 void
