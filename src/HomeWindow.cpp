@@ -239,7 +239,8 @@ HomeWindow::titleChanged()
 void
 HomeWindow::rideSelected()
 {
-    if (amVisible()) {
+    // we need to notify of null rides immediately
+    if (!myRideItem || amVisible()) {
         for (int i=0; i < charts.count(); i++) {
 
             // show if its not a tab
