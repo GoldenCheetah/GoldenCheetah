@@ -51,6 +51,7 @@
 \"NAME\"            return NAME;
 \"START\"           return START;
 \"STOP\"            return STOP;
+\"REFERENCES\"      return REFERENCES;
 \"SAMPLES\"         return SAMPLES;
 \"SECS\"            return SECS;
 \"KM\"              return KM;
