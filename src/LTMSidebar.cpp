@@ -496,11 +496,17 @@ LTMSidebar::deleteRange()
 void
 LTMSidebar::addEvent()
 {
-    if (dateRangeTree->selectedItems().count() == 0) return; // need a season selected!
+    if (dateRangeTree->selectedItems().count() == 0) {
+        QMessageBox::warning(this, tr("Add Event"), tr("You can only add events to user defined seasons. Please select a season you have created before adding an event."));
+        return; // need a season selected!
+    }
 
     int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
 
-    if (seasons->seasons[seasonindex].getType() == Season::temporary) return; // must be a user season
+    if (seasons->seasons[seasonindex].getType() == Season::temporary) {
+        QMessageBox::warning(this, tr("Add Event"), tr("You can only add events to user defined seasons. Please select a season you have created before adding an event."));
+        return; // must be a user season
+    }
 
     SeasonEvent myevent("", QDate());
     EditSeasonEventDialog dialog(main, &myevent);
