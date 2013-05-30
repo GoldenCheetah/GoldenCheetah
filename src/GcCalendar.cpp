@@ -648,7 +648,8 @@ GcMiniCalendar::previous()
 
     // begin of month
     QDateTime bom(QDate(year,month,01), QTime(0,0,0));
-    for(int i=allDates.count()-1; i>0; i--) {
+
+    for(int i=allDates.count()-1; i>=0; i--) {
         if (allDates.at(i) < bom) {
 
             QDate date = allDates.at(i).date();
