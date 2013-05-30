@@ -1818,7 +1818,7 @@ FindDialog::dataChanged()
 
         // value
         t = new QTableWidgetItem;
-        t->setText(QString("%1").arg(rideEditor->ride->ride()->getPointValue(row,series)));
+        t->setData(Qt::DisplayRole, QVariant(rideEditor->ride->ride()->getPointValue(row,series)));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         resultsTable->setItem(counter, 2, t);
 
