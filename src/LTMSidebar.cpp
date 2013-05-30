@@ -52,7 +52,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     connect(moreSeasonAct, SIGNAL(triggered(void)), this, SLOT(dateRangePopup(void)));
 
     dateRangeTree = new SeasonTreeView;
-    //allDateRanges = new QTreeWidgetItem(dateRangeTree, ROOT_TYPE);
     allDateRanges=dateRangeTree->invisibleRootItem();
     // Drop for Seasons
     allDateRanges->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
@@ -78,7 +77,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
     eventTree = new QTreeWidget;
     eventTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    //allEvents = new QTreeWidgetItem(eventTree, ROOT_TYPE);
     allEvents = eventTree->invisibleRootItem();
     allEvents->setText(0, tr("Events"));
     eventTree->setFrameStyle(QFrame::NoFrame);
@@ -231,7 +229,7 @@ LTMSidebar::newSeason(QString name, QDate start, QDate end, int type)
 {
     seasons->newSeason(name, start, end, type);
 
-    QTreeWidgetItem *item = new QTreeWidgetItem(USER_DATE);
+    QTreeWidgetItem *item = new QTreeWidgetItem(Season::season);
     item->setText(0, name);
     allDateRanges->insertChild(0, item);
     return 0; // always add at the top
@@ -248,7 +246,7 @@ void
 LTMSidebar::dateRangePopup(QPoint pos)
 {
     QTreeWidgetItem *item = dateRangeTree->itemAt(pos);
-    if (item != NULL && item->type() != ROOT_TYPE && item->type() != SYS_DATE) {
+    if (item != NULL) {
 
         // out of bounds or not user defined
         int index = allDateRanges->indexOfChild(item);
@@ -307,7 +305,7 @@ LTMSidebar::dateRangePopup()
     menu.addAction(add);
     connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
 
-    if (item != NULL && item->type() != ROOT_TYPE && allDateRanges->indexOfChild(item) != -1) {
+    if (item != NULL && allDateRanges->indexOfChild(item) != -1) {
         QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
         QAction *del = new QAction(tr("Delete season"), dateRangeTree);
         QAction *event = new QAction(tr("Add Event"), dateRangeTree);
@@ -341,7 +339,7 @@ LTMSidebar::eventPopup(QPoint pos)
 
     // OK - we are working with a specific event..
     QMenu menu(eventTree);
-    if (item != NULL && item->type() != ROOT_TYPE && allEvents->indexOfChild(item) != -1) {
+    if (item != NULL && allEvents->indexOfChild(item) != -1) {
 
         QAction *edit = new QAction(tr("Edit details"), eventTree);
         QAction *del = new QAction(tr("Delete event"), eventTree);
@@ -383,7 +381,7 @@ LTMSidebar::eventPopup()
     menu.addAction(addEvent);
     connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
 
-    if (item != NULL && item->type() != ROOT_TYPE && allEvents->indexOfChild(item) != -1) {
+    if (item != NULL && allEvents->indexOfChild(item) != -1) {
 
         QAction *edit = new QAction(tr("Edit details"), eventTree);
         QAction *del = new QAction(tr("Delete event"), eventTree);
