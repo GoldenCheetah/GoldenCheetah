@@ -135,7 +135,7 @@ JouleDevice::download( const QDir &tmpdir,
     }
 
     bool isJouleGPS = getJouleGPS(versionResponse);
-    emit updateStatus(QString(tr("Joule %1 indentified")).arg(isJouleGPS?"GPS":"1.0"));
+    emit updateStatus(QString(tr("Joule %1 identified")).arg(isJouleGPS?"GPS":"1.0"));
 
     QList<DeviceStoredRideItem> trainings;
     if (!getDownloadableRides(trainings, isJouleGPS, err))
@@ -384,7 +384,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
                 rides.append(ride);
             }
         }
-        emit updateStatus(QString(tr("%1 detailled rides")).arg(rides.count()));
+        emit updateStatus(QString(tr("%1 detailed rides")).arg(rides.count()));
         return true;
     }
     return false;
@@ -605,7 +605,7 @@ JoulePacket::read(CommPortPtr dev, QString &err)
         err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
         return false;
     } else if (n < length) {
-        err += QString(tr(", read only %1 bytes insteed of: %2"))
+        err += QString(tr(", read only %1 bytes instead of: %2"))
             .arg(n).arg(length);
         return false;
     }

@@ -6152,7 +6152,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../JouleDevice.cpp" line="48"/>
         <source>Make sure the Joule (1.0 or GPS) unit is turned ON
 </source>
-        <translation>Bitte den Jouls (1.0 oder GPS) einschalten</translation>
+        <translation type="unfinished">Bitte den Joule (1.0 oder GPS) einschalten</translation>
     </message>
 </context>
 <context>
