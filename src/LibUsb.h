@@ -39,6 +39,7 @@ extern "C" {
 
 #define GARMIN_USB2_VID   0x0fcf
 #define GARMIN_USB2_PID   0x1008
+#define GARMIN_OEM_PID    0x1009
 
 #define FORTIUS_VID       0x3561
 #define FORTIUS_INIT_PID  0xe6be    // uninitialised Fortius PID
