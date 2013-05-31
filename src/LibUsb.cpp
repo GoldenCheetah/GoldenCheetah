@@ -357,7 +357,8 @@ bool LibUsb::findAntStick()
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID) {
+            if (dev->descriptor.idVendor == GARMIN_USB2_VID && 
+                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
                 found = true;
             }
         }
@@ -377,7 +378,8 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID) {
+            if (dev->descriptor.idVendor == GARMIN_USB2_VID &&
+                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
 
                 if ((udev = usb_open(dev))) {
                     usb_reset(udev);
@@ -392,7 +394,8 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID) {
+            if (dev->descriptor.idVendor == GARMIN_USB2_VID && 
+                (dev->descriptor.idProduct == GARMIN_USB2_PID || dev->descriptor.idProduct == GARMIN_OEM_PID)) {
 
                 //Avoid noisy output
                 //qDebug() << "Found a Garmin USB2 ANT+ stick";
