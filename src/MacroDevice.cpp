@@ -396,7 +396,7 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
         err = (n < 0) ? (tr("read error: ") + err) : tr("read timeout");
         return false;
     } else if (n < len) {
-        err += QString(tr(", read only %1 bytes insteed of: %2"))
+        err += QString(tr(", read only %1 bytes instead of: %2"))
             .arg(n).arg(len);
         return false;
     }
