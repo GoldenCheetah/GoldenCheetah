@@ -28,9 +28,10 @@
 // 3004 - V3 RC4 / 4X
 // 3005 - V3 RC5 / 5X
 // 3006 - V3 RC6
+// 3007 - V3 RC7
 
-#define VERSION_LATEST 3006
-#define VERSION_STRING "V3.0 RC6"
+#define VERSION_LATEST 3007
+#define VERSION_STRING "V3.0 RC7"
 
 class GcUpgrade
 {
