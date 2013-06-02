@@ -124,6 +124,7 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     wheelSizeCombo->addItem("Tri/TT (650C)"); // 1960mm
     wheelSizeCombo->addItem("Mountain (26\")"); // 1985mm
     wheelSizeCombo->addItem("BMX (20\")"); // 1750mm
+    wheelSizeCombo->addItem("Kurt Kinetic roller (2.125\")"); // 170mm
 
     switch (wheelSize) {
     default:
@@ -131,6 +132,7 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     case 1960 : wheelSizeCombo->setCurrentIndex(1); break;
     case 1985 : wheelSizeCombo->setCurrentIndex(2); break;
     case 1750 : wheelSizeCombo->setCurrentIndex(3); break;
+    case 170 : wheelSizeCombo->setCurrentIndex(4); break;
     }
 
     configLayout->addWidget(wheelSizeLabel, 2,0, Qt::AlignRight);
@@ -230,7 +232,7 @@ GeneralPage::saveClicked()
 
     // save wheel size
     static const int wheelSizes[] = {
-        2100, 1960, 1985, 1750
+        2100, 1960, 1985, 1750, 170
     };
 
     appsettings->setValue(GC_WHEELSIZE, wheelSizes[wheelSizeCombo->currentIndex()]);
