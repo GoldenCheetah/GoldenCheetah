@@ -372,7 +372,7 @@ ScatterPlot::showTime(ScatterSettings *settings, int offset, int secs)
     }
 
     // offset into data points...
-    if (settings->ride->ride()) {
+    if (settings && settings->ride && settings->ride->ride()) {
         int startidx = settings->ride->ride()->timeIndex(begin);
         int stopidx = settings->ride->ride()->timeIndex(offset);
 

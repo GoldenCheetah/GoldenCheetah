@@ -32,6 +32,9 @@ class ScatterDataColor;
 class ScatterSettings
 {
     public:
+        ScatterSettings() : ride(NULL), x(0), y(0), crop(false), ignore(false), frame(false),
+                             gridlines(false), secStart(0), secEnd(0) {}
+
         RideItem *ride;   // ride to use
         int x,y;  // which channels to use
         bool crop,        // crop to non-zero z values
