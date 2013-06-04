@@ -648,10 +648,14 @@ HomeWindow::resetLayout()
     }
     restoreState(true);
     for(int i = 0; i < charts.count(); i++) {
-        charts[i]->show();
+        RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
+        charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        DateRange dr = mainWindow->currentDateRange();
+        charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+        
     }
     setUpdatesEnabled(true);
-    update();
+    if (currentStyle == 0 && charts.count()) tabSelected(0);
 }
 
 void
