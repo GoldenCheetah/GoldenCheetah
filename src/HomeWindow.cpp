@@ -652,6 +652,7 @@ HomeWindow::resetLayout()
         charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
         DateRange dr = mainWindow->currentDateRange();
         charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+        if (currentStyle != 0) charts[i]->show();
         
     }
     setUpdatesEnabled(true);
