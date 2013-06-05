@@ -352,7 +352,7 @@ MainWindow::MainWindow(const QDir &home) :
     head->addWidget(viewsel);
 
 #ifdef GC_HAVE_LUCENE
-    SearchFilterBox *searchBox = new SearchFilterBox(this,this);
+    SearchFilterBox *searchBox = new SearchFilterBox(this,this,false);
     QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(300);
@@ -537,7 +537,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef GC_HAVE_LUCENE
     // add a search box on far right, but with a little space too
-    SearchFilterBox *searchBox = new SearchFilterBox(this,this);
+    SearchFilterBox *searchBox = new SearchFilterBox(this,this,false);
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(250);
     head->addWidget(searchBox);

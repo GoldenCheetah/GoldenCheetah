@@ -60,7 +60,7 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
 
 #ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
-        searchFilterBox = new SearchFilterBox(this, main);
+        searchFilterBox = new SearchFilterBox(this, main, false);
         mainLayout->addWidget(searchFilterBox);
     }
 #endif
