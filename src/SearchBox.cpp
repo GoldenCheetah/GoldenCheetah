@@ -28,8 +28,8 @@
 #include <QMenu>
 #include <QDebug>
 
-SearchBox::SearchBox(MainWindow *main, QWidget *parent, bool nomenu)
-    : QLineEdit(parent), main(main), filtered(false), nomenu(nomenu)
+SearchBox::SearchBox(MainWindow *main, QWidget *parent, bool nochooser)
+    : QLineEdit(parent), main(main), filtered(false), nochooser(nochooser)
 {
     setFixedHeight(21);
     //clear button
@@ -186,18 +186,16 @@ void SearchBox::checkMenu()
 void SearchBox::setMenu()
 {
     dropMenu->clear();
-    if (!nomenu) {
-        if (text() != "") dropMenu->addAction(tr("Add to Favourites"));
-        if (main->namedSearches->getList().count()) {
-            if (text() != "") dropMenu->addSeparator();
-            foreach(NamedSearch x, main->namedSearches->getList()) {
-                dropMenu->addAction(x.name);
-            }
-            dropMenu->addSeparator();
-            dropMenu->addAction(tr("Manage Favourites"));
+    if (text() != "") dropMenu->addAction(tr("Add to Favourites"));
+    if (main->namedSearches->getList().count()) {
+        if (text() != "") dropMenu->addSeparator();
+        foreach(NamedSearch x, main->namedSearches->getList()) {
+            dropMenu->addAction(x.name);
         }
+        dropMenu->addSeparator();
+        dropMenu->addAction(tr("Manage Favourites"));
     }
-    dropMenu->addAction(tr("Column Chooser"));
+    if (!nochooser) dropMenu->addAction(tr("Column Chooser"));
 }
 
 void SearchBox::runMenu(QAction *x)

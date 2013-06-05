@@ -22,7 +22,7 @@
 #include "DataFilter.h"
 #include "SearchBox.h"
 
-SearchFilterBox::SearchFilterBox(QWidget *parent, MainWindow *main) : QWidget(parent), main(main)
+SearchFilterBox::SearchFilterBox(QWidget *parent, MainWindow *main, bool nochooser) : QWidget(parent), main(main)
 {
 
     setContentsMargins(0,0,0,0);
@@ -30,7 +30,8 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, MainWindow *main) : QWidget(pa
     contents->setSpacing(0);
     contents->setContentsMargins(0,0,0,0);
 
-    searchbox = new SearchBox(main, this);
+    // no column chooser if my parent widget is a modal widget
+    searchbox = new SearchBox(main, this, nochooser);
     contents->addWidget(searchbox);
 
     lucene = new Lucene(this, main);

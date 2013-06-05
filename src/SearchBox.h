@@ -37,7 +37,7 @@ public:
     enum searchboxmode { Search, Filter };
     typedef enum searchboxmode SearchBoxMode;
 
-    SearchBox(MainWindow *main, QWidget *parent = 0, bool nomenu=false);
+    SearchBox(MainWindow *main, QWidget *parent = 0, bool nochooser=true);
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
@@ -80,7 +80,7 @@ signals:
 private:
     MainWindow *main;
     bool filtered;
-    bool nomenu;
+    bool nochooser;
     QToolButton *clearButton, *searchButton, *toolButton;
     QMenu *dropMenu;
     SearchBoxMode mode;
