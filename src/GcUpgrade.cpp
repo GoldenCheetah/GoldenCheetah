@@ -26,12 +26,15 @@ GcUpgrade::upgrade(const QDir &home)
 { 
     // what was the last version? -- do we need to upgrade?
     int last = appsettings->cvalue(home.dirName(), GC_VERSION_USED, 0).toInt();
-    if (!last || last < VERSION_LATEST) {
+
+    // Upgrade processing was introduced in Version 3 -- below must be performed
+    // for athlete directories from prior to Version 3
+    if (!last || last < VERSION3_BUILD) {
 
         // For now we always do the same thing
         // when we have some maturity with versions we may
         // choose to do different things
-        if (last < VERSION_LATEST) {
+        if (last < VERSION3_BUILD) {
 
             // 1. Delete old files
             QStringList oldfiles;
@@ -86,6 +89,10 @@ GcUpgrade::upgrade(const QDir &home)
             appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
         }
     }
+
+    // Versions after 3 should add their upgrade processing at this point
+    // DO NOT CHANGE THE VERSION 3 UPGRADE PROCESS ABOVE, ADD TO IT BELOW
+
     return 0;
 }
 
