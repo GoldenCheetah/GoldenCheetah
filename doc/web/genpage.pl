@@ -54,6 +54,7 @@ body {
 <img src="logo.jpg" width="175" height="175" alt="Picture of Cheetah">
 
 <p>  <b><a href="index.html">Introduction</a></b>
+<br> <b><a href="download.html">Download</a></b>
 <br> <b><a href="screenshots.html">Screenshots</a>
 <br> <b><a href="wiki.html">Wiki</a>
 <br> <b><a href="users-guide.html">User's Guide</a>
@@ -61,7 +62,6 @@ body {
 <br> <b><a href="faq.html">FAQ</a>
 <br> <b><a href="wishlist.html">Wish List</a>
 <br> <b><a href="license.html">License</a></b>
-<br> <b><a href="download.html">Download</a></b>
 <br> <b><a href="contrib.html">Contributors</a></b>
 <br> <b><a href="search.html">Search</a></b>
 <br> <b><a href="mailing-list.html">Mailing List</a></b>
