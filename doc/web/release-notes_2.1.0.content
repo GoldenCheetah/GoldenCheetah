@@ -1,0 +1,252 @@
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>GoldenCheetah 2.1</strong></big>
+</font>
+</p>
+
+<p>
+New Features and Enhancements
+  <ul>
+  <li>FIT file support for Mac OSX - Rainer Clasen</li>
+  <li>SRM 5 - Rainer Clasen</li>
+  <li>Aerolab Improvements - Damien Grauser</li>
+  <li>O-Sync Macro X device support - Damien Grauser</li>
+  <li>Air density (RHO) Calculator - Steven Gribble</li>
+  <li>Virtual Power - Darren Hague</li>
+  <li>GoldenCheetah JSON - Mark Liversedge</li>
+  <li>Support TrainerRoad.com TCX Files - Mark Liversedge</li>
+  <li>Garmin GPX - Greg Lonnon</li>
+  <li>Sigma SLF/SMF - Frank Zschockelt</li>
+  </ul>
+</p>
+
+<p>
+Internationalisation
+  <ul>
+  <li>Czech (David Kramar)</li>
+  <li>French (Damien Grauser, Guillaume LeMaitre)</li>
+  <li>German (Alexander Pietsch)</li>
+  <li>Italian (Robert Masso)</li>
+  <li>Portugese (Thomas Irps)</li>
+  <li>Portugese-Brazil (Bruno Assis)</li>
+  <li>Japanese (Mitsukuni Sato, Keisuke Yamaguchi)</li>
+  <li>Spanish (Alejandro Martinez)</li>
+  </ul>
+</p>
+
+<p>
+Development Builds
+  <ul>
+  <li>Gareth Coco</li>
+  <li>Jamie Kimberley</li>
+  </ul>
+</p>
+
+<p>
+Full Change Log
+<pre>
+Alejandro Martinez (7):
+      Add Spanish Translation and Enable Metrics Translation
+      Add Spanish Translation & Fix Translation Issues
+      Set UTF-8 in charts,metadata and seasons xml files
+      Add HrZones to Weekly Summary and Fix Spanish Translation
+      Update Spanish Translation
+      Enable 3d Plot Translation and include spanish translation
+      Rho Estimator Translation
+
+Bruno Assis (1):
+      Portugese (Brazil) Translation
+
+Damien (22):
+      Modify csv import for ergomo file with comma or semicolon separator
+      Remove error logs for unused datas in ride file
+      handle showHr/Speed/Cad/Alt state for stacked view
+      Add summary metrics list to preferences
+      Correct crash with truncated files
+      Add PeakPowerHr metric (average HR during peak power)
+      Altitude scale present with no altitude data.
+      Bug #178 TRIMP is not updated after modification in Rest Hr Tag -> compute metric after save
+      Add a setFocus on the Treelist to correct a MacOs Bug of Qt
+      Modification to handle odd start page and compatible with qt 4.6
+      Correct interval
+      Modify TRIMP formula to use time_riding instead of workout time
+      Modify Aerolab to add interval highlight and zoom + auto offset
+      Aerolab : Change LCD display to LineEdit
+      Correct bug in the peakPowerHr formula
+      Correct encoding in json parser
+      Correct bug #496 for longitude < -65
+      Remove Joule warnings
+      Update french translation for rho estimator
+      Change speed to double in Bin parser
+      Correct intialisation of altitude for TCX without altitude
+      Correct intialisation of altitude for TCX without altitude
+
+Damien Grauser (2):
+      Update French translation.
+      O_Sync Macro X device support
+
+Darren Hague (5):
+      Virtual Power; Better GSC-10 pairing support.
+      Corrected - to + in CycleOps formula
+      Use realtime clock for realtime-mode clock
+      Add virtual power support for BT-ATS trainer
+      Remove toMSecsSinceEpoch() and work around
+
+David (1):
+      Updated Czech translations
+
+Eric Brandt (1):
+      fix realtime mode load timer and lcd sig. digit display issues
+
+Frank Zschockelt (2):
+      Support for Sigma SLF/SMF file formats
+      Included 4 sample sigma files in the test/rides directory
+
+Gareth Coco (25):
+      Changes to map markers
+      FIT file reader fixes
+      Set default Smoothing (secs) in Ride Plot to one (1) second
+      Change start date from UTC to localtime for bin ride file
+      Make interval period on map user defineable
+      Reorder liboauth includes
+      Comment out QwtDesigner build in qwtconfig.pri.in
+      Changed kph to km/h in displays
+      Changed KPH to km/h in displays
+      Update translation .qm files
+      Update gc_fr.qm for updated French translation
+      Fixes for RealtimeController
+      Initialise LAT/LON to zero (0.0) in the parser
+      Updated Spanish Translation
+      Add a Portuguese translation
+      Add a TCX ride exporter
+      Fix interpolation of lat/lon when missing or 0/0
+      Allow CdA to lowest possible in AerolabWindow.cpp
+      Update translation files
+      Ordered build - qwt then src
+      Fixes for Manual Ride Entry
+      Comment added and replace tabs with spaces
+      v2.1dev - Allow ride to be added with no Average HR
+      Update documentation
+      Added v2.0.0 information.
+
+Greg Lonnon (3):
+      GPX RideFile Support
+      changes to the markers in google maps.
+      Added a QFilesystemWatcher to monitor adding files to the workout directory.
+
+Ilja Booij (1):
+      fix 'Wrong distance on Tacx caf file import'
+
+Jamie Kimberley (6):
+      Update download page to reflect build of mac 10.4
+      force use of no elide and scrollbars in main tab
+      Update user guide steps 1 and 2
+      clean up wishlist web page
+      Add other TRIMP metrics to performance manager.
+      update French Translation
+
+Justin Knotzke (2):
+      Cycleops Test Ride
+      Update of German translation by LukeNRG
+
+Keisuke Yamaguchi (1):
+      Update Japanese translation files
+
+LukeNRG (4):
+      German Translation
+      Updated German Translation
+      Updated German Translations
+      German Translations
+
+Mark Liversedge (59):
+      Updated www.goldencheetah.org for v2.0 release.
+      Joule support fixed on download page.
+      Add link to wiki from the website.
+      Mac PPC binary added to downloads page.
+      Translations Bonanza!
+      Fix Computrainer with Stereo FTDI adaptor
+      Fix 'Save data' in RealtimeWindow
+      Updated Czech translation
+      Fix Wko GPS parsing on 64bit
+      Fix Virtual Power for Fluid2
+      Revert "Add Spanish Translation and Enable Metrics Translation"
+      Fix WKO parser for Ergomo users
+      Better rounding of time in AllPlot
+      Fix WKO+ file reader GPS 'drops'
+      Remove console error for seasons.xml
+      Fix RideSummaryWindow crash
+      Fix RideEditor find dialog for 'between'
+      Fix .man crash in CP plot
+      Better support for Negative, Inf, NaN and High Values
+      Fix annoying gap in CP curve.
+      Fix Save when old .bak exists
+      Fix SummaryWindow crash
+      Don't allow Nan or Inf sample values
+      Fix LogY Intervals on Histogram
+      Fit files sometimes go backwards
+      Guess ride date time for Poweragent CSV files
+      Add JSON support to v2.1
+      Fix date/time handling when importing rides
+      Update .gitignore for Lex/yacc
+      Fix Macro device data crash
+      Support FR310xt latest firmware
+      Fix FitRideFile for header change
+      Fix Download Ride Dialog instructions refresh
+      SplitRide overwrites existing file
+      Revert "SplitRide overwrites existing file"
+      Fix Split Ride file loss bug
+      Check Date/Time unique
+      Summary fixups
+      Updated translation files.
+      Add virtual power for LeMond Revolution
+      Use strtod() to convert text to double
+      Fix FTDI Adaptor on Linux and Mac
+      Better Bounds Checking in RideFile::intervalBegin()
+      Forward support in .json for temp/slope
+      Add Virtual Power for 1UP USA bike trainer
+      FitRideFile distance of zero bug
+      Disable roch text in metadata
+      Fix zero speed in TxtRideFile for Imperial units
+      Support TrainerRoad.com TCX Files/Tcx speed in meters/sec The TCX parser ignored samples where distance is
+      Fix crash if TRIMP zones > 5
+      Fix PWX file intervals
+      Fix SEGV on empty/dodgy FIT files
+
+Mitsukuni Sato (1):
+      Japanese Translation
+
+Rainer Clasen (8):
+      Added SRM5 file format read support
+      whitespace cleanup
+      fix reading signed values from srm files
+      Fit: ignore unknown message types
+      Fit: support big/little endian data
+      Fit: handle unknown fields gracefully
+      SrmRideFile: turned assertions into graceful fail
+      FitRideFile: turned assertions into graceful fail
+
+Roberto Massa (1):
+      Italian Translation
+
+Roderic Campbell (1):
+      There was what looked like a copy paste error. I changed the zone 7 label to the appropriate 7 instead of
+
+Steven Gribble (1):
+      This patch adds an air density (rho) calculator feature to GoldenCheetah.
+
+Thomas Irps (1):
+      Portuguese translation
+
+Tim Shaffer (1):
+      Make the default date range for Performance Manager a user preference.
+
+kohasa (1):
+      enabled editing interval duration by keyboard.
+
+lemaitre (1):
+      Updating of the French translation
+
+unknown (1):
+      This patch correct altitude for TCX files converted from FIT files These files doesn't have altitude for e
+</pre>
+</p>

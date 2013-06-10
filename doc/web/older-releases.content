@@ -19,6 +19,59 @@ please see <a href="download.html">the download page</a> instead.
 </tr>
 
 <tr>
+<td valign="top">2.1.0</td>
+<td valign="top">
+<a href="GoldenCheetah_2.1.0_Linux_x86.gz">Linux x86</a><br>
+<a href="GoldenCheetah_2.1.0_Linux_x86_64.gz">Linux x86_64</a><br>
+<a href="GoldenCheetah_2.1.0_Mac_Universal.zip">Mac OS X Universal</a><br>
+<a href="GoldenCheetah_2.1.0_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+New Features and Enhancements
+  <ul>
+  <li>FIT file support for Mac OSX - Rainer Clasen</li>
+  <li>SRM 5 - Rainer Clasen</li>
+  <li>Aerolab Improvements - Damien Grauser</li>
+  <li>O-Sync Macro X device support - Damien Grauser</li>
+  <li>Air density (RHO) Calculator - Steven Gribble</li>
+  <li>Virtual Power - Darren Hague</li>
+  <li>GoldenCheetah JSON - Mark Liversedge</li>
+  <li>Support TrainerRoad.com TCX Files - Mark Liversedge</li>
+  <li>Garmin GPX - Greg Lonnon</li>
+  <li>Sigma SLF/SMF - Frank Zschockelt</li>
+  </ul>
+</p>
+
+<p>
+Internationalisation
+  <ul>
+  <li>Czech (David Kramar)</li>
+  <li>French (Damien Grauser, Guillaume LeMaitre)</li>
+  <li>German (Alexander Pietsch)</li>
+  <li>Italian (Robert Masso)</li>
+  <li>Portugese (Thomas Irps)</li>
+  <li>Portugese-Brazil (Bruno Assis)</li>
+  <li>Japanese (Mitsukuni Sato, Keisuke Yamaguchi)</li>
+  <li>Spanish (Alejandro Martinez)</li>
+  </ul>
+</p>
+
+<p>
+Development Builds
+  <ul>
+  <li>Gareth Coco</li>
+  <li>Jamie Kimberley</li>
+  </ul>
+</p>
+
+<p>
+<a href="release-notes_2.1.0.html">Full Version 2.1.0 change log.</a><br>
+</p>
+</td>
+</tr>
+
+<tr>
 <td valign="top">2.0.0</td>
 <td valign="top">
 <a href="GoldenCheetah_2.0.0_Linux_x86.gz">Linux x86</a><br>

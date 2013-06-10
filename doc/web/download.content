@@ -8,10 +8,11 @@ It is also available as source code.
 
 <p>
 Golden Cheetah downloads data from all versions of the PowerTap
-computer including the new Joule.  If you're using the PowerTap USB cradle
-(as opposed to the older, serial cable), you may need to install the
-<a href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB driver</a>
-before downloading.
+computer including the new Joule. Previously you needed to have the
+FTDI USB Drivers installed if you were using the PowerTap USB cradle
+(as opposed to the older, serial cable). This should not be necessary.
+If you are having problems then you can manually install the
+ <a href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB driver</a>.
 </p>
 
 <p>
@@ -25,24 +26,33 @@ PCV on Mac OS X</a> for further information.
 
 <p>
 <font face="arial,helvetica,sanserif">
-<big><strong>Download Release 2.1</strong></big>
+<big><strong>Download Release 3.0</strong></big>
 </font>
 </p>
 
 <ul>
-<li><a href="GoldenCheetah_2.1.0_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
-<li><a href="GoldenCheetah_2.1.0_Mac_Universal.dmg">Mac OS X Universal 10.4->10.8</a><br>
-<li><a href="GoldenCheetah_2.1.0_Linux_x86.tgz">Linux x86</a><br>
-<li><a href="GoldenCheetah_2.1.0_Linux_x86_64.tgz">Linux x86_64</a><br>
+<li><a href="GoldenCheetah_3.0.0_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
+<li><a href="GoldenCheetah_3.0.0_Mac_32bit.dmg">Mac OS X Intel 32bit (10.6+)</a><br>
+<li><a href="GoldenCheetah_3.0.0_Mac_64bit.dmg">Mac OS X Intel 64bit (10.6+)</a><br>
 </ul>
 </p>
 
 <p>
-Please follow the <a href="/users-guide.html">User's Guide</a> on how to install
-and use Golden Cheetah.
+Installation is simple. Download the file for your operationg system.<br>
+On Mac, open the DMG and drag and drop where you would like to install.<br>
+For Windows, run the Installer and follow the prompts.<br>
 </p>
 <p>
-You can also <a href="release-notes.html">view the release notes</a> for 2.1
+There is a <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Manual.pdf?raw=true">Manual</a>
+and a <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-FAQ.pdf?raw=true">FAQ</a> that
+you can use to help you use the program.
+</p>
+<p>
+There is the older Version 2.1.0  <a href="/users-guide.html">User's Guide</a> on how to install
+and use Golden Cheetah that can assist also.
+</p>
+<p>
+You can also <a href="release-notes.html">view the release notes</a> for 3.0
 or <a href="older-releases.html">download older releases</a> of Golden Cheetah.
 </p>
 

@@ -1,12 +1,24 @@
 <!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 GoldenCheetah Exp $ -->
+<h2><font face="arial,helvetica,sanserif">Version 3.0</font></h2>
+
+<p>
+Please dowload the <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Manual.pdf?raw=true">Manual</a>
+for great information on how to use all the functions in Golden Cheetah.
+</p>
+<p>
+You can also see a list of
+<a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-FAQ.pdf?raw=true">Frequently Asked Questions (FAQ)</a>.
+</p>
 <p>
 Note that more detailed information is often available on the
 <a href ="wiki.html">
 Golden Cheetah Wiki</a>.
 
+<h2><font face="arial,helvetica,sanserif">Version 2.1</font></h2>
+
 <p>
 What follows is a brief step-by-step guide to installing and setting up
-Golden Cheetah.
+Golden Cheetah Version 2.1.0.
 
 <p>
 <big><font face="arial,helvetica,sanserif">
