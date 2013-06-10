@@ -29,9 +29,12 @@
 // 3005 - V3 RC5 / 5X
 // 3006 - V3 RC6
 // 3007 - V3 RC7
+// 3010 - V3 RELEASE (June 7 2013)
 
-#define VERSION_LATEST 3007
-#define VERSION_STRING "V3.0 RC7"
+#define VERSION_LATEST 3010
+#define VERSION_STRING "V3.0"
+
+#define VERSION3_BUILD 3010
 
 class GcUpgrade
 {
