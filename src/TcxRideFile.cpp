@@ -119,7 +119,8 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool wi
     lap.appendChild(lap_distance);
 
     QDomElement max_speed = doc.createElement("MaximumSpeed");
-    text = doc.createTextNode(QString("%1").arg(computed.value("max_speed")->value(true)));
+    text = doc.createTextNode(QString("%1")
+        .arg(computed.value("max_speed")->value(true) / 3.6));
     max_speed.appendChild(text);
     lap.appendChild(max_speed);
 
@@ -272,7 +273,8 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool wi
     extensions.appendChild(lx);
 
     QDomElement avg_speed = doc.createElement("AvgSpeed");
-    text = doc.createTextNode(QString("%1").arg(computed.value("average_speed")->value(true)));
+    text = doc.createTextNode(QString("%1")
+        .arg(computed.value("average_speed")->value(true) / 3.6));
     avg_speed.appendChild(text);
     lx.appendChild(avg_speed);
 
