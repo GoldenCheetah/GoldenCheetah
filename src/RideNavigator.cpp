@@ -974,7 +974,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // draw border of each cell
         QPen rpen;
-        rpen.setWidth(0.5);
+        rpen.setWidth(1);
         rpen.setColor(Qt::lightGray);
         painter->setPen(rpen);
         painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth,myOption.rect.y());
