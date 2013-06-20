@@ -770,7 +770,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
         QString text, dateStr;
 
         // add when to tooltip if its all curve
-        if (allCurves.contains(curve) != NULL) {
+        if (allCurves.contains(curve)) {
             int index = xvalue * 60;
             if (index >= 0 && getBests().count() > index) {
                 QDate date = getBestDates()[index];
