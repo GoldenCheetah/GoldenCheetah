@@ -39,14 +39,25 @@
 
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown"), data(NULL), weight_(0)
+            deviceType_("unknown"), data(NULL), weight_(0),
+            totalCount(0)
 {
     command = new RideFileCommand(this);
+
+    minPoint = new RideFilePoint();
+    maxPoint = new RideFilePoint();
+    avgPoint = new RideFilePoint();
+    totalPoint = new RideFilePoint();
 }
 
-RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0)
+RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0), totalCount(0)
 {
     command = new RideFileCommand(this);
+
+    minPoint = new RideFilePoint();
+    maxPoint = new RideFilePoint();
+    avgPoint = new RideFilePoint();
+    totalPoint = new RideFilePoint();
 }
 
 RideFile::~RideFile()
@@ -379,6 +390,109 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
     return dir.entryList(filters, spec, QDir::Name);
 }
 
+void RideFile::updateMin(RideFilePoint* point)
+{
+    // MIN
+    if (point->secs<minPoint->secs)
+       minPoint->secs = point->secs;
+    if (minPoint->cad == 0 || point->cad<minPoint->cad)
+       minPoint->cad = point->cad;
+    if (minPoint->hr == 0 || point->hr<minPoint->hr)
+       minPoint->hr = point->hr;
+    if (minPoint->km == 0 || point->km<minPoint->km)
+       minPoint->km = point->km;
+    if (minPoint->kph == 0 || point->kph<minPoint->kph)
+       minPoint->kph = point->kph;
+    if (minPoint->nm == 0 || point->nm<minPoint->nm)
+       minPoint->nm = point->nm;
+    if (minPoint->watts == 0 || point->watts<minPoint->watts)
+       minPoint->watts = point->watts;
+    if (point->alt<minPoint->alt)
+       minPoint->alt = point->alt;
+    if (point->lon<minPoint->lon)
+       minPoint->lon = point->lon;
+    if (point->lat<minPoint->lat)
+       minPoint->lat = point->lat;
+    if (point->headwind<minPoint->headwind)
+       minPoint->headwind = point->headwind;
+    if (point->slope<minPoint->slope)
+       minPoint->slope = point->slope;
+    if (point->temp<minPoint->temp)
+       minPoint->temp = point->temp;
+    if (minPoint->lrbalance == 0 || point->lrbalance<minPoint->lrbalance)
+       minPoint->lrbalance = point->lrbalance;
+}
+
+void RideFile::updateMax(RideFilePoint* point)
+{
+    // MAX
+    if (point->secs>maxPoint->secs)
+       maxPoint->secs = point->secs;
+    if (point->cad>maxPoint->cad)
+       maxPoint->cad = point->cad;
+    if (point->hr>maxPoint->hr)
+       maxPoint->hr = point->hr;
+    if (point->km>maxPoint->km)
+       maxPoint->km = point->km;
+    if (point->kph>maxPoint->kph)
+       maxPoint->kph = point->kph;
+    if (point->nm>maxPoint->nm)
+       maxPoint->nm = point->nm;
+    if (point->watts>maxPoint->watts)
+       maxPoint->watts = point->watts;
+    if (point->alt>maxPoint->alt)
+       maxPoint->alt = point->alt;
+    if (point->lon>maxPoint->lon)
+       maxPoint->lon = point->lon;
+    if (point->lat>maxPoint->lat)
+       maxPoint->lat = point->lat;
+    if (point->headwind>maxPoint->headwind)
+       maxPoint->headwind = point->headwind;
+    if (point->slope>maxPoint->slope)
+       maxPoint->slope = point->slope;
+    if (point->temp>maxPoint->temp)
+       maxPoint->temp = point->temp;
+    if (point->lrbalance>maxPoint->lrbalance)
+       maxPoint->lrbalance = point->lrbalance;
+}
+
+void RideFile::updateAvg(RideFilePoint* point)
+{
+    // AVG
+    totalPoint->secs += point->secs;
+    totalPoint->cad += point->cad;
+    totalPoint->hr += point->hr;
+    totalPoint->km += point->km;
+    totalPoint->kph += point->kph;
+    totalPoint->nm += point->nm;
+    totalPoint->watts += point->watts;
+    totalPoint->alt += point->alt;
+    totalPoint->lon += point->lon;
+    totalPoint->lat += point->lat;
+    totalPoint->headwind += point->headwind;
+    totalPoint->slope += point->slope;
+    totalPoint->temp += point->temp;
+    totalPoint->lrbalance += point->lrbalance;
+
+    ++totalCount;
+
+    // todo : division only for last after last point
+    avgPoint->secs = totalPoint->secs/totalCount;
+    avgPoint->cad = totalPoint->cad/totalCount;
+    avgPoint->hr = totalPoint->hr/totalCount;
+    avgPoint->km = totalPoint->km/totalCount;
+    avgPoint->kph = totalPoint->kph/totalCount;
+    avgPoint->nm = totalPoint->nm/totalCount;
+    avgPoint->watts = totalPoint->watts/totalCount;
+    avgPoint->alt = totalPoint->alt/totalCount;
+    avgPoint->lon = totalPoint->lon/totalCount;
+    avgPoint->lat = totalPoint->lat/totalCount;
+    avgPoint->headwind = totalPoint->headwind/totalCount;
+    avgPoint->slope = totalPoint->slope/totalCount;
+    avgPoint->temp = totalPoint->temp/totalCount;
+    avgPoint->lrbalance = totalPoint->lrbalance/totalCount;
+}
+
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double kph, double nm, double watts, double alt,
                            double lon, double lat, double headwind,
@@ -395,8 +509,10 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!isfinite(watts) || watts<0) watts=0;
     if (!isfinite(interval) || interval<0) interval=0;
 
-    dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
-                                         nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance, interval));
+    RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph,
+                                             nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance, interval);
+    dataPoints_.append(point);
+
     dataPresent.secs     |= (secs != 0);
     dataPresent.cad      |= (cad != 0);
     dataPresent.hr       |= (hr != 0);
@@ -412,6 +528,10 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.temp     |= (temp != noTemp);
     dataPresent.lrbalance|= (lrbalance != 0);
     dataPresent.interval |= (interval != 0);
+
+    updateMin(point);
+    updateMax(point);
+    updateAvg(point);
 }
 
 void RideFile::appendPoint(const RideFilePoint &point)
@@ -525,14 +645,37 @@ RideFile::getPointValue(int index, SeriesType series) const
 }
 
 QVariant
-RideFile::getPoint(int index, SeriesType series) const
+RideFile::getPointFromValue(double value, SeriesType series) const
 {
-    double value = getPointValue(index, series);
     if (series==RideFile::temp && value == RideFile::noTemp)
         return "";
     else if (series==RideFile::wattsKg)
         return "";
     return value;
+}
+
+QVariant
+RideFile::getPoint(int index, SeriesType series) const
+{
+    return getPointFromValue(getPointValue(index, series), series);
+}
+
+QVariant
+RideFile::getMinPoint(SeriesType series) const
+{
+    return getPointFromValue(minPoint->value(series), series);
+}
+
+QVariant
+RideFile::getAvgPoint(SeriesType series) const
+{
+    return getPointFromValue(avgPoint->value(series), series);
+}
+
+QVariant
+RideFile::getMaxPoint(SeriesType series) const
+{
+    return getPointFromValue(maxPoint->value(series), series);
 }
 
 int
