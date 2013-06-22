@@ -106,6 +106,10 @@ class RideFile : public QObject // QObject to emit signals
         double getPointValue(int index, SeriesType series) const;
         QVariant getPoint(int index, SeriesType series) const;
 
+        QVariant getMinPoint(SeriesType series) const;
+        QVariant getAvgPoint(SeriesType series) const;
+        QVariant getMaxPoint(SeriesType series) const;
+
         void appendPoint(double secs, double cad, double hr, double km,
                          double kph, double nm, double watts, double alt,
                          double lon, double lat, double headwind, double slope,
@@ -192,6 +196,11 @@ class RideFile : public QObject // QObject to emit signals
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QVector<RideFilePoint*> dataPoints_;
+        RideFilePoint* minPoint;
+        RideFilePoint* maxPoint;
+        RideFilePoint* avgPoint;
+        RideFilePoint* totalPoint;
+        double totalCount;
         RideFileDataPresent dataPresent;
         QString deviceType_;
         QString fileFormat_;
@@ -199,6 +208,11 @@ class RideFile : public QObject // QObject to emit signals
         QMap<QString,QString> tags_;
         EditorData *data;
         double weight_; // cached to save calls to getWeight();
+
+        QVariant getPointFromValue(double value, SeriesType series) const;
+        void updateMin(RideFilePoint* point);
+        void updateMax(RideFilePoint* point);
+        void updateAvg(RideFilePoint* point);
 };
 
 struct RideFilePoint
