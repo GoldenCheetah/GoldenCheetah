@@ -200,7 +200,6 @@ class RideFile : public QObject // QObject to emit signals
         RideFilePoint* maxPoint;
         RideFilePoint* avgPoint;
         RideFilePoint* totalPoint;
-        double totalCount;
         RideFileDataPresent dataPresent;
         QString deviceType_;
         QString fileFormat_;
@@ -208,6 +207,7 @@ class RideFile : public QObject // QObject to emit signals
         QMap<QString,QString> tags_;
         EditorData *data;
         double weight_; // cached to save calls to getWeight();
+        double totalCount;
 
         QVariant getPointFromValue(double value, SeriesType series) const;
         void updateMin(RideFilePoint* point);
