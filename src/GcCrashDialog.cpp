@@ -40,6 +40,10 @@
 #include "D2XX.h"
 #endif
 
+#ifdef GC_HAVE_SRMIO
+#include "srmio.h"
+#endif
+
 #ifdef GC_HAVE_LIBOAUTH
 #include <oauth.h>
 #endif
@@ -141,7 +145,7 @@ QString GcCrashDialog::versionHTML()
     QString srmio = "none";
 
     #ifdef GC_HAVE_SRMIO
-    srmio = "yes";
+    srmio = QString("%1 commit %2").arg(srmio_version).arg(srmio_commit);
     #endif
 
     // -- D2XX ----
