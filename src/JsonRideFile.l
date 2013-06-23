@@ -69,7 +69,7 @@
 \"LRBALANCE\"       return LRBALANCE;
 [-+]?[0-9]+            return INTEGER;
 [-+]?[0-9]+e-[0-9]+    return FLOAT;
-[-+]?[0-9]+\.[-e0-9]*  return FLOAT;
+[-+]?[0-9]+\.[-+e0-9]*  return FLOAT;
 \"([^\"]|\\\")*\"   return STRING;  /* contains non-quotes or escaped-quotes */
 [ \n\t\r]           ;               /* we just ignore whitespace */
 .                   return JsonRideFiletext[0]; /* any other character, typically :, { or } */
