@@ -560,7 +560,7 @@ SrmDevice::download( const QDir &tmpdir,
         }
         file.startTime.setTime_t( 0.1 * stime );
 
-        fh = fopen( file.name.toAscii().constData(), "w" );
+        fh = fopen( file.name.toAscii().constData(), "wb" );
         if( ! fh ){
             srmio_data_free(fixed);
             err = tr( "failed to open file %1: %2")
