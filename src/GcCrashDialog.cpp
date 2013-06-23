@@ -145,7 +145,7 @@ QString GcCrashDialog::versionHTML()
     QString srmio = "none";
 
     #ifdef GC_HAVE_SRMIO
-    srmio = QString("%1 commit %2").arg(srmio_version).arg(srmio_commit);
+    srmio = QString("%1 %2").arg(QString(srmio_version).replace("srmio ", "")).arg(srmio_commit);
     #endif
 
     // -- D2XX ----
