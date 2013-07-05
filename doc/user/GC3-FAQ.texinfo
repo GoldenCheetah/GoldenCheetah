@@ -567,16 +567,20 @@ using a free service they do not let you retrieve your data.
 
 
 
-@section Why is data uploaded to Strava all wrong?
+@section Upload/Download with Strava fails?
 @cindex Strava
 
-In general Strava will only use GPS data. If your ride does not contain GPS data then
-Strava is not likely to play nice. In addition many of the other data series will be
-ignored. This is related to Strava data processing in V2.0 of their API.
+Strava have switched off their v1 and v2 APIs before providing access to their
+v3 APIs. We have requested access to the new v3 API but it has not been granted.
+In the meantime to upload to Strava you can send an email to @email{upload@@strava.com} 
+from you registered email account attaching the ride in a format Strava supports.
 
-We always upload as TCX since the JSON flavour of their API appears to have less
-functionality.
+We remain committed to helping cyclists download their power data 
+to the computer of their choice, analyze it in whatever way they see fit, and 
+share their methods of analysis with others. 
 
+We will be deprecating support for Strava upload/download in v3 SP1 and have no
+immediate plans to provide support for it in the future.
 
 
 @section What settings do I need to get GoldenCheetah to upload to my Google Calendar?
