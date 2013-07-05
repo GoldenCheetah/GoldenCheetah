@@ -893,10 +893,10 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
-    stravaAction = new QAction(tr("Upload to Strava..."), this);
-    connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
-    rideMenu->addAction(stravaAction);
-    rideMenu->addAction(tr("Download from Strava..."), this, SLOT(downloadStrava()));
+    //XXX deprecated stravaAction = new QAction(tr("Upload to Strava..."), this);
+    //XXX deprecated connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
+    //XXX deprecated rideMenu->addAction(stravaAction);
+    //XXX deprecated rideMenu->addAction(tr("Download from Strava..."), this, SLOT(downloadStrava()));
 
     rideWithGPSAction = new QAction(tr("Upload to RideWithGPS..."), this);
     connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
@@ -1142,20 +1142,20 @@ MainWindow::setActivityMenu()
     // enable/disable upload if already uploaded
     if (ride && ride->ride()) {
 
-        QString activityId = ride->ride()->getTag("Strava uploadId", "");
-        if (activityId == "") stravaAction->setEnabled(true);
-        else stravaAction->setEnabled(false);
+        //XXX deprecated QString activityId = ride->ride()->getTag("Strava uploadId", "");
+        //XXX deprecated if (activityId == "") stravaAction->setEnabled(true);
+        //XXX deprecated else stravaAction->setEnabled(false);
 
         QString tripid = ride->ride()->getTag("RideWithGPS tripid", "");
         if (tripid == "") rideWithGPSAction->setEnabled(true);
         else rideWithGPSAction->setEnabled(false);
         
-        activityId = ride->ride()->getTag("TtbExercise", "");
+        QString activityId = ride->ride()->getTag("TtbExercise", "");
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
         
     } else {
-        stravaAction->setEnabled(false);
+        //XXX deprecated stravaAction->setEnabled(false);
         rideWithGPSAction->setEnabled(false);
         ttbAction->setEnabled(false);
     }
