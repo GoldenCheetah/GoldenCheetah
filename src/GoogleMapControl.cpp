@@ -276,7 +276,7 @@ void GoogleMapControl::createHtml()
 QColor GoogleMapControl::GetColor(int watts)
 {
     if (range < 0) return Qt::red;
-    else return zoneColor(main->zones()->whichZone(range, watts), 7);
+    else return zoneColor(main->athlete->zones()->whichZone(range, watts), 7);
 }
 
 // create the ride line

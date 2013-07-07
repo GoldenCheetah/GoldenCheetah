@@ -23,17 +23,17 @@
 // create a separate array for the ergfile data, we plot
 // directly from the ErgFile points array
 double ErgFileData::x(size_t i) const { 
-    if (main->currentErgFile()) return main->currentErgFile()->Points.at(i).x;
+    if (main->context->currentErgFile()) return main->context->currentErgFile()->Points.at(i).x;
     else return 0;
 }
 
 double ErgFileData::y(size_t i) const {
-    if (main->currentErgFile()) return main->currentErgFile()->Points.at(i).y;
+    if (main->context->currentErgFile()) return main->context->currentErgFile()->Points.at(i).y;
     else return 0;
 }
 
 size_t ErgFileData::size() const {
-    if (main->currentErgFile()) return main->currentErgFile()->Points.count();
+    if (main->context->currentErgFile()) return main->context->currentErgFile()->Points.count();
     else return 0;
 }
 
@@ -44,10 +44,10 @@ QPointF ErgFileData::sample(size_t i) const
 
 QRectF ErgFileData::boundingRect() const
 {
-    if (main->currentErgFile()) {
+    if (main->context->currentErgFile()) {
         double minX, minY, maxX, maxY;
         minX=minY=maxX=maxY=0.0f;
-        foreach(ErgFilePoint x, main->currentErgFile()->Points) {
+        foreach(ErgFilePoint x, main->context->currentErgFile()->Points) {
             if (x.y > maxY) maxY = x.y;
             if (x.x > maxX) maxX = x.x;
             if (x.y < minY) minY = x.y;
@@ -61,10 +61,10 @@ QRectF ErgFileData::boundingRect() const
 
 
 // Now bar
-double NowData::x(size_t) const { return main->getNow(); }
+double NowData::x(size_t) const { return main->context->getNow(); }
 double NowData::y(size_t i) const {
     if (i) {
-        if (main->currentErgFile()) return main->currentErgFile()->maxY;
+        if (main->context->currentErgFile()) return main->context->currentErgFile()->maxY;
         else return 0;
     } else return 0;
 }
@@ -292,8 +292,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
         }
 
         // set the axis so we use all the screen estate
-        if (main->currentErgFile() && main->currentErgFile()->Points.count()) {
-            double maxX = (double)main->currentErgFile()->Points.last().x;
+        if (main->context->currentErgFile() && main->context->currentErgFile()->Points.count()) {
+            double maxX = (double)main->context->currentErgFile()->Points.last().x;
 
             if (bydist) {
 

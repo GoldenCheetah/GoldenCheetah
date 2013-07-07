@@ -29,9 +29,9 @@ bool
 WithingsDownload::download()
 {
     QString request = QString("%1/measure?action=getmeas&userid=%2&publickey=%3")
-                             .arg(appsettings->cvalue(main->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString())
-                             .arg(appsettings->cvalue(main->cyclist, GC_WIUSER, "").toString())
-                             .arg(appsettings->cvalue(main->cyclist, GC_WIKEY, "").toString());
+                             .arg(appsettings->cvalue(main->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString())
+                             .arg(appsettings->cvalue(main->athlete->cyclist, GC_WIUSER, "").toString())
+                             .arg(appsettings->cvalue(main->athlete->cyclist, GC_WIKEY, "").toString());
 
 
     QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(request)));
@@ -57,7 +57,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
 
 
     foreach (WithingsReading x, parser->readings()) {
-        QList<SummaryMetrics> list = main->metricDB->getAllMeasuresFor(x.when,x.when);
+        QList<SummaryMetrics> list = main->athlete->metricDB->getAllMeasuresFor(x.when,x.when);
         bool presentOrEmpty = false;
         for (int i=0;i<list.size();i++) {
             SummaryMetrics sm = list.at(i);
@@ -80,7 +80,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
             add.setText("Fat Mass", QString("%1").arg(x.fatkg));
             add.setText("Fat Ratio", QString("%1").arg(x.fatpercent));
 
-            main->metricDB->importMeasure(&add);
+            main->athlete->metricDB->importMeasure(&add);
 
             if (olderDate.isNull() || x.when<olderDate)
                 olderDate = x.when;
@@ -92,7 +92,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
 
     if (!olderDate.isNull()) {
         main->isclean = false;
-        main->metricDB->refreshMetrics(olderDate);
+        main->athlete->metricDB->refreshMetrics(olderDate);
     }
     return;
 }

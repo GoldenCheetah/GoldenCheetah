@@ -70,7 +70,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);
-    splitter->prepare(main->cyclist, "diary");
+    splitter->prepare(main->athlete->cyclist, "diary");
 
     black.setColor(QPalette::WindowText, Qt::gray);
     white.setColor(QPalette::WindowText, Qt::white);
@@ -112,7 +112,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     // refresh on these events...
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
 
     // set up for current selections
     refresh();
@@ -222,7 +222,7 @@ void
 GcCalendar::setSummary()
 {
     // are we metric?
-    bool useMetricUnits = main->useMetricUnits;
+    bool useMetricUnits = main->athlete->useMetricUnits;
 
     // where we construct the text
     QString summaryText("");
@@ -288,7 +288,7 @@ GcCalendar::setSummary()
         to = newTo;
 
         // lets get the metrics
-        QList<SummaryMetrics>results = main->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
+        QList<SummaryMetrics>results = main->athlete->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
 
         // foreach of the metrics get an aggregated value
         // header of summary
@@ -410,7 +410,7 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     grey.setColor(QPalette::WindowText, Qt::gray);
 
     // get the model
-    fieldDefinitions = main->rideMetadata()->getFields();
+    fieldDefinitions = main->athlete->rideMetadata()->getFields();
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, main);
     calendarModel->setSourceModel(main->listView->sqlModel);
 
@@ -645,7 +645,7 @@ GcMiniCalendar::dayClicked(int i)
 void
 GcMiniCalendar::previous()
 {
-    QList<QDateTime> allDates = main->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = main->athlete->metricDB->db()->getAllDates();
     qSort(allDates);
 
     // begin of month
@@ -679,7 +679,7 @@ GcMiniCalendar::previous()
 void
 GcMiniCalendar::next()
 {
-    QList<QDateTime> allDates = main->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = main->athlete->metricDB->db()->getAllDates();
     qSort(allDates);
 
     // end of month

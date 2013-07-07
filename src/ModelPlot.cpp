@@ -314,7 +314,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 {
     // get application settings
     cranklength = appsettings->value(NULL, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
-    useMetricUnits = plot.main->useMetricUnits;
+    useMetricUnits = plot.main->athlete->useMetricUnits;
 
     // if there are no settings or incomplete settings
     // create a null data plot
@@ -1006,7 +1006,7 @@ ModelPlot::ModelPlot(MainWindow *parent, ModelSettings *settings) : QFrame(paren
     layout->setContentsMargins(2,2,2,2);
     setLayout(layout);
 
-    connect(main, SIGNAL(configChanged()), basicModelPlot, SLOT(configChanged()));
+    connect(main->context, SIGNAL(configChanged()), basicModelPlot, SLOT(configChanged()));
 }
 
 void

@@ -102,7 +102,7 @@ RideItem::setDirty(bool val)
             setFont(i, current);
         }
 
-        main->notifyRideDirty();
+        main->context->notifyRideDirty();
 
     } else {
 
@@ -113,7 +113,7 @@ RideItem::setDirty(bool val)
             setFont(i, current);
         }
 
-        main->notifyRideClean();
+        main->context->notifyRideClean();
     }
 }
 
@@ -164,5 +164,5 @@ RideItem::setStartTime(QDateTime newDateTime)
     setText(2, dateTime.toString("h:mm AP"));
 
     ride()->setStartTime(newDateTime);
-    main->notifyRideSelected();
+    //XXX main->context->notifyRideSelected();
 }

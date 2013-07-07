@@ -49,20 +49,13 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     revealLayout->setContentsMargins(0,0,0,0);
     revealLayout->addStretch();
 
-    rCpintSetCPButton = new QPushButton(tr("&Save CP value"));
-    rCpintSetCPButton->setStyleSheet("QPushButton {border-radius: 3px;border-style: outset; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #DDDDDD, stop: 1 #BBBBBB); border-width: 1px; border-color: #555555;} QPushButton:pressed {background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBBBBB, stop: 1 #999999); }");
-    rCpintSetCPButton->setEnabled(false);
-
-    revealLayout->addWidget(rCpintSetCPButton);
-    revealLayout->addStretch();
-
     setRevealLayout(revealLayout);
 
     //
     // main plot area
     //
     QVBoxLayout *vlayout = new QVBoxLayout;
-    cpintPlot = new CpintPlot(mainWindow, home.path(), mainWindow->zones());
+    cpintPlot = new CpintPlot(mainWindow, home.path(), mainWindow->athlete->zones());
     vlayout->addWidget(cpintPlot);
 
     QGridLayout *mainLayout = new QGridLayout();
@@ -144,7 +137,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     // data -- season / daterange edit
     cComboSeason = new QComboBox(this);
-    seasons = parent->seasons;
+    seasons = parent->athlete->seasons;
     resetSeasons();
     QLabel *label = new QLabel(tr("Date range"));
     QLabel *label2 = new QLabel(tr("Date range"));
@@ -179,7 +172,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
-    connect(rCpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
@@ -189,12 +181,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
     // redraw on config change -- this seems the simplest approach
     connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(rideSelected()));
-    connect(mainWindow->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(rideSelected()));
+    connect(mainWindow->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
@@ -207,7 +199,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 void
 CriticalPowerWindow::refreshRideSaved()
 {
-    const RideItem *current = mainWindow->rideItem();
+    const RideItem *current = mainWindow->context->rideItem();
     if (!current) return;
 
     // if the saved ride is in the aggregated time period
@@ -274,9 +266,9 @@ CriticalPowerWindow::rideSelected()
 
     currentRide = myRideItem;
     if (currentRide) {
-        if (mainWindow->zones()) {
-            int zoneRange = mainWindow->zones()->whichRange(currentRide->dateTime.date());
-            int CP = zoneRange >= 0 ? mainWindow->zones()->getCP(zoneRange) : 0;
+        if (mainWindow->athlete->zones()) {
+            int zoneRange = mainWindow->athlete->zones()->whichRange(currentRide->dateTime.date());
+            int CP = zoneRange >= 0 ? mainWindow->athlete->zones()->getCP(zoneRange) : 0;
             cpintPlot->setDateCP(CP);
         } else {
             cpintPlot->setDateCP(0);
@@ -285,8 +277,6 @@ CriticalPowerWindow::rideSelected()
 
         // apply latest colors
         picker->setRubberBandPen(GColor(CPLOTTRACKER));
-        rCpintSetCPButton->setEnabled(cpintPlot->cp > 0);
-
         setIsBlank(false);
     } else if (!rangemode) {
         setIsBlank(true);
@@ -300,21 +290,6 @@ CriticalPowerWindow::setSeries(int index)
         cpintPlot->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(index).toInt()));
         cpintPlot->calculate(currentRide);
     }
-}
-
-void
-CriticalPowerWindow::cpintSetCPButtonClicked()
-{
-    int cp = (int) cpintPlot->cp;
-    if (cp <= 0) {
-        QMessageBox::critical(
-            this,
-            tr("Set CP value to extracted value"),
-            tr("No non-zero extracted value was identified:\n") +
-            tr("Zones were unchanged."));
-        return;
-    }
-    mainWindow->setCriticalPower(cp);
 }
 
 static double
@@ -547,12 +522,12 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
     cto = dateRange.to;
 
     // lets work out the average CP configure value
-    if (mainWindow->zones()) {
-        int fromZoneRange = mainWindow->zones()->whichRange(cfrom);
-        int toZoneRange = mainWindow->zones()->whichRange(cto);
+    if (mainWindow->athlete->zones()) {
+        int fromZoneRange = mainWindow->athlete->zones()->whichRange(cfrom);
+        int toZoneRange = mainWindow->athlete->zones()->whichRange(cto);
 
-        int CPfrom = fromZoneRange >= 0 ? mainWindow->zones()->getCP(fromZoneRange) : 0;
-        int CPto = toZoneRange >= 0 ? mainWindow->zones()->getCP(toZoneRange) : CPfrom;
+        int CPfrom = fromZoneRange >= 0 ? mainWindow->athlete->zones()->getCP(fromZoneRange) : 0;
+        int CPto = toZoneRange >= 0 ? mainWindow->athlete->zones()->getCP(toZoneRange) : CPfrom;
         if (CPfrom == 0) CPfrom = CPto;
         int dateCP = (CPfrom + CPto) / 2;
 

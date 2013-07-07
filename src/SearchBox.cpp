@@ -179,7 +179,7 @@ void SearchBox::clearClicked()
 
 void SearchBox::checkMenu()
 {
-    if (main->namedSearches->getList().count() || text() != "") toolButton->show();
+    if (main->athlete->namedSearches->getList().count() || text() != "") toolButton->show();
     else toolButton->hide();
 }
 
@@ -187,9 +187,9 @@ void SearchBox::setMenu()
 {
     dropMenu->clear();
     if (text() != "") dropMenu->addAction(tr("Add to Favourites"));
-    if (main->namedSearches->getList().count()) {
+    if (main->athlete->namedSearches->getList().count()) {
         if (text() != "") dropMenu->addSeparator();
-        foreach(NamedSearch x, main->namedSearches->getList()) {
+        foreach(NamedSearch x, main->athlete->namedSearches->getList()) {
             dropMenu->addAction(x.name);
         }
         dropMenu->addSeparator();
@@ -212,7 +212,7 @@ void SearchBox::runMenu(QAction *x)
         ColumnChooser *selector = new ColumnChooser(main->listView->logicalHeadings);
         selector->show();
     } else {
-        NamedSearch get = main->namedSearches->get(x->text());
+        NamedSearch get = main->athlete->namedSearches->get(x->text());
         if (get.name == x->text()) {
             setMode(static_cast<SearchBox::SearchBoxMode>(get.type));
             setText(get.text);
@@ -282,6 +282,6 @@ SearchBox::addNamed()
         x.text = this->text();
         x.type = mode;
         x.count = 0;
-        main->namedSearches->getList().append(x);
+        main->athlete->namedSearches->getList().append(x);
     }
 }

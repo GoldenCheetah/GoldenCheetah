@@ -36,13 +36,11 @@ bool TreeMapLessThan(const TreeMap *a, const TreeMap *b) {
     return (a->value) > (b->value);
 }
 
-TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main, QDir home)
-            : QWidget (parent), parent(parent), main(main), home(home)
+TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main)
+            : QWidget (parent), parent(parent), main(main)
 {
     setInstanceName("TreeMap Plot");
 
-    // get application settings
-    useMetricUnits = main->useMetricUnits;
     settings = NULL;
 
     root = new TreeMap;
@@ -53,7 +51,7 @@ TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main, QDir home)
     setContentsMargins(0,0,0,0);
 
     configUpdate(); // set basic colors
-    connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 TreeMapPlot::~TreeMapPlot()
@@ -61,11 +59,7 @@ TreeMapPlot::~TreeMapPlot()
 }
 
 void
-TreeMapPlot::configUpdate()
-{
-    // get application settings
-    useMetricUnits = main->useMetricUnits;
-}
+TreeMapPlot::configUpdate() { }
 
 void
 TreeMapPlot::setData(TMSettings *settings)

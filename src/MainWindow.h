@@ -78,32 +78,32 @@ class GcSplitterItem;
 class QtSegmentControl;
 class IntervalItem;
 class IntervalTreeView;
+class SaveSingleDialogWidget;
+class SplitActivityWizard;
+
+class MainWindow;
+class Athlete;
+class Context;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 extern QDesktopWidget *desktop;         // how many screens / res etc
 
-class MainWindow : public QMainWindow
+class Athlete : public QObject
 {
     Q_OBJECT
-    G_OBJECT
 
     public:
 
-        MainWindow(const QDir &home);
-
-        // *********************************************
-        // ATHLETE INFO
-        // *********************************************
-
-        // general data
+        // basic athlete info
         QString cyclist; // the cyclist name
         bool useMetricUnits;
         QDir home;
         const Zones *zones() const { return zones_; }
         const HrZones *hrZones() const { return hrzones_; }
+        Zones *zones_;
+        HrZones *hrzones_;
         void setCriticalPower(int cp);
         QSqlDatabase db;
-        RideNavigator *listView;
         MetricAggregator *metricDB;
         RideMetadata *_rideMetadata;
         Seasons *seasons;
@@ -111,27 +111,42 @@ class MainWindow : public QMainWindow
 
         // athlete's calendar
         CalendarDownload *calendarDownload;
+        WithingsDownload *withingsDownload;
+        ZeoDownload *zeoDownload;
 #ifdef GC_HAVE_ICAL
         ICalendar *rideCalendar;
         CalDAV *davCalendar;
 #endif
 
-        // *********************************************
-        // ATHLETE RIDE LIBRARY
-        // *********************************************
+        // ride metadata definitions
+        RideMetadata *rideMetadata() { return _rideMetadata; }
 
-        // athlete's ride library
-        void addRide(QString name, bool bSelect=true);
-        void removeCurrentRide();
+        // indexes / filters
+#ifdef GC_HAVE_LUCENE
+        Lucene *lucene;
+        NamedSearches *namedSearches;
+#endif
+        Context *context;
 
-        // save a ride to disk
-        void saveSilent(RideItem *);
-        bool saveRideSingleDialog(RideItem *);
+        void notifyZonesChanged() { zonesChanged(); }
+        void notifySeasonsChanged() { seasonsChanged(); }
 
-        // currently selected ride item, ride list
-        void selectRideFile(QString);
-        QTreeWidget *rideTreeWidget() { return treeWidget; }
-        const QTreeWidgetItem *allRideItems() { return allRides; }
+    signals:
+        void zonesChanged();
+        void seasonsChanged();
+
+    public slots:
+        void configChanged();
+
+};
+
+class Context : public QObject
+{
+    Q_OBJECT;
+
+    public:
+
+        // ride item
         RideItem *rideItem() const { return ride; }
         const RideFile *currentRide();
         const RideItem *currentRideItem() { return ride; }
@@ -139,18 +154,101 @@ class MainWindow : public QMainWindow
         // last date range selected in diary/home view
         DateRange currentDateRange() { return _dr; }
 
+
+        // current selections
+        MainWindow *mainWindow;
+        Athlete *athlete;
+        RideItem *ride;  // the currently selected ride
+        DateRange _dr;   // the currently selected date range
+        ErgFile *workout; // the currently selected workout file
+        long now; // point in time during train session
+
+        // *********************************************
+        // APPLICATION EVENTS
+        // *********************************************
+        void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
+                                    // when config has changed - and to get a
+                                    // signal emitted to notify its children
+
+        // realtime signals
+        void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
+        void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
+        ErgFile *currentErgFile() { return workout; }
+        void notifyMediaSelected( QString x) { mediaSelected(x); }
+        void notifySelectVideo(QString x) { selectMedia(x); }
+        void notifySelectWorkout(QString x) { selectWorkout(x); }
+        void notifySetNow(long x) { now = x; setNow(x); }
+        long getNow() { return now; }
+        void notifyNewLap() { emit newLap(); }
+        void notifyStart() { emit start(); }
+        void notifyUnPause() { emit unpause(); }
+        void notifyPause() { emit pause(); }
+        void notifyStop() { emit stop(); }
+        void notifySeek(long x) { emit seek(x); }
+
+        void notifyRideClean() { rideClean(ride); }
+        void notifyRideDirty() { rideDirty(ride); }
+
+    signals:
+
+        void configChanged();
+
+        void rideDirty(RideItem*);
+        void rideClean(RideItem*);
+
+        // realtime
+        void telemetryUpdate(RealtimeData rtData);
+        void ergFileSelected(ErgFile *);
+        void mediaSelected(QString);
+        void selectWorkout(QString); // ask traintool to select this
+        void selectMedia(QString); // ask traintool to select this
+        void setNow(long);
+        void seek(long);
+        void newLap();
+        void start();
+        void unpause();
+        void pause();
+        void stop();
+
+};
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+    G_OBJECT
+
+    // transitional
+    friend class ::Context;
+    friend class ::SaveSingleDialogWidget;
+    friend class ::SplitActivityWizard;
+
+    public:
+
+        MainWindow(const QDir &home);
+
+        // transitionary
+        Athlete *athlete;
+        Context *context;
+
+        // currently selected ride item, ride list
+        void selectRideFile(QString);
+        QTreeWidget *rideTreeWidget() { return treeWidget; }
+        const QTreeWidgetItem *allRideItems() { return allRides; }
+
         // ride intervals
         const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
         IntervalTreeView *intervalTreeWidget() { return intervalWidget; }
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
         void updateRideFileIntervals();
 
-        // ride metadata definitions
-        RideMetadata *rideMetadata() { return _rideMetadata; }
+        // filters changed
+        void notifyFilter(QStringList f) { filters = f; emit filterChanged(f); }
 
         // *********************************************
         // MAINWINDOW STATE / GUI DATA
         // *********************************************
+
+        RideNavigator *listView;
 
         // Top-level views
         HomeWindow *homeWindow;
@@ -184,11 +282,6 @@ class MainWindow : public QMainWindow
 
         void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 
-#ifdef GC_HAVE_LUCENE
-        Lucene *lucene;
-        NamedSearches *namedSearches;
-#endif
-
         // splitter for sidebar and main view
         QSplitter *splitter;
 
@@ -215,43 +308,10 @@ class MainWindow : public QMainWindow
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
 #endif
-        // *********************************************
-        // APPLICATION EVENTS
-        // *********************************************
 
-        // MainWindow signals are used to notify
-        // widgets of important events, these methods
-        // can be called to raise signals
-        void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
-                                    // when config has changed - and to get a
-                                    // signal emitted to notify its children
-        void notifyRideSelected();  // used by RideItem to notify when
-                                    // rideItem date/time changes
-        void notifyRideClean() { rideClean(ride); }
-        void notifyRideDirty() { rideDirty(ride); }
-        void notifyZonesChanged() { zonesChanged(); }
-
-        // realtime signals
-        void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
-        void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
-        ErgFile *currentErgFile() { return workout; }
-        void notifyMediaSelected( QString x) { mediaSelected(x); }
-        void notifySelectVideo(QString x) { selectMedia(x); }
-        void notifySelectWorkout(QString x) { selectWorkout(x); }
-        void notifySetNow(long x) { now = x; setNow(x); }
-        long getNow() { return now; }
-        void notifyNewLap() { emit newLap(); }
-        void notifyStart() { emit start(); }
-        void notifyUnPause() { emit unpause(); }
-        void notifyPause() { emit pause(); }
-        void notifyStop() { emit stop(); }
-        void notifySeek(long x) { emit seek(x); }
-        void notifyFilter(QStringList f) { filters = f; emit filterChanged(f); }
+        // transitionary
 
     protected:
-
-        Zones *zones_;
-        HrZones *hrzones_;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -259,34 +319,17 @@ class MainWindow : public QMainWindow
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
 
-    signals:
+        const RideFile *currentRide();
 
+    signals:
+        void filterChanged(QStringList&);
+
+        // transitionary will move too XXX
         void intervalSelected();
         void intervalZoom(IntervalItem*);
         void intervalsChanged();
-        void zonesChanged();
-        void seasonsChanged();
-        void configChanged();
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
-        void rideDirty(RideItem*);
-        void rideClean(RideItem*);
-
-        // realtime
-        void telemetryUpdate(RealtimeData rtData);
-        void ergFileSelected(ErgFile *);
-        void mediaSelected(QString);
-        void selectWorkout(QString); // ask traintool to select this
-        void selectMedia(QString); // ask traintool to select this
-        void setNow(long);
-        void seek(long);
-        void newLap();
-        void start();
-        void unpause();
-        void pause();
-        void stop();
-
-        void filterChanged(QStringList&);
 
     public slots:
         void checkCPX(RideItem*);
@@ -307,6 +350,12 @@ class MainWindow : public QMainWindow
         void analysisPopup();
         void intervalPopup();
 
+        // transitionary
+        void addRide(QString name, bool bSelect=true);
+        bool saveRideSingleDialog(RideItem *);
+        void removeCurrentRide();
+        void saveSilent(RideItem *);
+
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
@@ -318,8 +367,6 @@ class MainWindow : public QMainWindow
         void exportRide();
         void exportBatch();
         void exportMetrics();
-        void uploadStrava();
-        void downloadStrava();
         void uploadRideWithGPSAction();
         void uploadTtb();
         void manualProcess(QString);
@@ -415,6 +462,7 @@ class MainWindow : public QMainWindow
         void searchResults(QStringList);
         void searchClear();
 
+
     protected:
 
     private:
@@ -422,13 +470,6 @@ class MainWindow : public QMainWindow
         // active when right clicked
         IntervalItem *activeInterval; // currently active for context menu popup
         RideItem *activeRide; // currently active for context menu popup
-
-        // current selections
-        RideItem *ride;  // the currently selected ride
-        DateRange _dr;   // the currently selected date range
-        ErgFile *workout; // the currently selected workout file
-
-        long now; // point in time during train session
 
 #ifdef Q_OS_MAC
         // Mac Native Support
@@ -481,8 +522,6 @@ class MainWindow : public QMainWindow
         // Miscellany
         QSignalMapper *groupByMapper;
         QSignalMapper *toolMapper;
-        WithingsDownload *withingsDownload;
-        ZeoDownload *zeoDownload;
         bool parseRideFileName(const QString &name, QDateTime *dt);
 
 };

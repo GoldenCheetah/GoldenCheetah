@@ -157,7 +157,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
     connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
@@ -503,7 +503,7 @@ HomeWindow::addChart(GcWindow* newone)
         // watch for enter events!
         newone->installEventFilter(this);
 
-        RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
+        RideItem *notconst = (RideItem*)mainWindow->context->currentRideItem();
         newone->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
         newone->setProperty("dateRange", property("dateRange"));
 
@@ -648,9 +648,9 @@ HomeWindow::resetLayout()
     }
     restoreState(true);
     for(int i = 0; i < charts.count(); i++) {
-        RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
+        RideItem *notconst = (RideItem*)mainWindow->context->currentRideItem();
         charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        DateRange dr = mainWindow->currentDateRange();
+        DateRange dr = mainWindow->context->currentDateRange();
         charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
         if (currentStyle != 0) charts[i]->show();
         
@@ -1040,9 +1040,9 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
         layout->setStretch(1, 50);
     }
 
-    RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
+    RideItem *notconst = (RideItem*)mainWindow->context->currentRideItem();
     win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-    DateRange dr = mainWindow->currentDateRange();
+    DateRange dr = mainWindow->context->currentDateRange();
     win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 
 
@@ -1135,7 +1135,7 @@ HomeWindow::saveState()
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
     if (charts.count() == 0) return; // don't save empty, use default instead
 
-    QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
+    QString filename = mainWindow->athlete->home.absolutePath() + "/" + name + "-layout.xml";
     QFile file(filename);
     file.open(QFile::WriteOnly);
     file.resize(0);
@@ -1187,7 +1187,7 @@ void
 HomeWindow::restoreState(bool useDefault)
 {
     // restore window state
-    QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
+    QString filename = mainWindow->athlete->home.absolutePath() + "/" + name + "-layout.xml";
     QFileInfo finfo(filename);
 
     if (useDefault) QFile::remove(filename);

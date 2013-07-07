@@ -142,8 +142,8 @@ RideEditor::RideEditor(MainWindow *main) : GcChartWindow(main), data(NULL), ride
     connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(main, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
-    connect(main, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
+    connect(main->context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
+    connect(main->context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
@@ -1107,7 +1107,7 @@ void
 RideEditor::intervalSelected()
 {
     // is it for the ride item we are editing?
-    if (main->currentRideItem() == ride) {
+    if (main->context->currentRideItem() == ride) {
 
         // clear all selections
         table->selectionModel()->select(QItemSelection(model->index(0,0),

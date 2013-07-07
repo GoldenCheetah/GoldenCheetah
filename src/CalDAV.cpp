@@ -35,7 +35,7 @@ CalDAV::CalDAV(MainWindow *main) : main(main), mode(None)
 bool
 CalDAV::download()
 {
-    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -78,7 +78,7 @@ CalDAV::download()
 bool
 CalDAV::options()
 {
-    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -111,7 +111,7 @@ CalDAV::options()
 bool
 CalDAV::propfind()
 {
-    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -150,7 +150,7 @@ CalDAV::propfind()
 bool
 CalDAV::report()
 {
-    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -318,7 +318,7 @@ CalDAV::upload(RideItem *rideItem)
     // is this a valid ride?
     if (!rideItem || !rideItem->ride()) return false;
 
-    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     // lets upload to calendar
@@ -356,7 +356,7 @@ CalDAV::requestReply(QNetworkReply *reply)
     switch (mode) {
     case Report:
     case Events:
-        main->rideCalendar->refreshRemote(extractComponents(response));
+        main->athlete->rideCalendar->refreshRemote(extractComponents(response));
         break;
     default:
     case Options:
@@ -374,8 +374,8 @@ CalDAV::requestReply(QNetworkReply *reply)
 void
 CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
 {
-    QString user = appsettings->cvalue(main->cyclist, GC_DVUSER, "").toString();
-    QString pass = appsettings->cvalue(main->cyclist, GC_DVPASS, "").toString();
+    QString user = appsettings->cvalue(main->athlete->cyclist, GC_DVUSER, "").toString();
+    QString pass = appsettings->cvalue(main->athlete->cyclist, GC_DVPASS, "").toString();
     a->setUser(user);
     a->setPassword(pass);
 }

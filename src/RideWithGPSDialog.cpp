@@ -187,8 +187,8 @@ RideWithGPSDialog::requestUpload()
 
     int size = 0;
 
-    QString username = appsettings->cvalue(mainWindow->cyclist, GC_RWGPSUSER).toString();
-    QString password = appsettings->cvalue(mainWindow->cyclist, GC_RWGPSPASS).toString();
+    QString username = appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSUSER).toString();
+    QString password = appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSPASS).toString();
 
     // application/json
     out += "{\"apikey\": \"p24n3a9e\", ";

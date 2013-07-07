@@ -137,7 +137,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 DataFilter::DataFilter(QObject *parent, MainWindow *mainWindow) : QObject(parent), mainWindow(mainWindow), treeRoot(NULL)
 {
     configUpdate();
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 QStringList DataFilter::parseFilter(QString query)
@@ -174,7 +174,7 @@ QStringList DataFilter::parseFilter(QString query)
         emit parseGood();
 
         // get all fields...
-        QList<SummaryMetrics> allRides = mainWindow->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
+        QList<SummaryMetrics> allRides = mainWindow->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
 
         filenames.clear();
 
@@ -217,7 +217,7 @@ void DataFilter::configUpdate()
     }
 
     // now add the ride metadata fields -- should be the same generally
-    foreach(FieldDefinition field, mainWindow->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, mainWindow->athlete->rideMetadata()->getFields()) {
             QString underscored = field.name;
             if (!mainWindow->specialFields.isMetric(underscored)) { 
                 lookupMap.insert(underscored.replace(" ","_"), field.name);

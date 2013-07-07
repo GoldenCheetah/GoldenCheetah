@@ -26,7 +26,7 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     setControls(NULL);
 
     // get config
-    fieldDefinitions = mainWindow->rideMetadata()->getFields();
+    fieldDefinitions = mainWindow->athlete->rideMetadata()->getFields();
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
 
@@ -83,7 +83,7 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(rideSelected()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
 }
@@ -92,13 +92,13 @@ void
 DiaryWindow::configChanged()
 {
     // get config
-    fieldDefinitions = mainWindow->rideMetadata()->getFields();
+    fieldDefinitions = mainWindow->athlete->rideMetadata()->getFields();
 }
 
 void
 DiaryWindow::setDefaultView(int view)
 {
-    appsettings->setCValue(mainWindow->cyclist, GC_DIARY_VIEW, view);
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_DIARY_VIEW, view);
 }
 void
 DiaryWindow::rideSelected()

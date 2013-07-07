@@ -32,10 +32,10 @@ using namespace lucene::store;
 Lucene::Lucene(QObject *parent, MainWindow *main) : QObject(parent), main(main)
 {
     // create the directory if needed
-    main->home.mkdir("index");
+    main->athlete->home.mkdir("index");
 
     // make index directory if needed
-    dir = QDir(main->home.canonicalPath() + "/index");
+    dir = QDir(main->athlete->home.canonicalPath() + "/index");
 
     try {
 
@@ -77,7 +77,7 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     QString alltexts;
 
     // And all the metadata texts individually
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
 
         if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
 

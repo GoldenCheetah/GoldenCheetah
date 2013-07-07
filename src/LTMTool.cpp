@@ -40,8 +40,6 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
 
     // get application settings
-    useMetricUnits = main->useMetricUnits;
-
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
@@ -157,7 +155,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
         // set default for the user overiddable fields
         adds.uname  = adds.name;
         adds.units = "";
-        adds.uunits = adds.metric->units(useMetricUnits);
+        adds.uunits = adds.metric->units(main->athlete->useMetricUnits);
 
         // default units to metric name if it is blank
         if (adds.uunits == "") adds.uunits = adds.name;
@@ -625,7 +623,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
 
     // metadata metrics
     SpecialFields sp;
-    foreach (FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach (FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
@@ -648,7 +646,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     // measures
     QList<FieldDefinition> measureDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
-    QString filename = main->home.absolutePath()+"/measures.xml";
+    QString filename = main->athlete->home.absolutePath()+"/measures.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
     RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions, colorfield);
@@ -712,12 +710,9 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     tabs->addTab(basic, tr("Preset"));
     tabs->addTab(metricContainer, tr("Custom"));
 
-    connect(metricTree,SIGNAL(itemSelectionChanged()),
-            this, SLOT(metricTreeWidgetSelectionChanged()));
-    connect(main, SIGNAL(configChanged()),
-            this, SLOT(configChanged()));
-    connect(metricTree,SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(metricTreePopup(const QPoint &)));
+    connect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(metricTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(metricTreePopup(const QPoint &)));
 
     // switched between one or other
     connect(dateSetting, SIGNAL(useStandardRange()), this, SIGNAL(useStandardRange()));
@@ -881,8 +876,8 @@ LTMTool::applySettings(LTMSettings *settings)
                 // usemetricUnits changed since charts.xml was
                 // written
                 if (saved && saved->conversion() != 1.0 &&
-                    metrics[i].uunits.contains(saved->units(!useMetricUnits)))
-                    metrics[i].uunits.replace(saved->units(!useMetricUnits), saved->units(useMetricUnits));
+                    metrics[i].uunits.contains(saved->units(!main->athlete->useMetricUnits)))
+                    metrics[i].uunits.replace(saved->units(!main->athlete->useMetricUnits), saved->units(main->athlete->useMetricUnits));
                 // select it on the tool
                 allMetrics->child(i)->setSelected(true);
                 break;

@@ -35,9 +35,8 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
 
-LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) :
-            GcChartWindow(parent), home(home),
-            useMetricUnits(useMetricUnits), dirty(true)
+LTMWindow::LTMWindow(MainWindow *parent) :
+            GcChartWindow(parent), dirty(true)
 {
     main = parent;
     setInstanceName("Metric Window");
@@ -46,7 +45,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    ltmPlot = new LTMPlot(this, main, home);
+    ltmPlot = new LTMPlot(this, main);
     mainLayout->addWidget(ltmPlot);
     setChartLayout(mainLayout);
 
@@ -121,7 +120,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     _canvasPicker = new LTMCanvasPicker(ltmPlot);
 
-    ltmTool = new LTMTool(parent, home);
+    ltmTool = new LTMTool(parent, main->athlete->home);
 
     // initialise
     settings.ltmTool = ltmTool;
@@ -158,7 +157,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
-    connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
 }
 
 LTMWindow::~LTMWindow()
@@ -213,13 +212,11 @@ LTMWindow::refresh()
 {
 
     // refresh for changes to ridefiles / zones
-    if (amVisible() == true && main->metricDB != NULL) {
-        // if config has changed get new useMetricUnits
-        useMetricUnits = main->useMetricUnits;
+    if (amVisible() == true && main->athlete->metricDB != NULL) {
         results.clear(); // clear any old data
-        results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
+        results = main->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
-        measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
+        measures = main->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
         refreshPlot();
         repaint(); // title changes color when filters change
         dirty = false;
@@ -293,9 +290,9 @@ LTMWindow::filterChanged()
 
     // we need to get data again and apply filter
     results.clear(); // clear any old data
-    results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
+    results = main->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
     measures.clear(); // clear any old data
-    measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
+    measures = main->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
 
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {
@@ -379,7 +376,7 @@ LTMWindow::saveClicked()
     EditChartDialog editor(main, &settings, ltmTool->presets);
     if (editor.exec()) {
         ltmTool->presets.append(settings);
-        settings.writeChartXML(main->home, ltmTool->presets);
+        settings.writeChartXML(main->athlete->home, ltmTool->presets);
         ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
         ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
@@ -399,7 +396,7 @@ LTMWindow::manageClicked()
             ltmTool->presetPicker->addItem(ltmTool->presets[i].name, i);
 
         // update charts.xml
-        settings.writeChartXML(main->home, ltmTool->presets);
+        settings.writeChartXML(main->athlete->home, ltmTool->presets);
     }
 }
 

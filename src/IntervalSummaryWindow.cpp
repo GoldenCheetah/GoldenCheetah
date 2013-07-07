@@ -40,7 +40,7 @@ IntervalSummaryWindow::~IntervalSummaryWindow() {
 void IntervalSummaryWindow::intervalSelected()
 {
     // if no ride available don't bother
-    if (mainWindow->currentRideItem() == NULL || mainWindow->currentRide() == NULL) return;
+    if (mainWindow->context->currentRideItem() == NULL || mainWindow->context->currentRide() == NULL) return;
 
 	QString html;
     if (mainWindow->allIntervalItems() != NULL) {
@@ -62,9 +62,9 @@ void IntervalSummaryWindow::intervalSelected()
 
 void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 {
-	const RideFile* ride = mainWindow->currentRide();
+	const RideFile* ride = mainWindow->context->currentRide();
 
-    bool metricUnits = mainWindow->useMetricUnits;
+    bool metricUnits = mainWindow->athlete->useMetricUnits;
 
     RideFile f(ride->startTime(), ride->recIntSecs());
     f.mainwindow = mainWindow;
@@ -88,7 +88,7 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
     QStringList intervalMetrics = s.split(",");
 
     QHash<QString,RideMetricPtr> metrics =
-        RideMetric::computeMetrics(mainWindow, &f, mainWindow->zones(), mainWindow->hrZones(), intervalMetrics);
+        RideMetric::computeMetrics(mainWindow, &f, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), intervalMetrics);
 
     html += "<b>" + interval->text(0) + "</b>";
     html += "<table align=\"center\" width=\"90%\" ";

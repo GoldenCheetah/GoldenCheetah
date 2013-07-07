@@ -33,10 +33,10 @@ WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
     ergPlot = new ErgFilePlot(mainWindow);
     layout->addWidget(ergPlot);
 
-    connect(mainWindow, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
-    connect(mainWindow, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
-    connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
-    connect(mainWindow, SIGNAL(start()), ergPlot, SLOT(start()));
+    connect(mainWindow->context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
+    connect(mainWindow->context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
+    connect(mainWindow->context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
+    connect(mainWindow->context, SIGNAL(start()), ergPlot, SLOT(start()));
 }
 
 void

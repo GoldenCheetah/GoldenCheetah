@@ -127,7 +127,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
 //
 BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePage(main)
 {  
-    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_ANALYSIS, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
     welcomeTitle->setText(tr("Analysis"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -155,7 +155,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePag
 //
 BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
 {
-    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_HOME, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_HOME, false).toBool());
     welcomeTitle->setText(tr("Home"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -182,7 +182,7 @@ BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
 //
 BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main)
 {
-    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_DIARY, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_DIARY, false).toBool());
     welcomeTitle->setText(tr("Diary"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -209,7 +209,7 @@ BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main
 //
 BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main)
 {
-    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_TRAIN, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_TRAIN, false).toBool());
     welcomeTitle->setText(tr("Train"));
     welcomeText->setText(tr("No devices or workouts ?\nLet's get you setup."));
 

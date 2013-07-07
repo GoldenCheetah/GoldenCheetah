@@ -77,9 +77,9 @@ SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
     connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged()));
 
     // get updates..
-    connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
-    connect(mainWindow, SIGNAL(start()), this, SLOT(start()));
-    connect(mainWindow, SIGNAL(stop()), this, SLOT(stop()));
+    connect(mainWindow->context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(mainWindow->context, SIGNAL(start()), this, SLOT(start()));
+    connect(mainWindow->context, SIGNAL(stop()), this, SLOT(stop()));
 
     // set to zero
     stop(); // resets the array

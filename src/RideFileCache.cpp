@@ -301,11 +301,11 @@ RideFileCache::refreshCache()
         // invalidate any incore cache of aggregate
         // that contains this ride in its date range
         QDate date = ride->startTime().date();
-        for (int i=0; i<main->cpxCache.count();) {
-            if (date >= main->cpxCache.at(i)->start &&
-                date <= main->cpxCache.at(i)->end) {
-                delete main->cpxCache.at(i);
-                main->cpxCache.removeAt(i);
+        for (int i=0; i<main->athlete->cpxCache.count();) {
+            if (date >= main->athlete->cpxCache.at(i)->start &&
+                date <= main->athlete->cpxCache.at(i)->end) {
+                delete main->athlete->cpxCache.at(i);
+                main->athlete->cpxCache.removeAt(i);
             } else i++;
         }
 
@@ -814,13 +814,13 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (ride->isDataPresent(baseSeries) == false) return;
 
     // get zones that apply, if any
-    int zoneRange = main->zones() ? main->zones()->whichRange(ride->startTime().date()) : -1;
-    int hrZoneRange = main->hrZones() ? main->hrZones()->whichRange(ride->startTime().date()) : -1;
+    int zoneRange = main->athlete->zones() ? main->athlete->zones()->whichRange(ride->startTime().date()) : -1;
+    int hrZoneRange = main->athlete->hrZones() ? main->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
 
-    if (zoneRange != -1) CP=main->zones()->getCP(zoneRange);
+    if (zoneRange != -1) CP=main->athlete->zones()->getCP(zoneRange);
     else CP=0;
 
-    if (hrZoneRange != -1) LTHR=main->hrZones()->getLT(hrZoneRange);
+    if (hrZoneRange != -1) LTHR=main->athlete->hrZones()->getLT(hrZoneRange);
     else LTHR=0;
 
     // setup the array based upon the ride
@@ -843,11 +843,11 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
         // watts time in zone
         if (series == RideFile::watts && zoneRange != -1)
-            wattsTimeInZone[main->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
+            wattsTimeInZone[main->athlete->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
 
         // hr time in zone
         if (series == RideFile::hr && hrZoneRange != -1)
-            hrTimeInZone[main->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
+            hrTimeInZone[main->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
 
         int offset = lvalue - min;
         if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
@@ -895,7 +895,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
 
     // Oh lets get from the cache if we can -- but not if filtered
     if (!filter && !main->isfiltered) {
-        foreach(RideFileCache *p, main->cpxCache) {
+        foreach(RideFileCache *p, main->athlete->cpxCache) {
             if (p->start == start && p->end == end) {
                 *this = *p;
                 return;
@@ -934,7 +934,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
 
     // Iterate over the ride files (not the cpx files since they /might/ not
     // exist, or /might/ be out of date.
-    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(main->home)) {
+    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(main->athlete->home)) {
         QDate rideDate = dateFromFileName(rideFileName);
         if (((filter == true && files.contains(rideFileName)) || filter == false) &&
             rideDate >= start && rideDate <= end) {
@@ -943,7 +943,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
             if (main->isfiltered && !main->filters.contains(rideFileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(main, main->home.absolutePath() + "/" + rideFileName);
+            RideFileCache rideCache(main, main->athlete->home.absolutePath() + "/" + rideFileName);
 
             // lets aggregate
             meanMaxAggregate(wattsMeanMaxDouble, rideCache.wattsMeanMaxDouble, wattsMeanMaxDate, rideDate);
@@ -978,11 +978,11 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
 
     // lets add to the cache for others to re-use -- but not if filtered
     if (!main->isfiltered && !filter) {
-        if (main->cpxCache.count() > maxcache) {
-            delete(main->cpxCache.at(0));
-            main->cpxCache.removeAt(0);
+        if (main->athlete->cpxCache.count() > maxcache) {
+            delete(main->athlete->cpxCache.at(0));
+            main->athlete->cpxCache.removeAt(0);
         }
-        main->cpxCache.append(new RideFileCache(this));
+        main->athlete->cpxCache.append(new RideFileCache(this));
     }
 
 }

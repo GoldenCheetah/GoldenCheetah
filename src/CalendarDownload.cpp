@@ -31,7 +31,7 @@ CalendarDownload::CalendarDownload(MainWindow *main) : main(main)
 bool
 CalendarDownload::download()
 {
-    QString request = appsettings->cvalue(main->cyclist, GC_WEBCAL_URL, "").toString();
+    QString request = appsettings->cvalue(main->athlete->cyclist, GC_WEBCAL_URL, "").toString();
     if (request == "") return false;
     else {
         // change webcal to http, since it is basically the same port
@@ -55,7 +55,7 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
     QStringList errors;
 
 #ifdef GC_HAVE_ICAL
-    QString remoteCache = main->home.absolutePath()+"/remote.ics";
+    QString remoteCache = main->athlete->home.absolutePath()+"/remote.ics";
     QFile remoteCacheFile(remoteCache);
 
     if (fulltext != "") {
@@ -83,6 +83,6 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
         }
     }
 
-    if (fulltext != "") main->rideCalendar->refreshRemote(fulltext);
+    if (fulltext != "") main->athlete->rideCalendar->refreshRemote(fulltext);
 #endif
 }

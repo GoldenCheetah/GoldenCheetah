@@ -243,7 +243,7 @@ PowerHist::refreshHRZoneLabels()
     if (!rideItem) return;
 
     if (series == RideFile::hr) {
-        const HrZones *zones       = mainWindow->hrZones();
+        const HrZones *zones       = mainWindow->athlete->hrZones();
         int zone_range     = rideItem->hrZoneRange();
 
         // generate labels for existing zones
@@ -272,7 +272,7 @@ PowerHist::recalc(bool force)
         LASTrideItem == rideItem &&
         LASTseries == series &&
         LASTshade == shade &&
-        LASTuseMetricUnits == mainWindow->useMetricUnits &&
+        LASTuseMetricUnits == mainWindow->athlete->useMetricUnits &&
         LASTlny == lny &&
         LASTzoned == zoned &&
         LASTbinw == binw &&
@@ -289,7 +289,7 @@ PowerHist::recalc(bool force)
         LASTrideItem = rideItem;
         LASTseries = series;
         LASTshade = shade;
-        LASTuseMetricUnits = mainWindow->useMetricUnits;
+        LASTuseMetricUnits = mainWindow->athlete->useMetricUnits;
         LASTlny = lny;
         LASTzoned = zoned;
         LASTbinw = binw;
@@ -504,28 +504,28 @@ PowerHist::recalc(bool force)
 
         // hr scale draw
         int hrRange;
-        if (series == RideFile::hr && zoned && rideItem && mainWindow->hrZones() &&
-            (hrRange=mainWindow->hrZones()->whichRange(rideItem->dateTime.date())) != -1) {
-            setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->hrZones(), hrRange));
+        if (series == RideFile::hr && zoned && rideItem && mainWindow->athlete->hrZones() &&
+            (hrRange=mainWindow->athlete->hrZones()->whichRange(rideItem->dateTime.date())) != -1) {
+            setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->athlete->hrZones(), hrRange));
 
             if (hrRange >= 0)
-                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(hrRange), 1);
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->athlete->hrZones()->numZones(hrRange), 1);
             else
                 setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
         }
 
         // watts zoned for a time range
-        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && mainWindow->zones()) {
-            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(mainWindow->zones(), 0));
-            if (mainWindow->zones()->getRangeSize())
-                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->zones()->numZones(0), 1); // use zones from first defined range
+        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && mainWindow->athlete->zones()) {
+            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(mainWindow->athlete->zones(), 0));
+            if (mainWindow->athlete->zones()->getRangeSize())
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->athlete->zones()->numZones(0), 1); // use zones from first defined range
         }
 
         // hr zoned for a time range
-        if (source == Cache && zoned && series == RideFile::hr && mainWindow->hrZones()) {
-            setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->hrZones(), 0));
-            if (mainWindow->hrZones()->getRangeSize())
-                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(0), 1); // use zones from first defined range
+        if (source == Cache && zoned && series == RideFile::hr && mainWindow->athlete->hrZones()) {
+            setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->athlete->hrZones(), 0));
+            if (mainWindow->athlete->hrZones()->getRangeSize())
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->athlete->hrZones()->numZones(0), 1); // use zones from first defined range
         }
 
         setAxisMaxMinor(QwtPlot::xBottom, 0);
@@ -602,9 +602,9 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(cadArray, cache->distributionArray(RideFile::cad));
     longFromDouble(kphArray, cache->distributionArray(RideFile::kph));
 
-    if (!mainWindow->useMetricUnits) {
-        double torque_factor = (mainWindow->useMetricUnits ? 1.0 : 0.73756215);
-        double speed_factor  = (mainWindow->useMetricUnits ? 1.0 : 0.62137119);
+    if (!mainWindow->athlete->useMetricUnits) {
+        double torque_factor = (mainWindow->athlete->useMetricUnits ? 1.0 : 0.73756215);
+        double speed_factor  = (mainWindow->athlete->useMetricUnits ? 1.0 : 0.62137119);
 
         for(int i=0; i<nmArray.size(); i++) nmArray[i] = nmArray[i] * torque_factor;
         for(int i=0; i<kphArray.size(); i++) kphArray[i] = kphArray[i] * speed_factor;
@@ -649,7 +649,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (mainWindow->isfiltered && !mainWindow->filters.contains(x.getFileName())) continue;
 
         // get computed value
-        double v = x.getForSymbol(distMetric, mainWindow->useMetricUnits);
+        double v = x.getForSymbol(distMetric, mainWindow->athlete->useMetricUnits);
 
         // ignore no temp files
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::noTemp) continue;
@@ -658,7 +658,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (isnan(v) || isinf(v)) v = 0;
 
         // seconds to minutes
-        if (m->units(mainWindow->useMetricUnits) == tr("seconds")) v /= 60;
+        if (m->units(mainWindow->athlete->useMetricUnits) == tr("seconds")) v /= 60;
 
         // apply multiplier
         v *= multiplier;
@@ -689,7 +689,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (mainWindow->isfiltered && !mainWindow->filters.contains(x.getFileName())) continue;
 
         // get computed value
-        double v = x.getForSymbol(distMetric, mainWindow->useMetricUnits);
+        double v = x.getForSymbol(distMetric, mainWindow->athlete->useMetricUnits);
 
         // ignore no temp files
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::noTemp) continue;
@@ -698,7 +698,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (isnan(v) || isinf(v)) v = 0;
 
         // seconds to minutes
-        if (m->units(mainWindow->useMetricUnits) == tr("seconds")) v /= 60;
+        if (m->units(mainWindow->athlete->useMetricUnits) == tr("seconds")) v /= 60;
 
         // apply multiplier
         v *= multiplier;
@@ -710,10 +710,10 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         // there will be some loss of precision due to totalising
         // a double in an int, but frankly that should be minimal
         // since most values of note are integer based anyway.
-        double t = x.getForSymbol(totalMetric, mainWindow->useMetricUnits);
+        double t = x.getForSymbol(totalMetric, mainWindow->athlete->useMetricUnits);
 
         // totalise in minutes
-        if (tm->units(mainWindow->useMetricUnits) == tr("seconds")) t /= 60;
+        if (tm->units(mainWindow->athlete->useMetricUnits) == tr("seconds")) t /= 60;
 
         // sum up
         metricArray[(int)(v)-min] += t;
@@ -734,17 +734,17 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
     absolutetime = true;
 
     // and the plot itself
-    QString yunits = tm->units(mainWindow->useMetricUnits);
+    QString yunits = tm->units(mainWindow->athlete->useMetricUnits);
     if (yunits == tr("seconds")) yunits = tr("minutes");
-    QString xunits = m->units(mainWindow->useMetricUnits);
+    QString xunits = m->units(mainWindow->athlete->useMetricUnits);
     if (xunits == tr("seconds")) xunits = tr("minutes");
 
-    if (tm->units(mainWindow->useMetricUnits) != "")
+    if (tm->units(mainWindow->athlete->useMetricUnits) != "")
         setAxisTitle(yLeft, QString(tr("Total %1 (%2)")).arg(tm->name()).arg(yunits));
     else
         setAxisTitle(yLeft, QString(tr("Total %1")).arg(tm->name()));
     
-    if (m->units(mainWindow->useMetricUnits) != "")
+    if (m->units(mainWindow->athlete->useMetricUnits) != "")
         setAxisTitle(xBottom, QString(tr("%1 of Activity (%2)")).arg(m->name()).arg(xunits));
     else
         setAxisTitle(xBottom, QString(tr("%1 of Activity")).arg(m->name()));
@@ -811,8 +811,8 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         cadSelectedArray.resize(0);
 
         // unit conversion factor for imperial units for selected parameters
-        double torque_factor = (mainWindow->useMetricUnits ? 1.0 : 0.73756215);
-        double speed_factor  = (mainWindow->useMetricUnits ? 1.0 : 0.62137119);
+        double torque_factor = (mainWindow->athlete->useMetricUnits ? 1.0 : 0.73756215);
+        double speed_factor  = (mainWindow->athlete->useMetricUnits ? 1.0 : 0.62137119);
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
             bool selected = isSelected(p1, ride->recIntSecs());
@@ -893,11 +893,11 @@ PowerHist::setData(RideItem *_rideItem, bool force)
             }
 
             // hr zoned array
-            int hrZoneRange = mainWindow->hrZones() ? mainWindow->hrZones()->whichRange(ride->startTime().date()) : -1;
+            int hrZoneRange = mainWindow->athlete->hrZones() ? mainWindow->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
 
             // Only calculate zones if we have a valid range
             if (hrZoneRange > -1 && (withz || (!withz && p1->hr))) {
-                hrIndex = mainWindow->hrZones()->whichZone(hrZoneRange, p1->hr);
+                hrIndex = mainWindow->athlete->hrZones()->whichZone(hrZoneRange, p1->hr);
 
                 if (hrIndex >= 0 && hrIndex < maxSize) {
                     if (hrIndex >= hrZoneArray.size())
@@ -1027,11 +1027,11 @@ PowerHist::setParameterAxisTitle()
             break;
 
         case RideFile::kph:
-            axislabel = QString(tr("Speed (%1)")).arg(mainWindow->useMetricUnits ? tr("kph") : tr("mph"));
+            axislabel = QString(tr("Speed (%1)")).arg(mainWindow->athlete->useMetricUnits ? tr("kph") : tr("mph"));
             break;
 
         case RideFile::nm:
-            axislabel = QString(tr("Torque (%1)")).arg(mainWindow->useMetricUnits ? tr("N-m") : tr("ft-lbf"));
+            axislabel = QString(tr("Torque (%1)")).arg(mainWindow->athlete->useMetricUnits ? tr("N-m") : tr("ft-lbf"));
             break;
 
         default:

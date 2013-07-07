@@ -240,7 +240,7 @@ class TreeMapPlot : public QWidget
 
 
     public:
-        TreeMapPlot(TreeMapWindow *, MainWindow *main, QDir home);
+        TreeMapPlot(TreeMapWindow *, MainWindow *main);
         ~TreeMapPlot();
         void setData(TMSettings *);
 
@@ -259,8 +259,6 @@ class TreeMapPlot : public QWidget
 
     private:
         MainWindow *main;
-        QDir home;
-        bool useMetricUnits;
         TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure

@@ -171,7 +171,7 @@ void ConfigDialog::saveClicked()
     hide();
 
     // do the zones first..
-    mainWindow->notifyConfigChanged();
+    mainWindow->context->notifyConfigChanged();
     close();
 }
 

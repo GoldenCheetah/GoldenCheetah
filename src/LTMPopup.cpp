@@ -21,8 +21,6 @@
 LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
 {
     // get application settings
-    useMetricUnits = main->useMetricUnits;
-
     setAutoFillBackground(false);
     setContentsMargins(0,0,0,0);
     setFixedWidth(800);
@@ -105,9 +103,6 @@ LTMPopup::setTitle(QString s)
 void
 LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString title)
 {
-    // list of activities only need to show 1 value (see symbol)
-    useMetricUnits = main->useMetricUnits;
-
     // create the ride list
     int count = 0;
     rides->clear();
@@ -140,7 +135,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         rides->setRowHeight(count, 14);
 
         // metrics
-        QString value = x.getStringForSymbol(metric->symbol(), useMetricUnits);
+        QString value = x.getStringForSymbol(metric->symbol(), main->athlete->useMetricUnits);
         h = new QTableWidgetItem(value,QTableWidgetItem::Type);
         h->setFlags(t->flags() & (~Qt::ItemIsEditable));
         h->setTextAlignment(Qt::AlignHCenter);
@@ -178,7 +173,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
     }
 
     // Metric summary
-    QString filename = main->home.absolutePath()+"/ltm-summary.html";
+    QString filename = main->athlete->home.absolutePath()+"/ltm-summary.html";
     if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
 
     // read it in...
@@ -196,8 +191,6 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
 void
 LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
 {
-    useMetricUnits = main->useMetricUnits;
-
     // set the title
     QString _title;
     switch (settings.groupBy) {
@@ -254,7 +247,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
             // metrics
             int column = 1;
             foreach(MetricDetail d, settings.metrics) {
-                QString value = x.getStringForSymbol(d.symbol, useMetricUnits);
+                QString value = x.getStringForSymbol(d.symbol, main->athlete->useMetricUnits);
                 h = new QTableWidgetItem(value,QTableWidgetItem::Type);
                 h->setFlags(t->flags() & (~Qt::ItemIsEditable));
                 h->setTextAlignment(Qt::AlignHCenter);
@@ -298,7 +291,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
     }
 
     // Metric summary
-    QString filename = main->home.absolutePath()+"/ltm-summary.html";
+    QString filename = main->athlete->home.absolutePath()+"/ltm-summary.html";
     if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
 
     // read it in...
@@ -323,7 +316,7 @@ LTMPopup::rideSelected()
     if (selected.count() > index) {
 
         // update summary
-        metrics->setText(selected[index].toString(summary, useMetricUnits));
+        metrics->setText(selected[index].toString(summary, main->athlete->useMetricUnits));
 
         notes->setText(selected[index].getText("Notes", ""));
     }

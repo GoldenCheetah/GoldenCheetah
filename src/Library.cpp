@@ -158,7 +158,7 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
             // set target directory
             QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
             if (workoutDir == "") {
-                QDir root = mainWindow->home;
+                QDir root = mainWindow->athlete->home;
                 root.cdUp();
                 workoutDir = root.absolutePath();
             }
@@ -182,11 +182,11 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
         trainDB->endLUW();
 
         // now write to disk.. any refs we added
-        LibraryParser::serialize(mainWindow->home);
+        LibraryParser::serialize(mainWindow->athlete->home);
 
         // Tell traintool to select what was imported
-        if (videos.count()) mainWindow->notifySelectVideo(videos[0]);
-        if (workouts.count()) mainWindow->notifySelectWorkout(target);
+        if (videos.count()) mainWindow->context->notifySelectVideo(videos[0]);
+        if (workouts.count()) mainWindow->context->notifySelectWorkout(target);
 
     } else {
 
@@ -203,7 +203,7 @@ Library::removeRef(MainWindow *mainWindow, QString ref)
     int index = refs.indexOf(ref);
     if (index >= 0) {
         refs.removeAt(index);
-        LibraryParser::serialize(mainWindow->home);
+        LibraryParser::serialize(mainWindow->athlete->home);
     }
 }
 
@@ -406,7 +406,7 @@ LibrarySearchDialog::search()
 
 
             // now write to disk..
-            LibraryParser::serialize(mainWindow->home);
+            LibraryParser::serialize(mainWindow->athlete->home);
         }
 
         // ok, we;ve completed a search without aborting
@@ -750,12 +750,12 @@ WorkoutImportDialog::import()
     }
 
     // now write to disk..
-    LibraryParser::serialize(main->home);
+    LibraryParser::serialize(main->athlete->home);
 
     // set target directory
     QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
     if (workoutDir == "") {
-        QDir root = main->home;
+        QDir root = main->athlete->home;
         root.cdUp();
         workoutDir = root.absolutePath();
     }

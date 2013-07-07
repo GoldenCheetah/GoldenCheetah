@@ -156,7 +156,7 @@ GCColor::GCColor(MainWindow *main) : QObject(main)
 {
     setupColors();
     readConfig();
-    connect(main, SIGNAL(configChanged()), this, SLOT(readConfig()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(readConfig()));
 }
 
 const Colors * GCColor::colorSet()
@@ -216,7 +216,7 @@ GCColor::getColor(int colornum)
 ColorEngine::ColorEngine(MainWindow* main) : QObject(main), defaultColor(QColor(Qt::white)), mainWindow(main)
 {
     configUpdate();
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 void ColorEngine::configUpdate()
@@ -225,7 +225,7 @@ void ColorEngine::configUpdate()
     workoutCodes.clear();
 
     // setup the keyword/color combinations from config settings
-    foreach (KeywordDefinition keyword, mainWindow->rideMetadata()->getKeywords()) {
+    foreach (KeywordDefinition keyword, mainWindow->athlete->rideMetadata()->getKeywords()) {
         if (keyword.name == "Default")
             defaultColor = keyword.color;
         else {

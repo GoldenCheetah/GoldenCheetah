@@ -39,7 +39,7 @@ class MetricAggregator : public QObject
 
 
 	public:
-        MetricAggregator(MainWindow *, QDir , const Zones *, const HrZones *);
+        MetricAggregator(MainWindow *);
 		~MetricAggregator();
 
 
@@ -66,9 +66,6 @@ class MetricAggregator : public QObject
     private:
         MainWindow *main;
         DBAccess *dbaccess;
-        QDir home;
-        const Zones *zones;
-        const HrZones *hrzones;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);

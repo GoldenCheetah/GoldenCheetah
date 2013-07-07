@@ -132,7 +132,6 @@ class LTMTool : public QWidget
 
         const QDir home;
         MainWindow *main;
-        bool useMetricUnits;
         bool active; // ignore season changed signals since we triggered them
 
         //Seasons *seasons;

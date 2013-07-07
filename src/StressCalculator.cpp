@@ -69,7 +69,7 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
     QList<SummaryMetrics> results;
 
     // get metrics
-    results = main->metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
+    results = main->athlete->metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
 
     if (isfilter) {
         // remove any we don't have filtered
@@ -105,7 +105,7 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
     // start date for any season -- since it may be seeded
     // so lets run through the seasons and set start date
     // to the very earliest date set
-    foreach(Season x, main->seasons->seasons)
+    foreach(Season x, main->athlete->seasons->seasons)
         if (x.getStart() < startDate.date())
             startDate = QDateTime(x.getStart(), QTime(0,0,0));
     
@@ -121,7 +121,7 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
     // clear data add in the seeds
     ltsvalues.fill(0);
     stsvalues.fill(0);
-    foreach(Season x, main->seasons->seasons) {
+    foreach(Season x, main->athlete->seasons->seasons) {
         if (x.getSeed()) {
             int offset = startDate.date().daysTo(x.getStart());
             ltsvalues[offset] = x.getSeed() * -1;

@@ -97,8 +97,8 @@ TPUpload::upload(MainWindow *main, const RideFile *ride)
     http.setHost("www.trainingpeaks.com");
     http.setAction("http://www.trainingpeaks.com/TPWebServices/ImportFileForUser");
     current.setMethod("ImportFileForUser", "http://www.trainingpeaks.com/TPWebServices/");
-    current.addMethodArgument("username", "", appsettings->cvalue(main->cyclist, GC_TPUSER).toString());
-    current.addMethodArgument("password", "", appsettings->cvalue(main->cyclist, GC_TPPASS).toString());
+    current.addMethodArgument("username", "", appsettings->cvalue(main->athlete->cyclist, GC_TPUSER).toString());
+    current.addMethodArgument("password", "", appsettings->cvalue(main->athlete->cyclist, GC_TPPASS).toString());
     current.addMethodArgument("byteData", "", pwxFile);
 
     // do it!

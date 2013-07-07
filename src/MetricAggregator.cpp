@@ -34,14 +34,14 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
-MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrzones) : QObject(main), main(main), home(home), zones(zones), hrzones(hrzones)
+MetricAggregator::MetricAggregator(MainWindow *main) : QObject(main), main(main)
 {
     colorEngine = new ColorEngine(main);
-    dbaccess = new DBAccess(main, home);
-    connect(main, SIGNAL(configChanged()), this, SLOT(update()));
+    dbaccess = new DBAccess(main);
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(update()));
+    connect(main->context, SIGNAL(rideClean(RideItem*)), this, SLOT(update(void)));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
-    connect(main, SIGNAL(rideClean(RideItem*)), this, SLOT(update(void)));
 }
 
 MetricAggregator::~MetricAggregator()
@@ -77,7 +77,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     // Get a list of the ride files
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
-    QStringList filenames = RideFileFactory::instance().listRideFiles(home);
+    QStringList filenames = RideFileFactory::instance().listRideFiles(main->athlete->home);
     QStringListIterator i(filenames);
 
     // get a Hash map of statistic records and timestamps
@@ -98,16 +98,16 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // Delete statistics for non-existant ride files
     QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
-        if (QFile(home.absolutePath() + "/" + d.key()).exists() == false) {
+        if (QFile(main->athlete->home.absolutePath() + "/" + d.key()).exists() == false) {
             dbaccess->deleteRide(d.key());
 #ifdef GC_HAVE_LUCENE
-            main->lucene->deleteRide(d.key());
+            main->athlete->lucene->deleteRide(d.key());
 #endif
         }
     }
 
-    unsigned long zoneFingerPrint = static_cast<unsigned long>(zones->getFingerprint())
-                                  + static_cast<unsigned long>(hrzones->getFingerprint()); // checksum of *all* zone data (HR and Power)
+    unsigned long zoneFingerPrint = static_cast<unsigned long>(main->athlete->zones()->getFingerprint())
+                                  + static_cast<unsigned long>(main->athlete->hrZones()->getFingerprint()); // checksum of *all* zone data (HR and Power)
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
@@ -123,7 +123,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QApplication::processEvents(); // get that dialog up!
 
     // log of progress
-    QFile log(home.absolutePath() + "/" + "metric.log");
+    QFile log(main->athlete->home.absolutePath() + "/" + "metric.log");
     log.open(QIODevice::WriteOnly);
     log.resize(0);
     QTextStream out(&log);
@@ -131,7 +131,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     while (i.hasNext()) {
         QString name = i.next();
-        QFile file(home.absolutePath() + "/" + name);
+        QFile file(main->athlete->home.absolutePath() + "/" + name);
 
         // if it s missing or out of date then update it!
         status current = dbStatus.value(name);
@@ -168,7 +168,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                 out << "Getting weight: " << name << "\r\n";
                 ride->getWeight();
                 out << "Updating statistics: " << name << "\r\n";
-                importRide(home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
+                importRide(main->athlete->home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
 
             }
         }
@@ -177,7 +177,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // if ride wasn't opened it will do it itself
         // we only want to check so passing check=true
         // because we don't actually want the results now
-        RideFileCache updater(main, home.absolutePath() + "/" + name, ride, true);
+        RideFileCache updater(main, main->athlete->home.absolutePath() + "/" + name, ride, true);
 
         // free memory - if needed
         if (ride) delete ride;
@@ -195,7 +195,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 #ifdef GC_HAVE_LUCENE
 #ifndef WIN32 // windows crashes here....
     out << "OPTIMISE: " << QDateTime::currentDateTime().toString() + "\r\n";
-    main->lucene->optimise();
+    main->athlete->lucene->optimise();
 #endif
 #endif
     main->isclean = true;
@@ -216,8 +216,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 void MetricAggregator::addRide(RideItem*ride)
 {
     if (ride && ride->ride()) {
-        importRide(main->home, ride->ride(), ride->fileName, main->zones()->getFingerprint(), true);
-        RideFileCache updater(main, home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
+        importRide(main->athlete->home, ride->ride(), ride->fileName, main->athlete->zones()->getFingerprint(), true);
+        RideFileCache updater(main, main->athlete->home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
         dataChanged(); // notify models/views
     }
 }
@@ -254,7 +254,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
         metrics << factory.metricName(i);
 
     // compute all the metrics
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(main, ride, zones, hrzones, metrics);
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(main, ride, main->athlete->zones(), main->athlete->hrZones(), metrics);
 
     // get metrics into summaryMetric QMap
     for(int i = 0; i < factory.metricCount(); ++i) {
@@ -263,11 +263,11 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
     }
 
     // what color will this ride be?
-    QColor color = colorEngine->colorFor(ride->getTag(main->rideMetadata()->getColorField(), ""));
+    QColor color = colorEngine->colorFor(ride->getTag(main->athlete->rideMetadata()->getColorField(), ""));
 
     dbaccess->importRide(&summaryMetric, ride, color, fingerprint, modify);
 #ifdef GC_HAVE_LUCENE
-    main->lucene->importRide(&summaryMetric, ride, color, fingerprint, modify);
+    main->athlete->lucene->importRide(&summaryMetric, ride, color, fingerprint, modify);
 #endif
 
     return true;
