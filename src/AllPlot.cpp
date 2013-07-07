@@ -863,7 +863,7 @@ AllPlot::setYMax()
         }
 
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
-        for (int i=0;i<maxY;i+=step)
+        for (int i=0;i<maxY && i<2000;i+=step)
             xytick[QwtScaleDiv::MajorTick]<<i;
 
         setAxisTitle(yLeft, tr("Watts"));
