@@ -60,7 +60,6 @@
 #include "BatchExportDialog.h"
 #include "RideWithGPSDialog.h"
 #include "TtbDialog.h"
-#include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
 #include "CalendarDownload.h"
@@ -1347,11 +1346,6 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 
         menu.addAction(actDeleteRide);
         menu.addAction(actSplitRide);
-#ifdef GC_HAVE_LIBOAUTH
-        QAction *actTweetRide = new QAction(tr("Tweet Activity"), treeWidget);
-        connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
-        menu.addAction(actTweetRide);
-#endif
 #ifdef GC_HAVE_ICAL
         QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), treeWidget);
         connect(actUploadCalendar, SIGNAL(triggered(void)), this, SLOT(uploadCalendar()));
@@ -1839,21 +1833,6 @@ MainWindow::setStyle()
         styleSelector->setSegmentSelected(select, true);
 #endif
 }
-
-#ifdef GC_HAVE_LIBOAUTH
-void
-MainWindow::tweetRide()
-{
-    QTreeWidgetItem *_item = treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE)
-        return;
-
-    RideItem *item = dynamic_cast<RideItem*>(_item);
-    TwitterDialog *twitterDialog = new TwitterDialog(this, item);
-    twitterDialog->setWindowModality(Qt::ApplicationModal);
-    twitterDialog->exec();
-}
-#endif
 
 /*----------------------------------------------------------------------
  * Drag and Drop
@@ -2818,10 +2797,10 @@ MainWindow::searchTextChanged(QString text)
         gcCalendar->clearFilter();
         gcMultiCalendar->clearFilter();
     } else {
-        lucene->search(text);
-        listView->searchStrings(lucene->files());
-        gcCalendar->setFilter(lucene->files());
-        gcMultiCalendar->setFilter(lucene->files());
+        athlete->lucene->search(text);
+        listView->searchStrings(athlete->lucene->files());
+        gcCalendar->setFilter(athlete->lucene->files());
+        gcMultiCalendar->setFilter(athlete->lucene->files());
     }
 #endif
 }

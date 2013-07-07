@@ -288,19 +288,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *passLabel = new QLabel(tr("Password"));
     QLabel *typeLabel = new QLabel(tr("Account Type"));
 
-    //XXX deprecated QLabel *twp = new QLabel(tr("Twitter"));
-    //XXX deprecated twp->setFont(current);
-
-    //XXX deprecated QLabel *twurlLabel = new QLabel(tr("Website"));
-    //XXX deprecated QLabel *twauthLabel = new QLabel(tr("Authorise"));
-    //XXX deprecated QLabel *twpinLabel = new QLabel(tr("PIN"));
-
-    //XXX deprecated QLabel *str = new QLabel(tr("Strava"));
-    //XXX deprecated str->setFont(current);
-
-    //XXX deprecated QLabel *struserLabel = new QLabel(tr("Username"));
-    //XXX deprecated QLabel *strpassLabel = new QLabel(tr("Password"));
-
     QLabel *rwgps = new QLabel(tr("RideWithGPS"));
     rwgps->setFont(current);
 
@@ -368,19 +355,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     tpType->addItem("Shared Coached Premium");
 
     tpType->setCurrentIndex(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TPTYPE, "0").toInt());
-
-    //XXX deprecated twitterURL = new QLineEdit(this);
-    //XXX deprecated twitterURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_TWURL, "http://www.twitter.com").toString());
-    //XXX deprecated twitterAuthorise = new QPushButton("Authorise", this);
-    //XXX deprecated twitterPIN = new QLineEdit(this);
-    //XXX deprecated twitterPIN->setText("");
-
-    //XXX deprecated stravaUser = new QLineEdit(this);
-    //XXX deprecated stravaUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_STRUSER, "").toString());
-
-    //XXX deprecated stravaPass = new QLineEdit(this);
-    //XXX deprecated stravaPass->setEchoMode(QLineEdit::Password);
-    //XXX deprecated stravaPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_STRPASS, "").toString());
 
     rideWithGPSUser = new QLineEdit(this);
     rideWithGPSUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSUSER, "").toString());
@@ -476,13 +450,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(gcUser, 7, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(gcPass, 8, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    //XXX deprecated grid->addWidget(twitterURL, 10, 1, 0);
-    //XXX deprecated grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    //XXX deprecated grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //XXX grid->addWidget(stravaUser, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    //XXX grid->addWidget(stravaPass, 15, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
     grid->addWidget(rideWithGPSUser, 18, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(rideWithGPSPass, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
@@ -511,8 +478,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     setFrameStyle(QFrame::NoFrame);
     setWidgetResizable(true);
     setWidget(main);
-
-    //XXX deprecated connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
 }
 
 
@@ -3481,70 +3446,6 @@ MeasuresPage::saveClicked()
 
     // write to measures.xml (uses same format as metadata.xml)
     RideMetadata::serialize(main->athlete->home.absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current, "");
-}
-
-void CredentialsPage::authoriseTwitter()
-{
-#ifdef GC_HAVE_LIBOAUTH
-    int rc;
-    char **rv = NULL;
-    QString token;
-    QString url = QString();
-    t_key = NULL;
-    t_secret = NULL;
-
-    const char *request_token_uri = "http://api.twitter.com/oauth/request_token";
-
-    char *req_url = NULL;
-    char *postarg = NULL;
-    char *reply   = NULL;
-    req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
-    reply = oauth_http_get(req_url,postarg);
-
-    rc = oauth_split_url_parameters(reply, &rv);
-    qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
-    token = QString(rv[1]);
-    t_key  =strdup(&(rv[1][12]));
-    t_secret =strdup(&(rv[2][19]));
-    url = QString("http://api.twitter.com/oauth/authorize?");
-    url.append(token);
-    QDesktopServices::openUrl(QUrl(url));
-    if(rv) free(rv);
-#endif
-}
-
-void CredentialsPage::saveTwitter()
-{
-#ifdef GC_HAVE_LIBOAUTH
-    char *reply;
-    char *req_url;
-    char **rv = NULL;
-    char *postarg = NULL;
-    QString url = QString("http://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
-
-    QString strPin = twitterPIN->text();
-    if(strPin.size() == 0)
-        return;
-
-    url.append(strPin);
-
-    req_url = oauth_sign_url2(url.toLatin1(), NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, t_key, t_secret);
-    reply = oauth_http_get(req_url,postarg);
-
-    int rc = oauth_split_url_parameters(reply, &rv);
-
-    if(rc ==4)
-    {
-        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
-
-        const char *oauth_token = strdup(&(rv[0][12]));
-        const char *oauth_secret = strdup(&(rv[1][19]));
-
-        //Save Twitter oauth_token and oauth_secret;
-        appsettings->setValue(GC_TWITTER_TOKEN, oauth_token);
-        appsettings->setValue(GC_TWITTER_SECRET, oauth_secret);
-    }
-#endif
 }
 
 //
