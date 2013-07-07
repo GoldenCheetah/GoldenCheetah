@@ -107,8 +107,8 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
            SLOT(PMpickerMoved(const QPoint &)));
     connect(metricCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(metricChanged()));
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(mainWindow, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
@@ -162,7 +162,6 @@ void PerformanceManagerWindow::rideSelected()
 
 void PerformanceManagerWindow::replot()
 {
-    const QDir &home = mainWindow->home;
     const QTreeWidgetItem *allRides = mainWindow->allRideItems();
 
     int newdays, rightIndex, endIndex;
@@ -180,7 +179,7 @@ void PerformanceManagerWindow::replot()
     }
 
     if (firstRideItem) {
-        int lookahead = (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt();
+        int lookahead = (appsettings->cvalue(mainWindow->athlete->cyclist, GC_STS_DAYS,7)).toInt();
         QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
         endTime = endTime.addDays( lookahead );
         newdays = firstRideItem->dateTime.daysTo(endTime);
@@ -205,15 +204,15 @@ void PerformanceManagerWindow::replot()
 	    if (sc) delete sc;
 
 	    sc = new StressCalculator(
-            mainWindow->cyclist,
+            mainWindow->athlete->cyclist,
 		    firstRideItem->dateTime,
 		    endTime,
-		    (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt(),
-		    (appsettings->cvalue(mainWindow->cyclist, GC_LTS_DAYS,42)).toInt());
+		    (appsettings->cvalue(mainWindow->athlete->cyclist, GC_STS_DAYS,7)).toInt(),
+		    (appsettings->cvalue(mainWindow->athlete->cyclist, GC_LTS_DAYS,42)).toInt());
 #ifdef GC_HAVE_LUCENE
-            sc->calculateStress(mainWindow,home.absolutePath(),newMetric,isfiltered,filter);
+            sc->calculateStress(mainWindow,mainWindow->athlete->home.absolutePath(),newMetric,isfiltered,filter);
 #else
-            sc->calculateStress(mainWindow,home.absolutePath(),newMetric);
+            sc->calculateStress(mainWindow,mainWindow->athlete->home.absolutePath(),newMetric);
 #endif
 
 	    perfplot->setStressCalculator(sc);

@@ -550,7 +550,7 @@ AddFirmware::validatePage()
     if (copy->isChecked()) {
 
         QString fileName = QFileInfo(filePath).fileName();
-        QString targetFileName = QFileInfo(mainWindow->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
+        QString targetFileName = QFileInfo(mainWindow->athlete->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
 
         // check not the same thing!
         if(QFileInfo(fileName).absolutePath() != QFileInfo(targetFileName).absolutePath()) {
@@ -1178,7 +1178,7 @@ AddFinal::validatePage()
         all.writeConfig(list);
 
         // tell everyone
-        wizard->main->notifyConfigChanged();
+        wizard->main->context->notifyConfigChanged();
  
         // shut down the controller, if it is there, since it will
         // still be connected to the device (in case we hit the back button)

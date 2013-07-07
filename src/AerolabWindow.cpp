@@ -241,8 +241,8 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   connect(eoffsetAuto, SIGNAL(stateChanged(int)), this, SLOT(setAutoEoffset(int)));
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
-  connect(mainWindow, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
-  connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+  connect(mainWindow->context, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
+  connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
   connect(mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
   connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
   connect(allZoomer, SIGNAL( zoomed(const QRectF) ), this, SLOT(zoomChanged()));
@@ -317,7 +317,7 @@ AerolabWindow::setCrrFromText(const QString text) {
     aerolab->setIntCrr(value);
     //crrQLCDNumber->display(QString("%1").arg(aerolab->getCrr()));
     crrSlider->setValue(aerolab->intCrr());
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = mainWindow->context->rideItem();
     aerolab->setData(ride, false);
   }
 }
@@ -367,7 +367,7 @@ AerolabWindow::setTotalMassFromText(const QString text) {
     aerolab->setIntTotalMass(value);
     //mQLCDNumber->display(QString("%1").arg(aerolab->getTotalMass()));
     mSlider->setValue(aerolab->intTotalMass());
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = mainWindow->context->rideItem();
     aerolab->setData(ride, false);
   }
 }
@@ -474,7 +474,7 @@ AerolabWindow::setByDistance(int value)
 void
 AerolabWindow::doEstCdACrr()
 {
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = mainWindow->context->rideItem();
     /* Estimate Crr&Cda */
     const QString errMsg = aerolab->estimateCdACrr(ride);
     if (errMsg.isEmpty()) {

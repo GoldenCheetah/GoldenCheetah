@@ -318,8 +318,8 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
 
-    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(mainWindow, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
+    connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
 
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
@@ -642,8 +642,8 @@ HistogramWindow::rideSelected()
 
     if (rangemode) {
         // get range that applies to this ride
-        powerRange = mainWindow->zones()->whichRange(ride->dateTime.date());
-        hrRange = mainWindow->hrZones()->whichRange(ride->dateTime.date());
+        powerRange = mainWindow->athlete->zones()->whichRange(ride->dateTime.date());
+        hrRange = mainWindow->athlete->hrZones()->whichRange(ride->dateTime.date());
     }
 
     // update
@@ -872,7 +872,7 @@ HistogramWindow::updateChart()
                     last = use;
 
                     // plotting a metric, reread the metrics for the selected date range
-                    results = mainWindow->metricDB->getAllMetricsFor(use);
+                    results = mainWindow->athlete->metricDB->getAllMetricsFor(use);
 
                 }
 

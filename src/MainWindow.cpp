@@ -58,8 +58,6 @@
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
-#include "StravaUploadDialog.h"
-#include "StravaDownloadDialog.h"
 #include "RideWithGPSDialog.h"
 #include "TtbDialog.h"
 #include "TwitterDialog.h"
@@ -147,24 +145,40 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home) :
-    home(home), session(0), isclean(false), ismultisave(false), init(false), isfiltered(false),
-    zones_(new Zones), hrzones_(new HrZones),
-    ride(NULL), workout(NULL), groupByMapper(NULL)
+    session(0), isclean(false), ismultisave(false), init(false), isfiltered(false), groupByMapper(NULL)
 {
+
+    // transitionary - as we split out the MainWindow "god object"
+    //               - athlete does not have a constructor yet
+    context = new Context;
+    context->mainWindow = this;
+    context->ride = NULL;
+    context->workout = NULL;
+
+    athlete = new Athlete;
+    athlete->zones_ = new Zones;
+    athlete->hrzones_ = new HrZones;
+    athlete->context = context;
+    context->athlete = athlete;
+
+
     // who are you?
-    cyclist = home.dirName();
-    setInstanceName(cyclist);
+    athlete->home = home;
+    athlete->cyclist = athlete->home.dirName();
+    setInstanceName(athlete->cyclist);
+
+    connect(context, SIGNAL(configChanged()), athlete, SLOT(configChanged()));
 
     //
     // CRASH PROCESSING
     //
 
     // Recovering from a crash?
-    if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
-        GcCrashDialog *crashed = new GcCrashDialog(home);
+    if(!appsettings->cvalue(athlete->cyclist, GC_SAFEEXIT, true).toBool()) {
+        GcCrashDialog *crashed = new GcCrashDialog(athlete->home);
         crashed->exec();
     }
-    appsettings->setCValue(home.dirName(), GC_SAFEEXIT, false); // will be set to true on exit
+    appsettings->setCValue(athlete->home.dirName(), GC_SAFEEXIT, false); // will be set to true on exit
 
     //
     // UPGRADE PROCESSING
@@ -172,7 +186,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Before we initialise we need to run the upgrade wizard
     GcUpgrade v3;
-    if (v3.upgrade(home) != 0) {
+    if (v3.upgrade(athlete->home) != 0) {
         hide();
         QTimer::singleShot(0, this, SLOT(close())); // wait for event loop
     } else { // don't indent since it would change entire file
@@ -194,11 +208,11 @@ MainWindow::MainWindow(const QDir &home) :
     #endif
 
     // Metadata fields
-    _rideMetadata = new RideMetadata(this,true);
-    _rideMetadata->hide();
+    athlete->_rideMetadata = new RideMetadata(this,true);
+    athlete->_rideMetadata->hide();
 
     #ifdef GC_HAVE_LUCENE
-    namedSearches = new NamedSearches(home); // must be before navigator
+    athlete->namedSearches = new NamedSearches(athlete->home); // must be before navigator
     #endif
 
     if (desktop == NULL) desktop = QApplication::desktop();
@@ -216,7 +230,7 @@ MainWindow::MainWindow(const QDir &home) :
     mainwindows.append(this);  // add us to the list of open windows
 
     // search paths
-    Library::initialise(home);
+    Library::initialise(athlete->home);
 
     // Network proxy
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
@@ -232,7 +246,7 @@ MainWindow::MainWindow(const QDir &home) :
     setAttribute(Qt::WA_DeleteOnClose);
 
     // need to restore geometry before setUnifiedToolBar.. on Mac
-    appsettings->setValue(GC_SETTINGS_LAST, home.dirName());
+    appsettings->setValue(GC_SETTINGS_LAST, athlete->home.dirName());
     QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
     if (geom == QVariant()) {
 
@@ -274,7 +288,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef Q_OS_MAC // MAC NATIVE TOOLBAR
     setUnifiedTitleAndToolBarOnMac(true);
-    head = addToolBar(cyclist);
+    head = addToolBar(athlete->cyclist);
     head->setContentsMargins(0,0,0,0);
 
     // widgets
@@ -363,7 +377,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // COMMON GUI SETUP
     setWindowIcon(QIcon(":images/gc.png"));
-    setWindowTitle(home.dirName());
+    setWindowTitle(athlete->home.dirName());
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
 
@@ -387,35 +401,35 @@ MainWindow::MainWindow(const QDir &home) :
      *  Athlete details
      *--------------------------------------------------------------------*/
 
-    seasons = new Seasons(home);
+    athlete->seasons = new Seasons(athlete->home);
 
-    QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
+    QVariant unit = appsettings->cvalue(athlete->cyclist, GC_UNIT);
     if (unit == 0) {
         // Default to system locale
         unit = appsettings->value(this, GC_UNIT,
              QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL);
-        appsettings->setCValue(cyclist, GC_UNIT, unit);
+        appsettings->setCValue(athlete->cyclist, GC_UNIT, unit);
     }
-    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
+    athlete->useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // read power zones...
-    QFile zonesFile(home.absolutePath() + "/power.zones");
+    QFile zonesFile(athlete->home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
-        if (!zones_->read(zonesFile)) {
+        if (!athlete->zones_->read(zonesFile)) {
             QMessageBox::critical(this, tr("Zones File Error"),
-				  zones_->errorString());
-        } else if (! zones_->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
+				  athlete->zones_->errorString());
+        } else if (! athlete->zones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Zones File"), athlete->zones_->warningString());
     }
 
     // read hr zones...
-    QFile hrzonesFile(home.absolutePath() + "/hr.zones");
+    QFile hrzonesFile(athlete->home.absolutePath() + "/hr.zones");
     if (hrzonesFile.exists()) {
-        if (!hrzones_->read(hrzonesFile)) {
+        if (!athlete->hrzones_->read(hrzonesFile)) {
             QMessageBox::critical(this, tr("HR Zones File Error"),
-				  hrzones_->errorString());
-        } else if (! hrzones_->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
+				  athlete->hrzones_->errorString());
+        } else if (! athlete->hrzones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading HR Zones File"), athlete->hrzones_->warningString());
     }
 
     /*----------------------------------------------------------------------
@@ -423,27 +437,27 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
 #ifdef GC_HAVE_LUCENE
-    lucene = new Lucene(this, this); // before metricDB attempts to refresh
+    athlete->lucene = new Lucene(this, this); // before metricDB attempts to refresh
 #endif
-    metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
-    metricDB->refreshMetrics();
+    athlete->metricDB = new MetricAggregator(this); // just to catch config updates!
+    athlete->metricDB->refreshMetrics();
 
     // Downloaders
-    withingsDownload = new WithingsDownload(this);
-    zeoDownload      = new ZeoDownload(this);
-    calendarDownload = new CalendarDownload(this);
+    athlete->withingsDownload = new WithingsDownload(this);
+    athlete->zeoDownload      = new ZeoDownload(this);
+    athlete->calendarDownload = new CalendarDownload(this);
 
     // Calendar
 #ifdef GC_HAVE_ICAL
-    rideCalendar = new ICalendar(this); // my local/remote calendar entries
-    davCalendar = new CalDAV(this); // remote caldav
-    davCalendar->download(); // refresh the diary window
+    athlete->rideCalendar = new ICalendar(this); // my local/remote calendar entries
+    athlete->davCalendar = new CalDAV(this); // remote caldav
+    athlete->davCalendar->download(); // refresh the diary window
 #endif
 
     // if no workout directory is configured, default to the
     // top level GoldenCheetah directory
     if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(home.absolutePath() + "/../").absolutePath());
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(athlete->home.absolutePath() + "/../").absolutePath());
 
     /*----------------------------------------------------------------------
      * Non-Mac Toolbar
@@ -550,7 +564,7 @@ MainWindow::MainWindow(const QDir &home) :
     /*----------------------------------------------------------------------
      * Scope Bar
      *--------------------------------------------------------------------*/
-    trainTool = new TrainTool(this, home);
+    trainTool = new TrainTool(this, athlete->home);
     trainTool->hide();
     trainTool->getToolbarButtons()->hide(); // no show yet
 
@@ -626,12 +640,12 @@ MainWindow::MainWindow(const QDir &home) :
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(searchClear()));
 #endif
     // retrieve settings (properties are saved when we close the window)
-    if (appsettings->cvalue(cyclist, GC_NAVHEADINGS, "").toString() != "") {
-        listView->setSortByIndex(appsettings->cvalue(cyclist, GC_SORTBY).toInt());
-        listView->setSortByOrder(appsettings->cvalue(cyclist, GC_SORTBYORDER).toInt());
-        listView->setGroupBy(appsettings->cvalue(cyclist, GC_NAVGROUPBY).toInt());
-        listView->setColumns(appsettings->cvalue(cyclist, GC_NAVHEADINGS).toString());
-        listView->setWidths(appsettings->cvalue(cyclist, GC_NAVHEADINGWIDTHS).toString());
+    if (appsettings->cvalue(athlete->cyclist, GC_NAVHEADINGS, "").toString() != "") {
+        listView->setSortByIndex(appsettings->cvalue(athlete->cyclist, GC_SORTBY).toInt());
+        listView->setSortByOrder(appsettings->cvalue(athlete->cyclist, GC_SORTBYORDER).toInt());
+        listView->setGroupBy(appsettings->cvalue(athlete->cyclist, GC_NAVGROUPBY).toInt());
+        listView->setColumns(appsettings->cvalue(athlete->cyclist, GC_NAVHEADINGS).toString());
+        listView->setWidths(appsettings->cvalue(athlete->cyclist, GC_NAVHEADINGWIDTHS).toString());
     }
 
     // INTERVALS
@@ -692,15 +706,15 @@ MainWindow::MainWindow(const QDir &home) :
     analSidebar->addWidget(calendarItem);
     analSidebar->addWidget(analItem);
     analSidebar->addWidget(intervalItem);
-    analSidebar->prepare(cyclist, "analysis");
+    analSidebar->prepare(athlete->cyclist, "analysis");
 
     QTreeWidgetItem *last = NULL;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(athlete->home));
     while (i.hasNext()) {
         QString name = i.next();
         QDateTime dt;
         if (parseRideFileName(name, &dt)) {
-            last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), this);
+            last = new RideItem(RIDE_TYPE, athlete->home.path(), name, dt, athlete->zones(), athlete->hrZones(), this);
             allRides->addChild(last);
         }
     }
@@ -763,10 +777,10 @@ MainWindow::MainWindow(const QDir &home) :
     // NO RIDE WINDOW - Replace analysis, home and train window when no ride
 
     // did we say we din't want to see this?
-    showBlankTrain = !(appsettings->cvalue(cyclist, GC_BLANK_TRAIN, false).toBool());
-    showBlankHome = !(appsettings->cvalue(cyclist, GC_BLANK_HOME, false).toBool());
-    showBlankAnal = !(appsettings->cvalue(cyclist, GC_BLANK_ANALYSIS, false).toBool());
-    showBlankDiary = !(appsettings->cvalue(cyclist, GC_BLANK_DIARY, false).toBool());
+    showBlankTrain = !(appsettings->cvalue(athlete->cyclist, GC_BLANK_TRAIN, false).toBool());
+    showBlankHome = !(appsettings->cvalue(athlete->cyclist, GC_BLANK_HOME, false).toBool());
+    showBlankAnal = !(appsettings->cvalue(athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
+    showBlankDiary = !(appsettings->cvalue(athlete->cyclist, GC_BLANK_DIARY, false).toBool());
 
     // setup the blank pages
     blankStateAnalysisPage = new BlankStateAnalysisPage(this);
@@ -785,7 +799,7 @@ MainWindow::MainWindow(const QDir &home) :
     // do controllers after home windows -- they need their first signals caught
     connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
 
-    ltmSidebar = new LTMSidebar(this, home);
+    ltmSidebar = new LTMSidebar(this, athlete->home);
     connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
     ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
 
@@ -843,7 +857,7 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
-    QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
+    QVariant splitterSizes = appsettings->cvalue(athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes.toByteArray().size() > 1 ) {
         splitter->restoreState(splitterSizes.toByteArray());
         splitter->setOpaqueResize(true); // redraw when released, snappier UI
@@ -892,11 +906,6 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+U"));
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
-
-    //XXX deprecated stravaAction = new QAction(tr("Upload to Strava..."), this);
-    //XXX deprecated connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
-    //XXX deprecated rideMenu->addAction(stravaAction);
-    //XXX deprecated rideMenu->addAction(tr("Download from Strava..."), this, SLOT(downloadStrava()));
 
     rideWithGPSAction = new QAction(tr("Upload to RideWithGPS..."), this);
     connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
@@ -1026,9 +1035,9 @@ MainWindow::MainWindow(const QDir &home) :
     connect(this,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
 
     // when metricDB updates check if BlankState needs to be closed
-    connect(metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
+    connect(athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
     // when config changes see if Train View BlankState needs to be closed
-    connect(this, SIGNAL(configChanged()), this, SLOT(checkBlankState()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(checkBlankState()));
     // when trainDB updates check if BlankState needs to be closed
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
 
@@ -1060,7 +1069,7 @@ MainWindow::showSidebar(bool want)
         toolBox->show();
 
         // Restore sizes
-        QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES);
+        QVariant splitterSizes = appsettings->cvalue(athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES);
         if (splitterSizes.toByteArray().size() > 1 ) {
             splitter->restoreState(splitterSizes.toByteArray());
             splitter->setOpaqueResize(true); // redraw when released, snappier UI
@@ -1140,17 +1149,13 @@ void
 MainWindow::setActivityMenu()
 {
     // enable/disable upload if already uploaded
-    if (ride && ride->ride()) {
+    if (context->ride && context->ride->ride()) {
 
-        //XXX deprecated QString activityId = ride->ride()->getTag("Strava uploadId", "");
-        //XXX deprecated if (activityId == "") stravaAction->setEnabled(true);
-        //XXX deprecated else stravaAction->setEnabled(false);
-
-        QString tripid = ride->ride()->getTag("RideWithGPS tripid", "");
+        QString tripid = context->ride->ride()->getTag("RideWithGPS tripid", "");
         if (tripid == "") rideWithGPSAction->setEnabled(true);
         else rideWithGPSAction->setEnabled(false);
         
-        QString activityId = ride->ride()->getTag("TtbExercise", "");
+        QString activityId = context->ride->ride()->getTag("TtbExercise", "");
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
         
@@ -1180,7 +1185,7 @@ MainWindow::setWindowMenu()
 {
     windowMenu->clear();
     foreach (MainWindow *m, mainwindows) {
-        windowMenu->addAction(m->cyclist);
+        windowMenu->addAction(m->athlete->cyclist);
     }
 }
 
@@ -1188,7 +1193,7 @@ void
 MainWindow::selectWindow(QAction *act)
 {
     foreach (MainWindow *m, mainwindows) {
-        if (m->cyclist == act->text()) {
+        if (m->athlete->cyclist == act->text()) {
             m->activateWindow();
             m->raise();
             break;
@@ -1238,26 +1243,26 @@ MainWindow::rideTreeWidgetSelectionChanged()
 {
     assert(treeWidget->selectedItems().size() <= 1);
     if (treeWidget->selectedItems().isEmpty())
-        ride = NULL;
+        context->ride = NULL;
     else {
         QTreeWidgetItem *which = treeWidget->selectedItems().first();
         if (which->type() != RIDE_TYPE) return; // ignore!
         else
-            ride = (RideItem*) which;
+            context->ride = (RideItem*) which;
     }
 
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride
-    gcCalendar->setRide(ride);
-    gcMultiCalendar->setRide(ride);
-    _rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    gcCalendar->setRide(context->ride);
+    gcMultiCalendar->setRide(context->ride);
+    athlete->_rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
 
-    if (!ride) return;
+    if (!context->ride) return;
 
     // refresh interval list for bottom left
     // first lets wipe away the existing intervals
@@ -1265,8 +1270,8 @@ MainWindow::rideTreeWidgetSelectionChanged()
     for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
 
     // now add the intervals for the current ride
-    if (ride) { // only if we have a ride pointer
-        RideFile *selected = ride->ride();
+    if (context->ride) { // only if we have a ride pointer
+        RideFile *selected = context->ride->ride();
         if (selected) {
             // get all the intervals in the currently selected RideFile
             QList<RideFileInterval> intervals = selected->intervals();
@@ -1293,7 +1298,7 @@ MainWindow::dateRangeChangedDiary(DateRange dr)
     // when we have multiple sidebars that change date we need to connect
     // them up individually.... i.e. LTM....
     diaryWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-    _dr = dr;
+    context->_dr = dr;
 }
 
 void
@@ -1303,7 +1308,7 @@ MainWindow::dateRangeChangedLTM(DateRange dr)
     // when we have multiple sidebars that change date we need to connect
     // them up individually.... i.e. LTM....
     homeWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-    _dr = dr;
+    context->_dr = dr;
 }
 
 void
@@ -1492,13 +1497,13 @@ MainWindow::splitterMoved(int pos, int /*index*/)
     if ((pos == 0  && toolBox->isVisible()) || (pos>10 && !toolBox->isVisible())) toggleSidebar();
 
     listView->setWidth(pos);
-    appsettings->setCValue(cyclist, GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
+    appsettings->setCValue(athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(home, zones_, this);
+    ConfigDialog *cd = new ConfigDialog(athlete->home, athlete->zones_, this);
     cd->show();
 }
 
@@ -1521,11 +1526,11 @@ MainWindow::closeEvent(QCloseEvent* event)
         trainTool->Stop();
 
         // save ride list config
-        appsettings->setCValue(cyclist, GC_SORTBY, listView->sortByIndex());
-        appsettings->setCValue(cyclist, GC_SORTBYORDER, listView->sortByOrder());
-        appsettings->setCValue(cyclist, GC_NAVGROUPBY, listView->groupBy());
-        appsettings->setCValue(cyclist, GC_NAVHEADINGS, listView->columns());
-        appsettings->setCValue(cyclist, GC_NAVHEADINGWIDTHS, listView->widths());
+        appsettings->setCValue(athlete->cyclist, GC_SORTBY, listView->sortByIndex());
+        appsettings->setCValue(athlete->cyclist, GC_SORTBYORDER, listView->sortByOrder());
+        appsettings->setCValue(athlete->cyclist, GC_NAVGROUPBY, listView->groupBy());
+        appsettings->setCValue(athlete->cyclist, GC_NAVHEADINGS, listView->columns());
+        appsettings->setCValue(athlete->cyclist, GC_NAVHEADINGWIDTHS, listView->widths());
 
         // save the state of all the pages
         analWindow->saveState();
@@ -1535,21 +1540,21 @@ MainWindow::closeEvent(QCloseEvent* event)
 
 #ifdef GC_HAVE_LUCENE
         // save the named searches
-        namedSearches->write();
+        athlete->namedSearches->write();
 #endif
 
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
 
         // blank state settings
-        appsettings->setCValue(cyclist, GC_BLANK_ANALYSIS, blankStateAnalysisPage->dontShow->isChecked());
-        appsettings->setCValue(cyclist, GC_BLANK_DIARY, blankStateDiaryPage->dontShow->isChecked());
-        appsettings->setCValue(cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
-        appsettings->setCValue(cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
+        appsettings->setCValue(athlete->cyclist, GC_BLANK_ANALYSIS, blankStateAnalysisPage->dontShow->isChecked());
+        appsettings->setCValue(athlete->cyclist, GC_BLANK_DIARY, blankStateDiaryPage->dontShow->isChecked());
+        appsettings->setCValue(athlete->cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
+        appsettings->setCValue(athlete->cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
 
         // set to latest so we don't repeat
-        appsettings->setCValue(home.dirName(), GC_VERSION_USED, VERSION_LATEST);
-        appsettings->setCValue(home.dirName(), GC_SAFEEXIT, true);
+        appsettings->setCValue(athlete->home.dirName(), GC_VERSION_USED, VERSION_LATEST);
+        appsettings->setCValue(athlete->home.dirName(), GC_SAFEEXIT, true);
 
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
@@ -1590,7 +1595,7 @@ MainWindow::closeAll()
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog *ad = new AboutDialog(this, home);
+    AboutDialog *ad = new AboutDialog(this, athlete->home);
     ad->exec();
 }
 
@@ -1621,8 +1626,8 @@ void MainWindow::dateChanged(const QDate &date)
 {
     for (int i = 0; i < allRides->childCount(); i++)
     {
-        ride = (RideItem*) allRides->child(i);
-        if (ride->dateTime.date() == date) {
+        context->ride = (RideItem*) allRides->child(i);
+        if (context->ride->dateTime.date() == date) {
             treeWidget->scrollToItem(allRides->child(i),
                 QAbstractItemView::EnsureVisible);
             treeWidget->setCurrentItem(allRides->child(i));
@@ -1635,8 +1640,8 @@ void MainWindow::selectRideFile(QString fileName)
 {
     for (int i = 0; i < allRides->childCount(); i++)
     {
-        ride = (RideItem*) allRides->child(i);
-        if (ride->fileName == fileName) {
+        context->ride = (RideItem*) allRides->child(i);
+        if (context->ride->fileName == fileName) {
             treeWidget->scrollToItem(allRides->child(i),
                 QAbstractItemView::EnsureVisible);
             treeWidget->setCurrentItem(allRides->child(i));
@@ -1652,7 +1657,7 @@ void MainWindow::manualProcess(QString name)
     // and also show the explanation
     // of what this function does
     // then call it!
-    RideItem *rideitem = (RideItem*)currentRideItem();
+    RideItem *rideitem = (RideItem*)context->currentRideItem();
     if (rideitem) {
         ManualDataProcessorDialog *p = new ManualDataProcessorDialog(this, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
@@ -1876,7 +1881,7 @@ MainWindow::dropEvent(QDropEvent *event)
 
     if (currentWindow != trainWindow) {
         // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (&urls, home, this);
+        RideImportWizard *dialog = new RideImportWizard (&urls, athlete->home, this);
         dialog->process(); // do it!
     } else {
         QStringList filenames;
@@ -1899,7 +1904,7 @@ MainWindow::addRide(QString name, bool dosignal)
         fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
     }
-    RideItem *last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), this);
+    RideItem *last = new RideItem(RIDE_TYPE, athlete->home.path(), name, dt, athlete->zones(), athlete->hrZones(), this);
 
     int index = 0;
     while (index < allRides->childCount()) {
@@ -1954,15 +1959,15 @@ MainWindow::removeCurrentRide()
     allRides->removeChild(item);
 
 
-    QFile file(home.absolutePath() + "/" + strOldFileName);
+    QFile file(athlete->home.absolutePath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
     QString strNewName = strOldFileName + ".bak";
 
     // in case there was an existing bak file, delete it
     // ignore errors since it probably isn't there.
-    QFile::remove(home.absolutePath() + "/" + strNewName);
+    QFile::remove(athlete->home.absolutePath() + "/" + strNewName);
 
-    if (!file.rename(home.absolutePath() + "/" + strNewName))
+    if (!file.rename(athlete->home.absolutePath() + "/" + strNewName))
     {
         QMessageBox::critical(
             this, "Rename Error",
@@ -1976,7 +1981,7 @@ MainWindow::removeCurrentRide()
     foreach (QString extension, extras) {
 
         QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
-        QFile::remove(home.absolutePath() + "/" + deleteMe);
+        QFile::remove(athlete->home.absolutePath() + "/" + deleteMe);
     }
 
     // notify AFTER deleted from DISK..
@@ -1988,10 +1993,10 @@ MainWindow::removeCurrentRide()
 
     // any left?
     if (allRides->childCount() == 0) {
-        ride = NULL;
+        context->ride = NULL;
         rideTreeWidgetSelectionChanged(); // notifies children
-        gcCalendar->setRide(ride); // and the pesky calendars
-        gcMultiCalendar->setRide(ride);
+        gcCalendar->setRide(context->ride); // and the pesky calendars
+        gcMultiCalendar->setRide(context->ride);
     }
 
     treeWidget->setCurrentItem(itemToSelect);
@@ -2003,17 +2008,17 @@ MainWindow::checkCPX(RideItem*ride)
 {
     QList<RideFileCache*> newList;
 
-    foreach(RideFileCache *p, cpxCache) {
+    foreach(RideFileCache *p, athlete->cpxCache) {
         if (ride->dateTime.date() < p->start || ride->dateTime.date() > p->end)
             newList.append(p);
     }
-    cpxCache = newList;
+    athlete->cpxCache = newList;
 }
 
 void
 MainWindow::downloadRide()
 {
-    (new DownloadRideDialog(this, home))->show();
+    (new DownloadRideDialog(this, athlete->home))->show();
 }
 
 
@@ -2021,6 +2026,12 @@ void
 MainWindow::manualRide()
 {
     (new ManualRideDialog(this))->show();
+}
+
+const RideFile *
+Context::currentRide()
+{
+    return mainWindow->currentRide();
 }
 
 const RideFile *
@@ -2066,7 +2077,7 @@ MainWindow::exportRide()
     getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    bool result = RideFileFactory::instance().writeRideFile(this, currentRide(), file, getSuffix.cap(1));
+    bool result = RideFileFactory::instance().writeRideFile(this, context->currentRide(), file, getSuffix.cap(1));
 
     if (result == false) {
         QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
@@ -2096,7 +2107,7 @@ MainWindow::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        RideImportWizard *import = new RideImportWizard(fileNamesCopy, home, this);
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, athlete->home, this);
         import->process();
     }
 }
@@ -2104,8 +2115,8 @@ MainWindow::importFile()
 void
 MainWindow::saveRide()
 {
-    if (ride)
-        saveRideSingleDialog(ride); // will signal save to everyone
+    if (context->ride)
+        saveRideSingleDialog(context->ride); // will signal save to everyone
     else {
         QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
                          tr("There is no currently selected ride to save."));
@@ -2117,20 +2128,20 @@ MainWindow::saveRide()
 void
 MainWindow::revertRide()
 {
-    ride->freeMemory();
-    ride->ride(); // force re-load
+    context->ride->freeMemory();
+    context->ride->ride(); // force re-load
 
     // in case reverted ride has different starttime
-    ride->setStartTime(ride->ride()->startTime()); // Note: this will also signal rideSelected()
-    ride->ride()->emitReverted();
+    context->ride->setStartTime(context->ride->ride()->startTime()); // Note: this will also signal rideSelected()
+    context->ride->ride()->emitReverted();
 }
 
 void
 MainWindow::splitRide()
 {
-    if (ride && ride->ride() && ride->ride()->dataPoints().count()) (new SplitActivityWizard(this))->exec();
+    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(this))->exec();
     else {
-        if (!ride || !ride->ride())
+        if (!context->ride || !context->ride->ride())
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to split"));
@@ -2178,7 +2189,7 @@ MainWindow::addDevice()
 void
 MainWindow::newCyclist()
 {
-    QDir newHome = home;
+    QDir newHome = athlete->home;
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) {
@@ -2193,7 +2204,7 @@ MainWindow::newCyclist()
 void
 MainWindow::openCyclist()
 {
-    QDir newHome = home;
+    QDir newHome = athlete->home;
     newHome.cdUp();
     ChooseCyclistDialog d(newHome, false);
     d.setModal(true);
@@ -2216,32 +2227,7 @@ MainWindow::exportMetrics()
     QString fileName = QFileDialog::getSaveFileName( this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
     if (fileName.length() == 0)
         return;
-    metricDB->writeAsCSV(fileName);
-}
-
-/*----------------------------------------------------------------------
-* Strava.com
-*--------------------------------------------------------------------*/
-
-void
-MainWindow::uploadStrava()
-{
-    QTreeWidgetItem *_item = treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE) return;
-
-    RideItem *item = dynamic_cast<RideItem*>(_item);
-
-    if (item) { // menu is disabled anyway, but belt and braces
-        StravaUploadDialog d(this, item);
-        d.exec();
-    }
-}
-
-void
-MainWindow::downloadStrava()
-{
-    StravaDownloadDialog d(this);
-    d.exec();
+    athlete->metricDB->writeAsCSV(fileName);
 }
 
 /*----------------------------------------------------------------------
@@ -2349,8 +2335,8 @@ MainWindow::manageLibrary()
 void
 MainWindow::uploadTP()
 {
-    if (ride) {
-        TPUploadDialog uploader(cyclist, currentRide(), this);
+    if (context->ride) {
+        TPUploadDialog uploader(athlete->cyclist, context->currentRide(), this);
         uploader.exec();
     }
 }
@@ -2370,7 +2356,7 @@ MainWindow::downloadTP()
 void
 MainWindow::addIntervals()
 {
-    if (ride && ride->ride() && ride->ride()->dataPoints().count()) {
+    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
         AddIntervalDialog *p = new AddIntervalDialog(this);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
@@ -2378,7 +2364,7 @@ MainWindow::addIntervals()
 
     } else {
 
-        if (!ride || !ride->ride())
+        if (!context->ride || !context->ride->ride())
             QMessageBox::critical(this, tr("Find Best Intervals"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Find Best Intervals"), tr("Current activity contains no data"));
@@ -2406,32 +2392,32 @@ void
 MainWindow::findPowerPeaks()
 {
 
-    if (!ride) return;
+    if (!context->ride) return;
 
     QTreeWidgetItem *which = treeWidget->selectedItems().first();
     if (which->type() != RIDE_TYPE) {
         return;
     }
 
-    if (ride && ride->ride() && ride->ride()->dataPoints().count()) {
+    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
-        addIntervalForPowerPeaksForSecs(ride->ride(), 5, "Peak 5s");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 10, "Peak 10s");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 20, "Peak 20s");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 30, "Peak 30s");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 60, "Peak 1min");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 120, "Peak 2min");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 300, "Peak 5min");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 600, "Peak 10min");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 1200, "Peak 20min");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 1800, "Peak 30min");
-        addIntervalForPowerPeaksForSecs(ride->ride(), 3600, "Peak 60min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 5, "Peak 5s");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 10, "Peak 10s");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 20, "Peak 20s");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 30, "Peak 30s");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 60, "Peak 1min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 120, "Peak 2min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 300, "Peak 5min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 600, "Peak 10min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 1200, "Peak 20min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 1800, "Peak 30min");
+        addIntervalForPowerPeaksForSecs(context->ride->ride(), 3600, "Peak 60min");
 
         // now update the RideFileIntervals
         updateRideFileIntervals();
 
     } else {
-        if (!ride || !ride->ride())
+        if (!context->ride || !context->ride->ride())
             QMessageBox::critical(this, tr("Find Power Peaks"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current activity contains no data"));
@@ -2667,44 +2653,6 @@ MainWindow::intervalTreeWidgetSelectionChanged()
  * Utility
  *--------------------------------------------------------------------*/
 
-
-// set the rider value of CP to the value derived from the CP model extraction
-void
-MainWindow::setCriticalPower(int cp)
-{
-  // determine in which range to write the value: use the range associated with the presently selected ride
-  int range;
-  if (ride)
-      range = ride->zoneRange();
-  else {
-      QDate today = QDate::currentDate();
-      range = zones_->whichRange(today);
-  }
-
-  // add a new range if we failed to find a valid one
-  if (range < 0) {
-    // create an infinite range
-    zones_->addZoneRange();
-    range = 0;
-  }
-
-  zones_->setCP(range, cp);        // update the CP value
-  zones_->setZonesFromCP(range);   // update the zones based on the value of CP
-  zones_->write(home);             // write the output file
-
-  QDate startDate = zones_->getStartDate(range);
-  QDate endDate   =  zones_->getEndDate(range);
-  QMessageBox::information(
-			   this,
-			   tr("CP saved"),
-			   tr("Range from %1 to %2\nAthlete CP set to %3 watts") .
-			   arg(startDate.isNull() ? "BEGIN" : startDate.toString()) .
-			   arg(endDate.isNull() ? "END" : endDate.toString()) .
-			   arg(cp)
-			   );
-  zonesChanged();
-}
-
 bool
 MainWindow::parseRideFileName(const QString &name, QDateTime *dt)
 {
@@ -2732,41 +2680,41 @@ MainWindow::parseRideFileName(const QString &name, QDateTime *dt)
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::notifyConfigChanged()
+Context::notifyConfigChanged()
+{
+    // now tell everyone else
+    configChanged();
+}
+
+void
+Athlete::configChanged()
 {
     // re-read Zones in case it changed
     QFile zonesFile(home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
         if (!zones_->read(zonesFile)) {
-            QMessageBox::critical(this, tr("Zones File Error"),
+            QMessageBox::critical(context->mainWindow, tr("Zones File Error"),
                                  zones_->errorString());
         }
        else if (! zones_->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
+            QMessageBox::warning(context->mainWindow, tr("Reading Zones File"), zones_->warningString());
     }
 
     // reread HR zones
     QFile hrzonesFile(home.absolutePath() + "/hr.zones");
     if (hrzonesFile.exists()) {
         if (!hrzones_->read(hrzonesFile)) {
-            QMessageBox::critical(this, tr("HR Zones File Error"),
+            QMessageBox::critical(context->mainWindow, tr("HR Zones File Error"),
                                  hrzones_->errorString());
         }
        else if (! hrzones_->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
+            QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
     }
 
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
-    // now tell everyone else
-    configChanged();
 }
-
-// notify children that rideSelected
-// called by RideItem when its date/time changes
-void
-MainWindow::notifyRideSelected() {}
 
 /*----------------------------------------------------------------------
  * Measures
@@ -2780,13 +2728,13 @@ MainWindow::recordMeasure()
 void
 MainWindow::downloadMeasures()
 {
-    withingsDownload->download();
+    athlete->withingsDownload->download();
 }
 
 void
 MainWindow::downloadMeasuresFromZeo()
 {
-    zeoDownload->download();
+    athlete->zeoDownload->download();
 }
 
 void
@@ -2796,7 +2744,7 @@ MainWindow::exportMeasures()
     end = QDateTime::currentDateTime();
     start.fromTime_t(0);
 
-    foreach (SummaryMetrics x, metricDB->db()->getAllMeasuresFor(start, end)) {
+    foreach (SummaryMetrics x, athlete->metricDB->db()->getAllMeasuresFor(start, end)) {
 //qDebug()<<x.getDateTime();
 //qDebug()<<x.getText("Weight", "0.0").toDouble();
 //qDebug()<<x.getText("Lean Mass", "0.0").toDouble();
@@ -2812,8 +2760,8 @@ void
 MainWindow::refreshCalendar()
 {
 #ifdef GC_HAVE_ICAL
-    davCalendar->download();
-    calendarDownload->download();
+    athlete->davCalendar->download();
+    athlete->calendarDownload->download();
 #endif
 }
 
@@ -2825,7 +2773,7 @@ MainWindow::refreshCalendar()
 void
 MainWindow::uploadCalendar()
 {
-    davCalendar->upload((RideItem*)currentRideItem()); // remove const coz it updates the ride
+    athlete->davCalendar->upload((RideItem*)context->currentRideItem()); // remove const coz it updates the ride
                                                // to set GID and upload date
 }
 #endif

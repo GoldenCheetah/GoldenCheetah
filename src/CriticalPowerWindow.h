@@ -116,7 +116,6 @@ class CriticalPowerWindow : public GcChartWindow
         void forceReplot();
         void newRideAdded(RideItem*);
         void cpintTimeValueEntered();
-        void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
         void rideSelected();
         void seasonSelected(int season);
@@ -133,9 +132,6 @@ class CriticalPowerWindow : public GcChartWindow
         void refreshRideSaved();
 
     private:
-        // reveal controls
-        QPushButton *rCpintSetCPButton;
-
         void updateCpint(double minutes);
 
         QString _dateRange;

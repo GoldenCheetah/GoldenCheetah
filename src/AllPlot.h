@@ -100,7 +100,6 @@ class AllPlot : public QwtPlot
         RideItem *rideItem;
         AllPlotBackground *bg;
         QSettings *settings;
-        bool useMetricUnits;
 
         // controls
         bool shade_zones;

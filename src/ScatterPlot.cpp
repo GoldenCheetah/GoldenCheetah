@@ -165,7 +165,7 @@ ScatterPlot::ScatterPlot(MainWindow *parent) : main(parent)
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
-    connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     configChanged(); // use latest colors etc
 }
 
@@ -200,8 +200,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-        double xv = x[points] = pointType(point, settings->x, main->useMetricUnits, cranklength);
-        double yv = y[points] = pointType(point, settings->y, main->useMetricUnits, cranklength);
+        double xv = x[points] = pointType(point, settings->x, main->athlete->useMetricUnits, cranklength);
+        double yv = y[points] = pointType(point, settings->y, main->athlete->useMetricUnits, cranklength);
 
         // skip zeroes?
         if (!(settings->ignore && (x[points] == 0 || y[points] == 0))) {

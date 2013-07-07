@@ -365,7 +365,6 @@ HEADERS += \
         SpinScanPlot.h \
         SpinScanPolarPlot.h \
         SpinScanPlotWindow.h \
-        SplitRideDialog.h \
         SplitActivityWizard.h \
         SlfParser.h \
         SlfRideFile.h \
@@ -373,10 +372,6 @@ HEADERS += \
         SmfRideFile.h \
         SrdRideFile.h \
         SrmRideFile.h \
-        StravaDownloadDialog.h \
-        StravaParser.h \
-        StravaRideFile.h \
-        StravaUploadDialog.h \
         StressCalculator.h \
         SummaryMetrics.h \
         SummaryWindow.h \
@@ -557,7 +552,6 @@ SOURCES += \
         SpinScanPlot.cpp \
         SpinScanPolarPlot.cpp \
         SpinScanPlotWindow.cpp \
-        SplitRideDialog.cpp \
         SplitActivityWizard.cpp \
         SlfParser.cpp \
         SlfRideFile.cpp \
@@ -565,10 +559,6 @@ SOURCES += \
         SmfRideFile.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
-        StravaDownloadDialog.cpp \
-        StravaParser.cpp \
-        StravaRideFile.cpp \
-        StravaUploadDialog.cpp \
         StressCalculator.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \

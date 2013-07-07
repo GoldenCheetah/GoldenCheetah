@@ -50,12 +50,12 @@ GcWindow(parent), home(home), main(parent), hasMovie(false)
 
     layout->addWidget(player);
 
-    connect(main, SIGNAL(stop()), this, SLOT(stopPlayback()));
-    connect(main, SIGNAL(start()), this, SLOT(startPlayback()));
-    connect(main, SIGNAL(pause()), this, SLOT(pausePlayback()));
-    connect(main, SIGNAL(unpause()), this, SLOT(resumePlayback()));
-    connect(main, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
-    connect(main, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
+    connect(main->context, SIGNAL(stop()), this, SLOT(stopPlayback()));
+    connect(main->context, SIGNAL(start()), this, SLOT(startPlayback()));
+    connect(main->context, SIGNAL(pause()), this, SLOT(pausePlayback()));
+    connect(main->context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
+    connect(main->context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
+    connect(main->context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
 
 }
 

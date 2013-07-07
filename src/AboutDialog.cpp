@@ -80,8 +80,8 @@ AboutPage::AboutPage(MainWindow *main, QDir home) : main(main), home(home)
                 "Analytic Cycling</a>."
                 "</center>"
                 )
-                .arg(QString(QUrl::fromLocalFile(main->home.absolutePath()).toEncoded()))
-                .arg(main->home.absolutePath().replace(" ", "&nbsp;"))
+                .arg(QString(QUrl::fromLocalFile(home.absolutePath()).toEncoded()))
+                .arg(home.absolutePath().replace(" ", "&nbsp;"))
     );
 
     QVBoxLayout *mainLayout = new QVBoxLayout;

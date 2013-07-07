@@ -398,7 +398,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones       = parent->mainWindow->hrZones();
+	const HrZones *zones       = parent->mainWindow->athlete->hrZones();
 	int zone_range     = rideItem->hrZoneRange();
 
 	if (parent->shadeHRZones() && (zone_range >= 0)) {
@@ -448,7 +448,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones       = parent->mainWindow->hrZones();
+	const HrZones *zones       = parent->mainWindow->athlete->hrZones();
 	int zone_range     = rideItem->hrZoneRange();
 
 	setZ(1.0 + zone_number / 100.0);

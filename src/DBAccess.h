@@ -52,7 +52,7 @@ class DBAccess
     int getDBVersion();
 
     // create and drop connections
-	DBAccess(MainWindow *main, QDir home);
+	DBAccess(MainWindow *main);
     ~DBAccess();
 
     // Create/Delete Metrics
@@ -81,7 +81,6 @@ class DBAccess
 
 	private:
     MainWindow *main;
-    QDir home;
     QSqlDatabase dbconn;
     QString sessionid;
 

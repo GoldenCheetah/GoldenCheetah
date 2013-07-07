@@ -42,7 +42,7 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
-    sqlModel = new QSqlTableModel(this, main->metricDB->db()->connection());
+    sqlModel = new QSqlTableModel(this, main->athlete->metricDB->db()->connection());
     sqlModel->setTable("metrics");
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sqlModel->select();
@@ -94,10 +94,10 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     resetView();
 
     // refresh when database is updated
-    connect(main->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
+    connect(main->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
-    connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
     // refresh when rides added/removed
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
@@ -194,7 +194,7 @@ RideNavigator::resetView()
 
     // add metadata fields...
     SpecialFields sp; // all the special fields are in here...
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
@@ -919,8 +919,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         if (metricValue) {
             // metric / imperial converstion
-            metricValue *= (rideNavigator->main->useMetricUnits) ? 1 : m->conversion();
-            metricValue += (rideNavigator->main->useMetricUnits) ? 0 : m->conversionSum();
+            metricValue *= (rideNavigator->main->athlete->useMetricUnits) ? 1 : m->conversion();
+            metricValue += (rideNavigator->main->athlete->useMetricUnits) ? 0 : m->conversionSum();
 
             // format with the right precision
             if (m->units(true) == "seconds" || m->units(true) == tr("seconds")) {

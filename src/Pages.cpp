@@ -177,9 +177,9 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     perfManLTSavgValidator = new QIntValidator(7,56,this);
 
     // get config or set to defaults
-    QVariant perfManSTSVal = appsettings->cvalue(main->cyclist, GC_STS_DAYS);
+    QVariant perfManSTSVal = appsettings->cvalue(main->athlete->cyclist, GC_STS_DAYS);
     if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(main->cyclist, GC_LTS_DAYS);
+    QVariant perfManLTSVal = appsettings->cvalue(main->athlete->cyclist, GC_LTS_DAYS);
     if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
 
     perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
@@ -188,7 +188,7 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     perfManLTSavg->setValidator(perfManLTSavgValidator);
 
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(main->cyclist, GC_SB_TODAY).toInt());
+    showSBToday->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_SB_TODAY).toInt());
 
     configLayout->addWidget(perfManSTSLabel, 9,0, Qt::AlignRight);
     configLayout->addWidget(perfManSTSavg, 9,1, Qt::AlignLeft);
@@ -240,9 +240,9 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
     // Performance Manager
-    appsettings->setCValue(main->cyclist, GC_STS_DAYS, perfManSTSavg->text());
-    appsettings->setCValue(main->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
-    appsettings->setCValue(main->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+    appsettings->setCValue(main->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
+    appsettings->setCValue(main->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
+    appsettings->setCValue(main->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
 
     // set default stress names if not set:
     appsettings->setValue(GC_STS_NAME, appsettings->value(this, GC_STS_NAME,tr("Short Term Stress")));
@@ -340,24 +340,24 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
 
 
     gcURL = new QLineEdit(this);
-    gcURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_GCURL, "http://race.goldencheetah.org").toString());
+    gcURL->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_GCURL, "http://race.goldencheetah.org").toString());
 
     gcUser = new QLineEdit(this);
-    gcUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_GCUSER, "").toString());
+    gcUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_GCUSER, "").toString());
 
     gcPass = new QLineEdit(this);
     gcPass->setEchoMode(QLineEdit::Password);
-    gcPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_GCPASS, "").toString());
+    gcPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_GCPASS, "").toString());
 
     tpURL = new QLineEdit(this);
-    tpURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_TPURL, "http://www.trainingpeaks.com").toString());
+    tpURL->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TPURL, "http://www.trainingpeaks.com").toString());
 
     tpUser = new QLineEdit(this);
-    tpUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_TPUSER, "").toString());
+    tpUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TPUSER, "").toString());
 
     tpPass = new QLineEdit(this);
     tpPass->setEchoMode(QLineEdit::Password);
-    tpPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_TPPASS, "").toString());
+    tpPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TPPASS, "").toString());
 
     tpType = new QComboBox(this);
     tpType->addItem("Shared Free");
@@ -367,7 +367,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     tpType->addItem("Coached Premium");
     tpType->addItem("Shared Coached Premium");
 
-    tpType->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_TPTYPE, "0").toInt());
+    tpType->setCurrentIndex(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TPTYPE, "0").toInt());
 
     //XXX deprecated twitterURL = new QLineEdit(this);
     //XXX deprecated twitterURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_TWURL, "http://www.twitter.com").toString());
@@ -383,52 +383,52 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     //XXX deprecated stravaPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_STRPASS, "").toString());
 
     rideWithGPSUser = new QLineEdit(this);
-    rideWithGPSUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_RWGPSUSER, "").toString());
+    rideWithGPSUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSUSER, "").toString());
 
     rideWithGPSPass = new QLineEdit(this);
     rideWithGPSPass->setEchoMode(QLineEdit::Password);
-    rideWithGPSPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_RWGPSPASS, "").toString());
+    rideWithGPSPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSPASS, "").toString());
 
     ttbUser = new QLineEdit(this);
-    ttbUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_TTBUSER, "").toString());
+    ttbUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBUSER, "").toString());
 
     ttbPass = new QLineEdit(this);
     ttbPass->setEchoMode(QLineEdit::Password);
-    ttbPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_TTBPASS, "").toString());
+    ttbPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBPASS, "").toString());
 
     wiURL = new QLineEdit(this);
-    wiURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
+    wiURL->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
 
     wiUser = new QLineEdit(this);
-    wiUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIUSER, "").toString());
+    wiUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_WIUSER, "").toString());
 
     wiPass = new QLineEdit(this);
-    wiPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIKEY, "").toString());
+    wiPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_WIKEY, "").toString());
 
     zeoURL = new QLineEdit(this);
-    zeoURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080/").toString());
+    zeoURL->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080/").toString());
 
     zeoUser = new QLineEdit(this);
-    zeoUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_ZEOUSER, "").toString());
+    zeoUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_ZEOUSER, "").toString());
 
     zeoPass = new QLineEdit(this);
     zeoPass->setEchoMode(QLineEdit::Password);
-    zeoPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_ZEOPASS, "").toString());
+    zeoPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_ZEOPASS, "").toString());
 
     webcalURL = new QLineEdit(this);
-    webcalURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WEBCAL_URL, "").toString());
+    webcalURL->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_WEBCAL_URL, "").toString());
 
     dvURL = new QLineEdit(this);
-    QString url = appsettings->cvalue(mainWindow->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(mainWindow->athlete->cyclist, GC_DVURL, "").toString();
     url.replace("%40", "@"); // remove escape of @ character
     dvURL->setText(url);
 
     dvUser = new QLineEdit(this);
-    dvUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVUSER, "").toString());
+    dvUser->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_DVUSER, "").toString());
 
     dvPass = new QLineEdit(this);
     dvPass->setEchoMode(QLineEdit::Password);
-    dvPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVPASS, "").toString());
+    dvPass->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_DVPASS, "").toString());
 
     grid->addWidget(tp, 0,0);
     grid->addWidget(urlLabel, 1,0);
@@ -519,34 +519,34 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
 void
 CredentialsPage::saveClicked()
 {
-    appsettings->setCValue(mainWindow->cyclist, GC_GCURL, gcURL->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_GCUSER, gcUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_GCPASS, gcPass->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_TPURL, tpURL->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_TPUSER, tpUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_TPPASS, tpPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_GCURL, gcURL->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_GCUSER, gcUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_GCPASS, gcPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_TPURL, tpURL->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_TPUSER, tpUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_TPPASS, tpPass->text());
     //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_STRUSER, stravaUser->text());
     //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_STRPASS, stravaPass->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_TTBUSER, ttbUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_TTBPASS, ttbPass->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_TPTYPE, tpType->currentIndex());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_TTBUSER, ttbUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_TTBPASS, ttbPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_TPTYPE, tpType->currentIndex());
     //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_WIUSER, wiUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_WIKEY, wiPass->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_ZEOURL, zeoURL->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_ZEOUSER, zeoUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_ZEOPASS, zeoPass->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_WEBCAL_URL, webcalURL->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_WIURL, wiURL->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_WIUSER, wiUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_WIKEY, wiPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_ZEOURL, zeoURL->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_ZEOUSER, zeoUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_ZEOPASS, zeoPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
 
     // escape the at character
     QString url = dvURL->text();
     url.replace("@", "%40");
-    appsettings->setCValue(mainWindow->cyclist, GC_DVURL, url);
-    appsettings->setCValue(mainWindow->cyclist, GC_DVUSER, dvUser->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_DVPASS, dvPass->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_DVURL, url);
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_DVUSER, dvUser->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_DVPASS, dvPass->text());
 
     //XXX deprecated saveTwitter(); // get secret key if PIN set
 }
@@ -565,14 +565,14 @@ RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent),
     QLabel *unitlabel = new QLabel(tr("Unit"));
     QLabel *biolabel = new QLabel(tr("Bio"));
 
-    QString weighttext = QString(tr("Weight (%1)")).arg(mainWindow->useMetricUnits ? tr("kg") : tr("lb"));
+    QString weighttext = QString(tr("Weight (%1)")).arg(mainWindow->athlete->useMetricUnits ? tr("kg") : tr("lb"));
     weightlabel = new QLabel(weighttext);
 
     nickname = new QLineEdit(this);
-    nickname->setText(appsettings->cvalue(mainWindow->cyclist, GC_NICKNAME).toString());
+    nickname->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_NICKNAME).toString());
 
     dob = new QDateEdit(this);
-    dob->setDate(appsettings->cvalue(mainWindow->cyclist, GC_DOB).toDate());
+    dob->setDate(appsettings->cvalue(mainWindow->athlete->cyclist, GC_DOB).toDate());
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
@@ -581,13 +581,13 @@ RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent),
 
     // we set to 0 or 1 for male or female since this
     // is language independent (and for once the code is easier!)
-    sex->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_SEX).toInt());
+    sex->setCurrentIndex(appsettings->cvalue(mainWindow->athlete->cyclist, GC_SEX).toInt());
 
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
     unitCombo->addItem(tr("Imperial"));
 
-    if (mainWindow->useMetricUnits)
+    if (mainWindow->athlete->useMetricUnits)
         unitCombo->setCurrentIndex(0);
     else
         unitCombo->setCurrentIndex(1);
@@ -596,13 +596,13 @@ RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent),
     weight->setMaximum(999.9);
     weight->setMinimum(0.0);
     weight->setDecimals(1);
-    weight->setValue(appsettings->cvalue(mainWindow->cyclist, GC_WEIGHT).toDouble() * (mainWindow->useMetricUnits ? 1.0 : LB_PER_KG));
+    weight->setValue(appsettings->cvalue(mainWindow->athlete->cyclist, GC_WEIGHT).toDouble() * (mainWindow->athlete->useMetricUnits ? 1.0 : LB_PER_KG));
 
     bio = new QTextEdit(this);
-    bio->setText(appsettings->cvalue(mainWindow->cyclist, GC_BIO).toString());
+    bio->setText(appsettings->cvalue(mainWindow->athlete->cyclist, GC_BIO).toString());
 
-    if (QFileInfo(mainWindow->home.absolutePath() + "/" + "avatar.png").exists())
-        avatar = QPixmap(mainWindow->home.absolutePath() + "/" + "avatar.png");
+    if (QFileInfo(mainWindow->athlete->home.absolutePath() + "/" + "avatar.png").exists())
+        avatar = QPixmap(mainWindow->athlete->home.absolutePath() + "/" + "avatar.png");
     else
         avatar = QPixmap(":/images/noavatar.png");
 
@@ -669,18 +669,18 @@ RiderPage::unitChanged(int currentIndex)
 void
 RiderPage::saveClicked()
 {
-    appsettings->setCValue(mainWindow->cyclist, GC_NICKNAME, nickname->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_DOB, dob->date());
-    appsettings->setCValue(mainWindow->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_NICKNAME, nickname->text());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_DOB, dob->date());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
 
     if (unitCombo->currentIndex()==0)
-        appsettings->setCValue(mainWindow->cyclist, GC_UNIT, GC_UNIT_METRIC);
+        appsettings->setCValue(mainWindow->athlete->cyclist, GC_UNIT, GC_UNIT_METRIC);
     else if (unitCombo->currentIndex()==1)
-        appsettings->setCValue(mainWindow->cyclist, GC_UNIT, GC_UNIT_IMPERIAL);
+        appsettings->setCValue(mainWindow->athlete->cyclist, GC_UNIT, GC_UNIT_IMPERIAL);
 
-    appsettings->setCValue(mainWindow->cyclist, GC_SEX, sex->currentIndex());
-    appsettings->setCValue(mainWindow->cyclist, GC_BIO, bio->toPlainText());
-    avatar.save(mainWindow->home.absolutePath() + "/" + "avatar.png", "PNG");
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_SEX, sex->currentIndex());
+    appsettings->setCValue(mainWindow->athlete->cyclist, GC_BIO, bio->toPlainText());
+    avatar.save(mainWindow->athlete->home.absolutePath() + "/" + "avatar.png", "PNG");
 }
 
 //
@@ -1580,9 +1580,9 @@ MetadataPage::MetadataPage(MainWindow *main) : main(main)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config using default file
-    keywordDefinitions = main->rideMetadata()->getKeywords();
-    fieldDefinitions = main->rideMetadata()->getFields();
-    colorfield = main->rideMetadata()->getColorField();
+    keywordDefinitions = main->athlete->rideMetadata()->getKeywords();
+    fieldDefinitions = main->athlete->rideMetadata()->getFields();
+    colorfield = main->athlete->rideMetadata()->getColorField();
 
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
@@ -1609,7 +1609,7 @@ MetadataPage::saveClicked()
     keywordsPage->getDefinitions(keywordDefinitions);
 
     // write to metadata.xml
-    RideMetadata::serialize(main->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
+    RideMetadata::serialize(main->athlete->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
 
     // save processors config
     processorPage->saveClicked();
@@ -2139,7 +2139,7 @@ ZonePage::ZonePage(MainWindow *main) : main(main)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(main->home.absolutePath() + "/power.zones");
+    QFile zonesFile(main->athlete->home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
@@ -2160,7 +2160,7 @@ void
 ZonePage::saveClicked()
 {
     zones.setScheme(schemePage->getScheme());
-    zones.write(main->home);
+    zones.write(main->athlete->home);
 }
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
@@ -2682,7 +2682,7 @@ HrZonePage::HrZonePage(MainWindow *main) : main(main)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(main->home.absolutePath() + "/hr.zones");
+    QFile zonesFile(main->athlete->home.absolutePath() + "/hr.zones");
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
@@ -2703,7 +2703,7 @@ void
 HrZonePage::saveClicked()
 {
     zones.setScheme(schemePage->getScheme());
-    zones.write(main->home);
+    zones.write(main->athlete->home);
 }
 
 HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
@@ -3330,7 +3330,7 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
 
     // check we have one and use built in if not there
-    QString filename = main->home.absolutePath()+"/measures.xml";
+    QString filename = main->athlete->home.absolutePath()+"/measures.xml";
     QString colorfield;
 
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
@@ -3480,7 +3480,7 @@ MeasuresPage::saveClicked()
     getDefinitions(current);
 
     // write to measures.xml (uses same format as metadata.xml)
-    RideMetadata::serialize(main->home.absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current, "");
+    RideMetadata::serialize(main->athlete->home.absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current, "");
 }
 
 void CredentialsPage::authoriseTwitter()
@@ -3557,7 +3557,7 @@ SeasonsPage::SeasonsPage(QWidget *parent, MainWindow *mainWindow) : QWidget(pare
     editLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
     // get the list
-    array = mainWindow->seasons->seasons;
+    array = mainWindow->athlete->seasons->seasons;
 
     // Edit widgets
     nameEdit = new QLineEdit(this);
@@ -3776,9 +3776,9 @@ SeasonsPage::saveClicked()
     }
 
     // write to disk
-    QString file = QString(mainWindow->home.absolutePath() + "/seasons.xml");
+    QString file = QString(mainWindow->athlete->home.absolutePath() + "/seasons.xml");
     SeasonParser::serialize(file, array);
 
     // re-read
-    mainWindow->seasons->readSeasons();
+    mainWindow->athlete->seasons->readSeasons();
 }

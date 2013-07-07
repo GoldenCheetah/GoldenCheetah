@@ -28,8 +28,8 @@ ZeoDownload::ZeoDownload(MainWindow *main) : main(main)
     base_api_url = "/zeows/api/v1/sleeperService/";
     api_key = "B8B1881541731200E67B902FC933E87E"; // GC key
 
-    QString _username = appsettings->cvalue(main->cyclist, GC_ZEOUSER, "").toString();
-    QString _password = appsettings->cvalue(main->cyclist, GC_ZEOPASS, "").toString();
+    QString _username = appsettings->cvalue(main->athlete->cyclist, GC_ZEOUSER, "").toString();
+    QString _password = appsettings->cvalue(main->athlete->cyclist, GC_ZEOPASS, "").toString();
 
     usernameAndPasswordEncoded = QString(_username + ":" + _password).toUtf8().toBase64();
 }
@@ -41,7 +41,7 @@ ZeoDownload::download()
     allMeasures = 0;
 
     // Build the URL to retrieve dates with sleep data.
-    QString url = appsettings->cvalue(main->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080").toString() + base_api_url + "getAllDatesWithSleepData" + "?key=" + api_key;
+    QString url = appsettings->cvalue(main->athlete->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080").toString() + base_api_url + "getAllDatesWithSleepData" + "?key=" + api_key;
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Authorization", "Basic " + usernameAndPasswordEncoded.toLatin1());
     request.setRawHeader("Referer" , "http://www.goldencheetah.org");
@@ -102,7 +102,7 @@ ZeoDownload::downloadFinished(QNetworkReply *reply)
             add.setDateTime(QDateTime(dates.first(), QTime(0,0,0)));
             add.setText("Sleep index (ZQ)", QString("%1").arg(zq));
             add.setText("Sleep time", QString("%1").arg(time));
-            main->metricDB->importMeasure(&add);
+            main->athlete->metricDB->importMeasure(&add);
         }
 
         dates.removeFirst();
@@ -124,7 +124,7 @@ ZeoDownload::nextDate()
         QString dateStr = date.toString("yyyy-MM-dd");
 
         QDateTime dateTime = QDateTime(date, QTime(0,0,0));
-        QList<SummaryMetrics> list = main->metricDB->getAllMeasuresFor(dateTime,dateTime);
+        QList<SummaryMetrics> list = main->athlete->metricDB->getAllMeasuresFor(dateTime,dateTime);
         for (int i=0;i<list.size();i++) {
             SummaryMetrics sm = list.at(i);
             if (sm.getText("Sleep time", "").length()>0 && sm.getText("Sleep index (ZQ)", "").length()>0) {
@@ -137,7 +137,7 @@ ZeoDownload::nextDate()
         if (!present) {
             newMeasures ++;
             // Build the URL to retrieve the stats for date
-            QString url = appsettings->cvalue(main->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080").toString() + base_api_url + "getSleepStatsForDate" + "?key=" + api_key + "&date=" + dateStr;
+            QString url = appsettings->cvalue(main->athlete->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080").toString() + base_api_url + "getSleepStatsForDate" + "?key=" + api_key + "&date=" + dateStr;
             QNetworkRequest request = QNetworkRequest(QUrl(url));
             request.setRawHeader("Authorization", "Basic " + usernameAndPasswordEncoded.toLatin1());
             request.setRawHeader("Referer" , "http://www.goldencheetah.org");

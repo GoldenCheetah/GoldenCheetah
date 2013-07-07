@@ -84,7 +84,7 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
     if (ridesummary) {
 
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
-        connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
+        connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(refresh()));
         connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
 
     } else {
@@ -192,7 +192,7 @@ RideSummaryWindow::htmlSummary() const
 
     if (!ride && !ridesummary) return ""; // didn't parse!
 
-    bool useMetricUnits = mainWindow->useMetricUnits;
+    bool useMetricUnits = mainWindow->athlete->useMetricUnits;
 
     // ride summary and there were ridefile read errors?
     if (ridesummary && !ride) {
@@ -291,7 +291,7 @@ RideSummaryWindow::htmlSummary() const
             worklist += timeInZonesHR;
 
             // go calculate them then...
-            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
+            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), worklist);
             for(int i = 0; i < worklist.count(); ++i) {
                 if (worklist[i] != "") {
                     RideMetricPtr m = computed.value(worklist[i]);
@@ -302,7 +302,7 @@ RideSummaryWindow::htmlSummary() const
         } else {
 
             // just use the metricDB versions, nice 'n fast
-            metrics = mainWindow->metricDB->getRideMetrics(rideItem->fileName);
+            metrics = mainWindow->athlete->metricDB->getRideMetrics(rideItem->fileName);
         }
     }
 
@@ -393,11 +393,11 @@ RideSummaryWindow::htmlSummary() const
         range = rideItem->zoneRange();
 
     // or for end of daterange plotted for daterange summary
-    } else if (mainWindow->zones()) {
+    } else if (mainWindow->athlete->zones()) {
 
         // get from end if period
-        range = mainWindow->zones()->whichRange(myDateRange.to);
-        if (range > -1) numzones = mainWindow->zones()->numZones(range);
+        range = mainWindow->athlete->zones()->whichRange(myDateRange.to);
+        if (range > -1) numzones = mainWindow->athlete->zones()->numZones(range);
 
     }
 
@@ -410,7 +410,7 @@ RideSummaryWindow::htmlSummary() const
             else time_in_zone[i] = SummaryMetrics::getAggregated(mainWindow, timeInZones[i], data, filters, filtered, useMetricUnits, true).toDouble();
         }
         summary += tr("<h3>Power Zones</h3>");
-        summary += mainWindow->zones()->summarize(range, time_in_zone); //aggregating
+        summary += mainWindow->athlete->zones()->summarize(range, time_in_zone); //aggregating
     }
 
     //
@@ -426,11 +426,11 @@ RideSummaryWindow::htmlSummary() const
         hrrange = rideItem->hrZoneRange();
 
     // or for end of daterange plotted for daterange summary
-    } else if (mainWindow->hrZones()) {
+    } else if (mainWindow->athlete->hrZones()) {
 
         // get from end if period
-        hrrange = mainWindow->hrZones()->whichRange(myDateRange.to);
-        if (hrrange > -1) numhrzones = mainWindow->hrZones()->numZones(hrrange);
+        hrrange = mainWindow->athlete->hrZones()->whichRange(myDateRange.to);
+        if (hrrange > -1) numhrzones = mainWindow->athlete->hrZones()->numZones(hrrange);
 
     }
 
@@ -445,7 +445,7 @@ RideSummaryWindow::htmlSummary() const
         }
 
         summary += tr("<h3>Heart Rate Zones</h3>");
-        summary += mainWindow->hrZones()->summarize(hrrange, time_in_zone); //aggregating
+        summary += mainWindow->athlete->hrZones()->summarize(hrrange, time_in_zone); //aggregating
     }
 
     // Only get interval summary for a ride summary
@@ -483,7 +483,7 @@ RideSummaryWindow::htmlSummary() const
                 }
 
                 QHash<QString,RideMetricPtr> metrics =
-                    RideMetric::computeMetrics(mainWindow, &f, mainWindow->zones(), mainWindow->hrZones(), intervalMetrics);
+                    RideMetric::computeMetrics(mainWindow, &f, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), intervalMetrics);
                 if (firstRow) {
                     summary += "<tr>";
                     summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";
@@ -705,15 +705,15 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
     else current = dr;
 
     if (useCustom) {
-        data = mainWindow->metricDB->getAllMetricsFor(custom);
+        data = mainWindow->athlete->metricDB->getAllMetricsFor(custom);
     } else if (useToToday) {
 
         DateRange use = myDateRange;
         QDate today = QDate::currentDate();
         if (use.to > today) use.to = today;
-        data = mainWindow->metricDB->getAllMetricsFor(use);
+        data = mainWindow->athlete->metricDB->getAllMetricsFor(use);
 
-    } else data = mainWindow->metricDB->getAllMetricsFor(myDateRange);
+    } else data = mainWindow->athlete->metricDB->getAllMetricsFor(myDateRange);
 
     refresh();
 }

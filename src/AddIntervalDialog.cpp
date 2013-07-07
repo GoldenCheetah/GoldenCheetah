@@ -303,7 +303,7 @@ struct CompareBests {
 void
 AddIntervalDialog::createClicked()
 {
-    const RideFile *ride = mainWindow->currentRide();
+    const RideFile *ride = mainWindow->context->currentRide();
     if (!ride) {
         QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
         return;
@@ -642,7 +642,7 @@ AddIntervalDialog::addClicked()
             double start = resultsTable->item(i,3)->text().toDouble();
             double stop = resultsTable->item(i,4)->text().toDouble();
             QString name = resultsTable->item(i,2)->text();
-            const RideFile *ride = mainWindow->currentRide();
+            const RideFile *ride = mainWindow->context->currentRide();
 
             QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
             QTreeWidgetItem *last =

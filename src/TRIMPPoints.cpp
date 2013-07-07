@@ -91,7 +91,7 @@ class TRIMPPoints : public RideMetric {
         QString athlete;
         double ksex = 1.92;
         if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            if (appsettings->cvalue(main->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
+            if (appsettings->cvalue(main->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
             else ksex = 1.92; // Male
         }
 
@@ -158,7 +158,7 @@ public:
         QString athlete;
         double ksex = 1.92;
         if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            if (appsettings->cvalue(main->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
+            if (appsettings->cvalue(main->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
             else ksex = 1.92; // Male
         }
 

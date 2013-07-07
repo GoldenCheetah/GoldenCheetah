@@ -106,9 +106,6 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(MainWindow *main, QString n
 void
 ManualDataProcessorDialog::okClicked()
 {
-    if (processor->postProcess((RideFile *)ride->ride(), config) == true) {
-        main->notifyRideSelected();     // to remain compatible with rest of GC for now
-    }
     accept();
 }
 

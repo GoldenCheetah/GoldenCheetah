@@ -56,8 +56,6 @@ class LTMPopup : public QWidget
     private:
 
         MainWindow *main;
-        bool useMetricUnits;
-
         QLabel *title;
         QTableWidget *rides;
         QTextEdit *metrics;

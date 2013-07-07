@@ -411,9 +411,8 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
 void
 GcBubble::setText(QString filename)
 {
-        SummaryMetrics metrics = parent->metricDB->getAllMetricsFor(filename);
-	
-        useMetricUnits = mainWindow->useMetricUnits;
+        SummaryMetrics metrics = parent->athlete->metricDB->getAllMetricsFor(filename);
+        useMetricUnits = mainWindow->athlete->useMetricUnits;
     
 
         //

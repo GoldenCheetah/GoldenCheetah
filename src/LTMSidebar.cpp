@@ -93,7 +93,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 #endif
     eventsWidget->addWidget(eventTree);
 
-    seasons = parent->seasons;
+    seasons = parent->athlete->seasons;
     resetSeasons(); // reset the season list
 
     configChanged(); // will reset the metric tree
@@ -120,7 +120,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
     mainLayout->addWidget(splitter);
 
-    splitter->prepare(main->cyclist, "LTM");
+    splitter->prepare(main->athlete->cyclist, "LTM");
 
     // our date ranges
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
@@ -129,7 +129,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
     // GC signal
-    connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
@@ -182,7 +182,7 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 
         // make sure they fit
         eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
-        appsettings->setCValue(main->cyclist, GC_LTM_LAST_DATE_RANGE, dateRange->id().toString());
+        appsettings->setCValue(main->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, dateRange->id().toString());
 
     }
 
@@ -206,7 +206,7 @@ LTMSidebar::resetSeasons()
     for (i=allDateRanges->childCount(); i > 0; i--) {
         delete allDateRanges->takeChild(0);
     }
-    QString id = appsettings->cvalue(main->cyclist, GC_LTM_LAST_DATE_RANGE, seasons->seasons.at(0).id().toString()).toString();
+    QString id = appsettings->cvalue(main->athlete->cyclist, GC_LTM_LAST_DATE_RANGE, seasons->seasons.at(0).id().toString()).toString();
     for (i=0; i <seasons->seasons.count(); i++) {
         Season season = seasons->seasons.at(i);
         QTreeWidgetItem *add = new QTreeWidgetItem(allDateRanges, season.getType());
@@ -633,7 +633,7 @@ LTMSidebar::setSummary(DateRange dateRange)
         to = newTo;
 
         // lets get the metrics
-        QList<SummaryMetrics>results = main->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
+        QList<SummaryMetrics>results = main->athlete->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
 
         // foreach of the metrics get an aggregated value
         // header of summary
@@ -685,15 +685,15 @@ LTMSidebar::setSummary(DateRange dateRange)
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
                 QStringList empty; // filter list not used at present
-                QString value = SummaryMetrics::getAggregated(main, metricname, results, empty, false, main->useMetricUnits);
+                QString value = SummaryMetrics::getAggregated(main, metricname, results, empty, false, main->athlete->useMetricUnits);
 
                 // Maximum Max and Average Average looks nasty, remove from name for display
                 QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
 
                 // don't show units for time values
-                if (metric && (metric->units(main->useMetricUnits) == "seconds" ||
-                               metric->units(main->useMetricUnits) == tr("seconds") ||
-                               metric->units(main->useMetricUnits) == "")) {
+                if (metric && (metric->units(main->athlete->useMetricUnits) == "seconds" ||
+                               metric->units(main->athlete->useMetricUnits) == tr("seconds") ||
+                               metric->units(main->athlete->useMetricUnits) == "")) {
 
                     summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")
                                             .arg(s)
@@ -702,7 +702,7 @@ LTMSidebar::setSummary(DateRange dateRange)
                 } else {
                     summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td>")
                                             .arg(s)
-                                            .arg(metric ? metric->units(main->useMetricUnits) : "unknown")
+                                            .arg(metric ? metric->units(main->athlete->useMetricUnits) : "unknown")
                                             .arg(value);
                 }
             }

@@ -104,7 +104,7 @@ class LTMWindow : public GcChartWindow
 
     public:
 
-        LTMWindow(MainWindow *, bool, const QDir &);
+        LTMWindow(MainWindow *);
         ~LTMWindow();
         LTMToolTip *toolTip() { return picker; }
 
@@ -179,8 +179,6 @@ class LTMWindow : public GcChartWindow
 
     private:
         // passed from MainWindow
-        QDir home;
-        bool useMetricUnits;
         DateRange plotted;
 
         bool useCustom;

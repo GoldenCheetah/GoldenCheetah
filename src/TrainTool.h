@@ -196,7 +196,6 @@ class TrainTool : public GcWindow
         int FTP; // current FTP
 
         QList<DeviceConfiguration> Devices;
-        bool useMetricUnits;
 
         // updated with a RealtimeData object either from
         // update() - from a push device (quarqd ANT+)

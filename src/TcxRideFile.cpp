@@ -104,7 +104,7 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool wi
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), worklist);
 
     QDomElement lap_time = doc.createElement("TotalTimeSeconds");
     text = doc.createTextNode(QString("%1").arg(computed.value("workout_time")->value(true)));

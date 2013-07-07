@@ -177,7 +177,7 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             break;
 
         case RideFile::wattsKg:
-            if (mainWindow->useMetricUnits)
+            if (mainWindow->athlete->useMetricUnits)
                 setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
             else
                 setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
@@ -549,7 +549,7 @@ CpintPlot::calculate(RideItem *rideItem)
 
     // zap any existing ridefilecache then get new one
     if (current) delete current;
-    current = new RideFileCache(mainWindow, mainWindow->home.absolutePath() + "/" + fileName);
+    current = new RideFileCache(mainWindow, mainWindow->athlete->home.absolutePath() + "/" + fileName);
 
     // get aggregates - incase not initialised from date change
     if (bests == NULL) bests = new RideFileCache(mainWindow, startDate, endDate, isFiltered, files);

@@ -68,11 +68,11 @@
 
 int DBSchemaVersion = 48;
 
-DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
+DBAccess::DBAccess(MainWindow* main) : main(main)
 {
     // check we have one and use built in if not there
     RideMetadata::readXML(":/xml/measures.xml", mkeywordDefinitions, mfieldDefinitions, mcolorfield);
-	initDatabase(home);
+	initDatabase(main->athlete->home);
 }
 
 void DBAccess::closeConnection()
@@ -98,13 +98,13 @@ DBAccess::initDatabase(QDir home)
     if (main->session == 1) {
         // use different name for v3 metricDB to avoid constant rebuilding
         // when switching between v2 stable and v3 development builds
-        main->db = QSqlDatabase::addDatabase("QSQLITE", sessionid);
-        main->db.setDatabaseName(home.absolutePath() + "/metricDBv3"); 
+        main->athlete->db = QSqlDatabase::addDatabase("QSQLITE", sessionid);
+        main->athlete->db.setDatabaseName(home.absolutePath() + "/metricDBv3"); 
         //dbconn = db.database(QString("GC"));
-        dbconn = main->db.database(sessionid);
+        dbconn = main->athlete->db.database(sessionid);
     } else {
         // clone the first one!
-        dbconn = QSqlDatabase::cloneDatabase(main->db, sessionid);
+        dbconn = QSqlDatabase::cloneDatabase(main->athlete->db, sessionid);
         dbconn.open();
     }
 
@@ -175,14 +175,14 @@ bool DBAccess::createMetricsTable()
             createMetricTable += QString(", X%1 double").arg(factory.metricName(i));
 
         // And all the metadata texts
-        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
             if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 createMetricTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
             }
         }
 
         // And all the metadata metrics
-        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
             if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 createMetricTable += QString(", Z%1 double").arg(main->specialFields.makeTechName(field.name));
             }
@@ -193,7 +193,7 @@ bool DBAccess::createMetricsTable()
         //if (!rc) qDebug()<<"create table failed!"  << query.lastError();
 
         // add row to version database
-        QString metadataXML =  QString(home.absolutePath()) + "/metadata.xml";
+        QString metadataXML =  QString(main->athlete->home.absolutePath()) + "/metadata.xml";
         int metadatacrcnow = computeFileCRC(metadataXML);
         QDateTime timestamp = QDateTime::currentDateTime();
 
@@ -298,7 +298,7 @@ bool DBAccess::createDatabase()
 void DBAccess::checkDBVersion()
 {
     // get a CRC for metadata.xml
-    QString metadataXML =  QString(home.absolutePath()) + "/metadata.xml";
+    QString metadataXML =  QString(main->athlete->home.absolutePath()) + "/metadata.xml";
     int metadatacrcnow = computeFileCRC(metadataXML);
 
     // get a CRC for measures.xml
@@ -407,13 +407,13 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
         insertStatement += QString(", X%1 ").arg(factory.metricName(i));
 
     // And all the metadata texts
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
             insertStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
         // And all the metadata metrics
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             insertStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
@@ -422,7 +422,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     insertStatement += " ) values (?,?,?,?,?,?"; // filename, identifier, timestamp, ride_date, color, fingerprint
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             insertStatement += ",?";
         }
@@ -445,14 +445,14 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     }
 
     // And all the metadata texts
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
 
         if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type ==7)) {
             query.addBindValue(ride->getTag(field.name, ""));
         }
     }
     // And all the metadata metrics
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
 
         if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             query.addBindValue(ride->getTag(field.name, "0.0").toDouble());
@@ -505,7 +505,7 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
@@ -532,7 +532,7 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
         for (; i<factory.metricCount(); i++)
             summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+4).toDouble());
 
-        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
             if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+4).toDouble());
@@ -561,7 +561,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
@@ -586,7 +586,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
         int i=0;
         for (; i<factory.metricCount(); i++)
             summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+3).toDouble());
-        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
             if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+3).toDouble());
@@ -611,7 +611,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
         if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
@@ -631,7 +631,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
         int i=0;
         for (; i<factory.metricCount(); i++)
             summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+2).toDouble());
-        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
             if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());

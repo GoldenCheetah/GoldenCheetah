@@ -170,7 +170,7 @@ double IntervalAerolabData::x
 
     if ( current != NULL )
     {
-        double multiplier = aerolab->useMetricUnits ? 1 : MILES_PER_KM;
+        double multiplier = mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM;
         // which point are we returning?
 //qDebug() << "number = " << number << endl;
         switch ( number % 4 )
@@ -244,8 +244,6 @@ Aerolab::Aerolab(
   eta       = 1.0;
   eoffset   = 0.0;
 
-  useMetricUnits = mainWindow->useMetricUnits;
-
   insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
   setCanvasBackground(Qt::white);
   canvas()->setFrameStyle(QFrame::NoFrame);
@@ -281,7 +279,6 @@ Aerolab::Aerolab(
 void
 Aerolab::configChanged()
 {
-  useMetricUnits = mainWindow->useMetricUnits;
 
   // set colors
   setCanvasBackground(GColor(CPLOTBACKGROUND));
@@ -321,7 +318,6 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
   altArray.clear();
   distanceArray.clear();
   timeArray.clear();
-  useMetricUnits = true;
 
   if( ride ) {
 
@@ -370,7 +366,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
 
       timeArray[arrayLength]  = p1->secs / 60.0;
       if ( have_recorded_alt_curve )
-        altArray[arrayLength] = (useMetricUnits
+        altArray[arrayLength] = (mainWindow->athlete->useMetricUnits
                    ? p1->alt
                    : p1->alt * FEET_PER_METER);
 
@@ -517,7 +513,7 @@ Aerolab::setYMax(bool new_zoom)
           if (veCurve->isVisible())
           {
 
-             if ( useMetricUnits )
+             if ( mainWindow->athlete->useMetricUnits )
 
              {
 
@@ -594,7 +590,7 @@ void
 Aerolab::setXTitle() {
 
   if (bydist)
-    setAxisTitle(xBottom, tr("Distance ")+QString(useMetricUnits?"(km)":"(miles)"));
+    setAxisTitle(xBottom, tr("Distance ")+QString(mainWindow->athlete->useMetricUnits?"(km)":"(miles)"));
   else
     setAxisTitle(xBottom, tr("Time (minutes)"));
 }
@@ -764,7 +760,7 @@ void Aerolab::refreshIntervalMarkers()
             if (!bydist)
                 mrk->setValue(interval.start / 60.0, 0.0);
             else
-                mrk->setValue((useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
                                 rideItem->ride()->timeToDistance(interval.start), 0.0);
             mrk->setLabel(text);
         }

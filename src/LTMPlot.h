@@ -45,7 +45,7 @@ class LTMPlot : public QwtPlot
 
 
     public:
-        LTMPlot(LTMWindow *, MainWindow *main, QDir home);
+        LTMPlot(LTMWindow *, MainWindow *main);
         ~LTMPlot();
         void setData(LTMSettings *);
         void setAxisTitle(int axis, QString label);
@@ -67,8 +67,6 @@ class LTMPlot : public QwtPlot
 
     private:
         MainWindow *main;
-        QDir home;
-        bool useMetricUnits;
         LTMSettings *settings;
 
         // date range selection

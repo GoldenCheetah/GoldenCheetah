@@ -192,8 +192,8 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
-    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(mainWindow, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
+    connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
 }
 
 void

@@ -63,7 +63,7 @@ class TreeMapWindow : public GcWindow
     public:
 
         MainWindow *main; // used by zones shader
-        TreeMapWindow(MainWindow *, bool, const QDir &);
+        TreeMapWindow(MainWindow *); 
         ~TreeMapWindow();
 
 #ifdef GC_HAVE_LUCENE
@@ -129,8 +129,6 @@ class TreeMapWindow : public GcWindow
 
     private:
         // passed from MainWindow
-        QDir home;
-        bool useMetricUnits;
         TMSettings settings;
         DateSettingsEdit *dateSetting;
 

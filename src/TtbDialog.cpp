@@ -146,8 +146,8 @@ TtbDialog::requestSettings()
 
     currentRequest = reqSettings;
 
-    QString username = appsettings->cvalue(mainWindow->cyclist, GC_TTBUSER).toString();
-    QString password = appsettings->cvalue(mainWindow->cyclist, GC_TTBPASS).toString();
+    QString username = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBUSER).toString();
+    QString password = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBPASS).toString();
 
     QUrl url( TTB_URL + "/settings/list" );
     url.addQueryItem( "view", "xml" );
@@ -170,8 +170,8 @@ TtbDialog::requestSession()
 
     currentRequest = reqSession;
 
-    QString username = appsettings->cvalue(mainWindow->cyclist, GC_TTBUSER).toString();
-    QString password = appsettings->cvalue(mainWindow->cyclist, GC_TTBPASS).toString();
+    QString username = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBUSER).toString();
+    QString password = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBPASS).toString();
 
     QUrl url( TTB_URL + "/login/sso" );
     url.addQueryItem( "view", "xml" );
@@ -203,7 +203,7 @@ TtbDialog::requestUpload()
     body->append( textPart );
 
 
-    QString fname = mainWindow->home.absoluteFilePath(".ttbupload.tcx" );
+    QString fname = mainWindow->athlete->home.absoluteFilePath(".ttbupload.tcx" );
     QFile *uploadFile = new QFile( fname );
     uploadFile->setParent(body);
 

@@ -34,15 +34,14 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
 
-TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) :
-            GcWindow(parent), main(parent), home(home),
-            useMetricUnits(useMetricUnits), active(false), dirty(true), useCustom(false), useToToday(false)
+TreeMapWindow::TreeMapWindow(MainWindow *parent) :
+            GcWindow(parent), main(parent), active(false), dirty(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Treemap Window");
 
     // the plot
     mainLayout = new QVBoxLayout;
-    ltmPlot = new TreeMapPlot(this, main, home);
+    ltmPlot = new TreeMapPlot(this, main);
     mainLayout->addWidget(ltmPlot);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -54,7 +53,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     setControls(c);
 
     // read metadata.xml
-    QString filename = main->home.absolutePath()+"/metadata.xml";
+    QString filename = main->athlete->home.absolutePath()+"/metadata.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
     RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
@@ -138,7 +137,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh(void)));
 
-    connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
 
     // user clicked on a cell in the plot
     connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
@@ -204,9 +203,6 @@ TreeMapWindow::refresh()
 
     // refresh for changes to ridefiles / zones
     if (active == false) {
-        // if config has changed get new useMetricUnits
-        useMetricUnits = main->useMetricUnits;
-
         // setup settings to current user selection
         foreach(QTreeWidgetItem *metric, metricTree->selectedItems()) {
             if (metric->type() != ROOT_TYPE) {
@@ -232,7 +228,7 @@ TreeMapWindow::refresh()
 
         // get the data
         results.clear(); // clear any old data
-        results = main->metricDB->getAllMetricsFor(QDateTime(settings.from, QTime(0,0,0)),
+        results = main->athlete->metricDB->getAllMetricsFor(QDateTime(settings.from, QTime(0,0,0)),
                                                    QDateTime(settings.to, QTime(0,0,0)));
 
         refreshPlot();

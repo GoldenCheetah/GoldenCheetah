@@ -222,8 +222,8 @@ void WorkoutTypePage::initializePage()
     relWattageRadioButton = new QRadioButton(tr("% FTP Wattage"));
     gradientRadioButton = new QRadioButton(tr("Gradient"));
 
-    if (hackMW->rideItem()) {
-        QString s = hackMW->rideItem()->ride()->startTime().toLocalTime().toString();
+    if (hackMW->context->rideItem()) {
+        QString s = hackMW->context->rideItem()->ride()->startTime().toLocalTime().toString();
         QString importStr = "Import Selected Ride (" + s + ")";
         importRadioButton = new QRadioButton((importStr));
     } else {
@@ -339,7 +339,7 @@ void AbsWattagePage::updateMetrics()
     metrics.append("average_power");
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackMW->zones(),hackMW->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackMW->athlete->zones(),hackMW->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 }
 
@@ -386,8 +386,8 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
-    int zoneRange = hackMW->zones()->whichRange(QDate::currentDate());
-    ftp = hackMW->zones()->getCP(zoneRange);
+    int zoneRange = hackMW->athlete->zones()->whichRange(QDate::currentDate());
+    ftp = hackMW->athlete->zones()->getCP(zoneRange);
 
     setTitle("Workout Wizard");
     QString subTitle = "Relative Wattage Workout Wizard, current CP60 = " + QString::number(ftp);
@@ -466,7 +466,7 @@ void RelWattagePage::updateMetrics()
     metrics.append("average_power");
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackMW->zones(),hackMW->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackMW->athlete->zones(),hackMW->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 }
 
@@ -512,9 +512,9 @@ GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
-    int zoneRange = hackMW->zones()->whichRange(QDate::currentDate());
-    ftp = hackMW->zones()->getCP(zoneRange);
-    metricUnits = hackMW->useMetricUnits;
+    int zoneRange = hackMW->athlete->zones()->whichRange(QDate::currentDate());
+    ftp = hackMW->athlete->zones()->getCP(zoneRange);
+    metricUnits = hackMW->athlete->useMetricUnits;
     setTitle("Workout Wizard");
 
     setSubTitle("Manually crate a workout based on gradient (slope) and distance, maxium grade is 5.");
@@ -607,14 +607,14 @@ void ImportPage::initializePage()
         setFinalPage(true);
         QVBoxLayout *layout = new QVBoxLayout();
         plot = new WorkoutPlot();
-        metricUnits = hackMW->useMetricUnits;
+        metricUnits = hackMW->athlete->useMetricUnits;
         QString s = (metricUnits ? "KM" : "Miles");
         QString distance = QString("Distance (") + s + QString(")");
         plot->setXAxisTitle(distance);
         s = (metricUnits ? "Meters" : "Feet");
         QString elevation = QString("elevation (") + s + QString(")");
         plot->setYAxisTitle(elevation);
-        RideItem *rideItem = hackMW->rideItem();
+        RideItem *rideItem = hackMW->context->rideItem();
 
         if(rideItem == NULL)
             return;

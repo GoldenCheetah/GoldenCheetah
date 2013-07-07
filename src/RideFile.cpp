@@ -99,7 +99,7 @@ RideFile::seriesName(SeriesType series)
 QString
 RideFile::unitName(SeriesType series, MainWindow *main)
 {
-    bool useMetricUnits = main->useMetricUnits;
+    bool useMetricUnits = main->athlete->useMetricUnits;
 
     switch (series) {
     case RideFile::secs: return QString(tr("seconds"));
@@ -320,7 +320,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
 
         // Construct the summary text used on the calendar
         QString calendarText;
-        foreach (FieldDefinition field, main->rideMetadata()->getFields()) {
+        foreach (FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
             if (field.diary == true && result->getTag(field.name, "") != "") {
                 calendarText += QString("%1\n")
                         .arg(result->getTag(field.name, ""));
@@ -820,7 +820,7 @@ RideFile::getWeight()
     }
 
     // withings?
-    QList<SummaryMetrics> measures = mainwindow->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
+    QList<SummaryMetrics> measures = mainwindow->athlete->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
     int i = measures.count()-1;
     if (i) {
         while (i>=0) {
@@ -833,7 +833,7 @@ RideFile::getWeight()
 
 
     // global options
-    weight_ = appsettings->cvalue(mainwindow->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+    weight_ = appsettings->cvalue(mainwindow->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
 
     // if set to zero in global options then override it.
     // it must not be zero!!!

@@ -430,13 +430,13 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     // GC signals
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(mainWindow->context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
+    connect(mainWindow->context, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
+    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(mainWindow, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
 
     // set initial colors
@@ -515,8 +515,8 @@ AllPlotWindow::redrawFullPlot()
 
     if (fullPlot->bydist)
         fullPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (fullPlot->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (fullPlot->useMetricUnits ? 1 : MILES_PER_KM));
+        ride->ride()->dataPoints().first()->km * (mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM));
     else
         fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                  ride->ride()->dataPoints().last()->secs/60);
@@ -1027,7 +1027,6 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
     QwtPlotMarker* allMarker1 = plot->allMarker1;
     QwtPlotMarker* allMarker2 = plot->allMarker2;
 
-    bool useMetricUnits = plot->useMetricUnits;
     if (!allMarker2->isVisible() || allMarker2->xValue() != xValue) {
         allMarker2->setValue(xValue, plot->bydist ? 0 : 100);
         allMarker2->show();
@@ -1057,7 +1056,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         // if we are in distance mode then x1 and x2 are distances
         // we need to make sure they are in KM for the rest of this
         // code.
-        if (plot->bydist && useMetricUnits == false) {
+        if (plot->bydist && mainWindow->athlete->useMetricUnits == false) {
             x1 *= KM_PER_MILE;
             x2 *=  KM_PER_MILE;
         }
@@ -1080,15 +1079,15 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             }
         }
         QString s("\n%1%2 %3 %4\n%5%6 %7%8 %9%10");
-        s = s.arg(useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 2);
-        s = s.arg((useMetricUnits? "km":"mi"));
+        s = s.arg(mainWindow->athlete->useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 2);
+        s = s.arg((mainWindow->athlete->useMetricUnits? "km":"mi"));
         s = s.arg(time_to_string(duration2-duration1));
         if (duration2-duration1-secsMoving>1)
             s = s.arg("("+time_to_string(secsMoving)+")");
         else
             s = s.arg("");
-        s = s.arg((useMetricUnits ? 1 : MILES_PER_KM) * (distance2-distance1)/secsMoving*3600, 0, 'f', 1);
-        s = s.arg((useMetricUnits? "km/h":"mph"));
+        s = s.arg((mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) * (distance2-distance1)/secsMoving*3600, 0, 'f', 1);
+        s = s.arg((mainWindow->athlete->useMetricUnits? "km/h":"mph"));
         if (wattsTotal>0) {
             s = s.arg(wattsTotal/arrayLength, 0, 'f', 1);
             s = s.arg("W");
@@ -1413,9 +1412,9 @@ AllPlotWindow::resetStackedDatas()
         int startIndex, stopIndex;
         if (plot->bydist) {
             startIndex = allPlot->rideItem->ride()->distanceIndex(
-                        (allPlot->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+                        (mainWindow->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->distanceIndex(
-                        (allPlot->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+                        (mainWindow->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
@@ -1553,7 +1552,7 @@ AllPlotWindow::setupStackPlots()
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
 
     double duration = rideItem->ride()->dataPoints().last()->secs;
-    double distance =  (fullPlot->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
+    double distance =  (mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
     int nbplot;
 
     if (fullPlot->bydist)
@@ -1569,9 +1568,9 @@ AllPlotWindow::setupStackPlots()
         // calculate the segment of ride this stack plot contains
         int startIndex, stopIndex;
         if (fullPlot->bydist) {
-            startIndex = fullPlot->rideItem->ride()->distanceIndex((fullPlot->useMetricUnits ?
+            startIndex = fullPlot->rideItem->ride()->distanceIndex((mainWindow->athlete->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*i);
-            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((fullPlot->useMetricUnits ?
+            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((mainWindow->athlete->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = fullPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);

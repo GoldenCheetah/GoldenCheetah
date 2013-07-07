@@ -111,8 +111,8 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main)
     switch(id) {
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(main); break;
     case GcWindowTypes::AllPlot: returning = new AllPlotWindow(main); break;
-    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(main->home, main); break;
-    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(main->home, main, true); break;
+    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(main->athlete->home, main); break;
+    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(main->athlete->home, main, true); break;
 #ifdef GC_HAVE_ICAL
     case GcWindowTypes::Diary: returning = new DiaryWindow(main); break;
 #else
@@ -121,9 +121,9 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main)
     case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(main); break;
     case GcWindowTypes::Histogram: returning = new HistogramWindow(main); break;
     case GcWindowTypes::Distribution: returning = new HistogramWindow(main, true); break;
-    case GcWindowTypes::LTM: returning = new LTMWindow(main, main->useMetricUnits, main->home); break;
+    case GcWindowTypes::LTM: returning = new LTMWindow(main); break;
 #ifdef GC_HAVE_QWTPLOT3D
-    case GcWindowTypes::Model: returning = new ModelWindow(main, main->home); break;
+    case GcWindowTypes::Model: returning = new ModelWindow(main, main->athlete->home); break;
 #else
     case GcWindowTypes::Model: returning = new GcWindow(); break;
 #endif
@@ -133,12 +133,12 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main)
     case GcWindowTypes::RideEditor: returning = new RideEditor(main); break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(main, true); break;
     case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(main, false); break;
-    case GcWindowTypes::Scatter: returning = new ScatterWindow(main, main->home); break;
+    case GcWindowTypes::Scatter: returning = new ScatterWindow(main, main->athlete->home); break;
     case GcWindowTypes::Summary: returning = new SummaryWindow(main); break;
-    case GcWindowTypes::TreeMap: returning = new TreeMapWindow(main, main->useMetricUnits, main->home); break;
+    case GcWindowTypes::TreeMap: returning = new TreeMapWindow(main); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(main); break; // deprecated
 #if defined Q_OS_MAC || defined GC_HAVE_VLC // mac uses Quicktime / Win/Linux uses VLC
-    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(main, main->home); break;
+    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(main, main->athlete->home); break;
 #else
     case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
 #endif

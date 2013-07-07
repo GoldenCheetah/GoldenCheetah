@@ -168,7 +168,7 @@ ICalendar::ICalendar(MainWindow *parent) : QWidget(parent), main(parent)
     // get from local and remote calendar
 
     // local file
-    QString localFilename = main->home.absolutePath()+"/calendar.ics";
+    QString localFilename = main->athlete->home.absolutePath()+"/calendar.ics";
     QFile localFile(localFilename);
     if (localFile.exists() && localFile.open(QFile::ReadOnly | QFile::Text)) {
 
@@ -182,7 +182,7 @@ ICalendar::ICalendar(MainWindow *parent) : QWidget(parent), main(parent)
     }
 
     // remote file
-    main->calendarDownload->download();
+    main->athlete->calendarDownload->download();
 }
 
 void ICalendar::refreshRemote(QString fulltext)
