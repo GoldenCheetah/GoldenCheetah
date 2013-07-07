@@ -410,9 +410,6 @@ class MainWindow : public QMainWindow
         void frontInterval();
         void backInterval();
         void intervalEdited(QTreeWidgetItem *, int);
-#ifdef GC_HAVE_LIBOAUTH
-        void tweetRide();
-#endif
 
         // working with measures, not rides
         void recordMeasure();

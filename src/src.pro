@@ -22,8 +22,8 @@ LIBS += -lm $${LIBZ_LIBS}
     INCLUDEPATH += $${LIBOAUTH_INCLUDE}
     LIBS        += $${LIBOAUTH_LIBS}
     DEFINES     += GC_HAVE_LIBOAUTH
-    SOURCES     += TwitterDialog.cpp
-    HEADERS     += TwitterDialog.h
+    #SOURCES     += TwitterDialog.cpp
+    #HEADERS     += TwitterDialog.h
 }
 
 !isEmpty( D2XX_INCLUDE ) {
