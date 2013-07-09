@@ -125,6 +125,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Dag Gruneau");
     contributors.append("Damien Grauser");
     contributors.append("Darren Hague");
+    contributors.append("Dave Waterworth");
     contributors.append("Dean Junk");
     contributors.append("Eric Brandt");
     contributors.append("Eric Murray");
@@ -167,7 +168,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     QString contributorsTable = "<center><table><tr>";
     for (int i=0;i<contributors.count();i++){
         contributorsTable.append("<td><center>"+contributors.at(i)+"</center></td>");
-        if ((i+1) % 2 == 0)
+        if ((i+1) % 3 == 0)
             contributorsTable.append("</tr><tr>");
     }
     contributorsTable.append("</tr></table></center>");
