@@ -1056,6 +1056,12 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
                     // to within defined limits
                 }
 
+				if (Devices[dev].type == DEV_FORTIUS) {
+	                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
+                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted	
+					// to within defined limits					
+				}
+				
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());

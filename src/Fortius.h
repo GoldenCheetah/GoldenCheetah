@@ -38,6 +38,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QFile>
+#include <QtCore/qendian.h>
 #include "RealtimeController.h"
 
 #include "LibUsb.h"
@@ -51,6 +52,7 @@
 #include <sys/types.h>
 
 /* Device operation mode */
+#define FT_IDLE    	   0x00
 #define FT_ERGOMODE    0x01
 #define FT_SSMODE      0x02
 #define FT_CALIBRATE   0x04
@@ -66,13 +68,16 @@
 #define FT_PAUSED  0x02
 
 #define DEFAULT_LOAD        100.00
-#define DEFAULT_GRADIENT    2.00
+#define DEFAULT_GRADIENT   	2.00
+#define DEFAULT_WEIGHT    	77
+#define DEFAULT_CALIBRATION 0.00
+#define DEFAULT_SCALING    	1.00
 
 class Fortius : public QThread
 {
 
 public:
-    Fortius(QObject *parent=0);       // pass device
+    Fortius(QObject *parent=0);       			// pass device
     ~Fortius();
 
     QObject *parent;
@@ -90,35 +95,41 @@ public:
     // SET
     void setLoad(double load);                  // set the load to generate in ERGOMODE
     void setGradient(double gradient);          // set the load to generate in SSMODE
-    void setMode(int mode, double load=DEFAULT_LOAD, double gradient=DEFAULT_GRADIENT);
+	void setBrakeCalibrationFactor(double calibrationFactor); 	// Impacts relationship between brake setpoint and load
+	void setPowerScaleFactor(double calibrationFactor); 		// Scales output power, so user can adjust to match hub or crank power meter
+    void setMode(int mode);
+	void setWeight(double weight); 				// set the total weight of rider + bike in kg's
+	
     int getMode();
     double getGradient();
     double getLoad();
-
+    double getBrakeCalibrationFactor();
+	double getPowerScaleFactor();
+	double getWeight();
+	
     // GET TELEMETRY AND STATUS
     // direct access to class variables is not allowed because we need to use wait conditions
     // to sync data read/writes between the run() thread and the main gui thread
-    void getTelemetry(double &power, double &heartrate, double &cadence, double &speed, int &buttons, int &status);
+    void getTelemetry(double &power, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status);
 
 private:
     void run();                                 // called by start to kick off the CT comtrol thread
 
-    // 56 bytes comprise of 8 7byte command messages, where
-    // the last is the set load / gradient respectively
     uint8_t ERGO_Command[12],
             SLOPE_Command[12];
-
+	
     // Utility and BG Thread functions
     int openPort();
     int closePort();
 
     // Protocol encoding
-    void prepareCommand(int mode, double value);  // sets up the command packet according to current settings
-    int sendCommand(int mode);      // writes a command to the device
-
+    int sendRunCommand(int16_t pedalSensor);
+	int sendOpenCommand();
+	int sendCloseCommand();
+	
     // Protocol decoding
     int readMessage();
-    void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
+    //void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
 
     // Mutex for controlling accessing private data
     QMutex pvars;
@@ -127,17 +138,22 @@ private:
     volatile double devicePower;            // current output power in Watts
     volatile double deviceHeartRate;        // current heartrate in BPM
     volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speef in KPH
+    volatile double deviceSpeed;            // current speed in KPH
+	volatile double deviceDistance;         // odometer in meters
     volatile int    deviceButtons;          // Button status
     volatile int    deviceStatus;           // Device status running, paused, disconnected
-
+	volatile int    deviceSteering;			// Steering angle
+	
     // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
     volatile int mode;
     volatile double load;
     volatile double gradient;
-
+    volatile double brakeCalibrationFactor;
+	volatile double powerScaleFactor;
+	volatile double weight;
+	
     // i/o message holder
-    uint8_t buf[48];
+    uint8_t buf[64];
 
     // device port
     LibUsb *usb2;                   // used for USB2 support
