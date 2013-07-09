@@ -543,8 +543,9 @@ AddFirmware::AddFirmware(AddDeviceWizard *parent) : QWizardPage(parent), wizard(
 bool
 AddFirmware::validatePage()
 {
+    // changed to true to support 1932 version which doesn't require a firmware file
     QString filePath = name->text();
-    if (filePath == "" || !QFile(filePath).exists()) return false;
+    if (filePath == "" || !QFile(filePath).exists()) return true;
 
     // either copy it, or reference it!
     if (copy->isChecked()) {

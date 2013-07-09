@@ -76,8 +76,10 @@ bool FortiusController::doesLoad() { return true; }
 void
 FortiusController::getRealtimeData(RealtimeData &rtData)
 {
-    int Buttons, Status;
-    double Power, HeartRate, Cadence, Speed, Load;
+	// Added Distance and Steering here but yet to RealtimeData
+
+    int Buttons, Status, Steering;
+    double Power, HeartRate, Cadence, Speed, Distance;
 
     if(!myFortius->isRunning())
     {
@@ -89,7 +91,7 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
         return;
     }
     // get latest telemetry
-    myFortius->getTelemetry(Power, HeartRate, Cadence, Speed, Buttons, Status);
+    myFortius->getTelemetry(Power, HeartRate, Cadence, Speed, Distance, Buttons, Steering, Status);
 
     //
     // PASS BACK TELEMETRY
@@ -99,8 +101,6 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
     rtData.setCadence(Cadence);
     rtData.setSpeed(Speed);
 
-    // get current load
-    Load = myFortius->getLoad();
 
     // post processing, probably not used
     // since its used to compute power for
@@ -119,6 +119,7 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
 
     // ADJUST LOAD
     if ((Buttons&FT_PLUS)) parent->Higher();
+	
     if ((Buttons&FT_MINUS)) parent->Lower();
 
     // LAP/INTERVAL
@@ -127,7 +128,9 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
     // CANCEL
     if (Buttons&FT_CANCEL) parent->Stop(0);
 
-    rtData.setLoad(Load);
+	// Ensure we set the UI load to the actual setpoint from the fortius (as it will clamp)
+    rtData.setLoad(myFortius->getLoad());
+	rtData.setSlope(myFortius->getGradient());
 }
 
 void FortiusController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
@@ -143,10 +146,13 @@ FortiusController::setGradient(double grade)
 {
     myFortius->setGradient(grade);
 }
+
 void
 FortiusController::setMode(int mode)
 {
     if (mode == RT_MODE_ERGO) mode = FT_ERGOMODE;
-    if (mode == RT_MODE_SPIN) mode = FT_SSMODE;
+    else if (mode == RT_MODE_SPIN) mode = FT_SSMODE;
+	else mode = FT_IDLE;
+	
     myFortius->setMode(mode);
 }
