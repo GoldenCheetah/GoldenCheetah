@@ -16,6 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Athlete.h"
+#include "Context.h"
 #include "Library.h"
 #include "Settings.h"
 #include "LibraryParser.h"
@@ -93,7 +95,7 @@ Library::initialise(QDir home)
 }
 
 void
-Library::importFiles(MainWindow *mainWindow, QStringList files)
+Library::importFiles(Context *context, QStringList files)
 {
     QStringList videos, workouts;
     MediaHelper helper;
@@ -110,7 +112,7 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
         // if it is a workout we parse it to check
         if (ErgFile::isWorkout(file)) {
             int mode;
-            ErgFile *p = new ErgFile(file, mode, mainWindow);
+            ErgFile *p = new ErgFile(file, mode, context);
             if (p->isValid()) workouts << file;
             delete p;
         }
@@ -158,7 +160,7 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
             // set target directory
             QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
             if (workoutDir == "") {
-                QDir root = mainWindow->athlete->home;
+                QDir root = context->athlete->home;
                 root.cdUp();
                 workoutDir = root.absolutePath();
             }
@@ -174,7 +176,7 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
 
             // still add it, it may noit have been scanned...
             int mode;
-            ErgFile file(target, mode, mainWindow);
+            ErgFile file(target, mode, context);
             trainDB->importWorkout(target, &file);
 
         }
@@ -182,35 +184,35 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
         trainDB->endLUW();
 
         // now write to disk.. any refs we added
-        LibraryParser::serialize(mainWindow->athlete->home);
+        LibraryParser::serialize(context->athlete->home);
 
         // Tell traintool to select what was imported
-        if (videos.count()) mainWindow->context->notifySelectVideo(videos[0]);
-        if (workouts.count()) mainWindow->context->notifySelectWorkout(target);
+        if (videos.count()) context->notifySelectVideo(videos[0]);
+        if (workouts.count()) context->notifySelectWorkout(target);
 
     } else {
 
         // we have a list of files to import, lets kick off the importer...
-        WorkoutImportDialog *p = new WorkoutImportDialog(mainWindow, files);
+        WorkoutImportDialog *p = new WorkoutImportDialog(context, files);
         p->exec();
     }
 }
 
 void
-Library::removeRef(MainWindow *mainWindow, QString ref)
+Library::removeRef(Context *context, QString ref)
 {
     // remove a previous reference
     int index = refs.indexOf(ref);
     if (index >= 0) {
         refs.removeAt(index);
-        LibraryParser::serialize(mainWindow->athlete->home);
+        LibraryParser::serialize(context->athlete->home);
     }
 }
 
 //
 // SEARCHDIALOG -- user select paths and files and run a search
 //
-LibrarySearchDialog::LibrarySearchDialog(MainWindow *mainWindow) : mainWindow(mainWindow)
+LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Search for Workouts and Media"));
@@ -406,7 +408,7 @@ LibrarySearchDialog::search()
 
 
             // now write to disk..
-            LibraryParser::serialize(mainWindow->athlete->home);
+            LibraryParser::serialize(context->athlete->home);
         }
 
         // ok, we;ve completed a search without aborting
@@ -551,7 +553,7 @@ LibrarySearchDialog::updateDB()
     // workouts
     foreach(QString ergFile, workoutsFound) {
         int mode;
-        ErgFile file(ergFile, mode, mainWindow);
+        ErgFile file(ergFile, mode, context);
         if (file.isValid()) {
             trainDB->importWorkout(ergFile, &file);
         }
@@ -579,7 +581,7 @@ LibrarySearchDialog::updateDB()
             // is a workout?
             if (ErgFile::isWorkout(r)) {
                 int mode;
-                ErgFile file(r, mode, mainWindow);
+                ErgFile file(r, mode, context);
                 if (file.isValid()) {
                     trainDB->importWorkout(r, &file);
                 }
@@ -644,8 +646,8 @@ LibrarySearch::abort()
 //
 // LIBRARY IMPORT DIALOG...
 //
-WorkoutImportDialog::WorkoutImportDialog(MainWindow *main, QStringList files) :
-    main(main), files(files)
+WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
+    context(context), files(files)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -667,7 +669,7 @@ WorkoutImportDialog::WorkoutImportDialog(MainWindow *main, QStringList files) :
         // if it is a workout we parse it to check
         if (ErgFile::isWorkout(file)) {
             int mode;
-            ErgFile *p = new ErgFile(file, mode, main);
+            ErgFile *p = new ErgFile(file, mode, context);
             if (p->isValid()) workouts << file;
             delete p;
         }
@@ -750,12 +752,12 @@ WorkoutImportDialog::import()
     }
 
     // now write to disk..
-    LibraryParser::serialize(main->athlete->home);
+    LibraryParser::serialize(context->athlete->home);
 
     // set target directory
     QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
     if (workoutDir == "") {
-        QDir root = main->athlete->home;
+        QDir root = context->athlete->home;
         root.cdUp();
         workoutDir = root.absolutePath();
     }
@@ -769,7 +771,7 @@ WorkoutImportDialog::import()
 
         // cannot read or not valid
         int mode;
-        ErgFile file(workout, mode, main);
+        ErgFile file(workout, mode, context);
         if (!file.isValid()) continue;
 
         // get target name

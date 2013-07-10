@@ -17,7 +17,8 @@
  */
 
 #include "TPUpload.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include <QString>
 #include "Settings.h"
 #include "RideFile.h"
@@ -73,7 +74,7 @@ TPUpload::TPUpload(QObject *parent) : QObject(parent), http(this), uploading(fal
 }
 
 int
-TPUpload::upload(MainWindow *main, const RideFile *ride)
+TPUpload::upload(Context *context, const RideFile *ride)
 {
     // if currently uploading fail!
     if (uploading == true) return 0;
@@ -82,7 +83,7 @@ TPUpload::upload(MainWindow *main, const RideFile *ride)
     QString uploadfile(QDir::tempPath() + "/tpupload.pwx");
     QFile file(uploadfile);
     PwxFileReader reader;
-    reader.writeRideFile(main, ride, file);
+    reader.writeRideFile(context, ride, file);
 
     // read the whole thing back and encode as base64binary
     file.open(QFile::ReadOnly);
@@ -97,8 +98,8 @@ TPUpload::upload(MainWindow *main, const RideFile *ride)
     http.setHost("www.trainingpeaks.com");
     http.setAction("http://www.trainingpeaks.com/TPWebServices/ImportFileForUser");
     current.setMethod("ImportFileForUser", "http://www.trainingpeaks.com/TPWebServices/");
-    current.addMethodArgument("username", "", appsettings->cvalue(main->athlete->cyclist, GC_TPUSER).toString());
-    current.addMethodArgument("password", "", appsettings->cvalue(main->athlete->cyclist, GC_TPPASS).toString());
+    current.addMethodArgument("username", "", appsettings->cvalue(context->athlete->cyclist, GC_TPUSER).toString());
+    current.addMethodArgument("password", "", appsettings->cvalue(context->athlete->cyclist, GC_TPPASS).toString());
     current.addMethodArgument("byteData", "", pwxFile);
 
     // do it!

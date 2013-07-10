@@ -40,8 +40,8 @@ class Library : QObject
 
         static void initialise(QDir); // init
         static Library *findLibrary(QString);
-        static void importFiles(MainWindow *mainWindow, QStringList files);
-        void removeRef(MainWindow *mainWindow, QString ref);
+        static void importFiles(Context *context, QStringList files);
+        void removeRef(Context *context, QString ref);
 };
 
 extern QList<Library *> libraries;        // keep track of all Library search paths for all users
@@ -52,7 +52,7 @@ class LibrarySearchDialog : public QDialog
     Q_OBJECT
 
     public:
-        LibrarySearchDialog(MainWindow *mainWindow);
+        LibrarySearchDialog(Context *context);
 
     private slots:
         void search();
@@ -68,7 +68,7 @@ class LibrarySearchDialog : public QDialog
         void updateDB();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         Library *library;
         LibrarySearch *searcher;
         bool searching;
@@ -130,13 +130,13 @@ class WorkoutImportDialog : public QDialog
     Q_OBJECT
 
     public:
-        WorkoutImportDialog(MainWindow *main, QStringList files);
+        WorkoutImportDialog(Context *context, QStringList files);
 
     public slots:
         void import();
 
     private:
-        MainWindow *main;
+        Context *context;
         QStringList files;
  
         QStringList videos, workouts;

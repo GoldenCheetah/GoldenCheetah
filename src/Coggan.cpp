@@ -43,7 +43,7 @@ class NP : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         if(ride->recIntSecs() == 0) return;
 
@@ -110,7 +110,7 @@ class VI : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
             assert(deps.contains("coggan_np"));
             assert(deps.contains("average_power"));
             NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
@@ -147,7 +147,7 @@ class IntensityFactor : public RideMetric {
     void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
         if (zones && zoneRange >= 0) {
             assert(deps.contains("coggan_np"));
             NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
@@ -182,7 +182,7 @@ class TSS : public RideMetric {
     void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 	if (!zones || zoneRange < 0)
 	    return;
         assert(deps.contains("coggan_np"));
@@ -224,7 +224,7 @@ class EfficiencyFactor : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
         assert(deps.contains("coggan_np"));
         assert(deps.contains("average_hr"));
         NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));

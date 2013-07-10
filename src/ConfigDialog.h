@@ -23,12 +23,12 @@
 #include <QDialog>
 #include <QSettings>
 #include "Pages.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;
-class MainWindow;
+class Context;
 class Zones;
 
 // GENERAL PAGE
@@ -37,7 +37,7 @@ class GeneralConfig : public QWidget
     Q_OBJECT
 
     public:
-        GeneralConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        GeneralConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -45,7 +45,7 @@ class GeneralConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         GeneralPage *generalPage;
 };
@@ -56,7 +56,7 @@ class AthleteConfig : public QWidget
     Q_OBJECT
 
     public:
-        AthleteConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        AthleteConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -64,7 +64,7 @@ class AthleteConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         // about me, power ones and hr zones
         RiderPage *athletePage;
@@ -78,7 +78,7 @@ class AppearanceConfig : public QWidget
     Q_OBJECT
 
     public:
-        AppearanceConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        AppearanceConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -86,7 +86,7 @@ class AppearanceConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         ColorsPage *appearancePage;
 };
@@ -97,7 +97,7 @@ class PasswordConfig : public QWidget
     Q_OBJECT
 
     public:
-        PasswordConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        PasswordConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -105,7 +105,7 @@ class PasswordConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         CredentialsPage *passwordPage;
 };
@@ -116,7 +116,7 @@ class DataConfig : public QWidget
     Q_OBJECT
 
     public:
-        DataConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        DataConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -124,7 +124,7 @@ class DataConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         MetadataPage *dataPage;
 };
@@ -135,7 +135,7 @@ class MetricConfig : public QWidget
     Q_OBJECT
 
     public:
-        MetricConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        MetricConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -143,7 +143,7 @@ class MetricConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         IntervalMetricsPage *intervalsPage;
         SummaryMetricsPage *summaryPage;
@@ -155,7 +155,7 @@ class DeviceConfig : public QWidget
     Q_OBJECT
 
     public:
-        DeviceConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+        DeviceConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
         void saveClicked();
@@ -163,7 +163,7 @@ class DeviceConfig : public QWidget
     private:
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         DevicePage *devicePage;
 };
@@ -174,7 +174,7 @@ class ConfigDialog : public QMainWindow
     G_OBJECT
 
     public:
-        ConfigDialog(QDir home, Zones *zones, MainWindow *mainWindow);
+        ConfigDialog(QDir home, Zones *zones, Context *context);
 
     public slots:
         void changePage(int);
@@ -184,7 +184,7 @@ class ConfigDialog : public QMainWindow
         QSettings *settings;
         QDir home;
         Zones *zones;
-        MainWindow *mainWindow;
+        Context *context;
 
         QStackedWidget *pagesWidget;
         QPushButton *saveButton;

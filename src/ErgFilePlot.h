@@ -19,7 +19,7 @@
 #ifndef _GC_ErgFilePlot_h
 #define _GC_ErgFilePlot_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 #include <QDebug>
 #include <QtGui>
@@ -47,13 +47,13 @@
 class ErgFileData : public QwtPointArrayData
 {
     public:
-    ErgFileData (MainWindow *main) : QwtPointArrayData(QVector<double>(), QVector<double>()), main(main) {}
+    ErgFileData (Context *context) : QwtPointArrayData(QVector<double>(), QVector<double>()), context(context) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
 
     private:
-    MainWindow *main;
+    Context *context;
 
     virtual QPointF sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -62,14 +62,14 @@ class ErgFileData : public QwtPointArrayData
 class NowData : public QwtPointArrayData
 {
     public:
-    NowData (MainWindow *main) : QwtPointArrayData(QVector<double>(), QVector<double>()), main(main) {}
+    NowData (Context *context) : QwtPointArrayData(QVector<double>(), QVector<double>()), context(context) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
 
     void init() ;
     private:
-    MainWindow *main;
+    Context *context;
 
     virtual QPointF sample(size_t i) const;
     //virtual QRectF boundingRect() const;
@@ -128,7 +128,7 @@ class ErgFilePlot : public QwtPlot
 
     public:
 
-    ErgFilePlot(MainWindow *main);
+    ErgFilePlot(Context *context);
     QList<QwtPlotMarker *> Marks;
 
     void setData(ErgFile *); // set the course
@@ -142,7 +142,7 @@ class ErgFilePlot : public QwtPlot
 
     private:
 
-    MainWindow *main;
+    Context *context;
     bool bydist;
     ErgFile *ergFile;
 

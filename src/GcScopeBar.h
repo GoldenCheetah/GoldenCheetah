@@ -23,7 +23,7 @@
 #include <QList>
 #include <QAction>
 
-class MainWindow;
+class Context;
 #ifdef Q_OS_MAC
 class QtMacButton;
 #else
@@ -59,7 +59,7 @@ class GcScopeBar : public QWidget
 
 public:
 
-    GcScopeBar(MainWindow *parent, QWidget *traintool);
+    GcScopeBar(Context *context, QWidget *traintool);
     ~GcScopeBar();
 
 public slots:
@@ -87,7 +87,7 @@ signals:
 private:
     void paintBackground(QPaintEvent *);
 
-    MainWindow *mainWindow;
+    Context *context;
     QHBoxLayout *layout;
     GcLabel *searchLabel;
 #ifdef Q_OS_MAC

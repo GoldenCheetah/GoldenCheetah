@@ -18,6 +18,8 @@
 
 #include "LTMTool.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
 #include <assert.h>
@@ -34,7 +36,7 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(parent), home(home), main(parent), active(false), _amFiltered(false)
+LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(context->mainWindow), home(home), context(context), active(false), _amFiltered(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
@@ -51,7 +53,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     basicsettingsLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
 #ifdef GC_HAVE_LUCENE
-    searchBox = new SearchFilterBox(this, main);
+    searchBox = new SearchFilterBox(this, context);
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
 
@@ -155,7 +157,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
         // set default for the user overiddable fields
         adds.uname  = adds.name;
         adds.units = "";
-        adds.uunits = adds.metric->units(main->athlete->useMetricUnits);
+        adds.uunits = adds.metric->units(context->athlete->useMetricUnits);
 
         // default units to metric name if it is blank
         if (adds.uunits == "") adds.uunits = adds.name;
@@ -623,7 +625,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
 
     // metadata metrics
     SpecialFields sp;
-    foreach (FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
+    foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
@@ -646,7 +648,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     // measures
     QList<FieldDefinition> measureDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
-    QString filename = main->athlete->home.absolutePath()+"/measures.xml";
+    QString filename = context->athlete->home.absolutePath()+"/measures.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
     RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions, colorfield);
@@ -711,7 +713,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     tabs->addTab(metricContainer, tr("Custom"));
 
     connect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(metricTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(metricTreePopup(const QPoint &)));
 
     // switched between one or other
@@ -815,7 +817,7 @@ void
 LTMTool::editMetric()
 {
     int index = allMetrics->indexOfChild(activeMetric);
-    EditMetricDetailDialog dialog(main, &metrics[index]);
+    EditMetricDetailDialog dialog(context, &metrics[index]);
 
     if (dialog.exec()) {
         // notify of change
@@ -827,7 +829,7 @@ void
 LTMTool::colorPicker()
 {
     int index = allMetrics->indexOfChild(activeMetric);
-    QColorDialog picker(main);
+    QColorDialog picker(context->mainWindow);
     picker.setCurrentColor(metrics[index].penColor);
 
     // don't use native dialog, since there is a nasty bug causing focus loss
@@ -876,8 +878,8 @@ LTMTool::applySettings(LTMSettings *settings)
                 // usemetricUnits changed since charts.xml was
                 // written
                 if (saved && saved->conversion() != 1.0 &&
-                    metrics[i].uunits.contains(saved->units(!main->athlete->useMetricUnits)))
-                    metrics[i].uunits.replace(saved->units(!main->athlete->useMetricUnits), saved->units(main->athlete->useMetricUnits));
+                    metrics[i].uunits.contains(saved->units(!context->athlete->useMetricUnits)))
+                    metrics[i].uunits.replace(saved->units(!context->athlete->useMetricUnits), saved->units(context->athlete->useMetricUnits));
                 // select it on the tool
                 allMetrics->child(i)->setSelected(true);
                 break;
@@ -891,8 +893,8 @@ LTMTool::applySettings(LTMSettings *settings)
 /*----------------------------------------------------------------------
  * EDIT METRIC DETAIL DIALOG
  *--------------------------------------------------------------------*/
-EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDetail *metricDetail) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), metricDetail(metricDetail)
+EditMetricDetailDialog::EditMetricDetailDialog(Context *context, MetricDetail *metricDetail) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), metricDetail(metricDetail)
 {
     setWindowTitle(tr("Settings"));
 
@@ -1061,7 +1063,7 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    QColorDialog picker(mainWindow);
+    QColorDialog picker(context->mainWindow);
     picker.setCurrentColor(penColor);
 
     // don't use native dialog, since there is a nasty bug causing focus loss
@@ -1162,11 +1164,11 @@ LTMTool::metricDetails(QString symbol)
 }
 
 void
-LTMTool::translateMetrics(MainWindow *main, const QDir &home, LTMSettings *settings)
+LTMTool::translateMetrics(Context *context, const QDir &home, LTMSettings *settings)
 {
     static QMap<QString, QString> unitsMap;
     // LTMTool instance is created to have access to metrics catalog
-    LTMTool* ltmTool = new LTMTool(main, home, false);
+    LTMTool* ltmTool = new LTMTool(context, home, false);
     if (unitsMap.isEmpty()) {
         foreach(MetricDetail metric, ltmTool->metrics) {
             if (metric.units != "")  // translate units

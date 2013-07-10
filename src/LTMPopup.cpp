@@ -17,8 +17,10 @@
  */
 
 #include "LTMPopup.h"
+#include "MainWindow.h"
+#include "Athlete.h"
 
-LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
+LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
     // get application settings
     setAutoFillBackground(false);
@@ -135,7 +137,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         rides->setRowHeight(count, 14);
 
         // metrics
-        QString value = x.getStringForSymbol(metric->symbol(), main->athlete->useMetricUnits);
+        QString value = x.getStringForSymbol(metric->symbol(), context->athlete->useMetricUnits);
         h = new QTableWidgetItem(value,QTableWidgetItem::Type);
         h->setFlags(t->flags() & (~Qt::ItemIsEditable));
         h->setTextAlignment(Qt::AlignHCenter);
@@ -173,7 +175,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
     }
 
     // Metric summary
-    QString filename = main->athlete->home.absolutePath()+"/ltm-summary.html";
+    QString filename = context->athlete->home.absolutePath()+"/ltm-summary.html";
     if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
 
     // read it in...
@@ -247,7 +249,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
             // metrics
             int column = 1;
             foreach(MetricDetail d, settings.metrics) {
-                QString value = x.getStringForSymbol(d.symbol, main->athlete->useMetricUnits);
+                QString value = x.getStringForSymbol(d.symbol, context->athlete->useMetricUnits);
                 h = new QTableWidgetItem(value,QTableWidgetItem::Type);
                 h->setFlags(t->flags() & (~Qt::ItemIsEditable));
                 h->setTextAlignment(Qt::AlignHCenter);
@@ -291,7 +293,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
     }
 
     // Metric summary
-    QString filename = main->athlete->home.absolutePath()+"/ltm-summary.html";
+    QString filename = context->athlete->home.absolutePath()+"/ltm-summary.html";
     if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
 
     // read it in...
@@ -316,7 +318,7 @@ LTMPopup::rideSelected()
     if (selected.count() > index) {
 
         // update summary
-        metrics->setText(selected[index].toString(summary, main->athlete->useMetricUnits));
+        metrics->setText(selected[index].toString(summary, context->athlete->useMetricUnits));
 
         notes->setText(selected[index].getText("Notes", ""));
     }

@@ -20,7 +20,7 @@
 #define _GC_LTMPopup_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 #include "LTMSettings.h"
 #include "MetricAggregator.h"
@@ -37,7 +37,7 @@ class LTMPopup : public QWidget
 
     public:
 
-        LTMPopup(MainWindow *parent);
+        LTMPopup(Context *context);
         void setTitle(QString);
 
         // when called from LTM chart
@@ -55,7 +55,7 @@ class LTMPopup : public QWidget
 
     private:
 
-        MainWindow *main;
+        Context *context;
         QLabel *title;
         QTableWidget *rides;
         QTextEdit *metrics;

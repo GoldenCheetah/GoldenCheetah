@@ -20,7 +20,7 @@
 #define _GC_LTMTool_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "Season.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
@@ -49,7 +49,7 @@ class LTMTool : public QWidget
 
     public:
 
-        LTMTool(MainWindow *parent, const QDir &home, bool Multi = true);
+        LTMTool(Context *context, const QDir &home, bool Multi = true);
 
         //const Season *currentDateRange() { return dateRange; }
         //void selectDateRange(int);
@@ -60,7 +60,7 @@ class LTMTool : public QWidget
         MetricDetail metricDetails(QTreeWidgetItem *);
         MetricDetail* metricDetails(QString symbol);
         void selectMetric(QString symbol);
-        static void translateMetrics(MainWindow *main, const QDir &home, LTMSettings *settings);
+        static void translateMetrics(Context *context, const QDir &home, LTMSettings *settings);
 
         // allow others to create and update season structures
         //int newSeason(QString, QDate, QDate, int);
@@ -131,7 +131,7 @@ class LTMTool : public QWidget
         void translateDefaultCharts(QList<LTMSettings>&charts);
 
         const QDir home;
-        MainWindow *main;
+        Context *context;
         bool active; // ignore season changed signals since we triggered them
 
         //Seasons *seasons;
@@ -160,7 +160,7 @@ class EditMetricDetailDialog : public QDialog
 
 
     public:
-        EditMetricDetailDialog(MainWindow *, MetricDetail *);
+        EditMetricDetailDialog(Context *, MetricDetail *);
 
     public slots:
         void colorClicked();
@@ -168,7 +168,7 @@ class EditMetricDetailDialog : public QDialog
         void cancelClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         MetricDetail *metricDetail;
 
         QLineEdit *userName,

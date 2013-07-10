@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Athlete.h"
 #include "Zones.h"
 #include "Colors.h"
 #include "CpintPlot.h"
@@ -42,14 +43,14 @@
 
 #define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
 
-CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
+CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones) :
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
     allCurve(NULL),
     zones(zones),
     series(RideFile::watts),
-    mainWindow(main),
+    context(context),
     current(NULL),
     bests(NULL),
     isFiltered(false),
@@ -177,7 +178,7 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             break;
 
         case RideFile::wattsKg:
-            if (mainWindow->athlete->useMetricUnits)
+            if (context->athlete->useMetricUnits)
                 setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
             else
                 setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
@@ -549,10 +550,10 @@ CpintPlot::calculate(RideItem *rideItem)
 
     // zap any existing ridefilecache then get new one
     if (current) delete current;
-    current = new RideFileCache(mainWindow, mainWindow->athlete->home.absolutePath() + "/" + fileName);
+    current = new RideFileCache(context, context->athlete->home.absolutePath() + "/" + fileName);
 
     // get aggregates - incase not initialised from date change
-    if (bests == NULL) bests = new RideFileCache(mainWindow, startDate, endDate, isFiltered, files);
+    if (bests == NULL) bests = new RideFileCache(context, startDate, endDate, isFiltered, files);
 
     //
     // PLOT MODEL CURVE (DERIVED)
@@ -782,7 +783,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
         text = QString("%1\n%3 %4%5")
             .arg(interval_to_str(60.0*xvalue))
             .arg(yvalue, 0, 'f', RideFile::decimalsFor(series))
-            .arg(RideFile::unitName(series, mainWindow))
+            .arg(RideFile::unitName(series, context))
             .arg(dateStr);
 
         // set that text up

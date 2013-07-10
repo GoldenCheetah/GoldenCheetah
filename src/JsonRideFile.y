@@ -302,7 +302,7 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 
 // Writes valid .json (validated at www.jsonlint.com)
 bool
-JsonFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const
+JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) const
 {
     // can we open the file for writing?
     if (!file.open(QIODevice::WriteOnly)) return false;

@@ -24,7 +24,7 @@
 #include <QtGui>
 #include <qdatetimeedit.h>
 
-class MainWindow;
+class Context;
 
 class ManualRideDialog : public QDialog
 {
@@ -32,7 +32,7 @@ class ManualRideDialog : public QDialog
     G_OBJECT
 
     public:
-        ManualRideDialog(MainWindow *mainWindow);
+        ManualRideDialog(Context *context);
 
     private slots:
         void okClicked();
@@ -43,7 +43,7 @@ class ManualRideDialog : public QDialog
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         QVector<unsigned char> records;
         QString filename, filepath;
         int daysago; // remember last deriveFactors value

@@ -18,10 +18,10 @@
 
 #include "GcScopeBar.h"
 #include "GcCalendar.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "QtMacButton.h"
 
-GcScopeBar::GcScopeBar(MainWindow *main, QWidget *traintool) : QWidget(main), mainWindow(main)
+GcScopeBar::GcScopeBar(Context *context, QWidget *traintool) : QWidget(context->mainWindow), context(context)
 {
 
     setFixedHeight(23);
@@ -51,7 +51,7 @@ GcScopeBar::GcScopeBar(MainWindow *main, QWidget *traintool) : QWidget(main), ma
     searchLabel->hide();
 
 #ifdef GC_HAVE_LUCENE
-    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setHighlighted()));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setHighlighted()));
 #endif
 
     // Mac uses QtMacButton - recessed etc
@@ -120,7 +120,7 @@ void
 GcScopeBar::setHighlighted()
 {
 #ifdef GC_HAVE_LUCENE
-    if (mainWindow->isfiltered) {
+    if (context->mainWindow->isfiltered) {
         searchLabel->setHighlighted(true);
         searchLabel->show();
 #ifndef Q_OS_MAC

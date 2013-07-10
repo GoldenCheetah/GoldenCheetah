@@ -33,7 +33,7 @@
 #include <QDebug>
 #include <QSpinBox>
 #include "RideFile.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "GoldenCheetah.h"
 #include "Settings.h"
 class QwtPlotCurve;
@@ -281,7 +281,7 @@ class GradientPage : public WorkoutPage
 
     WorkoutEditorGradient *we;
     WorkoutMetricsSummary *metricsSummary;
-    MainWindow *mainWindow;
+    Context *context;
     int ftp;
     bool metricUnits;
 

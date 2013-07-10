@@ -20,7 +20,7 @@
 #define _GC_TrainTool_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RealtimeData.h"
 #include "RealtimePlot.h"
 #include "DeviceConfiguration.h"
@@ -76,7 +76,7 @@ class TrainTool : public GcWindow
 
     public:
 
-        TrainTool(MainWindow *parent, const QDir &home);
+        TrainTool(Context *context, const QDir &home);
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
@@ -166,7 +166,7 @@ class TrainTool : public GcWindow
         friend class ::MultiDeviceDialog;
 
         const QDir home;
-        MainWindow *main;
+        Context *context;
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,
@@ -241,7 +241,7 @@ class MultiDeviceDialog : public QDialog
     G_OBJECT
 
     public:
-        MultiDeviceDialog(MainWindow *, TrainTool *);
+        MultiDeviceDialog(Context *, TrainTool *);
 
     public slots:
         void applyClicked();
@@ -249,7 +249,7 @@ class MultiDeviceDialog : public QDialog
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         TrainTool *traintool;
         QComboBox  *bpmSelect,          // heartrate
                    *wattsSelect,        // power

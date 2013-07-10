@@ -18,7 +18,7 @@
 
 #include "GoldenCheetah.h"
 #include "HrPwWindow.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "LTMWindow.h"
 #include "HrPwPlot.h"
 #include "SmallPlot.h"
@@ -30,8 +30,8 @@
 
 // tooltip
 
-HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
-     GcChartWindow(mainWindow), mainWindow(mainWindow), current(NULL)
+HrPwWindow::HrPwWindow(Context *context) :
+     GcChartWindow(context), context(context), current(NULL)
 {
     setControls(NULL);
     setInstanceName("HrPw");
@@ -85,7 +85,7 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
 	QVBoxLayout *vlayout = new QVBoxLayout;
 
     // main plot
-    hrPwPlot = new HrPwPlot(mainWindow, this);
+    hrPwPlot = new HrPwPlot(context, this);
 
 
     // tooltip on hover over point

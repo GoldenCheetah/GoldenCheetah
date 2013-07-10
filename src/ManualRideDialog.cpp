@@ -18,6 +18,8 @@
 
 #include "ManualRideDialog.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include <assert.h>
 #include <string.h>
@@ -42,7 +44,7 @@ ManualRideDialog::deriveFactors()
     timeKJ = distanceKJ = timeTSS = distanceTSS = timeBS = distanceBS = timeDP = distanceDP = 0.0;
 
     // whats the most recent ride?
-    QList<SummaryMetrics> metrics = mainWindow->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
+    QList<SummaryMetrics> metrics = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
 
     // do we have any rides?
     if (metrics.count()) {
@@ -57,7 +59,7 @@ ManualRideDialog::deriveFactors()
         totalseconds = totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
 
         // just use the metricDB versions, nice 'n fast
-        foreach (SummaryMetrics metric, mainWindow->athlete->metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
+        foreach (SummaryMetrics metric, context->athlete->metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
 
             // skip those with no time or distance values (not comparing doubles)
             if (metric.getForSymbol("time_riding") == 0 || metric.getForSymbol("total_distance") == 0) continue;
@@ -88,7 +90,7 @@ ManualRideDialog::deriveFactors()
 
         // total values, not just last 'n' days -- but avoid divide by zero
         if (totalseconds && totaldistance) {
-            if (!mainWindow->athlete->useMetricUnits) totaldistance *= MILES_PER_KM;
+            if (!context->athlete->useMetricUnits) totaldistance *= MILES_PER_KM;
             timeBS = (totalbs * 3600) / totalseconds;  // BS per hour
             distanceBS = totalbs / totaldistance;  // BS per mile or km
             timeDP = (totaldp * 3600) / totalseconds;  // DP per hour
@@ -101,7 +103,7 @@ ManualRideDialog::deriveFactors()
 
         // don't use defaults if we have rides in last 'n' days
         if (rides) {
-            if (!mainWindow->athlete->useMetricUnits) distance *= MILES_PER_KM;
+            if (!context->athlete->useMetricUnits) distance *= MILES_PER_KM;
             timeBS = (bs * 3600) / seconds;  // BS per hour
             distanceBS = bs / distance;  // BS per mile or km
             timeDP = (dp * 3600) / seconds;  // DP per hour
@@ -114,7 +116,7 @@ ManualRideDialog::deriveFactors()
     }
 }
 
-ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWindow)
+ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Manual Activity Entry"));
@@ -149,7 +151,7 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     duration->setDisplayFormat("hh:mm:ss");
 
     // ride distance
-    QString distanceString = QString(tr("Distance (%1):")).arg(mainWindow->athlete->useMetricUnits ? "km" : "miles");
+    QString distanceString = QString(tr("Distance (%1):")).arg(context->athlete->useMetricUnits ? "km" : "miles");
     QLabel *distanceLabel = new QLabel(distanceString, this);
     distance = new QDoubleSpinBox(this);
     distance->setSingleStep(10.0);
@@ -482,16 +484,16 @@ ManualRideDialog::okClicked()
                            .arg (rideDateTime.time().minute(), 2, 10, zero)
                            .arg (rideDateTime.time().second(), 2, 10, zero);
 
-    QString filename = mainWindow->athlete->home.absolutePath() + "/" + basename + ".json";
+    QString filename = context->athlete->home.absolutePath() + "/" + basename + ".json";
 
     QFile out(filename);
-    bool success = RideFileFactory::instance().writeRideFile(mainWindow, rideFile, out, "json");
+    bool success = RideFileFactory::instance().writeRideFile(context, rideFile, out, "json");
     delete rideFile;
 
     if (success) {
 
         // refresh metric db etc
-        mainWindow->addRide(basename + ".json");
+        context->mainWindow->addRide(basename + ".json");
         accept();
 
     } else {

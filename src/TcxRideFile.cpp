@@ -21,7 +21,8 @@
 #include "TcxParser.h"
 #include <QDomDocument>
 
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "RideMetric.h"
 
 #ifndef GC_VERSION
@@ -51,7 +52,7 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 }
 
 QByteArray
-TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
+TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
 {
     QDomText text;
     QDomDocument doc;
@@ -104,7 +105,7 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool wi
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), worklist);
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
 
     QDomElement lap_time = doc.createElement("TotalTimeSeconds");
     text = doc.createTextNode(QString("%1").arg(computed.value("workout_time")->value(true)));
@@ -397,9 +398,9 @@ TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride, bool wi
 }
 
 bool
-TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const
+TcxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file) const
 {
-    QByteArray xml = toByteArray(mainWindow, ride, true, true, true, true);
+    QByteArray xml = toByteArray(context, ride, true, true, true, true);
 
     if (!file.open(QIODevice::WriteOnly)) return(false);
     if (file.write(xml) != xml.size()) return(false);

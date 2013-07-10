@@ -18,7 +18,7 @@
 
 #include "QTFullScreen.h"
 
-QTFullScreen::QTFullScreen(MainWindow *main) : QObject(main), main(main), isFull(false)
+QTFullScreen::QTFullScreen(Context *context) : QObject(main), context(context), isFull(false)
 {
     // watch for ESC key being hit when in full screen
     main->installEventFilter(this);

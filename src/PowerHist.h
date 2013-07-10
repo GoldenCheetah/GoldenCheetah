@@ -20,8 +20,10 @@
 #ifndef _GC_PowerHist_h
 #define _GC_PowerHist_h 1
 #include "GoldenCheetah.h"
-#include "RideFile.h"
 #include "MainWindow.h"
+#include "RideFile.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Zones.h"
 #include "HrZones.h"
 
@@ -35,7 +37,7 @@
 
 class QwtPlotCurve;
 class QwtPlotGrid;
-class MainWindow;
+class Context;
 class RideItem;
 struct RideFilePoint;
 class RideFileCache;
@@ -96,7 +98,7 @@ class PowerHist : public QwtPlot
 
     public:
 
-        PowerHist(MainWindow *mainWindow);
+        PowerHist(Context *context);
         ~PowerHist();
 
         double minX;
@@ -157,7 +159,7 @@ class PowerHist : public QwtPlot
 
         // plot settings
         RideItem *rideItem;
-        MainWindow *mainWindow;
+        Context *context;
         RideFile::SeriesType series;
         bool lny;
         bool shade;
@@ -398,7 +400,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones       = parent->mainWindow->athlete->hrZones();
+	const HrZones *zones       = parent->context->athlete->hrZones();
 	int zone_range     = rideItem->hrZoneRange();
 
 	if (parent->shadeHRZones() && (zone_range >= 0)) {
@@ -448,7 +450,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones       = parent->mainWindow->athlete->hrZones();
+	const HrZones *zones       = parent->context->athlete->hrZones();
 	int zone_range     = rideItem->hrZoneRange();
 
 	setZ(1.0 + zone_number / 100.0);

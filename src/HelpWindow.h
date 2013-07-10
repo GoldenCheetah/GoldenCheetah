@@ -22,7 +22,7 @@
 
 #include <QWidget>
 #include <QtWebKit>
-#include "MainWindow.h"
+#include "Context.h"
 
 class HelpWindow : public QDialog
 {
@@ -31,16 +31,15 @@ G_OBJECT
 
 
  private:
-    MainWindow *main;
+    Context *context;
     QVBoxLayout *layout;
     QWebView *view;
-    MainWindow *parent;
     HelpWindow();  // default ctor
 
  protected:
 
  public:
-    HelpWindow(MainWindow *);
+    HelpWindow(Context *);
 };
 
 #endif

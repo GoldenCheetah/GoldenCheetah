@@ -21,14 +21,15 @@
 #include "DownloadRideDialog.h"
 #include "Device.h"
 #include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
 
-DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
+DownloadRideDialog::DownloadRideDialog(Context *context,
                                        const QDir &home) :
-    mainWindow(mainWindow), home(home), cancelled(false),
+    context(context), home(home), cancelled(false),
     action(actionIdle)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -389,7 +390,7 @@ DownloadRideDialog::downloadClicked()
         }
 
         QFile::remove(files.at(i).name);
-        mainWindow->addRide(filename);
+        context->mainWindow->addRide(filename);
     }
 
     if( ! failures )

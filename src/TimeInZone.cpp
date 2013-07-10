@@ -45,7 +45,7 @@ class ZoneTime : public RideMetric {
     void compute(const RideFile *ride, const Zones *zone, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *)
+                 const Context *)
     {
         seconds = 0;
         // get zone ranges

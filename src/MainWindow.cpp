@@ -18,6 +18,8 @@
  */
 
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "AboutDialog.h"
 #include "AddIntervalDialog.h"
 #include "BestIntervalDialog.h"
@@ -207,7 +209,7 @@ MainWindow::MainWindow(const QDir &home) :
     #endif
 
     // Metadata fields
-    athlete->_rideMetadata = new RideMetadata(this,true);
+    athlete->_rideMetadata = new RideMetadata(context,true);
     athlete->_rideMetadata->hide();
 
     #ifdef GC_HAVE_LUCENE
@@ -365,7 +367,7 @@ MainWindow::MainWindow(const QDir &home) :
     head->addWidget(viewsel);
 
 #ifdef GC_HAVE_LUCENE
-    SearchFilterBox *searchBox = new SearchFilterBox(this,this,false);
+    SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
     QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(300);
@@ -380,7 +382,7 @@ MainWindow::MainWindow(const QDir &home) :
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
 
-    GCColor *GCColorSet = new GCColor(this); // get/keep colorset
+    GCColor *GCColorSet = new GCColor(context); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
 
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
@@ -393,7 +395,7 @@ MainWindow::MainWindow(const QDir &home) :
     /*----------------------------------------------------------------------
      * The help bubble used everywhere
      *--------------------------------------------------------------------*/
-    bubble = new GcBubble(this);
+    bubble = new GcBubble(context);
     bubble->hide();
 
     /*----------------------------------------------------------------------
@@ -436,20 +438,20 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
 #ifdef GC_HAVE_LUCENE
-    athlete->lucene = new Lucene(this, this); // before metricDB attempts to refresh
+    athlete->lucene = new Lucene(context, context); // before metricDB attempts to refresh
 #endif
-    athlete->metricDB = new MetricAggregator(this); // just to catch config updates!
+    athlete->metricDB = new MetricAggregator(context); // just to catch config updates!
     athlete->metricDB->refreshMetrics();
 
     // Downloaders
-    athlete->withingsDownload = new WithingsDownload(this);
-    athlete->zeoDownload      = new ZeoDownload(this);
-    athlete->calendarDownload = new CalendarDownload(this);
+    athlete->withingsDownload = new WithingsDownload(context);
+    athlete->zeoDownload      = new ZeoDownload(context);
+    athlete->calendarDownload = new CalendarDownload(context);
 
     // Calendar
 #ifdef GC_HAVE_ICAL
-    athlete->rideCalendar = new ICalendar(this); // my local/remote calendar entries
-    athlete->davCalendar = new CalDAV(this); // remote caldav
+    athlete->rideCalendar = new ICalendar(context); // my local/remote calendar entries
+    athlete->davCalendar = new CalDAV(context); // remote caldav
     athlete->davCalendar->download(); // refresh the diary window
 #endif
 
@@ -550,7 +552,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef GC_HAVE_LUCENE
     // add a search box on far right, but with a little space too
-    SearchFilterBox *searchBox = new SearchFilterBox(this,this,false);
+    SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(250);
     head->addWidget(searchBox);
@@ -563,11 +565,11 @@ MainWindow::MainWindow(const QDir &home) :
     /*----------------------------------------------------------------------
      * Scope Bar
      *--------------------------------------------------------------------*/
-    trainTool = new TrainTool(this, athlete->home);
+    trainTool = new TrainTool(context, athlete->home);
     trainTool->hide();
     trainTool->getToolbarButtons()->hide(); // no show yet
 
-    scopebar = new GcScopeBar(this, trainTool->getToolbarButtons());
+    scopebar = new GcScopeBar(context, trainTool->getToolbarButtons());
     connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
     connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
     connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
@@ -616,12 +618,12 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->setFirstItemColumnSpanned (allRides, true);
 
     // UI Ride List (configurable)
-    listView = new RideNavigator(this, true);
+    listView = new RideNavigator(context, true);
     listView->setProperty("nomenu", true);
 
     // sidebar items
-    gcCalendar = new GcCalendar(this);
-    gcMultiCalendar = new GcMultiCalendar(this);
+    gcCalendar = new GcCalendar(context);
+    gcMultiCalendar = new GcMultiCalendar(context);
 
     // we need to connect the search box on Linux/Windows
 #ifdef GC_HAVE_LUCENE
@@ -648,8 +650,8 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     // INTERVALS
-    intervalSummaryWindow = new IntervalSummaryWindow(this);
-    intervalWidget = new IntervalTreeView(this);
+    intervalSummaryWindow = new IntervalSummaryWindow(context);
+    intervalWidget = new IntervalTreeView(context);
     intervalWidget->setColumnCount(1);
     intervalWidget->setIndentation(5);
     intervalWidget->setSortingEnabled(false);
@@ -713,7 +715,7 @@ MainWindow::MainWindow(const QDir &home) :
         QString name = i.next();
         QDateTime dt;
         if (parseRideFileName(name, &dt)) {
-            last = new RideItem(RIDE_TYPE, athlete->home.path(), name, dt, athlete->zones(), athlete->hrZones(), this);
+            last = new RideItem(RIDE_TYPE, athlete->home.path(), name, dt, athlete->zones(), athlete->hrZones(), context);
             allRides->addChild(last);
         }
     }
@@ -754,21 +756,21 @@ MainWindow::MainWindow(const QDir &home) :
     masterControls->addWidget(homeControls);
 
     // HOME WINDOW & CONTROLS
-    homeWindow = new HomeWindow(this, "home", "Home");
+    homeWindow = new HomeWindow(context, "home", "Home");
     homeControls->addWidget(homeWindow->controls());
     homeControls->setCurrentIndex(0);
 
     // DIARY WINDOW & CONTROLS
-    diaryWindow = new HomeWindow(this, "diary", "Diary");
+    diaryWindow = new HomeWindow(context, "diary", "Diary");
     diaryControls->addWidget(diaryWindow->controls());
 
     // TRAIN WINDOW & CONTROLS
-    trainWindow = new HomeWindow(this, "train", "Training");
+    trainWindow = new HomeWindow(context, "train", "Training");
     trainWindow->controls()->hide();
     trainControls->addWidget(trainWindow->controls());
 
     // ANALYSIS WINDOW & CONTRAOLS
-    analWindow = new HomeWindow(this, "analysis", "Analysis");
+    analWindow = new HomeWindow(context, "analysis", "Analysis");
     analysisControls->addWidget(analWindow->controls());
 
     currentWindow = NULL;
@@ -782,10 +784,10 @@ MainWindow::MainWindow(const QDir &home) :
     showBlankDiary = !(appsettings->cvalue(athlete->cyclist, GC_BLANK_DIARY, false).toBool());
 
     // setup the blank pages
-    blankStateAnalysisPage = new BlankStateAnalysisPage(this);
-    blankStateHomePage = new BlankStateHomePage(this);
-    blankStateDiaryPage = new BlankStateDiaryPage(this);
-    blankStateTrainPage = new BlankStateTrainPage(this);
+    blankStateAnalysisPage = new BlankStateAnalysisPage(context);
+    blankStateHomePage = new BlankStateHomePage(context);
+    blankStateDiaryPage = new BlankStateDiaryPage(context);
+    blankStateTrainPage = new BlankStateTrainPage(context);
 
     connect(blankStateDiaryPage, SIGNAL(closeClicked()), this, SLOT(closeBlankDiary()));
     connect(blankStateHomePage, SIGNAL(closeClicked()), this, SLOT(closeBlankHome()));
@@ -798,7 +800,7 @@ MainWindow::MainWindow(const QDir &home) :
     // do controllers after home windows -- they need their first signals caught
     connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
 
-    ltmSidebar = new LTMSidebar(this, athlete->home);
+    ltmSidebar = new LTMSidebar(context, athlete->home);
     connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
     ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
 
@@ -1497,7 +1499,7 @@ MainWindow::splitterMoved(int pos, int /*index*/)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(athlete->home, athlete->zones_, this);
+    ConfigDialog *cd = new ConfigDialog(athlete->home, athlete->zones_, context);
     cd->show();
 }
 
@@ -1589,7 +1591,7 @@ MainWindow::closeAll()
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog *ad = new AboutDialog(this, athlete->home);
+    AboutDialog *ad = new AboutDialog(context, athlete->home);
     ad->exec();
 }
 
@@ -1601,7 +1603,7 @@ void MainWindow::showTools()
 
 void MainWindow::showRhoEstimator()
 {
-   ToolsRhoEstimator *tre = new ToolsRhoEstimator(this);
+   ToolsRhoEstimator *tre = new ToolsRhoEstimator(context);
    tre->show();
 }
 
@@ -1653,7 +1655,7 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)context->currentRideItem();
     if (rideitem) {
-        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(this, name, rideitem);
+        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
     }
@@ -1860,13 +1862,13 @@ MainWindow::dropEvent(QDropEvent *event)
 
     if (currentWindow != trainWindow) {
         // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (&urls, athlete->home, this);
+        RideImportWizard *dialog = new RideImportWizard (&urls, athlete->home, context);
         dialog->process(); // do it!
     } else {
         QStringList filenames;
         for (int i=0; i<urls.count(); i++)
             filenames.append(QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath());
-        Library::importFiles(this, filenames);
+        Library::importFiles(context, filenames);
     }
     return;
 }
@@ -1883,7 +1885,7 @@ MainWindow::addRide(QString name, bool dosignal)
         fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
     }
-    RideItem *last = new RideItem(RIDE_TYPE, athlete->home.path(), name, dt, athlete->zones(), athlete->hrZones(), this);
+    RideItem *last = new RideItem(RIDE_TYPE, athlete->home.path(), name, dt, athlete->zones(), athlete->hrZones(), context);
 
     int index = 0;
     while (index < allRides->childCount()) {
@@ -1997,14 +1999,14 @@ MainWindow::checkCPX(RideItem*ride)
 void
 MainWindow::downloadRide()
 {
-    (new DownloadRideDialog(this, athlete->home))->show();
+    (new DownloadRideDialog(context, athlete->home))->show();
 }
 
 
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(this))->show();
+    (new ManualRideDialog(context))->show();
 }
 
 const RideFile *
@@ -2026,7 +2028,7 @@ MainWindow::currentRide()
 void
 MainWindow::exportBatch()
 {
-    BatchExportDialog *d = new BatchExportDialog(this);
+    BatchExportDialog *d = new BatchExportDialog(context);
     d->exec();
 }
 
@@ -2056,7 +2058,7 @@ MainWindow::exportRide()
     getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    bool result = RideFileFactory::instance().writeRideFile(this, context->currentRide(), file, getSuffix.cap(1));
+    bool result = RideFileFactory::instance().writeRideFile(context, context->currentRide(), file, getSuffix.cap(1));
 
     if (result == false) {
         QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
@@ -2086,7 +2088,7 @@ MainWindow::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        RideImportWizard *import = new RideImportWizard(fileNamesCopy, athlete->home, this);
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, athlete->home, context);
         import->process();
     }
 }
@@ -2118,7 +2120,7 @@ MainWindow::revertRide()
 void
 MainWindow::splitRide()
 {
-    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(this))->exec();
+    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(context))->exec();
     else {
         if (!context->ride || !context->ride->ride())
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
@@ -2156,7 +2158,7 @@ MainWindow::addDevice()
 {
 
     // lets get a new one
-    AddDeviceWizard *p = new AddDeviceWizard(this);
+    AddDeviceWizard *p = new AddDeviceWizard(context);
     p->show();
 
 }
@@ -2222,7 +2224,7 @@ MainWindow::uploadRideWithGPSAction()
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        RideWithGPSDialog d(this, item);
+        RideWithGPSDialog d(context, item);
         d.exec();
     }
 }
@@ -2240,7 +2242,7 @@ MainWindow::uploadTtb()
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        TtbDialog d(this, item);
+        TtbDialog d(context, item);
         d.exec();
     }
 }
@@ -2271,7 +2273,7 @@ MainWindow::importWorkout()
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
 
         // import them via the workoutimporter
-        Library::importFiles(this, fileNamesCopy);
+        Library::importFiles(context, fileNamesCopy);
     }
 }
 /*----------------------------------------------------------------------
@@ -2286,7 +2288,7 @@ MainWindow::downloadErgDB()
     QFileInfo fi(workoutDir);
 
     if (fi.exists() && fi.isDir()) {
-        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(this);
+        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(context);
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"), 
@@ -2302,7 +2304,7 @@ MainWindow::downloadErgDB()
 void
 MainWindow::manageLibrary()
 {
-    LibrarySearchDialog *search = new LibrarySearchDialog(this);
+    LibrarySearchDialog *search = new LibrarySearchDialog(context);
     search->exec();
 }
 
@@ -2315,7 +2317,7 @@ void
 MainWindow::uploadTP()
 {
     if (context->ride) {
-        TPUploadDialog uploader(athlete->cyclist, context->currentRide(), this);
+        TPUploadDialog uploader(athlete->cyclist, context->currentRide(), context);
         uploader.exec();
     }
 }
@@ -2323,7 +2325,7 @@ MainWindow::uploadTP()
 void
 MainWindow::downloadTP()
 {
-    TPDownloadDialog downloader(this);
+    TPDownloadDialog downloader(context);
     downloader.exec();
 }
 #endif
@@ -2337,7 +2339,7 @@ MainWindow::addIntervals()
 {
     if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
-        AddIntervalDialog *p = new AddIntervalDialog(this);
+        AddIntervalDialog *p = new AddIntervalDialog(context);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
 

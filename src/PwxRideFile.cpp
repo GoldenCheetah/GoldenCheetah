@@ -17,6 +17,7 @@
  */
 
 #include "PwxRideFile.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include <QDomDocument>
 #include <QVector>
@@ -297,7 +298,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
 }
 
 bool
-PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file) const
+PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file) const
 {
     QDomText text; // used all over
     QDomDocument doc;
@@ -320,7 +321,7 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
     // athlete details
     QDomElement athlete = doc.createElement("athlete");
     QDomElement name = doc.createElement("name");
-    text = doc.createTextNode(main->athlete->cyclist); name.appendChild(text);
+    text = doc.createTextNode(context->athlete->cyclist); name.appendChild(text);
     athlete.appendChild(name);
     double cyclistweight = ride->getTag("Weight", "0.0").toDouble();
     if (cyclistweight) {

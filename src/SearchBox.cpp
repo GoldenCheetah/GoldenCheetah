@@ -17,7 +17,8 @@
  */
 
 #include "SearchBox.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "NamedSearch.h"
 #include "RideNavigator.h"
 #include "GcSideBarItem.h"
@@ -28,8 +29,8 @@
 #include <QMenu>
 #include <QDebug>
 
-SearchBox::SearchBox(MainWindow *main, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), main(main), filtered(false), nochooser(nochooser)
+SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
+    : QLineEdit(parent), context(context), filtered(false), nochooser(nochooser)
 {
     setFixedHeight(21);
     //clear button
@@ -179,7 +180,7 @@ void SearchBox::clearClicked()
 
 void SearchBox::checkMenu()
 {
-    if (main->athlete->namedSearches->getList().count() || text() != "") toolButton->show();
+    if (context->athlete->namedSearches->getList().count() || text() != "") toolButton->show();
     else toolButton->hide();
 }
 
@@ -187,9 +188,9 @@ void SearchBox::setMenu()
 {
     dropMenu->clear();
     if (text() != "") dropMenu->addAction(tr("Add to Favourites"));
-    if (main->athlete->namedSearches->getList().count()) {
+    if (context->athlete->namedSearches->getList().count()) {
         if (text() != "") dropMenu->addSeparator();
-        foreach(NamedSearch x, main->athlete->namedSearches->getList()) {
+        foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
             dropMenu->addAction(x.name);
         }
         dropMenu->addSeparator();
@@ -204,15 +205,15 @@ void SearchBox::runMenu(QAction *x)
     if (x->text() == tr("Add to Favourites")) addNamed();
     else if (x->text() == tr("Manage Favourites")) {
 
-        EditNamedSearches *editor = new EditNamedSearches(this, main);
+        EditNamedSearches *editor = new EditNamedSearches(this, context);
         editor->move(QCursor::pos()-QPoint(230,-5));
         editor->show();
 
     } else if (x->text() == tr("Column Chooser")) {
-        ColumnChooser *selector = new ColumnChooser(main->listView->logicalHeadings);
+        ColumnChooser *selector = new ColumnChooser(context->mainWindow->listView->logicalHeadings);
         selector->show();
     } else {
-        NamedSearch get = main->athlete->namedSearches->get(x->text());
+        NamedSearch get = context->mainWindow->athlete->namedSearches->get(x->text());
         if (get.name == x->text()) {
             setMode(static_cast<SearchBox::SearchBoxMode>(get.type));
             setText(get.text);
@@ -282,6 +283,6 @@ SearchBox::addNamed()
         x.text = this->text();
         x.type = mode;
         x.count = 0;
-        main->athlete->namedSearches->getList().append(x);
+        context->mainWindow->athlete->namedSearches->getList().append(x);
     }
 }

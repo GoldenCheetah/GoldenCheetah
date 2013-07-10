@@ -34,7 +34,7 @@
 class LTMTool;
 class LTMSettings;
 class SummaryMetrics;
-class MainWindow;
+class Context;
 class RideMetric;
 
 // group by settings
@@ -141,14 +141,14 @@ class EditChartDialog : public QDialog
 
 
     public:
-        EditChartDialog(MainWindow *, LTMSettings *, QList<LTMSettings>);
+        EditChartDialog(Context *, LTMSettings *, QList<LTMSettings>);
 
     public slots:
         void okClicked();
         void cancelClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         LTMSettings *settings;
 
         QList<LTMSettings> presets;
@@ -163,7 +163,7 @@ class ChartManagerDialog : public QDialog
 
 
     public:
-        ChartManagerDialog(MainWindow *, QList<LTMSettings> *);
+        ChartManagerDialog(Context *, QList<LTMSettings> *);
 
     public slots:
         void okClicked();
@@ -176,7 +176,7 @@ class ChartManagerDialog : public QDialog
         void deleteClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         QList<LTMSettings> *presets;
 
         QLineEdit *chartName;

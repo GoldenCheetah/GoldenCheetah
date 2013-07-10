@@ -24,7 +24,8 @@
 #include <QtGui>
 #include <QWebView>
 
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "TimeUtils.h"
 #include "GcCalendarModel.h"
 #include "RideItem.h"
@@ -75,7 +76,7 @@ class GcMiniCalendar : public QWidget
 
     public:
 
-        GcMiniCalendar(MainWindow *, bool master);
+        GcMiniCalendar(Context *, bool master);
 
         void setDate(int month, int year);
         void getDate(int &_month, int &_year) { _month = month; _year = year; }
@@ -99,7 +100,7 @@ class GcMiniCalendar : public QWidget
         void dateChanged(int month, int year);
 
     protected:
-        MainWindow *main;
+        Context *context;
         RideItem *_ride;
         int month, year;
 
@@ -127,7 +128,7 @@ class GcMultiCalendar : public QScrollArea
 
     public:
 
-        GcMultiCalendar(MainWindow*);
+        GcMultiCalendar(Context *);
         void refresh();
 
     public slots:
@@ -142,7 +143,7 @@ class GcMultiCalendar : public QScrollArea
     private:
         GcWindowLayout *layout;
         QVector<GcMiniCalendar*> calendars;
-        MainWindow *main;
+        Context *context;
         int showing;
         QStringList filters;
         bool active;
@@ -157,7 +158,7 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
 
     public:
 
-        GcCalendar(MainWindow *);
+        GcCalendar(Context *);
 
     public slots:
 
@@ -172,7 +173,7 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         void dateRangeChanged(DateRange);
 
     protected:
-        MainWindow *main;
+        Context *context;
         RideItem *_ride;
         int month, year;
 

@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include "LibUsb.h"
 #include "Settings.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 LibUsb::LibUsb(int type) : type(type)
 {

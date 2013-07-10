@@ -19,7 +19,7 @@
 #ifndef _ErgFile_h
 #define _ErgFile_h
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 #include <QtGui>
 #include <QObject>
@@ -66,12 +66,12 @@ class ErgFileLap
 class ErgFile
 {
     public:
-        ErgFile(QString, int&, MainWindow *main);       // constructor uses filename
-        ErgFile(MainWindow *main); // no filename, going to use a string
+        ErgFile(QString, int&, Context *context);       // constructor uses filename
+        ErgFile(Context *context); // no filename, going to use a string
 
         ~ErgFile();             // delete the contents
 
-        static ErgFile *fromContent(QString, MainWindow *); // read from memory
+        static ErgFile *fromContent(QString, Context *); // read from memory
         static bool isWorkout(QString); // is this a supported workout?
 
         void reload();          // reload after messed about
@@ -112,7 +112,7 @@ class ErgFile
         double ELE, ELEDIST, GRADE;    // crs
 
     private:
-        MainWindow *main;
+        Context *context;
         int &mode;
         int nomode;
 };

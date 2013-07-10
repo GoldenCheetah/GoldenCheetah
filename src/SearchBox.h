@@ -26,7 +26,7 @@
 
 class QToolButton;
 class QMenu;
-class MainWindow;
+class Context;
 class QLabel;
 
 class SearchBox : public QLineEdit
@@ -37,7 +37,7 @@ public:
     enum searchboxmode { Search, Filter };
     typedef enum searchboxmode SearchBoxMode;
 
-    SearchBox(MainWindow *main, QWidget *parent = 0, bool nochooser=true);
+    SearchBox(Context *context, QWidget *parent = 0, bool nochooser=true);
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
@@ -78,7 +78,7 @@ signals:
     void clearFilter();
 
 private:
-    MainWindow *main;
+    Context *context;
     bool filtered;
     bool nochooser;
     QToolButton *clearButton, *searchButton, *toolButton;

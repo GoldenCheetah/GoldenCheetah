@@ -22,7 +22,11 @@
 
 #include <QObject>
 #include <QtGui>
-#include "MainWindow.h"
+#include <QHttp>
+#include <QUrl>
+#include <QScriptEngine>
+#include <QNetworkReply>
+#include "Context.h"
 #include "RideItem.h"
 
 class RideWithGPSDialog : public QDialog
@@ -31,7 +35,7 @@ class RideWithGPSDialog : public QDialog
     G_OBJECT
 
 public:
-     RideWithGPSDialog(MainWindow *mainWindow, RideItem *item);
+     RideWithGPSDialog(Context *context, RideItem *item);
 
 signals:
 
@@ -52,7 +56,7 @@ private:
      QPushButton *searchActivityButton;
      QPushButton *getActivityButton;
      QPushButton *cancelButton;
-     MainWindow *mainWindow;
+     Context *context;
      QCheckBox *workoutTimeChk;
      QCheckBox *timeRidingChk;
      QCheckBox *totalDistanceChk;

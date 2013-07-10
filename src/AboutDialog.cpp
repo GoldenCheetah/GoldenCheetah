@@ -20,15 +20,15 @@
 #include "GcUpgrade.h"
 #include "GcCrashDialog.h"
 
-AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWindow), home(home)
+AboutDialog::AboutDialog(Context *context, QDir home) : context(context), home(home)
 {
     setWindowTitle(tr("About GoldenCheetah"));
 
-    aboutPage = new AboutPage(mainWindow, home);
-    versionPage = new VersionPage(mainWindow, home);
-    contributorsPage = new ContributorsPage(mainWindow, home);
+    aboutPage = new AboutPage(context, home);
+    versionPage = new VersionPage(context, home);
+    contributorsPage = new ContributorsPage(context, home);
 #ifndef GC_VERSION
-    configPage = new ConfigPage(mainWindow, home);
+    configPage = new ConfigPage(context, home);
 #endif
 
     tabWidget = new QTabWidget;
@@ -53,7 +53,7 @@ AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWin
 //
 // About page
 //
-AboutPage::AboutPage(MainWindow *main, QDir home) : main(main), home(home)
+AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
 {
     QLabel *text;
     text=new QLabel(this);
@@ -94,7 +94,7 @@ AboutPage::AboutPage(MainWindow *main, QDir home) : main(main), home(home)
 //
 // Version page
 //
-VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
+VersionPage::VersionPage(Context *context, QDir home) : context(context), home(home)
 {
     QLabel *text;
     text=new QLabel(this);
@@ -111,7 +111,7 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
 //
 // Contributors page
 //
-ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), home(home)
+ContributorsPage::ContributorsPage(Context *context, QDir home) : context(context), home(home)
 {
     QStringList contributors;
     contributors.append("Alejandro Martinez");
@@ -186,7 +186,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     setLayout(mainLayout);
 }
 
-ConfigPage::ConfigPage(MainWindow *main, QDir home) : main(main), home(home)
+ConfigPage::ConfigPage(Context *context, QDir home) : context(context), home(home)
 {
     QTextEdit *text = new QTextEdit(this);
     text->setAutoFillBackground(false);

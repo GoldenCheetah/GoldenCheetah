@@ -29,10 +29,11 @@
 #include <QDebug>
 
 #include "RideFile.h"
+#include "Context.h"
 
 class Zones;
 class HrZones;
-class MainWindow;
+class Context;
 
 class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
@@ -101,7 +102,7 @@ public:
                          const Zones *zones, int zoneRange,
                          const HrZones *hrzones, int hrzoneRange,
                          const QHash<QString,RideMetric*> &deps,
-                         const MainWindow *main = 0) = 0;
+                         const Context *context = 0) = 0;
 
     // Fill in the value of the ride metric using the mapping provided.  For
     // example, average speed might be specified by the mapping
@@ -136,7 +137,7 @@ public:
     virtual RideMetric *clone() const = 0;
 
     static QHash<QString,RideMetricPtr>
-    computeMetrics(const MainWindow *main, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
+    computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
                    const QStringList &metrics);
 
     // Initialisers for derived classes to setup basic data

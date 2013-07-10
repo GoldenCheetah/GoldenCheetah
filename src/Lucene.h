@@ -23,7 +23,7 @@
 #include <QString>
 #include <QDir>
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideMetadata.h"
 #include "SummaryMetrics.h"
 #include "RideFile.h"
@@ -43,7 +43,7 @@ class Lucene : public QObject
     Q_OBJECT
 
 public:
-    Lucene(QObject *parent, MainWindow *main);
+    Lucene(QObject *parent, Context *context);
     ~Lucene();
 
     // Create/Delete Metrics
@@ -63,7 +63,7 @@ signals:
     void results(QStringList);
 
 private:
-    MainWindow *main;
+    Context *context;
     QDir dir;
 
     // CLucene objects

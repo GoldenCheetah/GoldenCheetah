@@ -174,7 +174,7 @@ MainWindow::saveSilent(RideItem *rideItem)
 
     // save in GC format
     JsonFileReader reader;
-    reader.writeRideFile(this, rideItem->ride(), savedFile);
+    reader.writeRideFile(context, rideItem->ride(), savedFile);
 
     // rename the file and update the rideItem list to reflect the change
     if (convert) {

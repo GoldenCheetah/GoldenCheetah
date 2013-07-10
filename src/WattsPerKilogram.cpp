@@ -45,7 +45,7 @@ class AverageWPK : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 
         // unconst naughty boy
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -81,7 +81,7 @@ class PeakWPK : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         // unconst naughty boy
         RideFile *uride = const_cast<RideFile*>(ride);
@@ -300,7 +300,7 @@ class Vo2max : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 
         PeakWPK5m *wpk5m = dynamic_cast<PeakWPK5m*>(deps.value("5m_peak_wpk"));
         setValue(wpk5m->value(false) * 12 + 3.5);

@@ -17,7 +17,7 @@
  */
 
 #include "DataProcessor.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "AllPlot.h"
 #include "Settings.h"
 #include "Units.h"
@@ -56,7 +56,7 @@ DataProcessorFactory::autoProcess(RideFile *ride)
     return changed;
 }
 
-ManualDataProcessorDialog::ManualDataProcessorDialog(MainWindow *main, QString name, RideItem *ride) : main(main), ride(ride)
+ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride) : context(context), ride(ride)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(name);

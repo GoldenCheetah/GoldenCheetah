@@ -23,7 +23,7 @@
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
-class MainWindow;
+class Context;
 class PfPvPlot;
 class RideItem;
 
@@ -60,7 +60,7 @@ class PfPvWindow : public GcChartWindow
 
     public:
 
-        PfPvWindow(MainWindow *mainWindow);
+        PfPvWindow(Context *context);
 
         // reveal
         bool hasReveal() { return true; }
@@ -100,7 +100,7 @@ class PfPvWindow : public GcChartWindow
 
     protected:
 
-        MainWindow *mainWindow;
+        Context *context;
         PfPvPlot *pfPvPlot;
         QwtPlotZoomer *pfpvZoomer;
         PfPvDoubleClickPicker *doubleClickPicker;

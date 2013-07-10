@@ -476,7 +476,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 }
 
 bool
-CsvFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const
+CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) const
 {
     if (!file.open(QIODevice::WriteOnly)) return(false);
 

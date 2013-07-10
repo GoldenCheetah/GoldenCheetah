@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Athlete.h"
 #include "ICalendar.h"
 #include "GcCalendarModel.h"
 #include "CalendarDownload.h"
@@ -163,12 +164,12 @@ static QDateTime propertyToDate(icalproperty *p)
     }
 }
 
-ICalendar::ICalendar(MainWindow *parent) : QWidget(parent), main(parent)
+ICalendar::ICalendar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     // get from local and remote calendar
 
     // local file
-    QString localFilename = main->athlete->home.absolutePath()+"/calendar.ics";
+    QString localFilename = context->athlete->home.absolutePath()+"/calendar.ics";
     QFile localFile(localFilename);
     if (localFile.exists() && localFile.open(QFile::ReadOnly | QFile::Text)) {
 
@@ -182,7 +183,7 @@ ICalendar::ICalendar(MainWindow *parent) : QWidget(parent), main(parent)
     }
 
     // remote file
-    main->athlete->calendarDownload->download();
+    context->athlete->calendarDownload->download();
 }
 
 void ICalendar::refreshRemote(QString fulltext)

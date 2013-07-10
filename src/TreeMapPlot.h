@@ -24,7 +24,7 @@
 
 #include "MetricAggregator.h"
 #include "TreeMapWindow.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 
 // for sorting
@@ -240,7 +240,7 @@ class TreeMapPlot : public QWidget
 
 
     public:
-        TreeMapPlot(TreeMapWindow *, MainWindow *main);
+        TreeMapPlot(TreeMapWindow *, Context *context);
         ~TreeMapPlot();
         void setData(TMSettings *);
 
@@ -258,7 +258,7 @@ class TreeMapPlot : public QWidget
         virtual void resizeEvent(QResizeEvent *);
 
     private:
-        MainWindow *main;
+        Context *context;
         TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure

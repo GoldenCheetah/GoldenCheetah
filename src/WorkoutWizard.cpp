@@ -17,6 +17,8 @@
  */
 
 #include "WorkoutWizard.h"
+#include "Context.h"
+#include "Athlete.h"
 
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
@@ -25,7 +27,7 @@
 
 
 // hack...  Need to get the CP and zones for metrics
-MainWindow *hackMW;
+Context *hackContext;
 
 /// workout plot
 class WorkoutPlot: public QwtPlot
@@ -222,8 +224,8 @@ void WorkoutTypePage::initializePage()
     relWattageRadioButton = new QRadioButton(tr("% FTP Wattage"));
     gradientRadioButton = new QRadioButton(tr("Gradient"));
 
-    if (hackMW->context->rideItem()) {
-        QString s = hackMW->context->rideItem()->ride()->startTime().toLocalTime().toString();
+    if (hackContext->rideItem()) {
+        QString s = hackContext->rideItem()->ride()->startTime().toLocalTime().toString();
         QString importStr = "Import Selected Ride (" + s + ")";
         importRadioButton = new QRadioButton((importStr));
     } else {
@@ -298,7 +300,7 @@ void AbsWattagePage::updateMetrics()
     int curSecs = 0;
     // create rideFile
     QSharedPointer<RideFile> workout(new RideFile());
-    workout->mainwindow = hackMW;
+    workout->context = hackContext;
     workout->setRecIntSecs(1);
     double curMin = 0;
     for(int i = 0; i < data.size() ; i++)
@@ -339,7 +341,7 @@ void AbsWattagePage::updateMetrics()
     metrics.append("average_power");
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackMW->athlete->zones(),hackMW->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 }
 
@@ -386,8 +388,8 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
-    int zoneRange = hackMW->athlete->zones()->whichRange(QDate::currentDate());
-    ftp = hackMW->athlete->zones()->getCP(zoneRange);
+    int zoneRange = hackContext->athlete->zones()->whichRange(QDate::currentDate());
+    ftp = hackContext->athlete->zones()->getCP(zoneRange);
 
     setTitle("Workout Wizard");
     QString subTitle = "Relative Wattage Workout Wizard, current CP60 = " + QString::number(ftp);
@@ -428,7 +430,7 @@ void RelWattagePage::updateMetrics()
     int curSecs = 0;
     // create rideFile
     QSharedPointer<RideFile> workout(new RideFile());
-    workout->mainwindow = hackMW;
+    workout->context = hackContext;
     workout->setRecIntSecs(1);
     for(int i = 0; i < data.size() ; i++)
     {
@@ -466,7 +468,7 @@ void RelWattagePage::updateMetrics()
     metrics.append("average_power");
     metrics.append("skiba_bike_score");
     metrics.append("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackMW->athlete->zones(),hackMW->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 }
 
@@ -512,9 +514,9 @@ GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
-    int zoneRange = hackMW->athlete->zones()->whichRange(QDate::currentDate());
-    ftp = hackMW->athlete->zones()->getCP(zoneRange);
-    metricUnits = hackMW->athlete->useMetricUnits;
+    int zoneRange = hackContext->athlete->zones()->whichRange(QDate::currentDate());
+    ftp = hackContext->athlete->zones()->getCP(zoneRange);
+    metricUnits = hackContext->athlete->useMetricUnits;
     setTitle("Workout Wizard");
 
     setSubTitle("Manually crate a workout based on gradient (slope) and distance, maxium grade is 5.");
@@ -607,14 +609,14 @@ void ImportPage::initializePage()
         setFinalPage(true);
         QVBoxLayout *layout = new QVBoxLayout();
         plot = new WorkoutPlot();
-        metricUnits = hackMW->athlete->useMetricUnits;
+        metricUnits = hackContext->athlete->useMetricUnits;
         QString s = (metricUnits ? "KM" : "Miles");
         QString distance = QString("Distance (") + s + QString(")");
         plot->setXAxisTitle(distance);
         s = (metricUnits ? "Meters" : "Feet");
         QString elevation = QString("elevation (") + s + QString(")");
         plot->setYAxisTitle(elevation);
-        RideItem *rideItem = hackMW->context->rideItem();
+        RideItem *rideItem = hackContext->rideItem();
 
         if(rideItem == NULL)
             return;
@@ -740,7 +742,7 @@ void ImportPage::SaveWorkout()
 
 WorkoutWizard::WorkoutWizard(QWidget *parent) :QWizard(parent)
 {
-    hackMW = (MainWindow *)parent;
+    hackContext = (Context *)parent;
     setPage(WW_WorkoutTypePage, new WorkoutTypePage());
     setPage(WW_AbsWattagePage, new AbsWattagePage());
     setPage(WW_RelWattagePage, new RelWattagePage());

@@ -17,6 +17,8 @@
  */
 
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
+#include "Context.h"
 #include "Colors.h"
 #include "Settings.h"
 #include <QDebug>
@@ -186,7 +188,7 @@ GcWindow::GcWindow()
 #endif
 }
 
-GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
+GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) {
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
@@ -194,7 +196,7 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     qRegisterMetaType<DateRange>("dateRange");
     qRegisterMetaType<bool>("nomenu");
     revealed = false;
-    setParent(parent);
+    setParent(context->mainWindow);
     setControls(NULL);
     setRideItem(NULL);
     setTitle("");
@@ -651,7 +653,7 @@ GcWindow::_closeWindow()
     emit closeWindow(this);
 }
 
-GcChartWindow::GcChartWindow(QWidget *parent) : GcWindow(parent) {
+GcChartWindow::GcChartWindow(Context *context) : GcWindow(context) {
     //
     // Default layout
     //

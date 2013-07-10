@@ -22,7 +22,7 @@
 
 #include <QtGui>
 
-class MainWindow;
+class Context;
 class RideFile;
 
 class BestIntervalDialog : public QDialog
@@ -39,7 +39,7 @@ class BestIntervalDialog : public QDialog
                 start(start), stop(stop), avg(avg) {}
         };
 
-        BestIntervalDialog(MainWindow *mainWindow);
+        BestIntervalDialog(Context *context);
 
         static void findBests(const RideFile *ride, double windowSizeSecs,
                               int maxIntervals, QList<BestInterval> &results);
@@ -51,7 +51,7 @@ class BestIntervalDialog : public QDialog
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         QPushButton *findButton, *doneButton, *addButton;
         QDoubleSpinBox *hrsSpinBox, *minsSpinBox, *secsSpinBox, *countSpinBox;
         QTableWidget *resultsTable;

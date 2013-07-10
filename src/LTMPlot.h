@@ -31,7 +31,7 @@
 #include "LTMSettings.h"
 #include "MetricAggregator.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 
 class LTMPlotBackground;
 class LTMWindow;
@@ -45,7 +45,7 @@ class LTMPlot : public QwtPlot
 
 
     public:
-        LTMPlot(LTMWindow *, MainWindow *main);
+        LTMPlot(LTMWindow *, Context *context);
         ~LTMPlot();
         void setData(LTMSettings *);
         void setAxisTitle(int axis, QString label);
@@ -66,7 +66,7 @@ class LTMPlot : public QwtPlot
         double minY[10], maxY[10], maxX;      // for all possible 10 curves
 
     private:
-        MainWindow *main;
+        Context *context;
         LTMSettings *settings;
 
         // date range selection

@@ -43,7 +43,7 @@ class LeftRightBalance : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         total = count = 0;
 

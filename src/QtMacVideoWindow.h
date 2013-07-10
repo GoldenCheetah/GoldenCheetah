@@ -24,7 +24,7 @@
 #include <QtGui>
 #include <QTimer>
 #include <QMacCocoaViewContainer>
-#include "MainWindow.h"
+#include "Context.h"
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
@@ -87,7 +87,7 @@ class VideoWindow : public GcWindow
 
     public:
 
-        VideoWindow(MainWindow *, const QDir &);
+        VideoWindow(Context *, const QDir &);
         ~VideoWindow();
 
     public slots:
@@ -103,9 +103,9 @@ class VideoWindow : public GcWindow
 
         void resizeEvent(QResizeEvent *);
 
-        // passed from MainWindow
+        // passed from Context *
         QDir home;
-        MainWindow *main;
+        Context *context;
         bool hasMovie;
 
         // the active movie

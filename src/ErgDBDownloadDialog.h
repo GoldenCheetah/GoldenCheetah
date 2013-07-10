@@ -20,7 +20,7 @@
 #ifndef _ErgDBDownloadDialog_h
 #define _ErgDBDownloadDialog_h
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 #include "Units.h"
 
@@ -47,7 +47,7 @@ class ErgDBDownloadDialog : public QDialog
 
 
 public:
-    ErgDBDownloadDialog(MainWindow *main);
+    ErgDBDownloadDialog(Context *context);
 
     QTreeWidget *files; // choose files to export
 
@@ -60,7 +60,7 @@ private slots:
     void allClicked();
 
 private:
-    MainWindow *main;
+    Context *context;
     bool aborted;
 
     QCheckBox *all;

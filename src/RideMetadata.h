@@ -20,7 +20,7 @@
 #define _GC_RideMetadata_h
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "SpecialFields.h"
 #include <QWidget>
 #include <QXmlDefaultHandler>
@@ -34,6 +34,8 @@
 #define FIELD_DATE      5
 #define FIELD_TIME      6
 #define FIELD_CHECKBOX  7
+
+class RideMetadata;
 
 class KeywordDefinition
 {
@@ -118,7 +120,7 @@ class RideMetadata : public QWidget
     RideItem *_ride, *_connected;
 
     public:
-        RideMetadata(MainWindow *, bool singlecolumn = false);
+        RideMetadata(Context *, bool singlecolumn = false);
         static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QString colofield);
         static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QString &colorfield);
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
@@ -133,7 +135,7 @@ class RideMetadata : public QWidget
         bool singlecolumn;
         SpecialFields sp;
 
-        MainWindow *main;
+        Context *context;
         SpecialTabs specialTabs;
 
     public slots:

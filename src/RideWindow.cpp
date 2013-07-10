@@ -17,6 +17,7 @@
  */
 
 #include "RideWindow.h"
+#include "RideItem.h"
 #include "RealtimeData.h"
 #include "JsonRideFile.h"
 
@@ -52,17 +53,16 @@ void RideWindow::loadRide()
                             this, SLOT(addJSObjects()));
     view->setPage(page);
     // used for testing...
-    RiderBridge* tr = new RealtimeRider(main);
+    RiderBridge* tr = new RealtimeRider(context);
     tr->setRide(ride);
     rider = tr;
     addJSObjects();
 }
 
-RideWindow::RideWindow(MainWindow * _main) :
-    GcWindow(_main),
+RideWindow::RideWindow(Context *context) :
+    GcWindow(context),
     rideLoaded(false)
 {
-    main = _main;
     setInstanceName("Ride Window");
     view = new QWebView();
     QVBoxLayout *layout = new QVBoxLayout();

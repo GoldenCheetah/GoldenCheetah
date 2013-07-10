@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 #include "ErgFile.h"
 #include <QHttp>
+#include <QNetworkReply>
 #include <QUrl>
 #include <QEventLoop>
 #include <QObject>

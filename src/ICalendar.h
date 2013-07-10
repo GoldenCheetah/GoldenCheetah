@@ -21,7 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideMetric.h"
 #include <libical/ical.h>
 
@@ -33,7 +33,7 @@ class ICalendar : public QWidget
 
     public:
 
-        ICalendar(MainWindow *parent);
+        ICalendar(Context *context);
 
         // to get access to from the Calendar
         QVariant data(QDate date, int role = Qt::DisplayRole);
@@ -48,7 +48,7 @@ class ICalendar : public QWidget
 
     private:
 
-        MainWindow *main;
+        Context *context;
 
         // We store the calendar as an associative array
         // For each date we have a list of events that

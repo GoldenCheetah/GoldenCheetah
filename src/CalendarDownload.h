@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 /* #include "CalendarParser.h" */
 #include "MetricAggregator.h"
@@ -35,14 +35,14 @@ class CalendarDownload : public QObject
 
 
 public:
-    CalendarDownload(MainWindow *main);
+    CalendarDownload(Context *context);
 
     bool download();
 public slots:
     void downloadFinished(QNetworkReply *reply);
 
 private:
-    MainWindow *main;
+    Context *context;
     QNetworkAccessManager *nam;
 /*    CalendarParser *parser; */
 };

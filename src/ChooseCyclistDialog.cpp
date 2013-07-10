@@ -18,7 +18,9 @@
 
 #include "ChooseCyclistDialog.h"
 #include "NewCyclistDialog.h"
-#include "MainWindow.h"
+#include "Mainwindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include <QtGui>
 
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :

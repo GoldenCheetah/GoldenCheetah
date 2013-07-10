@@ -18,8 +18,11 @@
  */
 
 #include "BatchExportDialog.h"
+#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 
-BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(main)
+BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!
@@ -50,7 +53,7 @@ BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(mai
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    const QTreeWidgetItem *allRides = main->allRideItems();
+    const QTreeWidgetItem *allRides = context->mainWindow->allRideItems();
 
     for (int i=0; i<allRides->childCount(); i++) {
 
@@ -221,8 +224,8 @@ BatchExportDialog::exportFiles()
             // open it..
             QStringList errors;
             QList<RideFile*> rides;
-            QFile thisfile(QString(main->athlete->home.absolutePath()+"/"+current->text(1)));
-            RideFile *ride = RideFileFactory::instance().openRideFile(main, thisfile, errors, &rides);
+            QFile thisfile(QString(context->athlete->home.absolutePath()+"/"+current->text(1)));
+            RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
 
             // open success?
             if (ride) {
@@ -230,7 +233,7 @@ BatchExportDialog::exportFiles()
 
                 current->setText(4, tr("Writing...")); QApplication::processEvents();
                 QFile out(filename);
-                bool success = RideFileFactory::instance().writeRideFile(main, ride, out, type);
+                bool success = RideFileFactory::instance().writeRideFile(context, ride, out, type);
 
                 if (success) {
                     exports++;

@@ -17,8 +17,10 @@
  */
 
 #include "CalDAV.h"
+#include "MainWindow.h"
+#include "Athlete.h"
 
-CalDAV::CalDAV(MainWindow *main) : main(main), mode(None)
+CalDAV::CalDAV(Context *context) : context(context), mode(None)
 {
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestReply(QNetworkReply*)));
@@ -35,7 +37,7 @@ CalDAV::CalDAV(MainWindow *main) : main(main), mode(None)
 bool
 CalDAV::download()
 {
-    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -65,7 +67,7 @@ CalDAV::download()
     mode = Events;
     QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("CalDAV REPORT url error"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
         mode = None;
         return false;
     }
@@ -78,7 +80,7 @@ CalDAV::download()
 bool
 CalDAV::options()
 {
-    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -98,7 +100,7 @@ CalDAV::options()
     mode = Options;
     QNetworkReply *reply = nam->sendCustomRequest(request, "OPTIONS", query);
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("CalDAV OPTIONS url error"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
         mode = None;
         return false;
     }
@@ -111,7 +113,7 @@ CalDAV::options()
 bool
 CalDAV::propfind()
 {
-    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -136,7 +138,7 @@ CalDAV::propfind()
     mode = PropFind;
     QNetworkReply *reply = nam->sendCustomRequest(request, "PROPFIND" , query);
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("CalDAV OPTIONS url error"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("CalDAV OPTIONS url error"), reply->errorString());
         mode = None;
         return false;
     }
@@ -150,7 +152,7 @@ CalDAV::propfind()
 bool
 CalDAV::report()
 {
-    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -173,7 +175,7 @@ CalDAV::report()
     mode = Report;
     QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("CalDAV REPORT url error"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("CalDAV REPORT url error"), reply->errorString());
         mode = None;
         return false;
     }
@@ -318,7 +320,7 @@ CalDAV::upload(RideItem *rideItem)
     // is this a valid ride?
     if (!rideItem || !rideItem->ride()) return false;
 
-    QString url = appsettings->cvalue(main->athlete->cyclist, GC_DVURL, "").toString();
+    QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
 
     // lets upload to calendar
@@ -339,7 +341,7 @@ CalDAV::upload(RideItem *rideItem)
     QNetworkReply *reply = nam->put(request, vcardtext);
     if (reply->error() != QNetworkReply::NoError) {
         mode = None;
-        QMessageBox::warning(main, tr("CalDAV Calendar url error"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("CalDAV Calendar url error"), reply->errorString());
         return false;
     }
     return true;
@@ -356,7 +358,7 @@ CalDAV::requestReply(QNetworkReply *reply)
     switch (mode) {
     case Report:
     case Events:
-        main->athlete->rideCalendar->refreshRemote(extractComponents(response));
+        context->athlete->rideCalendar->refreshRemote(extractComponents(response));
         break;
     default:
     case Options:
@@ -374,8 +376,8 @@ CalDAV::requestReply(QNetworkReply *reply)
 void
 CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
 {
-    QString user = appsettings->cvalue(main->athlete->cyclist, GC_DVUSER, "").toString();
-    QString pass = appsettings->cvalue(main->athlete->cyclist, GC_DVPASS, "").toString();
+    QString user = appsettings->cvalue(context->athlete->cyclist, GC_DVUSER, "").toString();
+    QString pass = appsettings->cvalue(context->athlete->cyclist, GC_DVPASS, "").toString();
     a->setUser(user);
     a->setPassword(pass);
 }

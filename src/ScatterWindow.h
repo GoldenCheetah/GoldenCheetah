@@ -23,7 +23,11 @@
 #include <QtGui>
 #include <QTimer>
 #include "qxtstringspinbox.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "RideItem.h"
+#include "IntervalItem.h"
+#include "math.h"
+#include "Units.h" // for MILES_PER_KM
 
 
 class ScatterPlot; // we don't include the header because it uses namespaces
@@ -61,7 +65,7 @@ class ScatterWindow : public GcChartWindow
 
     public:
 
-        ScatterWindow(MainWindow *, const QDir &);
+        ScatterWindow(Context *, const QDir &);
 
         // reveal
         bool hasReveal() { return true; }
@@ -98,9 +102,9 @@ class ScatterWindow : public GcChartWindow
 
     protected:
 
-        // passed from MainWindow
+        // passed from Context *
         QDir home;
-        MainWindow *main;
+        Context *context;
         bool useMetricUnits;
         bool active;
 

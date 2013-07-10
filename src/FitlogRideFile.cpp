@@ -20,7 +20,8 @@
 #include "FitlogParser.h"
 #include <QDomDocument>
 
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "RideMetric.h"
 
 #ifndef GC_VERSION
@@ -50,7 +51,7 @@ RideFile *FitlogFileReader::openRideFile(QFile &file, QStringList &errors, QList
 }
 
 bool
-FitlogFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const
+FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file) const
 {
     QDomText text;
     QDomDocument doc;
@@ -69,7 +70,7 @@ FitlogFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QF
     fitnessWorkbook.appendChild(athleteLog);
 
     QDomElement athlete = doc.createElement("Athlete");
-    athlete.setAttribute("athlete",mainWindow->athlete->cyclist);
+    athlete.setAttribute("athlete",context->athlete->cyclist);
     athleteLog.appendChild(athlete);
 
     QDomElement activity = doc.createElement("Activity");
@@ -100,7 +101,7 @@ FitlogFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QF
     QStringList worklist = QStringList();
     for (int i=0; metrics[i];i++) worklist << metrics[i];
 
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), worklist);
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
 
     QDomElement duration = doc.createElement("Duration");
     duration.setAttribute("TotalSeconds", QString("%1").arg(computed.value("workout_time")->value(true)));
@@ -157,7 +158,7 @@ FitlogFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QF
             }
 
             computed =
-                RideMetric::computeMetrics(mainWindow, &f, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), worklist);
+                RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), worklist);
 
             QDomElement lap = doc.createElement("Lap");
             lap.setAttribute("StartTime", ride->startTime().addSecs(interval.start).toString(Qt::ISODate)+"Z");

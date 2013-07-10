@@ -56,7 +56,7 @@ class DanielsPoints : public RideMetric {
     void compute(const RideFile *ride, const Zones *zones, int zoneRange,
                 const HrZones *, int,
                 const QHash<QString,RideMetric*> &,
-                const MainWindow *) {
+                const Context *) {
         if (!zones || zoneRange < 0) {
             setValue(0);
             return;
@@ -122,7 +122,7 @@ class DanielsEquivalentPower : public RideMetric {
     void compute(const RideFile *, const Zones *zones, int zoneRange,
                 const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                const MainWindow *)
+                const Context *)
     {
         if (!zones || zoneRange < 0) {
             setValue(0);

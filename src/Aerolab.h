@@ -32,7 +32,7 @@ class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
 class AerolabWindow;
-class MainWindow;
+class Context;
 class IntervalAerolabData;
 class LTMToolTip;
 class LTMCanvasPicker;
@@ -45,7 +45,7 @@ class Aerolab : public QwtPlot {
 
 
   public:
-  Aerolab( AerolabWindow *, MainWindow * );
+  Aerolab( AerolabWindow *, Context * );
   bool byDistance() const { return bydist; }
   bool useMetricUnits;  // whether metric units are used (or imperial)
   void setData(RideItem *_rideItem, bool new_zoom);
@@ -54,7 +54,7 @@ class Aerolab : public QwtPlot {
   void refreshIntervalMarkers();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         AerolabWindow *parent;
 
         LTMToolTip      *tooltip;

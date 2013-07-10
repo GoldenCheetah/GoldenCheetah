@@ -49,7 +49,7 @@ extern "C" {
 #define TYPE_ANT     0
 #define TYPE_FORTIUS 1
 
-class MainWindow;
+class Context;
 
 class LibUsb {
 

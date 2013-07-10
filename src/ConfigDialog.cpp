@@ -20,7 +20,9 @@
 #include <QSettings>
 #include <assert.h>
 
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "ConfigDialog.h"
 #include "Pages.h"
 #include "Settings.h"
@@ -29,8 +31,8 @@
 #include "AddDeviceWizard.h"
 
 
-ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
-    home(_home), zones(_zones), mainWindow(mainWindow)
+ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
+    home(_home), zones(_zones), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -93,25 +95,25 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     pagesWidget = new QStackedWidget(this);
 
     // create those config pages
-    general = new GeneralConfig(_home, _zones, mainWindow);
+    general = new GeneralConfig(_home, _zones, context);
     pagesWidget->addWidget(general);
 
-    athlete = new AthleteConfig(_home, _zones, mainWindow);
+    athlete = new AthleteConfig(_home, _zones, context);
     pagesWidget->addWidget(athlete);
 
-    password = new PasswordConfig(_home, _zones, mainWindow);
+    password = new PasswordConfig(_home, _zones, context);
     pagesWidget->addWidget(password);
 
-    appearance = new AppearanceConfig(_home, _zones, mainWindow);
+    appearance = new AppearanceConfig(_home, _zones, context);
     pagesWidget->addWidget(appearance);
 
-    data = new DataConfig(_home, _zones, mainWindow);
+    data = new DataConfig(_home, _zones, context);
     pagesWidget->addWidget(data);
 
-    metric = new MetricConfig(_home, _zones, mainWindow);
+    metric = new MetricConfig(_home, _zones, context);
     pagesWidget->addWidget(metric);
 
-    device = new DeviceConfig(_home, _zones, mainWindow);
+    device = new DeviceConfig(_home, _zones, context);
     pagesWidget->addWidget(device);
 
 
@@ -171,15 +173,15 @@ void ConfigDialog::saveClicked()
     hide();
 
     // do the zones first..
-    mainWindow->context->notifyConfigChanged();
+    context->notifyConfigChanged();
     close();
 }
 
 // GENERAL CONFIG
-GeneralConfig::GeneralConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+GeneralConfig::GeneralConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
-    generalPage = new GeneralPage(mainWindow);
+    generalPage = new GeneralPage(context);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(generalPage);
 
@@ -193,13 +195,13 @@ void GeneralConfig::saveClicked()
 }
 
 // ATHLETE CONFIG
-AthleteConfig::AthleteConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
     // the widgets
-    athletePage = new RiderPage(this, mainWindow);
-    zonePage = new ZonePage(mainWindow);
-    hrZonePage = new HrZonePage(mainWindow);
+    athletePage = new RiderPage(this, context);
+    zonePage = new ZonePage(context);
+    hrZonePage = new HrZonePage(context);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -222,8 +224,8 @@ void AthleteConfig::saveClicked()
 }
 
 // APPEARANCE CONFIG
-AppearanceConfig::AppearanceConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+AppearanceConfig::AppearanceConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
     appearancePage = new ColorsPage(this);
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -239,10 +241,10 @@ void AppearanceConfig::saveClicked()
 }
 
 // PASSWORD CONFIG
-PasswordConfig::PasswordConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+PasswordConfig::PasswordConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
-    passwordPage = new CredentialsPage(this, mainWindow);
+    passwordPage = new CredentialsPage(this, context);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(passwordPage);
 
@@ -256,10 +258,10 @@ void PasswordConfig::saveClicked()
 }
 
 // METADATA CONFIG
-DataConfig::DataConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+DataConfig::DataConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
-    dataPage = new MetadataPage(mainWindow);
+    dataPage = new MetadataPage(context);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(dataPage);
 
@@ -273,8 +275,8 @@ void DataConfig::saveClicked()
 }
 
 // GENERAL CONFIG
-MetricConfig::MetricConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+MetricConfig::MetricConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
     // the widgets
     intervalsPage = new IntervalMetricsPage(this);
@@ -299,10 +301,10 @@ void MetricConfig::saveClicked()
 }
 
 // GENERAL CONFIG
-DeviceConfig::DeviceConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
-    home(home), zones(zones), mainWindow(mainWindow)
+DeviceConfig::DeviceConfig(QDir home, Zones *zones, Context *context) :
+    home(home), zones(zones), context(context)
 {
-    devicePage = new DevicePage(this, mainWindow);
+    devicePage = new DevicePage(this, context);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(devicePage);
 

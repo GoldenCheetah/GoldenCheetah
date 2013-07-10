@@ -18,14 +18,15 @@
 
 #include "AddIntervalDialog.h"
 #include "MainWindow.h"
+#include "Context.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include <QMap>
 #include <assert.h>
 #include <math.h>
 
-AddIntervalDialog::AddIntervalDialog(MainWindow *mainWindow) :
-    mainWindow(mainWindow)
+AddIntervalDialog::AddIntervalDialog(Context *context) :
+    context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Add Intervals"));
@@ -303,7 +304,7 @@ struct CompareBests {
 void
 AddIntervalDialog::createClicked()
 {
-    const RideFile *ride = mainWindow->context->currentRide();
+    const RideFile *ride = context->currentRide();
     if (!ride) {
         QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
         return;
@@ -642,9 +643,9 @@ AddIntervalDialog::addClicked()
             double start = resultsTable->item(i,3)->text().toDouble();
             double stop = resultsTable->item(i,4)->text().toDouble();
             QString name = resultsTable->item(i,2)->text();
-            const RideFile *ride = mainWindow->context->currentRide();
+            const RideFile *ride = context->currentRide();
 
-            QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
+            QTreeWidgetItem *allIntervals = context->mainWindow->mutableIntervalItems();
             QTreeWidgetItem *last =
                 new IntervalItem(ride, name, start, stop,
                                  ride->timeToDistance(start),
@@ -655,5 +656,5 @@ AddIntervalDialog::addClicked()
             allIntervals->addChild(last);
         }
     }
-    mainWindow->updateRideFileIntervals();
+    context->mainWindow->updateRideFileIntervals();
 }

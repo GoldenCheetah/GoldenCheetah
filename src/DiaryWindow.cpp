@@ -18,15 +18,18 @@
 
 
 #include "DiaryWindow.h"
+#include "RideMetadata.h"
+#include "Athlete.h"
+#include "Context.h"
 
-DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false)
+DiaryWindow::DiaryWindow(Context *context) :
+    GcWindow(context), context(context), active(false)
 {
     setInstanceName("Diary Window");
     setControls(NULL);
 
     // get config
-    fieldDefinitions = mainWindow->athlete->rideMetadata()->getFields();
+    fieldDefinitions = context->athlete->rideMetadata()->getFields();
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
 
@@ -57,8 +60,8 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     vlayout->addLayout(controls);
 
     // monthly view via QCalendarWidget
-    calendarModel = new GcCalendarModel(this, &fieldDefinitions, mainWindow);
-    calendarModel->setSourceModel(mainWindow->listView->sqlModel);
+    calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
+    calendarModel->setSourceModel(context->mainWindow->listView->sqlModel);
 
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);
@@ -81,9 +84,9 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultView(int)));
     //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(rideSelected()));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(rideSelected()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
 }
@@ -92,13 +95,13 @@ void
 DiaryWindow::configChanged()
 {
     // get config
-    fieldDefinitions = mainWindow->athlete->rideMetadata()->getFields();
+    fieldDefinitions = context->athlete->rideMetadata()->getFields();
 }
 
 void
 DiaryWindow::setDefaultView(int view)
 {
-    appsettings->setCValue(mainWindow->athlete->cyclist, GC_DIARY_VIEW, view);
+    appsettings->setCValue(context->athlete->cyclist, GC_DIARY_VIEW, view);
 }
 void
 DiaryWindow::rideSelected()
@@ -156,7 +159,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
 {
 
     if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy)
-        mainWindow->setBubble("");
+        context->mainWindow->setBubble("");
 
     switch (e->type()) {
     case QEvent::MouseButtonPress:
@@ -175,7 +178,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
         // clicked on cell contents
         if (files.count() == 1) {
             if (files[0] == "calendar") ; // handle planned rides
-            else mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+            else context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
 
         } else if (files.count()) {
 
@@ -185,7 +188,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
             for(i=files.count()-1; i>=0; i--) if (y > (c.y()+15+(h*i))) break;
 
             if (files[i] == "calendar") ; // handle planned rides
-            else mainWindow->selectRideFile(QFileInfo(files[i]).fileName());
+            else context->mainWindow->selectRideFile(QFileInfo(files[i]).fileName());
         }
 
         // force a repaint 
@@ -212,7 +215,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
                 // Popup bubble for ride
                 if (files.count() == 1) {
                     if (files[0] == "calendar") ; // handle planned rides
-                    else mainWindow->setBubble(files.at(0), monthlyView->viewport()->mapToGlobal(pos));
+                    else context->mainWindow->setBubble(files.at(0), monthlyView->viewport()->mapToGlobal(pos));
 
                 } else if (files.count()) {
 
@@ -224,14 +227,14 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
                     for(i=files.count()-1; i>=0; i--) if (pos.y() > (c.y()+15+(h*i))) break;
 
                     if (i<0) {
-                        mainWindow->setBubble("");
+                        context->mainWindow->setBubble("");
                         return true;
                     }
 
                     if (files.at(i) == "calendar") ; // handle planned rides
-                    else mainWindow->setBubble(files.at(i), monthlyView->viewport()->mapToGlobal(pos));
+                    else context->mainWindow->setBubble(files.at(i), monthlyView->viewport()->mapToGlobal(pos));
                 } else {
-                    mainWindow->setBubble("");
+                    context->mainWindow->setBubble("");
                 }
             }
         }

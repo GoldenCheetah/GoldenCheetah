@@ -22,7 +22,7 @@
 #include <QList>
 #include <QStringList>
 
-class MainWindow;
+class Context;
 class RideMetric;
 class FieldDefinition;
 class SummaryMetrics;
@@ -59,7 +59,7 @@ class DataFilter : public QObject
     Q_OBJECT
 
     public:
-        DataFilter(QObject *parent, MainWindow *mainWindow);
+        DataFilter(QObject *parent, Context *context);
         QStringList &files() { return filenames; }
 
         // used by Leaf
@@ -80,7 +80,7 @@ class DataFilter : public QObject
         void results(QStringList);
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         Leaf *treeRoot;
         QStringList errors;
 

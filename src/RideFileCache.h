@@ -24,7 +24,7 @@
 #include <QVector>
 #include <QThread>
 
-class MainWindow;
+class Context;
 class RideFile;
 
 #include "GoldenCheetah.h"
@@ -120,11 +120,11 @@ class RideFileCache
         // the calling class.
         // to save time you can pass the ride file if you already have it open
         // and if you don't want the data and just want to check pass check=true
-        RideFileCache(MainWindow *main, QString filename, RideFile *ride =0, bool check = false);
+        RideFileCache(Context *context, QString filename, RideFile *ride =0, bool check = false);
 
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.
-        RideFileCache(MainWindow *main, QDate start, QDate end, bool filter = false, QStringList files = QStringList());
+        RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList());
 
         // not actually a copy constructor -- but we call it IN the constructor.
         RideFileCache(RideFileCache *other) { *this = *other; }
@@ -157,7 +157,7 @@ class RideFileCache
 
     private:
 
-        MainWindow *main;
+        Context *context;
         QString rideFileName; // filename of ride
         QString cacheFileName; // filename of cache file
         RideFile *ride;

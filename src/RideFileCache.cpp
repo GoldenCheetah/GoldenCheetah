@@ -18,6 +18,8 @@
 
 #include "RideFileCache.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Zones.h"
 #include "HrZones.h"
 
@@ -30,8 +32,8 @@
 static const int maxcache = 25; // lets max out at 25 caches
 
 // cache from ride
-RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passedride, bool check) :
-               main(main), rideFileName(fileName), ride(passedride)
+RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passedride, bool check) :
+               context(context), rideFileName(fileName), ride(passedride)
 {
     // resize all the arrays to zero
     wattsMeanMax.resize(0);
@@ -99,7 +101,7 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
         QStringList errors;
         QFile file(rideFileName);
 
-        ride = RideFileFactory::instance().openRideFile(main, file, errors);
+        ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
         if (ride) {
             ride->getWeight(); // before threads are created
@@ -301,11 +303,11 @@ RideFileCache::refreshCache()
         // invalidate any incore cache of aggregate
         // that contains this ride in its date range
         QDate date = ride->startTime().date();
-        for (int i=0; i<main->athlete->cpxCache.count();) {
-            if (date >= main->athlete->cpxCache.at(i)->start &&
-                date <= main->athlete->cpxCache.at(i)->end) {
-                delete main->athlete->cpxCache.at(i);
-                main->athlete->cpxCache.removeAt(i);
+        for (int i=0; i<context->athlete->cpxCache.count();) {
+            if (date >= context->athlete->cpxCache.at(i)->start &&
+                date <= context->athlete->cpxCache.at(i)->end) {
+                delete context->athlete->cpxCache.at(i);
+                context->athlete->cpxCache.removeAt(i);
             } else i++;
         }
 
@@ -814,13 +816,13 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (ride->isDataPresent(baseSeries) == false) return;
 
     // get zones that apply, if any
-    int zoneRange = main->athlete->zones() ? main->athlete->zones()->whichRange(ride->startTime().date()) : -1;
-    int hrZoneRange = main->athlete->hrZones() ? main->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
+    int zoneRange = context->athlete->zones() ? context->athlete->zones()->whichRange(ride->startTime().date()) : -1;
+    int hrZoneRange = context->athlete->hrZones() ? context->athlete->hrZones()->whichRange(ride->startTime().date()) : -1;
 
-    if (zoneRange != -1) CP=main->athlete->zones()->getCP(zoneRange);
+    if (zoneRange != -1) CP=context->athlete->zones()->getCP(zoneRange);
     else CP=0;
 
-    if (hrZoneRange != -1) LTHR=main->athlete->hrZones()->getLT(hrZoneRange);
+    if (hrZoneRange != -1) LTHR=context->athlete->hrZones()->getLT(hrZoneRange);
     else LTHR=0;
 
     // setup the array based upon the ride
@@ -843,11 +845,11 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
         // watts time in zone
         if (series == RideFile::watts && zoneRange != -1)
-            wattsTimeInZone[main->athlete->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
+            wattsTimeInZone[context->athlete->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
 
         // hr time in zone
         if (series == RideFile::hr && hrZoneRange != -1)
-            hrTimeInZone[main->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
+            hrTimeInZone[context->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
 
         int offset = lvalue - min;
         if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
@@ -889,13 +891,13 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 
 }
 
-RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filter, QStringList files)
-               : start(start), end(end), main(main), rideFileName(""), ride(0) 
+RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filter, QStringList files)
+               : start(start), end(end), context(context), rideFileName(""), ride(0) 
 {
 
     // Oh lets get from the cache if we can -- but not if filtered
-    if (!filter && !main->isfiltered) {
-        foreach(RideFileCache *p, main->athlete->cpxCache) {
+    if (!filter && !context->mainWindow->isfiltered) {
+        foreach(RideFileCache *p, context->athlete->cpxCache) {
             if (p->start == start && p->end == end) {
                 *this = *p;
                 return;
@@ -930,20 +932,20 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
 
     // set cursor busy whilst we aggregate -- bit of feedback
     // and less intrusive than a popup box
-    main->setCursor(Qt::WaitCursor);
+    context->mainWindow->setCursor(Qt::WaitCursor);
 
     // Iterate over the ride files (not the cpx files since they /might/ not
     // exist, or /might/ be out of date.
-    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(main->athlete->home)) {
+    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(context->athlete->home)) {
         QDate rideDate = dateFromFileName(rideFileName);
         if (((filter == true && files.contains(rideFileName)) || filter == false) &&
             rideDate >= start && rideDate <= end) {
 
             // skip globally filtered values
-            if (main->isfiltered && !main->filters.contains(rideFileName)) continue;
+            if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideFileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(main, main->athlete->home.absolutePath() + "/" + rideFileName);
+            RideFileCache rideCache(context, context->athlete->home.absolutePath() + "/" + rideFileName);
 
             // lets aggregate
             meanMaxAggregate(wattsMeanMaxDouble, rideCache.wattsMeanMaxDouble, wattsMeanMaxDate, rideDate);
@@ -974,15 +976,15 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
     }
 
     // set the cursor back to normal
-    main->setCursor(Qt::ArrowCursor);
+    context->mainWindow->setCursor(Qt::ArrowCursor);
 
     // lets add to the cache for others to re-use -- but not if filtered
-    if (!main->isfiltered && !filter) {
-        if (main->athlete->cpxCache.count() > maxcache) {
-            delete(main->athlete->cpxCache.at(0));
-            main->athlete->cpxCache.removeAt(0);
+    if (!context->mainWindow->isfiltered && !filter) {
+        if (context->athlete->cpxCache.count() > maxcache) {
+            delete(context->athlete->cpxCache.at(0));
+            context->athlete->cpxCache.removeAt(0);
         }
-        main->athlete->cpxCache.append(new RideFileCache(this));
+        context->athlete->cpxCache.append(new RideFileCache(this));
     }
 
 }

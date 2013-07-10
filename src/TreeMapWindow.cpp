@@ -20,7 +20,9 @@
 #include "LTMTool.h"
 #include "TreeMapPlot.h"
 #include "LTMSettings.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "SummaryMetrics.h"
 #include "Settings.h"
 #include "math.h"
@@ -34,14 +36,14 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
 
-TreeMapWindow::TreeMapWindow(MainWindow *parent) :
-            GcWindow(parent), main(parent), active(false), dirty(true), useCustom(false), useToToday(false)
+TreeMapWindow::TreeMapWindow(Context *context) :
+            GcWindow(context), context(context), active(false), dirty(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Treemap Window");
 
     // the plot
     mainLayout = new QVBoxLayout;
-    ltmPlot = new TreeMapPlot(this, main);
+    ltmPlot = new TreeMapPlot(this, context);
     mainLayout->addWidget(ltmPlot);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -53,7 +55,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent) :
     setControls(c);
 
     // read metadata.xml
-    QString filename = main->athlete->home.absolutePath()+"/metadata.xml";
+    QString filename = context->athlete->home.absolutePath()+"/metadata.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
     RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
@@ -70,7 +72,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent) :
 
     // setup the popup widget
     popup = new GcPane();
-    ltmPopup = new LTMPopup(main);
+    ltmPopup = new LTMPopup(context);
     QVBoxLayout *popupLayout = new QVBoxLayout();
     popupLayout->addWidget(ltmPopup);
     popup->setLayout(popupLayout);
@@ -133,11 +135,11 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent) :
 
     // config changes or ride file activities cause a redraw/refresh (but only if active)
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
-    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
-    connect(main, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh(void)));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh(void)));
 
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
 
     // user clicked on a cell in the plot
     connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
@@ -228,7 +230,7 @@ TreeMapWindow::refresh()
 
         // get the data
         results.clear(); // clear any old data
-        results = main->athlete->metricDB->getAllMetricsFor(QDateTime(settings.from, QTime(0,0,0)),
+        results = context->athlete->metricDB->getAllMetricsFor(QDateTime(settings.from, QTime(0,0,0)),
                                                    QDateTime(settings.to, QTime(0,0,0)));
 
         refreshPlot();

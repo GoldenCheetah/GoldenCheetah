@@ -17,7 +17,9 @@
  */
 
 #include "DataFilter.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "RideNavigator.h"
 #include <QDebug>
 
@@ -134,10 +136,10 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     }
 }
 
-DataFilter::DataFilter(QObject *parent, MainWindow *mainWindow) : QObject(parent), mainWindow(mainWindow), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
 {
     configUpdate();
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 QStringList DataFilter::parseFilter(QString query)
@@ -174,7 +176,7 @@ QStringList DataFilter::parseFilter(QString query)
         emit parseGood();
 
         // get all fields...
-        QList<SummaryMetrics> allRides = mainWindow->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
+        QList<SummaryMetrics> allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
 
         filenames.clear();
 
@@ -217,9 +219,9 @@ void DataFilter::configUpdate()
     }
 
     // now add the ride metadata fields -- should be the same generally
-    foreach(FieldDefinition field, mainWindow->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             QString underscored = field.name;
-            if (!mainWindow->specialFields.isMetric(underscored)) { 
+            if (!context->mainWindow->specialFields.isMetric(underscored)) { 
                 lookupMap.insert(underscored.replace(" ","_"), field.name);
                 lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
             }

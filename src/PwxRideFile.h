@@ -21,12 +21,12 @@
 #include "GoldenCheetah.h"
 
 #include "RideFile.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include <QDomDocument>
 
 struct PwxFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-    bool writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const;
+    bool writeRideFile(Context *, const RideFile *ride, QFile &file) const;
     virtual RideFile *PwxFromDomDoc(QDomDocument doc, QStringList &errors) const;
     bool hasWrite() const { return true; }
 };

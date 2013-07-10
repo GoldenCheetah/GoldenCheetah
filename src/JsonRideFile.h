@@ -32,7 +32,7 @@
 
 struct JsonFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-    bool writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const;
+    bool writeRideFile(Context *, const RideFile *ride, QFile &file) const;
     bool hasWrite() const { return true; }
 };
 

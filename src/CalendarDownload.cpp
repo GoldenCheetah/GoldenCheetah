@@ -17,12 +17,14 @@
  */
 
 #include "CalendarDownload.h"
+#include "MainWindow.h"
+#include "Athlete.h"
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
 #include <libical/ical.h>
 #endif
 
-CalendarDownload::CalendarDownload(MainWindow *main) : main(main)
+CalendarDownload::CalendarDownload(Context *context) : context(context)
 {
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
@@ -31,7 +33,7 @@ CalendarDownload::CalendarDownload(MainWindow *main) : main(main)
 bool
 CalendarDownload::download()
 {
-    QString request = appsettings->cvalue(main->athlete->cyclist, GC_WEBCAL_URL, "").toString();
+    QString request = appsettings->cvalue(context->athlete->cyclist, GC_WEBCAL_URL, "").toString();
     if (request == "") return false;
     else {
         // change webcal to http, since it is basically the same port
@@ -42,7 +44,7 @@ CalendarDownload::download()
     QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(request)));
 
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("Calendar Data Download"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("Calendar Data Download"), reply->errorString());
         return false;
     }
     return true;
@@ -55,7 +57,7 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
     QStringList errors;
 
 #ifdef GC_HAVE_ICAL
-    QString remoteCache = main->athlete->home.absolutePath()+"/remote.ics";
+    QString remoteCache = context->athlete->home.absolutePath()+"/remote.ics";
     QFile remoteCacheFile(remoteCache);
 
     if (fulltext != "") {
@@ -83,6 +85,6 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
         }
     }
 
-    if (fulltext != "") main->athlete->rideCalendar->refreshRemote(fulltext);
+    if (fulltext != "") context->athlete->rideCalendar->refreshRemote(fulltext);
 #endif
 }

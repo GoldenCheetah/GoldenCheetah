@@ -27,11 +27,12 @@
 #include <sstream>
 #include <string>
 #include "RideFile.h"
-#include "MainWindow.h"
+#include "IntervalItem.h"
+#include "Context.h"
 
 class QMouseEvent;
 class RideItem;
-class MainWindow;
+class Context;
 class QColor;
 class QVBoxLayout;
 class QTabWidget;
@@ -53,11 +54,11 @@ class WebBridge : public QObject
     Q_OBJECT;
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         GoogleMapControl *gm;
 
     public:
-        WebBridge(MainWindow *mainWindow, GoogleMapControl *gm) : mainWindow(mainWindow), gm(gm) {}
+        WebBridge(Context *context, GoogleMapControl *gm) : context(context), gm(gm) {}
 
     public slots:
         Q_INVOKABLE void call(int count);
@@ -85,7 +86,7 @@ class GoogleMapControl : public GcChartWindow
     G_OBJECT
 
     public:
-        GoogleMapControl(MainWindow *);
+        GoogleMapControl(Context *);
         ~GoogleMapControl();
         bool first;
 
@@ -96,10 +97,9 @@ class GoogleMapControl : public GcChartWindow
         void zoomInterval(IntervalItem*);
 
     private:
-        MainWindow *main;
+        Context *context;
         QVBoxLayout *layout;
         QWebView *view;
-        MainWindow *parent;
         WebBridge *webBridge;
         GoogleMapControl();  // default ctor
         int range;

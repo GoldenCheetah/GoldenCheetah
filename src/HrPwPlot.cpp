@@ -17,7 +17,7 @@
  */
 
 #include "HrPwPlot.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "HrPwWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
@@ -39,10 +39,10 @@
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
+HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
     QwtPlot(hrPwWindow),
     hrPwWindow(hrPwWindow),
-    mainWindow(mainWindow),
+    context(context),
     bg(NULL), delay(-1),
     minHr(50), minWatt(50), maxWatt(500)
 {

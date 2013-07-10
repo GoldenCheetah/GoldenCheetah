@@ -24,7 +24,7 @@ RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
 
 QHash<QString,RideMetricPtr>
-RideMetric::computeMetrics(const MainWindow *main, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
+RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
                            const QStringList &metrics)
 {
     int zoneRange = zones->whichRange(ride->startTime().date());
@@ -48,7 +48,7 @@ RideMetric::computeMetrics(const MainWindow *main, const RideFile *ride, const Z
         if (ready) {
             RideMetric *m = factory.newMetric(symbol);
             //if (!ride->dataPoints().isEmpty())
-                m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, main);
+                m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, context);
             if (ride->metricOverrides.contains(symbol))
                 m->override(ride->metricOverrides.value(symbol));
             done.insert(symbol, m);

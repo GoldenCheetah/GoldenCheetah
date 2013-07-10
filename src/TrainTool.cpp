@@ -18,6 +18,8 @@
 
 #include "TrainTool.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
@@ -54,7 +56,7 @@
 #include "TrainDB.h"
 #include "Library.h"
 
-TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
+TrainTool::TrainTool(Context *context, const QDir &home) : GcWindow(context), home(home), context(context)
 {
     setInstanceName("Train Controls");
 
@@ -273,7 +275,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
     connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
     connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
-    connect(main->context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
+    connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // not used but kept in case re-instated in the future
@@ -311,7 +313,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
 #endif
-    trainSplitter->prepare(main->athlete->cyclist, "train");
+    trainSplitter->prepare(context->athlete->cyclist, "train");
 
 #ifdef Q_OS_MAC
     // get rid of annoying focus rectangle for sidebar components
@@ -327,10 +329,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
-    connect(main->context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
+    connect(context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
 #endif
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(main->context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
@@ -338,7 +340,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
 
     // set home
-    main = parent;
+    //XXX ??? main = parent;
     ergFile = NULL;
     calibrating = false;
 
@@ -434,10 +436,10 @@ TrainTool::workoutPopup()
     }
 
     // connect menu to functions
-    connect(import, SIGNAL(triggered(void)), main, SLOT(importWorkout(void)));
-    connect(wizard, SIGNAL(triggered(void)), main, SLOT(showWorkoutWizard(void)));
-    connect(download, SIGNAL(triggered(void)), main, SLOT(downloadErgDB(void)));
-    connect(scan, SIGNAL(triggered(void)), main, SLOT(manageLibrary(void)));
+    connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
+    connect(wizard, SIGNAL(triggered(void)), context->mainWindow, SLOT(showWorkoutWizard(void)));
+    connect(download, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadErgDB(void)));
+    connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
 
     // execute the menu
     menu.exec(trainSplitter->mapToGlobal(QPoint(workoutItem->pos().x()+workoutItem->width()-20,
@@ -456,8 +458,8 @@ TrainTool::mediaPopup()
     menu.addAction(scan);
 
     // connect menu to functions
-    connect(import, SIGNAL(triggered(void)), main, SLOT(importWorkout(void)));
-    connect(scan, SIGNAL(triggered(void)), main, SLOT(manageLibrary(void)));
+    connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
+    connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
 
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
@@ -530,8 +532,8 @@ TrainTool::configChanged()
     workoutTree->setCurrentIndex(firstWorkout);
     // Athlete
     FTP=285; // default to 285 if zones are not set
-    int range = main->athlete->zones()->whichRange(QDate::currentDate());
-    if (range != -1) FTP = main->athlete->zones()->getCP(range);
+    int range = context->athlete->zones()->whichRange(QDate::currentDate());
+    if (range != -1) FTP = context->athlete->zones()->getCP(range);
 
 }
 
@@ -584,7 +586,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
     }
 
     if (filename == "") {
-        main->context->notifyErgFileSelected(NULL);
+        context->notifyErgFileSelected(NULL);
         return;
     }
 
@@ -592,21 +594,21 @@ TrainTool::workoutTreeWidgetSelectionChanged()
     int index = target.row();
     if (index == 0) {
         // ergo mode
-        main->context->notifyErgFileSelected(NULL);
+        context->notifyErgFileSelected(NULL);
         mode = ERG;
         setLabels();
         status &= ~RT_WORKOUT;
         //ergPlot->setVisible(false);
     } else if (index == 1) {
         // slope mode
-        main->context->notifyErgFileSelected(NULL);
+        context->notifyErgFileSelected(NULL);
         mode = CRS;
         setLabels();
         status &= ~RT_WORKOUT;
         //ergPlot->setVisible(false);
     } else {
         // workout mode
-        ergFile = new ErgFile(filename, mode, main);
+        ergFile = new ErgFile(filename, mode, context);
         if (ergFile->isValid()) {
 
             status |= RT_WORKOUT;
@@ -614,7 +616,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
             // success! we have a load file
             // setup the course profile in the
             // display!
-            main->context->notifyErgFileSelected(ergFile);
+            context->notifyErgFileSelected(ergFile);
             intensitySlider->setValue(100);
             lastAppliedIntensity = 100;
             setLabels();
@@ -623,7 +625,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
             // couldn't parse fall back to ERG mode
             delete ergFile;
             ergFile = NULL;
-            main->context->notifyErgFileSelected(NULL);
+            context->notifyErgFileSelected(NULL);
             mode = ERG;
             status &= ~RT_WORKOUT;
             setLabels();
@@ -684,7 +686,7 @@ TrainTool::deleteVideos()
 
         // remove any reference (from drag and drop)
         Library *l = Library::findLibrary("Media Library");
-        if (l) l->removeRef(main, filename);
+        if (l) l->removeRef(context, filename);
 
         // delete from DB
         trainDB->startLUW();
@@ -728,7 +730,7 @@ TrainTool::mediaTreeWidgetSelectionChanged()
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
     QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    main->context->notifyMediaSelected(filename);
+    context->notifyMediaSelected(filename);
 }
 
 /*--------------------------------------------------------------------------------
@@ -759,7 +761,7 @@ void TrainTool::Start()       // when start button is pressed
 #endif
 
         // tell the world
-        main->context->notifyUnPause();
+        context->notifyUnPause();
 
     } else if (status&RT_RUNNING) {
 
@@ -781,7 +783,7 @@ void TrainTool::Start()       // when start button is pressed
 #endif
 
         // tell the world
-        main->context->notifyPause();
+        context->notifyPause();
 
     } else {
 
@@ -791,7 +793,7 @@ void TrainTool::Start()       // when start button is pressed
         // if we have selected multiple devices lets
         // configure the series we collect from each one
         if (deviceTree->selectedItems().count() > 1) {
-            MultiDeviceDialog *multisetup = new MultiDeviceDialog(main, this);
+            MultiDeviceDialog *multisetup = new MultiDeviceDialog(context, this);
             if (multisetup->exec() == false) {
                 return;
             }
@@ -827,7 +829,7 @@ void TrainTool::Start()       // when start button is pressed
         foreach(int dev, devices()) Devices[dev].controller->start();
 
         // tell the world
-        main->context->notifyStart();
+        context->notifyStart();
 
         // we're away!
         status |=RT_RUNNING;
@@ -893,7 +895,7 @@ void TrainTool::Pause()        // pause capture to recalibrate
 #endif
 
         // tell the world
-        main->context->notifyUnPause();
+        context->notifyUnPause();
 
     } else {
 
@@ -912,7 +914,7 @@ void TrainTool::Pause()        // pause capture to recalibrate
 #endif
 
         // tell the world
-        main->context->notifyPause();
+        context->notifyPause();
     }
 }
 
@@ -956,7 +958,7 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
             // add to the view - using basename ONLY
             QString name;
             name = recordFile->fileName();
-            main->addRide(QFileInfo(name).fileName(), true);
+            context->mainWindow->addRide(QFileInfo(name).fileName(), true);
         }
     }
 
@@ -968,15 +970,15 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     // get back to normal after it may have been adusted by the user
     lastAppliedIntensity=100;
     intensitySlider->setValue(100);
-    if (main->context->currentErgFile()) main->context->currentErgFile()->reload();
-    main->context->notifySetNow(load_msecs);
+    if (context->currentErgFile()) context->currentErgFile()->reload();
+    context->notifySetNow(load_msecs);
 
     // reset the play button
     QIcon playIcon(":images/oxygen/play.png");
     play->setIcon(playIcon);
 
     // tell the world
-    main->context->notifyStop();
+    context->notifyStop();
 
     // Re-enable gui elements
     // reset counters etc
@@ -1109,7 +1111,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces
             double g = 9.81;     // g constant 9.81 m/s
-            double weight = appsettings->cvalue(main->athlete->cyclist, GC_WEIGHT, 0.0).toDouble();
+            double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, 0.0).toDouble();
             double m = weight ? weight + 8 : 83; // default to 75kg weight, plus 8kg bike
             double sl = slope / 100; // 10% = 0.1
             double ad = 1.226f; // default air density at sea level
@@ -1138,7 +1140,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 
 
             // go update the displays...
-            main->context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
+            context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
 
             // set now to current time when not using a workout
             // but limit to almost every second (account for
@@ -1150,7 +1152,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             long rmsecs = round((rtData.getMsecs() + 99) / 100) * 100;
             // Test for <= 100ms
             if (!(status&RT_WORKOUT) && ((rmsecs % 1000) <= 100)) {
-                main->context->notifySetNow(rtData.getMsecs());
+                context->notifySetNow(rtData.getMsecs());
             }
         }
     }
@@ -1167,7 +1169,7 @@ void TrainTool::newLap()
         hrcount   = 0;
         spdcount  = 0;
 
-        main->context->notifyNewLap();
+        context->notifyNewLap();
     }
 }
 
@@ -1238,7 +1240,7 @@ void TrainTool::loadUpdate()
 
         if(displayWorkoutLap != curLap)
         {
-            main->context->notifyNewLap();
+            context->notifyNewLap();
         }
         displayWorkoutLap = curLap;
 
@@ -1247,14 +1249,14 @@ void TrainTool::loadUpdate()
             Stop(DEVICE_OK);
         } else {
             foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
-            main->context->notifySetNow(load_msecs);
+            context->notifySetNow(load_msecs);
         }
     } else {
         slope = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
 
         if(displayWorkoutLap != curLap)
         {
-            main->context->notifyNewLap();
+            context->notifyNewLap();
         }
         displayWorkoutLap = curLap;
 
@@ -1263,7 +1265,7 @@ void TrainTool::loadUpdate()
             Stop(DEVICE_OK);
         } else {
             foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
-            main->context->notifySetNow(displayWorkoutDistance * 1000);
+            context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
 }
@@ -1282,7 +1284,7 @@ void TrainTool::Calibrate()
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
-        main->context->notifyUnPause(); // get video started again, amongst other things
+        context->notifyUnPause(); // get video started again, amongst other things
 
         // back to ergo/slope mode and restore load/gradient
         if (status&RT_MODE_ERGO) {
@@ -1320,7 +1322,7 @@ void TrainTool::Calibrate()
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
 
-        main->context->notifyPause(); // get video started again, amongst other things
+        context->notifyPause(); // get video started again, amongst other things
 
         // only do this for computrainers!
         foreach(int dev, devices())
@@ -1336,7 +1338,7 @@ void TrainTool::FFwd()
 
     if (status&RT_MODE_ERGO) {
         load_msecs += 10000; // jump forward 10 seconds
-        main->context->notifySeek(load_msecs);
+        context->notifySeek(load_msecs);
     }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
 
@@ -1349,7 +1351,7 @@ void TrainTool::Rewind()
     if (status&RT_MODE_ERGO) {
         load_msecs -=10000; // jump back 10 seconds
         if (load_msecs < 0) load_msecs = 0;
-        main->context->notifySeek(load_msecs);
+        context->notifySeek(load_msecs);
     } else {
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
@@ -1367,7 +1369,7 @@ void TrainTool::FFwdLap()
     if (status&RT_MODE_ERGO) {
         lapmarker = ergFile->nextLap(load_msecs);
         if (lapmarker != -1) load_msecs = lapmarker; // jump forward to lapmarker
-        main->context->notifySeek(load_msecs);
+        context->notifySeek(load_msecs);
     } else {
         lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
         if (lapmarker != -1) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
@@ -1379,7 +1381,7 @@ void TrainTool::Higher()
 {
     if ((status&RT_RUNNING) == 0) return;
 
-    if (main->context->currentErgFile()) {
+    if (context->currentErgFile()) {
         // adjust the workout IF
         intensitySlider->setValue(intensitySlider->value()+5);
 
@@ -1402,7 +1404,7 @@ void TrainTool::Lower()
 {
     if ((status&RT_RUNNING) == 0) return;
 
-    if (main->context->currentErgFile()) {
+    if (context->currentErgFile()) {
         // adjust the workout IF
         intensitySlider->setValue(intensitySlider->value()-5);
 
@@ -1423,19 +1425,19 @@ void TrainTool::Lower()
 
 void TrainTool::setLabels()
 {
-    if (main->context->currentErgFile()) {
+    if (context->currentErgFile()) {
 
         intensitySlider->show();
 
-        if (main->context->currentErgFile()->format == CRS) {
+        if (context->currentErgFile()->format == CRS) {
 
-            stress->setText(QString("Elevation %1").arg(main->context->currentErgFile()->ELE, 0, 'f', 0));
-            intensity->setText(QString("Grade %1 %").arg(main->context->currentErgFile()->GRADE, 0, 'f', 1));
+            stress->setText(QString("Elevation %1").arg(context->currentErgFile()->ELE, 0, 'f', 0));
+            intensity->setText(QString("Grade %1 %").arg(context->currentErgFile()->GRADE, 0, 'f', 1));
 
         } else {
 
-            stress->setText(QString("TSS %1").arg(main->context->currentErgFile()->TSS, 0, 'f', 0));
-            intensity->setText(QString("IF %1").arg(main->context->currentErgFile()->IF, 0, 'f', 3));
+            stress->setText(QString("TSS %1").arg(context->currentErgFile()->TSS, 0, 'f', 0));
+            intensity->setText(QString("IF %1").arg(context->currentErgFile()->IF, 0, 'f', 3));
         }
 
     } else {
@@ -1448,10 +1450,10 @@ void TrainTool::setLabels()
 
 void TrainTool::adjustIntensity()
 {
-    if (!main->context->currentErgFile()) return; // no workout selected
+    if (!context->currentErgFile()) return; // no workout selected
 
     // block signals temporarily
-    main->blockSignals(true);
+    context->mainWindow->blockSignals(true);
 
     // work through the ergFile from NOW
     // adjusting back from last intensity setting
@@ -1461,29 +1463,29 @@ void TrainTool::adjustIntensity()
     double to = double(intensitySlider->value()) / 100.00;
     lastAppliedIntensity = intensitySlider->value();
 
-    long starttime = main->context->getNow();
+    long starttime = context->getNow();
 
-    bool insertedNow = main->context->getNow() ? false : true; // don't add if at start
+    bool insertedNow = context->getNow() ? false : true; // don't add if at start
 
     // what about gradient courses?
     ErgFilePoint last;
-    for(int i = 0; i < main->context->currentErgFile()->Points.count(); i++) {
+    for(int i = 0; i < context->currentErgFile()->Points.count(); i++) {
 
-        if (main->context->currentErgFile()->Points.at(i).x >= starttime) {
+        if (context->currentErgFile()->Points.at(i).x >= starttime) {
 
             if (insertedNow == false) {
 
                 if (i) {
                     // add a point to adjust from
                     ErgFilePoint add;
-                    add.x = main->context->getNow();
+                    add.x = context->getNow();
                     add.val = last.val / from * to;
 
                     // recalibrate altitude if gradient changing
-                    if (main->context->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    if (context->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
                     else add.y = add.val;
 
-                    main->context->currentErgFile()->Points.insert(i, add);
+                    context->currentErgFile()->Points.insert(i, add);
 
                     last = add;
                     i++; // move on to next point (i.e. where we were!)
@@ -1492,32 +1494,32 @@ void TrainTool::adjustIntensity()
                 insertedNow = true;
             }
 
-            ErgFilePoint *p = &main->context->currentErgFile()->Points[i];
+            ErgFilePoint *p = &context->currentErgFile()->Points[i];
 
             // recalibrate altitude if in CRS mode
             p->val = p->val / from * to;
-            if (main->context->currentErgFile()->format == CRS) {
+            if (context->currentErgFile()->format == CRS) {
                 if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
             }
             else p->y = p->val;
         }
 
         // remember last
-        last = main->context->currentErgFile()->Points.at(i);
+        last = context->currentErgFile()->Points.at(i);
     }
 
     // recalculate metrics
-    main->context->currentErgFile()->calculateMetrics();
+    context->currentErgFile()->calculateMetrics();
     setLabels();
 
     // unblock signals now we are done
-    main->blockSignals(false);
+    context->mainWindow->blockSignals(false);
 
     // force replot
-    main->context->notifySetNow(main->context->getNow());
+    context->notifySetNow(context->getNow());
 }
 
-MultiDeviceDialog::MultiDeviceDialog(MainWindow *, TrainTool *traintool) : traintool(traintool)
+MultiDeviceDialog::MultiDeviceDialog(Context *, TrainTool *traintool) : traintool(traintool)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1609,7 +1611,7 @@ TrainTool::devicePopup()
     QMenu menu(deviceTree);
 
     QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
-    connect(addDevice, SIGNAL(triggered(void)), main, SLOT(addDevice()));
+    connect(addDevice, SIGNAL(triggered(void)), context->mainWindow, SLOT(addDevice()));
     menu.addAction(addDevice);
 
     if (deviceTree->selectedItems().size() == 1) {
@@ -1627,7 +1629,7 @@ TrainTool::deviceTreeMenuPopup(const QPoint &pos)
 {
     QMenu menu(deviceTree);
     QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
-    connect(addDevice, SIGNAL(triggered(void)), main, SLOT(addDevice()));
+    connect(addDevice, SIGNAL(triggered(void)), context->mainWindow, SLOT(addDevice()));
     menu.addAction(addDevice);
 
     if (deviceTree->selectedItems().size() == 1) {
@@ -1669,7 +1671,7 @@ TrainTool::deleteDevice()
     all.writeConfig(list);
 
     // tell everyone
-    main->context->notifyConfigChanged();
+    context->notifyConfigChanged();
 }
 
 // we have been told to select this video (usually because

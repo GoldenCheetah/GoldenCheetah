@@ -34,7 +34,7 @@ class QwtPlotGrid;
 class QwtPlotMarker;
 class RideItem;
 class Zones;
-class MainWindow;
+class Context;
 class LTMCanvasPicker;
 
 class penTooltip: public QwtPlotZoomer
@@ -81,7 +81,7 @@ class CpintPlot : public QwtPlot
 
     public:
 
-        CpintPlot(MainWindow *, QString path, const Zones *zones);
+        CpintPlot(Context *, QString path, const Zones *zones);
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
@@ -127,7 +127,7 @@ class CpintPlot : public QwtPlot
         const Zones *zones;
         int dateCP;
         RideFile::SeriesType series;
-        MainWindow *mainWindow;
+        Context *context;
 
         RideFileCache *current, *bests;
         LTMCanvasPicker *canvasPicker;

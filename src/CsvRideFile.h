@@ -24,7 +24,7 @@
 
 struct CsvFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-    bool writeRideFile(MainWindow *main, const RideFile *ride, QFile &file) const;
+    bool writeRideFile(Context *context, const RideFile *ride, QFile &file) const;
     bool hasWrite() const { return true; }
 };
 

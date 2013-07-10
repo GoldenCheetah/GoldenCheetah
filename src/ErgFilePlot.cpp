@@ -18,22 +18,24 @@
 
 
 #include "ErgFilePlot.h"
+#include "MainWindow.h"
+#include "Context.h"
 
 // Bridge between QwtPlot and ErgFile to avoid having to
 // create a separate array for the ergfile data, we plot
 // directly from the ErgFile points array
 double ErgFileData::x(size_t i) const { 
-    if (main->context->currentErgFile()) return main->context->currentErgFile()->Points.at(i).x;
+    if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).x;
     else return 0;
 }
 
 double ErgFileData::y(size_t i) const {
-    if (main->context->currentErgFile()) return main->context->currentErgFile()->Points.at(i).y;
+    if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).y;
     else return 0;
 }
 
 size_t ErgFileData::size() const {
-    if (main->context->currentErgFile()) return main->context->currentErgFile()->Points.count();
+    if (context->currentErgFile()) return context->currentErgFile()->Points.count();
     else return 0;
 }
 
@@ -44,10 +46,10 @@ QPointF ErgFileData::sample(size_t i) const
 
 QRectF ErgFileData::boundingRect() const
 {
-    if (main->context->currentErgFile()) {
+    if (context->currentErgFile()) {
         double minX, minY, maxX, maxY;
         minX=minY=maxX=maxY=0.0f;
-        foreach(ErgFilePoint x, main->context->currentErgFile()->Points) {
+        foreach(ErgFilePoint x, context->currentErgFile()->Points) {
             if (x.y > maxY) maxY = x.y;
             if (x.x > maxX) maxX = x.x;
             if (x.y < minY) minY = x.y;
@@ -61,10 +63,10 @@ QRectF ErgFileData::boundingRect() const
 
 
 // Now bar
-double NowData::x(size_t) const { return main->context->getNow(); }
+double NowData::x(size_t) const { return context->getNow(); }
 double NowData::y(size_t i) const {
     if (i) {
-        if (main->context->currentErgFile()) return main->context->currentErgFile()->maxY;
+        if (context->currentErgFile()) return context->currentErgFile()->maxY;
         else return 0;
     } else return 0;
 }
@@ -82,7 +84,7 @@ QPointF NowData::sample(size_t i) const
     return QRectF(0, 0, 0, 0);
 }*/
 
-ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
+ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
     setInstanceName("ErgFile Plot");
 
@@ -144,7 +146,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     enableAxis(yRight2, false);
 
     // data bridge to ergfile
-    lodData = new ErgFileData(main);
+    lodData = new ErgFileData(context);
     // Load Curve
     LodCurve = new QwtPlotCurve("Course Load");
     LodCurve->setData(lodData);
@@ -197,7 +199,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
 
     // Now data bridge
-    nowData = new NowData(main);
+    nowData = new NowData(context);
 
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
@@ -292,8 +294,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
         }
 
         // set the axis so we use all the screen estate
-        if (main->context->currentErgFile() && main->context->currentErgFile()->Points.count()) {
-            double maxX = (double)main->context->currentErgFile()->Points.last().x;
+        if (context->currentErgFile() && context->currentErgFile()->Points.count()) {
+            double maxX = (double)context->currentErgFile()->Points.last().x;
 
             if (bydist) {
 

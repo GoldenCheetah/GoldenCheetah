@@ -27,7 +27,7 @@
 #include "TPUpload.h"
 #include "MetricAggregator.h"
 
-class MainWindow;
+class Context;
 
 class TPDownloadDialog : public QDialog
 {
@@ -36,7 +36,7 @@ class TPDownloadDialog : public QDialog
 
 
     public:
-        TPDownloadDialog(MainWindow *main);
+        TPDownloadDialog(Context *context);
 	
     protected:  
         // cached state
@@ -60,7 +60,7 @@ class TPDownloadDialog : public QDialog
         void selectAllSyncChanged(int);
 
     private:
-        MainWindow *main;
+        Context *context;
         TPDownload *downloader;
         TPUpload *uploader;
         TPAthlete *athleter;

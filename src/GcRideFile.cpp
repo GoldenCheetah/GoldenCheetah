@@ -173,7 +173,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
     if (present->name) \
         sample.setAttribute(#name, QString("%1").arg(point->name, 0, 'g', 11));
 bool
-GcFileReader::writeRideFile(MainWindow *,const RideFile *ride, QFile &file) const
+GcFileReader::writeRideFile(Context *,const RideFile *ride, QFile &file) const
 {
     QDomDocument doc("GoldenCheetah");
     QDomElement root = doc.createElement("ride");

@@ -28,10 +28,11 @@
 #include <string>
 #include "RideFile.h"
 #include "MainWindow.h"
+#include "Context.h"
 
 class QMouseEvent;
 class RideItem;
-class MainWindow;
+class Context;
 class QColor;
 class QVBoxLayout;
 class QTabWidget;
@@ -42,11 +43,11 @@ class BWebBridge : public QObject
     Q_OBJECT;
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         BingMap *gm;
 
     public:
-        BWebBridge(MainWindow *mainWindow, BingMap *gm) : mainWindow(mainWindow), gm(gm) {}
+        BWebBridge(Context *context, BingMap *gm) : context(context), gm(gm) {}
 
     public slots:
         Q_INVOKABLE void call(int count);
@@ -74,7 +75,7 @@ class BingMap : public GcWindow
     G_OBJECT
 
     public:
-        BingMap(MainWindow *);
+        BingMap(Context *);
         virtual ~BingMap() {}
         bool first;
 
@@ -85,10 +86,9 @@ class BingMap : public GcWindow
         void zoomInterval(IntervalItem*);
 
     private:
-        MainWindow *main;
+        Context *context;
         QVBoxLayout *layout;
         QWebView *view;
-        MainWindow *parent;
         BWebBridge *webBridge;
         BingMap();  // default ctor
         int range;

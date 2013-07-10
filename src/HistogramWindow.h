@@ -20,17 +20,35 @@
 #ifndef _GC_HistogramWindow_h
 #define _GC_HistogramWindow_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "MetricAggregator.h"
+#include "SummaryMetrics.h"
+#include "ChartSettings.h"
+#include "ColorButton.h"
+#include "PowerHist.h"
+#include "RideFile.h"
+#include "RideFileCache.h"
+#include "RideItem.h"
+#include "Settings.h"
+#include <QtGui>
+#include <assert.h>
+
+#include "Zones.h"
+#include "HrZones.h"
 #include "SummaryMetrics.h"
 
 #include "Season.h"
 #include "SeasonParser.h"
+
 #ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
 #endif
 
 #include <QtGui>
 
-class MainWindow;
+class Context;
 class PowerHist;
 class RideItem;
 class RideFileCache;
@@ -65,7 +83,7 @@ class HistogramWindow : public GcChartWindow
 
     public:
 
-        HistogramWindow(MainWindow *mainWindow, bool rangemode = false);
+        HistogramWindow(Context *context, bool rangemode = false);
 
         // reveal
         bool hasReveal() { return true; }
@@ -86,7 +104,7 @@ class HistogramWindow : public GcChartWindow
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { if (rangemode) return (isfiltered || mainWindow->isfiltered);
+        bool isFiltered() const { if (rangemode) return (isfiltered || context->mainWindow->isfiltered);
                                   else return false; }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
@@ -163,7 +181,7 @@ class HistogramWindow : public GcChartWindow
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         PowerHist *powerHist;
 
         QSlider *binWidthSlider;        // seet Bin Width from a slider

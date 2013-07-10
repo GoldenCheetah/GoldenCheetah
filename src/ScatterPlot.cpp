@@ -18,8 +18,11 @@
 
 #include "ScatterPlot.h"
 #include "ScatterWindow.h"
-#include "IntervalItem.h"
 #include "MainWindow.h"
+#include "IntervalItem.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include "Zones.h"
 #include "Colors.h"
@@ -147,7 +150,7 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
     }
 }
 
-ScatterPlot::ScatterPlot(MainWindow *parent) : main(parent)
+ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
     setInstanceName("2D Plot");
     all = NULL;
@@ -165,7 +168,7 @@ ScatterPlot::ScatterPlot(MainWindow *parent) : main(parent)
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     configChanged(); // use latest colors etc
 }
 
@@ -200,8 +203,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-        double xv = x[points] = pointType(point, settings->x, main->athlete->useMetricUnits, cranklength);
-        double yv = y[points] = pointType(point, settings->y, main->athlete->useMetricUnits, cranklength);
+        double xv = x[points] = pointType(point, settings->x, context->athlete->useMetricUnits, cranklength);
+        double yv = y[points] = pointType(point, settings->y, context->athlete->useMetricUnits, cranklength);
 
         // skip zeroes?
         if (!(settings->ignore && (x[points] == 0 || y[points] == 0))) {
@@ -286,8 +289,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
     QVector<int> intervals;
     QMap<int,int> displaySequence;
 
-    for (int child=0; child<main->allIntervalItems()->childCount(); child++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(main->allIntervalItems()->child(child));
+    for (int child=0; child<context->mainWindow->allIntervalItems()->childCount(); child++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(child));
         if ((current != NULL) && current->isSelected()) {
             intervals.append(child);
             displaySequence.insert(current->displaySequence, intervals.count()-1);
@@ -312,7 +315,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 // which interval is it in?
                 for (int idx=0; idx<intervals.count(); idx++) {
 
-                    IntervalItem *current = dynamic_cast<IntervalItem *>(main->allIntervalItems()->child(intervals[idx]));
+                    IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(intervals[idx]));
 
                     if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
                         xvals[idx].append(x);
@@ -331,7 +334,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
             QPen pen;
             QColor intervalColor;
-            intervalColor.setHsv((255/main->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
+            intervalColor.setHsv((255/context->mainWindow->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
             pen.setColor(intervalColor);
             sym.setPen(pen);
 

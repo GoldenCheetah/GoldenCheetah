@@ -18,6 +18,7 @@
 
 #include "GoldenCheetah.h"
 #include "GcWindowRegistry.h"
+#include "Athlete.h"
 
 // all the windows we have defined
 #include "AerolabWindow.h"
@@ -48,6 +49,7 @@
 #include "SummaryWindow.h"
 #include "MetadataWindow.h"
 #include "TreeMapWindow.h"
+#include "RideWindow.h"
 #include "DialWindow.h"
 #include "RealtimePlotWindow.h"
 #include "SpinScanPlotWindow.h"
@@ -104,54 +106,54 @@ GcWindowRegistry::initialize()
 
 // instantiate a new window
 GcWindow *
-GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main)
+GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 {
     GcWindow *returning = NULL;
 
     switch(id) {
-    case GcWindowTypes::Aerolab: returning = new AerolabWindow(main); break;
-    case GcWindowTypes::AllPlot: returning = new AllPlotWindow(main); break;
-    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(main->athlete->home, main); break;
-    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(main->athlete->home, main, true); break;
+    case GcWindowTypes::Aerolab: returning = new AerolabWindow(context); break;
+    case GcWindowTypes::AllPlot: returning = new AllPlotWindow(context); break;
+    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(context->athlete->home, context); break;
+    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(context->athlete->home, context, true); break;
 #ifdef GC_HAVE_ICAL
-    case GcWindowTypes::Diary: returning = new DiaryWindow(main); break;
+    case GcWindowTypes::Diary: returning = new DiaryWindow(context); break;
 #else
     case GcWindowTypes::Diary: returning = new GcWindow(); break;
 #endif
-    case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(main); break;
-    case GcWindowTypes::Histogram: returning = new HistogramWindow(main); break;
-    case GcWindowTypes::Distribution: returning = new HistogramWindow(main, true); break;
-    case GcWindowTypes::LTM: returning = new LTMWindow(main); break;
+    case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
+    case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
+    case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
+    case GcWindowTypes::LTM: returning = new LTMWindow(context); break;
 #ifdef GC_HAVE_QWTPLOT3D
-    case GcWindowTypes::Model: returning = new ModelWindow(main, main->athlete->home); break;
+    case GcWindowTypes::Model: returning = new ModelWindow(context, context->athlete->home); break;
 #else
     case GcWindowTypes::Model: returning = new GcWindow(); break;
 #endif
-    case GcWindowTypes::PerformanceManager: returning = new PerformanceManagerWindow(main); break;
-    case GcWindowTypes::PfPv: returning = new PfPvWindow(main); break;
-    case GcWindowTypes::HrPw: returning = new HrPwWindow(main); break;
-    case GcWindowTypes::RideEditor: returning = new RideEditor(main); break;
-    case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(main, true); break;
-    case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(main, false); break;
-    case GcWindowTypes::Scatter: returning = new ScatterWindow(main, main->athlete->home); break;
-    case GcWindowTypes::Summary: returning = new SummaryWindow(main); break;
-    case GcWindowTypes::TreeMap: returning = new TreeMapWindow(main); break;
-    case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(main); break; // deprecated
+    case GcWindowTypes::PerformanceManager: returning = new PerformanceManagerWindow(context); break;
+    case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
+    case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
+    case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;
+    case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(context, true); break;
+    case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(context, false); break;
+    case GcWindowTypes::Scatter: returning = new ScatterWindow(context, context->athlete->home); break;
+    case GcWindowTypes::Summary: returning = new SummaryWindow(context); break;
+    case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
+    case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
 #if defined Q_OS_MAC || defined GC_HAVE_VLC // mac uses Quicktime / Win/Linux uses VLC
-    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(main, main->athlete->home); break;
+    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
 #else
     case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
 #endif
-    case GcWindowTypes::DialWindow: returning = new DialWindow(main); break;
-    case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
+    case GcWindowTypes::DialWindow: returning = new DialWindow(context); break;
+    case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(context); break;
     case GcWindowTypes::RealtimeControls: returning = new GcWindow(); break;
-    case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(main); break;
-    case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(main); break;
-    case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(main); break;
-    case GcWindowTypes::BingMap: returning = new BingMap(main); break;
-    case GcWindowTypes::MapWindow: returning = new MapWindow(main); break;
-    case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(main); break;
-    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(main); break;
+    case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(context); break;
+    case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(context); break;
+    case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(context); break;
+    case GcWindowTypes::BingMap: returning = new BingMap(context); break;
+    case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
+    case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
+    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(context); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

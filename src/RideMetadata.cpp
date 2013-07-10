@@ -20,6 +20,9 @@
 #include "SpecialFields.h"
 
 #include "MainWindow.h"
+#include "RideItem.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "RideSummaryWindow.h"
 #include "Settings.h"
 #include "Units.h"
@@ -33,8 +36,8 @@
 /*----------------------------------------------------------------------
  * Master widget for Metadata Entry "on" RideSummaryWindow
  *--------------------------------------------------------------------*/
-RideMetadata::RideMetadata(MainWindow *parent, bool singlecolumn) : 
-    QWidget(parent), singlecolumn(singlecolumn), main(parent)
+RideMetadata::RideMetadata(Context *context, bool singlecolumn) : 
+    QWidget(context->mainWindow), singlecolumn(singlecolumn), context(context)
 {
 
     _ride = _connected = NULL;
@@ -70,7 +73,7 @@ RideMetadata::RideMetadata(MainWindow *parent, bool singlecolumn) :
     configUpdate();
 
     // watch for config changes
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 
     // Extra tab is expensive to update so we only update if it
     // is visible. In this case we need to trigger refresh when the
@@ -113,7 +116,7 @@ RideMetadata::warnDateTime(QDateTime datetime)
     // now make a regexp for all know ride types
     foreach(QString suffix, RideFileFactory::instance().suffixes()) {
 
-        QString conflict = main->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
+        QString conflict = context->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
         if (QFile(conflict).exists() && QFileInfo(conflict).fileName() != rideItem()->fileName) {
             QMessageBox::warning(this, "Date/Time Entry", "An activity already exists with that date/time, if you do not change it then you will overwrite and lose existing data");
             return; // only warn on the first conflict!
@@ -209,7 +212,7 @@ RideMetadata::configUpdate()
     setFont(QFont());
 
     // read metadata.xml
-    QString filename = main->athlete->home.absolutePath()+"/metadata.xml";
+    QString filename = context->athlete->home.absolutePath()+"/metadata.xml";
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
     readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
@@ -408,13 +411,13 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     if (meta->sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
-        units = meta->sp.rideMetric(field.name)->units(meta->main->athlete->useMetricUnits);
+        units = meta->sp.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
     // we need to show what units we use for weight...
     if (field.name == "Weight" && field.type == FIELD_DOUBLE) {
-        units = meta->main->athlete->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
+        units = meta->context->athlete->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
     label = new QLabel(QString("%1%2").arg(meta->sp.displayName(field.name)).arg(units), this);
@@ -473,7 +476,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
             enabled = new QCheckBox(this);
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
-            units = meta->sp.rideMetric(field.name)->units(meta->main->athlete->useMetricUnits);
+            units = meta->sp.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
 
             if (units == "seconds") {
                 // we need to use a TimeEdit instead
@@ -631,7 +634,7 @@ FormField::editFinished()
         if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
-            if (!meta->main->athlete->useMetricUnits) {
+            if (!meta->context->athlete->useMetricUnits) {
                 double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
                 value -= meta->sp.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
@@ -648,7 +651,7 @@ FormField::editFinished()
 
             // we need to convert from display value to 
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->main->athlete->useMetricUnits == false) {
+            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -745,7 +748,7 @@ FormField::metadataChanged()
                     // does it need conversion from metric?
                     if (meta->sp.rideMetric(definition.name)->conversion() != 1.0) {
                         // do we want imperial?
-                        if (!meta->main->athlete->useMetricUnits) {
+                        if (!meta->context->athlete->useMetricUnits) {
                             double newvalue = value.toDouble() * meta->sp.rideMetric(definition.name)->conversion();
                             newvalue -= meta->sp.rideMetric(definition.name)->conversionSum();
                             value = QString("%1").arg(newvalue);
@@ -783,7 +786,7 @@ FormField::metadataChanged()
     case FIELD_DOUBLE : // double
         if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
         else {
-            if (definition.name == "Weight" && meta->main->athlete->useMetricUnits == false) {
+            if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
                 double lbs = value.toDouble() * LB_PER_KG;
                 value = QString("%1").arg(lbs);
             }

@@ -23,7 +23,7 @@
 #include <QtGui>
 
 class Aerolab;
-class MainWindow;
+class Context;
 class QCheckBox;
 class QwtPlotZoomer;
 class QwtPlotPicker;
@@ -38,7 +38,7 @@ class AerolabWindow : public GcWindow {
 
 
   public:
-  AerolabWindow(MainWindow *mainWindow);
+  AerolabWindow(Context *context);
   void setData(RideItem *ride);
   double getCanvasTop() const;
   double getCanvasBottom() const;
@@ -71,7 +71,7 @@ class AerolabWindow : public GcWindow {
   protected slots:
 
   protected:
-  MainWindow  *mainWindow;
+  Context *context;
   Aerolab *aerolab;
   QwtPlotZoomer *allZoomer;
 

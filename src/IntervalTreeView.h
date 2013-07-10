@@ -22,17 +22,17 @@
 
 #include <QtGui>
 
-class MainWindow;
+class Context;
 
 class IntervalTreeView : public QTreeWidget
 {
     Q_OBJECT;
 
     public:
-        IntervalTreeView(MainWindow *main);
+        IntervalTreeView(Context *context);
 
     protected:
-        MainWindow *mainWindow;
+        Context *context;
 
         void dropEvent(QDropEvent* event);
 

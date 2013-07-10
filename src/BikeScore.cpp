@@ -54,7 +54,7 @@ class XPower : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
@@ -116,7 +116,7 @@ class VariabilityIndex : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("average_power"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
@@ -153,7 +153,7 @@ class RelativeIntensity : public RideMetric {
     void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
         if (zones && zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
@@ -201,7 +201,7 @@ class BikeScore : public RideMetric {
     void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 	    if (!zones || zoneRange < 0)
 	        return;
 
@@ -244,7 +244,7 @@ class ResponseIndex : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("average_hr"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));

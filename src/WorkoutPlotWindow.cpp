@@ -18,9 +18,10 @@
 
 
 #include "WorkoutPlotWindow.h"
+#include "Context.h"
 
-WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow)
+WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
+    GcWindow(context), context(context)
 {
     setContentsMargins(0,0,0,0);
     setInstanceName("RT Plot");
@@ -30,13 +31,13 @@ WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(2,2,2,2);
-    ergPlot = new ErgFilePlot(mainWindow);
+    ergPlot = new ErgFilePlot(context);
     layout->addWidget(ergPlot);
 
-    connect(mainWindow->context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
-    connect(mainWindow->context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
-    connect(mainWindow->context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
-    connect(mainWindow->context, SIGNAL(start()), ergPlot, SLOT(start()));
+    connect(context, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
+    connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
+    connect(context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
+    connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
 }
 
 void

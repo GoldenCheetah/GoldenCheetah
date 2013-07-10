@@ -18,6 +18,7 @@
  */
 
 #include "RideFile.h"
+#include "Athlete.h"
 #include "DataProcessor.h"
 #include "RideEditor.h"
 #include "RideMetadata.h"
@@ -97,9 +98,9 @@ RideFile::seriesName(SeriesType series)
 }
 
 QString
-RideFile::unitName(SeriesType series, MainWindow *main)
+RideFile::unitName(SeriesType series, Context *context)
 {
-    bool useMetricUnits = main->athlete->useMetricUnits;
+    bool useMetricUnits = context->athlete->useMetricUnits;
 
     switch (series) {
     case RideFile::secs: return QString(tr("seconds"));
@@ -264,17 +265,17 @@ RideFileFactory::rideFileRegExp() const
 }
 
 bool
-RideFileFactory::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file, QString format) const
+RideFileFactory::writeRideFile(Context *context, const RideFile *ride, QFile &file, QString format) const
 {
     // get the ride file writer for this format
     RideFileReader *reader = readFuncs_.value(format.toLower());
 
     // write away
     if (!reader) return false;
-    else return reader->writeRideFile(main, ride, file);
+    else return reader->writeRideFile(context, ride, file);
 }
 
-RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
+RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                                            QStringList &errors, QList<RideFile*> *rideList) const
 {
     QString suffix = file.fileName();
@@ -289,7 +290,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
 
     // NULL returned to indicate openRide failed
     if (result) {
-        result->mainwindow = main;
+        result->context = context;
         if (result->intervals().empty()) result->fillInIntervals();
 
 
@@ -320,7 +321,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
 
         // Construct the summary text used on the calendar
         QString calendarText;
-        foreach (FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
+        foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (field.diary == true && result->getTag(field.name, "") != "") {
                 calendarText += QString("%1\n")
                         .arg(result->getTag(field.name, ""));
@@ -820,7 +821,7 @@ RideFile::getWeight()
     }
 
     // withings?
-    QList<SummaryMetrics> measures = mainwindow->athlete->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
+    QList<SummaryMetrics> measures = context->athlete->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
     int i = measures.count()-1;
     if (i) {
         while (i>=0) {
@@ -833,7 +834,7 @@ RideFile::getWeight()
 
 
     // global options
-    weight_ = appsettings->cvalue(mainwindow->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+    weight_ = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
 
     // if set to zero in global options then override it.
     // it must not be zero!!!

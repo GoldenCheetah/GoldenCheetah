@@ -18,6 +18,8 @@
 
 #include "PfPvWindow.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "PfPvPlot.h"
 #include "RideItem.h"
 #include "Settings.h"
@@ -63,8 +65,8 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
     return QwtText( text );
 }
 
-PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
-    GcChartWindow(mainWindow), mainWindow(mainWindow), current(NULL)
+PfPvWindow::PfPvWindow(Context *context) :
+    GcChartWindow(context), context(context), current(NULL)
 {
     setInstanceName("Pf/Pv Window");
 
@@ -108,7 +110,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
 
     // the plot
     QVBoxLayout *vlayout = new QVBoxLayout;
-    pfPvPlot = new PfPvPlot(mainWindow);
+    pfPvPlot = new PfPvPlot(context);
     vlayout->addWidget(pfPvPlot);
 
     setChartLayout(vlayout);
@@ -190,10 +192,10 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
-    connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(mainWindow->context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
+    connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
 }
 
 void

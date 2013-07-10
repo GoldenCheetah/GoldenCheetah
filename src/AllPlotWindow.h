@@ -24,7 +24,7 @@
 #include <QObject> // for Q_PROPERTY
 
 class AllPlot;
-class MainWindow;
+class Context;
 class QwtPlotPanner;
 class QwtPlotZoomer;
 class QwtPlotPicker;
@@ -65,7 +65,7 @@ class AllPlotWindow : public GcChartWindow
 
     public:
 
-        AllPlotWindow(MainWindow *mainWindow);
+        AllPlotWindow(Context *context);
         void setData(RideItem *ride);
 
         bool hasReveal() { return true; }
@@ -136,14 +136,14 @@ class AllPlotWindow : public GcChartWindow
 
         // whilst we refactor, lets make friend
         friend class IntervalPlotData;
-        friend class MainWindow;
+        friend class Context;
 
         void setAllPlotWidgets(RideItem *rideItem);
 
         // cached state
         RideItem *current;
         int selection;
-        MainWindow *mainWindow;
+        Context *context;
 
         // All the plot widgets
         QVBoxLayout *allPlotLayout;

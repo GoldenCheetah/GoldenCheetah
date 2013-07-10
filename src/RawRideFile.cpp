@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Context.h"
 #include "RawRideFile.h"
 #include "PowerTapUtil.h"
 #include "Units.h"

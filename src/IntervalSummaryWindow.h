@@ -21,14 +21,14 @@
 
 #include <QtGui>
 
-class MainWindow;
+class Context;
 class IntervalItem;
 
 class IntervalSummaryWindow : public QTextEdit {
 	Q_OBJECT;
 
 public:
-	IntervalSummaryWindow(MainWindow *mainWindow);
+	IntervalSummaryWindow(Context *context);
 	virtual ~IntervalSummaryWindow();
 
 public slots:
@@ -38,7 +38,7 @@ public slots:
 protected:
     void calcInterval(IntervalItem* interval, QString& html);
 
-    MainWindow *mainWindow;
+    Context *context;
 };
 
 #endif /* INTERVALSUMMARYWINDOW_H_ */

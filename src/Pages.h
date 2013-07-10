@@ -55,7 +55,7 @@ class GeneralPage : public QWidget
     G_OBJECT
 
     public:
-        GeneralPage(MainWindow *main);
+        GeneralPage(Context *context);
         void saveClicked();
 
 
@@ -63,7 +63,7 @@ class GeneralPage : public QWidget
         void browseWorkoutDir();
 
     private:
-        MainWindow *main;
+        Context *context;
 
         QComboBox *langCombo;
         QComboBox *unitCombo;
@@ -96,7 +96,7 @@ class RiderPage : public QWidget
 
 
     public:
-        RiderPage(QWidget *parent, MainWindow *mainWindow);
+        RiderPage(QWidget *parent, Context *context);
         void saveClicked();
 
     public slots:
@@ -104,7 +104,7 @@ class RiderPage : public QWidget
         void unitChanged(int currentIndex);
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
 
         QLineEdit *nickname;
         QDateEdit *dob;
@@ -124,13 +124,13 @@ class CredentialsPage : public QScrollArea
 
 
     public:
-        CredentialsPage(QWidget *parent, MainWindow *mainWindow);
+        CredentialsPage(QWidget *parent, Context *context);
         void saveClicked();
 
     public slots:
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
 
         QLineEdit *tpURL; // url for training peaks.com ... http://www.trainingpeaks.com
         QLineEdit *tpUser;
@@ -200,7 +200,7 @@ class DevicePage : public QWidget
     G_OBJECT
 
     public:
-        DevicePage(QWidget *, MainWindow *);
+        DevicePage(QWidget *, Context *);
         void saveClicked();
 
         QTableView *deviceList;
@@ -210,7 +210,7 @@ class DevicePage : public QWidget
         void devdelClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
 
         QList<DeviceType> devices;
 
@@ -418,7 +418,7 @@ class ProcessorPage : public QWidget
 
     public:
 
-        ProcessorPage(MainWindow *main);
+        ProcessorPage(Context *context);
         void saveClicked();
 
     public slots:
@@ -428,7 +428,7 @@ class ProcessorPage : public QWidget
 
     protected:
 
-        MainWindow *main;
+        Context *context;
         QMap<QString, DataProcessor*> processors;
 
         QTreeWidget *processorTree;
@@ -445,7 +445,7 @@ class MetadataPage : public QWidget
 
     public:
 
-        MetadataPage(MainWindow *);
+        MetadataPage(Context *);
         void saveClicked();
 
     public slots:
@@ -453,7 +453,7 @@ class MetadataPage : public QWidget
 
     protected:
 
-        MainWindow *main;
+        Context *context;
         bool changed;
 
         QTabWidget *tabs;
@@ -528,7 +528,7 @@ class ZonePage : public QWidget
 
     public:
 
-        ZonePage(MainWindow *);
+        ZonePage(Context *);
         void saveClicked();
 
         //ZoneScheme scheme;
@@ -543,7 +543,7 @@ class ZonePage : public QWidget
 
     protected:
 
-        MainWindow *main;
+        Context *context;
         bool changed;
 
         QTabWidget *tabs;
@@ -615,7 +615,7 @@ class HrZonePage : public QWidget
 
 public:
 
-    HrZonePage(MainWindow *);
+    HrZonePage(Context *);
     void saveClicked();
 
     //ZoneScheme scheme;
@@ -630,7 +630,7 @@ public:
 
 protected:
 
-    MainWindow *main;
+    Context *context;
     bool changed;
 
     QTabWidget *tabs;
@@ -645,7 +645,7 @@ class SeasonsPage : public QWidget
 
 
     public:
-        SeasonsPage(QWidget *parent, MainWindow *main);
+        SeasonsPage(QWidget *parent, Context *context);
         void getDefinitions(QList<Season>&);
 
     public slots:
@@ -660,7 +660,7 @@ class SeasonsPage : public QWidget
     private:
 
         QTreeWidget *seasons;
-        MainWindow *mainWindow;
+        Context *context;
 
         QLineEdit *nameEdit;
         QComboBox *typeEdit;
@@ -682,7 +682,7 @@ class MeasuresPage : public QWidget
 
 
     public:
-        MeasuresPage(MainWindow *main);
+        MeasuresPage(Context *context);
         void getDefinitions(QList<FieldDefinition>&);
 
     public slots:
@@ -695,7 +695,7 @@ class MeasuresPage : public QWidget
 
     private:
 
-        MainWindow *main;
+        Context *context;
         QTreeWidget *fields;
 #ifndef Q_OS_MAC
         QToolButton *upButton, *downButton;

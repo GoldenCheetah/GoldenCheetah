@@ -16,7 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
+#include "MainWindow.h"
+#include "Athlete.h"
+#include "Context.h"
 #include "HomeWindow.h"
 #include "LTMTool.h"
 #include "LTMSettings.h"
@@ -27,8 +29,8 @@
 static const int tileMargin = 20;
 static const int tileSpacing = 10;
 
-HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowtitle */) :
-    GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
+HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */) :
+    GcWindow(context), context(context), name(name), active(false),
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
     setInstanceName("Home Window");
@@ -157,7 +159,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
     connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
@@ -188,7 +190,7 @@ HomeWindow::addChartFromMenu(QAction*action)
         }
     }
 
-    if (id != GcWindowTypes::None) appendChart(id); // called from MainWindow to inset chart
+    if (id != GcWindowTypes::None) appendChart(id); // called from Context to inset chart
 }
 
 void
@@ -425,7 +427,7 @@ void
 HomeWindow::appendChart(GcWinID id)
 {
     // GcWindowDialog is delete on close, so no need to delete
-    GcWindowDialog *f = new GcWindowDialog(id, mainWindow);
+    GcWindowDialog *f = new GcWindowDialog(id, context);
     GcWindow *newone = f->exec();
 
     // returns null if cancelled or closed
@@ -474,8 +476,8 @@ HomeWindow::dropEvent(QDropEvent *event)
 void
 HomeWindow::showControls()
 {
-    mainWindow->chartSettings->adjustSize();
-    mainWindow->chartSettings->show();
+    context->mainWindow->chartSettings->adjustSize();
+    context->mainWindow->chartSettings->show();
 }
 
 void
@@ -503,7 +505,7 @@ HomeWindow::addChart(GcWindow* newone)
         // watch for enter events!
         newone->installEventFilter(this);
 
-        RideItem *notconst = (RideItem*)mainWindow->context->currentRideItem();
+        RideItem *notconst = (RideItem*)context->currentRideItem();
         newone->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
         newone->setProperty("dateRange", property("dateRange"));
 
@@ -589,7 +591,7 @@ HomeWindow::removeChart(int num, bool confirm)
 
     // better let the user confirm since this
     // is undoable etc - code swiped from delete
-    // ride in MainWindow, seems to work ok ;)
+    // ride in Context, seems to work ok ;)
     if(confirm == true)
     {
         QMessageBox msgBox;
@@ -648,9 +650,9 @@ HomeWindow::resetLayout()
     }
     restoreState(true);
     for(int i = 0; i < charts.count(); i++) {
-        RideItem *notconst = (RideItem*)mainWindow->context->currentRideItem();
+        RideItem *notconst = (RideItem*)context->currentRideItem();
         charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        DateRange dr = mainWindow->context->currentDateRange();
+        DateRange dr = context->currentDateRange();
         charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
         if (currentStyle != 0) charts[i]->show();
         
@@ -1009,7 +1011,7 @@ HomeWindow::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindow(mainWindow), type(type)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context *context) : context(context), type(type)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
@@ -1027,7 +1029,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     title = new QLineEdit(this);
     chartLayout->addWidget(title);
 
-    win = GcWindowRegistry::newGcWindow(type, mainWindow);
+    win = GcWindowRegistry::newGcWindow(type, context);
     chartLayout->addWidget(win);
     //win->setFrameStyle(QFrame::Box);
 
@@ -1040,9 +1042,9 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
         layout->setStretch(1, 50);
     }
 
-    RideItem *notconst = (RideItem*)mainWindow->context->currentRideItem();
+    RideItem *notconst = (RideItem*)context->currentRideItem();
     win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-    DateRange dr = mainWindow->context->currentDateRange();
+    DateRange dr = context->currentDateRange();
     win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 
 
@@ -1135,7 +1137,7 @@ HomeWindow::saveState()
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
     if (charts.count() == 0) return; // don't save empty, use default instead
 
-    QString filename = mainWindow->athlete->home.absolutePath() + "/" + name + "-layout.xml";
+    QString filename = context->athlete->home.absolutePath() + "/" + name + "-layout.xml";
     QFile file(filename);
     file.open(QFile::WriteOnly);
     file.resize(0);
@@ -1187,7 +1189,7 @@ void
 HomeWindow::restoreState(bool useDefault)
 {
     // restore window state
-    QString filename = mainWindow->athlete->home.absolutePath() + "/" + name + "-layout.xml";
+    QString filename = context->athlete->home.absolutePath() + "/" + name + "-layout.xml";
     QFileInfo finfo(filename);
 
     if (useDefault) QFile::remove(filename);
@@ -1201,7 +1203,7 @@ HomeWindow::restoreState(bool useDefault)
     // setup the handler
     QXmlInputSource source(&file);
     QXmlSimpleReader xmlReader;
-    ViewParser handler(mainWindow);
+    ViewParser handler(context);
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
 
@@ -1254,7 +1256,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         // new chart
         type = static_cast<GcWinID>(typeStr.toInt());
-        chart = GcWindowRegistry::newGcWindow(type, mainWindow);
+        chart = GcWindowRegistry::newGcWindow(type, context);
         chart->hide();
         chart->setProperty("title", QVariant(title));
         chart->setProperty("instanceName", QVariant(name));

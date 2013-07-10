@@ -16,6 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Athlete.h"
+#include "Context.h"
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
@@ -23,7 +25,7 @@
 #include <QtGui>
 #include <QString>
 
-RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent), active(false), _groupBy(-1)
+RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(context), active(false), _groupBy(-1)
 {
     // get column headings
     // default column layouts etc
@@ -42,7 +44,7 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
-    sqlModel = new QSqlTableModel(this, main->athlete->metricDB->db()->connection());
+    sqlModel = new QSqlTableModel(this, context->athlete->metricDB->db()->connection());
     sqlModel->setTable("metrics");
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sqlModel->select();
@@ -60,7 +62,7 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
 
 #ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
-        searchFilterBox = new SearchFilterBox(this, main, false);
+        searchFilterBox = new SearchFilterBox(this, context, false);
         mainLayout->addWidget(searchFilterBox);
     }
 #endif
@@ -94,14 +96,14 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     resetView();
 
     // refresh when database is updated
-    connect(main->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
+    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
     // refresh when rides added/removed
-    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(main->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(context->mainWindow->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
     // selection of a ride by double clicking it, we need to update the ride list
     connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(selectRide(QModelIndex)));
     connect(tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(cursorRide()));
@@ -194,7 +196,7 @@ RideNavigator::resetView()
 
     // add metadata fields...
     SpecialFields sp; // all the special fields are in here...
-    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
@@ -433,7 +435,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
     // so we ignore those
     if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint &&
         e->type() != QEvent::WinIdChange && e->type() != QEvent::Destroy) {
-        main->setBubble("");
+        context->mainWindow->setBubble("");
     }
 
     // not for the table?
@@ -514,7 +516,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
 
             // off view port!
             if (local.y() <= 0 || local.x() <= 0) {
-                main->setBubble("");
+                context->mainWindow->setBubble("");
                 return false;
             }
 
@@ -524,7 +526,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
                 e->accept();
                 QPoint p = local;
                 p.setX(width()-20);
-                main->setBubble(hoverFileName, tableView->viewport()->mapToGlobal(p));
+                context->mainWindow->setBubble(hoverFileName, tableView->viewport()->mapToGlobal(p));
             }
         }
         break;
@@ -795,7 +797,7 @@ RideNavigator::selectRide(const QModelIndex &index)
     QModelIndex fileIndex = tableView->model()->index(index.row(), 2, index.parent()); // column 2 for filename ?
 
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
-    main->selectRideFile(filename);
+    context->mainWindow->selectRideFile(filename);
 }
 
 // user cursor moved to ride
@@ -825,8 +827,8 @@ RideNavigator::rideTreeSelectionChanged()
     else active = true;
 
     QTreeWidgetItem *which;
-    if (main->rideTreeWidget()->selectedItems().count())
-        which = main->rideTreeWidget()->selectedItems().first();
+    if (context->mainWindow->rideTreeWidget()->selectedItems().count())
+        which = context->mainWindow->rideTreeWidget()->selectedItems().first();
     else // no rides slected
         which = NULL;
 
@@ -919,8 +921,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         if (metricValue) {
             // metric / imperial converstion
-            metricValue *= (rideNavigator->main->athlete->useMetricUnits) ? 1 : m->conversion();
-            metricValue += (rideNavigator->main->athlete->useMetricUnits) ? 0 : m->conversionSum();
+            metricValue *= (rideNavigator->context->athlete->useMetricUnits) ? 1 : m->conversion();
+            metricValue += (rideNavigator->context->athlete->useMetricUnits) ? 0 : m->conversionSum();
 
             // format with the right precision
             if (m->units(true) == "seconds" || m->units(true) == tr("seconds")) {
@@ -1083,5 +1085,5 @@ ColumnChooser::buttonClicked(QString name)
 void
 RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 {
-   main->showTreeContextMenuPopup(mapToGlobal(pos));
+   context->mainWindow->showTreeContextMenuPopup(mapToGlobal(pos));
 }

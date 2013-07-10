@@ -22,7 +22,7 @@
 
 #include <QtGui>
 
-class MainWindow;
+class Context;
 class RideFile;
 
 class AddIntervalDialog : public QDialog
@@ -40,7 +40,7 @@ class AddIntervalDialog : public QDialog
                 start(start), stop(stop), avg(avg) {}
         };
 
-        AddIntervalDialog(MainWindow *mainWindow);
+        AddIntervalDialog(Context *context);
 
         static void findPeakPowerStandard(const RideFile *ride, QList<AddedInterval> &results);
 
@@ -64,7 +64,7 @@ class AddIntervalDialog : public QDialog
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         QWidget *intervalMethodWidget, *intervalPeakPowerWidget, *intervalTypeWidget, *intervalTimeWidget, *intervalDistanceWidget, *intervalCountWidget;
 
         QHBoxLayout *intervalPeakPowerTypeLayout;

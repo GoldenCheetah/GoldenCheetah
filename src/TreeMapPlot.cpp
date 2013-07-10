@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Context.h"
 #include "TreeMapPlot.h"
 #include "LTMTool.h"
 #include "TreeMapWindow.h"
@@ -36,8 +37,8 @@ bool TreeMapLessThan(const TreeMap *a, const TreeMap *b) {
     return (a->value) > (b->value);
 }
 
-TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main)
-            : QWidget (parent), parent(parent), main(main)
+TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, Context *context)
+            : QWidget (parent), parent(parent), context(context)
 {
     setInstanceName("TreeMap Plot");
 
@@ -51,7 +52,7 @@ TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main)
     setContentsMargins(0,0,0,0);
 
     configUpdate(); // set basic colors
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 TreeMapPlot::~TreeMapPlot()
@@ -69,7 +70,7 @@ TreeMapPlot::setData(TMSettings *settings)
     foreach (SummaryMetrics rideMetrics, *(settings->data)) {
 
         // don't plot if filtered
-        if (main->isfiltered && !main->filters.contains(rideMetrics.getFileName())) continue;
+        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
 
         double value = rideMetrics.getForSymbol(settings->symbol);
         QString text1 = rideMetrics.getText(settings->field1, "(unknown)");
