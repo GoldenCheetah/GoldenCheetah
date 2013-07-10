@@ -17,7 +17,8 @@
  */
 
 #include "AllPlot.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "AllPlotWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
@@ -44,8 +45,8 @@
 class IntervalPlotData : public QwtSeriesData<QPointF>
 {
     public:
-    IntervalPlotData(AllPlot *allPlot, MainWindow *mainWindow) :
-        allPlot(allPlot), mainWindow(mainWindow) {}
+    IntervalPlotData(AllPlot *allPlot, Context *context) :
+        allPlot(allPlot), context(context) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -54,7 +55,7 @@ class IntervalPlotData : public QwtSeriesData<QPointF>
     IntervalItem *intervalNum(int n) const;
     int intervalCount() const;
     AllPlot *allPlot;
-    MainWindow *mainWindow;
+    Context *context;
 
     virtual QPointF sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -223,7 +224,7 @@ class TimeScaleDraw: public QwtScaleDraw
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
+AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     QwtPlot(parent),
     rideItem(NULL),
     shade_zones(true),
@@ -237,7 +238,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     showTorque(true),
     showBalance(true),
     bydist(false),
-    mainWindow(mainWindow),
+    context(context),
     parent(parent)
 {
     setInstanceName("AllPlot");
@@ -276,7 +277,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     altCurve->setYAxis(yRight2);
 
     tempCurve = new QwtPlotCurve(tr("Temperature"));
-    if (mainWindow->athlete->useMetricUnits)
+    if (context->athlete->useMetricUnits)
         tempCurve->setYAxis(yRight); // with speed
     else
         tempCurve->setYAxis(yLeft2); // with cadence
@@ -295,7 +296,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
 
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
-    intervalHighlighterCurve->setData(new IntervalPlotData(this, mainWindow));
+    intervalHighlighterCurve->setData(new IntervalPlotData(this, context));
     intervalHighlighterCurve->attach(this);
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
@@ -725,13 +726,13 @@ AllPlot::recalc()
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             smoothWatts.append(dp->watts);
             smoothHr.append(dp->hr);
-            smoothSpeed.append(mainWindow->athlete->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
+            smoothSpeed.append(context->athlete->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
             smoothCad.append(dp->cad);
             smoothTime.append(dp->secs/60);
-            smoothDistance.append(mainWindow->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
-            smoothAltitude.append(mainWindow->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
-            smoothTemp.append(mainWindow->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
-            smoothWind.append(mainWindow->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
+            smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
+            smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
+            smoothTemp.append(context->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
+            smoothWind.append(context->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             smoothTorque.append(dp->nm);
 
             if (dp->lrbalance == 0) {
@@ -747,8 +748,8 @@ AllPlot::recalc()
                 smoothBalanceR.append(dp->lrbalance);
             }
 
-            double head = dp->headwind * (mainWindow->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
-            double speed = dp->kph * (mainWindow->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
+            double head = dp->headwind * (context->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
+            double speed = dp->kph * (context->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
             smoothRelSpeed.append(QwtIntervalSample( bydist ? smoothDistance.last() : smoothTime.last(), QwtInterval(qMin(head, speed) , qMax(head, speed) ) ));
 
         }
@@ -781,7 +782,7 @@ AllPlot::recalc()
 
     } if (!tempArray.empty()) {
         tempCurve->setData(xaxis.data() + startingIndex, smoothTemp.data() + startingIndex, totalPoints);
-        if (mainWindow->athlete->useMetricUnits)
+        if (context->athlete->useMetricUnits)
             intervalHighlighterCurve->setYAxis(yRight);
         else
             intervalHighlighterCurve->setYAxis(yLeft2);
@@ -835,7 +836,7 @@ AllPlot::refreshIntervalMarkers()
             if (!bydist)
                 mrk->setValue(interval.start / 60.0, 0.0);
             else
-                mrk->setValue((mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
                                 rideItem->ride()->timeToDistance(interval.start), 0.0);
             mrk->setLabel(text);
         }
@@ -868,7 +869,7 @@ AllPlot::setYMax()
         setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
-    if (hrCurve->isVisible() || cadCurve->isVisible() || (!mainWindow->athlete->useMetricUnits && tempCurve->isVisible()) || balanceLCurve->isVisible()) {
+    if (hrCurve->isVisible() || cadCurve->isVisible() || (!context->athlete->useMetricUnits && tempCurve->isVisible()) || balanceLCurve->isVisible()) {
         double ymin = 0;
         double ymax = 0;
 
@@ -887,7 +888,7 @@ AllPlot::setYMax()
             else
                 ymax = qMax(ymax, referencePlot->cadCurve->maxYValue());
         }
-        if (tempCurve->isVisible() && !mainWindow->athlete->useMetricUnits) {
+        if (tempCurve->isVisible() && !context->athlete->useMetricUnits) {
 
             labels << QString::fromUtf8("°F");
 
@@ -931,21 +932,21 @@ AllPlot::setYMax()
         setAxisLabelRotation(yLeft2,270);
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
-    if (speedCurve->isVisible() || (mainWindow->athlete->useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
+    if (speedCurve->isVisible() || (context->athlete->useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
         double ymin = 0;
         double ymax = 0;
 
         QStringList labels;
 
         if (speedCurve->isVisible()) {
-            labels << (mainWindow->athlete->useMetricUnits ? tr("KPH") : tr("MPH"));
+            labels << (context->athlete->useMetricUnits ? tr("KPH") : tr("MPH"));
 
             if (referencePlot == NULL)
                 ymax = speedCurve->maxYValue();
             else
                 ymax = referencePlot->speedCurve->maxYValue();
         }
-        if (tempCurve->isVisible() && mainWindow->athlete->useMetricUnits) {
+        if (tempCurve->isVisible() && context->athlete->useMetricUnits) {
 
             labels << QString::fromUtf8("°C");
 
@@ -959,7 +960,7 @@ AllPlot::setYMax()
             }
         }
         if (torqueCurve->isVisible()) {
-            labels << (mainWindow->athlete->useMetricUnits ? tr("Nm") : tr("ftLb"));
+            labels << (context->athlete->useMetricUnits ? tr("Nm") : tr("ftLb"));
 
             if (referencePlot == NULL)
                 ymax = qMax(ymax, torqueCurve->maxYValue());
@@ -972,7 +973,7 @@ AllPlot::setYMax()
         setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
-        setAxisTitle(yRight2, mainWindow->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
+        setAxisTitle(yRight2, context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin,ymax;
 
         if (referencePlot == NULL) {
@@ -1015,7 +1016,7 @@ void
 AllPlot::setXTitle()
 {
     if (bydist)
-        setAxisTitle(xBottom, tr("Distance ")+QString(mainWindow->athlete->useMetricUnits?"(km)":"(miles)"));
+        setAxisTitle(xBottom, tr("Distance ")+QString(context->athlete->useMetricUnits?"(km)":"(miles)"));
     else
         setAxisTitle(xBottom, tr("Time (Hours:Minutes)"));
 }
@@ -1268,13 +1269,13 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
                 hrArray[arrayLength]    = max(0, point->hr);
             if (!speedArray.empty())
                 speedArray[arrayLength] = max(0,
-                                              (mainWindow->athlete->useMetricUnits
+                                              (context->athlete->useMetricUnits
                                                ? point->kph
                                                : point->kph * MILES_PER_KM));
             if (!cadArray.empty())
                 cadArray[arrayLength]   = max(0, point->cad);
             if (!altArray.empty())
-                altArray[arrayLength]   = (mainWindow->athlete->useMetricUnits
+                altArray[arrayLength]   = (context->athlete->useMetricUnits
                                            ? point->alt
                                            : point->alt * FEET_PER_METER);
             if (!tempArray.empty())
@@ -1282,7 +1283,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
             if (!windArray.empty())
                 windArray[arrayLength] = max(0,
-                                             (mainWindow->athlete->useMetricUnits
+                                             (context->athlete->useMetricUnits
                                               ? point->headwind
                                               : point->headwind * MILES_PER_KM));
 
@@ -1290,13 +1291,13 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
                 balanceArray[arrayLength]   = point->lrbalance;
 
             distanceArray[arrayLength] = max(0,
-                                             (mainWindow->athlete->useMetricUnits
+                                             (context->athlete->useMetricUnits
                                               ? point->km
                                               : point->km * MILES_PER_KM));
 
             if (!torqueArray.empty())
                 torqueArray[arrayLength] = max(0,
-                                              (mainWindow->athlete->useMetricUnits
+                                              (context->athlete->useMetricUnits
                                                ? point->nm
                                                : point->nm * FEET_LB_PER_NM));
             ++arrayLength;
@@ -1530,7 +1531,7 @@ AllPlot::distanceIndex(double km) const
 IntervalItem *IntervalPlotData::intervalNum(int n) const
 {
     int highlighted=0;
-    const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
     for (int i=0; i<allIntervals->childCount(); i++) {
         IntervalItem *current = (IntervalItem *)allIntervals->child(i);
 
@@ -1549,9 +1550,9 @@ int IntervalPlotData::intervalCount() const
 {
     int highlighted;
     highlighted = 0;
-    if (mainWindow->allIntervalItems() == NULL) return 0; // not inited yet!
+    if (context->mainWindow->allIntervalItems() == NULL) return 0; // not inited yet!
 
-    const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
     for (int i=0; i<allIntervals->childCount(); i++) {
         IntervalItem *current = (IntervalItem *)allIntervals->child(i);
         if (current != NULL) {
@@ -1571,7 +1572,7 @@ int IntervalPlotData::intervalCount() const
  */
 
 // The interval curve data is derived from the intervals that have
-// been selected in the MainWindow leftlayout for each selected
+// been selected in the Context leftlayout for each selected
 // interval we return 4 data points; bottomleft, topleft, topright
 // and bottom right.
 //
@@ -1587,7 +1588,7 @@ double IntervalPlotData::x(size_t i) const
     int interval = i ? i/4 : 0;
     interval += 1; // interval numbers start at 1 not ZERO in the utility functions
 
-    double multiplier = mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+    double multiplier = context->mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM;
 
     // get the interval
     IntervalItem *current = intervalNum(interval);

@@ -22,7 +22,7 @@
 
 #include <QtGui>
 #include <QTimer>
-#include "MainWindow.h"
+#include "Context.h"
 
 #include <qwt3d_global.h>
 
@@ -86,9 +86,9 @@ class BasicModelPlot : public SurfacePlot
 
 
     public:
-        BasicModelPlot(MainWindow *, ModelSettings *);
+        BasicModelPlot(Context *, ModelSettings *);
 
-        MainWindow *main;
+        Context *context;
 
         void setData(ModelSettings *);
         void resetViewPoint();
@@ -165,7 +165,7 @@ class ModelPlot : public QFrame
 
     public:
 
-        ModelPlot(MainWindow *, ModelSettings *);
+        ModelPlot(Context *, ModelSettings *);
         void setData(ModelSettings *settings);
         void resetViewPoint();
         void setStyle(int);
@@ -180,7 +180,7 @@ class ModelPlot : public QFrame
         void setResolution(int);
 
     private:
-        MainWindow *main;
+        Context *context;
         QVBoxLayout *layout;
 };
 

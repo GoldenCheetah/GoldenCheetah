@@ -20,7 +20,7 @@
 #define _GC_GcWindowTool_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "Season.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"

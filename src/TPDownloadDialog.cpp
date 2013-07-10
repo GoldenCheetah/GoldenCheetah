@@ -18,6 +18,8 @@
 #include "TPDownloadDialog.h"
 #include "TPDownload.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "PwxRideFile.h"
 #include "JsonRideFile.h"
 #include "RideFile.h"
@@ -25,16 +27,16 @@
 #include "MetricAggregator.h"
 #include "Units.h"
 
-TPDownloadDialog::TPDownloadDialog(MainWindow *main) : QDialog(main, Qt::Dialog), main(main), downloading(false), aborted(false)
+TPDownloadDialog::TPDownloadDialog(Context *context) : QDialog(context->mainWindow, Qt::Dialog), context(context), downloading(false), aborted(false)
 {
     setWindowTitle(tr("Download from TrainingPeaks.com"));
 
     athleter = new TPAthlete(this);
 
     connect (athleter, SIGNAL(completed(QList<QMap<QString,QString> >)), this, SLOT(completedAthlete(QList<QMap<QString,QString> >)));
-    athleter->list(appsettings->cvalue(main->athlete->cyclist, GC_TPTYPE, "0").toInt(),
-                  appsettings->cvalue(main->athlete->cyclist, GC_TPUSER, "null").toString(),
-                  appsettings->cvalue(main->athlete->cyclist, GC_TPPASS, "null").toString());
+    athleter->list(appsettings->cvalue(context->athlete->cyclist, GC_TPTYPE, "0").toInt(),
+                  appsettings->cvalue(context->athlete->cyclist, GC_TPUSER, "null").toString(),
+                  appsettings->cvalue(context->athlete->cyclist, GC_TPPASS, "null").toString());
 
     QWidget::hide(); // don't show just yet...
 }
@@ -289,7 +291,7 @@ TPDownloadDialog::refreshClicked()
     }
 
     // First lets get the ride metrics - if they refresh it takes a while...
-    rideMetrics = main->athlete->metricDB->getAllMetricsFor(QDateTime(from->date()), QDateTime(to->date()));
+    rideMetrics = context->athlete->metricDB->getAllMetricsFor(QDateTime(from->date()), QDateTime(to->date()));
 
     // First lets kick off a download of ridefile lookups
     // since that can take a while
@@ -297,13 +299,13 @@ TPDownloadDialog::refreshClicked()
                   athleteCombo->itemData(athleteCombo->currentIndex()).toInt(),
                   from->date(),
                   to->date(),
-                  appsettings->cvalue(main->athlete->cyclist, GC_TPUSER, "null").toString(),
-                  appsettings->cvalue(main->athlete->cyclist, GC_TPPASS, "null").toString());
+                  appsettings->cvalue(context->athlete->cyclist, GC_TPUSER, "null").toString(),
+                  appsettings->cvalue(context->athlete->cyclist, GC_TPPASS, "null").toString());
 
     // Whilst we wait for the results lets fill the map of existing rideFiles
     // (but ignore seconds since they aren't reliable)
     rideFiles.clear();
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(main->athlete->home));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home));
     for (i.toFront(); i.hasNext();) rideFiles << QFileInfo(i.next()).baseName().mid(0,14);
 
 }
@@ -333,7 +335,7 @@ TPDownloadDialog::tabChanged(int idx)
 void
 TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
 {
-    useMetricUnits = main->athlete->useMetricUnits;
+    useMetricUnits = context->athlete->useMetricUnits;
 
     //
     // Setup the upload list
@@ -654,7 +656,7 @@ TPDownloadDialog::syncNext()
                 curr->setText(7, tr("Downloading"));
                 rideListSync->setCurrentItem(curr);
                 downloader->download(
-                    main->athlete->cyclist,
+                    context->athlete->cyclist,
                     athleteCombo->itemData(athleteCombo->currentIndex()).toInt(),
                     curr->text(1).toInt()
                     );
@@ -665,11 +667,11 @@ TPDownloadDialog::syncNext()
 
                 // read in the file
                 QStringList errors;
-                QFile file(main->athlete->home.absolutePath() + "/" + curr->text(1));
-                RideFile *ride = RideFileFactory::instance().openRideFile(main, file, errors);
+                QFile file(context->athlete->home.absolutePath() + "/" + curr->text(1));
+                RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
                 if (ride) {
-                    uploader->upload(main, ride);
+                    uploader->upload(context, ride);
                     delete ride; // clean up!
                     QApplication::processEvents();
                     return true;
@@ -727,7 +729,7 @@ TPDownloadDialog::downloadNext()
             rideList->setCurrentItem(curr);
             progressLabel->setText(QString(tr("Downloaded %1 of %2")).arg(downloadcounter).arg(downloadtotal));
             downloader->download(
-                  main->athlete->cyclist,
+                  context->athlete->cyclist,
                   athleteCombo->itemData(athleteCombo->currentIndex()).toInt(),
                   curr->text(1).toInt()
                   );
@@ -820,11 +822,11 @@ TPDownloadDialog::uploadNext()
 
             // read in the file
             QStringList errors;
-            QFile file(main->athlete->home.absolutePath() + "/" + curr->text(1));
-            RideFile *ride = RideFileFactory::instance().openRideFile(main, file, errors);
+            QFile file(context->athlete->home.absolutePath() + "/" + curr->text(1));
+            RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
             if (ride) {
-                uploader->upload(main, ride);
+                uploader->upload(context, ride);
                 delete ride; // clean up!
                 QApplication::processEvents();
                 return true;
@@ -894,7 +896,7 @@ TPDownloadDialog::saveRide(RideFile *ride, QDomDocument &, QStringList &errors)
                            .arg ( ridedatetime.time().minute(), 2, 10, zero )
                            .arg ( ridedatetime.time().second(), 2, 10, zero );
 
-    QString filename = main->athlete->home.absolutePath() + "/" + targetnosuffix + ".json";
+    QString filename = context->athlete->home.absolutePath() + "/" + targetnosuffix + ".json";
 
     // exists?
     QFileInfo fileinfo(filename);
@@ -905,11 +907,11 @@ TPDownloadDialog::saveRide(RideFile *ride, QDomDocument &, QStringList &errors)
 
     JsonFileReader reader;
     QFile file(filename);
-    reader.writeRideFile(main, ride, file);
+    reader.writeRideFile(context, ride, file);
 
     // add to the ride list
     rideFiles<<targetnosuffix;
-    main->addRide(fileinfo.fileName(), true);
+    context->mainWindow->addRide(fileinfo.fileName(), true);
 
     return true;
 }

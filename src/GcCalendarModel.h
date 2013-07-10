@@ -40,6 +40,9 @@
 #include <QDebug>
 #include "qxtscheduleview.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "RideItem.h"
 #include "RideMetadata.h"
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
@@ -65,7 +68,7 @@ private:
     QMap <QDate, QVector<int>* > dateToRows; // map a date to SQL rows
 
     QList<QString> columns; // what columns in the sql model
-    MainWindow *mainWindow;
+    Context *context;
     int filenameIndex, durationIndex, dateIndex, textIndex, colorIndex;
 
 public slots:
@@ -135,7 +138,7 @@ public slots:
 
 public:
 
-    GcCalendarModel(QWidget *parent, QList<FieldDefinition> *, MainWindow *main) : QAbstractProxyModel(parent), mainWindow(main) {
+    GcCalendarModel(QWidget *parent, QList<FieldDefinition> *, Context *context) : QAbstractProxyModel(parent), context(context) {
         setParent(parent);
 
         stale = true;
@@ -143,9 +146,9 @@ public:
         setMonth(today.month(), today.year());
 
         // invalidate model if rides added or deleted or filter applier
-        connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
-        connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
-        connect(main, SIGNAL(filterChanged(QStringList&)), this, SLOT(setStale()));
+        connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
+        connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
+        connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setStale()));
 
     }
     ~GcCalendarModel() {}
@@ -178,7 +181,7 @@ public:
         connect(model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(refresh()));
         connect(model, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(refresh()));
 #ifdef GC_HAVE_ICAL
-        connect(mainWindow->athlete->rideCalendar, SIGNAL(dataChanged()), this, SLOT(refresh()));
+        connect(context->athlete->rideCalendar, SIGNAL(dataChanged()), this, SLOT(refresh()));
 #endif
         refresh();
     }
@@ -238,7 +241,7 @@ public:
             QVector<int> *arr = dateToRows.value(date(proxyIndex), NULL);
             if (arr) {
                 foreach (int i, *arr) {
-                    if (mainWindow->context->rideItem() && sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == mainWindow->context->rideItem()->dateTime) {
+                    if (context->rideItem() && sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == context->rideItem()->dateTime) {
                         colors << GColor(CCALCURRENT); // its the current ride!
                     } else {
                         colors << QColor(sourceModel()->data(index(i, colorIndex, QModelIndex())).toString());
@@ -248,7 +251,7 @@ public:
 
 #ifdef GC_HAVE_ICAL
             // added planned workouts
-            for (int k= mainWindow->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
+            for (int k= context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
                 colors.append(GColor(CCALPLANNED));
 #endif
 
@@ -263,7 +266,7 @@ public:
             if (arr) {
                 foreach (int i, *arr) {
                     QString filename = sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
-                    if (mainWindow->isfiltered && mainWindow->filters.contains(filename))
+                    if (context->mainWindow->isfiltered && context->mainWindow->filters.contains(filename))
                         colors << GColor(CCALCURRENT);
                     else
                         colors << QColor(Qt::black);
@@ -272,7 +275,7 @@ public:
 
 #ifdef GC_HAVE_ICAL
             // added planned workouts
-            for (int k= mainWindow->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
+            for (int k= context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
                 colors.append(Qt::black);
 #endif
 
@@ -319,8 +322,8 @@ public:
 
 #ifdef GC_HAVE_ICAL
             // fold in planned workouts
-            if (mainWindow->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
-                foreach(QString x, mainWindow->athlete->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList())
+            if (context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
+                foreach(QString x, context->athlete->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList())
                     filenames << "calendar";
             }
 #endif
@@ -341,9 +344,9 @@ public:
 
 #ifdef GC_HAVE_ICAL
             // fold in planned workouts
-            if (mainWindow->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
+            if (context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
                 QStringList planned;
-                planned = mainWindow->athlete->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList();
+                planned = context->athlete->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList();
                 strings << planned;
             }
 #endif

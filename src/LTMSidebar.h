@@ -20,7 +20,7 @@
 #define _GC_LTMSidebar_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "GcSideBarItem.h"
 #include "Season.h"
 #include "RideMetric.h"
@@ -42,7 +42,7 @@ class LTMSidebar : public QWidget
 
     public:
 
-        LTMSidebar(MainWindow *parent, const QDir &home);
+        LTMSidebar(Context *context, const QDir &home);
 
         //const Season *currentDateRange() { return dateRange; }
         //void selectDateRange(int);
@@ -82,7 +82,7 @@ class LTMSidebar : public QWidget
     private:
 
         const QDir home;
-        MainWindow *main;
+        Context *context;
         bool active;
         QDate from, to; // so we don't repeat update...
 

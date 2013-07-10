@@ -18,21 +18,6 @@
  */
 
 #include "HistogramWindow.h"
-#include "MainWindow.h"
-#include "MetricAggregator.h"
-#include "SummaryMetrics.h"
-#include "ChartSettings.h"
-#include "ColorButton.h"
-#include "PowerHist.h"
-#include "RideFile.h"
-#include "RideFileCache.h"
-#include "RideItem.h"
-#include "Settings.h"
-#include <QtGui>
-#include <assert.h>
-
-#include "Zones.h"
-#include "HrZones.h"
 
 // predefined deltas for each series
 static const double wattsDelta = 1.0;
@@ -54,7 +39,7 @@ static const int cadDigits   = 0;
 //
 // Constructor
 //
-HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcChartWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), useCustom(false), useToToday(false), precision(99)
+HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), useCustom(false), useToToday(false), precision(99)
 {
     setInstanceName("Histogram Window");
 
@@ -99,7 +84,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(10);
-    powerHist = new PowerHist(mainWindow);
+    powerHist = new PowerHist(context);
     vlayout->addWidget(powerHist);
 
     setChartLayout(vlayout);
@@ -107,7 +92,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
 #ifdef GC_HAVE_LUCENE
     // search filter box
     isfiltered = false;
-    searchBox = new SearchFilterBox(this, mainWindow);
+    searchBox = new SearchFilterBox(this, context);
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     if (!rangemode) searchBox->hide();
@@ -305,7 +290,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
     } else {
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-        connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+        connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     }
 
     // if any of the controls change we pass the chart everything
@@ -318,12 +303,12 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
 
-    connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(mainWindow->context, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
+    connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(context, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
 
-    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
-    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
-    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
 }
 
 //
@@ -543,7 +528,7 @@ HistogramWindow::switchMode()
         // select the series.. (but without the half second delay)
         treeSelectionTimeout();
     }
-    mainWindow->chartSettings->adjustSize();
+    context->mainWindow->chartSettings->adjustSize();
 
     stale = true;
     updateChart(); // to whatever is currently selected.
@@ -642,8 +627,8 @@ HistogramWindow::rideSelected()
 
     if (rangemode) {
         // get range that applies to this ride
-        powerRange = mainWindow->athlete->zones()->whichRange(ride->dateTime.date());
-        hrRange = mainWindow->athlete->hrZones()->whichRange(ride->dateTime.date());
+        powerRange = context->athlete->zones()->whichRange(ride->dateTime.date());
+        hrRange = context->athlete->hrZones()->whichRange(ride->dateTime.date());
     }
 
     // update
@@ -840,9 +825,9 @@ HistogramWindow::updateChart()
                 // plotting a data series, so refresh the ridefilecache
 
 #ifdef GC_HAVE_LUCENE
-                source = new RideFileCache(mainWindow, use.from, use.to, isfiltered, files);
+                source = new RideFileCache(context, use.from, use.to, isfiltered, files);
 #else
-                source = new RideFileCache(mainWindow, use.from, use.to);
+                source = new RideFileCache(context, use.from, use.to);
 #endif
                 cfrom = use.from;
                 cto = use.to;
@@ -872,7 +857,7 @@ HistogramWindow::updateChart()
                     last = use;
 
                     // plotting a metric, reread the metrics for the selected date range
-                    results = mainWindow->athlete->metricDB->getAllMetricsFor(use);
+                    results = context->athlete->metricDB->getAllMetricsFor(use);
 
                 }
 

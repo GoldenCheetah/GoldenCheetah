@@ -17,8 +17,9 @@
  */
 
 #include "LTMSettings.h"
-#include "LTMTool.h"
 #include "MainWindow.h"
+#include "LTMTool.h"
+#include "Context.h"
 #include "LTMChartParser.h"
 
 #include <QtGui>
@@ -30,8 +31,8 @@
 /*----------------------------------------------------------------------
  * EDIT CHART DIALOG
  *--------------------------------------------------------------------*/
-EditChartDialog::EditChartDialog(MainWindow *mainWindow, LTMSettings *settings, QList<LTMSettings>presets) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), settings(settings), presets(presets)
+EditChartDialog::EditChartDialog(Context *context, LTMSettings *settings, QList<LTMSettings>presets) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), settings(settings), presets(presets)
 {
     setWindowTitle(tr("Enter Chart Name"));
 
@@ -90,8 +91,8 @@ EditChartDialog::cancelClicked()
 /*----------------------------------------------------------------------
  * CHART MANAGER DIALOG
  *--------------------------------------------------------------------*/
-ChartManagerDialog::ChartManagerDialog(MainWindow *mainWindow, QList<LTMSettings>*presets) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), presets(presets)
+ChartManagerDialog::ChartManagerDialog(Context *context, QList<LTMSettings>*presets) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), presets(presets)
 {
     setWindowTitle(tr("Manage Charts"));
 

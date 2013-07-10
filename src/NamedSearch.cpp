@@ -18,7 +18,8 @@
 
 #include "NamedSearch.h"
 #include "SearchBox.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "GcSideBarItem.h" // for iconFromPNG
 
 // Escape special characters (JSON compliance)
@@ -179,7 +180,7 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
 }
 
 
-EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialog(parent), mainWindow(main), active(false)
+EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialog(parent), context(context), active(false)
 {
     filterIcon = iconFromPNG(":images/toolbar/filter3.png", false);
     searchIcon = iconFromPNG(":images/toolbar/search3.png", false);
@@ -207,7 +208,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialo
     layout->addLayout(row2);
     QLabel *filter = new QLabel(tr("Filter"), this);
     row2->addWidget(filter);
-    editSearch = new SearchBox(mainWindow, this, true);
+    editSearch = new SearchBox(context, this, true);
     row2->addWidget(editSearch);
 
     // add/update buttons
@@ -250,7 +251,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialo
     row4->addWidget(deleteButton);
 
     // Populate the list of named searches
-    foreach(NamedSearch x, mainWindow->athlete->namedSearches->getList()) {
+    foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
         QTreeWidgetItem *add = new QTreeWidgetItem(searchList->invisibleRootItem(), 0);
         add->setIcon(0, x.type == NamedSearch::search ? searchIcon : filterIcon);
         add->setText(1, x.name);
@@ -259,7 +260,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, MainWindow *main) : QDialo
     connect(searchList, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 
     // and select the first one
-    if (mainWindow->athlete->namedSearches->getList().count()) {
+    if (context->athlete->namedSearches->getList().count()) {
         searchList->setCurrentItem(searchList->invisibleRootItem()->child(0));
     }
 
@@ -275,7 +276,7 @@ EditNamedSearches::selectionChanged()
     if (active || searchList->currentItem() == NULL) return;
 
     int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
-    NamedSearch x = mainWindow->athlete->namedSearches->getList().at(index);
+    NamedSearch x = context->athlete->namedSearches->getList().at(index);
 
     editName->setText(x.name);
     editSearch->setText(x.text);
@@ -292,7 +293,7 @@ EditNamedSearches::addClicked()
     x.text = editSearch->text();
     x.name = editName->text();
     x.type = editSearch->getMode();
-    mainWindow->athlete->namedSearches->getList().append(x);
+    context->athlete->namedSearches->getList().append(x);
 
     QTreeWidgetItem *add = new QTreeWidgetItem(searchList->invisibleRootItem(), 0);
     add->setIcon(0, x.type == NamedSearch::search ? searchIcon : filterIcon);
@@ -313,9 +314,9 @@ EditNamedSearches::updateClicked()
     int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
 
     // update the text
-    mainWindow->athlete->namedSearches->getList()[index].name = editName->text();
-    mainWindow->athlete->namedSearches->getList()[index].type = editSearch->getMode();
-    mainWindow->athlete->namedSearches->getList()[index].text = editSearch->text();
+    context->athlete->namedSearches->getList()[index].name = editName->text();
+    context->athlete->namedSearches->getList()[index].type = editSearch->getMode();
+    context->athlete->namedSearches->getList()[index].text = editSearch->text();
 
     QTreeWidgetItem *here = searchList->invisibleRootItem()->child(index);
     here->setIcon(0, editSearch->getMode() == 0 ? searchIcon : filterIcon);
@@ -333,7 +334,7 @@ EditNamedSearches::deleteClicked()
     active = true;
 
     int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
-    mainWindow->athlete->namedSearches->getList().removeAt(index);
+    context->athlete->namedSearches->getList().removeAt(index);
     delete searchList->invisibleRootItem()->takeChild(index);
 
     active = false;
@@ -347,6 +348,6 @@ void EditNamedSearches::reject() { writeSearches(); }
 void 
 EditNamedSearches::writeSearches()
 {
-    mainWindow->athlete->namedSearches->write();
+    context->athlete->namedSearches->write();
 }
 

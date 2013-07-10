@@ -18,9 +18,11 @@
 
 
 #include "RealtimePlotWindow.h"
+#include "MainWindow.h"
+#include "Athlete.h"
 
-RealtimePlotWindow::RealtimePlotWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false)
+RealtimePlotWindow::RealtimePlotWindow(Context *context) :
+    GcWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
     setInstanceName("RT Plot");
@@ -90,7 +92,7 @@ RealtimePlotWindow::RealtimePlotWindow(MainWindow *mainWindow) :
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
 
     // get updates..
-    connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(context->mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
 
     // lets initialise all the smoothing variables
     hrtot = hrindex = cadtot = cadindex = spdtot = spdindex = alttot = altindex = powtot = powindex = 0;
@@ -142,7 +144,7 @@ RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
         spdtot += spd; spdtot -= spdHist[spdindex]; spdHist[spdindex] = spd;
         spdindex++; if (spdindex >= rtPlot->smooth) spdindex = 0;
         spd = spdtot / rtPlot->smooth;
-        if (!mainWindow->athlete->useMetricUnits) spd *= MILES_PER_KM;
+        if (!context->athlete->useMetricUnits) spd *= MILES_PER_KM;
         rtPlot->spdData->addData(spd);
 
         // Power

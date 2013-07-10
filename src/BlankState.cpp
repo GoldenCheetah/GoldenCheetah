@@ -18,11 +18,13 @@
 #include "BlankState.h"
 #include <QtGui>
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 
 //
 // Replace home window when no ride
 //
-BlankStatePage::BlankStatePage(MainWindow *main) : main(main)
+BlankStatePage::BlankStatePage(Context *context) : context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addStretch();
@@ -125,9 +127,9 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
 //
 // Replace analysis window when no ride
 //
-BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePage(main)
+BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePage(context)
 {  
-    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
     welcomeTitle->setText(tr("Analysis"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -139,23 +141,23 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePag
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
-    connect(importButton, SIGNAL(clicked()), main, SLOT(importFile()));
+    connect(importButton, SIGNAL(clicked()), context->mainWindow, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
-    connect(downloadButton, SIGNAL(clicked()), main, SLOT(downloadRide()));
+    connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
 
 }
 
 //
 // Replace home window when no ride
 //
-BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
+BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(context)
 {
-    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_HOME, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_HOME, false).toBool());
     welcomeTitle->setText(tr("Home"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -167,22 +169,22 @@ BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
-    connect(importButton, SIGNAL(clicked()), main, SLOT(importFile()));
+    connect(importButton, SIGNAL(clicked()), context->mainWindow, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
-    connect(downloadButton, SIGNAL(clicked()), main, SLOT(downloadRide()));
+    connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
 }
 
 //
 // Replace diary window when no ride
 //
-BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main)
+BlankStateDiaryPage::BlankStateDiaryPage(Context *context) : BlankStatePage(context)
 {
-    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_DIARY, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY, false).toBool());
     welcomeTitle->setText(tr("Diary"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
@@ -194,22 +196,22 @@ BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
-    connect(importButton, SIGNAL(clicked()), main, SLOT(importFile()));
+    connect(importButton, SIGNAL(clicked()), context->mainWindow, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
-    connect(downloadButton, SIGNAL(clicked()), main, SLOT(downloadRide()));
+    connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
 }
 
 //
 // Replace train window when no ride
 //
-BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main)
+BlankStateTrainPage::BlankStateTrainPage(Context *context) : BlankStatePage(context)
 {
-    dontShow->setChecked(appsettings->cvalue(main->athlete->cyclist, GC_BLANK_TRAIN, false).toBool());
+    dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_TRAIN, false).toBool());
     welcomeTitle->setText(tr("Train"));
     welcomeText->setText(tr("No devices or workouts ?\nLet's get you setup."));
 
@@ -223,7 +225,7 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     scAddDevice.buttonLabel = tr("Add device");
     scAddDevice.buttonIconPath = ":images/devices/kickr.png";
     QPushButton *addDeviceButton = addToShortCuts(scAddDevice);
-    connect(addDeviceButton, SIGNAL(clicked()), main, SLOT(addDevice()));
+    connect(addDeviceButton, SIGNAL(clicked()), context->mainWindow, SLOT(addDevice()));
 
 
     ShortCut scImportWorkout;
@@ -231,12 +233,12 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     scImportWorkout.buttonLabel = tr("Scan hard drives");
     scImportWorkout.buttonIconPath = ":images/toolbar/Disk.png";
     QPushButton *importWorkoutButton = addToShortCuts(scImportWorkout);
-    connect(importWorkoutButton, SIGNAL(clicked()), main, SLOT(manageLibrary()));
+    connect(importWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(manageLibrary()));
 
     ShortCut scDownloadWorkout;
     scDownloadWorkout.label = tr("Download workout files from the Erg DB.");
     scDownloadWorkout.buttonLabel = tr("Download workouts");
     scDownloadWorkout.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadWorkoutButton = addToShortCuts(scDownloadWorkout);
-    connect(downloadWorkoutButton, SIGNAL(clicked()), main, SLOT(downloadErgDB()));
+    connect(downloadWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadErgDB()));
 }

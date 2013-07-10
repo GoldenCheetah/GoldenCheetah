@@ -58,7 +58,7 @@ class AerobicDecoupling : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         double firstHalfPower = 0.0, secondHalfPower = 0.0;
         double firstHalfHR = 0.0, secondHalfHR = 0.0;
         int halfway = ride->dataPoints().size() / 2;

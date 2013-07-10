@@ -1,6 +1,8 @@
 
 #include "PerformanceManagerWindow.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "PerfPlot.h"
 #include "Colors.h"
 #include "StressCalculator.h"
@@ -8,8 +10,8 @@
 #include <qwt_picker_machine.h>
 
 
-PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false), isfiltered(false)
+PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
+    GcWindow(context), context(context), active(false), isfiltered(false)
 {
     setInstanceName("PM Window");
     setControls(NULL);
@@ -107,14 +109,14 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
            SLOT(PMpickerMoved(const QPoint &)));
     connect(metricCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(metricChanged()));
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(mainWindow->context, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
-    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
-    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 #ifdef GC_HAVE_LUCENE
-    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));
 #endif
 }
 
@@ -129,7 +131,7 @@ void
 PerformanceManagerWindow::filterChanged(QStringList &list)
 {
     filter = list;
-    isfiltered = mainWindow->isfiltered;
+    isfiltered = context->mainWindow->isfiltered;
     days = 0; // force it
     replot();
     repaint();
@@ -162,7 +164,7 @@ void PerformanceManagerWindow::rideSelected()
 
 void PerformanceManagerWindow::replot()
 {
-    const QTreeWidgetItem *allRides = mainWindow->allRideItems();
+    const QTreeWidgetItem *allRides = context->mainWindow->allRideItems();
 
     int newdays, rightIndex, endIndex;
     RideItem *firstRideItem = NULL;
@@ -179,7 +181,7 @@ void PerformanceManagerWindow::replot()
     }
 
     if (firstRideItem) {
-        int lookahead = (appsettings->cvalue(mainWindow->athlete->cyclist, GC_STS_DAYS,7)).toInt();
+        int lookahead = (appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS,7)).toInt();
         QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
         endTime = endTime.addDays( lookahead );
         newdays = firstRideItem->dateTime.daysTo(endTime);
@@ -204,15 +206,15 @@ void PerformanceManagerWindow::replot()
 	    if (sc) delete sc;
 
 	    sc = new StressCalculator(
-            mainWindow->athlete->cyclist,
+            context->athlete->cyclist,
 		    firstRideItem->dateTime,
 		    endTime,
-		    (appsettings->cvalue(mainWindow->athlete->cyclist, GC_STS_DAYS,7)).toInt(),
-		    (appsettings->cvalue(mainWindow->athlete->cyclist, GC_LTS_DAYS,42)).toInt());
+		    (appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS,7)).toInt(),
+		    (appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS,42)).toInt());
 #ifdef GC_HAVE_LUCENE
-            sc->calculateStress(mainWindow,mainWindow->athlete->home.absolutePath(),newMetric,isfiltered,filter);
+            sc->calculateStress(context,context->athlete->home.absolutePath(),newMetric,isfiltered,filter);
 #else
-            sc->calculateStress(mainWindow,mainWindow->athlete->home.absolutePath(),newMetric);
+            sc->calculateStress(context,context->athlete->home.absolutePath(),newMetric);
 #endif
 
 	    perfplot->setStressCalculator(sc);

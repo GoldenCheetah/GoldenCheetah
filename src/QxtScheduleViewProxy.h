@@ -38,7 +38,7 @@
 
 #include <QtGui>
 #include "qxtscheduleview.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideMetadata.h"
 #include "Colors.h"
 #include "Settings.h"
@@ -54,12 +54,12 @@ private:
     QxtScheduleView *rideNavigator;
     QList<FieldDefinition> *fieldDefinitions;
     QList<QString> columns; // what columns in the sql model
-    MainWindow *mainWindow;
+    Context *context;
     int filenameIndex, durationIndex, dateIndex, summaryIndex;
 
 public:
 
-    QxtScheduleViewProxy(QWidget *parent, QList<FieldDefinition> *fields, MainWindow *main) : QAbstractProxyModel(parent), fieldDefinitions(fields), mainWindow(main) {
+    QxtScheduleViewProxy(QWidget *parent, QList<FieldDefinition> *fields, Context *context) : QAbstractProxyModel(parent), fieldDefinitions(fields), mainWindow(main) {
         setParent(parent);
     }
     ~QxtScheduleViewProxy() {}

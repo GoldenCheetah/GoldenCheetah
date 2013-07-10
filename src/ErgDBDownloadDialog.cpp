@@ -17,9 +17,10 @@
  */
 
 #include "ErgDBDownloadDialog.h"
+#include "MainWindow.h"
 #include "TrainDB.h"
 
-ErgDBDownloadDialog::ErgDBDownloadDialog(MainWindow *main) : QDialog(main), main(main)
+ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -131,7 +132,7 @@ ErgDBDownloadDialog::okClicked()
         status->setText(QString("%1 workouts downloaded, %2 failed or skipped.").arg(downloads).arg(fails));
         ok->setText("Finish");
 
-        main->trainTool->configChanged();
+        context->mainWindow->trainTool->configChanged();
 
     } else if (ok->text() == "Abort") {
         aborted = true;
@@ -185,7 +186,7 @@ ErgDBDownloadDialog::downloadFiles()
             QString content = ergdb.getFile(id, 300);
 
             QString filename = workoutDir + "/" + current->text(1) + ".erg";
-            ErgFile *p = ErgFile::fromContent(content, main);
+            ErgFile *p = ErgFile::fromContent(content, context);
 
             // open success?
             if (p->isValid()) {

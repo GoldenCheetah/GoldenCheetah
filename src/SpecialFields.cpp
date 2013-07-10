@@ -30,7 +30,7 @@ SpecialFields::SpecialFields()
     namesmap.insert("Sport", tr("Sport"));                           // in WKO and possible others
     namesmap.insert("Objective", tr("Objective"));                   // in WKO as "goal" nad possibly others
     namesmap.insert("Summary", tr("Summary"));                       // embeds the RideSummary widget
-    namesmap.insert("Notes", tr("Notes"));                           // linked to MainWindow::rideNotes
+    namesmap.insert("Notes", tr("Notes"));                           // linked to Context::rideNotes
     namesmap.insert("Keywords", tr("Keywords"));                     // extracted from Notes / used for highlighting calendar
     namesmap.insert("Recording Interval", tr("Recording Interval")); // linked to RideFile::recIntSecs
     namesmap.insert("Weight", tr("Weight"));                         // in WKO and possibly others

@@ -28,7 +28,7 @@
 #include "HrZones.h"
 #include "RideMetric.h"
 #include "SummaryMetrics.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "DBAccess.h"
 #include "Colors.h"
 
@@ -39,7 +39,7 @@ class MetricAggregator : public QObject
 
 
 	public:
-        MetricAggregator(MainWindow *);
+        MetricAggregator(Context *);
 		~MetricAggregator();
 
 
@@ -64,7 +64,7 @@ class MetricAggregator : public QObject
         void importMeasure(SummaryMetrics *sm);
 
     private:
-        MainWindow *main;
+        Context *context;
         DBAccess *dbaccess;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;

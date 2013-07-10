@@ -17,12 +17,12 @@
  */
 
 #include "SearchFilterBox.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "Lucene.h"
 #include "DataFilter.h"
 #include "SearchBox.h"
 
-SearchFilterBox::SearchFilterBox(QWidget *parent, MainWindow *main, bool nochooser) : QWidget(parent), main(main)
+SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochooser) : QWidget(parent), context(context)
 {
 
     setContentsMargins(0,0,0,0);
@@ -31,11 +31,11 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, MainWindow *main, bool nochoos
     contents->setContentsMargins(0,0,0,0);
 
     // no column chooser if my parent widget is a modal widget
-    searchbox = new SearchBox(main, this, nochooser);
+    searchbox = new SearchBox(context, this, nochooser);
     contents->addWidget(searchbox);
 
-    lucene = new Lucene(this, main);
-    datafilter = new DataFilter(this,main);
+    lucene = new Lucene(this, context);
+    datafilter = new DataFilter(this,context);
 
     // text searching
     connect(searchbox, SIGNAL(submitQuery(QString)), lucene, SLOT(search(QString)));

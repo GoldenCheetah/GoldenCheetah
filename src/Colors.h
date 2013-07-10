@@ -24,7 +24,7 @@
 #include <QString>
 #include <QColor>
 
-class MainWindow;
+class Context;
 
 // set appearace defaults based upon screen size
 struct SizeSettings {
@@ -62,7 +62,7 @@ class GCColor : public QObject
 
         void setupColors();
     public:
-        GCColor(MainWindow*);
+        GCColor(Context *);
         static QColor getColor(int);
         static const Colors *colorSet();
         static const Colors *defaultColorSet();
@@ -81,7 +81,7 @@ class ColorEngine : public QObject
     G_OBJECT
 
     public:
-        ColorEngine(MainWindow*);
+        ColorEngine(Context *);
 
         QColor colorFor(QString);
 
@@ -91,7 +91,7 @@ class ColorEngine : public QObject
     private:
         QMap<QString, QColor> workoutCodes;
         QColor defaultColor;
-        MainWindow *mainWindow;
+        Context *context;
 };
 
 

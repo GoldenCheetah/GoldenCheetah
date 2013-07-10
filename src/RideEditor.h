@@ -20,7 +20,7 @@
 #define _GC_RideEditor_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideFileCommand.h"
@@ -47,7 +47,7 @@ class RideEditor : public GcChartWindow
 
     public:
 
-        RideEditor(MainWindow *);
+        RideEditor(Context *);
 
         // item delegate uses this
         QTableView *table;
@@ -127,7 +127,7 @@ class RideEditor : public GcChartWindow
         AnomalyDialog *anomalyTool;
 
     private:
-        MainWindow *main;
+        Context *context;
 
         bool inLUW;
         QList<QModelIndex> itemselection;

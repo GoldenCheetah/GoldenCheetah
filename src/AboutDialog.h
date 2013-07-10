@@ -5,7 +5,7 @@
 #include "Pages.h"
 #include <QDialog>
 
-class MainWindow;
+class Context;
 class AboutPage;
 class VersionPage;
 class ConfigPage;
@@ -17,10 +17,10 @@ class AboutDialog: public QDialog
     G_OBJECT
 
     public:
-        AboutDialog(MainWindow *mainWindow, QDir home);
+        AboutDialog(Context *context, QDir home);
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         QDir home;
 
         AboutPage *aboutPage;
@@ -40,10 +40,10 @@ class AboutPage : public QWidget
 
 
     public:
-        AboutPage(MainWindow *main, QDir home);
+        AboutPage(Context *context, QDir home);
 
     private:
-        MainWindow *main;
+        Context *context;
         QDir home;
 };
 
@@ -54,10 +54,10 @@ class VersionPage : public QWidget
 
 
     public:
-        VersionPage(MainWindow *main, QDir home);
+        VersionPage(Context *context, QDir home);
 
     private:
-        MainWindow *main;
+        Context *context;
         QDir home;
 };
 
@@ -66,10 +66,10 @@ class ConfigPage : public QWidget
     Q_OBJECT
 
     public:
-        ConfigPage(MainWindow*main, QDir home);
+        ConfigPage(Context *context, QDir home);
 
     private:
-        MainWindow *main;
+        Context *context;
         QDir home;
 };
 
@@ -80,10 +80,10 @@ class ContributorsPage : public QWidget
 
 
     public:
-        ContributorsPage(MainWindow *main, QDir home);
+        ContributorsPage(Context *context, QDir home);
 
     private:
-        MainWindow *main;
+        Context *context;
         QDir home;
 
 };

@@ -21,13 +21,14 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include "MainWindow.h"
 #include "Season.h"
 #ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
 #endif
 
 class CpintPlot;
-class MainWindow;
+class Context;
 class RideItem;
 class QwtPlotPicker;
 
@@ -57,7 +58,7 @@ class CriticalPowerWindow : public GcChartWindow
 
     public:
 
-        CriticalPowerWindow(const QDir &home, MainWindow *parent, bool range = false);
+        CriticalPowerWindow(const QDir &home, Context *context, bool range = false);
 
         // reveal
         bool hasReveal() { return false; }
@@ -71,7 +72,7 @@ class CriticalPowerWindow : public GcChartWindow
 
 #ifdef GC_HAVE_LUCENE
         // filter
-        bool isFiltered() const { return (searchBox->isFiltered() || mainWindow->isfiltered); }
+        bool isFiltered() const { return (searchBox->isFiltered() || context->mainWindow->isfiltered); }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif
@@ -140,7 +141,7 @@ class CriticalPowerWindow : public GcChartWindow
 
         QDir home;
         CpintPlot *cpintPlot;
-        MainWindow *mainWindow;
+        Context *context;
         QLabel *cpintTimeValue;
         QLabel *cpintTodayValue;
         QLabel *cpintAllValue;

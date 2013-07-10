@@ -17,13 +17,9 @@
  */
 
 #include "TtbDialog.h"
+#include "MainWindow.h"
+#include "Athlete.h"
 #include "Settings.h"
-#include <QHttp>
-#include <QUrl>
-#include <QHttpMultiPart>
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
-#include <QXmlDefaultHandler>
 #include "TimeUtils.h"
 #include "Units.h"
 
@@ -85,14 +81,11 @@ protected:
 };
 
 
-TtbDialog::TtbDialog(MainWindow *mainWindow, RideItem *item) :
-    mainWindow(mainWindow),
+TtbDialog::TtbDialog(Context *context, RideItem *item) :
+    context(context),
     ride( item ),
     proMember( false )
 {
-    assert(mainWindow);
-    assert(ride);
-
     exerciseId = ride->ride()->getTag("TtbExercise", "");
 
     setWindowTitle("Trainingstagebuch");
@@ -146,8 +139,8 @@ TtbDialog::requestSettings()
 
     currentRequest = reqSettings;
 
-    QString username = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBUSER).toString();
-    QString password = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBPASS).toString();
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
     QUrl url( TTB_URL + "/settings/list" );
     url.addQueryItem( "view", "xml" );
@@ -170,8 +163,8 @@ TtbDialog::requestSession()
 
     currentRequest = reqSession;
 
-    QString username = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBUSER).toString();
-    QString password = appsettings->cvalue(mainWindow->athlete->cyclist, GC_TTBPASS).toString();
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
     QUrl url( TTB_URL + "/login/sso" );
     url.addQueryItem( "view", "xml" );
@@ -203,12 +196,12 @@ TtbDialog::requestUpload()
     body->append( textPart );
 
 
-    QString fname = mainWindow->athlete->home.absoluteFilePath(".ttbupload.tcx" );
+    QString fname = context->athlete->home.absoluteFilePath(".ttbupload.tcx" );
     QFile *uploadFile = new QFile( fname );
     uploadFile->setParent(body);
 
     TcxFileReader reader;
-    reader.writeRideFile( mainWindow, ride->ride(), *uploadFile );
+    reader.writeRideFile(context, ride->ride(), *uploadFile );
     progressBar->setValue(12);
 
     int limit = proMember

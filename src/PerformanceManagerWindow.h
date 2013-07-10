@@ -20,7 +20,7 @@
 #ifndef _GC_PerformanceManagerWindow_h
 #define _GC_PerformanceManagerWindow_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 #include <QtGui>
 #include <QSlider>
@@ -47,7 +47,7 @@ class PerformanceManagerWindow : public GcWindow
 
     public:
 
-	PerformanceManagerWindow (MainWindow *mainWindow);
+	PerformanceManagerWindow (Context *context);
 	~PerformanceManagerWindow (void);
 
     int scheme() const { return metricCombo->currentIndex(); }
@@ -76,7 +76,7 @@ class PerformanceManagerWindow : public GcWindow
         QString metric;
 	StressCalculator *sc;
 
-        MainWindow *mainWindow;
+        Context *context;
     bool active;
 
 	PerfPlot *perfplot;

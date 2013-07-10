@@ -87,7 +87,7 @@ class EditNamedSearches : public QDialog
     G_OBJECT
 
     public:
-        EditNamedSearches(QWidget *parent, MainWindow *main);
+        EditNamedSearches(QWidget *parent, Context *context);
         void closeEvent(QCloseEvent* event); // write away on save
         void writeSearches();
 
@@ -95,7 +95,7 @@ class EditNamedSearches : public QDialog
         void reject(); // write away on close
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         bool active;
         QLineEdit *editName;
         SearchBox *editSearch;

@@ -93,7 +93,7 @@ class DataProcessorFactory {
         bool autoProcess(RideFile *); // run auto processes (after open rideFile)
 };
 
-class MainWindow;
+class Context;
 class ManualDataProcessorDialog : public QDialog
 {
     Q_OBJECT
@@ -101,7 +101,7 @@ class ManualDataProcessorDialog : public QDialog
 
 
     public:
-        ManualDataProcessorDialog(MainWindow *, QString, RideItem *);
+        ManualDataProcessorDialog(Context *, QString, RideItem *);
 
     private slots:
         void cancelClicked();
@@ -109,7 +109,7 @@ class ManualDataProcessorDialog : public QDialog
 
     private:
 
-        MainWindow *main;
+        Context *context;
         RideItem *ride;
         DataProcessor *processor;
         DataProcessorConfig *config;

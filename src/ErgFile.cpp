@@ -17,6 +17,7 @@
  */
 
 #include "ErgFile.h"
+#include "Athlete.h"
 
 #include <stdint.h>
 #include "Units.h"
@@ -40,21 +41,21 @@ bool ErgFile::isWorkout(QString name)
     }
     return false;
 }
-ErgFile::ErgFile(QString filename, int &mode, MainWindow *main) : 
-    filename(filename), main(main), mode(mode)
+ErgFile::ErgFile(QString filename, int &mode, Context *context) : 
+    filename(filename), context(context), mode(mode)
 {
-    if (main->athlete->zones()) {
-        int zonerange = main->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = main->athlete->zones()->getCP(zonerange);
+    if (context->athlete->zones()) {
+        int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones()->getCP(zonerange);
     }
     reload();
 }
 
-ErgFile::ErgFile(MainWindow *main) : main(main), mode(nomode)
+ErgFile::ErgFile(Context *context) : context(context), mode(nomode)
 {
-    if (main->athlete->zones()) {
-        int zonerange = main->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = main->athlete->zones()->getCP(zonerange);
+    if (context->athlete->zones()) {
+        int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones()->getCP(zonerange);
     } else {
         CP = 300;
     }
@@ -62,9 +63,9 @@ ErgFile::ErgFile(MainWindow *main) : main(main), mode(nomode)
 }
 
 ErgFile *
-ErgFile::fromContent(QString contents, MainWindow *main)
+ErgFile::fromContent(QString contents, Context *context)
 {
-    ErgFile *p = new ErgFile(main);
+    ErgFile *p = new ErgFile(context);
     p->parseComputrainer(contents);
     return p;
 }
@@ -719,9 +720,9 @@ ErgFile::calculateMetrics()
         AP = apsum / count;
 
         // CP
-        if (main->athlete->zones()) {
-            int zonerange = main->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-            if (zonerange >= 0) CP = main->athlete->zones()->getCP(zonerange);
+        if (context->athlete->zones()) {
+            int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
+            if (zonerange >= 0) CP = context->athlete->zones()->getCP(zonerange);
         }
 
         // IF

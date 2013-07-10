@@ -18,7 +18,8 @@
 
 #include "Aerolab.h"
 #include "AerolabWindow.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideItem.h"
@@ -52,12 +53,12 @@ class IntervalAerolabData : public QwtSeriesData<QPointF>
 {
     public:
         Aerolab *aerolab;
-        MainWindow *mainWindow;
+        Context *context;
         IntervalAerolabData
         (
             Aerolab    *aerolab,
-            MainWindow *mainWindow
-        ) : aerolab( aerolab ), mainWindow( mainWindow ) { }
+            Context *context
+        ) : aerolab( aerolab ), context(context) { }
 
         double x( size_t ) const;
         double y( size_t ) const;
@@ -90,7 +91,7 @@ IntervalItem *IntervalAerolabData::intervalNum
 ) const
 {
     int                    highlighted  = 0;
-    const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
     for ( int ii = 0; ii < allIntervals->childCount(); ii++)
 
     {
@@ -120,9 +121,9 @@ int IntervalAerolabData::intervalCount() const
 {
     int highlighted = 0;
 
-    if ( mainWindow->allIntervalItems() != NULL )
+    if ( context->mainWindow->allIntervalItems() != NULL )
     {
-        const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
+        const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
         for ( int ii = 0; ii < allIntervals->childCount(); ii++)
         {
             IntervalItem *current = (IntervalItem *) allIntervals->child( ii );
@@ -144,7 +145,7 @@ int IntervalAerolabData::intervalCount() const
  *                    size returns the number of points
  */
 // The interval curve data is derived from the intervals that have
-// been selected in the MainWindow leftlayout for each selected
+// been selected in the Context leftlayout for each selected
 // interval we return 4 data points; bottomleft, topleft, topright
 // and bottom right.
 //
@@ -170,7 +171,7 @@ double IntervalAerolabData::x
 
     if ( current != NULL )
     {
-        double multiplier = mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+        double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
         // which point are we returning?
 //qDebug() << "number = " << number << endl;
         switch ( number % 4 )
@@ -229,10 +230,10 @@ QRectF IntervalAerolabData::boundingRect() const
 
 Aerolab::Aerolab(
     AerolabWindow *parent,
-    MainWindow    *mainWindow
+    Context    *context
 ):
   QwtPlot(parent),
-  mainWindow(mainWindow),
+  context(context),
   parent(parent),
   rideItem(NULL),
   smooth(1), bydist(true), autoEoffset(true) {
@@ -264,7 +265,7 @@ Aerolab::Aerolab(
   intervalHighlighterCurve = new QwtPlotCurve();
   intervalHighlighterCurve->setBaseline(-5000);
   intervalHighlighterCurve->setYAxis( yLeft );
-  intervalHighlighterCurve->setData( new IntervalAerolabData( this, mainWindow ) );
+  intervalHighlighterCurve->setData( new IntervalAerolabData( this, context ) );
   intervalHighlighterCurve->attach( this );
   this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
 
@@ -366,7 +367,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
 
       timeArray[arrayLength]  = p1->secs / 60.0;
       if ( have_recorded_alt_curve )
-        altArray[arrayLength] = (mainWindow->athlete->useMetricUnits
+        altArray[arrayLength] = (context->athlete->useMetricUnits
                    ? p1->alt
                    : p1->alt * FEET_PER_METER);
 
@@ -513,7 +514,7 @@ Aerolab::setYMax(bool new_zoom)
           if (veCurve->isVisible())
           {
 
-             if ( mainWindow->athlete->useMetricUnits )
+             if ( context->athlete->useMetricUnits )
 
              {
 
@@ -590,7 +591,7 @@ void
 Aerolab::setXTitle() {
 
   if (bydist)
-    setAxisTitle(xBottom, tr("Distance ")+QString(mainWindow->athlete->useMetricUnits?"(km)":"(miles)"));
+    setAxisTitle(xBottom, tr("Distance ")+QString(context->athlete->useMetricUnits?"(km)":"(miles)"));
   else
     setAxisTitle(xBottom, tr("Time (minutes)"));
 }
@@ -760,7 +761,7 @@ void Aerolab::refreshIntervalMarkers()
             if (!bydist)
                 mrk->setValue(interval.start / 60.0, 0.0);
             else
-                mrk->setValue((mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
                                 rideItem->ride()->timeToDistance(interval.start), 0.0);
             mrk->setLabel(text);
         }

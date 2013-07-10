@@ -24,7 +24,7 @@
 #include <QObject> // for Q_PROPERTY
 
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideFile.h" // for data series types
 #include "SpinScanPolarPlot.h"
 #include "SpinScanPlot.h"
@@ -42,7 +42,7 @@ class SpinScanPlotWindow : public GcWindow
 
     public:
 
-        SpinScanPlotWindow(MainWindow *mainWindow);
+        SpinScanPlotWindow(Context *context);
 
    public slots:
 
@@ -86,7 +86,7 @@ class SpinScanPlotWindow : public GcWindow
         uint16_t rtot[24];
         int current;
 
-        MainWindow *mainWindow;
+        Context *context;
         bool active;
 
         QStackedWidget *stack;

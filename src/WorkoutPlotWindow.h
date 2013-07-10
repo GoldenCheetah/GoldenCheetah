@@ -19,13 +19,12 @@
 #ifndef _GC_WorkoutPlotWindow_h
 #define _GC_WorkoutPlotWindow_h 1
 #include "GoldenCheetah.h"
-#include "RideWindow.h"
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
 
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideFile.h" // for data series types
 #include "ErgFilePlot.h"
 #include "RealtimeData.h" // for realtimedata structure
@@ -40,7 +39,7 @@ class WorkoutPlotWindow : public GcWindow
 
     public:
 
-        WorkoutPlotWindow(MainWindow *mainWindow);
+        WorkoutPlotWindow(Context *context);
 
    public slots:
 
@@ -50,7 +49,7 @@ class WorkoutPlotWindow : public GcWindow
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         ErgFilePlot *ergPlot;
 };
 

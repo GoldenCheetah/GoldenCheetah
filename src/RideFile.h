@@ -35,7 +35,7 @@ struct RideFileDataPresent;
 struct RideFileInterval;
 class EditorData;      // attached to a RideFile
 class RideFileCommand; // for manipulating ride data
-class MainWindow;      // for context; cyclist, homedir
+class Context;      // for context; cyclist, homedir
 
 // This file defines four classes:
 //
@@ -83,7 +83,8 @@ class RideFile : public QObject // QObject to emit signals
     public:
 
         friend class RideFileCommand; // tells us we were modified
-        friend class MainWindow; // tells us we were saved
+        friend class MainWindow; // tells us we were modified
+        friend class Context; // tells us we were saved
 
         // Constructor / Destructor
         RideFile();
@@ -96,7 +97,7 @@ class RideFile : public QObject // QObject to emit signals
 
         typedef enum seriestype SeriesType;
         static QString seriesName(SeriesType);
-        static QString unitName(SeriesType, MainWindow *main);
+        static QString unitName(SeriesType, Context *context);
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);
         static double minimumFor(SeriesType series);
@@ -153,7 +154,7 @@ class RideFile : public QObject // QObject to emit signals
         QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
 
-        MainWindow *mainwindow;
+        Context *context;
         double getWeight();
 
         // METRIC OVERRIDES
@@ -235,7 +236,7 @@ struct RideFileReader {
 
     // if hasWrite capability should re-implement writeRideFile and hasWrite
     virtual bool hasWrite() const { return false; }
-    virtual bool writeRideFile(MainWindow *, const RideFile *, QFile &) const { return false; }
+    virtual bool writeRideFile(Context *, const RideFile *, QFile &) const { return false; }
 };
 
 class RideFileFactory {
@@ -254,8 +255,8 @@ class RideFileFactory {
 
         int registerReader(const QString &suffix, const QString &description,
                            RideFileReader *reader);
-        RideFile *openRideFile(MainWindow *main, QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
-        bool writeRideFile(MainWindow *main, const RideFile *ride, QFile &file, QString format) const;
+        RideFile *openRideFile(Context *context, QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
+        bool writeRideFile(Context *context, const RideFile *ride, QFile &file, QString format) const;
         QStringList listRideFiles(const QDir &dir) const;
         QStringList suffixes() const;
         QStringList writeSuffixes() const;

@@ -18,7 +18,7 @@
 
 #include "ModelWindow.h"
 #include "ModelPlot.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "math.h"
@@ -44,8 +44,8 @@ ModelWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("Longitude"), MODEL_LONG);
 }
 
-ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
-    GcChartWindow(parent), home(home), main(parent), ride(NULL), current(NULL)
+ModelWindow::ModelWindow(Context *context, const QDir &home) :
+    GcChartWindow(context), home(home), main(parent), ride(NULL), current(NULL)
 {
     setInstanceName("3D Window");
 

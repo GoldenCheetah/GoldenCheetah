@@ -20,7 +20,9 @@
 #include "LTMTool.h"
 #include "LTMPlot.h"
 #include "LTMSettings.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "SummaryMetrics.h"
 #include "Settings.h"
 #include "math.h"
@@ -35,17 +37,16 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
 
-LTMWindow::LTMWindow(MainWindow *parent) :
-            GcChartWindow(parent), dirty(true)
+LTMWindow::LTMWindow(Context *context) :
+            GcChartWindow(context), context(context), dirty(true)
 {
-    main = parent;
     setInstanceName("Metric Window");
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
 
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    ltmPlot = new LTMPlot(this, main);
+    ltmPlot = new LTMPlot(this, context);
     mainLayout->addWidget(ltmPlot);
     setChartLayout(mainLayout);
 
@@ -87,7 +88,7 @@ LTMWindow::LTMWindow(MainWindow *parent) :
 
     // the popup
     popup = new GcPane();
-    ltmPopup = new LTMPopup(main);
+    ltmPopup = new LTMPopup(context);
     QVBoxLayout *popupLayout = new QVBoxLayout();
     popupLayout->addWidget(ltmPopup);
     popup->setLayout(popupLayout);
@@ -120,7 +121,7 @@ LTMWindow::LTMWindow(MainWindow *parent) :
 
     _canvasPicker = new LTMCanvasPicker(ltmPlot);
 
-    ltmTool = new LTMTool(parent, main->athlete->home);
+    ltmTool = new LTMTool(context, context->athlete->home);
 
     // initialise
     settings.ltmTool = ltmTool;
@@ -149,15 +150,15 @@ LTMWindow::LTMWindow(MainWindow *parent) :
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
-    connect(main, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh()));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh()));
 
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), ltmPlot, SLOT(pointClicked(QwtPlotCurve*, int)));
 
-    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
-    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
 }
 
 LTMWindow::~LTMWindow()
@@ -212,11 +213,11 @@ LTMWindow::refresh()
 {
 
     // refresh for changes to ridefiles / zones
-    if (amVisible() == true && main->athlete->metricDB != NULL) {
+    if (amVisible() == true && context->athlete->metricDB != NULL) {
         results.clear(); // clear any old data
-        results = main->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
+        results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
-        measures = main->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
+        measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
         refreshPlot();
         repaint(); // title changes color when filters change
         dirty = false;
@@ -290,9 +291,9 @@ LTMWindow::filterChanged()
 
     // we need to get data again and apply filter
     results.clear(); // clear any old data
-    results = main->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
+    results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
     measures.clear(); // clear any old data
-    measures = main->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
+    measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
 
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {
@@ -373,10 +374,10 @@ LTMWindow::chartSelected(int selected)
 void
 LTMWindow::saveClicked()
 {
-    EditChartDialog editor(main, &settings, ltmTool->presets);
+    EditChartDialog editor(context, &settings, ltmTool->presets);
     if (editor.exec()) {
         ltmTool->presets.append(settings);
-        settings.writeChartXML(main->athlete->home, ltmTool->presets);
+        settings.writeChartXML(context->athlete->home, ltmTool->presets);
         ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
         ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
@@ -386,7 +387,7 @@ void
 LTMWindow::manageClicked()
 {
     QList<LTMSettings> charts = ltmTool->presets; // get current
-    ChartManagerDialog editor(main, &charts);
+    ChartManagerDialog editor(context, &charts);
     if (editor.exec()) {
         // wipe the current and add the new
         ltmTool->presets = charts;
@@ -396,7 +397,7 @@ LTMWindow::manageClicked()
             ltmTool->presetPicker->addItem(ltmTool->presets[i].name, i);
 
         // update charts.xml
-        settings.writeChartXML(main->athlete->home, ltmTool->presets);
+        settings.writeChartXML(context->athlete->home, ltmTool->presets);
     }
 }
 

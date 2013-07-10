@@ -28,6 +28,8 @@
 #include <limits>
 #include "TrainTool.h"
 #include "RealtimeController.h"
+#include "MainWindow.h"
+#include "RideItem.h"
 #include "RideFile.h"
 
 class Route
@@ -315,10 +317,10 @@ public slots:
         curPosition = findCurrentPosition();
     }
 public:
-    RealtimeRider(MainWindow *main)
+    RealtimeRider(Context *context)
     {
         curPosition = 1;
-        connect(main,SIGNAL(telemetryUpdate(const RealtimeData &)), this,SLOT(telemetryUpdate(const RealtimeData &)));
+        connect(context->mainWindow,SIGNAL(telemetryUpdate(const RealtimeData &)), this,SLOT(telemetryUpdate(const RealtimeData &)));
     }
 };
 
@@ -330,7 +332,7 @@ protected:
     RideItem *ride;
     QWebView *view;
     bool rideLoaded;
-    MainWindow *main;
+    Context *context;
 
     virtual void loadRide();
     RiderBridge *rider;
@@ -343,7 +345,7 @@ protected:
         qwi->setVisible(true);
     }
 public:
-    explicit RideWindow(MainWindow *);
+    explicit RideWindow(Context *);
 signals:
 
 public slots:
@@ -363,7 +365,7 @@ protected:
        //EnableWebInspector(view->page());  // turns on the javascript debugger
     }
 public:
-    explicit MapWindow(MainWindow *main) : RideWindow(main) {}
+    explicit MapWindow(Context *context) : RideWindow(context) {}
 };
 
 
@@ -377,7 +379,7 @@ protected:
         // EnableWebInspector(view->page());  // turns on the javascript debugger
     }
 public:
-     explicit StreetViewWindow(MainWindow *main) : RideWindow(main) {}
+     explicit StreetViewWindow(Context *context) : RideWindow(context) {}
 
 };
 

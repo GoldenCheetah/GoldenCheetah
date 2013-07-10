@@ -22,10 +22,12 @@
 
 #include <QtGui>
 #include <QTimer>
-#include "MainWindow.h"
+#include "Context.h"
 
 class ModelPlot; // we don't include the header because it uses namespaces
 class ModelDataColor;
+class IntervalItem;
+class RideItem;
 
 class ModelSettings
 {
@@ -65,7 +67,7 @@ class ModelWindow : public GcChartWindow
 
     public:
 
-        ModelWindow(MainWindow *, const QDir &);
+        ModelWindow(Context *, const QDir &);
 
         // reveal
         bool hasReveal() { return false; }
@@ -112,9 +114,9 @@ class ModelWindow : public GcChartWindow
 
     protected:
 
-        // passed from MainWindow
+        // passed from Context *
         QDir home;
-        MainWindow *main;
+        Context *context;
         bool useMetricUnits;
         bool active;
 

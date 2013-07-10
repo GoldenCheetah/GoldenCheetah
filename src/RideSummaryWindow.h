@@ -20,6 +20,7 @@
 #define _GC_RideSummaryWindow_h 1
 #include "GoldenCheetah.h"
 #include "MainWindow.h"
+#include "Context.h"
 
 #include <QWidget>
 #include <QWebView>
@@ -51,7 +52,7 @@ class RideSummaryWindow : public GcChartWindow
     public:
 
         // two modes - summarise ride or summarise date range
-        RideSummaryWindow(MainWindow *parent, bool ridesummary = true);
+        RideSummaryWindow(Context *context, bool ridesummary = true);
 
         // properties
         int useSelected() { return dateSetting->mode(); }
@@ -69,7 +70,7 @@ class RideSummaryWindow : public GcChartWindow
         int prevN() { return dateSetting->prevN(); }
         void setPrevN(int x) { dateSetting->setPrevN(x); }
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { if (!ridesummary) return (filtered || mainWindow->isfiltered);
+        bool isFiltered() const { if (!ridesummary) return (filtered || context->mainWindow->isfiltered);
                                   else return false; }
         // filter
         QString filter() const { return ridesummary ? "" : searchBox->filter(); }
@@ -98,7 +99,7 @@ class RideSummaryWindow : public GcChartWindow
 
         QString htmlSummary() const;
 
-        MainWindow *mainWindow;
+        Context *context;
         QWebView *rideSummary;
 
         RideItem *_connected;

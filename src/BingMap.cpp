@@ -21,7 +21,8 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "IntervalItem.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Zones.h"
 #include "Settings.h"
 #include "Colors.h"
@@ -30,7 +31,7 @@
 
 #include <QDebug>
 
-BingMap::BingMap(MainWindow *mw) : GcWindow(mw), main(mw), range(-1), current(NULL)
+BingMap::BingMap(Context *context) : GcWindow(context), context(context), range(-1), current(NULL)
 {
     setInstanceName("Google Map");
     setControls(NULL);
@@ -40,7 +41,7 @@ BingMap::BingMap(MainWindow *mw) : GcWindow(mw), main(mw), range(-1), current(NU
     layout->setContentsMargins(2,0,2,2);
     setLayout(layout);
 
-    parent = mw;
+    //XXX ???? parent = context->mainWindow;
     view = new QWebView();
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
@@ -48,13 +49,13 @@ BingMap::BingMap(MainWindow *mw) : GcWindow(mw), main(mw), range(-1), current(NU
     view->setAcceptDrops(false);
     layout->addWidget(view);
 
-    webBridge = new BWebBridge(mw, this);
+    webBridge = new BWebBridge(context, this);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
-    connect(mw, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
-    connect(mw, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
-    connect(mw, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
+    connect(context->mainWindow, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
+    connect(context->mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
 
     first = true;
 }
@@ -255,7 +256,7 @@ void BingMap::createHtml()
 QColor BingMap::GetColor(int watts)
 {
     if (range < 0) return Qt::red;
-    else return zoneColor(main->athlete->zones()->whichZone(range, watts), 7);
+    else return zoneColor(context->athlete->zones()->whichZone(range, watts), 7);
 }
 
 // create the ride line
@@ -429,7 +430,7 @@ BingMap::createMarkers()
     //
     // INTERVAL MARKERS
     //
-    if (main->allIntervalItems() == NULL) return; // none to do, we are all done then
+    if (context->mainWindow->allIntervalItems() == NULL) return; // none to do, we are all done then
 
     int interval=0;
     foreach (const RideFileInterval x, myRideItem->ride()->intervals()) {
@@ -508,11 +509,11 @@ BWebBridge::intervalCount()
     highlighted = 0;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    if (mainWindow->allIntervalItems() == NULL ||
+    if (context->mainWindow->allIntervalItems() == NULL ||
         rideItem == NULL || rideItem->ride() == NULL) return 0; // not inited yet!
 
-    for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(i));
+    for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
         if (current != NULL) {
             if (current->isSelected() == true) {
                 ++highlighted;
@@ -530,14 +531,14 @@ BWebBridge::getLatLons(int i)
     int highlighted=0;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    if (mainWindow->allIntervalItems() == NULL ||
+    if (context->mainWindow->allIntervalItems() == NULL ||
        rideItem ==NULL || rideItem->ride() == NULL) return latlons; // not inited yet!
 
     if (i) {
 
         // get for specific interval
-        for (int j=0; j<mainWindow->allIntervalItems()->childCount(); j++) {
-            IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(j));
+        for (int j=0; j<context->mainWindow->allIntervalItems()->childCount(); j++) {
+            IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(j));
             if (current != NULL) {
                 if (current->isSelected() == true) {
                     ++highlighted;
@@ -590,6 +591,6 @@ BWebBridge::drawOverlays()
 void
 BWebBridge::toggleInterval(int x)
 {
-    IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(x));
+    IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(x));
     if (current) current->setSelected(!current->isSelected());
 }

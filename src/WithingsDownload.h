@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 #include "WithingsParser.h"
 #include "MetricAggregator.h"
@@ -35,14 +35,14 @@ class WithingsDownload : public QObject
 
 
 public:
-    WithingsDownload(MainWindow *main);
+    WithingsDownload(Context *context);
     bool download();
 
 public slots:
     void downloadFinished(QNetworkReply *reply);
 
 private:
-    MainWindow *main;
+    Context *context;
     QNetworkAccessManager *nam;
     WithingsParser *parser;
 

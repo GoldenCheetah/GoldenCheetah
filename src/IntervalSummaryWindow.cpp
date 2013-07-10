@@ -17,12 +17,14 @@
  */
 
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "IntervalItem.h"
 #include "IntervalSummaryWindow.h"
 #include "Settings.h"
 #include "TimeUtils.h"
 
-IntervalSummaryWindow::IntervalSummaryWindow(MainWindow *mainWindow) : mainWindow(mainWindow)
+IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context)
 {
 	setWindowTitle(tr("Interval Summary"));
 	setReadOnly(true);
@@ -31,7 +33,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(MainWindow *mainWindow) : mainWindo
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
 }
 
 IntervalSummaryWindow::~IntervalSummaryWindow() {
@@ -40,12 +42,12 @@ IntervalSummaryWindow::~IntervalSummaryWindow() {
 void IntervalSummaryWindow::intervalSelected()
 {
     // if no ride available don't bother
-    if (mainWindow->context->currentRideItem() == NULL || mainWindow->context->currentRide() == NULL) return;
+    if (context->currentRideItem() == NULL || context->currentRide() == NULL) return;
 
 	QString html;
-    if (mainWindow->allIntervalItems() != NULL) {
-        for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem*>(mainWindow->allIntervalItems()->child(i));
+    if (context->mainWindow->allIntervalItems() != NULL) {
+        for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = dynamic_cast<IntervalItem*>(context->mainWindow->allIntervalItems()->child(i));
             if (current != NULL) {
                 if (current->isSelected()) {
                     calcInterval(current, html);
@@ -62,12 +64,12 @@ void IntervalSummaryWindow::intervalSelected()
 
 void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 {
-	const RideFile* ride = mainWindow->context->currentRide();
+	const RideFile* ride = context->currentRide();
 
-    bool metricUnits = mainWindow->athlete->useMetricUnits;
+    bool metricUnits = context->athlete->useMetricUnits;
 
     RideFile f(ride->startTime(), ride->recIntSecs());
-    f.mainwindow = mainWindow;
+    f.context = context;
     int start = ride->timeIndex(interval->start);
     int end = ride->timeIndex(interval->stop);
     for (int i = start; i < end; ++i) {
@@ -88,7 +90,7 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
     QStringList intervalMetrics = s.split(",");
 
     QHash<QString,RideMetricPtr> metrics =
-        RideMetric::computeMetrics(mainWindow, &f, mainWindow->athlete->zones(), mainWindow->athlete->hrZones(), intervalMetrics);
+        RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
 
     html += "<b>" + interval->text(0) + "</b>";
     html += "<table align=\"center\" width=\"90%\" ";

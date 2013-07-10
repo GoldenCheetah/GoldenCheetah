@@ -18,9 +18,10 @@
 
 
 #include "SpinScanPlotWindow.h"
+#include "Context.h"
 
-SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false)
+SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
+    GcWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
     setInstanceName("SpinScan Plot");
@@ -77,9 +78,9 @@ SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
     connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged()));
 
     // get updates..
-    connect(mainWindow->context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
-    connect(mainWindow->context, SIGNAL(start()), this, SLOT(start()));
-    connect(mainWindow->context, SIGNAL(stop()), this, SLOT(stop()));
+    connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(context, SIGNAL(start()), this, SLOT(start()));
+    connect(context, SIGNAL(stop()), this, SLOT(stop()));
 
     // set to zero
     stop(); // resets the array

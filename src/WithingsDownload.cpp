@@ -17,8 +17,10 @@
  */
 
 #include "WithingsDownload.h"
+#include "MainWindow.h"
+#include "Athlete.h"
 
-WithingsDownload::WithingsDownload(MainWindow *main) : main(main)
+WithingsDownload::WithingsDownload(Context *context) : context(context)
 {
     nam = new QNetworkAccessManager(this);
     connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
@@ -29,15 +31,15 @@ bool
 WithingsDownload::download()
 {
     QString request = QString("%1/measure?action=getmeas&userid=%2&publickey=%3")
-                             .arg(appsettings->cvalue(main->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString())
-                             .arg(appsettings->cvalue(main->athlete->cyclist, GC_WIUSER, "").toString())
-                             .arg(appsettings->cvalue(main->athlete->cyclist, GC_WIKEY, "").toString());
+                             .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net").toString())
+                             .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIUSER, "").toString())
+                             .arg(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString());
 
 
     QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(request)));
 
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("Withings Data Download"), reply->errorString());
+        QMessageBox::warning(context->mainWindow, tr("Withings Data Download"), reply->errorString());
         return false;
     }
     return true;
@@ -57,7 +59,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
 
 
     foreach (WithingsReading x, parser->readings()) {
-        QList<SummaryMetrics> list = main->athlete->metricDB->getAllMeasuresFor(x.when,x.when);
+        QList<SummaryMetrics> list = context->athlete->metricDB->getAllMeasuresFor(x.when,x.when);
         bool presentOrEmpty = false;
         for (int i=0;i<list.size();i++) {
             SummaryMetrics sm = list.at(i);
@@ -80,7 +82,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
             add.setText("Fat Mass", QString("%1").arg(x.fatkg));
             add.setText("Fat Ratio", QString("%1").arg(x.fatpercent));
 
-            main->athlete->metricDB->importMeasure(&add);
+            context->athlete->metricDB->importMeasure(&add);
 
             if (olderDate.isNull() || x.when<olderDate)
                 olderDate = x.when;
@@ -88,11 +90,11 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     }
 
     QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
-    QMessageBox::information(main, tr("Withings Data Download"), status);
+    QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
 
     if (!olderDate.isNull()) {
-        main->isclean = false;
-        main->athlete->metricDB->refreshMetrics(olderDate);
+        context->mainWindow->isclean = false;
+        context->athlete->metricDB->refreshMetrics(olderDate);
     }
     return;
 }

@@ -24,7 +24,7 @@
 #include <QObject> // for Q_PROPERTY
 
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideFile.h" // for data series types
 #include "RealtimePlot.h"
 #include "RealtimeData.h" // for realtimedata structure
@@ -48,7 +48,7 @@ class RealtimePlotWindow : public GcWindow
 
     public:
 
-        RealtimePlotWindow(MainWindow *mainWindow);
+        RealtimePlotWindow(Context *context);
 
         // get properties - the setters are below
         int isShowHr() const { return showHr->checkState(); }
@@ -80,7 +80,7 @@ class RealtimePlotWindow : public GcWindow
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         RealtimePlot *rtPlot;
         bool active;
 

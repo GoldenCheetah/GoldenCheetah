@@ -35,7 +35,7 @@ class AllPlotWindow;
 class AllPlot;
 class IntervalItem;
 class IntervalPlotData;
-class MainWindow;
+class Context;
 class LTMToolTip;
 class LTMCanvasPicker;
 
@@ -47,7 +47,7 @@ class AllPlot : public QwtPlot
 
     public:
 
-        AllPlot(AllPlotWindow *parent, MainWindow *mainWindow);
+        AllPlot(AllPlotWindow *parent, Context *context);
 
         // set the curve data e.g. when a ride is selected
         void setDataFromRide(RideItem *_rideItem);
@@ -165,7 +165,7 @@ class AllPlot : public QwtPlot
         bool bydist;
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
 
         AllPlot *referencePlot;
         AllPlotWindow *parent;

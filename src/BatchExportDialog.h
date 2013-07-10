@@ -20,7 +20,7 @@
 #ifndef _BatchExportDialog_h
 #define _BatchExportDialog_h
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 #include "Units.h"
 
@@ -45,7 +45,7 @@ class BatchExportDialog : public QDialog
 
 
 public:
-    BatchExportDialog(MainWindow *main);
+    BatchExportDialog(Context *context);
 
     QTreeWidget *files; // choose files to export
 
@@ -59,7 +59,7 @@ private slots:
     void allClicked();
 
 private:
-    MainWindow *main;
+    Context *context;
     bool aborted;
 
     QCheckBox *all;

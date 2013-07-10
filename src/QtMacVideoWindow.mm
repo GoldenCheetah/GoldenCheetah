@@ -25,6 +25,7 @@
 #include <QTkit/QTMovieView.h>
 
 #include "QtMacVideoWindow.h"
+#include "Context.h"
 
 
 static inline NSString *darwinQStringToNSString (const QString &aString)
@@ -33,8 +34,8 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
     (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length());
 }
 
-VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
-GcWindow(parent), home(home), main(parent), hasMovie(false)
+VideoWindow::VideoWindow(Context *context, const QDir &home)  :
+GcWindow(context), home(home), context(context), hasMovie(false)
 {
 
     setControls(NULL);
@@ -50,12 +51,12 @@ GcWindow(parent), home(home), main(parent), hasMovie(false)
 
     layout->addWidget(player);
 
-    connect(main->context, SIGNAL(stop()), this, SLOT(stopPlayback()));
-    connect(main->context, SIGNAL(start()), this, SLOT(startPlayback()));
-    connect(main->context, SIGNAL(pause()), this, SLOT(pausePlayback()));
-    connect(main->context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
-    connect(main->context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
-    connect(main->context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
+    connect(context, SIGNAL(stop()), this, SLOT(stopPlayback()));
+    connect(context, SIGNAL(start()), this, SLOT(startPlayback()));
+    connect(context, SIGNAL(pause()), this, SLOT(pausePlayback()));
+    connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
+    connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
+    connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
 
 }
 
@@ -206,7 +207,7 @@ MediaHelper::isMedia(QString filename)
     return false;
 }
 
-QtMacMovieView::QtMacMovieView (QWidget *parent) : QMacCocoaViewContainer (0, parent)
+QtMacMovieView::QtMacMovieView (QWidget *context) : QMacCocoaViewContainer (0, context)
 {
 #if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
     setAttribute(Qt::WA_NativeWindow);

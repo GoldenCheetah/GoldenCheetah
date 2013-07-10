@@ -27,7 +27,7 @@ class QCheckBox;
 class QLineEdit;
 class RideItem;
 class HrPwPlot;
-class MainWindow;
+class Context;
 class SmallPlot;
 class QSlider;
 
@@ -52,7 +52,7 @@ class HrPwWindow : public GcChartWindow
 
     public:
 
-        HrPwWindow(MainWindow *mainWindow);
+        HrPwWindow(Context *context);
         void setData(RideItem *item);
         int findDelay(QVector<double> &wattsArray, QVector<double> &hrArray, int rideTimeSecs);
 
@@ -86,7 +86,7 @@ class HrPwWindow : public GcChartWindow
         void setDelay(int);
 
     protected:
-        MainWindow *mainWindow;
+        Context *context;
         HrPwPlot  *hrPwPlot;
         SmallPlot *smallPlot;
 

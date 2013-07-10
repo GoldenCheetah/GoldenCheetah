@@ -19,7 +19,10 @@
 #include "ModelPlot.h"
 #include "ModelWindow.h"
 #include "IntervalItem.h"
-#include "MainWindow.h"
+#include "RideItem.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include "Zones.h"
 #include "Colors.h"
@@ -314,7 +317,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 {
     // get application settings
     cranklength = appsettings->value(NULL, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
-    useMetricUnits = plot.main->athlete->useMetricUnits;
+    useMetricUnits = plot.context->athlete->useMetricUnits;
 
     // if there are no settings or incomplete settings
     // create a null data plot
@@ -794,7 +797,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
  *
  *----------------------------------------------------------------------*/
 
-BasicModelPlot::BasicModelPlot(MainWindow *parent, ModelSettings *settings) : main(parent)
+BasicModelPlot::BasicModelPlot(Context *context, ModelSettings *settings) : context(context)
 {
     diag_=0;
     currentStyle = STYLE_BAR;
@@ -990,7 +993,7 @@ BasicModelPlot::resetViewPoint()
  * MODEL PLOT
  * Nothing special - just a framed BasicModelPlot
  *----------------------------------------------------------------------*/
-ModelPlot::ModelPlot(MainWindow *parent, ModelSettings *settings) : QFrame(parent), main(parent)
+ModelPlot::ModelPlot(Context *context, ModelSettings *settings) : QFrame(context->mainWindow), context(context)
 {
     // the distinction between a model plot and a basic model plot
     // is only to provide a frame for the qwt3d plot (it looks odd
@@ -1006,7 +1009,7 @@ ModelPlot::ModelPlot(MainWindow *parent, ModelSettings *settings) : QFrame(paren
     layout->setContentsMargins(2,2,2,2);
     setLayout(layout);
 
-    connect(main->context, SIGNAL(configChanged()), basicModelPlot, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), basicModelPlot, SLOT(configChanged()));
 }
 
 void

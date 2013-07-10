@@ -23,6 +23,7 @@
 #include <QtGui>
 #include <QTimer>
 #include "MainWindow.h"
+#include "Context.h"
 #include "MetricAggregator.h"
 #include "Season.h"
 #include "LTMPlot.h"
@@ -104,18 +105,18 @@ class LTMWindow : public GcChartWindow
 
     public:
 
-        LTMWindow(MainWindow *);
+        LTMWindow(Context *);
         ~LTMWindow();
         LTMToolTip *toolTip() { return picker; }
 
         // reveal / filters
         bool hasReveal() { return true; }
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return (ltmTool->isFiltered() || main->isfiltered); }
+        bool isFiltered() const { return (ltmTool->isFiltered() || context->mainWindow->isfiltered); }
 #endif
 
         // used by children
-        MainWindow *main;
+        Context *context;
 
         // get/set properties
         int chart() const { return ltmTool->presetPicker->currentIndex(); }
@@ -178,7 +179,7 @@ class LTMWindow : public GcChartWindow
         void useThruToday();
 
     private:
-        // passed from MainWindow
+        // passed from Context *
         DateRange plotted;
 
         bool useCustom;

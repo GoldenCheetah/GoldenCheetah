@@ -31,7 +31,7 @@ class RideItem;
 struct RideFilePoint;
 class QwtPlotCurve;
 class QwtPlotMarker;
-class MainWindow;
+class Context;
 class PfPvPlotZoneLabel;
 
 class PfPvPlot : public QwtPlot
@@ -42,7 +42,7 @@ class PfPvPlot : public QwtPlot
 
     public:
 
-        PfPvPlot(MainWindow *mainWindow);
+        PfPvPlot(Context *context);
         void refreshZoneItems();
         void setData(RideItem *_rideItem);
         void showIntervals(RideItem *_rideItem);
@@ -82,7 +82,7 @@ class PfPvPlot : public QwtPlot
     protected:
         int intervalCount() const;
 
-        MainWindow *mainWindow;
+        Context *context;
         QwtPlotCurve *curve;
         QList <QwtPlotCurve *> intervalCurves;
         QwtPlotCurve *cpCurve;

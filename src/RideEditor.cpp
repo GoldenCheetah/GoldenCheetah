@@ -20,6 +20,7 @@
 #include "LTMOutliers.h"
 #include "IntervalItem.h"
 #include "MainWindow.h"
+#include "Context.h"
 #include "Settings.h"
 
 #include <QtGui>
@@ -54,7 +55,7 @@ static void secsMsecs(double value, int &secs, int &msecs)
     msecs = round((value - secs) * 100) * 10;
 }
 
-RideEditor::RideEditor(MainWindow *main) : GcChartWindow(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
+RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
 {
     setInstanceName("Ride Editor");
     setControls(NULL);
@@ -139,11 +140,11 @@ RideEditor::RideEditor(MainWindow *main) : GcChartWindow(main), data(NULL), ride
     mainLayout->addWidget(table);
 
     // trap GC signals
-    connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(main->context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
-    connect(main->context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
+    connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
+    connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
@@ -271,7 +272,7 @@ void
 RideEditor::saveFile()
 {
     if (ride && ride->isDirty()) {
-        main->saveRideSingleDialog(ride);
+        context->mainWindow->saveRideSingleDialog(ride);
     }
 }
 
@@ -1107,7 +1108,7 @@ void
 RideEditor::intervalSelected()
 {
     // is it for the ride item we are editing?
-    if (main->context->currentRideItem() == ride) {
+    if (context->currentRideItem() == ride) {
 
         // clear all selections
         table->selectionModel()->select(QItemSelection(model->index(0,0),
@@ -1115,7 +1116,7 @@ RideEditor::intervalSelected()
                                                        QItemSelectionModel::Clear);
 
         // highlight selection and jump to last
-        foreach(QTreeWidgetItem *x, main->allIntervalItems()->treeWidget()->selectedItems()) {
+        foreach(QTreeWidgetItem *x, context->mainWindow->allIntervalItems()->treeWidget()->selectedItems()) {
 
             IntervalItem *current = (IntervalItem*)x;
 

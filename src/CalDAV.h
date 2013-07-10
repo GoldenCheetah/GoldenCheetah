@@ -29,7 +29,8 @@
 
 // set user and password
 #include <QAuthenticator>
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 
 // work with calDAV protocol
 // ...
@@ -58,7 +59,7 @@ class CalDAV : public QObject
     typedef enum action ActionType;
 
 public:
-    CalDAV(MainWindow *main);
+    CalDAV(Context *context);
 
 
 public slots:
@@ -84,7 +85,7 @@ public slots:
     void sslErrors(QNetworkReply*,QList<QSslError>&);
 
 private:
-    MainWindow *main;
+    Context *context;
     QNetworkAccessManager *nam;
     ActionType mode;
 };

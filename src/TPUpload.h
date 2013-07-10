@@ -31,7 +31,7 @@ class TPUpload : public QObject
 
 public:
     TPUpload(QObject *parent = 0);
-    int upload(MainWindow *main, const RideFile *ride);
+    int upload(Context *context, const RideFile *ride);
 
 signals:
     void completed(QString);

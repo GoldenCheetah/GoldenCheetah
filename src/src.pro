@@ -237,6 +237,7 @@ HEADERS += \
         ANTMessage.h \
         ANTMessages.h \
         ANTlocalController.h \
+        Athlete.h \
         BatchExportDialog.h \
         BestIntervalDialog.h \
         BinRideFile.h \
@@ -252,6 +253,7 @@ HEADERS += \
         Computrainer.h \
         Computrainer3dpFile.h \
         ConfigDialog.h \
+        Context.h \
         CpintPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
@@ -586,8 +588,7 @@ SOURCES += \
         Zones.cpp \
         main.cpp \
 
-RESOURCES = application.qrc \
-            RideWindow.qrc
+RESOURCES = application.qrc
 
 TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_ja.ts \

@@ -18,8 +18,8 @@
 
 #include "SummaryWindow.h"
 
-SummaryWindow::SummaryWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow)
+SummaryWindow::SummaryWindow(Context *context) :
+    GcWindow(context), context(context)
 {
     setInstanceName("Summary Window");
     setControls(NULL);
@@ -32,8 +32,8 @@ SummaryWindow::SummaryWindow(MainWindow *mainWindow) :
     vlayout->setContentsMargins(1,1,1,1);
     vlayout->addWidget(splitter);
 
-    rideSummary = new RideSummaryWindow(mainWindow);
-    rideMetadata = new RideMetadata(mainWindow);
+    rideSummary = new RideSummaryWindow(context);
+    rideMetadata = new RideMetadata(context);
 
     splitter->addWidget(rideSummary);
     splitter->addWidget(rideMetadata);

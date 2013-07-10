@@ -22,7 +22,14 @@
 
 #include <QObject>
 #include <QtGui>
-#include "MainWindow.h"
+#include <QHttp>
+#include <QUrl>
+#include <QHttpMultiPart>
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
+#include <QXmlDefaultHandler>
+#include <QNetworkReply>
+#include "Context.h"
 #include "RideItem.h"
 
 class TtbDialog : public QDialog
@@ -31,7 +38,7 @@ class TtbDialog : public QDialog
     G_OBJECT
 
 public:
-    TtbDialog(MainWindow *mainWindow, RideItem *item);
+    TtbDialog(Context *context, RideItem *item);
 
 signals:
 
@@ -61,7 +68,7 @@ private:
         reqUpload,
     };
 
-    MainWindow *mainWindow;
+    Context *context;
     RideItem *ride;
 
     QProgressBar *progressBar;

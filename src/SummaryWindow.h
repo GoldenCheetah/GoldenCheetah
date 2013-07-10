@@ -23,7 +23,7 @@
 #include "RideSummaryWindow.h"
 #include "RideMetadata.h"
 
-class MainWindow;
+class Context;
 
 class SummaryWindow : public GcWindow
 {
@@ -32,7 +32,7 @@ class SummaryWindow : public GcWindow
 
     public:
 
-        SummaryWindow(MainWindow *parent);
+        SummaryWindow(Context *context);
 
     protected slots:
 
@@ -40,7 +40,7 @@ class SummaryWindow : public GcWindow
 
     protected:
 
-        MainWindow *mainWindow;
+        Context *context;
         RideSummaryWindow *rideSummary;
         RideMetadata *rideMetadata;
         QSplitter *splitter;

@@ -22,7 +22,7 @@
 #include "GoldenCheetah.h"
 #include <QApplication>
 
-class MainWindow;
+class Context;
 
 // all the windows we have defined
 namespace GcWindowTypes {
@@ -80,7 +80,7 @@ class GcWindowRegistry {
     GcWinID id;
 
     static void initialize(); // initialize global registry
-    static GcWindow *newGcWindow(GcWinID id, MainWindow *main); //XXX main is gonna go
+    static GcWindow *newGcWindow(GcWinID id, Context *context); //XXX main is gonna go
 };
 
 extern GcWindowRegistry* GcWindows;

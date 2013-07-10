@@ -16,15 +16,15 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "TPUploadDialog.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "GcRideFile.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "TPUpload.h"
 #include "Settings.h"
 
-TPUploadDialog::TPUploadDialog(QString cyclist, const RideFile *ride, MainWindow *main) :
-main(main), cyclist(cyclist), ride(ride)
+TPUploadDialog::TPUploadDialog(QString cyclist, const RideFile *ride, Context *context) :
+context(context), cyclist(cyclist), ride(ride)
 {
     setWindowTitle(tr("Upload to TrainingPeaks.com"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -53,7 +53,7 @@ main(main), cyclist(cyclist), ride(ride)
     connect(uploader, SIGNAL(completed(QString)),this, SLOT(completed(QString)));
 
     uploading = true;
-    int size = uploader->upload(main, ride);
+    int size = uploader->upload(context, ride);
 
     statusLabel->setText(QString(tr("Uploading ride (%1 bytes)...")).arg(size));
 

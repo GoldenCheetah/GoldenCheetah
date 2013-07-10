@@ -20,7 +20,7 @@
 #define _NewCyclistDialog_h
 
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "Units.h"
 #include "Settings.h"
 
@@ -41,7 +41,7 @@ class NewCyclistDialog : public QDialog
         void cancelClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         bool useMetricUnits;
         QDateEdit *dob;
         QComboBox *sex;

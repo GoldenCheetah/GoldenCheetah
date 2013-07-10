@@ -17,6 +17,8 @@
  */
 
 #include "GcCalendar.h"
+#include "Athlete.h"
+#include "Context.h"
 #include "GcWindowLayout.h"
 #include "Settings.h"
 #include <QWebSettings>
@@ -26,7 +28,7 @@
 //********************************************************************************
 // CALENDAR SIDEBAR (GcCalendar)
 //********************************************************************************
-GcCalendar::GcCalendar(MainWindow *main) : main(main)
+GcCalendar::GcCalendar(Context *context) : context(context)
 {
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
@@ -70,13 +72,13 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);
-    splitter->prepare(main->athlete->cyclist, "diary");
+    splitter->prepare(context->athlete->cyclist, "diary");
 
     black.setColor(QPalette::WindowText, Qt::gray);
     white.setColor(QPalette::WindowText, Qt::white);
     grey.setColor(QPalette::WindowText, Qt::gray);
 
-    multiCalendar = new GcMultiCalendar(main);
+    multiCalendar = new GcMultiCalendar(context);
     layout->addWidget(multiCalendar);
 
     // Summary level selector
@@ -110,9 +112,9 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     connect(summarySelect, SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
 
     // refresh on these events...
-    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
 
     // set up for current selections
     refresh();
@@ -222,7 +224,7 @@ void
 GcCalendar::setSummary()
 {
     // are we metric?
-    bool useMetricUnits = main->athlete->useMetricUnits;
+    bool useMetricUnits = context->athlete->useMetricUnits;
 
     // where we construct the text
     QString summaryText("");
@@ -288,7 +290,7 @@ GcCalendar::setSummary()
         to = newTo;
 
         // lets get the metrics
-        QList<SummaryMetrics>results = main->athlete->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
+        QList<SummaryMetrics>results = context->athlete->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
 
         // foreach of the metrics get an aggregated value
         // header of summary
@@ -340,7 +342,7 @@ GcCalendar::setSummary()
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
                 QStringList empty; // usually for filters, but we don't do that
-                QString value = SummaryMetrics::getAggregated(main, metricname, results, empty, false, useMetricUnits);
+                QString value = SummaryMetrics::getAggregated(context, metricname, results, empty, false, useMetricUnits);
 
 
                 // Maximum Max and Average Average looks nasty, remove from name for display
@@ -392,7 +394,7 @@ GcCalendar::setSummary()
 //********************************************************************************
 // MINI CALENDAR (GcMiniCalendar)
 //********************************************************************************
-GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), master(master)
+GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context), master(master)
 {
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
@@ -410,9 +412,9 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     grey.setColor(QPalette::WindowText, Qt::gray);
 
     // get the model
-    fieldDefinitions = main->athlete->rideMetadata()->getFields();
-    calendarModel = new GcCalendarModel(this, &fieldDefinitions, main);
-    calendarModel->setSourceModel(main->listView->sqlModel);
+    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
+    calendarModel->setSourceModel(context->mainWindow->listView->sqlModel);
 
     QHBoxLayout *line = new QHBoxLayout;
     line->setSpacing(0);
@@ -584,7 +586,7 @@ GcMiniCalendar::event(QEvent *e)
 {
     if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy &&
         e->type() != QEvent::LayoutRequest) {
-        main->setBubble("");
+        context->mainWindow->setBubble("");
     }
 
     if (e->type() == QEvent::Paint) {
@@ -615,7 +617,7 @@ GcMiniCalendar::event(QEvent *e)
                 // Popup bubble for ride
                 if (files.count()) {
                     if (files[0] == "calendar") ; // handle planned rides
-                    else main->setBubble(files.at(0), mapToGlobal(pos+QPoint(+2,+2)));
+                    else context->mainWindow->setBubble(files.at(0), mapToGlobal(pos+QPoint(+2,+2)));
                 }
             }
             n++;
@@ -638,14 +640,14 @@ GcMiniCalendar::dayClicked(int i)
     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
 
     if (files.count()) // if more than one file cycle through them?
-        main->selectRideFile(QFileInfo(files[0]).fileName());
+        context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
 
 }
 
 void
 GcMiniCalendar::previous()
 {
-    QList<QDateTime> allDates = main->athlete->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = context->athlete->metricDB->db()->getAllDates();
     qSort(allDates);
 
     // begin of month
@@ -667,7 +669,7 @@ GcMiniCalendar::previous()
                 if (date == heredate) {
                     // select this ride...
                     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
-                    if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
+                    if (files.count()) context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
             emit dateChanged(month,year);
@@ -679,7 +681,7 @@ GcMiniCalendar::previous()
 void
 GcMiniCalendar::next()
 {
-    QList<QDateTime> allDates = main->athlete->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = context->athlete->metricDB->db()->getAllDates();
     qSort(allDates);
 
     // end of month
@@ -700,7 +702,7 @@ GcMiniCalendar::next()
                 if (date == heredate) {
                     // select this ride...
                     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
-                    if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
+                    if (files.count()) context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
             emit dateChanged(month,year);
@@ -811,7 +813,7 @@ GcMiniCalendar::setDate(int _month, int _year)
 //********************************************************************************
 // MULTI CALENDAR (GcMultiCalendar)
 //********************************************************************************
-GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(main), active(false)
+GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWindow), context(context), active(false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setContentsMargins(0,0,0,0);
@@ -826,7 +828,7 @@ GcMultiCalendar::GcMultiCalendar(MainWindow *main) : QScrollArea(main), main(mai
     pal.setColor(QPalette::Window, Qt::white);
     setPalette(pal);
 
-    GcMiniCalendar *mini = new GcMiniCalendar(main, true);
+    GcMiniCalendar *mini = new GcMiniCalendar(context, true);
     calendars.append(mini);
     mini->setDate(QDate::currentDate().month(), QDate::currentDate().year()); // default to this month
     layout->addWidget(mini);
@@ -919,7 +921,7 @@ GcMultiCalendar::resizeEvent(QResizeEvent*)
     if (showing > calendars.count()) {
 
         for (int i=have; i<showing; i++) {
-            GcMiniCalendar *mini = new GcMiniCalendar(main, false);
+            GcMiniCalendar *mini = new GcMiniCalendar(context, false);
             mini->setFilter(this->filters);
             calendars.append(mini);
             layout->insert(i, mini);

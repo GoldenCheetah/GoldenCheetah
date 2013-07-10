@@ -25,7 +25,7 @@
 
 #include <QtGui>
 #include <QXmlDefaultHandler>
-#include "MainWindow.h"
+#include "Context.h"
 
 #ifdef Q_OS_MAC
 #include "QtMacSegmentedButton.h"
@@ -40,7 +40,7 @@ class HomeWindow : public GcWindow
 
     public:
 
-        HomeWindow(MainWindow *, QString name, QString title);
+        HomeWindow(Context *, QString name, QString title);
         ~HomeWindow();
 
         void resetLayout();
@@ -69,7 +69,7 @@ class HomeWindow : public GcWindow
         void styleChanged(int);
         void addChart(GcWindow* newone);
         void addChartFromMenu(QAction*action); // called with an action
-        void appendChart(GcWinID id); // called from MainWindow to inset chart
+        void appendChart(GcWinID id); // called from Context *to inset chart
         bool removeChart(int, bool confirm = true);
         void titleChanged();
 
@@ -96,7 +96,7 @@ class HomeWindow : public GcWindow
         void rightClick(const QPoint &pos);
 
     protected:
-        MainWindow *mainWindow;
+        Context *context;
         QString name;
         bool active; // ignore gui signals when changing views
         GcWindow *clicked; // keep track of selected charts
@@ -136,7 +136,7 @@ class GcWindowDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcWindowDialog(GcWinID, MainWindow*);
+        GcWindowDialog(GcWinID, Context *);
         GcWindow *exec();               // return pointer to window, or NULL if cancelled
 
     public slots:
@@ -144,7 +144,7 @@ class GcWindowDialog : public QDialog
         void cancelClicked();
 
     protected:
-        MainWindow *mainWindow;
+        Context *context;
         GcWinID type;
 
         // we remove from the layout at the end
@@ -163,7 +163,7 @@ class ViewParser : public QXmlDefaultHandler
 {
 
 public:
-    ViewParser(MainWindow *mainWindow) : style(2), mainWindow(mainWindow) {}
+    ViewParser(Context *context) : style(2), context(context) {}
 
     // the results!
     QList<GcWindow*> charts;
@@ -177,7 +177,7 @@ public:
     bool characters( const QString& str );
 
 protected:
-    MainWindow *mainWindow;
+    Context *context;
     GcWindow *chart;
 
 };

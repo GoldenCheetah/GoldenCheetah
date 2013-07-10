@@ -17,7 +17,8 @@
  */
 
 
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
 #include "IntervalItem.h"
@@ -26,8 +27,8 @@
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
-AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
-  GcWindow(mainWindow), mainWindow(mainWindow) {
+AerolabWindow::AerolabWindow(Context *context) :
+  GcWindow(context), context(context) {
     setInstanceName("Aerolab Window");
     setControls(NULL);
 
@@ -36,7 +37,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QHBoxLayout *cLayout      = new QHBoxLayout;
 
   // Plot:
-  aerolab = new Aerolab(this, mainWindow);
+  aerolab = new Aerolab(this, context);
 
   // Left controls layout:
   QVBoxLayout *leftControls  =  new QVBoxLayout;
@@ -241,10 +242,10 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   connect(eoffsetAuto, SIGNAL(stateChanged(int)), this, SLOT(setAutoEoffset(int)));
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
-  connect(mainWindow->context, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
-  connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-  connect(mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
-  connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
+  connect(context, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
+  connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+  connect(context->mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
+  connect(context->mainWindow, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
   connect(allZoomer, SIGNAL( zoomed(const QRectF) ), this, SLOT(zoomChanged()));
 
 
@@ -317,7 +318,7 @@ AerolabWindow::setCrrFromText(const QString text) {
     aerolab->setIntCrr(value);
     //crrQLCDNumber->display(QString("%1").arg(aerolab->getCrr()));
     crrSlider->setValue(aerolab->intCrr());
-    RideItem *ride = mainWindow->context->rideItem();
+    RideItem *ride = context->rideItem();
     aerolab->setData(ride, false);
   }
 }
@@ -367,7 +368,7 @@ AerolabWindow::setTotalMassFromText(const QString text) {
     aerolab->setIntTotalMass(value);
     //mQLCDNumber->display(QString("%1").arg(aerolab->getTotalMass()));
     mSlider->setValue(aerolab->intTotalMass());
-    RideItem *ride = mainWindow->context->rideItem();
+    RideItem *ride = context->rideItem();
     aerolab->setData(ride, false);
   }
 }
@@ -474,7 +475,7 @@ AerolabWindow::setByDistance(int value)
 void
 AerolabWindow::doEstCdACrr()
 {
-    RideItem *ride = mainWindow->context->rideItem();
+    RideItem *ride = context->rideItem();
     /* Estimate Crr&Cda */
     const QString errMsg = aerolab->estimateCdACrr(ride);
     if (errMsg.isEmpty()) {

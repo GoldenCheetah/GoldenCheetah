@@ -16,6 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "Athlete.h"
+#include "Context.h"
 #include "LTMPlot.h"
 #include "LTMTool.h"
 #include "LTMTrend.h"
@@ -42,8 +44,8 @@
 
 static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1, QwtPlot::yRight1, QwtPlot::yLeft2, QwtPlot::yRight2, QwtPlot::yLeft3, QwtPlot::yRight3 };
 
-LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main) : 
-    bg(NULL), parent(parent), main(main), highlighter(NULL)
+LTMPlot::LTMPlot(LTMWindow *parent, Context *context) : 
+    bg(NULL), parent(parent), context(context), highlighter(NULL)
 {
     setInstanceName("Metric Plot");
 
@@ -64,7 +66,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main) :
 
     configUpdate(); // set basic colors
 
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 LTMPlot::~LTMPlot()
@@ -101,7 +103,7 @@ LTMPlot::setData(LTMSettings *set)
     settings = set;
 
     // For each metric in chart, translate units and name if default uname
-    LTMTool::translateMetrics(main, main->athlete->home, settings);
+    LTMTool::translateMetrics(context, context->athlete->home, settings);
 
     // crop dates to at least within a year of the data available, but only if we have some data
     if (settings->data != NULL && (*settings->data).count() != 0) {
@@ -780,7 +782,7 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
     foreach (SummaryMetrics rideMetrics, *(settings->data)) {
 
         // filter out unwanted rides
-        if (main->isfiltered && !main->filters.contains(rideMetrics.getFileName())) continue;
+        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
 
         double value = rideMetrics.getForSymbol(metricDetail.symbol);
 
@@ -790,7 +792,7 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (main->athlete->useMetricUnits == false) {
+            if (context->athlete->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -856,8 +858,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
 
         // filter out unwanted rides but not for PMC type metrics
         // because that needs to be done in the stress calculator
-        if (metricDetail.type != METRIC_PM && main->isfiltered && 
-            !main->filters.contains(rideMetrics.getFileName())) continue;
+        if (metricDetail.type != METRIC_PM && context->mainWindow->isfiltered && 
+            !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
 
         // day we are on
         int currentDay = groupForDate(rideMetrics.getRideDate().date(), settings->groupBy);
@@ -875,7 +877,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (main->athlete->useMetricUnits == false) {
+            if (context->athlete->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -957,13 +959,13 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
     // create the Stress Calculation List
     // FOR ALL RIDE FILES
 	StressCalculator *sc = new StressCalculator(
-            main->athlete->cyclist,
+            context->athlete->cyclist,
 		    settings->start,
 		    settings->end,
 		    (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
             (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
 
-    sc->calculateStress(main, main->athlete->home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
+    sc->calculateStress(context, context->athlete->home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
 
     // pick out any data that is in the date range selected
     // convert to SummaryMetric Format used on the plot
@@ -1087,7 +1089,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             c.next();
             if (c.value() == curve) {
                 const RideMetric *metric =factory.rideMetric(c.key());
-                units = metric ? metric->units(main->athlete->useMetricUnits) : "";
+                units = metric ? metric->units(context->athlete->useMetricUnits) : "";
                 precision = metric ? metric->precision() : 1;
 
                 // BikeScore, RI and Daniels Points have no units
@@ -1181,8 +1183,8 @@ class LTMPlotBackground: public QwtPlotItem
                       const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                       const QRectF &rect) const
     {
-        const Zones *zones       = parent->parent->main->athlete->zones();
-        int zone_range_size     = parent->parent->main->athlete->zones()->getRangeSize();
+        const Zones *zones       = parent->parent->context->mainWindow->athlete->zones();
+        int zone_range_size     = parent->parent->context->mainWindow->athlete->zones()->getRangeSize();
 
         if (zone_range_size >= 0) { //parent->shadeZones() &&
             for (int i = 0; i < zone_range_size; i ++) {
@@ -1238,8 +1240,8 @@ class LTMPlotZoneLabel: public QwtPlotItem
             parent = _parent;
             zone_number = _zone_number;
 
-            const Zones *zones       = parent->parent->main->athlete->zones();
-            //int zone_range     = 0; //parent->parent->mainWindow->zoneRange();
+            const Zones *zones       = parent->parent->context->mainWindow->athlete->zones();
+            //int zone_range     = 0; //parent->parent->context->mainWindow->zoneRange();
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 
             // which axis has watts?
@@ -1308,7 +1310,7 @@ LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
 
     // seasons and season events
     if (settings->events) {
-        foreach (Season s, main->athlete->seasons->seasons) {
+        foreach (Season s, context->athlete->seasons->seasons) {
 
             if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) {
 
@@ -1366,7 +1368,7 @@ LTMPlot::refreshZoneLabels(int axisid)
     }
     if (axisid == -1) return; // our job is done - no zones to plot
 
-    const Zones *zones       = main->athlete->zones();
+    const Zones *zones       = context->athlete->zones();
 
     if (zones == NULL || zones->getRangeSize()==0) return; // no zones to plot
 

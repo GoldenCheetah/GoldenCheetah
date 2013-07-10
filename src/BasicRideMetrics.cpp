@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "Context.h"
 #include "Settings.h"
 #include "LTMOutliers.h"
 #include "Units.h"
@@ -43,7 +44,7 @@ class RideCount : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         setValue(1);
     }
     RideMetric *clone() const { return new RideCount(*this); }
@@ -73,7 +74,7 @@ class WorkoutTime : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         if (!ride->dataPoints().isEmpty()) { 
             seconds = ride->dataPoints().back()->secs -
                       ride->dataPoints().front()->secs + ride->recIntSecs();
@@ -110,7 +111,7 @@ class TimeRiding : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         secsMovingOrPedaling = 0;
         if (ride->areDataPresent()->kph) {
@@ -155,7 +156,7 @@ class TotalDistance : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         // Note: The 'km' in each sample is the distance travelled by the
         // *end* of the sampling period.  The last term in this equation
@@ -206,10 +207,10 @@ class ElevationGain : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *main) {
+                 const Context *context) {
 
         // hysteresis can be configured, we default to 3.0
-        double hysteresis = appsettings->value((QObject*)main, GC_ELEVATION_HYSTERESIS).toDouble();
+        double hysteresis = appsettings->value((QObject*)context->mainWindow, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
         bool first = true;
@@ -255,7 +256,7 @@ class TotalWork : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= 0.0)
                 joules += point->watts * ride->recIntSecs();
@@ -294,7 +295,7 @@ class AvgSpeed : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
         assert(deps.contains("total_distance"));
         km = deps.value("total_distance")->value(true);
 
@@ -351,7 +352,7 @@ class Pace : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
 
@@ -397,7 +398,7 @@ struct AvgPower : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= 0.0) {
@@ -437,7 +438,7 @@ struct NonZeroPower : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts > 0.0) {
@@ -477,7 +478,7 @@ struct AvgHeartRate : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->hr > 0) {
@@ -517,7 +518,7 @@ struct AvgCadence : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->cad > 0) {
@@ -560,7 +561,7 @@ struct AvgTemp : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         if (ride->areDataPresent()->temp) {
             total = count = 0;
@@ -603,7 +604,7 @@ class MaxPower : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= max)
                 max = point->watts;
@@ -636,7 +637,7 @@ class MaxHr : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->hr >= max)
                 max = point->hr;
@@ -672,7 +673,7 @@ class MaxSpeed : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         double max = 0.0;
 
         if (ride->areDataPresent()->kph) {
@@ -716,7 +717,7 @@ class MaxCadence : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         double max = 0.0;
         foreach (const RideFilePoint *point, ride->dataPoints())
             if (point->cad > max) max = point->cad;
@@ -760,7 +761,7 @@ class MaxTemp : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         if (ride->areDataPresent()->temp) {
             double max = 0.0;
@@ -805,7 +806,7 @@ class NinetyFivePercentHeartRate : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
         QVector<double> hrs;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->hr >= 0.0)
@@ -843,7 +844,7 @@ class VAM : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 
         ElevationGain *el = dynamic_cast<ElevationGain*>(deps.value("elevation_gain"));
         WorkoutTime *wt = dynamic_cast<WorkoutTime*>(deps.value("workout_time"));
@@ -884,7 +885,7 @@ class Gradient : public RideMetric {
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 
         ElevationGain *el = dynamic_cast<ElevationGain*>(deps.value("elevation_gain"));
         TotalDistance *td = dynamic_cast<TotalDistance*>(deps.value("total_distance"));
@@ -930,7 +931,7 @@ class MeanPowerVariance : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         // Less than 30s don't bother
         if (ride->dataPoints().count() < 30) {
@@ -982,7 +983,7 @@ class MaxPowerVariance : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *) {
+                 const Context *) {
 
         MeanPowerVariance *mean = dynamic_cast<MeanPowerVariance*>(deps.value("meanpowervariance"));
         if (ride->dataPoints().count() < 30)

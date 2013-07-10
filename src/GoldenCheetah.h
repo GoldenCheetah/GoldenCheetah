@@ -19,6 +19,8 @@
 #ifndef _GC_GoldenCheetah_h
 #define _GC_GoldenCheetah_h
 #include "TimeUtils.h"
+class RideItem;
+class GcWindow;
 
 #define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
 #define setInstanceName(x) setProperty("instanceName", x)
@@ -37,10 +39,7 @@
 #include <QFrame>
 #include <QtGui>
 
-class RideItem;
-class GcWindow;
 #include "GcWindowRegistry.h"
-
 
 Q_DECLARE_METATYPE(QWidget*)
 Q_DECLARE_METATYPE(RideItem*)
@@ -126,7 +125,7 @@ public:
 
     GcWindow();
     ~GcWindow();
-    GcWindow(QWidget *p);
+    GcWindow(Context *context);
 
     void _setInstanceName(QString x); // GOBJECTS can set their instance name, but not be GcWindows
     QString instanceName() const;
@@ -200,6 +199,7 @@ public:
 class GcChartWindow : public GcWindow
 {
 private:
+
     Q_OBJECT
 
     QStackedLayout *_layout;
@@ -219,6 +219,7 @@ private:
     QPropertyAnimation *_revealAnim,
                        *_unrevealAnim;
     QTimer *_unrevealTimer;
+    Context *context;
 
     // reveal
     bool virtual hasReveal() { return false; }
@@ -226,7 +227,7 @@ private:
     void unreveal();
 
 public:
-    GcChartWindow(QWidget *p);
+    GcChartWindow(Context *context);
 
     QWidget *mainWidget() { return _mainWidget; }
 

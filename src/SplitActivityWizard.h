@@ -20,7 +20,7 @@
 #define _SplitActivityWizard_h
 
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "SmallPlot.h"
 #include "RideItem.h"
 #include "RideFile.h"
@@ -40,9 +40,9 @@ class SplitActivityWizard : public QWizard
     Q_OBJECT
 
 public:
-    SplitActivityWizard(MainWindow *main);
+    SplitActivityWizard(Context *context);
 
-    MainWindow *main;
+    Context *context;
     bool keepOriginal;
     RideItem *rideItem;
 

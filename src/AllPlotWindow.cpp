@@ -17,10 +17,11 @@
  */
 
 
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
-#include "MainWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
@@ -48,8 +49,8 @@
 // tooltip
 #include "LTMWindow.h"
 
-AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
-    GcChartWindow(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true), setupStack(false)
+AllPlotWindow::AllPlotWindow(Context *context) :
+    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false)
 {
     setInstanceName("Ride Plot Window");
 
@@ -205,7 +206,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     smoothLayout->addWidget(smoothSlider);
     cl3->addRow(smoothLabel, smoothLayout);
 
-    allPlot = new AllPlot(this, mainWindow);
+    allPlot = new AllPlot(this, context);
     allPlot->setInstanceName("allPlot");
     allPlot->setContentsMargins(0,0,0,0);
 
@@ -340,7 +341,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     scrollRight->setStyle(style);
 #endif
 
-    fullPlot = new AllPlot(this, mainWindow);
+    fullPlot = new AllPlot(this, context);
     fullPlot->setInstanceName("fullPlot");
     fullPlot->grid->enableY(false);
     fullPlot->setFixedHeight(100);
@@ -430,14 +431,14 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     // GC signals
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow->context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow->context, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(mainWindow->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
-    connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
-    connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
+    connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+    connect(context->mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
 
     // set initial colors
     configChanged();
@@ -515,8 +516,8 @@ AllPlotWindow::redrawFullPlot()
 
     if (fullPlot->bydist)
         fullPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
     else
         fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                  ride->ride()->dataPoints().last()->secs/60);
@@ -1056,7 +1057,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         // if we are in distance mode then x1 and x2 are distances
         // we need to make sure they are in KM for the rest of this
         // code.
-        if (plot->bydist && mainWindow->athlete->useMetricUnits == false) {
+        if (plot->bydist && context->athlete->useMetricUnits == false) {
             x1 *= KM_PER_MILE;
             x2 *=  KM_PER_MILE;
         }
@@ -1079,15 +1080,15 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             }
         }
         QString s("\n%1%2 %3 %4\n%5%6 %7%8 %9%10");
-        s = s.arg(mainWindow->athlete->useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 2);
-        s = s.arg((mainWindow->athlete->useMetricUnits? "km":"mi"));
+        s = s.arg(context->athlete->useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 2);
+        s = s.arg((context->athlete->useMetricUnits? "km":"mi"));
         s = s.arg(time_to_string(duration2-duration1));
         if (duration2-duration1-secsMoving>1)
             s = s.arg("("+time_to_string(secsMoving)+")");
         else
             s = s.arg("");
-        s = s.arg((mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) * (distance2-distance1)/secsMoving*3600, 0, 'f', 1);
-        s = s.arg((mainWindow->athlete->useMetricUnits? "km/h":"mph"));
+        s = s.arg((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) * (distance2-distance1)/secsMoving*3600, 0, 'f', 1);
+        s = s.arg((context->athlete->useMetricUnits? "km/h":"mph"));
         if (wattsTotal>0) {
             s = s.arg(wattsTotal/arrayLength, 0, 'f', 1);
             s = s.arg("W");
@@ -1121,7 +1122,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
 
         if (newInterval) {
 
-            QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
+            QTreeWidgetItem *allIntervals = context->mainWindow->mutableIntervalItems();
             int count = allIntervals->childCount();
 
             // are we adjusting an existing interval? - if so delete it and readd it
@@ -1139,10 +1140,10 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             allIntervals->addChild(last);
 
             // select this new interval
-            mainWindow->intervalTreeWidget()->setItemSelected(last, true);
+            context->mainWindow->intervalTreeWidget()->setItemSelected(last, true);
 
             // now update the RideFileIntervals and all the plots etc
-            mainWindow->updateRideFileIntervals();
+            context->mainWindow->updateRideFileIntervals();
         }
     }
     active = false;
@@ -1412,9 +1413,9 @@ AllPlotWindow::resetStackedDatas()
         int startIndex, stopIndex;
         if (plot->bydist) {
             startIndex = allPlot->rideItem->ride()->distanceIndex(
-                        (mainWindow->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->distanceIndex(
-                        (mainWindow->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
@@ -1552,7 +1553,7 @@ AllPlotWindow::setupStackPlots()
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
 
     double duration = rideItem->ride()->dataPoints().last()->secs;
-    double distance =  (mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
+    double distance =  (context->athlete->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
     int nbplot;
 
     if (fullPlot->bydist)
@@ -1568,9 +1569,9 @@ AllPlotWindow::setupStackPlots()
         // calculate the segment of ride this stack plot contains
         int startIndex, stopIndex;
         if (fullPlot->bydist) {
-            startIndex = fullPlot->rideItem->ride()->distanceIndex((mainWindow->athlete->useMetricUnits ?
+            startIndex = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*i);
-            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((mainWindow->athlete->useMetricUnits ?
+            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = fullPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
@@ -1581,7 +1582,7 @@ AllPlotWindow::setupStackPlots()
         if (stopIndex - startIndex < 2) break;
 
         // create that plot
-        AllPlot *_allPlot = new AllPlot(this, mainWindow);
+        AllPlot *_allPlot = new AllPlot(this, context);
         _allPlot->setInstanceName("stackPlot");
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);

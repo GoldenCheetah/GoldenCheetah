@@ -20,11 +20,11 @@
 #define _GC_RideNavigator_h 1
 #include "GoldenCheetah.h"
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "MetricAggregator.h"
 #include "RideMetadata.h"
 #include "DBAccess.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "GcCalendar.h"
 #include "Settings.h"
 #include "Colors.h"
@@ -69,7 +69,7 @@ class RideNavigator : public GcWindow
     friend class ::SearchBox;
 
     public:
-        RideNavigator(MainWindow *, bool mainwindow = false);
+        RideNavigator(Context *, bool mainwindow = false);
         ~RideNavigator();
 
         void borderMenu(const QPoint &pos);
@@ -77,7 +77,7 @@ class RideNavigator : public GcWindow
         // so the cell delegate can access
         QTreeView *tableView; // the view
 
-        MainWindow *main;
+        Context *context;
 
     signals:
 

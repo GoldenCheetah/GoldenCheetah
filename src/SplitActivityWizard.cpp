@@ -17,6 +17,9 @@
  */
 
 #include "SplitActivityWizard.h"
+#include "MainWindow.h"
+#include "Athlete.h"
+#include "Context.h"
 
 // Minimum gap in recording to find a natural break to split
 static const double defaultMinimumGap = 1; // 1 minute
@@ -25,7 +28,7 @@ static const double defaultMinimumGap = 1; // 1 minute
 static const double defaultMinimumSegmentSize = 5; // 5 minutes
 
 // Main wizard
-SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main(main)
+SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
 #ifdef Q_OS_MAX
     setWizardStyle(QWizard::ModernStyle);
@@ -42,7 +45,7 @@ SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main
     setWindowTitle(tr("Split Activity"));
 
     // set ride - unconst since we will wipe it away eventually
-    rideItem = const_cast<RideItem*>(main->context->currentRideItem());
+    rideItem = const_cast<RideItem*>(context->currentRideItem());
 
     // Set sensible defaults
     keepOriginal = false;
@@ -286,8 +289,8 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
         double distance = rideItem->ride()->timeToDistance(interval.stop) - 
                           rideItem->ride()->timeToDistance(interval.start);
         add->setText(5, QString("%1 %2")
-                        .arg(distance * (main->athlete->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
-                        .arg(main->athlete->useMetricUnits ? "km" : "mi"));
+                        .arg(distance * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
+                        .arg(context->athlete->useMetricUnits ? "km" : "mi"));
 
         // interval name
         add->setText(6, interval.name);
@@ -333,7 +336,7 @@ SplitActivityWizard::setFilesList()
         add->setText(3, time);
 
         // set distance
-        QString dist = main->athlete->useMetricUnits
+        QString dist = context->athlete->useMetricUnits
             ? QString ("%1 km").arg(km, 0, 'f', 1)
             : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
         add->setText(4, dist);
@@ -380,7 +383,7 @@ SplitActivityWizard::setFilesList()
         add->setText(3, time);
 
         // set distance
-        QString dist = main->athlete->useMetricUnits
+        QString dist = context->athlete->useMetricUnits
             ? QString ("%1 km").arg(km, 0, 'f', 1)
             : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
         add->setText(4, dist);
@@ -399,7 +402,7 @@ SplitActivityWizard::setFilesList()
 QString
 SplitActivityWizard::hasBackup(QString filename)
 {
-    QString backupFilename = main->athlete->home.absolutePath() + "/" + filename + ".bak";
+    QString backupFilename = context->athlete->home.absolutePath() + "/" + filename + ".bak";
 
     if (QFile(backupFilename).exists()) {
 
@@ -429,7 +432,7 @@ SplitActivityWizard::conflicts(QDateTime datetime)
     // now make a regexp for all know ride types
     foreach(QString suffix, RideFileFactory::instance().suffixes()) {
 
-        QString conflict = main->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
+        QString conflict = context->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
         if (QFile(conflict).exists()) returning << conflict;
     }
     return returning;
@@ -707,7 +710,7 @@ SplitConfirm::initializePage()
     // it will always conflict with current ride, so we pick that
     // up as a special case.
     // we check against existing rides AND the rides we WILL create
-    QString originalFileName = wizard->main->athlete->home.absolutePath() + "/" + wizard->rideItem->fileName;
+    QString originalFileName = wizard->context->athlete->home.absolutePath() + "/" + wizard->rideItem->fileName;
     QList<QDateTime> toBeCreated;
     foreach(RideFile *ride, wizard->activities) {
 
@@ -804,7 +807,7 @@ SplitConfirm::validatePage()
         // first do we need to remove the current ride?
         if (wizard->keepOriginal == false) {
 
-            wizard->main->removeCurrentRide();
+            wizard->context->mainWindow->removeCurrentRide();
             QTreeWidgetItem *current = wizard->files->invisibleRootItem()->child(0);
             current->setText(5, tr("Removed"));
         }
@@ -814,15 +817,15 @@ SplitConfirm::validatePage()
         for(int i=0; i<wizard->activities.count(); i++) {
 
             QTreeWidgetItem *current = wizard->files->invisibleRootItem()->child(i+off);
-            QString target = wizard->main->athlete->home.absolutePath() + "/" + current->text(0);
+            QString target = wizard->context->athlete->home.absolutePath() + "/" + current->text(0);
 
             JsonFileReader reader;
             QFile out(target);
-            reader.writeRideFile(wizard->main, wizard->activities.at(i), out);
+            reader.writeRideFile(wizard->context, wizard->activities.at(i), out);
 
             current->setText(5, tr("Saved"));
 
-            wizard->main->addRide(QFileInfo(out).fileName(), true);
+            wizard->context->mainWindow->addRide(QFileInfo(out).fileName(), true);
         }
 
         // now make this page the last (so we can see what was done)

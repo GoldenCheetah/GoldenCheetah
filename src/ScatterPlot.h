@@ -22,11 +22,14 @@
 
 #include <QtGui>
 #include <QTimer>
-#include "MainWindow.h"
+#include "Context.h"
+#include "IntervalItem.h"
+#include "RideItem.h"
 #include "Units.h"
 #include "math.h"
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_curve.h>
 #include <qwt_symbol.h>
 
 #define MODEL_NONE          0
@@ -57,7 +60,7 @@ class ScatterPlot : public QwtPlot
 
 
     public:
-        ScatterPlot(MainWindow *);
+        ScatterPlot(Context *);
         void setData(ScatterSettings *);
         void showTime(ScatterSettings *, int offset, int secs);
         void setAxisTitle(int axis, QString label);
@@ -67,8 +70,8 @@ class ScatterPlot : public QwtPlot
 
     protected:
 
-        // passed from MainWindow
-        MainWindow *main;
+        // passed from Context *
+        Context *context;
         bool useMetricUnits;
         double cranklength;
 

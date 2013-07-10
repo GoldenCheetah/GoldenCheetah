@@ -37,7 +37,7 @@ class PeakPower : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
+                 const Context *) {
 
         if (!ride->dataPoints().isEmpty()) {
             QList<BestIntervalDialog::BestInterval> results;
@@ -338,7 +338,7 @@ class PeakPowerHr : public RideMetric {
     }
     void setSecs(double secs) { this->secs=secs; }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
-                 const QHash<QString,RideMetric*> &, const MainWindow *) {
+                 const QHash<QString,RideMetric*> &, const Context *) {
 
         if (!ride->dataPoints().isEmpty()){
             QList<BestIntervalDialog::BestInterval> results;

@@ -25,7 +25,7 @@
 #include <QFile>
 #include <QApplication>
 
-#include "MainWindow.h"
+#include "Context.h"
 
 class SeasonEvent
 {
@@ -83,14 +83,14 @@ class EditSeasonDialog : public QDialog
 
 
     public:
-        EditSeasonDialog(MainWindow *, Season *);
+        EditSeasonDialog(Context *, Season *);
 
     public slots:
         void applyClicked();
         void cancelClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         Season *season;
 
         QPushButton *applyButton, *cancelButton;
@@ -107,14 +107,14 @@ class EditSeasonEventDialog : public QDialog
 
 
     public:
-        EditSeasonEventDialog(MainWindow *, SeasonEvent *);
+        EditSeasonEventDialog(Context *, SeasonEvent *);
 
     public slots:
         void applyClicked();
         void cancelClicked();
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
         SeasonEvent *event;
 
         QPushButton *applyButton, *cancelButton;

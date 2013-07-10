@@ -25,7 +25,7 @@
 #include <QProgressBar>
 #include <QList>
 #include <QListIterator>
-#include "MainWindow.h"
+#include "Context.h"
 
 // Dialog class to show filenames, import progress and to capture user input
 // of ride date and time
@@ -37,8 +37,8 @@ class RideImportWizard : public QDialog
 
 
 public:
-    RideImportWizard(QList<QUrl> *urls, QDir &home, MainWindow *main, QWidget *parent = 0);
-    RideImportWizard(QList<QString> files, QDir &home, MainWindow *main, QWidget *parent = 0);
+    RideImportWizard(QList<QUrl> *urls, QDir &home, Context *context, QWidget *parent = 0);
+    RideImportWizard(QList<QString> files, QDir &home, Context *context, QWidget *parent = 0);
     ~RideImportWizard();
     int process();
 
@@ -52,7 +52,7 @@ private slots:
     void activateSave();
 
 private:
-    void init(QList<QString> files, QDir &home, MainWindow *main);
+    void init(QList<QString> files, QDir &home, Context *context);
     QList <QString> filenames; // list of filenames passed
     QList <bool> blanks; // record of which have a RideFileReader returned date & time
     QDir home; // target directory
@@ -65,7 +65,7 @@ private:
     QComboBox *todayButton;    // set date to today when asking for dates
     QCheckBox *overFiles;      // chance to set overwrite when asking for dates
     bool overwriteFiles; // flag to overwrite files from checkbox
-    MainWindow *mainWindow; // caller
+    Context *context; // caller
 
     QStringList deleteMe; // list of temp files created during import
 };

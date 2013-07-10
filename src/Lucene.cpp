@@ -18,6 +18,8 @@
 
 #include "Lucene.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 
 // stdc strings
 using namespace std;
@@ -29,13 +31,13 @@ using namespace lucene::queryParser;
 using namespace lucene::search;
 using namespace lucene::store;
 
-Lucene::Lucene(QObject *parent, MainWindow *main) : QObject(parent), main(main)
+Lucene::Lucene(QObject *parent, Context *context) : QObject(parent), context(context)
 {
     // create the directory if needed
-    main->athlete->home.mkdir("index");
+    context->athlete->home.mkdir("index");
 
     // make index directory if needed
-    dir = QDir(main->athlete->home.canonicalPath() + "/index");
+    dir = QDir(context->athlete->home.canonicalPath() + "/index");
 
     try {
 
@@ -77,11 +79,11 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     QString alltexts;
 
     // And all the metadata texts individually
-    foreach(FieldDefinition field, main->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
 
-        if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
+        if (!context->mainWindow->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
 
-            std::wstring name = main->specialFields.makeTechName(field.name).toStdWString();
+            std::wstring name = context->mainWindow->specialFields.makeTechName(field.name).toStdWString();
             std::wstring value = ride->getTag(field.name,"").toStdWString();
 
             alltexts += ride->getTag(field.name,"") + " ";

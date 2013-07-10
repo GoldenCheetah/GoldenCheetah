@@ -18,6 +18,7 @@
 
 #include "SummaryMetrics.h"
 #include "MainWindow.h"
+#include "Context.h"
 #include "RideMetric.h"
 #include <QRegExp>
 #include <QStringList>
@@ -114,7 +115,7 @@ SummaryMetrics::getUnitsForSymbol(QString symbol, bool UseMetric) const
     else return QString("units");
 }
 
-QString SummaryMetrics::getAggregated(MainWindow *main, QString name, const QList<SummaryMetrics> &results, const QStringList &filters, 
+QString SummaryMetrics::getAggregated(Context *context, QString name, const QList<SummaryMetrics> &results, const QStringList &filters, 
                                       bool filtered, bool useMetricUnits, bool nofmt)
 {
     // get the metric details, so we can convert etc
@@ -130,7 +131,7 @@ QString SummaryMetrics::getAggregated(MainWindow *main, QString name, const QLis
 
         // skip filtered rides
         if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
-        if (main->isfiltered && !main->filters.contains(rideMetrics.getFileName())) continue;
+        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
 
         // get this value
         double value = rideMetrics.getForSymbol(name);

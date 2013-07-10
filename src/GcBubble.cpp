@@ -26,13 +26,17 @@ static const int spikeMargin = 40;
 
 #include "GcBubble.h"
 
+#include "Athlete.h"
+#include "MainWindow.h"
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
 #include "DBAccess.h"
 #include "Settings.h"
 #include "Units.h"
 
-GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint), mainWindow(parent), borderWidth(3), parent(parent), orientation(Qt::Horizontal)
+GcBubble::GcBubble(Context *context) : 
+    QWidget(context->mainWindow, Qt::FramelessWindowHint),
+    context(context), borderWidth(3), orientation(Qt::Horizontal)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -211,7 +215,7 @@ GcBubble::paintEvent(QPaintEvent *)
 void
 GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses global co-ords
 {
-    QPoint here = parent->mapFromGlobal(QPoint(x,y));
+    QPoint here = context->mainWindow->mapFromGlobal(QPoint(x,y));
     this->orientation = orientation;
 
     // set to as big as possible
@@ -222,7 +226,7 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
     if (orientation == Qt::Horizontal) {
 
         // would the window be off mainwindow?
-        if ((x+width()) > parent->geometry().x()+parent->geometry().width()) {
+        if ((x+width()) > context->mainWindow->geometry().x()+context->mainWindow->geometry().width()) {
             spikePosition = right;
         } else {
             spikePosition = left;
@@ -232,7 +236,7 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
     } else {
 
         // would the window be off mainwindow?
-        if ((y-height()) < (parent->geometry().y()+40)) { // +40 for menu and title bar
+        if ((y-height()) < (context->mainWindow->geometry().y()+40)) { // +40 for menu and title bar
             spikePosition = top;
         } else {
             spikePosition = bottom;
@@ -246,12 +250,12 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
     // stay visible in mainwindow
     if (orientation == Qt::Horizontal) {
 
-        if (y-(height()/2) < (parent->geometry().y()+40)) { // +40 for menu and title bar of mainwindow
+        if (y-(height()/2) < (context->mainWindow->geometry().y()+40)) { // +40 for menu and title bar of mainwindow
             // put it at the top
             if (spikePosition == left) start = QPoint(lineWidth, 40);
             else start = QPoint(width()-lineWidth, 40);
 
-        } else if (y+(height()/2) > (parent->geometry().y()+parent->geometry().height())) {
+        } else if (y+(height()/2) > (context->mainWindow->geometry().y()+context->mainWindow->geometry().height())) {
             // put it at the bottom
             if (spikePosition == left) start = QPoint(lineWidth, height()-40);
             else start = QPoint(width()-lineWidth, height()-40);
@@ -265,12 +269,12 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
 
     } else { // Qt::Vertical
 
-        if (x-(width()/2) < parent->geometry().x()) {
+        if (x-(width()/2) < context->mainWindow->geometry().x()) {
             // put it at the left
             if (spikePosition == top) start = QPoint(40, lineWidth);
             else start = QPoint(40, height()-lineWidth);
 
-        } else if (x+(width()/2) > (parent->geometry().x()+parent->geometry().width())) {
+        } else if (x+(width()/2) > (context->mainWindow->geometry().x()+context->mainWindow->geometry().width())) {
             // put it at the right
             if (spikePosition == top) start = QPoint(width()-40, lineWidth);
             else start = QPoint(width()-40, height()-lineWidth);
@@ -411,8 +415,8 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
 void
 GcBubble::setText(QString filename)
 {
-        SummaryMetrics metrics = parent->athlete->metricDB->getAllMetricsFor(filename);
-        useMetricUnits = mainWindow->athlete->useMetricUnits;
+        SummaryMetrics metrics = context->athlete->metricDB->getAllMetricsFor(filename);
+        useMetricUnits = context->athlete->useMetricUnits;
     
 
         //

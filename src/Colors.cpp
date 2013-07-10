@@ -17,7 +17,9 @@
  */
 
 #include "Colors.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "RideMetadata.h"
 #include <QObject>
 #include <QDir>
@@ -152,11 +154,11 @@ GCColor::defaultSizes(int width, int height)
     return defaultAppearance[0]; // shouldn't get here
 }
 
-GCColor::GCColor(MainWindow *main) : QObject(main)
+GCColor::GCColor(Context *context) : QObject(context)
 {
     setupColors();
     readConfig();
-    connect(main->context, SIGNAL(configChanged()), this, SLOT(readConfig()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(readConfig()));
 }
 
 const Colors * GCColor::colorSet()
@@ -213,10 +215,10 @@ GCColor::getColor(int colornum)
     return ColorList[colornum].color;
 }
 
-ColorEngine::ColorEngine(MainWindow* main) : QObject(main), defaultColor(QColor(Qt::white)), mainWindow(main)
+ColorEngine::ColorEngine(Context* context) : QObject(context), defaultColor(QColor(Qt::white)), context(context)
 {
     configUpdate();
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
 void ColorEngine::configUpdate()
@@ -225,7 +227,7 @@ void ColorEngine::configUpdate()
     workoutCodes.clear();
 
     // setup the keyword/color combinations from config settings
-    foreach (KeywordDefinition keyword, mainWindow->athlete->rideMetadata()->getKeywords()) {
+    foreach (KeywordDefinition keyword, context->athlete->rideMetadata()->getKeywords()) {
         if (keyword.name == "Default")
             defaultColor = keyword.color;
         else {

@@ -17,8 +17,9 @@
 */
 
 #include "VideoWindow.h"
+#include "Context.h"
 
-VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
+VideoWindow::VideoWindow(Context *parent, const QDir &home)  :
     GcWindow(parent), home(home), main(parent), m_MediaChanged(false)
 {
     setControls(NULL);

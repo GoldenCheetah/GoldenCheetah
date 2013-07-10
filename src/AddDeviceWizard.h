@@ -20,7 +20,7 @@
 #define _AddDeviceWizard_h
 
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "DeviceTypes.h"
 #include "Serial.h"
 #include "RealtimeController.h"
@@ -45,9 +45,9 @@ class AddDeviceWizard : public QWizard
     Q_OBJECT
 
 public:
-    AddDeviceWizard(MainWindow *main);
+    AddDeviceWizard(Context *context);
 
-    MainWindow *main;
+    Context *context;
     bool done; // have we finished?
     RealtimeController *controller; // for working with devices
 
@@ -135,7 +135,7 @@ class AddFirmware : public QWizardPage
         QLabel *help;
         QLabel *file;
         QLineEdit *name;
-        MainWindow *mainWindow;
+        Context *context;
         AddDeviceWizard *wizard;
 };
 

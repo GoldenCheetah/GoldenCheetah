@@ -18,10 +18,10 @@
 
 #include "IntervalTreeView.h"
 #include "IntervalItem.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 
-IntervalTreeView::IntervalTreeView(MainWindow *mainWindow) : mainWindow(mainWindow)
+IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragDropOverwriteMode(true);

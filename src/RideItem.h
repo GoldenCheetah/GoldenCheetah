@@ -26,7 +26,7 @@
 
 class RideFile;
 class RideEditor;
-class MainWindow;
+class Context;
 class Zones;
 class HrZones;
 
@@ -49,7 +49,7 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         QVector<double> time_in_hr_zone;
         RideFile *ride_;
         QStringList errors_;
-        MainWindow *main; // to notify widgets when date/time changes
+        Context *context; // to notify widgets when date/time changes
         bool isdirty;
 
     public slots:
@@ -77,7 +77,7 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
 
         RideItem(int type, QString path,
                  QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, const HrZones *hrZones, MainWindow *main);
+                 const Zones *zones, const HrZones *hrZones, Context *context);
 
         void setDirty(bool);
         bool isDirty() { return isdirty; }

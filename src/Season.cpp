@@ -17,6 +17,7 @@
  */
 
 #include "Season.h"
+#include "MainWindow.h"
 #include <QString>
 #include <QFile>
 #include <QXmlInputSource>
@@ -85,8 +86,8 @@ void Season::setType(int _type)
 /*----------------------------------------------------------------------
  * EDIT SEASON DIALOG
  *--------------------------------------------------------------------*/
-EditSeasonDialog::EditSeasonDialog(MainWindow *mainWindow, Season *season) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), season(season)
+EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), season(season)
 {
     setWindowTitle(tr("Edit Date Range"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -170,8 +171,8 @@ EditSeasonDialog::cancelClicked()
 /*----------------------------------------------------------------------
  * EDIT SEASONEVENT DIALOG
  *--------------------------------------------------------------------*/
-EditSeasonEventDialog::EditSeasonEventDialog(MainWindow *mainWindow, SeasonEvent *event) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), event(event)
+EditSeasonEventDialog::EditSeasonEventDialog(Context *context, SeasonEvent *event) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), event(event)
 {
     setWindowTitle(tr("Edit Event"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);

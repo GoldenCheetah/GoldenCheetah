@@ -25,7 +25,7 @@
 #include "RideFile.h"
 #include "TPUpload.h"
 
-class MainWindow;
+class Context;
 
 class TPUploadDialog : public QDialog
 {
@@ -34,14 +34,14 @@ class TPUploadDialog : public QDialog
 
 
     public:
-        TPUploadDialog(QString cyclist, const RideFile *ride, MainWindow *main);
+        TPUploadDialog(QString cyclist, const RideFile *ride, Context *context);
 
     public slots:
         void cancelClicked();
         void completed(QString);
 
     private:
-        MainWindow *main;
+        Context *context;
         QString cyclist;
         const RideFile *ride;
 

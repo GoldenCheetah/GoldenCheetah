@@ -22,7 +22,7 @@
 
 #include "RideFile.h"
 #include "RideFileCommand.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include <QAbstractTableModel>
 
 //

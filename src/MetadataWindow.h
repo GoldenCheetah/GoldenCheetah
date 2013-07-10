@@ -21,7 +21,7 @@
 #include "GoldenCheetah.h"
 #include "RideMetadata.h"
 
-class MainWindow;
+class Context;
 
 class MetadataWindow : public GcChartWindow
 {
@@ -30,7 +30,7 @@ class MetadataWindow : public GcChartWindow
 
     public:
 
-        MetadataWindow(MainWindow *parent);
+        MetadataWindow(Context *context);
 
     protected slots:
 
@@ -38,7 +38,7 @@ class MetadataWindow : public GcChartWindow
 
     protected:
 
-        MainWindow *mainWindow;
+        Context *context;
         RideMetadata *rideMetadata;
 };
 

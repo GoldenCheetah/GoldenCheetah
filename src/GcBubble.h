@@ -19,7 +19,7 @@
 #ifndef _GC_GcBubble_h
 #define _GC_GcBubble_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "Context.h"
 
 #include <QtGui>
 #include "Colors.h"
@@ -30,7 +30,7 @@ class GcBubble : public QWidget
     G_OBJECT
 
     public:
-        GcBubble(MainWindow *parent = NULL);
+        GcBubble(Context *context = NULL);
         void setText(QString); // set the text displayed according to filename
 
     protected:  
@@ -47,10 +47,9 @@ class GcBubble : public QWidget
         virtual void paintEvent(QPaintEvent *);
 
     private:
-        MainWindow *mainWindow;
+        Context *context;
 
         int borderWidth;
-        MainWindow *parent;
 
         QPoint start; // where the bubble spike is
         QPoint coords; // where on the screen (global) the bubble should be placed

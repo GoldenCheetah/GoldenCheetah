@@ -17,10 +17,8 @@
  */
 
 #include "RideWithGPSDialog.h"
+#include "Athlete.h"
 #include "Settings.h"
-#include <QHttp>
-#include <QUrl>
-#include <QScriptEngine>
 #include "TimeUtils.h"
 #include "Units.h"
 
@@ -30,8 +28,8 @@
 #include "DBAccess.h"
 #include "TcxRideFile.h"
 
-RideWithGPSDialog::RideWithGPSDialog(MainWindow *mainWindow, RideItem *item) :
-    mainWindow(mainWindow)
+RideWithGPSDialog::RideWithGPSDialog(Context *context, RideItem *item) :
+    context(context)
 {
     RIDE_WITH_GPS_URL = "http://ridewithgps.com";
 
@@ -187,8 +185,8 @@ RideWithGPSDialog::requestUpload()
 
     int size = 0;
 
-    QString username = appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSUSER).toString();
-    QString password = appsettings->cvalue(mainWindow->athlete->cyclist, GC_RWGPSPASS).toString();
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSPASS).toString();
 
     // application/json
     out += "{\"apikey\": \"p24n3a9e\", ";

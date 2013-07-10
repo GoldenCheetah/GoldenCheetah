@@ -17,12 +17,9 @@
  */
 
 #include "ScatterWindow.h"
-#include "ScatterPlot.h"
 #include "MainWindow.h"
-#include "RideItem.h"
-#include "IntervalItem.h"
-#include "math.h"
-#include "Units.h" // for MILES_PER_KM
+#include "ScatterPlot.h"
+#include "Context.h"
 
 #include <QtGui>
 #include <QString>
@@ -62,8 +59,8 @@ ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
     box->setStrings(list);
 }
 
-ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
-    GcChartWindow(parent), home(home), main(parent), ride(NULL), current(NULL)
+ScatterWindow::ScatterWindow(Context *context, const QDir &home) :
+    GcChartWindow(context), home(home), context(context), ride(NULL), current(NULL)
 {
     setInstanceName("2D Window");
 
@@ -105,7 +102,7 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
     setControls(c);
 
     // the plot widget
-    scatterPlot= new ScatterPlot(main);
+    scatterPlot= new ScatterPlot(context);
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->addWidget(scatterPlot);
 
@@ -153,8 +150,8 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(main, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
     connect(rxSelector, SIGNAL(valueChanged(int)), this, SLOT(rxSelectorChanged(int)));
@@ -294,8 +291,8 @@ ScatterWindow::setData()
 
     // any intervals to plot?
     settings.intervals.clear();
-    for (int i=0; i<main->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(main->allIntervalItems()->child(i));
+    for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
         if (current != NULL && current->isSelected() == true)
                 settings.intervals.append(current);
     }

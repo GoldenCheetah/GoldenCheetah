@@ -19,10 +19,11 @@
 #ifndef _GC_TreeMapWindow_h
 #define _GC_TreeMapWindow_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
 
 #include <QtGui>
 #include <QTimer>
-#include "MainWindow.h"
+#include "Context.h"
 #include "MetricAggregator.h"
 #include "RideMetadata.h"
 #include "Season.h"
@@ -62,12 +63,12 @@ class TreeMapWindow : public GcWindow
 
     public:
 
-        MainWindow *main; // used by zones shader
-        TreeMapWindow(MainWindow *); 
+        Context *context; // used by zones shader
+        TreeMapWindow(Context *); 
         ~TreeMapWindow();
 
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return main->isfiltered; }
+        bool isFiltered() const { return context->mainWindow->isfiltered; }
 #endif
         QString f1() const { return field1->currentText(); }
         void setf1(QString x) const { field1->setCurrentIndex(field1->findText(x)); }
@@ -128,7 +129,7 @@ class TreeMapWindow : public GcWindow
         void useThruToday();
 
     private:
-        // passed from MainWindow
+        // passed from Context *
         TMSettings settings;
         DateSettingsEdit *dateSetting;
 

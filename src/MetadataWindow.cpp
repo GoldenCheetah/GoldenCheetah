@@ -18,8 +18,8 @@
 
 #include "MetadataWindow.h"
 
-MetadataWindow::MetadataWindow(MainWindow *mainWindow) :
-    GcChartWindow(mainWindow), mainWindow(mainWindow)
+MetadataWindow::MetadataWindow(Context *context) :
+    GcChartWindow(context), context(context)
 {
     setInstanceName("Metadata Window");
     setControls(NULL);
@@ -28,7 +28,7 @@ MetadataWindow::MetadataWindow(MainWindow *mainWindow) :
 
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(0);
-    rideMetadata = new RideMetadata(mainWindow);
+    rideMetadata = new RideMetadata(context);
     QFont font;
     font.setPointSize(font.pointSize());
     rideMetadata->setFont(font);

@@ -26,7 +26,7 @@
 class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
-class MainWindow;
+class Context;
 class HrPwWindow;
 class RideItem;
 class HrPwPlotBackground;
@@ -42,7 +42,7 @@ class HrPwPlot : public QwtPlot
 
     public:
 
-        HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow);
+        HrPwPlot(Context *context, HrPwWindow *hrPwWindow);
 
         RideItem *rideItem;
         QwtPlotMarker *r_mrk1;
@@ -67,7 +67,7 @@ class HrPwPlot : public QwtPlot
         friend class ::HrPwWindow;
 
         HrPwWindow *hrPwWindow;
-        MainWindow *mainWindow;
+        Context *context;
 
         HrPwPlotBackground *bg;
 

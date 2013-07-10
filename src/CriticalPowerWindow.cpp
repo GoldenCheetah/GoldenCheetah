@@ -20,7 +20,9 @@
 #include "SearchFilterBox.h"
 #include "MetricAggregator.h"
 #include "CpintPlot.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "RideItem.h"
 #include "TimeUtils.h"
 #include <qwt_picker.h>
@@ -35,8 +37,8 @@
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
-CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
-    GcChartWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false)
+CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
+    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Critical Power Window");
 
@@ -55,7 +57,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     // main plot area
     //
     QVBoxLayout *vlayout = new QVBoxLayout;
-    cpintPlot = new CpintPlot(mainWindow, home.path(), mainWindow->athlete->zones());
+    cpintPlot = new CpintPlot(context, home.path(), context->athlete->zones());
     vlayout->addWidget(cpintPlot);
 
     QGridLayout *mainLayout = new QGridLayout();
@@ -122,7 +124,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
 #ifdef GC_HAVE_LUCENE
     // filter / searchbox
-    searchBox = new SearchFilterBox(this, parent);
+    searchBox = new SearchFilterBox(this, context);
     connect(searchBox, SIGNAL(searchClear()), cpintPlot, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), cpintPlot, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(filterChanged()));
@@ -137,7 +139,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     // data -- season / daterange edit
     cComboSeason = new QComboBox(this);
-    seasons = parent->athlete->seasons;
+    seasons = context->athlete->seasons;
     resetSeasons();
     QLabel *label = new QLabel(tr("Date range"));
     QLabel *label2 = new QLabel(tr("Date range"));
@@ -181,14 +183,14 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(mainWindow->context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
     // redraw on config change -- this seems the simplest approach
-    connect(mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(rideSelected()));
-    connect(mainWindow->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
-    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
-    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
+    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(rideSelected()));
+    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
+    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
+    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -199,7 +201,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 void
 CriticalPowerWindow::refreshRideSaved()
 {
-    const RideItem *current = mainWindow->context->rideItem();
+    const RideItem *current = context->rideItem();
     if (!current) return;
 
     // if the saved ride is in the aggregated time period
@@ -266,9 +268,9 @@ CriticalPowerWindow::rideSelected()
 
     currentRide = myRideItem;
     if (currentRide) {
-        if (mainWindow->athlete->zones()) {
-            int zoneRange = mainWindow->athlete->zones()->whichRange(currentRide->dateTime.date());
-            int CP = zoneRange >= 0 ? mainWindow->athlete->zones()->getCP(zoneRange) : 0;
+        if (context->athlete->zones()) {
+            int zoneRange = context->athlete->zones()->whichRange(currentRide->dateTime.date());
+            int CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
             cpintPlot->setDateCP(CP);
         } else {
             cpintPlot->setDateCP(0);
@@ -522,12 +524,12 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
     cto = dateRange.to;
 
     // lets work out the average CP configure value
-    if (mainWindow->athlete->zones()) {
-        int fromZoneRange = mainWindow->athlete->zones()->whichRange(cfrom);
-        int toZoneRange = mainWindow->athlete->zones()->whichRange(cto);
+    if (context->athlete->zones()) {
+        int fromZoneRange = context->athlete->zones()->whichRange(cfrom);
+        int toZoneRange = context->athlete->zones()->whichRange(cto);
 
-        int CPfrom = fromZoneRange >= 0 ? mainWindow->athlete->zones()->getCP(fromZoneRange) : 0;
-        int CPto = toZoneRange >= 0 ? mainWindow->athlete->zones()->getCP(toZoneRange) : CPfrom;
+        int CPfrom = fromZoneRange >= 0 ? context->athlete->zones()->getCP(fromZoneRange) : 0;
+        int CPto = toZoneRange >= 0 ? context->athlete->zones()->getCP(toZoneRange) : CPfrom;
         if (CPfrom == 0) CPfrom = CPto;
         int dateCP = (CPfrom + CPto) / 2;
 

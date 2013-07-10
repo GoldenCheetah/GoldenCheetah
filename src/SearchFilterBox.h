@@ -19,7 +19,7 @@
 #ifndef _GC_SearchFilter_h
 #define _GC_SearchFilter_h
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "SearchBox.h" // for searchboxmode
 
 class Lucene;
@@ -30,7 +30,7 @@ class SearchFilterBox : public QWidget
     Q_OBJECT
 
 public:
-    SearchFilterBox(QWidget *parent, MainWindow *main, bool nochooser = true);
+    SearchFilterBox(QWidget *parent, Context *context, bool nochooser = true);
     void setMode(SearchBox::SearchBoxMode x) { searchbox->setMode(x); }
 
     QString filter();
@@ -44,7 +44,7 @@ signals:
     void searchClear();                 // we stopped search/filtering looking
 
 private:
-    MainWindow *main;
+    Context *context;
     Lucene *lucene;
     DataFilter *datafilter;
     SearchBox *searchbox;

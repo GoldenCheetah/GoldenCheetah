@@ -18,10 +18,12 @@
 
 #include <assert.h>
 #include <QDebug>
+#include "MainWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideImportWizard.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include "QuarqRideFile.h"
 #include <QWaitCondition>
 #include "Settings.h"
@@ -33,24 +35,24 @@
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
-RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent), mainWindow(main)
+RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
         filenames.append(QFileInfo(urls->value(i).toLocalFile()).absoluteFilePath());
-    init(filenames, home, mainWindow);
+    init(filenames, home, context);
     filenames.clear();
 }
 
-RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent), mainWindow(main)
+RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
-    init(files, home, mainWindow);
+    init(files, home, context);
 }
 
 void
-RideImportWizard::init(QList<QString> files, QDir &home, MainWindow * /*mainWindow*/)
+RideImportWizard::init(QList<QString> files, QDir &home, Context * /*mainWindow*/)
 {
 
     // initialise dialog box
@@ -279,7 +281,7 @@ RideImportWizard::process()
               QApplication::processEvents();
 
               QList<RideFile*> rides;
-              RideFile *ride = RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors, &rides);
+              RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
 
               // is this an archive of files?
               if (rides.count() > 1) {
@@ -307,7 +309,7 @@ RideImportWizard::process()
                      QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
                      TcxFileReader reader;
                      QFile target(fulltarget);
-                     reader.writeRideFile(mainWindow, extracted, target);
+                     reader.writeRideFile(context, extracted, target);
                      deleteMe.append(fulltarget);
                      delete extracted;
                      
@@ -423,7 +425,7 @@ RideImportWizard::process()
                    tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
 
                    // show distance by looking at last data point
-                   QString dist = mainWindow->athlete->useMetricUnits
+                   QString dist = context->athlete->useMetricUnits
                        ? QString ("%1 km").arg(km, 0, 'f', 1)
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
                    tableWidget->item(i,4)->setText(dist);
@@ -698,8 +700,8 @@ RideImportWizard::abortClicked()
 
     if (label == tr("Abort")) {
         hide();
-        mainWindow->isclean = false;
-        mainWindow->athlete->metricDB->refreshMetrics();
+        context->mainWindow->isclean = false;
+        context->athlete->metricDB->refreshMetrics();
         aborted=true; // terminated. I'll be back.
         return;
     }
@@ -707,8 +709,8 @@ RideImportWizard::abortClicked()
     if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
-       mainWindow->isclean = false;
-       mainWindow->athlete->metricDB->refreshMetrics();
+       context->mainWindow->isclean = false;
+       context->athlete->metricDB->refreshMetrics();
        done(0);
        return;
     }
@@ -801,7 +803,7 @@ RideImportWizard::abortClicked()
                 // read the file (again)
                 QStringList errors;
                 QFile thisfile(filenames[i]);
-                RideFile *ride(RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors));
+                RideFile *ride(RideFileFactory::instance().openRideFile(context, thisfile, errors));
 
                 // update ridedatetime
                 ride->setStartTime(ridedatetime);
@@ -810,11 +812,11 @@ RideImportWizard::abortClicked()
                 if (filenames[i].endsWith(".gc")) {
                     GcFileReader reader;
                     QFile target(fulltarget);
-                    reader.writeRideFile(mainWindow, ride, target);
+                    reader.writeRideFile(context, ride, target);
                 } else {
                     JsonFileReader reader;
                     QFile target(fulltarget);
-                    reader.writeRideFile(mainWindow, ride, target);
+                    reader.writeRideFile(context, ride, target);
                 }
 
                 // clear
@@ -824,7 +826,7 @@ RideImportWizard::abortClicked()
                     tableWidget->item(i,5)->setText(tr("File Overwritten"));
                 } else {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
-                    mainWindow->addRide(QFileInfo(fulltarget).fileName(), true);
+                    context->mainWindow->addRide(QFileInfo(fulltarget).fileName(), true);
                 }
             }
 
@@ -869,7 +871,7 @@ RideImportWizard::abortClicked()
                     QFile source(filenames[i]);
                     if (source.copy(fulltarget)) {
                         tableWidget->item(i,5)->setText(tr("File Saved"));
-                        mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
+                        context->mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
                         // free immediately otherwise all imported rides are cached
                         // and with large imports this can lead to memory exhaustion
                         // BUT! Some charts/windows will hava snaffled away the ridefile

@@ -18,9 +18,11 @@
 
 
 #include "DialWindow.h"
+#include "Athlete.h"
+#include "Context.h"
 
-DialWindow::DialWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), average(1), isNewLap(false)
+DialWindow::DialWindow(Context *context) :
+    GcWindow(context), context(context), average(1), isNewLap(false)
 {
     rolling.resize(150); // enough for 30 seconds at 5hz
 
@@ -77,11 +79,11 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     layout->addWidget(valueLabel);
 
     // get updates..
-    connect(mainWindow->context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
-    connect(mainWindow->context, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
-    connect(mainWindow->context, SIGNAL(stop()), this, SLOT(stop()));
-    connect(mainWindow->context, SIGNAL(start()), this, SLOT(start()));
-    connect(mainWindow->context, SIGNAL(newLap()), this, SLOT(onNewLap()));
+    connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
+    connect(context, SIGNAL(stop()), this, SLOT(stop()));
+    connect(context, SIGNAL(start()), this, SLOT(start()));
+    connect(context, SIGNAL(newLap()), this, SLOT(onNewLap()));
 
     connect(seriesSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
     connect(averageSlider, SIGNAL(valueChanged(int)),this, SLOT(setAverageFromSlider()));
@@ -204,12 +206,12 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Speed:
     case RealtimeData::VirtualSpeed:
-        if (!mainWindow->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
     case RealtimeData::Distance:
-        if (!mainWindow->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
@@ -226,7 +228,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         sum += rtData.value(RealtimeData::Speed);
         count++;
         value = sum / count;
-        if (!mainWindow->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
@@ -282,11 +284,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (mainWindow->athlete->zones()) {
+            if (context->athlete->zones()) {
 
                 // get cp for today
-                int zonerange = mainWindow->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = mainWindow->athlete->zones()->getCP(zonerange);
+                int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones()->getCP(zonerange);
                 else cp = 0;
 
             } else {
@@ -368,11 +370,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (mainWindow->athlete->zones()) {
+            if (context->athlete->zones()) {
 
                 // get cp for today
-                int zonerange = mainWindow->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = mainWindow->athlete->zones()->getCP(zonerange);
+                int zonerange = context->athlete->zones()->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones()->getCP(zonerange);
                 else cp = 0;
 
             } else {

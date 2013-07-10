@@ -20,7 +20,8 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "RideFile.h"
-#include "MainWindow.h"
+#include "Context.h"
+#include "Context.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include <assert.h>
@@ -28,8 +29,8 @@
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
-                   const Zones *zones, const HrZones *hrZones, MainWindow *main) :
-    QTreeWidgetItem(type), ride_(NULL), main(main), isdirty(false), isedit(false), path(path), fileName(fileName),
+                   const Zones *zones, const HrZones *hrZones, Context *context) :
+    QTreeWidgetItem(type), ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName),
     dateTime(dateTime), zones(zones), hrZones(hrZones)
 { }
 
@@ -39,7 +40,7 @@ RideFile *RideItem::ride()
 
     // open the ride file
     QFile file(path + "/" + fileName);
-    ride_ = RideFileFactory::instance().openRideFile(main, file, errors_);
+    ride_ = RideFileFactory::instance().openRideFile(context, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
 
     setDirty(false); // we're gonna use on-disk so by
@@ -48,7 +49,7 @@ RideFile *RideItem::ride()
                      // certainly be referenced by consuming widgets
 
     // stay aware of state changes to our ride
-    // MainWindow saves and RideFileCommand modifies
+    // Context saves and RideFileCommand modifies
     connect(ride_, SIGNAL(modified()), this, SLOT(modified()));
     connect(ride_, SIGNAL(saved()), this, SLOT(saved()));
     connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
@@ -102,7 +103,7 @@ RideItem::setDirty(bool val)
             setFont(i, current);
         }
 
-        main->context->notifyRideDirty();
+        context->notifyRideDirty();
 
     } else {
 
@@ -113,7 +114,7 @@ RideItem::setDirty(bool val)
             setFont(i, current);
         }
 
-        main->context->notifyRideClean();
+        context->notifyRideClean();
     }
 }
 

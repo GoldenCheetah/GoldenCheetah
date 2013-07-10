@@ -26,7 +26,7 @@
 #include <QHash>
 #include <QtSql>
 #include "SummaryMetrics.h"
-#include "MainWindow.h"
+#include "Context.h"
 #include "Season.h"
 #include "RideFile.h"
 #include "SpecialFields.h"
@@ -52,7 +52,7 @@ class DBAccess
     int getDBVersion();
 
     // create and drop connections
-	DBAccess(MainWindow *main);
+	DBAccess(Context *context);
     ~DBAccess();
 
     // Create/Delete Metrics
@@ -80,7 +80,7 @@ class DBAccess
     QList<Season> getAllSeasons();
 
 	private:
-    MainWindow *main;
+    Context *context;
     QSqlDatabase dbconn;
     QString sessionid;
 

@@ -25,6 +25,7 @@
 #include "DBAccess.h"
 #include "MetricAggregator.h"
 #include <QtSql>
+#include <qwt_plot_curve.h>
 
 #define GCC_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
 

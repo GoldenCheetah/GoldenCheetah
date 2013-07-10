@@ -25,7 +25,7 @@
 #include <QCalendarWidget>
 #include <QStackedWidget>
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "RideMetadata.h"
 
 // list view
@@ -48,13 +48,13 @@ class DiaryWindow : public GcWindow
 
     public:
 
-        DiaryWindow(MainWindow *);
+        DiaryWindow(Context *);
 
         int view() const { return 0; /* viewMode->currentIndex(); */ }
         void setView(int /* x */ ) { /* viewMode->setCurrentIndex(x); */ }
 
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return mainWindow->isfiltered; }
+        bool isFiltered() const { return context->mainWindow->isfiltered; }
 #endif
 
     public slots:
@@ -66,7 +66,7 @@ class DiaryWindow : public GcWindow
         bool eventFilter(QObject *object, QEvent *e); // traps monthly view
 
     protected:
-        MainWindow *mainWindow;
+        Context *context;
 
         QLabel *title;
         QPushButton *prev, *next;

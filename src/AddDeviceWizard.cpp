@@ -17,6 +17,9 @@
  */
 
 #include "AddDeviceWizard.h"
+#include "MainWindow.h"
+#include "Athlete.h"
+#include "Context.h"
 
 // WIZARD FLOW
 //
@@ -29,7 +32,7 @@
 //
 
 // Main wizard
-AddDeviceWizard::AddDeviceWizard(MainWindow *main) : QWizard(main), main(main)
+AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
@@ -551,7 +554,7 @@ AddFirmware::validatePage()
     if (copy->isChecked()) {
 
         QString fileName = QFileInfo(filePath).fileName();
-        QString targetFileName = QFileInfo(mainWindow->athlete->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
+        QString targetFileName = QFileInfo(context->athlete->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
 
         // check not the same thing!
         if(QFileInfo(fileName).absolutePath() != QFileInfo(targetFileName).absolutePath()) {
@@ -1179,7 +1182,7 @@ AddFinal::validatePage()
         all.writeConfig(list);
 
         // tell everyone
-        wizard->main->context->notifyConfigChanged();
+        wizard->context->notifyConfigChanged();
  
         // shut down the controller, if it is there, since it will
         // still be connected to the device (in case we hit the back button)

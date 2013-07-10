@@ -17,18 +17,16 @@
  */
 
 #include "HelpWindow.h"
+#include "MainWindow.h"
 
-#include <QDebug>
-
-
-HelpWindow::HelpWindow(MainWindow *mw) : QDialog(mw)
+HelpWindow::HelpWindow(Context *context) : QDialog(context->mainWindow)
 {
     setWindowTitle("Help");
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
     setInstanceName("Help Window");
 
-    parent = mw;
+    //XXX ???? parent = context->mainWindow;
     view = new QWebView();
     layout = new QVBoxLayout();
     layout->addWidget(view);

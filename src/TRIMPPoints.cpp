@@ -21,7 +21,8 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include <math.h>
-#include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include <QApplication>
 
 // This is Morton/Banister with Green et al coefficient.
@@ -56,7 +57,7 @@ class TRIMPPoints : public RideMetric {
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *main)
+                 const Context *context)
     {
         if (!hrZones || hrZoneRange < 0) {
             setValue(0);
@@ -91,7 +92,7 @@ class TRIMPPoints : public RideMetric {
         QString athlete;
         double ksex = 1.92;
         if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            if (appsettings->cvalue(main->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
+            if (appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
             else ksex = 1.92; // Male
         }
 
@@ -131,7 +132,7 @@ public:
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *main)
+                 const Context *context)
     {
         if (!hrZones || hrZoneRange < 0) {
             setValue(0);
@@ -158,7 +159,7 @@ public:
         QString athlete;
         double ksex = 1.92;
         if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            if (appsettings->cvalue(main->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
+            if (appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
             else ksex = 1.92; // Male
         }
 
@@ -201,7 +202,7 @@ public:
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *)
+                 const Context *)
     {
         assert(deps.contains("average_hr"));
         const RideMetric *averageHrMetric = deps.value("average_hr");
@@ -326,7 +327,7 @@ class SessionRPE : public RideMetric {
                  const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
-                 const MainWindow *)
+                 const Context *)
     {
         // use RPE value in ride metadata
         double rpe = rideFile->getTag("RPE", "0.0").toDouble();

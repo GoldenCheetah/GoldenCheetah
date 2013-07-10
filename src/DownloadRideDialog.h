@@ -23,7 +23,7 @@
 #include "CommPort.h"
 #include <QtGui>
 
-class MainWindow;
+class Context;
 
 class DownloadRideDialog : public QDialog
 {
@@ -32,7 +32,7 @@ class DownloadRideDialog : public QDialog
 
 
     public:
-        DownloadRideDialog(MainWindow *mainWindow, const QDir &home);
+        DownloadRideDialog(Context *context, const QDir &home);
 
         bool isCancelled();
 
@@ -52,7 +52,7 @@ class DownloadRideDialog : public QDialog
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
         QDir home;
         QPushButton *downloadButton, *eraseRideButton, *rescanButton,
             *cancelButton, *closeButton;

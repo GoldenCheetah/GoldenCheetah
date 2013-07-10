@@ -24,7 +24,7 @@
 #include <QObject> // for Q_PROPERTY
 
 
-#include "MainWindow.h"
+#include "Context.h"
 #include "Zones.h" // for data series types
 #include "RideFile.h" // for data series types
 #include "ErgFile.h" // for workout modes
@@ -60,7 +60,7 @@ class DialWindow : public GcWindow
 
     public:
 
-        DialWindow(MainWindow *mainWindow);
+        DialWindow(Context *context);
 
         // get properties - the setters are below
         bool isInstant() const { return _instant; }
@@ -91,7 +91,7 @@ class DialWindow : public GcWindow
 
     private:
 
-        MainWindow *mainWindow;
+        Context *context;
 
         // properties
         bool _instant;
