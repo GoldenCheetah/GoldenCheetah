@@ -18,6 +18,7 @@
 
 #include "ModelWindow.h"
 #include "ModelPlot.h"
+#include "MainWindow.h"
 #include "Context.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
@@ -45,7 +46,7 @@ ModelWindow::addStandardChannels(QComboBox *box)
 }
 
 ModelWindow::ModelWindow(Context *context, const QDir &home) :
-    GcChartWindow(context), home(home), main(parent), ride(NULL), current(NULL)
+    GcChartWindow(context), home(home), context(context), ride(NULL), current(NULL)
 {
     setInstanceName("3D Window");
 
@@ -59,7 +60,7 @@ ModelWindow::ModelWindow(Context *context, const QDir &home) :
 
     // the plot widget
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    modelPlot= new ModelPlot(main, NULL);
+    modelPlot= new ModelPlot(context, NULL);
     zpane = new QSlider(Qt::Vertical);
     zpane->setTickInterval(1);
     zpane->setMinimum(0);
@@ -150,7 +151,7 @@ ModelWindow::ModelWindow(Context *context, const QDir &home) :
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
@@ -238,8 +239,8 @@ ModelWindow::setData(bool adjustPlot)
 
     // any intervals to plot?
     settings.intervals.clear();
-    for (int i=0; i<main->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(main->allIntervalItems()->child(i));
+    for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
         if (current != NULL && current->isSelected() == true)
                 settings.intervals.append(current);
     }

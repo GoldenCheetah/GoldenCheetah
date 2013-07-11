@@ -1609,7 +1609,7 @@ void MainWindow::showRhoEstimator()
 
 void MainWindow::showWorkoutWizard()
 {
-   WorkoutWizard *ww = new WorkoutWizard(this);
+   WorkoutWizard *ww = new WorkoutWizard(context);
    ww->show();
 }
 

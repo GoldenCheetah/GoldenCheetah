@@ -17,6 +17,7 @@
  */
 
 #include "WorkoutWizard.h"
+#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 
@@ -740,9 +741,9 @@ void ImportPage::SaveWorkout()
     stream << "[END COURSE DATA]" << endl;
 }
 
-WorkoutWizard::WorkoutWizard(QWidget *parent) :QWizard(parent)
+WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
 {
-    hackContext = (Context *)parent;
+    hackContext = context;
     setPage(WW_WorkoutTypePage, new WorkoutTypePage());
     setPage(WW_AbsWattagePage, new AbsWattagePage());
     setPage(WW_RelWattagePage, new RelWattagePage());

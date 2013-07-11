@@ -323,7 +323,7 @@ class WorkoutWizard : public QWizard
 public:
     enum { WW_WorkoutTypePage, WW_AbsWattagePage, WW_RelWattagePage, WW_GradientPage, WW_ImportPage };
 
-    WorkoutWizard(QWidget *parent = NULL);
+    WorkoutWizard(Context *context);
 
     // called at the end of the wizard...
     void accept();

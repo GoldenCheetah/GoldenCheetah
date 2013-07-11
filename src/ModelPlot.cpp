@@ -18,6 +18,7 @@
 
 #include "ModelPlot.h"
 #include "ModelWindow.h"
+#include "MainWindow.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Context.h"
@@ -1004,7 +1005,7 @@ ModelPlot::ModelPlot(Context *context, ModelSettings *settings) : QFrame(context
     setLineWidth(1);
     setFrameStyle(QFrame::NoFrame);
     setContentsMargins(0,0,0,0);
-    basicModelPlot = new BasicModelPlot(parent, settings);
+    basicModelPlot = new BasicModelPlot(context, settings);
     layout->addWidget(basicModelPlot);
     layout->setContentsMargins(2,2,2,2);
     setLayout(layout);
