@@ -588,7 +588,8 @@ SOURCES += \
         Zones.cpp \
         main.cpp \
 
-RESOURCES = application.qrc
+RESOURCES = application.qrc \
+            RideWindow.qrc
 
 TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_ja.ts \
