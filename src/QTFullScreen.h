@@ -24,7 +24,7 @@
 
 // QT stuff etc
 #include <QtGui>
-#include "Context.h"
+#include "MainWindow.h"
 
 class QTFullScreen : public QObject
 {
@@ -32,7 +32,7 @@ class QTFullScreen : public QObject
 
     public:
 
-        QTFullScreen(Context *context);
+        QTFullScreen(MainWindow *mainWindow);
 
         // found in the supplied directory
         void toggle();
@@ -41,7 +41,7 @@ class QTFullScreen : public QObject
         bool eventFilter(QObject *obj, QEvent *event);
 
     private:
-        Context *context;
+        MainWindow *mainWindow;
         bool isFull;
 };
 

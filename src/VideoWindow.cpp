@@ -19,8 +19,8 @@
 #include "VideoWindow.h"
 #include "Context.h"
 
-VideoWindow::VideoWindow(Context *parent, const QDir &home)  :
-    GcWindow(parent), home(home), main(parent), m_MediaChanged(false)
+VideoWindow::VideoWindow(Context *context, const QDir &home)  :
+    GcWindow(context), home(home), context(context), m_MediaChanged(false)
 {
     setControls(NULL);
     setInstanceName("Video Window");
@@ -74,12 +74,12 @@ VideoWindow::VideoWindow(Context *parent, const QDir &home)  :
      libvlc_media_player_set_hwnd (mp, container->winId());
 #endif
 
-    connect(main->context, SIGNAL(stop()), this, SLOT(stopPlayback()));
-    connect(main->context, SIGNAL(start()), this, SLOT(startPlayback()));
-    connect(main->context, SIGNAL(pause()), this, SLOT(pausePlayback()));
-    connect(main->context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
-    connect(main->context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
-    connect(main->context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
+    connect(context, SIGNAL(stop()), this, SLOT(stopPlayback()));
+    connect(context, SIGNAL(start()), this, SLOT(startPlayback()));
+    connect(context, SIGNAL(pause()), this, SLOT(pausePlayback()));
+    connect(context, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
+    connect(context, SIGNAL(unpause()), this, SLOT(resumePlayback()));
+    connect(context, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
 
 }
 
