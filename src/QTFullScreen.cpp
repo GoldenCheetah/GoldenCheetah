@@ -18,16 +18,16 @@
 
 #include "QTFullScreen.h"
 
-QTFullScreen::QTFullScreen(Context *context) : QObject(main), context(context), isFull(false)
+QTFullScreen::QTFullScreen(MainWindow *mainWindow) : QObject(mainWindow), mainWindow(mainWindow), isFull(false)
 {
     // watch for ESC key being hit when in full screen
-    main->installEventFilter(this);
+    mainWindow->installEventFilter(this);
 }
 
 bool
 QTFullScreen::eventFilter(QObject *obj, QEvent *event)
 {
-    if (obj != main) return false;
+    if (obj != mainWindow) return false;
 
     // F11 toggle full screen
     if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent *>(event)->key() == Qt::Key_F11) {
@@ -39,7 +39,7 @@ QTFullScreen::eventFilter(QObject *obj, QEvent *event)
 
         // if in full screen then toggle, otherwise do nothing
         if (isFull) {
-            main->showNormal();
+            mainWindow->showNormal();
             isFull = false;
         }
         return false;
@@ -52,9 +52,9 @@ void
 QTFullScreen::toggle()
 {
     if (isFull) {
-        main->showNormal();
+        mainWindow->showNormal();
     } else {
-        main->showFullScreen();
+        mainWindow->showFullScreen();
     }
     isFull = !isFull;
 }

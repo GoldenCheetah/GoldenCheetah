@@ -18,7 +18,7 @@
 
 #include "ChooseCyclistDialog.h"
 #include "NewCyclistDialog.h"
-#include "Mainwindow.h"
+#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include <QtGui>
