@@ -320,20 +320,12 @@ SaveOnExitDialogWidget::saveClicked()
 {
     // whizz through the list and save one by one using
     // singleSave to ensure warnings are given if neccessary
-    // use mainWindow->ismultisave to prevent refreshing stats
-    // for each file
-    mainWindow->ismultisave = true;
     for (int i=0; i<dirtyList.count(); i++) {
         QCheckBox *c = (QCheckBox *)dirtyFiles->cellWidget(i,0);
         if (c->isChecked()) {
-            if (i==dirtyList.count()-1) {
-                mainWindow->ismultisave = false;
-            }
             mainWindow->saveRideSingleDialog(dirtyList.at(i));
         }
     }
-
-    mainWindow->ismultisave = false;
     accept();
 }
 

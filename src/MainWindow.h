@@ -148,7 +148,6 @@ class MainWindow : public QMainWindow
         SpecialFields specialFields;
         int session;
         bool isclean;
-        bool ismultisave;
         bool init; // we built children (i.e. didn't quit at upgrade)
 
         // global filters
