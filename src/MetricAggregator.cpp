@@ -120,7 +120,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QProgressDialog bar(title, tr("Abort"), 0, filenames.count(), context->mainWindow);
     bar.setWindowModality(Qt::WindowModal);
     bar.setMinimumDuration(0);
-    bar.show();
+    bar.hide(); // lets hide until elapsed time is > 6 seconds
 
     int processed=0;
     QApplication::processEvents(); // get that dialog up!
@@ -145,12 +145,18 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
         // update progress bar
         long elapsedtime = elapsed.elapsed();
+
+
         QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
                                                 .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
                                                 .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
         QString title = tr("Refreshing Ride Statistics...\nElapsed: %1\n%2").arg(elapsedString).arg(name);
         bar.setLabelText(title);
         bar.setValue(++processed);
+
+        // show the dialog if its been a while..
+        if (elapsedtime > 6000) bar.show();
+        else bar.hide();
         QApplication::processEvents();
 
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
