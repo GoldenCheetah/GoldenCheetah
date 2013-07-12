@@ -147,7 +147,6 @@ class MainWindow : public QMainWindow
         // state data
         SpecialFields specialFields;
         int session;
-        bool isclean;
         bool init; // we built children (i.e. didn't quit at upgrade)
 
         // global filters

@@ -47,6 +47,7 @@ Athlete::Athlete(Context *context, const QDir &home)
     this->context = context;
     context->athlete = this;
     cyclist = home.dirName();
+    isclean = false;
 
     // metric / non-metric
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);

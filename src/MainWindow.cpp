@@ -146,7 +146,7 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home) :
-    session(0), isclean(false), init(false), isfiltered(false), groupByMapper(NULL)
+    session(0), init(false), isfiltered(false), groupByMapper(NULL)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
