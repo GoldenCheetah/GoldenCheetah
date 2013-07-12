@@ -1183,8 +1183,8 @@ class LTMPlotBackground: public QwtPlotItem
                       const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                       const QRectF &rect) const
     {
-        const Zones *zones       = parent->parent->context->mainWindow->athlete->zones();
-        int zone_range_size     = parent->parent->context->mainWindow->athlete->zones()->getRangeSize();
+        const Zones *zones       = parent->parent->context->athlete->zones();
+        int zone_range_size     = parent->parent->context->athlete->zones()->getRangeSize();
 
         if (zone_range_size >= 0) { //parent->shadeZones() &&
             for (int i = 0; i < zone_range_size; i ++) {
@@ -1240,7 +1240,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
             parent = _parent;
             zone_number = _zone_number;
 
-            const Zones *zones       = parent->parent->context->mainWindow->athlete->zones();
+            const Zones *zones       = parent->parent->context->athlete->zones();
             //int zone_range     = 0; //parent->parent->context->mainWindow->zoneRange();
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 

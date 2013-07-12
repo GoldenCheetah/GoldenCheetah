@@ -213,7 +213,7 @@ void SearchBox::runMenu(QAction *x)
         ColumnChooser *selector = new ColumnChooser(context->mainWindow->listView->logicalHeadings);
         selector->show();
     } else {
-        NamedSearch get = context->mainWindow->athlete->namedSearches->get(x->text());
+        NamedSearch get = context->athlete->namedSearches->get(x->text());
         if (get.name == x->text()) {
             setMode(static_cast<SearchBox::SearchBoxMode>(get.type));
             setText(get.text);
@@ -283,6 +283,6 @@ SearchBox::addNamed()
         x.text = this->text();
         x.type = mode;
         x.count = 0;
-        context->mainWindow->athlete->namedSearches->getList().append(x);
+        context->athlete->namedSearches->getList().append(x);
     }
 }
