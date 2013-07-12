@@ -1588,7 +1588,7 @@ double IntervalPlotData::x(size_t i) const
     int interval = i ? i/4 : 0;
     interval += 1; // interval numbers start at 1 not ZERO in the utility functions
 
-    double multiplier = context->mainWindow->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
 
     // get the interval
     IntervalItem *current = intervalNum(interval);
