@@ -103,7 +103,6 @@ class MainWindow : public QMainWindow
         MainWindow(const QDir &home);
 
         // transitionary
-        Athlete *athlete;
         Context *context;
 
         // currently selected ride item, ride list
