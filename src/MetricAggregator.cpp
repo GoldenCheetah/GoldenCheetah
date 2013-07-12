@@ -241,9 +241,7 @@ void MetricAggregator::addRide(RideItem*ride)
 
 void MetricAggregator::update() {
     context->mainWindow->isclean = false;
-    if (!context->mainWindow->ismultisave) {
-        refreshMetrics();
-    }
+    refreshMetrics();
 }
 
 bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
