@@ -39,7 +39,7 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows)
-            if (x->athlete->cyclist == name)
+            if (x->context->athlete->cyclist == name)
                 newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
     }
 

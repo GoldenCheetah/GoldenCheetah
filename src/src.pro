@@ -418,6 +418,7 @@ SOURCES += \
         ANTLogger.cpp \
         ANTMessage.cpp \
         ANTlocalController.cpp \
+        Athlete.cpp \
         BasicRideMetrics.cpp \
         BatchExportDialog.cpp \
         BestIntervalDialog.cpp \
@@ -436,6 +437,7 @@ SOURCES += \
         Computrainer.cpp \
         Computrainer3dpFile.cpp \
         ConfigDialog.cpp \
+        Context.cpp \
         CpintPlot.cpp \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \

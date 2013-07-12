@@ -49,6 +49,7 @@ class Athlete : public QObject
     Q_OBJECT
 
     public:
+        Athlete(Context *context, const QDir &home);
 
         // basic athlete info
         QString cyclist; // the cyclist name
@@ -61,7 +62,7 @@ class Athlete : public QObject
         void setCriticalPower(int cp);
         QSqlDatabase db;
         MetricAggregator *metricDB;
-        RideMetadata *_rideMetadata;
+        RideMetadata *rideMetadata_;
         Seasons *seasons;
         QList<RideFileCache*> cpxCache;
 
@@ -75,7 +76,7 @@ class Athlete : public QObject
 #endif
 
         // ride metadata definitions
-        RideMetadata *rideMetadata() { return _rideMetadata; }
+        RideMetadata *rideMetadata() { return rideMetadata_; }
 
         // indexes / filters
 #ifdef GC_HAVE_LUCENE

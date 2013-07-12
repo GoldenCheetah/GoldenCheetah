@@ -35,6 +35,7 @@ class Context : public QObject
     Q_OBJECT;
 
     public:
+        Context(MainWindow *mainWindow);
 
         // ride item
         RideItem *rideItem() const { return ride; }
