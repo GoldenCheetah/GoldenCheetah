@@ -72,7 +72,7 @@ void MetricAggregator::refreshMetrics()
 void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 {
     // only if we have established a connection to the database
-    if (dbaccess == NULL || context->mainWindow->isclean==true) return;
+    if (dbaccess == NULL || context->athlete->isclean==true) return;
 
     // first check db structure is still up to date
     // this is because metadata.xml may add new fields
@@ -215,7 +215,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     context->athlete->lucene->optimise();
 #endif
 #endif
-    context->mainWindow->isclean = true;
+    context->athlete->isclean = true;
 
     // stop logging
     out << "SIGNAL DATA CHANGED: " << QDateTime::currentDateTime().toString() + "\r\n";
@@ -240,7 +240,7 @@ void MetricAggregator::addRide(RideItem*ride)
 }
 
 void MetricAggregator::update() {
-    context->mainWindow->isclean = false;
+    context->athlete->isclean = false;
     refreshMetrics();
 }
 
@@ -346,7 +346,7 @@ MetricAggregator::getAllMetricsFor(DateRange dr)
 QList<SummaryMetrics>
 MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
 {
-    if (context->mainWindow->isclean == false) refreshMetrics(); // get them up-to-date
+    if (context->athlete->isclean == false) refreshMetrics(); // get them up-to-date
 
     QList<SummaryMetrics> empty;
 
@@ -367,7 +367,7 @@ MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
 SummaryMetrics
 MetricAggregator::getAllMetricsFor(QString filename)
 {
-    if (context->mainWindow->isclean == false) refreshMetrics(); // get them up-to-date
+    if (context->athlete->isclean == false) refreshMetrics(); // get them up-to-date
 
     SummaryMetrics results;
     QColor color; // ignored for now...
@@ -408,7 +408,7 @@ MetricAggregator::getAllMeasuresFor(QDateTime start, QDateTime end)
 SummaryMetrics
 MetricAggregator::getRideMetrics(QString filename)
 {
-    if (context->mainWindow->isclean == false) refreshMetrics(); // get them up-to-date
+    if (context->athlete->isclean == false) refreshMetrics(); // get them up-to-date
 
     SummaryMetrics empty;
 

@@ -93,7 +93,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
 
     if (!olderDate.isNull()) {
-        context->mainWindow->isclean = false;
+        context->athlete->isclean = false;
         context->athlete->metricDB->refreshMetrics(olderDate);
     }
     return;

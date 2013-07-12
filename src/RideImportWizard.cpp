@@ -700,7 +700,7 @@ RideImportWizard::abortClicked()
 
     if (label == tr("Abort")) {
         hide();
-        context->mainWindow->isclean = false;
+        context->athlete->isclean = false;
         context->athlete->metricDB->refreshMetrics();
         aborted=true; // terminated. I'll be back.
         return;
@@ -709,7 +709,7 @@ RideImportWizard::abortClicked()
     if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
-       context->mainWindow->isclean = false;
+       context->athlete->isclean = false;
        context->athlete->metricDB->refreshMetrics();
        done(0);
        return;

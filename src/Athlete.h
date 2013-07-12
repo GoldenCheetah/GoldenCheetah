@@ -60,6 +60,7 @@ class Athlete : public QObject
         Zones *zones_;
         HrZones *hrzones_;
         void setCriticalPower(int cp);
+        bool isclean;
         QSqlDatabase db;
         MetricAggregator *metricDB;
         RideMetadata *rideMetadata_;
