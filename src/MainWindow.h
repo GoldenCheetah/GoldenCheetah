@@ -54,7 +54,7 @@ class Seasons;
 class IntervalSummaryWindow;
 class RideNavigator;
 class GcToolBar;
-class GcCalendar;
+class DiarySidebar;
 class GcMultiCalendar;
 class GcBubble;
 class LTMSidebar;
@@ -165,7 +165,7 @@ class MainWindow : public QMainWindow
         // sidebars
         TrainTool *trainTool; // train view
         LTMSidebar *ltmSidebar; // home view
-        GcCalendar *gcCalendar; // diary
+        DiarySidebar *diarySidebar; // diary
 
         // analysis view
         // constructed from parts in mainwindow

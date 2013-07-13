@@ -25,7 +25,7 @@
 #include "RideMetadata.h"
 #include "DBAccess.h"
 #include "Context.h"
-#include "GcCalendar.h"
+#include "DiarySidebar.h"
 #include "Settings.h"
 #include "Colors.h"
 
@@ -63,7 +63,7 @@ class RideNavigator : public GcWindow
     friend class ::NavigatorCellDelegate;
     friend class ::GroupByModel;
     friend class ::DiaryWindow;
-    friend class ::GcCalendar;
+    friend class ::DiarySidebar;
     friend class ::GcMiniCalendar;
     friend class ::DataFilter;
     friend class ::SearchBox;

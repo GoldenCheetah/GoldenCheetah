@@ -265,6 +265,7 @@ HEADERS += \
         DeviceTypes.h \
         DeviceConfiguration.h \
         DialWindow.h \
+        DiarySidebar.h \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgDB.h \
@@ -274,7 +275,6 @@ HEADERS += \
         FitlogParser.h \
         FitRideFile.h \
         GcBubble.h \
-        GcCalendar.h \
         GcCalendarModel.h \
         GcCrashDialog.h \
         GcPane.h \
@@ -449,6 +449,7 @@ SOURCES += \
         DeviceTypes.cpp \
         DeviceConfiguration.cpp \
         DialWindow.cpp \
+        DiarySidebar.cpp \
         DownloadRideDialog.cpp \
         ErgDB.cpp \
         ErgDBDownloadDialog.cpp \
@@ -463,7 +464,6 @@ SOURCES += \
         FixTorque.cpp \
         FixHRSpikes.cpp \
         GcBubble.cpp \
-        GcCalendar.cpp \
         GcCrashDialog.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
