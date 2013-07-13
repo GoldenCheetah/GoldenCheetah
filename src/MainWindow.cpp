@@ -86,7 +86,7 @@
 #include "HelpWindow.h"
 #include "HomeWindow.h"
 #include "GcBubble.h"
-#include "GcCalendar.h"
+#include "DiarySidebar.h"
 #include "GcScopeBar.h"
 #include "LTMSidebar.h"
 
@@ -540,7 +540,7 @@ MainWindow::MainWindow(const QDir &home) :
     listView->setProperty("nomenu", true);
 
     // sidebar items
-    gcCalendar = new GcCalendar(context);
+    diarySidebar = new DiarySidebar(context);
     gcMultiCalendar = new GcMultiCalendar(context);
 
     // we need to connect the search box on Linux/Windows
@@ -548,10 +548,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     // link to the sidebars
     connect(searchBox, SIGNAL(searchResults(QStringList)), listView, SLOT(searchStrings(QStringList)));
-    connect(searchBox, SIGNAL(searchResults(QStringList)), gcCalendar, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), diarySidebar, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchResults(QStringList)), gcMultiCalendar, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), listView, SLOT(clearSearch()));
-    connect(searchBox, SIGNAL(searchClear()), gcCalendar, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchClear()), diarySidebar, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchClear()), gcMultiCalendar, SLOT(clearFilter()));
 
     // and global for charts AFTER sidebars
@@ -716,14 +716,14 @@ MainWindow::MainWindow(const QDir &home) :
     // POPULATE TOOLBOX
 
     // do controllers after home windows -- they need their first signals caught
-    connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
+    connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
 
     ltmSidebar = new LTMSidebar(context, context->athlete->home);
     connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
     ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
 
     toolBox->addWidget(analSidebar);
-    toolBox->addWidget(gcCalendar);
+    toolBox->addWidget(diarySidebar);
     toolBox->addWidget(trainTool->controls());
     toolBox->addWidget(ltmSidebar);
 
@@ -1173,7 +1173,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride
-    gcCalendar->setRide(context->ride);
+    diarySidebar->setRide(context->ride);
     gcMultiCalendar->setRide(context->ride);
     //context->athlete->rideMetadata()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
     analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
@@ -1712,7 +1712,7 @@ MainWindow::selectDiary()
         trainTool->getToolbarButtons()->hide();
         scopebar->selected(1);
         toolBox->setCurrentIndex(1);
-        gcCalendar->refresh(); // get that signal with the date range...
+        diarySidebar->refresh(); // get that signal with the date range...
     }
     currentWindow = diaryWindow;
     setStyle();
@@ -1894,7 +1894,7 @@ MainWindow::removeCurrentRide()
     if (allRides->childCount() == 0) {
         context->ride = NULL;
         rideTreeWidgetSelectionChanged(); // notifies children
-        gcCalendar->setRide(context->ride); // and the pesky calendars
+        diarySidebar->setRide(context->ride); // and the pesky calendars
         gcMultiCalendar->setRide(context->ride);
     }
 
@@ -2714,12 +2714,12 @@ MainWindow::searchTextChanged(QString text)
     // clear or set...
     if (text == "") {
         listView->clearSearch();
-        gcCalendar->clearFilter();
+        diarySidebar->clearFilter();
         gcMultiCalendar->clearFilter();
     } else {
         context->athlete->lucene->search(text);
         listView->searchStrings(context->athlete->lucene->files());
-        gcCalendar->setFilter(context->athlete->lucene->files());
+        diarySidebar->setFilter(context->athlete->lucene->files());
         gcMultiCalendar->setFilter(context->athlete->lucene->files());
     }
 #endif

@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_GcCalendar_h
-#define _GC_GcCalendar_h 1
+#ifndef _GC_DiarySidebar_h
+#define _GC_DiarySidebar_h 1
 
 #include "GoldenCheetah.h"
 
@@ -151,14 +151,14 @@ class GcMultiCalendar : public QScrollArea
         RideItem *_ride;
 };
 
-class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
+class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
 {
     Q_OBJECT
     G_OBJECT
 
     public:
 
-        GcCalendar(Context *);
+        DiarySidebar(Context *);
 
     public slots:
 
@@ -191,4 +191,4 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         QWebView *summary;
         QDate from, to;
 };
-#endif // _GC_GcCalendar_h
+#endif // _GC_DiarySidebar_h

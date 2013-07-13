@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "GcCalendar.h"
+#include "DiarySidebar.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "GcWindowLayout.h"
@@ -26,9 +26,9 @@
 #include "TimeUtils.h"
 
 //********************************************************************************
-// CALENDAR SIDEBAR (GcCalendar)
+// CALENDAR SIDEBAR (DiarySidebar)
 //********************************************************************************
-GcCalendar::GcCalendar(Context *context) : context(context)
+DiarySidebar::DiarySidebar(Context *context) : context(context)
 {
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
@@ -121,7 +121,7 @@ GcCalendar::GcCalendar(Context *context) : context(context)
 }
 
 void
-GcCalendar::refresh()
+DiarySidebar::refresh()
 {
     if (!isHidden()) {
         multiCalendar->refresh();
@@ -131,7 +131,7 @@ GcCalendar::refresh()
 }
 
 void
-GcCalendar::setRide(RideItem *ride)
+DiarySidebar::setRide(RideItem *ride)
 {
     _ride = ride;
 
@@ -221,7 +221,7 @@ GcLabel::paintEvent(QPaintEvent *)
 }
 
 void
-GcCalendar::setSummary()
+DiarySidebar::setSummary()
 {
     // are we metric?
     bool useMetricUnits = context->athlete->useMetricUnits;
