@@ -192,8 +192,8 @@ PfPvWindow::PfPvWindow(Context *context) :
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
 }

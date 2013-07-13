@@ -178,7 +178,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
         // clicked on cell contents
         if (files.count() == 1) {
             if (files[0] == "calendar") ; // handle planned rides
-            else context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+            else context->athlete->selectRideFile(QFileInfo(files[0]).fileName());
 
         } else if (files.count()) {
 
@@ -188,7 +188,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
             for(i=files.count()-1; i>=0; i--) if (y > (c.y()+15+(h*i))) break;
 
             if (files[i] == "calendar") ; // handle planned rides
-            else context->mainWindow->selectRideFile(QFileInfo(files[i]).fileName());
+            else context->athlete->selectRideFile(QFileInfo(files[i]).fileName());
         }
 
         // force a repaint 

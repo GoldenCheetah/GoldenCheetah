@@ -111,8 +111,8 @@ PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
             this, SLOT(metricChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 #ifdef GC_HAVE_LUCENE
@@ -164,7 +164,7 @@ void PerformanceManagerWindow::rideSelected()
 
 void PerformanceManagerWindow::replot()
 {
-    const QTreeWidgetItem *allRides = context->mainWindow->allRideItems();
+    const QTreeWidgetItem *allRides = context->athlete->allRideItems();
 
     int newdays, rightIndex, endIndex;
     RideItem *firstRideItem = NULL;

@@ -101,9 +101,9 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     // refresh when config changes (metric/imperial?)
     connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
     // refresh when rides added/removed
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(context->mainWindow->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(context->athlete->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
     // selection of a ride by double clicking it, we need to update the ride list
     connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(selectRide(QModelIndex)));
     connect(tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(cursorRide()));
@@ -797,7 +797,7 @@ RideNavigator::selectRide(const QModelIndex &index)
     QModelIndex fileIndex = tableView->model()->index(index.row(), 2, index.parent()); // column 2 for filename ?
 
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
-    context->mainWindow->selectRideFile(filename);
+    context->athlete->selectRideFile(filename);
 }
 
 // user cursor moved to ride
@@ -827,8 +827,8 @@ RideNavigator::rideTreeSelectionChanged()
     else active = true;
 
     QTreeWidgetItem *which;
-    if (context->mainWindow->rideTreeWidget()->selectedItems().count())
-        which = context->mainWindow->rideTreeWidget()->selectedItems().first();
+    if (context->athlete->rideTreeWidget()->selectedItems().count())
+        which = context->athlete->rideTreeWidget()->selectedItems().first();
     else // no rides slected
         which = NULL;
 

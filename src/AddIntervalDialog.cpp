@@ -18,6 +18,7 @@
 
 #include "AddIntervalDialog.h"
 #include "MainWindow.h"
+#include "Athlete.h"
 #include "Context.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
@@ -645,7 +646,7 @@ AddIntervalDialog::addClicked()
             QString name = resultsTable->item(i,2)->text();
             const RideFile *ride = context->currentRide();
 
-            QTreeWidgetItem *allIntervals = context->mainWindow->mutableIntervalItems();
+            QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
             QTreeWidgetItem *last =
                 new IntervalItem(ride, name, start, stop,
                                  ride->timeToDistance(start),
@@ -656,5 +657,5 @@ AddIntervalDialog::addClicked()
             allIntervals->addChild(last);
         }
     }
-    context->mainWindow->updateRideFileIntervals();
+    context->athlete->updateRideFileIntervals();
 }

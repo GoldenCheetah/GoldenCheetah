@@ -22,6 +22,7 @@
 #include "Device.h"
 #include "MainWindow.h"
 #include "Context.h"
+#include "Athlete.h"
 #include "Settings.h"
 #include <assert.h>
 #include <errno.h>
@@ -390,7 +391,7 @@ DownloadRideDialog::downloadClicked()
         }
 
         QFile::remove(files.at(i).name);
-        context->mainWindow->addRide(filename);
+        context->athlete->addRide(filename);
     }
 
     if( ! failures )

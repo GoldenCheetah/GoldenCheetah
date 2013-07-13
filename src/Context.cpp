@@ -17,6 +17,7 @@
  */
 
 #include "Context.h"
+#include "Athlete.h"
 
 Context::Context(MainWindow *mainWindow)
 {
@@ -24,3 +25,10 @@ Context::Context(MainWindow *mainWindow)
     ride = NULL;
     workout = NULL;
 }
+
+const RideFile *
+Context::currentRide()
+{
+    return athlete->currentRide();
+}
+

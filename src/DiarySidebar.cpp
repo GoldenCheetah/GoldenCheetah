@@ -112,8 +112,8 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     connect(summarySelect, SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
 
     // refresh on these events...
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
 
     // set up for current selections
@@ -640,7 +640,7 @@ GcMiniCalendar::dayClicked(int i)
     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
 
     if (files.count()) // if more than one file cycle through them?
-        context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+        context->athlete->selectRideFile(QFileInfo(files[0]).fileName());
 
 }
 
@@ -669,7 +669,7 @@ GcMiniCalendar::previous()
                 if (date == heredate) {
                     // select this ride...
                     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
-                    if (files.count()) context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+                    if (files.count()) context->athlete->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
             emit dateChanged(month,year);
@@ -702,7 +702,7 @@ GcMiniCalendar::next()
                 if (date == heredate) {
                     // select this ride...
                     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
-                    if (files.count()) context->mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+                    if (files.count()) context->athlete->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
             emit dateChanged(month,year);

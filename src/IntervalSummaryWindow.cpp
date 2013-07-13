@@ -33,7 +33,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
 }
 
 IntervalSummaryWindow::~IntervalSummaryWindow() {
@@ -45,9 +45,9 @@ void IntervalSummaryWindow::intervalSelected()
     if (context->currentRideItem() == NULL || context->currentRide() == NULL) return;
 
 	QString html;
-    if (context->mainWindow->allIntervalItems() != NULL) {
-        for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem*>(context->mainWindow->allIntervalItems()->child(i));
+    if (context->athlete->allIntervalItems() != NULL) {
+        for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
             if (current != NULL) {
                 if (current->isSelected()) {
                     calcInterval(current, html);

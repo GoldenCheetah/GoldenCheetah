@@ -1531,7 +1531,7 @@ AllPlot::distanceIndex(double km) const
 IntervalItem *IntervalPlotData::intervalNum(int n) const
 {
     int highlighted=0;
-    const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
     for (int i=0; i<allIntervals->childCount(); i++) {
         IntervalItem *current = (IntervalItem *)allIntervals->child(i);
 
@@ -1550,9 +1550,9 @@ int IntervalPlotData::intervalCount() const
 {
     int highlighted;
     highlighted = 0;
-    if (context->mainWindow->allIntervalItems() == NULL) return 0; // not inited yet!
+    if (context->athlete->allIntervalItems() == NULL) return 0; // not inited yet!
 
-    const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
     for (int i=0; i<allIntervals->childCount(); i++) {
         IntervalItem *current = (IntervalItem *)allIntervals->child(i);
         if (current != NULL) {

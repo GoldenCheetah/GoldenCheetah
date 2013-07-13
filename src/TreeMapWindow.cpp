@@ -135,8 +135,8 @@ TreeMapWindow::TreeMapWindow(Context *context) :
 
     // config changes or ride file activities cause a redraw/refresh (but only if active)
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh(void)));
 
     connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));

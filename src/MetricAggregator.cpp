@@ -43,8 +43,8 @@ MetricAggregator::MetricAggregator(Context *context) : QObject(context), context
     dbaccess = new DBAccess(context);
     connect(context, SIGNAL(configChanged()), this, SLOT(update()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(update(void)));
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
 }
 
 MetricAggregator::~MetricAggregator()

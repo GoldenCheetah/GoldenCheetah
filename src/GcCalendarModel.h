@@ -146,8 +146,8 @@ public:
         setMonth(today.month(), today.year());
 
         // invalidate model if rides added or deleted or filter applier
-        connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
-        connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
+        connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
+        connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
         connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setStale()));
 
     }

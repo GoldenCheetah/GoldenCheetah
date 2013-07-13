@@ -1078,9 +1078,9 @@ bool PowerHist::shadeHRZones() const
 }
 
 bool PowerHist::isSelected(const RideFilePoint *p, double sample) {
-    if (context->mainWindow->allIntervalItems() != NULL) {
-        for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem*>(context->mainWindow->allIntervalItems()->child(i));
+    if (context->athlete->allIntervalItems() != NULL) {
+        for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
             if (current != NULL) {
                 if (current->isSelected() && p->secs+sample>current->start && p->secs<current->stop) {
                     return true;

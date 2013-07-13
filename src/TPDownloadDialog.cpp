@@ -911,7 +911,7 @@ TPDownloadDialog::saveRide(RideFile *ride, QDomDocument &, QStringList &errors)
 
     // add to the ride list
     rideFiles<<targetnosuffix;
-    context->mainWindow->addRide(fileinfo.fileName(), true);
+    context->athlete->addRide(fileinfo.fileName(), true);
 
     return true;
 }

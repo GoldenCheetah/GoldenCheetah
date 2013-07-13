@@ -19,6 +19,7 @@
 #include "ScatterWindow.h"
 #include "MainWindow.h"
 #include "ScatterPlot.h"
+#include "Athlete.h"
 #include "Context.h"
 
 #include <QtGui>
@@ -150,8 +151,8 @@ ScatterWindow::ScatterWindow(Context *context, const QDir &home) :
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
     connect(rxSelector, SIGNAL(valueChanged(int)), this, SLOT(rxSelectorChanged(int)));
@@ -291,8 +292,8 @@ ScatterWindow::setData()
 
     // any intervals to plot?
     settings.intervals.clear();
-    for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
         if (current != NULL && current->isSelected() == true)
                 settings.intervals.append(current);
     }

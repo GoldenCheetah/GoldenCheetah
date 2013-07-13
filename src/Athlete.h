@@ -40,6 +40,9 @@ class RideNavigator;
 class Lucene;
 class NamedSearches;
 class RideFileCache;
+class RideItem;
+class IntervalItem;
+class IntervalTreeView;
 
 class Context;
 class Context;
@@ -86,6 +89,24 @@ class Athlete : public QObject
 #endif
         Context *context;
 
+        // The ride collection -- transitionary
+        QTreeWidget *treeWidget;
+        QTreeWidgetItem *allRides;
+        QTreeWidgetItem *allIntervals;
+        IntervalTreeView *intervalWidget;
+
+        // access to the ride collection
+        void selectRideFile(QString);
+        void addRide(QString name, bool bSelect=true);
+        void removeCurrentRide();
+
+        QTreeWidget *rideTreeWidget() { return treeWidget; }
+        const QTreeWidgetItem *allRideItems() { return allRides; }
+        const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
+        const RideFile * currentRide();
+        IntervalTreeView *intervalTreeWidget() { return intervalWidget; }
+        QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
+
         void notifyZonesChanged() { zonesChanged(); }
         void notifySeasonsChanged() { seasonsChanged(); }
 
@@ -94,6 +115,10 @@ class Athlete : public QObject
         void seasonsChanged();
 
     public slots:
+        void rideTreeWidgetSelectionChanged();
+        void intervalTreeWidgetSelectionChanged();
+        void checkCPX(RideItem*ride);
+        void updateRideFileIntervals();
         void configChanged();
 
 };

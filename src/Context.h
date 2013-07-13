@@ -77,6 +77,11 @@ class Context : public QObject
         void notifyStop() { emit stop(); }
         void notifySeek(long x) { emit seek(x); }
 
+        void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
+        void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
+        void notifyRideDeleted(RideItem *x) { ride=x; rideDeleted(x); }
+        void notifyIntervalSelected() { intervalSelected(); }
+        void notifyIntervalsChanged() { emit intervalsChanged(); }
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
 
@@ -84,6 +89,11 @@ class Context : public QObject
 
         void configChanged();
 
+        void rideSelected(RideItem*);
+        void rideAdded(RideItem *);
+        void rideDeleted(RideItem *);
+        void intervalSelected();
+        void intervalsChanged();
         void rideDirty(RideItem*);
         void rideClean(RideItem*);
 

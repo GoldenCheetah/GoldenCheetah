@@ -17,7 +17,7 @@
  */
 
 #include "GcScopeBar.h"
-#include "GcCalendar.h"
+#include "DiaryWindow.h"
 #include "Context.h"
 #include "QtMacButton.h"
 

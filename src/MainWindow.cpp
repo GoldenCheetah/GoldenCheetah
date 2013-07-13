@@ -517,24 +517,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     // RIDES
 
-    // OLD Ride List (retained for legacy)
-    treeWidget = new QTreeWidget;
-    treeWidget->setColumnCount(3);
-    treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    // TODO: Test this on various systems with differing font settings (looks good on Leopard :)
-    treeWidget->header()->resizeSection(0,60);
-    treeWidget->header()->resizeSection(1,100);
-    treeWidget->header()->resizeSection(2,70);
-    treeWidget->header()->hide();
-    treeWidget->setAlternatingRowColors (false);
-    treeWidget->setIndentation(5);
-    treeWidget->hide();
-
-    allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
-    allRides->setText(0, tr("All Activities"));
-    treeWidget->expandItem(allRides);
-    treeWidget->setFirstItemColumnSpanned (allRides, true);
-
     // UI Ride List (configurable)
     listView = new RideNavigator(context, true);
     listView->setProperty("nomenu", true);
@@ -569,24 +551,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(context);
-    intervalWidget = new IntervalTreeView(context);
-    intervalWidget->setColumnCount(1);
-    intervalWidget->setIndentation(5);
-    intervalWidget->setSortingEnabled(false);
-    intervalWidget->header()->hide();
-    intervalWidget->setAlternatingRowColors (false);
-    intervalWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    intervalWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    intervalWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    intervalWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    intervalWidget->setFrameStyle(QFrame::NoFrame);
-
-    //allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
-    allIntervals = intervalWidget->invisibleRootItem();
-    allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
-
-    allIntervals->setText(0, tr("Intervals"));
-
     QWidget *activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
 #ifndef Q_OS_MAC // not on mac thanks
@@ -600,7 +564,7 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter = new QSplitter(this);
     intervalSplitter->setHandleWidth(1);
     intervalSplitter->setOrientation(Qt::Vertical);
-    intervalSplitter->addWidget(intervalWidget);
+    intervalSplitter->addWidget(context->athlete->intervalWidget);
     intervalSplitter->addWidget(intervalSummaryWindow);
     intervalSplitter->setFrameStyle(QFrame::NoFrame);
     intervalSplitter->setCollapsible(0, false);
@@ -632,9 +596,9 @@ MainWindow::MainWindow(const QDir &home) :
     while (i.hasNext()) {
         QString name = i.next();
         QDateTime dt;
-        if (parseRideFileName(name, &dt)) {
+        if (RideFile::parseRideFileName(name, &dt)) {
             last = new RideItem(RIDE_TYPE, context->athlete->home.path(), name, dt, context->athlete->zones(), context->athlete->hrZones(), context);
-            allRides->addChild(last);
+            context->athlete->allRides->addChild(last);
         }
     }
 
@@ -935,14 +899,10 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
     // selects the latest ride in the list:
-    if (allRides->childCount() != 0)
-        treeWidget->setCurrentItem(allRides->child(allRides->childCount()-1));
+    if (context->athlete->allRides->childCount() != 0)
+        context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(context->athlete->allRides->childCount()-1));
 
     // now we're up and runnning lets connect the signals
-    connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
-    connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenuPopup(const QPoint &)));
-    connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
-    connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     // We really do need a mechanism for showing if a ride needs saving...
@@ -950,8 +910,8 @@ MainWindow::MainWindow(const QDir &home) :
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
     // cpx aggregate cache check
-    connect(this,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
-    connect(this,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
+    connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
+    connect(context->athlete->intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenuPopup(const QPoint &)));
 
     // when metricDB updates check if BlankState needs to be closed
     connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
@@ -961,7 +921,8 @@ MainWindow::MainWindow(const QDir &home) :
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
 
     // Kick off
-    rideTreeWidgetSelectionChanged();
+    context->athlete->rideTreeWidgetSelectionChanged();
+
     selectAnalysis();
     setStyle();
 } // upgrade from first line of constructor
@@ -1157,58 +1118,6 @@ MainWindow::toggleFullScreen()
     else qDebug()<<"no fullscreen support compiled in.";
 }
 #endif
-void
-MainWindow::rideTreeWidgetSelectionChanged()
-{
-    assert(treeWidget->selectedItems().size() <= 1);
-    if (treeWidget->selectedItems().isEmpty())
-        context->ride = NULL;
-    else {
-        QTreeWidgetItem *which = treeWidget->selectedItems().first();
-        if (which->type() != RIDE_TYPE) return; // ignore!
-        else
-            context->ride = (RideItem*) which;
-    }
-
-    // update the ride property on all widgets
-    // to let them know they need to replot new
-    // selected ride
-    diarySidebar->setRide(context->ride);
-    gcMultiCalendar->setRide(context->ride);
-    //context->athlete->rideMetadata()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-
-    if (!context->ride) return;
-
-    // refresh interval list for bottom left
-    // first lets wipe away the existing intervals
-    QList<QTreeWidgetItem *> intervals = allIntervals->takeChildren();
-    for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
-
-    // now add the intervals for the current ride
-    if (context->ride) { // only if we have a ride pointer
-        RideFile *selected = context->ride->ride();
-        if (selected) {
-            // get all the intervals in the currently selected RideFile
-            QList<RideFileInterval> intervals = selected->intervals();
-            for (int i=0; i < intervals.count(); i++) {
-                // add as a child to allIntervals
-                IntervalItem *add = new IntervalItem(selected,
-                                                        intervals.at(i).name,
-                                                        intervals.at(i).start,
-                                                        intervals.at(i).stop,
-                                                        selected->timeToDistance(intervals.at(i).start),
-                                                        selected->timeToDistance(intervals.at(i).stop),
-                                                        allIntervals->childCount()+1);
-                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-                allIntervals->addChild(add);
-            }
-        }
-    }
-}
 
 void
 MainWindow::dateRangeChangedDiary(DateRange dr)
@@ -1240,23 +1149,23 @@ MainWindow::analysisPopup()
 void
 MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 {
-    if (treeWidget->selectedItems().size() == 0) return; //none selected!
+    if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
 
-    RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
+    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
     if (rideItem != NULL && rideItem->text(0) != tr("All Activities")) {
-        QMenu menu(treeWidget);
+        QMenu menu(context->athlete->treeWidget);
 
 
-        QAction *actSaveRide = new QAction(tr("Save Changes"), treeWidget);
+        QAction *actSaveRide = new QAction(tr("Save Changes"), context->athlete->treeWidget);
         connect(actSaveRide, SIGNAL(triggered(void)), this, SLOT(saveRide()));
 
-        QAction *revertRide = new QAction(tr("Revert to Saved version"), treeWidget);
+        QAction *revertRide = new QAction(tr("Revert to Saved version"), context->athlete->treeWidget);
         connect(revertRide, SIGNAL(triggered(void)), this, SLOT(revertRide()));
 
-        QAction *actDeleteRide = new QAction(tr("Delete Activity"), treeWidget);
+        QAction *actDeleteRide = new QAction(tr("Delete Activity"), context->athlete->treeWidget);
         connect(actDeleteRide, SIGNAL(triggered(void)), this, SLOT(deleteRide()));
 
-        QAction *actSplitRide = new QAction(tr("Split Activity"), treeWidget);
+        QAction *actSplitRide = new QAction(tr("Split Activity"), context->athlete->treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
 
         if (rideItem->isDirty() == true) {
@@ -1267,27 +1176,27 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         menu.addAction(actDeleteRide);
         menu.addAction(actSplitRide);
 #ifdef GC_HAVE_ICAL
-        QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), treeWidget);
+        QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), context->athlete->treeWidget);
         connect(actUploadCalendar, SIGNAL(triggered(void)), this, SLOT(uploadCalendar()));
         menu.addAction(actUploadCalendar);
 #endif
         menu.addSeparator();
 
         // ride navigator stuff
-        QAction *colChooser = new QAction(tr("Show Column Chooser"), treeWidget);
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
         connect(colChooser, SIGNAL(triggered(void)), listView, SLOT(showColumnChooser()));
         menu.addAction(colChooser);
 
         if (listView->groupBy() >= 0) {
 
             // already grouped lets ungroup
-            QAction *nogroups = new QAction(tr("Do Not Show In Groups"), treeWidget);
+            QAction *nogroups = new QAction(tr("Do Not Show In Groups"), context->athlete->treeWidget);
             connect(nogroups, SIGNAL(triggered(void)), listView, SLOT(noGroups()));
             menu.addAction(nogroups);
 
         } else {
 
-            QMenu *groupByMenu = new QMenu(tr("Group By"), treeWidget);
+            QMenu *groupByMenu = new QMenu(tr("Group By"), context->athlete->treeWidget);
             groupByMenu->setEnabled(true);
             menu.addMenu(groupByMenu);
 
@@ -1299,7 +1208,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
             foreach(QString heading, listView->columnNames()) {
                 if (heading == "*") continue; // special hidden column
 
-                QAction *groupByAct = new QAction(heading, treeWidget);
+                QAction *groupByAct = new QAction(heading, context->athlete->treeWidget);
                 connect(groupByAct, SIGNAL(triggered()), groupByMapper, SLOT(map()));
                 groupByMenu->addAction(groupByAct);
 
@@ -1317,7 +1226,7 @@ MainWindow::intervalPopup()
     // always show the 'find best' 'find peaks' options
     QMenu menu(intervalItem);
 
-    RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
+    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
 
     if (rideItem != NULL && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
         QAction *actFindPeak = new QAction(tr("Find Peak Intervals"), intervalItem);
@@ -1328,22 +1237,22 @@ MainWindow::intervalPopup()
         menu.addAction(actFindBest);
 
         // sort but only if 2 or more intervals
-        if (allIntervals->childCount() > 1) {
+        if (context->athlete->allIntervals->childCount() > 1) {
             QAction *actSort = new QAction(tr("Sort Intervals"), intervalItem);
             connect(actSort, SIGNAL(triggered(void)), this, SLOT(sortIntervals(void)));
             menu.addAction(actSort);
         }
 
-        if (intervalWidget->selectedItems().count()) menu.addSeparator();
+        if (context->athlete->intervalWidget->selectedItems().count()) menu.addSeparator();
     }
 
 
-    if (intervalWidget->selectedItems().count() == 1) {
+    if (context->athlete->intervalWidget->selectedItems().count() == 1) {
 
         // we can zoom, rename etc if only 1 interval is selected
-        QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
-        QAction *actEditInt = new QAction(tr("Edit interval"), intervalWidget);
-        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
+        QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
+        QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
 
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
@@ -1354,10 +1263,10 @@ MainWindow::intervalPopup()
         menu.addAction(actDeleteInt);
     }
 
-    if (intervalWidget->selectedItems().count() > 1) {
-        QAction *actRenameInt = new QAction(tr("Rename selected intervals"), intervalWidget);
+    if (context->athlete->intervalWidget->selectedItems().count() > 1) {
+        QAction *actRenameInt = new QAction(tr("Rename selected intervals"), context->athlete->intervalWidget);
         connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalsSelected(void)));
-        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalWidget);
+        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), context->athlete->intervalWidget);
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
 
         menu.addAction(actRenameInt);
@@ -1370,17 +1279,17 @@ MainWindow::intervalPopup()
 void
 MainWindow::showContextMenuPopup(const QPoint &pos)
 {
-    QTreeWidgetItem *trItem = intervalWidget->itemAt( pos );
+    QTreeWidgetItem *trItem = context->athlete->intervalWidget->itemAt( pos );
     if (trItem != NULL && trItem->text(0) != tr("Intervals")) {
-        QMenu menu(intervalWidget);
+        QMenu menu(context->athlete->intervalWidget);
 
         activeInterval = (IntervalItem *)trItem;
 
-        QAction *actEditInt = new QAction(tr("Edit interval"), intervalWidget);
-        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
-        QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
-        QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalWidget);
-        QAction *actBackInt = new QAction(tr("Send to back"), intervalWidget);
+        QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
+        QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
+        QAction *actFrontInt = new QAction(tr("Bring to Front"), context->athlete->intervalWidget);
+        QAction *actBackInt = new QAction(tr("Send to back"), context->athlete->intervalWidget);
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
@@ -1390,7 +1299,7 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
         menu.addAction(actDeleteInt);
-        menu.exec(intervalWidget->mapToGlobal( pos ));
+        menu.exec(context->athlete->intervalWidget->mapToGlobal( pos ));
     }
 }
 
@@ -1538,31 +1447,18 @@ void MainWindow::resetWindowLayout()
 
 void MainWindow::dateChanged(const QDate &date)
 {
-    for (int i = 0; i < allRides->childCount(); i++)
+    for (int i = 0; i < context->athlete->allRides->childCount(); i++)
     {
-        context->ride = (RideItem*) allRides->child(i);
+        context->ride = (RideItem*) context->athlete->allRides->child(i);
         if (context->ride->dateTime.date() == date) {
-            treeWidget->scrollToItem(allRides->child(i),
+            context->athlete->treeWidget->scrollToItem(context->athlete->allRides->child(i),
                 QAbstractItemView::EnsureVisible);
-            treeWidget->setCurrentItem(allRides->child(i));
-            i = allRides->childCount();
+            context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(i));
+            i = context->athlete->allRides->childCount();
         }
     }
 }
 
-void MainWindow::selectRideFile(QString fileName)
-{
-    for (int i = 0; i < allRides->childCount(); i++)
-    {
-        context->ride = (RideItem*) allRides->child(i);
-        if (context->ride->fileName == fileName) {
-            treeWidget->scrollToItem(allRides->child(i),
-                QAbstractItemView::EnsureVisible);
-            treeWidget->setCurrentItem(allRides->child(i));
-            i = allRides->childCount();
-        }
-    }
-}
 
 void MainWindow::manualProcess(QString name)
 {
@@ -1597,17 +1493,17 @@ MainWindow::checkBlankState()
     // Home?
     if (views->currentWidget() == blankStateHomePage) {
         // should it be closed?
-        if (allRides->childCount() > 0) closeBlankHome();
+        if (context->athlete->allRides->childCount() > 0) closeBlankHome();
     }
     // Diary?
     if (views->currentWidget() == blankStateDiaryPage) {
         // should it be closed?
-        if (allRides->childCount() > 0) closeBlankDiary();
+        if (context->athlete->allRides->childCount() > 0) closeBlankDiary();
     }
     // Analysis??
     if (views->currentWidget() == blankStateAnalysisPage) {
         // should it be closed?
-        if (allRides->childCount() > 0) closeBlankAnal();
+        if (context->athlete->allRides->childCount() > 0) closeBlankAnal();
     }
     // Train??
     if (views->currentWidget() == blankStateTrainPage) {
@@ -1648,7 +1544,7 @@ void
 MainWindow::selectAnalysis()
 {
     // No ride - no analysis view
-    if (allRides->childCount() == 0 && showBlankAnal == true) {
+    if (context->athlete->allRides->childCount() == 0 && showBlankAnal == true) {
         masterControls->setVisible(false);
         toolBox->hide();
         views->setCurrentWidget(blankStateAnalysisPage);
@@ -1699,7 +1595,7 @@ MainWindow::selectTrain()
 void
 MainWindow::selectDiary()
 {
-    if (allRides->childCount() == 0 && showBlankDiary == true) {
+    if (context->athlete->allRides->childCount() == 0 && showBlankDiary == true) {
         masterControls->setVisible(false);
         toolBox->hide();
         views->setCurrentWidget(blankStateDiaryPage);
@@ -1722,7 +1618,7 @@ void
 MainWindow::selectHome()
 {
     // No ride - no analysis view
-    if (allRides->childCount() == 0 && showBlankHome == true) {
+    if (context->athlete->allRides->childCount() == 0 && showBlankHome == true) {
         masterControls->setVisible(false);
         toolBox->hide();
         views->setCurrentWidget(blankStateHomePage);
@@ -1795,124 +1691,6 @@ MainWindow::dropEvent(QDropEvent *event)
  * Ride Library Functions
  *--------------------------------------------------------------------*/
 
-void
-MainWindow::addRide(QString name, bool dosignal)
-{
-    QDateTime dt;
-    if (!parseRideFileName(name, &dt)) {
-        fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
-        assert(false);
-    }
-    RideItem *last = new RideItem(RIDE_TYPE, context->athlete->home.path(), name, dt, context->athlete->zones(), context->athlete->hrZones(), context);
-
-    int index = 0;
-    while (index < allRides->childCount()) {
-        QTreeWidgetItem *item = allRides->child(index);
-        if (item->type() != RIDE_TYPE)
-            continue;
-        RideItem *other = static_cast<RideItem*>(item);
-
-        if (other->dateTime > dt) break;
-        if (other->fileName == name) {
-            delete allRides->takeChild(index);
-            break;
-        }
-        ++index;
-    }
-    if (dosignal) rideAdded(last); // here so emitted BEFORE rideSelected is emitted!
-    allRides->insertChild(index, last);
-
-    // if it is the very first ride, we need to select it
-    // after we added it
-    if (!index) treeWidget->setCurrentItem(last);
-}
-
-void
-MainWindow::removeCurrentRide()
-{
-    int x = 0;
-
-    QTreeWidgetItem *_item = treeWidget->currentItem();
-    if (_item->type() != RIDE_TYPE)
-        return;
-    RideItem *item = static_cast<RideItem*>(_item);
-
-
-    QTreeWidgetItem *itemToSelect = NULL;
-    for (x=0; x<allRides->childCount(); ++x)
-    {
-        if (item==allRides->child(x))
-        {
-            break;
-        }
-    }
-
-    if (x>0) {
-        itemToSelect = allRides->child(x-1);
-    }
-    if ((x+1)<allRides->childCount()) {
-        itemToSelect = allRides->child(x+1);
-    }
-
-    QString strOldFileName = item->fileName;
-    allRides->removeChild(item);
-
-
-    QFile file(context->athlete->home.absolutePath() + "/" + strOldFileName);
-    // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
-    QString strNewName = strOldFileName + ".bak";
-
-    // in case there was an existing bak file, delete it
-    // ignore errors since it probably isn't there.
-    QFile::remove(context->athlete->home.absolutePath() + "/" + strNewName);
-
-    if (!file.rename(context->athlete->home.absolutePath() + "/" + strNewName))
-    {
-        QMessageBox::critical(
-            this, "Rename Error",
-            tr("Can't rename %1 to %2")
-            .arg(strOldFileName).arg(strNewName));
-    }
-
-    // remove any other derived/additional files; notes, cpi etc
-    QStringList extras;
-    extras << "notes" << "cpi" << "cpx";
-    foreach (QString extension, extras) {
-
-        QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
-        QFile::remove(context->athlete->home.absolutePath() + "/" + deleteMe);
-    }
-
-    // notify AFTER deleted from DISK..
-    rideDeleted(item);
-
-    // ..but before MEMORY cleared
-    item->freeMemory();
-    delete item;
-
-    // any left?
-    if (allRides->childCount() == 0) {
-        context->ride = NULL;
-        rideTreeWidgetSelectionChanged(); // notifies children
-        diarySidebar->setRide(context->ride); // and the pesky calendars
-        gcMultiCalendar->setRide(context->ride);
-    }
-
-    treeWidget->setCurrentItem(itemToSelect);
-    rideTreeWidgetSelectionChanged();
-}
-
-void
-MainWindow::checkCPX(RideItem*ride)
-{
-    QList<RideFileCache*> newList;
-
-    foreach(RideFileCache *p, context->athlete->cpxCache) {
-        if (ride->dateTime.date() < p->start || ride->dateTime.date() > p->end)
-            newList.append(p);
-    }
-    context->athlete->cpxCache = newList;
-}
 
 void
 MainWindow::downloadRide()
@@ -1927,22 +1705,6 @@ MainWindow::manualRide()
     (new ManualRideDialog(context))->show();
 }
 
-const RideFile *
-Context::currentRide()
-{
-    return mainWindow->currentRide();
-}
-
-const RideFile *
-MainWindow::currentRide()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        return NULL;
-    }
-    return ((RideItem*) treeWidget->selectedItems().first())->ride();
-}
-
 void
 MainWindow::exportBatch()
 {
@@ -1953,8 +1715,8 @@ MainWindow::exportBatch()
 void
 MainWindow::exportRide()
 {
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+    if ((context->athlete->treeWidget->selectedItems().size() != 1)
+        || (context->athlete->treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
         QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
@@ -2050,7 +1812,7 @@ MainWindow::splitRide()
 void
 MainWindow::deleteRide()
 {
-    QTreeWidgetItem *_item = treeWidget->currentItem();
+    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) {
         QMessageBox::critical(this, tr("Delete Activity"), tr("No activity selected!"));
         return;
@@ -2065,7 +1827,7 @@ MainWindow::deleteRide()
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
-        removeCurrentRide();
+        context->athlete->removeCurrentRide();
 }
 
 /*----------------------------------------------------------------------
@@ -2136,7 +1898,7 @@ MainWindow::exportMetrics()
 void
 MainWindow::uploadRideWithGPSAction()
 {
-    QTreeWidgetItem *_item = treeWidget->currentItem();
+    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
@@ -2154,7 +1916,7 @@ MainWindow::uploadRideWithGPSAction()
 void
 MainWindow::uploadTtb()
 {
-    QTreeWidgetItem *_item = treeWidget->currentItem();
+    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
@@ -2282,9 +2044,9 @@ MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, 
                          i.start, i.stop,
                          ride->timeToDistance(i.start),
                          ride->timeToDistance(i.stop),
-                         allIntervals->childCount()+1);
+                         context->athlete->allIntervals->childCount()+1);
     peak->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-    allIntervals->addChild(peak);
+    context->athlete->allIntervals->addChild(peak);
 }
 
 void
@@ -2293,7 +2055,7 @@ MainWindow::findPowerPeaks()
 
     if (!context->ride) return;
 
-    QTreeWidgetItem *which = treeWidget->selectedItems().first();
+    QTreeWidgetItem *which = context->athlete->treeWidget->selectedItems().first();
     if (which->type() != RIDE_TYPE) {
         return;
     }
@@ -2313,7 +2075,7 @@ MainWindow::findPowerPeaks()
         addIntervalForPowerPeaksForSecs(context->ride->ride(), 3600, "Peak 60min");
 
         // now update the RideFileIntervals
-        updateRideFileIntervals();
+        context->athlete->updateRideFileIntervals();
 
     } else {
         if (!context->ride || !context->ride->ride())
@@ -2323,26 +2085,6 @@ MainWindow::findPowerPeaks()
     }
 }
 
-void
-MainWindow::updateRideFileIntervals()
-{
-    // iterate over allIntervals as they are now defined
-    // and update the RideFile->intervals
-    RideItem *which = (RideItem *)treeWidget->selectedItems().first();
-    RideFile *current = which->ride();
-    current->clearIntervals();
-    for (int i=0; i < allIntervals->childCount(); i++) {
-        // add the intervals as updated
-        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
-        current->addInterval(it->start, it->stop, it->text(0));
-    }
-
-    // emit signal for interval data changed
-    intervalsChanged();
-
-    // set dirty
-    which->setDirty(true);
-}
 
 bool
 lessItem(const IntervalItem *s1, const IntervalItem *s2) {
@@ -2356,22 +2098,22 @@ MainWindow::sortIntervals()
     QList<IntervalItem*> intervals;
 
     // set string to first interval selected
-    for (int i=0; i<allIntervals->childCount();i++)
-        intervals.append((IntervalItem*)(allIntervals->child(i)));
+    for (int i=0; i<context->athlete->allIntervals->childCount();i++)
+        intervals.append((IntervalItem*)(context->athlete->allIntervals->child(i)));
 
     // now sort them into start time order
     qStableSort(intervals.begin(), intervals.end(), lessItem);
 
-    // empty allIntervals
-    allIntervals->takeChildren();
+    // empty context->athlete->allIntervals
+    context->athlete->allIntervals->takeChildren();
 
     // and put em back in chronological sequence
     foreach(IntervalItem* item, intervals) {
-        allIntervals->addChild(item);
+        context->athlete->allIntervals->addChild(item);
     }
 
     // now update the ridefile
-    updateRideFileIntervals(); // will emit intervalChanged() signal
+    context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 // rename multiple intervals
@@ -2381,9 +2123,9 @@ MainWindow::renameIntervalsSelected()
     QString string;
 
     // set string to first interval selected
-    for (int i=0; i<allIntervals->childCount();i++) {
-        if (allIntervals->child(i)->isSelected()) {
-            string = allIntervals->child(i)->text(0);
+    for (int i=0; i<context->athlete->allIntervals->childCount();i++) {
+        if (context->athlete->allIntervals->child(i)->isSelected()) {
+            string = context->athlete->allIntervals->child(i)->text(0);
             break;
         }
     }
@@ -2408,12 +2150,12 @@ MainWindow::renameIntervalsSelected()
         } else if (!string.endsWith(" ")) string += " ";
 
         // now go and renumber from 'number' with prefix 'string'
-        for (int i=0; i<allIntervals->childCount();i++) {
-            if (allIntervals->child(i)->isSelected())
-                allIntervals->child(i)->setText(0, QString("%1%2").arg(string).arg(number++));
+        for (int i=0; i<context->athlete->allIntervals->childCount();i++) {
+            if (context->athlete->allIntervals->child(i)->isSelected())
+                context->athlete->allIntervals->child(i)->setText(0, QString("%1%2").arg(string).arg(number++));
         }
 
-        updateRideFileIntervals(); // will emit intervalChanged() signal
+        context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
     }
 }
 
@@ -2429,42 +2171,42 @@ void
 MainWindow::deleteInterval()
 {
     // now delete highlighted!
-    for (int i=0; i<allIntervals->childCount();) {
-        if (allIntervals->child(i)->isSelected()) delete allIntervals->takeChild(i);
+    for (int i=0; i<context->athlete->allIntervals->childCount();) {
+        if (context->athlete->allIntervals->child(i)->isSelected()) delete context->athlete->allIntervals->takeChild(i);
         else i++;
     }
 
-    updateRideFileIntervals(); // will emit intervalChanged() signal
+    context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 void
 MainWindow::renameIntervalSelected()
 {
     // go edit the name
-    for (int i=0; i<allIntervals->childCount();) {
-        if (allIntervals->child(i)->isSelected()) {
-            allIntervals->child(i)->setFlags(allIntervals->child(i)->flags() | Qt::ItemIsEditable);
-            intervalWidget->editItem(allIntervals->child(i), 0);
+    for (int i=0; i<context->athlete->allIntervals->childCount();) {
+        if (context->athlete->allIntervals->child(i)->isSelected()) {
+            context->athlete->allIntervals->child(i)->setFlags(context->athlete->allIntervals->child(i)->flags() | Qt::ItemIsEditable);
+            context->athlete->intervalWidget->editItem(context->athlete->allIntervals->child(i), 0);
             break;
         } else i++;
     }
-    updateRideFileIntervals(); // will emit intervalChanged() signal
+    context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 void
 MainWindow::renameInterval() {
     // go edit the name
     activeInterval->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
-    intervalWidget->editItem(activeInterval, 0);
+    context->athlete->intervalWidget->editItem(activeInterval, 0);
 }
 
 void
 MainWindow::editIntervalSelected()
 {
     // go edit the interval
-    for (int i=0; i<allIntervals->childCount();) {
-        if (allIntervals->child(i)->isSelected()) {
-            activeInterval = (IntervalItem*)allIntervals->child(i);
+    for (int i=0; i<context->athlete->allIntervals->childCount();) {
+        if (context->athlete->allIntervals->child(i)->isSelected()) {
+            activeInterval = (IntervalItem*)context->athlete->allIntervals->child(i);
             editInterval();
             break;
         } else i++;
@@ -2479,24 +2221,18 @@ MainWindow::editInterval()
 
     if (dialog.exec()) {
         *activeInterval = temp;
-        updateRideFileIntervals(); // will emit intervalChanged() signal
-        intervalWidget->update();
+        context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
+        context->athlete->intervalWidget->update();
     }
-}
-
-void
-MainWindow::intervalEdited(QTreeWidgetItem *, int) {
-    // the user renamed the interval
-    updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 void
 MainWindow::zoomIntervalSelected()
 {
     // zoom the one interval that is selected via popup menu
-    for (int i=0; i<allIntervals->childCount();) {
-        if (allIntervals->child(i)->isSelected()) {
-            emit intervalZoom((IntervalItem*)(allIntervals->child(i)));
+    for (int i=0; i<context->athlete->allIntervals->childCount();) {
+        if (context->athlete->allIntervals->child(i)->isSelected()) {
+            emit intervalZoom((IntervalItem*)(context->athlete->allIntervals->child(i)));
             break;
         } else i++;
     }
@@ -2512,24 +2248,24 @@ void
 MainWindow::frontInterval()
 {
     int oindex = activeInterval->displaySequence;
-    for (int i=0; i<allIntervals->childCount(); i++) {
-        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+    for (int i=0; i<context->athlete->allIntervals->childCount(); i++) {
+        IntervalItem *it = (IntervalItem *)context->athlete->allIntervals->child(i);
         int ds = it->displaySequence;
         if (ds > oindex)
             it->setDisplaySequence(ds-1);
     }
-    activeInterval->setDisplaySequence(allIntervals->childCount());
+    activeInterval->setDisplaySequence(context->athlete->allIntervals->childCount());
 
     // signal!
-    intervalsChanged();
+    context->notifyIntervalsChanged();
 }
 
 void
 MainWindow::backInterval()
 {
     int oindex = activeInterval->displaySequence;
-    for (int i=0; i<allIntervals->childCount(); i++) {
-        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+    for (int i=0; i<context->athlete->allIntervals->childCount(); i++) {
+        IntervalItem *it = (IntervalItem *)context->athlete->allIntervals->child(i);
         int ds = it->displaySequence;
         if (ds < oindex)
             it->setDisplaySequence(ds+1);
@@ -2537,42 +2273,15 @@ MainWindow::backInterval()
     activeInterval->setDisplaySequence(1);
 
     // signal!
-    intervalsChanged();
+    context->notifyIntervalsChanged();
 
 }
 
-void
-MainWindow::intervalTreeWidgetSelectionChanged()
-{
-    intervalSelected();
-}
 
 
 /*----------------------------------------------------------------------
  * Utility
  *--------------------------------------------------------------------*/
-
-bool
-MainWindow::parseRideFileName(const QString &name, QDateTime *dt)
-{
-    static char rideFileRegExp[] = "^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                                   "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
-    QRegExp rx(rideFileRegExp);
-    if (!rx.exactMatch(name))
-            return false;
-    assert(rx.numCaptures() == 8);
-    QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
-    QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
-    if ((! date.isValid()) || (! time.isValid())) {
-	QMessageBox::warning(this,
-			     tr("Invalid Activity File Name"),
-			     tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name)
-			     );
-	return false;
-    }
-    *dt = QDateTime(date, time);
-    return true;
-}
 
 /*----------------------------------------------------------------------
  * Notifiers - application level events
@@ -2740,5 +2449,48 @@ MainWindow::actionClicked(int index)
     case 2 : deleteRide();
             break;
 
+    }
+}
+
+void
+MainWindow::rideSelected(RideItem*)
+{
+
+    // update the ride property on all widgets
+    // to let them know they need to replot new
+    // selected ride
+    diarySidebar->setRide(context->ride);
+    gcMultiCalendar->setRide(context->ride);
+    analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+
+    if (!context->ride) return;
+
+    // refresh interval list for bottom left
+    // first lets wipe away the existing intervals
+    QList<QTreeWidgetItem *> intervals = context->athlete->allIntervals->takeChildren();
+    for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
+
+    // now add the intervals for the current ride
+    if (context->ride) { // only if we have a ride pointer
+        RideFile *selected = context->ride->ride();
+        if (selected) {
+            // get all the intervals in the currently selected RideFile
+            QList<RideFileInterval> intervals = selected->intervals();
+            for (int i=0; i < intervals.count(); i++) {
+                // add as a child to context->athlete->allIntervals
+                IntervalItem *add = new IntervalItem(selected,
+                                                        intervals.at(i).name,
+                                                        intervals.at(i).start,
+                                                        intervals.at(i).stop,
+                                                        selected->timeToDistance(intervals.at(i).start),
+                                                        selected->timeToDistance(intervals.at(i).stop),
+                                                        context->athlete->allIntervals->childCount()+1);
+                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                context->athlete->allIntervals->addChild(add);
+            }
+        }
     }
 }

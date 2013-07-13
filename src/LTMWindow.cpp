@@ -156,8 +156,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), ltmPlot, SLOT(pointClicked(QwtPlotCurve*, int)));
 
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
 }
 

@@ -53,7 +53,7 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    const QTreeWidgetItem *allRides = context->mainWindow->allRideItems();
+    const QTreeWidgetItem *allRides = context->athlete->allRideItems();
 
     for (int i=0; i<allRides->childCount(); i++) {
 

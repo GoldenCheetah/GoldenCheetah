@@ -59,8 +59,8 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     //
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
-    connect(context->mainWindow, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
-    connect(context->mainWindow, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
+    connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
+    connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context->mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
 
     first = true;
@@ -448,7 +448,7 @@ GoogleMapControl::createMarkers()
     //
     // INTERVAL MARKERS
     //
-    if (context->mainWindow->allIntervalItems() == NULL) return; // none to do, we are all done then
+    if (context->athlete->allIntervalItems() == NULL) return; // none to do, we are all done then
 
     int interval=0;
     foreach (const RideFileInterval x, myRideItem->ride()->intervals()) {
@@ -531,11 +531,11 @@ WebBridge::intervalCount()
     highlighted = 0;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    if (context->mainWindow->allIntervalItems() == NULL ||
+    if (context->athlete->allIntervalItems() == NULL ||
         rideItem == NULL || rideItem->ride() == NULL) return 0; // not inited yet!
 
-    for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
         if (current != NULL) {
             if (current->isSelected() == true) {
                 ++highlighted;
@@ -553,14 +553,14 @@ WebBridge::getLatLons(int i)
     int highlighted=0;
     RideItem *rideItem = gm->property("ride").value<RideItem*>();
 
-    if (context->mainWindow->allIntervalItems() == NULL ||
+    if (context->athlete->allIntervalItems() == NULL ||
        rideItem ==NULL || rideItem->ride() == NULL) return latlons; // not inited yet!
 
     if (i) {
 
         // get for specific interval
-        for (int j=0; j<context->mainWindow->allIntervalItems()->childCount(); j++) {
-            IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(j));
+        for (int j=0; j<context->athlete->allIntervalItems()->childCount(); j++) {
+            IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(j));
             if (current != NULL) {
                 if (current->isSelected() == true) {
                     ++highlighted;
@@ -614,6 +614,6 @@ void
 WebBridge::toggleInterval(int x)
 {
 return;
-    IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(x));
+    IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(x));
     if (current) current->setSelected(!current->isSelected());
 }
