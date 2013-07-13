@@ -435,10 +435,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(context, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(context->mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
-    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
 
     // set initial colors
     configChanged();
@@ -1122,7 +1122,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
 
         if (newInterval) {
 
-            QTreeWidgetItem *allIntervals = context->mainWindow->mutableIntervalItems();
+            QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
             int count = allIntervals->childCount();
 
             // are we adjusting an existing interval? - if so delete it and readd it
@@ -1139,11 +1139,11 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             allIntervals->addChild(last);
 
-            // select this new interval
-            context->mainWindow->intervalTreeWidget()->setItemSelected(last, true);
+            // select this new interval --WTAF?????? NO! NO! NO!
+            context->athlete->intervalTreeWidget()->setItemSelected(last, true);
 
             // now update the RideFileIntervals and all the plots etc
-            context->mainWindow->updateRideFileIntervals();
+            context->athlete->updateRideFileIntervals();
         }
     }
     active = false;

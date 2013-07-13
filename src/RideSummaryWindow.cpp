@@ -86,13 +86,13 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
         connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(refresh()));
-        connect(context->mainWindow, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
 
     } else {
 
         connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-        connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-        connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+        connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+        connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
         connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh()));
 
         // date settings

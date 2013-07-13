@@ -842,3 +842,26 @@ RideFile::getWeight()
 
     return weight_;
 }
+
+bool
+RideFile::parseRideFileName(const QString &name, QDateTime *dt)
+{
+    static char rideFileRegExp[] = "^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
+                                   "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
+    QRegExp rx(rideFileRegExp);
+    if (!rx.exactMatch(name))
+            return false;
+    assert(rx.numCaptures() == 8);
+    QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
+    QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
+    if ((! date.isValid()) || (! time.isValid())) {
+	QMessageBox::warning(NULL,
+			     tr("Invalid Activity File Name"),
+			     tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name)
+			     );
+	return false;
+    }
+    *dt = QDateTime(date, time);
+    return true;
+}
+

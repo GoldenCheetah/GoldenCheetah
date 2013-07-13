@@ -290,7 +290,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     } else {
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-        connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+        connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     }
 
     // if any of the controls change we pass the chart everything
@@ -306,8 +306,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
 
-    connect(context->mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
-    connect(context->mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
 }
 

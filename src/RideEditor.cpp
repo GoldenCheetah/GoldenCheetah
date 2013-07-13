@@ -19,6 +19,7 @@
 #include "RideEditor.h"
 #include "LTMOutliers.h"
 #include "IntervalItem.h"
+#include "Athlete.h"
 #include "MainWindow.h"
 #include "Context.h"
 #include "Settings.h"
@@ -140,7 +141,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     mainLayout->addWidget(table);
 
     // trap GC signals
-    connect(context->mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
@@ -1116,7 +1117,7 @@ RideEditor::intervalSelected()
                                                        QItemSelectionModel::Clear);
 
         // highlight selection and jump to last
-        foreach(QTreeWidgetItem *x, context->mainWindow->allIntervalItems()->treeWidget()->selectedItems()) {
+        foreach(QTreeWidgetItem *x, context->athlete->allIntervalItems()->treeWidget()->selectedItems()) {
 
             IntervalItem *current = (IntervalItem*)x;
 

@@ -91,7 +91,7 @@ IntervalItem *IntervalAerolabData::intervalNum
 ) const
 {
     int                    highlighted  = 0;
-    const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
     for ( int ii = 0; ii < allIntervals->childCount(); ii++)
 
     {
@@ -121,9 +121,9 @@ int IntervalAerolabData::intervalCount() const
 {
     int highlighted = 0;
 
-    if ( context->mainWindow->allIntervalItems() != NULL )
+    if ( context->athlete->allIntervalItems() != NULL )
     {
-        const QTreeWidgetItem *allIntervals = context->mainWindow->allIntervalItems();
+        const QTreeWidgetItem *allIntervals = context->athlete->allIntervalItems();
         for ( int ii = 0; ii < allIntervals->childCount(); ii++)
         {
             IntervalItem *current = (IntervalItem *) allIntervals->child( ii );

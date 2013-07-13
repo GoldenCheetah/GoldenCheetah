@@ -101,6 +101,7 @@ class RideFile : public QObject // QObject to emit signals
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);
         static double minimumFor(SeriesType series);
+        static bool parseRideFileName(const QString &name, QDateTime *dt);
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;

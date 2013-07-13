@@ -19,6 +19,7 @@
 
 #include "PfPvPlot.h"
 #include "MainWindow.h"
+#include "Athlete.h"
 #include "Context.h"
 #include "RideFile.h"
 #include "RideItem.h"
@@ -329,10 +330,10 @@ int PfPvPlot::intervalCount() const
 {
     int highlighted;
     highlighted = 0;
-    if (context->mainWindow->allIntervalItems() == NULL) return 0; // not inited yet!
+    if (context->athlete->allIntervalItems() == NULL) return 0; // not inited yet!
 
-    for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
         if (current != NULL) {
             if (current->isSelected() == true) {
                 ++highlighted;
@@ -470,9 +471,9 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-                for (int high=-1, t=0; t<context->mainWindow->allIntervalItems()->childCount(); t++) {
+                for (int high=-1, t=0; t<context->athlete->allIntervalItems()->childCount(); t++) {
 
-                    IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(t));
+                    IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(t));
 
                     if ((current != NULL) && current->isSelected()) {
                         ++high;
@@ -516,12 +517,12 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
            // ensure same colors are used for each interval selected
            int num_intervals_defined=0;
            QVector<int> intervalmap;
-           if (context->mainWindow->allIntervalItems() != NULL) {
+           if (context->athlete->allIntervalItems() != NULL) {
 
-                num_intervals_defined = context->mainWindow->allIntervalItems()->childCount();
+                num_intervals_defined = context->athlete->allIntervalItems()->childCount();
 
-                for (int g=0; g<context->mainWindow->allIntervalItems()->childCount(); g++) {
-                    IntervalItem *curr = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(g));
+                for (int g=0; g<context->athlete->allIntervalItems()->childCount(); g++) {
+                    IntervalItem *curr = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(g));
                     if (curr->isSelected()) intervalmap.append(g);
                 }
            }
@@ -532,9 +533,9 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
             if (mergeIntervals()) intervalOrder.insert(1,0);
             else {
-                for (int i=0; i<context->mainWindow->allIntervalItems()->childCount(); i++) {
+                for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
 
-                    IntervalItem *current = dynamic_cast<IntervalItem *>(context->mainWindow->allIntervalItems()->child(i));
+                    IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
 
                     if (current != NULL && current->isSelected() == true) {
                             intervalOrder.insert(current->displaySequence, count++);

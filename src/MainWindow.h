@@ -76,10 +76,9 @@ class BlankStateTrainPage;
 class GcSplitter;
 class GcSplitterItem;
 class QtSegmentControl;
-class IntervalItem;
-class IntervalTreeView;
 class SaveSingleDialogWidget;
 class SplitActivityWizard;
+class IntervalItem;
 
 class MainWindow;
 class Athlete;
@@ -104,17 +103,6 @@ class MainWindow : public QMainWindow
 
         // transitionary
         Context *context;
-
-        // currently selected ride item, ride list
-        void selectRideFile(QString);
-        QTreeWidget *rideTreeWidget() { return treeWidget; }
-        const QTreeWidgetItem *allRideItems() { return allRides; }
-
-        // ride intervals
-        const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
-        IntervalTreeView *intervalTreeWidget() { return intervalWidget; }
-        QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
-        void updateRideFileIntervals();
 
         // filters changed
         void notifyFilter(QStringList f) { filters = f; emit filterChanged(f); }
@@ -172,7 +160,6 @@ class MainWindow : public QMainWindow
         GcSplitter *analSidebar;
         GcSplitterItem *analItem, *intervalItem;
         QSplitter *intervalSplitter;
-        IntervalTreeView *intervalWidget;
         GcMultiCalendar *gcMultiCalendar;
 
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
@@ -182,8 +169,6 @@ class MainWindow : public QMainWindow
         QTFullScreen *fullScreen;
 #endif
 
-        // transitionary
-
     protected:
 
         virtual void resizeEvent(QResizeEvent*);
@@ -192,20 +177,11 @@ class MainWindow : public QMainWindow
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
 
-        const RideFile *currentRide();
-
     signals:
         void filterChanged(QStringList&);
-
-        // transitionary will move too XXX
-        void intervalSelected();
         void intervalZoom(IntervalItem*);
-        void intervalsChanged();
-        void rideAdded(RideItem *);
-        void rideDeleted(RideItem *);
 
     public slots:
-        void checkCPX(RideItem*);
         void showTreeContextMenuPopup(const QPoint &);
         void closeAll();
         void addDevice();
@@ -224,14 +200,11 @@ class MainWindow : public QMainWindow
         void intervalPopup();
 
         // transitionary
-        void addRide(QString name, bool bSelect=true);
+        void rideSelected(RideItem*ride);
         bool saveRideSingleDialog(RideItem *);
-        void removeCurrentRide();
         void saveSilent(RideItem *);
 
     private slots:
-        void rideTreeWidgetSelectionChanged();
-        void intervalTreeWidgetSelectionChanged();
         void splitterMoved(int, int);
         void newCyclist();
         void openCyclist();
@@ -282,7 +255,6 @@ class MainWindow : public QMainWindow
         void zoomIntervalSelected(void); // from menu popup
         void frontInterval();
         void backInterval();
-        void intervalEdited(QTreeWidgetItem *, int);
 
         // working with measures, not rides
         void recordMeasure();
@@ -383,16 +355,11 @@ class MainWindow : public QMainWindow
                        *diaryControls,
                        *homeControls;
 
-        // central data structure
-        QTreeWidget *treeWidget;
-        QTreeWidgetItem *allRides;
-        QTreeWidgetItem *allIntervals;
         IntervalSummaryWindow *intervalSummaryWindow;
 
         // Miscellany
         QSignalMapper *groupByMapper;
         QSignalMapper *toolMapper;
-        bool parseRideFileName(const QString &name, QDateTime *dt);
 
 };
 

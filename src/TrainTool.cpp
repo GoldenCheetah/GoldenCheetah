@@ -958,7 +958,7 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
             // add to the view - using basename ONLY
             QString name;
             name = recordFile->fileName();
-            context->mainWindow->addRide(QFileInfo(name).fileName(), true);
+            context->athlete->addRide(QFileInfo(name).fileName(), true);
         }
     }
 

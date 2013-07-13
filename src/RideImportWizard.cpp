@@ -826,7 +826,7 @@ RideImportWizard::abortClicked()
                     tableWidget->item(i,5)->setText(tr("File Overwritten"));
                 } else {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
-                    context->mainWindow->addRide(QFileInfo(fulltarget).fileName(), true);
+                    context->athlete->addRide(QFileInfo(fulltarget).fileName(), true);
                 }
             }
 
@@ -871,7 +871,7 @@ RideImportWizard::abortClicked()
                     QFile source(filenames[i]);
                     if (source.copy(fulltarget)) {
                         tableWidget->item(i,5)->setText(tr("File Saved"));
-                        context->mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
+                        context->athlete->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
                         // free immediately otherwise all imported rides are cached
                         // and with large imports this can lead to memory exhaustion
                         // BUT! Some charts/windows will hava snaffled away the ridefile

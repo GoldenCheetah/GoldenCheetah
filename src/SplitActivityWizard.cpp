@@ -807,7 +807,7 @@ SplitConfirm::validatePage()
         // first do we need to remove the current ride?
         if (wizard->keepOriginal == false) {
 
-            wizard->context->mainWindow->removeCurrentRide();
+            wizard->context->athlete->removeCurrentRide();
             QTreeWidgetItem *current = wizard->files->invisibleRootItem()->child(0);
             current->setText(5, tr("Removed"));
         }
@@ -825,7 +825,7 @@ SplitConfirm::validatePage()
 
             current->setText(5, tr("Saved"));
 
-            wizard->context->mainWindow->addRide(QFileInfo(out).fileName(), true);
+            wizard->context->athlete->addRide(QFileInfo(out).fileName(), true);
         }
 
         // now make this page the last (so we can see what was done)

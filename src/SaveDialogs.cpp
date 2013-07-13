@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "MainWindow.h"
+#include "Athlete.h"
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
 #include "RideItem.h"
@@ -92,8 +93,8 @@ MainWindow::saveRideExitDialog()
     // have we been told to not warn on exit?
     if (warnExit() == false) return true; // just close regardless!
 
-    for (int i=0; i<allRides->childCount(); i++) {
-        RideItem *curr = (RideItem *)allRides->child(i);
+    for (int i=0; i<context->athlete->allRides->childCount(); i++) {
+        RideItem *curr = (RideItem *)context->athlete->allRides->child(i);
         if (curr->isDirty() == true) dirtyList.append(curr);
     }
 
