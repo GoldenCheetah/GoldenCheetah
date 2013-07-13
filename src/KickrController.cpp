@@ -20,7 +20,7 @@
 #include "KickrController.h"
 #include "RealtimeData.h"
 
-KickrController::KickrController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
+KickrController::KickrController(TrainSidebar *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myKickr = new Kickr(parent, dc);
     connect(myKickr, SIGNAL(foundDevice(QString,int)), this, SIGNAL(foundDevice(QString,int)));

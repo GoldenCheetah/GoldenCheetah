@@ -26,7 +26,7 @@
 #include <QWebInspector>
 #include <QDebug>
 #include <limits>
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 #include "RealtimeController.h"
 #include "MainWindow.h"
 #include "RideItem.h"

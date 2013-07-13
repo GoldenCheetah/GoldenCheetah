@@ -27,7 +27,7 @@
 #include "ErgDB.h" // for interacting with the ErgDB site
 #include "ErgFile.h" // for interacting with the ErgDB site
 
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 
 #include <QtGui>
 #include <QTableWidget>

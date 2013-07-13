@@ -60,7 +60,7 @@ class GcBubble;
 class LTMSidebar;
 class LionFullScreen;
 class QTFullScreen;
-class TrainTool;
+class TrainSidebar;
 class Lucene;
 class NamedSearches;
 class ChartSettings;
@@ -151,7 +151,7 @@ class MainWindow : public QMainWindow
         QStackedWidget *views;   // contains all the views
 
         // sidebars
-        TrainTool *trainTool; // train view
+        TrainSidebar *trainSidebar; // train view
         LTMSidebar *ltmSidebar; // home view
         DiarySidebar *diarySidebar; // diary
 

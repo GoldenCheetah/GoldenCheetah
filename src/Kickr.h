@@ -26,7 +26,7 @@
 #include <QMutex>
 #include <QFile>
 #include "RealtimeController.h"
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 #include "DeviceConfiguration.h"
 
 #include "WFApi.h"

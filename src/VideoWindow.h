@@ -37,7 +37,7 @@ extern "C" {
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 
 #ifdef Q_OS_LINUX
 #include <QX11EmbedContainer>

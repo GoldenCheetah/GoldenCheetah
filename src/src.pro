@@ -385,7 +385,7 @@ HEADERS += \
         ToolsDialog.h \
         ToolsRhoEstimator.h \
         TrainDB.h \
-        TrainTool.h \
+        TrainSidebar.h \
         TreeMapWindow.h \
         TreeMapPlot.h \
         TtbDialog.h \
@@ -576,7 +576,7 @@ SOURCES += \
         ToolsDialog.cpp \
         ToolsRhoEstimator.cpp \
         TrainDB.cpp \
-        TrainTool.cpp \
+        TrainSidebar.cpp \
         TreeMapWindow.cpp \
         TreeMapPlot.cpp \
         TtbDialog.cpp \

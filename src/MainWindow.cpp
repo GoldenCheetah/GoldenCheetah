@@ -70,7 +70,7 @@
 #include "ErgDBDownloadDialog.h"
 #include "DeviceConfiguration.h"
 #include "AddDeviceWizard.h"
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 
 #include "GcWindowTool.h"
 #include "GcToolBar.h"
@@ -483,11 +483,11 @@ MainWindow::MainWindow(const QDir &home) :
     /*----------------------------------------------------------------------
      * Scope Bar
      *--------------------------------------------------------------------*/
-    trainTool = new TrainTool(context, context->athlete->home);
-    trainTool->hide();
-    trainTool->getToolbarButtons()->hide(); // no show yet
+    trainSidebar = new TrainSidebar(context, context->athlete->home);
+    trainSidebar->hide();
+    trainSidebar->getToolbarButtons()->hide(); // no show yet
 
-    scopebar = new GcScopeBar(context, trainTool->getToolbarButtons());
+    scopebar = new GcScopeBar(context, trainSidebar->getToolbarButtons());
     connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
     connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
     connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
@@ -688,7 +688,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     toolBox->addWidget(analSidebar);
     toolBox->addWidget(diarySidebar);
-    toolBox->addWidget(trainTool->controls());
+    toolBox->addWidget(trainSidebar->controls());
     toolBox->addWidget(ltmSidebar);
 
     // Chart Settings now in their own dialog box
@@ -1346,7 +1346,7 @@ MainWindow::closeEvent(QCloseEvent* event)
     else {
 
         // stop any active realtime conneection
-        trainTool->Stop();
+        trainSidebar->Stop();
 
         // save ride list config
         appsettings->setCValue(context->athlete->cyclist, GC_SORTBY, listView->sortByIndex());
@@ -1553,7 +1553,7 @@ MainWindow::selectAnalysis()
         masterControls->setCurrentIndex(0);
         views->setCurrentIndex(0);
         analWindow->selected(); // tell it!
-        trainTool->getToolbarButtons()->hide();
+        trainSidebar->getToolbarButtons()->hide();
 #ifdef GC_HAVE_ICAL
         scopebar->selected(2);
 #else
@@ -1580,7 +1580,7 @@ MainWindow::selectTrain()
         masterControls->setCurrentIndex(1);
         views->setCurrentIndex(1);
         trainWindow->selected(); // tell it!
-        trainTool->getToolbarButtons()->show();
+        trainSidebar->getToolbarButtons()->show();
 #ifdef GC_HAVE_ICAL
         scopebar->selected(3);
 #else
@@ -1605,7 +1605,7 @@ MainWindow::selectDiary()
         masterControls->setCurrentIndex(2);
         views->setCurrentIndex(2);
         diaryWindow->selected(); // tell it!
-        trainTool->getToolbarButtons()->hide();
+        trainSidebar->getToolbarButtons()->hide();
         scopebar->selected(1);
         toolBox->setCurrentIndex(1);
         diarySidebar->refresh(); // get that signal with the date range...
@@ -1629,7 +1629,7 @@ MainWindow::selectHome()
         masterControls->setCurrentIndex(3);
         views->setCurrentIndex(3);
         homeWindow->selected(); // tell it!
-        trainTool->getToolbarButtons()->hide();
+        trainSidebar->getToolbarButtons()->hide();
         scopebar->selected(0);
         toolBox->setCurrentIndex(3);
     }

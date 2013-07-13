@@ -31,7 +31,7 @@ class BT40Controller : public RealtimeController
     Q_OBJECT
 
 public:
-    BT40Controller (TrainTool *parent =0, DeviceConfiguration *dc =0);
+    BT40Controller (TrainSidebar *parent =0, DeviceConfiguration *dc =0);
     ~BT40Controller();
 
     BT40 *myBT40;               // the device itself

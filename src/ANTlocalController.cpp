@@ -23,7 +23,7 @@
 #include "ANTLogger.h"
 #include "RealtimeData.h"
 
-ANTlocalController::ANTlocalController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
+ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myANTlocal = new ANT (parent, dc);
     connect(myANTlocal, SIGNAL(foundDevice(int,int,int)), this, SIGNAL(foundDevice(int,int,int)));

@@ -20,7 +20,7 @@
 #include "Computrainer.h"
 #include "RealtimeData.h"
 
-ComputrainerController::ComputrainerController(TrainTool *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
+ComputrainerController::ComputrainerController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myComputrainer = new Computrainer (parent, dc ? dc->portSpec : ""); // we may get NULL passed when configuring
 }

@@ -29,7 +29,7 @@ class FortiusController : public RealtimeController
 {
 
 public:
-    FortiusController (TrainTool *, DeviceConfiguration *);
+    FortiusController (TrainSidebar *, DeviceConfiguration *);
 
     Fortius *myFortius;               // the device itself
 
