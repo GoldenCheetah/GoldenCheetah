@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -56,7 +56,7 @@
 #include "TrainDB.h"
 #include "Library.h"
 
-TrainTool::TrainTool(Context *context, const QDir &home) : GcWindow(context), home(home), context(context)
+TrainSidebar::TrainSidebar(Context *context, const QDir &home) : GcWindow(context), home(home), context(context)
 {
     setInstanceName("Train Controls");
 
@@ -383,7 +383,7 @@ TrainTool::TrainTool(Context *context, const QDir &home) : GcWindow(context), ho
 }
 
 void
-TrainTool::refresh()
+TrainSidebar::refresh()
 {
     int row;
 
@@ -411,7 +411,7 @@ TrainTool::refresh()
 }
 
 void
-TrainTool::workoutPopup()
+TrainSidebar::workoutPopup()
 {
     // OK - we are working with a specific event..
     QMenu menu(workoutTree);
@@ -447,7 +447,7 @@ TrainTool::workoutPopup()
 }
 
 void
-TrainTool::mediaPopup()
+TrainSidebar::mediaPopup()
 {
     // OK - we are working with a specific event..
     QMenu menu(mediaTree);
@@ -476,7 +476,7 @@ TrainTool::mediaPopup()
 }
 
 void
-TrainTool::configChanged()
+TrainSidebar::configChanged()
 {
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
@@ -541,14 +541,14 @@ TrainTool::configChanged()
  * Device Selected
  *--------------------------------------------------------------------*/
 void
-TrainTool::deviceTreeWidgetSelectionChanged()
+TrainSidebar::deviceTreeWidgetSelectionChanged()
 {
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
 }
 
 int
-TrainTool::selectedDeviceNumber()
+TrainSidebar::selectedDeviceNumber()
 {
     if (deviceTree->selectedItems().isEmpty()) return -1;
 
@@ -559,7 +559,7 @@ TrainTool::selectedDeviceNumber()
 }
 
 QList<int>
-TrainTool::devices()
+TrainSidebar::devices()
 {
     QList<int> returning;
     foreach(QTreeWidgetItem *item, deviceTree->selectedItems())
@@ -573,7 +573,7 @@ TrainTool::devices()
  * Workout Selected
  *--------------------------------------------------------------------*/
 void
-TrainTool::workoutTreeWidgetSelectionChanged()
+TrainSidebar::workoutTreeWidgetSelectionChanged()
 {
     QModelIndex current = workoutTree->currentIndex();
     QModelIndex target = sortModel->mapToSource(current);
@@ -650,7 +650,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
 }
 
 QStringList
-TrainTool::listWorkoutFiles(const QDir &dir) const
+TrainSidebar::listWorkoutFiles(const QDir &dir) const
 {
     QStringList filters;
     filters << "*.erg";
@@ -662,7 +662,7 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
 }
 
 void
-TrainTool::deleteVideos()
+TrainSidebar::deleteVideos()
 {
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
@@ -695,7 +695,7 @@ TrainTool::deleteVideos()
     }
 }
 void
-TrainTool::deleteWorkouts()
+TrainSidebar::deleteWorkouts()
 {
     QModelIndex current = workoutTree->currentIndex();
     QModelIndex target = sortModel->mapToSource(current);
@@ -724,7 +724,7 @@ TrainTool::deleteWorkouts()
 }
 
 void
-TrainTool::mediaTreeWidgetSelectionChanged()
+TrainSidebar::mediaTreeWidgetSelectionChanged()
 {
 
     QModelIndex current = mediaTree->currentIndex();
@@ -737,7 +737,7 @@ TrainTool::mediaTreeWidgetSelectionChanged()
  * Was realtime window, now local and manages controller and chart updates etc
  *------------------------------------------------------------------------------*/
 
-void TrainTool::Start()       // when start button is pressed
+void TrainSidebar::Start()       // when start button is pressed
 {
     static QIcon playIcon(":images/oxygen/play.png");
     static QIcon pauseIcon(":images/oxygen/pause.png");
@@ -874,7 +874,7 @@ void TrainTool::Start()       // when start button is pressed
     }
 }
 
-void TrainTool::Pause()        // pause capture to recalibrate
+void TrainSidebar::Pause()        // pause capture to recalibrate
 {
     // we're not running fool!
     if ((status&RT_RUNNING) == 0) return;
@@ -918,7 +918,7 @@ void TrainTool::Pause()        // pause capture to recalibrate
     }
 }
 
-void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
+void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
 
     if ((status&RT_RUNNING) == 0) return;
@@ -1000,7 +1000,7 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
 
 
 // Called by push devices (e.g. ANT+)
-void TrainTool::updateData(RealtimeData &rtData)
+void TrainSidebar::updateData(RealtimeData &rtData)
 {
     displayPower = rtData.getWatts();
     displayCadence = rtData.getCadence();
@@ -1015,7 +1015,7 @@ void TrainTool::updateData(RealtimeData &rtData)
 // SCREEN UPDATE FUNCTIONS
 //----------------------------------------------------------------------
 
-void TrainTool::guiUpdate()           // refreshes the telemetry
+void TrainSidebar::guiUpdate()           // refreshes the telemetry
 {
     RealtimeData rtData;
     rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
@@ -1159,7 +1159,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 }
 
 // can be called from the controller - when user presses "Lap" button
-void TrainTool::newLap()
+void TrainSidebar::newLap()
 {
     if ((status&RT_RUNNING) == RT_RUNNING) {
         displayLap++;
@@ -1173,18 +1173,18 @@ void TrainTool::newLap()
     }
 }
 
-void TrainTool::resetLapTimer()
+void TrainSidebar::resetLapTimer()
 {
     lap_time.restart();
     lap_elapsed_msec = 0;
 }
 
 // can be called from the controller
-void TrainTool::nextDisplayMode()
+void TrainSidebar::nextDisplayMode()
 {
 }
 
-void TrainTool::warnnoConfig()
+void TrainSidebar::warnnoConfig()
 {
     QMessageBox::warning(this, tr("No Devices Configured"), "Please configure a device in Preferences.");
 }
@@ -1192,7 +1192,7 @@ void TrainTool::warnnoConfig()
 //----------------------------------------------------------------------
 // DISK UPDATE FUNCTIONS
 //----------------------------------------------------------------------
-void TrainTool::diskUpdate()
+void TrainSidebar::diskUpdate()
 {
     double  Minutes;
 
@@ -1224,7 +1224,7 @@ void TrainTool::diskUpdate()
 // WORKOUT MODE
 //----------------------------------------------------------------------
 
-void TrainTool::loadUpdate()
+void TrainSidebar::loadUpdate()
 {
     int curLap;
 
@@ -1270,7 +1270,7 @@ void TrainTool::loadUpdate()
     }
 }
 
-void TrainTool::Calibrate()
+void TrainSidebar::Calibrate()
 {
     static QProgressDialog *bar=NULL;
 
@@ -1332,7 +1332,7 @@ void TrainTool::Calibrate()
     calibrating = !calibrating;
 }
 
-void TrainTool::FFwd()
+void TrainSidebar::FFwd()
 {
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1344,7 +1344,7 @@ void TrainTool::FFwd()
 
 }
 
-void TrainTool::Rewind()
+void TrainSidebar::Rewind()
 {
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1360,7 +1360,7 @@ void TrainTool::Rewind()
 
 
 // jump to next Lap marker (if there is one?)
-void TrainTool::FFwdLap()
+void TrainSidebar::FFwdLap()
 {
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1377,7 +1377,7 @@ void TrainTool::FFwdLap()
 }
 
 // higher load/gradient
-void TrainTool::Higher()
+void TrainSidebar::Higher()
 {
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1400,7 +1400,7 @@ void TrainTool::Higher()
 }
 
 // higher load/gradient
-void TrainTool::Lower()
+void TrainSidebar::Lower()
 {
     if ((status&RT_RUNNING) == 0) return;
 
@@ -1423,7 +1423,7 @@ void TrainTool::Lower()
     }
 }
 
-void TrainTool::setLabels()
+void TrainSidebar::setLabels()
 {
     if (context->currentErgFile()) {
 
@@ -1448,7 +1448,7 @@ void TrainTool::setLabels()
     }
 }
 
-void TrainTool::adjustIntensity()
+void TrainSidebar::adjustIntensity()
 {
     if (!context->currentErgFile()) return; // no workout selected
 
@@ -1519,7 +1519,7 @@ void TrainTool::adjustIntensity()
     context->notifySetNow(context->getNow());
 }
 
-MultiDeviceDialog::MultiDeviceDialog(Context *, TrainTool *traintool) : traintool(traintool)
+MultiDeviceDialog::MultiDeviceDialog(Context *, TrainSidebar *traintool) : traintool(traintool)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1605,7 +1605,7 @@ MultiDeviceDialog::cancelClicked()
 }
 
 void
-TrainTool::devicePopup()
+TrainSidebar::devicePopup()
 {
     // OK - we are working with a specific event..
     QMenu menu(deviceTree);
@@ -1625,7 +1625,7 @@ TrainTool::devicePopup()
                                            deviceItem->pos().y())));
 }
 void
-TrainTool::deviceTreeMenuPopup(const QPoint &pos)
+TrainSidebar::deviceTreeMenuPopup(const QPoint &pos)
 {
     QMenu menu(deviceTree);
     QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
@@ -1642,7 +1642,7 @@ TrainTool::deviceTreeMenuPopup(const QPoint &pos)
 }
 
 void
-TrainTool::deleteDevice()
+TrainSidebar::deleteDevice()
 {
     // get the configuration
     DeviceConfigurations all;
@@ -1677,7 +1677,7 @@ TrainTool::deleteDevice()
 // we have been told to select this video (usually because
 // the user just dragndropped it in)
 void
-TrainTool::selectVideo(QString fullpath)
+TrainSidebar::selectVideo(QString fullpath)
 {
     // look at each entry in the top workoutTree
     for (int i=0; i<mediaTree->model()->rowCount(); i++) {
@@ -1692,7 +1692,7 @@ TrainTool::selectVideo(QString fullpath)
 // we have been told to select this workout (usually because
 // the user just dragndropped it in)
 void
-TrainTool::selectWorkout(QString fullpath)
+TrainSidebar::selectWorkout(QString fullpath)
 {
     // look at each entry in the top workoutTree
     for (int i=0; i<workoutTree->model()->rowCount(); i++) {

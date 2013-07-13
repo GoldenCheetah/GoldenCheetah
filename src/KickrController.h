@@ -31,7 +31,7 @@ class KickrController : public RealtimeController
     Q_OBJECT
 
 public:
-    KickrController (TrainTool *parent =0, DeviceConfiguration *dc =0);
+    KickrController (TrainSidebar *parent =0, DeviceConfiguration *dc =0);
 
     Kickr *myKickr;               // the device itself
 

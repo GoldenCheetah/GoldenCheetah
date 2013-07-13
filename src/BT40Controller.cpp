@@ -20,7 +20,7 @@
 #include "BT40Controller.h"
 #include "RealtimeData.h"
 
-BT40Controller::BT40Controller(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
+BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myBT40 = new BT40(parent, dc);
     connect(myBT40, SIGNAL(foundDevice(QString,int)), this, SIGNAL(foundDevice(QString,int)));

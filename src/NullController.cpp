@@ -24,7 +24,7 @@
 
 #include <math.h>
 
-NullController::NullController(TrainTool *parent,
+NullController::NullController(TrainSidebar *parent,
                                                  DeviceConfiguration *dc)
   : RealtimeController(parent, dc), parent(parent), load(100)
 {

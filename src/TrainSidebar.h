@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_TrainTool_h
-#define _GC_TrainTool_h 1
+#ifndef _GC_TrainSidebar_h
+#define _GC_TrainSidebar_h 1
 #include "GoldenCheetah.h"
 
 #include "Context.h"
@@ -69,14 +69,14 @@ class RealtimePlot;
 class RealtimeData;
 class MultiDeviceDialog;
 
-class TrainTool : public GcWindow
+class TrainSidebar : public GcWindow
 {
     Q_OBJECT
     G_OBJECT
 
     public:
 
-        TrainTool(Context *context, const QDir &home);
+        TrainSidebar(Context *context, const QDir &home);
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
@@ -241,7 +241,7 @@ class MultiDeviceDialog : public QDialog
     G_OBJECT
 
     public:
-        MultiDeviceDialog(Context *, TrainTool *);
+        MultiDeviceDialog(Context *, TrainSidebar *);
 
     public slots:
         void applyClicked();
@@ -250,7 +250,7 @@ class MultiDeviceDialog : public QDialog
     private:
 
         Context *context;
-        TrainTool *traintool;
+        TrainSidebar *traintool;
         QComboBox  *bpmSelect,          // heartrate
                    *wattsSelect,        // power
                    *rpmSelect,          // cadence
@@ -258,5 +258,5 @@ class MultiDeviceDialog : public QDialog
 
         QPushButton *applyButton, *cancelButton;
 };
-#endif // _GC_TrainTool_h
+#endif // _GC_TrainSidebar_h
 

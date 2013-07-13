@@ -29,7 +29,7 @@ class ComputrainerController : public RealtimeController
 {
 
 public:
-    ComputrainerController (TrainTool *, DeviceConfiguration *);
+    ComputrainerController (TrainSidebar *, DeviceConfiguration *);
 
     Computrainer *myComputrainer;               // the device itself
 

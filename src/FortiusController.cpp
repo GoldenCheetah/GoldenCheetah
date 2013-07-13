@@ -20,7 +20,7 @@
 #include "Fortius.h"
 #include "RealtimeData.h"
 
-FortiusController::FortiusController(TrainTool *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
+FortiusController::FortiusController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myFortius = new Fortius (parent);
 }

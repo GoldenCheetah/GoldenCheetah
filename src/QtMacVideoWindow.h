@@ -28,7 +28,7 @@
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 
 // We add references to the Native objects, but since we
 // will be running Qt's moc utility on this file we need

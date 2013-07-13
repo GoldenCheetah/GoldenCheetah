@@ -19,7 +19,7 @@
 
 // Abstract base class for Realtime device controllers
 #include "RealtimeData.h"
-#include "TrainTool.h"
+#include "TrainSidebar.h"
 
 #ifndef _GC_RealtimeController_h
 #define _GC_RealtimeController_h 1
@@ -33,9 +33,9 @@ class RealtimeController : public QObject
     Q_OBJECT
 
 public:
-    TrainTool *parent;                     // for push devices
+    TrainSidebar *parent;                     // for push devices
 
-    RealtimeController (TrainTool *parent, DeviceConfiguration *dc = 0);
+    RealtimeController (TrainSidebar *parent, DeviceConfiguration *dc = 0);
     virtual ~RealtimeController() {}
 
     virtual int start();
