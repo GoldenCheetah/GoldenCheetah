@@ -591,16 +591,6 @@ MainWindow::MainWindow(const QDir &home) :
     analSidebar->addWidget(intervalItem);
     analSidebar->prepare(context->athlete->cyclist, "analysis");
 
-    QTreeWidgetItem *last = NULL;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home));
-    while (i.hasNext()) {
-        QString name = i.next();
-        QDateTime dt;
-        if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(RIDE_TYPE, context->athlete->home.path(), name, dt, context->athlete->zones(), context->athlete->hrZones(), context);
-            context->athlete->allRides->addChild(last);
-        }
-    }
 
     splitter = new QSplitter;
 

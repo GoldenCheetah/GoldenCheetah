@@ -147,14 +147,23 @@ Athlete::Athlete(Context *context, const QDir &home)
     allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allIntervals->setText(0, tr("Intervals"));
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    // populate ride list
+    QTreeWidgetItem *last = NULL;
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
+    while (i.hasNext()) {
+        QString name = i.next();
+        QDateTime dt;
+        if (RideFile::parseRideFileName(name, &dt)) {
+            last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), context);
+            allRides->addChild(last);
+        }
+    }
 
-    // ride list signals
+    // trap signals
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
-
-    // interval signals
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(updateRideFileIntervals()));
 }
