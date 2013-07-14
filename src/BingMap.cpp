@@ -41,7 +41,6 @@ BingMap::BingMap(Context *context) : GcWindow(context), context(context), range(
     layout->setContentsMargins(2,0,2,2);
     setLayout(layout);
 
-    //XXX ???? parent = context->mainWindow;
     view = new QWebView();
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);

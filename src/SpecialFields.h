@@ -20,10 +20,8 @@
 #define _GC_SpecialFields_h
 #include "GoldenCheetah.h"
 
-#include <QApplication>
-#include <QStringList>
-#include <QStringListModel>
-#include "RideMetric.h"
+class QStringListModel;
+class RideMetric;
 
 class SpecialFields
 {

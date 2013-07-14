@@ -429,7 +429,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
 
     // GC signals
-    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));

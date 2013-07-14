@@ -221,7 +221,7 @@ void DataFilter::configUpdate()
     // now add the ride metadata fields -- should be the same generally
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             QString underscored = field.name;
-            if (!context->mainWindow->specialFields.isMetric(underscored)) { 
+            if (!context->specialFields.isMetric(underscored)) { 
                 lookupMap.insert(underscored.replace(" ","_"), field.name);
                 lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
             }

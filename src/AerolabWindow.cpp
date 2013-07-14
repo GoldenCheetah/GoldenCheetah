@@ -225,7 +225,6 @@ AerolabWindow::AerolabWindow(Context *context) :
   allZoomer->setMousePattern( QwtEventPattern::MouseSelect3, Qt::RightButton );
 
   // SIGNALs to SLOTs:
-  //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
   connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
   connect(crrSlider, SIGNAL(valueChanged(int)),this, SLOT(setCrrFromSlider()));
   connect(crrLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setCrrFromText(const QString)));

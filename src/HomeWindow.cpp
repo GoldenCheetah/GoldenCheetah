@@ -1063,7 +1063,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context) : context(context
 
 void GcWindowDialog::okClicked()
 {
-    // give back to mainWindow so we can re-use
+    // give back to owner so we can re-use
     // note that in reject they are not and will
     // get deleted (this has been verfied with
     // some debug statements in ~GcWindow).
