@@ -43,6 +43,9 @@
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 
+#include "GcUpgrade.h" // upgrade wizard
+#include "GcCrashDialog.h" // recovering from a crash?
+
 Athlete::Athlete(Context *context, const QDir &home)
 {
     // athlete name
@@ -51,6 +54,17 @@ Athlete::Athlete(Context *context, const QDir &home)
     context->athlete = this;
     cyclist = home.dirName();
     isclean = false;
+
+    // Recovering from a crash?
+    if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
+        GcCrashDialog *crashed = new GcCrashDialog(home);
+        crashed->exec();
+    }
+    appsettings->setCValue(cyclist, GC_SAFEEXIT, false); // will be set to true on exit
+
+    // Before we initialise we need to run the upgrade wizard for this athlete
+    GcUpgrade v3;
+    v3.upgrade(context->athlete->home);
 
     // metric / non-metric
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
@@ -166,6 +180,13 @@ Athlete::Athlete(Context *context, const QDir &home)
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(updateRideFileIntervals()));
+}
+
+Athlete::~Athlete()
+{
+    // set to latest so we don't repeat
+    appsettings->setCValue(context->athlete->home.dirName(), GC_VERSION_USED, VERSION_LATEST);
+    appsettings->setCValue(context->athlete->home.dirName(), GC_SAFEEXIT, true);
 }
 
 void Athlete::selectRideFile(QString fileName)

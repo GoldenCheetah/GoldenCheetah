@@ -31,4 +31,3 @@ Context::currentRide()
 {
     return athlete->currentRide();
 }
-
