@@ -148,28 +148,35 @@ MainWindow::MainWindow(const QDir &home) :
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
-    // Bootstrap context 
+    /*----------------------------------------------------------------------
+     *  Bootstrap
+     *--------------------------------------------------------------------*/
+    mainwindows.append(this);  // add us to the list of open windows
     context = new Context(this);
     context->athlete = new Athlete(context, home);
+
     setInstanceName(context->athlete->cyclist);
+    setWindowIcon(QIcon(":images/gc.png"));
+    setWindowTitle(context->athlete->home.dirName());
+    setContentsMargins(0,0,0,0);
+    setAcceptDrops(true);
+    GCColor *GCColorSet = new GCColor(context); // get/keep colorset
+    GCColorSet->colorSet(); // shut up the compiler
 
-    //
-    // CRASH PROCESSING
-    //
-
-
-    //
-    // NORMAL PROCESSING (CONSTRUCTOR)
-    //
     #ifdef Q_OS_MAC
     // get an autorelease pool setup
     static CocoaInitializer cocoaInitializer;
     #endif
-
     #ifdef GC_HAVE_WFAPI
     WFApi *w = WFApi::getInstance(); // ensure created on main thread
     w->apiVersion();//shutup compiler
     #endif
+    Library::initialise(context->athlete->home);
+    QNetworkProxyQuery npq(QUrl("http://www.google.com"));
+    QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
+    if (listOfProxies.count() > 0) {
+        QNetworkProxy::setApplicationProxy(listOfProxies.first());
+    }
 
     if (desktop == NULL) desktop = QApplication::desktop();
     static const QIcon hideIcon(":images/toolbar/main/hideside.png");
@@ -180,24 +187,24 @@ MainWindow::MainWindow(const QDir &home) :
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
-    /*----------------------------------------------------------------------
-     *  Basic State / Config
-     *--------------------------------------------------------------------*/
-    mainwindows.append(this);  // add us to the list of open windows
+#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
+    fullScreen = new LionFullScreen(this);
+#endif
+#ifndef Q_OS_MAC
+    fullScreen = new QTFullScreen(this);
+#endif
 
-    // search paths
-    Library::initialise(context->athlete->home);
-
-    // Network proxy
-    QNetworkProxyQuery npq(QUrl("http://www.google.com"));
-    QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
-    if (listOfProxies.count() > 0) {
-        QNetworkProxy::setApplicationProxy(listOfProxies.first());
-    }
+    // if no workout directory is configured, default to the
+    // top level GoldenCheetah directory
+    if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home.absolutePath() + "/../").absolutePath());
 
     /*----------------------------------------------------------------------
-     *  Basic GUI setup
+     *  GUI setup
      *--------------------------------------------------------------------*/
+
+    bubble = new GcBubble(context);
+    bubble->hide();
 
     // need to restore geometry before setUnifiedToolBar.. on Mac
     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
@@ -230,6 +237,7 @@ MainWindow::MainWindow(const QDir &home) :
         QApplication::setFont(font);
 
     } else {
+
         QRect size = desktop->availableGeometry();
 
         // ensure saved geometry isn't greater than current screen size
@@ -240,7 +248,10 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
 
-#ifdef Q_OS_MAC // MAC NATIVE TOOLBAR
+    /*----------------------------------------------------------------------
+     *  Mac Toolbar
+     *--------------------------------------------------------------------*/
+#ifdef Q_OS_MAC 
     setUnifiedTitleAndToolBarOnMac(true);
     head = addToolBar(context->athlete->cyclist);
     head->setContentsMargins(0,0,0,0);
@@ -327,39 +338,11 @@ MainWindow::MainWindow(const QDir &home) :
     head->addWidget(searchBox);
 #endif
 
-#endif // MAC NATIVE TOOLBAR AND SCOPEBAR
-
-    // COMMON GUI SETUP
-    setWindowIcon(QIcon(":images/gc.png"));
-    setWindowTitle(context->athlete->home.dirName());
-    setContentsMargins(0,0,0,0);
-    setAcceptDrops(true);
-
-    GCColor *GCColorSet = new GCColor(context); // get/keep colorset
-    GCColorSet->colorSet(); // shut up the compiler
-
-#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
-    fullScreen = new LionFullScreen(this);
-#endif
-#ifndef Q_OS_MAC
-    fullScreen = new QTFullScreen(this);
-#endif
+#endif 
 
     /*----------------------------------------------------------------------
-     * The help bubble used everywhere
+     *  Windows and Linux Toolbar
      *--------------------------------------------------------------------*/
-    bubble = new GcBubble(context);
-    bubble->hide();
-
-    // if no workout directory is configured, default to the
-    // top level GoldenCheetah directory
-    if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home.absolutePath() + "/../").absolutePath());
-
-    /*----------------------------------------------------------------------
-     * Non-Mac Toolbar
-     *--------------------------------------------------------------------*/
-
 #ifndef Q_OS_MAC
 
     head = new GcToolBar(this);
@@ -493,8 +476,6 @@ MainWindow::MainWindow(const QDir &home) :
      * Sidebar
      *--------------------------------------------------------------------*/
 
-    // RIDES
-
     // UI Ride List (configurable)
     listView = new RideNavigator(context, true);
     listView->setProperty("nomenu", true);
@@ -570,9 +551,12 @@ MainWindow::MainWindow(const QDir &home) :
     analSidebar->prepare(context->athlete->cyclist, "analysis");
 
 
+    /*----------------------------------------------------------------------
+     * The 4 views
+     *--------------------------------------------------------------------*/
+
     splitter = new QSplitter;
 
-    // TOOLBOX - IS A SPLITTER
     toolBox = new QStackedWidget(this);
     toolBox->setAcceptDrops(true);
     toolBox->setFrameStyle(QFrame::NoFrame);
@@ -666,10 +650,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     //toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
     chartSettings->hide();
-
-    /*----------------------------------------------------------------------
-     * Main view
-     *--------------------------------------------------------------------*/
 
     views = new QStackedWidget(this);
     views->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
