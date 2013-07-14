@@ -584,11 +584,6 @@ GcMiniCalendar::refresh()
 bool
 GcMiniCalendar::event(QEvent *e)
 {
-    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy &&
-        e->type() != QEvent::LayoutRequest) {
-        context->mainWindow->setBubble("");
-    }
-
     if (e->type() == QEvent::Paint) {
         // fill the background
         QPainter painter(this);
@@ -613,12 +608,6 @@ GcMiniCalendar::event(QEvent *e)
                 QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
 
                 QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
-
-                // Popup bubble for ride
-                if (files.count()) {
-                    if (files[0] == "calendar") ; // handle planned rides
-                    else context->mainWindow->setBubble(files.at(0), mapToGlobal(pos+QPoint(+2,+2)));
-                }
             }
             n++;
         }

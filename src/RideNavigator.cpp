@@ -429,14 +429,6 @@ RideNavigator::columnsChanged()
 bool
 RideNavigator::eventFilter(QObject *object, QEvent *e)
 {
-    // if in doubt hide the tooltip, but paint events are
-    // always generated in the viewport when the popup is shown
-    // so we ignore those
-    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint &&
-        e->type() != QEvent::WinIdChange && e->type() != QEvent::Destroy) {
-        context->mainWindow->setBubble("");
-    }
-
     // not for the table?
     if (object != (QObject *)tableView) return false;
 
@@ -504,29 +496,6 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             }
             active=false;
             setWidth(geometry().width()); // calculate width...
-        }
-        break;
-
-        case QEvent::ToolTip:
-        case QEvent::ToolTipChange:
-        {
-            QPoint global = dynamic_cast<QHelpEvent*>(e)->globalPos();
-            QPoint local = tableView->viewport()->mapFromGlobal(global);
-
-            // off view port!
-            if (local.y() <= 0 || local.x() <= 0) {
-                context->mainWindow->setBubble("");
-                return false;
-            }
-
-            QModelIndex index = tableView->indexAt(local);
-            if (index.isValid()) {
-                QString hoverFileName = tableView->model()->data(index, Qt::UserRole+1).toString();
-                e->accept();
-                QPoint p = local;
-                p.setX(width()-20);
-                context->mainWindow->setBubble(hoverFileName, tableView->viewport()->mapToGlobal(p));
-            }
         }
         break;
 

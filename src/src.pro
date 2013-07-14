@@ -274,7 +274,6 @@ HEADERS += \
         FitlogRideFile.h \
         FitlogParser.h \
         FitRideFile.h \
-        GcBubble.h \
         GcCalendarModel.h \
         GcCrashDialog.h \
         GcPane.h \
@@ -463,7 +462,6 @@ SOURCES += \
         FixSpikes.cpp \
         FixTorque.cpp \
         FixHRSpikes.cpp \
-        GcBubble.cpp \
         GcCrashDialog.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
