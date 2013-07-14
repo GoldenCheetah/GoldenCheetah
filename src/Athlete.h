@@ -53,6 +53,7 @@ class Athlete : public QObject
 
     public:
         Athlete(Context *context, const QDir &home);
+        ~Athlete();
 
         // basic athlete info
         QString cyclist; // the cyclist name

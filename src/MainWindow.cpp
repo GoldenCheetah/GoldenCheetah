@@ -128,8 +128,6 @@
 #include "WFApi.h"
 #endif
 
-#include "GcUpgrade.h" // upgrade wizard
-#include "GcCrashDialog.h" // recovering from a crash?
 
 // handy spacer
 class Spacer : public QWidget
@@ -146,7 +144,7 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home) :
-    session(0), init(false), isfiltered(false), groupByMapper(NULL)
+    session(0), isfiltered(false), groupByMapper(NULL)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -159,26 +157,6 @@ MainWindow::MainWindow(const QDir &home) :
     // CRASH PROCESSING
     //
 
-    // Recovering from a crash?
-    if(!appsettings->cvalue(context->athlete->cyclist, GC_SAFEEXIT, true).toBool()) {
-        GcCrashDialog *crashed = new GcCrashDialog(context->athlete->home);
-        crashed->exec();
-    }
-    appsettings->setCValue(context->athlete->home.dirName(), GC_SAFEEXIT, false); // will be set to true on exit
-
-    //
-    // UPGRADE PROCESSING
-    //
-
-    // Before we initialise we need to run the upgrade wizard
-    GcUpgrade v3;
-    if (v3.upgrade(context->athlete->home) != 0) {
-        hide();
-        QTimer::singleShot(0, this, SLOT(close())); // wait for event loop
-    } else { // don't indent since it would change entire file
-    init=true;
-    // !!! the code below is not indented since it would change the entire
-    //     constructor for this small update. Please bear this in mind
 
     //
     // NORMAL PROCESSING (CONSTRUCTOR)
@@ -915,7 +893,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     selectAnalysis();
     setStyle();
-} // upgrade from first line of constructor
 }
 
 /*----------------------------------------------------------------------
@@ -1329,9 +1306,6 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
-    // do nothing on upgrade exit
-    if (init == false) return;
-
     if (saveRideExitDialog() == false) event->ignore();
     else {
 
@@ -1365,9 +1339,9 @@ MainWindow::closeEvent(QCloseEvent* event)
         appsettings->setCValue(context->athlete->cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
         appsettings->setCValue(context->athlete->cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
 
-        // set to latest so we don't repeat
-        appsettings->setCValue(context->athlete->home.dirName(), GC_VERSION_USED, VERSION_LATEST);
-        appsettings->setCValue(context->athlete->home.dirName(), GC_SAFEEXIT, true);
+        // un bootstrap
+        delete context->athlete;
+        delete context;
 
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
