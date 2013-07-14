@@ -92,7 +92,7 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
 
     // get updates..
-    connect(context->mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
 
     // lets initialise all the smoothing variables
     hrtot = hrindex = cadtot = cadindex = spdtot = spdindex = alttot = altindex = powtot = powindex = 0;

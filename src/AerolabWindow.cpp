@@ -244,8 +244,8 @@ AerolabWindow::AerolabWindow(Context *context) :
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
   connect(context, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
   connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-  connect(context->mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
-  connect(context->mainWindow, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
+  connect(context, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
+  connect(context, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
   connect(allZoomer, SIGNAL( zoomed(const QRectF) ), this, SLOT(zoomChanged()));
 
 
