@@ -37,7 +37,6 @@ class RideNavigator;
 class GcToolBar;
 class DiarySidebar;
 class GcMultiCalendar;
-class GcBubble;
 class LTMSidebar;
 class LionFullScreen;
 class QTFullScreen;
@@ -117,8 +116,6 @@ class MainWindow : public QMainWindow
         // global filters
         bool isfiltered;
         QStringList filters;
-
-        void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 
         // splitter for sidebar and main view
         QSplitter *splitter;
@@ -321,8 +318,6 @@ class MainWindow : public QMainWindow
         QAction *stravaAction;
         QAction *rideWithGPSAction;
         QAction *ttbAction;
-
-        GcBubble *bubble;
 
         // each view has its own controls
         QStackedWidget *masterControls,

@@ -85,7 +85,6 @@
 #endif
 #include "HelpWindow.h"
 #include "HomeWindow.h"
-#include "GcBubble.h"
 #include "DiarySidebar.h"
 #include "GcScopeBar.h"
 #include "LTMSidebar.h"
@@ -202,9 +201,6 @@ MainWindow::MainWindow(const QDir &home) :
     /*----------------------------------------------------------------------
      *  GUI setup
      *--------------------------------------------------------------------*/
-
-    bubble = new GcBubble(context);
-    bubble->hide();
 
     // need to restore geometry before setUnifiedToolBar.. on Mac
     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
@@ -2343,20 +2339,6 @@ MainWindow::exportCalendar()
     // need options to decide wether to
     // include past dates, workout plans only
     // or also workouts themselves
-}
-
-void
-MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
-{
-    if (text == "") {
-        bubble->setVisible(false);
-    } else {
-        bubble->setText(text);
-        bubble->setPos(pos.x(), pos.y(), orientation);
-        bubble->setVisible(true);
-        bubble->raise();
-        bubble->repaint();
-    }
 }
 
 #ifdef Q_OS_MAC

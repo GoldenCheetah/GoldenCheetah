@@ -153,9 +153,6 @@ bool
 DiaryWindow::eventFilter(QObject *object, QEvent *e)
 {
 
-    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy)
-        context->mainWindow->setBubble("");
-
     switch (e->type()) {
     case QEvent::MouseButtonPress:
         {
@@ -196,43 +193,6 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
     case QEvent::MouseButtonRelease:
     case QEvent::MouseMove:
     case QEvent::MouseButtonDblClick:
-        return true;
-    case QEvent::ToolTip:
-        return true; // disabled for now, its just too fugly.
-        {
-            QModelIndex index = monthlyView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
-            if (index.isValid()) {
-                QStringList files = monthlyView->model()->data(index, GcCalendarModel::FilenamesRole).toStringList();
-                e->accept();
-
-                QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
-
-                // Popup bubble for ride
-                if (files.count() == 1) {
-                    if (files[0] == "calendar") ; // handle planned rides
-                    else context->mainWindow->setBubble(files.at(0), monthlyView->viewport()->mapToGlobal(pos));
-
-                } else if (files.count()) {
-
-                    QRect c = monthlyView->visualRect(index);
-
-                    // which ride?
-                    int h = (c.height()-15) / files.count();
-                    int i;
-                    for(i=files.count()-1; i>=0; i--) if (pos.y() > (c.y()+15+(h*i))) break;
-
-                    if (i<0) {
-                        context->mainWindow->setBubble("");
-                        return true;
-                    }
-
-                    if (files.at(i) == "calendar") ; // handle planned rides
-                    else context->mainWindow->setBubble(files.at(i), monthlyView->viewport()->mapToGlobal(pos));
-                } else {
-                    context->mainWindow->setBubble("");
-                }
-            }
-        }
         return true;
     default:
         return QObject::eventFilter(object, e);
