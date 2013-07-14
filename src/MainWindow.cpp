@@ -2222,7 +2222,7 @@ MainWindow::zoomIntervalSelected()
     // zoom the one interval that is selected via popup menu
     for (int i=0; i<context->athlete->allIntervals->childCount();) {
         if (context->athlete->allIntervals->child(i)->isSelected()) {
-            emit intervalZoom((IntervalItem*)(context->athlete->allIntervals->child(i)));
+            context->notifyIntervalZoom((IntervalItem*)(context->athlete->allIntervals->child(i)));
             break;
         } else i++;
     }
@@ -2231,7 +2231,7 @@ MainWindow::zoomIntervalSelected()
 void
 MainWindow::zoomInterval() {
     // zoom into this interval on allPlot
-    emit intervalZoom(activeInterval);
+    context->notifyIntervalZoom(activeInterval);
 }
 
 void

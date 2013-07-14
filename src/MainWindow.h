@@ -23,11 +23,7 @@
 #include <QDir>
 #include <QSqlDatabase>
 #include <QtGui>
-#include <QNetworkReply>
-#include <qwt_plot_curve.h>
 #include "RideItem.h"
-#include "GcWindowRegistry.h"
-#include "RealtimeData.h"
 #include "SpecialFields.h"
 #include "TimeUtils.h"
 
@@ -36,21 +32,7 @@
 #include <AvailabilityMacros.h>
 #endif
 
-class MetricAggregator;
-class Zones;
-class HrZones;
-class RideFile;
-class ErgFile;
-class RideMetadata;
-class WithingsDownload;
-class ZeoDownload;
-class CalendarDownload;
-class DiaryWindow;
-class ICalendar;
-class CalDAV;
 class HomeWindow;
-class GcWindowTool;
-class Seasons;
 class IntervalSummaryWindow;
 class RideNavigator;
 class GcToolBar;
@@ -61,13 +43,10 @@ class LTMSidebar;
 class LionFullScreen;
 class QTFullScreen;
 class TrainSidebar;
-class Lucene;
-class NamedSearches;
 class ChartSettings;
 class QtMacSegmentedButton;
 class QtMacButton;
 class GcScopeBar;
-class RideFileCache;
 class Library;
 class BlankStateAnalysisPage;
 class BlankStateHomePage;
@@ -179,7 +158,6 @@ class MainWindow : public QMainWindow
 
     signals:
         void filterChanged(QStringList&);
-        void intervalZoom(IntervalItem*);
 
     public slots:
         void showTreeContextMenuPopup(const QPoint &);

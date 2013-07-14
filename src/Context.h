@@ -24,6 +24,7 @@
 
 class RideFile;
 class RideItem;
+class IntervalItem;
 class ErgFile;
 
 class Context;
@@ -80,6 +81,7 @@ class Context : public QObject
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
         void notifyRideDeleted(RideItem *x) { ride=x; rideDeleted(x); }
+        void notifyIntervalZoom(IntervalItem*x) { emit intervalZoom(x); }
         void notifyIntervalSelected() { intervalSelected(); }
         void notifyIntervalsChanged() { emit intervalsChanged(); }
         void notifyRideClean() { rideClean(ride); }
@@ -94,6 +96,7 @@ class Context : public QObject
         void rideDeleted(RideItem *);
         void intervalSelected();
         void intervalsChanged();
+        void intervalZoom(IntervalItem*);
         void rideDirty(RideItem*);
         void rideClean(RideItem*);
 
