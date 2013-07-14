@@ -24,7 +24,6 @@
 #include <QSqlDatabase>
 #include <QtGui>
 #include "RideItem.h"
-#include "SpecialFields.h"
 #include "TimeUtils.h"
 
 #ifdef Q_OS_MAC
@@ -112,7 +111,6 @@ class MainWindow : public QMainWindow
         ChartSettings *chartSettings;
 
         // state data
-        SpecialFields specialFields;
         int session;
         bool init; // we built children (i.e. didn't quit at upgrade)
 

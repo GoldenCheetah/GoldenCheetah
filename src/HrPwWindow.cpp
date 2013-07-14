@@ -189,7 +189,6 @@ HrPwWindow::HrPwWindow(Context *context) :
     connect(rSmoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setrSmoothingFromSlider()));
     connect(rDelayEdit, SIGNAL(editingFinished()), this, SLOT(setrDelayFromLineEdit()));
     connect(rDelaySlider, SIGNAL(valueChanged(int)), this, SLOT(setrDelayFromSlider()));
-    //connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }
 

@@ -75,17 +75,12 @@ DiaryWindow::DiaryWindow(Context *context) :
 
     allViews = new QStackedWidget(this);
     allViews->addWidget(monthlyView);
-    //allViews->setCurrentIndex(viewMode->currentIndex());
     allViews->setCurrentIndex(0);
 
     vlayout->addWidget(allViews);
 
-    //connect(viewMode, SIGNAL(currentIndexChanged(int)), allViews, SLOT(setCurrentIndex(int)));
-    //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultView(int)));
-    //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(rideSelected()));
-    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));

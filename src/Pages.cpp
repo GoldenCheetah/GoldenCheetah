@@ -491,14 +491,11 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_TPURL, tpURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPUSER, tpUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPPASS, tpPass->text());
-    //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_STRUSER, stravaUser->text());
-    //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_STRPASS, stravaPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBUSER, ttbUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBPASS, ttbPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPTYPE, tpType->currentIndex());
-    //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIKEY, wiPass->text());
@@ -513,8 +510,6 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_DVURL, url);
     appsettings->setCValue(context->athlete->cyclist, GC_DVUSER, dvUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DVPASS, dvPass->text());
-
-    //XXX deprecated saveTwitter(); // get secret key if PIN set
 }
 
 //

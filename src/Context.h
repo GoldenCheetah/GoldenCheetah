@@ -21,6 +21,7 @@
 
 #include "TimeUtils.h" // for class DateRange
 #include "RealtimeData.h" // for class RealtimeData
+#include "SpecialFields.h" // for class RealtimeData
 
 class RideFile;
 class RideItem;
@@ -54,6 +55,7 @@ class Context : public QObject
         DateRange _dr;   // the currently selected date range
         ErgFile *workout; // the currently selected workout file
         long now; // point in time during train session
+        SpecialFields specialFields;
 
         // *********************************************
         // APPLICATION EVENTS

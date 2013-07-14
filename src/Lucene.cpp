@@ -81,9 +81,9 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     // And all the metadata texts individually
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
 
-        if (!context->mainWindow->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
+        if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
 
-            std::wstring name = context->mainWindow->specialFields.makeTechName(field.name).toStdWString();
+            std::wstring name = context->specialFields.makeTechName(field.name).toStdWString();
             std::wstring value = ride->getTag(field.name,"").toStdWString();
 
             alltexts += ride->getTag(field.name,"") + " ";

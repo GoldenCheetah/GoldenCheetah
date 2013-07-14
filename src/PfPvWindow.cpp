@@ -189,7 +189,6 @@ PfPvWindow::PfPvWindow(Context *context) :
                 this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
     connect(rFrameInterval, SIGNAL(stateChanged(int)),
                 this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
-    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));

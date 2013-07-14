@@ -43,7 +43,6 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     layout->setContentsMargins(2,0,2,2);
     setChartLayout(layout);
 
-    //XXX ???? parent = context->mainWindow;;
     view = new QWebView();
     view->setPage(new myWebPage());
     view->setContentsMargins(0,0,0,0);

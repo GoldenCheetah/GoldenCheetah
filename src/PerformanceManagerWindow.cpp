@@ -113,7 +113,6 @@ PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
     connect(context, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
-    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 #ifdef GC_HAVE_LUCENE
     connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));

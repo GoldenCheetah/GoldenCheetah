@@ -1241,11 +1241,9 @@ class LTMPlotZoneLabel: public QwtPlotItem
             zone_number = _zone_number;
 
             const Zones *zones       = parent->parent->context->athlete->zones();
-            //int zone_range     = 0; //parent->parent->context->mainWindow->zoneRange();
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 
             // which axis has watts?
-            //setAxis(QwtPlot::xBottom, axisid);
             setXAxis(axisid);
 
             // create new zone labels if we're shading
