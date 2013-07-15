@@ -76,7 +76,6 @@ Athlete::Athlete(Context *context, const QDir &home)
     }
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
-
     // Power Zones
     zones_ = new Zones;
     QFile zonesFile(home.absolutePath() + "/power.zones");
@@ -115,6 +114,11 @@ Athlete::Athlete(Context *context, const QDir &home)
     // metrics DB
     metricDB = new MetricAggregator(context); // just to catch config updates!
     metricDB->refreshMetrics();
+
+    // the model atop the metric DB
+    sqlModel = new QSqlTableModel(this, metricDB->db()->connection());
+    sqlModel->setTable("metrics");
+    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
     // Downloaders
     withingsDownload = new WithingsDownload(context);
@@ -182,7 +186,8 @@ Athlete::Athlete(Context *context, const QDir &home)
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(updateRideFileIntervals()));
 }
 
-Athlete::~Athlete()
+void
+Athlete::close()
 {
     // set to latest so we don't repeat
     appsettings->setCValue(context->athlete->home.dirName(), GC_VERSION_USED, VERSION_LATEST);

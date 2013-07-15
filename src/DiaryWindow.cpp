@@ -61,7 +61,7 @@ DiaryWindow::DiaryWindow(Context *context) :
 
     // monthly view via QCalendarWidget
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
-    calendarModel->setSourceModel(context->mainWindow->listView->sqlModel);
+    calendarModel->setSourceModel(context->athlete->sqlModel);
 
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);

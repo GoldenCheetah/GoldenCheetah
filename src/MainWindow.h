@@ -38,6 +38,7 @@ class GcToolBar;
 class DiarySidebar;
 class GcMultiCalendar;
 class LTMSidebar;
+class AnalysisSidebar;
 class LionFullScreen;
 class QTFullScreen;
 class TrainSidebar;
@@ -88,8 +89,6 @@ class MainWindow : public QMainWindow
         // MAINWINDOW STATE / GUI DATA
         // *********************************************
 
-        RideNavigator *listView;
-
         // Top-level views
         HomeWindow *homeWindow;
         HomeWindow *diaryWindow;
@@ -125,16 +124,10 @@ class MainWindow : public QMainWindow
         QStackedWidget *views;   // contains all the views
 
         // sidebars
+        AnalysisSidebar *analysisSidebar;
         TrainSidebar *trainSidebar; // train view
         LTMSidebar *ltmSidebar; // home view
         DiarySidebar *diarySidebar; // diary
-
-        // analysis view
-        // constructed from parts in mainwindow
-        GcSplitter *analSidebar;
-        GcSplitterItem *analItem, *intervalItem;
-        QSplitter *intervalSplitter;
-        GcMultiCalendar *gcMultiCalendar;
 
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
         LionFullScreen *fullScreen;
@@ -315,7 +308,6 @@ class MainWindow : public QMainWindow
         // only keeping those used outside of mainwindow constructor
         QAction *styleAction;
         QAction *showhideSidebar;
-        QAction *stravaAction;
         QAction *rideWithGPSAction;
         QAction *ttbAction;
 
@@ -325,8 +317,6 @@ class MainWindow : public QMainWindow
                        *trainControls,
                        *diaryControls,
                        *homeControls;
-
-        IntervalSummaryWindow *intervalSummaryWindow;
 
         // Miscellany
         QSignalMapper *groupByMapper;

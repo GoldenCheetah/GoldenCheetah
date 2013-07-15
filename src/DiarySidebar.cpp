@@ -414,7 +414,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     // get the model
     fieldDefinitions = context->athlete->rideMetadata()->getFields();
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
-    calendarModel->setSourceModel(context->mainWindow->listView->sqlModel);
+    calendarModel->setSourceModel(context->athlete->sqlModel);
 
     QHBoxLayout *line = new QHBoxLayout;
     line->setSpacing(0);

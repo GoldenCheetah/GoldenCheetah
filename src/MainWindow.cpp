@@ -88,6 +88,7 @@
 #include "DiarySidebar.h"
 #include "GcScopeBar.h"
 #include "LTMSidebar.h"
+#include "AnalysisSidebar.h"
 
 #ifdef Q_OS_MAC
 #ifdef GC_HAVE_LION
@@ -472,80 +473,25 @@ MainWindow::MainWindow(const QDir &home) :
      * Sidebar
      *--------------------------------------------------------------------*/
 
-    // UI Ride List (configurable)
-    listView = new RideNavigator(context, true);
-    listView->setProperty("nomenu", true);
-
     // sidebar items
     diarySidebar = new DiarySidebar(context);
-    gcMultiCalendar = new GcMultiCalendar(context);
+    ltmSidebar = new LTMSidebar(context, context->athlete->home);
+    analysisSidebar = new AnalysisSidebar(context);
+
 
     // we need to connect the search box on Linux/Windows
 #ifdef GC_HAVE_LUCENE
 
     // link to the sidebars
-    connect(searchBox, SIGNAL(searchResults(QStringList)), listView, SLOT(searchStrings(QStringList)));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), analysisSidebar, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchResults(QStringList)), diarySidebar, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchResults(QStringList)), gcMultiCalendar, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), listView, SLOT(clearSearch()));
     connect(searchBox, SIGNAL(searchClear()), diarySidebar, SLOT(clearFilter()));
-    connect(searchBox, SIGNAL(searchClear()), gcMultiCalendar, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchClear()), analysisSidebar, SLOT(clearFilter()));
 
     // and global for charts AFTER sidebars
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchResults(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(searchClear()));
 #endif
-    // retrieve settings (properties are saved when we close the window)
-    if (appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGS, "").toString() != "") {
-        listView->setSortByIndex(appsettings->cvalue(context->athlete->cyclist, GC_SORTBY).toInt());
-        listView->setSortByOrder(appsettings->cvalue(context->athlete->cyclist, GC_SORTBYORDER).toInt());
-        listView->setGroupBy(appsettings->cvalue(context->athlete->cyclist, GC_NAVGROUPBY).toInt());
-        listView->setColumns(appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGS).toString());
-        listView->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGWIDTHS).toString());
-    }
-
-    // INTERVALS
-    intervalSummaryWindow = new IntervalSummaryWindow(context);
-    QWidget *activityHistory = new QWidget(this);
-    activityHistory->setContentsMargins(0,0,0,0);
-#ifndef Q_OS_MAC // not on mac thanks
-    activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
-#endif
-    QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
-    activityLayout->setSpacing(0);
-    activityLayout->setContentsMargins(0,0,0,0);
-    activityLayout->addWidget(listView);
-
-    intervalSplitter = new QSplitter(this);
-    intervalSplitter->setHandleWidth(1);
-    intervalSplitter->setOrientation(Qt::Vertical);
-    intervalSplitter->addWidget(context->athlete->intervalWidget);
-    intervalSplitter->addWidget(intervalSummaryWindow);
-    intervalSplitter->setFrameStyle(QFrame::NoFrame);
-    intervalSplitter->setCollapsible(0, false);
-    intervalSplitter->setCollapsible(1, false);
-
-    GcSplitterItem *calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
-    calendarItem->addWidget(gcMultiCalendar);
-
-    analItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
-    QAction *moreAnalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
-    analItem->addAction(moreAnalAct);
-    connect(moreAnalAct, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
-    analItem->addWidget(activityHistory);
-
-    intervalItem = new GcSplitterItem(tr("Intervals"), iconFromPNG(":images/mac/stop.png"), this);
-    QAction *moreIntervalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
-    intervalItem->addAction(moreIntervalAct);
-    connect(moreIntervalAct, SIGNAL(triggered(void)), this, SLOT(intervalPopup()));
-    intervalItem->addWidget(intervalSplitter);
-
-    analSidebar = new GcSplitter(Qt::Vertical);
-    analSidebar->addWidget(calendarItem);
-    analSidebar->addWidget(analItem);
-    analSidebar->addWidget(intervalItem);
-    analSidebar->prepare(context->athlete->cyclist, "analysis");
-
 
     /*----------------------------------------------------------------------
      * The 4 views
@@ -629,12 +575,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     // do controllers after home windows -- they need their first signals caught
     connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
-
-    ltmSidebar = new LTMSidebar(context, context->athlete->home);
     connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
     ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
 
-    toolBox->addWidget(analSidebar);
+    toolBox->addWidget(analysisSidebar);
     toolBox->addWidget(diarySidebar);
     toolBox->addWidget(trainSidebar->controls());
     toolBox->addWidget(ltmSidebar);
@@ -983,7 +927,6 @@ MainWindow::setActivityMenu()
         else ttbAction->setEnabled(false);
         
     } else {
-        //XXX deprecated stravaAction->setEnabled(false);
         rideWithGPSAction->setEnabled(false);
         ttbAction->setEnabled(false);
     }
@@ -1086,7 +1029,7 @@ void
 MainWindow::analysisPopup()
 {
     // set the point for the menu and call below
-    showTreeContextMenuPopup(analSidebar->mapToGlobal(QPoint(analItem->pos().x()+analItem->width()-20, analItem->pos().y())));
+    //XXX showTreeContextMenuPopup(analSidebar->mapToGlobal(QPoint(analItem->pos().x()+analItem->width()-20, analItem->pos().y())));
 }
 
 void
@@ -1126,10 +1069,11 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         menu.addSeparator();
 
         // ride navigator stuff
-        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
-        connect(colChooser, SIGNAL(triggered(void)), listView, SLOT(showColumnChooser()));
-        menu.addAction(colChooser);
+        //XXX QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
+        //XXX connect(colChooser, SIGNAL(triggered(void)), listView, SLOT(showColumnChooser()));
+        //XXX menu.addAction(colChooser);
 
+#if 0 //XXX 
         if (listView->groupBy() >= 0) {
 
             // already grouped lets ungroup
@@ -1159,6 +1103,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
                 groupByMapper->setMapping(groupByAct, heading);
             }
         }
+#endif
         menu.exec(pos);
     }
 }
@@ -1166,6 +1111,8 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 void
 MainWindow::intervalPopup()
 {
+//XXX
+#if 0
     // always show the 'find best' 'find peaks' options
     QMenu menu(intervalItem);
 
@@ -1216,7 +1163,8 @@ MainWindow::intervalPopup()
         menu.addAction(actDeleteInt);
     }
 
-    menu.exec(analSidebar->mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
+    //XXX menu.exec(analSidebar->mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
+#endif
 }
 
 void
@@ -1262,7 +1210,7 @@ MainWindow::splitterMoved(int pos, int /*index*/)
     // show / hide sidebar as dragged..
     if ((pos == 0  && toolBox->isVisible()) || (pos>10 && !toolBox->isVisible())) toggleSidebar();
 
-    listView->setWidth(pos);
+    analysisSidebar->setWidth(pos);
     appsettings->setCValue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
@@ -1287,13 +1235,7 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // stop any active realtime conneection
         trainSidebar->Stop();
-
-        // save ride list config
-        appsettings->setCValue(context->athlete->cyclist, GC_SORTBY, listView->sortByIndex());
-        appsettings->setCValue(context->athlete->cyclist, GC_SORTBYORDER, listView->sortByOrder());
-        appsettings->setCValue(context->athlete->cyclist, GC_NAVGROUPBY, listView->groupBy());
-        appsettings->setCValue(context->athlete->cyclist, GC_NAVHEADINGS, listView->columns());
-        appsettings->setCValue(context->athlete->cyclist, GC_NAVHEADINGWIDTHS, listView->widths());
+        analysisSidebar->close(); // save settings
 
         // save the state of all the pages
         analWindow->saveState();
@@ -1315,9 +1257,8 @@ MainWindow::closeEvent(QCloseEvent* event)
         appsettings->setCValue(context->athlete->cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
         appsettings->setCValue(context->athlete->cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
 
-        // un bootstrap
-        delete context->athlete;
-        delete context;
+        // clear down athlete
+        context->athlete->close();
 
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
@@ -2348,14 +2289,12 @@ MainWindow::searchTextChanged(QString text)
 #ifdef GC_HAVE_LUCENE
     // clear or set...
     if (text == "") {
-        listView->clearSearch();
+        analysisSidebar->clearFilter();
         diarySidebar->clearFilter();
-        gcMultiCalendar->clearFilter();
     } else {
         context->athlete->lucene->search(text);
-        listView->searchStrings(context->athlete->lucene->files());
+        analysisSidebar->setFilter(context->athlete->lucene->files());
         diarySidebar->setFilter(context->athlete->lucene->files());
-        gcMultiCalendar->setFilter(context->athlete->lucene->files());
     }
 #endif
 }
@@ -2386,7 +2325,7 @@ MainWindow::rideSelected(RideItem*)
     // to let them know they need to replot new
     // selected ride
     diarySidebar->setRide(context->ride);
-    gcMultiCalendar->setRide(context->ride);
+    analysisSidebar->setRide(context->ride);
     analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
     homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));

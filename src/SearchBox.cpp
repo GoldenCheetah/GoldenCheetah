@@ -210,8 +210,8 @@ void SearchBox::runMenu(QAction *x)
         editor->show();
 
     } else if (x->text() == tr("Column Chooser")) {
-        ColumnChooser *selector = new ColumnChooser(context->mainWindow->listView->logicalHeadings);
-        selector->show();
+        //XXX!!! ColumnChooser *selector = new ColumnChooser(context->mainWindow->listView->logicalHeadings);
+        //XXX!!! selector->show();
     } else {
         NamedSearch get = context->athlete->namedSearches->get(x->text());
         if (get.name == x->text()) {
