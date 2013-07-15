@@ -7,7 +7,7 @@
  * any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * ANY WARRAfNTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
  *
@@ -76,7 +76,7 @@ bool FortiusController::doesLoad() { return true; }
 void
 FortiusController::getRealtimeData(RealtimeData &rtData)
 {
-	// Added Distance and Steering here but yet to RealtimeData
+    // Added Distance and Steering here but yet to RealtimeData
 
     int Buttons, Status, Steering;
     double Power, HeartRate, Cadence, Speed, Distance;
@@ -119,7 +119,7 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
 
     // ADJUST LOAD
     if ((Buttons&FT_PLUS)) parent->Higher();
-	
+    
     if ((Buttons&FT_MINUS)) parent->Lower();
 
     // LAP/INTERVAL
@@ -128,9 +128,9 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
     // CANCEL
     if (Buttons&FT_CANCEL) parent->Stop(0);
 
-	// Ensure we set the UI load to the actual setpoint from the fortius (as it will clamp)
+    // Ensure we set the UI load to the actual setpoint from the fortius (as it will clamp)
     rtData.setLoad(myFortius->getLoad());
-	rtData.setSlope(myFortius->getGradient());
+    rtData.setSlope(myFortius->getGradient());
 }
 
 void FortiusController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
@@ -152,7 +152,7 @@ FortiusController::setMode(int mode)
 {
     if (mode == RT_MODE_ERGO) mode = FT_ERGOMODE;
     else if (mode == RT_MODE_SPIN) mode = FT_SSMODE;
-	else mode = FT_IDLE;
-	
+    else mode = FT_IDLE;
+    
     myFortius->setMode(mode);
 }
