@@ -34,33 +34,33 @@
 // 10            Calibration Value - Lo Byte
 // 11            Calibration High - Hi Byte
 
-// Encoded Calibration is 130 x Callibration Value + 1040 so calibration of zero gives lo 0x10 0x04
+// Encoded Calibration is 130 x Callibration Value + 1040 so calibration of zero gives 0x0410
 
 const static uint8_t ergo_command[12] = {
      // 0     1     2     3     4     5     6     7    8      9     10    11
-        0x01, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x0a, 0x04, 0x10
+        0x01, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x0a, 0x10, 0x04
 };
 
 const static uint8_t slope_command[12] = {
      // 0     1     2     3     4     5     6     7    8      9     10    11
-        0x01, 0x08, 0x01, 0x00, 0x6c, 0x01, 0x00, 0x00, 0x02, 0x48, 0x04, 0x10
+        0x01, 0x08, 0x01, 0x00, 0x6c, 0x01, 0x00, 0x00, 0x02, 0x48, 0x10, 0x04
 };
 
 
-	
+    
 /* ----------------------------------------------------------------------
  * CONSTRUCTOR/DESRTUCTOR
  * ---------------------------------------------------------------------- */
 Fortius::Fortius(QObject *parent) : QThread(parent)
 {
-	
+    
     devicePower = deviceHeartRate = deviceCadence = deviceSpeed = 0.00;
     mode = FT_IDLE;
     load = DEFAULT_LOAD;
     gradient = DEFAULT_GRADIENT;
-	weight = DEFAULT_WEIGHT;
-	brakeCalibrationFactor = DEFAULT_CALIBRATION;
-	powerScaleFactor = DEFAULT_SCALING;
+    weight = DEFAULT_WEIGHT;
+    brakeCalibrationFactor = DEFAULT_CALIBRATION;
+    powerScaleFactor = DEFAULT_SCALING;
     deviceStatus=0;
     this->parent = parent;
 
@@ -102,9 +102,9 @@ void Fortius::setBrakeCalibrationFactor(double brakeCalibrationFactor)
 // output power adjusted by this value so user can compare with hub or crank based readings
 void Fortius::setPowerScaleFactor(double powerScaleFactor)
 {
-	if (weight < 0.8) weight = 0.8;
-	if (weight > 1.2) weight = 1.2;
-	
+    if (weight < 0.8) weight = 0.8;
+    if (weight > 1.2) weight = 1.2;
+    
     pvars.lock();
     this->powerScaleFactor = powerScaleFactor;
     pvars.unlock();
@@ -113,10 +113,10 @@ void Fortius::setPowerScaleFactor(double powerScaleFactor)
 // User weight used by brake in slope mode
 void Fortius::setWeight(double weight)
 {
-	// need to apply range as same byte used to signify erg mode
-	if (weight < 50) weight = 50;
-	if (weight > 120) weight = 120;
-		
+    // need to apply range as same byte used to signify erg mode
+    if (weight < 50) weight = 50;
+    if (weight > 120) weight = 120;
+        
     pvars.lock();
     this->weight = weight;
     pvars.unlock();
@@ -125,10 +125,10 @@ void Fortius::setWeight(double weight)
 // Load in watts when in power mode
 void Fortius::setLoad(double load)
 {
-	// we can only do 50-1000w on a Fortius
-	if (load > 1000) load = 1000;
-	if (load < 50) load = 50;
-		
+    // we can only do 50-1000w on a Fortius
+    if (load > 1000) load = 1000;
+    if (load < 50) load = 50;
+        
     pvars.lock();
     this->load = load;
     pvars.unlock();
@@ -137,9 +137,9 @@ void Fortius::setLoad(double load)
 // Load as slope % when in slope mode
 void Fortius::setGradient(double gradient)
 {
-	if (gradient > 20) gradient = 20;
-	if (gradient < -5) gradient = -5;
-	
+    if (gradient > 20) gradient = 20;
+    if (gradient < -5) gradient = -5;
+    
     pvars.lock();
     this->gradient = gradient;
     pvars.unlock();
@@ -157,15 +157,15 @@ void Fortius::getTelemetry(double &power, double &heartrate, double &cadence, do
     heartrate = deviceHeartRate;
     cadence = deviceCadence;
     speed = deviceSpeed;
-	distance = deviceDistance;
+    distance = deviceDistance;
     buttons = deviceButtons;
-	steering = deviceSteering;
+    steering = deviceSteering;
     status = deviceStatus;
-	
-	// work around to ensure controller doesn't miss button press. 
-	// The run thread will only set the button bits, they don't get
-	// reset until the ui reads the device state
-	deviceButtons = 0; 
+    
+    // work around to ensure controller doesn't miss button press. 
+    // The run thread will only set the button bits, they don't get
+    // reset until the ui reads the device state
+    deviceButtons = 0; 
     pvars.unlock();
 }
 
@@ -262,11 +262,11 @@ int Fortius::restart()
     pvars.unlock();
     // what state are we in anyway?
     if (status&FT_RUNNING && status&FT_PAUSED) {
-            status &= ~FT_PAUSED;
-            pvars.lock();
-            this->deviceStatus = status;
-            pvars.unlock();
-            return 0; // ok its running again!
+        status &= ~FT_PAUSED;
+        pvars.lock();
+        this->deviceStatus = status;
+        pvars.unlock();
+        return 0; // ok its running again!
     }
     return 2;
 }
@@ -293,13 +293,13 @@ int Fortius::pause()
     else if (!(status&FT_RUNNING)) return 4; // not running anyway, fool!
     else {
 
-            // ok we're running and not paused so lets pause
-            status |= FT_PAUSED;
-            pvars.lock();
-            this->deviceStatus = status;
-            pvars.unlock();
+        // ok we're running and not paused so lets pause
+        status |= FT_PAUSED;
+        pvars.lock();
+        this->deviceStatus = status;
+        pvars.unlock();
 
-            return 0;
+        return 0;
     }
 }
 
@@ -321,32 +321,38 @@ void Fortius::run()
     // newly read values - compared against cached values
     bool isDeviceOpen = false;
 
-	// ui controller state
+    // ui controller state
     int curstatus;
 
-	// variables for telemetry, copied to fields on each brake update
+    // variables for telemetry, copied to fields on each brake update
     double curPower;                      // current output power in Watts
     double curHeartRate;                  // current heartrate in BPM
     double curCadence;                    // current cadence in RPM
-    double curSpeed;                      // current speef in KPH
-	double curDistance;					// odometer?
+    double curSpeed;                      // current speed in KPH
+    // UNUSED double curDistance;                    // odometer?
     int curButtons;                       // Button status
-	int curSteering;					// Angle of steering controller
-	int curStatus;
-	uint8_t pedalSensor;				// 1 when cadence pulse detected else zero. Fed back to brake but seems to be ignored
-										
+    int curSteering;                    // Angle of steering controller
+    // UNUSED int curStatus;
+    uint8_t pedalSensor;                // 1 when using is cycling else 0, fed back to brake although appears unecessary
 
+    // we need to average out power for the last second
+    // since we get updates every 10ms (100hz)
+    int powerhist[10];     // last 10 values received
+    int powertot=0;        // running total
+    int powerindex=0;      // index into the powerhist array
+    for (int i=0; i<10; i++) powerhist[i]=0; 
+                                        
     // initialise local cache & main vars
     pvars.lock();
-    curStatus = this->deviceStatus;
+    // UNUSED curStatus = this->deviceStatus;
     curPower = this->devicePower = 0;
     curHeartRate = this->deviceHeartRate = 0;
     curCadence = this->deviceCadence = 0;
     curSpeed = this->deviceSpeed = 0;
-	curSteering = this->deviceSteering = 0;
-	curDistance = this->deviceDistance = 0;
+    // UNUSED curDistance = this->deviceDistance = 0;
+    curSteering = this->deviceSteering = 0;
     curButtons = this->deviceButtons = 0;
-	pedalSensor = 0;
+    pedalSensor = 0;
     pvars.unlock();
 
 
@@ -356,7 +362,7 @@ void Fortius::run()
         return; // open failed!
     } else {
         isDeviceOpen = true;
-		sendOpenCommand();
+        sendOpenCommand();
     }
 
     QTime timer;
@@ -366,7 +372,7 @@ void Fortius::run()
 
         if (isDeviceOpen == true) {
 
-			int actualLength = readMessage();
+            int actualLength = readMessage();
             if (actualLength >= 24) {
 
                 //----------------------------------------------------------------
@@ -374,51 +380,60 @@ void Fortius::run()
                 // The data structure is very simple, no bit twiddling needed here
                 //----------------------------------------------------------------
 
-				// buf[14] changes from time to time (controller status?)
-				
-				// buttons
+                // buf[14] changes from time to time (controller status?)
+                
+                // buttons
                 curButtons = buf[13];
 
-				// steering angle
-				curSteering = buf[18] | (buf[19] << 8);
-				
-				// update public fields
-				pvars.lock();
-				deviceButtons |= curButtons;    // workaround to ensure controller doesn't miss button pushes
-				deviceSteering = curSteering;
-				pvars.unlock();
-			}
-			if (actualLength >= 48) {
+                // steering angle
+                curSteering = buf[18] | (buf[19] << 8);
+                
+                // update public fields
+                pvars.lock();
+                deviceButtons |= curButtons;    // workaround to ensure controller doesn't miss button pushes
+                deviceSteering = curSteering;
+                pvars.unlock();
+            }
+            if (actualLength >= 48) {
                 // brake status status&0x04 == stopping wheel
                 //              status&0x01 == brake on
                 //curBrakeStatus = buf[42];
-				
-				// pedal sensor is 0x01 when pedal passes magnet
-				pedalSensor = buf[46];
-				
-				curDistance = buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24);
+                
+                // pedal sensor is 0x01 when cycling
+                pedalSensor = buf[46];
+                
+                // UNUSED curDistance = buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24);
 
                 // cadence - confirmed correct
                 curCadence = buf[44];
 
-                // speed - scale seems incorrect
-                curSpeed = (double)(qFromLittleEndian<quint16>(&buf[32])) / (3.6f * 100.00f);
+                // speed
+                curSpeed = 1.3f * (double)(qFromLittleEndian<quint16>(&buf[32])) / (3.6f * 100.00f);
 
                 // power - changed scale from 10 to 13, seems correct in erg mode, slope mode needs work
                 curPower = qFromLittleEndian<qint16>(&buf[38])/13;
-				if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
+                if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
+                
+                // average power over last 1s
+                powertot += curPower;
+                powertot -= powerhist[powerindex];
+                powerhist[powerindex] = curPower;
+
+                curPower = powertot / 10;
+                powerindex = (powerindex == 9) ? 0 : powerindex+1; 
+
                 curPower *= powerScaleFactor; // apply scale factor
-				
+                
                 // heartrate - confirmed correct
                 curHeartRate = buf[12];
 
-				// update public fields
-				pvars.lock();
-				deviceSpeed = curSpeed;
-				deviceCadence = curCadence;
-				deviceHeartRate = curHeartRate;
-				devicePower = curPower;
-				pvars.unlock();
+                // update public fields
+                pvars.lock();
+                deviceSpeed = curSpeed;
+                deviceCadence = curCadence;
+                deviceHeartRate = curHeartRate;
+                devicePower = curPower;
+                pvars.unlock();
             }
         }
 
@@ -432,16 +447,16 @@ void Fortius::run()
         /* time to shut up shop */
         if (!(curstatus&FT_RUNNING)) {
             // time to stop!
-			
-			sendCloseCommand();
-			
+            
+            sendCloseCommand();
+            
             closePort(); // need to release that file handle!!
             quit(0);
             return;
         }
 
         if ((curstatus&FT_PAUSED) && isDeviceOpen == true) {
-		
+        
             closePort();
             isDeviceOpen = false;
 
@@ -451,9 +466,9 @@ void Fortius::run()
                 quit(2);
                 return; // open failed!
             }
-            isDeviceOpen = true;		
-			sendOpenCommand();
-						
+            isDeviceOpen = true;        
+            sendOpenCommand();
+                        
             timer.restart();
         }
 
@@ -463,16 +478,16 @@ void Fortius::run()
         if (isDeviceOpen == true) {
 
             if (sendRunCommand(pedalSensor) < 0) {
-                    // send failed - ouch!
-                    closePort(); // need to release that file handle!!
-                    quit(4);
-                    return; // couldn't write to the device
+                // send failed - ouch!
+                closePort(); // need to release that file handle!!
+                quit(4);
+                return; // couldn't write to the device
             }
         }
-		
-		// The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
-		// only packages (24byte).
-		msleep(10);
+        
+        // The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
+        // only packages (24byte).
+        msleep(10);
     }
 }
 
@@ -486,62 +501,62 @@ void Fortius::run()
  * ---------------------------------------------------------------------- */
 int Fortius::sendOpenCommand()
 {
-	uint8_t open_command[] = {0x02,0x00,0x00,0x00};
-	
-	return rawWrite(open_command, 4);
+    uint8_t open_command[] = {0x02,0x00,0x00,0x00};
+    
+    return rawWrite(open_command, 4);
 }
 
 int Fortius::sendCloseCommand()
 {
-	uint8_t close_command[] = {0x01,0x08,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x52,0x04,0x10};
-	
-	return rawWrite(close_command, 12);
+    uint8_t close_command[] = {0x01,0x08,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x52,0x10,0x04};
+    
+    return rawWrite(close_command, 12);
 }
 
 int Fortius::sendRunCommand(int16_t pedalSensor)
 {
     pvars.lock();
     int mode = this->mode;
-	int16_t gradient = (int16_t)this->gradient;
-	int16_t load = (int16_t)this->load;
-	unsigned int weight = (unsigned int)this->weight;
-	int16_t brakeCalibrationFactor = (int16_t)this->brakeCalibrationFactor;
+    int16_t gradient = (int16_t)this->gradient;
+    int16_t load = (int16_t)this->load;
+    unsigned int weight = (unsigned int)this->weight;
+    int16_t brakeCalibrationFactor = (int16_t)this->brakeCalibrationFactor;
     pvars.unlock();
-	
-	if (mode == FT_ERGOMODE)
-	{
+    
+    if (mode == FT_ERGOMODE)
+    {
         qToLittleEndian<int16_t>(13 * load, &ERGO_Command[4]);
-		ERGO_Command[6] = pedalSensor;
-		
-		qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &ERGO_Command[10]);
-				
-		return rawWrite(ERGO_Command, 12);
-	}
-	else if (mode == FT_SSMODE)
-	{
+        ERGO_Command[6] = pedalSensor;
+        
+        qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &ERGO_Command[10]);
+                
+        return rawWrite(ERGO_Command, 12);
+    }
+    else if (mode == FT_SSMODE)
+    {
         // Tacx driver appears to add an offset to create additional load at
         // zero slope, also seems to be slightly dependent on weight but have
         // ignored this for now.
-        qToLittleEndian<int16_t>(130 * gradient + 507, &SLOPE_Command[4]);
-		SLOPE_Command[6] = pedalSensor;
-		SLOPE_Command[9] = weight;
-		
-		qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &ERGO_Command[10]);
-		
-		return rawWrite(SLOPE_Command, 12);
-	}
-	else if (mode == FT_IDLE)
-	{
-		return sendOpenCommand();
-	}
-	else if (mode == FT_CALIBRATE)
-	{
-		// Not yet implemented, easy enough to start callibration but appears that the callibration factor needs
-		// to be calculated by observing the brake power and speed after callibratio starts (i.e. it's not returned
-		// by the brake).
-	}
-	
-	return 0;
+        qToLittleEndian<int16_t>(1300 * gradient + 507, &SLOPE_Command[4]);
+        SLOPE_Command[6] = pedalSensor;
+        SLOPE_Command[9] = weight;
+        
+        qToLittleEndian<int16_t>(130 * brakeCalibrationFactor + 1040, &SLOPE_Command[10]);
+        
+        return rawWrite(SLOPE_Command, 12);
+    }
+    else if (mode == FT_IDLE)
+    {
+        return sendOpenCommand();
+    }
+    else if (mode == FT_CALIBRATE)
+    {
+        // Not yet implemented, easy enough to start callibration but appears that the callibration factor needs
+        // to be calculated by observing the brake power and speed after callibratio starts (i.e. it's not returned
+        // by the brake).
+    }
+    
+    return 0;
 }
 
 /* ----------------------------------------------------------------------
@@ -587,7 +602,7 @@ int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!
 
 int Fortius::rawRead(uint8_t bytes[], int size)
 {
-	return usb2->read((char *)bytes, size);
+    return usb2->read((char *)bytes, size);
 }
 
 // check to see of there is a port at the device specified
