@@ -139,7 +139,6 @@ class RideNavigator : public GcWindow
         void clearSearch();
 
     protected:
-        QSqlTableModel *sqlModel; // the sql table
         GroupByModel *groupByModel; // for group by
         BUGFIXQSortFilterProxyModel *sortModel; // for sort/filter
 

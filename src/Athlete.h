@@ -43,6 +43,7 @@ class RideFileCache;
 class RideItem;
 class IntervalItem;
 class IntervalTreeView;
+class QSqlTableModel;
 
 class Context;
 class Context;
@@ -53,7 +54,7 @@ class Athlete : public QObject
 
     public:
         Athlete(Context *context, const QDir &home);
-        ~Athlete();
+        void close();
 
         // basic athlete info
         QString cyclist; // the cyclist name
@@ -67,6 +68,7 @@ class Athlete : public QObject
         bool isclean;
         QSqlDatabase db;
         MetricAggregator *metricDB;
+        QSqlTableModel *sqlModel;
         RideMetadata *rideMetadata_;
         Seasons *seasons;
         QList<RideFileCache*> cpxCache;

@@ -165,5 +165,5 @@ RideItem::setStartTime(QDateTime newDateTime)
     setText(2, dateTime.toString("h:mm AP"));
 
     ride()->setStartTime(newDateTime);
-    //XXX main->context->notifyRideSelected();
+    context->notifyRideSelected(this);
 }

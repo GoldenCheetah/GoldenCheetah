@@ -414,13 +414,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(gcurlLabel, 6,0);
     grid->addWidget(gcuserLabel, 7,0);
     grid->addWidget(gcpassLabel, 8,0);
-    //XXX deprecated grid->addWidget(twp, 9,0);
-    //XXX deprecated grid->addWidget(twurlLabel, 10,0);
-    //XXX deprecated grid->addWidget(twauthLabel, 11,0);
-    //XXX deprecated grid->addWidget(twpinLabel, 12,0);
-    //XXX deprecated grid->addWidget(str, 13,0);
-    //XXX deprecated grid->addWidget(struserLabel, 14,0);
-    //XXX deprecated grid->addWidget(strpassLabel, 15,0);
     grid->addWidget(rwgps, 17,0);
     grid->addWidget(rwgpsuserLabel, 18,0);
     grid->addWidget(rwgpspassLabel, 19,0);

@@ -44,14 +44,11 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
-    sqlModel = new QSqlTableModel(this, context->athlete->metricDB->db()->connection());
-    sqlModel->setTable("metrics");
-    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    sqlModel->select();
-    while (sqlModel->canFetchMore(QModelIndex())) sqlModel->fetchMore(QModelIndex());
+    context->athlete->sqlModel->select();
+    while (context->athlete->sqlModel->canFetchMore(QModelIndex())) context->athlete->sqlModel->fetchMore(QModelIndex());
 
     searchFilter = new SearchFilter(this);
-    searchFilter->setSourceModel(sqlModel); // filter out/in search results
+    searchFilter->setSourceModel(context->athlete->sqlModel); // filter out/in search results
 
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(searchFilter);
@@ -131,7 +128,6 @@ RideNavigator::~RideNavigator()
 {
     delete tableView;
     delete groupByModel;
-    delete sqlModel;
 }
 
 void
@@ -139,9 +135,9 @@ RideNavigator::refresh()
 {
     fontHeight = QFontMetrics(QFont()).height();
 
-    sqlModel->select();
-    while (sqlModel->canFetchMore(QModelIndex()))
-        sqlModel->fetchMore(QModelIndex());
+    context->athlete->sqlModel->select();
+    while (context->athlete->sqlModel->canFetchMore(QModelIndex()))
+        context->athlete->sqlModel->fetchMore(QModelIndex());
 
     active=false;
     rideTreeSelectionChanged();
@@ -748,6 +744,7 @@ RideNavigator::removeColumn()
     
     setWidth(geometry().width()); // calculate width...
     columnsChanged(); // need to do after, just once
+    columnsChanged(); // need to do after, and again
 }
 
 void
