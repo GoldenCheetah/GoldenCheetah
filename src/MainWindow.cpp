@@ -439,11 +439,35 @@ MainWindow::MainWindow(const QDir &home) :
 #endif
 
     /*----------------------------------------------------------------------
-     * Scope Bar
+     * Sidebar
      *--------------------------------------------------------------------*/
+
+    // sidebar items
+    diarySidebar = new DiarySidebar(context);
+    ltmSidebar = new LTMSidebar(context, context->athlete->home);
+    analysisSidebar = new AnalysisSidebar(context);
     trainSidebar = new TrainSidebar(context, context->athlete->home);
     trainSidebar->hide();
     trainSidebar->getToolbarButtons()->hide(); // no show yet
+
+
+    // we need to connect the search box on Linux/Windows
+#ifdef GC_HAVE_LUCENE
+
+    // link to the sidebars
+    connect(searchBox, SIGNAL(searchResults(QStringList)), analysisSidebar, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), diarySidebar, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), diarySidebar, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchClear()), analysisSidebar, SLOT(clearFilter()));
+
+    // and global for charts AFTER sidebars
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchResults(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(searchClear()));
+#endif
+
+    /*----------------------------------------------------------------------
+     * Scope Bar
+     *--------------------------------------------------------------------*/
 
     scopebar = new GcScopeBar(context, trainSidebar->getToolbarButtons());
     connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
@@ -468,30 +492,6 @@ MainWindow::MainWindow(const QDir &home) :
     newchart->setMenu(chartMenu);
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
-
-    /*----------------------------------------------------------------------
-     * Sidebar
-     *--------------------------------------------------------------------*/
-
-    // sidebar items
-    diarySidebar = new DiarySidebar(context);
-    ltmSidebar = new LTMSidebar(context, context->athlete->home);
-    analysisSidebar = new AnalysisSidebar(context);
-
-
-    // we need to connect the search box on Linux/Windows
-#ifdef GC_HAVE_LUCENE
-
-    // link to the sidebars
-    connect(searchBox, SIGNAL(searchResults(QStringList)), analysisSidebar, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchResults(QStringList)), diarySidebar, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), diarySidebar, SLOT(clearFilter()));
-    connect(searchBox, SIGNAL(searchClear()), analysisSidebar, SLOT(clearFilter()));
-
-    // and global for charts AFTER sidebars
-    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchResults(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), this, SLOT(searchClear()));
-#endif
 
     /*----------------------------------------------------------------------
      * The 4 views
