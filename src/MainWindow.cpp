@@ -1056,7 +1056,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         QAction *actSplitRide = new QAction(tr("Split Activity"), context->athlete->treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
 
-        QAction *actMergeRide = new QAction(tr("Merge Activities"), treeWidget);
+        QAction *actMergeRide = new QAction(tr("Merge Activities"), context->athlete->treeWidget);
         connect(actMergeRide, SIGNAL(triggered(void)), this, SLOT(mergeRide()));
 
         if (rideItem->isDirty() == true) {
