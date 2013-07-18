@@ -51,6 +51,8 @@
 \"NAME\"            return NAME;
 \"START\"           return START;
 \"STOP\"            return STOP;
+\"CALIBRATIONS\"    return CALIBRATIONS;
+\"VALUE\"           return VALUE;
 \"REFERENCES\"      return REFERENCES;
 \"SAMPLES\"         return SAMPLES;
 \"SECS\"            return SECS;

@@ -61,6 +61,7 @@ class AllPlot : public QwtPlot
         bool shadeZones() const;
         void refreshZoneLabels();
         void refreshIntervalMarkers();
+        void refreshCalibrationMarkers();
         void setAxisTitle(int axis, QString label);
 
         // refresh data / plot parameters
@@ -116,6 +117,7 @@ class AllPlot : public QwtPlot
         // plot objects
         QwtPlotGrid *grid;
         QVector<QwtPlotMarker*> d_mrk;
+        QVector<QwtPlotMarker*> cal_mrk;
         QwtPlotMarker *allMarker1;
         QwtPlotMarker *allMarker2;
         QwtPlotCurve *wattsCurve;

@@ -805,6 +805,7 @@ AllPlot::recalc()
 
     setYMax();
     refreshIntervalMarkers();
+    refreshCalibrationMarkers();
     refreshZoneLabels();
 
     //replot();
@@ -838,6 +839,36 @@ AllPlot::refreshIntervalMarkers()
             else
                 mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
                                 rideItem->ride()->timeToDistance(interval.start), 0.0);
+            mrk->setLabel(text);
+        }
+    }
+}
+
+void
+AllPlot::refreshCalibrationMarkers()
+{
+    foreach(QwtPlotMarker *mrk, cal_mrk) {
+        mrk->detach();
+        delete mrk;
+    }
+    cal_mrk.clear();
+
+    if (rideItem->ride()) {
+        foreach(const RideFileCalibration &calibration, rideItem->ride()->calibrations()) {
+            QwtPlotMarker *mrk = new QwtPlotMarker;
+            cal_mrk.append(mrk);
+            mrk->attach(this);
+            mrk->setLineStyle(QwtPlotMarker::VLine);
+            mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+            mrk->setLinePen(QPen(GColor(CCALIBRATIONMARKER), 0, Qt::DashDotLine));
+            QwtText text("\n\n"+calibration.name);
+            text.setFont(QFont("Helvetica", 9, QFont::Bold));
+            text.setColor(GColor(CCALIBRATIONMARKER));
+            if (!bydist)
+                mrk->setValue(calibration.start / 60.0, 0.0);
+            else
+                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                                rideItem->ride()->timeToDistance(calibration.start), 0.0);
             mrk->setLabel(text);
         }
     }
@@ -1180,6 +1211,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
 
     refreshIntervalMarkers();
+    refreshCalibrationMarkers();
     refreshZoneLabels();
 
     //if (this->legend()) this->legend()->show();
