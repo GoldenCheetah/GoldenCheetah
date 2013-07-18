@@ -298,7 +298,6 @@ class MainWindow : public QMainWindow
                        *homeControls;
 
         // Miscellany
-        QSignalMapper *groupByMapper;
         QSignalMapper *toolMapper;
 
 };

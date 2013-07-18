@@ -51,6 +51,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     // Activity History
     rideNavigator = new RideNavigator(context, true);
     rideNavigator->setProperty("nomenu", true);
+    groupByMapper = NULL;
 
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGS, "").toString() != "") {
@@ -192,16 +193,15 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         menu.addSeparator();
 
         // ride navigator stuff
-        //XXX QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
-        //XXX connect(colChooser, SIGNAL(triggered(void)), listView, SLOT(showColumnChooser()));
-        //XXX menu.addAction(colChooser);
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
+        connect(colChooser, SIGNAL(triggered(void)), rideNavigator, SLOT(showColumnChooser()));
+        menu.addAction(colChooser);
 
-#if 0 //XXX 
-        if (listView->groupBy() >= 0) {
+        if (rideNavigator->groupBy() >= 0) {
 
             // already grouped lets ungroup
             QAction *nogroups = new QAction(tr("Do Not Show In Groups"), context->athlete->treeWidget);
-            connect(nogroups, SIGNAL(triggered(void)), listView, SLOT(noGroups()));
+            connect(nogroups, SIGNAL(triggered(void)), rideNavigator, SLOT(noGroups()));
             menu.addAction(nogroups);
 
         } else {
@@ -213,9 +213,9 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             // add menu options for each column
             if (groupByMapper) delete groupByMapper;
             groupByMapper = new QSignalMapper(this);
-            connect(groupByMapper, SIGNAL(mapped(const QString &)), listView, SLOT(setGroupByColumnName(QString)));
+            connect(groupByMapper, SIGNAL(mapped(const QString &)), rideNavigator, SLOT(setGroupByColumnName(QString)));
 
-            foreach(QString heading, listView->columnNames()) {
+            foreach(QString heading, rideNavigator->columnNames()) {
                 if (heading == "*") continue; // special hidden column
 
                 QAction *groupByAct = new QAction(heading, context->athlete->treeWidget);
@@ -226,7 +226,6 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
                 groupByMapper->setMapping(groupByAct, heading);
             }
         }
-#endif
         menu.exec(pos);
     }
 }

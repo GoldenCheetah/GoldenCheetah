@@ -22,6 +22,7 @@
 #include "NamedSearch.h"
 #include "RideNavigator.h"
 #include "GcSideBarItem.h"
+#include "AnalysisSidebar.h"
 #include <QToolButton>
 #include <QInputDialog>
 
@@ -210,8 +211,8 @@ void SearchBox::runMenu(QAction *x)
         editor->show();
 
     } else if (x->text() == tr("Column Chooser")) {
-        //XXX!!! ColumnChooser *selector = new ColumnChooser(context->mainWindow->listView->logicalHeadings);
-        //XXX!!! selector->show();
+        ColumnChooser *selector = new ColumnChooser(context->mainWindow->analysisSidebar->rideNavigator->logicalHeadings);
+        selector->show();
     } else {
         NamedSearch get = context->athlete->namedSearches->get(x->text());
         if (get.name == x->text()) {
