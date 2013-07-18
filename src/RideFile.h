@@ -164,6 +164,10 @@ class RideFile : public QObject // QObject to emit signals
             calibrations_.append(RideFileCalibration(start, value, name));
         }
 
+        // Working with REFERENCES
+        void appendReference(const RideFilePoint &);
+        const QVector<RideFilePoint*> &referencePoints() const { return referencePoints_; }
+
         // Index offset calculations
         double timeToDistance(double) const;  // get distance in km at time in secs
         int timeIndex(double) const;          // get index offset for time in secs
@@ -217,6 +221,7 @@ class RideFile : public QObject // QObject to emit signals
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QVector<RideFilePoint*> dataPoints_;
+        QVector<RideFilePoint*> referencePoints_;
         RideFilePoint* minPoint;
         RideFilePoint* maxPoint;
         RideFilePoint* avgPoint;
