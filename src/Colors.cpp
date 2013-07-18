@@ -110,6 +110,7 @@ void GCColor::setupColors()
         { tr("Alternate Power"), "CALTPOWER", Qt::magenta },
         { tr("Left Balance"), "CBALANCELEFT", QColor(178,0,0) },
         { tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
+        { tr("Plot Markers"), "COLORCALIBRATIONMARKER", QColor(40,40,40) },
         { "", "", QColor(0,0,0) },
     };
 

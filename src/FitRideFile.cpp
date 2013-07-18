@@ -68,6 +68,7 @@ struct FitFileReaderState
     QMap<int, FitDefinition> local_msg_types;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
+    int calibration;
     int devices;
     bool stopped;
     int last_event_type;
@@ -76,7 +77,7 @@ struct FitFileReaderState
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), last_distance(0.00f), interval(0), devices(0), stopped(true),
+        last_time(0), last_distance(0.00f), interval(0), calibration(0), devices(0), stopped(true),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
     }
@@ -251,8 +252,10 @@ struct FitFileReaderState
     }
 
     void decodeEvent(const FitDefinition &def, int, const std::vector<fit_value_t> values) {
+        int time = -1;
         int event = -1;
         int event_type = -1;
+        qint16 data16 = -1;
         int i = 0;
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++];
@@ -261,10 +264,15 @@ struct FitFileReaderState
                 continue;
 
             switch (field.num) {
-                case 253: //time = value + qbase_time.toTime_t();
+                case 253: // timestamp field (s)
+                    time = value + qbase_time.toTime_t();
                           break;
-                case 0: event = value; break;
-                case 1: event_type = value; break;
+                case 0: // event field
+                    event = value; break;
+                case 1: // event_type field
+                    event_type = value; break;
+                case 2: // data16 field
+                    data16 = value; break;
                 default: ; // do nothing
             }
         }
@@ -292,7 +300,19 @@ struct FitFileReaderState
                     stopped = true;
                     break;
                 default:
-                    errors << QString("Unknown event type %1").arg(event_type);
+                    errors << QString("Unknown timer event type %1").arg(event_type);
+            }
+        }
+        else if (event == 36) { // Calibration event
+            int secs = (start_time==0?0:time-start_time);
+            switch (event_type) {
+                case 3: // marker
+                    ++calibration;
+                    rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
+                    qDebug() << "marker" << secs << data16;
+                    break;
+                default:
+                    errors << QString("Unknown calibration event type %1").arg(event_type);
             }
         }
         // printf("event type %d\n", event_type);
@@ -375,8 +395,10 @@ struct FitFileReaderState
                 case 13: temperature = value; break;
                 case 29: // ACCUMULATED_POWER
                          break;
-                case 30: lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);break;
-
+                case 30: lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);
+                         break;
+                case 31: // GPS Accuracy
+                         break;
                 default: unknown_record_fields.insert(field.num);
             }
         }
