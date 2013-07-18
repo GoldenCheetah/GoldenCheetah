@@ -1775,25 +1775,6 @@ MainWindow::downloadMeasuresFromZeo()
 }
 
 void
-MainWindow::exportMeasures()
-{
-    QDateTime start, end;
-    end = QDateTime::currentDateTime();
-    start.fromTime_t(0);
-
-    foreach (SummaryMetrics x, context->athlete->metricDB->db()->getAllMeasuresFor(start, end)) {
-//qDebug()<<x.getDateTime();
-//qDebug()<<x.getText("Weight", "0.0").toDouble();
-//qDebug()<<x.getText("Lean Mass", "0.0").toDouble();
-//qDebug()<<x.getText("Fat Mass", "0.0").toDouble();
-//qDebug()<<x.getText("Fat Ratio", "0.0").toDouble();
-    }
-}
-
-void
-MainWindow::importMeasures() { }
-
-void
 MainWindow::refreshCalendar()
 {
 #ifdef GC_HAVE_ICAL
@@ -1814,21 +1795,6 @@ MainWindow::uploadCalendar()
                                                // to set GID and upload date
 }
 #endif
-
-void
-MainWindow::importCalendar()
-{
-    // read an iCalendar format file
-}
-
-void
-MainWindow::exportCalendar()
-{
-    // write and iCalendar format file
-    // need options to decide wether to
-    // include past dates, workout plans only
-    // or also workouts themselves
-}
 
 #ifdef Q_OS_MAC
 void

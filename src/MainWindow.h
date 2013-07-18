@@ -139,28 +139,88 @@ class MainWindow : public QMainWindow
         void filterChanged(QStringList&);
 
     public slots:
+
+        // GUI
+#ifndef Q_OS_MAC
+        void toggleFullScreen();
+#endif
+        void splitterMoved(int, int);
+        void aboutDialog();
+        void helpView();
+        void logBug();
         void closeAll();
-        void addDevice();
+        void actionClicked(int);
+
+        // Search / Filter
+#ifdef Q_OS_MAC
+        void searchTextChanged(QString); // Mac Native Support
+#endif
+        void searchResults(QStringList); // from global search
+        void searchClear();
+
 
         void checkBlankState();
         void closeBlankTrain();
         void closeBlankAnal();
         void closeBlankDiary();
         void closeBlankHome();
+        void selectHome();
+        void selectDiary();
+        void selectAnalysis();
+        void selectTrain();
 
+        void setChartMenu();
+        void addChart(QAction*);
+        void setWindowMenu();
+        void selectWindow(QAction*);
+        void setSubChartMenu();
+        void dateChanged(const QDate &);
+
+
+        void showOptions();
+        void toggleSidebar();
+        void showSidebar(bool want);
+        void showToolbar(bool want);
+        void resetWindowLayout();
+        void toggleStyle();
+        void setStyle();
+        void setStyleFromSegment(int); // special case for linux/win qtsegmentcontrol toggline
+
+        // Analysis View
+        void setActivityMenu();
+        void showTools();
+        void showRhoEstimator();
+
+        // Training View
+        void addDevice();
         void downloadErgDB();
         void manageLibrary();
         void showWorkoutWizard();
+        void importWorkout();
 
-        // transitionary
+        // Diary View
+        void dateRangeChangedDiary(DateRange);
+        void refreshCalendar();
+#ifdef GC_HAVE_ICAL
+        void uploadCalendar(); // upload ride to calendar
+#endif
+
+        // LTM View
+        void dateRangeChangedLTM(DateRange);
+
+        // Measures View
+        void recordMeasure();
+        void downloadMeasures();
+        void downloadMeasuresFromZeo();
+
+        // Athlete Collection
+        void newCyclist();
+        void openCyclist();
+
+        // Activity Collection
         void rideSelected(RideItem*ride);
         bool saveRideSingleDialog(RideItem *);
         void saveSilent(RideItem *);
-
-    private slots:
-        void splitterMoved(int, int);
-        void newCyclist();
-        void openCyclist();
         void downloadRide();
         void manualRide();
         void exportRide();
@@ -173,82 +233,15 @@ class MainWindow : public QMainWindow
         void uploadTP();
         void downloadTP();
 #endif
-#ifdef GC_HAVE_ICAL
-        void uploadCalendar(); // upload ride to calendar
-#endif
         void importFile();
-        void importWorkout();
         void splitRide();
         void mergeRide();
         void deleteRide();
-        void aboutDialog();
         void saveRide();                        // save current ride menu item
         void revertRide();
         bool saveRideExitDialog();              // save dirty rides on exit dialog
-        void showOptions();
-        void showTools();
-        void showRhoEstimator();
-        void toggleSidebar();
-        void showSidebar(bool want);
-        void showToolbar(bool want);
-        void resetWindowLayout();
-        void dateChanged(const QDate &);
-
-        // working with measures, not rides
-        void recordMeasure();
-        void downloadMeasures();
-        void exportMeasures();
-        void importMeasures();
-        void downloadMeasuresFromZeo();
-
-        // get calendars
-        void refreshCalendar();
-        void importCalendar();
-        void exportCalendar();
-
-        void helpView();
-        void logBug();
-
-        void selectHome();
-        void selectDiary();
-        void selectAnalysis();
-        void selectTrain();
-
-        void setActivityMenu();
-        void setWindowMenu();
-        void selectWindow(QAction*);
-
-        void setChartMenu();
-        void setSubChartMenu();
-        void addChart(QAction*);
-
-        void toggleStyle();
-        void setStyle();
-        // special case for linux/win qtsegmentcontrol toggline
-        void setStyleFromSegment(int);
-
-#ifndef Q_OS_MAC
-        void toggleFullScreen();
-#else
-        // Mac Native Support
-        void searchTextChanged(QString);
-#endif
-        void actionClicked(int);
-
-        void dateRangeChangedDiary(DateRange);
-        void dateRangeChangedLTM(DateRange);
-
-        // from global search
-        void searchResults(QStringList);
-        void searchClear();
-
-
-    protected:
 
     private:
-
-        // active when right clicked
-        RideItem *activeRide; // currently active for context menu popup
 
 #ifdef Q_OS_MAC
         // Mac Native Support
