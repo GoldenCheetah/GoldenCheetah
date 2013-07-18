@@ -50,6 +50,31 @@ class AnalysisSidebar : public QWidget
         void setFilter(QStringList);
         void clearFilter();
 
+        // analysis menu
+        void analysisPopup();
+        void showActivityMenu(const QPoint &pos);
+
+        // interval menu
+        void intervalPopup();
+        void showIntervalMenu(const QPoint &pos);
+
+        // interval functions
+        void addIntervals();
+        void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);
+        void findPowerPeaks();
+        void editInterval(); // from right click
+        void deleteInterval(); // from right click
+        void renameInterval(); // from right click
+        void zoomInterval(); // from right click
+        void sortIntervals(); // from menu popup
+        void renameIntervalSelected(void); // from menu popup
+        void renameIntervalsSelected(void); // from menu popup -- rename a series
+        void editIntervalSelected(); // from menu popup
+        void deleteIntervalSelected(void); // from menu popup
+        void zoomIntervalSelected(void); // from menu popup
+        void frontInterval();
+        void backInterval();
+
     private:
 
         Context *context;
@@ -64,6 +89,7 @@ class AnalysisSidebar : public QWidget
         GcSplitterItem *intervalItem;
         QSplitter *intervalSplitter;
         IntervalSummaryWindow *intervalSummaryWindow;
+        IntervalItem *activeInterval; // currently active for context menu popup
 };
 
 #endif // _GC_AnalysisSidebar_h

@@ -148,7 +148,6 @@ class MainWindow : public QMainWindow
         void filterChanged(QStringList&);
 
     public slots:
-        void showTreeContextMenuPopup(const QPoint &);
         void closeAll();
         void addDevice();
 
@@ -161,9 +160,6 @@ class MainWindow : public QMainWindow
         void downloadErgDB();
         void manageLibrary();
         void showWorkoutWizard();
-
-        void analysisPopup();
-        void intervalPopup();
 
         // transitionary
         void rideSelected(RideItem*ride);
@@ -191,9 +187,6 @@ class MainWindow : public QMainWindow
 #endif
         void importFile();
         void importWorkout();
-        void addIntervals();
-        void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);
-        void findPowerPeaks();
         void splitRide();
         void mergeRide();
         void deleteRide();
@@ -209,19 +202,6 @@ class MainWindow : public QMainWindow
         void showToolbar(bool want);
         void resetWindowLayout();
         void dateChanged(const QDate &);
-        void showContextMenuPopup(const QPoint &);
-        void editInterval(); // from right click
-        void deleteInterval(); // from right click
-        void renameInterval(); // from right click
-        void zoomInterval(); // from right click
-        void sortIntervals(); // from menu popup
-        void renameIntervalSelected(void); // from menu popup
-        void renameIntervalsSelected(void); // from menu popup -- rename a series
-        void editIntervalSelected(); // from menu popup
-        void deleteIntervalSelected(void); // from menu popup
-        void zoomIntervalSelected(void); // from menu popup
-        void frontInterval();
-        void backInterval();
 
         // working with measures, not rides
         void recordMeasure();
@@ -277,7 +257,6 @@ class MainWindow : public QMainWindow
     private:
 
         // active when right clicked
-        IntervalItem *activeInterval; // currently active for context menu popup
         RideItem *activeRide; // currently active for context menu popup
 
 #ifdef Q_OS_MAC

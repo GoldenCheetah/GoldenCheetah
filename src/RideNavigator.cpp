@@ -1050,5 +1050,12 @@ ColumnChooser::buttonClicked(QString name)
 void
 RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 {
-   context->mainWindow->showTreeContextMenuPopup(mapToGlobal(pos));
+    // map to global does not take into account the height of the header (??)
+    // so we take it off the result of map to global
+
+    // in the past this called mainwindow routinesfor the menu -- that was
+    // a bad design since it coupled the ride navigator with the gui
+    // we emit signals now, which only the sidebar is interested in trapping
+    // so the activity log for example doesn't have a context menu now
+    emit customContextMenuRequested(tableView->mapToGlobal(pos+QPoint(0,tableView->header()->geometry().height())));
 }

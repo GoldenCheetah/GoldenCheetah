@@ -81,6 +81,8 @@ class RideNavigator : public GcWindow
 
     signals:
 
+        void customContextMenuRequested(const QPoint &);
+
     public slots:
         void refresh();
 
