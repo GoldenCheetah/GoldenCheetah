@@ -805,6 +805,7 @@ AllPlot::recalc()
     }
 
     setYMax();
+    refreshReferenceLines();
     refreshIntervalMarkers();
     refreshCalibrationMarkers();
     refreshZoneLabels();
@@ -874,6 +875,70 @@ AllPlot::refreshCalibrationMarkers()
         }
     }
 }
+
+void
+AllPlot::refreshReferenceLines()
+{
+    foreach(QwtPlotCurve *referenceLine, referenceLines) {
+        referenceLine->detach();
+        delete referenceLine;
+    }
+    referenceLines.clear();
+    if (rideItem->ride()) {
+        foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
+            QwtPlotCurve *referenceLine;
+
+            QVector<double> xaxis;
+            QVector<double> yaxis;
+            if (bydist) {
+                xaxis.append(referencePlot == NULL ? smoothDistance.first() : referencePlot->smoothDistance.first());
+                xaxis.append(referencePlot == NULL ? smoothDistance.last() : referencePlot->smoothDistance.last());
+
+            } else {
+                xaxis.append(referencePlot == NULL ? smoothTime.first() : referencePlot->smoothTime.first());
+                xaxis.append(referencePlot == NULL ? smoothTime.last() : referencePlot->smoothTime.last());
+            }
+
+            if (referencePoint->watts != 0)  {
+                referenceLine = new QwtPlotCurve(tr("Power Ref"));
+                referenceLine->setYAxis(yLeft);
+                QPen wattsPen = QPen(GColor(CPOWER));
+                wattsPen.setWidth(1);
+                wattsPen.setStyle(Qt::DashLine);
+                referenceLine->setPen(wattsPen);
+
+                yaxis.append(referencePoint->watts);
+                yaxis.append(referencePoint->watts);
+            } else if (referencePoint->hr != 0)  {
+                referenceLine = new QwtPlotCurve(tr("Heart Rate Ref"));
+                referenceLine->setYAxis(yLeft);
+                QPen hrPen = QPen(GColor(CHEARTRATE));
+                hrPen.setWidth(1);
+                hrPen.setStyle(Qt::DashLine);
+                referenceLine->setPen(hrPen);
+
+                yaxis.append(referencePoint->hr);
+                yaxis.append(referencePoint->hr);
+            } else if (referencePoint->cad != 0)  {
+                referenceLine = new QwtPlotCurve(tr("Cadence Ref"));
+                referenceLine->setYAxis(yLeft);
+                QPen cadPen = QPen(GColor(CCADENCE));
+                cadPen.setWidth(1);
+                cadPen.setStyle(Qt::DashLine);
+                referenceLine->setPen(cadPen);
+
+                yaxis.append(referencePoint->cad);
+                yaxis.append(referencePoint->cad);
+            }
+
+            referenceLine->setData(xaxis,yaxis);
+            referenceLine->attach(this);
+            referenceLine->setVisible(true);
+            referenceLines.append(referenceLine);
+        }
+    }
+}
+
 
 void
 AllPlot::setYMax()
@@ -1211,6 +1276,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
 
 
+    refreshReferenceLines();
     refreshIntervalMarkers();
     refreshCalibrationMarkers();
     refreshZoneLabels();
@@ -1354,6 +1420,16 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         foreach(QwtPlotMarker *mrk, d_mrk)
             delete mrk;
         d_mrk.clear();
+
+        foreach(QwtPlotMarker *mrk, cal_mrk)
+            delete mrk;
+        cal_mrk.clear();
+
+        foreach(QwtPlotCurve *referenceLine, referenceLines) {
+            referenceLine->detach();
+            delete referenceLine;
+        }
+        referenceLines.clear();
     }
 }
 

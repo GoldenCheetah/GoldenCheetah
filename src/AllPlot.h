@@ -62,6 +62,7 @@ class AllPlot : public QwtPlot
         void refreshZoneLabels();
         void refreshIntervalMarkers();
         void refreshCalibrationMarkers();
+        void refreshReferenceLines();
         void setAxisTitle(int axis, QString label);
 
         // refresh data / plot parameters
@@ -133,6 +134,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *balanceRCurve;
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QList <AllPlotZoneLabel *> zoneLabels;
+        QVector<QwtPlotCurve*> referenceLines;
 
         // source data
         QVector<double> hrArray;

@@ -698,3 +698,9 @@ RideFile::getWeight()
 
     return weight_;
 }
+
+void RideFile::appendReference(const RideFilePoint &point)
+{
+    referencePoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,point.watts,point.alt,point.lon,point.lat,
+                                         point.headwind, point.slope, point.temp, point.lrbalance, point.interval));
+}

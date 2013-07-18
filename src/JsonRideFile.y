@@ -221,8 +221,8 @@ references: REFERENCES ':' '[' reference_list ']'
                                           JsonPoint = RideFilePoint();
                                         }
 reference_list: reference | reference_list ',' reference;
-reference: '{' series '}'               { //JsonRide->appendReference(JsonPoint);
-                                          //JsonPoint = RideFilePoint();
+reference: '{' series '}'               { JsonRide->appendReference(JsonPoint);
+                                          JsonPoint = RideFilePoint();
                                         }
 
 /*
@@ -438,6 +438,30 @@ JsonFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) c
             out << "\"NAME\":\"" << protect(i.name) << "\"";
             out << ", \"START\": " << QString("%1").arg(i.start);
             out << ", \"VALUE\": " << QString("%1").arg(i.value) << " }";
+        }
+        out <<"\n\t\t]";
+    }
+
+    //
+    // REFERENCES
+    //
+    if (!ride->referencePoints().empty()) {
+
+        out << ",\n\t\t\"REFERENCES\":[\n";
+        bool first = true;
+
+        foreach (RideFilePoint *p, ride->referencePoints()) {
+            if (first) first=false;
+            else out << ",\n";
+
+            out << "\t\t\t{ ";
+
+            if (p->watts > 0) out << " \"WATTS\":" << QString("%1").arg(p->watts);
+            if (p->cad > 0) out << " \"CAD\":" << QString("%1").arg(p->cad);
+            if (p->hr > 0) out << " \"HR\":"  << QString("%1").arg(p->hr);
+
+            // sample points in here!
+            out << " }";
         }
         out <<"\n\t\t]";
     }
