@@ -39,9 +39,9 @@
 #include <QtGui>
 #include <QDebug>
 #include "qxtscheduleview.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "MainWindow.h"
 #include "RideItem.h"
 #include "RideMetadata.h"
 #ifdef GC_HAVE_ICAL

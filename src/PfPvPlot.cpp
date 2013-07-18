@@ -18,7 +18,6 @@
  */
 
 #include "PfPvPlot.h"
-#include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "RideFile.h"

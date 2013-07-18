@@ -27,7 +27,6 @@
 #include <sstream>
 #include <string>
 #include "RideFile.h"
-#include "MainWindow.h"
 #include "Context.h"
 
 class QMouseEvent;

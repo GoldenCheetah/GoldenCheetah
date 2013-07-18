@@ -17,7 +17,6 @@
  */
 
 #include "ManualRideDialog.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Settings.h"

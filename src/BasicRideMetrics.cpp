@@ -207,10 +207,10 @@ class ElevationGain : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const Context *context) {
+                 const Context *) {
 
         // hysteresis can be configured, we default to 3.0
-        double hysteresis = appsettings->value((QObject*)context->mainWindow, GC_ELEVATION_HYSTERESIS).toDouble();
+        double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
         if (hysteresis <= 0.1) hysteresis = 3.00;
 
         bool first = true;

@@ -17,7 +17,6 @@
  */
 
 #include "PfPvWindow.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "PfPvPlot.h"
