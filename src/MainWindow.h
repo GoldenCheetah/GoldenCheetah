@@ -110,7 +110,6 @@ class MainWindow : public QMainWindow
 
         // state data
         int session;
-        bool init; // we built children (i.e. didn't quit at upgrade)
 
         // global filters
         bool isfiltered;
