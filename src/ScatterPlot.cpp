@@ -18,7 +18,6 @@
 
 #include "ScatterPlot.h"
 #include "ScatterWindow.h"
-#include "MainWindow.h"
 #include "IntervalItem.h"
 #include "Context.h"
 #include "Context.h"

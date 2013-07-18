@@ -17,7 +17,6 @@
  */
 
 #include "TtbDialog.h"
-#include "MainWindow.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "TimeUtils.h"

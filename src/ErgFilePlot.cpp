@@ -18,7 +18,6 @@
 
 
 #include "ErgFilePlot.h"
-#include "MainWindow.h"
 #include "Context.h"
 
 // Bridge between QwtPlot and ErgFile to avoid having to

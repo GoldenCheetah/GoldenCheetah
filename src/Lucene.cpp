@@ -17,7 +17,6 @@
  */
 
 #include "Lucene.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 

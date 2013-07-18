@@ -17,7 +17,6 @@
  */
 
 #include "BestIntervalDialog.h"
-#include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "IntervalItem.h"

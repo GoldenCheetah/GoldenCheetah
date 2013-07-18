@@ -18,7 +18,6 @@
 
 #include "ModelWindow.h"
 #include "ModelPlot.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"

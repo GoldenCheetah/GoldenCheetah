@@ -18,7 +18,6 @@
 
 
 #include "RealtimePlotWindow.h"
-#include "MainWindow.h"
 #include "Athlete.h"
 
 RealtimePlotWindow::RealtimePlotWindow(Context *context) :

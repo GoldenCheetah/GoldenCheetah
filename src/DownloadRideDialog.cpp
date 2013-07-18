@@ -20,7 +20,6 @@
 
 #include "DownloadRideDialog.h"
 #include "Device.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Settings.h"

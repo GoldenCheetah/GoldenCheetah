@@ -17,7 +17,6 @@
  */
 
 #include "ScatterWindow.h"
-#include "MainWindow.h"
 #include "ScatterPlot.h"
 #include "Athlete.h"
 #include "Context.h"

@@ -16,9 +16,10 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideFile.h"
+#include "RideMetric.h"
 #include "IntervalItem.h"
 #include "IntervalSummaryWindow.h"
 #include "Settings.h"

@@ -32,11 +32,8 @@
 #endif
 
 class HomeWindow;
-class IntervalSummaryWindow;
-class RideNavigator;
 class GcToolBar;
 class DiarySidebar;
-class GcMultiCalendar;
 class LTMSidebar;
 class AnalysisSidebar;
 class LionFullScreen;
@@ -51,12 +48,8 @@ class BlankStateAnalysisPage;
 class BlankStateHomePage;
 class BlankStateDiaryPage;
 class BlankStateTrainPage;
-class GcSplitter;
-class GcSplitterItem;
 class QtSegmentControl;
 class SaveSingleDialogWidget;
-class SplitActivityWizard;
-class IntervalItem;
 
 class MainWindow;
 class Athlete;
@@ -73,7 +66,6 @@ class MainWindow : public QMainWindow
     // transitional
     friend class ::Context;
     friend class ::SaveSingleDialogWidget;
-    friend class ::SplitActivityWizard;
 
     public:
 
