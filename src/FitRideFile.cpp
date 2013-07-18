@@ -309,10 +309,11 @@ struct FitFileReaderState
                 case 3: // marker
                     ++calibration;
                     rideFile->addCalibration(secs, data16, QString("Calibration %1 (%2)").arg(calibration).arg(data16));
-                    qDebug() << "marker" << secs << data16;
+                    //qDebug() << "marker" << secs << data16;
                     break;
                 default:
                     errors << QString("Unknown calibration event type %1").arg(event_type);
+                    break;
             }
         }
         // printf("event type %d\n", event_type);
