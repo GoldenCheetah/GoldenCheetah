@@ -25,37 +25,15 @@
 #include "ChooseCyclistDialog.h"
 #include "Colors.h"
 #include "ConfigDialog.h"
-#include "PwxRideFile.h"
-#include "TcxRideFile.h"
-#include "GcRideFile.h"
-#include "JsonRideFile.h"
-#ifdef GC_HAVE_KML
-#include "KmlRideFile.h"
-#endif
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
-#include "IntervalTreeView.h"
-#include "IntervalSummaryWindow.h"
-#ifdef GC_HAVE_ICAL
-#include "DiaryWindow.h"
-#endif
-#include "RideNavigator.h"
 #include "RideFile.h"
-#include "RideFileCache.h"
 #include "RideImportWizard.h"
-#include "RideMetadata.h"
-#include "RideMetric.h"
 #include "Settings.h"
-#include "TimeUtils.h"
-#include "Units.h"
-#include "Zones.h"
-
-#include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 #include "ToolsRhoEstimator.h"
-#include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "BatchExportDialog.h"
@@ -79,7 +57,6 @@
 #include "TPDownloadDialog.h"
 #endif
 #ifdef GC_HAVE_ICAL
-#include "ICalendar.h"
 #include "CalDAV.h"
 #endif
 #include "HelpWindow.h"
@@ -114,10 +91,6 @@
 #include <QtGui>
 #include <QRegExp>
 #include <QNetworkProxyQuery>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_picker.h>
-#include <qwt_plot_grid.h>
-#include <qwt_series_data.h>
 
 #include "Library.h"
 #include "LibraryParser.h"
