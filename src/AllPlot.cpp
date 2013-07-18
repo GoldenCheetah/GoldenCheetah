@@ -861,10 +861,10 @@ AllPlot::refreshCalibrationMarkers()
             mrk->attach(this);
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            mrk->setLinePen(QPen(GColor(CCALIBRATIONMARKER), 0, Qt::DashDotLine));
+            mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             QwtText text("\n\n"+calibration.name);
             text.setFont(QFont("Helvetica", 9, QFont::Bold));
-            text.setColor(GColor(CCALIBRATIONMARKER));
+            text.setColor(GColor(CPLOTMARKER));
             if (!bydist)
                 mrk->setValue(calibration.start / 60.0, 0.0);
             else
