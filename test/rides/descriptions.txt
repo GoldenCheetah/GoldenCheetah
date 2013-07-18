@@ -70,3 +70,7 @@ lgulseth...pwx
    A very short ride (12 seconds) to test array processing and general
    bounds checking in the GC codebase.
 
+20130716_202738.fit
+20130717_143733.fit
+   Two rides that contain the calibration messages collected from 
+   an osync headunit.
