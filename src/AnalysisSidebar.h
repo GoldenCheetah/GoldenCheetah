@@ -75,13 +75,19 @@ class AnalysisSidebar : public QWidget
         void frontInterval();
         void backInterval();
 
+
+    protected:
+
+        friend class ::SearchBox;
+        RideNavigator *rideNavigator;
+
     private:
 
         Context *context;
         GcSplitter *splitter;
 
         GcSplitterItem *activityItem;
-        RideNavigator *rideNavigator;
+        QSignalMapper *groupByMapper;
 
         GcSplitterItem *calendarItem;
         GcMultiCalendar *calendarWidget;
