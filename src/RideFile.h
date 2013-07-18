@@ -74,6 +74,19 @@ struct RideFileInterval
     bool operator< (RideFileInterval right) const { return start < right.start; }
 };
 
+struct RideFileCalibration
+{
+    double start;
+    int value;
+    QString name;
+    RideFileCalibration() : start(0.0), value(0) {}
+    RideFileCalibration(double start, int value, QString name) :
+        start(start), value(value), name(name) {}
+
+    // order bu start time
+    bool operator< (RideFileCalibration right) const { return start < right.start; }
+};
+
 class RideFile : public QObject // QObject to emit signals
 {
     Q_OBJECT
@@ -139,6 +152,12 @@ class RideFile : public QObject // QObject to emit signals
         void fillInIntervals();
         int intervalBegin(const RideFileInterval &interval) const;
 
+        // Working with CAIBRATIONS
+        const QList<RideFileCalibration> &calibrations() const { return calibrations_; }
+        void addCalibration(double start, int value, const QString &name) {
+            calibrations_.append(RideFileCalibration(start, value, name));
+        }
+
         // Index offset calculations
         double timeToDistance(double) const;  // get distance in km at time in secs
         int timeIndex(double) const;          // get index offset for time in secs
@@ -196,6 +215,7 @@ class RideFile : public QObject // QObject to emit signals
         QString deviceType_;
         QString fileFormat_;
         QList<RideFileInterval> intervals_;
+        QList<RideFileCalibration> calibrations_;
         QMap<QString,QString> tags_;
         EditorData *data;
         double weight_; // cached to save calls to getWeight();

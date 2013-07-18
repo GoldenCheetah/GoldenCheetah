@@ -43,6 +43,7 @@ static RideFile *JsonRide;
 // term state data is held in these variables
 static RideFilePoint JsonPoint;
 static RideFileInterval JsonInterval;
+static RideFileCalibration JsonCalibration;
 static QString JsonString,
                JsonTagKey, JsonTagValue,
                JsonOverName, JsonOverKey, JsonOverValue;
@@ -108,6 +109,7 @@ static QString unprotect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
+%token CALIBRATIONS VALUE
 %token REFERENCES
 %token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE
 
@@ -136,6 +138,7 @@ rideelement: starttime
             | overrides
             | tags
             | intervals
+            | calibrations
             | references
             | samples
             ;
@@ -193,6 +196,22 @@ interval: '{' NAME ':' string ','       { JsonInterval.name = JsonString; }
                                                                 JsonInterval.name);
                                           JsonInterval = RideFileInterval();
                                         }
+
+/*
+ * Calibrations
+ */
+calibrations: CALIBRATIONS ':' '[' calibration_list ']' ;
+calibration_list: calibration | calibration_list ',' calibration ;
+calibration: '{' NAME ':' string ','    { JsonCalibration.name = JsonString; }
+                 START ':' number ','   { JsonCalibration.start = JsonNumber; }
+                 VALUE ':' number       { JsonCalibration.value = JsonNumber; }
+             '}'
+                                        { JsonRide->addCalibration(JsonCalibration.start,
+                                                                   JsonCalibration.value,
+                                                                   JsonCalibration.name);
+                                          JsonCalibration = RideFileCalibration();
+                                        }
+
 
 /*
  * Ride references
@@ -399,6 +418,26 @@ JsonFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) c
             out << "\"NAME\":\"" << protect(i.name) << "\"";
             out << ", \"START\": " << QString("%1").arg(i.start);
             out << ", \"STOP\": " << QString("%1").arg(i.stop) << " }";
+        }
+        out <<"\n\t\t]";
+    }
+
+    //
+    // CALIBRATION
+    //
+    if (!ride->calibrations().empty()) {
+
+        out << ",\n\t\t\"CALIBRATIONS\":[\n";
+        bool first = true;
+
+        foreach (RideFileCalibration i, ride->calibrations()) {
+            if (first) first=false;
+            else out << ",\n";
+
+            out << "\t\t\t{ ";
+            out << "\"NAME\":\"" << protect(i.name) << "\"";
+            out << ", \"START\": " << QString("%1").arg(i.start);
+            out << ", \"VALUE\": " << QString("%1").arg(i.value) << " }";
         }
         out <<"\n\t\t]";
     }
