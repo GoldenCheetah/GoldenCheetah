@@ -476,8 +476,8 @@ HomeWindow::dropEvent(QDropEvent *event)
 void
 HomeWindow::showControls()
 {
-    context->mainWindow->chartSettings->adjustSize();
-    context->mainWindow->chartSettings->show();
+    context->mainWindow->chartsettings()->adjustSize();
+    context->mainWindow->chartsettings()->show();
 }
 
 void

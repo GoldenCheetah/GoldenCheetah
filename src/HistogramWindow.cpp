@@ -528,7 +528,6 @@ HistogramWindow::switchMode()
         // select the series.. (but without the half second delay)
         treeSelectionTimeout();
     }
-    context->mainWindow->chartSettings->adjustSize();
 
     stale = true;
     updateChart(); // to whatever is currently selected.
