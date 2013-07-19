@@ -285,7 +285,6 @@ HEADERS += \
         GcUpgrade.h \
         GcWindowLayout.h \
         GcWindowRegistry.h \
-        GcWindowTool.h \
         GoldenCheetah.h \
         GoogleMapControl.h \
         GpxParser.h \
@@ -474,7 +473,6 @@ SOURCES += \
         GcUpgrade.cpp \
         GcWindowLayout.cpp \
         GcWindowRegistry.cpp \
-        GcWindowTool.cpp \
         GoldenCheetah.cpp \
         GoogleMapControl.cpp \
         GpxParser.cpp \

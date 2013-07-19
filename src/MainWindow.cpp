@@ -49,7 +49,6 @@
 #include "AddDeviceWizard.h"
 #include "TrainSidebar.h"
 
-#include "GcWindowTool.h"
 #include "GcToolBar.h"
 #include "GcSideBarItem.h"
 #ifdef GC_HAVE_SOAP
