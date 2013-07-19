@@ -61,7 +61,8 @@ void RideWindow::loadRide()
 
 RideWindow::RideWindow(Context *context) :
     GcWindow(context),
-    rideLoaded(false)
+    rideLoaded(false),
+    context(context)
 {
     setInstanceName("Ride Window");
     view = new QWebView();
