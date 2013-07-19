@@ -260,7 +260,6 @@ HEADERS += \
         CsvRideFile.h \
         DataProcessor.h \
         DBAccess.h \
-        DatePickerDialog.h \
         DaysScaleDraw.h \
         Device.h \
         DeviceTypes.h \
@@ -445,7 +444,6 @@ SOURCES += \
         DanielsPoints.cpp \
         DataProcessor.cpp \
         DBAccess.cpp \
-        DatePickerDialog.cpp \
         Device.cpp \
         DeviceTypes.cpp \
         DeviceConfiguration.cpp \
