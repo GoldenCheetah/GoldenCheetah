@@ -17,6 +17,8 @@
 */
 
 #include "QTFullScreen.h"
+#include "Context.h"
+#include "MainWindow.h"
 
 QTFullScreen::QTFullScreen(Context *context) : QObject(context->mainWindow), context(context), isFull(false)
 {
