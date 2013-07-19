@@ -19,10 +19,10 @@
 #ifndef _GC_LTMWindow_h
 #define _GC_LTMWindow_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h" // for isfiltered and filters
 
 #include <QtGui>
 #include <QTimer>
-#include "MainWindow.h"
 #include "Context.h"
 #include "MetricAggregator.h"
 #include "Season.h"

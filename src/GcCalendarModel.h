@@ -35,13 +35,13 @@
 #ifndef _GC_GcCalendarModel_h
 #define _GC_GcCalendarModel_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
 
 #include <QtGui>
 #include <QDebug>
 #include "qxtscheduleview.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "MainWindow.h"
 #include "RideItem.h"
 #include "RideMetadata.h"
 #ifdef GC_HAVE_ICAL

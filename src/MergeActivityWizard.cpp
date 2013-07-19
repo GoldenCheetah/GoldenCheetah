@@ -18,6 +18,7 @@
 
 #include "MergeActivityWizard.h"
 #include "Context.h"
+#include "MainWindow.h"
 
 /**
  * Wizard to merge 2 files from same ride

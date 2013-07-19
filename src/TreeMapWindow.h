@@ -19,7 +19,7 @@
 #ifndef _GC_TreeMapWindow_h
 #define _GC_TreeMapWindow_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "MainWindow.h" // or isfiltered and filters
 
 #include <QtGui>
 #include <QTimer>

@@ -20,8 +20,8 @@
 #ifndef _GC_PowerHist_h
 #define _GC_PowerHist_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
 #include "RideFile.h"
+#include "RideItem.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Zones.h"

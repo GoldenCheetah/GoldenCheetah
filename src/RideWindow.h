@@ -28,7 +28,6 @@
 #include <limits>
 #include "TrainSidebar.h"
 #include "RealtimeController.h"
-#include "MainWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
 
@@ -320,7 +319,7 @@ public:
     RealtimeRider(Context *context)
     {
         curPosition = 1;
-        connect(context->mainWindow,SIGNAL(telemetryUpdate(const RealtimeData &)), this,SLOT(telemetryUpdate(const RealtimeData &)));
+        connect(context,SIGNAL(telemetryUpdate(const RealtimeData &)), this,SLOT(telemetryUpdate(const RealtimeData &)));
     }
 };
 

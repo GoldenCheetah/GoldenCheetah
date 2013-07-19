@@ -19,11 +19,10 @@
 #ifndef _GC_LionFullScreen_h
 #define _GC_LionFullScreen_h 1
 
-#include "GoldenCheetah.h"
+#include "Context.h"
 
 // QT stuff etc
 #include <QtGui>
-#include "MainWindow.h"
 
 class LionFullScreen : public QObject
 {
@@ -31,7 +30,7 @@ class LionFullScreen : public QObject
 
     public:
 
-        LionFullScreen(MainWindow *main);
+        LionFullScreen(Context *context);
 
         // found in the supplied directory
         void toggle();
@@ -40,7 +39,7 @@ class LionFullScreen : public QObject
         bool eventFilter(QObject *obj, QEvent *event);
 
     private:
-        MainWindow *main;
+        Context *context;
 };
 
 #endif // _GC_LionFullScreen_h
