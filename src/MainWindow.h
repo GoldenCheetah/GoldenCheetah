@@ -71,61 +71,22 @@ class MainWindow : public QMainWindow
 
         MainWindow(const QDir &home);
 
-        // transitionary
-        Context *context;
-
-        // filters changed
-        void notifyFilter(QStringList f) { filters = f; emit filterChanged(f); }
-
-        // *********************************************
-        // MAINWINDOW STATE / GUI DATA
-        // *********************************************
-
-        // Top-level views
-        HomeWindow *homeWindow;
-        HomeWindow *diaryWindow;
-        HomeWindow *trainWindow;
-        HomeWindow *analWindow;
-        HomeWindow *currentWindow;  // tracks the curerntly showing window
-
-        BlankStateAnalysisPage *blankStateAnalysisPage;
-        BlankStateHomePage *blankStateHomePage;
-        BlankStateDiaryPage *blankStateDiaryPage;
-        BlankStateTrainPage *blankStateTrainPage;
-
-        bool showBlankAnal;
-        bool showBlankTrain;
-        bool showBlankHome;
-        bool showBlankDiary;
-
-        ChartSettings *chartSettings;
-
         // state data
-        int session;
+        int session; // by DBAccess
 
         // global filters
-        bool isfiltered;
-        QStringList filters;
+        bool isfiltered; // used by lots of charts
+        QStringList filters; // used by lots of charts
 
-        // splitter for sidebar and main view
-        QSplitter *splitter;
+        // temporary access to chart settings
+        ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
 
-        // sidebar and views
-        QStackedWidget *toolBox; // contains all left sidebars
-        QStackedWidget *views;   // contains all the views
+        // temporary access to the sidebars
+        AnalysisSidebar *analysissidebar() {return analysisSidebar; } // by SearchBox
+        TrainSidebar *trainsidebar() {return trainSidebar; } // by ErgDBDownloadDialog
 
-        // sidebars
-        AnalysisSidebar *analysisSidebar;
-        TrainSidebar *trainSidebar; // train view
-        LTMSidebar *ltmSidebar; // home view
-        DiarySidebar *diarySidebar; // diary
-
-#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
-        LionFullScreen *fullScreen;
-#endif
-#ifndef Q_OS_MAC
-        QTFullScreen *fullScreen;
-#endif
+        // temporary access to the context
+        Context *contextmain() { return context; } // by ChooseCyclistDialog
 
     protected:
 
@@ -242,6 +203,47 @@ class MainWindow : public QMainWindow
         bool saveRideExitDialog();              // save dirty rides on exit dialog
 
     private:
+
+        Context *context;
+
+        // Top-level views
+        HomeWindow *homeWindow;
+        HomeWindow *diaryWindow;
+        HomeWindow *trainWindow;
+        HomeWindow *analWindow;
+        HomeWindow *currentWindow;  // tracks the curerntly showing window
+
+        BlankStateAnalysisPage *blankStateAnalysisPage;
+        BlankStateHomePage *blankStateHomePage;
+        BlankStateDiaryPage *blankStateDiaryPage;
+        BlankStateTrainPage *blankStateTrainPage;
+
+        bool showBlankAnal;
+        bool showBlankTrain;
+        bool showBlankHome;
+        bool showBlankDiary;
+
+        ChartSettings *chartSettings;
+
+        // splitter for sidebar and main view
+        QSplitter *splitter;
+
+        // sidebar and views
+        QStackedWidget *toolBox; // contains all left sidebars
+        QStackedWidget *views;   // contains all the views
+
+        // sidebars
+        AnalysisSidebar *analysisSidebar;
+        TrainSidebar *trainSidebar; // train view
+        LTMSidebar *ltmSidebar; // home view
+        DiarySidebar *diarySidebar; // diary
+
+#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
+        LionFullScreen *fullScreen;
+#endif
+#ifndef Q_OS_MAC
+        QTFullScreen *fullScreen;
+#endif
 
 #ifdef Q_OS_MAC
         // Mac Native Support
