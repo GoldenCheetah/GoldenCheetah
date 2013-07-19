@@ -251,7 +251,6 @@ class MainWindow : public QMainWindow
         QPushButton *import, *compose, *sidebar;
         QtSegmentControl *actbuttons, *styleSelector;
         GcToolBar *head;
-        QPushButton *full;
 
         // the icons
         QIcon importIcon, composeIcon, intervalIcon, splitIcon,
@@ -282,7 +281,6 @@ class MainWindow : public QMainWindow
 
         // Miscellany
         QSignalMapper *toolMapper;
-
 };
 
 #endif // _GC_MainWindow_h
