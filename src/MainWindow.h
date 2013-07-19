@@ -63,10 +63,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     G_OBJECT
 
-    // transitional
-    friend class ::Context;
-    friend class ::SaveSingleDialogWidget;
-
     public:
 
         MainWindow(const QDir &home);
