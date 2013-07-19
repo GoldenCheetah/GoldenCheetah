@@ -17,20 +17,21 @@
 */
 
 #include "LionFullScreen.h"
+#include "MainWindow.h"
 
 // which version of the SDK?
 #include <Availability.h>
 
-LionFullScreen::LionFullScreen(MainWindow *main) : QObject(main), main(main)
+LionFullScreen::LionFullScreen(Context *context) : QObject(context->mainWindow), context(context)
 {
 #ifdef GC_HAVE_LION
     // lets enable fullscreen stuff
-    NSView *nsview = (NSView *) main->winId(); 
+    NSView *nsview = (NSView *) context->mainWindow->winId(); 
     NSWindow *nswindow = [nsview window];
     [nswindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 
     // watch for ESC key being hit when in full screen
-    main->installEventFilter(this);
+    context->mainWindow->installEventFilter(this);
 #endif
 }
 
@@ -38,7 +39,7 @@ bool
 LionFullScreen::eventFilter(QObject *obj, QEvent *event)
 {
 #ifdef GC_HAVE_LION
-    if (obj != main) return false;
+    if (obj != context->mainWindow) return false;
 
     // Ctrl-Cmd-F toggles
     if (event->type() == QEvent::KeyPress &&
@@ -53,7 +54,7 @@ LionFullScreen::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent *>(event)->key() == Qt::Key_Escape) {
 
         // if in full screen then toggle, otherwise do nothing
-        NSView *nsview = (NSView *) main->winId();
+        NSView *nsview = (NSView *) context->mainWindow->winId();
         NSWindow *nswindow = [nsview window];
         NSUInteger masks = [nswindow styleMask];
         if (masks & NSFullScreenWindowMask) toggle();
@@ -69,7 +70,7 @@ LionFullScreen::toggle()
 {
 #ifdef GC_HAVE_LION
     // toggle full screen back
-    NSView *nsview = (NSView *) main->winId();
+    NSView *nsview = (NSView *) context->mainWindow->winId();
     NSWindow *nswindow = [nsview window];
     [nswindow toggleFullScreen:nil];
 #endif

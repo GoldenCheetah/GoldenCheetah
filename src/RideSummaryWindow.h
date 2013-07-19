@@ -19,7 +19,7 @@
 #ifndef _GC_RideSummaryWindow_h
 #define _GC_RideSummaryWindow_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "MainWindow.h" // for isfiltered and filters
 #include "Context.h"
 
 #include <QWidget>

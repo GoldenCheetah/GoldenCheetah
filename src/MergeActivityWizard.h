@@ -19,7 +19,6 @@
 #ifndef _MergeActivityWizard_h
 #define _MergeActivityWizard_h
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideFile.h"

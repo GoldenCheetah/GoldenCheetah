@@ -20,7 +20,8 @@
 #ifndef _GC_HistogramWindow_h
 #define _GC_HistogramWindow_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h"
+#include "MainWindow.h" // for isfiltered and filters
+
 #include "Context.h"
 #include "Athlete.h"
 #include "MetricAggregator.h"
