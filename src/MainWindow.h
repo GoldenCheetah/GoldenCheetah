@@ -125,12 +125,10 @@ class MainWindow : public QMainWindow
         void selectTrain();
 
         void setChartMenu();
+        void setSubChartMenu();
         void addChart(QAction*);
         void setWindowMenu();
         void selectWindow(QAction*);
-        void setSubChartMenu();
-        void dateChanged(const QDate &);
-
 
         void showOptions();
         void toggleSidebar();
@@ -164,7 +162,6 @@ class MainWindow : public QMainWindow
         void dateRangeChangedLTM(DateRange);
 
         // Measures View
-        void recordMeasure();
         void downloadMeasures();
         void downloadMeasuresFromZeo();
 
