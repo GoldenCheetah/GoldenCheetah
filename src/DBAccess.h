@@ -42,61 +42,62 @@ class DBAccess
 
 	public:
 
-    // get connection name
-    QSqlDatabase connection() { return dbconn; }
+        // get connection name
+        QSqlDatabase connection() { return db->database(sessionid); }
 
-    // check the db structure is up to date
-    void checkDBVersion();
+        // check the db structure is up to date
+        void checkDBVersion();
 
-    // get schema version
-    int getDBVersion();
+        // get schema version
+        int getDBVersion();
 
-    // create and drop connections
-	DBAccess(Context *context);
-    ~DBAccess();
+        // create and drop connections
+	    DBAccess(Context *context);
+        ~DBAccess();
 
-    // Create/Delete Metrics
-	bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long, bool);
-    bool deleteRide(QString);
+        // Create/Delete Metrics
+	    bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long, bool);
+        bool deleteRide(QString);
 
-    // Create/Delete Measures
-    bool importMeasure(SummaryMetrics *summaryMetrics);
+        // Create/Delete Measures
+        bool importMeasure(SummaryMetrics *summaryMetrics);
 
-    // Query Records
-    QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
-    QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
-        return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
-    }
+        // Query Records
+        QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
+        QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
+            return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
+        }
 
-    bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
-    QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
-    QList<SummaryMetrics> getAllMeasuresFor(DateRange dr) { 
-        return getAllMeasuresFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
-    }
+        bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
+        QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
+        QList<SummaryMetrics> getAllMeasuresFor(DateRange dr) { 
+            return getAllMeasuresFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
+        }
 
-    SummaryMetrics getRideMetrics(QString filename); // for a filename
+        SummaryMetrics getRideMetrics(QString filename); // for a filename
 
-	QList<QDateTime> getAllDates();
-    QList<Season> getAllSeasons();
+	    QList<QDateTime> getAllDates();
+        QList<Season> getAllSeasons();
 
 	private:
-    Context *context;
-    QSqlDatabase dbconn;
-    QString sessionid;
 
-    SpecialFields msp;
-    QList<FieldDefinition> mfieldDefinitions;
-    QList<KeywordDefinition> mkeywordDefinitions; //NOTE: not used in measures.xml
-    QString mcolorfield;
+        Context *context;
+        QSqlDatabase *db;
+        QSqlDatabase dbconn;
+        QString sessionid;
 
-	typedef QHash<QString,RideMetric*> MetricMap;
+        SpecialFields msp;
+        QList<FieldDefinition> mfieldDefinitions;
+        QList<KeywordDefinition> mkeywordDefinitions; //NOTE: not used in measures.xml
+        QString mcolorfield;
 
-	bool createDatabase();
-    void closeConnection();
-    bool createMetricsTable();
-    bool dropMetricTable();
-    bool createMeasuresTable();
-    bool dropMeasuresTable();
-	void initDatabase(QDir home);
+	    typedef QHash<QString,RideMetric*> MetricMap;
+
+	    bool createDatabase();
+        bool createMetricsTable();
+        bool dropMetricTable();
+        bool createMeasuresTable();
+        bool dropMeasuresTable();
+	    void initDatabase(QDir home);
 };
 #endif

@@ -70,21 +70,20 @@
 
 int DBSchemaVersion = 48;
 
-DBAccess::DBAccess(Context* context) : context(context)
+DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
     // check we have one and use built in if not there
     RideMetadata::readXML(":/xml/measures.xml", mkeywordDefinitions, mfieldDefinitions, mcolorfield);
 	initDatabase(context->athlete->home);
 }
 
-void DBAccess::closeConnection()
-{
-    dbconn.close();
-}
-
 DBAccess::~DBAccess()
 {
-    closeConnection();
+    if (db) {
+        db->close();
+        delete db;
+        QSqlDatabase::removeDatabase(sessionid);
+    }
 }
 
 void
@@ -92,25 +91,17 @@ DBAccess::initDatabase(QDir home)
 {
 
 
-    if(dbconn.isOpen()) return;
+    if(db && db->database(sessionid).isOpen()) return;
 
     QString cyclist = QFileInfo(home.path()).baseName();
-    sessionid = QString("%1%2").arg(cyclist).arg(context->mainWindow->session++);
+    sessionid = QString("%1").arg(context->athlete->cyclist);
 
-    if (context->mainWindow->session == 1) {
-        // use different name for v3 metricDB to avoid constant rebuilding
-        // when switching between v2 stable and v3 development builds
-        context->athlete->db = QSqlDatabase::addDatabase("QSQLITE", sessionid);
-        context->athlete->db.setDatabaseName(home.absolutePath() + "/metricDBv3"); 
-        //dbconn = db.database(QString("GC"));
-        dbconn = context->athlete->db.database(sessionid);
-    } else {
-        // clone the first one!
-        dbconn = QSqlDatabase::cloneDatabase(context->athlete->db, sessionid);
-        dbconn.open();
-    }
+    // use different name for v3 metricDB to avoid constant rebuilding
+    // when switching between v2 stable and v3 development builds
+    db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", sessionid));
+    db->setDatabaseName(home.absolutePath() + "/metricDBv3"); 
 
-    if (!dbconn.isOpen()) {
+    if (!db->database(sessionid).isOpen()) {
         QMessageBox::critical(0, qApp->translate("DBAccess","Cannot open database"),
                        qApp->translate("DBAccess","Unable to establish a database connection.\n"
                                        "This feature requires SQLite support. Please read "
@@ -146,7 +137,7 @@ computeFileCRC(QString filename)
 
 bool DBAccess::createMetricsTable()
 {
-    QSqlQuery query(dbconn);
+    QSqlQuery query(db->database(sessionid));
     bool rc;
     bool createTables = true;
 
@@ -214,14 +205,14 @@ bool DBAccess::createMetricsTable()
 
 bool DBAccess::dropMetricTable()
 {
-    QSqlQuery query("DROP TABLE metrics", dbconn);
+    QSqlQuery query("DROP TABLE metrics", db->database(sessionid));
     bool rc = query.exec();
     return rc;
 }
 
 bool DBAccess::createMeasuresTable()
 {
-    QSqlQuery query(dbconn);
+    QSqlQuery query(db->database(sessionid));
     bool rc;
     bool createTables = true;
 
@@ -278,7 +269,7 @@ bool DBAccess::createMeasuresTable()
 
 bool DBAccess::dropMeasuresTable()
 {
-    QSqlQuery query("DROP TABLE measures", dbconn);
+    QSqlQuery query("DROP TABLE measures", db->database(sessionid));
     bool rc = query.exec();
     return rc;
 }
@@ -308,7 +299,7 @@ void DBAccess::checkDBVersion()
     int measurescrcnow = 0; //computeFileCRC(measuresXML);// we don't allow user to edit
 
     // can we get a version number?
-    QSqlQuery query("SELECT table_name, schema_version, creation_date, metadata_crc from version;", dbconn);
+    QSqlQuery query("SELECT table_name, schema_version, creation_date, metadata_crc from version;", db->database(sessionid));
 
     bool rc = query.exec();
 
@@ -316,11 +307,11 @@ void DBAccess::checkDBVersion()
         // we couldn't read the version table properly
         // it must be out of date!!
 
-        QSqlQuery dropM("DROP TABLE version", dbconn);
+        QSqlQuery dropM("DROP TABLE version", db->database(sessionid));
         dropM.exec();
 
         // recreate version table and add one entry
-        QSqlQuery version("CREATE TABLE version ( table_name varchar primary key, schema_version integer, creation_date date, metadata_crc integer );", dbconn);
+        QSqlQuery version("CREATE TABLE version ( table_name varchar primary key, schema_version integer, creation_date date, metadata_crc integer );", db->database(sessionid));
         version.exec();
 
         // wipe away whatever (if anything is there)
@@ -373,7 +364,7 @@ int DBAccess::getDBVersion()
 {
     int schema_version = -1;
     // can we get a version number?
-    QSqlQuery query("SELECT schema_version from version;", dbconn);
+    QSqlQuery query("SELECT schema_version from version;", db->database(sessionid));
 
     bool rc = query.exec();
 
@@ -392,7 +383,7 @@ int DBAccess::getDBVersion()
  *----------------------------------------------------------------------*/
 bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long fingerprint, bool modify)
 {
-	QSqlQuery query(dbconn);
+	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
     if (modify) {
@@ -475,7 +466,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
 bool
 DBAccess::deleteRide(QString name)
 {
-    QSqlQuery query(dbconn);
+    QSqlQuery query(db->database(sessionid));
 
     query.prepare("DELETE FROM metrics WHERE filename = ?;");
     query.addBindValue(name);
@@ -484,7 +475,7 @@ DBAccess::deleteRide(QString name)
 
 QList<QDateTime> DBAccess::getAllDates()
 {
-    QSqlQuery query("SELECT ride_date from metrics ORDER BY ride_date;", dbconn);
+    QSqlQuery query("SELECT ride_date from metrics ORDER BY ride_date;", db->database(sessionid));
     QList<QDateTime> dates;
 
     query.exec();
@@ -515,7 +506,7 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
     selectStatement += " FROM metrics where filename = :name;";
 
     // execute the select statement
-    QSqlQuery query(selectStatement, dbconn);
+    QSqlQuery query(selectStatement, db->database(sessionid));
     query.bindValue(":start", filename);
     query.exec();
 
@@ -572,7 +563,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
                        " ORDER BY ride_date;";
 
     // execute the select statement
-    QSqlQuery query(selectStatement, dbconn);
+    QSqlQuery query(selectStatement, db->database(sessionid));
     query.bindValue(":start", start.date());
     query.bindValue(":end", end.date());
     query.exec();
@@ -621,7 +612,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     selectStatement += " FROM metrics where filename == :filename ;";
 
     // execute the select statement
-    QSqlQuery query(selectStatement, dbconn);
+    QSqlQuery query(selectStatement, db->database(sessionid));
     query.bindValue(":filename", filename);
     query.exec();
     while(query.next())
@@ -653,7 +644,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
  *----------------------------------------------------------------------*/
 bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
 {
-	QSqlQuery query(dbconn);
+	QSqlQuery query(db->database(sessionid));
 
     // construct an insert statement
     QString insertStatement = "insert into measures (timestamp, measure_date";
@@ -726,7 +717,7 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
                        " ORDER BY measure_date;";
 
     // execute the select statement
-    QSqlQuery query(selectStatement, dbconn);
+    QSqlQuery query(selectStatement, db->database(sessionid));
     query.bindValue(":start", start.date());
     query.bindValue(":end", end.date());
     query.exec();

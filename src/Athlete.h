@@ -54,6 +54,7 @@ class Athlete : public QObject
 
     public:
         Athlete(Context *context, const QDir &home);
+        ~Athlete();
         void close();
 
         // basic athlete info
@@ -66,7 +67,6 @@ class Athlete : public QObject
         HrZones *hrzones_;
         void setCriticalPower(int cp);
         bool isclean;
-        QSqlDatabase db;
         MetricAggregator *metricDB;
         QSqlTableModel *sqlModel;
         RideMetadata *rideMetadata_;

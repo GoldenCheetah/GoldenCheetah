@@ -194,6 +194,27 @@ Athlete::close()
     appsettings->setCValue(context->athlete->home.dirName(), GC_SAFEEXIT, true);
 }
 
+Athlete::~Athlete()
+{
+    delete withingsDownload;
+    delete zeoDownload;
+    delete calendarDownload;
+
+#ifdef GC_HAVE_ICAL
+    delete rideCalendar;
+    delete davCalendar;
+#endif
+    delete treeWidget;
+
+    // close the db connection (but clear models first!)
+    delete sqlModel;
+    delete metricDB;
+
+    delete seasons;
+    delete zones_;
+    delete hrzones_;
+}
+
 void Athlete::selectRideFile(QString fileName)
 {
     for (int i = 0; i < allRides->childCount(); i++)
