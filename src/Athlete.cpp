@@ -210,7 +210,13 @@ Athlete::~Athlete()
     delete sqlModel;
     delete metricDB;
 
+#ifdef GC_HAVE_LUCENE
+    delete namedSearches;
+    delete lucene;
+#endif
     delete seasons;
+
+    delete rideMetadata_;
     delete zones_;
     delete hrzones_;
 }
