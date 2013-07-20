@@ -66,9 +66,7 @@ class MainWindow : public QMainWindow
     public:
 
         MainWindow(const QDir &home);
-
-        // state data
-        int session; // by DBAccess
+        ~MainWindow(); // temp to zap db - will move to tab //
 
         // global filters
         bool isfiltered; // used by lots of charts

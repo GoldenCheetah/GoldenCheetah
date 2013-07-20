@@ -99,6 +99,7 @@
 #include "WFApi.h"
 #endif
 
+#include "GcUpgrade.h"
 
 // handy spacer
 class Spacer : public QWidget
@@ -114,8 +115,7 @@ public:
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 QDesktopWidget *desktop = NULL;
 
-MainWindow::MainWindow(const QDir &home) :
-    session(0), isfiltered(false)
+MainWindow::MainWindow(const QDir &home) : isfiltered(false)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -1060,7 +1060,7 @@ MainWindow::closeEvent(QCloseEvent* event)
         appsettings->setCValue(context->athlete->cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
         appsettings->setCValue(context->athlete->cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
 
-        // clear down athlete
+        // close athlete 
         context->athlete->close();
 
         // now remove from the list
@@ -1068,6 +1068,21 @@ MainWindow::closeEvent(QCloseEvent* event)
             qDebug()<<"closeEvent: mainwindows list error";
 
     }
+}
+
+MainWindow::~MainWindow()
+{
+    delete analysisSidebar;
+    delete ltmSidebar;
+    delete diarySidebar;
+    delete trainSidebar;
+
+    delete analWindow;
+    delete homeWindow;
+    delete trainWindow;
+    delete diaryWindow;
+
+    delete context->athlete;
 }
 
 // global search/data filter
