@@ -1144,21 +1144,6 @@ void MainWindow::resetWindowLayout()
     currentWindow->resetLayout();
 }
 
-void MainWindow::dateChanged(const QDate &date)
-{
-    for (int i = 0; i < context->athlete->allRides->childCount(); i++)
-    {
-        context->ride = (RideItem*) context->athlete->allRides->child(i);
-        if (context->ride->dateTime.date() == date) {
-            context->athlete->treeWidget->scrollToItem(context->athlete->allRides->child(i),
-                QAbstractItemView::EnsureVisible);
-            context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(i));
-            i = context->athlete->allRides->childCount();
-        }
-    }
-}
-
-
 void MainWindow::manualProcess(QString name)
 {
     // open a dialog box and let the users
@@ -1770,11 +1755,6 @@ Athlete::configChanged()
 /*----------------------------------------------------------------------
  * Measures
  *--------------------------------------------------------------------*/
-
-void
-MainWindow::recordMeasure()
-{
-}
 
 void
 MainWindow::downloadMeasures()
