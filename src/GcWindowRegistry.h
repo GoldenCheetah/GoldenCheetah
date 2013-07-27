@@ -80,7 +80,9 @@ class GcWindowRegistry {
     GcWinID id;
 
     static void initialize(); // initialize global registry
-    static GcWindow *newGcWindow(GcWinID id, Context *context); //XXX main is gonna go
+    static GcWindow *newGcWindow(GcWinID id, Context *context);
+    static QStringList windowsForType(int type);
+    static QList<GcWinID> idsForType(int type);
 };
 
 extern GcWindowRegistry* GcWindows;
