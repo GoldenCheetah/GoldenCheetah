@@ -115,7 +115,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 #ifdef GC_HAVE_LUCENE
-    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(filterChanged(QStringList&)));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 #endif
 }
 
@@ -127,10 +127,10 @@ PerformanceManagerWindow::~PerformanceManagerWindow()
 
 #ifdef GC_HAVE_LUCENE
 void 
-PerformanceManagerWindow::filterChanged(QStringList &list)
+PerformanceManagerWindow::filterChanged()
 {
-    filter = list;
-    isfiltered = context->mainWindow->isfiltered;
+    filter = context->filters;
+    isfiltered = context->isfiltered;
     days = 0; // force it
     replot();
     repaint();

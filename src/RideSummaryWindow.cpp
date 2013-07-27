@@ -93,7 +93,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
         connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
         connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-        connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh()));
+        connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
 
         // date settings
         connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -536,11 +536,11 @@ RideSummaryWindow::htmlSummary() const
         // we have after filtering has been applied, otherwise it is just
         // the number of entries
         int activities = 0;
-        if (context->mainWindow->isfiltered || filtered) {
+        if (context->isfiltered || filtered) {
 
             foreach (SummaryMetrics activity, data) {
                 if (filtered && !filters.contains(activity.getFileName())) continue;
-                if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(activity.getFileName())) continue;
+                if (context->isfiltered && !context->filters.contains(activity.getFileName())) continue;
                 activities++;
             }
 
@@ -555,7 +555,7 @@ RideSummaryWindow::htmlSummary() const
         else totalCols = rtotalColumn.count();
         int metricCols = metricColumn.count() > 7 ? 7 : metricColumn.count();
 
-        if (context->mainWindow->isfiltered || filtered) {
+        if (context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
             summary += ("<p><h3>" + 
@@ -617,7 +617,7 @@ RideSummaryWindow::htmlSummary() const
 
             // apply the filter if there is one active
             if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
-            if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
+            if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
 
             if (even) summary += "<tr>";
             else {

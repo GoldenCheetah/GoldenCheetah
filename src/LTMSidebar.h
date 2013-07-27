@@ -42,7 +42,7 @@ class LTMSidebar : public QWidget
 
     public:
 
-        LTMSidebar(Context *context, const QDir &home);
+        LTMSidebar(Context *context);
 
         //const Season *currentDateRange() { return dateRange; }
         //void selectDateRange(int);
@@ -81,7 +81,6 @@ class LTMSidebar : public QWidget
 
     private:
 
-        const QDir home;
         Context *context;
         bool active;
         QDate from, to; // so we don't repeat update...

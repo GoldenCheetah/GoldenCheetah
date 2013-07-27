@@ -135,7 +135,7 @@ LIBS += -lm $${LIBZ_LIBS}
 # Lion fullscreen playback
 # search box for title bar
 macx {
-    LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit -framework MMTabBarView
+    LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
     HEADERS +=  QtMacVideoWindow.h \
                 LionFullScreen.h \
                 QtMacSegmentedButton.h \
@@ -377,7 +377,6 @@ HEADERS += \
         SummaryMetrics.h \
         SummaryWindow.h \
         SyncRideFile.h \
-        TabView.h \
         TcxParser.h \
         TcxRideFile.h \
         TxtRideFile.h \
@@ -566,7 +565,6 @@ SOURCES += \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \
         SyncRideFile.cpp \
-        TabView.cpp \
         TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \

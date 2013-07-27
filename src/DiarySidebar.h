@@ -135,6 +135,7 @@ class GcMultiCalendar : public QScrollArea
         void dateChanged(int month, int year);
         void setRide(RideItem *ride);
         void resizeEvent(QResizeEvent*);
+        void filterChanged();
         void setFilter(QStringList filter);
         void clearFilter();
         void showEvent(QShowEvent*);
@@ -166,8 +167,7 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
         void refresh(); 
         void setSummary(); // set the summary at the bottom
 
-        void setFilter(QStringList filters) { multiCalendar->setFilter(filters);}
-        void clearFilter() { multiCalendar->clearFilter();}
+        void filterChanged() { multiCalendar->filterChanged(); }
 
     signals:
         void dateRangeChanged(DateRange);

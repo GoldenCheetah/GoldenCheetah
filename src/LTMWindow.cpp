@@ -150,7 +150,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
-    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(refresh()));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
 
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));

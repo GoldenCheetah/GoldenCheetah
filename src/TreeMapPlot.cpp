@@ -70,7 +70,7 @@ TreeMapPlot::setData(TMSettings *settings)
     foreach (SummaryMetrics rideMetrics, *(settings->data)) {
 
         // don't plot if filtered
-        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
+        if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
 
         double value = rideMetrics.getForSymbol(settings->symbol);
         QString text1 = rideMetrics.getText(settings->field1, "(unknown)");

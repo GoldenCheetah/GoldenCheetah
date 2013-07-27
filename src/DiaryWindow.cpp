@@ -80,7 +80,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     vlayout->addWidget(allViews);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));

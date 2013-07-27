@@ -24,6 +24,7 @@ Context::Context(MainWindow *mainWindow)
     this->mainWindow = mainWindow;
     ride = NULL;
     workout = NULL;
+    isfiltered = false;
 }
 
 const RideFile *

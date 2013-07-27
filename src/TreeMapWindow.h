@@ -19,7 +19,6 @@
 #ifndef _GC_TreeMapWindow_h
 #define _GC_TreeMapWindow_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h" // or isfiltered and filters
 
 #include <QtGui>
 #include <QTimer>
@@ -68,7 +67,7 @@ class TreeMapWindow : public GcWindow
         ~TreeMapWindow();
 
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return context->mainWindow->isfiltered; }
+        bool isFiltered() const { return context->isfiltered; }
 #endif
         QString f1() const { return field1->currentText(); }
         void setf1(QString x) const { field1->setCurrentIndex(field1->findText(x)); }

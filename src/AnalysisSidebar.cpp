@@ -109,6 +109,8 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     // right click menus...
     connect(rideNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
     connect(context->athlete->intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showIntervalMenu(const QPoint &)));
+
+    connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 }
 
 void
@@ -130,6 +132,13 @@ AnalysisSidebar::close()
 void
 AnalysisSidebar::configChanged()
 {
+}
+
+void
+AnalysisSidebar::filterChanged()
+{
+    if (context->isfiltered) setFilter(context->filters);
+    else clearFilter();
 }
 
 void

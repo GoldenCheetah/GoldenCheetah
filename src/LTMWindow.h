@@ -112,7 +112,7 @@ class LTMWindow : public GcChartWindow
         // reveal / filters
         bool hasReveal() { return true; }
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return (ltmTool->isFiltered() || context->mainWindow->isfiltered); }
+        bool isFiltered() const { return (ltmTool->isFiltered() || context->isfiltered); }
 #endif
 
         // used by children

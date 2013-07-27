@@ -31,6 +31,7 @@ class ErgFile;
 class Context;
 class Athlete;
 class MainWindow;
+class Tab;
 
 class Context : public QObject
 {
@@ -47,9 +48,9 @@ class Context : public QObject
         // last date range selected in diary/home view
         DateRange currentDateRange() { return _dr; }
 
-
         // current selections
         MainWindow *mainWindow;
+        Tab *tab;
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
         DateRange _dr;   // the currently selected date range
@@ -57,12 +58,20 @@ class Context : public QObject
         long now; // point in time during train session
         SpecialFields specialFields;
 
+        // search filter
+        bool isfiltered;
+        QStringList filters;
+
         // *********************************************
         // APPLICATION EVENTS
         // *********************************************
         void notifyConfigChanged(); // used by ConfigDialog to notify Context *
                                     // when config has changed - and to get a
                                     // signal emitted to notify its children
+
+        // filters
+        void setFilter(QStringList&f) { filters=f; isfiltered=true; emit filterChanged(); }
+        void clearFilter() { filters.clear(); isfiltered=false; emit filterChanged(); }
 
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
@@ -90,6 +99,9 @@ class Context : public QObject
         void notifyRideDirty() { rideDirty(ride); }
 
     signals:
+
+        // global filter changed
+        void filterChanged();
 
         void configChanged();
 

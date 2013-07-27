@@ -17,7 +17,6 @@
  */
 
 #include "SummaryMetrics.h"
-#include "MainWindow.h"
 #include "Context.h"
 #include "RideMetric.h"
 #include <QRegExp>
@@ -131,7 +130,7 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
 
         // skip filtered rides
         if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
-        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
+        if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
 
         // get this value
         double value = rideMetrics.getForSymbol(name);

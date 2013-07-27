@@ -41,7 +41,7 @@
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
 
-LTMSidebar::LTMSidebar(Context *context, const QDir &home) : QWidget(context->mainWindow), home(home), context(context), active(false)
+LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context(context), active(false)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);

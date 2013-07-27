@@ -68,10 +68,6 @@ class MainWindow : public QMainWindow
         MainWindow(const QDir &home);
         ~MainWindow(); // temp to zap db - will move to tab //
 
-        // global filters
-        bool isfiltered; // used by lots of charts
-        QStringList filters; // used by lots of charts
-
         // temporary access to chart settings
         ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
 
@@ -91,7 +87,6 @@ class MainWindow : public QMainWindow
         virtual void dropEvent(QDropEvent *);
 
     signals:
-        void filterChanged(QStringList&);
 
     public slots:
 
@@ -107,11 +102,8 @@ class MainWindow : public QMainWindow
         void actionClicked(int);
 
         // Search / Filter
-#ifdef Q_OS_MAC
-        void searchTextChanged(QString); // Mac Native Support
-#endif
-        void searchResults(QStringList); // from global search
-        void searchClear();
+        void setFilter(QStringList);
+        void clearFilter();
 
 
         void checkBlankState();
