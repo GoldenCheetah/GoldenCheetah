@@ -21,6 +21,7 @@
 #include "TimeUtils.h"
 class RideItem;
 class GcWindow;
+class Context;
 
 #define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
 #define setInstanceName(x) setProperty("instanceName", x)

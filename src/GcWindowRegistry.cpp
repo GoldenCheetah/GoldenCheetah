@@ -104,6 +104,28 @@ GcWindowRegistry::initialize()
   GcWindows = GcWindowsInit;
 }
 
+QStringList windowsForType(int type)
+{
+    QStringList returning;
+
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].relevance & type) 
+            returning << GcWindows[i].name;
+    }
+    return returning;
+}
+
+QList<GcWinID> idsForType(int type)
+{
+    QList<GcWinID> returning;
+
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].relevance & type) 
+            returning << GcWindows[i].id;
+    }
+    return returning;
+}
+
 // instantiate a new window
 GcWindow *
 GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
