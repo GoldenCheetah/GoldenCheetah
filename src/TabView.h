@@ -43,6 +43,7 @@ class TabView : public QWidget
 
         TabView(Context *context, int type);
         virtual ~TabView();
+        virtual void close() {};
 
         // add the widgets to the view
         void setSidebar(QWidget *sidebar);
@@ -64,34 +65,35 @@ class TabView : public QWidget
         void setSelected(bool x) { _selected=x; selectionChanged(); }
         bool isSelected() const { return _selected; }
 
+        void saveState() { if (page_) page_->saveState(); }
+
     signals:
 
         void sidebarClosed(); // the user dragged the sidebar closed.
+        void onSelected();
 
     public slots:
 
         // interface used by the Tab class - must be implemented by a TabView
         virtual bool isBlank() = 0;
+        virtual void setRide(RideItem*);
 
         // can be overriden by the derived class but we provide a working version
         virtual void sidebarChanged();
         virtual void tileModeChanged();
         virtual void selectionChanged();
         virtual void resetLayout();
-        //virtual void setChartMenu(); // need to be in Tab 
-        //virtual void setSubChartMenu(); // need to be in Tab and scopebar by the looks of it 
+        
         virtual void addChart(GcWinID id);
 
         // Let the base class handle the splitter movement and
         // hiding the sidebar by dragging it closed.
         void splitterMoved(int, int);
 
-        //void dateRangeChanged(DateRange);
-        //void rideSelected(RideItem*ride);
         //void mediaSelected(QString filename);
         //void ergSelected(ErgFile *erg);
 
-    private:
+    protected:
 
         Context *context;
         int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_HOME

@@ -18,10 +18,11 @@
 
 #include "GcScopeBar.h"
 #include "DiaryWindow.h"
+#include "DiarySidebar.h"
 #include "Context.h"
 #include "QtMacButton.h"
 
-GcScopeBar::GcScopeBar(Context *context, QWidget *traintool) : QWidget(context->mainWindow), context(context)
+GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
 
     setFixedHeight(23);
@@ -94,7 +95,7 @@ GcScopeBar::GcScopeBar(Context *context, QWidget *traintool) : QWidget(context->
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
 
     layout->addStretch();
-    layout->addWidget(traintool);
+    //layout->addWidget(traintool); //XXX!!! eek
     layout->addStretch();
 
     // we now need to adjust the buttons according to their text size

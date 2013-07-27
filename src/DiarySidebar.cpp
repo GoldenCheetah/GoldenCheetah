@@ -806,6 +806,7 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setContentsMargins(0,0,0,0);
+    _ride = NULL;
 
     setFrameStyle(QFrame::NoFrame);
 

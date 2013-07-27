@@ -211,7 +211,14 @@ void SearchBox::runMenu(QAction *x)
         editor->show();
 
     } else if (x->text() == tr("Column Chooser")) {
-        ColumnChooser *selector = new ColumnChooser(context->mainWindow->analysissidebar()->rideNavigator->logicalHeadings);
+
+        QStringList logicalHeadings;
+        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
+                logicalHeadings << context->specialFields.displayName(field.name);
+            }
+        }
+        ColumnChooser *selector = new ColumnChooser(logicalHeadings);
         selector->show();
     } else {
         NamedSearch get = context->athlete->namedSearches->get(x->text());

@@ -25,7 +25,6 @@
 #include "RideMetadata.h"
 #include "DBAccess.h"
 #include "Context.h"
-#include "DiarySidebar.h"
 #include "Settings.h"
 #include "Colors.h"
 
@@ -37,6 +36,7 @@ class GroupByModel;
 class SearchFilter;
 class SearchFilterBox;
 class DiaryWindow;
+class DiarySidebar;
 class BUGFIXQSortFilterProxyModel;
 class DataFilter;
 class GcMiniCalendar;

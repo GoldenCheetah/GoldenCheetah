@@ -44,16 +44,14 @@ class Context : public QObject
         RideItem *rideItem() const { return ride; }
         const RideFile *currentRide();
         const RideItem *currentRideItem() { return ride; }
-
-        // last date range selected in diary/home view
-        DateRange currentDateRange() { return _dr; }
+        DateRange currentDateRange() { return dr_; }
 
         // current selections
         MainWindow *mainWindow;
         Tab *tab;
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
-        DateRange _dr;   // the currently selected date range
+        DateRange dr_;
         ErgFile *workout; // the currently selected workout file
         long now; // point in time during train session
         SpecialFields specialFields;

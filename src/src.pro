@@ -377,6 +377,8 @@ HEADERS += \
         SummaryMetrics.h \
         SummaryWindow.h \
         SyncRideFile.h \
+        Tab.h \
+        TabView.h \
         TcxParser.h \
         TcxRideFile.h \
         TxtRideFile.h \
@@ -389,6 +391,7 @@ HEADERS += \
         TreeMapPlot.h \
         TtbDialog.h \
         Units.h \
+        Views.h \
         WithingsDownload.h \
         WkoRideFile.h \
         WorkoutPlotWindow.h \
@@ -565,6 +568,8 @@ SOURCES += \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \
         SyncRideFile.cpp \
+        Tab.cpp \
+        TabView.cpp \
         TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
@@ -579,6 +584,7 @@ SOURCES += \
         TreeMapPlot.cpp \
         TtbDialog.cpp \
         TRIMPPoints.cpp \
+        Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \
         WkoRideFile.cpp \

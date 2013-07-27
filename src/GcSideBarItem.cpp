@@ -18,6 +18,7 @@
 
 #include "GcSideBarItem.h"
 #include "DiaryWindow.h"
+#include "DiarySidebar.h"
 
 QIcon iconFromPNG(QString filename, bool emboss)
 {

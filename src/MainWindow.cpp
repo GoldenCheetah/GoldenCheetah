@@ -21,7 +21,6 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "AboutDialog.h"
-#include "BlankState.h"
 #include "ChooseCyclistDialog.h"
 #include "Colors.h"
 #include "ConfigDialog.h"
@@ -47,10 +46,9 @@
 #include "ErgDBDownloadDialog.h"
 #include "DeviceConfiguration.h"
 #include "AddDeviceWizard.h"
-#include "TrainSidebar.h"
 
+#include "Tab.h"
 #include "GcToolBar.h"
-#include "GcSideBarItem.h"
 #ifdef GC_HAVE_SOAP
 #include "TPUploadDialog.h"
 #include "TPDownloadDialog.h"
@@ -60,10 +58,7 @@
 #endif
 #include "HelpWindow.h"
 #include "HomeWindow.h"
-#include "DiarySidebar.h"
 #include "GcScopeBar.h"
-#include "LTMSidebar.h"
-#include "AnalysisSidebar.h"
 
 #ifdef Q_OS_MAC
 #ifdef GC_HAVE_LION
@@ -82,8 +77,6 @@
 #include "NamedSearch.h"
 #include "SearchFilterBox.h"
 #endif
-
-#include "ChartSettings.h"
 
 #include <assert.h>
 #include <QApplication>
@@ -304,6 +297,8 @@ MainWindow::MainWindow(const QDir &home)
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(300);
     head->addWidget(searchBox);
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
 #endif
 
 #endif 
@@ -403,6 +398,8 @@ MainWindow::MainWindow(const QDir &home)
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(250);
     head->addWidget(searchBox);
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
 #endif
     Spacer *spacer = new Spacer(this);
     spacer->setFixedWidth(5);
@@ -410,39 +407,16 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     /*----------------------------------------------------------------------
-     * Sidebar
+     * ScopeBar
      *--------------------------------------------------------------------*/
-
-    // sidebar items
-    diarySidebar = new DiarySidebar(context);
-    ltmSidebar = new LTMSidebar(context);
-    analysisSidebar = new AnalysisSidebar(context);
-    trainSidebar = new TrainSidebar(context);
-    trainSidebar->hide();
-    trainSidebar->getToolbarButtons()->hide(); // no show yet
-
-
-    // we need to connect the search box on Linux/Windows
-#ifdef GC_HAVE_LUCENE
-
-    // link to the sidebars
-    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
-#endif
-
-    /*----------------------------------------------------------------------
-     * Scope Bar
-     *--------------------------------------------------------------------*/
-
-    scopebar = new GcScopeBar(context, trainSidebar->getToolbarButtons());
+    scopebar = new GcScopeBar(context);
     connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
     connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
     connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
     connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
 
-    // add chart button with a menu
+    // Add chart is on the scope bar
     chartMenu = new QMenu(this);
-    
     QCleanlooksStyle *styler = new QCleanlooksStyle();
     QPushButton *newchart = new QPushButton("+", this);
     scopebar->addWidget(newchart);
@@ -459,159 +433,27 @@ MainWindow::MainWindow(const QDir &home)
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
     /*----------------------------------------------------------------------
-     * The 4 views
+     * Central Widget
      *--------------------------------------------------------------------*/
 
-    splitter = new QSplitter;
+    tab = new Tab(context);
 
-    toolBox = new QStackedWidget(this);
-    toolBox->setAcceptDrops(true);
-    toolBox->setFrameStyle(QFrame::NoFrame);
-    toolBox->setContentsMargins(0,0,0,0);
-    toolBox->layout()->setSpacing(0);
-    splitter->addWidget(toolBox);
+    /*----------------------------------------------------------------------
+     * Central Widget
+     *--------------------------------------------------------------------*/
 
-    // CONTAINERS FOR TOOLBOX
-    masterControls = new QStackedWidget(this);
-    masterControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    masterControls->setCurrentIndex(0);          // default to Analysis
-    masterControls->setContentsMargins(0,0,0,0);
-    analysisControls = new QStackedWidget(this);
-    analysisControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    analysisControls->setCurrentIndex(0);          // default to Analysis
-    analysisControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(analysisControls);
-    trainControls = new QStackedWidget(this);
-    trainControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    trainControls->setCurrentIndex(0);          // default to Analysis
-    trainControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(trainControls);
-    diaryControls = new QStackedWidget(this);
-    diaryControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    diaryControls->setCurrentIndex(0);          // default to Analysis
-    diaryControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(diaryControls);
-    homeControls = new QStackedWidget(this);
-    homeControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    homeControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(homeControls);
-
-    // HOME WINDOW & CONTROLS
-    homeWindow = new HomeWindow(context, "home", "Home");
-    homeControls->addWidget(homeWindow->controls());
-    homeControls->setCurrentIndex(0);
-
-    // DIARY WINDOW & CONTROLS
-    diaryWindow = new HomeWindow(context, "diary", "Diary");
-    diaryControls->addWidget(diaryWindow->controls());
-
-    // TRAIN WINDOW & CONTROLS
-    trainWindow = new HomeWindow(context, "train", "Training");
-    trainWindow->controls()->hide();
-    trainControls->addWidget(trainWindow->controls());
-
-    // ANALYSIS WINDOW & CONTRAOLS
-    analWindow = new HomeWindow(context, "analysis", "Analysis");
-    analysisControls->addWidget(analWindow->controls());
-
-    currentWindow = NULL;
-
-    // NO RIDE WINDOW - Replace analysis, home and train window when no ride
-
-    // did we say we din't want to see this?
-    showBlankTrain = !(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_TRAIN, false).toBool());
-    showBlankHome = !(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_HOME, false).toBool());
-    showBlankAnal = !(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
-    showBlankDiary = !(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY, false).toBool());
-
-    // setup the blank pages
-    blankStateAnalysisPage = new BlankStateAnalysisPage(context);
-    blankStateHomePage = new BlankStateHomePage(context);
-    blankStateDiaryPage = new BlankStateDiaryPage(context);
-    blankStateTrainPage = new BlankStateTrainPage(context);
-
-    connect(blankStateDiaryPage, SIGNAL(closeClicked()), this, SLOT(closeBlankDiary()));
-    connect(blankStateHomePage, SIGNAL(closeClicked()), this, SLOT(closeBlankHome()));
-    connect(blankStateAnalysisPage, SIGNAL(closeClicked()), this, SLOT(closeBlankAnal()));
-    connect(blankStateTrainPage, SIGNAL(closeClicked()), this, SLOT(closeBlankTrain()));
-
-
-    // POPULATE TOOLBOX
-
-    // do controllers after home windows -- they need their first signals caught
-    connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
-    connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
-    ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
-
-    toolBox->addWidget(analysisSidebar);
-    toolBox->addWidget(diarySidebar);
-    toolBox->addWidget(trainSidebar->controls());
-    toolBox->addWidget(ltmSidebar);
-
-    // Chart Settings now in their own dialog box
-    chartSettings = new ChartSettings(this, masterControls);
-    chartSettings->setMaximumWidth(450);
-    chartSettings->setMaximumHeight(600);
-
-    //toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
-    chartSettings->hide();
-
-    views = new QStackedWidget(this);
-    views->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    views->setMinimumWidth(500);
-
-    // add all the layouts
-    views->addWidget(analWindow);
-    views->addWidget(trainWindow);
-    views->addWidget(diaryWindow);
-    views->addWidget(homeWindow);
-
-    // add Blank State pages
-    views->addWidget(blankStateAnalysisPage);
-    views->addWidget(blankStateHomePage);
-    views->addWidget(blankStateDiaryPage);
-    views->addWidget(blankStateTrainPage);
-
-    //views->setCurrentIndex(0);
-    views->setContentsMargins(0,0,0,0);
-
-    QWidget *sviews = new QWidget(this);
-    sviews->setContentsMargins(0,0,0,0);
-    QVBoxLayout *sviewLayout = new QVBoxLayout(sviews);
-    sviewLayout->setContentsMargins(0,0,0,0);
-    sviewLayout->setSpacing(0);
-    sviewLayout->addWidget(scopebar);
-    sviewLayout->addWidget(views);
-    splitter->addWidget(sviews);
-
-    splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,1);
-    splitter->setCollapsible(0, true);
-    splitter->setCollapsible(1, false);
-    splitter->setHandleWidth(1);
-    splitter->setStyleSheet(" QSplitter::handle { background-color: rgb(120,120,120); color: darkGray; }");
-    splitter->setFrameStyle(QFrame::NoFrame);
-    splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
-
-    QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES); 
-    if (splitterSizes.toByteArray().size() > 1 ) {
-        splitter->restoreState(splitterSizes.toByteArray());
-        splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    }
-
-    // CENTRAL LAYOUT
     QWidget *central = new QWidget(this);
+    setContentsMargins(0,0,0,0);
     central->setContentsMargins(0,0,0,0);
-
-    QVBoxLayout *centralLayout = new QVBoxLayout(central);
-    centralLayout->setSpacing(0);
-    centralLayout->setContentsMargins(0,0,0,0);
+    QVBoxLayout *mainLayout = new QVBoxLayout(central);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
 #ifndef Q_OS_MAC // nonmac toolbar on main view -- its not 
                  // unified with the title bar.
-    centralLayout->addWidget(head);
+    mainLayout->addWidget(head);
 #endif
-    centralLayout->addWidget(splitter);
-
+    mainLayout->addWidget(scopebar);
+    mainLayout->addWidget(tab);
     setCentralWidget(central);
 
     /*----------------------------------------------------------------------
@@ -682,7 +524,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
 #endif
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Find intervals..."), analysisSidebar, SLOT(addIntervals()), tr (""));
+    optionsMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
 
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
@@ -756,28 +598,17 @@ MainWindow::MainWindow(const QDir &home)
     if (context->athlete->allRides->childCount() != 0)
         context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(context->athlete->allRides->childCount()-1));
 
-    // now we're up and runnning lets connect the signals
-    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
-
-    // We really do need a mechanism for showing if a ride needs saving...
+    //XXX!!! We really do need a mechanism for showing if a ride needs saving...
     //connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
-    // when metricDB updates check if BlankState needs to be closed
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
-    // when config changes see if Train View BlankState needs to be closed
-    connect(context, SIGNAL(configChanged()), this, SLOT(checkBlankState()));
-    // when trainDB updates check if BlankState needs to be closed
-    connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
-
     // Kick off
     context->athlete->rideTreeWidgetSelectionChanged();
 
     selectAnalysis();
-    setStyle();
 }
 
 /*----------------------------------------------------------------------
@@ -787,45 +618,13 @@ MainWindow::MainWindow(const QDir &home)
 void
 MainWindow::toggleSidebar()
 {
-    showSidebar(!toolBox->isVisible());
-#ifdef Q_OS_MAC
-    sidebar->setSelected(toolBox->isVisible());
-#endif
+    tab->toggleSidebar();
 }
 
 void
 MainWindow::showSidebar(bool want)
 {
-    if (want) {
-
-        toolBox->show();
-
-        // Restore sizes
-        QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES);
-        if (splitterSizes.toByteArray().size() > 1 ) {
-            splitter->restoreState(splitterSizes.toByteArray());
-            splitter->setOpaqueResize(true); // redraw when released, snappier UI
-        }
-
-        // if it was collapsed we need set to at least 200
-        // unless the mainwindow isn't big enough
-        if (toolBox->width()<10) {
-            int size = width() - 200;
-            if (size>200) size = 200;
-
-            QList<int> sizes;
-            sizes.append(size);
-            sizes.append(width()-size);
-            splitter->setSizes(sizes);
-        }
-
-    } else {
-
-        toolBox->hide();
-    }
-    showhideSidebar->setChecked(toolBox->isVisible());
-    setStyle();
-
+    tab->setSidebarEnabled(want);
 }
 
 void
@@ -839,14 +638,18 @@ void
 MainWindow::setChartMenu()
 {
     unsigned int mask=0;
+
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
-    if (currentWindow == analWindow) mask = VIEW_ANALYSIS;
-    if (currentWindow == trainWindow) mask = VIEW_TRAIN;
-    if (currentWindow == diaryWindow) mask = VIEW_DIARY;
-    if (currentWindow == homeWindow) mask = VIEW_HOME;
-
+    switch(tab->currentView()) {
+        case 0 : mask = VIEW_HOME; break;
+        default:
+        case 1 : mask = VIEW_ANALYSIS; break;
+        case 2 : mask = VIEW_DIARY; break;
+        case 3 : mask = VIEW_TRAIN; break;
+    }
+    
     chartMenu->clear();
     if (!mask) return;
 
@@ -863,10 +666,13 @@ MainWindow::setSubChartMenu()
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
-    if (currentWindow == analWindow) mask = VIEW_ANALYSIS;
-    if (currentWindow == trainWindow) mask = VIEW_TRAIN;
-    if (currentWindow == diaryWindow) mask = VIEW_DIARY;
-    if (currentWindow == homeWindow) mask = VIEW_HOME;
+    switch(tab->currentView()) {
+        case 0 : mask = VIEW_HOME; break;
+        default:
+        case 1 : mask = VIEW_ANALYSIS; break;
+        case 2 : mask = VIEW_DIARY; break;
+        case 3 : mask = VIEW_TRAIN; break;
+    }
 
     subChartMenu->clear();
     if (!mask) return;
@@ -908,7 +714,7 @@ MainWindow::addChart(QAction*action)
         }
     }
     if (id != GcWindowTypes::None)
-        currentWindow->appendChart(id); // called from MainWindow to inset chart
+        tab->addChart(id); // called from MainWindow to inset chart
 }
 
 void
@@ -935,29 +741,15 @@ MainWindow::selectWindow(QAction *act)
 void
 MainWindow::setStyleFromSegment(int segment)
 {
-    if (!currentWindow) return;
-    currentWindow->setStyle(segment ? 2 : 0);
+    tab->setTiled(segment);
     styleAction->setChecked(!segment);
 }
 
 void
 MainWindow::toggleStyle()
 {
-    if (!currentWindow) return;
-
-    switch (currentWindow->currentStyle) {
-
-    default:
-    case 0 :
-        currentWindow->setStyle(2);
-        styleAction->setChecked(false);
-        break;
-
-    case 2 :
-        currentWindow->setStyle(0);
-        styleAction->setChecked(true);
-        break;
-    }
+    tab->toggleTile();
+    styleAction->setChecked(tab->isTiled());
     setStyle();
 }
 
@@ -971,27 +763,6 @@ MainWindow::toggleFullScreen()
 #endif
 
 void
-MainWindow::dateRangeChangedDiary(DateRange dr)
-{
-    // we got signalled date range changed, tell the current view
-    // when we have multiple sidebars that change date we need to connect
-    // them up individually.... i.e. LTM....
-    diaryWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-    context->_dr = dr;
-}
-
-void
-MainWindow::dateRangeChangedLTM(DateRange dr)
-{
-    // we got signalled date range changed, tell the current view
-    // when we have multiple sidebars that change date we need to connect
-    // them up individually.... i.e. LTM....
-    homeWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-    context->_dr = dr;
-}
-
-
-void
 MainWindow::resizeEvent(QResizeEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
@@ -999,16 +770,6 @@ MainWindow::resizeEvent(QResizeEvent*)
     head->updateGeometry();
     repaint();
 #endif
-}
-
-void
-MainWindow::splitterMoved(int pos, int /*index*/)
-{
-    // show / hide sidebar as dragged..
-    if ((pos == 0  && toolBox->isVisible()) || (pos>10 && !toolBox->isVisible())) toggleSidebar();
-
-    analysisSidebar->setWidth(pos);
-    appsettings->setCValue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
 void
@@ -1030,16 +791,6 @@ MainWindow::closeEvent(QCloseEvent* event)
     if (saveRideExitDialog() == false) event->ignore();
     else {
 
-        // stop any active realtime conneection
-        trainSidebar->Stop();
-        analysisSidebar->close(); // save settings
-
-        // save the state of all the pages
-        analWindow->saveState();
-        homeWindow->saveState();
-        trainWindow->saveState();
-        diaryWindow->saveState();
-
 #ifdef GC_HAVE_LUCENE
         // save the named searches
         context->athlete->namedSearches->write();
@@ -1048,11 +799,8 @@ MainWindow::closeEvent(QCloseEvent* event)
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
 
-        // blank state settings
-        appsettings->setCValue(context->athlete->cyclist, GC_BLANK_ANALYSIS, blankStateAnalysisPage->dontShow->isChecked());
-        appsettings->setCValue(context->athlete->cyclist, GC_BLANK_DIARY, blankStateDiaryPage->dontShow->isChecked());
-        appsettings->setCValue(context->athlete->cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
-        appsettings->setCValue(context->athlete->cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
+        // close the tab
+        tab->close();
 
         // close athlete 
         context->athlete->close();
@@ -1066,16 +814,7 @@ MainWindow::closeEvent(QCloseEvent* event)
 
 MainWindow::~MainWindow()
 {
-    delete analysisSidebar;
-    delete ltmSidebar;
-    delete diarySidebar;
-    delete trainSidebar;
-
-    delete analWindow;
-    delete homeWindow;
-    delete trainWindow;
-    delete diaryWindow;
-
+    delete tab;
     delete context->athlete;
 }
 
@@ -1122,7 +861,7 @@ void MainWindow::showWorkoutWizard()
 
 void MainWindow::resetWindowLayout()
 {
-    currentWindow->resetLayout();
+    tab->resetLayout();
 }
 
 void MainWindow::manualProcess(QString name)
@@ -1153,159 +892,37 @@ MainWindow::helpView()
 }
 
 void
-MainWindow::checkBlankState()
-{
-    // Home?
-    if (views->currentWidget() == blankStateHomePage) {
-        // should it be closed?
-        if (context->athlete->allRides->childCount() > 0) closeBlankHome();
-    }
-    // Diary?
-    if (views->currentWidget() == blankStateDiaryPage) {
-        // should it be closed?
-        if (context->athlete->allRides->childCount() > 0) closeBlankDiary();
-    }
-    // Analysis??
-    if (views->currentWidget() == blankStateAnalysisPage) {
-        // should it be closed?
-        if (context->athlete->allRides->childCount() > 0) closeBlankAnal();
-    }
-    // Train??
-    if (views->currentWidget() == blankStateTrainPage) {
-        // should it be closed?
-        if (appsettings->value(this, GC_DEV_COUNT).toInt() > 0 && trainDB->getCount() > 2) closeBlankTrain();
-    }
-}
-
-void
-MainWindow::closeBlankTrain()
-{
-    showBlankTrain = false;
-    selectTrain();
-}
-
-void 
-MainWindow::closeBlankAnal()
-{
-    showBlankAnal = false;
-    selectAnalysis();
-}
-
-void 
-MainWindow::closeBlankDiary()
-{
-    showBlankDiary = false;
-    selectDiary();
-}
-
-void 
-MainWindow::closeBlankHome()
-{
-    showBlankHome = false;
-    selectHome();
-}
-
-void
 MainWindow::selectAnalysis()
 {
-    // No ride - no analysis view
-    if (context->athlete->allRides->childCount() == 0 && showBlankAnal == true) {
-        masterControls->setVisible(false);
-        toolBox->hide();
-        views->setCurrentWidget(blankStateAnalysisPage);
-    } else {
-        masterControls->setVisible(true);
-        masterControls->setCurrentIndex(0);
-        views->setCurrentIndex(0);
-        analWindow->selected(); // tell it!
-        trainSidebar->getToolbarButtons()->hide();
-#ifdef GC_HAVE_ICAL
-        scopebar->selected(2);
-#else
-        scopebar->selected(1);
-#endif
-        toolBox->setCurrentIndex(0);
-    }
-    currentWindow = analWindow;
+    tab->selectView(1);
     setStyle();
 }
 
 void
 MainWindow::selectTrain()
 {
-    // no devices configured -or- only the manual mode workouts defined
-    // we need to get setup properly...
-    if ((appsettings->value(this, GC_DEV_COUNT) == 0 || trainDB->getCount() <= 2) && showBlankTrain == true) {
-        masterControls->setVisible(false);
-        toolBox->hide();
-        views->setCurrentWidget(blankStateTrainPage);
-    } else {
-        masterControls->setVisible(true);
-		//this->showSidebar(true);
-        masterControls->setCurrentIndex(1);
-        views->setCurrentIndex(1);
-        trainWindow->selected(); // tell it!
-        trainSidebar->getToolbarButtons()->show();
-#ifdef GC_HAVE_ICAL
-        scopebar->selected(3);
-#else
-        scopebar->selected(2);
-#endif
-        toolBox->setCurrentIndex(2);
-    }
-    currentWindow = trainWindow;
+    tab->selectView(3);
     setStyle();
 }
 
 void
 MainWindow::selectDiary()
 {
-    if (context->athlete->allRides->childCount() == 0 && showBlankDiary == true) {
-        masterControls->setVisible(false);
-        toolBox->hide();
-        views->setCurrentWidget(blankStateDiaryPage);
-    } else {
-        masterControls->setVisible(true);
-		//this->showSidebar(true);
-        masterControls->setCurrentIndex(2);
-        views->setCurrentIndex(2);
-        diaryWindow->selected(); // tell it!
-        trainSidebar->getToolbarButtons()->hide();
-        scopebar->selected(1);
-        toolBox->setCurrentIndex(1);
-        diarySidebar->refresh(); // get that signal with the date range...
-    }
-    currentWindow = diaryWindow;
+    tab->selectView(2);
     setStyle();
 }
 
 void
 MainWindow::selectHome()
 {
-    // No ride - no analysis view
-    if (context->athlete->allRides->childCount() == 0 && showBlankHome == true) {
-        masterControls->setVisible(false);
-        toolBox->hide();
-        views->setCurrentWidget(blankStateHomePage);
-    } else {
-        masterControls->setVisible(true);
-        //toolBox->show();
-		//this->showSidebar(true);
-        masterControls->setCurrentIndex(3);
-        views->setCurrentIndex(3);
-        homeWindow->selected(); // tell it!
-        trainSidebar->getToolbarButtons()->hide();
-        scopebar->selected(0);
-        toolBox->setCurrentIndex(3);
-    }
-    currentWindow = homeWindow;
+    tab->selectView(0);
     setStyle();
 }
 
 void
 MainWindow::setStyle()
 {
-    int select = currentWindow->currentStyle == 0 ? 0 : 1;
+    int select = tab->isTiled() ? 1 : 0;
 
 #ifdef Q_OS_MAC
     styleSelector->setSelected(select, true);
@@ -1339,7 +956,7 @@ MainWindow::dropEvent(QDropEvent *event)
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.isEmpty()) return;
 
-    if (currentWindow != trainWindow) {
+    if (tab->currentView() != 3) { // we're not on train view
         // We have something to process then
         RideImportWizard *dialog = new RideImportWizard (&urls, context->athlete->home, context);
         dialog->process(); // do it!
@@ -1777,7 +1394,7 @@ MainWindow::actionClicked(int index)
     switch(index) {
 
     default:
-    case 0: analysisSidebar->addIntervals();
+    case 0: tab->addIntervals();
             break;
 
     case 1 : splitRide();
@@ -1790,18 +1407,19 @@ MainWindow::actionClicked(int index)
 }
 
 void
+MainWindow::addIntervals()
+{
+    tab->addIntervals();
+}
+
+void
 MainWindow::rideSelected(RideItem*)
 {
 
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride
-    diarySidebar->setRide(context->ride);
-    analysisSidebar->setRide(context->ride);
-    analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
-    trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(context->ride)));
+    tab->setRide(context->ride);
 
     if (!context->ride) return;
 
