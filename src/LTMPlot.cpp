@@ -782,7 +782,7 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
     foreach (SummaryMetrics rideMetrics, *(settings->data)) {
 
         // filter out unwanted rides
-        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
+        if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
 
         double value = rideMetrics.getForSymbol(metricDetail.symbol);
 
@@ -858,8 +858,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
 
         // filter out unwanted rides but not for PMC type metrics
         // because that needs to be done in the stress calculator
-        if (metricDetail.type != METRIC_PM && context->mainWindow->isfiltered && 
-            !context->mainWindow->filters.contains(rideMetrics.getFileName())) continue;
+        if (metricDetail.type != METRIC_PM && context->isfiltered && 
+            !context->filters.contains(rideMetrics.getFileName())) continue;
 
         // day we are on
         int currentDay = groupForDate(rideMetrics.getRideDate().date(), settings->groupBy);

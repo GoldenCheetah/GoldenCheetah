@@ -76,7 +76,7 @@ class TrainSidebar : public GcWindow
 
     public:
 
-        TrainSidebar(Context *context, const QDir &home);
+        TrainSidebar(Context *context);
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices

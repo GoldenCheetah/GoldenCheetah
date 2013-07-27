@@ -46,8 +46,11 @@ class TabView : public QWidget
 
         // add the widgets to the view
         void setSidebar(QWidget *sidebar);
+        QWidget *sidebar() { return sidebar_; }
         void setPage(HomeWindow *page);
+        HomeWindow *page() { return page_;}
         void setBlank(BlankStatePage *blank);
+        BlankStatePage *blank() { return blank_; }
 
         // sidebar
         void setSidebarEnabled(bool x) { _sidebar=x; sidebarChanged(); }
@@ -104,9 +107,9 @@ class TabView : public QWidget
 
         QStackedWidget *stack;
         QSplitter *splitter;
-        QWidget *sidebar;
-        HomeWindow *page;
-        BlankStatePage *blank;
+        QWidget *sidebar_;
+        HomeWindow *page_;
+        BlankStatePage *blank_;
 
 };
 

@@ -188,7 +188,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
     // redraw on config change -- this seems the simplest approach
-    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(configChanged()), this, SLOT(rideSelected()));
     connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));

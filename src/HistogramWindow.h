@@ -20,7 +20,6 @@
 #ifndef _GC_HistogramWindow_h
 #define _GC_HistogramWindow_h 1
 #include "GoldenCheetah.h"
-#include "MainWindow.h" // for isfiltered and filters
 
 #include "Context.h"
 #include "Athlete.h"
@@ -105,7 +104,7 @@ class HistogramWindow : public GcChartWindow
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { if (rangemode) return (isfiltered || context->mainWindow->isfiltered);
+        bool isFiltered() const { if (rangemode) return (isfiltered || context->isfiltered);
                                   else return false; }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }

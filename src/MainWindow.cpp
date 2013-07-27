@@ -115,7 +115,7 @@ public:
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 QDesktopWidget *desktop = NULL;
 
-MainWindow::MainWindow(const QDir &home) : isfiltered(false)
+MainWindow::MainWindow(const QDir &home)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -415,9 +415,9 @@ MainWindow::MainWindow(const QDir &home) : isfiltered(false)
 
     // sidebar items
     diarySidebar = new DiarySidebar(context);
-    ltmSidebar = new LTMSidebar(context, context->athlete->home);
+    ltmSidebar = new LTMSidebar(context);
     analysisSidebar = new AnalysisSidebar(context);
-    trainSidebar = new TrainSidebar(context, context->athlete->home);
+    trainSidebar = new TrainSidebar(context);
     trainSidebar->hide();
     trainSidebar->getToolbarButtons()->hide(); // no show yet
 
@@ -426,14 +426,8 @@ MainWindow::MainWindow(const QDir &home) : isfiltered(false)
 #ifdef GC_HAVE_LUCENE
 
     // link to the sidebars
-    connect(searchBox, SIGNAL(searchResults(QStringList)), analysisSidebar, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchResults(QStringList)), diarySidebar, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), diarySidebar, SLOT(clearFilter()));
-    connect(searchBox, SIGNAL(searchClear()), analysisSidebar, SLOT(clearFilter()));
-
-    // and global for charts AFTER sidebars
-    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchResults(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), this, SLOT(searchClear()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
 #endif
 
     /*----------------------------------------------------------------------
@@ -1086,21 +1080,8 @@ MainWindow::~MainWindow()
 }
 
 // global search/data filter
-void
-MainWindow::searchResults(QStringList f)
-{
-    filters = f;
-    isfiltered = true;
-    emit filterChanged(filters);
-}
-
-void
-MainWindow::searchClear()
-{
-    filters.clear();
-    isfiltered = false;
-    emit filterChanged(filters);
-}
+void MainWindow::setFilter(QStringList f) { context->setFilter(f); }
+void MainWindow::clearFilter() { context->clearFilter(); }
 
 void
 MainWindow::closeAll()
@@ -1790,23 +1771,6 @@ MainWindow::uploadCalendar()
 }
 #endif
 
-#ifdef Q_OS_MAC
-void
-MainWindow::searchTextChanged(QString text)
-{
-#ifdef GC_HAVE_LUCENE
-    // clear or set...
-    if (text == "") {
-        analysisSidebar->clearFilter();
-        diarySidebar->clearFilter();
-    } else {
-        context->athlete->lucene->search(text);
-        analysisSidebar->setFilter(context->athlete->lucene->files());
-        diarySidebar->setFilter(context->athlete->lucene->files());
-    }
-#endif
-}
-#endif
 void
 MainWindow::actionClicked(int index)
 {

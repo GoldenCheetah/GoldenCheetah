@@ -51,7 +51,7 @@ GcScopeBar::GcScopeBar(Context *context, QWidget *traintool) : QWidget(context->
     searchLabel->hide();
 
 #ifdef GC_HAVE_LUCENE
-    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setHighlighted()));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(setHighlighted()));
 #endif
 
     // Mac uses QtMacButton - recessed etc
@@ -120,7 +120,7 @@ void
 GcScopeBar::setHighlighted()
 {
 #ifdef GC_HAVE_LUCENE
-    if (context->mainWindow->isfiltered) {
+    if (context->isfiltered) {
         searchLabel->setHighlighted(true);
         searchLabel->show();
 #ifndef Q_OS_MAC

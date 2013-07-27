@@ -607,7 +607,7 @@ GcMiniCalendar::event(QEvent *e)
                 QModelIndex p = calendarModel->index(row,col);
                 QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
 
-                QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
+                //QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
             }
             n++;
         }
@@ -826,6 +826,14 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
     showing = 1;
 
     connect(mini, SIGNAL(dateChanged(int,int)), this, SLOT(dateChanged(int,int)));
+    connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+}
+
+void
+GcMultiCalendar::filterChanged()
+{
+    if (context->isfiltered) setFilter(context->filters);
+    else clearFilter();
 }
 
 void

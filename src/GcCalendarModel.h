@@ -148,7 +148,7 @@ public:
         // invalidate model if rides added or deleted or filter applier
         connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideChange(RideItem*)));
         connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideChange(RideItem*)));
-        connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(setStale()));
+        connect(context, SIGNAL(filterChanged()), this, SLOT(setStale()));
 
     }
     ~GcCalendarModel() {}
@@ -266,7 +266,7 @@ public:
             if (arr) {
                 foreach (int i, *arr) {
                     QString filename = sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
-                    if (context->mainWindow->isfiltered && context->mainWindow->filters.contains(filename))
+                    if (context->isfiltered && context->filters.contains(filename))
                         colors << GColor(CCALCURRENT);
                     else
                         colors << QColor(Qt::black);

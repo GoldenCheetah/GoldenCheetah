@@ -29,7 +29,7 @@
 TabView::TabView(Context *context, int type) : 
     QWidget(context->mainWindow), type(type),
     _sidebar(true), _tiled(false), _selected(false), 
-    stack(NULL), splitter(NULL), sidebar(NULL), page(NULL), blank(NULL)
+    stack(NULL), splitter(NULL), sidebar_(NULL), page_(NULL), blank_(NULL)
 {
     // setup the basic widget
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -62,7 +62,7 @@ TabView::TabView(Context *context, int type) :
 
 TabView::~TabView()
 {
-    if (page) page->saveState();
+    if (page_) page_->saveState();
 }
 
 void
@@ -83,21 +83,21 @@ TabView::splitterMoved(int pos,int)
 void
 TabView::setSidebar(QWidget *sidebar)
 {
-    this->sidebar = sidebar;
+    sidebar_ = sidebar;
     splitter->insertWidget(0, sidebar);
 }
 
 void
 TabView::setPage(HomeWindow *page)
 {
-    this->page = page;
+    page_ = page;
     splitter->insertWidget(-1, page);
 }
 
 void
 TabView::setBlank(BlankStatePage *blank)
 {
-    this->blank = blank;
+    blank_ = blank;
     stack->insertWidget(1, blank); // blank state always at index 1
 }
 
@@ -105,14 +105,14 @@ TabView::setBlank(BlankStatePage *blank)
 void
 TabView::sidebarChanged()
 {
-    if (sidebarEnabled()) sidebar->show();
-    else sidebar->hide();
+    if (sidebarEnabled()) sidebar_->show();
+    else sidebar_->hide();
 }
 
 void
 TabView::tileModeChanged()
 {
-    if (page) page->setStyle(isTiled() ? 0 : 2);
+    if (page_) page_->setStyle(isTiled() ? 0 : 2);
 }
 
 void
@@ -120,19 +120,19 @@ TabView::selectionChanged()
 {
     // we got selected..
     if (isSelected()) {
-        if (isBlank() && blank && page) stack->setCurrentIndex(1);
-        if (!isBlank() && blank && page) stack->setCurrentIndex(0);
+        if (isBlank() && blank_ && page_) stack->setCurrentIndex(1);
+        if (!isBlank() && blank_ && page_) stack->setCurrentIndex(0);
     }
 }
 
 void
 TabView::resetLayout()
 {
-    if (page) page->resetLayout();
+    if (page_) page_->resetLayout();
 }
 
 void
 TabView::addChart(GcWinID id)
 {
-    if (page) page->appendChart(id);
+    if (page_) page_->appendChart(id);
 }

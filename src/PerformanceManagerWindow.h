@@ -67,7 +67,7 @@ class PerformanceManagerWindow : public GcWindow
         void rideSelected();
 
 #ifdef GC_HAVE_LUCENE
-    void filterChanged(QStringList&);
+    void filterChanged();
 #endif
 
     protected:

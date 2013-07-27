@@ -308,7 +308,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
-    connect(context->mainWindow, SIGNAL(filterChanged(QStringList&)), this, SLOT(forceReplot()));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
 }
 
 //

@@ -56,7 +56,7 @@
 #include "TrainDB.h"
 #include "Library.h"
 
-TrainSidebar::TrainSidebar(Context *context, const QDir &home) : GcWindow(context), home(home), context(context)
+TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context)
 {
     setInstanceName("Train Controls");
 
@@ -855,7 +855,7 @@ void TrainSidebar::Start()       // when start button is pressed
             // setup file
             QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
 
-            QString fulltarget = home.absolutePath() + "/" + filename;
+            QString fulltarget = context->athlete->home.absolutePath() + "/" + filename;
             if (recordFile) delete recordFile;
             recordFile = new QFile(fulltarget);
             if (!recordFile->open(QFile::WriteOnly | QFile::Truncate)) {

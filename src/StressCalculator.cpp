@@ -1,6 +1,5 @@
 
 #include "Athlete.h"
-#include "MainWindow.h"
 #include "StressCalculator.h"
 #include "MetricAggregator.h"
 #include "RideMetric.h"
@@ -84,11 +83,11 @@ void StressCalculator::calculateStress(Context *context, QString, const QString 
     }
 
     // and honour the global one too!
-    if (context->mainWindow->isfiltered) {
+    if (context->isfiltered) {
         // remove any we don't have filtered
         QList<SummaryMetrics> filteredresults;
         foreach (SummaryMetrics x, results) {
-            if (context->mainWindow->filters.contains(x.getFileName()))
+            if (context->filters.contains(x.getFileName()))
                 filteredresults << x;
         }
         results = filteredresults;

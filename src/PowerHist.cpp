@@ -648,7 +648,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (isFiltered && !files.contains(x.getFileName())) continue;
 
         // and global filter too
-        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(x.getFileName())) continue;
+        if (context->isfiltered && !context->filters.contains(x.getFileName())) continue;
 
         // get computed value
         double v = x.getForSymbol(distMetric, context->athlete->useMetricUnits);
@@ -688,7 +688,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (isFiltered && !files.contains(x.getFileName())) continue;
 
         // and global filter too
-        if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(x.getFileName())) continue;
+        if (context->isfiltered && !context->filters.contains(x.getFileName())) continue;
 
         // get computed value
         double v = x.getForSymbol(distMetric, context->athlete->useMetricUnits);

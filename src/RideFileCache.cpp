@@ -896,7 +896,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
 {
 
     // Oh lets get from the cache if we can -- but not if filtered
-    if (!filter && !context->mainWindow->isfiltered) {
+    if (!filter && !context->isfiltered) {
         foreach(RideFileCache *p, context->athlete->cpxCache) {
             if (p->start == start && p->end == end) {
                 *this = *p;
@@ -942,7 +942,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             rideDate >= start && rideDate <= end) {
 
             // skip globally filtered values
-            if (context->mainWindow->isfiltered && !context->mainWindow->filters.contains(rideFileName)) continue;
+            if (context->isfiltered && !context->filters.contains(rideFileName)) continue;
 
             // get its cached values (will refresh if needed...)
             RideFileCache rideCache(context, context->athlete->home.absolutePath() + "/" + rideFileName);
@@ -979,7 +979,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     context->mainWindow->setCursor(Qt::ArrowCursor);
 
     // lets add to the cache for others to re-use -- but not if filtered
-    if (!context->mainWindow->isfiltered && !filter) {
+    if (!context->isfiltered && !filter) {
         if (context->athlete->cpxCache.count() > maxcache) {
             delete(context->athlete->cpxCache.at(0));
             context->athlete->cpxCache.removeAt(0);
