@@ -18,6 +18,7 @@
 
 #include "Athlete.h"
 #include "Context.h"
+#include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"

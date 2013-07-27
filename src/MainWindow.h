@@ -31,23 +31,13 @@
 #include <AvailabilityMacros.h>
 #endif
 
-class HomeWindow;
-class GcToolBar;
-class DiarySidebar;
-class LTMSidebar;
-class AnalysisSidebar;
 class LionFullScreen;
 class QTFullScreen;
-class TrainSidebar;
-class ChartSettings;
 class QtMacSegmentedButton;
 class QtMacButton;
+class GcToolBar;
 class GcScopeBar;
 class Library;
-class BlankStateAnalysisPage;
-class BlankStateHomePage;
-class BlankStateDiaryPage;
-class BlankStateTrainPage;
 class QtSegmentControl;
 class SaveSingleDialogWidget;
 
@@ -69,11 +59,11 @@ class MainWindow : public QMainWindow
         ~MainWindow(); // temp to zap db - will move to tab //
 
         // temporary access to chart settings
-        ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
+        //ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
 
         // temporary access to the sidebars
-        AnalysisSidebar *analysissidebar() {return analysisSidebar; } // by SearchBox
-        TrainSidebar *trainsidebar() {return trainSidebar; } // by ErgDBDownloadDialog
+        //AnalysisSidebar *analysissidebar() {return analysisSidebar; } // by SearchBox
+        //TrainSidebar *trainsidebar() {return trainSidebar; } // by ErgDBDownloadDialog
 
         // temporary access to the context
         Context *contextmain() { return context; } // by ChooseCyclistDialog
@@ -94,7 +84,6 @@ class MainWindow : public QMainWindow
 #ifndef Q_OS_MAC
         void toggleFullScreen();
 #endif
-        void splitterMoved(int, int);
         void aboutDialog();
         void helpView();
         void logBug();
@@ -106,11 +95,6 @@ class MainWindow : public QMainWindow
         void clearFilter();
 
 
-        void checkBlankState();
-        void closeBlankTrain();
-        void closeBlankAnal();
-        void closeBlankDiary();
-        void closeBlankHome();
         void selectHome();
         void selectDiary();
         void selectAnalysis();
@@ -123,6 +107,7 @@ class MainWindow : public QMainWindow
         void selectWindow(QAction*);
 
         void showOptions();
+
         void toggleSidebar();
         void showSidebar(bool want);
         void showToolbar(bool want);
@@ -144,14 +129,10 @@ class MainWindow : public QMainWindow
         void importWorkout();
 
         // Diary View
-        void dateRangeChangedDiary(DateRange);
         void refreshCalendar();
 #ifdef GC_HAVE_ICAL
         void uploadCalendar(); // upload ride to calendar
 #endif
-
-        // LTM View
-        void dateRangeChangedLTM(DateRange);
 
         // Measures View
         void downloadMeasures();
@@ -162,6 +143,7 @@ class MainWindow : public QMainWindow
         void openCyclist();
 
         // Activity Collection
+        void addIntervals(); // pass thru to tab
         void rideSelected(RideItem*ride);
         bool saveRideSingleDialog(RideItem *);
         void saveSilent(RideItem *);
@@ -188,38 +170,8 @@ class MainWindow : public QMainWindow
     private:
 
         Context *context;
-
-        // Top-level views
-        HomeWindow *homeWindow;
-        HomeWindow *diaryWindow;
-        HomeWindow *trainWindow;
-        HomeWindow *analWindow;
-        HomeWindow *currentWindow;  // tracks the curerntly showing window
-
-        BlankStateAnalysisPage *blankStateAnalysisPage;
-        BlankStateHomePage *blankStateHomePage;
-        BlankStateDiaryPage *blankStateDiaryPage;
-        BlankStateTrainPage *blankStateTrainPage;
-
-        bool showBlankAnal;
-        bool showBlankTrain;
-        bool showBlankHome;
-        bool showBlankDiary;
-
-        ChartSettings *chartSettings;
-
-        // splitter for sidebar and main view
-        QSplitter *splitter;
-
-        // sidebar and views
-        QStackedWidget *toolBox; // contains all left sidebars
-        QStackedWidget *views;   // contains all the views
-
-        // sidebars
-        AnalysisSidebar *analysisSidebar;
-        TrainSidebar *trainSidebar; // train view
-        LTMSidebar *ltmSidebar; // home view
-        DiarySidebar *diarySidebar; // diary
+        GcScopeBar *scopebar;
+        Tab *tab;
 
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
         LionFullScreen *fullScreen;
@@ -243,7 +195,6 @@ class MainWindow : public QMainWindow
         QIcon importIcon, composeIcon, intervalIcon, splitIcon,
               deleteIcon, sidebarIcon, tabbedIcon, tiledIcon;
 #endif
-        GcScopeBar *scopebar;
 
         // chart menus
         QMenu *chartMenu;
@@ -258,13 +209,6 @@ class MainWindow : public QMainWindow
         QAction *showhideSidebar;
         QAction *rideWithGPSAction;
         QAction *ttbAction;
-
-        // each view has its own controls
-        QStackedWidget *masterControls,
-                       *analysisControls,
-                       *trainControls,
-                       *diaryControls,
-                       *homeControls;
 
         // Miscellany
         QSignalMapper *toolMapper;

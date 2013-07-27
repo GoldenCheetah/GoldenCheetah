@@ -132,7 +132,7 @@ ErgDBDownloadDialog::okClicked()
         status->setText(QString("%1 workouts downloaded, %2 failed or skipped.").arg(downloads).arg(fails));
         ok->setText("Finish");
 
-        context->mainWindow->trainsidebar()->configChanged();
+        context->notifyConfigChanged();
 
     } else if (ok->text() == "Abort") {
         aborted = true;

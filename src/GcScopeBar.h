@@ -59,7 +59,7 @@ class GcScopeBar : public QWidget
 
 public:
 
-    GcScopeBar(Context *context, QWidget *traintool);
+    GcScopeBar(Context *context);
     ~GcScopeBar();
 
 public slots:

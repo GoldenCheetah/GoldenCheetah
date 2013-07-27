@@ -16,9 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "Tab.h"
 #include "HomeWindow.h"
 #include "LTMTool.h"
 #include "LTMSettings.h"
@@ -476,8 +476,8 @@ HomeWindow::dropEvent(QDropEvent *event)
 void
 HomeWindow::showControls()
 {
-    context->mainWindow->chartsettings()->adjustSize();
-    context->mainWindow->chartsettings()->show();
+    context->tab->chartsettings()->adjustSize();
+    context->tab->chartsettings()->show();
 }
 
 void
@@ -652,8 +652,7 @@ HomeWindow::resetLayout()
     for(int i = 0; i < charts.count(); i++) {
         RideItem *notconst = (RideItem*)context->currentRideItem();
         charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        DateRange dr = context->currentDateRange();
-        charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+        charts[i]->setProperty("dateRange", property("dateRange"));
         if (currentStyle != 0) charts[i]->show();
         
     }

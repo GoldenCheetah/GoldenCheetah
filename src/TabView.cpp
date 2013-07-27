@@ -27,7 +27,7 @@
 #include "MainWindow.h" // temp - will become Tab when its ready
 
 TabView::TabView(Context *context, int type) : 
-    QWidget(context->mainWindow), type(type),
+    QWidget(context->mainWindow), context(context), type(type),
     _sidebar(true), _tiled(false), _selected(false), 
     stack(NULL), splitter(NULL), sidebar_(NULL), page_(NULL), blank_(NULL)
 {
@@ -38,14 +38,13 @@ TabView::TabView(Context *context, int type) :
     layout->setSpacing(0);
 
     stack = new QStackedWidget(this);
+    stack->setContentsMargins(0,0,0,0);
     layout->addWidget(stack);
 
     // the splitter
     splitter = new QSplitter(this);
     splitter->setStretchFactor(0,0);
     splitter->setStretchFactor(1,1);
-    splitter->setCollapsible(0, true);
-    splitter->setCollapsible(1, false);
     splitter->setHandleWidth(1);
     splitter->setStyleSheet(" QSplitter::handle { background-color: rgb(120,120,120); color: darkGray; }");
     splitter->setFrameStyle(QFrame::NoFrame);
@@ -53,16 +52,18 @@ TabView::TabView(Context *context, int type) :
     splitter->setOpaqueResize(true); // redraw when released, snappier UI
     stack->insertWidget(0, splitter); // splitter always at index 0
 
-    QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
-    QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
-    if (splitterSizes.toByteArray().size() > 1 ) {
-        splitter->restoreState(splitterSizes.toByteArray());
-    }
+    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 }
 
 TabView::~TabView()
 {
     if (page_) page_->saveState();
+}
+
+void
+TabView::setRide(RideItem*ride)
+{
+    page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 }
 
 void
@@ -91,7 +92,17 @@ void
 TabView::setPage(HomeWindow *page)
 {
     page_ = page;
+
+    // now reset the splitter
     splitter->insertWidget(-1, page);
+    splitter->setCollapsible(0, true);
+    splitter->setCollapsible(1, false);
+    QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
+    QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
+    if (splitterSizes.toByteArray().size() > 1 ) {
+        splitter->restoreState(splitterSizes.toByteArray());
+    }
+
 }
 
 void
@@ -105,14 +116,37 @@ TabView::setBlank(BlankStatePage *blank)
 void
 TabView::sidebarChanged()
 {
-    if (sidebarEnabled()) sidebar_->show();
-    else sidebar_->hide();
+    if (sidebarEnabled()) {
+
+        sidebar_->show();
+
+        // Restore sizes
+        QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
+        QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting);
+        if (splitterSizes.toByteArray().size() > 1 ) {
+            splitter->restoreState(splitterSizes.toByteArray());
+            splitter->setOpaqueResize(true); // redraw when released, snappier UI
+        }
+
+        // if it was collapsed we need set to at least 200
+        // unless the mainwindow isn't big enough
+        if (sidebar_->width()<10) {
+            int size = width() - 200;
+            if (size>200) size = 200;
+
+            QList<int> sizes;
+            sizes.append(size);
+            sizes.append(width()-size);
+            splitter->setSizes(sizes);
+        }
+
+    } else sidebar_->hide();
 }
 
 void
 TabView::tileModeChanged()
 {
-    if (page_) page_->setStyle(isTiled() ? 0 : 2);
+    if (page_) page_->setStyle(isTiled() ? 2 : 0);
 }
 
 void
@@ -120,6 +154,11 @@ TabView::selectionChanged()
 {
     // we got selected..
     if (isSelected()) {
+
+        emit onSelected(); // give view a change to prepare
+        page()->selected(); // select the view
+
+        // or do we need to show blankness?
         if (isBlank() && blank_ && page_) stack->setCurrentIndex(1);
         if (!isBlank() && blank_ && page_) stack->setCurrentIndex(0);
     }
