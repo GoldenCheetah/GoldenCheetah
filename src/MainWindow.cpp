@@ -17,20 +17,35 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+// QT
+#include <QApplication>
+#include <QtGui>
+#include <QRegExp>
+#include <QNetworkProxyQuery>
+
+// DATA STRUCTURES
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "AboutDialog.h"
-#include "ChooseCyclistDialog.h"
+
 #include "Colors.h"
-#include "ConfigDialog.h"
-#include "DownloadRideDialog.h"
-#include "ManualRideDialog.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
-#include "RideImportWizard.h"
 #include "Settings.h"
+#include "ErgDB.h"
+#include "Library.h"
+#include "LibraryParser.h"
+#include "TrainDB.h"
+#include "GcUpgrade.h"
+
+// DIALOGS / DOWNLOADS / UPLOADS
+#include "AboutDialog.h"
+#include "ChooseCyclistDialog.h"
+#include "ConfigDialog.h"
+#include "DownloadRideDialog.h"
+#include "ManualRideDialog.h"
+#include "RideImportWizard.h"
 #include "ToolsDialog.h"
 #include "ToolsRhoEstimator.h"
 #include "SplitActivityWizard.h"
@@ -40,15 +55,9 @@
 #include "TtbDialog.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
-#include "CalendarDownload.h"
 #include "WorkoutWizard.h"
-#include "ErgDB.h"
 #include "ErgDBDownloadDialog.h"
-#include "DeviceConfiguration.h"
 #include "AddDeviceWizard.h"
-
-#include "Tab.h"
-#include "GcToolBar.h"
 #ifdef GC_HAVE_SOAP
 #include "TPUploadDialog.h"
 #include "TPDownloadDialog.h"
@@ -56,10 +65,14 @@
 #ifdef GC_HAVE_ICAL
 #include "CalDAV.h"
 #endif
+#include "CalendarDownload.h"
+
+// GUI Widgets
+#include "Tab.h"
+#include "GcToolBar.h"
 #include "HelpWindow.h"
 #include "HomeWindow.h"
 #include "GcScopeBar.h"
-
 #ifdef Q_OS_MAC
 #ifdef GC_HAVE_LION
 #include "LionFullScreen.h" // mac and lion or later
@@ -72,49 +85,27 @@
 #include "../qtsolutions/segmentcontrol/qtsegmentcontrol.h"
 #endif
 
+// SEARCH / FILTER
 #ifdef GC_HAVE_LUCENE
 #include "Lucene.h"
 #include "NamedSearch.h"
 #include "SearchFilterBox.h"
 #endif
 
-#include <assert.h>
-#include <QApplication>
-#include <QtGui>
-#include <QRegExp>
-#include <QNetworkProxyQuery>
-
-#include "Library.h"
-#include "LibraryParser.h"
-#include "TrainDB.h"
-
 #ifdef GC_HAVE_WFAPI
 #include "WFApi.h"
 #endif
 
-#include "GcUpgrade.h"
-
-// handy spacer
-class Spacer : public QWidget
-{
-public:
-    Spacer(QWidget *parent) : QWidget(parent) {
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        setSizePolicy(sizePolicy);
-    }
-    QSize sizeHint() const { return QSize(10, 1); }
-};
-
-QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
+// We keep track of all theopen mainwindows
+QList<MainWindow *> mainwindows;
 QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
-
     /*----------------------------------------------------------------------
      *  Bootstrap
      *--------------------------------------------------------------------*/
+    setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
     context = new Context(this);
     context->athlete = new Athlete(context, home);
@@ -605,9 +596,8 @@ MainWindow::MainWindow(const QDir &home)
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
-    // Kick off
+    // Kick off - select a ride and switch to Analysis View
     context->athlete->rideTreeWidgetSelectionChanged();
-
     selectAnalysis();
 }
 
@@ -1149,8 +1139,7 @@ MainWindow::newCyclist()
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) {
         newHome.cd(name);
-        if (!newHome.exists())
-            assert(false);
+        if (!newHome.exists()) return;
         MainWindow *main = new MainWindow(newHome);
         main->show();
     }
@@ -1165,8 +1154,7 @@ MainWindow::openCyclist()
     d.setModal(true);
     if (d.exec() == QDialog::Accepted) {
         newHome.cd(d.choice());
-        if (!newHome.exists())
-            assert(false);
+        if (!newHome.exists()) return;
         MainWindow *main = new MainWindow(newHome);
         main->show();
     }
@@ -1449,3 +1437,4 @@ MainWindow::rideSelected(RideItem*)
         }
     }
 }
+
