@@ -77,6 +77,7 @@ class TabView : public QWidget
         // interface used by the Tab class - must be implemented by a TabView
         virtual bool isBlank() = 0;
         virtual void setRide(RideItem*);
+        virtual void checkBlank();
 
         // can be overriden by the derived class but we provide a working version
         virtual void sidebarChanged();

@@ -22,20 +22,7 @@
 #include "TrainSidebar.h"
 #include "LTMSidebar.h"
 #include "BlankState.h"
-
-// BLANK STATE NEEDS FIXING
-// blank state settings
-//appsettings->setCValue(context->athlete->cyclist, GC_BLANK_ANALYSIS, blankStateAnalysisPage->dontShow->isChecked());
-//appsettings->setCValue(context->athlete->cyclist, GC_BLANK_DIARY, blankStateDiaryPage->dontShow->isChecked());
-//appsettings->setCValue(context->athlete->cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
-//appsettings->setCValue(context->athlete->cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
-//    // when metricDB updates check if BlankState needs to be closed
-//    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
-//    // when config changes see if Train View BlankState needs to be closed
-//    connect(context, SIGNAL(configChanged()), this, SLOT(checkBlankState()));
-//    // when trainDB updates check if BlankState needs to be closed
-//    connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
-
+#include "TrainDB.h"
 
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
@@ -75,7 +62,8 @@ void AnalysisView::close()
 bool
 AnalysisView::isBlank()
 {
-    return false;
+    if (context->athlete->allRides->childCount() > 0) return false;
+    else return true;
 }
 
 DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_DIARY)
@@ -114,7 +102,8 @@ DiaryView::dateRangeChanged(DateRange dr)
 bool
 DiaryView::isBlank()
 {
-    return false;
+    if (context->athlete->allRides->childCount() > 0) return false;
+    else return true;
 }
 
 HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_HOME)
@@ -146,7 +135,8 @@ HomeView::dateRangeChanged(DateRange dr)
 bool
 HomeView::isBlank()
 {
-    return false;
+    if (context->athlete->allRides->childCount() > 0) return false;
+    else return true;
 }
 
 void
@@ -186,5 +176,6 @@ TrainView::close()
 bool
 TrainView::isBlank()
 {
-    return false;
+    if (appsettings->value(this, GC_DEV_COUNT).toInt() > 0 && trainDB->getCount() > 2) return false;
+    else return true;
 }

@@ -24,7 +24,7 @@
 //
 // Replace home window when no ride
 //
-BlankStatePage::BlankStatePage(Context *context) : context(context)
+BlankStatePage::BlankStatePage(Context *context) : context(context), canShow_(true)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addStretch();
@@ -81,7 +81,16 @@ BlankStatePage::BlankStatePage(Context *context) : context(context)
     bottomRow->addStretch();
     bottomRow->addWidget(closeButton);
 
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(setCanShow()));
     connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeClicked()));
+}
+
+void
+BlankStatePage::setCanShow()
+{
+    // the view was closed, so set canShow_ off
+    canShow_ = false;
+    saveState();
 }
 
 QPushButton*
@@ -150,6 +159,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
     QPushButton *downloadButton = addToShortCuts(scDownload);
     connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
 
+    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_ANALYSIS).toBool();
 }
 
 //
@@ -177,6 +187,8 @@ BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(contex
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
     connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
+
+    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_HOME).toBool();
 }
 
 //
@@ -204,6 +216,8 @@ BlankStateDiaryPage::BlankStateDiaryPage(Context *context) : BlankStatePage(cont
     scDownload.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadButton = addToShortCuts(scDownload);
     connect(downloadButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadRide()));
+
+    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_DIARY).toBool();
 }
 
 //
@@ -241,4 +255,29 @@ BlankStateTrainPage::BlankStateTrainPage(Context *context) : BlankStatePage(cont
     scDownloadWorkout.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadWorkoutButton = addToShortCuts(scDownloadWorkout);
     connect(downloadWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadErgDB()));
+
+    canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_TRAIN).toBool();
 }
+
+// save away the don't show stuff
+void
+BlankStateAnalysisPage::saveState()
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_ANALYSIS, dontShow->isChecked());
+}
+void
+BlankStateDiaryPage::saveState()
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_DIARY, dontShow->isChecked());
+}
+void
+BlankStateHomePage::saveState()
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_HOME, dontShow->isChecked());
+}
+void
+BlankStateTrainPage::saveState()
+{
+    appsettings->setCValue(context->athlete->cyclist, GC_BLANK_TRAIN, dontShow->isChecked());
+}
+
