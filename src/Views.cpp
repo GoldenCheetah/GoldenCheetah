@@ -175,6 +175,11 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
 
 TrainView::~TrainView()
 {
+}
+
+void
+TrainView::close()
+{
     static_cast<TrainSidebar*>(sidebar())->Stop();
 }
 

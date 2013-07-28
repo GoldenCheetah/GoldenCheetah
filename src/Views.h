@@ -62,6 +62,7 @@ class TrainView : public TabView
 
         TrainView(Context *context, QStackedWidget *controls);
         ~TrainView();
+        void close();
 
     public slots:
 
