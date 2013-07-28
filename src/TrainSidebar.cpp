@@ -169,7 +169,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QIcon rewIcon(":images/oxygen/rewind.png");
     QPushButton *rewind = new QPushButton(rewIcon, "", this);
     rewind->setFocusPolicy(Qt::NoFocus);
-    rewind->setIconSize(QSize(20,20));
+    rewind->setIconSize(QSize(64,64));
     rewind->setAutoFillBackground(false);
     rewind->setAutoDefault(false);
     rewind->setFlat(true);
@@ -181,7 +181,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QIcon stopIcon(":images/oxygen/stop.png");
     QPushButton *stop = new QPushButton(stopIcon, "", this);
     stop->setFocusPolicy(Qt::NoFocus);
-    stop->setIconSize(QSize(20,20));
+    stop->setIconSize(QSize(64,64));
     stop->setAutoFillBackground(false);
     stop->setAutoDefault(false);
     stop->setFlat(true);
@@ -191,7 +191,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QIcon playIcon(":images/oxygen/play.png");
     play = new QPushButton(playIcon, "", this);
     play->setFocusPolicy(Qt::NoFocus);
-    play->setIconSize(QSize(20,20));
+    play->setIconSize(QSize(64,64));
     play->setAutoFillBackground(false);
     play->setAutoDefault(false);
     play->setFlat(true);
@@ -201,7 +201,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QIcon fwdIcon(":images/oxygen/ffwd.png");
     QPushButton *forward = new QPushButton(fwdIcon, "", this);
     forward->setFocusPolicy(Qt::NoFocus);
-    forward->setIconSize(QSize(20,20));
+    forward->setIconSize(QSize(64,64));
     forward->setAutoFillBackground(false);
     forward->setAutoDefault(false);
     forward->setFlat(true);
@@ -213,7 +213,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QIcon lapIcon(":images/oxygen/lap.png");
     QPushButton *lap = new QPushButton(lapIcon, "", this);
     lap->setFocusPolicy(Qt::NoFocus);
-    lap->setIconSize(QSize(20,20));
+    lap->setIconSize(QSize(64,64));
     lap->setAutoFillBackground(false);
     lap->setAutoDefault(false);
     lap->setFlat(true);
@@ -234,6 +234,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     intensitySlider->setValue(100);
     slideLayout->addStretch();
     slideLayout->addWidget(intensitySlider);
+intensitySlider->hide(); //XXX!!! temporary
 
 #ifdef Q_OS_MAC
     QWindowsStyle *macstyler = new QWindowsStyle();
@@ -251,6 +252,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     stress->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     pal.setColor(stress->foregroundRole(), Qt::white);
     stress->setPalette(pal);
+stress->hide(); //XXX!!! temporary
 
     intensity = new QLabel(this);
     intensity->setAutoFillBackground(false);
@@ -258,6 +260,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     intensity->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     pal.setColor(intensity->foregroundRole(), Qt::white);
     intensity->setPalette(pal);
+intensity->hide(); //XXX!!! temporary
 
     slideLayout->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
     slideLayout->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
@@ -1427,7 +1430,7 @@ void TrainSidebar::setLabels()
 {
     if (context->currentErgFile()) {
 
-        intensitySlider->show();
+        //intensitySlider->show();//XXX!!! temporary
 
         if (context->currentErgFile()->format == CRS) {
 

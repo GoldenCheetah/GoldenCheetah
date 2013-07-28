@@ -70,7 +70,7 @@ class TabView : public QWidget
     signals:
 
         void sidebarClosed(); // the user dragged the sidebar closed.
-        void onSelected();
+        void onSelectionChanged();
 
     public slots:
 

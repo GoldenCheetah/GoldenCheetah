@@ -119,7 +119,7 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
     setBlank(b);
 
     connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(this, SIGNAL(onSelected()), this, SLOT(justSelected()));
+    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
 }
 
 HomeView::~HomeView()
@@ -142,25 +142,34 @@ HomeView::isBlank()
 void
 HomeView::justSelected()
 {
-    // force date range refresh
-    static_cast<LTMSidebar*>(sidebar())->dateRangeTreeWidgetSelectionChanged();
+    if (isSelected()) {
+        // force date range refresh
+        static_cast<LTMSidebar*>(sidebar())->dateRangeTreeWidgetSelectionChanged();
+    }
 }
 
 TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_TRAIN)
 {
-    TrainSidebar *s = new TrainSidebar(context);
-    s->hide();
-    s->getToolbarButtons()->hide(); // no show yet
+    trainTool = new TrainSidebar(context);
+    trainTool->hide();
 
     HomeWindow *t = new HomeWindow(context, "train", "train");
     controls->addWidget(t->controls());
     controls->setCurrentIndex(0);
     BlankStateTrainPage *b = new BlankStateTrainPage(context);
 
-    setSidebar(s->controls());
+    setSidebar(trainTool->controls());
     setPage(t);
     setBlank(b);
 
+    p = new QDialog(NULL);
+    QVBoxLayout *m = new QVBoxLayout(p);
+    m->addWidget(trainTool->getToolbarButtons());
+    trainTool->getToolbarButtons()->show();
+    p->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+    p->hide();
+
+    connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
 }
 
 TrainView::~TrainView()
@@ -171,6 +180,7 @@ void
 TrainView::close()
 {
     static_cast<TrainSidebar*>(sidebar())->Stop();
+    p->close();
 }
 
 bool
@@ -178,4 +188,14 @@ TrainView::isBlank()
 {
     if (appsettings->value(this, GC_DEV_COUNT).toInt() > 0 && trainDB->getCount() > 2) return false;
     else return true;
+}
+
+void
+TrainView::onSelectionChanged()
+{
+    if (isSelected()) {
+        p->show();
+    } else {
+        p->hide();
+    }
 }

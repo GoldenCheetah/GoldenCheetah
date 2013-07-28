@@ -142,6 +142,10 @@ Tab::view(int index)
 void
 Tab::selectView(int index)
 {
+    // first we deselect the current
+    view(views->currentIndex())->setSelected(false);
+
+    // now select the real one
     views->setCurrentIndex(index);
     view(index)->setSelected(true);
     masterControls->setCurrentIndex(index);
