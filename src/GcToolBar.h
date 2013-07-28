@@ -41,4 +41,15 @@ private:
     void paintBackground(QPaintEvent *);
 };
 
+// handy spacer
+class Spacer : public QWidget
+{
+public:
+    Spacer(QWidget *parent) : QWidget(parent) {
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        setSizePolicy(sizePolicy);
+    }
+    QSize sizeHint() const { return QSize(10, 1); }
+};
+
 #endif

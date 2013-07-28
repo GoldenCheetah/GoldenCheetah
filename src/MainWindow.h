@@ -58,13 +58,6 @@ class MainWindow : public QMainWindow
         MainWindow(const QDir &home);
         ~MainWindow(); // temp to zap db - will move to tab //
 
-        // temporary access to chart settings
-        //ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
-
-        // temporary access to the sidebars
-        //AnalysisSidebar *analysissidebar() {return analysisSidebar; } // by SearchBox
-        //TrainSidebar *trainsidebar() {return trainSidebar; } // by ErgDBDownloadDialog
-
         // temporary access to the context
         Context *contextmain() { return context; } // by ChooseCyclistDialog
 
@@ -75,8 +68,6 @@ class MainWindow : public QMainWindow
         virtual void closeEvent(QCloseEvent*);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
-
-    signals:
 
     public slots:
 
