@@ -182,11 +182,15 @@ TabView::selectionChanged()
             blank()->hide();
             splitter->show();
 
-            emit onSelected(); // give view a change to prepare
+            emit onSelectionChanged(); // give view a change to prepare
             page()->selected(); // select the view
 
             stack->setCurrentIndex(0);
         }
+    } else {
+
+        emit onSelectionChanged(); // give view a change to clear
+
     }
 }
 

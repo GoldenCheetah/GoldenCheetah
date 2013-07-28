@@ -20,6 +20,8 @@
 #define _GC_Views_h 1
 
 #include "TabView.h"
+class TrainSidebar;
+class QDialog;
 
 class AnalysisView : public TabView
 {
@@ -67,6 +69,12 @@ class TrainView : public TabView
     public slots:
 
         bool isBlank();
+        void onSelectionChanged();
+
+    private:
+
+        TrainSidebar *trainTool;
+        QDialog *p;
 
 };
 class HomeView : public TabView
