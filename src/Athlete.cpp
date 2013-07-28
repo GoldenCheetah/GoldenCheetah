@@ -361,6 +361,9 @@ Athlete::removeCurrentRide()
         QFile::remove(home.absolutePath() + "/" + deleteMe);
     }
 
+    // we don't want the whole delete, select next flicker
+    context->mainWindow->setUpdatesEnabled(false);
+
     // notify AFTER deleted from DISK..
     context->notifyRideDeleted(item);
 
@@ -375,7 +378,13 @@ Athlete::removeCurrentRide()
     }
 
     treeWidget->setCurrentItem(itemToSelect);
+
+    // now we can update
+    context->mainWindow->setUpdatesEnabled(true);
+    QApplication::processEvents();
+
     context->notifyRideSelected((RideItem*)itemToSelect);
+
 }
 
 void
