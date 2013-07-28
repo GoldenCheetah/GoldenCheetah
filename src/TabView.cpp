@@ -43,8 +43,6 @@ TabView::TabView(Context *context, int type) :
 
     // the splitter
     splitter = new QSplitter(this);
-    splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,1);
     splitter->setHandleWidth(1);
     splitter->setStyleSheet(" QSplitter::handle { background-color: rgb(120,120,120); color: darkGray; }");
     splitter->setFrameStyle(QFrame::NoFrame);
@@ -95,8 +93,10 @@ TabView::setPage(HomeWindow *page)
 
     // now reset the splitter
     splitter->insertWidget(-1, page);
+    splitter->setStretchFactor(0,0);
+    splitter->setStretchFactor(1,1);
     splitter->setCollapsible(0, true);
-    splitter->setCollapsible(1, false);
+    splitter->setCollapsible(1, true);
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
     if (splitterSizes.toByteArray().size() > 1 ) {
@@ -109,7 +109,7 @@ void
 TabView::setBlank(BlankStatePage *blank)
 {
     blank_ = blank;
-    stack->insertWidget(1, blank); // blank state always at index 1
+    blank->hide();//stack->insertWidget(1, blank); // blank state always at index 1
 }
 
 
