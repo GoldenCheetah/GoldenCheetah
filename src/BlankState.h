@@ -43,11 +43,18 @@ class BlankStatePage : public GcWindow
         QPushButton *addToShortCuts(ShortCut shortCut);
         QCheckBox       *dontShow;
 
+        bool canShow() { return canShow_; }
+        virtual void saveState() = 0; // save settings
+
     signals:
         void closeClicked();
 
+    public slots:
+        void setCanShow();
+
     protected:
         Context *context;
+        bool canShow_;
 
         QVBoxLayout     *leftLayout;
         QLabel          *welcomeTitle;
@@ -69,6 +76,7 @@ class BlankStateAnalysisPage : public BlankStatePage
 
     public:
         BlankStateAnalysisPage(Context *context);
+        void saveState();
 
 };
 
@@ -79,6 +87,7 @@ class BlankStateHomePage : public BlankStatePage
 
     public:
         BlankStateHomePage(Context *context);
+        void saveState();
 
 };
 
@@ -89,6 +98,7 @@ class BlankStateDiaryPage : public BlankStatePage
 
     public:
         BlankStateDiaryPage(Context *context);
+        void saveState();
 
 };
 
@@ -99,6 +109,7 @@ class BlankStateTrainPage : public BlankStatePage
 
     public:
         BlankStateTrainPage(Context *context);
+        void saveState();
 
 };
 

@@ -22,6 +22,8 @@
 #include "BlankState.h"
 #include "HomeWindow.h"
 #include "GcWindowRegistry.h"
+#include "TrainDB.h"
+#include "MetricAggregator.h"
 
 #include "Settings.h"
 #include "MainWindow.h" // temp - will become Tab when its ready
@@ -39,6 +41,10 @@ TabView::TabView(Context *context, int type) :
 
     stack = new QStackedWidget(this);
     stack->setContentsMargins(0,0,0,0);
+    stack->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    stack->setMinimumWidth(500);
+    stack->setMinimumHeight(500);
+
     layout->addWidget(stack);
 
     // the splitter
@@ -109,7 +115,15 @@ void
 TabView::setBlank(BlankStatePage *blank)
 {
     blank_ = blank;
-    blank->hide();//stack->insertWidget(1, blank); // blank state always at index 1
+    blank->hide();
+    stack->insertWidget(1, blank); // blank state always at index 1
+
+    // and when stuff happens lets check
+    connect(blank, SIGNAL(closeClicked()), this, SLOT(checkBlank()));
+    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(checkBlank()));
+    connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
+
 }
 
 
@@ -155,12 +169,24 @@ TabView::selectionChanged()
     // we got selected..
     if (isSelected()) {
 
-        emit onSelected(); // give view a change to prepare
-        page()->selected(); // select the view
-
         // or do we need to show blankness?
-        if (isBlank() && blank_ && page_) stack->setCurrentIndex(1);
-        if (!isBlank() && blank_ && page_) stack->setCurrentIndex(0);
+        if (isBlank() && blank_ && page_ && blank_->canShow()) {
+
+            splitter->hide();
+            blank()->show();
+
+            stack->setCurrentIndex(1);
+
+        } else if (blank_ && page_) {
+
+            blank()->hide();
+            splitter->show();
+
+            emit onSelected(); // give view a change to prepare
+            page()->selected(); // select the view
+
+            stack->setCurrentIndex(0);
+        }
     }
 }
 
@@ -174,4 +200,10 @@ void
 TabView::addChart(GcWinID id)
 {
     if (page_) page_->appendChart(id);
+}
+
+void
+TabView::checkBlank()
+{
+    selectionChanged(); // run through the code again
 }
