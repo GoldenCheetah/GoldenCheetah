@@ -49,6 +49,9 @@ class DialWindow : public GcWindow
     // show the instant value?
     Q_PROPERTY(bool showInstant READ isInstant WRITE setInstant USER true)
 
+    // rolling average window
+    Q_PROPERTY(int avgsecs READ avgSecs WRITE setAvgSecs USER true)
+
     // average - none, 30s rolling, total, currentlap
     Q_PROPERTY(int avgType READ avgType WRITE setAvgType USER true)
 
@@ -67,6 +70,7 @@ class DialWindow : public GcWindow
         int avgType() const { return _avgType; }
         int dataSeries() const { return seriesSelector->currentIndex(); }
         int style() const { return _style; }
+        int avgSecs() const { return average; }
 
         // change font as window resizes
         void resizeEvent(QResizeEvent *);
@@ -85,6 +89,7 @@ class DialWindow : public GcWindow
     protected:
 
         void setInstant(bool x) { _instant=x; }
+        void setAvgSecs(int x) { average=x; averageSlider->setValue(x); setAverageFromSlider(); }
         void setAvgType(int x) { _avgType=x; }
         void setDataSeries(int x) { seriesSelector->setCurrentIndex(x); }
         void setStyle(int x) { _style=x; }

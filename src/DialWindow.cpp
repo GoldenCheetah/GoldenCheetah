@@ -560,9 +560,7 @@ DialWindow::setAverageFromText(const QString text) {
 
 void
 DialWindow::setAverageFromSlider() {
-    if (average != averageSlider->value()) {
-        setAverageFromText(QString("%1").arg(averageSlider->value()));
-    }
+    setAverageFromText(QString("%1").arg(averageSlider->value()));
 }
 
 void
