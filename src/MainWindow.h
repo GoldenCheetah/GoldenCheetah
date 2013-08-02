@@ -143,7 +143,8 @@ class MainWindow : public QMainWindow
         void exportRide();
         void exportBatch();
         void exportMetrics();
-        void uploadRideWithGPSAction();
+        void tweetRide();
+        void share();
         void uploadTtb();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
@@ -198,7 +199,8 @@ class MainWindow : public QMainWindow
         // only keeping those used outside of mainwindow constructor
         QAction *styleAction;
         QAction *showhideSidebar;
-        QAction *rideWithGPSAction;
+        QAction *tweetAction;
+        QAction *shareAction;
         QAction *ttbAction;
 
         // Miscellany

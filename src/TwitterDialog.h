@@ -42,15 +42,17 @@ class TwitterDialog : public QDialog
     G_OBJECT
 
 public:
-     TwitterDialog(MainWindow *mainWindow, RideItem *item);
+     TwitterDialog(Context *context, RideItem *item);
 
 signals:
 
 private slots:
-     void onCheck(int state);
-     void tweetMsgChange(QString);
-     void tweetCurrentRide();
+    void onCheck(int state);
+    void tweetMsgChange(QString);
+    void tweetCurrentRide();
+
 private:
+    Context *context;
 
      QPushButton *tweetButton;
      QPushButton *cancelButton;

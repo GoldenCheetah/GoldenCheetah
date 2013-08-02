@@ -22,8 +22,8 @@ LIBS += -lm $${LIBZ_LIBS}
     INCLUDEPATH += $${LIBOAUTH_INCLUDE}
     LIBS        += $${LIBOAUTH_LIBS}
     DEFINES     += GC_HAVE_LIBOAUTH
-    #SOURCES     += TwitterDialog.cpp
-    #HEADERS     += TwitterDialog.h
+    SOURCES     += OAuthDialog.cpp TwitterDialog.cpp ShareDialog.cpp
+    HEADERS     += OAuthDialog.h TwitterDialog.h ShareDialog.h
 }
 
 !isEmpty( D2XX_INCLUDE ) {
@@ -352,7 +352,6 @@ HEADERS += \
         RideNavigator.h \
         RideNavigatorProxy.h \
         RideWindow.h \
-        RideWithGPSDialog.h \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
@@ -544,7 +543,6 @@ SOURCES += \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
-        RideWithGPSDialog.cpp \
         SaveDialogs.cpp \
         ScatterPlot.cpp \
         ScatterWindow.cpp \
