@@ -32,6 +32,7 @@
 #include "ColorButton.h"
 #include "SpecialFields.h"
 #include "DataProcessor.h"
+#include "OAuthDialog.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -289,6 +290,21 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *passLabel = new QLabel(tr("Password"));
     QLabel *typeLabel = new QLabel(tr("Account Type"));
 
+    QLabel *twp = new QLabel(tr("Twitter"));
+    twp->setFont(current);
+
+    QLabel *twurlLabel = new QLabel(tr("Website"));
+    QLabel *twauthLabel = new QLabel(tr("Authorise"));
+    QLabel *twpinLabel = new QLabel(tr("PIN"));
+
+    QLabel *str = new QLabel(tr("Strava"));
+    str->setFont(current);
+
+    //QLabel *struserLabel = new QLabel(tr("Username"));
+    //QLabel *strpassLabel = new QLabel(tr("Password"));
+    QLabel *strauthLabel = new QLabel(tr("Authorise"));
+    QLabel *strpinLabel = new QLabel(tr("PIN"));
+
     QLabel *rwgps = new QLabel(tr("RideWithGPS"));
     rwgps->setFont(current);
 
@@ -357,6 +373,27 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     tpType->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_TPTYPE, "0").toInt());
 
+    twitterURL = new QLineEdit(this);
+    twitterURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TWURL, "http://www.twitter.com").toString());
+    twitterAuthorise = new QPushButton("Authorise", this);
+    twitterPIN = new QLineEdit(this);
+    twitterPIN->setText("");
+
+    stravaAuthorise = new QPushButton("Authorise", this);
+#ifndef GC_STRAVA_CLIENT_SECRET
+    stravaAuthorise->setEnabled(false);
+#endif
+
+    QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
+
+    stravaAuthorised = new QPushButton(this);
+    stravaAuthorised->setContentsMargins(0,0,0,0);
+    stravaAuthorised->setIcon(passwords.scaled(16,16));
+    stravaAuthorised->setIconSize(QSize(16,16));
+    stravaAuthorised->setFixedHeight(16);
+    stravaAuthorised->setFixedWidth(16);
+
+
     rideWithGPSUser = new QLineEdit(this);
     rideWithGPSUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER, "").toString());
 
@@ -414,6 +451,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(gcurlLabel, 6,0);
     grid->addWidget(gcuserLabel, 7,0);
     grid->addWidget(gcpassLabel, 8,0);
+    grid->addWidget(twp, 9,0);
+    grid->addWidget(twurlLabel, 10,0);
+    grid->addWidget(twauthLabel, 11,0);
+    grid->addWidget(twpinLabel, 12,0);
+    grid->addWidget(str, 13,0);
+    grid->addWidget(strauthLabel, 14,0);
+    grid->addWidget(strpinLabel, 15,0);
     grid->addWidget(rwgps, 17,0);
     grid->addWidget(rwgpsuserLabel, 18,0);
     grid->addWidget(rwgpspassLabel, 19,0);
@@ -444,6 +488,14 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(gcUser, 7, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(gcPass, 8, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
+    grid->addWidget(twitterURL, 10, 1, 0);
+    grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(stravaAuthorise, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "")!="")
+        grid->addWidget(stravaAuthorised, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
     grid->addWidget(rideWithGPSUser, 18, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(rideWithGPSPass, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
@@ -472,8 +524,84 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     setFrameStyle(QFrame::NoFrame);
     setWidgetResizable(true);
     setWidget(main);
+
+    connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
+    connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
 }
 
+
+void CredentialsPage::authoriseTwitter()
+{
+#ifdef GC_HAVE_LIBOAUTH
+    int rc;
+    char **rv = NULL;
+    QString token;
+    QString url = QString();
+    t_key = NULL;
+    t_secret = NULL;
+
+    const char *request_token_uri = "http://api.twitter.com/oauth/request_token";
+
+    char *req_url = NULL;
+    char *postarg = NULL;
+    char *reply   = NULL;
+    req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
+    reply = oauth_http_get(req_url,postarg);
+
+    rc = oauth_split_url_parameters(reply, &rv);
+    qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+    token = QString(rv[1]);
+    t_key  =strdup(&(rv[1][12]));
+    t_secret =strdup(&(rv[2][19]));
+    url = QString("http://api.twitter.com/oauth/authorize?");
+    url.append(token);
+    QDesktopServices::openUrl(QUrl(url));
+    if(rv) free(rv);
+#endif
+}
+
+void CredentialsPage::saveTwitter()
+{
+#ifdef GC_HAVE_LIBOAUTH
+    char *reply;
+    char *req_url;
+    char **rv = NULL;
+    char *postarg = NULL;
+    QString url = QString("http://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
+
+    QString strPin = twitterPIN->text();
+    if(strPin.size() == 0)
+        return;
+
+    url.append(strPin);
+
+    req_url = oauth_sign_url2(url.toLatin1(), NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, t_key, t_secret);
+    reply = oauth_http_get(req_url,postarg);
+
+    int rc = oauth_split_url_parameters(reply, &rv);
+
+    if(rc ==4)
+    {
+        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+
+        const char *oauth_token = strdup(&(rv[0][12]));
+        const char *oauth_secret = strdup(&(rv[1][19]));
+
+        //Save Twitter oauth_token and oauth_secret;
+        appsettings->setValue(GC_TWITTER_TOKEN, oauth_token);
+        appsettings->setValue(GC_TWITTER_SECRET, oauth_secret);
+    }
+#endif
+}
+
+void CredentialsPage::authoriseStrava()
+{
+#ifdef GC_HAVE_LIBOAUTH
+    OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA);
+    oauthDialog->setWindowModality(Qt::ApplicationModal);
+    oauthDialog->exec();
+#endif
+}
 
 void
 CredentialsPage::saveClicked()

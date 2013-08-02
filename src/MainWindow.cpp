@@ -51,7 +51,8 @@
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "BatchExportDialog.h"
-#include "RideWithGPSDialog.h"
+#include "TwitterDialog.h"
+#include "ShareDialog.h"
 #include "TtbDialog.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
@@ -476,9 +477,15 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
-    rideWithGPSAction = new QAction(tr("Upload to RideWithGPS..."), this);
-    connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
-    rideMenu->addAction(rideWithGPSAction);
+#ifdef GC_HAVE_LIBOAUTH
+    tweetAction = new QAction(tr("Tweet Activity"), this);
+    connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
+    rideMenu->addAction(tweetAction);
+
+    shareAction = new QAction(tr("Share..."), this);
+    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
+    rideMenu->addAction(shareAction);
+#endif
 
     ttbAction = new QAction(tr("Upload to Trainingstagebuch..."), this);
     connect(ttbAction, SIGNAL(triggered(bool)), this, SLOT(uploadTtb()));
@@ -679,16 +686,12 @@ MainWindow::setActivityMenu()
     // enable/disable upload if already uploaded
     if (context->ride && context->ride->ride()) {
 
-        QString tripid = context->ride->ride()->getTag("RideWithGPS tripid", "");
-        if (tripid == "") rideWithGPSAction->setEnabled(true);
-        else rideWithGPSAction->setEnabled(false);
         
         QString activityId = context->ride->ride()->getTag("TtbExercise", "");
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
         
     } else {
-        rideWithGPSAction->setEnabled(false);
         ttbAction->setEnabled(false);
     }
 }
@@ -1174,11 +1177,11 @@ MainWindow::exportMetrics()
 }
 
 /*----------------------------------------------------------------------
-* RideWithGPS.com
-*--------------------------------------------------------------------*/
-
+ * Twitter
+ *--------------------------------------------------------------------*/
+#ifdef GC_HAVE_LIBOAUTH
 void
-MainWindow::uploadRideWithGPSAction()
+MainWindow::tweetRide()
 {
     QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
@@ -1186,10 +1189,30 @@ MainWindow::uploadRideWithGPSAction()
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        RideWithGPSDialog d(context, item);
+        TwitterDialog *twitterDialog = new TwitterDialog(context, item);
+        twitterDialog->setWindowModality(Qt::ApplicationModal);
+        twitterDialog->exec();
+    }
+}
+
+/*----------------------------------------------------------------------
+* Share : Twitter, Strava, RideWithGPS
+*--------------------------------------------------------------------*/
+
+void
+MainWindow::share()
+{
+    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE) return;
+
+    RideItem *item = dynamic_cast<RideItem*>(_item);
+
+    if (item) { // menu is disabled anyway, but belt and braces
+        ShareDialog d(context, item);
         d.exec();
     }
 }
+#endif
 
 /*----------------------------------------------------------------------
 * trainingstagebuch.org
