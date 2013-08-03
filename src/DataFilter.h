@@ -32,18 +32,18 @@ class Leaf {
 
     public:
 
-        Leaf() : type(none) { }
+        Leaf() : type(none),series(NULL) { }
 
         // evaluate against a SummaryMetric
-        bool eval(DataFilter *df, Leaf *, SummaryMetrics);
+        double eval(DataFilter *df, Leaf *, SummaryMetrics);
 
         // tree traversal etc
-        void print(Leaf *);  // print leaf and all children
+        void print(Leaf *, int level);  // print leaf and all children
         void validateFilter(DataFilter *, Leaf*); // validate
         bool isNumber(DataFilter *df, Leaf *leaf);
         void clear(Leaf*);
 
-        enum { none, Float, Integer, String, Symbol, Logical, Operation } type;
+        enum { none, Float, Integer, String, Symbol, Logical, Operation, BinaryOperation, Function } type;
         union value {
             float f;
             int i;
@@ -52,6 +52,8 @@ class Leaf {
             Leaf *l;
         } lvalue, rvalue;
         int op;
+        QString function;
+        Leaf *series; // is a symbol
 };
 
 class DataFilter : public QObject
@@ -86,3 +88,5 @@ class DataFilter : public QObject
 
         QStringList filenames;
 };
+
+extern int DataFilterdebug;
