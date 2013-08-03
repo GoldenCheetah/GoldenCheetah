@@ -39,20 +39,28 @@ extern int DataFilterparse();
 
 Leaf *root; // root node for parsed statement
 
-void Leaf::print(Leaf *leaf)
+void Leaf::print(Leaf *leaf, int level)
 {
+    qDebug()<<"LEVEL"<<level;
     switch(leaf->type) {
     case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f; break;
     case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i; break;
     case Leaf::String : qDebug()<<"string"<<*leaf->lvalue.s; break;
     case Leaf::Symbol : qDebug()<<"symbol"<<*leaf->lvalue.n; break;
-    case Leaf::Logical  : qDebug()<<"logical"<<leaf->op;
-                    leaf->print(leaf->lvalue.l);
-                    leaf->print(leaf->rvalue.l);
+    case Leaf::Logical  : qDebug()<<"lop"<<leaf->op;
+                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->rvalue.l, level+1);
                     break;
-    case Leaf::Operation : qDebug()<<"compare"<<leaf->op;
-                    leaf->print(leaf->lvalue.l);
-                    leaf->print(leaf->rvalue.l);
+    case Leaf::Operation : qDebug()<<"cop"<<leaf->op;
+                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->rvalue.l, level+1);
+                    break;
+    case Leaf::BinaryOperation : qDebug()<<"bop"<<leaf->op;
+                    leaf->print(leaf->lvalue.l, level+1);
+                    leaf->print(leaf->rvalue.l, level+1);
+                    break;
+    case Leaf::Function : qDebug()<<"function"<<leaf->function<<"series="<<*(leaf->series->lvalue.n);
+                    leaf->print(leaf->lvalue.l, level+1);
                     break;
     default:
         break;
@@ -64,11 +72,13 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
 {
     switch(leaf->type) {
     case Leaf::Float : return true;
-    case Leaf::Integer : return true; 
+    case Leaf::Integer : return true;
     case Leaf::String : return false;
     case Leaf::Symbol : return df->lookupType.value(*(leaf->lvalue.n), false);
-    case Leaf::Logical  : return false; // not possible!
-    case Leaf::Operation : return false;
+    case Leaf::Logical  : return true; // not possible!
+    case Leaf::Operation : return true;
+    case Leaf::BinaryOperation : return true;
+    case Leaf::Function : return true;
     default:
         return false;
         break;
@@ -78,18 +88,24 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
 
 void Leaf::clear(Leaf *leaf)
 {
+#if 0 // memory leak!!!
     switch(leaf->type) {
     case Leaf::String : delete leaf->lvalue.s; break;
     case Leaf::Symbol : delete leaf->lvalue.n; break;
-    case Leaf::Logical  : 
+    case Leaf::Logical  :
+    case Leaf::BinaryOperation :
     case Leaf::Operation : clear(leaf->lvalue.l);
                            clear(leaf->rvalue.l);
                            delete(leaf->lvalue.l);
                            delete(leaf->rvalue.l);
                            break;
+    case Leaf::Function :  clear(leaf->lvalue.l);
+                           delete(leaf->lvalue.l);
+                            break;
     default:
         break;
     }
+#endif
 }
 
 void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
@@ -106,9 +122,25 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 DataFiltererrors << QString("%1 is unknown").arg(*(leaf->lvalue.n));
             }
         }
-    break;
+        break;
 
-    case Leaf::Operation  : 
+    case Leaf::Function :
+        {
+            // is the symbol valid?
+            QRegExp bestValidSymbols("^(power|hr|cadence|speed|torque|vam|xpower|np)$", Qt::CaseInsensitive);
+            QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
+            QString symbol = *(leaf->series->lvalue.n); 
+
+            if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) 
+                DataFiltererrors << QString("invalid data series for best(): %1").arg(symbol);
+
+            if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) 
+                DataFiltererrors << QString("invalid data series for tiz(): %1").arg(symbol);
+        }
+        break;
+
+    case Leaf::BinaryOperation  :
+    case Leaf::Operation  :
         {
             // first lets make sure the lhs and rhs are of the same type
             bool lhsType = Leaf::isNumber(df, leaf->lvalue.l);
@@ -144,7 +176,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
 
 QStringList DataFilter::parseFilter(QString query)
 {
-    //DataFilterdebug = 0; // no debug -- needs bison -t in src.pro
+    //DataFilterdebug = 2; // no debug -- needs bison -t in src.pro
     root = NULL;
 
     // if something was left behind clear it up now
@@ -163,7 +195,10 @@ QStringList DataFilter::parseFilter(QString query)
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(this, treeRoot);
 
     // ok, did it pass all tests?
-    if (DataFiltererrors.count() > 0) { // nope
+    if (!treeRoot || DataFiltererrors.count() > 0) { // nope
+
+        // no errors just failed to finish
+        if (!treeRoot) DataFiltererrors << "malformed expression.";
 
         // Bzzzt, malformed
         emit parseBad(DataFiltererrors);
@@ -183,7 +218,7 @@ QStringList DataFilter::parseFilter(QString query)
         for (int i=0; i<allRides.count(); i++) {
 
             // evaluate each ride...
-            bool result = treeRoot->eval(this, treeRoot, allRides.at(i));
+            double result = treeRoot->eval(this, treeRoot, allRides.at(i));
             if (result) {
                 filenames << allRides.at(i).getFileName();
             }
@@ -221,18 +256,18 @@ void DataFilter::configUpdate()
     // now add the ride metadata fields -- should be the same generally
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             QString underscored = field.name;
-            if (!context->specialFields.isMetric(underscored)) { 
+            if (!context->specialFields.isMetric(underscored)) {
                 lookupMap.insert(underscored.replace(" ","_"), field.name);
                 lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
             }
     }
 }
 
-bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
+double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
 {
     switch(leaf->type) {
 
-    case Leaf::Logical  : 
+    case Leaf::Logical  :
     {
         switch (leaf->op) {
             case AND :
@@ -240,11 +275,63 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
 
             case OR :
                 return (eval(df, leaf->lvalue.l, m) || eval(df, leaf->rvalue.l, m));
+
+            default : // parenthesis
+                return (eval(df, leaf->lvalue.l, m));
         }
     }
     break;
 
-    case Leaf::Operation : 
+    case Leaf::Function :
+    {
+        double duration;
+
+        // GET LHS VALUE
+        switch (leaf->lvalue.l->type) {
+
+            default:
+            case Leaf::Function :
+            {
+                duration = eval(df, leaf->lvalue.l, m); // duration
+            }
+            break;
+
+            case Leaf::Symbol :
+            {
+                QString rename;
+                // get symbol value
+                if (df->lookupType.value(*(leaf->lvalue.l->lvalue.n)) == true) {
+                    // numeric
+                    duration = m.getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                } else {
+                    duration = 0;
+                }
+            }
+            break;
+
+            case Leaf::Float :
+                duration = leaf->lvalue.l->lvalue.f;
+                break;
+
+            case Leaf::Integer :
+                duration = leaf->lvalue.l->lvalue.i;
+                break;
+
+            case Leaf::String :
+                duration = (leaf->lvalue.l->lvalue.s)->toDouble();
+                break;
+
+            break;
+        }
+        //qDebug()<<"best for series"<<*(leaf->series->lvalue.n)<<duration<<"returning 100";
+
+        //XXX!!! we must now call the real function to get the tiz/best for duration...
+        return 100;
+    }
+    break;
+
+    case Leaf::BinaryOperation :
+    case Leaf::Operation :
     {
         double lhsdouble=0.00, rhsdouble=0.00;
         QString lhsstring, rhsstring;
@@ -252,6 +339,14 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
 
         // GET LHS VALUE
         switch (leaf->lvalue.l->type) {
+
+            default:
+            case Leaf::Function :
+            {
+                lhsdouble = eval(df, leaf->lvalue.l, m); // duration
+                lhsisNumber=true;
+            }
+            break;
 
             case Leaf::Symbol :
             {
@@ -284,13 +379,19 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
                 lhsstring = *(leaf->lvalue.l->lvalue.s);
                 break;
 
-            default:
             break;
         }
 
-        // GET RHS VALUE
+        // GET RHS VALUE -- BUT NOT FOR FUNCTIONS
         switch (leaf->rvalue.l->type) {
 
+            default:
+            case Leaf::Function :
+            {
+                rhsdouble = eval(df, leaf->rvalue.l, m);
+                rhsisNumber=true;
+            }
+            break;
             case Leaf::Symbol :
             {
                 QString rename;
@@ -322,12 +423,62 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
                 rhsstring = *(leaf->rvalue.l->lvalue.s);
                 break;
 
-            default:
             break;
         }
 
         // NOW PERFORM OPERATION
+        //qDebug()<<"lhs="<<lhsdouble<<"rhs="<<rhsdouble;
         switch (leaf->op) {
+
+        case ADD:
+        {
+            if (lhsisNumber) {
+                return lhsdouble + rhsdouble;
+            } else {
+                return 0;
+            }
+        }
+        break;
+
+        case SUBTRACT:
+        {
+            if (lhsisNumber) {
+                return lhsdouble - rhsdouble;
+            } else {
+                return 0;
+            }
+        }
+        break;
+
+        case DIVIDE:
+        {
+            if (lhsisNumber && rhsdouble) { // avoid divide by zero
+                return lhsdouble / rhsdouble;
+            } else {
+                return 0;
+            }
+        }
+        break;
+
+        case MULTIPLY:
+        {
+            if (lhsisNumber) {
+                return lhsdouble * rhsdouble;
+            } else {
+                return 0;
+            }
+        }
+        break;
+
+        case POW:
+        {
+            if (lhsisNumber && rhsdouble) {
+                return pow(lhsdouble,rhsdouble);
+            } else {
+                return 0;
+            }
+        }
+        break;
 
         case EQ:
         {
@@ -399,7 +550,7 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
             break;
 
         case CONTAINS:
-            return lhsstring.contains(rhsstring);
+            return lhsstring.contains(rhsstring) ? true : false;
             break;
 
         default:

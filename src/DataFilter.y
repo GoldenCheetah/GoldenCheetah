@@ -54,9 +54,11 @@ extern Leaf *root; // root node for parsed statement
 
 // Constants can be a string or a number
 %token <leaf> STRING INTEGER FLOAT
+%token <function> BEST TIZ
 
 // comparative operators
 %token <op> EQ NEQ LT LTE GT GTE 
+%token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 
 // logical operators
@@ -65,11 +67,13 @@ extern Leaf *root; // root node for parsed statement
 %union {
    Leaf *leaf;
    int op;
+   char function[32];
 }
 
-%type <leaf> value lexpr;
-%type <op> lop op;
+%type <leaf> symbol value lexpr;
+%type <op> lop cop bop;
 
+%left ADD SUBTRACT DIVIDE MULTIPLY POW
 %left EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %left AND OR
 
@@ -90,15 +94,24 @@ lexpr : '(' lexpr ')'               { $$ = new Leaf();
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
                                     
-      | value op value              { $$ = new Leaf();
+      | lexpr cop lexpr              { $$ = new Leaf();
                                       $$->type = Leaf::Operation;
                                       $$->lvalue.l = $1;
                                       $$->op = $2;
                                       $$->rvalue.l = $3; }
+
+      | lexpr bop lexpr              { $$ = new Leaf();
+                                      $$->type = Leaf::BinaryOperation;
+                                      $$->lvalue.l = $1;
+                                      $$->op = $2;
+                                      $$->rvalue.l = $3; }
+
+      | value                        { $$ = $1; }
+
       ;
 
 
-op    : EQ
+cop    : EQ
       | NEQ
       | LT
       | LTE
@@ -114,12 +127,22 @@ lop   : AND
       | OR
       ;
 
-value : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
+bop   : ADD
+      | SUBTRACT
+      | DIVIDE
+      | MULTIPLY
+      | POW
+      ;
+
+symbol : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
                                       if (QString(DataFiltertext) == "BikeScore")
                                         $$->lvalue.n = new QString("BikeScore&#8482;");
                                       else
                                         $$->lvalue.n = new QString(DataFiltertext);
                                     }
+        ;
+
+value : symbol                      { $$ = $1; }
 
       | STRING                      { $$ = new Leaf(); $$->type = Leaf::String;
                                       QString s2(DataFiltertext);
@@ -128,6 +151,19 @@ value : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
                                       $$->lvalue.f = QString(DataFiltertext).toFloat(); }
       | INTEGER                     { $$ = new Leaf(); $$->type = Leaf::Integer;
                                       $$->lvalue.i = QString(DataFiltertext).toInt(); }
+
+      | BEST '(' symbol ',' lexpr ')' { $$ = new Leaf(); $$->type = Leaf::Function;
+                                        $$->function = QString($1);
+                                        $$->series = $3;
+                                        $$->lvalue.l = $5;
+                                      }
+
+
+      | TIZ '(' symbol ',' lexpr ')' { $$ = new Leaf(); $$->type = Leaf::Function;
+                                        $$->function = QString($1);
+                                        $$->series = $3;
+                                        $$->lvalue.l = $5;
+                                      }
       ;
 
 %%

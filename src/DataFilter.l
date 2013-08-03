@@ -44,6 +44,9 @@
 [Ee][Nn][Dd][Ss][Ww][Ii][Tt][Hh]            DataFilterlval.op = ENDSWITH; return ENDSWITH;
 [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Ss]            DataFilterlval.op = CONTAINS; return CONTAINS;
 
+[Bb][Ee][Ss][Tt]                          strcpy(DataFilterlval.function, "best"); return BEST;
+[Tt][Ii][Zz]                               strcpy(DataFilterlval.function, "tiz"); return TIZ;
+
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;
 "||"                                        DataFilterlval.op = OR; return OR;
@@ -55,12 +58,22 @@
 [-+]?[0-9]+\.[-e0-9]*                       return FLOAT;
 \"([^\"]|\\\")*\"                           return STRING;  /* contains non-quotes or escaped-quotes */
 
+
 "TRIMP(100)_Points"                         return SYMBOL; /* special case */
 "Left/Right_Balance"                        return SYMBOL; /* special case */
 [a-zA-Z0-9][a-zA-Z0-9_%™]+                  return SYMBOL; /* symbols can start with 0-9 */
 
+
+"+"                                         DataFilterlval.op = ADD; return ADD;
+"-"                                         DataFilterlval.op = SUBTRACT; return SUBTRACT;
+"*"                                         DataFilterlval.op = MULTIPLY; return MULTIPLY;
+"/"                                         DataFilterlval.op = DIVIDE; return DIVIDE;
+"^"                                         DataFilterlval.op = POW; return POW;
+
 [ \n\t\r]                                   ;               /* we just ignore whitespace */
 
+
+.                   return DataFiltertext[0]; /* any other character, typically :, { or } */
 %%
 
 // Older versions of flex (prior to 2.5.9) do not have the destroy function
@@ -71,6 +84,7 @@ int DataFilterlex_destroy(void) { return 0; }
 
 void DataFilter_setString(QString p)
 {
+    BEGIN(0);
     DataFilter_scan_string(p.toLatin1().data());
 }
 
