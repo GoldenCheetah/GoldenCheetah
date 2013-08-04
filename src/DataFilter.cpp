@@ -160,8 +160,11 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
         }
         break;
 
-    case Leaf::Logical : validateFilter(df, leaf->lvalue.l);
-                         validateFilter(df, leaf->rvalue.l);
+    case Leaf::Logical : 
+        {
+            validateFilter(df, leaf->lvalue.l);
+            if (leaf->op) validateFilter(df, leaf->rvalue.l);
+        }
         break;
     default:
         break;
