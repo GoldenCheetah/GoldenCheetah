@@ -17,7 +17,6 @@
  */
 
 
-#include <assert.h>
 #include <QDebug>
 #include <qwt_series_data.h>
 #include <qwt_legend.h>

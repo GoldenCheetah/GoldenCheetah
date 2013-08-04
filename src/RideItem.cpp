@@ -24,7 +24,6 @@
 #include "Context.h"
 #include "Zones.h"
 #include "HrZones.h"
-#include <assert.h>
 #include <math.h>
 
 RideItem::RideItem(int type,

@@ -33,7 +33,6 @@
 
 #include "ZoneScaleDraw.h"
 
-#include <assert.h>
 #include <qpainter.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>

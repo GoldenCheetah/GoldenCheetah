@@ -20,7 +20,6 @@
 #include "RawRideFile.h"
 #include "PowerTapUtil.h"
 #include "Units.h"
-#include <assert.h>
 #include <math.h>
 
 static int rawFileReaderRegistered =
@@ -51,8 +50,8 @@ config_cb(unsigned interval, double rec_int_secs,
     ReadState *state = (ReadState*) context;
     // Assume once set, rec_int should never change.
     //double recIntSecs = rec_int * 1.26;
-    assert((state->rideFile->recIntSecs() == 0.0)
-           || (state->rideFile->recIntSecs() == rec_int_secs));
+    // ACTUALLY LETS NOT, IF IT CHANGES ITS NOT A REASON TO FUCKING CRASH.
+    //assert((state->rideFile->recIntSecs() == 0.0) || (state->rideFile->recIntSecs() == rec_int_secs));
     state->rideFile->setRecIntSecs(rec_int_secs);
 }
 

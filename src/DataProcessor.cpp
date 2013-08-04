@@ -21,7 +21,6 @@
 #include "AllPlot.h"
 #include "Settings.h"
 #include "Units.h"
-#include <assert.h>
 
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
@@ -33,7 +32,7 @@ DataProcessorFactory &DataProcessorFactory::instance()
 bool
 DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 {
-    assert(!processors.contains(name));
+    if (processors.contains(name)) return false; // don't register twice!
     processors.insert(name, processor);
     return true;
 }
