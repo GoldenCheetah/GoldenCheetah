@@ -32,7 +32,7 @@ class Leaf {
 
     public:
 
-        Leaf() : type(none),series(NULL) { }
+        Leaf() : type(none),op(0),series(NULL) { }
 
         // evaluate against a SummaryMetric
         double eval(DataFilter *df, Leaf *, SummaryMetrics);
