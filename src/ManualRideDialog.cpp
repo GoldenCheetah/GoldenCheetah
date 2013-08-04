@@ -20,7 +20,6 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "Settings.h"
-#include <assert.h>
 #include <string.h>
 #include <errno.h>
 #include <QtGui>

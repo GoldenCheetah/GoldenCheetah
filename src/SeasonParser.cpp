@@ -19,7 +19,6 @@
 #include "SeasonParser.h"
 #include <QDate>
 #include <QDebug>
-#include <assert.h>
 
 static inline QString unquote(QString quoted)
 {
@@ -100,7 +99,6 @@ QDate SeasonParser::seasonDateToDate(QString seasonDate)
 {
     QRegExp rx(".*([0-9][0-9][0-9][0-9])-([0-9][0-9])-([0-9][0-9]$)");
         if (rx.exactMatch(seasonDate)) {
-            assert(rx.numCaptures() == 3);
             QDate date = QDate(
                                rx.cap(1).toInt(),
                                rx.cap(2).toInt(),

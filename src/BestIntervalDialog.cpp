@@ -22,7 +22,6 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include <QMap>
-#include <assert.h>
 #include <math.h>
 
 BestIntervalDialog::BestIntervalDialog(Context *context) :

@@ -17,7 +17,6 @@
  */
 
 #include "Device.h"
-#include "assert.h"
 
 typedef QMap<QString,DevicesPtr> DevicesMap;
 
@@ -76,14 +75,12 @@ Devices::typeNames()
 DevicesPtr
 Devices::getType(const QString &deviceTypeName )
 {
-    assert(devices().contains(deviceTypeName));
     return devices().value(deviceTypeName);
 }
 
 bool
 Devices::addType(const QString &deviceTypeName, DevicesPtr p )
 {
-    assert(!devices().contains(deviceTypeName));
     devices().insert(deviceTypeName, p);
     return true;
 }

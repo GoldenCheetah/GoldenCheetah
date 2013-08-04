@@ -18,7 +18,6 @@
 
 #include <QtGui>
 #include <QSettings>
-#include <assert.h>
 
 #include "Context.h"
 #include "Context.h"

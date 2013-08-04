@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <assert.h>
 #include <QApplication>
 #include <QtGui>
 #include "ChooseCyclistDialog.h"
@@ -90,7 +89,7 @@ main(int argc, char *argv[])
                 if (!home.mkpath(libraryPath))
                 {
                     qDebug()<<"Failed to create library path\n";
-                    assert(false);
+                    exit(0);
                 }
             }
             home.cd(libraryPath);
@@ -155,7 +154,7 @@ main(int argc, char *argv[])
             return 0;
         home.cd(d.choice());
         if (!home.exists())
-            assert(false);
+            exit(0);
         MainWindow *mainWindow = new MainWindow(home);
         mainWindow->show();
     }

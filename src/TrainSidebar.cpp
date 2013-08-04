@@ -25,7 +25,6 @@
 #include "Units.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
-#include <assert.h>
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>

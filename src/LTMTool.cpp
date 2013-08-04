@@ -22,7 +22,6 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
-#include <assert.h>
 #include <QApplication>
 #include <QtGui>
 
