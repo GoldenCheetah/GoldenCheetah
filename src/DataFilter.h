@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QList>
 #include <QStringList>
+#include "RideFile.h" //for SeriesType
 
 class Context;
 class RideMetric;
@@ -35,7 +36,7 @@ class Leaf {
         Leaf() : type(none),op(0),series(NULL) { }
 
         // evaluate against a SummaryMetric
-        double eval(DataFilter *df, Leaf *, SummaryMetrics);
+        double eval(DataFilter *df, Leaf *, SummaryMetrics, QString filename);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
@@ -54,6 +55,7 @@ class Leaf {
         int op;
         QString function;
         Leaf *series; // is a symbol
+        RideFile::SeriesType seriesType; // for ridefilecache
 };
 
 class DataFilter : public QObject
@@ -62,6 +64,8 @@ class DataFilter : public QObject
 
     public:
         DataFilter(QObject *parent, Context *context);
+
+        Context *context;
         QStringList &files() { return filenames; }
 
         // used by Leaf
@@ -82,7 +86,6 @@ class DataFilter : public QObject
         void results(QStringList);
 
     private:
-        Context *context;
         Leaf *treeRoot;
         QStringList errors;
 

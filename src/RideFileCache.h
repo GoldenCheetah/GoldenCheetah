@@ -129,6 +129,11 @@ class RideFileCache
         // not actually a copy constructor -- but we call it IN the constructor.
         RideFileCache(RideFileCache *other) { *this = *other; }
 
+        // get a single best or time in zone value from the cache file
+        // intended to be very fast (using lseek to jump direct to the value requested
+        static double best(Context *context, QString fileName, RideFile::SeriesType series, int duration);
+        static int tiz(Context *context, QString fileName, RideFile::SeriesType series, int zone);
+
         static int decimalsFor(RideFile::SeriesType series);
 
         // get data

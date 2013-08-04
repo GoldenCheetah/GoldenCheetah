@@ -1140,3 +1140,151 @@ void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, Rid
     return;
 }
 
+// returns offset from end of head
+static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
+{
+    long offset = 0;
+
+    switch (series) {
+    case RideFile::wattsKg : offset += head.vamMeanMaxCount * sizeof(float);
+    case RideFile::vam : offset += head.npMeanMaxCount * sizeof(float);
+    case RideFile::NP : offset += head.xPowerMeanMaxCount * sizeof(float);
+    case RideFile::xPower : offset += head.kphMeanMaxCount * sizeof(float);
+    case RideFile::kph : offset += head.nmMeanMaxCount * sizeof(float);
+    case RideFile::nm : offset += head.cadMeanMaxCount * sizeof(float);
+    case RideFile::cad : offset += head.hrMeanMaxCount * sizeof(float);
+    case RideFile::hr : offset += head.wattsMeanMaxCount * sizeof(float);
+    case RideFile::watts : offset += 0;
+    default:
+        break;
+    }
+
+    return offset;
+}
+
+//offset to tiz table
+static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
+{
+    long offset = 0;
+
+    // skip past the mean max arrays
+    offset += head.wattsKgMeanMaxCount * sizeof(float);
+    offset += head.vamMeanMaxCount * sizeof(float);
+    offset += head.npMeanMaxCount * sizeof(float);
+    offset += head.xPowerMeanMaxCount * sizeof(float);
+    offset += head.kphMeanMaxCount * sizeof(float);
+    offset += head.nmMeanMaxCount * sizeof(float);
+    offset += head.cadMeanMaxCount * sizeof(float);
+    offset += head.hrMeanMaxCount * sizeof(float);
+    offset += head.wattsMeanMaxCount * sizeof(float);
+
+    // skip past the distribution arrays
+    offset += head.wattsDistCount * sizeof(float);
+    offset += head.hrDistCount * sizeof(float);
+    offset += head.cadDistCount * sizeof(float);
+    offset += head.nmDistrCount * sizeof(float);
+    offset += head.kphDistCount * sizeof(float);
+    offset += head.xPowerDistCount * sizeof(float);
+    offset += head.npDistCount * sizeof(float);
+    offset += head.wattsKgDistCount * sizeof(float);
+
+    // Watts then HR
+    if (series == RideFile::hr) offset += 10 * sizeof(float);
+
+    return offset;
+}
+
+
+// returns offset from end of head
+static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
+{
+    switch (series) {
+    case RideFile::wattsKg : return head.wattsKgMeanMaxCount;
+    case RideFile::vam : return head.vamMeanMaxCount;
+    case RideFile::NP : return head.npMeanMaxCount;
+    case RideFile::xPower :  return head.xPowerMeanMaxCount;
+    case RideFile::kph :  return head.kphMeanMaxCount;
+    case RideFile::nm :  return head.nmMeanMaxCount;
+    case RideFile::cad :  return head.cadMeanMaxCount;
+    case RideFile::hr :  return head.hrMeanMaxCount;
+    case RideFile::watts :  return head.wattsMeanMaxCount;
+    default:
+        break;
+    }
+
+    return 0;
+}
+double 
+RideFileCache::best(Context *context, QString filename, RideFile::SeriesType series, int duration)
+{
+    // read the header
+    QFileInfo rideFileInfo(context->athlete->home.absolutePath() + "/" + filename);
+    QString cacheFileName(context->athlete->home.absolutePath() + "/" + rideFileInfo.baseName() + ".cpx");
+    QFileInfo cacheFileInfo(cacheFileName);
+
+    // head
+    RideFileCacheHeader head;
+    QFile cacheFile(cacheFileName);
+
+    if (cacheFile.open(QIODevice::ReadOnly) == true) {
+        QDataStream inFile(&cacheFile);
+        inFile.readRawData((char *) &head, sizeof(head));
+
+        // out of date or not enough samples
+        if (head.version != RideFileCacheVersion || duration > countForMeanMax(head, series)) {
+            cacheFile.close();
+            return 0;
+        }
+
+        // jump to correct offset
+        long offset = offsetForMeanMax(head, series) + (sizeof(float) * (duration-1));
+        inFile.skipRawData(offset);
+
+        float readhere = 0;
+        inFile.readRawData((char*)&readhere, sizeof(float));
+        cacheFile.close();
+
+        return readhere; // will convert to double
+    }
+
+    return 0;
+}
+
+int 
+RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType series, int zone)
+{
+    if (zone < 1 || zone > 10) return 0;
+
+    // read the header
+    QFileInfo rideFileInfo(context->athlete->home.absolutePath() + "/" + filename);
+    QString cacheFileName(context->athlete->home.absolutePath() + "/" + rideFileInfo.baseName() + ".cpx");
+    QFileInfo cacheFileInfo(cacheFileName);
+
+    // head
+    RideFileCacheHeader head;
+    QFile cacheFile(cacheFileName);
+
+    if (cacheFile.open(QIODevice::ReadOnly) == true) {
+        QDataStream inFile(&cacheFile);
+        inFile.readRawData((char *) &head, sizeof(head));
+
+        // out of date 
+        if (head.version != RideFileCacheVersion) {
+            cacheFile.close();
+            return 0;
+        }
+
+        // jump to correct offset
+        long offset = offsetForTiz(head, series) + (sizeof(float) * (zone-1));
+        inFile.skipRawData(offset);
+
+        float readhere = 0;
+        inFile.readRawData((char*)&readhere, sizeof(float));
+        cacheFile.close();
+
+        return readhere; // will convert to double
+    }
+
+    return 0;
+}
+
