@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideNavigator.h"
+#include "RideFileCache.h"
 #include <QDebug>
 
 #include "DataFilter_yacc.h"
@@ -38,6 +39,22 @@ QStringList DataFiltererrors;
 extern int DataFilterparse();
 
 Leaf *root; // root node for parsed statement
+
+static RideFile::SeriesType nameToSeries(QString name)
+{
+    if (!name.compare("power", Qt::CaseInsensitive)) return RideFile::watts;
+    if (!name.compare("cadence", Qt::CaseInsensitive)) return RideFile::cad;
+    if (!name.compare("hr", Qt::CaseInsensitive)) return RideFile::hr;
+    if (!name.compare("speed", Qt::CaseInsensitive)) return RideFile::kph;
+    if (!name.compare("torque", Qt::CaseInsensitive)) return RideFile::nm;
+    if (!name.compare("NP", Qt::CaseInsensitive)) return RideFile::NP;
+    if (!name.compare("xPower", Qt::CaseInsensitive)) return RideFile::xPower;
+    if (!name.compare("VAM", Qt::CaseInsensitive)) return RideFile::vam;
+    if (!name.compare("wpk", Qt::CaseInsensitive)) return RideFile::wattsKg;
+
+    return RideFile::none;
+
+}
 
 void Leaf::print(Leaf *leaf, int level)
 {
@@ -88,6 +105,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
 
 void Leaf::clear(Leaf *leaf)
 {
+Q_UNUSED(leaf);
 #if 0 // memory leak!!!
     switch(leaf->type) {
     case Leaf::String : delete leaf->lvalue.s; break;
@@ -136,6 +154,9 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
             if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) 
                 DataFiltererrors << QString("invalid data series for tiz(): %1").arg(symbol);
+
+            // now set the series type
+            leaf->seriesType = nameToSeries(symbol);
         }
         break;
 
@@ -221,9 +242,10 @@ QStringList DataFilter::parseFilter(QString query)
         for (int i=0; i<allRides.count(); i++) {
 
             // evaluate each ride...
-            double result = treeRoot->eval(this, treeRoot, allRides.at(i));
+            QString f= allRides.at(i).getFileName();
+            double result = treeRoot->eval(this, treeRoot, allRides.at(i), f);
             if (result) {
-                filenames << allRides.at(i).getFileName();
+                filenames << f;
             }
         }
         emit results(filenames);
@@ -266,7 +288,7 @@ void DataFilter::configUpdate()
     }
 }
 
-double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
+double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
 {
     switch(leaf->type) {
 
@@ -274,13 +296,13 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
     {
         switch (leaf->op) {
             case AND :
-                return (eval(df, leaf->lvalue.l, m) && eval(df, leaf->rvalue.l, m));
+                return (eval(df, leaf->lvalue.l, m, f) && eval(df, leaf->rvalue.l, m, f));
 
             case OR :
-                return (eval(df, leaf->lvalue.l, m) || eval(df, leaf->rvalue.l, m));
+                return (eval(df, leaf->lvalue.l, m, f) || eval(df, leaf->rvalue.l, m, f));
 
             default : // parenthesis
-                return (eval(df, leaf->lvalue.l, m));
+                return (eval(df, leaf->lvalue.l, m, f));
         }
     }
     break;
@@ -295,7 +317,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
             default:
             case Leaf::Function :
             {
-                duration = eval(df, leaf->lvalue.l, m); // duration
+                duration = eval(df, leaf->lvalue.l, m, f); // duration
             }
             break;
 
@@ -326,10 +348,15 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
 
             break;
         }
-        //qDebug()<<"best for series"<<*(leaf->series->lvalue.n)<<duration<<"returning 100";
 
-        //XXX!!! we must now call the real function to get the tiz/best for duration...
-        return 100;
+        if (leaf->function == "best")
+            return RideFileCache::best(df->context, f, leaf->seriesType, duration);
+
+        if (leaf->function == "tiz") // duration is really zone number
+            return RideFileCache::tiz(df->context, f, leaf->seriesType, duration); 
+
+        // unknown function!?
+        return 0 ;
     }
     break;
 
@@ -346,7 +373,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
             default:
             case Leaf::Function :
             {
-                lhsdouble = eval(df, leaf->lvalue.l, m); // duration
+                lhsdouble = eval(df, leaf->lvalue.l, m, f); // duration
                 lhsisNumber=true;
             }
             break;
@@ -391,7 +418,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
             default:
             case Leaf::Function :
             {
-                rhsdouble = eval(df, leaf->rvalue.l, m);
+                rhsdouble = eval(df, leaf->rvalue.l, m, f);
                 rhsisNumber=true;
             }
             break;
