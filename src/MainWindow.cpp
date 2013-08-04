@@ -286,7 +286,7 @@ MainWindow::MainWindow(const QDir &home)
     SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
     QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(150);
+    searchBox->setFixedWidth(200);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
@@ -387,7 +387,7 @@ MainWindow::MainWindow(const QDir &home)
     // add a search box on far right, but with a little space too
     SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(150);
+    searchBox->setFixedWidth(200);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
