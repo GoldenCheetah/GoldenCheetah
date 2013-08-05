@@ -5232,7 +5232,7 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>linha %1: leu zonas sem os dados da série anterior</translation>
     </message>
     <message>
@@ -14514,7 +14514,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>linha %1: a ler zonas sem dados da série anterior</translation>
     </message>
     <message>
