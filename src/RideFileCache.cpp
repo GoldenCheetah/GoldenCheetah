@@ -1226,7 +1226,7 @@ RideFileCache::best(Context *context, QString filename, RideFile::SeriesType ser
     RideFileCacheHeader head;
     QFile cacheFile(cacheFileName);
 
-    if (cacheFile.open(QIODevice::ReadOnly) == true) {
+    if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == true) {
         QDataStream inFile(&cacheFile);
         inFile.readRawData((char *) &head, sizeof(head));
 
@@ -1264,7 +1264,7 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
     RideFileCacheHeader head;
     QFile cacheFile(cacheFileName);
 
-    if (cacheFile.open(QIODevice::ReadOnly) == true) {
+    if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == true) {
         QDataStream inFile(&cacheFile);
         inFile.readRawData((char *) &head, sizeof(head));
 
