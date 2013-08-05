@@ -1,7 +1,7 @@
 # To build, copy this file to gcconfig.pri and then fill in the paths.
 
 # You can define the name of the executage file here.
-# If you do not specify anything then we deafult to: GoldenCheetah
+# If you do not specify anything then we default to: GoldenCheetah
 #APP_NAME = 
 
 # We recommend a debug build for development and a release build for deployment

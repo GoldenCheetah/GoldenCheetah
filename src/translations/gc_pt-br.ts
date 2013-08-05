@@ -4933,7 +4933,7 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation></translation>
     </message>
     <message>
@@ -13819,7 +13819,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation></translation>
     </message>
     <message>

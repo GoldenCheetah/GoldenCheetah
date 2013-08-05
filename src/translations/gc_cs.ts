@@ -5166,8 +5166,8 @@ NEJASNE</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
-        <translation>line %1: read zone without preceeding date range
+        <source>line %1: read zone without preceding date range</source>
+        <translation>line %1: read zone without preceding date range
 NEJASNE</translation>
     </message>
     <message>
@@ -14334,8 +14334,8 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
-        <translation>line %1: read zone without preceeding date range
+        <source>line %1: read zone without preceding date range</source>
+        <translation>line %1: read zone without preceding date range
 NEJASNE</translation>
     </message>
     <message>
