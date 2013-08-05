@@ -1244,7 +1244,8 @@ RideFileCache::best(Context *context, QString filename, RideFile::SeriesType ser
         inFile.readRawData((char*)&readhere, sizeof(float));
         cacheFile.close();
 
-        return readhere; // will convert to double
+        double divisor = pow(10, decimalsFor(series)); // ? 10 : 1;
+        return readhere / divisor; // will convert to double
     }
 
     return 0;
