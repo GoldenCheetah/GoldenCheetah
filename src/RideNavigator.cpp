@@ -68,6 +68,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     // get setup
     tableView = new QTreeView;
     delegate = new NavigatorCellDelegate(this);
+    tableView->setAnimated(true);
     tableView->setItemDelegate(delegate);
     tableView->setModel(sortModel);
     tableView->setSortingEnabled(true);
