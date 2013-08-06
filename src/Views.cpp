@@ -179,7 +179,7 @@ TrainView::~TrainView()
 void
 TrainView::close()
 {
-    static_cast<TrainSidebar*>(sidebar())->Stop();
+    trainTool->Stop();
     p->close();
 }
 
