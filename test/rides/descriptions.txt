@@ -74,3 +74,8 @@ lgulseth...pwx
 20130717_143733.fit
    Two rides that contain the calibration messages collected from 
    an osync headunit.
+
+Move_2013_08_06_18_00_35.xlsx
+   A Suunto Ambit export from the movescount website, the original
+   file can be viewed at http://www.movescount.com/moves/move16837909
+
