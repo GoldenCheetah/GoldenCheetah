@@ -1226,7 +1226,7 @@ RideFileCache::best(Context *context, QString filename, RideFile::SeriesType ser
     RideFileCacheHeader head;
     QFile cacheFile(cacheFileName);
 
-    if (cacheFile.open(QIODevice::ReadOnly) == true) {
+    if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == true) {
         QDataStream inFile(&cacheFile);
         inFile.readRawData((char *) &head, sizeof(head));
 
@@ -1244,7 +1244,8 @@ RideFileCache::best(Context *context, QString filename, RideFile::SeriesType ser
         inFile.readRawData((char*)&readhere, sizeof(float));
         cacheFile.close();
 
-        return readhere; // will convert to double
+        double divisor = pow(10, decimalsFor(series)); // ? 10 : 1;
+        return readhere / divisor; // will convert to double
     }
 
     return 0;
@@ -1264,7 +1265,7 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
     RideFileCacheHeader head;
     QFile cacheFile(cacheFileName);
 
-    if (cacheFile.open(QIODevice::ReadOnly) == true) {
+    if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == true) {
         QDataStream inFile(&cacheFile);
         inFile.readRawData((char *) &head, sizeof(head));
 

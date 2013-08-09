@@ -235,6 +235,15 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
                 groupByMapper->setMapping(groupByAct, heading);
             }
         }
+        // expand / collapse
+        QAction *expandAll = new QAction(tr("Expand All"), context->athlete->treeWidget);
+        connect(expandAll, SIGNAL(triggered(void)), rideNavigator->tableView, SLOT(expandAll()));
+        menu.addAction(expandAll);
+
+        // expand / collapse
+        QAction *collapseAll = new QAction(tr("Collapse All"), context->athlete->treeWidget);
+        connect(collapseAll, SIGNAL(triggered(void)), rideNavigator->tableView, SLOT(collapseAll()));
+        menu.addAction(collapseAll);
         menu.exec(pos);
     }
 }

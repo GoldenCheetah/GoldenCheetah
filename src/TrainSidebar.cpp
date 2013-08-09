@@ -922,7 +922,6 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
 void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
-
     if ((status&RT_RUNNING) == 0) return;
 
     status &= ~(RT_RUNNING|RT_PAUSED);
