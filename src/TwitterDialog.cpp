@@ -115,7 +115,7 @@ TwitterDialog::tweetCurrentRide()
     }
 
     char *postarg = NULL;
-    QString qurl = "http://api.twitter.com/1/statuses/update.json?status=";
+    QString qurl = "http://api.twitter.com/1.1/statuses/update.json?status=";
 
     QString twitterMsg = getTwitterMessage();
 
