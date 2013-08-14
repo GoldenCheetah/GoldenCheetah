@@ -296,7 +296,7 @@ MergeSync::getSamplesForRide(RideFile *ride1)
             currentPoint = nextPoint;
 
             //watts, cad, kph, alt, hr;
-            if (secs < maxTime-1)
+            if (secs < maxTime-ride1->recIntSecs())
                 nextPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
         }
         // next point
