@@ -33,6 +33,7 @@ struct Bin2FileReaderState
     QFile &file;
     QStringList &errors;
     RideFile *rideFile;
+    int data_version;
 
     double secs, km;
 
@@ -201,7 +202,7 @@ struct Bin2FileReaderState
 
     void read_ride_summary(int *bytes_read = NULL, int *sum = NULL)
     {
-        read_bytes(1, bytes_read, sum); // data_version
+        data_version = read_bytes(1, bytes_read, sum); // data_version
         read_bytes(1, bytes_read, sum); // firmware_minor_version
 
         QDateTime t = read_date(bytes_read, sum);
@@ -209,11 +210,17 @@ struct Bin2FileReaderState
         rideFile->setStartTime(t);
 
         read_bytes(148, bytes_read, sum);
+
+        if (data_version >= 4)
+            read_bytes(8, bytes_read, sum);
     }
 
     void read_interval_summary(int *bytes_read = NULL, int *sum = NULL)
     {
-        read_bytes(3200, bytes_read, sum);
+        int interval_summary_size = 32;
+        if (data_version>=4)
+            interval_summary_size = 36;
+        read_bytes(interval_summary_size*100, bytes_read, sum);
     }
 
     void read_username(int *bytes_read = NULL, int *sum = NULL)
