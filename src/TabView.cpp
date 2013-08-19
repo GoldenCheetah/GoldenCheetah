@@ -17,8 +17,10 @@
  */
 
 #include "TabView.h"
+#include "Tab.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideItem.h"
 #include "BlankState.h"
 #include "HomeWindow.h"
 #include "GcWindowRegistry.h"
@@ -26,10 +28,9 @@
 #include "MetricAggregator.h"
 
 #include "Settings.h"
-#include "MainWindow.h" // temp - will become Tab when its ready
 
 TabView::TabView(Context *context, int type) : 
-    QWidget(context->mainWindow), context(context), type(type),
+    QWidget(context->tab), context(context), type(type),
     _sidebar(true), _tiled(false), _selected(false), 
     stack(NULL), splitter(NULL), sidebar_(NULL), page_(NULL), blank_(NULL)
 {
