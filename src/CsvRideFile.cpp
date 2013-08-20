@@ -219,6 +219,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             else if (lineno > unitsHeader) {
                 double minutes=0,nm,kph,watts,km,cad,alt,hr,dfpm, seconds=0.0;
                 double temp=RideFile::noTemp;
+                double slope=0.0;
                 bool ok;
                 double lat = 0.0, lon = 0.0;
                 double headwind = 0.0;
@@ -278,6 +279,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      alt = line.section(',', 6, 6).toDouble();
                      lat = line.section(',', 12, 12).toDouble();
                      lon = line.section(',', 13, 13).toDouble();
+                     temp = line.section(',', 8, 8).toDouble();
+                     slope = line.section(',', 7, 7).toDouble();
                      int lap = line.section(',', 9, 9).toInt();
                      if (lap > 0) {
                          iBikeInterval += 1;
@@ -373,7 +376,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                else
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
-                                          headwind, 0.0, temp, 0.0,
+                                          headwind, slope, temp, 0.0,
                                           interval);
             }
             ++lineno;
