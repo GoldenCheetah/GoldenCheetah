@@ -172,7 +172,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                 }
             }
 
-        // data points: offset, hr, spd, pwr, torq, cad, dist, lat, lon, alt (ignored: temp, time)
+        // data points: offset, hr, spd, pwr, torq, cad, dist, lat, lon, alt, temp
         } else if (node.nodeName() == "sample") {
             RideFilePoint add;
 
@@ -222,6 +222,10 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
             QDomElement alt = node.firstChildElement("alt");
             if (!alt.isNull()) add.alt = alt.text().toDouble();
             else add.alt = 0.0;
+            // temp
+            QDomElement temp = node.firstChildElement("temp");
+            if (!temp.isNull()) add.temp = temp.text().toDouble();
+            else add.temp = 0.0;
 
             // do we need to calculate distance?
             if (add.km == 0.0 && samples) {
@@ -457,6 +461,13 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
         summarydata.appendChild(s);
     }
 
+    if (ride->areDataPresent()->temp) {
+        QDomElement s = doc.createElement("temp");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
 
     // interval "segments"
     foreach (RideFileInterval i, ride->intervals()) {
@@ -582,6 +593,14 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
                 text = doc.createTextNode(QString("%1").arg(point->alt));
                 alt.appendChild(text);
                 sample.appendChild(alt);
+            }
+
+            // temp
+            if (ride->areDataPresent()->temp) {
+                QDomElement temp = doc.createElement("temp");
+                text = doc.createTextNode(QString("%1").arg(point->temp));
+                temp.appendChild(text);
+                sample.appendChild(temp);
             }
         }
     }
