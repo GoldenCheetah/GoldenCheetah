@@ -486,7 +486,21 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     // samples
     // data points: timeoffset, dist, hr, spd, pwr, torq, cad, lat, lon, alt
     if (!ride->dataPoints().empty()) {
+        int secs = 0;
+
         foreach (const RideFilePoint *point, ride->dataPoints()) {
+            // if there was a gap, log time when this sample started:
+            if( secs + ride->recIntSecs() < point->secs ){
+                QDomElement sample = doc.createElement("sample");
+                root.appendChild(sample);
+
+                QDomElement timeoffset = doc.createElement("timeoffset");
+                text = doc.createTextNode(QString("%1")
+                    .arg((int)point->secs - ride->recIntSecs() ));
+                timeoffset.appendChild(text);
+                sample.appendChild(timeoffset);
+            }
+
             QDomElement sample = doc.createElement("sample");
             root.appendChild(sample);
 
