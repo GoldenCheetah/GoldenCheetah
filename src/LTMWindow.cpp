@@ -139,9 +139,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(rGroupBy, SIGNAL(valueChanged(int)), this, SLOT(rGroupBySelected(int)));
-    connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
-    connect(ltmTool->manageButton, SIGNAL(clicked(bool)), this, SLOT(manageClicked(void)));
-    connect(ltmTool->presetPicker, SIGNAL(currentIndexChanged(int)), this, SLOT(chartSelected(int)));
+    //!!! connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
+    connect(ltmTool->applyButton, SIGNAL(clicked(bool)), this, SLOT(applyClicked(void)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(rShade, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
@@ -362,12 +361,14 @@ LTMWindow::showEventsClicked(int state)
 }
 
 void
-LTMWindow::chartSelected(int selected)
+LTMWindow::applyClicked()
 {
+    if (ltmTool->charts->selectedItems().count() == 0) return;
+
+    int selected = ltmTool->charts->invisibleRootItem()->indexOfChild(ltmTool->charts->selectedItems().first());
     if (selected >= 0) {
         // what is the index of the chart?
-        int chartid = ltmTool->presetPicker->itemData(selected).toInt();
-        ltmTool->applySettings(&ltmTool->presets[chartid]);
+        ltmTool->applySettings(&ltmTool->presets[selected]);
     }
 }
 
@@ -378,28 +379,28 @@ LTMWindow::saveClicked()
     if (editor.exec()) {
         ltmTool->presets.append(settings);
         settings.writeChartXML(context->athlete->home, ltmTool->presets);
-        ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
-        ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
+        //ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
+        //ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
 }
 
-void
-LTMWindow::manageClicked()
-{
-    QList<LTMSettings> charts = ltmTool->presets; // get current
-    ChartManagerDialog editor(context, &charts);
-    if (editor.exec()) {
-        // wipe the current and add the new
-        ltmTool->presets = charts;
-        ltmTool->presetPicker->clear();
-        // update the presets to reflect the change
-        for(int i=0; i<ltmTool->presets.count(); i++)
-            ltmTool->presetPicker->addItem(ltmTool->presets[i].name, i);
-
-        // update charts.xml
-        settings.writeChartXML(context->athlete->home, ltmTool->presets);
-    }
-}
+//void
+//LTMWindow::manageClicked()
+//{
+    //QList<LTMSettings> charts = ltmTool->presets; // get current
+    //ChartManagerDialog editor(context, &charts);
+    //if (editor.exec()) {
+        //// wipe the current and add the new
+        //ltmTool->presets = charts;
+        //ltmTool->presetPicker->clear();
+        //// update the presets to reflect the change
+        //for(int i=0; i<ltmTool->presets.count(); i++)
+            //ltmTool->presetPicker->addItem(ltmTool->presets[i].name, i);
+//
+        //// update charts.xml
+        //settings.writeChartXML(context->athlete->home, ltmTool->presets);
+    //}
+//}
 
 int
 LTMWindow::groupForDate(QDate date, int groupby)
