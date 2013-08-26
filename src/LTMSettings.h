@@ -156,36 +156,4 @@ class EditChartDialog : public QDialog
         QPushButton *okButton, *cancelButton;
 };
 
-class ChartManagerDialog : public QDialog
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        ChartManagerDialog(Context *, QList<LTMSettings> *);
-
-    public slots:
-        void okClicked();
-        void cancelClicked();
-        void exportClicked();
-        void importClicked();
-        void upClicked();
-        void downClicked();
-        void renameClicked();
-        void deleteClicked();
-
-    private:
-        Context *context;
-        QList<LTMSettings> *presets;
-
-        QLineEdit *chartName;
-
-        QTreeWidget *charts;
-
-        QPushButton *importButton, *exportButton;
-        QPushButton *upButton, *downButton, *renameButton, *deleteButton;
-        QPushButton *okButton, *cancelButton;
-};
-
 #endif

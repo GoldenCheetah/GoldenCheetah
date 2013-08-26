@@ -25,13 +25,16 @@
 #include <QApplication>
 #include <QtGui>
 
-// seasons support
+// charts.xml support
+#include "LTMChartParser.h"
+
+// seasons.xml support
 #include "Season.h"
 #include "SeasonParser.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
-// metadata support
+// metadata.xml support
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
@@ -60,27 +63,23 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 #endif
 
+    // read charts.xml and translate etc
+    LTMSettings reader;
+    reader.readChartXML(home, presets);
+    translateDefaultCharts(presets);
+
     // Basic Controls
     QWidget *basic = new QWidget(this);
     basic->setContentsMargins(0,0,0,0);
     QVBoxLayout *basicLayout = new QVBoxLayout(basic);
     basicLayout->setContentsMargins(0,0,0,0);
-    basicLayout->setSpacing(0);
+    basicLayout->setSpacing(5);
 
     QLabel *presetLabel = new QLabel(tr("Chart"));
     QFont sameFont = presetLabel->font();
 #ifdef Q_OS_MAC // possibly needed on others too
     sameFont.setPointSize(sameFont.pointSize() + 2);
 #endif
-    presetPicker = new QComboBox;
-    presetPicker->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    QHBoxLayout *presetrow = new QHBoxLayout;
-    presetrow->setSpacing(5);
-    presetrow->addWidget(presetLabel);
-    presetrow->addWidget(presetPicker);
-    presetrow->addStretch();
-    basicLayout->addLayout(presetrow);
-    basicLayout->addStretch();
 
     dateSetting = new DateSettingsEdit(this);
     basicsettingsLayout->addRow(new QLabel(tr("Date range")), dateSetting);
@@ -106,15 +105,57 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     basicsettingsLayout->addRow(new QLabel(""), showEvents);
 
     // controls
-    saveButton = new QPushButton(tr("Add"));
-    manageButton = new QPushButton(tr("Manage"));
+    QGridLayout *presetLayout = new QGridLayout;
+    basicLayout->addLayout(presetLayout);
+
+    importButton = new QPushButton(tr("Import..."));
+    exportButton = new QPushButton(tr("Export..."));
+    upButton = new QPushButton(tr("Move up"));
+    downButton = new QPushButton(tr("Move down"));
+    renameButton = new QPushButton(tr("Rename"));
+    deleteButton = new QPushButton(tr("Delete"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(renameButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(upButton);
+    actionButtons->addWidget(downButton);
+    actionButtons->addStretch();
+    actionButtons->addWidget(importButton);
+    actionButtons->addWidget(exportButton);
+    actionButtons->addStretch();
+
+    charts = new QTreeWidget;
+    charts->headerItem()->setText(0, "Charts");
+    charts->setColumnCount(1);
+    charts->setSelectionMode(QAbstractItemView::SingleSelection);
+    charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    charts->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    charts->setIndentation(0);
+    foreach(LTMSettings chart, presets) {
+        QTreeWidgetItem *add;
+        add = new QTreeWidgetItem(charts->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setText(0, chart.name);
+    }
+    charts->setCurrentItem(charts->invisibleRootItem()->child(0));
+
+    applyButton = new QPushButton(tr("Apply"));
     QHBoxLayout *buttons = new QHBoxLayout;
-    buttons->addWidget(manageButton);
+    buttons->addWidget(applyButton);
     buttons->addStretch();
-    buttons->addWidget(saveButton);
-    basicLayout->addStretch();
     basicLayout->addLayout(buttons);
 
+    presetLayout->addWidget(charts, 0,0);
+    presetLayout->addLayout(actionButtons, 0,1);
+
+    // connect up slots
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
+    connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
     metricTree = new QTreeWidget;
 #ifdef Q_OS_MAC
     metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -683,15 +724,6 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     }
     metricTree->expandItem(allMetrics);
 
-    // read charts.xml and populate the picker
-    LTMSettings reader;
-    reader.readChartXML(home, presets);
-    // translate default chart names
-    translateDefaultCharts(presets);
-    for(int i=0; i<presets.count(); i++)
-        presetPicker->addItem(presets[i].name, i);
-    presetPicker->setCurrentIndex(-1);
-
     configChanged(); // will reset the metric tree
 
     tabs = new QTabWidget(this);
@@ -1191,4 +1223,137 @@ LTMTool::translateMetrics(Context *context, const QDir &home, LTMSettings *setti
         }
     }
     delete ltmTool;
+}
+
+//void
+//LTMTool::okClicked()
+//{
+    //// take the edited versions of the name first
+    //for(int i=0; i<charts->invisibleRootItem()->childCount(); i++)
+        //(presets)[i].name = charts->invisibleRootItem()->child(i)->text(0);
+//}
+
+void
+LTMTool::importClicked()
+{
+    QFileDialog existing(this);
+    existing.setFileMode(QFileDialog::ExistingFile);
+    existing.setNameFilter(tr("Chart File (*.xml)"));
+    if (existing.exec()){
+        // we will only get one (ExistingFile not ExistingFiles)
+        QStringList filenames = existing.selectedFiles();
+
+        if (QFileInfo(filenames[0]).exists()) {
+
+            QList<LTMSettings> imported;
+            QFile chartsFile(filenames[0]);
+
+            // setup XML processor
+            QXmlInputSource source( &chartsFile );
+            QXmlSimpleReader xmlReader;
+            LTMChartParser (handler);
+            xmlReader.setContentHandler(&handler);
+            xmlReader.setErrorHandler(&handler);
+
+            // parse and get return values
+            xmlReader.parse(source);
+            imported = handler.getSettings();
+
+            // now append to the QList and QTreeWidget
+            presets += imported;
+            foreach (LTMSettings chart, imported) {
+                QTreeWidgetItem *add;
+                add = new QTreeWidgetItem(charts->invisibleRootItem());
+                add->setFlags(add->flags() | Qt::ItemIsEditable);
+                add->setText(0, chart.name);
+            }
+
+        } else {
+            // oops non existant - does this ever happen?
+            QMessageBox::warning( 0, "Entry Error", QString("Selected file (%1) does not exist").arg(filenames[0]));
+        }
+    }
+}
+
+void
+LTMTool::exportClicked()
+{
+    QFileDialog newone(this);
+    newone.setFileMode(QFileDialog::AnyFile);
+    newone.setNameFilter(tr("Chart File (*.xml)"));
+    if (newone.exec()){
+        // we will only get one (ExistingFile not ExistingFiles)
+        QStringList filenames = newone.selectedFiles();
+
+        // if exists confirm overwrite
+        if (QFileInfo(filenames[0]).exists()) {
+            QMessageBox msgBox;
+            msgBox.setText(QString("The selected file (%1) exists.").arg(filenames[0]));
+            msgBox.setInformativeText("Do you want to overwrite it?");
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Cancel);
+            msgBox.setIcon(QMessageBox::Warning);
+            if (msgBox.exec() != QMessageBox::Ok)
+                return;
+        }
+        LTMChartParser::serialize(filenames[0], presets);
+    }
+}
+
+void
+LTMTool::upClicked()
+{
+    if (charts->currentItem()) {
+        int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
+        if (index == 0) return; // its at the top already
+
+        // movin on up!
+        QTreeWidgetItem *moved;
+        charts->invisibleRootItem()->insertChild(index-1, moved=charts->invisibleRootItem()->takeChild(index));
+        charts->setCurrentItem(moved);
+        LTMSettings save = (presets)[index];
+        presets.removeAt(index);
+        presets.insert(index-1, save);
+    }
+}
+
+void
+LTMTool::downClicked()
+{
+    if (charts->currentItem()) {
+        int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
+        if (index == (charts->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+
+        // movin on up!
+        QTreeWidgetItem *moved;
+        charts->invisibleRootItem()->insertChild(index+1, moved=charts->invisibleRootItem()->takeChild(index));
+        charts->setCurrentItem(moved);
+        LTMSettings save = (presets)[index];
+        presets.removeAt(index);
+        presets.insert(index+1, save);
+    }
+}
+
+void
+LTMTool::renameClicked()
+{
+    // which one is selected?
+    if (charts->currentItem()) charts->editItem(charts->currentItem(), 0);
+}
+
+void
+LTMTool::deleteClicked()
+{
+    // must have at least 1 child
+    if (charts->invisibleRootItem()->childCount() == 1) {
+        QMessageBox::warning(0, "Error", "You must have at least one chart");
+        return;
+
+    } else if (charts->currentItem()) {
+        int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
+
+        // zap!
+        presets.removeAt(index);
+        delete charts->invisibleRootItem()->takeChild(index);
+    }
 }

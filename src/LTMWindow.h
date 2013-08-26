@@ -119,8 +119,6 @@ class LTMWindow : public GcChartWindow
         Context *context;
 
         // get/set properties
-        int chart() const { return ltmTool->presetPicker->currentIndex(); }
-        void setChart(int x) { ltmTool->presetPicker->setCurrentIndex(x); }
         int bin() const { return ltmTool->groupBy->currentIndex(); }
         void setBin(int x) { rGroupBy->setValue(x); ltmTool->groupBy->setCurrentIndex(x); }
         bool shade() const { return ltmTool->shadeZones->isChecked(); }
@@ -129,6 +127,11 @@ class LTMWindow : public GcChartWindow
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
         bool events() const { return ltmTool->showEvents->isChecked(); }
         void setEvents(bool x) { ltmTool->showEvents->setChecked(x); }
+
+        // preset selection kind of pointless...
+        int chart() const { return 0; }
+        void setChart(int) { }
+
 
         int useSelected() { return ltmTool->dateSetting->mode(); }
         void setUseSelected(int x) { ltmTool->dateSetting->setMode(x); }
@@ -167,9 +170,8 @@ class LTMWindow : public GcChartWindow
         void shadeZonesClicked(int);
         void showEventsClicked(int);
         void showLegendClicked(int);
-        void chartSelected(int);
         void saveClicked();
-        void manageClicked();
+        void applyClicked();
         void refresh();
         void pointClicked(QwtPlotCurve*, int);
         int groupForDate(QDate, int);

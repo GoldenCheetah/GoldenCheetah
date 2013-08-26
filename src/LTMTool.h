@@ -87,13 +87,13 @@ class LTMTool : public QWidget
         QList<LTMSettings> presets;
 
         // accessed by LTMWindow hence public
-        QComboBox *presetPicker;
         QComboBox *groupBy;
         QCheckBox *shadeZones;
         QCheckBox *showLegend;
         QCheckBox *showEvents;
         QPushButton *saveButton;
-        QPushButton *manageButton;
+        QPushButton *applyButton;
+        QTreeWidget *charts;
 
         DateSettingsEdit *dateSetting;
 
@@ -123,6 +123,13 @@ class LTMTool : public QWidget
         void clearFilter();
         void setFilter(QStringList);
 
+        void exportClicked();
+        void importClicked();
+        void upClicked();
+        void downClicked();
+        void renameClicked();
+        void deleteClicked();
+
     private:
 
         QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
@@ -151,6 +158,10 @@ class LTMTool : public QWidget
 
         QTabWidget *tabs;
 
+        QWidget *presetWidget;
+        QLineEdit *chartName;
+        QPushButton *importButton, *exportButton;
+        QPushButton *upButton, *downButton, *renameButton, *deleteButton;
 };
 
 class EditMetricDetailDialog : public QDialog
