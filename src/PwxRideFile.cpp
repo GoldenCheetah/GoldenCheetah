@@ -498,7 +498,7 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
 
                 QDomElement timeoffset = doc.createElement("timeoffset");
                 text = doc.createTextNode(QString("%1")
-                    .arg((int)point->secs - ride->recIntSecs() ));
+                    .arg(point->secs - ride->recIntSecs() ));
                 timeoffset.appendChild(text);
                 sample.appendChild(timeoffset);
             }
@@ -508,7 +508,7 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
 
             // time
             QDomElement timeoffset = doc.createElement("timeoffset");
-            text = doc.createTextNode(QString("%1").arg((int)point->secs));
+            text = doc.createTextNode(QString("%1").arg(point->secs));
             timeoffset.appendChild(text);
             sample.appendChild(timeoffset);
 
@@ -556,7 +556,7 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
 
             // distance - meters
             QDomElement dist = doc.createElement("dist");
-            text = doc.createTextNode(QString("%1").arg((int)(point->km*1000)));
+            text = doc.createTextNode(QString("%1").arg((point->km*1000)));
             dist.appendChild(text);
             sample.appendChild(dist);
 
