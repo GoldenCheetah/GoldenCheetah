@@ -172,7 +172,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                 }
             }
 
-        // data points: offset, hr, spd, pwr, torq, cad, dist, lat, lon, alt (ignored: temp, time)
+        // data points: offset, hr, spd, pwr, torq, cad, dist, lat, lon, alt, temp
         } else if (node.nodeName() == "sample") {
             RideFilePoint add;
 
@@ -222,6 +222,10 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
             QDomElement alt = node.firstChildElement("alt");
             if (!alt.isNull()) add.alt = alt.text().toDouble();
             else add.alt = 0.0;
+            // temp
+            QDomElement temp = node.firstChildElement("temp");
+            if (!temp.isNull()) add.temp = temp.text().toDouble();
+            else add.temp = 0.0;
 
             // do we need to calculate distance?
             if (add.km == 0.0 && samples) {
@@ -390,109 +394,132 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     time.appendChild(text);
     root.appendChild(time);
 
-    if (!ride->intervals().empty()) {
+    // summary data
+    QDomElement summarydata = doc.createElement("summarydata");
+    root.appendChild(summarydata);
+    QDomElement beginning = doc.createElement("beginning");
+    text = doc.createTextNode(QString("%1").arg(ride->dataPoints().empty()
+        ? 0 : ride->dataPoints().first()->secs));
+    beginning.appendChild(text);
+    summarydata.appendChild(beginning);
 
-        // summary data
+    QDomElement duration = doc.createElement("duration");
+    text = doc.createTextNode(QString("%1").arg(ride->dataPoints().empty()
+        ? 0 : ride->dataPoints().last()->secs));
+    duration.appendChild(text);
+    summarydata.appendChild(duration);
+
+    // the channels - min max avg get set by TP anyway
+    // so we leave them blank to save time on calculating them
+    if (ride->areDataPresent()->hr) {
+        QDomElement s = doc.createElement("hr");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+    if (ride->areDataPresent()->kph) {
+        QDomElement s = doc.createElement("spd");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+    if (ride->areDataPresent()->watts) {
+        QDomElement s = doc.createElement("pwr");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+    if (ride->areDataPresent()->nm) {
+        QDomElement s = doc.createElement("torq");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+    if (ride->areDataPresent()->cad) {
+        QDomElement s = doc.createElement("cad");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+    QDomElement dist = doc.createElement("dist");
+    text = doc.createTextNode(QString("%1")
+        .arg((int)(ride->dataPoints().empty() ? 0
+            : ride->dataPoints().last()->km * 1000)));
+    dist.appendChild(text);
+    summarydata.appendChild(dist);
+
+    if (ride->areDataPresent()->alt) {
+        QDomElement s = doc.createElement("alt");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+
+    if (ride->areDataPresent()->temp) {
+        QDomElement s = doc.createElement("temp");
+        s.setAttribute("max", "0");
+        s.setAttribute("min", "0");
+        s.setAttribute("avg", "0");
+        summarydata.appendChild(s);
+    }
+
+    // interval "segments"
+    foreach (RideFileInterval i, ride->intervals()) {
+        QDomElement segment = doc.createElement("segment");
+        root.appendChild(segment);
+
+        // name
+        QDomElement name = doc.createElement("name");
+        text = doc.createTextNode(i.name); name.appendChild(text);
+        segment.appendChild(name);
+
+        // summarydata
         QDomElement summarydata = doc.createElement("summarydata");
-        root.appendChild(summarydata);
+        segment.appendChild(summarydata);
+
+        // beginning
         QDomElement beginning = doc.createElement("beginning");
-        text = doc.createTextNode(QString("%1").arg(ride->dataPoints().first()->secs));
+        text = doc.createTextNode(QString("%1").arg(i.start));
         beginning.appendChild(text);
         summarydata.appendChild(beginning);
 
+        // duration
         QDomElement duration = doc.createElement("duration");
-        text = doc.createTextNode(QString("%1").arg(ride->dataPoints().last()->secs));
+        text = doc.createTextNode(QString("%1").arg(i.stop - i.start));
         duration.appendChild(text);
         summarydata.appendChild(duration);
-
-        // the channels - min max avg get set by TP anyway
-        // so we leave them blank to save time on calculating them
-        if (ride->areDataPresent()->hr) {
-            QDomElement s = doc.createElement("hr");
-            s.setAttribute("max", "0");
-            s.setAttribute("min", "0");
-            s.setAttribute("avg", "0");
-            summarydata.appendChild(s);
-        }
-        if (ride->areDataPresent()->kph) {
-            QDomElement s = doc.createElement("spd");
-            s.setAttribute("max", "0");
-            s.setAttribute("min", "0");
-            s.setAttribute("avg", "0");
-            summarydata.appendChild(s);
-        }
-        if (ride->areDataPresent()->watts) {
-            QDomElement s = doc.createElement("pwr");
-            s.setAttribute("max", "0");
-            s.setAttribute("min", "0");
-            s.setAttribute("avg", "0");
-            summarydata.appendChild(s);
-        }
-        if (ride->areDataPresent()->nm) {
-            QDomElement s = doc.createElement("torq");
-            s.setAttribute("max", "0");
-            s.setAttribute("min", "0");
-            s.setAttribute("avg", "0");
-            summarydata.appendChild(s);
-        }
-        if (ride->areDataPresent()->cad) {
-            QDomElement s = doc.createElement("cad");
-            s.setAttribute("max", "0");
-            s.setAttribute("min", "0");
-            s.setAttribute("avg", "0");
-            summarydata.appendChild(s);
-        }
-        QDomElement dist = doc.createElement("dist");
-        text = doc.createTextNode(QString("%1").arg((int)(ride->dataPoints().last()->km * 1000)));
-        dist.appendChild(text);
-        summarydata.appendChild(dist);
-
-        if (ride->areDataPresent()->alt) {
-            QDomElement s = doc.createElement("alt");
-            s.setAttribute("max", "0");
-            s.setAttribute("min", "0");
-            s.setAttribute("avg", "0");
-            summarydata.appendChild(s);
-        }
-
-        // interval "segments"
-        foreach (RideFileInterval i, ride->intervals()) {
-            QDomElement segment = doc.createElement("segment");
-            root.appendChild(segment);
-
-            // name
-            QDomElement name = doc.createElement("name");
-            text = doc.createTextNode(i.name); name.appendChild(text);
-            segment.appendChild(name);
-
-            // summarydata
-            QDomElement summarydata = doc.createElement("summarydata");
-            segment.appendChild(summarydata);
-
-            // beginning
-            QDomElement beginning = doc.createElement("beginning");
-            text = doc.createTextNode(QString("%1").arg(i.start));
-            beginning.appendChild(text);
-            summarydata.appendChild(beginning);
-
-            // duration
-            QDomElement duration = doc.createElement("duration");
-            text = doc.createTextNode(QString("%1").arg(i.stop - i.start));
-            duration.appendChild(text);
-            summarydata.appendChild(duration);
-        }
     }
 
     // samples
     // data points: timeoffset, dist, hr, spd, pwr, torq, cad, lat, lon, alt
     if (!ride->dataPoints().empty()) {
+        int secs = 0;
+
         foreach (const RideFilePoint *point, ride->dataPoints()) {
+            // if there was a gap, log time when this sample started:
+            if( secs + ride->recIntSecs() < point->secs ){
+                QDomElement sample = doc.createElement("sample");
+                root.appendChild(sample);
+
+                QDomElement timeoffset = doc.createElement("timeoffset");
+                text = doc.createTextNode(QString("%1")
+                    .arg(point->secs - ride->recIntSecs() ));
+                timeoffset.appendChild(text);
+                sample.appendChild(timeoffset);
+            }
+
             QDomElement sample = doc.createElement("sample");
             root.appendChild(sample);
 
             // time
             QDomElement timeoffset = doc.createElement("timeoffset");
-            text = doc.createTextNode(QString("%1").arg((int)point->secs));
+            text = doc.createTextNode(QString("%1").arg(point->secs));
             timeoffset.appendChild(text);
             sample.appendChild(timeoffset);
 
@@ -540,7 +567,7 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
 
             // distance - meters
             QDomElement dist = doc.createElement("dist");
-            text = doc.createTextNode(QString("%1").arg((int)(point->km*1000)));
+            text = doc.createTextNode(QString("%1").arg((point->km*1000)));
             dist.appendChild(text);
             sample.appendChild(dist);
 
@@ -566,6 +593,14 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
                 text = doc.createTextNode(QString("%1").arg(point->alt));
                 alt.appendChild(text);
                 sample.appendChild(alt);
+            }
+
+            // temp
+            if (ride->areDataPresent()->temp) {
+                QDomElement temp = doc.createElement("temp");
+                text = doc.createTextNode(QString("%1").arg(point->temp));
+                temp.appendChild(text);
+                sample.appendChild(temp);
             }
         }
     }
