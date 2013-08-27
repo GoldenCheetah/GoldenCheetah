@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 // acccess to metrics
-#include "TcxRideFile.h"
+#include "PwxRideFile.h"
 
 /*
  * - reuse single QNetworkAccessManager for all requests to allow
@@ -195,11 +195,11 @@ TtbDialog::requestUpload()
     body->append( textPart );
 
 
-    QString fname = context->athlete->home.absoluteFilePath(".ttbupload.tcx" );
+    QString fname = context->athlete->home.absoluteFilePath(".ttbupload.pwx" );
     QFile *uploadFile = new QFile( fname );
     uploadFile->setParent(body);
 
-    TcxFileReader reader;
+    PwxFileReader reader;
     reader.writeRideFile(context, ride->ride(), *uploadFile );
     progressBar->setValue(12);
 
@@ -218,7 +218,7 @@ TtbDialog::requestUpload()
     filePart.setHeader(QNetworkRequest::ContentTypeHeader,
     QVariant("application/occtet-stream"));
     filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-    QVariant("form-data; name=\"file\"; filename=\"gc-upload-ttb.tcx\""));
+    QVariant("form-data; name=\"file\"; filename=\"gc-upload-ttb.pwx\""));
     uploadFile->open(QIODevice::ReadOnly);
     filePart.setBodyDevice(uploadFile);
     body->append( filePart );
