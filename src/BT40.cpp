@@ -179,7 +179,7 @@ void BT40::run()
 
             // set speed from wheelRpm and configured wheelsize
             double x = rt.getWheelRpm();
-            if (devConf) rt.setSpeed(x * (devConf->wheelSize/1000) * 60 / 1000);
+            if (devConf) rt.setSpeed(x * devConf->wheelSize / 1000 * 60 / 1000);
             else rt.setSpeed(x * 2.10 * 60 / 1000);
             pvars.unlock();
         }
