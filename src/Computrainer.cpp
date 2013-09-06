@@ -179,6 +179,12 @@ void Computrainer::getTelemetry(double &power, double &heartrate, double &cadenc
     buttons = deviceButtons;
     status = deviceStatus;
     memcpy((void*)ss, (void*)spinScan, 24);
+
+    // work around to ensure controller doesn't miss button press. 
+    // The run thread will only set the button bits, they don't get
+    // reset until the ui reads the device state
+    //  Borrowed from: Fortius.cpp 
+    deviceButtons = 0; 
     pvars.unlock();
 }
 
@@ -516,15 +522,13 @@ void Computrainer::run()
     curHeartRate = this->deviceHeartRate = 0;
     curCadence = this->deviceCadence = 0;
     curSpeed = this->deviceSpeed = 0;
-    curButtons = this->deviceButtons;
+    curButtons = this->deviceButtons = 0;
     curRRC = this->deviceRRC = 0;
     this->deviceCalibrated = false;
     curhrconnected = false;
     this->deviceHRConnected = false;
     curcadconnected = false;
     this->deviceCADConnected = false;
-    curButtons = 0;
-    this->deviceButtons = 0;
     pvars.unlock();
 
 
@@ -633,7 +637,7 @@ void Computrainer::run()
             if (buttons != curButtons) {
                 // let the gui workout what the deal is with silly button values!
                 pvars.lock();
-                this->deviceButtons = curButtons = buttons;
+			  this->deviceButtons |= buttons; // Borrowed from Fortius.cpp: workaround to ensure controller doesn't miss button pushes
                 pvars.unlock();
             }
 
