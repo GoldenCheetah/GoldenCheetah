@@ -288,12 +288,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *passLabel = new QLabel(tr("Password"));
     QLabel *typeLabel = new QLabel(tr("Account Type"));
 
-    //XXX deprecated QLabel *twp = new QLabel(tr("Twitter"));
-    //XXX deprecated twp->setFont(current);
+    QLabel *twp = new QLabel(tr("Twitter"));
+    twp->setFont(current);
 
-    //XXX deprecated QLabel *twurlLabel = new QLabel(tr("Website"));
-    //XXX deprecated QLabel *twauthLabel = new QLabel(tr("Authorise"));
-    //XXX deprecated QLabel *twpinLabel = new QLabel(tr("PIN"));
+    QLabel *twurlLabel = new QLabel(tr("Website"));
+    QLabel *twauthLabel = new QLabel(tr("Authorise"));
+    QLabel *twpinLabel = new QLabel(tr("PIN"));
 
     //XXX deprecated QLabel *str = new QLabel(tr("Strava"));
     //XXX deprecated str->setFont(current);
@@ -369,11 +369,11 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
 
     tpType->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_TPTYPE, "0").toInt());
 
-    //XXX deprecated twitterURL = new QLineEdit(this);
-    //XXX deprecated twitterURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_TWURL, "http://www.twitter.com").toString());
-    //XXX deprecated twitterAuthorise = new QPushButton("Authorise", this);
-    //XXX deprecated twitterPIN = new QLineEdit(this);
-    //XXX deprecated twitterPIN->setText("");
+    twitterURL = new QLineEdit(this);
+    twitterURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_TWURL, "http://www.twitter.com").toString());
+    twitterAuthorise = new QPushButton("Authorise", this);
+    twitterPIN = new QLineEdit(this);
+    twitterPIN->setText("");
 
     //XXX deprecated stravaUser = new QLineEdit(this);
     //XXX deprecated stravaUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_STRUSER, "").toString());
@@ -439,10 +439,10 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(gcurlLabel, 6,0);
     grid->addWidget(gcuserLabel, 7,0);
     grid->addWidget(gcpassLabel, 8,0);
-    //XXX deprecated grid->addWidget(twp, 9,0);
-    //XXX deprecated grid->addWidget(twurlLabel, 10,0);
-    //XXX deprecated grid->addWidget(twauthLabel, 11,0);
-    //XXX deprecated grid->addWidget(twpinLabel, 12,0);
+    grid->addWidget(twp, 9,0);
+    grid->addWidget(twurlLabel, 10,0);
+    grid->addWidget(twauthLabel, 11,0);
+    grid->addWidget(twpinLabel, 12,0);
     //XXX deprecated grid->addWidget(str, 13,0);
     //XXX deprecated grid->addWidget(struserLabel, 14,0);
     //XXX deprecated grid->addWidget(strpassLabel, 15,0);
@@ -476,9 +476,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(gcUser, 7, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(gcPass, 8, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    //XXX deprecated grid->addWidget(twitterURL, 10, 1, 0);
-    //XXX deprecated grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    //XXX deprecated grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(twitterURL, 10, 1, 0);
+    grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     //XXX grid->addWidget(stravaUser, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
     //XXX grid->addWidget(stravaPass, 15, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -512,7 +512,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     setWidgetResizable(true);
     setWidget(main);
 
-    //XXX deprecated connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
+    connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
 }
 
 
@@ -532,7 +532,7 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_TTBUSER, ttbUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TTBPASS, ttbPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPTYPE, tpType->currentIndex());
-    //XXX deprecated appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIKEY, wiPass->text());
@@ -548,7 +548,7 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_DVUSER, dvUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_DVPASS, dvPass->text());
 
-    //XXX deprecated saveTwitter(); // get secret key if PIN set
+    saveTwitter(); // get secret key if PIN set
 }
 
 //
