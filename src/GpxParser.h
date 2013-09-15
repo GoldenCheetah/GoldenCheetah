@@ -42,22 +42,25 @@ public:
 
 private:
 
-    RideFile*	rideFile;
+    RideFile*   rideFile;
 
-    QString	buffer;
+    QString     buffer;
     QVariant    isGarminSmartRecording;
     QVariant    GarminHWM;
 
-    QDateTime	start_time;
-    QDateTime	last_time;
-    QDateTime	time;
-    double	distance;
+    QDateTime   start_time;
+    QDateTime   last_time;
+    QDateTime   time;
+    double      distance;
     double      lastLat, lastLon;
 
     double      alt;
     double      lat;
     double      lon;
-    int         hr;
+    double      hr;
+    double      temp;
+    double      cad;
+    double      watts;
 
     // set to false after the first time element is seen (not in metadata)
     bool firstTime;
