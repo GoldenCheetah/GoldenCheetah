@@ -58,10 +58,10 @@ struct Bin2FileReaderState
         return (0xff & c) - (((0xff & c)/16)*6);
     }
 
-    int read_bytes(int len, int *count = NULL, int *sum = NULL)
+    double read_bytes(int len, int *count = NULL, int *sum = NULL)
     {
         char c;
-        int res = 0;
+        double res = 0;
         for (int i = 0; i < len; ++i) {
             if (file.read(&c, 1) != 1)
                 throw TruncatedRead();
