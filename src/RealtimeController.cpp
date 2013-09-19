@@ -71,7 +71,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double mph = rtData.getSpeed() * MILES_PER_KM;
         // using the algorithm from http://www.kurtkinetic.com/powercurve.php
-        rtData.setWatts((5.244820) * mph + (0.01968) * (mph*mph*mph));
+        rtData.setWatts((5.244820) * mph + (0.019168) * (mph*mph*mph));
         }
         break;
     case 3 : // Cyclops Fluid 2
