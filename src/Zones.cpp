@@ -225,7 +225,7 @@ bool Zones::read(QFile &file)
         if (zonerx.indexIn(line, 0) != -1) {
 	    if (! (in_range || zones_are_defaults)) {
 		err = tr("line %1: read zone without "
-			 "preceeding date range").arg(lineno);
+			 "preceding date range").arg(lineno);
 		file.close();
 		return false;
 	    }

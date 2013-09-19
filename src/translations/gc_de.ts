@@ -5371,7 +5371,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>zeile %1: Erstelle Zone ohne vorangegangenen Datenbereich zu beachten</translation>
     </message>
     <message>
@@ -14878,7 +14878,7 @@ F3 drücken, wenn fertig.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>Zeile %1: Erstelle Zone ohne vorherigen Datumsbereich zu beachten</translation>
     </message>
     <message>
