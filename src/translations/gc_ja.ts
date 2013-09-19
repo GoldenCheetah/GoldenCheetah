@@ -5292,7 +5292,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>%1行目: これまでの日付指定を除いてゾーンを読み込み</translation>
     </message>
     <message>
@@ -14590,7 +14590,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>%1行目: これまでの日付指定を除いてゾーンを読み込み</translation>
     </message>
     <message>

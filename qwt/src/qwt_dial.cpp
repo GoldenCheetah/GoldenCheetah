@@ -159,7 +159,7 @@ void QwtDial::initDial()
     d_data->scaleDraw->setRadius( 0 );
 
     setScaleArc( 0.0, 360.0 ); // scale as a full circle
-    setRange( 0.0, 360.0, 1.0, 10 ); // degrees as deafult
+    setRange( 0.0, 360.0, 1.0, 10 ); // degrees as default
 }
 
 //!  Destructor
