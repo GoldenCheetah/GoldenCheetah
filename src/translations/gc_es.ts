@@ -5443,7 +5443,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>linea %1: zona sin rango de fechas precedente</translation>
     </message>
     <message>
@@ -14967,7 +14967,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>linea %1: zona sin rango de fechas precedente</translation>
     </message>
     <message>

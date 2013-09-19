@@ -5160,7 +5160,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>строка %1: чтение уровня без предшествующего диапазона дат</translation>
     </message>
     <message>
@@ -14364,7 +14364,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>строка %1: чтение уровня без предшествующего диапазона дат</translation>
     </message>
     <message>

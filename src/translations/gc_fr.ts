@@ -5240,7 +5240,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     </message>
     <message>
         <location filename="../HrZones.cpp" line="246"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>ligne %1: lecture de zone sans période de date précédente</translation>
     </message>
     <message>
@@ -14436,7 +14436,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
-        <source>line %1: read zone without preceeding date range</source>
+        <source>line %1: read zone without preceding date range</source>
         <translation>ligne %1: lecture de zone sans zone période de date</translation>
     </message>
     <message>
