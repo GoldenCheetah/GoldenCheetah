@@ -38,12 +38,15 @@ GpxParser::GpxParser (RideFile* rideFile)
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0)
         GarminHWM.setValue(25); // default to 25 seconds.
 
+    cad = 0;
     distance = 0;
     lastLat = lastLon = 0;
-    alt =0;
+    watts = 0;
+    alt = 0;
     lon = 0;
     lat = 0;
     hr = 0;
+    temp = RideFile::noTemp;
     firstTime = true;
     metadata = false;
 
@@ -122,8 +125,25 @@ bool
     }
     else if (qName == "gpxtpx:hr")
     {
-        hr = buffer.toInt();  // metric
+        hr = buffer.toInt();
     }
+    else if (qName == "gpxdata:hr")
+    {
+        hr = buffer.toDouble(); // on suunto ambit export file, there are sometimes double values
+    }
+    else if (qName == "gpxdata:temp")
+    {
+        temp = buffer.toDouble();
+    }
+    else if (qName == "gpxdata:cadence")
+    {
+        cad = buffer.toDouble();
+    }
+    else if (qName == "gpxdata:bikepower") // hopefully suunto adds bikepower data to gpx export file, as it is on saved moveslink log_.xml
+    {
+        watts = buffer.toDouble();
+    }
+
 
     else if (qName == "trkpt")
     {
@@ -177,7 +197,7 @@ bool
 
 	if(rideFile->dataPoints().empty()) {
 	    // first point
-            rideFile->appendPoint(secs, 0, hr, distance, speed, 0, 0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
+            rideFile->appendPoint(secs, cad, hr, distance, speed, 0, watts, alt, lon, lat, 0, 0.0, temp, 0.0, 0);
 	}
 	else {
 	    // assumption that the change in ride is linear...  :)
@@ -196,7 +216,7 @@ bool
                 (secs == 0)) {
 
                 // no smart recording, or delta exceeds HW treshold, or no time elements; just insert the data
-                rideFile->appendPoint(secs, 0, hr, distance, speed, 0,0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
+                rideFile->appendPoint(secs, cad, hr, distance, speed, 0,watts, alt, lon, lat, 0, 0.0, temp, 0.0, 0);
 
 	    } else {
 
@@ -210,18 +230,18 @@ bool
 		    double lon = prevPoint->lon + (deltaLon * weight);
 		    rideFile->appendPoint(
 			    prevPoint->secs + (deltaSecs * weight),
-			    0,
+                cad,
 			    hr,
 			    prevPoint->km + (deltaDist * weight),
 			    kph,
 			    0,
-			    0,
+                watts,
 			    prevPoint->alt + (deltaAlt * weight),
 			    lon, // lon
 			    lat, // lat
                 0,
                 0.0,
-                RideFile::noTemp,
+                temp,
                 0,
 			    0);
 		}
