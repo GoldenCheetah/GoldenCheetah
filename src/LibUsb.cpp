@@ -406,9 +406,9 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 
                         if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
 
-                            if (OperatingSystem == LINUX) {
-                                usb_detach_kernel_driver_np(udev, interface);
-                            }
+#ifdef Q_OS_LINUX
+                            usb_detach_kernel_driver_np(udev, interface);
+#endif
 
                             int rc = usb_set_configuration(udev, 1);
                             if (rc < 0) {
