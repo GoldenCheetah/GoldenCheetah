@@ -406,6 +406,10 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 
                         if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
 
+#ifdef Q_OS_LINUX
+                            usb_detach_kernel_driver_np(udev, interface);
+#endif
+
                             int rc = usb_set_configuration(udev, 1);
                             if (rc < 0) {
                                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
