@@ -18,7 +18,6 @@
 
 #include <QString>
 #include <iostream>
-#include <assert.h>
 #include "QuarqParser.h"
 
 QuarqParser::QuarqParser (RideFile* rideFile)

@@ -32,7 +32,6 @@
 #include <QVector>
 
 #include <algorithm>            // for std::sort
-#include <assert.h>
 #include <stdint.h>    // for int8_t, int16_t, etc.
 #include <iostream>
 

@@ -20,7 +20,6 @@
 #include "Settings.h"
 #include <QDomDocument>
 #include <QVector>
-#include <assert.h>
 
 #include <QDebug>
 

@@ -21,7 +21,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QDateTime>
-#include <assert.h>
 
 struct TacxCafFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
@@ -103,7 +102,11 @@ RideFile *TacxCafFileReader::openRideFile(QFile &file, QStringList &errors, QLis
 }
 
 qint16 readHeaderBlock(const QByteArray& block, QStringList& errors) {
-    assert(block.size() == 8);
+
+    if (block.size() != 8){
+        errors << "Block size is not 8, is this a valid Tacx run file?";
+        return 0;
+    }
 
     qint16 fingerprint = readShortFromByteArray(block);
 

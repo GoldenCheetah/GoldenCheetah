@@ -21,7 +21,6 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include <QMap>
-#include <assert.h>
 #include <math.h>
 
 AddIntervalDialog::AddIntervalDialog(MainWindow *mainWindow) :

@@ -18,7 +18,6 @@
 
 #include <math.h>
 #include <float.h>
-#include <assert.h>
 #include "LTMOutliers.h"
 
 #include <QDebug>
@@ -30,8 +29,6 @@ LTMOutliers::LTMOutliers(double *xdata, double *ydata, int count, int windowsize
     int points = 0;
     double allSum = 0.0;
     int pos=0;
-
-    assert(count >= windowsize);
 
     // initial samples from point 0 to windowsize
     for (; pos < windowsize; ++pos) {

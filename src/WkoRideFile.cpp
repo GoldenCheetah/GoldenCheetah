@@ -22,7 +22,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <algorithm> // for std::sort
-#include <assert.h>
 #include "math.h"
 
 static int wkoFileReaderRegistered = RideFileFactory::instance().registerReader(

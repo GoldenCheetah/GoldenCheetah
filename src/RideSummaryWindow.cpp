@@ -29,7 +29,6 @@
 #include "DBAccess.h"
 #include <QtGui>
 #include <QtXml/QtXml>
-#include <assert.h>
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
@@ -322,8 +321,8 @@ RideSummaryWindow::htmlSummary() const
             case 0: metricsList = totalColumn; break;
             case 1: metricsList = averageColumn; break;
             case 2: metricsList = maximumColumn; break;
+            default:
             case 3: metricsList = metricColumn; break;
-            default: assert(false);
         }
         for (int j = 0; j< metricsList.count(); ++j) {
             QString symbol = metricsList[j];
