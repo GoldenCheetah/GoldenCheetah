@@ -22,7 +22,6 @@
 #include "Device.h"
 #include "MainWindow.h"
 #include "Settings.h"
-#include <assert.h>
 #include <errno.h>
 #include <QtGui>
 
@@ -36,7 +35,6 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
 
     deviceCombo = new QComboBox(this);
     QList<QString> deviceTypes = Devices::typeNames();
-    assert(deviceTypes.size() > 0);
     Q_FOREACH(QString device, deviceTypes) {
         deviceCombo->addItem(device);
     }
@@ -277,7 +275,6 @@ DownloadRideDialog::downloadClicked()
             break;
         }
     }
-    assert(dev);
     QString err;
     QList<DeviceDownloadFile> files;
 
@@ -413,7 +410,6 @@ DownloadRideDialog::eraseClicked()
             break;
         }
     }
-    assert(dev);
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
     DevicePtr device = devtype->newDevice( dev );
 

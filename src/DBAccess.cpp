@@ -25,7 +25,6 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "TimeUtils.h"
-#include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
 #include <QFile>

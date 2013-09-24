@@ -29,7 +29,6 @@
 #include "RideItem.h"
 #include "Settings.h"
 #include <QtGui>
-#include <assert.h>
 
 #include "Zones.h"
 #include "HrZones.h"

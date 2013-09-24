@@ -2183,8 +2183,7 @@ MainWindow::newCyclist()
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) {
         newHome.cd(name);
-        if (!newHome.exists())
-            assert(false);
+        if (!newHome.exists()) return;
         MainWindow *main = new MainWindow(newHome);
         main->show();
     }
@@ -2199,8 +2198,7 @@ MainWindow::openCyclist()
     d.setModal(true);
     if (d.exec() == QDialog::Accepted) {
         newHome.cd(d.choice());
-        if (!newHome.exists())
-            assert(false);
+        if (!newHome.exists()) return;
         MainWindow *main = new MainWindow(newHome);
         main->show();
     }

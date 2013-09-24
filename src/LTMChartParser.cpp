@@ -22,7 +22,6 @@
 
 #include <QDate>
 #include <QDebug>
-#include <assert.h>
 
 // local helper functions to convert Qwt enums to ints and back
 static int curveToInt(QwtPlotCurve::CurveStyle x)

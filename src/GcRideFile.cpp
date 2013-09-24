@@ -20,7 +20,6 @@
 #include <algorithm> // for std::sort
 #include <QDomDocument>
 #include <QVector>
-#include <assert.h>
 
 #include <QDebug>
 
@@ -251,11 +250,9 @@ GcFileReader::writeRideFile(MainWindow *,const RideFile *ride, QFile &file) cons
         QDomElement samples = doc.createElement("samples");
         root.appendChild(samples);
         const RideFileDataPresent *present = ride->areDataPresent();
-        assert(present->secs);
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             QDomElement sample = doc.createElement("sample");
             samples.appendChild(sample);
-            assert(present->secs);
             add_sample_hp(secs);
             add_sample(cad);
             add_sample(hr);
