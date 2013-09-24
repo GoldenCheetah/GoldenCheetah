@@ -19,7 +19,6 @@
 #include "Zones.h"
 #include "Colors.h"
 #include "CpintPlot.h"
-#include <assert.h>
 #include <unistd.h>
 #include <QDebug>
 #include <qwt_series_data.h>
@@ -56,7 +55,6 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     shadeMode(2)
 {
     setInstanceName("CP Plot");
-    assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
 
     setAxisTitle(xBottom, tr("Interval Length"));
     LogTimeScaleDraw *ld = new LogTimeScaleDraw;
@@ -755,7 +753,6 @@ CpintPlot::calculate(RideItem *rideItem)
 void
 CpintPlot::showGrid(int state)
 {
-    assert(state != Qt::PartiallyChecked);
     grid->setVisible(state == Qt::Checked);
     replot();
 }

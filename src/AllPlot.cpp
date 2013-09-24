@@ -27,7 +27,6 @@
 #include "Zones.h"
 #include "Colors.h"
 
-#include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_plot_grid.h>
@@ -147,7 +146,7 @@ class AllPlotZoneLabel: public QwtPlotItem
                 QList <int> zone_lows = zones->getZoneLows(zone_range);
                 QList <QString> zone_names = zones->getZoneNames(zone_range);
                 int num_zones = zone_lows.size();
-                assert(zone_names.size() == num_zones);
+                if (zone_names.size() != num_zones) return;
                 if (zone_number < num_zones) {
                     watts =
                         (

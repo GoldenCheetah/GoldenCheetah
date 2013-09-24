@@ -24,7 +24,6 @@
 #include <QTextStream>
 #include <QVector>
 #include <algorithm> // for std::sort
-#include <assert.h>
 #include "math.h"
 
 static int csvFileReaderRegistered =

@@ -23,7 +23,6 @@
 #include <QtEndian>
 #include <QDebug>
 #include <QTime>
-#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <limits>
@@ -424,9 +423,9 @@ struct FitFileReaderState
             // Evil smart recording.  Linearly interpolate missing points.
             RideFilePoint *prevPoint = rideFile->dataPoints().back();
             int deltaSecs = (int) (secs - prevPoint->secs);
-            assert(deltaSecs == secs - prevPoint->secs); // no fractional part
+            //assert(deltaSecs == secs - prevPoint->secs); // no fractional part -- don't CRASH FFS, be graceful
             // This is only true if the previous record was of type record:
-            assert(deltaSecs == time - last_time);
+            //assert(deltaSecs == time - last_time); -- don't CRASH FFS, be graceful
             // If the last lat/lng was missing (0/0) then all points up to lat/lng are marked as 0/0.
             if (prevPoint->lat == 0 && prevPoint->lon == 0 ) {
                 badgps = 1;

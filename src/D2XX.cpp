@@ -18,7 +18,6 @@
 
 #include "D2XX.h"
 #include <dlfcn.h>
-#include <assert.h>
 
 // D2XXWrapper is a wrapper around libftd2xx to make it amenable to loading
 // with dlopen().
@@ -115,7 +114,6 @@ D2XX::isOpen()
 bool
 D2XX::open(QString &err)
 {
-    assert(!_isOpen);
     FT_STATUS ftStatus =
         lib->open_ex(info.Description, FT_OPEN_BY_DESCRIPTION, &ftHandle);
     if (ftStatus != FT_OK) {
@@ -149,7 +147,6 @@ D2XX::open(QString &err)
 void
 D2XX::close()
 {
-    assert(_isOpen);
     lib->close(ftHandle);
     _isOpen = false;
 }
@@ -157,7 +154,6 @@ D2XX::close()
 int
 D2XX::read(void *buf, size_t nbyte, QString &err)
 {
-    assert(_isOpen);
     DWORD rxbytes;
     FT_STATUS ftStatus = lib->get_queue_status(ftHandle, &rxbytes);
     if (ftStatus != FT_OK) {
@@ -181,7 +177,6 @@ D2XX::read(void *buf, size_t nbyte, QString &err)
 int
 D2XX::write(void *buf, size_t nbyte, QString &err)
 {
-    assert(_isOpen);
     DWORD n;
     FT_STATUS ftStatus = lib->write(ftHandle, buf, nbyte, &n);
     if (ftStatus == FT_OK)
@@ -199,7 +194,6 @@ D2XX::name() const
 bool
 D2XX::setBaudRate(int speed, QString &err)
 {
-    assert(_isOpen);
     FT_STATUS ftStatus = lib->set_baud_rate(ftHandle, speed);
     if (ftStatus != FT_OK) {
         err = QString("FT_SetBaudRate: %1").arg(ftStatus);

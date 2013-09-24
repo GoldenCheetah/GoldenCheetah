@@ -20,7 +20,6 @@
 #include "GcRideFile.h"
 #include "MainWindow.h"
 #include "RideFile.h"
-#include <assert.h>
 #include <string.h>
 #include <errno.h>
 #include <QtGui>

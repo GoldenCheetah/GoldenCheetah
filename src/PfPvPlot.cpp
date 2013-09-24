@@ -27,7 +27,6 @@
 #include "Colors.h"
 
 #include <math.h>
-#include <assert.h>
 #include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_canvas.h>
@@ -72,7 +71,7 @@ public:
             QList <int> zone_lows = zones->getZoneLows(zone_range);
             QList <QString> zone_names = zones->getZoneNames(zone_range);
             int num_zones = zone_lows.size();
-            assert(zone_names.size() == num_zones);
+            if (zone_names.size() != num_zones) return;
 
             if (zone_number < num_zones) {
 
@@ -263,7 +262,7 @@ PfPvPlot::refreshZoneItems()
         QList <int> zone_power = zones->getZoneLows(zone_range);
         QList <QString> zone_name = zones->getZoneNames(zone_range);
         int num_zones = zone_power.size();
-        assert(zone_name.size() == num_zones);
+        if (zone_name.size() != num_zones) return;
 
         if (num_zones > 0) {
             QPen *pen = new QPen();

@@ -21,7 +21,6 @@
 #include <QRegExp>
 #include <QTextStream>
 #include <algorithm> // for std::sort
-#include <assert.h>
 #include "math.h"
 
 

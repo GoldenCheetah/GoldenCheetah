@@ -19,7 +19,6 @@
 #include "ManualRideDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
-#include <assert.h>
 #include <string.h>
 #include <errno.h>
 #include <QtGui>

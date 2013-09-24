@@ -22,7 +22,6 @@
 #include "Settings.h"
 #include "Colors.h"
 
-#include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
@@ -223,7 +222,6 @@ SmallPlot::setData(RideItem *rideItem)
 void
 SmallPlot::showPower(int state)
 {
-    assert(state != Qt::PartiallyChecked);
     wattsCurve->setVisible(state == Qt::Checked);
     setYMax();
     replot();
@@ -232,7 +230,6 @@ SmallPlot::showPower(int state)
 void
 SmallPlot::showHr(int state)
 {
-    assert(state != Qt::PartiallyChecked);
     hrCurve->setVisible(state == Qt::Checked);
     setYMax();
     replot();

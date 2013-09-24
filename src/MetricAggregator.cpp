@@ -29,7 +29,6 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "TimeUtils.h"
-#include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
 #include <QProgressDialog>
@@ -239,7 +238,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
         return false; // not a ridefile!
     }
     summaryMetric.setFileName(fileName);
-    assert(rx.numCaptures() == 7);
+    //assert(rx.numCaptures() == 7); -- it was an exact match of course there are 7
     QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt());
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt());
     QDateTime dateTime(date, time);
