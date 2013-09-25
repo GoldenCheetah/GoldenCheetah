@@ -61,6 +61,7 @@ class AerolabWindow : public GcWindow {
   void setEoffsetFromText(const QString text);
   void doEstCdACrr();
   void setAutoEoffset(int value);
+  void setConstantAlt(int value);
   void setByDistance(int value);
   void rideSelected();
   void zoomChanged();

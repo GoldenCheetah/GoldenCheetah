@@ -65,6 +65,7 @@ class Aerolab : public QwtPlot {
   public slots:
 
   void setAutoEoffset(int value);
+  void setConstantAlt(int value);
   void setByDistance(int value);
   void configChanged();
 
@@ -102,6 +103,7 @@ class Aerolab : public QwtPlot {
   int smooth;
   bool bydist;
   bool autoEoffset;
+  bool constantAlt;
   int arrayLength;
   int iCrr;
   int iCda;
