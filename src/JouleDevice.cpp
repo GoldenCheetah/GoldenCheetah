@@ -214,8 +214,7 @@ JouleDevice::download( const QDir &tmpdir,
 
                 int _try = 1;
                 while (page < 65535) {
-                    qDebug() << "page"<<page;
-                    if (JOULE_DEBUG) printf("Acknowledge\n");
+                    if (JOULE_DEBUG) printf("page  %d\n", page);
 
                     request = JoulePacket(PAGE_RIDE_DETAIL);
                     request.addToPayload(response.payload.left(2).data(),2);
@@ -253,7 +252,7 @@ JouleDevice::download( const QDir &tmpdir,
                 }
                 tmp.close();
             }
-            qDebug() << "end page" << page;
+
 
             if (JOULE_DEBUG) printf("Acknowledge\n");
             request = JoulePacket(PAGE_RIDE_DETAIL);
