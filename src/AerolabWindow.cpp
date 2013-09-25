@@ -113,6 +113,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   //etaLayout->addWidget( etaQLCDNumber );
   etaLayout->addWidget( etaSlider );
 
+
   // Add to leftControls:
   leftControls->addLayout( crrLayout );
   leftControls->addLayout( cdaLayout );
@@ -191,9 +192,16 @@ AerolabWindow::AerolabWindow(Context *context) :
   //eoffsetLayout->addWidget( eoffsetQLCDNumber );
   eoffsetLayout->addWidget( eoffsetSlider );
 
+  QVBoxLayout *checkboxLayout = new QVBoxLayout;
   QCheckBox *eoffsetAuto = new QCheckBox(tr("eoffset auto"), this);
   eoffsetAuto->setCheckState(Qt::Checked);
-  eoffsetLayout->addWidget(eoffsetAuto);
+  checkboxLayout->addWidget(eoffsetAuto);
+
+  QCheckBox *constantAlt = new QCheckBox(tr("Constant altitude (velodrome,...)"), this);
+  checkboxLayout->addWidget(constantAlt);
+
+  eoffsetLayout->addLayout(checkboxLayout);
+
 
   QHBoxLayout *smoothLayout = new QHBoxLayout;
   QComboBox *comboDistance = new QComboBox();
@@ -239,6 +247,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   connect(eoffsetSlider, SIGNAL(valueChanged(int)), this, SLOT(setEoffsetFromSlider()));
   connect(eoffsetLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setEoffsetFromText(const QString)));
   connect(eoffsetAuto, SIGNAL(stateChanged(int)), this, SLOT(setAutoEoffset(int)));
+  connect(constantAlt, SIGNAL(stateChanged(int)), this, SLOT(setConstantAlt(int)));
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
   connect(context, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
@@ -460,6 +469,15 @@ void
 AerolabWindow::setAutoEoffset(int value)
 {
     aerolab->setAutoEoffset(value);
+}
+
+void
+AerolabWindow::setConstantAlt(int value)
+{
+    aerolab->setConstantAlt(value);
+    // refresh
+    RideItem *ride = myRideItem;
+    aerolab->setData(ride, false);
 }
 
 void

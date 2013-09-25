@@ -331,7 +331,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       int npoints = ride->dataPoints().size();
       double dt = ride->recIntSecs();
       veArray.resize(dataPresent->watts ? npoints : 0);
-      altArray.resize(dataPresent->alt ? npoints : 0);
+      altArray.resize(dataPresent->alt || constantAlt ? npoints : 0);
       timeArray.resize(dataPresent->watts ? npoints : 0);
       distanceArray.resize(dataPresent->watts ? npoints : 0);
 
@@ -352,7 +352,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       if (!altArray.empty()) {
         have_recorded_alt_curve = true;
         altCurve->attach(this);
-        altCurve->setVisible(dataPresent->alt);
+        altCurve->setVisible(dataPresent->alt || constantAlt );
       }
 
       // Fill the virtual elevation profile with data from the ride data:
@@ -365,10 +365,19 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
         e = eoffset;
 
       timeArray[arrayLength]  = p1->secs / 60.0;
-      if ( have_recorded_alt_curve )
-        altArray[arrayLength] = (context->athlete->useMetricUnits
+      if ( have_recorded_alt_curve ) {
+          if ( constantAlt && arrayLength > 0) {
+              altArray[arrayLength] = altArray[arrayLength-1];
+          }
+          else  {
+              if ( constantAlt && !dataPresent->alt)
+                  altArray[arrayLength] = 0;
+              else
+                altArray[arrayLength] = (context->athlete->useMetricUnits
                    ? p1->alt
                    : p1->alt * FEET_PER_METER);
+          }
+      }
 
       // Unpack:
       double power = max(0, p1->watts);
@@ -603,6 +612,12 @@ Aerolab::setAutoEoffset(int value)
 }
 
 void
+Aerolab::setConstantAlt(int value)
+{
+    constantAlt = value;
+}
+
+void
 Aerolab::setByDistance(int value) {
   bydist = value;
   setXTitle();
@@ -785,7 +800,7 @@ QString Aerolab::estimateCdACrr(RideItem *rideItem)
 
     if(ride) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
-        if(dataPresent->alt && dataPresent->watts) {
+        if(( dataPresent->alt || constantAlt )  && dataPresent->watts) {
             double dt = ride->recIntSecs();
             int npoints = ride->dataPoints().size();
             double X1[npoints], X2[npoints], Egain[npoints];
