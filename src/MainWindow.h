@@ -143,8 +143,10 @@ class MainWindow : public QMainWindow
         void exportRide();
         void exportBatch();
         void exportMetrics();
+#ifdef GC_HAVE_LIBOAUTH
         void tweetRide();
         void share();
+#endif
         void uploadTtb();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
