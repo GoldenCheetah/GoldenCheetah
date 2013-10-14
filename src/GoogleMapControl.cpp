@@ -231,7 +231,7 @@ void GoogleMapControl::createHtml()
     "    };\n"
 
     // setup the map, and fit to contain the limits of the route
-    "    map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);\n"
+    "    map = new google.maps.Map(document.getElementById('map-canvas'), myOptions);\n"
     "    var sw = new google.maps.LatLng(%1,%2);\n"  // .ARG 1, 2
     "    var ne = new google.maps.LatLng(%3,%4);\n"  // .ARG 3, 4
     "    var bounds = new google.maps.LatLngBounds(sw,ne);\n"
@@ -268,7 +268,7 @@ void GoogleMapControl::createHtml()
     // the main page is rather trivial
     currentPage += QString("</head>\n"
     "<body onload=\"initialize()\">\n"
-    "<div id=\"map_canvas\"></div>\n"
+    "<div id=\"map-canvas\"></div>\n"
     "</body>\n"
     "</html>\n");
 }
