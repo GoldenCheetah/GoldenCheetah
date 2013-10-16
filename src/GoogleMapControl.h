@@ -94,6 +94,8 @@ class GoogleMapControl : public GcChartWindow
         void createMarkers();
         void drawShadedRoute();
         void zoomInterval(IntervalItem*);
+        void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
+
 
     private:
         MainWindow *main;

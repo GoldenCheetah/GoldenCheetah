@@ -30,6 +30,9 @@
 #include "TimeUtils.h"
 
 #include <QDebug>
+#include <QtNetwork/QSslConfiguration>
+#include <QtNetwork/QSslSocket>
+#include <QtNetwork/QSslError>
 
 GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcChartWindow(mw), main(mw), range(-1), current(NULL)
 {
@@ -60,6 +63,12 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcChartWindow(mw), main(mw)
     connect(mw, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(mw, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(mw, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
+
+    connect(view->page()->networkAccessManager(), SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
+            this, SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError> & )));
+
+    bool isSSLSupported = QSslSocket::supportsSsl();
+    qDebug() << "SSL Support:" << isSSLSupported ;
 
     first = true;
 }
@@ -475,6 +484,16 @@ GoogleMapControl::createMarkers()
 
     return;
 }
+
+void GoogleMapControl::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist)
+{
+
+    qDebug() << "SSL Error(s):" << errlist;
+    qDebug() << "Certificate:" << qnr->sslConfiguration().peerCertificate();
+
+    qnr->ignoreSslErrors();
+}
+
 
 void GoogleMapControl::zoomInterval(IntervalItem *which)
 {
