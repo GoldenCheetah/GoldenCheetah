@@ -106,4 +106,3 @@ StravaParser::parse()
         }
     }
 }
-

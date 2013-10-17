@@ -150,6 +150,10 @@
 #define GC_TWITTER_TOKEN "twitter_token"
 #define GC_TWITTER_SECRET "twitter_secret"
 
+//Strava
+#define GC_STRAVA_CLIENT_ID    "83" //< client id
+#define GC_STRAVA_TOKEN "strava_token"
+
 // Tcx Smart recording
 #define GC_GARMIN_SMARTRECORD "garminSmartRecord"
 #define GC_GARMIN_HWMARK "garminHWMark"

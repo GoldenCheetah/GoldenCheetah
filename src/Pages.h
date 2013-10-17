@@ -125,11 +125,12 @@ class CredentialsPage : public QScrollArea
 
     public:
         CredentialsPage(QWidget *parent, MainWindow *mainWindow);
-        void saveClicked();
         void saveTwitter();
+        void saveClicked();
 
     public slots:
         void authoriseTwitter();
+        void authoriseStrava();
 
     private:
         MainWindow *mainWindow;
@@ -150,9 +151,12 @@ class CredentialsPage : public QScrollArea
         char *t_key, *t_secret;
 
         QLineEdit *stravaURL; // url for strava ... http://www.strava.com
-        QPushButton *stravaTest;
-        QLineEdit *stravaUser;
-        QLineEdit *stravaPass;
+        //QPushButton *stravaTest;
+        //QLineEdit *stravaUser;
+        //QLineEdit *stravaPass;
+        QPushButton *stravaAuthorise, *stravaAuthorised;
+        QLineEdit *stravaPIN;
+        char *s_id, *s_secret;
 
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;

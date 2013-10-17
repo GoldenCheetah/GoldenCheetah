@@ -362,5 +362,3 @@ StravaDownloadDialog::requestListRidesFinished(QNetworkReply *reply)
 
     }
 }
-
-

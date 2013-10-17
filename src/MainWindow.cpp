@@ -58,11 +58,9 @@
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
-#include "StravaUploadDialog.h"
-#include "StravaDownloadDialog.h"
-#include "RideWithGPSDialog.h"
 #include "TtbDialog.h"
 #include "TwitterDialog.h"
+#include "ShareDialog.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
 #include "CalendarDownload.h"
@@ -893,14 +891,15 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
-    //XXX deprecated stravaAction = new QAction(tr("Upload to Strava..."), this);
-    //XXX deprecated connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
-    //XXX deprecated rideMenu->addAction(stravaAction);
-    //XXX deprecated rideMenu->addAction(tr("Download from Strava..."), this, SLOT(downloadStrava()));
+#ifdef GC_HAVE_LIBOAUTH
+    tweetAction = new QAction(tr("Tweet Activity"), this);
+    connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
+    rideMenu->addAction(tweetAction);
 
-    rideWithGPSAction = new QAction(tr("Upload to RideWithGPS..."), this);
-    connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
-    rideMenu->addAction(rideWithGPSAction);
+    shareAction = new QAction(tr("Share..."), this);
+    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
+    rideMenu->addAction(shareAction);
+#endif
 
     ttbAction = new QAction(tr("Upload to Trainingstagebuch..."), this);
     connect(ttbAction, SIGNAL(triggered(bool)), this, SLOT(uploadTtb()));
@@ -1142,21 +1141,11 @@ MainWindow::setActivityMenu()
     // enable/disable upload if already uploaded
     if (ride && ride->ride()) {
 
-        //XXX deprecated QString activityId = ride->ride()->getTag("Strava uploadId", "");
-        //XXX deprecated if (activityId == "") stravaAction->setEnabled(true);
-        //XXX deprecated else stravaAction->setEnabled(false);
-
-        QString tripid = ride->ride()->getTag("RideWithGPS tripid", "");
-        if (tripid == "") rideWithGPSAction->setEnabled(true);
-        else rideWithGPSAction->setEnabled(false);
-        
         QString activityId = ride->ride()->getTag("TtbExercise", "");
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
         
     } else {
-        //XXX deprecated stravaAction->setEnabled(false);
-        rideWithGPSAction->setEnabled(false);
         ttbAction->setEnabled(false);
     }
 }
@@ -1835,6 +1824,7 @@ MainWindow::setStyle()
 #endif
 }
 
+/*----------------------------------------------------------------------
 #ifdef GC_HAVE_LIBOAUTH
 void
 MainWindow::tweetRide()
@@ -1849,6 +1839,7 @@ MainWindow::tweetRide()
     twitterDialog->exec();
 }
 #endif
+ *--------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------
  * Drag and Drop
@@ -2218,11 +2209,11 @@ MainWindow::exportMetrics()
 }
 
 /*----------------------------------------------------------------------
-* Strava.com
-*--------------------------------------------------------------------*/
-
+ * Twitter
+ *--------------------------------------------------------------------*/
+#ifdef GC_HAVE_LIBOAUTH
 void
-MainWindow::uploadStrava()
+MainWindow::tweetRide()
 {
     QTreeWidgetItem *_item = treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
@@ -2230,24 +2221,18 @@ MainWindow::uploadStrava()
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        StravaUploadDialog d(this, item);
-        d.exec();
+        TwitterDialog *twitterDialog = new TwitterDialog(this, item);
+        twitterDialog->setWindowModality(Qt::ApplicationModal);
+        twitterDialog->exec();
     }
-}
-
-void
-MainWindow::downloadStrava()
-{
-    StravaDownloadDialog d(this);
-    d.exec();
 }
 
 /*----------------------------------------------------------------------
-* RideWithGPS.com
+* Share : Twitter, Strava, RideWithGPS
 *--------------------------------------------------------------------*/
 
 void
-MainWindow::uploadRideWithGPSAction()
+MainWindow::share()
 {
     QTreeWidgetItem *_item = treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
@@ -2255,10 +2240,11 @@ MainWindow::uploadRideWithGPSAction()
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        RideWithGPSDialog d(this, item);
+        ShareDialog d(this, item);
         d.exec();
     }
 }
+#endif
 
 /*----------------------------------------------------------------------
 * trainingstagebuch.org

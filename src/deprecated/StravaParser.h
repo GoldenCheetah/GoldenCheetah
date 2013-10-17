@@ -38,4 +38,3 @@ private:
 };
 
 #endif // _StravaParser_h
-
