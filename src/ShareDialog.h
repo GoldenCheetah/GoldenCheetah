@@ -33,71 +33,123 @@ extern "C" {
 }
 #endif
 
+class ShareDialog;
+
+// uploader to strava.com
+class StravaUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    StravaUploader(MainWindow *mainWindow, RideItem *item, ShareDialog *parent = 0);
+
+    void uploadStrava();
+
+private slots:
+    void requestUploadStrava();
+    void requestUploadStravaFinished(QNetworkReply *reply);
+
+    void requestVerifyUpload();
+    void requestVerifyUploadFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    MainWindow *mainWindow;
+    RideItem *ride;
+    ShareDialog *parent;
+
+    QDialog *dialog;
+
+    QString token;
+
+    QString STRAVA_URL_SSL;
+    QString stravaUploadId, stravaActivityId;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+
+    QString uploadStatus;
+    QString uploadProgress;
+};
+
+// uploader to ridewithgps.com
+class RideWithGpsUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    RideWithGpsUploader(MainWindow *mainWindow, RideItem *item, ShareDialog *parent = 0);
+
+    void uploadRideWithGPS();
+
+private slots:
+
+    void requestUploadRideWithGPS();
+    void requestUploadRideWithGPSFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    MainWindow *mainWindow;
+    RideItem *ride;
+    ShareDialog *parent;
+
+    QDialog *dialog;
+
+    QString rideWithGpsActivityId;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+};
+
 class ShareDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT
 
 public:
-     ShareDialog(MainWindow *mainWindow, RideItem *item);
+    ShareDialog(MainWindow *mainWindow, RideItem *item);
 
+    QProgressBar *progressBar;
+    QLabel *progressLabel, *errorLabel;
+
+    QLineEdit *titleEdit;
+
+    //QCheckBox *gpsChk;
+    QCheckBox *altitudeChk;
+    QCheckBox *powerChk;
+    QCheckBox *cadenceChk;
+    QCheckBox *heartrateChk;
+
+    int shareSiteCount;
 signals:
 
 public slots:
      void upload();
 
-private slots:
-     void uploadStrava();
-     void uploadRideWithGPS();
-
-     void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
-
-     void requestUploadStrava();
-     void requestUploadStravaFinished(QNetworkReply *reply);
-
-     void requestUploadRideWithGPS();
-     void requestUploadRideWithGPSFinished(QNetworkReply *reply);
-
-     void requestVerifyUpload();
-     void requestVerifyUploadFinished(QNetworkReply *reply);
-
-     void okClicked();
-     void closeClicked();
-
 private:
      MainWindow *mainWindow;
-     QDialog *dialog;
 
      QPushButton *uploadButton;
-     QPushButton *searchActivityButton;
-     QPushButton *getActivityButton;
      QPushButton *closeButton;
 
-     QLineEdit *titleEdit;
+
      QCheckBox *stravaChk;
      QCheckBox *rideWithGPSChk;
 
-     //QCheckBox *gpsChk;
-     QCheckBox *altitudeChk;
-     QCheckBox *powerChk;
-     QCheckBox *cadenceChk;
-     QCheckBox *heartrateChk;
-
-     QProgressBar *progressBar;
-     QLabel *progressLabel;
-
      RideItem *ride;
 
+     StravaUploader *stravaUploader;
+     RideWithGpsUploader *rideWithGpsUploader;
+
      QString athleteId;
-     QString token;
-     QString stravaUploadId;
-     QString stravaActivityId;
-     QString uploadStatus;
-     QString uploadProgress;
-
-     QString STRAVA_URL_SSL;
-
-     bool overwrite, loggedIn, uploadSuccessful;
 };
+
+
 
 #endif // SHAREDIALOGDIALOG_H
