@@ -868,7 +868,7 @@ AllPlot::refreshCalibrationMarkers()
             if (!bydist)
                 mrk->setValue(calibration.start / 60.0, 0.0);
             else
-                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((mainWindow->useMetricUnits ? 1 : MILES_PER_KM) *
                                 rideItem->ride()->timeToDistance(calibration.start), 0.0);
             mrk->setLabel(text);
         }
