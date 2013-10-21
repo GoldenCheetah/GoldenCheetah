@@ -62,10 +62,10 @@ OAuthDialog::OAuthDialog(MainWindow *mainWindow, OAuthSite site) :
 void
 OAuthDialog::urlChanged(const QUrl &url)
 {
-    qDebug() << url.toString();
+    //qDebug() << url.toString();
     if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=")) {
         QString code = url.toString().right(40);
-        qDebug() << "code" << code;
+        //qDebug() << "code" << code;
 
         const char *request_token_uri = "https://www.strava.com/oauth/token?";
 
@@ -97,7 +97,7 @@ OAuthDialog::loadFinished()
         int j = view->page()->mainFrame()->toHtml().indexOf("\"", i);
         if (i>16 && j>-1) {
             QString access_token = view->page()->mainFrame()->toHtml().mid(i,j-i);
-            qDebug() << "token" << access_token;
+            //qDebug() << "token" << access_token;
             appsettings->setCValue(mainWindow->cyclist, GC_STRAVA_TOKEN, access_token);
 
             accept();
