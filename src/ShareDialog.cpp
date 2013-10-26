@@ -330,6 +330,8 @@ StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
 
     sc = se.evaluate("("+response+")");
     QString uploadError = sc.property("error").toString();
+    if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
+        uploadError = "";
 
     if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError)
     {
@@ -595,6 +597,8 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
 
     sc = se.evaluate("("+response+")");
     QString uploadError = sc.property("error").toString();
+    if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
+        uploadError = "";
 
     if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError) {
         //qDebug() << "Error " << reply->error();
