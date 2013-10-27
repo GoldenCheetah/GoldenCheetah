@@ -38,7 +38,7 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(context->mainWindow), home(home), context(context), active(false), _amFiltered(false)
+LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
@@ -65,7 +65,7 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
 
     // read charts.xml and translate etc
     LTMSettings reader;
-    reader.readChartXML(home, presets);
+    reader.readChartXML(context->athlete->home, presets);
     translateDefaultCharts(presets);
 
     // Basic Controls
@@ -126,6 +126,9 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     actionButtons->addStretch();
 
     charts = new QTreeWidget;
+#ifdef Q_OS_MAC
+    charts->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     charts->headerItem()->setText(0, "Charts");
     charts->setColumnCount(1);
     charts->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -140,7 +143,7 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     }
     charts->setCurrentItem(charts->invisibleRootItem()->child(0));
 
-    applyButton = new QPushButton(tr("Apply"));
+    applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->addWidget(applyButton);
     buttons->addStretch();
@@ -156,22 +159,11 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
     connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
-    metricTree = new QTreeWidget;
-#ifdef Q_OS_MAC
-    metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#endif
-    metricTree->setColumnCount(1);
-    if (multi)
-        metricTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    else
-        metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
-    metricTree->header()->hide();
-    //metricTree->setFrameStyle(QFrame::NoFrame);
-    //metricTree->setAlternatingRowColors (true);
-    metricTree->setIndentation(5);
-    allMetrics = new QTreeWidgetItem(metricTree, ROOT_TYPE);
-    allMetrics->setText(0, tr("Metric"));
-    metricTree->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    tabs = new QTabWidget(this);
+
+    mainLayout->addWidget(tabs);
+    basic->setContentsMargins(20,20,20,20);
 
     // initialise the metrics catalogue and user selector
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -717,35 +709,52 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     // sort the list
     qSort(metrics);
 
-    foreach(MetricDetail metric, metrics) {
-        QTreeWidgetItem *add;
-        add = new QTreeWidgetItem(allMetrics, METRIC_TYPE);
-        add->setText(0, metric.name);
-    }
-    metricTree->expandItem(allMetrics);
+    // custom widget
+    QWidget *custom = new QWidget(this);
+    custom->setContentsMargins(20,20,20,20);
+    QVBoxLayout *customLayout = new QVBoxLayout(custom);
+    customLayout->setContentsMargins(0,0,0,0);
+    customLayout->setSpacing(5);
 
-    configChanged(); // will reset the metric tree
+    // custom table
+    customTable = new QTableWidget(this);
+#ifdef Q_OS_MAX
+    customTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    customTable->setColumnCount(2);
+    customTable->horizontalHeader()->setStretchLastSection(true);
+    customTable->setSortingEnabled(false);
+    customTable->verticalHeader()->hide();
+    customTable->setShowGrid(false);
+    customTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    customTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    customLayout->addWidget(customTable);
 
-    tabs = new QTabWidget(this);
+    // custom buttons
+    editCustomButton = new QPushButton(tr("Edit"));
+    connect(editCustomButton, SIGNAL(clicked()), this, SLOT(editMetric()));
 
-    mainLayout->addWidget(tabs);
-    basic->setContentsMargins(20,20,20,20);
+    addCustomButton = new QPushButton("+");
+    connect(addCustomButton, SIGNAL(clicked()), this, SLOT(addMetric()));
 
-    // metric tree in a container for spacing etc
-    QWidget *metricContainer = new QWidget(this);
-    metricContainer->setContentsMargins(20,20,20,20);
-    QVBoxLayout *metricContainerLayout = new QVBoxLayout(metricContainer);
-    metricContainerLayout->setContentsMargins(0,0,0,0);
-    metricContainerLayout->setSpacing(0);
-    metricContainerLayout->addWidget(metricTree);
+    deleteCustomButton = new QPushButton("- ");
+    connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteMetric()));
+
+#ifndef Q_OS_MAC
+    addCustomButton->setFixedSize(20,20);
+    deleteCustomButton->setFixedSize(20,20);
+#endif
+    QHBoxLayout *customButtons = new QHBoxLayout;
+    customButtons->setSpacing(2);
+    customButtons->addWidget(editCustomButton);
+    customButtons->addStretch();
+    customButtons->addWidget(addCustomButton);
+    customButtons->addWidget(deleteCustomButton);
+    customLayout->addLayout(customButtons);
 
     tabs->addTab(basicsettings, tr("Basic"));
     tabs->addTab(basic, tr("Preset"));
-    tabs->addTab(metricContainer, tr("Custom"));
-
-    connect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(metricTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(metricTreePopup(const QPoint &)));
+    tabs->addTab(custom, tr("Curves"));
 
     // switched between one or other
     connect(dateSetting, SIGNAL(useStandardRange()), this, SIGNAL(useStandardRange()));
@@ -753,142 +762,90 @@ LTMTool::LTMTool(Context *context, const QDir &home, bool multi) : QWidget(conte
     connect(dateSetting, SIGNAL(useThruToday()), this, SIGNAL(useThruToday()));
 }
 
-QwtPlotCurve::CurveStyle
-LTMTool::curveStyle(RideMetric::MetricType type)
-{
-    switch (type) {
-
-    case RideMetric::Average : return QwtPlotCurve::Lines;
-    case RideMetric::Total : return QwtPlotCurve::Steps;
-    case RideMetric::Peak : return QwtPlotCurve::Lines;
-    default : return QwtPlotCurve::Lines;
-
-    }
-}
-
-QwtSymbol::Style
-LTMTool::symbolStyle(RideMetric::MetricType type)
-{
-    switch (type) {
-
-    case RideMetric::Average : return QwtSymbol::Ellipse;
-    case RideMetric::Total : return QwtSymbol::Ellipse;
-    case RideMetric::Peak : return QwtSymbol::Rect;
-    default : return QwtSymbol::XCross;
-    }
-}
-
 void
-LTMTool::configChanged()
+LTMTool::refreshCustomTable()
 {
-}
+    // clear then repopulate custom table settings to reflect
+    // the current LTMSettings.
+    customTable->clear();
 
-void
-LTMTool::metricTreeWidgetSelectionChanged()
-{
-    metricSelected();
-}
+    // get headers back
+    QStringList header;
+    header << tr("Type") << tr("Details"); 
+    customTable->setHorizontalHeaderLabels(header);
 
-/*----------------------------------------------------------------------
- * Metric settings
- *--------------------------------------------------------------------*/
-QString
-LTMTool::metricName(QTreeWidgetItem *item)
-{
-    int idx = allMetrics->indexOfChild(item);
-    if (idx >= 0) return metrics[idx].name;
-    else return tr("Unknown Metric");
-}
+    // now lets add a row for each metric
+    customTable->setRowCount(settings->metrics.count());
+    int i=0;
+    foreach (MetricDetail metricDetail, settings->metrics) {
 
-QString
-LTMTool::metricSymbol(QTreeWidgetItem *item)
-{
-    int idx = allMetrics->indexOfChild(item);
-    if (idx >= 0) return metrics[idx].symbol;
-    else return tr("Unknown Metric");
-}
+        QTableWidgetItem *t = new QTableWidgetItem();
+        t->setText(tr("Metric")); // only metrics .. for now ..
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        customTable->setItem(i,0,t);
 
-MetricDetail
-LTMTool::metricDetails(QTreeWidgetItem *item)
-{
-    MetricDetail empty;
-    int idx = allMetrics->indexOfChild(item);
-    if (idx >= 0) return metrics[idx];
-    else return empty;
-}
+        t = new QTableWidgetItem();
+        t->setText(metricDetail.name);
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        customTable->setItem(i,1,t);
 
-
-
-void
-LTMTool::metricTreePopup(QPoint pos)
-{
-    QTreeWidgetItem *item = metricTree->itemAt(pos);
-    if (item != NULL && item->type() != ROOT_TYPE) {
-
-        // save context
-        activeMetric = item;
-
-        // create context menu
-        QMenu menu(metricTree);
-        QAction *color = new QAction(tr("Pick Color"), metricTree);
-        QAction *edit = new QAction(tr("Settings"), metricTree);
-        menu.addAction(color);
-        menu.addAction(edit);
-
-        // connect menu to functions
-        connect(color, SIGNAL(triggered(void)), this, SLOT(colorPicker(void)));
-        connect(edit, SIGNAL(triggered(void)), this, SLOT(editMetric(void)));
-
-        // execute the menu
-        menu.exec(metricTree->mapToGlobal(pos));
+        i++;
     }
 }
 
 void
 LTMTool::editMetric()
 {
-    int index = allMetrics->indexOfChild(activeMetric);
-    EditMetricDetailDialog dialog(context, &metrics[index]);
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+
+    int index = customTable->row(items.first());
+
+    MetricDetail edit = settings->metrics[index];
+    EditMetricDetailDialog dialog(context, this, &edit);
 
     if (dialog.exec()) {
-        // notify of change
-        metricSelected();
+
+        // apply!
+        settings->metrics[index] = edit;
+
+        // update
+        refreshCustomTable();
+        curvesChanged();
     }
 }
 
 void
-LTMTool::colorPicker()
+LTMTool::deleteMetric()
 {
-    int index = allMetrics->indexOfChild(activeMetric);
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(metrics[index].penColor);
+    QList<QTableWidgetItem*> items = customTable->selectedItems();
+    if (items.count() < 1) return;
+    
+    int index = customTable->row(items.first());
+    settings->metrics.removeAt(index);
+    refreshCustomTable();
+    curvesChanged();
+}
 
-    // don't use native dialog, since there is a nasty bug causing focus loss
-    // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = picker.getColor(metrics[index].penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+void
+LTMTool::addMetric()
+{
+    MetricDetail add;
+    EditMetricDetailDialog dialog(context, this, &add);
 
-    // if we got a good color use it and notify others
-    if (color.isValid()) {
-        metrics[index].penColor = color;
-        metricSelected();
+    if (dialog.exec()) {
+        // apply
+        settings->metrics.append(add);
+
+        // refresh
+        refreshCustomTable();
+        curvesChanged();
     }
 }
 
 void
-LTMTool::selectMetric(QString symbol)
+LTMTool::applySettings()
 {
-    for (int i=0; i<metrics.count(); i++) {
-        if (metrics[i].symbol == symbol) {
-            allMetrics->child(i)->setSelected(true);
-        }
-    }
-}
-
-void
-LTMTool::applySettings(LTMSettings *settings)
-{
-    disconnect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
-    metricTree->clearSelection(); // de-select everything
     foreach (MetricDetail metricDetail, settings->metrics) {
         // get index for the symbol
         for (int i=0; i<metrics.count(); i++) {
@@ -911,35 +868,57 @@ LTMTool::applySettings(LTMSettings *settings)
                 if (saved && saved->conversion() != 1.0 &&
                     metrics[i].uunits.contains(saved->units(!context->athlete->useMetricUnits)))
                     metrics[i].uunits.replace(saved->units(!context->athlete->useMetricUnits), saved->units(context->athlete->useMetricUnits));
-                // select it on the tool
-                allMetrics->child(i)->setSelected(true);
+
+
                 break;
             }
         }
     }
-    connect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
-    metricTreeWidgetSelectionChanged();
+
+    refreshCustomTable();
+
+    curvesChanged();
 }
 
 /*----------------------------------------------------------------------
  * EDIT METRIC DETAIL DIALOG
  *--------------------------------------------------------------------*/
-EditMetricDetailDialog::EditMetricDetailDialog(Context *context, MetricDetail *metricDetail) :
-    QDialog(context->mainWindow, Qt::Dialog), context(context), metricDetail(metricDetail)
+EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmTool, MetricDetail *metricDetail) :
+    QDialog(context->mainWindow, Qt::Dialog), context(context), ltmTool(ltmTool), metricDetail(metricDetail)
 {
     setWindowTitle(tr("Settings"));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    // Metric Name
-    mainLayout->addSpacing(5);
-    QLabel *metricName = new QLabel(metricDetail->name, this);
-    metricName->setAlignment(Qt::AlignHCenter);
-    QFont def;
-    def.setBold(true);
-    metricName->setFont(def);
-    mainLayout->addWidget(metricName);
-    mainLayout->addSpacing(5);
+    // metric selection tree
+    metricTree = new QTreeWidget;
+#ifdef Q_OS_MAC
+    metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    metricTree->setColumnCount(1);
+    metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    metricTree->header()->hide();
+    metricTree->setIndentation(5);
+
+    QLabel *metricLabel = new QLabel(tr("Metric"), this);
+
+    foreach(MetricDetail metric, ltmTool->metrics) {
+        QTreeWidgetItem *add;
+        add = new QTreeWidgetItem(metricTree->invisibleRootItem(), METRIC_TYPE);
+        add->setText(0, metric.name);
+    }
+    metricTree->expandItem(metricTree->invisibleRootItem());
+
+    int index = indexMetric(metricDetail);
+    if (index > 0) {
+
+        // which item to select?
+        QTreeWidgetItem *item = metricTree->invisibleRootItem()->child(index);
+
+        // select the current
+        metricTree->clearSelection();
+        metricTree->setCurrentItem(item, QItemSelectionModel::Select);
+    }
 
     // Grid
     QGridLayout *grid = new QGridLayout;
@@ -951,7 +930,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, MetricDetail *m
     userUnits = new QLineEdit(this);
     userUnits->setText(metricDetail->uunits);
 
-    QLabel *style = new QLabel(tr("Curve"));
+    QLabel *style = new QLabel(tr("Style"));
     curveStyle = new QComboBox(this);
     curveStyle->addItem(tr("Bar"), QwtPlotCurve::Steps);
     curveStyle->addItem(tr("Line"), QwtPlotCurve::Lines);
@@ -1018,28 +997,36 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, MetricDetail *m
     curveTrend->setChecked(metricDetail->trend);
 
     // add to grid
-    grid->addWidget(name, 0,0);
-    grid->addWidget(userName, 0,1);
-    grid->addWidget(units, 1,0);
-    grid->addWidget(userUnits, 1,1);
-    grid->addWidget(style, 2,0);
-    grid->addWidget(curveStyle, 2,1);
-    grid->addWidget(symbol, 3,0);
-    grid->addWidget(curveSymbol, 3,1);
-    grid->addWidget(stackLabel, 4, 0);
-    grid->addWidget(stack, 4, 1);
-    grid->addWidget(color, 5,0);
-    grid->addWidget(curveColor, 5,1);
-    grid->addWidget(fill, 6,0);
-    grid->addWidget(fillCurve, 6,1);
-    grid->addWidget(topN, 7,0);
-    grid->addWidget(showBest, 7,1);
-    grid->addWidget(outN, 8,0);
-    grid->addWidget(showOut, 8,1);
-    grid->addWidget(baseline, 9, 0);
-    grid->addWidget(baseLine, 9,1);
-    grid->addWidget(curveSmooth, 10,1);
-    grid->addWidget(curveTrend, 11,1);
+    grid->addWidget(metricLabel, 0, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
+    grid->addWidget(metricTree, 0, 1, 1, 3);
+    QWidget *spacer1 = new QWidget(this);
+    spacer1->setFixedHeight(10);
+    grid->addWidget(spacer1, 1,0);
+    grid->addWidget(name, 2,0);
+    grid->addWidget(userName, 2, 1, 1, 3);
+    grid->addWidget(units, 3,0);
+    grid->addWidget(userUnits, 3,1);
+    grid->addWidget(style, 4,0);
+    grid->addWidget(curveStyle, 4,1);
+    grid->addWidget(symbol, 5,0);
+    grid->addWidget(curveSymbol, 5,1);
+    QWidget *spacer2 = new QWidget(this);
+    spacer2->setFixedHeight(10);
+    grid->addWidget(spacer2, 6,0);
+    grid->addWidget(stackLabel, 7, 0);
+    grid->addWidget(stack, 7, 1);
+    grid->addWidget(color, 8,0);
+    grid->addWidget(curveColor, 8,1);
+    grid->addWidget(fill, 9,0);
+    grid->addWidget(fillCurve, 9,1);
+    grid->addWidget(topN, 3,2);
+    grid->addWidget(showBest, 3,3);
+    grid->addWidget(outN, 4,2);
+    grid->addWidget(showOut, 4,3);
+    grid->addWidget(baseline, 5, 2);
+    grid->addWidget(baseLine, 5,3);
+    grid->addWidget(curveSmooth, 7,2);
+    grid->addWidget(curveTrend, 8,2);
 
     mainLayout->addLayout(grid);
 
@@ -1053,9 +1040,91 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, MetricDetail *m
     mainLayout->addLayout(buttonLayout);
 
     // connect up slots
+    connect(metricTree, SIGNAL(itemSelectionChanged()), this, SLOT(metricSelected()));
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(curveColor, SIGNAL(clicked()), this, SLOT(colorClicked()));
+}
+
+int
+EditMetricDetailDialog::indexMetric(MetricDetail *metricDetail)
+{
+    for (int i=0; i < ltmTool->metrics.count(); i++) {
+        if (ltmTool->metrics.at(i).symbol == metricDetail->symbol) return i;
+    }
+    return -1;
+}
+
+void
+EditMetricDetailDialog::metricSelected()
+{
+    // user selected a different metric
+    // so update accordingly
+    int index = metricTree->invisibleRootItem()->indexOfChild(metricTree->currentItem());
+
+    userName->setText(ltmTool->metrics[index].uname);
+    userUnits->setText(ltmTool->metrics[index].uunits);
+    curveSmooth->setChecked(ltmTool->metrics[index].smooth);
+    curveTrend->setChecked(ltmTool->metrics[index].trend);
+    fillCurve->setChecked(ltmTool->metrics[index].fillCurve);
+    stack->setChecked(ltmTool->metrics[index].stack);
+    showBest->setValue(ltmTool->metrics[index].topN);
+    showOut->setValue(ltmTool->metrics[index].topOut);
+    baseLine->setValue(ltmTool->metrics[index].baseline);
+    penColor = ltmTool->metrics[index].penColor;
+    setButtonIcon(penColor);
+
+    // curve style
+    switch (ltmTool->metrics[index].curveStyle) {
+      
+    case QwtPlotCurve::Steps:
+        curveStyle->setCurrentIndex(0);
+        break;
+    case QwtPlotCurve::Lines:
+        curveStyle->setCurrentIndex(1);
+        break;
+    case QwtPlotCurve::Sticks:
+        curveStyle->setCurrentIndex(2);
+        break;
+    case QwtPlotCurve::Dots:
+    default:
+        curveStyle->setCurrentIndex(3);
+        break;
+
+    }
+
+    // curveSymbol
+    switch (ltmTool->metrics[index].symbolStyle) {
+      
+    case QwtSymbol::NoSymbol:
+        curveSymbol->setCurrentIndex(0);
+        break;
+    case QwtSymbol::Ellipse:
+        curveSymbol->setCurrentIndex(1);
+        break;
+    case QwtSymbol::Rect:
+        curveSymbol->setCurrentIndex(2);
+        break;
+    case QwtSymbol::Diamond:
+        curveSymbol->setCurrentIndex(3);
+        break;
+    case QwtSymbol::Triangle:
+        curveSymbol->setCurrentIndex(4);
+        break;
+    case QwtSymbol::XCross:
+        curveSymbol->setCurrentIndex(5);
+        break;
+    case QwtSymbol::Hexagon:
+        curveSymbol->setCurrentIndex(6);
+        break;
+    case QwtSymbol::Star1:
+    default:
+        curveSymbol->setCurrentIndex(7);
+        break;
+
+    }
+    
+    (*metricDetail) = ltmTool->metrics[index]; // overwrite!
 }
 
 // uh. i hate enums when you need to modify from ints
@@ -1084,6 +1153,31 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();
     accept();
+}
+
+QwtPlotCurve::CurveStyle
+LTMTool::curveStyle(RideMetric::MetricType type)
+{
+    switch (type) {
+
+    case RideMetric::Average : return QwtPlotCurve::Lines;
+    case RideMetric::Total : return QwtPlotCurve::Steps;
+    case RideMetric::Peak : return QwtPlotCurve::Lines;
+    default : return QwtPlotCurve::Lines;
+
+    }
+}
+
+QwtSymbol::Style
+LTMTool::symbolStyle(RideMetric::MetricType type)
+{
+    switch (type) {
+
+    case RideMetric::Average : return QwtSymbol::Ellipse;
+    case RideMetric::Total : return QwtSymbol::Ellipse;
+    case RideMetric::Peak : return QwtSymbol::Rect;
+    default : return QwtSymbol::XCross;
+    }
 }
 void
 EditMetricDetailDialog::cancelClicked()
@@ -1195,11 +1289,11 @@ LTMTool::metricDetails(QString symbol)
 }
 
 void
-LTMTool::translateMetrics(Context *context, const QDir &home, LTMSettings *settings)
+LTMTool::translateMetrics(Context *context, LTMSettings *settings) // settings override local scope (static function)!!
 {
     static QMap<QString, QString> unitsMap;
     // LTMTool instance is created to have access to metrics catalog
-    LTMTool* ltmTool = new LTMTool(context, home, false);
+    LTMTool* ltmTool = new LTMTool(context, settings);
     if (unitsMap.isEmpty()) {
         foreach(MetricDetail metric, ltmTool->metrics) {
             if (metric.units != "")  // translate units

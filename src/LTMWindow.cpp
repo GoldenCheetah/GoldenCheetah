@@ -121,7 +121,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     _canvasPicker = new LTMCanvasPicker(ltmPlot);
 
-    ltmTool = new LTMTool(context, context->athlete->home);
+    ltmTool = new LTMTool(context, &settings);
 
     // initialise
     settings.ltmTool = ltmTool;
@@ -136,7 +136,6 @@ LTMWindow::LTMWindow(Context *context) :
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
-    connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(rGroupBy, SIGNAL(valueChanged(int)), this, SLOT(rGroupBySelected(int)));
     //!!! connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
@@ -149,6 +148,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
+    connect(ltmTool, SIGNAL(curvesChanged()), this, SLOT(refresh()));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
 
     // connect pickers to ltmPlot
@@ -223,21 +223,6 @@ LTMWindow::refresh()
     } else {
         dirty = true;
     }
-}
-
-void
-LTMWindow::metricSelected()
-{
-    // wipe existing settings
-    settings.metrics.clear();
-
-    foreach(QTreeWidgetItem *metric, ltmTool->selectedMetrics()) {
-        if (metric->type() != ROOT_TYPE) {
-            QString symbol = ltmTool->metricSymbol(metric);
-            settings.metrics.append(ltmTool->metricDetails(metric));
-        }
-    }
-    refreshPlot();
 }
 
 void
@@ -367,8 +352,31 @@ LTMWindow::applyClicked()
 
     int selected = ltmTool->charts->invisibleRootItem()->indexOfChild(ltmTool->charts->selectedItems().first());
     if (selected >= 0) {
-        // what is the index of the chart?
-        ltmTool->applySettings(&ltmTool->presets[selected]);
+
+        // save chart setup
+        int groupBy = settings.groupBy;
+        bool legend = settings.legend;
+        bool events = settings.events;
+        bool shadeZones = settings.shadeZones;
+        QDateTime start = settings.start;
+        QDateTime end = settings.end;
+
+        // apply preset
+        settings = ltmTool->presets[selected];
+
+        // now get back the local chart setup
+        settings.ltmTool = ltmTool;
+        settings.data = &results;
+        settings.measures = &measures;
+        settings.groupBy = groupBy;
+        settings.legend = legend;
+        settings.events = events;
+        settings.shadeZones = shadeZones;
+        settings.start = start;
+        settings.end = end;
+
+        ltmTool->applySettings();
+        refresh();
     }
 }
 
@@ -383,24 +391,6 @@ LTMWindow::saveClicked()
         //ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
 }
-
-//void
-//LTMWindow::manageClicked()
-//{
-    //QList<LTMSettings> charts = ltmTool->presets; // get current
-    //ChartManagerDialog editor(context, &charts);
-    //if (editor.exec()) {
-        //// wipe the current and add the new
-        //ltmTool->presets = charts;
-        //ltmTool->presetPicker->clear();
-        //// update the presets to reflect the change
-        //for(int i=0; i<ltmTool->presets.count(); i++)
-            //ltmTool->presetPicker->addItem(ltmTool->presets[i].name, i);
-//
-        //// update charts.xml
-        //settings.writeChartXML(context->athlete->home, ltmTool->presets);
-    //}
-//}
 
 int
 LTMWindow::groupForDate(QDate date, int groupby)

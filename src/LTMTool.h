@@ -49,35 +49,21 @@ class LTMTool : public QWidget
 
     public:
 
-        LTMTool(Context *context, const QDir &home, bool Multi = true);
+        LTMTool(Context *context, LTMSettings *settings);
 
-        //const Season *currentDateRange() { return dateRange; }
-        //void selectDateRange(int);
-        QList<QTreeWidgetItem *> selectedMetrics() { return metricTree->selectedItems(); }
-
-        QString metricName(QTreeWidgetItem *);
-        QString metricSymbol(QTreeWidgetItem *);
-        MetricDetail metricDetails(QTreeWidgetItem *);
+        QList<MetricDetail> metrics;
         MetricDetail* metricDetails(QString symbol);
-        void selectMetric(QString symbol);
-        static void translateMetrics(Context *context, const QDir &home, LTMSettings *settings);
-
-        // allow others to create and update season structures
-        //int newSeason(QString, QDate, QDate, int);
-        //void updateSeason(int, QString, QDate, QDate, int);
+        static void translateMetrics(Context *context, LTMSettings *settings);
 
         // apply settings to the metric selector
-        void applySettings(LTMSettings *);
-
-        // get/set the date range
-        //void setDateRange(QString);
-        //QString _dateRange() const;
-
+        void applySettings();
         void setUseSelected(int);;
         int useSelected();
 
         bool isFiltered() { return _amFiltered; }
         QStringList &filters() { return filenames; }
+
+        LTMSettings *settings;
 
 #ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
@@ -86,7 +72,7 @@ class LTMTool : public QWidget
         // preset charts
         QList<LTMSettings> presets;
 
-        // accessed by LTMWindow hence public
+        // basic tab: accessed by LTMWindow hence public
         QComboBox *groupBy;
         QCheckBox *shadeZones;
         QCheckBox *showLegend;
@@ -99,26 +85,16 @@ class LTMTool : public QWidget
 
     signals:
 
-        //void dateRangeSelected(const Season *);
+        void curvesChanged();
         void filterChanged();
-        void metricSelected();
         void useCustomRange(DateRange); // use the range passed...
         void useStandardRange();        // fall back to standard date range...
         void useThruToday();        // fall back to standard date range thru today
 
     private slots:
-        //void dateRangeTreeWidgetSelectionChanged();
-        //void dateRangePopup(QPoint);
-        //void dateRangeChanged(QTreeWidgetItem *, int);
-        //void renameRange();
-        //void editRange();
-        //void deleteRange();
-        void metricTreeWidgetSelectionChanged();
-        void metricTreePopup(QPoint);
-        void colorPicker();
         void editMetric();
-        void configChanged();
-        //void resetSeasons(); // rebuild the seasons list if it changes
+        void addMetric();
+        void deleteMetric();
 
         void clearFilter();
         void setFilter(QStringList);
@@ -132,36 +108,30 @@ class LTMTool : public QWidget
 
     private:
 
-        QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
-        QwtSymbol::Style symbolStyle(RideMetric::MetricType);
         // Helper function for default charts translation
         void translateDefaultCharts(QList<LTMSettings>&charts);
+        QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
+        QwtSymbol::Style symbolStyle(RideMetric::MetricType);
 
         const QDir home;
         Context *context;
         bool active; // ignore season changed signals since we triggered them
 
-        //Seasons *seasons;
-        //QTreeWidget *dateRangeTree;
-        //QTreeWidgetItem *allDateRanges;
-        //const Season *dateRange;
-
         bool _amFiltered; // is a filter appling?
         QStringList filenames; // filters
 
-        QList<MetricDetail> metrics;
-        QTreeWidget *metricTree;
-        QTreeWidgetItem *allMetrics;
-
-        //QTreeWidgetItem *activeDateRange; // when using context menus
-        QTreeWidgetItem *activeMetric; // when using context menus
-
         QTabWidget *tabs;
 
+        // preset tab:
         QWidget *presetWidget;
         QLineEdit *chartName;
         QPushButton *importButton, *exportButton;
         QPushButton *upButton, *downButton, *renameButton, *deleteButton;
+
+        // custom tab:
+        QTableWidget *customTable;
+        QPushButton *editCustomButton, *addCustomButton, *deleteCustomButton;
+        void refreshCustomTable(); // refreshes the table from LTMSettings
 };
 
 class EditMetricDetailDialog : public QDialog
@@ -171,16 +141,23 @@ class EditMetricDetailDialog : public QDialog
 
 
     public:
-        EditMetricDetailDialog(Context *, MetricDetail *);
+        EditMetricDetailDialog(Context *, LTMTool *, MetricDetail *);
 
     public slots:
         void colorClicked();
         void applyClicked();
         void cancelClicked();
 
+        void metricSelected();
+        int indexMetric(MetricDetail *metric);
+
     private:
         Context *context;
+        LTMTool *ltmTool;
         MetricDetail *metricDetail;
+
+        QTreeWidget *metricTree;
+        QTreeWidgetItem *allMetrics;
 
         QLineEdit *userName,
                   *userUnits;
