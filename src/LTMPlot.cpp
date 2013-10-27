@@ -290,7 +290,7 @@ LTMPlot::setData(LTMSettings *set)
 
             int barn = metricDetail.stack ? stacknum : barnum;
 
-            double space = double(0.8) / bars;
+            double space = double(0.9) / bars;
             double gap = space * 0.10;
             double width = space * 0.90;
             left = (space * barn) + (gap / 2) + 0.1;
@@ -435,7 +435,7 @@ LTMPlot::setData(LTMSettings *set)
             // below this one
             int barn = metricDetail.stack ? stacknum : barnum;
 
-            double space = double(0.8) / bars;
+            double space = double(0.9) / bars;
             double gap = space * 0.10;
             double width = space * 0.90;
             left = (space * barn) + (gap / 2) + 0.1;
