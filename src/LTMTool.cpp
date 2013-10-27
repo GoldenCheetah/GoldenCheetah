@@ -114,6 +114,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     downButton = new QPushButton(tr("Move down"));
     renameButton = new QPushButton(tr("Rename"));
     deleteButton = new QPushButton(tr("Delete"));
+    newButton = new QPushButton(tr("Add Current")); // connected in LTMWindow.cpp
+    connect(newButton, SIGNAL(clicked()), this, SLOT(addCurrent()));
 
     QVBoxLayout *actionButtons = new QVBoxLayout;
     actionButtons->addWidget(renameButton);
@@ -124,6 +126,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     actionButtons->addWidget(importButton);
     actionButtons->addWidget(exportButton);
     actionButtons->addStretch();
+    actionButtons->addWidget(newButton);
 
     charts = new QTreeWidget;
 #ifdef Q_OS_MAC
@@ -150,7 +153,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     basicLayout->addLayout(buttons);
 
     presetLayout->addWidget(charts, 0,0);
-    presetLayout->addLayout(actionButtons, 0,1);
+    presetLayout->addLayout(actionButtons, 0,1,1,2);
 
     // connect up slots
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
@@ -878,6 +881,24 @@ LTMTool::applySettings()
     refreshCustomTable();
 
     curvesChanged();
+}
+
+void
+LTMTool::addCurrent()
+{
+    // give the chart a name
+    if (settings->name == "") settings->name = QString("Chart %1").arg(presets.count()+1);
+
+    // add the current chart to the presets with a name using the chart title
+    presets.append(*settings);
+
+    // add to the list
+    QTreeWidgetItem *add;
+    add = new QTreeWidgetItem(charts->invisibleRootItem());
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+    add->setText(0, settings->name);
+
+    // save charts.xml
 }
 
 /*----------------------------------------------------------------------
