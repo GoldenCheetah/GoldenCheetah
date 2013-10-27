@@ -79,6 +79,7 @@ class LTMTool : public QWidget
         QCheckBox *showEvents;
         QPushButton *saveButton;
         QPushButton *applyButton;
+        QPushButton *newButton;
         QTreeWidget *charts;
 
         DateSettingsEdit *dateSetting;
@@ -105,6 +106,7 @@ class LTMTool : public QWidget
         void downClicked();
         void renameClicked();
         void deleteClicked();
+        void addCurrent();
 
     private:
 
