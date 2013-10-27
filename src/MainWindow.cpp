@@ -627,8 +627,14 @@ MainWindow::showSidebar(bool want)
 void
 MainWindow::showToolbar(bool want)
 {
-    if (want) head->show();
-    else head->hide();
+    if (want) {
+        head->show();
+        scopebar->show();
+    }
+    else {
+        head->hide();
+        scopebar->hide();
+    }
 }
 
 void
