@@ -67,6 +67,7 @@
 			<metricuname>"Coggan Acute Training Load"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
 			<metricsmooth>0</metricsmooth>
+			<metrictype>2</metrictype>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
 			<metricoutn>0</metricoutn>
@@ -86,6 +87,7 @@
 			<metricname>coggan_ctl</metricname>
 			<metricuname>"Coggan Chronic Training Load"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -106,6 +108,7 @@
 			<metricname>coggan_tsb</metricname>
 			<metricuname>"Coggan Training Stress Balance"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -1569,6 +1572,7 @@
 			<metricname>skiba_lts</metricname>
 			<metricuname>"Skiba Long Term Stress"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>1</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -1589,6 +1593,7 @@
 			<metricname>skiba_sts</metricname>
 			<metricuname>"Skiba Short Term Stress"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>1</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -1652,6 +1657,7 @@
 			<metricname>skiba_lts</metricname>
 			<metricuname>"Skiba Long Term Stress"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
@@ -1672,6 +1678,7 @@
 			<metricname>skiba_sts</metricname>
 			<metricuname>"Skiba Short Term Stress"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
@@ -1692,6 +1699,7 @@
 			<metricname>skiba_sb</metricname>
 			<metricuname>"Skiba Stress Balance"</metricuname>
 			<metricuunits>"Stress Balance"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>1</metrictopn>
@@ -1735,6 +1743,7 @@
 			<metricname>daniels_points</metricname>
 			<metricuname>"Daniels Points"</metricuname>
 			<metricuunits>"Daniels Points"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -1755,6 +1764,7 @@
 			<metricname>daniels_lts</metricname>
 			<metricuname>"Daniels Long Term Stress"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -1775,6 +1785,7 @@
 			<metricname>daniels_sb</metricname>
 			<metricuname>"Daniels Stress Balance"</metricuname>
 			<metricuunits>"Stress Balance"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
@@ -1795,6 +1806,7 @@
 			<metricname>daniels_sts</metricname>
 			<metricuname>"Daniels Short Term Stress"</metricuname>
 			<metricuunits>"Stress"</metricuunits>
+			<metrictype>2</metrictype>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>

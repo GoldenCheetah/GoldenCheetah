@@ -157,14 +157,13 @@ class LTMWindow : public GcChartWindow
 #endif
 
         LTMSettings getSettings() const { return settings; }
-        void applySettings(LTMSettings x) { ltmTool->applySettings(&x); }
+        void applySettings(LTMSettings x) { settings = x; settings.ltmTool = ltmTool; ltmTool->applySettings(); }
 
     public slots:
         void rideSelected();
         void refreshPlot();
         void dateRangeChanged(DateRange);
         void filterChanged();
-        void metricSelected();
         void groupBySelected(int);
         void rGroupBySelected(int);
         void shadeZonesClicked(int);

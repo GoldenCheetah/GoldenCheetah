@@ -137,6 +137,7 @@ bool LTMChartParser::endElement( const QString&, const QString&, const QString &
     else if(qName == "metricbaseline") metric.baseline = buffer.trimmed().toDouble();
     else if(qName == "metricsmooth") metric.smooth = buffer.trimmed().toInt();
     else if(qName == "metrictrend") metric.trend = buffer.trimmed().toInt();
+    else if(qName == "metrictype") metric.type = buffer.trimmed().toInt();
     else if(qName == "metrictopn") metric.topN = buffer.trimmed().toInt();
     else if(qName == "metricoutn") metric.topOut = buffer.trimmed().toInt();
     else if(qName == "metriccurve") metric.curveStyle = intToCurve(buffer.trimmed().toInt());
@@ -255,6 +256,7 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
             out<<QString("\t\t\t<metricname>%1</metricname>\n").arg(metric.symbol);
             out<<QString("\t\t\t<metricuname>\"%1\"</metricuname>\n").arg(xmlprotect(metric.uname));
             out<<QString("\t\t\t<metricuunits>\"%1\"</metricuunits>\n").arg(xmlprotect(metric.uunits));
+            out<<QString("\t\t\t<metrictype>\"%1\"</metrictype>\n").arg(metric.type);
 
             // SMOOTH, TREND, TOPN
             out<<QString("\t\t\t<metricsmooth>%1</metricsmooth>\n").arg(metric.smooth);
