@@ -289,14 +289,25 @@ LTMWindow::filterChanged()
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {
 
+        // metrics filtering
         QList<SummaryMetrics> filteredresults;
         foreach (SummaryMetrics x, results) {
             if (ltmTool->filters().contains(x.getFileName()))
                 filteredresults << x;
         }
         results = filteredresults;
+
+        // metrics filtering
+        QList<SummaryMetrics> filteredbestsresults;
+        foreach (SummaryMetrics x, bestsresults) {
+            if (ltmTool->filters().contains(x.getFileName()))
+                filteredbestsresults << x;
+        }
+        bestsresults = filteredbestsresults;
+
         settings.data = &results;
         settings.measures = &measures;
+        settings.bests = &bestsresults;
     }
 
     refreshPlot();

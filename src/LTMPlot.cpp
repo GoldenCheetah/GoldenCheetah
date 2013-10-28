@@ -266,7 +266,10 @@ LTMPlot::setData(LTMSettings *set)
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
-        curves.insert(metricDetail.symbol, current);
+        if (metricDetail.type == METRIC_BEST)
+            curves.insert(metricDetail.bestSymbol, current);
+        else
+            curves.insert(metricDetail.symbol, current);
         stacks.insert(current, stackcounter+1);
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -408,7 +411,10 @@ LTMPlot::setData(LTMSettings *set)
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
-        curves.insert(metricDetail.symbol, current);
+        if (metricDetail.type == METRIC_BEST)
+            curves.insert(metricDetail.bestSymbol, current);
+        else
+            curves.insert(metricDetail.symbol, current);
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen cpen = QPen(metricDetail.penColor);
@@ -453,7 +459,9 @@ LTMPlot::setData(LTMSettings *set)
         if (metricDetail.trend == true && count > 2) {
 
             QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
-            QString trendSymbol = QString("%1_trend").arg(metricDetail.symbol);
+            QString trendSymbol = QString("%1_trend")
+                                  .arg(metricDetail.type == METRIC_BEST ? 
+                                       metricDetail.bestSymbol : metricDetail.symbol);
             QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
             // cosmetics
@@ -508,7 +516,8 @@ LTMPlot::setData(LTMSettings *set)
             else
                 outName = QString(tr("%1 Outlier")).arg(metricDetail.uname);
 
-            QString outSymbol = QString("%1_outlier").arg(metricDetail.symbol);
+            QString outSymbol = QString("%1_outlier").arg(metricDetail.type == METRIC_BEST ?
+                                                          metricDetail.bestSymbol : metricDetail.symbol);
             QwtPlotCurve *out = new QwtPlotCurve(outName);
             curves.insert(outSymbol, out);
 
@@ -569,7 +578,9 @@ LTMPlot::setData(LTMSettings *set)
             else
                 topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
-            QString topSymbol = QString("%1_topN").arg(metricDetail.symbol);
+            QString topSymbol = QString("%1_topN")
+                                .arg(metricDetail.type == METRIC_BEST ? 
+                                     metricDetail.bestSymbol : metricDetail.symbol);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
             curves.insert(topSymbol, top);
 
