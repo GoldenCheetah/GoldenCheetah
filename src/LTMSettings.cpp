@@ -139,7 +139,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(1);
+    out<<int(2); // version 2
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         out<<metric.type;
@@ -166,6 +166,9 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.brushColor;
         out<<metric.brushAlpha;
         out<<metric.fillCurve;
+        out<<metric.duration;
+        out<<metric.duration_units;
+        out<<static_cast<int>(metric.series);
     }
     return out;
 }
@@ -227,6 +230,13 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
             in>>m.fillCurve;
         } else {
             m.fillCurve = false;
+        }
+
+        if (version >= 2) { // get bests info
+            in>>m.duration;
+            in>>m.duration_units;
+            in>>x;
+            m.series = static_cast<RideFile::SeriesType>(x);
         }
         // get a metric pointer (if it exists)
         m.metric = factory.rideMetric(m.symbol);

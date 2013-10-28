@@ -841,7 +841,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
     // Get metric data, either from metricDB for RideFile metrics
     // or from StressCalculator for PM type metrics
     QList<SummaryMetrics> PMCdata;
-    if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
+    if (/* XXX FIXME */metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         data = settings->data;
     } else if (metricDetail.type == METRIC_MEASURE) {
         data = settings->measures;
