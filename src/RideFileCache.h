@@ -26,6 +26,8 @@
 
 class Context;
 class RideFile;
+class SummaryMetrics;
+class MetricDetail;
 
 #include "GoldenCheetah.h"
 
@@ -133,6 +135,10 @@ class RideFileCache
         // intended to be very fast (using lseek to jump direct to the value requested
         static double best(Context *context, QString fileName, RideFile::SeriesType series, int duration);
         static int tiz(Context *context, QString fileName, RideFile::SeriesType series, int zone);
+
+        // get all the bests passed and return a list of summary metrics, like the DBAccess
+        // function but using CPX files as the source
+        static QList<SummaryMetrics> getAllBestsFor(QList<MetricDetail>, QDateTime from, QDateTime to);
 
         static int decimalsFor(RideFile::SeriesType series);
 

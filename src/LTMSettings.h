@@ -69,6 +69,7 @@ class MetricDetail {
 
     // for METRICS
     QString symbol;
+    QString bestSymbol;
     QString name, units;
     const RideMetric *metric;
 
@@ -138,9 +139,12 @@ class LTMSettings {
         bool shadeZones;
         bool legend;
         bool events;
+
         QList<MetricDetail> metrics;
         QList<SummaryMetrics> *data;
         QList<SummaryMetrics> *measures;
+        QList<SummaryMetrics> *bests;
+
         LTMTool *ltmTool;
         QString field1, field2;
 };

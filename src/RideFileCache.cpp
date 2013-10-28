@@ -22,6 +22,8 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "SummaryMetrics.h"
+#include "LTMSettings.h" // getAllBestsFor needs this
 
 #include <math.h> // for pow()
 #include <QDebug>
@@ -1289,3 +1291,46 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
     return 0;
 }
 
+// get best values (as passed in the list of MetricDetails between the dates specified
+// and return as an array of SummaryMetrics.
+//
+// this is to 're-use' the metric api (especially in the LTM code) for passing back multiple
+// bests across multiple rides in one object. We do this so we can optimise the read/seek acroos
+// the CPX files within a single call.
+//
+// We order the bests requested in the order they will appear in the CPX file so we can open
+// and seek forward to each value before putting into the summary metric. Since it is placed
+// on the stack as a return paramater we also don't need to worry about memory allocation just
+// like the metric code works.
+// 
+//
+QList<SummaryMetrics>
+RideFileCache::getAllBestsFor(QList<MetricDetail> metrics, QDateTime from, QDateTime to)
+{
+//qDebug()<<"refresh cpx...";
+
+    QList<SummaryMetrics> results;
+    QList<MetricDetail> worklist;
+
+    // lets get a worklist
+    foreach(MetricDetail x, metrics) {
+        if (x.type == 5) {
+            worklist << x;
+            //qDebug()<<"added"<<x.bestSymbol;
+        }
+    }
+    if (worklist.count() == 0) return results; // no work to do
+
+    // get a list of rides
+
+    // iterate over the rides
+
+    // open the CPX
+
+    // calculate the read order
+
+    // get the values and place into the summarymetric map
+
+    // all done, return results
+    return results;
+}

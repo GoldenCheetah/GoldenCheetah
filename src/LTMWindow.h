@@ -201,6 +201,7 @@ class LTMWindow : public GcChartWindow
         LTMSettings settings; // all the plot settings
         QList<SummaryMetrics> results;
         QList<SummaryMetrics> measures;
+        QList<SummaryMetrics> bestsresults;
 
         // Widgets
         LTMPlot *ltmPlot;
