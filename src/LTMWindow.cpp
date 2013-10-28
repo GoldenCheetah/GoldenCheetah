@@ -219,7 +219,7 @@ LTMWindow::refresh()
         measures.clear(); // clear any old data
         measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
         bestsresults.clear();
-        bestsresults = RideFileCache::getAllBestsFor(settings.metrics, settings.start, settings.end);
+        bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
         refreshPlot();
         repaint(); // title changes color when filters change
         dirty = false;
@@ -284,7 +284,7 @@ LTMWindow::filterChanged()
     measures.clear(); // clear any old data
     measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
     bestsresults.clear();
-    bestsresults = RideFileCache::getAllBestsFor(settings.metrics, settings.start, settings.end);
+    bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
 
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {

@@ -138,7 +138,7 @@ class RideFileCache
 
         // get all the bests passed and return a list of summary metrics, like the DBAccess
         // function but using CPX files as the source
-        static QList<SummaryMetrics> getAllBestsFor(QList<MetricDetail>, QDateTime from, QDateTime to);
+        static QList<SummaryMetrics> getAllBestsFor(Context *context, QList<MetricDetail>, QDateTime from, QDateTime to);
 
         static int decimalsFor(RideFile::SeriesType series);
 

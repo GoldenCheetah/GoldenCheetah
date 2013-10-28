@@ -879,7 +879,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
         if (isnan(value) || isinf(value)) value = 0;
 
         // Special computed metrics (LTS/STS) have a null metric pointer
-        if (metricDetail.metric) {
+        if (metricDetail.type != METRIC_BEST && metricDetail.metric) {
             // convert from stored metric value to imperial
             if (context->athlete->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
@@ -893,7 +893,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
 
         if (value || wantZero) {
             unsigned long seconds = rideMetrics.getForSymbol("workout_time");
-            if (metricDetail.type == METRIC_MEASURE) seconds = 1;
+            if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_MEASURE) seconds = 1;
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
                     while (lastDay<currentDay) {
@@ -914,6 +914,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
 
                 if (metricDetail.uunits == "Ramp" ||
                     metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
+
+                if (metricDetail.type == METRIC_BEST) type = RideMetric::Peak;
 
                 switch (type) {
                 case RideMetric::Total:

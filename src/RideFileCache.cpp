@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "MetricAggregator.h"
 #include "SummaryMetrics.h"
 #include "LTMSettings.h" // getAllBestsFor needs this
 
@@ -1305,31 +1306,88 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
 // 
 //
 QList<SummaryMetrics>
-RideFileCache::getAllBestsFor(QList<MetricDetail> metrics, QDateTime from, QDateTime to)
+RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDateTime from, QDateTime to)
 {
-//qDebug()<<"refresh cpx...";
-
     QList<SummaryMetrics> results;
     QList<MetricDetail> worklist;
 
     // lets get a worklist
     foreach(MetricDetail x, metrics) {
-        if (x.type == 5) {
+        if (x.type == METRIC_BEST) {
             worklist << x;
-            //qDebug()<<"added"<<x.bestSymbol;
         }
     }
     if (worklist.count() == 0) return results; // no work to do
 
-    // get a list of rides
+    // get a list of rides & iterate over them
+    foreach(QString filename, context->athlete->metricDB->allActivityFilenames()) {
 
-    // iterate over the rides
+        QDateTime datetime;
+        QRegExp rx ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
 
-    // open the CPX
+        if (rx.exactMatch(filename)) {
 
-    // calculate the read order
+            QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
+            QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
+            datetime = QDateTime(date,time);
 
-    // get the values and place into the summarymetric map
+        } else continue;
+
+        // is it in range?
+        if (datetime < from || datetime > to) continue;
+
+        // CPX filename
+        QFileInfo rideFileInfo(context->athlete->home.absolutePath() + "/" + filename);
+        QString cacheFileName(context->athlete->home.absolutePath() + "/" + rideFileInfo.baseName() + ".cpx");
+        QFileInfo cacheFileInfo(cacheFileName);
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFileName);
+
+        // open
+        if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == false) continue;
+
+        // get header
+        QDataStream inFile(&cacheFile);
+        inFile.readRawData((char *) &head, sizeof(head));
+
+        // out of date 
+        if (head.version != RideFileCacheVersion) {
+            cacheFile.close();
+            continue;
+        }
+
+        SummaryMetrics add;
+        add.setFileName(filename);
+        add.setRideDate(datetime);
+
+        // work through the worklist adding each best
+        foreach (MetricDetail workitem, worklist) {
+
+            int seconds = workitem.duration * workitem.duration_units;
+            float value;
+
+            if (seconds > countForMeanMax(head, workitem.series)) value=0.0;
+            else {
+
+                // get the values and place into the summarymetric map
+                long offset = offsetForMeanMax(head, workitem.series) + 
+                              (sizeof(head)) +
+                              (sizeof(float) * ((workitem.duration*workitem.duration_units)-1));
+
+                cacheFile.seek(qint64(offset));
+                inFile.readRawData((char*)&value, sizeof(float));
+
+            }
+            add.setForSymbol(workitem.bestSymbol, value);
+
+        }
+
+        // add to the results
+        results << add;
+
+        // close CPX file
+        cacheFile.close();
+    }
 
     // all done, return results
     return results;

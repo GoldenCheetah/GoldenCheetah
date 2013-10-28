@@ -54,6 +54,7 @@ class MetricAggregator : public QObject
         QList<SummaryMetrics> getAllMeasuresFor(DateRange);
         SummaryMetrics getRideMetrics(QString filename);
         void writeAsCSV(QString filename); // export all...
+        QStringList allActivityFilenames();
 
     signals:
         void dataChanged(); // when metricDB table changed
