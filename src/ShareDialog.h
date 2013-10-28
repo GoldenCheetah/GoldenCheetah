@@ -44,7 +44,7 @@ class StravaUploader : public QObject
 public:
     StravaUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void uploadStrava();
+    void upload();
 
 private slots:
     void requestUploadStrava();
@@ -64,7 +64,6 @@ private:
 
     QString token;
 
-    QString STRAVA_URL_SSL;
     QString stravaUploadId, stravaActivityId;
 
     bool loggedIn, uploadSuccessful;
@@ -83,7 +82,7 @@ class RideWithGpsUploader : public QObject
 public:
     RideWithGpsUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void uploadRideWithGPS();
+    void upload();
 
 private slots:
 
@@ -103,6 +102,41 @@ private:
 
     bool loggedIn, uploadSuccessful;
     bool overwrite;
+};
+
+// uploader to strava.com
+class CyclingAnalyticsUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    CyclingAnalyticsUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
+
+    void upload();
+
+private slots:
+    void requestUploadCyclingAnalytics();
+    void requestUploadCyclingAnalyticsFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    Context *context;
+    ShareDialog *parent;
+    RideItem *ride;
+    QDialog *dialog;
+
+    QString token;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+
+    QString cyclingAnalyticsUploadId;
+
+    QString uploadStatus;
+    QString uploadProgress;
 };
 
 class ShareDialog : public QDialog
@@ -139,11 +173,13 @@ private:
 
      QCheckBox *stravaChk;
      QCheckBox *rideWithGPSChk;
+     QCheckBox *cyclingAnalyticsChk;
 
      RideItem *ride;
 
      StravaUploader *stravaUploader;
      RideWithGpsUploader *rideWithGpsUploader;
+     CyclingAnalyticsUploader *cyclingAnalyticsUploader;
 
      QString athleteId;
 };

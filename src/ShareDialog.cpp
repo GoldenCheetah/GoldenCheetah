@@ -46,6 +46,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     // uploaders
     stravaUploader = new StravaUploader(context, ride, this);
     rideWithGpsUploader = new RideWithGpsUploader(context, ride, this);
+    cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose which sites you wish to share on: "));
@@ -55,10 +56,16 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     stravaChk->setEnabled(false);
 #endif
     rideWithGPSChk = new QCheckBox(tr("Ride With GPS"));
+    cyclingAnalyticsChk = new QCheckBox(tr("Cycling Analytics"));
+#ifndef GC_STRAVA_CLIENT_SECRET
+    cyclingAnalyticsChk->setEnabled(false);
+#endif
 
     QGridLayout *vbox1 = new QGridLayout();
     vbox1->addWidget(stravaChk,0,0);
     vbox1->addWidget(rideWithGPSChk,0,2);
+    vbox1->addWidget(cyclingAnalyticsChk,0,3);
+
 
     groupBox1->setLayout(vbox1);
     mainLayout->addWidget(groupBox1);
@@ -132,7 +139,7 @@ ShareDialog::upload()
 {
     show();
 
-    if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked()) {
+    if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() && !cyclingAnalyticsChk->isChecked()) {
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("No share site selected !"));
         aMsgBox.exec();
@@ -152,12 +159,20 @@ ShareDialog::upload()
         shareSiteCount ++;
     }
 
+    if (cyclingAnalyticsChk->isChecked()) {
+        shareSiteCount ++;
+    }
+
     if (stravaChk->isChecked()) {
-        stravaUploader->uploadStrava();
+        stravaUploader->upload();
     }
 
     if (rideWithGPSChk->isChecked()) {
-        rideWithGpsUploader->uploadRideWithGPS();
+        rideWithGpsUploader->upload();
+    }
+
+    if (cyclingAnalyticsChk->isChecked()) {
+        cyclingAnalyticsUploader->upload();
     }
 }
 
@@ -169,7 +184,7 @@ StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *pa
 }
 
 void
-StravaUploader::uploadStrava()
+StravaUploader::upload()
 {
     // OAuth no more login
     token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
@@ -252,9 +267,7 @@ StravaUploader::requestUploadStrava()
 
     TcxFileReader reader;
 
-    STRAVA_URL_SSL = "https://www.strava.com/api/v3/uploads" ; // The V3 API doc said "https://api.strava.com" but it is not working yet
-
-    QUrl url = QUrl( STRAVA_URL_SSL );
+    QUrl url = QUrl( "https://www.strava.com/api/v3/uploads" ); // The V3 API doc said "https://api.strava.com" but it is not working yet
     QNetworkRequest request = QNetworkRequest(url);
 
     //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
@@ -367,7 +380,7 @@ StravaUploader::requestVerifyUpload()
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
     QByteArray out;
 
-    QUrl url = QUrl(STRAVA_URL_SSL + "/upload/status/"+stravaUploadId+"?token="+token);
+    QUrl url = QUrl("https://www.strava.com/api/v3/upload/status/"+stravaUploadId+"?token="+token);
     QNetworkRequest request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
@@ -440,7 +453,7 @@ RideWithGpsUploader::RideWithGpsUploader(Context *context, RideItem *ride, Share
 }
 
 void
-RideWithGpsUploader::uploadRideWithGPS()
+RideWithGpsUploader::upload()
 {
     if(rideWithGpsActivityId.length()>0)
     {
@@ -633,5 +646,190 @@ RideWithGpsUploader::closeClicked()
     return;
 }
 
+CyclingAnalyticsUploader::CyclingAnalyticsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
+    context(context), ride(ride), parent(parent)
+{
+    cyclingAnalyticsUploadId = ride->ride()->getTag("Strava uploadId", "");
+}
 
+void
+CyclingAnalyticsUploader::upload()
+{
+    // OAuth no more login
+    token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
+    if (token=="")
+    {
+        QMessageBox aMsgBox;
+        aMsgBox.setText(tr("Cannot login to CyclingAnalytics. Check permission"));
+        aMsgBox.exec();
+        return;
+    }
+
+    // allready shared ?
+    if(cyclingAnalyticsUploadId.length()>0)
+    {
+        overwrite = false;
+
+        dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout;
+
+        QVBoxLayout *layoutLabel = new QVBoxLayout();
+        QLabel *label = new QLabel();
+        label->setText(tr("This Ride is marked as already on CyclingAnalytics. Are you sure you want to upload it?"));
+        layoutLabel->addWidget(label);
+
+        QPushButton *ok = new QPushButton(tr("OK"), dialog);
+        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
+        QHBoxLayout *buttons = new QHBoxLayout();
+        buttons->addStretch();
+        buttons->addWidget(cancel);
+        buttons->addWidget(ok);
+
+        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
+
+        layout->addLayout(layoutLabel);
+        layout->addLayout(buttons);
+
+        dialog->setLayout(layout);
+
+        if (!dialog->exec()) return;
+    }
+
+    requestUploadCyclingAnalytics();
+
+    if(!uploadSuccessful)
+    {
+        parent->progressLabel->setText("Error uploading to CyclingAnalytics");
+    }
+    else
+    {
+        //requestVerifyUpload();
+        parent->progressLabel->setText(tr("Successfully uploaded to CyclingAnalytics"));
+    }
+}
+
+void
+CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
+{
+    parent->progressLabel->setText(tr("Upload ride to Strava..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+
+    QEventLoop eventLoop;
+    QNetworkAccessManager networkMgr;
+
+    int year = ride->fileName.left(4).toInt();
+    int month = ride->fileName.mid(5,2).toInt();
+    int day = ride->fileName.mid(8,2).toInt();
+    int hour = ride->fileName.mid(11,2).toInt();
+    int minute = ride->fileName.mid(14,2).toInt();;
+    int second = ride->fileName.mid(17,2).toInt();;
+
+    QDate rideDate = QDate(year, month, day);
+    QTime rideTime = QTime(hour, minute, second);
+    QDateTime rideDateTime = QDateTime(rideDate, rideTime);
+
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadCyclingAnalyticsFinished(QNetworkReply*)));
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+
+    TcxFileReader reader;
+
+    QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
+    QNetworkRequest request = QNetworkRequest(url);
+
+    //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
+    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+
+    QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
+
+    // MULTIPART *****************
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    multiPart->setBoundary(boundary.toAscii());
+
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toAscii());
+
+    QHttpPart activityNamePart;
+    activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"title\""));
+    activityNamePart.setBody(QString(parent->titleEdit->text()).toAscii());
+
+    QHttpPart dataTypePart;
+    dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"format\""));
+    dataTypePart.setBody("tcx");
+
+    QHttpPart filenamePart;
+    filenamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"filename\""));
+    filenamePart.setBody("file.tcx");
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\"; filename=\"file.tcx\"; type=\"text/xml\""));
+    filePart.setBody(file);
+
+    multiPart->append(activityNamePart);
+    multiPart->append(filenamePart);
+    multiPart->append(dataTypePart);
+    multiPart->append(filePart);
+
+    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
+    multiPart->setParent(reply.data());
+
+    parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload ride... Sending to CyclingAnalytics"));
+
+    eventLoop.exec();
+}
+
+void
+CyclingAnalyticsUploader::requestUploadCyclingAnalyticsFinished(QNetworkReply *reply)
+{
+    parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload to CyclingAnalytics finished."));
+
+    uploadSuccessful = false;
+
+    QString response = reply->readAll();
+    //qDebug() << "response" << response;
+
+    QScriptValue sc;
+    QScriptEngine se;
+
+    sc = se.evaluate("("+response+")");
+    QString uploadError = sc.property("error").toString();
+    if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
+        uploadError = "";
+
+    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError)
+    {
+        //qDebug() << "Error " << reply->error() ;
+        //qDebug() << "Error " << uploadError;
+        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from CyclingAnalytics: ") + uploadError + "\n" );
+    }
+    else
+    {
+        cyclingAnalyticsUploadId = sc.property("upload_id").toString();
+
+        ride->ride()->setTag("CyclingAnalytics uploadId", cyclingAnalyticsUploadId);
+        ride->setDirty(true);
+
+        //qDebug() << "uploadId: " << cyclingAnalyticsUploadId;
+
+        parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+        uploadSuccessful = true;
+    }
+    //qDebug() << reply->readAll();
+}
+
+void
+CyclingAnalyticsUploader::okClicked()
+{
+    dialog->accept();
+    return;
+}
+
+void
+CyclingAnalyticsUploader::closeClicked()
+{
+    dialog->reject();
+    return;
+}
 

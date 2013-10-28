@@ -131,6 +131,7 @@ class CredentialsPage : public QScrollArea
     public slots:
         void authoriseTwitter();
         void authoriseStrava();
+        void authoriseCyclingAnalytics();
 
     private:
         Context *context;
@@ -157,6 +158,9 @@ class CredentialsPage : public QScrollArea
         QPushButton *stravaAuthorise, *stravaAuthorised;
         QLineEdit *stravaPIN;
         char *s_id, *s_secret;
+
+        QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
+
 
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;

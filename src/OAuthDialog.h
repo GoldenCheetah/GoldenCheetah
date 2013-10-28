@@ -33,7 +33,8 @@ class OAuthDialog : public QDialog
 public:
     typedef enum {
         STRAVA,
-        TWITTER
+        TWITTER,
+        CYCLING_ANALYTICS
     } OAuthSite;
 
     OAuthDialog(Context *context, OAuthSite site);

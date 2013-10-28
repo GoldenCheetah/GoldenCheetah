@@ -482,7 +482,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
     rideMenu->addAction(tweetAction);
 
-    shareAction = new QAction(tr("Share (Strava, RideWithGPS)..."), this);
+    shareAction = new QAction(tr("Share (Strava, RideWithGPS, CyclingAnalytics)..."), this);
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
     rideMenu->addAction(shareAction);
 #endif

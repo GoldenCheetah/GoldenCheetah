@@ -151,8 +151,12 @@
 #define GC_TWITTER_SECRET "twitter_secret"
 
 //Strava
-#define GC_STRAVA_CLIENT_ID    "83" //< client id
+#define GC_STRAVA_CLIENT_ID    "83" // client id
 #define GC_STRAVA_TOKEN "strava_token"
+
+//Cycling Analytics
+#define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
+#define GC_CYCLINGANALYTICS_TOKEN "cyclinganalytics_token"
 
 // Tcx Smart recording
 #define GC_GARMIN_SMARTRECORD "garminSmartRecord"
