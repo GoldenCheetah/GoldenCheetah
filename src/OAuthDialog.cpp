@@ -35,12 +35,25 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
     layout->setContentsMargins(2,0,2,2);
     setLayout(layout);
 
-    QString urlstr = QString("https://www.strava.com/oauth/authorize?");
-    urlstr.append("client_id=83&");
-    urlstr.append("scope=view_private,write&");
+    QString urlstr = "";
+    if (site == STRAVA) {
+        urlstr = QString("https://www.strava.com/oauth/authorize?");
+        urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
+    }
+    else if (site == TWITTER) {
+        urlstr = QString("http://api.twitter.com/oauth/request_token?");
+        // TODO
+    }
+    else if (site == CYCLING_ANALYTICS) {
+        urlstr = QString("https://www.cyclinganalytics.com/api/auth?");
+        urlstr.append("client_id=").append(GC_CYCLINGANALYTICS_CLIENT_ID).append("&");
+    }
     urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
+    urlstr.append("scope=modify_rides&");
     urlstr.append("response_type=code&");
     urlstr.append("approval_prompt=force");
+
+
     url = QUrl(urlstr);
 
     view = new QWebView();
@@ -63,24 +76,41 @@ void
 OAuthDialog::urlChanged(const QUrl &url)
 {
     qDebug() << url.toString();
-    if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=")) {
-        QString code = url.toString().right(40);
+    if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
+        url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
+        QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
         qDebug() << "code" << code;
-
-        const char *request_token_uri = "https://www.strava.com/oauth/token?";
 
         QByteArray data;
         QUrl params;
+        QString urlstr = "";
 
-        params.addQueryItem("code", code);
-        params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
+        if (site == STRAVA) {
+            urlstr = QString("https://www.strava.com/oauth/token?");
+            params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
 #ifdef GC_STRAVA_CLIENT_SECRET
-        params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
+            params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
 #endif
-        params.addQueryItem("redirect_uri", "http://www.goldencheetah.org/");
+            params.addQueryItem("redirect_uri", "http://www.goldencheetah.org/");
+        }
+        else if (site == TWITTER) {
+            urlstr = QString("http://api.twitter.com/oauth/token?");
+            // TODO
+        }
+        else if (site == CYCLING_ANALYTICS) {
+            urlstr = QString("https://www.cyclinganalytics.com/api/token?");
+            params.addQueryItem("client_id", GC_CYCLINGANALYTICS_CLIENT_ID);
+#ifdef GC_CYCLINGANALYTICS_CLIENT_SECRET
+            params.addQueryItem("client_secret", GC_CYCLINGANALYTICS_CLIENT_SECRET);
+#endif
+            params.addQueryItem("grant_type", "authorization_code");
+        }
+        params.addQueryItem("code", code);
+
         data = params.encodedQuery();
 
-        QUrl url = QUrl( request_token_uri);
+        QUrl url = QUrl( urlstr);
+        qDebug() << "url" << url.toString();
         QNetworkRequest request = QNetworkRequest(url);
         request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
@@ -93,14 +123,25 @@ void
 OAuthDialog::loadFinished()
 {
     if (requestToken) {
-        int i = view->page()->mainFrame()->toHtml().indexOf("{\"access_token\":\"")+17;
-        int j = view->page()->mainFrame()->toHtml().indexOf("\"", i);
-        if (i>16 && j>-1) {
-            QString access_token = view->page()->mainFrame()->toHtml().mid(i,j-i);
-            qDebug() << "token" << access_token;
-            appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
-
-            accept();
+        int at = view->page()->mainFrame()->toHtml().indexOf("\"access_token\":")+16;
+        if (at>15) {
+            int i = view->page()->mainFrame()->toHtml().indexOf("\"", at);
+            int j = view->page()->mainFrame()->toHtml().indexOf("\"", i+1);
+            if (i>-1 && j>-1) {
+                qDebug() << "result" << view->page()->mainFrame()->toHtml();
+                QString access_token = view->page()->mainFrame()->toHtml().mid(i+1,j-i-1);
+                qDebug() << "token" << access_token;
+                if (site == STRAVA) {
+                    appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
+                }
+                else if (site == TWITTER) {
+                    // TODO
+                }
+                else if (site == CYCLING_ANALYTICS) {
+                    appsettings->setCValue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, access_token);
+                }
+                accept();
+            }
         }
     }
 }
