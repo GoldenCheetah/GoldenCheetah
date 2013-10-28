@@ -1199,6 +1199,7 @@ EditMetricDetailDialog::bestName()
     }
     desc += RideFile::seriesName(seriesList.at(dataSeries->currentIndex()));
     userName->setText(desc);
+    metricDetail->bestSymbol = desc.replace(" ", "_");
 }
 
 void
@@ -1269,7 +1270,7 @@ EditMetricDetailDialog::metricSelected()
         break;
 
     }
-    
+
     (*metricDetail) = ltmTool->metrics[index]; // overwrite!
 }
 

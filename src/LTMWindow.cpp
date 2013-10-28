@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideFileCache.h"
 #include "SummaryMetrics.h"
 #include "Settings.h"
 #include "math.h"
@@ -217,6 +218,8 @@ LTMWindow::refresh()
         results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
         measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
+        bestsresults.clear();
+        bestsresults = RideFileCache::getAllBestsFor(settings.metrics, settings.start, settings.end);
         refreshPlot();
         repaint(); // title changes color when filters change
         dirty = false;
@@ -236,6 +239,7 @@ LTMWindow::dateRangeChanged(DateRange range)
 
          settings.data = &results;
          settings.measures = &measures;
+         settings.bests = &bestsresults;
 
         // apply filter to new date range too -- will also refresh plot
         filterChanged();
@@ -266,6 +270,7 @@ LTMWindow::filterChanged()
     }
     settings.title = myDateRange.name;
     settings.data = &results;
+    settings.bests = &bestsresults;
     settings.measures = &measures;
 
     // if we want weeks and start is not a monday go back to the monday
@@ -278,6 +283,8 @@ LTMWindow::filterChanged()
     results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
     measures.clear(); // clear any old data
     measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
+    bestsresults.clear();
+    bestsresults = RideFileCache::getAllBestsFor(settings.metrics, settings.start, settings.end);
 
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {

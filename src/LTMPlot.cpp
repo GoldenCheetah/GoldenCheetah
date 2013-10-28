@@ -841,13 +841,15 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
     // Get metric data, either from metricDB for RideFile metrics
     // or from StressCalculator for PM type metrics
     QList<SummaryMetrics> PMCdata;
-    if (/* XXX FIXME */metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
+    if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         data = settings->data;
     } else if (metricDetail.type == METRIC_MEASURE) {
         data = settings->measures;
     } else if (metricDetail.type == METRIC_PM) {
         createPMCCurveData(settings, metricDetail, PMCdata);
         data = &PMCdata;
+    } else if (metricDetail.type == METRIC_BEST) {
+        data = settings->bests;
     }
 
     n=-1;
@@ -868,6 +870,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
         double value;
         if (metricDetail.type == METRIC_MEASURE)
             value = rideMetrics.getText(metricDetail.symbol, "0.0").toDouble();
+        else if (metricDetail.type == METRIC_BEST)
+            value = rideMetrics.getForSymbol(metricDetail.bestSymbol);
         else
             value = rideMetrics.getForSymbol(metricDetail.symbol);
 

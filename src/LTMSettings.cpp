@@ -168,6 +168,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.fillCurve;
         out<<metric.duration;
         out<<metric.duration_units;
+        out<<metric.bestSymbol;
         out<<static_cast<int>(metric.series);
     }
     return out;
@@ -235,6 +236,7 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
         if (version >= 2) { // get bests info
             in>>m.duration;
             in>>m.duration_units;
+            in>>m.bestSymbol;
             in>>x;
             m.series = static_cast<RideFile::SeriesType>(x);
         }
