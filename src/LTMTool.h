@@ -153,14 +153,25 @@ class EditMetricDetailDialog : public QDialog
         void metricSelected();
         int indexMetric(MetricDetail *metric);
 
+        void typeChanged();
+        void bestName();
+
     private:
         Context *context;
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QTreeWidget *metricTree;
-        QTreeWidgetItem *allMetrics;
+        QRadioButton *chooseMetric, *chooseBest;
+        QWidget *bestWidget;
+        QStackedWidget *typeStack;
 
+        // bests
+        QDoubleSpinBox *duration;
+        QComboBox *durationUnits;
+        QComboBox *dataSeries;
+
+        // metric
+        QTreeWidget *metricTree;
         QLineEdit *userName,
                   *userUnits;
 
@@ -179,6 +190,8 @@ class EditMetricDetailDialog : public QDialog
 
         QColor penColor; // chosen from color Picker
         void setButtonIcon(QColor);
+
+        QList<RideFile::SeriesType> seriesList;
 };
 
 #endif // _GC_LTMTool_h

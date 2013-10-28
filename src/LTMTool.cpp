@@ -783,12 +783,21 @@ LTMTool::refreshCustomTable()
     foreach (MetricDetail metricDetail, settings->metrics) {
 
         QTableWidgetItem *t = new QTableWidgetItem();
-        t->setText(tr("Metric")); // only metrics .. for now ..
+        if (metricDetail.type != 5)
+            t->setText(tr("Metric")); // only metrics .. for now ..
+        else
+            t->setText(tr("Peak"));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,0,t);
 
         t = new QTableWidgetItem();
-        t->setText(metricDetail.name);
+        if (metricDetail.type != 5)
+            t->setText(metricDetail.name);
+        else {
+            // text description for peak
+            t->setText(metricDetail.uname);
+        }
+
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,1,t);
 
@@ -907,12 +916,74 @@ LTMTool::addCurrent()
 EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmTool, MetricDetail *metricDetail) :
     QDialog(context->mainWindow, Qt::Dialog), context(context), ltmTool(ltmTool), metricDetail(metricDetail)
 {
-    setWindowTitle(tr("Settings"));
+    setWindowTitle(tr("Curve Settings"));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
+    // choose the type
+    chooseMetric = new QRadioButton(tr("Metric"));
+    chooseMetric->setChecked(metricDetail->type != 5);
+    chooseBest = new QRadioButton(tr("Best"));
+    chooseBest->setChecked(metricDetail->type == 5);
+    QVBoxLayout *radioButtons = new QVBoxLayout;
+    radioButtons->addStretch();
+    radioButtons->addWidget(chooseMetric);
+    radioButtons->addWidget(chooseBest);
+    radioButtons->addStretch();
+
+    // bests selection
+    duration = new QDoubleSpinBox(this);
+    duration->setDecimals(0);
+    duration->setMinimum(0);
+    duration->setMaximum(999);
+    duration->setSingleStep(1.0);
+    duration->setValue(metricDetail->duration); // default to 60 minutes
+
+    durationUnits = new QComboBox(this);
+    durationUnits->addItem(tr("seconds"));
+    durationUnits->addItem(tr("minutes"));
+    durationUnits->addItem(tr("hours"));
+    switch(metricDetail->duration_units) {
+        case 1 : durationUnits->setCurrentIndex(0); break;
+        case 60 : durationUnits->setCurrentIndex(1); break;
+        default :
+        case 3600 : durationUnits->setCurrentIndex(2); break;
+    }
+
+    dataSeries = new QComboBox(this);
+
+    // add all the different series supported
+    seriesList << RideFile::watts
+               << RideFile::wattsKg
+               << RideFile::xPower
+               << RideFile::NP
+               << RideFile::hr
+               << RideFile::kph
+               << RideFile::cad
+               << RideFile::nm
+               << RideFile::vam;
+
+    foreach (RideFile::SeriesType x, seriesList) {
+            dataSeries->addItem(RideFile::seriesName(x), static_cast<int>(x));
+    }
+
+    int index = seriesList.indexOf(metricDetail->series);
+    if (index < 0) index = 0;
+    dataSeries->setCurrentIndex(index);
+
+    bestWidget = new QWidget(this);
+    QVBoxLayout *alignLayout = new QVBoxLayout(bestWidget);
+    QGridLayout *bestLayout = new QGridLayout();
+    alignLayout->addLayout(bestLayout);
+
+    bestLayout->addWidget(duration, 0,0);
+    bestLayout->addWidget(durationUnits, 0,1);
+    bestLayout->addWidget(new QLabel(tr("Peak"), this), 1,0);
+    bestLayout->addWidget(dataSeries, 1,1);
+
     // metric selection tree
     metricTree = new QTreeWidget;
+
 #ifdef Q_OS_MAC
     metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -921,8 +992,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     metricTree->header()->hide();
     metricTree->setIndentation(5);
 
-    QLabel *metricLabel = new QLabel(tr("Metric"), this);
-
     foreach(MetricDetail metric, ltmTool->metrics) {
         QTreeWidgetItem *add;
         add = new QTreeWidgetItem(metricTree->invisibleRootItem(), METRIC_TYPE);
@@ -930,7 +999,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     }
     metricTree->expandItem(metricTree->invisibleRootItem());
 
-    int index = indexMetric(metricDetail);
+    index = indexMetric(metricDetail);
     if (index > 0) {
 
         // which item to select?
@@ -940,6 +1009,15 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
         metricTree->clearSelection();
         metricTree->setCurrentItem(item, QItemSelectionModel::Select);
     }
+
+    // contains all the different ways of defining
+    // a curve, one foreach type. currently just
+    // metric and bests, but will add formula and
+    // measure at some point
+    typeStack = new QStackedWidget(this);
+    typeStack->addWidget(metricTree);
+    typeStack->addWidget(bestWidget);
+    typeStack->setCurrentIndex(chooseMetric->isChecked() ? 0 : 1);
 
     // Grid
     QGridLayout *grid = new QGridLayout;
@@ -1018,8 +1096,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     curveTrend->setChecked(metricDetail->trend);
 
     // add to grid
-    grid->addWidget(metricLabel, 0, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
-    grid->addWidget(metricTree, 0, 1, 1, 3);
+    grid->addLayout(radioButtons, 0, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
+    grid->addWidget(typeStack, 0, 1, 1, 3);
     QWidget *spacer1 = new QWidget(this);
     spacer1->setFixedHeight(10);
     grid->addWidget(spacer1, 1,0);
@@ -1065,6 +1143,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(curveColor, SIGNAL(clicked()), this, SLOT(colorClicked()));
+    connect(chooseMetric, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
+    connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
+
+    // when stuff changes rebuild name
+    connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(bestName()));
+    connect(duration, SIGNAL(valueChanged(double)), this, SLOT(bestName()));
+    connect(durationUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(bestName()));
+    connect(dataSeries, SIGNAL(currentIndexChanged(int)), this, SLOT(bestName()));
 }
 
 int
@@ -1074,6 +1160,45 @@ EditMetricDetailDialog::indexMetric(MetricDetail *metricDetail)
         if (ltmTool->metrics.at(i).symbol == metricDetail->symbol) return i;
     }
     return -1;
+}
+
+void
+EditMetricDetailDialog::typeChanged()
+{
+    // switch stack and hide other
+    if (chooseMetric->isChecked()) {
+        bestWidget->hide();
+        metricTree->show();
+        typeStack->setCurrentIndex(0);
+    }
+
+    if (chooseBest->isChecked()) {
+        bestWidget->show();
+        metricTree->hide();
+        typeStack->setCurrentIndex(1);
+    }
+    adjustSize();
+}
+
+void
+EditMetricDetailDialog::bestName()
+{
+    // only for bests!
+    if (chooseBest->isChecked() == false) return;
+
+    // when widget destroyed we get negative indexes so ignore
+    if (durationUnits->currentIndex() < 0 || dataSeries->currentIndex() < 0) return;
+
+    // set uname from current parms
+    QString desc = QString(tr("Peak %1")).arg(duration->value());
+    switch (durationUnits->currentIndex()) {
+    case 0 : desc += " second "; break;
+    case 1 : desc += " minute "; break;
+    default:
+    case 2 : desc += " hour "; break;
+    }
+    desc += RideFile::seriesName(seriesList.at(dataSeries->currentIndex()));
+    userName->setText(desc);
 }
 
 void
@@ -1160,7 +1285,24 @@ static QwtSymbol::Style symbolMap[] = { QwtSymbol::NoSymbol, QwtSymbol::Ellipse,
 void
 EditMetricDetailDialog::applyClicked()
 {
-    // get the values back
+    if (chooseMetric->isChecked()) { // is a metric, but what type?
+        int index = indexMetric(metricDetail);
+        if (index >= 0) metricDetail->type = ltmTool->metrics.at(index).type;
+        else metricDetail->type = 1;
+    }
+
+    if (chooseBest->isChecked()) metricDetail->type = 5; // is a best
+
+    metricDetail->duration = duration->value();
+
+    switch (durationUnits->currentIndex()) {
+        case 0 : metricDetail->duration_units = 1; break;
+        case 1 : metricDetail->duration_units = 60; break;
+        case 2 :
+        default: metricDetail->duration_units = 3600; break;
+    }
+    metricDetail->series = seriesList.at(dataSeries->currentIndex());
+
     metricDetail->smooth = curveSmooth->isChecked();
     metricDetail->trend = curveTrend->isChecked();
     metricDetail->topN = showBest->value();

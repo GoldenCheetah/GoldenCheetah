@@ -31,6 +31,8 @@
 #include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
 
+#include "RideFile.h" // for SeriesType
+
 class LTMTool;
 class LTMSettings;
 class SummaryMetrics;
@@ -49,6 +51,7 @@ class RideMetric;
 #define METRIC_PM        2
 #define METRIC_META      3
 #define METRIC_MEASURE   4
+#define METRIC_BEST      5
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {
@@ -64,9 +67,17 @@ class MetricDetail {
     int type;
     bool stack; // should this be stacked?
 
-    QString symbol, name, units;
+    // for METRICS
+    QString symbol;
+    QString name, units;
     const RideMetric *metric;
 
+    // for BESTS
+    int duration;       // n x units below for seconds
+    int duration_units; // 1=secs, 60=mins, 3600=hours
+    RideFile::SeriesType series; // what series are we doing the peak for
+
+    // GENERAL SETTINGS FOR A METRIC
     QString uname, uunits; // user specified name and units (axis choice)
 
     // user configurable settings
