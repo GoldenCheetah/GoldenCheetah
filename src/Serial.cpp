@@ -348,6 +348,7 @@ find_devices(char *result[], int capacity)
     //
     // To help decode this regexp;
     // /dev/cu.PL2303-[0-9A-F]+        - Prolific device driver for USB/serial device
+    // /dev/cu.usbserial               - typical for Sewell on Mac
     // /dev/ANTUSBStick.slabvcp        - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
     // /dev/SLAB_USBtoUART             - Silicon Labs Driver for USB/Serial
     // /dev/usbmodem[0-9A-F]+          - Usb modem module driver (generic)
@@ -360,7 +361,7 @@ find_devices(char *result[], int capacity)
     // /dev/ttyMI*                     - MOXA PCI cards
     // /dev/rfcomm*                    - Bluetooth devices
     if (regcomp(&reg, 
-                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-Z]+|KeySerial[0-9])|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
+                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-Z]+|KeySerial[0-9]|usbserial)|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }
