@@ -510,10 +510,14 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(stravaAuthorise, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "")!="")
         grid->addWidget(stravaAuthorised, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        stravaAuthorised->hide(); // if no token no show
 
     grid->addWidget(cyclingAnalyticsAuthorise, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "")!="")
         grid->addWidget(cyclingAnalyticsAuthorised, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        cyclingAnalyticsAuthorised->hide();
 
     grid->addWidget(rideWithGPSUser, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(rideWithGPSPass, 20, 1, Qt::AlignLeft | Qt::AlignVCenter);
