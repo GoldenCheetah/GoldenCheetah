@@ -66,8 +66,9 @@
 // 46  13  May 2013 Mark Liversedge    Handle absence of speed in metric calculations
 // 47  17  May 2013 Mark Liversedge    Reimplementation of w/kg and ride->getWeight()
 // 48  22  May 2013 Mark Liversedge    Removing local measures.xml, till v3.1
+// 49  29  Oct 2013 Mark Liversedge    Added percentage time in zone
 
-int DBSchemaVersion = 48;
+int DBSchemaVersion = 49;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
