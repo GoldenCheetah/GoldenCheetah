@@ -168,6 +168,9 @@ class CredentialsPage : public QScrollArea
         QLineEdit *ttbUser;
         QLineEdit *ttbPass;
 
+        QLineEdit *selUser;
+        QLineEdit *selPass;
+
         QLineEdit *wiURL; // url for withings
         QLineEdit *wiUser;
         QLineEdit *wiPass;

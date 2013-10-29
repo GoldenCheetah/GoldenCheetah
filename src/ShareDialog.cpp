@@ -32,6 +32,44 @@
 #include "DBAccess.h"
 #include "TcxRideFile.h"
 
+#include <zlib.h>
+
+//
+// Utility function to create a QByteArray of data in GZIP format
+// This is essentially the same as qCompress but creates it in
+// GZIP format (with recquisite headers) instead of ZLIB's format
+// which has less filename info in the header
+//
+static QByteArray zCompress(const QByteArray &source)
+{
+    // int size is source.size()
+    // const char *data is source.data()
+    z_stream strm;
+
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+
+    // note that (15+16) below means windowbits+_16_ adds the gzip header/footer
+    deflateInit2(&strm, Z_BEST_COMPRESSION, Z_DEFLATED, (15+16), 8, Z_DEFAULT_STRATEGY);
+
+    // input data
+    strm.avail_in = source.size();
+    strm.next_in = (Bytef *)source.data();
+
+    // output data - on stack not heap, will be released
+    QByteArray dest(source.size()/2, '\0'); // should compress by 50%, if not don't bother
+
+    strm.avail_out = source.size()/2;
+    strm.next_out = (Bytef *)dest.data();
+
+    // now compress!
+    deflate(&strm, Z_FINISH);
+
+    // return byte array on the stack
+    return QByteArray(dest.data(), (source.size()/2) - strm.avail_out);
+}
+
 ShareDialog::ShareDialog(Context *context, RideItem *item) :
     context(context)
 {
@@ -47,6 +85,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     stravaUploader = new StravaUploader(context, ride, this);
     rideWithGpsUploader = new RideWithGpsUploader(context, ride, this);
     cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
+    selfLoopsUploader = new SelfLoopsUploader(context, ride, this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose which sites you wish to share on: "));
@@ -60,11 +99,13 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 #ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
     cyclingAnalyticsChk->setEnabled(false);
 #endif
+    selfLoopsChk = new QCheckBox(tr("Selfloops"));
 
     QGridLayout *vbox1 = new QGridLayout();
     vbox1->addWidget(stravaChk,0,0);
-    vbox1->addWidget(rideWithGPSChk,0,2);
-    vbox1->addWidget(cyclingAnalyticsChk,0,3);
+    vbox1->addWidget(rideWithGPSChk,0,1);
+    vbox1->addWidget(cyclingAnalyticsChk,0,2);
+    vbox1->addWidget(selfLoopsChk,0,3);
 
 
     groupBox1->setLayout(vbox1);
@@ -139,7 +180,8 @@ ShareDialog::upload()
 {
     show();
 
-    if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() && !cyclingAnalyticsChk->isChecked()) {
+    if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() &&
+        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked()) {
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("No share site selected !"));
         aMsgBox.exec();
@@ -154,25 +196,27 @@ ShareDialog::upload()
     if (stravaChk->isChecked()) {
         shareSiteCount ++;
     }
-
     if (rideWithGPSChk->isChecked()) {
         shareSiteCount ++;
     }
-
     if (cyclingAnalyticsChk->isChecked()) {
+        shareSiteCount ++;
+    }
+    if (selfLoopsChk->isChecked()) {
         shareSiteCount ++;
     }
 
     if (stravaChk->isChecked()) {
         stravaUploader->upload();
     }
-
     if (rideWithGPSChk->isChecked()) {
         rideWithGpsUploader->upload();
     }
-
     if (cyclingAnalyticsChk->isChecked()) {
         cyclingAnalyticsUploader->upload();
+    }
+    if (selfLoopsChk->isChecked()) {
+        selfLoopsUploader->upload();
     }
 }
 
@@ -364,7 +408,6 @@ StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
-    //qDebug() << reply->readAll();
 }
 
 void
@@ -704,7 +747,6 @@ CyclingAnalyticsUploader::upload()
     }
     else
     {
-        //requestVerifyUpload();
         parent->progressLabel->setText(tr("Successfully uploaded to CyclingAnalytics"));
     }
 }
@@ -718,28 +760,15 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
     QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
 
-    int year = ride->fileName.left(4).toInt();
-    int month = ride->fileName.mid(5,2).toInt();
-    int day = ride->fileName.mid(8,2).toInt();
-    int hour = ride->fileName.mid(11,2).toInt();
-    int minute = ride->fileName.mid(14,2).toInt();;
-    int second = ride->fileName.mid(17,2).toInt();;
-
-    QDate rideDate = QDate(year, month, day);
-    QTime rideTime = QTime(hour, minute, second);
-    QDateTime rideDateTime = QDateTime(rideDate, rideTime);
-
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadCyclingAnalyticsFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
-
-    TcxFileReader reader;
 
     QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
     QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
 
+    TcxFileReader reader;
     QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
 
     // MULTIPART *****************
@@ -816,7 +845,6 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalyticsFinished(QNetworkReply *r
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
-    //qDebug() << reply->readAll();
 }
 
 void
@@ -833,3 +861,174 @@ CyclingAnalyticsUploader::closeClicked()
     return;
 }
 
+
+SelfLoopsUploader::SelfLoopsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
+    context(context), ride(ride), parent(parent)
+{
+    selfloopsUploadId = ride->ride()->getTag("Selfloops uploadId", "");
+}
+
+void
+SelfLoopsUploader::upload()
+{
+    // allready shared ?
+    if(selfloopsUploadId.length()>0)
+    {
+        overwrite = false;
+
+        dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout;
+
+        QVBoxLayout *layoutLabel = new QVBoxLayout();
+        QLabel *label = new QLabel();
+        label->setText(tr("This Ride is marked as already on Selfloops. Are you sure you want to upload it?"));
+        layoutLabel->addWidget(label);
+
+        QPushButton *ok = new QPushButton(tr("OK"), dialog);
+        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
+        QHBoxLayout *buttons = new QHBoxLayout();
+        buttons->addStretch();
+        buttons->addWidget(cancel);
+        buttons->addWidget(ok);
+
+        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
+
+        layout->addLayout(layoutLabel);
+        layout->addLayout(buttons);
+
+        dialog->setLayout(layout);
+
+        if (!dialog->exec()) return;
+    }
+
+    requestUploadSelfLoops();
+
+    if(!uploadSuccessful)
+    {
+        parent->progressLabel->setText("Error uploading to Selfloops");
+    }
+    else
+    {
+        parent->progressLabel->setText(tr("Successfully uploaded to Selfloops"));
+    }
+}
+
+/*
+  make a multipart HTTP POST at the following path "/restapi/public/activities/upload.json"
+  on selflloops web site using SSL.
+  The requested parameters are:
+   - "email" the email of a valid SelfLoops account
+   - "pw" the password
+   - "tcxfile" the zipped TCX file (example: test.tcx.gz).
+
+   On success, response message contains a JSON encoded data
+   with the new "activity_id" created.
+   On error, SelfLoops response contains a JSON encoded data with "error_code" and "message" key.
+*/
+void
+SelfLoopsUploader::requestUploadSelfLoops()
+{
+    parent->progressLabel->setText(tr("Upload ride to Selfloops..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+
+    QEventLoop eventLoop;
+    QNetworkAccessManager networkMgr;
+
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadSelfLoopsFinished(QNetworkReply*)));
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+
+    QUrl url = QUrl( "https://www.selfloops.com/restapi/public/activities/upload.json" );
+    QNetworkRequest request = QNetworkRequest(url);
+
+    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+
+    // The TCX file have to be gzipped
+    TcxFileReader reader;
+    QByteArray file = zCompress(reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked()));
+
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SELUSER).toString();
+    QString password = appsettings->cvalue(context->athlete->cyclist, GC_SELPASS).toString();
+
+    // MULTIPART *****************
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::MixedType);
+    multiPart->setBoundary(boundary.toAscii());
+
+    QHttpPart emailPart;
+    emailPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"email\""));
+    emailPart.setBody(username.toAscii());
+
+    QHttpPart passwordPart;
+    passwordPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"pw\""));
+    passwordPart.setBody(password.toAscii());
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"tcxfile\"; filename=\"myfile.tcx.gz\"; type=\"application/x-gzip\""));
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-gzip");
+    filePart.setBody(file);
+
+    multiPart->append(emailPart);
+    multiPart->append(passwordPart);
+    multiPart->append(filePart);
+
+    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
+    multiPart->setParent(reply.data());
+
+    parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload ride... Sending to Selfloops"));
+
+    eventLoop.exec();
+}
+
+void
+SelfLoopsUploader::requestUploadSelfLoopsFinished(QNetworkReply *reply)
+{
+    parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload to Selfloops finished."));
+
+    uploadSuccessful = false;
+
+    QString response = reply->readAll();
+    qDebug() << "response" << response;
+
+    QScriptValue sc;
+    QScriptEngine se;
+
+    sc = se.evaluate("("+response+")");
+    QString error = sc.property("error_code").toString();
+    QString uploadError = sc.property("message").toString();
+
+    if (error.length()>0 || reply->error() != QNetworkReply::NoError)
+    {
+        qDebug() << "Error " << reply->error() ;
+        qDebug() << "Error " << uploadError;
+        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Selfloops: ") + uploadError + "\n" );
+    }
+    else
+    {
+        selfloopsUploadId = sc.property("upload_id").toString();
+
+        ride->ride()->setTag("Selfloops uploadId", selfloopsUploadId);
+        ride->setDirty(true);
+
+        qDebug() << "uploadId: " << selfloopsUploadId;
+
+        parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+        uploadSuccessful = true;
+    }
+}
+
+void
+SelfLoopsUploader::okClicked()
+{
+    dialog->accept();
+    return;
+}
+
+void
+SelfLoopsUploader::closeClicked()
+{
+    dialog->reject();
+    return;
+}

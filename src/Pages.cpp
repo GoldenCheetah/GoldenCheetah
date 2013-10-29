@@ -320,6 +320,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *ttbuserLabel = new QLabel(tr("Username"));
     QLabel *ttbpassLabel = new QLabel(tr("Password"));
 
+    QLabel *sel = new QLabel(tr("Selfloops"));
+    sel->setFont(current);
+
+    QLabel *seluserLabel = new QLabel(tr("Username"));
+    QLabel *selpassLabel = new QLabel(tr("Password"));
+
     QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
     wip->setFont(current);
 
@@ -422,6 +428,14 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     ttbPass->setEchoMode(QLineEdit::Password);
     ttbPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS, "").toString());
 
+
+    selUser = new QLineEdit(this);
+    selUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELUSER, "").toString());
+
+    selPass = new QLineEdit(this);
+    selPass->setEchoMode(QLineEdit::Password);
+    selPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELPASS, "").toString());
+
     wiURL = new QLineEdit(this);
     wiURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
 
@@ -493,6 +507,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(ttb, 35,0);
     grid->addWidget(ttbuserLabel, 36,0);
     grid->addWidget(ttbpassLabel, 37,0);
+    grid->addWidget(sel, 38,0);
+    grid->addWidget(seluserLabel, 39,0);
+    grid->addWidget(selpassLabel, 40,0);
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -538,6 +555,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     grid->addWidget(ttbUser, 36, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(ttbPass, 37, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(selUser, 39, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(selPass, 40, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -649,6 +669,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBUSER, ttbUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBPASS, ttbPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SELUSER, selUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_SELPASS, selPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPTYPE, tpType->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, wiUser->text());
