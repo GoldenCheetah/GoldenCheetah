@@ -470,7 +470,7 @@ RideSummaryWindow::htmlSummary() const
                 f.mainwindow = mainWindow; // hack, until we refactor athlete and mainwindow
                 for (int i = ride->intervalBegin(interval); i>=0 && i < ride->dataPoints().size(); ++i) {
                     const RideFilePoint *p = ride->dataPoints()[i];
-                    if (p->secs >= interval.stop)
+                    if (p->secs > interval.stop)
                         break;
                     f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                                 p->watts, p->alt, p->lon, p->lat, p->headwind,

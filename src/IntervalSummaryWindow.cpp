@@ -70,7 +70,7 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
     f.mainwindow = mainWindow;
     int start = ride->timeIndex(interval->start);
     int end = ride->timeIndex(interval->stop);
-    for (int i = start; i < end; ++i) {
+    for (int i = start; i <= end; ++i) {
         const RideFilePoint *p = ride->dataPoints()[i];
         f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                       p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 0);
