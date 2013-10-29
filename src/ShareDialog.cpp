@@ -57,7 +57,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 #endif
     rideWithGPSChk = new QCheckBox(tr("Ride With GPS"));
     cyclingAnalyticsChk = new QCheckBox(tr("Cycling Analytics"));
-#ifndef GC_STRAVA_CLIENT_SECRET
+#ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
     cyclingAnalyticsChk->setEnabled(false);
 #endif
 
