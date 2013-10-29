@@ -67,8 +67,9 @@
 // 47  17  May 2013 Mark Liversedge    Reimplementation of w/kg and ride->getWeight()
 // 48  22  May 2013 Mark Liversedge    Removing local measures.xml, till v3.1
 // 49  29  Oct 2013 Mark Liversedge    Added percentage time in zone
+// 50  29  Oct 2013 Mark Liversedge    Added percentage time in heartrate zone
 
-int DBSchemaVersion = 49;
+int DBSchemaVersion = 50;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
