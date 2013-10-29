@@ -234,7 +234,446 @@ class ZoneTime10 : public ZoneTime {
         RideMetric *clone() const { return new ZoneTime10(*this); }
 };
 
+// Now for Time In Zone as a Percentage of Ride Time
+class ZonePTime1 : public RideMetric {
 
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime1)
+
+    public:
+
+        ZonePTime1()
+        {
+            setSymbol("percent_in_zone_L1");
+            setInternalName("L1 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L1 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L1"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L1")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime1(*this); }
+};
+
+class ZonePTime2 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime2)
+
+    public:
+
+        ZonePTime2()
+        {
+            setSymbol("percent_in_zone_L2");
+            setInternalName("L2 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L2 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L2"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L2")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime2(*this); }
+};
+
+class ZonePTime3 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime3)
+
+    public:
+
+        ZonePTime3()
+        {
+            setSymbol("percent_in_zone_L3");
+            setInternalName("L3 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L3 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L3"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L3")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime3(*this); }
+};
+
+class ZonePTime4 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime4)
+
+    public:
+
+        ZonePTime4()
+        {
+            setSymbol("percent_in_zone_L4");
+            setInternalName("L4 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L4 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L4"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L4")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime4(*this); }
+};
+
+class ZonePTime5 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime5)
+
+    public:
+
+        ZonePTime5()
+        {
+            setSymbol("percent_in_zone_L5");
+            setInternalName("L5 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L5 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L5"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L5")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime5(*this); }
+};
+
+class ZonePTime6 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime6)
+
+    public:
+
+        ZonePTime6()
+        {
+            setSymbol("percent_in_zone_L6");
+            setInternalName("L6 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L6 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L6"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L6")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime6(*this); }
+};
+
+class ZonePTime7 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime7)
+
+    public:
+
+        ZonePTime7()
+        {
+            setSymbol("percent_in_zone_L7");
+            setInternalName("L7 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L7 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L7"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L7")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime7(*this); }
+};
+
+class ZonePTime8 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime8)
+
+    public:
+
+        ZonePTime8()
+        {
+            setSymbol("percent_in_zone_L8");
+            setInternalName("L8 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L8 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L8"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L8")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime8(*this); }
+};
+
+class ZonePTime9 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime9)
+
+    public:
+
+        ZonePTime9()
+        {
+            setSymbol("percent_in_zone_L9");
+            setInternalName("L9 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L9 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L9"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L9")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime9(*this); }
+};
+
+class ZonePTime10 : public RideMetric {
+
+        Q_DECLARE_TR_FUNCTIONS(ZonePTime10)
+
+    public:
+
+        ZonePTime10()
+        {
+            setSymbol("percent_in_zone_L10");
+            setInternalName("L10 Percent in Zone");
+            setType(RideMetric::Average);
+            setMetricUnits("%");
+            setImperialUnits("%");
+            setPrecision(0);
+            setConversion(1.0);
+        }
+
+        void initialize ()
+        {
+            setName(tr("L10 Percent in Zone"));
+        }
+
+        void compute(const RideFile *, const Zones *, int,
+                    const HrZones *, int,
+                    const QHash<QString,RideMetric*> &deps,
+                    const Context *)
+        {
+            assert(deps.contains("time_in_zone_L10"));
+            assert(deps.contains("workout_time"));
+
+            // compute
+            double time = deps.value("workout_time")->value(true);
+            double inzone = deps.value("time_in_zone_L10")->value(true);
+
+            if (time && inzone) setValue((inzone / time) * 100.00);
+            else setValue(0);
+            setCount(time);
+        }
+
+        bool canAggregate() { return false; }
+        void aggregateWith(const RideMetric &) {}
+        RideMetric *clone() const { return new ZonePTime10(*this); }
+};
 
 static bool addAllZones() {
     RideMetricFactory::instance().addMetric(ZoneTime1());
@@ -247,6 +686,46 @@ static bool addAllZones() {
     RideMetricFactory::instance().addMetric(ZoneTime8());
     RideMetricFactory::instance().addMetric(ZoneTime9());
     RideMetricFactory::instance().addMetric(ZoneTime10());
+    QVector<QString> deps;
+    deps.append("time_in_zone_L1");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime1(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L2");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime2(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L3");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime3(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L4");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime4(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L5");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime5(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L6");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime6(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L7");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime7(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L8");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime8(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L9");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime9(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_L10");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(ZonePTime10(), &deps);
     return true;
 }
 
