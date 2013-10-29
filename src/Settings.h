@@ -104,6 +104,8 @@
 #define GC_RWGPSPASS      "rwgps/pass"
 #define GC_TTBUSER        "ttb/user"
 #define GC_TTBPASS        "ttb/pass"
+#define GC_SELUSER        "sel/user"
+#define GC_SELPASS        "sel/pass"
 #define GC_WIURL          "wi/url"
 #define GC_WIUSER         "wi/user"
 #define GC_WIKEY          "wi/key"

@@ -139,6 +139,41 @@ private:
     QString uploadProgress;
 };
 
+// uploader to selfloops.com
+class SelfLoopsUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    SelfLoopsUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
+
+    void upload();
+
+private slots:
+    void requestUploadSelfLoops();
+    void requestUploadSelfLoopsFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    Context *context;
+    ShareDialog *parent;
+    RideItem *ride;
+    QDialog *dialog;
+
+    QString token;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+
+    QString selfloopsUploadId;
+
+    QString uploadStatus;
+    QString uploadProgress;
+};
+
 class ShareDialog : public QDialog
 {
     Q_OBJECT
@@ -174,12 +209,14 @@ private:
      QCheckBox *stravaChk;
      QCheckBox *rideWithGPSChk;
      QCheckBox *cyclingAnalyticsChk;
+     QCheckBox *selfLoopsChk;
 
      RideItem *ride;
 
      StravaUploader *stravaUploader;
      RideWithGpsUploader *rideWithGpsUploader;
      CyclingAnalyticsUploader *cyclingAnalyticsUploader;
+     SelfLoopsUploader *selfLoopsUploader;
 
      QString athleteId;
 };
