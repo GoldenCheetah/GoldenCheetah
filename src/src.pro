@@ -395,6 +395,7 @@ HEADERS += \
         WkoRideFile.h \
         WorkoutPlotWindow.h \
         WorkoutWizard.h \
+        WPrime.h \
         ZeoDownload.h \
         Zones.h \
         ZoneScaleDraw.h
@@ -588,6 +589,7 @@ SOURCES += \
         WkoRideFile.cpp \
         WorkoutPlotWindow.cpp \
         WorkoutWizard.cpp \
+        WPrime.cpp \
         ZeoDownload.cpp \
         Zones.cpp \
         main.cpp \
