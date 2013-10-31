@@ -831,6 +831,9 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
             y[array] = value; //XXX average is broken
             break;
             }
+        case RideMetric::Low:
+            if (value < y[array]) y[array] = value;
+            break;
         case RideMetric::Peak:
             if (value > y[array]) y[array] = value;
             break;
@@ -940,6 +943,9 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
                     y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
                     break;
                     }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
                 case RideMetric::Peak:
                     if (value > y[n]) y[n] = value;
                     break;

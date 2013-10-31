@@ -159,6 +159,11 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
             rcount += count;
             break;
             }
+        case RideMetric::Low:
+            {
+            if (value < rvalue) rvalue = value;
+            break;
+            }
         case RideMetric::Peak:
             {
             if (value > rvalue) rvalue = value;

@@ -68,8 +68,9 @@
 // 48  22  May 2013 Mark Liversedge    Removing local measures.xml, till v3.1
 // 49  29  Oct 2013 Mark Liversedge    Added percentage time in zone
 // 50  29  Oct 2013 Mark Liversedge    Added percentage time in heartrate zone
+// 51  31  Oct 2013 Mark Liversedge    Added W' Minimum
 
-int DBSchemaVersion = 50;
+int DBSchemaVersion = 51;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

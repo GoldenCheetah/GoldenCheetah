@@ -142,3 +142,46 @@ WPrime::setRide(RideFile *input)
     //qDebug()<<values;
     //qDebug()<<"completed"<<time.elapsed();
 }
+
+//
+// Associated Metrics
+//
+
+class MinWPrime : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(WPrimeMin)
+
+    public:
+
+    MinWPrime()
+    {
+        setSymbol("skiba_wprime_low");
+        setInternalName("Minimum W'");
+    }
+    void initialize() {
+        setName(tr("Minimum W'"));
+        setType(RideMetric::Low);
+        setMetricUnits(tr("Kj"));
+        setImperialUnits(tr("Kj"));
+        setPrecision(1);
+    }
+    void compute(const RideFile *r, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        WPrime w;
+        w.setRide((RideFile*)r);
+        setValue(w.minY/1000.00f);
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new MinWPrime(*this); }
+};
+
+// add to catalogue
+static bool addMetrics() {
+    RideMetricFactory::instance().addMetric(MinWPrime());
+    return true;
+}
+
+static bool added = addMetrics();

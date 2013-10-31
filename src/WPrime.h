@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "Zones.h"
+#include "RideMetric.h"
 #include <QVector>
 #include <qwt_spline.h> // smoothing
 #include <math.h>
