@@ -348,12 +348,12 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     // generate a plot
     QString curve_title;
 #if USE_T0_IN_CP_MODEL
-    curve_title.sprintf("CP=%.1f W; AWC/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
+    curve_title.sprintf("CP=%.1f w; W'/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
 #else
     if (series == RideFile::wattsKg)
-        curve_title.sprintf("CP=%.2f W/kg; AWC=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
+        curve_title.sprintf("CP=%.2f w/kg; W'=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
     else
-        curve_title.sprintf("CP=%.0f W; AWC=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
+        curve_title.sprintf("CP=%.0f w; W'=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
 #endif
     if (series == RideFile::watts || series == RideFile::wattsKg) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
 
