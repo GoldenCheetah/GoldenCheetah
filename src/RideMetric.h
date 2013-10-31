@@ -42,7 +42,7 @@ class RideMetric {
 
 public:
 
-    enum metrictype { Total, Average, Peak } types;
+    enum metrictype { Total, Average, Peak, Low } types;
     typedef enum metrictype MetricType;
 
     RideMetric() {
