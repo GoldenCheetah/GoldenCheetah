@@ -42,13 +42,31 @@ const double E = 2.71828183;
 
 inline double decaySchedule(double sec) { return pow(E, -(sec/WprimeDecayConst)); }
 
-WPrime::WPrime(RideFile *input) : rideFile(input)
+WPrime::WPrime()
+{
+    // XXX will need to reset metrics when they are added
+    minY = maxY = 0;
+}
+
+void
+WPrime::setRide(RideFile *input)
 {
     QTime time; // for profiling performance of the code
     time.start();
 
+    // remember the ride for next time
+    rideFile = input;
+
     // no data or no power data then forget it.
-    if (input->dataPoints().count() == 0 || input->areDataPresent()->watts == false) return;
+    if (!input || input->dataPoints().count() == 0 || input->areDataPresent()->watts == false) {
+        values.resize(0); // the memory is kept for next time so this is efficient
+        xvalues.resize(0);
+
+        //XXX will need to reset metrics when they are added
+        minY = maxY = 0;
+        //qDebug()<<"now work to do"<<time.elapsed();
+        return;
+    }
 
     // STEP 1: CONVERT POWER DATA TO A 1 SECOND TIME SERIES
 
@@ -82,10 +100,12 @@ WPrime::WPrime(RideFile *input) : rideFile(input)
         inputArray[i] = value > CP ? value-CP : 0;
     }
 
-    qDebug()<<"data preparation took"<<time.elapsed();
+    //qDebug()<<"data preparation took"<<time.elapsed();
 
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
 
+    // wipe away whatever is there
+    minY = maxY = 0;
     values.resize(last+1);
     xvalues.resize(last+1);
     for(int i=last; i>=0; i--) {
@@ -111,8 +131,14 @@ WPrime::WPrime(RideFile *input) : rideFile(input)
 
             values[i] = 0;
         }
+
+        // min / max
+        if (values[i] < minY) minY = values[i];
+        if (values[i] > maxY) maxY = values[i];
     }
 
+    // STEP 3: CALCULATE METRICS XXX when they are added
+
     //qDebug()<<values;
-    qDebug()<<"completed"<<time.elapsed();
+    //qDebug()<<"completed"<<time.elapsed();
 }

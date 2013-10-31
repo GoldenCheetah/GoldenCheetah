@@ -34,6 +34,7 @@ class RideItem;
 class IntervalItem;
 class QxtSpanSlider;
 class QxtGroupBox;
+class WPrime;
 
 #include "LTMWindow.h" // for tooltip/canvaspicker
 
@@ -59,6 +60,7 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
     Q_PROPERTY(int showBalance READ isShowBalance WRITE setShowBalance USER true)
     Q_PROPERTY(int showTemp READ isShowTemp WRITE setShowTemp USER true)
+    Q_PROPERTY(int showW READ isShowW WRITE setShowW USER true)
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
     Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
     Q_PROPERTY(int paintBrush READ isPaintBrush WRITE setPaintBrush USER true)
@@ -88,6 +90,7 @@ class AllPlotWindow : public GcChartWindow
         int isShowPower() const { return showPower->currentIndex(); }
         int isShowBalance() const { return showBalance->checkState(); }
         int isShowTemp() const { return showTemp->checkState(); }
+        int isShowW() const { return showW->checkState(); }
         int isByDistance() const { return comboDistance->currentIndex(); }
         int isPaintBrush() const { return paintBrush->isChecked(); }
         int smoothing() const { return smoothSlider->value(); }
@@ -118,6 +121,7 @@ class AllPlotWindow : public GcChartWindow
         void setShowWind(int state);
         void setShowTorque(int state);
         void setShowBalance(int state);
+        void setShowW(int state);
         void setShowGrid(int state);
         void setPaintBrush(int state);
         void setShowFull(int state);
@@ -137,6 +141,7 @@ class AllPlotWindow : public GcChartWindow
         // whilst we refactor, lets make friend
         friend class IntervalPlotData;
         friend class Context;
+        friend class AllPlot;
 
         void setAllPlotWidgets(RideItem *rideItem);
 
@@ -144,6 +149,7 @@ class AllPlotWindow : public GcChartWindow
         RideItem *current;
         int selection;
         Context *context;
+        WPrime *wpData;
 
         // All the plot widgets
         QVBoxLayout *allPlotLayout;
@@ -178,6 +184,7 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showWind;
         QCheckBox *showTorque;
         QCheckBox *showBalance;
+        QCheckBox *showW;
         QComboBox *showPower;
         QComboBox *comboDistance;
         QSlider *smoothSlider;
