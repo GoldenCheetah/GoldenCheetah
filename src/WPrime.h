@@ -33,11 +33,17 @@ class WPrime {
     public: 
 
         // construct and calculate series/metrics
-        WPrime(RideFile *input);
+        WPrime();
+
+        // recalc from ride selected
+        void setRide(RideFile *ride);
+        RideFile *ride() { return rideFile; }
 
         // W' 1second time series from 0
         QVector<double> &ydata() { return values; }
         QVector<double> &xdata() { return xvalues; }
+
+        double minY, maxY;
 
     private:
 

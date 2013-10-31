@@ -49,6 +49,9 @@
 // tooltip
 #include "LTMWindow.h"
 
+// W' calculator
+#include "WPrime.h"
+
 AllPlotWindow::AllPlotWindow(Context *context) :
     GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false)
 {
@@ -173,6 +176,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showTorque->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showTorque);
 
+    showW = new QCheckBox(tr("W' balance"), this);
+    showW->setCheckState(Qt::Unchecked);
+    cl2->addRow(new QLabel(""), showW);
+
     showBalance = new QCheckBox(tr("Power balance"), this);
     showBalance->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showBalance);
@@ -215,6 +222,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     smoothLineEdit->setText(QString("%1").arg(allPlot->smooth));
     rSmoothSlider->setValue(allPlot->smooth);
     rSmoothEdit->setText(QString("%1").arg(allPlot->smooth));
+
+    // W' calculator
+    wpData = new WPrime();
 
     allZoomer = new QwtPlotZoomer(allPlot->canvas());
     allZoomer->setRubberBand(QwtPicker::RectRubberBand);
@@ -353,6 +363,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->enableAxis(QwtPlot::yLeft2, false);
     fullPlot->enableAxis(QwtPlot::yRight, false);
     fullPlot->enableAxis(QwtPlot::yRight2, false);
+    fullPlot->enableAxis(QwtPlot::yRight3, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
     //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
@@ -404,6 +415,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
     connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
     connect(showWind, SIGNAL(stateChanged(int)), this, SLOT(setShowWind(int)));
+    connect(showW, SIGNAL(stateChanged(int)), this, SLOT(setShowW(int)));
     connect(showTorque, SIGNAL(stateChanged(int)), this, SLOT(setShowTorque(int)));
     connect(showBalance, SIGNAL(stateChanged(int)), this, SLOT(setShowBalance(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
@@ -509,6 +521,7 @@ AllPlotWindow::redrawFullPlot()
     fullPlot->enableAxis(QwtPlot::yLeft2, false);
     fullPlot->enableAxis(QwtPlot::yRight, false);
     fullPlot->enableAxis(QwtPlot::yRight2, false);
+    fullPlot->enableAxis(QwtPlot::yRight3, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
     //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
@@ -609,6 +622,9 @@ AllPlotWindow::rideSelected()
 
     // clear any previous selections
     clearSelection();
+
+    // recalculate W' data
+    if (showW->isChecked()) wpData->setRide(ride->ride());
 
     // setup the control widgets, dependant on
     // data present in this ride, needs to happen
@@ -1275,11 +1291,28 @@ AllPlotWindow::setShowWind(int value)
     showWind->setChecked(value);
 
     //if (!current) return;
-    bool checked = ( ( value == Qt::Checked ) && showWind->isEnabled()) ? true : false;
+    bool checked = (( value == Qt::Checked ) && showWind->isEnabled()) ? true : false;
 
     allPlot->setShowWind(checked);
     foreach (AllPlot *plot, allPlots)
         plot->setShowWind(checked);
+}
+
+void
+AllPlotWindow::setShowW(int value)
+{
+    showW->setChecked(value);
+
+    //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showW->isEnabled()) ? true : false;
+
+    // refresh W' data if needed
+    if (checked && current && current->ride() && wpData->ride() != current->ride())
+        wpData->setRide(current->ride());
+
+    allPlot->setShowW(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowW(checked);
 }
 
 void
@@ -1604,6 +1637,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setAxisMaxMinor(QwtPlot::yLeft2, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight2, 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yRight3, 0);
 
         // controls
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
@@ -1614,6 +1648,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShowAlt((showAlt->isEnabled()) ? ( showAlt->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTemp((showTemp->isEnabled()) ? ( showTemp->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTorque((showTorque->isEnabled()) ? ( showTorque->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowW((showW->isEnabled()) ? ( showW->checkState() == Qt::Checked ) : false );
         _allPlot->setShowGrid(showGrid->checkState() == Qt::Checked);
         _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setSmoothing(smoothSlider->value());

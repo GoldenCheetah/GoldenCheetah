@@ -79,6 +79,7 @@ class AllPlot : public QwtPlot
         void setShowAlt(bool show);
         void setShowTemp(bool show);
         void setShowWind(bool show);
+        void setShowW(bool show);
         void setShowTorque(bool show);
         void setShowBalance(bool show);
         void setShowGrid(bool show);
@@ -112,6 +113,7 @@ class AllPlot : public QwtPlot
         bool showAlt;
         bool showTemp;
         bool showWind;
+        bool showW;
         bool showTorque;
         bool showBalance;
 
@@ -131,6 +133,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *torqueCurve;
         QwtPlotCurve *balanceLCurve;
         QwtPlotCurve *balanceRCurve;
+        QwtPlotCurve *wCurve;
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QList <AllPlotZoneLabel *> zoneLabels;
         QVector<QwtPlotCurve*> referenceLines;

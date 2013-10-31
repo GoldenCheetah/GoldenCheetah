@@ -27,6 +27,7 @@
 #include "Units.h"
 #include "Zones.h"
 #include "Colors.h"
+#include "WPrime.h"
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>
@@ -293,6 +294,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     balanceRCurve = new QwtPlotCurve(tr("Right Balance"));
     balanceRCurve->setYAxis(yLeft2);
 
+    wCurve = new QwtPlotCurve(tr("W' Balance (j)"));
+    wCurve->setYAxis(yRight3);
+
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
     intervalHighlighterCurve->setData(new IntervalPlotData(this, context));
@@ -323,6 +327,7 @@ AllPlot::configChanged()
 
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) {
         wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        wCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -382,7 +387,9 @@ AllPlot::configChanged()
     QColor blbrush_color = GColor(CBALANCELEFT);
     blbrush_color.setAlpha(200);
     balanceRCurve->setBrush(blbrush_color);   // fill below the line
-
+    QPen wPen = QPen(Qt::red);
+    wPen.setWidth(2); // thicken
+    wCurve->setPen(wPen);
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
     intervalHighlighterCurve->setPen(ihlPen);
@@ -400,6 +407,10 @@ AllPlot::configChanged()
         p = wattsCurve->pen().color();
         p.setAlpha(64);
         wattsCurve->setBrush(QBrush(p));
+
+        p = wCurve->pen().color();
+        p.setAlpha(64);
+        wCurve->setBrush(QBrush(p));
 
         p = hrCurve->pen().color();
         p.setAlpha(64);
@@ -426,6 +437,7 @@ AllPlot::configChanged()
         balanceRCurve->setBrush(QBrush(p));*/
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
+        wCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
         cadCurve->setBrush(Qt::NoBrush);
@@ -469,6 +481,12 @@ AllPlot::configChanged()
     pal.setColor(QPalette::Text, GColor(CALTITUDE));
     axisWidget(QwtPlot::yRight2)->setPalette(pal);
 
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yRight3, sd);
+    pal.setColor(QPalette::WindowText, Qt::red);
+    pal.setColor(QPalette::Text, Qt::red);
+    axisWidget(QwtPlot::yRight3)->setPalette(pal);
 }
 
 struct DataPoint {
@@ -536,6 +554,7 @@ AllPlot::recalc()
         QwtArray<double> data;
         QVector<QwtIntervalSample> intData;
 
+        wCurve->setData(data,data);
         if (!wattsArray.empty())
             wattsCurve->setData(data, data);
         if (!hrArray.empty())
@@ -759,6 +778,10 @@ AllPlot::recalc()
     int totalPoints = xaxis.count() - startingIndex;
 
     // set curves - we set the intervalHighlighter to whichver is available
+
+    //W' curve set to whatever data we have
+    wCurve->setData(parent->wpData->xdata().data(), parent->wpData->ydata().data(), parent->wpData->xdata().count());
+
     if (!wattsArray.empty()) {
         wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft);
@@ -941,6 +964,15 @@ AllPlot::refreshReferenceLines()
 void
 AllPlot::setYMax()
 {
+    // set axis scales
+    if (wCurve->isVisible()) {
+
+        setAxisTitle(yRight3, tr("W' Balance (j)"));
+        setAxisScale(QwtPlot::yRight3,parent->wpData->minY-1000,parent->wpData->maxY+1000);
+        setAxisLabelRotation(yRight3,270);
+        setAxisLabelAlignment(yRight3,Qt::AlignVCenter);
+    }
+
     if (wattsCurve->isVisible()) {
         double maxY = (referencePlot == NULL) ? (1.05 * wattsCurve->maxYValue()) :
                                              (1.05 * referencePlot->wattsCurve->maxYValue());
@@ -1105,6 +1137,7 @@ AllPlot::setYMax()
     enableAxis(yLeft2, hrCurve->isVisible() || cadCurve->isVisible());
     enableAxis(yRight, speedCurve->isVisible());
     enableAxis(yRight2, altCurve->isVisible());
+    enableAxis(yRight3, wCurve->isVisible());
 }
 
 void
@@ -1166,6 +1199,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
 
+    wCurve->detach();
     wattsCurve->detach();
     hrCurve->detach();
     speedCurve->detach();
@@ -1178,6 +1212,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     balanceRCurve->detach();
 
     wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
+    wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
     hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
     speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
     cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCad);
@@ -1188,6 +1223,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
     balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
+    wCurve->setData(parent->wpData->xdata().data(),parent->wpData->ydata().data(),parent->wpData->xdata().count());
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
     speedCurve->setData(xaxis, smoothS, stopidx-startidx);
@@ -1221,6 +1257,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         sym.setSize(0);
     }
 
+    wCurve->setSymbol(new QwtSymbol(sym));
     wattsCurve->setSymbol(new QwtSymbol(sym));
     hrCurve->setSymbol(new QwtSymbol(sym));
     speedCurve->setSymbol(new QwtSymbol(sym));
@@ -1238,6 +1275,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->smoothAltitude.empty()) {
         altCurve->attach(this);
         intervalHighlighterCurve->setYAxis(yRight2);
+    }
+    if (parent->wpData->xdata().count()) {
+        wCurve->attach(this);
     }
     if (!plot->smoothWatts.empty()) {
         wattsCurve->attach(this);
@@ -1308,6 +1348,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         distanceArray.resize(npoints);
 
         // attach appropriate curves
+        wCurve->detach();
         wattsCurve->detach();
         hrCurve->detach();
         speedCurve->detach();
@@ -1321,6 +1362,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
         if (!altArray.empty()) altCurve->attach(this);
         if (!wattsArray.empty()) wattsCurve->attach(this);
+        if (!parent->wpData->ydata().empty()) wCurve->attach(this);
         if (!hrArray.empty()) hrCurve->attach(this);
         if (!speedArray.empty()) speedCurve->attach(this);
         if (!cadArray.empty()) cadCurve->attach(this);
@@ -1332,6 +1374,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
             balanceRCurve->attach(this);
         }
 
+        wCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         hrCurve->setVisible(dataPresent->hr && showHr);
         speedCurve->setVisible(dataPresent->kph && showSpeed);
@@ -1404,6 +1447,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     else {
         //setTitle("no data");
 
+        wCurve->detach();
         wattsCurve->detach();
         hrCurve->detach();
         speedCurve->detach();
@@ -1502,6 +1546,15 @@ AllPlot::setShowWind(bool show)
 }
 
 void
+AllPlot::setShowW(bool show)
+{
+    showW = show;
+    wCurve->setVisible(show);
+    setYMax();
+    replot();
+}
+
+void
 AllPlot::setShowTorque(bool show)
 {
     showTorque = show;
@@ -1533,6 +1586,10 @@ AllPlot::setPaintBrush(int state)
     if (state) {
 
         QColor p;
+        p = wCurve->pen().color();
+        p.setAlpha(64);
+        wCurve->setBrush(QBrush(p));
+
         p = wattsCurve->pen().color();
         p.setAlpha(64);
         wattsCurve->setBrush(QBrush(p));
@@ -1565,6 +1622,7 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         balanceRCurve->setBrush(QBrush(p));*/
     } else {
+        wCurve->setBrush(Qt::NoBrush);
         wattsCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
