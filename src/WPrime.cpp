@@ -178,6 +178,7 @@ class MinWPrime : public RideMetric {
     RideMetric *clone() const { return new MinWPrime(*this); }
 };
 
+#if 0 // NEEDS OPTIMISING -- DISABLED UNTIL ISSUE RESOLVED
 // add to catalogue
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
@@ -185,3 +186,4 @@ static bool addMetrics() {
 }
 
 static bool added = addMetrics();
+#endif
