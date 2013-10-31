@@ -119,18 +119,11 @@ WPrime::setRide(RideFile *input)
         // of power over CP * the associated decay factor * the mult factor
         // it will be zero for first 20 minutes
 
-        if (i>=1200) {
-
-            double sumproduct = 0;
-            for (int j=0; j<1200 && (i-j) > 0; j++) {
-                sumproduct += inputArray.at(i-j) * pow(E, -(j/WprimeDecayConst)); 
-            }
-            values[i] = sumproduct * WprimeMultConst;
-
-        } else {
-
-            values[i] = 0;
+        double sumproduct = 0;
+        for (int j=0; j<1200 && (i-j) > 0; j++) {
+            sumproduct += inputArray.at(i-j) * pow(E, -(j/WprimeDecayConst)); 
         }
+        values[i] = sumproduct * WprimeMultConst;
 
         // min / max
         if (values[i] < minY) minY = values[i];
