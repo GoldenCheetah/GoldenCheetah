@@ -22,6 +22,10 @@
 
 #include <qwt_plot.h>
 #include <qwt_series_data.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_marker.h>
+#include <qwt_point_3d.h>
+#include <qwt_compat.h>
 #include <QtGui>
 
 class QwtPlotCurve;
@@ -121,6 +125,7 @@ class AllPlot : public QwtPlot
         QwtPlotGrid *grid;
         QVector<QwtPlotMarker*> d_mrk;
         QVector<QwtPlotMarker*> cal_mrk;
+        QwtPlotMarker curveTitle;
         QwtPlotMarker *allMarker1;
         QwtPlotMarker *allMarker2;
         QwtPlotCurve *wattsCurve;

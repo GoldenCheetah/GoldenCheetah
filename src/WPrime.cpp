@@ -36,11 +36,8 @@
 #include "WPrime.h"
 
 const double WprimeMultConst = -1.0;
-const double WprimeDecayConst = 336;
 const int WprimeDecayPeriod = 1200; // 1200 seconds or 20 minutes
 const double E = 2.71828183;
-
-inline double decaySchedule(double sec) { return pow(E, -(sec/WprimeDecayConst)); }
 
 WPrime::WPrime()
 {
@@ -64,6 +61,7 @@ WPrime::setRide(RideFile *input)
 
         //XXX will need to reset metrics when they are added
         minY = maxY = 0;
+        TAU=0;
         //qDebug()<<"now work to do"<<time.elapsed();
         return;
     }
@@ -93,12 +91,22 @@ WPrime::setRide(RideFile *input)
     // since we will be running up and down the data series multiple times
     // as we iterate and run a SUMPRODUCT it is best to extract the data
     // into a vector of ints for the watts above CP
+    double totalBelowCP=0;
+    double countBelowCP=0;
     QVector<int> inputArray(last+1);
     for (int i=0; i<last; i++) {
 
         int value = smoothed.value(i);
         inputArray[i] = value > CP ? value-CP : 0;
+
+        if (value < CP) {
+            totalBelowCP += value;
+            countBelowCP++;
+        }
     }
+
+    TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+    TAU = int(TAU); // round it down
 
     //qDebug()<<"data preparation took"<<time.elapsed();
 
@@ -121,7 +129,7 @@ WPrime::setRide(RideFile *input)
 
         double sumproduct = 0;
         for (int j=0; j<1200 && (i-j) > 0; j++) {
-            sumproduct += inputArray.at(i-j) * pow(E, -(j/WprimeDecayConst)); 
+            sumproduct += inputArray.at(i-j) * pow(E, -(double(j)/TAU)); 
         }
         values[i] = sumproduct * WprimeMultConst;
 
