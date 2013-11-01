@@ -71,9 +71,16 @@ WPrime::setRide(RideFile *input)
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
     int last=0;
+    RideFilePoint *lp=NULL;
     foreach(RideFilePoint *p, input->dataPoints()) {
-        points << QPointF(p->secs, p->watts);
+
+        // lets not go backwards -- or two sampls at the same time
+        if ((lp && p->secs > lp->secs) || !lp)
+            points << QPointF(p->secs, p->watts);
+
+        // update state
         last = p->secs;
+        lp = p;
     }
 
     // Create a spline
