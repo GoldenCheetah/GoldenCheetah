@@ -297,6 +297,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     wCurve = new QwtPlotCurve(tr("W' Balance (j)"));
     wCurve->setYAxis(yRight3);
 
+    curveTitle.attach(this);
+    curveTitle.setLabelAlignment(Qt::AlignRight);
+
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
     intervalHighlighterCurve->setData(new IntervalPlotData(this, context));
@@ -1176,6 +1179,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         stopidx  = plot->timeIndex(plot->timeArray[(stopidx>=plot->timeArray.size()?plot->timeArray.size()-1:stopidx)]/60)-1;
     }
 
+    // center the curve title
+    curveTitle.setYValue(30);
+    curveTitle.setXValue(2);
+
     // make sure indexes are still valid
     if (startidx > stopidx || startidx < 0 || stopidx < 0) return;
 
@@ -1198,6 +1205,14 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
+    if (showW && parent->wpData->TAU > 0) {
+        QwtText text(QString("tau=%1").arg(parent->wpData->TAU));
+        text.setFont(QFont("Helvetica", 10, QFont::Bold));
+        text.setColor(Qt::red);
+        curveTitle.setLabel(text);
+    } else {
+        curveTitle.setLabel(QwtText(""));
+    }
 
     wCurve->detach();
     wattsCurve->detach();
@@ -1330,6 +1345,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     if (_rideItem == NULL) return;
 
     wattsArray.clear();
+    curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
 
     RideFile *ride = rideItem->ride();
     if (ride && ride->dataPoints().size()) {
@@ -1550,6 +1566,14 @@ AllPlot::setShowW(bool show)
 {
     showW = show;
     wCurve->setVisible(show);
+    if (showW && parent->wpData->TAU > 0) {
+        QwtText text(QString("tau=%1").arg(parent->wpData->TAU));
+        text.setFont(QFont("Helvetica", 10, QFont::Bold));
+        text.setColor(Qt::red);
+        curveTitle.setLabel(text);
+    } else {
+        curveTitle.setLabel(QwtText(""));
+    }
     setYMax();
     replot();
 }
