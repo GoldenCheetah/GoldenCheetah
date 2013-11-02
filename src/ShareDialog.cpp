@@ -223,7 +223,6 @@ ShareDialog::upload()
 StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     context(context), ride(ride), parent(parent)
 {
-    //stravaActivityId = ride->ride()->getTag("Strava uploadId");
     stravaUploadId = ride->ride()->getTag("Strava uploadId", "");
 }
 
@@ -240,7 +239,7 @@ StravaUploader::upload()
         return;
     }
 
-    // allready shared ?
+    // already shared ?
     if(stravaUploadId.length()>0)
     {
         overwrite = false;
@@ -458,7 +457,7 @@ StravaUploader::requestVerifyUploadFinished(QNetworkReply *reply)
             return;
         }
 
-        ride->ride()->setTag("Strava actityId", stravaActivityId);
+        ride->ride()->setTag("Strava activityId", stravaActivityId);
         ride->setDirty(true);
 
         sc = se.evaluate("("+response+")");
@@ -692,7 +691,7 @@ RideWithGpsUploader::closeClicked()
 CyclingAnalyticsUploader::CyclingAnalyticsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     context(context), ride(ride), parent(parent)
 {
-    cyclingAnalyticsUploadId = ride->ride()->getTag("Strava uploadId", "");
+    cyclingAnalyticsUploadId = ride->ride()->getTag("CyclingAnalytics uploadId", "");
 }
 
 void
@@ -708,7 +707,7 @@ CyclingAnalyticsUploader::upload()
         return;
     }
 
-    // allready shared ?
+    // already shared ?
     if(cyclingAnalyticsUploadId.length()>0)
     {
         overwrite = false;
@@ -754,7 +753,7 @@ CyclingAnalyticsUploader::upload()
 void
 CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
 {
-    parent->progressLabel->setText(tr("Upload ride to Strava..."));
+    parent->progressLabel->setText(tr("Upload ride to CyclingAnalytics..."));
     parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
     QEventLoop eventLoop;

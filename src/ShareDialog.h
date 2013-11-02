@@ -104,7 +104,7 @@ private:
     bool overwrite;
 };
 
-// uploader to strava.com
+// uploader to cyclinganalytics.com
 class CyclingAnalyticsUploader : public QObject
 {
     Q_OBJECT
