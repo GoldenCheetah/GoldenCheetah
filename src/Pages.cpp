@@ -302,7 +302,10 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     //XXX deprecated QLabel *struserLabel = new QLabel(tr("Username"));
     //XXX deprecated QLabel *strpassLabel = new QLabel(tr("Password"));
     QLabel *strauthLabel = new QLabel(tr("Authorise"));
-    QLabel *strpinLabel = new QLabel(tr("PIN"));
+
+    QLabel *can = new QLabel(tr("Cycling Analytics"));
+    can->setFont(current);
+    QLabel *canauthLabel = new QLabel(tr("Authorise"));
 
     QLabel *rwgps = new QLabel(tr("RideWithGPS"));
     rwgps->setFont(current);
@@ -315,6 +318,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
 
     QLabel *ttbuserLabel = new QLabel(tr("Username"));
     QLabel *ttbpassLabel = new QLabel(tr("Password"));
+
+    QLabel *sel = new QLabel(tr("Selfloops"));
+    sel->setFont(current);
+
+    QLabel *seluserLabel = new QLabel(tr("Username"));
+    QLabel *selpassLabel = new QLabel(tr("Password"));
 
     QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
     wip->setFont(current);
@@ -392,6 +401,18 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     stravaAuthorised->setFixedHeight(16);
     stravaAuthorised->setFixedWidth(16);
 
+    cyclingAnalyticsAuthorise = new QPushButton("Authorise", this);
+#ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
+    cyclingAnalyticsAuthorise->setEnabled(false);
+#endif
+
+    cyclingAnalyticsAuthorised = new QPushButton(this);
+    cyclingAnalyticsAuthorised->setContentsMargins(0,0,0,0);
+    cyclingAnalyticsAuthorised->setIcon(passwords.scaled(16,16));
+    cyclingAnalyticsAuthorised->setIconSize(QSize(16,16));
+    cyclingAnalyticsAuthorised->setFixedHeight(16);
+    cyclingAnalyticsAuthorised->setFixedWidth(16);
+
     rideWithGPSUser = new QLineEdit(this);
     rideWithGPSUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_RWGPSUSER, "").toString());
 
@@ -405,6 +426,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     ttbPass = new QLineEdit(this);
     ttbPass->setEchoMode(QLineEdit::Password);
     ttbPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_TTBPASS, "").toString());
+
+    selUser = new QLineEdit(this);
+    selUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_SELUSER, "").toString());
+
+    selPass = new QLineEdit(this);
+    selPass->setEchoMode(QLineEdit::Password);
+    selPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_SELPASS, "").toString());
 
     wiURL = new QLineEdit(this);
     wiURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
@@ -455,27 +483,32 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(twpinLabel, 12,0);
     grid->addWidget(str, 13,0);
     grid->addWidget(strauthLabel, 14,0);
-    grid->addWidget(strpinLabel, 15,0);
-    grid->addWidget(rwgps, 17,0);
-    grid->addWidget(rwgpsuserLabel, 18,0);
-    grid->addWidget(rwgpspassLabel, 19,0);
-    grid->addWidget(wip, 20,0);
-    grid->addWidget(wiurlLabel, 21,0);
-    grid->addWidget(wiuserLabel, 22,0);
-    grid->addWidget(wipassLabel, 23,0);
-    grid->addWidget(zeo, 24,0);
-    grid->addWidget(zeourlLabel, 25,0);
-    grid->addWidget(zeouserLabel, 26,0);
-    grid->addWidget(zeopassLabel, 27,0);
-    grid->addWidget(webcal, 28, 0);
-    grid->addWidget(wcurlLabel, 29, 0);
-    grid->addWidget(dv, 30,0);
-    grid->addWidget(dvurlLabel, 31,0);
-    grid->addWidget(dvuserLabel, 32,0);
-    grid->addWidget(dvpassLabel, 33,0);
-    grid->addWidget(ttb, 34,0);
-    grid->addWidget(ttbuserLabel, 35,0);
-    grid->addWidget(ttbpassLabel, 36,0);
+    grid->addWidget(can, 15,0);
+    grid->addWidget(canauthLabel, 16,0);
+    grid->addWidget(rwgps, 18,0);
+    grid->addWidget(rwgpsuserLabel, 19,0);
+    grid->addWidget(rwgpspassLabel, 20,0);
+    grid->addWidget(wip, 21,0);
+    grid->addWidget(wiurlLabel, 22,0);
+    grid->addWidget(wiuserLabel, 23,0);
+    grid->addWidget(wipassLabel, 24,0);
+    grid->addWidget(zeo, 25,0);
+    grid->addWidget(zeourlLabel, 26,0);
+    grid->addWidget(zeouserLabel, 27,0);
+    grid->addWidget(zeopassLabel, 28,0);
+    grid->addWidget(webcal, 29, 0);
+    grid->addWidget(wcurlLabel, 30, 0);
+    grid->addWidget(dv, 31,0);
+    grid->addWidget(dvurlLabel, 32,0);
+    grid->addWidget(dvuserLabel, 33,0);
+    grid->addWidget(dvpassLabel, 34,0);
+    grid->addWidget(ttb, 35,0);
+    grid->addWidget(ttbuserLabel, 36,0);
+    grid->addWidget(ttbpassLabel, 37,0);
+    grid->addWidget(sel, 38,0);
+    grid->addWidget(seluserLabel, 39,0);
+    grid->addWidget(selpassLabel, 40,0);
+
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -493,26 +526,37 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(stravaAuthorise, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(mainWindow->cyclist, GC_STRAVA_TOKEN, "")!="")
         grid->addWidget(stravaAuthorised, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        stravaAuthorised->hide(); // if no token no show
 
-    grid->addWidget(rideWithGPSUser, 18, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(rideWithGPSPass, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(cyclingAnalyticsAuthorise, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(mainWindow->cyclist, GC_CYCLINGANALYTICS_TOKEN, "")!="")
+        grid->addWidget(cyclingAnalyticsAuthorised, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        cyclingAnalyticsAuthorised->hide();
 
-    grid->addWidget(wiURL, 21, 1, 0);
-    grid->addWidget(wiUser, 22, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(wiPass, 23, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(rideWithGPSUser, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(rideWithGPSPass, 20, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(zeoURL, 25, 1, 0);
-    grid->addWidget(zeoUser, 26, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(zeoPass, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(wiURL, 22, 1, 0);
+    grid->addWidget(wiUser, 23, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(wiPass, 24, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(webcalURL, 29, 1, 0);
+    grid->addWidget(zeoURL, 26, 1, 0);
+    grid->addWidget(zeoUser, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(zeoPass, 28, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(dvURL, 31, 1, 0);
-    grid->addWidget(dvUser, 32, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(dvPass, 33, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(webcalURL, 30, 1, 0);
 
-    grid->addWidget(ttbUser, 35, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(ttbPass, 36, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvURL, 32, 1, 0);
+    grid->addWidget(dvUser, 33, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvPass, 34, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(ttbUser, 36, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttbPass, 37, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(selUser, 39, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(selPass, 40, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -525,6 +569,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
 
     connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
     connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
+    connect(cyclingAnalyticsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseCyclingAnalytics()));
 }
 
 void CredentialsPage::authoriseTwitter()
@@ -600,6 +645,16 @@ void CredentialsPage::authoriseStrava()
 #endif
 }
 
+
+void CredentialsPage::authoriseCyclingAnalytics()
+{
+#ifdef GC_HAVE_LIBOAUTH
+    OAuthDialog *oauthDialog = new OAuthDialog(mainWindow, OAuthDialog::CYCLING_ANALYTICS);
+    oauthDialog->setWindowModality(Qt::ApplicationModal);
+    oauthDialog->exec();
+#endif
+}
+
 void
 CredentialsPage::saveClicked()
 {
@@ -615,6 +670,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TTBUSER, ttbUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TTBPASS, ttbPass->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_SELUSER, selUser->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_SELPASS, selPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPTYPE, tpType->currentIndex());
     appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());

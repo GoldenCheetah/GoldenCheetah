@@ -104,6 +104,8 @@
 #define GC_RWGPSPASS      "rwgps/pass"
 #define GC_TTBUSER        "ttb/user"
 #define GC_TTBPASS        "ttb/pass"
+#define GC_SELUSER        "sel/user"
+#define GC_SELPASS        "sel/pass"
 #define GC_WIURL          "wi/url"
 #define GC_WIUSER         "wi/user"
 #define GC_WIKEY          "wi/key"
@@ -153,6 +155,10 @@
 //Strava
 #define GC_STRAVA_CLIENT_ID    "83" //< client id
 #define GC_STRAVA_TOKEN "strava_token"
+
+//Cycling Analytics
+#define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
+#define GC_CYCLINGANALYTICS_TOKEN "cyclinganalytics_token"
 
 // Tcx Smart recording
 #define GC_GARMIN_SMARTRECORD "garminSmartRecord"

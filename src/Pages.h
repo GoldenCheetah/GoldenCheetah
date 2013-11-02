@@ -131,6 +131,7 @@ class CredentialsPage : public QScrollArea
     public slots:
         void authoriseTwitter();
         void authoriseStrava();
+        void authoriseCyclingAnalytics();
 
     private:
         MainWindow *mainWindow;
@@ -158,11 +159,16 @@ class CredentialsPage : public QScrollArea
         QLineEdit *stravaPIN;
         char *s_id, *s_secret;
 
+        QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
+
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;
 
         QLineEdit *ttbUser;
         QLineEdit *ttbPass;
+
+        QLineEdit *selUser;
+        QLineEdit *selPass;
 
         QLineEdit *wiURL; // url for withings
         QLineEdit *wiUser;

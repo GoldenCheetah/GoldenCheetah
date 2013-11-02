@@ -107,6 +107,77 @@ private:
     bool overwrite;
 };
 
+
+// uploader to cyclinganalytics.com
+class CyclingAnalyticsUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    CyclingAnalyticsUploader(MainWindow *mainWindow, RideItem *item, ShareDialog *parent = 0);
+
+    void upload();
+
+private slots:
+    void requestUploadCyclingAnalytics();
+    void requestUploadCyclingAnalyticsFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    MainWindow *mainWindow;
+    ShareDialog *parent;
+    RideItem *ride;
+    QDialog *dialog;
+
+    QString token;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+
+    QString cyclingAnalyticsUploadId;
+
+    QString uploadStatus;
+    QString uploadProgress;
+};
+
+// uploader to selfloops.com
+class SelfLoopsUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    SelfLoopsUploader(MainWindow *mainWindow, RideItem *item, ShareDialog *parent = 0);
+
+    void upload();
+
+private slots:
+    void requestUploadSelfLoops();
+    void requestUploadSelfLoopsFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    MainWindow *mainWindow;
+    ShareDialog *parent;
+    RideItem *ride;
+    QDialog *dialog;
+
+    QString token;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+
+    QString selfloopsUploadId, selfloopsActivityId;
+
+    QString uploadStatus;
+    QString uploadProgress;
+};
+
 class ShareDialog : public QDialog
 {
     Q_OBJECT
@@ -141,11 +212,15 @@ private:
 
      QCheckBox *stravaChk;
      QCheckBox *rideWithGPSChk;
+     QCheckBox *cyclingAnalyticsChk;
+     QCheckBox *selfLoopsChk;
 
      RideItem *ride;
 
      StravaUploader *stravaUploader;
      RideWithGpsUploader *rideWithGpsUploader;
+     CyclingAnalyticsUploader *cyclingAnalyticsUploader;
+     SelfLoopsUploader *selfLoopsUploader;
 
      QString athleteId;
 };
