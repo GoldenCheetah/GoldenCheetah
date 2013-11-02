@@ -168,7 +168,7 @@ private:
     bool loggedIn, uploadSuccessful;
     bool overwrite;
 
-    QString selfloopsUploadId;
+    QString selfloopsUploadId, selfloopsActivityId;
 
     QString uploadStatus;
     QString uploadProgress;
