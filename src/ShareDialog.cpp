@@ -865,13 +865,14 @@ SelfLoopsUploader::SelfLoopsUploader(Context *context, RideItem *ride, ShareDial
     context(context), ride(ride), parent(parent)
 {
     selfloopsUploadId = ride->ride()->getTag("Selfloops uploadId", "");
+    selfloopsActivityId = ride->ride()->getTag("Selfloops activityId", "");
 }
 
 void
 SelfLoopsUploader::upload()
 {
     // allready shared ?
-    if(selfloopsUploadId.length()>0)
+    if(selfloopsActivityId.length()>0)
     {
         overwrite = false;
 
@@ -1006,12 +1007,12 @@ SelfLoopsUploader::requestUploadSelfLoopsFinished(QNetworkReply *reply)
     }
     else
     {
-        selfloopsUploadId = sc.property("upload_id").toString();
+        selfloopsActivityId = sc.property("activity_id").toString();
 
-        ride->ride()->setTag("Selfloops uploadId", selfloopsUploadId);
+        ride->ride()->setTag("Selfloops activityId", selfloopsActivityId);
         ride->setDirty(true);
 
-        qDebug() << "uploadId: " << selfloopsUploadId;
+        qDebug() << "activity: " << selfloopsActivityId;
 
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
