@@ -45,7 +45,7 @@ class WPrime {
         QVector<double> &xdata() { return xvalues; }
 
         double minY, maxY;
-        double TAU;
+        double TAU, CP, WPRIME;
 
     private:
 

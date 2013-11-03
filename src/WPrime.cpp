@@ -35,7 +35,7 @@
 
 #include "WPrime.h"
 
-const double WprimeMultConst = -1.0;
+const double WprimeMultConst = 1.0;
 const int WprimeDecayPeriod = 1200; // 1200 seconds or 20 minutes
 const double E = 2.71828183;
 
@@ -61,7 +61,8 @@ WPrime::setRide(RideFile *input)
 
         //XXX will need to reset metrics when they are added
         minY = maxY = 0;
-        TAU=0;
+        CP = WPRIME = TAU=0;
+        
         //qDebug()<<"now work to do"<<time.elapsed();
         return;
     }
@@ -89,10 +90,11 @@ WPrime::setRide(RideFile *input)
     smoothed.setPoints(QPolygonF(points));
 
     // Get CP
-    int CP = 250; // default
+    CP = 250; // default
     if (input->context->athlete->zones()) {
         int zoneRange = input->context->athlete->zones()->whichRange(input->startTime().date());
         CP = zoneRange >= 0 ? input->context->athlete->zones()->getCP(zoneRange) : 0;
+        WPRIME = zoneRange >= 0 ? input->context->athlete->zones()->getWprime(zoneRange) : 0;
     }
 
     // since we will be running up and down the data series multiple times
@@ -138,7 +140,7 @@ WPrime::setRide(RideFile *input)
         for (int j=0; j<1200 && (i-j) > 0; j++) {
             sumproduct += inputArray.at(i-j) * pow(E, -(double(j)/TAU)); 
         }
-        values[i] = sumproduct * WprimeMultConst;
+        values[i] = WPRIME - (sumproduct * WprimeMultConst);
 
         // min / max
         if (values[i] < minY) minY = values[i];

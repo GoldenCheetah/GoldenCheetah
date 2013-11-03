@@ -1206,7 +1206,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
     if (showW && parent->wpData->TAU > 0) {
-        QwtText text(QString("tau=%1").arg(parent->wpData->TAU));
+        QwtText text(QString("Tau=%1, CP=%2, W'=%3").arg(parent->wpData->TAU)
+                                                    .arg(parent->wpData->CP)
+                                                    .arg(parent->wpData->WPRIME));
+
         text.setFont(QFont("Helvetica", 10, QFont::Bold));
         text.setColor(Qt::red);
         curveTitle.setLabel(text);

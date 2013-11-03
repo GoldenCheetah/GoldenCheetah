@@ -114,6 +114,7 @@ bool Zones::read(QFile &file)
                 "\\s*:?\\s*$",                                       // optional :
                 Qt::CaseInsensitive)
     };
+    QRegExp wprimerx("^W'=(\\d+)$");
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
 		   "(\\d+)\\s*(%?)\\s*(?:,\\s*(\\d+|MAX)\\s*(%?)\\s*)?$",
 		   Qt::CaseInsensitive);
@@ -127,6 +128,7 @@ bool Zones::read(QFile &file)
     bool in_range = false;
     QDate begin = date_zero, end = date_infinity;
     int cp=0;
+    int wprime=0;
     QList<ZoneInfo> zoneInfos;
 
     // true if zone defaults are found in the file (then we need to write them)
@@ -167,7 +169,7 @@ bool Zones::read(QFile &file)
                         if (in_range) {
 
                                 // if zones are empty, then generate them
-                                ZoneRange range(begin, end, cp);
+                                ZoneRange range(begin, end, cp, wprime);
                                 range.zones = zoneInfos;
 
                                 if (range.zones.empty()) {
@@ -219,6 +221,15 @@ bool Zones::read(QFile &file)
                         // bleck
                         goto next_line;
                 }
+        }
+
+        // check for w' 
+        if (wprimerx.indexIn(line, 0) != -1) {
+            if (!in_range) {
+                qDebug()<<"ignoring errant W'= in power.zones";
+            } else {
+                wprime = wprimerx.cap(1).toInt();
+            }
         }
 
 	// check for zone definition
@@ -286,7 +297,7 @@ bool Zones::read(QFile &file)
     }
 
     if (in_range) {
-        ZoneRange range(begin, end, cp);
+        ZoneRange range(begin, end, cp, wprime);
         range.zones = zoneInfos;
         if (range.zones.empty()) {
             if (range.cp > 0)
@@ -463,9 +474,21 @@ int Zones::getCP(int rnum) const
     return ranges[rnum].cp;
 }
 
+int Zones::getWprime(int rnum) const
+{
+    assert(rnum < ranges.size());
+    return ranges[rnum].wprime;
+}
+
 void Zones::setCP(int rnum, int cp)
 {
     ranges[rnum].cp = cp;
+    modificationTime = QDateTime::currentDateTime();
+}
+
+void Zones::setWprime(int rnum, int wprime)
+{
+    ranges[rnum].wprime = wprime;
     modificationTime = QDateTime::currentDateTime();
 }
 
@@ -631,6 +654,7 @@ void Zones::write(QDir home)
 
     for (int i = 0; i < ranges.size(); i++) {
         int cp = getCP(i);
+        int wprime = getWprime(i);
 
 	// print header for range
 	// note this explicitly sets the first and last ranges such that all time is spanned
@@ -640,6 +664,9 @@ void Zones::write(QDir home)
         //       since it becomes Jan 01 1900
         strzones += QString("%1: CP=%2").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(cp);
 	strzones += QString("\n");
+
+        // wite out the W' value
+        strzones += QString("W'=%1\n").arg(wprime);
 
 	// step through and print the zones if they've been explicitly set
 	if (! ranges[i].zonesSetFromCP) {
@@ -679,14 +706,14 @@ void Zones::write(QDir home)
     }
 }
 
-void Zones::addZoneRange(QDate _start, QDate _end, int _cp)
+void Zones::addZoneRange(QDate _start, QDate _end, int _cp, int _wprime)
 {
-    ranges.append(ZoneRange(_start, _end, _cp));
+    ranges.append(ZoneRange(_start, _end, _cp, _wprime));
 }
 
 // insert a new zone range using the current scheme
 // return the range number
-int Zones::addZoneRange(QDate _start, int _cp)
+int Zones::addZoneRange(QDate _start, int _cp, int _wprime)
 {
     int rnum;
 
@@ -694,8 +721,8 @@ int Zones::addZoneRange(QDate _start, int _cp)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp));
-    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp));
+    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp, _wprime));
+    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp, _wprime));
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
@@ -703,6 +730,7 @@ int Zones::addZoneRange(QDate _start, int _cp)
     // set zones from CP
     if (_cp > 0) {
         setCP(rnum, _cp);
+        setWprime(rnum, _wprime);
         setZonesFromCP(rnum);
     }
 
@@ -792,39 +820,6 @@ int Zones::deleteRange(int rnum) {
     return rnum-1;
 }
 
-// insert a new range starting at the given date extending to the end of the zone currently
-// containing that date.  If the start date of that zone is prior to the specified start
-// date, then that zone range is shorted.
-int Zones::insertRangeAtDate(QDate date, int cp) {
-    assert(date.isValid());
-    int rnum;
-
-    if (ranges.empty()) {
-        addZoneRange();
-        rnum = 0;
-    }
-    else {
-        rnum = whichRange(date);
-        assert(rnum >= 0);
-        QDate date1 = getStartDate(rnum);
-
-        // if the old range has dates before the specified, then truncate
-        // the old range and shift up the existing ranges
-        if (date > date1) {
-            QDate endDate = getEndDate(rnum);
-            setEndDate(rnum, date);
-            ranges.insert(++ rnum, ZoneRange(date, endDate));
-        }
-    }
-
-    if (cp > 0) {
-        setCP(rnum, cp);
-        setZonesFromCP(rnum);
-    }
-
-    return rnum;
-}
-
 quint16
 Zones::getFingerprint() const
 {
@@ -839,6 +834,11 @@ Zones::getFingerprint() const
 
         // CP
         x += ranges[i].cp;
+
+        // W'
+        //!! will not affect metrics so not part of the
+        //!! fingerprint calculation
+        //x += ranges[i].wprime;
 
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
