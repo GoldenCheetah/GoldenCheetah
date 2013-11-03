@@ -58,12 +58,13 @@ struct ZoneInfo {
 struct ZoneRange {
     QDate begin, end;
     int cp;
+    int wprime; // aka awc
     QList<ZoneInfo> zones;
     bool zonesSetFromCP;
     ZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), cp(0), zonesSetFromCP(false) {}
-    ZoneRange(const QDate &b, const QDate &e, int _cp) :
-        begin(b), end(e), cp(_cp), zonesSetFromCP(false) {}
+        begin(b), end(e), cp(0), wprime(0), zonesSetFromCP(false) {}
+    ZoneRange(const QDate &b, const QDate &e, int _cp, int _wprime) :
+        begin(b), end(e), cp(_cp), wprime(_wprime), zonesSetFromCP(false) {}
 
     // used by qSort()
     bool operator< (ZoneRange right) const {
@@ -121,13 +122,9 @@ class Zones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, int _cp);
-        int addZoneRange(QDate _start, int _cp);
+        void addZoneRange(QDate _start, QDate _end, int _cp, int _wprime);
+        int addZoneRange(QDate _start, int _cp, int _wprime);
         void addZoneRange();
-
-        // insert a range from the given date to the end date of the range
-        // presently including the date
-        int insertRangeAtDate(QDate date, int cp = 0);
 
         // Get / Set ZoneRange details
         ZoneRange getZoneRange(int rnum) { return ranges[rnum]; }
@@ -136,6 +133,8 @@ class Zones : public QObject
         // get and set CP for a given range
         int getCP(int rnum) const;
         void setCP(int rnum, int cp);
+        int getWprime(int rnum) const;
+        void setWprime(int rnum, int wprime);
 
         // calculate and then set zoneinfo for a given range
         void setZonesFromCP(int rnum);

@@ -2498,6 +2498,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
     QLabel *cpLabel = new QLabel(tr("Critical Power"));
+    QLabel *wLabel = new QLabel(tr("W'"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
 
@@ -2507,16 +2508,25 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     cpEdit->setSingleStep(1.0);
     cpEdit->setDecimals(0);
 
+    wEdit = new QDoubleSpinBox;
+    wEdit->setMinimum(0);
+    wEdit->setMaximum(40000);
+    wEdit->setSingleStep(100);
+    wEdit->setDecimals(0);
+
     addLayout->addWidget(dateLabel);
     addLayout->addWidget(dateEdit);
     addLayout->addWidget(cpLabel);
     addLayout->addWidget(cpEdit);
+    addLayout->addWidget(wLabel);
+    addLayout->addWidget(wEdit);
     addLayout->addStretch();
 
     ranges = new QTreeWidget;
     ranges->headerItem()->setText(0, tr("From Date"));
     ranges->headerItem()->setText(1, tr("Critical Power"));
-    ranges->setColumnCount(2);
+    ranges->headerItem()->setText(2, tr("W'"));
+    ranges->setColumnCount(3);
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
     //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
@@ -2541,6 +2551,11 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
         // CP
         add->setText(1, QString("%1").arg(zonePage->zones.getCP(i)));
         add->setFont(1, font);
+
+        // W'
+        add->setText(2, QString("%1").arg(zonePage->zones.getWprime(i)));
+        add->setFont(2, font);
+
     }
 
     zones = new QTreeWidget;
@@ -2587,7 +2602,7 @@ CPPage::addClicked()
     }
 
     //int index = ranges->invisibleRootItem()->childCount();
-    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value());
+    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), wEdit->value());
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -2599,6 +2614,10 @@ CPPage::addClicked()
 
     // CP
     add->setText(1, QString("%1").arg(cpEdit->value()));
+
+    // W'
+    add->setText(2, QString("%1").arg(wEdit->value()));
+
 }
 
 void

@@ -535,6 +535,7 @@ class CPPage : public QWidget
 
         QDateEdit *dateEdit;
         QDoubleSpinBox *cpEdit;
+        QDoubleSpinBox *wEdit;
 
         ZonePage *zonePage;
         QTreeWidget *ranges;

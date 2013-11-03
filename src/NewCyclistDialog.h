@@ -47,7 +47,7 @@ class NewCyclistDialog : public QDialog
         QComboBox *sex;
         QLabel *weightlabel;
         QComboBox *unitCombo;
-        QSpinBox *cp, *lthr, *resthr, *maxhr; // mandatory non-zero, default from age
+        QSpinBox *cp, *w, *lthr, *resthr, *maxhr; // mandatory non-zero, default from age
         QDoubleSpinBox *weight;
         QTextEdit  *bio;
         QPushButton *avatarButton;

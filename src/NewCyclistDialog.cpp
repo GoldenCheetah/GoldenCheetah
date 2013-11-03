@@ -35,6 +35,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QLabel *unitlabel = new QLabel(tr("Units"));
     QLabel *biolabel = new QLabel(tr("Bio"));
     QLabel *cplabel = new QLabel(tr("Critical Power (FTP)"));
+    QLabel *wlabel = new QLabel(tr("W' (J)"));
     QLabel *resthrlabel = new QLabel(tr("Resting Heartrate"));
     QLabel *lthrlabel = new QLabel(tr("Lactate Heartrate"));
     QLabel *maxhrlabel = new QLabel(tr("Maximum Heartrate"));
@@ -65,6 +66,12 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     cp->setMaximum(500); // thats over 6w/kg for a 80kg rider, anything higher is physiologically unlikely
     cp->setSingleStep(5);      // for those that insist on using the spinners, make it a bit quicker
     cp->setValue(250);   // seems like a 'sensible' default for those that 'don't know' ?
+
+    w = new QSpinBox(this);
+    w->setMinimum(0);
+    w->setMaximum(40000);
+    w->setSingleStep(100);
+    w->setValue(20000); // default to 20kj
 
     resthr = new QSpinBox(this);
     resthr->setMinimum(30);
@@ -103,10 +110,11 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(unitlabel, 3, 0, alignment);
     grid->addWidget(weightlabel, 4, 0, alignment);
     grid->addWidget(cplabel, 5, 0, alignment);
-    grid->addWidget(resthrlabel, 6, 0, alignment);
-    grid->addWidget(lthrlabel, 7, 0, alignment);
-    grid->addWidget(maxhrlabel, 8, 0, alignment);
-    grid->addWidget(biolabel, 9, 0, alignment);
+    grid->addWidget(wlabel, 6, 0, alignment);
+    grid->addWidget(resthrlabel, 7, 0, alignment);
+    grid->addWidget(lthrlabel, 8, 0, alignment);
+    grid->addWidget(maxhrlabel, 9, 0, alignment);
+    grid->addWidget(biolabel, 10, 0, alignment);
 
     grid->addWidget(name, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
@@ -114,10 +122,11 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(unitCombo, 3, 1, alignment);
     grid->addWidget(weight, 4, 1, alignment);
     grid->addWidget(cp, 5, 1, alignment);
-    grid->addWidget(resthr, 6, 1, alignment);
-    grid->addWidget(lthr, 7, 1, alignment);
-    grid->addWidget(maxhr, 8, 1, alignment);
-    grid->addWidget(bio, 10, 0, 1, 4);
+    grid->addWidget(w, 6, 1, alignment);
+    grid->addWidget(resthr, 7, 1, alignment);
+    grid->addWidget(lthr, 8, 1, alignment);
+    grid->addWidget(maxhr, 9, 1, alignment);
+    grid->addWidget(bio, 11, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -220,7 +229,7 @@ NewCyclistDialog::saveClicked()
 
                 // Setup Power Zones
                 Zones zones;
-                zones.addZoneRange(QDate(1900, 01, 01), cp->value());
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), w->value());
                 zones.write(QDir(home.path() + "/" + name->text()));
 
                 // HR Zones too!
