@@ -75,6 +75,13 @@ WPrime::setRide(RideFile *input)
     RideFilePoint *lp=NULL;
     foreach(RideFilePoint *p, input->dataPoints()) {
 
+        // fill gaps in recording with zeroes
+        if (lp)
+            for(int t=lp->secs+input->recIntSecs();
+                t < p->secs;
+                t += input->recIntSecs())
+                points << QPointF(t, 0);
+
         // lets not go backwards -- or two sampls at the same time
         if ((lp && p->secs > lp->secs) || !lp)
             points << QPointF(p->secs, p->watts);
