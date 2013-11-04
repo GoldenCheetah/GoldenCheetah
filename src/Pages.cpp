@@ -2482,13 +2482,6 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     deleteZoneButton->setFixedSize(20,20);
 #endif
 
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2);
-    actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(defaultButton);
-
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
     zoneButtons->setSpacing(0);
@@ -2514,12 +2507,19 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     wEdit->setSingleStep(100);
     wEdit->setDecimals(0);
 
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2);
+    actionButtons->addWidget(cpLabel);
+    actionButtons->addWidget(cpEdit);
+    actionButtons->addWidget(wLabel);
+    actionButtons->addWidget(wEdit);
+    actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(defaultButton);
+
     addLayout->addWidget(dateLabel);
     addLayout->addWidget(dateEdit);
-    addLayout->addWidget(cpLabel);
-    addLayout->addWidget(cpEdit);
-    addLayout->addWidget(wLabel);
-    addLayout->addWidget(wEdit);
     addLayout->addStretch();
 
     ranges = new QTreeWidget;
