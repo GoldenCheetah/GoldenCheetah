@@ -923,6 +923,11 @@ RideFile::recalculateDerivedSeries()
     double XPtotal = 0.0;
     int XPcount = 0;
 
+    //
+    // APower Initialisation -- working variables
+    double APtotal=0;
+    double APcount=0;
+
     foreach(RideFilePoint *p, dataPoints_) {
 
         //
@@ -988,7 +993,42 @@ RideFile::recalculateDerivedSeries()
         if (p->xp < minPoint->xp) minPoint->xp = p->xp;
 
         // aPower
-        // XXX coming soon.
+        if (dataPresent.watts == true && dataPresent.alt == true) {
+
+            dataPresent.apower = true;
+
+            static const double a0  = -174.1448622;
+            static const double a1  = 1.0899959;
+            static const double a2  = -0.0015119;
+            static const double a3  = 7.2674E-07;
+            static const double E = 2.71828183;
+
+            if (p->alt > 0) {
+                // pbar [mbar]= 0.76*EXP( -alt[m] / 7000 )*1000 
+                double pbar = 0.76 * pow(E, p->alt / 7000) * 1000;
+
+                // %Vo2max= a0 + a1 * pbar + a2 * pbar ^2 + a3 * pbar ^3 (with pbar in mbar)
+                double vo2maxPCT = a0 + (a1 * pbar) + (a2 * pow(pbar,2)) + (a3 * pow(pbar,3)); 
+
+                p->apower = p->watts / vo2maxPCT * 100.00f;
+
+            } else {
+
+                p->apower = p->watts;
+            }
+
+        } else {
+
+            dataPresent.apower = false;
+            p->apower = 0.00f;
+        }
+
+        // now the min and max values for NP
+        if (p->apower > maxPoint->apower) maxPoint->apower = p->apower;
+        if (p->apower < minPoint->apower) minPoint->apower = p->apower;
+
+        APtotal += p->apower;
+        APcount++;
     }
 
     // Averages and Totals
@@ -997,6 +1037,9 @@ RideFile::recalculateDerivedSeries()
 
     avgPoint->xp = XPcount ? (XPtotal / XPcount) : 0;
     totalPoint->xp = XPtotal;
+
+    avgPoint->apower = APcount ? (APtotal / APcount) : 0;
+    totalPoint->apower = APtotal;
 
     // and we're done
     dstale=false;
