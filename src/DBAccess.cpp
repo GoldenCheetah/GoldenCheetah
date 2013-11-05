@@ -69,8 +69,9 @@
 // 49  29  Oct 2013 Mark Liversedge    Added percentage time in zone
 // 50  29  Oct 2013 Mark Liversedge    Added percentage time in heartrate zone
 // 51  05  Nov 2013 Mark Liversedge    Added average aPower
+// 52  05  Nov 2013 Mark Liversedge    Added EOA - Effect of Altitude
 
-int DBSchemaVersion = 50;
+int DBSchemaVersion = 52;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
