@@ -1,5 +1,12 @@
 <!-- $Id: faq.content,v 1.4 2006/07/05 16:59:56 srhea Exp $ -->
 
+<h2>Documentation</h2>
+<p>
+There is a <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Manual.pdf?raw=true">Manual</a>
+and a <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-FAQ.pdf?raw=true">FAQ</a> that
+you can use to help you use the program.
+</p>
+
 <p>
 <b><i>GoldenCheetah doesn't find my PowerTap on Ubuntu Linux.</i></b>
 <p>
