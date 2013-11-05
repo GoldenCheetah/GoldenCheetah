@@ -476,6 +476,12 @@ RideSummaryWindow::htmlSummary() const
                     f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                                 p->watts, p->alt, p->lon, p->lat, p->headwind,
                                 p->slope, p->temp, p->lrbalance, 0);
+
+                    // derived data
+                    RideFilePoint *l = f.dataPoints().last();
+                    l->np = p->np;
+                    l->xp = p->xp;
+                    l->apower = p->apower;
                 }
                 if (f.dataPoints().size() == 0) {
                     // Interval empty, do not compute any metrics

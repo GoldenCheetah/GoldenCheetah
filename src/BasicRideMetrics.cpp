@@ -417,6 +417,46 @@ static bool avgPowerAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct AAvgPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AAvgPower)
+
+    double count, total;
+
+    public:
+
+    AAvgPower()
+    {
+        setSymbol("average_apower");
+        setInternalName("Average aPower");
+    }
+    void initialize() {
+        setName(tr("Average aPower"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+        total = count = 0;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->apower >= 0.0) {
+                total += point->apower;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : 0);
+        setCount(count);
+    }
+    RideMetric *clone() const { return new AAvgPower(*this); }
+};
+
+static bool aavgPowerAdded =
+    RideMetricFactory::instance().addMetric(AAvgPower());
+
+//////////////////////////////////////////////////////////////////////////////
+
 struct NonZeroPower : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(NonZeroPower)
 

@@ -1010,7 +1010,7 @@ RideFile::recalculateDerivedSeries()
                 // %Vo2max= a0 + a1 * pbar + a2 * pbar ^2 + a3 * pbar ^3 (with pbar in mbar)
                 double vo2maxPCT = a0 + (a1 * pbar) + (a2 * pow(pbar,2)) + (a3 * pow(pbar,3)); 
 
-                p->apower = p->watts / vo2maxPCT * 100.00f;
+                p->apower = (p->watts / 100) * vo2maxPCT;
 
             } else {
 
@@ -1020,7 +1020,7 @@ RideFile::recalculateDerivedSeries()
         } else {
 
             dataPresent.apower = false;
-            p->apower = 0.00f;
+            p->apower = p->watts;
         }
 
         // now the min and max values for NP
