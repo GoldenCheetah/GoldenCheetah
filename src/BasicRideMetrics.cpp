@@ -906,6 +906,46 @@ static bool vamAdded = addVam();
 
 ///////////////////////////////////////////////////////////////////////////////
 
+class EOA : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(EOA)
+
+    public:
+    EOA()
+    {
+        setSymbol("eoa");
+        setInternalName("EOA");
+    }
+    void initialize() {
+        setName(tr("Effect of Altitude"));
+        setImperialUnits("%");
+        setMetricUnits("%");
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        AAvgPower *aap = dynamic_cast<AAvgPower*>(deps.value("average_apower"));
+        AvgPower *ap = dynamic_cast<AvgPower*>(deps.value("average_power"));
+        setValue(((aap->value(true)-ap->value(true))/aap->value(true)) * 100.00f);
+    }
+    RideMetric *clone() const { return new EOA(*this); }
+};
+
+static bool addEOA()
+{
+    QVector<QString> deps;
+    deps.append("average_apower");
+    deps.append("average_power");
+    RideMetricFactory::instance().addMetric(EOA(), &deps);
+    return true;
+}
+
+static bool eoaAdded = addEOA();
+
+///////////////////////////////////////////////////////////////////////////////
+
 class Gradient : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(Gradient)
 
