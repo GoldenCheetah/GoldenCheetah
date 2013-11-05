@@ -54,12 +54,18 @@ class Context;      // for context; cyclist, homedir
 
 struct RideFileDataPresent
 {
+    // basic
     bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance, interval;
+
+    // derived
+    bool np,xp,apower;
+
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
-        headwind(false), slope(false), temp(false), lrbalance(false), interval(false) {}
+        headwind(false), slope(false), temp(false), lrbalance(false), interval(false),
+        np(false), xp(false), apower(false) {}
 };
 
 struct RideFileInterval
@@ -105,7 +111,7 @@ class RideFile : public QObject // QObject to emit signals
         virtual ~RideFile();
 
         // Working with DATASERIES
-        enum seriestype { secs=0, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, NP, xPower, vam, wattsKg, lrbalance, none };
+        enum seriestype { secs=0, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, NP, xPower, vam, wattsKg, lrbalance, aPower, none };
         enum specialValues { noTemp = -255 };
 
         typedef enum seriestype SeriesType;
@@ -132,6 +138,17 @@ class RideFile : public QObject // QObject to emit signals
 
         void appendPoint(const RideFilePoint &);
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
+
+        // recalculate all the derived data series
+        // might want to move to a factory for these
+        // at some point, but for now hard coded
+        //
+        // YOU MUST ALWAYS CALL THIS BEFORE ACESSING
+        // THE DERIVED DATA. IT IS REFRESHED ON DEMAND.
+        // STATE IS MAINTAINED IN 'bool dstale' BELOW
+        // TO ENSURE IT IS ONLY REFRESHED IF NEEDED
+        //
+        void recalculateDerivedSeries();
 
         // Working with DATAPRESENT flags
         inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
@@ -211,9 +228,11 @@ class RideFile : public QObject // QObject to emit signals
         void deleted();
 
     protected:
+
         void emitSaved();
         void emitReverted();
         void emitModified();
+
 
     private:
 
@@ -240,19 +259,32 @@ class RideFile : public QObject // QObject to emit signals
         void updateMin(RideFilePoint* point);
         void updateMax(RideFilePoint* point);
         void updateAvg(RideFilePoint* point);
+
+        bool dstale; // is derived data up to date?
 };
 
 struct RideFilePoint
 {
+    // recorded data
     double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance;
     int interval;
+
+    // derived data (we calculate it)
+    // xPower, normalised power, aPower
+    double xp, np, apower;
+
+    // create blank point
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
-        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(-255.0), lrbalance(0), interval(0) {}
+        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(-255.0), lrbalance(0), interval(0), xp(0), np(0), apower(0) {}
+
+    // create point supplying all values
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
                   double nm, double watts, double alt, double lon, double lat,
                   double headwind, double slope, double temp, double lrbalance, int interval) :
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
-        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), slope(slope), temp(temp), lrbalance(lrbalance), interval(interval) {}
+        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), slope(slope), temp(temp), lrbalance(lrbalance), interval(interval), xp(0), np(0), apower(0) {}
+
+    // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;
 };
 
