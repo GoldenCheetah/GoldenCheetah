@@ -41,7 +41,7 @@
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), weight_(0),
-            totalCount(0)
+            totalCount(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -51,7 +51,7 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
     totalPoint = new RideFilePoint();
 }
 
-RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0), totalCount(0)
+RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0), totalCount(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -82,6 +82,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::nm: return QString(tr("Torque"));
     case RideFile::watts: return QString(tr("Power"));
     case RideFile::xPower: return QString(tr("xPower"));
+    case RideFile::aPower: return QString(tr("aPower"));
     case RideFile::NP: return QString(tr("Normalized Power"));
     case RideFile::alt: return QString(tr("Altitude"));
     case RideFile::lon: return QString(tr("Longitude"));
@@ -111,6 +112,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::nm: return QString(tr("N"));
     case RideFile::watts: return QString(tr("watts"));
     case RideFile::xPower: return QString(tr("watts"));
+    case RideFile::aPower: return QString(tr("watts"));
     case RideFile::NP: return QString(tr("watts"));
     case RideFile::alt: return QString(useMetricUnits ? tr("metres") : tr("feet"));
     case RideFile::lon: return QString(tr("lon"));
@@ -337,6 +339,9 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         result->setTag("Year", result->startTime().toString("yyyy"));
         result->setTag("Month", result->startTime().toString("MMMM"));
         result->setTag("Weekday", result->startTime().toString("ddd"));
+
+        // calculate derived data series
+        result->recalculateDerivedSeries();
 
         DataProcessorFactory::instance().autoProcess(result);
 
@@ -637,6 +642,9 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::temp : return temp; break;
         case RideFile::lrbalance : return lrbalance; break;
         case RideFile::interval : return interval; break;
+        case RideFile::NP : return np; break;
+        case RideFile::xPower : return xp; break;
+        case RideFile::aPower : return apower; break;
 
         default:
         case RideFile::none : break;
@@ -696,6 +704,7 @@ RideFile::decimalsFor(SeriesType series)
         case nm : return 2; break;
         case watts : return 0; break;
         case xPower : return 0; break;
+        case aPower : return 0; break;
         case NP : return 0; break;
         case alt : return 3; break;
         case lon : return 6; break;
@@ -725,6 +734,7 @@ RideFile::maximumFor(SeriesType series)
         case watts : return 2500; break;
         case NP : return 2500; break;
         case xPower : return 2500; break;
+        case aPower : return 2500; break;
         case alt : return 8850; break; // mt everest is highest point above sea level
         case lon : return 180; break;
         case lat : return 90; break;
@@ -752,6 +762,7 @@ RideFile::minimumFor(SeriesType series)
         case nm : return 0; break;
         case watts : return 0; break;
         case xPower : return 0; break;
+        case aPower : return 0; break;
         case NP : return 0; break;
         case alt : return -413; break; // the Red Sea is lowest land point on earth
         case lon : return -180; break;
@@ -798,6 +809,7 @@ void
 RideFile::emitSaved()
 {
     weight_ = 0;
+    dstale = true;
     emit saved();
 }
 
@@ -805,6 +817,7 @@ void
 RideFile::emitReverted()
 {
     weight_ = 0;
+    dstale = true;
     emit reverted();
 }
 
@@ -812,6 +825,7 @@ void
 RideFile::emitModified()
 {
     weight_ = 0;
+    dstale = true;
     emit modified();
 }
 
@@ -876,3 +890,114 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
     return true;
 }
 
+void
+RideFile::recalculateDerivedSeries()
+{
+    // derived data is calculated from the data that is present
+    // we should set to 0 where we cannot derive since we may
+    // be called after data is deleted or added
+    if (dstale == false) return; // we're already up to date
+
+    //
+    // NP Initialisation -- working variables
+    //
+    QVector<double> NProlling;
+    int NProllingwindowsize = 30 / (recIntSecs_ ? recIntSecs_ : 1);
+    if (NProllingwindowsize > 1) NProlling.resize(NProllingwindowsize);
+    double NPtotal = 0;
+    int NPcount = 0;
+    int NPindex = 0;
+    double NPsum = 0;
+
+    //
+    // XPower Initialisation -- working variables
+    //
+    static const double EPSILON = 0.1;
+    static const double NEGLIGIBLE = 0.1;
+    double XPsecsDelta = recIntSecs_ ? recIntSecs_ : 1;
+    double XPsampsPerWindow = 25.0 / XPsecsDelta;
+    double XPattenuation = XPsampsPerWindow / (XPsampsPerWindow + XPsecsDelta);
+    double XPsampleWeight = XPsecsDelta / (XPsampsPerWindow + XPsecsDelta);
+    double XPlastSecs = 0.0;
+    double XPweighted = 0.0;
+    double XPtotal = 0.0;
+    int XPcount = 0;
+
+    foreach(RideFilePoint *p, dataPoints_) {
+
+        //
+        // NP
+        //
+        if (dataPresent.watts && NProllingwindowsize > 1) {
+
+            dataPresent.np = true;
+
+            // sum last 30secs
+            NPsum += p->watts;
+            NPsum -= NProlling[NPindex];
+            NProlling[NPindex] = p->watts;
+
+            // running total and count
+            NPtotal += pow(NPsum/NProllingwindowsize,4); // raise rolling average to 4th power
+            NPcount ++;
+
+            // root for ride so far
+            if (NPcount && NPcount*recIntSecs_ > 30) {
+                p->np = pow(NPtotal / (NPcount), 0.25);
+            } else {
+                p->np = 0.00f;
+            }
+
+            // move index on/round
+            NPindex = (NPindex >= NProllingwindowsize-1) ? 0 : NPindex+1;
+
+        } else {
+
+            p->np = 0.00f;
+        }
+
+        // now the min and max values for NP
+        if (p->np > maxPoint->np) maxPoint->np = p->np;
+        if (p->np < minPoint->np) minPoint->np = p->np;
+
+        //
+        // xPower
+        //
+        if (dataPresent.watts) {
+
+            dataPresent.np = true;
+
+            while ((XPweighted > NEGLIGIBLE) && (p->secs > XPlastSecs + XPsecsDelta + EPSILON)) {
+                XPweighted *= XPattenuation;
+                XPlastSecs += XPsecsDelta;
+                XPtotal += pow(XPweighted, 4.0);
+                XPcount++;
+            }
+
+            XPweighted *= XPattenuation;
+            XPweighted += XPsampleWeight * p->watts;
+            XPlastSecs = p->secs;
+            XPtotal += pow(XPweighted, 4.0);
+            XPcount++;
+        
+            p->xp = pow(XPtotal / XPcount, 0.25);
+        }
+
+        // now the min and max values for NP
+        if (p->xp > maxPoint->xp) maxPoint->xp = p->xp;
+        if (p->xp < minPoint->xp) minPoint->xp = p->xp;
+
+        // aPower
+        // XXX coming soon.
+    }
+
+    // Averages and Totals
+    avgPoint->np = NPcount ? (NPtotal / NPcount) : 0;
+    totalPoint->np = NPtotal;
+
+    avgPoint->xp = XPcount ? (XPtotal / XPcount) : 0;
+    totalPoint->xp = XPtotal;
+
+    // and we're done
+    dstale=false;
+}
