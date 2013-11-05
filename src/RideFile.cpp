@@ -890,6 +890,15 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
     return true;
 }
 
+//
+// Calculate derived data series, including a new metric aPower
+// aPower is based upon the models and research presented in
+// "Altitude training and Athletic Performance" by Randall L. Wilber
+// and Peronnet et al. (1991): Peronnet, F., G. Thibault, and D.L. Cousineau 1991.
+// "A theoretical analisys of the effect of altitude on running
+// performance." Journal of Applied Physiology 70:399-404
+//
+
 void
 RideFile::recalculateDerivedSeries()
 {
