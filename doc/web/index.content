@@ -13,8 +13,7 @@ GoldenCheetah is a software package that:
 
 <ul>
 <li>Downloads ride data directly from the CycleOps PowerTap and the SRM
-PowerControl V. Support for SRM PowerControl VI and VII is planned for the
-future.<p>
+PowerControl V, VI and VII.</p>
 
 <li>Imports ride data downloaded with other programs, including TrainingPeaks
 WKO+ and the manufacturers' software for the Ergomo, Garmin, Polar, PowerTap,

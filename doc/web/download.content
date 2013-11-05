@@ -26,7 +26,22 @@ PCV on Mac OS X</a> for further information.
 
 <p>
 <font face="arial,helvetica,sanserif">
-<big><strong>Download Release 3.0</strong></big>
+<big><strong>Known Issues in Release 3.0.0</strong></big>
+</font>
+</p>
+<ul>
+<li>Twitter posting is broken. (API change after release.)
+<li>Strava upload is broken. (API change after release.)
+<li>Google Maps is broken. (API change after release.)
+<li>Realtime trainer with wheelsizes of 20"/26"/650C give incorrect speed readings.
+<li>Several other minor issues.
+</ul>
+
+Fixes have been made to the code base and we are working on a new release to address these issues being released by the end of 2013.
+
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>Download Release 3.0.0</strong></big>
 </font>
 </p>
 
@@ -35,10 +50,9 @@ PCV on Mac OS X</a> for further information.
 <li><a href="GoldenCheetah_3.0.0_Mac_32bit.dmg">Mac OS X Intel 32bit (10.6+)</a><br>
 <li><a href="GoldenCheetah_3.0.0_Mac_64bit.dmg">Mac OS X Intel 64bit (10.6+)</a><br>
 </ul>
-</p>
 
 <p>
-Installation is simple. Download the file for your operating system.<br>
+Installation is simple. Download the file for your operationg system.<br>
 On Mac, open the DMG and drag and drop where you would like to install.<br>
 For Windows, run the Installer and follow the prompts.<br>
 </p>
