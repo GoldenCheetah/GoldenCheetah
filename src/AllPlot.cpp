@@ -20,6 +20,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "AllPlotWindow.h"
+#include "ReferenceLineDialog.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
@@ -319,6 +320,8 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     setAxisMaxMinor(yLeft2, 0);
     setAxisMaxMinor(yRight, 0);
     setAxisMaxMinor(yRight2, 0);
+
+    axisWidget(QwtPlot::yLeft)->installEventFilter(this);
 
     configChanged(); // set colors
 }
@@ -910,57 +913,65 @@ AllPlot::refreshReferenceLines()
     referenceLines.clear();
     if (rideItem->ride()) {
         foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
-            QwtPlotCurve *referenceLine;
-
-            QVector<double> xaxis;
-            QVector<double> yaxis;
-            if (bydist) {
-                xaxis.append(referencePlot == NULL ? smoothDistance.first() : referencePlot->smoothDistance.first());
-                xaxis.append(referencePlot == NULL ? smoothDistance.last() : referencePlot->smoothDistance.last());
-
-            } else {
-                xaxis.append(referencePlot == NULL ? smoothTime.first() : referencePlot->smoothTime.first());
-                xaxis.append(referencePlot == NULL ? smoothTime.last() : referencePlot->smoothTime.last());
-            }
-
-            if (referencePoint->watts != 0)  {
-                referenceLine = new QwtPlotCurve(tr("Power Ref"));
-                referenceLine->setYAxis(yLeft);
-                QPen wattsPen = QPen(GColor(CPOWER));
-                wattsPen.setWidth(1);
-                wattsPen.setStyle(Qt::DashLine);
-                referenceLine->setPen(wattsPen);
-
-                yaxis.append(referencePoint->watts);
-                yaxis.append(referencePoint->watts);
-            } else if (referencePoint->hr != 0)  {
-                referenceLine = new QwtPlotCurve(tr("Heart Rate Ref"));
-                referenceLine->setYAxis(yLeft);
-                QPen hrPen = QPen(GColor(CHEARTRATE));
-                hrPen.setWidth(1);
-                hrPen.setStyle(Qt::DashLine);
-                referenceLine->setPen(hrPen);
-
-                yaxis.append(referencePoint->hr);
-                yaxis.append(referencePoint->hr);
-            } else if (referencePoint->cad != 0)  {
-                referenceLine = new QwtPlotCurve(tr("Cadence Ref"));
-                referenceLine->setYAxis(yLeft);
-                QPen cadPen = QPen(GColor(CCADENCE));
-                cadPen.setWidth(1);
-                cadPen.setStyle(Qt::DashLine);
-                referenceLine->setPen(cadPen);
-
-                yaxis.append(referencePoint->cad);
-                yaxis.append(referencePoint->cad);
-            }
-
-            referenceLine->setData(xaxis,yaxis);
-            referenceLine->attach(this);
-            referenceLine->setVisible(true);
+            QwtPlotCurve *referenceLine = plotReferenceLine(referencePoint);
             referenceLines.append(referenceLine);
         }
     }
+}
+
+QwtPlotCurve*
+AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
+{
+    QwtPlotCurve *referenceLine;
+
+    QVector<double> xaxis;
+    QVector<double> yaxis;
+    if (bydist) {
+        xaxis.append(referencePlot == NULL ? smoothDistance.first() : referencePlot->smoothDistance.first());
+        xaxis.append(referencePlot == NULL ? smoothDistance.last() : referencePlot->smoothDistance.last());
+
+    } else {
+        xaxis.append(referencePlot == NULL ? smoothTime.first() : referencePlot->smoothTime.first());
+        xaxis.append(referencePlot == NULL ? smoothTime.last() : referencePlot->smoothTime.last());
+    }
+
+    if (referencePoint->watts != 0)  {
+        referenceLine = new QwtPlotCurve(tr("Power Ref"));
+        referenceLine->setYAxis(yLeft);
+        QPen wattsPen = QPen(GColor(CPOWER));
+        wattsPen.setWidth(2);
+        wattsPen.setStyle(Qt::DashLine);
+        referenceLine->setPen(wattsPen);
+
+        yaxis.append(referencePoint->watts);
+        yaxis.append(referencePoint->watts);
+    } else if (referencePoint->hr != 0)  {
+        referenceLine = new QwtPlotCurve(tr("Heart Rate Ref"));
+        referenceLine->setYAxis(yLeft);
+        QPen hrPen = QPen(GColor(CHEARTRATE));
+        hrPen.setWidth(1);
+        hrPen.setStyle(Qt::DashLine);
+        referenceLine->setPen(hrPen);
+
+        yaxis.append(referencePoint->hr);
+        yaxis.append(referencePoint->hr);
+    } else if (referencePoint->cad != 0)  {
+        referenceLine = new QwtPlotCurve(tr("Cadence Ref"));
+        referenceLine->setYAxis(yLeft);
+        QPen cadPen = QPen(GColor(CCADENCE));
+        cadPen.setWidth(1);
+        cadPen.setStyle(Qt::DashLine);
+        referenceLine->setPen(cadPen);
+
+        yaxis.append(referencePoint->cad);
+        yaxis.append(referencePoint->cad);
+    }
+
+    referenceLine->setData(xaxis,yaxis);
+    referenceLine->attach(this);
+    referenceLine->setVisible(true);
+
+    return referenceLine;
 }
 
 
@@ -1877,4 +1888,82 @@ AllPlot::nextStep( int& step )
     {
         step += 1000;
     }
+}
+
+bool
+AllPlot::eventFilter(QObject *obj, QEvent *event)
+{
+    int axis = -1;
+    if (obj == axisWidget(QwtPlot::yLeft))
+        axis=QwtPlot::yLeft;
+    if (obj == axisWidget(QwtPlot::yLeft1))
+        axis=QwtPlot::yLeft1;
+
+    if (axis>-1 && event->type() == QEvent::MouseButtonDblClick) {
+        QMouseEvent *m = static_cast<QMouseEvent*>(event);
+        confirmTmpReference(invTransform(axis, m->y()), axis);
+    }
+    if (axis>-1 && event->type() == QEvent::MouseMove) {
+        QMouseEvent *m = static_cast<QMouseEvent*>(event);
+        plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y());
+    }
+    if (axis>-1 && event->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent *m = static_cast<QMouseEvent*>(event);
+        if (m->x()>axisWidget(axis)->width()) {
+            confirmTmpReference(invTransform(axis, m->y()),axis);
+        }
+        else  {
+            plotTmpReference(axis, 0, 0); //unplot
+        }
+    }
+}
+
+void
+AllPlot::plotTmpReference(int axis, int x, int y)
+{
+    if (x>0) {
+        RideFilePoint *refPoint = new RideFilePoint();
+        refPoint->watts = invTransform(axis, y);
+
+        foreach(QwtPlotCurve *curve, tmpReferenceLines) {
+            curve->detach();
+            delete curve;
+        }
+        tmpReferenceLines.clear();
+
+        tmpReferenceLines.append(parent->allPlot->plotReferenceLine(refPoint));
+        parent->allPlot->replot();
+        foreach(AllPlot *plot, parent->allPlots) {
+            tmpReferenceLines.append(plot->plotReferenceLine(refPoint));
+            plot->replot();
+        }
+    } else  {
+        foreach(QwtPlotCurve *curve, tmpReferenceLines) {
+            curve->detach();
+            delete curve;
+        }
+        tmpReferenceLines.clear();
+        parent->allPlot->replot();
+        foreach(AllPlot *plot, parent->allPlots) {
+            plot->replot();
+        }
+    }
+}
+
+void
+AllPlot::refreshReferenceLinesForAllPlots()
+{
+    parent->allPlot->refreshReferenceLines();
+    foreach(AllPlot *plot, parent->allPlots) {
+        plot->refreshReferenceLines();
+    }
+}
+
+void
+AllPlot::confirmTmpReference(double value, int axis)
+{
+    ReferenceLineDialog *p = new ReferenceLineDialog(this, context);
+    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+    p->setValueForAxis(value, axis);
+    p->exec();
 }

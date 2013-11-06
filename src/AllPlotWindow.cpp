@@ -35,6 +35,7 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
+#include <qwt_scale_widget.h>
 #include <qwt_arrow_button.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -216,6 +217,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlot = new AllPlot(this, context);
     allPlot->setInstanceName("allPlot");
     allPlot->setContentsMargins(0,0,0,0);
+    //allPlot->axisWidget(QwtPlot::yLeft)->installEventFilter(this);
 
     // sort out default values
     smoothSlider->setValue(allPlot->smooth);
