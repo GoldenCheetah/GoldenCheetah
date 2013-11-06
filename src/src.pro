@@ -338,6 +338,7 @@ HEADERS += \
         RealtimeData.h \
         RealtimePlotWindow.h \
         RealtimeController.h \
+        ReferenceLineDialog.h \
         ComputrainerController.h \
         RealtimePlot.h \
         RideEditor.h \
@@ -532,6 +533,7 @@ SOURCES += \
         ComputrainerController.cpp \
         RealtimePlot.cpp \
         RealtimePlotWindow.cpp \
+        ReferenceLineDialog.cpp \
         RideEditor.cpp \
         RideFile.cpp \
         RideFileCache.cpp \

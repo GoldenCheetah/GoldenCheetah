@@ -37,6 +37,7 @@ class AllPlotBackground;
 class AllPlotZoneLabel;
 class AllPlotWindow;
 class AllPlot;
+class RideFilePoint;
 class IntervalItem;
 class IntervalPlotData;
 class Context;
@@ -53,6 +54,8 @@ class AllPlot : public QwtPlot
 
         AllPlot(AllPlotWindow *parent, Context *context);
 
+        bool eventFilter(QObject *object, QEvent *e);
+
         // set the curve data e.g. when a ride is selected
         void setDataFromRide(RideItem *_rideItem);
         void setDataFromPlot(AllPlot *plot, int startidx, int stopidx);
@@ -67,12 +70,17 @@ class AllPlot : public QwtPlot
         void refreshIntervalMarkers();
         void refreshCalibrationMarkers();
         void refreshReferenceLines();
+        void refreshReferenceLinesForAllPlots();
         void setAxisTitle(int axis, QString label);
 
         // refresh data / plot parameters
         void recalc();
         void setYMax();
         void setXTitle();
+
+        void plotTmpReference(int axis, int x, int y);
+        void confirmTmpReference(double value, int axis);
+        QwtPlotCurve* plotReferenceLine(const RideFilePoint *referencePoint);
 
     public slots:
 
@@ -142,6 +150,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QList <AllPlotZoneLabel *> zoneLabels;
         QVector<QwtPlotCurve*> referenceLines;
+        QVector<QwtPlotCurve*> tmpReferenceLines;
 
         // source data
         QVector<double> hrArray;
