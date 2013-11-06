@@ -43,6 +43,7 @@ Leaf *root; // root node for parsed statement
 static RideFile::SeriesType nameToSeries(QString name)
 {
     if (!name.compare("power", Qt::CaseInsensitive)) return RideFile::watts;
+    if (!name.compare("apower", Qt::CaseInsensitive)) return RideFile::aPower;
     if (!name.compare("cadence", Qt::CaseInsensitive)) return RideFile::cad;
     if (!name.compare("hr", Qt::CaseInsensitive)) return RideFile::hr;
     if (!name.compare("speed", Qt::CaseInsensitive)) return RideFile::kph;
@@ -145,7 +146,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     case Leaf::Function :
         {
             // is the symbol valid?
-            QRegExp bestValidSymbols("^(power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
+            QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|np|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
             QString symbol = *(leaf->series->lvalue.n); 
 

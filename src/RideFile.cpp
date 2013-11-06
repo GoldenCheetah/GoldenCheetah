@@ -586,6 +586,7 @@ RideFile::isDataPresent(SeriesType series)
         case kph : return dataPresent.kph; break;
         case nm : return dataPresent.nm; break;
         case watts : return dataPresent.watts; break;
+        case aPower : return dataPresent.apower; break;
         case alt : return dataPresent.alt; break;
         case lon : return dataPresent.lon; break;
         case lat : return dataPresent.lat; break;

@@ -171,6 +171,10 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             setAxisTitle(yLeft, tr("Normalized Power (watts)"));
             break;
 
+        case RideFile::aPower:
+            setAxisTitle(yLeft, tr("Altitude Power (watts)"));
+            break;
+
         case RideFile::xPower:
             setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
             break;
@@ -355,7 +359,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     else
         curve_title.sprintf("CP=%.0f w; W'=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
 #endif
-    if (series == RideFile::watts || series == RideFile::wattsKg) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
+    if (series == RideFile::watts || series == RideFile::aPower || series == RideFile::wattsKg) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
 
     if (series == RideFile::wattsKg)
         curveTitle.setYValue(0.6);
@@ -556,7 +560,7 @@ CpintPlot::calculate(RideItem *rideItem)
     //
     // PLOT MODEL CURVE (DERIVED)
     //
-    if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts  || series == RideFile::wattsKg || series == RideFile::none) {
+    if (series == RideFile::aPower || series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts  || series == RideFile::wattsKg || series == RideFile::none) {
 
         if (bests->meanMaxArray(series).size() > 1) {
             // calculate CP model from all-time best data
@@ -567,7 +571,7 @@ CpintPlot::calculate(RideItem *rideItem)
         //
         // CP curve only relevant for Energy or Watts (?)
         //
-        if (series == RideFile::watts || series == RideFile::wattsKg || series == RideFile::none) {
+        if (series == RideFile::aPower || series == RideFile::watts || series == RideFile::wattsKg || series == RideFile::none) {
             if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
             else {
                 // make sure color reflects latest config

@@ -361,6 +361,7 @@ CriticalPowerWindow::updateCpint(double minutes)
             break;
 
         default:
+        case RideFile::aPower:
         case RideFile::watts:
             units = "Watts";
             break;
@@ -436,6 +437,7 @@ void CriticalPowerWindow::addSeries()
                << RideFile::cad
                << RideFile::nm
                << RideFile::vam
+               << RideFile::aPower
                << RideFile::none; // this shows energy (hack)
 
     foreach (RideFile::SeriesType x, seriesList) {
