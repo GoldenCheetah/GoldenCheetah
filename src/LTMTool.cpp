@@ -956,6 +956,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     seriesList << RideFile::watts
                << RideFile::wattsKg
                << RideFile::xPower
+               << RideFile::aPower
                << RideFile::NP
                << RideFile::hr
                << RideFile::kph
