@@ -189,11 +189,11 @@ class PowerHist : public QwtPlot
         RideFileCache *cache;
 
         // storage for data counts
-        QVector<unsigned int> wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
+        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
                               hrZoneArray, kphArray, cadArray, metricArray;
 
         // storage for data counts in interval selected
-        QVector<unsigned int> wattsSelectedArray, wattsZoneSelectedArray,
+        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray, wattsZoneSelectedArray,
                               wattsKgSelectedArray,
                               nmSelectedArray, hrSelectedArray,
                               hrZoneSelectedArray, kphSelectedArray,

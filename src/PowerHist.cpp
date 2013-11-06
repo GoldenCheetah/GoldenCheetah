@@ -125,6 +125,7 @@ PowerHist::configChanged()
 
         switch (series) {
         case RideFile::watts:
+        case RideFile::aPower:
         case RideFile::wattsKg:
             pen.setColor(GColor(CPOWER).darker(200));
             brush_color = GColor(CPOWER);
@@ -323,6 +324,12 @@ PowerHist::recalc(bool force)
         array = &wattsZoneArray;
         arrayLength = wattsZoneArray.size();
         selectedArray = &wattsZoneSelectedArray;
+
+    } else if (series == RideFile::aPower && zoned == false) {
+
+        array = &aPowerArray;
+        arrayLength = aPowerArray.size();
+        selectedArray = &aPowerSelectedArray;
 
     } else if (series == RideFile::wattsKg && zoned == false) {
 
@@ -578,6 +585,7 @@ PowerHist::setData(RideFileCache *cache)
     wattsArray.resize(0);
     wattsZoneArray.resize(10);
     wattsKgArray.resize(0);
+    aPowerArray.resize(0);
     nmArray.resize(0);
     hrArray.resize(0);
     hrZoneArray.resize(10);
@@ -590,6 +598,7 @@ PowerHist::setData(RideFileCache *cache)
     wattsSelectedArray.resize(0);
     wattsZoneSelectedArray.resize(0);
     wattsKgSelectedArray.resize(0);
+    aPowerSelectedArray.resize(0);
     nmSelectedArray.resize(0);
     hrSelectedArray.resize(0);
     hrZoneSelectedArray.resize(0);
@@ -598,6 +607,7 @@ PowerHist::setData(RideFileCache *cache)
 
     longFromDouble(wattsArray, cache->distributionArray(RideFile::watts));
     longFromDouble(wattsKgArray, cache->distributionArray(RideFile::wattsKg));
+    longFromDouble(aPowerArray, cache->distributionArray(RideFile::aPower));
     longFromDouble(hrArray, cache->distributionArray(RideFile::hr));
     longFromDouble(nmArray, cache->distributionArray(RideFile::nm));
     longFromDouble(cadArray, cache->distributionArray(RideFile::cad));
@@ -783,6 +793,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                    (series == RideFile::nm && ride->areDataPresent()->nm) ||
                    (series == RideFile::kph && ride->areDataPresent()->kph) ||
                    (series == RideFile::cad && ride->areDataPresent()->cad) ||
+                   (series == RideFile::aPower && ride->areDataPresent()->apower) ||
                    (series == RideFile::hr && ride->areDataPresent()->hr);
 
     if (ride && hasData) {
@@ -796,6 +807,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         wattsArray.resize(0);
         wattsZoneArray.resize(0);
         wattsKgArray.resize(0);
+        aPowerArray.resize(0);
         nmArray.resize(0);
         hrArray.resize(0);
         hrZoneArray.resize(0);
@@ -805,6 +817,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         wattsSelectedArray.resize(0);
         wattsZoneSelectedArray.resize(0);
         wattsKgSelectedArray.resize(0);
+        aPowerSelectedArray.resize(0);
         nmSelectedArray.resize(0);
         hrSelectedArray.resize(0);
         hrZoneSelectedArray.resize(0);
@@ -850,6 +863,20 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                             wattsZoneSelectedArray.resize(wattsIndex + 1);
                         wattsZoneSelectedArray[wattsIndex]++;
                     }
+                }
+            }
+
+            // aPower array
+            int aPowerIndex = int(floor(p1->apower / wattsDelta));
+            if (aPowerIndex >= 0 && aPowerIndex < maxSize) {
+                if (aPowerIndex >= aPowerArray.size())
+                    aPowerArray.resize(aPowerIndex + 1);
+                aPowerArray[aPowerIndex]++;
+
+                if (selected) {
+                    if (aPowerIndex >= aPowerSelectedArray.size())
+                        aPowerSelectedArray.resize(aPowerIndex + 1);
+                    aPowerSelectedArray[aPowerIndex]++;
                 }
             }
 
@@ -1023,6 +1050,10 @@ PowerHist::setParameterAxisTitle()
             else axislabel = tr("Heartrate (bpm)");
             break;
 
+        case RideFile::aPower:
+            axislabel = tr("aPower (watts)");
+            break;
+
         case RideFile::cad:
             axislabel = tr("Cadence (rpm)");
             break;
@@ -1068,7 +1099,7 @@ PowerHist::setSeries(RideFile::SeriesType x)
 
 bool PowerHist::shadeZones() const
 {
-    return (rideItem && rideItem->ride() && (series == RideFile::watts || series == RideFile::wattsKg) && !zoned && shade == true);
+    return (rideItem && rideItem->ride() && (series == RideFile::aPower || series == RideFile::watts || series == RideFile::wattsKg) && !zoned && shade == true);
 }
 
 bool PowerHist::shadeHRZones() const

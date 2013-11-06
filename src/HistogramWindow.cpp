@@ -717,7 +717,8 @@ void HistogramWindow::addSeries()
                << RideFile::hr
                << RideFile::kph
                << RideFile::cad
-               << RideFile::nm;
+               << RideFile::nm
+               << RideFile::aPower;
 
     foreach (RideFile::SeriesType x, seriesList) 
         seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
@@ -951,6 +952,7 @@ HistogramWindow::getDelta()
             case 3: return kphDelta;
             case 4: return cadDelta;
             case 5: return nmDelta;
+            case 6: return wattsDelta; //aPower
             default: return 1;
         }
     }
@@ -978,6 +980,7 @@ HistogramWindow::getDigits()
             case  3: return kphDigits;
             case  4: return cadDigits;
             case  5: return nmDigits;
+            case  6: return wattsDigits; // aPower
             default: return 1;
         }
     }
