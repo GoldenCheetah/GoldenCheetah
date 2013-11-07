@@ -310,6 +310,10 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     wCurve = new QwtPlotCurve(tr("W' Balance (j)"));
     wCurve->setYAxis(yRight3);
 
+    mCurve = new QwtPlotCurve(tr("Matches"));
+    mCurve->setStyle(QwtPlotCurve::Dots);
+    mCurve->setYAxis(yRight3);
+
     curveTitle.attach(this);
     curveTitle.setLabelAlignment(Qt::AlignRight);
 
@@ -349,6 +353,7 @@ AllPlot::configChanged()
         xpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         apCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         wCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        mCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -420,6 +425,11 @@ AllPlot::configChanged()
     QPen wPen = QPen(GColor(CWBAL)); 
     wPen.setWidth(2); // thicken
     wCurve->setPen(wPen);
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Rect);
+    sym.setPen(QPen(QColor(255,127,0))); // orange like a match, will make configurable later
+    sym.setSize(4);
+    mCurve->setSymbol(new QwtSymbol(sym));
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
     intervalHighlighterCurve->setPen(ihlPen);
@@ -600,6 +610,7 @@ AllPlot::recalc()
         QVector<QwtIntervalSample> intData;
 
         wCurve->setData(data,data);
+        mCurve->setData(data,data);
         if (!npArray.empty())
             npCurve->setData(data, data);
         if (!xpArray.empty())
@@ -865,6 +876,7 @@ AllPlot::recalc()
 
     //W' curve set to whatever data we have
     wCurve->setData(parent->wpData->xdata().data(), parent->wpData->ydata().data(), parent->wpData->xdata().count());
+    mCurve->setData(parent->wpData->mxdata().data(), parent->wpData->mydata().data(), parent->wpData->mxdata().count());
 
     if (!wattsArray.empty()) {
         wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
@@ -1323,9 +1335,17 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
     if (showW && parent->wpData->TAU > 0) {
-        QwtText text(QString("Tau=%1, CP=%2, W'=%3").arg(parent->wpData->TAU)
+
+        // matches cost
+        double burnt=0;
+        foreach(struct Match match, parent->wpData->matches)
+            burnt += match.cost;
+
+        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches (%5 Kj)").arg(parent->wpData->TAU)
                                                     .arg(parent->wpData->CP)
-                                                    .arg(parent->wpData->WPRIME));
+                                                    .arg(parent->wpData->WPRIME)
+                                                    .arg(parent->wpData->matches.count())
+                                                    .arg(burnt/1000.00, 0, 'f', 1));
 
         text.setFont(QFont("Helvetica", 10, QFont::Bold));
         text.setColor(GColor(CWBAL));
@@ -1335,6 +1355,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
 
     wCurve->detach();
+    mCurve->detach();
     wattsCurve->detach();
     npCurve->detach();
     xpCurve->detach();
@@ -1354,6 +1375,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     xpCurve->setVisible(rideItem->ride()->areDataPresent()->xp && showXP);
     apCurve->setVisible(rideItem->ride()->areDataPresent()->apower && showAP);
     wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
+    mCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
     hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
     speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
     cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCad);
@@ -1365,6 +1387,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
     wCurve->setData(parent->wpData->xdata().data(),parent->wpData->ydata().data(),parent->wpData->xdata().count());
+    mCurve->setData(parent->wpData->mxdata().data(),parent->wpData->mydata().data(),parent->wpData->mxdata().count());
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     npCurve->setData(xaxis,smoothN,stopidx-startidx);
     xpCurve->setData(xaxis,smoothX,stopidx-startidx);
@@ -1425,6 +1448,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (parent->wpData->xdata().count()) {
         wCurve->attach(this);
+        mCurve->attach(this);
     }
     if (!plot->smoothWatts.empty()) {
         wattsCurve->attach(this);
@@ -1512,6 +1536,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
         // attach appropriate curves
         wCurve->detach();
+        mCurve->detach();
         wattsCurve->detach();
         npCurve->detach();
         xpCurve->detach();
@@ -1531,7 +1556,10 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         if (!npArray.empty()) npCurve->attach(this);
         if (!xpArray.empty()) xpCurve->attach(this);
         if (!apArray.empty()) apCurve->attach(this);
-        if (!parent->wpData->ydata().empty()) wCurve->attach(this);
+        if (!parent->wpData->ydata().empty()) {
+            wCurve->attach(this);
+            mCurve->attach(this);
+        }
         if (!hrArray.empty()) hrCurve->attach(this);
         if (!speedArray.empty()) speedCurve->attach(this);
         if (!cadArray.empty()) cadCurve->attach(this);
@@ -1544,6 +1572,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         }
 
         wCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
+        mCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         npCurve->setVisible(dataPresent->np && showNP);
         xpCurve->setVisible(dataPresent->xp && showXP);
@@ -1623,6 +1652,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         //setTitle("no data");
 
         wCurve->detach();
+        mCurve->detach();
         wattsCurve->detach();
         npCurve->detach();
         xpCurve->detach();
@@ -1755,6 +1785,7 @@ AllPlot::setShowW(bool show)
 {
     showW = show;
     wCurve->setVisible(show);
+    mCurve->setVisible(show);
     if (showW && parent->wpData->TAU > 0) {
         QwtText text(QString("tau=%1").arg(parent->wpData->TAU));
         text.setFont(QFont("Helvetica", 10, QFont::Bold));

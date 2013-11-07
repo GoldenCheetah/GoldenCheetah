@@ -156,6 +156,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *balanceLCurve;
         QwtPlotCurve *balanceRCurve;
         QwtPlotCurve *wCurve;
+        QwtPlotCurve *mCurve;
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QList <AllPlotZoneLabel *> zoneLabels;
         QVector<QwtPlotCurve*> referenceLines;
