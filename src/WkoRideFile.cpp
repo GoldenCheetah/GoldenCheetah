@@ -717,8 +717,23 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
 
         p += 44;
 
+        // gridlines in WKO+ become references in the ridefile
+        // we only support Power, but have never seen it for other
+        // series in cycling files, EVER. (>8000 files)
         p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
-        p += (us * 8); // 2 longs x number of gridlines
+        for(int j=0; j<us; j++) {
+
+            WKO_ULONG val, series;
+            p += donumber(p, &val); // value first
+            p += donumber(p, &series); // series second
+
+            // series of 0 or 1 seems to be power
+            if (val > 0 && val < 2500 && series < 2) {
+                RideFilePoint ref;
+                ref.watts = val;
+                results->appendReference(ref);
+            }
+        }
     }
 
     /* Ranges */
