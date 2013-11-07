@@ -54,16 +54,17 @@ WPrime::setRide(RideFile *input)
     // remember the ride for next time
     rideFile = input;
 
+    // reset from previous
+    values.resize(0); // the memory is kept for next time so this is efficient
+    xvalues.resize(0);
+    jvalues.resize(0);
+    xjvalues.resize(0);
+
+    minY = maxY = 0;
+    CP = WPRIME = TAU=0;
+        
     // no data or no power data then forget it.
     if (!input || input->dataPoints().count() == 0 || input->areDataPresent()->watts == false) {
-        values.resize(0); // the memory is kept for next time so this is efficient
-        xvalues.resize(0);
-
-        //XXX will need to reset metrics when they are added
-        minY = maxY = 0;
-        CP = WPRIME = TAU=0;
-        
-        //qDebug()<<"now work to do"<<time.elapsed();
         return;
     }
 
@@ -154,10 +155,26 @@ WPrime::setRide(RideFile *input)
         if (values[i] > maxY) maxY = values[i];
     }
 
-    // STEP 3: CALCULATE METRICS XXX when they are added
+    // STEP 3: FIND MATCHES
 
-    //qDebug()<<values;
-    //qDebug()<<"completed"<<time.elapsed();
+    // find peaks and troughs in W' bal curve
+    for(int i=1; i< values.size()-1; i++) {
+
+        // peaks
+        if (values[i-1] < values[i] && values[i+1] < values[i]) {
+
+            xjvalues << xvalues[i];
+            jvalues << values[i];
+
+        }
+
+        // troughs
+        if (values[i-1] > values[i] && values[i+1] > values[i]) {
+            xjvalues << xvalues[i];
+            jvalues << values[i];
+        }
+    }
+
 }
 
 //

@@ -1023,7 +1023,7 @@ AllPlot::refreshReferenceLines()
 QwtPlotCurve*
 AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
 {
-    QwtPlotCurve *referenceLine;
+    QwtPlotCurve *referenceLine = NULL;
 
     QVector<double> xaxis;
     QVector<double> yaxis;
@@ -1068,9 +1068,11 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
         yaxis.append(referencePoint->cad);
     }
 
-    referenceLine->setData(xaxis,yaxis);
-    referenceLine->attach(this);
-    referenceLine->setVisible(true);
+    if (referenceLine) {
+        referenceLine->setData(xaxis,yaxis);
+        referenceLine->attach(this);
+        referenceLine->setVisible(true);
+    }
 
     return referenceLine;
 }
@@ -2114,8 +2116,10 @@ AllPlot::plotTmpReference(int axis, int x, int y)
         refPoint->watts = invTransform(axis, y);
 
         foreach(QwtPlotCurve *curve, tmpReferenceLines) {
-            curve->detach();
-            delete curve;
+            if (curve) {
+                curve->detach();
+                delete curve;
+            }
         }
         tmpReferenceLines.clear();
 
@@ -2127,8 +2131,10 @@ AllPlot::plotTmpReference(int axis, int x, int y)
         }
     } else  {
         foreach(QwtPlotCurve *curve, tmpReferenceLines) {
-            curve->detach();
-            delete curve;
+            if (curve) {
+                curve->detach();
+                delete curve;
+            }
         }
         tmpReferenceLines.clear();
         parent->allPlot->replot();

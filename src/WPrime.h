@@ -44,6 +44,10 @@ class WPrime {
         QVector<double> &ydata() { return values; }
         QVector<double> &xdata() { return xvalues; }
 
+        // peaks and troughs
+        QVector<double> &yjdata() { return jvalues; }
+        QVector<double> &xjdata() { return xjvalues; }
+
         double minY, maxY;
         double TAU, CP, WPRIME;
 
@@ -52,5 +56,8 @@ class WPrime {
         RideFile *rideFile;          // the ride file we worked on
         QVector<double> values;      // W' time series in 1s intervals
         QVector<double> xvalues;      // W' time series in 1s intervals
+    
+        QVector<double> jvalues;      // W' time series in 1s intervals
+        QVector<double> xjvalues;      // W' time series in 1s intervals
 };
 #endif
