@@ -692,8 +692,8 @@ AllPlot::recalc()
                              (!hrArray.empty() ? hrArray[i] : 0),
                              (!wattsArray.empty() ? wattsArray[i] : 0),
                              (!npArray.empty() ? npArray[i] : 0),
-                             (!xpArray.empty() ? xpArray[i] : 0),
                              (!apArray.empty() ? apArray[i] : 0),
+                             (!xpArray.empty() ? xpArray[i] : 0),
                              (!speedArray.empty() ? speedArray[i] : 0),
                              (!cadArray.empty() ? cadArray[i] : 0),
                              (!altArray.empty() ? altArray[i] : 0),
@@ -741,8 +741,8 @@ AllPlot::recalc()
                 DataPoint &dp = list.front();
                 totalWatts -= dp.watts;
                 totalNP -= dp.np;
-                totalXP -= dp.xp;
                 totalAP -= dp.ap;
+                totalXP -= dp.xp;
                 totalHr    -= dp.hr;
                 totalSpeed -= dp.speed;
                 totalCad   -= dp.cad;
