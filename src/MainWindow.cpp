@@ -775,6 +775,9 @@ void
 MainWindow::showOptions()
 {
     ConfigDialog *cd = new ConfigDialog(context->athlete->home, context->athlete->zones_, context);
+
+    // move to the centre of the screen
+    cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
     cd->show();
 }
 
