@@ -39,6 +39,9 @@ const double WprimeMultConst = 1.0;
 const int WprimeDecayPeriod = 1200; // 1200 seconds or 20 minutes
 const double E = 2.71828183;
 
+const int WprimeMatchSmoothing = 25; // 25 sec smoothing looking for matches
+const int WprimeMatchMinJoules = 1000; // anything under 200 joules and you weren't trying ;)
+
 WPrime::WPrime()
 {
     // XXX will need to reset metrics when they are added
@@ -57,8 +60,6 @@ WPrime::setRide(RideFile *input)
     // reset from previous
     values.resize(0); // the memory is kept for next time so this is efficient
     xvalues.resize(0);
-    jvalues.resize(0);
-    xjvalues.resize(0);
 
     minY = maxY = 0;
     CP = WPRIME = TAU=0;
@@ -157,24 +158,77 @@ WPrime::setRide(RideFile *input)
 
     // STEP 3: FIND MATCHES
 
-    // find peaks and troughs in W' bal curve
-    for(int i=1; i< values.size()-1; i++) {
+    // SMOOTH DATA SERIES 
 
-        // peaks
-        if (values[i-1] < values[i] && values[i+1] < values[i]) {
+    // get raw data adjusted to 1s intervals (as before)
+    QVector<int> smoothArray(last+1);
+    QVector<int> rawArray(last+1);
+    for (int i=0; i<last; i++) {
+        smoothArray[i] = smoothed.value(i);
+        rawArray[i] = smoothed.value(i);
+    }
+    
+    // initialise rolling average
+    double rtot = 0;
+    for (int i=WprimeMatchSmoothing; i>0 && last-i >=0; i--) {
+        rtot += smoothArray[last-i];
+    }
 
-            xjvalues << xvalues[i];
-            jvalues << values[i];
+    // now run backwards setting the rolling average
+    for (int i=last; i>=WprimeMatchSmoothing; i--) {
+        int here = smoothArray[i];
+        smoothArray[i] = rtot / WprimeMatchSmoothing;
+        rtot -= here;
+        rtot += smoothArray[i-WprimeMatchSmoothing];
+    }
 
+    // FIND MATCHES -- INTERVALS WHERE POWER > CP 
+    //                 AND W' DEPLETED BY > WprimeMatchMinJoules
+    bool inmatch=false;
+    matches.clear();
+    mvalues.clear();
+    mxvalues.clear();
+    for(int i=0; i<last; i++) {
+
+        Match match;
+
+        if (!inmatch && (smoothArray[i] >= CP || rawArray[i] >= CP)) {
+            inmatch=true;
+            match.start=i;
         }
 
-        // troughs
-        if (values[i-1] > values[i] && values[i+1] > values[i]) {
-            xjvalues << xvalues[i];
-            jvalues << values[i];
+        if (inmatch && (smoothArray[i] < CP && rawArray[i] < CP)) {
+
+            // lets work backwards as we're at the end
+            // we only care about raw data to avoid smoothing
+            // artefacts
+            int end=i-1;
+            while (end > match.start && rawArray[end] < CP) {
+                end--;
+            }
+
+            if (end > match.start) {
+
+                match.stop = end;
+                match.secs = (match.stop-match.start) +1; // don't fencepost!
+                match.cost = values[match.start] - values[match.stop];
+
+                if (match.cost >= WprimeMatchMinJoules) {
+                    matches << match;
+                }
+            }
+            inmatch=false;
         }
     }
 
+    // SET MATCH SERIES FOR ALLPLOT CHART
+    foreach (struct Match match, matches) {
+
+        mvalues << values[match.start];
+        mxvalues << xvalues[match.start];
+        mvalues << values[match.stop];
+        mxvalues << xvalues[match.stop];
+    }
 }
 
 //

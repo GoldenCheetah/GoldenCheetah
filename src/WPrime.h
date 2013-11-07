@@ -28,6 +28,11 @@
 #include <qwt_spline.h> // smoothing
 #include <math.h>
 
+struct Match {
+    int start, stop, secs;       // all in whole seconds
+    int cost;                   // W' depletion
+};
+
 class WPrime {
 
 
@@ -44,12 +49,13 @@ class WPrime {
         QVector<double> &ydata() { return values; }
         QVector<double> &xdata() { return xvalues; }
 
-        // peaks and troughs
-        QVector<double> &yjdata() { return jvalues; }
-        QVector<double> &xjdata() { return xjvalues; }
+        QVector<double> &mydata() { return mvalues; }
+        QVector<double> &mxdata() { return mxvalues; }
 
         double minY, maxY;
         double TAU, CP, WPRIME;
+
+        QList<Match> matches;       // matches burned with associated cost
 
     private:
 
@@ -57,7 +63,8 @@ class WPrime {
         QVector<double> values;      // W' time series in 1s intervals
         QVector<double> xvalues;      // W' time series in 1s intervals
     
-        QVector<double> jvalues;      // W' time series in 1s intervals
-        QVector<double> xjvalues;      // W' time series in 1s intervals
+        QVector<double> mvalues;      // W' time series in 1s intervals
+        QVector<double> mxvalues;      // W' time series in 1s intervals
 };
+
 #endif
