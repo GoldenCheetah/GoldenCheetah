@@ -417,7 +417,7 @@ AllPlot::configChanged()
     QColor blbrush_color = GColor(CBALANCELEFT);
     blbrush_color.setAlpha(200);
     balanceRCurve->setBrush(blbrush_color);   // fill below the line
-    QPen wPen = QPen(Qt::red);
+    QPen wPen = QPen(GColor(CWBAL)); 
     wPen.setWidth(2); // thicken
     wCurve->setPen(wPen);
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
@@ -529,8 +529,8 @@ AllPlot::configChanged()
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yRight3, sd);
-    pal.setColor(QPalette::WindowText, Qt::red);
-    pal.setColor(QPalette::Text, Qt::red);
+    pal.setColor(QPalette::WindowText, GColor(CWBAL));
+    pal.setColor(QPalette::Text, GColor(CWBAL));
     axisWidget(QwtPlot::yRight3)->setPalette(pal);
 }
 
@@ -1328,7 +1328,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
                                                     .arg(parent->wpData->WPRIME));
 
         text.setFont(QFont("Helvetica", 10, QFont::Bold));
-        text.setColor(Qt::red);
+        text.setColor(GColor(CWBAL));
         curveTitle.setLabel(text);
     } else {
         curveTitle.setLabel(QwtText(""));
@@ -1758,7 +1758,7 @@ AllPlot::setShowW(bool show)
     if (showW && parent->wpData->TAU > 0) {
         QwtText text(QString("tau=%1").arg(parent->wpData->TAU));
         text.setFont(QFont("Helvetica", 10, QFont::Bold));
-        text.setColor(Qt::red);
+        text.setColor(GColor(CWBAL));
         curveTitle.setLabel(text);
     } else {
         curveTitle.setLabel(QwtText(""));

@@ -113,6 +113,7 @@ void GCColor::setupColors()
         { tr("Alternate Power"), "CALTPOWER", Qt::magenta },
         { tr("Left Balance"), "CBALANCELEFT", QColor(178,0,0) },
         { tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
+        { tr("W' Balance"), "CWBAL", Qt::red },
         { "", "", QColor(0,0,0) },
     };
 
