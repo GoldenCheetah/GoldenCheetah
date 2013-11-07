@@ -177,6 +177,18 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showTorque->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showTorque);
 
+    showNP = new QCheckBox(tr("Normalized Power"), this);
+    showNP->setCheckState(Qt::Unchecked);
+    cl2->addRow(new QLabel(""), showNP);
+
+    showXP = new QCheckBox(tr("Skiba xPower"), this);
+    showXP->setCheckState(Qt::Unchecked);
+    cl2->addRow(new QLabel(""), showXP);
+
+    showAP = new QCheckBox(tr("Altitude Power"), this);
+    showAP->setCheckState(Qt::Unchecked);
+    cl2->addRow(new QLabel(""), showAP);
+
     showW = new QCheckBox(tr("W' balance"), this);
     showW->setCheckState(Qt::Unchecked);
     cl2->addRow(new QLabel(""), showW);
@@ -411,6 +423,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     // common controls
     connect(showPower, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowPower(int)));
+    connect(showNP, SIGNAL(stateChanged(int)), this, SLOT(setShowNP(int)));
+    connect(showXP, SIGNAL(stateChanged(int)), this, SLOT(setShowXP(int)));
+    connect(showAP, SIGNAL(stateChanged(int)), this, SLOT(setShowAP(int)));
     connect(showHr, SIGNAL(stateChanged(int)), this, SLOT(setShowHr(int)));
     connect(showSpeed, SIGNAL(stateChanged(int)), this, SLOT(setShowSpeed(int)));
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
@@ -1233,6 +1248,54 @@ AllPlotWindow::setShowHr(int value)
     allPlot->setShowHr(checked);
     foreach (AllPlot *plot, allPlots)
         plot->setShowHr(checked);
+}
+
+void
+AllPlotWindow::setShowNP(int value)
+{
+    showNP->setChecked(value);
+
+    //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showNP->isEnabled()) ? true : false;
+
+    // recalc only does it if it needs to
+    if (value && current && current->ride()) current->ride()->recalculateDerivedSeries();
+
+    allPlot->setShowNP(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowNP(checked);
+}
+
+void
+AllPlotWindow::setShowXP(int value)
+{
+    showXP->setChecked(value);
+
+    //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showXP->isEnabled()) ? true : false;
+
+    // recalc only does it if it needs to
+    if (value && current && current->ride()) current->ride()->recalculateDerivedSeries();
+
+    allPlot->setShowXP(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowXP(checked);
+}
+
+void
+AllPlotWindow::setShowAP(int value)
+{
+    showAP->setChecked(value);
+
+    //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showAP->isEnabled()) ? true : false;
+
+    // recalc only does it if it needs to
+    if (value && current && current->ride()) current->ride()->recalculateDerivedSeries();
+
+    allPlot->setShowAP(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowAP(checked);
 }
 
 void

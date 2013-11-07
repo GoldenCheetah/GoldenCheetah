@@ -230,6 +230,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     rideItem(NULL),
     shade_zones(true),
     showPowerState(3),
+    showNP(false),
+    showXP(false),
+    showAP(false),
     showHr(true),
     showSpeed(true),
     showCad(true),
@@ -263,6 +266,15 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
 
     wattsCurve = new QwtPlotCurve(tr("Power"));
     wattsCurve->setYAxis(yLeft);
+
+    npCurve = new QwtPlotCurve(tr("NP"));
+    npCurve->setYAxis(yLeft);
+
+    xpCurve = new QwtPlotCurve(tr("xPower"));
+    xpCurve->setYAxis(yLeft);
+
+    apCurve = new QwtPlotCurve(tr("aPower"));
+    apCurve->setYAxis(yLeft);
 
     hrCurve = new QwtPlotCurve(tr("Heart Rate"));
     hrCurve->setYAxis(yLeft2);
@@ -333,6 +345,9 @@ AllPlot::configChanged()
 
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) {
         wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        npCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        xpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        apCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         wCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -350,6 +365,15 @@ AllPlot::configChanged()
     QPen wattsPen = QPen(GColor(CPOWER));
     wattsPen.setWidth(width);
     wattsCurve->setPen(wattsPen);
+    QPen npPen = QPen(GColor(CNPOWER));
+    npPen.setWidth(width);
+    npCurve->setPen(npPen);
+    QPen xpPen = QPen(GColor(CXPOWER));
+    xpPen.setWidth(width);
+    xpCurve->setPen(xpPen);
+    QPen apPen = QPen(GColor(CAPOWER));
+    apPen.setWidth(width);
+    apCurve->setPen(apPen);
     QPen hrPen = QPen(GColor(CHEARTRATE));
     hrPen.setWidth(width);
     hrCurve->setPen(hrPen);
@@ -414,6 +438,18 @@ AllPlot::configChanged()
         p.setAlpha(64);
         wattsCurve->setBrush(QBrush(p));
 
+        p = npCurve->pen().color();
+        p.setAlpha(64);
+        npCurve->setBrush(QBrush(p));
+
+        p = xpCurve->pen().color();
+        p.setAlpha(64);
+        xpCurve->setBrush(QBrush(p));
+
+        p = apCurve->pen().color();
+        p.setAlpha(64);
+        apCurve->setBrush(QBrush(p));
+
         p = wCurve->pen().color();
         p.setAlpha(64);
         wCurve->setBrush(QBrush(p));
@@ -443,6 +479,9 @@ AllPlot::configChanged()
         balanceRCurve->setBrush(QBrush(p));*/
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
+        npCurve->setBrush(Qt::NoBrush);
+        xpCurve->setBrush(Qt::NoBrush);
+        apCurve->setBrush(Qt::NoBrush);
         wCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
@@ -496,9 +535,9 @@ AllPlot::configChanged()
 }
 
 struct DataPoint {
-    double time, hr, watts, speed, cad, alt, temp, wind, torque, lrbalance;
-    DataPoint(double t, double h, double w, double s, double c, double a, double te, double wi, double tq, double lrb) :
-        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb) {}
+    double time, hr, watts, np, ap, xp, speed, cad, alt, temp, wind, torque, lrbalance;
+    DataPoint(double t, double h, double w, double n, double l, double x, double s, double c, double a, double te, double wi, double tq, double lrb) :
+        time(t), hr(h), watts(w), np(n), ap(l), xp(x), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -561,6 +600,12 @@ AllPlot::recalc()
         QVector<QwtIntervalSample> intData;
 
         wCurve->setData(data,data);
+        if (!npArray.empty())
+            npCurve->setData(data, data);
+        if (!xpArray.empty())
+            xpCurve->setData(data, data);
+        if (!apArray.empty())
+            apCurve->setData(data, data);
         if (!wattsArray.empty())
             wattsCurve->setData(data, data);
         if (!hrArray.empty())
@@ -588,6 +633,9 @@ AllPlot::recalc()
     if (smooth > rideItem->ride()->recIntSecs()) {
 
         double totalWatts = 0.0;
+        double totalNP = 0.0;
+        double totalXP = 0.0;
+        double totalAP = 0.0;
         double totalHr = 0.0;
         double totalSpeed = 0.0;
         double totalCad = 0.0;
@@ -601,6 +649,9 @@ AllPlot::recalc()
         QList<DataPoint> list;
 
         smoothWatts.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+        smoothNP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+        smoothXP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+        smoothAP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         smoothHr.resize(rideTimeSecs + 1);
         smoothSpeed.resize(rideTimeSecs + 1);
         smoothCad.resize(rideTimeSecs + 1);
@@ -617,6 +668,9 @@ AllPlot::recalc()
         for (int secs = 0; ((secs < smooth)
                             && (secs < rideTimeSecs)); ++secs) {
             smoothWatts[secs] = 0.0;
+            smoothNP[secs] = 0.0;
+            smoothXP[secs] = 0.0;
+            smoothAP[secs] = 0.0;
             smoothHr[secs]    = 0.0;
             smoothSpeed[secs] = 0.0;
             smoothCad[secs]   = 0.0;
@@ -637,6 +691,9 @@ AllPlot::recalc()
                 DataPoint dp(timeArray[i],
                              (!hrArray.empty() ? hrArray[i] : 0),
                              (!wattsArray.empty() ? wattsArray[i] : 0),
+                             (!npArray.empty() ? npArray[i] : 0),
+                             (!xpArray.empty() ? xpArray[i] : 0),
+                             (!apArray.empty() ? apArray[i] : 0),
                              (!speedArray.empty() ? speedArray[i] : 0),
                              (!cadArray.empty() ? cadArray[i] : 0),
                              (!altArray.empty() ? altArray[i] : 0),
@@ -646,6 +703,12 @@ AllPlot::recalc()
                              (!balanceArray.empty() ? balanceArray[i] : 0));
                 if (!wattsArray.empty())
                     totalWatts += wattsArray[i];
+                if (!npArray.empty())
+                    totalNP += npArray[i];
+                if (!xpArray.empty())
+                    totalXP += xpArray[i];
+                if (!apArray.empty())
+                    totalAP += apArray[i];
                 if (!hrArray.empty())
                     totalHr    += hrArray[i];
                 if (!speedArray.empty())
@@ -677,6 +740,9 @@ AllPlot::recalc()
             while (!list.empty() && (list.front().time < secs - smooth)) {
                 DataPoint &dp = list.front();
                 totalWatts -= dp.watts;
+                totalNP -= dp.np;
+                totalXP -= dp.xp;
+                totalAP -= dp.ap;
                 totalHr    -= dp.hr;
                 totalSpeed -= dp.speed;
                 totalCad   -= dp.cad;
@@ -691,6 +757,9 @@ AllPlot::recalc()
             // seconds represented by each point...
             if (list.empty()) {
                 smoothWatts[secs] = 0.0;
+                smoothNP[secs] = 0.0;
+                smoothXP[secs] = 0.0;
+                smoothAP[secs] = 0.0;
                 smoothHr[secs]    = 0.0;
                 smoothSpeed[secs] = 0.0;
                 smoothCad[secs]   = 0.0;
@@ -704,6 +773,9 @@ AllPlot::recalc()
             }
             else {
                 smoothWatts[secs]    = totalWatts / list.size();
+                smoothNP[secs]    = totalNP / list.size();
+                smoothXP[secs]    = totalXP / list.size();
+                smoothAP[secs]    = totalAP / list.size();
                 smoothHr[secs]       = totalHr / list.size();
                 smoothSpeed[secs]    = totalSpeed / list.size();
                 smoothCad[secs]      = totalCad / list.size();
@@ -734,6 +806,9 @@ AllPlot::recalc()
 
         // no smoothing .. just raw data
         smoothWatts.resize(0);
+        smoothNP.resize(0);
+        smoothXP.resize(0);
+        smoothAP.resize(0);
         smoothHr.resize(0);
         smoothSpeed.resize(0);
         smoothCad.resize(0);
@@ -749,6 +824,9 @@ AllPlot::recalc()
 
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             smoothWatts.append(dp->watts);
+            smoothNP.append(dp->np);
+            smoothXP.append(dp->xp);
+            smoothAP.append(dp->apower);
             smoothHr.append(dp->hr);
             smoothSpeed.append(context->athlete->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
             smoothCad.append(dp->cad);
@@ -791,40 +869,63 @@ AllPlot::recalc()
     if (!wattsArray.empty()) {
         wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft);
+    }
 
-    } if (!hrArray.empty()) {
+    if (!npArray.empty()) {
+        npCurve->setData(xaxis.data() + startingIndex, smoothNP.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+
+    if (!xpArray.empty()) {
+        xpCurve->setData(xaxis.data() + startingIndex, smoothXP.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+
+    if (!apArray.empty()) {
+        apCurve->setData(xaxis.data() + startingIndex, smoothAP.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+
+    if (!hrArray.empty()) {
         hrCurve->setData(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft2);
+    }
 
-    } if (!speedArray.empty()) {
+    if (!speedArray.empty()) {
         speedCurve->setData(xaxis.data() + startingIndex, smoothSpeed.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight);
+    }
 
-    } if (!cadArray.empty()) {
+    if (!cadArray.empty()) {
         cadCurve->setData(xaxis.data() + startingIndex, smoothCad.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft2);
+    }
 
-    } if (!altArray.empty()) {
+    if (!altArray.empty()) {
         altCurve->setData(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight2);
+    }
 
-    } if (!tempArray.empty()) {
+    if (!tempArray.empty()) {
         tempCurve->setData(xaxis.data() + startingIndex, smoothTemp.data() + startingIndex, totalPoints);
         if (context->athlete->useMetricUnits)
             intervalHighlighterCurve->setYAxis(yRight);
         else
             intervalHighlighterCurve->setYAxis(yLeft2);
+    }
 
 
-    } if (!windArray.empty()) {
+    if (!windArray.empty()) {
         windCurve->setData(new QwtIntervalSeriesData(smoothRelSpeed));
         intervalHighlighterCurve->setYAxis(yRight);
+    }
 
-    } if (!torqueArray.empty()) {
+    if (!torqueArray.empty()) {
         torqueCurve->setData(xaxis.data() + startingIndex, smoothTorque.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight);
+    }
 
-    } if (!balanceArray.empty()) {
+    if (!balanceArray.empty()) {
         balanceLCurve->setData(xaxis.data() + startingIndex, smoothBalanceL.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft2);
         balanceRCurve->setData(xaxis.data() + startingIndex, smoothBalanceR.data() + startingIndex, totalPoints);
@@ -1147,7 +1248,7 @@ AllPlot::setYMax()
         altCurve->setBaseline(ymin);
     }
 
-    enableAxis(yLeft, wattsCurve->isVisible());
+    enableAxis(yLeft, wattsCurve->isVisible() || npCurve->isVisible() || xpCurve->isVisible() || apCurve->isVisible());
     enableAxis(yLeft2, hrCurve->isVisible() || cadCurve->isVisible());
     enableAxis(yRight, speedCurve->isVisible());
     enableAxis(yRight2, altCurve->isVisible());
@@ -1198,6 +1299,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (startidx > stopidx || startidx < 0 || stopidx < 0) return;
 
     double *smoothW = &plot->smoothWatts[startidx];
+    double *smoothN = &plot->smoothNP[startidx];
+    double *smoothX = &plot->smoothXP[startidx];
+    double *smoothL = &plot->smoothAP[startidx];
     double *smoothT = &plot->smoothTime[startidx];
     double *smoothHR = &plot->smoothHr[startidx];
     double *smoothS = &plot->smoothSpeed[startidx];
@@ -1230,6 +1334,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     wCurve->detach();
     wattsCurve->detach();
+    npCurve->detach();
+    xpCurve->detach();
+    apCurve->detach();
     hrCurve->detach();
     speedCurve->detach();
     cadCurve->detach();
@@ -1241,6 +1348,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     balanceRCurve->detach();
 
     wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
+    npCurve->setVisible(rideItem->ride()->areDataPresent()->np && showNP);
+    xpCurve->setVisible(rideItem->ride()->areDataPresent()->xp && showXP);
+    apCurve->setVisible(rideItem->ride()->areDataPresent()->apower && showAP);
     wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
     hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
     speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
@@ -1254,6 +1364,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     wCurve->setData(parent->wpData->xdata().data(),parent->wpData->ydata().data(),parent->wpData->xdata().count());
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
+    npCurve->setData(xaxis,smoothN,stopidx-startidx);
+    xpCurve->setData(xaxis,smoothX,stopidx-startidx);
+    apCurve->setData(xaxis,smoothL,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
     speedCurve->setData(xaxis, smoothS, stopidx-startidx);
     cadCurve->setData(xaxis, smoothC, stopidx-startidx);
@@ -1288,6 +1401,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     wCurve->setSymbol(new QwtSymbol(sym));
     wattsCurve->setSymbol(new QwtSymbol(sym));
+    npCurve->setSymbol(new QwtSymbol(sym));
+    xpCurve->setSymbol(new QwtSymbol(sym));
+    apCurve->setSymbol(new QwtSymbol(sym));
     hrCurve->setSymbol(new QwtSymbol(sym));
     speedCurve->setSymbol(new QwtSymbol(sym));
     cadCurve->setSymbol(new QwtSymbol(sym));
@@ -1310,6 +1426,18 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (!plot->smoothWatts.empty()) {
         wattsCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+    if (!plot->smoothNP.empty()) {
+        npCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+    if (!plot->smoothXP.empty()) {
+        xpCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+    if (!plot->smoothAP.empty()) {
+        apCurve->attach(this);
         intervalHighlighterCurve->setYAxis(yLeft);
     }
     if (!plot->smoothHr.empty()) {
@@ -1366,6 +1494,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();
         wattsArray.resize(dataPresent->watts ? npoints : 0);
+        npArray.resize(dataPresent->np ? npoints : 0);
+        xpArray.resize(dataPresent->xp ? npoints : 0);
+        apArray.resize(dataPresent->apower ? npoints : 0);
         hrArray.resize(dataPresent->hr ? npoints : 0);
         speedArray.resize(dataPresent->kph ? npoints : 0);
         cadArray.resize(dataPresent->cad ? npoints : 0);
@@ -1380,6 +1511,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         // attach appropriate curves
         wCurve->detach();
         wattsCurve->detach();
+        npCurve->detach();
+        xpCurve->detach();
+        apCurve->detach();
         hrCurve->detach();
         speedCurve->detach();
         cadCurve->detach();
@@ -1392,6 +1526,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
         if (!altArray.empty()) altCurve->attach(this);
         if (!wattsArray.empty()) wattsCurve->attach(this);
+        if (!npArray.empty()) npCurve->attach(this);
+        if (!xpArray.empty()) xpCurve->attach(this);
+        if (!apArray.empty()) apCurve->attach(this);
         if (!parent->wpData->ydata().empty()) wCurve->attach(this);
         if (!hrArray.empty()) hrCurve->attach(this);
         if (!speedArray.empty()) speedCurve->attach(this);
@@ -1406,6 +1543,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
         wCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
+        npCurve->setVisible(dataPresent->np && showNP);
+        xpCurve->setVisible(dataPresent->xp && showXP);
+        apCurve->setVisible(dataPresent->apower && showAP);
         hrCurve->setVisible(dataPresent->hr && showHr);
         speedCurve->setVisible(dataPresent->kph && showSpeed);
         cadCurve->setVisible(dataPresent->cad && showCad);
@@ -1433,8 +1573,11 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
             double msecs = round((point->secs - secs) * 100) * 10;
 
             timeArray[arrayLength]  = secs + msecs/1000;
-            if (!wattsArray.empty())
-                wattsArray[arrayLength] = max(0, point->watts);
+            if (!wattsArray.empty()) wattsArray[arrayLength] = max(0, point->watts);
+            if (!npArray.empty()) npArray[arrayLength] = max(0, point->np);
+            if (!xpArray.empty()) xpArray[arrayLength] = max(0, point->xp);
+            if (!apArray.empty()) apArray[arrayLength] = max(0, point->apower);
+
             if (!hrArray.empty())
                 hrArray[arrayLength]    = max(0, point->hr);
             if (!speedArray.empty())
@@ -1479,6 +1622,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
         wCurve->detach();
         wattsCurve->detach();
+        npCurve->detach();
+        xpCurve->detach();
+        apCurve->detach();
         hrCurve->detach();
         speedCurve->detach();
         cadCurve->detach();
@@ -1519,6 +1665,33 @@ AllPlot::setShowPower(int id)
         refreshZoneLabels();
     } else
         bg->detach();
+}
+
+void
+AllPlot::setShowNP(bool show)
+{
+    showNP = show;
+    npCurve->setVisible(show);
+    setYMax();
+    replot();
+}
+
+void
+AllPlot::setShowXP(bool show)
+{
+    showXP = show;
+    xpCurve->setVisible(show);
+    setYMax();
+    replot();
+}
+
+void
+AllPlot::setShowAP(bool show)
+{
+    showAP = show;
+    apCurve->setVisible(show);
+    setYMax();
+    replot();
 }
 
 void
@@ -1632,6 +1805,18 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         wattsCurve->setBrush(QBrush(p));
 
+        p = npCurve->pen().color();
+        p.setAlpha(64);
+        npCurve->setBrush(QBrush(p));
+
+        p = xpCurve->pen().color();
+        p.setAlpha(64);
+        xpCurve->setBrush(QBrush(p));
+
+        p = apCurve->pen().color();
+        p.setAlpha(64);
+        apCurve->setBrush(QBrush(p));
+
         p = hrCurve->pen().color();
         p.setAlpha(64);
         hrCurve->setBrush(QBrush(p));
@@ -1662,6 +1847,9 @@ AllPlot::setPaintBrush(int state)
     } else {
         wCurve->setBrush(Qt::NoBrush);
         wattsCurve->setBrush(Qt::NoBrush);
+        npCurve->setBrush(Qt::NoBrush);
+        xpCurve->setBrush(Qt::NoBrush);
+        apCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
         cadCurve->setBrush(Qt::NoBrush);

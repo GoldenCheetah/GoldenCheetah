@@ -980,7 +980,7 @@ RideFile::recalculateDerivedSeries()
         //
         if (dataPresent.watts) {
 
-            dataPresent.np = true;
+            dataPresent.xp = true;
 
             while ((XPweighted > NEGLIGIBLE) && (p->secs > XPlastSecs + XPsecsDelta + EPSILON)) {
                 XPweighted *= XPattenuation;
@@ -1029,7 +1029,6 @@ RideFile::recalculateDerivedSeries()
 
         } else {
 
-            dataPresent.apower = false;
             p->apower = p->watts;
         }
 
