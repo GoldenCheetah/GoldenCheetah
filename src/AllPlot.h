@@ -85,6 +85,9 @@ class AllPlot : public QwtPlot
     public slots:
 
         void setShowPower(int id);
+        void setShowNP(bool show);
+        void setShowXP(bool show);
+        void setShowAP(bool show);
         void setShowHr(bool show);
         void setShowSpeed(bool show);
         void setShowCad(bool show);
@@ -119,6 +122,9 @@ class AllPlot : public QwtPlot
         // controls
         bool shade_zones;
         int showPowerState;
+        bool showNP;
+        bool showXP;
+        bool showAP;
         bool showHr;
         bool showSpeed;
         bool showCad;
@@ -137,6 +143,9 @@ class AllPlot : public QwtPlot
         QwtPlotMarker *allMarker1;
         QwtPlotMarker *allMarker2;
         QwtPlotCurve *wattsCurve;
+        QwtPlotCurve *npCurve;
+        QwtPlotCurve *xpCurve;
+        QwtPlotCurve *apCurve;
         QwtPlotCurve *hrCurve;
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
@@ -155,6 +164,9 @@ class AllPlot : public QwtPlot
         // source data
         QVector<double> hrArray;
         QVector<double> wattsArray;
+        QVector<double> npArray;
+        QVector<double> xpArray;
+        QVector<double> apArray;
         QVector<double> speedArray;
         QVector<double> cadArray;
         QVector<double> timeArray;
@@ -167,6 +179,9 @@ class AllPlot : public QwtPlot
 
         // smoothed data
         QVector<double> smoothWatts;
+        QVector<double> smoothNP;
+        QVector<double> smoothAP;
+        QVector<double> smoothXP;
         QVector<double> smoothHr;
         QVector<double> smoothSpeed;
         QVector<double> smoothCad;

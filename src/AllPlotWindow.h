@@ -53,6 +53,9 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
+    Q_PROPERTY(int showNP READ isShowNP WRITE setShowNP USER true)
+    Q_PROPERTY(int showXP READ isShowXP WRITE setShowXP USER true)
+    Q_PROPERTY(int showAP READ isShowAP WRITE setShowAP USER true)
     Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
     Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
@@ -83,6 +86,9 @@ class AllPlotWindow : public GcChartWindow
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
         int isShowHr() const { return showHr->checkState(); }
+        int isShowNP() const { return showNP->checkState(); }
+        int isShowXP() const { return showXP->checkState(); }
+        int isShowAP() const { return showAP->checkState(); }
         int isShowSpeed() const { return showSpeed->checkState(); }
         int isShowCad() const { return showCad->checkState(); }
         int isShowAlt() const { return showAlt->checkState(); }
@@ -114,6 +120,9 @@ class AllPlotWindow : public GcChartWindow
         void setStackZoomDown();
         void setShowPower(int state);
         void setShowHr(int state);
+        void setShowNP(int state);
+        void setShowXP(int state);
+        void setShowAP(int state);
         void setShowSpeed(int state);
         void setShowCad(int state);
         void setShowAlt(int state);
@@ -177,6 +186,9 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showFull;
         QCheckBox *paintBrush;
         QCheckBox *showHr;
+        QCheckBox *showNP;
+        QCheckBox *showXP;
+        QCheckBox *showAP;
         QCheckBox *showSpeed;
         QCheckBox *showCad;
         QCheckBox *showAlt;
