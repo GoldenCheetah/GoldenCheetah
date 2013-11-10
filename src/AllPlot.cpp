@@ -507,6 +507,9 @@ AllPlot::configChanged()
     TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
     tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::xBottom, tsd);
+    pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    axisWidget(QwtPlot::xBottom)->setPalette(pal);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -1098,7 +1101,6 @@ AllPlot::setYMax()
 
         setAxisTitle(yRight3, tr("W' Balance (j)"));
         setAxisScale(QwtPlot::yRight3,parent->wpData->minY-1000,parent->wpData->maxY+1000);
-        setAxisLabelRotation(yRight3,270);
         setAxisLabelAlignment(yRight3,Qt::AlignVCenter);
     }
 
@@ -1122,7 +1124,6 @@ AllPlot::setYMax()
 
         setAxisTitle(yLeft, tr("Watts"));
         setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
-        setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
     if (hrCurve->isVisible() || cadCurve->isVisible() || (!context->athlete->useMetricUnits && tempCurve->isVisible()) || balanceLCurve->isVisible()) {
@@ -1185,7 +1186,6 @@ AllPlot::setYMax()
 
         setAxisTitle(yLeft2, labels.join(" / "));
         setAxisScaleDiv(yLeft2,QwtScaleDiv(ymin, ymax, xytick));
-        setAxisLabelRotation(yLeft2,270);
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible() || (context->athlete->useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
@@ -1225,7 +1225,6 @@ AllPlot::setYMax()
         }
         setAxisTitle(yRight, labels.join(" / "));
         setAxisScale(yRight, ymin, 1.05 * ymax);
-        setAxisLabelRotation(yRight,90);
         setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
@@ -1257,7 +1256,6 @@ AllPlot::setYMax()
 
         //setAxisScale(yRight2, ymin, ymax);
         setAxisScaleDiv(yRight2,QwtScaleDiv(ymin,ymax,xytick));
-        setAxisLabelRotation(yRight2,90);
         setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
         altCurve->setBaseline(ymin);
     }
