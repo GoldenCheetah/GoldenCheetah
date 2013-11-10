@@ -226,6 +226,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     smoothLayout->addWidget(smoothSlider);
     cl3->addRow(smoothLabel, smoothLayout);
 
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+
     allPlot = new AllPlot(this, context);
     allPlot->setInstanceName("allPlot");
     allPlot->setContentsMargins(0,0,0,0);
@@ -294,13 +297,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allMarker2->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
     allPlot->allMarker2=allMarker2;
 
-    // Container widgets should not paint
-    // since they tend to use naff defaults and
-    // 'complicate' or 'make busy' the general
-    // look and feel
-    QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
-
     //
     // stack view
     //
@@ -309,17 +305,17 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackPlotLayout->setContentsMargins(0,0,0,0);
     stackWidget = new QWidget();
     stackWidget->setAutoFillBackground(false);
-    stackWidget->setPalette(palette);
     stackWidget->setLayout(stackPlotLayout);
+    stackWidget->setPalette(palette);
 
     stackFrame = new QScrollArea();
     stackFrame->hide();
-    stackFrame->setPalette(palette);
     stackFrame->setAutoFillBackground(false);
     stackFrame->setWidgetResizable(true);
     stackFrame->setWidget(stackWidget);
     stackFrame->setFrameStyle(QFrame::NoFrame);
     stackFrame->setContentsMargins(0,0,0,0);
+    stackFrame->setPalette(palette);
 
     //
     // allPlot view
@@ -330,8 +326,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlotFrame = new QScrollArea();
     allPlotFrame->setFrameStyle(QFrame::NoFrame);
     allPlotFrame->setAutoFillBackground(false);
-    allPlotFrame->setPalette(palette);
     allPlotFrame->setContentsMargins(0,0,0,0);
+    allPlotFrame->setPalette(palette);
 
     spanSlider = new QxtSpanSlider(Qt::Horizontal);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
@@ -369,9 +365,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->setInstanceName("fullPlot");
     fullPlot->grid->enableY(false);
     fullPlot->setFixedHeight(100);
-    QPalette def;
-    //fullPlot->setCanvasBackground(def.color(QPalette::Window));
-    fullPlot->setCanvasBackground(Qt::white);
+    fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     fullPlot->setCanvasLineWidth(0);
     fullPlot->enableAxis(QwtPlot::yLeft, false);
     fullPlot->enableAxis(QwtPlot::yLeft2, false);
@@ -485,6 +479,17 @@ AllPlotWindow::configChanged()
 
     // ignore if null, or manual / empty
     if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) return;
+
+    // Container widgets should not paint
+    // since they tend to use naff defaults and
+    // 'complicate' or 'make busy' the general
+    // look and feel
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    allPlotFrame->setPalette(palette);
+    stackFrame->setPalette(palette);
+    //stackWidget->setPalette(palette);
+    fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
 
     // ok replot with the new config!
     redrawFullPlot();
