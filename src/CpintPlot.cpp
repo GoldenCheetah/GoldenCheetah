@@ -66,6 +66,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones) :
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(yLeft, sd);
     setAxisTitle(yLeft, tr("Average Power (watts)"));
     setAxisMaxMinor(yLeft, 0);

@@ -550,6 +550,7 @@ AllPlot::configChanged()
     sd = new QwtScaleDraw;
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->setLabelRotation(90);// in the 000s
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yRight3, sd);
     pal.setColor(QPalette::WindowText, GColor(CWBAL));

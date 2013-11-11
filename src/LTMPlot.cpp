@@ -1055,6 +1055,8 @@ LTMPlot::chooseYAxis(QString units)
         axes.insert(units, chosen);
         QwtScaleDraw *sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        sd->enableComponent(QwtScaleDraw::Ticks, false);
+        sd->enableComponent(QwtScaleDraw::Backbone, false);
         setAxisScaleDraw(chosen, sd);
         setAxisMaxMinor(chosen, 0);
         return chosen;

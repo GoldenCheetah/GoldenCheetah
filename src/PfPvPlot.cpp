@@ -136,6 +136,8 @@ PfPvPlot::PfPvPlot(Context *context)
     setAxisScaleDraw(xBottom, sd);
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(yLeft, sd);
 
     mX = new QwtPlotMarker();
@@ -593,7 +595,7 @@ PfPvPlot::recalc()
                 double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-                if (aepf > maxAEPF) maxAEPF = aepf;
+                if (aepf < 255 && aepf > maxAEPF) maxAEPF = aepf;
                 if (cpv > maxCPV) maxCPV = cpv;
             }
         }
@@ -601,7 +603,7 @@ PfPvPlot::recalc()
 
     if (maxAEPF > 600) {
 
-        setAxisScale(yLeft, 0, maxAEPF < 2500 ? maxAEPF * 1.1 : 2500); // a bit of headroom
+        setAxisScale(yLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
         tiqMarker[0]->setYValue(maxAEPF);
         tiqMarker[1]->setYValue(maxAEPF);
 
