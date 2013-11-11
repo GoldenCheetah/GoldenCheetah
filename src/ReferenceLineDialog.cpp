@@ -21,8 +21,8 @@
 #include "Context.h"
 #include "RideItem.h"
 
-ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context) :
-    parent(parent), context(context), axis(-1)
+ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context, bool allowDelete) :
+    parent(parent), context(context), allowDelete(allowDelete), axis(-1)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Add Reference"));
@@ -46,6 +46,9 @@ ReferenceLineDialog::ReferenceLineDialog(AllPlot *parent, Context *context) :
     cancelButton = new QPushButton(tr("&Cancel"));
     buttonLayout->addWidget(cancelButton);
     mainLayout->addLayout(buttonLayout);
+
+    // below that line we will show the existing references
+    // so they can be deleted
 
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
