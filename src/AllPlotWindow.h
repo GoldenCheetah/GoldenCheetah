@@ -140,6 +140,7 @@ class AllPlotWindow : public GcChartWindow
 
         // trap widget signals
         void zoomChanged();
+        void zoomOut();
         void zoomInterval(IntervalItem *);
         void moveLeft();
         void moveRight();

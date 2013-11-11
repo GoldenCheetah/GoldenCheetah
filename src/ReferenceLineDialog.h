@@ -33,7 +33,7 @@ class ReferenceLineDialog : public QDialog
 
 
     public:
-        ReferenceLineDialog(AllPlot *parent, Context *context);
+        ReferenceLineDialog(AllPlot *parent, Context *context, bool allowDelete=false);
 
         void setValueForAxis(double value, int axis);
 
@@ -44,6 +44,7 @@ class ReferenceLineDialog : public QDialog
     private:
         AllPlot *parent;
         Context *context;
+        bool allowDelete;
 
         QLineEdit *refValue;
         QLabel *refUnit;

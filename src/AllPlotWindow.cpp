@@ -459,6 +459,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
+    connect(context, SIGNAL(zoomOut()), this, SLOT(zoomOut()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
 
@@ -942,6 +943,16 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         stackZoomUp->setEnabled(false);
         stackZoomDown->setEnabled(false);
     }
+}
+
+void
+AllPlotWindow::zoomOut()
+{
+    // set them to maximums to avoid overlapping
+    // when we set them below, daft but works
+    spanSlider->setLowerValue(spanSlider->minimum());
+    spanSlider->setUpperValue(spanSlider->maximum());
+    zoomChanged();
 }
 
 void

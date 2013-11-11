@@ -91,6 +91,7 @@ class Context : public QObject
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
         void notifyRideDeleted(RideItem *x) { ride=x; rideDeleted(x); }
         void notifyIntervalZoom(IntervalItem*x) { emit intervalZoom(x); }
+        void notifyZoomOut() { emit zoomOut(); }
         void notifyIntervalSelected() { intervalSelected(); }
         void notifyIntervalsChanged() { emit intervalsChanged(); }
         void notifyRideClean() { rideClean(ride); }
@@ -109,6 +110,7 @@ class Context : public QObject
         void intervalSelected();
         void intervalsChanged();
         void intervalZoom(IntervalItem*);
+        void zoomOut();
         void rideDirty(RideItem*);
         void rideClean(RideItem*);
 

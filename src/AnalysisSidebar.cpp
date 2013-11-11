@@ -260,11 +260,8 @@ AnalysisSidebar::intervalPopup()
     RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
 
     if (rideItem != NULL && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
-        //QAction *actFindPeak = new QAction(tr("Find Peak Intervals"), intervalItem);
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
-        //connect(actFindPeak, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks(void)));
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
-        //menu.addAction(actFindPeak);
         menu.addAction(actFindBest);
 
         // sort but only if 2 or more intervals
@@ -277,6 +274,9 @@ AnalysisSidebar::intervalPopup()
         if (context->athlete->intervalWidget->selectedItems().count()) menu.addSeparator();
     }
 
+    QAction *actZoomOut = new QAction(tr("Zoom out"), intervalItem);
+    connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
+    menu.addAction(actZoomOut);
 
     if (context->athlete->intervalWidget->selectedItems().count() == 1) {
 
@@ -318,15 +318,18 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
 
         QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
+        QAction *actZoomOut = new QAction(tr("Zoom Out"), context->athlete->intervalWidget);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
         QAction *actFrontInt = new QAction(tr("Bring to Front"), context->athlete->intervalWidget);
         QAction *actBackInt = new QAction(tr("Send to back"), context->athlete->intervalWidget);
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
+        connect(actZoomOut, SIGNAL(triggered(void)), this, SLOT(zoomOut(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
+        menu.addAction(actZoomOut);
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
         menu.addAction(actDeleteInt);
@@ -560,6 +563,12 @@ AnalysisSidebar::zoomIntervalSelected()
             break;
         } else i++;
     }
+}
+
+void
+AnalysisSidebar::zoomOut()
+{
+    context->notifyZoomOut(); // only really used by ride plot
 }
 
 void
