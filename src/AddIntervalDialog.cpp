@@ -427,7 +427,7 @@ AddIntervalDialog::createClicked()
                 add.start = match.start;
                 add.stop = match.stop;
 
-                int lenSecs = match.stop-match.start;
+                int lenSecs = match.stop-match.start+1;
                 QString duration;
 
                 // format the duration nicely!
