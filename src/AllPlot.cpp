@@ -987,7 +987,12 @@ AllPlot::refreshIntervalMarkers()
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
             mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
-            QwtText text(interval.name);
+
+            // put matches on second line down
+            QString name(interval.name);
+            if (interval.name.startsWith(tr("Match"))) name = QString("\n%1").arg(interval.name);
+
+            QwtText text(name);
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
             if (!bydist)
