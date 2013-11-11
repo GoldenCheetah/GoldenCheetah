@@ -195,7 +195,7 @@ PfPvPlot::configChanged()
     QwtSymbol sym;
     sym.setStyle(QwtSymbol::Ellipse);
     sym.setSize(6);
-    sym.setPen(QPen(GColor(CPLOTSYMBOL)));
+    sym.setPen(QPen(Qt::black));
     sym.setBrush(QBrush(Qt::NoBrush));
     curve->setSymbol(new QwtSymbol(sym));
     curve->setStyle(QwtPlotCurve::Dots);
