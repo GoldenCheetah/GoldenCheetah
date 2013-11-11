@@ -356,8 +356,8 @@ MainWindow::MainWindow(const QDir &home)
     actbuttons->setSegmentIcon(2, deleteIcon);
     actbuttons->setSelectionBehavior(QtSegmentControl::SelectNone); //wince. spelling. ugh
     actbuttons->setFixedHeight(25);
-    actbuttons->setSegmentToolTip(0, tr("Find Intervals"));
-    actbuttons->setSegmentToolTip(1, tr("Split Activity"));
+    actbuttons->setSegmentToolTip(0, tr("Find Intervals..."));
+    actbuttons->setSegmentToolTip(1, tr("Split Activity..."));
     actbuttons->setSegmentToolTip(2, tr("Delete Activity"));
     actbuttons->setPalette(metal);
     connect(actbuttons, SIGNAL(segmentSelected(int)), this, SLOT(actionClicked(int)));

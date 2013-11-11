@@ -40,7 +40,7 @@ const int WprimeDecayPeriod = 1200; // 1200 seconds or 20 minutes
 const double E = 2.71828183;
 
 const int WprimeMatchSmoothing = 25; // 25 sec smoothing looking for matches
-const int WprimeMatchMinJoules = 1000; // anything under 200 joules and you weren't trying ;)
+const int WprimeMatchMinJoules = 100; 
 
 WPrime::WPrime()
 {
@@ -224,10 +224,13 @@ WPrime::setRide(RideFile *input)
     // SET MATCH SERIES FOR ALLPLOT CHART
     foreach (struct Match match, matches) {
 
-        mvalues << values[match.start];
-        mxvalues << xvalues[match.start];
-        mvalues << values[match.stop];
-        mxvalues << xvalues[match.stop];
+        // we only count 1kj asa match
+        if (match.cost >= 2000) { //XXX need to agree how to define a match -- or even if we want to...
+            mvalues << values[match.start];
+            mxvalues << xvalues[match.start];
+            mvalues << values[match.stop];
+            mxvalues << xvalues[match.stop];
+        }
     }
 }
 
