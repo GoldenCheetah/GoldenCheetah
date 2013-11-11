@@ -21,34 +21,51 @@
 #include "Context.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
+#include "WPrime.h"
 #include <QMap>
 #include <math.h>
+
+// helper function
+static void clearResultsTable(QTableWidget *);
 
 AddIntervalDialog::AddIntervalDialog(Context *context) :
     context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(tr("Add Intervals"));
+    setWindowTitle(tr("Find Intervals"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     intervalMethodWidget = new QWidget();
-    QHBoxLayout *intervalMethodLayout = new QHBoxLayout;
+    mainLayout->addWidget(intervalMethodWidget);
+    QHBoxLayout *intervalMethodLayout = new QHBoxLayout(intervalMethodWidget);;
+    intervalMethodLayout->addStretch();
+
     QLabel *intervalMethodLabel = new QLabel(tr("Method: "), this);
     intervalMethodLayout->addWidget(intervalMethodLabel);
     QButtonGroup *methodButtonGroup = new QButtonGroup(this);
-    methodFirst = new QRadioButton(tr("First"));
-    methodFirst->setChecked(true);
-    methodButtonGroup->addButton(methodFirst);
-    intervalMethodLayout->addWidget(methodFirst);
+
+    QVBoxLayout *methodRadios = new QVBoxLayout;
+    intervalMethodLayout->addLayout(methodRadios);
+    intervalMethodLayout->addStretch();
+
     methodBestPower = new QRadioButton(tr("Peak Power"));
+    methodBestPower->setChecked(true);
     methodButtonGroup->addButton(methodBestPower);
-    intervalMethodLayout->addWidget(methodBestPower);
-    //mainLayout->addLayout(intervalMethodLayout);
-    intervalMethodWidget->setLayout(intervalMethodLayout);
-    mainLayout->addWidget(intervalMethodWidget);
+    methodRadios->addWidget(methodBestPower);
+
+    methodWPrime = new QRadioButton(tr("W' (Energy)"));
+    methodWPrime->setChecked(false);
+    methodButtonGroup->addButton(methodWPrime);
+    methodRadios->addWidget(methodWPrime);
+
+    methodFirst = new QRadioButton(tr("Time / Distance"));
+    methodFirst->setChecked(false);
+    methodButtonGroup->addButton(methodFirst);
+    methodRadios->addWidget(methodFirst);
 
     intervalPeakPowerWidget = new QWidget();
     intervalPeakPowerTypeLayout = new QHBoxLayout;
+    intervalPeakPowerTypeLayout->addStretch();
     QLabel *intervalPeakPowerTypeLabel = new QLabel(tr("Type: "), this);
     intervalPeakPowerTypeLayout->addWidget(intervalPeakPowerTypeLabel);
     QButtonGroup *peakPowerTypeButtonGroup = new QButtonGroup(this);
@@ -59,6 +76,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     peakPowerCustom = new QRadioButton(tr("Custom"));
     peakPowerTypeButtonGroup->addButton(peakPowerCustom);
     intervalPeakPowerTypeLayout->addWidget(peakPowerCustom);
+    intervalPeakPowerTypeLayout->addStretch();
     //mainLayout->addLayout(intervalPeakPowerTypeLayout);
     intervalPeakPowerWidget->setLayout(intervalPeakPowerTypeLayout);
     intervalPeakPowerWidget->hide();
@@ -66,7 +84,8 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
 
     intervalTypeWidget = new QWidget();
     QHBoxLayout *intervalTypeLayout = new QHBoxLayout;
-    QLabel *intervalTypeLabel = new QLabel(tr("Interval length: "), this);
+    intervalTypeLayout->addStretch();
+    QLabel *intervalTypeLabel = new QLabel(tr("Length: "), this);
     intervalTypeLayout->addWidget(intervalTypeLabel);
     QButtonGroup *typeButtonGroup = new QButtonGroup(this);
     typeTime = new QRadioButton(tr("By time"));
@@ -76,6 +95,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     typeDistance = new QRadioButton(tr("By distance"));
     typeButtonGroup->addButton(typeDistance);
     intervalTypeLayout->addWidget(typeDistance);
+    intervalTypeLayout->addStretch();
     //mainLayout->addLayout(intervalTypeLayout);
     intervalTypeWidget->setLayout(intervalTypeLayout);
     mainLayout->addWidget(intervalTypeWidget);
@@ -151,11 +171,30 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     intervalCountWidget->setLayout(intervalCountLayout);
     mainLayout->addWidget(intervalCountWidget);
 
+    intervalWPrimeWidget = new QWidget();
+    QHBoxLayout *intervalWPrimeLayout = new QHBoxLayout;
+    QLabel *intervalWPrimeLabel = new QLabel(tr("Minimum W' Cost: "), this);
+    intervalWPrimeLayout->addStretch();
+    intervalWPrimeLayout->addWidget(intervalWPrimeLabel);
+    kjSpinBox = new QDoubleSpinBox(this);
+    kjSpinBox->setDecimals(1);
+    kjSpinBox->setRange(0.1, 50);
+    kjSpinBox->setValue(2.0);
+    kjSpinBox->setSuffix(" kj");
+    kjSpinBox->setSingleStep(0.1);
+    kjSpinBox->setAlignment(Qt::AlignRight);
+    intervalWPrimeLayout->addWidget(kjSpinBox);
+    intervalWPrimeLayout->addStretch();
+    intervalWPrimeWidget->setLayout(intervalWPrimeLayout);
+    intervalWPrimeWidget->hide();
+    mainLayout->addWidget(intervalWPrimeWidget);
 
-
-
-
-
+    QHBoxLayout *findbuttonLayout = new QHBoxLayout;
+    findbuttonLayout->addStretch();
+    createButton = new QPushButton(tr("&Find"), this);
+    findbuttonLayout->addWidget(createButton);
+    findbuttonLayout->addStretch();
+    mainLayout->addLayout(findbuttonLayout);
 
     QLabel *resultsLabel = new QLabel(tr("Results:"), this);
     mainLayout->addWidget(resultsLabel);
@@ -168,37 +207,39 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     resultsTable->setColumnHidden(3, true); // has start time in secs
     resultsTable->setColumnHidden(4, true); // has stop time in secs
     resultsTable->horizontalHeader()->hide();
+    resultsTable->horizontalHeader()->setStretchLastSection(true);
 //    resultsTable->verticalHeader()->hide();
     resultsTable->setShowGrid(false);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    createButton = new QPushButton(tr("&Create Intervals"), this);
-    buttonLayout->addWidget(createButton);
-    doneButton = new QPushButton(tr("&Done"), this);
-    buttonLayout->addWidget(doneButton);
-    addButton = new QPushButton(tr("&Add to Intervals"));
+    buttonLayout->addStretch();
+    addButton = new QPushButton(tr("&Add to Activity"));
     buttonLayout->addWidget(addButton);
+    buttonLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
 
     connect(methodFirst, SIGNAL(clicked()), this, SLOT(methodFirstClicked()));
     connect(methodBestPower, SIGNAL(clicked()), this, SLOT(methodBestPowerClicked()));
+    connect(methodWPrime, SIGNAL(clicked()), this, SLOT(methodWPrimeClicked()));
     connect(peakPowerStandard, SIGNAL(clicked()), this, SLOT(peakPowerStandardClicked()));
     connect(peakPowerCustom, SIGNAL(clicked()), this, SLOT(peakPowerCustomClicked()));
     connect(typeTime, SIGNAL(clicked()), this, SLOT(typeTimeClicked()));
     connect(typeDistance, SIGNAL(clicked()), this, SLOT(typeDistanceClicked()));
-
-
-
-
     connect(createButton, SIGNAL(clicked()), this, SLOT(createClicked()));
-    connect(doneButton, SIGNAL(clicked()), this, SLOT(doneClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+
+    // get set to default to best powers (peaks) 
+    methodBestPowerClicked();
 }
 
 void
 AddIntervalDialog::methodFirstClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalPeakPowerWidget->hide();
+    intervalWPrimeWidget->hide();
     intervalTypeWidget->show();
     if (typeDistance->isChecked())
         typeDistanceClicked();
@@ -210,6 +251,10 @@ AddIntervalDialog::methodFirstClicked()
 void
 AddIntervalDialog::methodBestPowerClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
+    intervalWPrimeWidget->hide();
     intervalPeakPowerWidget->show();
     if (peakPowerCustom->isChecked())
         peakPowerCustomClicked();
@@ -218,8 +263,22 @@ AddIntervalDialog::methodBestPowerClicked()
 }
 
 void
+AddIntervalDialog::methodWPrimeClicked()
+{
+    intervalPeakPowerWidget->hide();
+    intervalTypeWidget->hide();
+    intervalDistanceWidget->hide();
+    intervalTimeWidget->hide();
+    intervalCountWidget->hide();
+    intervalWPrimeWidget->show();
+}
+
+void
 AddIntervalDialog::peakPowerStandardClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalTypeWidget->hide();
     intervalTimeWidget->hide();
     intervalDistanceWidget->hide();
@@ -229,6 +288,9 @@ AddIntervalDialog::peakPowerStandardClicked()
 void
 AddIntervalDialog::peakPowerCustomClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalTypeWidget->show();
     if (typeDistance->isChecked())
         typeDistanceClicked();
@@ -240,6 +302,9 @@ AddIntervalDialog::peakPowerCustomClicked()
 void
 AddIntervalDialog::typeTimeClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalDistanceWidget->hide();
     intervalTimeWidget->show();
 }
@@ -247,12 +312,12 @@ AddIntervalDialog::typeTimeClicked()
 void
 AddIntervalDialog::typeDistanceClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalDistanceWidget->show();
     intervalTimeWidget->hide();
 }
-
-
-
 
 // little helper function
 static void
@@ -260,9 +325,11 @@ clearResultsTable(QTableWidget *resultsTable)
 {
     // zap the 3 main cols and two hidden ones
     for (int i=0; i<resultsTable->rowCount(); i++) {
-        for (int j=0; j<resultsTable->columnCount(); j++)
+        for (int j=0; j<resultsTable->columnCount(); j++) {
             delete resultsTable->takeItem(i,j);
+        }
     }
+    resultsTable->setRowCount(0);
 }
 
 static double
@@ -311,30 +378,77 @@ AddIntervalDialog::createClicked()
 
     int maxIntervals = (int) countSpinBox->value();
 
+    double windowSizeMeters = (kmsSpinBox->value() * 1000.0
+                             + msSpinBox->value());
+
     double windowSizeSecs = (hrsSpinBox->value() * 3600.0
                              + minsSpinBox->value() * 60.0
                              + secsSpinBox->value());
 
-    double windowSizeMeters = (kmsSpinBox->value() * 1000.0
-                             + msSpinBox->value());
-
-    if (windowSizeSecs == 0.0) {
-        QMessageBox::critical(this, tr("Bad Interval Length"),
-                              tr("Interval length must be greater than zero!"));
-        return;
-    }
-
     bool byTime = typeTime->isChecked();
 
+    double minWPrime = kjSpinBox->value() * 1000;
+
     QList<AddedInterval> results;
+
+    // FIND PEAKS
     if (methodBestPower->isChecked()) {
+
         if (peakPowerStandard->isChecked())
             findPeakPowerStandard(ride, results);
-        else
+        else {
+
+            // bad window size?
+            if (windowSizeSecs == 0.0) {
+                QMessageBox::critical(this, tr("Bad Interval Length"), tr("Interval length must be greater than zero!"));
+                return;
+            }
+
             findBests(byTime, ride, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "");
-    }
-    else
+        }
+
+
+    } 
+
+    // FIND BY TIME OR DISTANCE
+    if (methodFirst->isChecked()) {
+
         findFirsts(byTime, ride, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results);
+    }
+
+    // FIND W' BAL DROPS
+    if (methodWPrime->isChecked()) {
+        WPrime wp;
+        wp.setRide((RideFile*)ride);
+
+        foreach(struct Match match, wp.matches) {
+            if (match.cost > minWPrime) {
+                struct AddedInterval add;
+                add.start = match.start;
+                add.stop = match.stop;
+
+                int lenSecs = match.stop-match.start;
+                QString duration;
+
+                // format the duration nicely!
+                if (lenSecs < 120) duration = QString("%1s").arg(lenSecs);
+                else {
+                    int mins = lenSecs / 60;
+                    int secs = lenSecs - (mins * 60);
+                    if (secs) {
+
+                        QChar zero = QLatin1Char ( '0' );
+                        duration = QString("%1:%2").arg(mins,2,10,zero)
+                                                   .arg(secs,2,10,zero);
+                    } else duration = QString("%1min").arg(mins);
+            
+                }
+                add.name = QString("Match %1 (%2kJ)").arg(duration)
+                                                        .arg(match.cost/1000.00, 0, 'f', 1);
+                results << add;
+            }
+        }
+    }
 
     // clear the table
     clearResultsTable(resultsTable);
@@ -386,7 +500,6 @@ AddIntervalDialog::createClicked()
     }
     resultsTable->resizeColumnToContents(0);
     resultsTable->resizeColumnToContents(1);
-    resultsTable->setColumnWidth(2,200);
 }
 
 void
@@ -617,13 +730,6 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
         }
     }
     results.append(_results);
-}
-
-void
-AddIntervalDialog::doneClicked()
-{
-    clearResultsTable(resultsTable); // clear out that table!
-    done(0);
 }
 
 void

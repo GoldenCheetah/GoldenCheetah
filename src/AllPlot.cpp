@@ -1336,13 +1336,17 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
         // matches cost
         double burnt=0;
+        int count=0;
         foreach(struct Match match, parent->wpData->matches)
-            burnt += match.cost;
+            if (match.cost > 2000) { //XXX how to decide the threshold for a match?
+                burnt += match.cost;
+                count++;
+            }
 
-        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches (%5 Kj)").arg(parent->wpData->TAU)
+        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ)").arg(parent->wpData->TAU)
                                                     .arg(parent->wpData->CP)
                                                     .arg(parent->wpData->WPRIME)
-                                                    .arg(parent->wpData->matches.count())
+                                                    .arg(count)
                                                     .arg(burnt/1000.00, 0, 'f', 1));
 
         text.setFont(QFont("Helvetica", 10, QFont::Bold));

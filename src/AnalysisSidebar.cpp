@@ -199,6 +199,9 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         connect(actUploadCalendar, SIGNAL(triggered(void)), context->mainWindow, SLOT(uploadCalendar()));
         menu.addAction(actUploadCalendar);
 #endif
+        QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
+        connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
+        menu.addAction(actFindBest);
         menu.addSeparator();
 
         // ride navigator stuff
@@ -257,11 +260,11 @@ AnalysisSidebar::intervalPopup()
     RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
 
     if (rideItem != NULL && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
-        QAction *actFindPeak = new QAction(tr("Find Peak Intervals"), intervalItem);
-        QAction *actFindBest = new QAction(tr("Find Best Intervals"), intervalItem);
-        connect(actFindPeak, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks(void)));
+        //QAction *actFindPeak = new QAction(tr("Find Peak Intervals"), intervalItem);
+        QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
+        //connect(actFindPeak, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks(void)));
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
-        menu.addAction(actFindPeak);
+        //menu.addAction(actFindPeak);
         menu.addAction(actFindBest);
 
         // sort but only if 2 or more intervals
@@ -347,9 +350,9 @@ AnalysisSidebar::addIntervals()
     } else {
 
         if (!context->ride || !context->ride->ride())
-            QMessageBox::critical(this, tr("Find Best Intervals"), tr("No activity selected"));
+            QMessageBox::critical(this, tr("Find Intervals"), tr("No activity selected"));
         else
-            QMessageBox::critical(this, tr("Find Best Intervals"), tr("Current activity contains no data"));
+            QMessageBox::critical(this, tr("Find Intervals"), tr("Current activity contains no data"));
     }
 }
 

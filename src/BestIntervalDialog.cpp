@@ -28,7 +28,7 @@ BestIntervalDialog::BestIntervalDialog(Context *context) :
     context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Find Best Intervals");
+    setWindowTitle("Find Intervals");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     QHBoxLayout *intervalLengthLayout = new QHBoxLayout;

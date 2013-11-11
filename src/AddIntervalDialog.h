@@ -36,6 +36,7 @@ class AddIntervalDialog : public QDialog
         struct AddedInterval {
             QString name;
             double start, stop, avg;
+            AddedInterval() : start(0), stop(0), avg(0) {}
             AddedInterval(double start, double stop, double avg) :
                 start(start), stop(stop), avg(avg) {}
         };
@@ -52,11 +53,11 @@ class AddIntervalDialog : public QDialog
 
     private slots:
         void createClicked();
-        void doneClicked();
         void addClicked(); // add to inverval selections
 
         void methodFirstClicked();
         void methodBestPowerClicked();
+        void methodWPrimeClicked();
         void peakPowerStandardClicked();
         void peakPowerCustomClicked();
         void typeTimeClicked();
@@ -65,12 +66,13 @@ class AddIntervalDialog : public QDialog
     private:
 
         Context *context;
-        QWidget *intervalMethodWidget, *intervalPeakPowerWidget, *intervalTypeWidget, *intervalTimeWidget, *intervalDistanceWidget, *intervalCountWidget;
+        QWidget *intervalMethodWidget, *intervalPeakPowerWidget, *intervalTypeWidget, *intervalTimeWidget, *intervalDistanceWidget, *intervalCountWidget, *intervalWPrimeWidget;
 
         QHBoxLayout *intervalPeakPowerTypeLayout;
-        QPushButton *createButton, *doneButton, *addButton;
-        QDoubleSpinBox *hrsSpinBox, *minsSpinBox, *secsSpinBox, *countSpinBox,*kmsSpinBox, *msSpinBox;
-        QRadioButton *methodFirst, *methodBestPower, *typeDistance, *typeTime, *peakPowerStandard, *peakPowerCustom;
+        QPushButton *createButton, *addButton;
+        QDoubleSpinBox *hrsSpinBox, *minsSpinBox, *secsSpinBox, *countSpinBox,*kmsSpinBox, *msSpinBox, *kjSpinBox;
+        QRadioButton *methodFirst, *methodBestPower, *methodWPrime;
+        QRadioButton *typeDistance, *typeTime, *peakPowerStandard, *peakPowerCustom;
         QTableWidget *resultsTable;
 };
 
