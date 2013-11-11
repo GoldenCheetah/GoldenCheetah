@@ -513,6 +513,8 @@ AllPlot::configChanged()
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
     pal.setColor(QPalette::WindowText, GColor(CPOWER));
     pal.setColor(QPalette::Text, GColor(CPOWER));
@@ -520,6 +522,8 @@ AllPlot::configChanged()
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft2, sd);
     pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
     pal.setColor(QPalette::Text, GColor(CHEARTRATE));
@@ -527,6 +531,8 @@ AllPlot::configChanged()
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yRight, sd);
     pal.setColor(QPalette::WindowText, GColor(CSPEED));
     pal.setColor(QPalette::Text, GColor(CSPEED));
@@ -534,12 +540,16 @@ AllPlot::configChanged()
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yRight2, sd);
     pal.setColor(QPalette::WindowText, GColor(CALTITUDE));
     pal.setColor(QPalette::Text, GColor(CALTITUDE));
     axisWidget(QwtPlot::yRight2)->setPalette(pal);
 
     sd = new QwtScaleDraw;
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yRight3, sd);
     pal.setColor(QPalette::WindowText, GColor(CWBAL));
@@ -1124,7 +1134,7 @@ AllPlot::setYMax()
 
         setAxisTitle(yLeft, tr("Watts"));
         setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
-        setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
+        //setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
     if (hrCurve->isVisible() || cadCurve->isVisible() || (!context->athlete->useMetricUnits && tempCurve->isVisible()) || balanceLCurve->isVisible()) {
         double ymin = 0;
@@ -1186,7 +1196,7 @@ AllPlot::setYMax()
 
         setAxisTitle(yLeft2, labels.join(" / "));
         setAxisScaleDiv(yLeft2,QwtScaleDiv(ymin, ymax, xytick));
-        setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
+        //setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible() || (context->athlete->useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
         double ymin = 0;
@@ -1225,7 +1235,7 @@ AllPlot::setYMax()
         }
         setAxisTitle(yRight, labels.join(" / "));
         setAxisScale(yRight, ymin, 1.05 * ymax);
-        setAxisLabelAlignment(yRight,Qt::AlignVCenter);
+        //setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
         setAxisTitle(yRight2, context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
@@ -1256,7 +1266,7 @@ AllPlot::setYMax()
 
         //setAxisScale(yRight2, ymin, ymax);
         setAxisScaleDiv(yRight2,QwtScaleDiv(ymin,ymax,xytick));
-        setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
+        //setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
         altCurve->setBaseline(ymin);
     }
 
