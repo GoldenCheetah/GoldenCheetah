@@ -994,7 +994,10 @@ AllPlot::refreshIntervalMarkers()
 
             QwtText text(name);
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
-            text.setColor(GColor(CPLOTMARKER));
+            if (interval.name.startsWith(tr("Match"))) 
+                text.setColor(GColor(CWBAL));
+            else
+                text.setColor(GColor(CPLOTMARKER));
             if (!bydist)
                 mrk->setValue(interval.start / 60.0, 0.0);
             else
