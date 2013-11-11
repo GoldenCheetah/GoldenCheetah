@@ -1282,9 +1282,9 @@ void
 AllPlot::setXTitle()
 {
     if (bydist)
-        setAxisTitle(xBottom, tr("Distance ")+QString(context->athlete->useMetricUnits?"(km)":"(miles)"));
+        setAxisTitle(xBottom, context->athlete->useMetricUnits ? "KM" : "Miles");
     else
-        setAxisTitle(xBottom, tr("Time (Hours:Minutes)"));
+        setAxisTitle(xBottom, tr("")); // time is bloody obvious, less noise
 }
 
 void
