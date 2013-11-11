@@ -1066,7 +1066,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
         referenceLine = new QwtPlotCurve(tr("Power Ref"));
         referenceLine->setYAxis(yLeft);
         QPen wattsPen = QPen(GColor(CPOWER));
-        wattsPen.setWidth(2);
+        wattsPen.setWidth(1);
         wattsPen.setStyle(Qt::DashLine);
         referenceLine->setPen(wattsPen);
 
