@@ -165,6 +165,8 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
