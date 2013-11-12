@@ -292,6 +292,9 @@ AddIntervalDialog::methodBestPowerClicked()
 void
 AddIntervalDialog::methodWPrimeClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalPeakPowerWidget->hide();
     intervalClimbWidget->hide();
     intervalTypeWidget->hide();
@@ -304,6 +307,9 @@ AddIntervalDialog::methodWPrimeClicked()
 void
 AddIntervalDialog::methodClimbClicked()
 {
+    // clear the table
+    clearResultsTable(resultsTable);
+
     intervalClimbWidget->show();
     intervalPeakPowerWidget->hide();
     intervalTypeWidget->hide();
