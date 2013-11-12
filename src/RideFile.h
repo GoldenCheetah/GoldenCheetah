@@ -183,6 +183,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // Working with REFERENCES
         void appendReference(const RideFilePoint &);
+        void removeReference(int index);
         const QVector<RideFilePoint*> &referencePoints() const { return referencePoints_; }
 
         // Index offset calculations

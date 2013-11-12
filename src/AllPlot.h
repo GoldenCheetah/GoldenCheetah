@@ -79,7 +79,7 @@ class AllPlot : public QwtPlot
         void setXTitle();
 
         void plotTmpReference(int axis, int x, int y);
-        void confirmTmpReference(double value, int axis);
+        void confirmTmpReference(double value, int axis, bool allowDelete);
         QwtPlotCurve* plotReferenceLine(const RideFilePoint *referencePoint);
 
     public slots:

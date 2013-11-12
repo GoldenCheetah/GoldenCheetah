@@ -2143,7 +2143,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
     if (axis>-1 && event->type() == QEvent::MouseButtonDblClick) {
         QMouseEvent *m = static_cast<QMouseEvent*>(event);
-        confirmTmpReference(invTransform(axis, m->y()), axis);
+        confirmTmpReference(invTransform(axis, m->y()),axis, true); // do show delete stuff
     }
     if (axis>-1 && event->type() == QEvent::MouseMove) {
         QMouseEvent *m = static_cast<QMouseEvent*>(event);
@@ -2152,7 +2152,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
     if (axis>-1 && event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent *m = static_cast<QMouseEvent*>(event);
         if (m->x()>axisWidget(axis)->width()) {
-            confirmTmpReference(invTransform(axis, m->y()),axis);
+            confirmTmpReference(invTransform(axis, m->y()),axis,false); // don't show delete stuff
         }
         else  {
             plotTmpReference(axis, 0, 0); //unplot
@@ -2206,10 +2206,11 @@ AllPlot::refreshReferenceLinesForAllPlots()
 }
 
 void
-AllPlot::confirmTmpReference(double value, int axis)
+AllPlot::confirmTmpReference(double value, int axis, bool allowDelete)
 {
-    ReferenceLineDialog *p = new ReferenceLineDialog(this, context);
+    ReferenceLineDialog *p = new ReferenceLineDialog(this, context, allowDelete);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
     p->setValueForAxis(value, axis);
+    p->move(QCursor::pos()-QPoint(40,40));
     p->exec();
 }
