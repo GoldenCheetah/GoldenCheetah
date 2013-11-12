@@ -869,6 +869,11 @@ void RideFile::appendReference(const RideFilePoint &point)
                                          point.headwind, point.slope, point.temp, point.lrbalance, point.interval));
 }
 
+void RideFile::removeReference(int index)
+{
+    referencePoints_.remove(index);
+}
+
 bool
 RideFile::parseRideFileName(const QString &name, QDateTime *dt)
 {

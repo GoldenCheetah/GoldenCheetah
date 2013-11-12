@@ -39,7 +39,8 @@ class ReferenceLineDialog : public QDialog
 
     private slots:
         void addClicked();
-        void cancelClicked();
+        void deleteRef();
+        void closed();
 
     private:
         AllPlot *parent;
@@ -51,7 +52,11 @@ class ReferenceLineDialog : public QDialog
 
         int axis;
 
+        QTableWidget *refsTable;
+        void refreshTable();
+
         QPushButton *addButton, *cancelButton;
+        QPushButton *deleteRefButton;
 };
 
 #endif // _GC_ReferenceLineDialog_h
