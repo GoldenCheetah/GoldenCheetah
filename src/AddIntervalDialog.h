@@ -58,6 +58,7 @@ class AddIntervalDialog : public QDialog
         void methodFirstClicked();
         void methodBestPowerClicked();
         void methodWPrimeClicked();
+        void methodClimbClicked();
         void peakPowerStandardClicked();
         void peakPowerCustomClicked();
         void typeTimeClicked();
@@ -66,12 +67,15 @@ class AddIntervalDialog : public QDialog
     private:
 
         Context *context;
-        QWidget *intervalMethodWidget, *intervalPeakPowerWidget, *intervalTypeWidget, *intervalTimeWidget, *intervalDistanceWidget, *intervalCountWidget, *intervalWPrimeWidget;
+        QWidget *intervalMethodWidget, *intervalPeakPowerWidget, *intervalTypeWidget, 
+                *intervalTimeWidget, *intervalDistanceWidget, *intervalClimbWidget,
+                *intervalCountWidget, *intervalWPrimeWidget;
 
         QHBoxLayout *intervalPeakPowerTypeLayout;
         QPushButton *createButton, *addButton;
-        QDoubleSpinBox *hrsSpinBox, *minsSpinBox, *secsSpinBox, *countSpinBox,*kmsSpinBox, *msSpinBox, *kjSpinBox;
-        QRadioButton *methodFirst, *methodBestPower, *methodWPrime;
+        QDoubleSpinBox *hrsSpinBox, *minsSpinBox, *secsSpinBox, *altSpinBox,
+                       *countSpinBox,*kmsSpinBox, *msSpinBox, *kjSpinBox;
+        QRadioButton *methodFirst, *methodBestPower, *methodWPrime, *methodClimb;
         QRadioButton *typeDistance, *typeTime, *peakPowerStandard, *peakPowerCustom;
         QTableWidget *resultsTable;
 };
