@@ -73,9 +73,9 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones) :
     setAxisMaxMinor(yLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
 
-    grid = new QwtPlotGrid();
-    grid->enableX(true);
-    grid->attach(this);
+    //grid = new QwtPlotGrid();
+    //grid->enableX(true);
+    //grid->attach(this);
 
     curveTitle.attach(this);
     curveTitle.setXValue(5);
@@ -97,9 +97,9 @@ void
 CpintPlot::configChanged()
 {
     setCanvasBackground(GColor(CPLOTBACKGROUND));
-    QPen gridPen(GColor(CPLOTGRID));
-    gridPen.setStyle(Qt::DotLine);
-    grid->setPen(gridPen);
+    //QPen gridPen(GColor(CPLOTGRID));
+    //gridPen.setStyle(Qt::DotLine);
+    //grid->setPen(gridPen);
 }
 
 void
@@ -760,8 +760,8 @@ CpintPlot::calculate(RideItem *rideItem)
 void
 CpintPlot::showGrid(int state)
 {
-    grid->setVisible(state == Qt::Checked);
-    replot();
+    //grid->setVisible(state == Qt::Checked);
+    //replot();
 }
 
 void
