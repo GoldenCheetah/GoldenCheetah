@@ -17,6 +17,7 @@
  */
 
 #include "AddIntervalDialog.h"
+#include "Settings.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "IntervalItem.h"
@@ -52,6 +53,11 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     methodBestPower->setChecked(true);
     methodButtonGroup->addButton(methodBestPower);
     methodRadios->addWidget(methodBestPower);
+
+    methodClimb = new QRadioButton(tr("Ascent (elevation)"));
+    methodClimb->setChecked(false);
+    methodButtonGroup->addButton(methodClimb);
+    methodRadios->addWidget(methodClimb);
 
     methodWPrime = new QRadioButton(tr("W' (Energy)"));
     methodWPrime->setChecked(false);
@@ -189,6 +195,24 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     intervalWPrimeWidget->hide();
     mainLayout->addWidget(intervalWPrimeWidget);
 
+    intervalClimbWidget = new QWidget();
+    QHBoxLayout *intervalClimbLayout = new QHBoxLayout;
+    QLabel *intervalClimbLabel = new QLabel(tr("Minimum Ascent: "), this);
+    intervalClimbLayout->addStretch();
+    intervalClimbLayout->addWidget(intervalClimbLabel);
+    altSpinBox = new QDoubleSpinBox(this);
+    altSpinBox->setDecimals(1);
+    altSpinBox->setRange(10, 5000);
+    altSpinBox->setValue(100);
+    altSpinBox->setSuffix(" metres");
+    altSpinBox->setSingleStep(10);
+    altSpinBox->setAlignment(Qt::AlignRight);
+    intervalClimbLayout->addWidget(altSpinBox);
+    intervalClimbLayout->addStretch();
+    intervalClimbWidget->setLayout(intervalClimbLayout);
+    intervalClimbWidget->hide();
+    mainLayout->addWidget(intervalClimbWidget);
+
     QHBoxLayout *findbuttonLayout = new QHBoxLayout;
     findbuttonLayout->addStretch();
     createButton = new QPushButton(tr("&Find"), this);
@@ -221,6 +245,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     connect(methodFirst, SIGNAL(clicked()), this, SLOT(methodFirstClicked()));
     connect(methodBestPower, SIGNAL(clicked()), this, SLOT(methodBestPowerClicked()));
     connect(methodWPrime, SIGNAL(clicked()), this, SLOT(methodWPrimeClicked()));
+    connect(methodClimb, SIGNAL(clicked()), this, SLOT(methodClimbClicked()));
     connect(peakPowerStandard, SIGNAL(clicked()), this, SLOT(peakPowerStandardClicked()));
     connect(peakPowerCustom, SIGNAL(clicked()), this, SLOT(peakPowerCustomClicked()));
     connect(typeTime, SIGNAL(clicked()), this, SLOT(typeTimeClicked()));
@@ -239,6 +264,7 @@ AddIntervalDialog::methodFirstClicked()
     clearResultsTable(resultsTable);
 
     intervalPeakPowerWidget->hide();
+    intervalClimbWidget->hide();
     intervalWPrimeWidget->hide();
     intervalTypeWidget->show();
     if (typeDistance->isChecked())
@@ -256,6 +282,7 @@ AddIntervalDialog::methodBestPowerClicked()
 
     intervalWPrimeWidget->hide();
     intervalPeakPowerWidget->show();
+    intervalClimbWidget->hide();
     if (peakPowerCustom->isChecked())
         peakPowerCustomClicked();
     else
@@ -266,11 +293,24 @@ void
 AddIntervalDialog::methodWPrimeClicked()
 {
     intervalPeakPowerWidget->hide();
+    intervalClimbWidget->hide();
     intervalTypeWidget->hide();
     intervalDistanceWidget->hide();
     intervalTimeWidget->hide();
     intervalCountWidget->hide();
     intervalWPrimeWidget->show();
+}
+
+void
+AddIntervalDialog::methodClimbClicked()
+{
+    intervalClimbWidget->show();
+    intervalPeakPowerWidget->hide();
+    intervalTypeWidget->hide();
+    intervalDistanceWidget->hide();
+    intervalTimeWidget->hide();
+    intervalCountWidget->hide();
+    intervalWPrimeWidget->hide();
 }
 
 void
@@ -414,6 +454,73 @@ AddIntervalDialog::createClicked()
     if (methodFirst->isChecked()) {
 
         findFirsts(byTime, ride, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results);
+    }
+
+    // FIND ASCENTS
+    if (methodClimb->isChecked()) {
+
+        // we need altitude and more than 3 data points
+        if (ride->areDataPresent()->alt == false || ride->dataPoints().count() < 3) return;
+
+        double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
+        if (hysteresis <= 0.1) hysteresis = 3.00;
+
+        // first apply hysteresis
+        QVector<QPoint> points; 
+
+        int index=0;
+        int runningAlt = ride->dataPoints().first()->alt;
+
+        foreach(RideFilePoint *p, ride->dataPoints()) {
+
+            // up
+            if (p->alt > (runningAlt + hysteresis)) {
+                runningAlt = p->alt;
+                points << QPoint(index, runningAlt);
+            }
+
+            // down
+            if (p->alt < (runningAlt - hysteresis)) {
+                runningAlt = p->alt;
+                points << QPoint(index, runningAlt);
+            }
+            index++;
+        }
+
+        // now find peaks and troughs in the point data
+        // there will only be ups and downs, no flats
+        QVector<QPoint> peaks;
+        for(int i=1; i<(points.count()-1); i++) {
+
+            // peak
+            if (points[i].y() > points[i-1].y() &&
+                points[i].y() > points[i+1].y()) peaks << points[i];
+
+            // trough
+            if (points[i].y() < points[i-1].y() &&
+                points[i].y() < points[i+1].y()) peaks << points[i];
+        }
+
+        // now run through looking for diffs > requested
+        int counter=0;
+        for (int i=0; i<(peaks.count()-1); i++) {
+
+            int ascent = 0; // ascent found in meters
+            if ((ascent=peaks[i+1].y() - peaks[i].y()) >= altSpinBox->value()) {
+
+                // found one so increment from zero
+                counter++;
+
+                // we have a winner...
+                struct AddedInterval add;
+                add.start = ride->dataPoints()[peaks[i].x()]->secs;
+                add.stop = ride->dataPoints()[peaks[i+1].x()]->secs;
+                add.name = QString("Climb #%1 (%2m)").arg(counter)
+                                                        .arg(ascent);
+                results << add;
+
+            }
+        }
     }
 
     // FIND W' BAL DROPS
