@@ -511,7 +511,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         curve->setPen(pen);
         QColor brush_color = GColor(CCP);
         brush_color.setAlpha(200);
-        curve->setBrush(brush_color);   // brush fills below the line
+        //curve->setBrush(QBrush::None);   // brush fills below the line
         if (series == RideFile::none)
             curve->setData(time_values.data(), energyBests.data(), n_values);
         else
@@ -578,7 +578,7 @@ CpintPlot::calculate(RideItem *rideItem)
             else {
                 // make sure color reflects latest config
                 QPen pen(GColor(CCP));
-                pen.setWidth(4.0);
+                pen.setWidth(1.0);
                 pen.setStyle(Qt::DashLine);
                 CPCurve->setPen(pen);
             }
