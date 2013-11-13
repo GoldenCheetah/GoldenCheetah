@@ -184,7 +184,7 @@ PowerHist::configChanged()
 
     // grid
     QPen gridPen(GColor(CPLOTGRID));
-    gridPen.setStyle(Qt::DotLine);
+    //gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
 }
 
