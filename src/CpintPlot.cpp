@@ -42,7 +42,7 @@
 
 #define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
 
-CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones) :
+CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool rangemode) :
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
@@ -53,7 +53,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones) :
     current(NULL),
     bests(NULL),
     isFiltered(false),
-    shadeMode(2)
+    shadeMode(2),
+    rangemode(rangemode)
 {
     setInstanceName("CP Plot");
 
@@ -372,7 +373,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
         CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen pen(GColor(CCP));
-    pen.setWidth(2.0);
+    pen.setWidth(1.0);
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
     CPCurve->setData(cp_curve_time.data(), cp_curve_power.data(), curve_points);
@@ -716,7 +717,7 @@ CpintPlot::calculate(RideItem *rideItem)
         thisCurve = NULL;
     }
 
-    if (current->meanMaxArray(series).size()) {
+    if (!rangemode && current->meanMaxArray(series).size()) {
         int maxNonZero = 0;
         QVector<double> timeArray(current->meanMaxArray(series).size());
         for (int i = 0; i < current->meanMaxArray(series).size(); ++i) {

@@ -61,7 +61,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // main plot area
     //
     QVBoxLayout *vlayout = new QVBoxLayout;
-    cpintPlot = new CpintPlot(context, home.path(), context->athlete->zones());
+    cpintPlot = new CpintPlot(context, home.path(), context->athlete->zones(), rangemode);
     vlayout->addWidget(cpintPlot);
 
     QGridLayout *mainLayout = new QGridLayout();
