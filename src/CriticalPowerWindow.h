@@ -29,6 +29,7 @@
 #endif
 
 class CpintPlot;
+class QwtPlotCurve;
 class Context;
 class RideItem;
 class QwtPlotPicker;
@@ -120,6 +121,8 @@ class CriticalPowerWindow : public GcChartWindow
         void cpintTimeValueEntered();
         void pickerMoved(const QPoint &pos);
         void rideSelected();
+        void intervalSelected();
+        void intervalsChanged();
         void seasonSelected(int season);
         void shadingSelected(int shading);
         void setSeries(int index);
@@ -135,6 +138,8 @@ class CriticalPowerWindow : public GcChartWindow
 
     private:
         void updateCpint(double minutes);
+        void hideIntervalCurve(int index);
+        void showIntervalCurve(IntervalItem *current, int index);
 
         QString _dateRange;
 
@@ -159,6 +164,8 @@ class CriticalPowerWindow : public GcChartWindow
 #ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
 #endif
+        QList<QwtPlotCurve*> intervalCurves;
+
 
         bool rangemode;
         bool isfiltered;

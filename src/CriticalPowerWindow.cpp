@@ -17,6 +17,7 @@
  */
 
 #include "CriticalPowerWindow.h"
+#include "Settings.h"
 #include "SearchFilterBox.h"
 #include "MetricAggregator.h"
 #include "CpintPlot.h"
@@ -25,6 +26,7 @@
 #include "Athlete.h"
 #include "RideItem.h"
 #include "TimeUtils.h"
+#include "IntervalItem.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -180,7 +182,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
     } else {
+        // when working on a ride we can selecct intervals!
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
+        connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
@@ -264,11 +269,172 @@ CriticalPowerWindow::newRideAdded(RideItem *here)
 }
 
 void
-CriticalPowerWindow::rideSelected()
+CriticalPowerWindow::intervalSelected()
 {
+    if (rangemode) return; // do nothing for ranges!
+
+    // nothing to plot
+    if (!amVisible() || myRideItem == NULL) return;
+    if (context->athlete->allIntervalItems() == NULL) return; // not inited yet!
+
+    // if the array hasn't been initialised properly then clean it up
+    // this is because intervalsChanged gets called when selecting rides
+    if (intervalCurves.count() != context->athlete->allIntervalItems()->childCount()) {
+        // wipe away what we got, even if not visible
+        // clear any interval curves -- even if we are not visible
+        foreach(QwtPlotCurve *p, intervalCurves) {
+            if (p) {
+                p->detach();
+                delete p;
+            }
+        }
+
+        // clear, resize to interval count and set to null
+        intervalCurves.clear();
+        for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+    }
+
+    // which itervals are selected?
+    IntervalItem *current=NULL;
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
+        if (current != NULL) {
+            if (current->isSelected() == true) {
+                showIntervalCurve(current, i); // set it all up
+            } else {
+                hideIntervalCurve(i); // in case its shown at present
+            }
+        }
+    }
+    cpintPlot->replot();
+}
+
+void
+CriticalPowerWindow::hideIntervalCurve(int index)
+{
+    if (rangemode) return; // do nothing for ranges!
+
+    if (intervalCurves[index] != NULL) {
+        intervalCurves[index]->detach(); // in case
+    }
+}
+
+void
+CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
+{
+    if (rangemode) return; // do nothing for ranges!
+
+    // we already made it?
+    if (intervalCurves[index] != NULL) {
+        intervalCurves[index]->detach(); // in case
+        intervalCurves[index]->attach(cpintPlot);
+
+        return;
+    }
+
+    // ack, we need to create the curve for this interval
+
+    // make a ridefile
+    RideFile f;
+    f.context = context; // hack, until we refactor athlete and mainwindow
+    f.setRecIntSecs(myRideItem->ride()->recIntSecs());
+   
+    foreach(RideFilePoint *p, myRideItem->ride()->dataPoints()) { 
+       if (p->secs+f.recIntSecs() > current->start && p->secs< current->stop) {
+           f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                       p->watts, p->alt, p->lon, p->lat, p->headwind,
+                       p->slope, p->temp, p->lrbalance, 0);
+       }
+
+        // for xpower et al
+       f.recalculateDerivedSeries();
+    }
+
+    // compute the mean max, this is BLAZINGLY fast, thanks to Mark Rages'
+    // mean-max computer. Does a 11hr ride in 150ms
+    QVector<float>vector;
+    MeanMaxComputer thread1(&f, vector, series()); thread1.run();
+    thread1.wait();
+
+    // no data!
+    if (vector.count() == 0) return;
+
+    // create curve data arrays
+    int i=0;
+    QVector<double>x;
+    QVector<double>y;
+    x.resize(vector.size());
+    y.resize(vector.size());
+    foreach(float yv, vector) { x << i / 60.00; y << yv; i++; }
+
+    // create a curve!
+    QwtPlotCurve *curve = new QwtPlotCurve();
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    // set its color - based upon index in intervals!
+    QColor intervalColor;
+    int count=context->athlete->allIntervalItems()->childCount();
+    intervalColor.setHsv(index * (255/count), 255,255);
+    QPen pen(intervalColor);
+    pen.setWidth(2.0);
+    pen.setStyle(Qt::DotLine);
+    intervalColor.setAlpha(64);
+    QBrush brush = QBrush(intervalColor);
+    curve->setBrush(brush);
+    curve->setPen(pen);
+    curve->setData(x.data(), y.data(), x.count()-1);
+
+    // attach and register
+    curve->attach(cpintPlot);
+    intervalCurves[index] = curve;
+}
+
+void
+CriticalPowerWindow::intervalsChanged()
+{
+    if (rangemode) return; // do nothing for ranges!
+
+    // wipe away what we got, even if not visible
+    // clear any interval curves -- even if we are not visible
+    foreach(QwtPlotCurve *p, intervalCurves) {
+        if (p) {
+            p->detach();
+            delete p;
+        }
+    }
+
+    // clear, resize to interval count and set to null
+    intervalCurves.clear();
+    for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+
     if (!amVisible()) return;
 
+    // replot if needed
+    intervalSelected(); // will refresh
+}
+
+void
+CriticalPowerWindow::rideSelected()
+{
+    if (!rangemode) { // we only highlight intervals in normal mode
+
+        // clear any interval curves -- even if we are not visible
+        foreach(QwtPlotCurve *p, intervalCurves) {
+            if (p) {
+                p->detach();
+                delete p;
+            }
+        }
+
+        // clear, resize to interval count and set to null
+        intervalCurves.clear();
+        for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+    }
+
+    if (!amVisible()) return;
     currentRide = myRideItem;
+
     if (currentRide) {
         if (context->athlete->zones()) {
             int zoneRange = context->athlete->zones()->whichRange(currentRide->dateTime.date());
@@ -285,14 +451,41 @@ CriticalPowerWindow::rideSelected()
     } else if (!rangemode) {
         setIsBlank(true);
     }
+
+    // refresh intervals
+    intervalSelected();
 }
 
 void
 CriticalPowerWindow::setSeries(int index)
 {
     if (index >= 0) {
-        cpintPlot->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(index).toInt()));
-        cpintPlot->calculate(currentRide);
+
+        if (rangemode) {
+
+            cpintPlot->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(index).toInt()));
+            cpintPlot->calculate(currentRide);
+
+        } else {
+
+            // clear any interval curves -- even if we are not visible
+            foreach(QwtPlotCurve *p, intervalCurves) {
+                if (p) {
+                    p->detach();
+                    delete p;
+                }
+            }
+
+            // clear, resize to interval count and set to null
+            intervalCurves.clear();
+            for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+
+            cpintPlot->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(index).toInt()));
+            cpintPlot->calculate(currentRide);
+
+            // refresh intervals
+            intervalSelected();
+        }
     }
 }
 
