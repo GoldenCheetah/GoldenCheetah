@@ -81,7 +81,7 @@ class CpintPlot : public QwtPlot
 
     public:
 
-        CpintPlot(Context *, QString path, const Zones *zones);
+        CpintPlot(Context *, QString path, const Zones *zones, bool rangemode);
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
@@ -136,6 +136,7 @@ class CpintPlot : public QwtPlot
         QStringList files;
         bool isFiltered;
         int shadeMode;
+        bool rangemode;
 };
 
 #endif // _GC_CpintPlot_h
