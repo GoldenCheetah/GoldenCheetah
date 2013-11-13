@@ -214,6 +214,7 @@ LTMWindow::refresh()
 
     // refresh for changes to ridefiles / zones
     if (amVisible() == true && context->athlete->metricDB != NULL) {
+
         results.clear(); // clear any old data
         results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
@@ -223,6 +224,7 @@ LTMWindow::refresh()
         refreshPlot();
         repaint(); // title changes color when filters change
         dirty = false;
+
     } else {
         dirty = true;
     }
@@ -249,6 +251,8 @@ LTMWindow::dateRangeChanged(DateRange range)
 void
 LTMWindow::filterChanged()
 {
+    if (amVisible() == false || context->athlete->metricDB == NULL) return;
+
     if (useCustom) {
 
         settings.start = QDateTime(custom.from, QTime(0,0));
