@@ -875,4 +875,5 @@ AddIntervalDialog::addClicked()
         }
     }
     context->athlete->updateRideFileIntervals();
+    done(0);
 }
