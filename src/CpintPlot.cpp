@@ -40,8 +40,6 @@
 
 #include <algorithm> // for std::lower_bound
 
-#define USE_T0_IN_CP_MODEL 1 // added djconnel 08Apr2009: allow 3-parameter CP model
-
 CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool rangemode) :
     path(p),
     thisCurve(NULL),
@@ -335,7 +333,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
     // populate curve data with a CP curve
     const int curve_points = 100;
-    double tmin = USE_T0_IN_CP_MODEL ? 1.0/60 : tau;
+    double tmin = useT0 ? 25.0/60 : tau;
     double tmax = 180.0;
     QVector<double> cp_curve_power(curve_points);
     QVector<double> cp_curve_time(curve_points);
