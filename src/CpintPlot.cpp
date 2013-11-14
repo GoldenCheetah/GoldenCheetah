@@ -333,7 +333,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
     // populate curve data with a CP curve
     const int curve_points = 100;
-    double tmin = useT0 ? 25.0/60 : tau;
+    double tmin = useT0 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
     double tmax = 180.0;
     QVector<double> cp_curve_power(curve_points);
     QVector<double> cp_curve_time(curve_points);
