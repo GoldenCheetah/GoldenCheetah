@@ -176,8 +176,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // model config
     // 2 or 3 point model ?
     modelCombo= new QComboBox(this);
-    modelCombo->addItem("2 point");
-    modelCombo->addItem("3 point");
+    modelCombo->addItem("2 parameter");
+    modelCombo->addItem("3 parameter");
     modelCombo->setCurrentIndex(0);
 
     cl->addWidget(new QLabel("")); //spacing
