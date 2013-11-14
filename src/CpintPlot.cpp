@@ -40,7 +40,7 @@
 
 #include <algorithm> // for std::lower_bound
 
-#define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
+#define USE_T0_IN_CP_MODEL 1 // added djconnel 08Apr2009: allow 3-parameter CP model
 
 CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool rangemode) :
     path(p),
