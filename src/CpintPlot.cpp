@@ -219,11 +219,11 @@ void
 CpintPlot::deriveCPParameters()
 {
     // bounds on anaerobic interval in minutes
-    const double t1 = USE_T0_IN_CP_MODEL ? 0.25 : 1;
-    const double t2 = 6;
+    const double t1 = useT0 ? 0.25 : 1;
+    const double t2 = I1;
 
     // bounds on aerobic interval in minutes
-    const double t3 = 10;
+    const double t3 = I2;
     const double t4 = 60;
 
     // bounds of these time valus in the data
@@ -310,9 +310,8 @@ CpintPlot::deriveCPParameters()
         }
 
         // update t0 if we're using that model
-        #if USE_T0_IN_CP_MODEL
-        t0 = tau / (bests->meanMaxArray(series)[1] / cp - 1) - 1 / 60.0;
-        #endif
+        if (useT0) 
+            t0 = tau / (bests->meanMaxArray(series)[1] / cp - 1) - 1 / 60.0;
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) ||
              (fabs(t0 - t0_prev) > t0_delta_max)
@@ -354,14 +353,22 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
     // generate a plot
     QString curve_title;
-#if USE_T0_IN_CP_MODEL
-    curve_title.sprintf("CP=%.1f w; W'/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
-#else
-    if (series == RideFile::wattsKg)
-        curve_title.sprintf("CP=%.2f w/kg; W'=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
-    else
-        curve_title.sprintf("CP=%.0f w; W'=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
+#if 0 //XXX ?
+    if (useT0) {
+
+        curve_title.sprintf("CP=%.1f w; W'/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
+
+    } else {
 #endif
+
+        if (series == RideFile::wattsKg)
+            curve_title.sprintf("CP=%.2f w/kg; W'=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
+        else
+            curve_title.sprintf("CP=%.0f w; W'=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
+#if 0
+    }
+#endif
+
     if (series == RideFile::watts || series == RideFile::aPower || series == RideFile::wattsKg) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
 
     if (series == RideFile::wattsKg)
@@ -820,4 +827,20 @@ void
 CpintPlot::setShadeMode(int x)
 {
     shadeMode = x;
+}
+
+// model parameters!
+void 
+CpintPlot::setModel(int i1, int i2, bool useT0)
+{
+    I1 = double(i1) / double(60.00f);
+    I2 = double(i2) / double(60.00f);
+    this->useT0 = useT0;
+
+    // wipe away previous effort
+    if (CPCurve) {
+        delete CPCurve;
+        CPCurve = NULL;
+        clear_CP_Curves();
+    }
 }
