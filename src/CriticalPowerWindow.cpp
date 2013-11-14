@@ -124,6 +124,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // controls widget and layout
     QWidget *c = new QWidget;
     QFormLayout *cl = new QFormLayout(c);
+    cl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+
     setControls(c);
 
 #ifdef GC_HAVE_LUCENE
@@ -171,6 +173,37 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    // model config
+    // 2 or 3 point model ?
+    modelCombo= new QComboBox(this);
+    modelCombo->addItem("2 point");
+    modelCombo->addItem("3 point");
+    modelCombo->setCurrentIndex(0);
+
+    cl->addWidget(new QLabel("")); //spacing
+    cl->addWidget(new QLabel("")); //spacing
+    cl->addRow(new QLabel(tr("CP Model")), modelCombo);
+
+    i1SpinBox = new QDoubleSpinBox(this);
+    i1SpinBox->setValue(180); // 3 minutes
+    i1SpinBox->setDecimals(0);
+    i1SpinBox->setMinimum(0);
+    i1SpinBox->setMaximum(3600);
+    i1SpinBox->setSingleStep(1.0);
+    i1SpinBox->setAlignment(Qt::AlignRight);
+    cl->addRow(new QLabel(tr("Interval 1 (seconds)")), i1SpinBox);
+
+    i2SpinBox = new QDoubleSpinBox(this);
+    i2SpinBox->setValue(1800); // 30 minutes
+    i2SpinBox->setDecimals(0);
+    i2SpinBox->setMinimum(0.0);
+    i2SpinBox->setMaximum(3600);
+    i2SpinBox->setSingleStep(1.0);
+    i2SpinBox->setAlignment(Qt::AlignRight);
+    cl->addRow(new QLabel(tr("Interval 2 (seconds)")), i2SpinBox);
+
+    // point 2 + 3 -or- point 1 + 2 in a 2 point model
+
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, cpintPlot->canvas());
@@ -192,6 +225,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
+    // model updated?
+    connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelParametersChanged()));
+    connect(i1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(i2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(configChanged()), this, SLOT(rideSelected()));
@@ -203,6 +241,20 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
+}
+
+void
+CriticalPowerWindow::modelParametersChanged()
+{
+    // tell the plot
+    cpintPlot->setModel(i1SpinBox->value(),
+                        i2SpinBox->value(),
+                        modelCombo->currentIndex() > 0 ? true : false); // true=use 3point model
+
+    // and apply
+    if (amVisible() && myRideItem != NULL) {
+        cpintPlot->calculate(myRideItem);
+    }
 }
 
 void

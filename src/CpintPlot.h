@@ -86,6 +86,12 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
+        void setModel(int i1, int i2, bool useT0);
+
+        // model type & intervals
+        bool useT0;
+        int I1, I2;
+
         double cp, tau, t0; // CP model parameters
         double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
@@ -137,6 +143,7 @@ class CpintPlot : public QwtPlot
         bool isFiltered;
         int shadeMode;
         bool rangemode;
+
 };
 
 #endif // _GC_CpintPlot_h

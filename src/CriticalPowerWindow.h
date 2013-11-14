@@ -49,6 +49,10 @@ class CriticalPowerWindow : public GcChartWindow
     // for retro compatibility
     Q_PROPERTY(QString season READ season WRITE setSeason USER true)
 
+    Q_PROPERTY(int cpmodel READ cpModel WRITE setCPModel USER true)
+    Q_PROPERTY(int i1 READ i1 WRITE seti1 USER true)
+    Q_PROPERTY(int i2 READ i2 WRITE seti2 USER true)
+
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
     Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
@@ -72,6 +76,9 @@ class CriticalPowerWindow : public GcChartWindow
         int mode() const { return seriesCombo->currentIndex(); }
         void setMode(int x) { seriesCombo->setCurrentIndex(x); }
 
+        int cpModel() const { return modelCombo->currentIndex(); }
+        void setCPModel(int x) { modelCombo->setCurrentIndex(x); }
+
 #ifdef GC_HAVE_LUCENE
         // filter
         bool isFiltered() const { return (searchBox->isFiltered() || context->isfiltered); }
@@ -88,6 +95,12 @@ class CriticalPowerWindow : public GcChartWindow
                 seasonSelected(index);
             }
         }
+
+        int i1() const { return i1SpinBox->value(); }
+        void seti1(int x) { return i1SpinBox->setValue(x); }
+
+        int i2() const { return i2SpinBox->value(); }
+        void seti2(int x) { return i2SpinBox->setValue(x); }
 
         RideFile::SeriesType series() { 
             return static_cast<RideFile::SeriesType>
@@ -115,6 +128,7 @@ class CriticalPowerWindow : public GcChartWindow
         int shading() { return shadeCombo->currentIndex(); }
         void setShading(int x) { return shadeCombo->setCurrentIndex(x); }
 
+
     protected slots:
         void forceReplot();
         void newRideAdded(RideItem*);
@@ -135,6 +149,7 @@ class CriticalPowerWindow : public GcChartWindow
         void useThruToday();
 
         void refreshRideSaved();
+        void modelParametersChanged(); // we changed the model type or intervals
 
     private:
         void updateCpint(double minutes);
@@ -153,6 +168,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpintAllValue;
         QLabel *cpintCPValue;
         QComboBox *seriesCombo;
+        QComboBox *modelCombo;
         QComboBox *cComboSeason;
         QComboBox *shadeCombo;
         QwtPlotPicker *picker;
@@ -166,6 +182,7 @@ class CriticalPowerWindow : public GcChartWindow
 #endif
         QList<QwtPlotCurve*> intervalCurves;
 
+        QDoubleSpinBox *i1SpinBox, *i2SpinBox;
 
         bool rangemode;
         bool isfiltered;
