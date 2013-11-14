@@ -70,27 +70,36 @@ WPrime::setRide(RideFile *input)
     }
 
     // STEP 1: CONVERT POWER DATA TO A 1 SECOND TIME SERIES
-
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
+
     int last=0;
-    RideFilePoint *lp=NULL;
-    foreach(RideFilePoint *p, input->dataPoints()) {
 
-        // fill gaps in recording with zeroes
-        if (lp)
-            for(int t=lp->secs+input->recIntSecs();
-                t < p->secs;
-                t += input->recIntSecs())
-                points << QPointF(t, 0);
+    if (input->recIntSecs() >= 1) {
+        RideFilePoint *lp=NULL;
+        foreach(RideFilePoint *p, input->dataPoints()) {
 
-        // lets not go backwards -- or two sampls at the same time
-        if ((lp && p->secs > lp->secs) || !lp)
+            // fill gaps in recording with zeroes
+            if (lp)
+                for(int t=lp->secs+input->recIntSecs();
+                    t < p->secs;
+                    t += input->recIntSecs())
+                    points << QPointF(t, 0);
+
+            // lets not go backwards -- or two sampls at the same time
+            if ((lp && p->secs > lp->secs) || !lp)
+                points << QPointF(p->secs, p->watts);
+
+            // update state
+            last = p->secs;
+            lp = p;
+        }
+    } else {
+
+        foreach(RideFilePoint *p, input->dataPoints()) {
             points << QPointF(p->secs, p->watts);
-
-        // update state
-        last = p->secs;
-        lp = p;
+            last = p->secs;
+        }
     }
 
     // Create a spline
