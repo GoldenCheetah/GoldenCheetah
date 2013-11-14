@@ -76,12 +76,24 @@ ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
     mainVBox->addStretch();
 
     QHBoxLayout *cpHBox = new QHBoxLayout;
+    cpHBox->addStretch();
     cpHBox->addWidget(new QLabel(tr("Your critical power:")));
     txtCP = new QLineEdit(this);
     txtCP->setAlignment(Qt::AlignRight);
     txtCP->setReadOnly(true);
     cpHBox->addWidget(txtCP, Qt::AlignLeft);
+    cpHBox->addStretch();
     mainVBox->addLayout(cpHBox);
+
+    QHBoxLayout *wpHBox = new QHBoxLayout;
+    wpHBox->addStretch();
+    wpHBox->addWidget(new QLabel(tr("Your W':")));
+    txtWP = new QLineEdit(this);
+    txtWP->setAlignment(Qt::AlignRight);
+    txtWP->setReadOnly(true);
+    wpHBox->addWidget(txtWP, Qt::AlignLeft);
+    wpHBox->addStretch();
+    mainVBox->addLayout(wpHBox);
 
     mainVBox->addStretch();
 
@@ -116,5 +128,9 @@ void ToolsDialog::on_btnCalculate_clicked()
         (longSecs * longWatts - shortSecs * shortWatts)
         / (longSecs - shortSecs);
     txtCP->setText(QString("%1 watts").arg(static_cast<int>(round(CP))));
+
+    double Wprime = ((shortSecs * (shortWatts-CP)) +
+                    (longSecs * (longWatts-CP))) /2;
+    txtWP->setText(QString("%1 kJ").arg(static_cast<int>(round(Wprime/1000))));
 }
 

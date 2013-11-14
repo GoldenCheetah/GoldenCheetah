@@ -33,6 +33,7 @@ class ToolsDialog : public QDialog
         QPushButton *btnCalculate;
         QPushButton *btnOK;
         QLineEdit *txtCP;
+        QLineEdit *txtWP;
         QDoubleSpinBox *shortMinsSpinBox;
         QDoubleSpinBox *shortSecsSpinBox;
         QDoubleSpinBox *shortWattsSpinBox;

@@ -500,7 +500,7 @@ MainWindow::MainWindow(const QDir &home)
 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
-    optionsMenu->addAction(tr("Critical Power Estimator..."), this, SLOT(showTools()));
+    optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
 
     optionsMenu->addSeparator();
