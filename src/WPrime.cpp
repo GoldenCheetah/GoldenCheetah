@@ -113,6 +113,10 @@ WPrime::setRide(RideFile *input)
         int zoneRange = input->context->athlete->zones()->whichRange(input->startTime().date());
         CP = zoneRange >= 0 ? input->context->athlete->zones()->getCP(zoneRange) : 0;
         WPRIME = zoneRange >= 0 ? input->context->athlete->zones()->getWprime(zoneRange) : 0;
+
+        // did we override CP in metadata / metrics ?
+        int oCP = input->getTag("CP","0").toInt();
+        if (oCP) CP=oCP;
     }
 
     // since we will be running up and down the data series multiple times
