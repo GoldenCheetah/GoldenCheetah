@@ -60,6 +60,7 @@ class MainWindow : public QMainWindow
 
         // temporary access to the context
         Context *contextmain() { return context; } // by ChooseCyclistDialog
+        void byebye() { close(); } // go bye bye for a restart
 
     protected:
 

@@ -179,6 +179,7 @@ class ConfigDialog : public QMainWindow
     public slots:
         void changePage(int);
         void saveClicked();
+        void closeClicked();
 
     private:
         QSettings *settings;

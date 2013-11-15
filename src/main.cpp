@@ -77,6 +77,9 @@ main(int argc, char *argv[])
     QString libraryPath=".goldencheetah";
 #endif
 
+    QString sh;
+    if ((sh=appsettings->value(NULL, GC_HOMEDIR).toString()) != "") localLibraryPath = sh;
+
     //First check to see if the Library folder exists where the executable is (for USB sticks)
     QDir home = QDir();
     //if it does, create an ini file for settings and cd into the library

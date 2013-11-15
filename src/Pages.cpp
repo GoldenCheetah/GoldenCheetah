@@ -199,6 +199,22 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(showSBToday, 11,1, Qt::AlignLeft);
 
     //
+    // Athlete directory (home of athletes)
+    //
+    QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
+    athleteLabel = new QLabel(tr("Athlete Library:"));
+    athleteDirectory = new QLineEdit;
+    athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
+    athleteBrowseButton = new QPushButton(tr("Browse"));
+    athleteBrowseButton->setFixedWidth(70);
+
+    configLayout->addWidget(athleteLabel, 12,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 12,1);
+    configLayout->addWidget(athleteBrowseButton, 12,2);
+
+    connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
+
+    //
     // Workout directory (train view)
     //
     QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
@@ -208,9 +224,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutBrowseButton = new QPushButton(tr("Browse"));
     workoutBrowseButton->setFixedWidth(70);
 
-    configLayout->addWidget(workoutLabel, 12,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 12,1);
-    configLayout->addWidget(workoutBrowseButton, 13,1);
+    configLayout->addWidget(workoutLabel, 14,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 14,1);
+    configLayout->addWidget(workoutBrowseButton, 14,2);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
@@ -239,6 +255,7 @@ GeneralPage::saveClicked()
 
     // Bike score estimation
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
+    appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
     // Performance Manager
@@ -261,6 +278,14 @@ GeneralPage::browseWorkoutDir()
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
                             "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     workoutDirectory->setText(dir);
+}
+
+void
+GeneralPage::browseAthleteDir()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Athlete Library"),
+                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    athleteDirectory->setText(dir);
 }
 
 //

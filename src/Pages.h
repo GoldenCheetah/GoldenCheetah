@@ -61,6 +61,7 @@ class GeneralPage : public QWidget
 
     public slots:
         void browseWorkoutDir();
+        void browseAthleteDir();
 
     private:
         Context *context;
@@ -72,13 +73,16 @@ class GeneralPage : public QWidget
         QCheckBox *garminSmartRecord;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
+        QLineEdit *athleteDirectory;
         QLineEdit *workoutDirectory;
         QPushButton *workoutBrowseButton;
+        QPushButton *athleteBrowseButton;
 
         QLabel *langLabel;
         QLabel *unitLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;
+        QLabel *athleteLabel;
 
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
