@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 #include <QDebug>
 
+#define GC_HOMEDIR                  "homedirectory"
 #define GC_VERSION_USED             "versionused"
 #define GC_SAFEEXIT                 "safeexit"
 #define GC_SETTINGS_CO              "goldencheetah.org"

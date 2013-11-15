@@ -28,7 +28,7 @@
 #include "Zones.h"
 
 #include "AddDeviceWizard.h"
-
+#include "MainWindow.h"
 
 ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     home(_home), zones(_zones), context(context)
@@ -147,7 +147,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     setWindowTitle(tr("Options"));
 #endif
 
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
 }
 
@@ -156,6 +156,11 @@ void ConfigDialog::changePage(int index)
     pagesWidget->setCurrentIndex(index);
 }
 
+void ConfigDialog::closeClicked()
+{
+    // don't save!
+    close();
+}
 // if save is clicked, we want to:
 //   new mode:   create a new zone starting at the selected date (which may be null, implying BEGIN
 //   ! new mode: change the CP associated with the present mode
@@ -170,6 +175,37 @@ void ConfigDialog::saveClicked()
     device->saveClicked();
 
     hide();
+
+    // did the home directory change?
+    QString shome = appsettings->value(this, GC_HOMEDIR).toString();
+    if (shome != "0" && shome != "" && QFileInfo(shome).absoluteFilePath() != QFileInfo(home.absolutePath()).absolutePath()) {
+
+        // are you sure you want to change the location of the athlete library?
+        // if so we will restart, if not I'll revert to current directory
+        QMessageBox msgBox;
+        msgBox.setText("You changed the location of the athlete library");
+        msgBox.setInformativeText("You have moved the location of the athlete library "
+                                  "This is where ALL new athletes and their activity files "
+                                  "will now be stored.\n\nCurrent athlete data will no longer be "
+                                  "available and you will need to relaunch GoldenCheetah.\n\nDo you want to apply and close GoldenCheetah?");
+
+        // we want our own buttons...
+        msgBox.addButton(tr("No, Keep current"), QMessageBox::RejectRole);
+        msgBox.addButton(tr("Yes, Apply and Close"), QMessageBox::AcceptRole);
+        msgBox.setDefaultButton(QMessageBox::Abort);
+
+        if (msgBox.exec() == 1) { // accept!
+
+            // close all the mainwindows
+            foreach(MainWindow *m, mainwindows) m->byebye();
+
+        } else {
+
+            // revert to current home 
+            appsettings->setValue(GC_HOMEDIR, QFileInfo(home.absolutePath()).absolutePath());
+
+        }
+    }
 
     // do the zones first..
     context->notifyConfigChanged();
