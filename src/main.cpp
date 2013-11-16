@@ -23,6 +23,8 @@
 #include "Settings.h"
 #include "TrainDB.h"
 
+#include "GcUpgrade.h"
+
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
 #endif
@@ -34,6 +36,14 @@ int
 main(int argc, char *argv[])
 {
     int ret=2; // return code from qapplication, default to error
+
+    if (argc == 2 && (!strcmp(argv[1] , "--help") || !strcmp(argv[1], "--version"))) {
+
+        fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
+        fprintf(stderr, "Specify the folder and/or athlete to open on startup\n");
+        fprintf(stderr, "If no parameters are passed it will reopen the last athlete\n");
+        exit(0);
+    }
 
 #ifdef Q_OS_X11
     XInitThreads();
@@ -144,14 +154,30 @@ main(int argc, char *argv[])
 
         QStringList args(application->arguments());
 
-        // lets reopen last athlete
+        // lets do what the command line says ...
         QVariant lastOpened;
-        if(args.size() > 1) {
+        if(args.count() == 2) { // $ ./GoldenCheetah Mark
+
+            // athlete
             lastOpened = args.at(1);
+
+        } else if (args.count() == 3) { // $ ./GoldenCheetah ~/Athletes Mark
+
+            // first parameter is a folder that exists?
+            if (QFileInfo(args.at(1)).isDir()) {
+                home.cd(args.at(1));
+            }
+
+            // folder and athlete
+            lastOpened = args.at(2);
+
         } else {
+
+            // no parameters passed lets open the last athlete we worked with
             lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
         }
 
+        // lets attempt to open as asked/remembered
         bool anyOpened = false;
         if (lastOpened != QVariant()) {
             QStringList list = lastOpened.toStringList();
@@ -167,7 +193,8 @@ main(int argc, char *argv[])
             }
         }
 
-        // need to ask the user
+        // ack, didn't manage to open an athlete
+        // lets ask the user which / create a new one
         if (!anyOpened) {
             ChooseCyclistDialog d(home, true);
             d.setModal(true);
