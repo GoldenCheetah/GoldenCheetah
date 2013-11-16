@@ -222,7 +222,8 @@ SummaryMetrics::getBests(Context *context, QString symbol, int n,
         // XXX this needs improving for all cases ... hack for now
         add.value = QString("%1").arg(add.nvalue, 0, 'f', metric->precision());
 
-        results << add;
+        // nil values are not needed
+        if (add.nvalue < 0 || add.nvalue > 0) results << add;
     }
 
     // now sort
