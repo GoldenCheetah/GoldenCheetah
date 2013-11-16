@@ -30,6 +30,8 @@
 #include "AddDeviceWizard.h"
 #include "MainWindow.h"
 
+extern bool restarting; //its actually in main.cpp
+
 ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     home(_home), zones(_zones), context(context)
 {
@@ -184,17 +186,20 @@ void ConfigDialog::saveClicked()
         // if so we will restart, if not I'll revert to current directory
         QMessageBox msgBox;
         msgBox.setText("You changed the location of the athlete library");
-        msgBox.setInformativeText("You have moved the location of the athlete library "
-                                  "This is where ALL new athletes and their activity files "
+        msgBox.setInformativeText("This is where all new athletes and their activity files "
                                   "will now be stored.\n\nCurrent athlete data will no longer be "
-                                  "available and you will need to relaunch GoldenCheetah.\n\nDo you want to apply and close GoldenCheetah?");
+                                  "available and GoldenCheetah will need to restart for the change to take effect."
+                                  "\n\nDo you want to apply and restart GoldenCheetah?");
 
         // we want our own buttons...
         msgBox.addButton(tr("No, Keep current"), QMessageBox::RejectRole);
-        msgBox.addButton(tr("Yes, Apply and Close"), QMessageBox::AcceptRole);
+        msgBox.addButton(tr("Yes, Apply and Restart"), QMessageBox::AcceptRole);
         msgBox.setDefaultButton(QMessageBox::Abort);
 
         if (msgBox.exec() == 1) { // accept!
+
+            // lets restart
+            restarting = true;
 
             // close all the mainwindows
             foreach(MainWindow *m, mainwindows) m->byebye();
