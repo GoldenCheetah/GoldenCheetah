@@ -34,7 +34,7 @@ class TrainDB : public QObject
 	public:
 
     // get connection name
-    QSqlDatabase connection() { return dbconn; }
+    QSqlDatabase connection() { return db->database(sessionid); }
 
     // check the db structure is up to date
     void checkDBVersion();
@@ -47,8 +47,8 @@ class TrainDB : public QObject
 	TrainDB(QDir home);
     ~TrainDB();
 
-    void startLUW() { dbconn.transaction(); }
-    void endLUW() { dbconn.commit(); emit dataChanged(); }
+    void startLUW() { db->database(sessionid).transaction(); }
+    void endLUW() { db->database(sessionid).commit(); emit dataChanged(); }
 
     bool importWorkout(QString pathname, ErgFile *ergFile);
     bool deleteWorkout(QString pathname);
@@ -64,8 +64,8 @@ class TrainDB : public QObject
 
 	private:
         QDir home;
-        QSqlDatabase db;
-        QSqlDatabase dbconn;
+        QSqlDatabase *db;
+        QString sessionid;
 
 	    void initDatabase(QDir home);
 	    bool createDatabase();
