@@ -36,12 +36,16 @@ TrainDB::TrainDB(QDir home) : home(home)
 
 void TrainDB::closeConnection()
 {
-    dbconn.close();
+    db->database(sessionid).close();
 }
 
 TrainDB::~TrainDB()
 {
-    closeConnection();
+    if (db) {
+        db->close();
+        delete db;
+        QSqlDatabase::removeDatabase(sessionid);
+    }
 }
 
 void
@@ -49,14 +53,14 @@ TrainDB::initDatabase(QDir home)
 {
 
 
-    if(dbconn.isOpen()) return;
+    if(db->database(sessionid).isOpen()) return;
 
     // get a connection
-    db = QSqlDatabase::addDatabase("QSQLITE", "1");
-    db.setDatabaseName(home.absolutePath() + "/trainDB"); 
-    dbconn = db.database("1");
+    sessionid = "train";
+    db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", sessionid));
+    db->setDatabaseName(home.absolutePath() + "/trainDB"); 
 
-    if (!dbconn.isOpen()) {
+    if (!db->database(sessionid).isOpen()) {
         QMessageBox::critical(0, qApp->translate("TrainDB","Cannot open database"),
                        qApp->translate("TrainDB","Unable to establish a database connection.\n"
                                        "This feature requires SQLite support. Please read "
@@ -84,7 +88,7 @@ TrainDB::rebuildDB()
 
 bool TrainDB::createVideoTable()
 {
-    QSqlQuery query(dbconn);
+    QSqlQuery query(db->database(sessionid));
     bool rc;
     bool createTables = true;
 
@@ -129,7 +133,7 @@ bool TrainDB::createVideoTable()
 
 bool TrainDB::createWorkoutTable()
 {
-    QSqlQuery query(dbconn);
+    QSqlQuery query(db->database(sessionid));
     bool rc;
     bool createTables = true;
 
@@ -187,14 +191,14 @@ bool TrainDB::createWorkoutTable()
 
 bool TrainDB::dropVideoTable()
 {
-    QSqlQuery query("DROP TABLE videos", dbconn);
+    QSqlQuery query("DROP TABLE videos", db->database(sessionid));
     bool rc = query.exec();
     return rc;
 }
 
 bool TrainDB::dropWorkoutTable()
 {
-    QSqlQuery query("DROP TABLE workouts", dbconn);
+    QSqlQuery query("DROP TABLE workouts", db->database(sessionid));
     bool rc = query.exec();
     return rc;
 }
@@ -214,7 +218,7 @@ bool TrainDB::createDatabase()
 void TrainDB::checkDBVersion()
 {
     // can we get a version number?
-    QSqlQuery query("SELECT table_name, schema_version, creation_date from version;", dbconn);
+    QSqlQuery query("SELECT table_name, schema_version, creation_date from version;", db->database(sessionid));
 
     bool rc = query.exec();
 
@@ -222,11 +226,11 @@ void TrainDB::checkDBVersion()
         // we couldn't read the version table properly
         // it must be out of date!!
 
-        QSqlQuery dropM("DROP TABLE version", dbconn);
+        QSqlQuery dropM("DROP TABLE version", db->database(sessionid));
         dropM.exec();
 
         // recreate version table and add one entry
-        QSqlQuery version("CREATE TABLE version ( table_name varchar primary key, schema_version integer, creation_date date );", dbconn);
+        QSqlQuery version("CREATE TABLE version ( table_name varchar primary key, schema_version integer, creation_date date );", db->database(sessionid));
         version.exec();
 
         // wipe away whatever (if anything is there)
@@ -260,7 +264,7 @@ void TrainDB::checkDBVersion()
 int TrainDB::getCount()
 {
     // how many workouts are there?
-    QSqlQuery query("SELECT count(*) from workouts;", dbconn);
+    QSqlQuery query("SELECT count(*) from workouts;", db->database(sessionid));
     bool rc = query.exec();
 
     if (rc) {
@@ -277,7 +281,7 @@ int TrainDB::getDBVersion()
     int schema_version = -1;
 
     // can we get a version number?
-    QSqlQuery query("SELECT schema_version from version;", dbconn);
+    QSqlQuery query("SELECT schema_version from version;", db->database(sessionid));
 
     bool rc = query.exec();
 
@@ -297,7 +301,7 @@ int TrainDB::getDBVersion()
 
 bool TrainDB::deleteWorkout(QString pathname)
 {
-	QSqlQuery query(dbconn);
+	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
     // zap the current row - if there is one
@@ -309,7 +313,7 @@ bool TrainDB::deleteWorkout(QString pathname)
 
 bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
 {
-	QSqlQuery query(dbconn);
+	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
     // zap the current row - if there is one
@@ -352,7 +356,7 @@ bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
 
 bool TrainDB::deleteVideo(QString pathname)
 {
-	QSqlQuery query(dbconn);
+	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
     // zap the current row - if there is one
@@ -363,7 +367,7 @@ bool TrainDB::deleteVideo(QString pathname)
 
 bool TrainDB::importVideo(QString pathname)
 {
-	QSqlQuery query(dbconn);
+	QSqlQuery query(db->database(sessionid));
     QDateTime timestamp = QDateTime::currentDateTime();
 
     // zap the current row - if there is one

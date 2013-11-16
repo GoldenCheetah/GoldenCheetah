@@ -83,7 +83,6 @@ class DBAccess
 
         Context *context;
         QSqlDatabase *db;
-        QSqlDatabase dbconn;
         QString sessionid;
 
         SpecialFields msp;

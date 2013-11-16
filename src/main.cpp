@@ -176,5 +176,11 @@ main(int argc, char *argv[])
         MainWindow *mainWindow = new MainWindow(home);
         mainWindow->show();
     }
-    return application->exec();
+
+    int ret =application->exec();
+
+    // close trainDB
+    delete trainDB;
+
+    return ret;
 }
