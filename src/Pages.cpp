@@ -1548,6 +1548,199 @@ IntervalMetricsPage::saveClicked()
     appsettings->setValue(GC_SETTINGS_INTERVAL_METRICS, metrics.join(","));
 }
 
+BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
+    QWidget(parent), changed(false)
+{
+    availList = new QListWidget;
+    availList->setSortingEnabled(true);
+    availList->setSelectionMode(QAbstractItemView::SingleSelection);
+    QVBoxLayout *availLayout = new QVBoxLayout;
+    availLayout->addWidget(new QLabel(tr("Available Metrics")));
+    availLayout->addWidget(availList);
+    selectedList = new QListWidget;
+    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
+    QVBoxLayout *selectedLayout = new QVBoxLayout;
+    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
+    selectedLayout->addWidget(selectedList);
+#ifndef Q_OS_MAC
+    upButton = new QToolButton(this);
+    downButton = new QToolButton(this);
+    leftButton = new QToolButton(this);
+    rightButton = new QToolButton(this);
+    upButton->setArrowType(Qt::UpArrow);
+    downButton->setArrowType(Qt::DownArrow);
+    leftButton->setArrowType(Qt::LeftArrow);
+    rightButton->setArrowType(Qt::RightArrow);
+    upButton->setFixedSize(20,20);
+    downButton->setFixedSize(20,20);
+    leftButton->setFixedSize(20,20);
+    rightButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    leftButton = new QPushButton("<");
+    rightButton = new QPushButton(">");
+#endif
+    QVBoxLayout *buttonGrid = new QVBoxLayout;
+    QHBoxLayout *upLayout = new QHBoxLayout;
+    QHBoxLayout *inexcLayout = new QHBoxLayout;
+    QHBoxLayout *downLayout = new QHBoxLayout;
+
+    upLayout->addStretch();
+    upLayout->addWidget(upButton);
+    upLayout->addStretch();
+
+    inexcLayout->addStretch();
+    inexcLayout->addWidget(leftButton);
+    inexcLayout->addWidget(rightButton);
+    inexcLayout->addStretch();
+
+    downLayout->addStretch();
+    downLayout->addWidget(downButton);
+    downLayout->addStretch();
+
+    buttonGrid->addStretch();
+    buttonGrid->addLayout(upLayout);
+    buttonGrid->addLayout(inexcLayout);
+    buttonGrid->addLayout(downLayout);
+    buttonGrid->addStretch();
+
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    hlayout->addLayout(availLayout);
+    hlayout->addLayout(buttonGrid);
+    hlayout->addLayout(selectedLayout);
+    setLayout(hlayout);
+
+    QString s;
+    if (appsettings->contains(GC_SETTINGS_BESTS_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS).toString();
+    else
+        s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
+    QStringList selectedMetrics = s.split(",");
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    for (int i = 0; i < factory.metricCount(); ++i) {
+        QString symbol = factory.metricName(i);
+        if (selectedMetrics.contains(symbol))
+            continue;
+        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
+        QString name = m->name();
+        name.replace(tr("&#8482;"), tr(" (TM)"));
+        QListWidgetItem *item = new QListWidgetItem(name);
+        item->setData(Qt::UserRole, symbol);
+        availList->addItem(item);
+    }
+    foreach (QString symbol, selectedMetrics) {
+        if (!factory.haveMetric(symbol))
+            continue;
+        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
+        QString name = m->name();
+        name.replace(tr("&#8482;"), tr(" (TM)"));
+        QListWidgetItem *item = new QListWidgetItem(name);
+        item->setData(Qt::UserRole, symbol);
+        selectedList->addItem(item);
+    }
+
+    upButton->setEnabled(false);
+    downButton->setEnabled(false);
+    leftButton->setEnabled(false);
+    rightButton->setEnabled(false);
+
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
+    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
+    connect(availList, SIGNAL(itemSelectionChanged()),
+            this, SLOT(availChanged()));
+    connect(selectedList, SIGNAL(itemSelectionChanged()),
+            this, SLOT(selectedChanged()));
+}
+
+void
+BestsMetricsPage::upClicked()
+{
+    assert(!selectedList->selectedItems().isEmpty());
+    QListWidgetItem *item = selectedList->selectedItems().first();
+    int row = selectedList->row(item);
+    assert(row > 0);
+    selectedList->takeItem(row);
+    selectedList->insertItem(row - 1, item);
+    selectedList->setCurrentItem(item);
+    changed = true;
+}
+
+void
+BestsMetricsPage::downClicked()
+{
+    assert(!selectedList->selectedItems().isEmpty());
+    QListWidgetItem *item = selectedList->selectedItems().first();
+    int row = selectedList->row(item);
+    assert(row < selectedList->count() - 1);
+    selectedList->takeItem(row);
+    selectedList->insertItem(row + 1, item);
+    selectedList->setCurrentItem(item);
+    changed = true;
+}
+
+void
+BestsMetricsPage::leftClicked()
+{
+    assert(!selectedList->selectedItems().isEmpty());
+    QListWidgetItem *item = selectedList->selectedItems().first();
+    selectedList->takeItem(selectedList->row(item));
+    availList->addItem(item);
+    changed = true;
+}
+
+void
+BestsMetricsPage::rightClicked()
+{
+    assert(!availList->selectedItems().isEmpty());
+    QListWidgetItem *item = availList->selectedItems().first();
+    availList->takeItem(availList->row(item));
+    selectedList->addItem(item);
+    changed = true;
+}
+
+void
+BestsMetricsPage::availChanged()
+{
+    rightButton->setEnabled(!availList->selectedItems().isEmpty());
+}
+
+void
+BestsMetricsPage::selectedChanged()
+{
+    if (selectedList->selectedItems().isEmpty()) {
+        upButton->setEnabled(false);
+        downButton->setEnabled(false);
+        leftButton->setEnabled(false);
+        return;
+    }
+    QListWidgetItem *item = selectedList->selectedItems().first();
+    int row = selectedList->row(item);
+    if (row == 0)
+        upButton->setEnabled(false);
+    else
+        upButton->setEnabled(true);
+    if (row == selectedList->count() - 1)
+        downButton->setEnabled(false);
+    else
+        downButton->setEnabled(true);
+    leftButton->setEnabled(true);
+}
+
+void
+BestsMetricsPage::saveClicked()
+{
+    if (!changed)
+        return;
+    QStringList metrics;
+    for (int i = 0; i < selectedList->count(); ++i)
+        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
+    appsettings->setValue(GC_SETTINGS_BESTS_METRICS, metrics.join(","));
+}
+
 SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {

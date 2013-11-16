@@ -145,6 +145,7 @@ class MetricConfig : public QWidget
         Zones *zones;
         Context *context;
 
+        BestsMetricsPage *bestsPage;
         IntervalMetricsPage *intervalsPage;
         SummaryMetricsPage *summaryPage;
 };

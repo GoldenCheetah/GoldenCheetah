@@ -24,7 +24,19 @@
 #include <QMap>
 #include <QDateTime>
 #include <QApplication>
+
 class Context;
+class SummaryBest
+{
+    public:
+    double nvalue;
+    QString value; // formatted value
+    QDate date;
+
+    // for qsort
+    bool operator< (SummaryBest right) const { return (nvalue < right.nvalue); }
+};
+
 class SummaryMetrics
 {
     Q_DECLARE_TR_FUNCTIONS(SummaryMetrics)
@@ -68,6 +80,12 @@ class SummaryMetrics
                                      const QList<SummaryMetrics> &results,
                                      const QStringList &filters, bool filtered,
                                      bool useMetricUnits, bool nofmt = false);
+
+        // get an ordered list pf bests for that symbol
+        static QList<SummaryBest> getBests(Context *context, QString symbol, int n, 
+                                            const QList<SummaryMetrics> &results, 
+                                            const QStringList &filters, bool filtered, 
+                                            bool useMetricUnits);
 
         QMap<QString, double> &values() { return value; }
         QMap<QString, QString> &texts() { return text; }
