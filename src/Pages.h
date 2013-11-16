@@ -255,6 +255,44 @@ class DevicePage : public QWidget
         QCheckBox   *multiCheck;
 };
 
+class BestsMetricsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+
+        BestsMetricsPage(QWidget *parent = NULL);
+
+    public slots:
+
+        void upClicked();
+        void downClicked();
+        void leftClicked();
+        void rightClicked();
+        void availChanged();
+        void selectedChanged();
+        void saveClicked();
+
+    protected:
+
+        bool changed;
+        QListWidget *availList;
+        QListWidget *selectedList;
+#ifndef Q_OS_MAC
+        QToolButton *upButton;
+        QToolButton *downButton;
+        QToolButton *leftButton;
+        QToolButton *rightButton;
+#else
+        QPushButton *upButton;
+        QPushButton *downButton;
+        QPushButton *leftButton;
+        QPushButton *rightButton;
+#endif
+};
+
 class IntervalMetricsPage : public QWidget
 {
     Q_OBJECT

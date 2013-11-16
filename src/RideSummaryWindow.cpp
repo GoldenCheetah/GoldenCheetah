@@ -178,7 +178,6 @@ RideSummaryWindow::refresh()
     rideSummary->page()->mainFrame()->setHtml(htmlSummary());
 }
 
-
 QString
 RideSummaryWindow::htmlSummary() const
 {
@@ -247,6 +246,10 @@ RideSummaryWindow::htmlSummary() const
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
     QStringList metricColumn = s.split(",");
+
+    s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS, GC_SETTINGS_BESTS_METRICS_DEFAULT).toString();
+    if (s == "") s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
+    QStringList bestsColumn = s.split(",");
 
     static const QStringList timeInZones = QStringList()
         << "time_in_zone_L1"
@@ -379,6 +382,49 @@ RideSummaryWindow::htmlSummary() const
         summary += "</table></td>";
     }
     summary += "</tr></table>";
+
+    //
+    // Bests for the period
+    //
+    if (!ridesummary) {
+        summary += tr("<h3>Athlete Bests</h3>\n");
+
+        // best headings
+        summary += "<table border=0 cellspacing=10><tr>";
+        for (int i = 0; i < bestsColumn.count(); ++i) {
+            summary += "<td align=\"center\" valign=\"top\" width=\"%1%\"><table>"
+                       "<tr><td align=\"center\" colspan=3><h3>%2</h3></td></tr>";
+            summary = summary.arg(90 / bestsColumn.count());
+
+            const RideMetric *m = factory.rideMetric(bestsColumn[i]);
+            summary = summary.arg(m->name());
+
+            // get top n
+            QList<SummaryBest> bests = SummaryMetrics::getBests(context, bestsColumn[i], 10, data, filters, filtered, useMetricUnits);
+
+            QColor color = QApplication::palette().alternateBase().color();
+            color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+
+            int pos=1;
+            foreach(SummaryBest best, bests) {
+
+                // alternating shading
+                if (pos%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                else summary += "<tr>";
+
+                summary += QString("<td align=\"center\">%1.</td><td align=\"center\">%2</td><td align=\"center\">%3</td></tr>")
+                           .arg(pos++)
+                           .arg(best.value)
+                           .arg(best.date.toString(tr("dd MMM yy")));
+            }
+
+            // close that column
+            summary += "</table></td>";
+        }
+        // close the table
+        summary += "</tr></table>";
+
+    }
 
     //
     // Time In Zones

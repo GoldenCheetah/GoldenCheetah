@@ -189,3 +189,49 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
 
     return result;
 }
+
+bool summaryBestGreaterThan(const SummaryBest &s1, const SummaryBest &s2)
+{
+     return s1.nvalue > s2.nvalue;
+}
+
+QList<SummaryBest> 
+SummaryMetrics::getBests(Context *context, QString symbol, int n, 
+                         const QList<SummaryMetrics> &data, 
+                         const QStringList &filters, bool filtered, 
+                         bool /* useMetricUnits */)
+{
+    QList<SummaryBest> results;
+
+    // get the metric details, so we can convert etc
+    const RideMetric *metric = RideMetricFactory::instance().rideMetric(symbol);
+    if (!metric) return results;
+
+    // loop through and aggregate
+    foreach (SummaryMetrics rideMetrics, data) {
+
+        // skip filtered rides
+        if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
+        if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
+
+        // get this value
+        SummaryBest add;
+        add.nvalue = rideMetrics.getForSymbol(symbol);
+        add.date = rideMetrics.getRideDate().date();
+
+        // XXX this needs improving for all cases ... hack for now
+        add.value = QString("%1").arg(add.nvalue, 0, 'f', metric->precision());
+
+        results << add;
+    }
+
+    // now sort
+    qStableSort(results.begin(), results.end(), summaryBestGreaterThan);
+
+    // truncate
+    if (results.count() > n) results.erase(results.begin()+n,results.end());
+
+    // return the array with the right number of entries in #1 - n order
+    return results;
+}
+
