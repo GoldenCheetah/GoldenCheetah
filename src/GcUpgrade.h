@@ -30,11 +30,12 @@
 // 3006 - V3 RC6
 // 3007 - V3 RC7
 // 3010 - V3 RELEASE (June 7 2013)
+// 3040 - V3.1 DEV BUILDS
+#define VERSION3_BUILD 3010 // this was the official v3 build -- don't change this line!
 
-#define VERSION_LATEST 3010
-#define VERSION_STRING "V3.0"
-
-#define VERSION3_BUILD 3010
+// add new versions below
+#define VERSION_LATEST 3040 // this is the very latest build -- increment for new dev branch or releases
+#define VERSION_STRING "V3.1"
 
 class GcUpgrade
 {
