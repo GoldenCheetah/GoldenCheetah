@@ -315,7 +315,7 @@ RideSummaryWindow::htmlSummary() const
     //
     summary += "<table border=0 cellspacing=10><tr>";
     for (int i = 0; i < columnNames.count(); ++i) {
-        summary += "<td align=\"center\" valign=\"top\" width=\"%1%\"><table>"
+        summary += "<td align=\"center\" valign=\"top\" width=\"%1%%\"><table>"
             "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
         summary = summary.arg(90 / columnNames.count());
         summary = summary.arg(columnNames[i]);
@@ -390,12 +390,12 @@ RideSummaryWindow::htmlSummary() const
         summary += tr("<h3>Athlete Bests</h3>\n");
 
         // best headings
-        summary += "<table border=0 cellspacing=10><tr>";
+        summary += "<table border=0 cellspacing=10 width=\"90%%\"><tr>";
         for (int i = 0; i < bestsColumn.count(); ++i) {
-            summary += "<td align=\"center\" valign=\"top\" width=\"%1%\"><table>"
-                       "<tr><td align=\"center\" colspan=3><h3>%2</h3></td></tr>";
-            summary = summary.arg(90 / bestsColumn.count());
+        summary += "<td align=\"center\" valign=\"top\"><table width=\"100%%\">"
+            "<tr><td align=\"center\" colspan=3><h4>%1<h4></td></tr>";
 
+            //summary = summary.arg(90 / bestsColumn.count());
             const RideMetric *m = factory.rideMetric(bestsColumn[i]);
             summary = summary.arg(m->name());
 

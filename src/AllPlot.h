@@ -37,7 +37,7 @@ class AllPlotBackground;
 class AllPlotZoneLabel;
 class AllPlotWindow;
 class AllPlot;
-class RideFilePoint;
+struct RideFilePoint;
 class IntervalItem;
 class IntervalPlotData;
 class Context;

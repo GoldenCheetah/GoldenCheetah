@@ -2153,6 +2153,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
             plotTmpReference(axis, 0, 0); //unplot
         }
     }
+    return false;
 }
 
 void
