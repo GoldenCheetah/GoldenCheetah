@@ -1807,12 +1807,7 @@ AllPlot::setShowW(bool show)
     showW = show;
     wCurve->setVisible(show);
     mCurve->setVisible(show);
-    if (showW && parent->wpData->TAU > 0) {
-        QwtText text(QString("tau=%1").arg(parent->wpData->TAU));
-        text.setFont(QFont("Helvetica", 10, QFont::Bold));
-        text.setColor(GColor(CWBAL));
-        curveTitle.setLabel(text);
-    } else {
+    if (!showW || parent->wpData->TAU <= 0) {
         curveTitle.setLabel(QwtText(""));
     }
     setYMax();

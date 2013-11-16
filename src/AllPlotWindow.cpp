@@ -1387,13 +1387,20 @@ AllPlotWindow::setShowW(int value)
     //if (!current) return;
     bool checked = ( ( value == Qt::Checked ) && showW->isEnabled()) ? true : false;
 
-    // refresh W' data if needed
-    if (checked && current && current->ride() && wpData->ride() != current->ride())
-        wpData->setRide(current->ride());
-
     allPlot->setShowW(checked);
     foreach (AllPlot *plot, allPlots)
         plot->setShowW(checked);
+
+    // refresh W' data if needed
+    if (checked && current && current->ride() && wpData->ride() != current->ride()) {
+        wpData->setRide(current->ride());
+
+        // redraw
+        redrawFullPlot();
+        redrawAllPlot();
+        redrawStackPlot();
+    }
+
 }
 
 void
