@@ -86,11 +86,11 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
-        void setModel(int i1, int i2, bool useT0);
+        void setModel(int i1, int i2, int i3, int i4, bool useT0);
 
         // model type & intervals
         bool useT0;
-        int I1, I2;
+        int anI1, anI2, aeI1, aeI2;
 
         double cp, tau, t0; // CP model parameters
         double shadingCP; // the CP value we use to draw the shade

@@ -50,8 +50,10 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(QString season READ season WRITE setSeason USER true)
 
     Q_PROPERTY(int cpmodel READ cpModel WRITE setCPModel USER true)
-    Q_PROPERTY(int i1 READ i1 WRITE seti1 USER true)
-    Q_PROPERTY(int i2 READ i2 WRITE seti2 USER true)
+    Q_PROPERTY(int ani1 READ anI1 WRITE setAnI1 USER true)
+    Q_PROPERTY(int ani2 READ anI2 WRITE setAnI2 USER true)
+    Q_PROPERTY(int aei1 READ aeI1 WRITE setAeI1 USER true)
+    Q_PROPERTY(int aei2 READ aeI2 WRITE setAeI2 USER true)
 
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -96,11 +98,17 @@ class CriticalPowerWindow : public GcChartWindow
             }
         }
 
-        int i1() const { return i1SpinBox->value(); }
-        void seti1(int x) { return i1SpinBox->setValue(x); }
+        int anI1() const { return anI1SpinBox->value(); }
+        void setAnI1(int x) { return anI1SpinBox->setValue(x); }
 
-        int i2() const { return i2SpinBox->value(); }
-        void seti2(int x) { return i2SpinBox->setValue(x); }
+        int anI2() const { return anI2SpinBox->value(); }
+        void setAnI2(int x) { return anI2SpinBox->setValue(x); }
+
+        int aeI1() const { return aeI1SpinBox->value(); }
+        void setAeI1(int x) { return aeI1SpinBox->setValue(x); }
+
+        int aeI2() const { return aeI2SpinBox->value(); }
+        void setAeI2(int x) { return aeI2SpinBox->setValue(x); }
 
         RideFile::SeriesType series() { 
             return static_cast<RideFile::SeriesType>
@@ -182,7 +190,7 @@ class CriticalPowerWindow : public GcChartWindow
 #endif
         QList<QwtPlotCurve*> intervalCurves;
 
-        QDoubleSpinBox *i1SpinBox, *i2SpinBox;
+        QDoubleSpinBox *anI1SpinBox, *anI2SpinBox, *aeI1SpinBox, *aeI2SpinBox;
 
         bool rangemode;
         bool isfiltered;
