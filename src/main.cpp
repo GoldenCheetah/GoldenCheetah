@@ -55,13 +55,52 @@ main(int argc, char *argv[])
 {
     int ret=2; // return code from qapplication, default to error
 
-    if (argc == 2 && (!strcmp(argv[1] , "--help") || !strcmp(argv[1], "--version"))) {
+    //
+    // PROCESS COMMAND LINE SWITCHES
+    //
 
-        fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
-        fprintf(stderr, "Specify the folder and/or athlete to open on startup\n");
-        fprintf(stderr, "If no parameters are passed it will reopen the last athlete\n");
+    // snaffle arguments into a stringlist we can play with into sargs
+    // and only keep non-switch args in the args string list
+    QStringList sargs, args;
+    for (int i=0; i<argc; i++) sargs << argv[i];
+
+    bool debug = false;
+    bool help = false;
+
+    // honour command line switches
+    foreach (QString arg, sargs) {
+
+        // help or version requested
+        if (arg == "--help" || arg == "--version") {
+
+            help = true;
+            fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
+            fprintf(stderr, "--help or --version to print this message and exit\n");
+            fprintf(stderr, "--debug             to direct diagnostic messages to the terminal instead of goldencheetah.log\n");
+            fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
+            fprintf(stderr, "Specify the folder and/or athlete to open on startup\n");
+            fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
+
+        } else if (arg == "--debug") {
+
+            // debug, so don't redirect stderr!
+            debug = true;
+
+        } else {
+
+            // not switches !
+            args << arg;
+        }
+    }
+
+    // help or version printed so just exit now
+    if (help) {
         exit(0);
     }
+
+    //
+    // INITIALISE ONE TIME OBJECTS
+    //
 
 #ifdef Q_OS_X11
     XInitThreads();
@@ -86,7 +125,9 @@ main(int argc, char *argv[])
     application->setFont(font); // set default font
 
 
-    // creating that first mainwindow
+    //
+    // OPEN FIRST MAINWINDOW
+    //
     do {
 
         // lets not restart endlessly
@@ -142,7 +183,7 @@ main(int argc, char *argv[])
         }
 
         // now redirect stderr
-        nostderr(home.absolutePath());
+        if (!debug) nostderr(home.absolutePath());
 
         // install QT Translator to enable QT Dialogs translation
         // we may have restarted JUST to get this!
@@ -166,8 +207,6 @@ main(int argc, char *argv[])
 
         // initialise the trainDB
         trainDB = new TrainDB(home);
-
-        QStringList args(application->arguments());
 
         // lets do what the command line says ...
         QVariant lastOpened;
