@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QtGui>
+#include <QFile>
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
@@ -29,13 +30,14 @@
 // sadly, no equivalent on Windows
 #ifndef WIN32
 #include "stdio.h"
+#include "unistd.h"
 void nostderr(QString dir)
 {
     // redirect stderr to a file
-    FILE *fp = fopen(QString("%1/goldencheetah.log").arg(dir).toLatin1(), "w+");
-    if (fp) {
+    QFile *fp = new QFile(QString("%1/goldencheetah.log").arg(dir));
+    if (fp->open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
         close(2);
-        dup(fileno(fp));
+        dup(fp->handle());
     } else {
         fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
     }
