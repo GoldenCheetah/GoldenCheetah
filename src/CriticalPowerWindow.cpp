@@ -185,20 +185,20 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     cl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
     anI1SpinBox = new QDoubleSpinBox(this);
-    anI1SpinBox->setValue(180); // 3 minutes
     anI1SpinBox->setDecimals(0);
     anI1SpinBox->setMinimum(0);
     anI1SpinBox->setMaximum(3600);
     anI1SpinBox->setSingleStep(1.0);
     anI1SpinBox->setAlignment(Qt::AlignRight);
+    anI1SpinBox->setValue(180); // 3 minutes
 
     anI2SpinBox = new QDoubleSpinBox(this);
-    anI2SpinBox->setValue(360); // 6 minutes
     anI2SpinBox->setDecimals(0);
     anI2SpinBox->setMinimum(0);
     anI2SpinBox->setMaximum(3600);
     anI2SpinBox->setSingleStep(1.0);
     anI2SpinBox->setAlignment(Qt::AlignRight);
+    anI2SpinBox->setValue(360); // 6 minutes
 
     QHBoxLayout *anLayout = new QHBoxLayout(this);
     anLayout->addWidget(anI1SpinBox);
@@ -206,20 +206,20 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     cl->addRow(new QLabel(tr("Interval 1 (seconds)")), anLayout);
 
     aeI1SpinBox = new QDoubleSpinBox(this);
-    aeI1SpinBox->setValue(1800); // 30 minutes
     aeI1SpinBox->setDecimals(0);
     aeI1SpinBox->setMinimum(0.0);
     aeI1SpinBox->setMaximum(3600);
     aeI1SpinBox->setSingleStep(1.0);
     aeI1SpinBox->setAlignment(Qt::AlignRight);
+    aeI1SpinBox->setValue(1800); // 30 minutes
 
     aeI2SpinBox = new QDoubleSpinBox(this);
-    aeI2SpinBox->setValue(3600); // 30 minutes
     aeI2SpinBox->setDecimals(0);
     aeI2SpinBox->setMinimum(0.0);
     aeI2SpinBox->setMaximum(3600);
     aeI2SpinBox->setSingleStep(1.0);
     aeI2SpinBox->setAlignment(Qt::AlignRight);
+    aeI2SpinBox->setValue(3600); // 30 minutes
 
     QHBoxLayout *aeLayout = new QHBoxLayout(this);
     aeLayout->addWidget(aeI1SpinBox);
@@ -267,6 +267,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
+
+    modelParametersChanged();
 }
 
 void
