@@ -25,6 +25,24 @@
 
 #include "GcUpgrade.h"
 
+// redirect errors to `home'/goldencheetah.log
+// sadly, no equivalent on Windows
+#ifndef WIN32
+#include "stdio.h"
+void nostderr(QString dir)
+{
+    // redirect stderr to a file
+    FILE *fp = fopen(QString("%1/goldencheetah.log").arg(dir).toLatin1(), "w+");
+    if (fp) {
+        close(2);
+        dup(fileno(fp));
+    } else {
+        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+    }
+}
+#endif
+
+
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
 #endif
@@ -54,12 +72,6 @@ main(int argc, char *argv[])
     {
         // fix Mac OS X 10.9 (mavericks) font issue
         // https://bugreports.qt-project.org/browse/QTBUG-32789
-        qDebug() << "insertSubstitution .Lucida Grande UI for Lucida Grande";
-        //QStringList list;
-        //list.append("Lucida Grande");
-        //list.append("LucidaGrande");
-        //QFont::insertSubstitutions(".Lucida Grande UI", list);
-        //QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
         QFont::insertSubstitution("LucidaGrande", "Lucida Grande");
     }
 #endif
@@ -128,6 +140,9 @@ main(int argc, char *argv[])
                 home.cd(libraryPath);
             }
         }
+
+        // now redirect stderr
+        nostderr(home.absolutePath());
 
         // install QT Translator to enable QT Dialogs translation
         // we may have restarted JUST to get this!
