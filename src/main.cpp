@@ -185,7 +185,9 @@ main(int argc, char *argv[])
         }
 
         // now redirect stderr
+#ifndef WIN32
         if (!debug) nostderr(home.absolutePath());
+#endif
 
         // install QT Translator to enable QT Dialogs translation
         // we may have restarted JUST to get this!
