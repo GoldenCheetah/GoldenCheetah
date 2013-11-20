@@ -217,12 +217,12 @@ void
 CpintPlot::deriveCPParameters()
 {
     // bounds on anaerobic interval in minutes
-    const double t1 = useT0 ? 0.25 : 1;
-    const double t2 = I1;
+    const double t1 = anI1;
+    const double t2 = anI2;
 
     // bounds on aerobic interval in minutes
-    const double t3 = I2;
-    const double t4 = 60;
+    const double t3 = aeI1;
+    const double t4 = aeI2;
 
     // bounds of these time valus in the data
     int i1, i2, i3, i4;
@@ -829,10 +829,13 @@ CpintPlot::setShadeMode(int x)
 
 // model parameters!
 void 
-CpintPlot::setModel(int i1, int i2, bool useT0)
+CpintPlot::setModel(int i1, int i2, int i3, int i4, bool useT0)
 {
-    I1 = double(i1) / double(60.00f);
-    I2 = double(i2) / double(60.00f);
+    anI1 = double(i1) / double(60.00f);
+    anI2 = double(i2) / double(60.00f);
+    aeI1 = double(i3) / double(60.00f);
+    aeI2 = double(i4) / double(60.00f);
+
     this->useT0 = useT0;
 
     // wipe away previous effort

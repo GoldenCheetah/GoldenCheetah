@@ -184,23 +184,47 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
-    i1SpinBox = new QDoubleSpinBox(this);
-    i1SpinBox->setValue(180); // 3 minutes
-    i1SpinBox->setDecimals(0);
-    i1SpinBox->setMinimum(0);
-    i1SpinBox->setMaximum(3600);
-    i1SpinBox->setSingleStep(1.0);
-    i1SpinBox->setAlignment(Qt::AlignRight);
-    cl->addRow(new QLabel(tr("Interval 1 (seconds)")), i1SpinBox);
+    anI1SpinBox = new QDoubleSpinBox(this);
+    anI1SpinBox->setValue(180); // 3 minutes
+    anI1SpinBox->setDecimals(0);
+    anI1SpinBox->setMinimum(0);
+    anI1SpinBox->setMaximum(3600);
+    anI1SpinBox->setSingleStep(1.0);
+    anI1SpinBox->setAlignment(Qt::AlignRight);
 
-    i2SpinBox = new QDoubleSpinBox(this);
-    i2SpinBox->setValue(1800); // 30 minutes
-    i2SpinBox->setDecimals(0);
-    i2SpinBox->setMinimum(0.0);
-    i2SpinBox->setMaximum(3600);
-    i2SpinBox->setSingleStep(1.0);
-    i2SpinBox->setAlignment(Qt::AlignRight);
-    cl->addRow(new QLabel(tr("Interval 2 (seconds)")), i2SpinBox);
+    anI2SpinBox = new QDoubleSpinBox(this);
+    anI2SpinBox->setValue(360); // 6 minutes
+    anI2SpinBox->setDecimals(0);
+    anI2SpinBox->setMinimum(0);
+    anI2SpinBox->setMaximum(3600);
+    anI2SpinBox->setSingleStep(1.0);
+    anI2SpinBox->setAlignment(Qt::AlignRight);
+
+    QHBoxLayout *anLayout = new QHBoxLayout(this);
+    anLayout->addWidget(anI1SpinBox);
+    anLayout->addWidget(anI2SpinBox);
+    cl->addRow(new QLabel(tr("Interval 1 (seconds)")), anLayout);
+
+    aeI1SpinBox = new QDoubleSpinBox(this);
+    aeI1SpinBox->setValue(1800); // 30 minutes
+    aeI1SpinBox->setDecimals(0);
+    aeI1SpinBox->setMinimum(0.0);
+    aeI1SpinBox->setMaximum(3600);
+    aeI1SpinBox->setSingleStep(1.0);
+    aeI1SpinBox->setAlignment(Qt::AlignRight);
+
+    aeI2SpinBox = new QDoubleSpinBox(this);
+    aeI2SpinBox->setValue(3600); // 30 minutes
+    aeI2SpinBox->setDecimals(0);
+    aeI2SpinBox->setMinimum(0.0);
+    aeI2SpinBox->setMaximum(3600);
+    aeI2SpinBox->setSingleStep(1.0);
+    aeI2SpinBox->setAlignment(Qt::AlignRight);
+
+    QHBoxLayout *aeLayout = new QHBoxLayout(this);
+    aeLayout->addWidget(aeI1SpinBox);
+    aeLayout->addWidget(aeI2SpinBox);
+    cl->addRow(new QLabel(tr("Interval 2 (seconds)")), aeLayout);
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
@@ -227,8 +251,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     // model updated?
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelParametersChanged()));
-    connect(i1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
-    connect(i2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(anI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(anI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(aeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(aeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
 
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
@@ -247,8 +273,10 @@ void
 CriticalPowerWindow::modelParametersChanged()
 {
     // tell the plot
-    cpintPlot->setModel(i1SpinBox->value(),
-                        i2SpinBox->value(),
+    cpintPlot->setModel(anI1SpinBox->value(),
+                        anI2SpinBox->value(),
+                        aeI1SpinBox->value(),
+                        aeI2SpinBox->value(),
                         modelCombo->currentIndex() > 0 ? true : false); // true=use 3point model
 
     // and apply
