@@ -373,7 +373,7 @@ CriticalPowerWindow::intervalSelected()
 
         // clear, resize to interval count and set to null
         intervalCurves.clear();
-        for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+        for (int i=0; i< context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
     }
 
     // which itervals are selected?
