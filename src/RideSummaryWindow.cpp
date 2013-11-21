@@ -415,7 +415,7 @@ RideSummaryWindow::htmlSummary() const
                 summary += QString("<td align=\"center\">%1.</td><td align=\"center\">%2</td><td align=\"center\">%3</td></tr>")
                            .arg(pos++)
                            .arg(best.value)
-                           .arg(best.date.toString(tr("dd MMM yy")));
+                           .arg(best.date.toString(tr("d MMM yyyy")));
             }
 
             // close that column
