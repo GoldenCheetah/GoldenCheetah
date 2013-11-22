@@ -202,6 +202,7 @@ class CriticalPowerWindow : public GcChartWindow
         DateRange custom;
 
         DateSettingsEdit *dateSetting;
+        bool active; // when resetting parameters
 };
 
 #endif // _GC_CriticalPowerWindow_h

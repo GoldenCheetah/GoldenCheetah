@@ -42,7 +42,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
-    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false)
+    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false)
 {
     setInstanceName("Critical Power Window");
 
@@ -279,12 +279,12 @@ CriticalPowerWindow::modelChanged()
     // based on advice from our exercise physiologist friends
     // for best results in predicting both W' and CP and providing
     // a reasonable fit for durations < 2mins.
-
+    active = true;
     switch (modelCombo->currentIndex()) {
 
     case 0 : // 2 param model
             anI1SpinBox->setValue(180);
-            anI2SpinBox->setValue(3600);
+            anI2SpinBox->setValue(360);
             aeI1SpinBox->setValue(1800);
             aeI2SpinBox->setValue(3600);
             break;
@@ -297,6 +297,7 @@ CriticalPowerWindow::modelChanged()
             aeI2SpinBox->setValue(3600);
             break;
     }
+    active = false;
 
     // update the plot.
     modelParametersChanged();
@@ -305,6 +306,8 @@ CriticalPowerWindow::modelChanged()
 void
 CriticalPowerWindow::modelParametersChanged()
 {
+    if (active == true) return;
+
     // tell the plot
     cpintPlot->setModel(anI1SpinBox->value(),
                         anI2SpinBox->value(),
