@@ -250,7 +250,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
     // model updated?
-    connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelParametersChanged()));
+    connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(anI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(anI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(aeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
@@ -268,6 +268,37 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
+    modelParametersChanged();
+}
+
+void
+CriticalPowerWindow::modelChanged()
+{
+    // we changed from/to a 2 or 3 parameter model
+    // so lets set some semsible defaults, these are
+    // based on advice from our exercise physiologist friends
+    // for best results in predicting both W' and CP and providing
+    // a reasonable fit for durations < 2mins.
+
+    switch (modelCombo->currentIndex()) {
+
+    case 0 : // 2 param model
+            anI1SpinBox->setValue(180);
+            anI2SpinBox->setValue(3600);
+            aeI1SpinBox->setValue(1800);
+            aeI2SpinBox->setValue(3600);
+            break;
+
+    case 1 : // 3 param model
+
+            anI1SpinBox->setValue(1800);
+            anI2SpinBox->setValue(2400);
+            aeI1SpinBox->setValue(2400);
+            aeI2SpinBox->setValue(3600);
+            break;
+    }
+
+    // update the plot.
     modelParametersChanged();
 }
 

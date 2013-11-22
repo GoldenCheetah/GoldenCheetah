@@ -157,7 +157,8 @@ class CriticalPowerWindow : public GcChartWindow
         void useThruToday();
 
         void refreshRideSaved();
-        void modelParametersChanged(); // we changed the model type or intervals
+        void modelParametersChanged(); // we changed the intervals
+        void modelChanged(); // we changed the model type 
 
     private:
         void updateCpint(double minutes);
