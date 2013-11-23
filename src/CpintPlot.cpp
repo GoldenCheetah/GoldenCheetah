@@ -367,7 +367,12 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     }
 #endif
 
-    if (series == RideFile::watts || series == RideFile::aPower || series == RideFile::wattsKg) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
+    if (series == RideFile::watts ||
+        series == RideFile::aPower ||
+        series == RideFile::xPower ||
+        series == RideFile::NP ||
+        series == RideFile::wattsKg) 
+        curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
 
     if (series == RideFile::wattsKg)
         curveTitle.setYValue(0.6);
@@ -579,7 +584,9 @@ CpintPlot::calculate(RideItem *rideItem)
         //
         // CP curve only relevant for Energy or Watts (?)
         //
-        if (series == RideFile::aPower || series == RideFile::watts || series == RideFile::wattsKg || series == RideFile::none) {
+        if (series == RideFile::aPower || series == RideFile::NP || series == RideFile::xPower ||
+            series == RideFile::watts || series == RideFile::wattsKg || series == RideFile::none) {
+
             if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
             else {
                 // make sure color reflects latest config
