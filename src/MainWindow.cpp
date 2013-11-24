@@ -250,6 +250,14 @@ MainWindow::MainWindow(const QDir &home)
     sidebar->setToolTip("Sidebar");
     sidebar->setSelected(true); // assume always start up with sidebar selected
 
+    lowbar = new QtMacButton(this, QtMacButton::TexturedRounded);
+    QPixmap *lowbarImg = new QPixmap(":images/mac/lowbar.png");
+    lowbar->setImage(lowbarImg);
+    lowbar->setMinimumSize(25, 25);
+    lowbar->setMaximumSize(25, 25);
+    lowbar->setToolTip("Compare");
+    lowbar->setSelected(false); // assume always start up with lowbar deselected
+
     actbuttons = new QtMacSegmentedButton(3, acts);
     actbuttons->setWidth(115);
     actbuttons->setNoSelect();
@@ -268,13 +276,22 @@ MainWindow::MainWindow(const QDir &home)
     QHBoxLayout *pq = new QHBoxLayout(viewsel);
     pq->setContentsMargins(0,0,0,0);
     pq->setSpacing(5);
-    pq->addWidget(sidebar);
+    QHBoxLayout *ps = new QHBoxLayout;
+    ps->setContentsMargins(0,0,0,0);
+    ps->setSpacing (2); // low and sidebar button close together
+    ps->addStretch();
+    ps->addWidget(sidebar);
+    ps->addWidget(lowbar);
+    ps->addStretch();
+    pq->addLayout(ps);
+
     styleSelector = new QtMacSegmentedButton(2, viewsel);
     styleSelector->setWidth(80); // actually its 80 but we want a 30px space between is and the searchbox
     styleSelector->setImage(0, new QPixmap(":images/mac/tabbed.png"), 24);
     styleSelector->setImage(1, new QPixmap(":images/mac/tiled.png"), 24);
     pq->addWidget(styleSelector);
     connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
+    connect(lowbar, SIGNAL(clicked(bool)), this, SLOT(toggleLowbar()));
     connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
 
     // setup Mac thetoolbar
@@ -313,6 +330,7 @@ MainWindow::MainWindow(const QDir &home)
     splitIcon = iconFromPNG(":images/mac/split.png");
     deleteIcon = iconFromPNG(":images/mac/trash.png");
     sidebarIcon = iconFromPNG(":images/mac/sidebar.png");
+    lowbarIcon = iconFromPNG(":images/mac/lowbar.png");
     tabbedIcon = iconFromPNG(":images/mac/tabbed.png");
     tiledIcon = iconFromPNG(":images/mac/tiled.png");
     QSize isize(19,19);
@@ -337,6 +355,15 @@ MainWindow::MainWindow(const QDir &home)
     compose->setToolTip(tr("Create Manual Activity"));
     compose->setPalette(metal);
     connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
+
+    lowbar = new QPushButton(this);
+    lowbar->setIcon(lowbarIcon);
+    lowbar->setIconSize(isize);
+    lowbar->setFixedHeight(25);
+    lowbar->setStyle(toolStyle);
+    lowbar->setToolTip(tr("Toggle Compare Pane"));
+    lowbar->setPalette(metal);
+    connect(lowbar, SIGNAL(clicked(bool)), this, SLOT(toggleLowbar()));
 
     sidebar = new QPushButton(this);
     sidebar->setIcon(sidebarIcon);
@@ -382,6 +409,7 @@ MainWindow::MainWindow(const QDir &home)
 
     head->addStretch();
     head->addWidget(sidebar);
+    head->addWidget(lowbar);
     head->addWidget(styleSelector);
 
 #ifdef GC_HAVE_LUCENE
@@ -553,6 +581,9 @@ MainWindow::MainWindow(const QDir &home)
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
+    showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)));
+    showhideLowbar->setCheckable(true);
+    showhideLowbar->setChecked(false);
 #ifndef Q_OS_MAC // not on a Mac
     QAction *showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
@@ -622,6 +653,18 @@ void
 MainWindow::showSidebar(bool want)
 {
     tab->setSidebarEnabled(want);
+}
+
+void
+MainWindow::toggleLowbar()
+{
+    //XXX tab->toggleSidebar();
+}
+
+void
+MainWindow::showLowbar(bool want)
+{
+    //XXX tab->setLowbarEnabled(want);
 }
 
 void
