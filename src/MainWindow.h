@@ -107,6 +107,8 @@ class MainWindow : public QMainWindow
         void toggleStyle();
         void setStyle();
         void setStyleFromSegment(int); // special case for linux/win qtsegmentcontrol toggline
+        void toggleLowbar();
+        void showLowbar(bool want);
 
         // Analysis View
         void setActivityMenu();
@@ -177,18 +179,18 @@ class MainWindow : public QMainWindow
 
 #ifdef Q_OS_MAC
         // Mac Native Support
-        QtMacButton *import, *compose, *sidebar;
+        QtMacButton *import, *compose, *sidebar, *lowbar;
         QtMacSegmentedButton *actbuttons, *styleSelector;
         QToolBar *head;
 #else
         // Not on Mac so use other types
-        QPushButton *import, *compose, *sidebar;
+        QPushButton *import, *compose, *sidebar, *lowbar;
         QtSegmentControl *actbuttons, *styleSelector;
         GcToolBar *head;
 
         // the icons
         QIcon importIcon, composeIcon, intervalIcon, splitIcon,
-              deleteIcon, sidebarIcon, tabbedIcon, tiledIcon;
+              deleteIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 #endif
 
         // chart menus
@@ -202,6 +204,7 @@ class MainWindow : public QMainWindow
         // only keeping those used outside of mainwindow constructor
         QAction *styleAction;
         QAction *showhideSidebar;
+        QAction *showhideLowbar;
         QAction *tweetAction;
         QAction *shareAction;
         QAction *ttbAction;

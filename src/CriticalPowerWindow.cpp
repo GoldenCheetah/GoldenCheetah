@@ -200,7 +200,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     anI2SpinBox->setAlignment(Qt::AlignRight);
     anI2SpinBox->setValue(360); // 6 minutes
 
-    QHBoxLayout *anLayout = new QHBoxLayout(this);
+    QHBoxLayout *anLayout = new QHBoxLayout;
     anLayout->addWidget(anI1SpinBox);
     anLayout->addWidget(anI2SpinBox);
     cl->addRow(new QLabel(tr("Interval 1 (seconds)")), anLayout);
@@ -221,7 +221,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     aeI2SpinBox->setAlignment(Qt::AlignRight);
     aeI2SpinBox->setValue(3600); // 30 minutes
 
-    QHBoxLayout *aeLayout = new QHBoxLayout(this);
+    QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
     aeLayout->addWidget(aeI2SpinBox);
     cl->addRow(new QLabel(tr("Interval 2 (seconds)")), aeLayout);
