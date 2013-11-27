@@ -38,5 +38,11 @@
         <text/>
       </controlProperties>
     </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Label" x="48" y="62" w="387" h="-1" measuredW="180" measuredH="21" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>10066329</color>
+        <text>Drag%20and%20drop%20intervals%20here%20...</text>
+      </controlProperties>
+    </control>
   </controls>
 </mockup>
