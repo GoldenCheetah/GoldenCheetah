@@ -647,24 +647,28 @@ void
 MainWindow::toggleSidebar()
 {
     tab->toggleSidebar();
+    setToolButtons();
 }
 
 void
 MainWindow::showSidebar(bool want)
 {
     tab->setSidebarEnabled(want);
+    setToolButtons();
 }
 
 void
 MainWindow::toggleLowbar()
 {
-    //XXX tab->toggleSidebar();
+    if (tab->hasBottom()) tab->setShowBottom(!tab->isShowBottom());
+    setToolButtons();
 }
 
 void
 MainWindow::showLowbar(bool want)
 {
-    //XXX tab->setLowbarEnabled(want);
+    if (tab->hasBottom()) tab->setShowBottom(want);
+    setToolButtons();
 }
 
 void
@@ -792,7 +796,7 @@ MainWindow::toggleStyle()
 {
     tab->toggleTile();
     styleAction->setChecked(tab->isTiled());
-    setStyle();
+    setToolButtons();
 }
 
 #ifndef Q_OS_MAC
@@ -940,37 +944,42 @@ void
 MainWindow::selectAnalysis()
 {
     tab->selectView(1);
-    setStyle();
+    setToolButtons();
 }
 
 void
 MainWindow::selectTrain()
 {
     tab->selectView(3);
-    setStyle();
+    setToolButtons();
 }
 
 void
 MainWindow::selectDiary()
 {
     tab->selectView(2);
-    setStyle();
+    setToolButtons();
 }
 
 void
 MainWindow::selectHome()
 {
     tab->selectView(0);
-    setStyle();
+    setToolButtons();
 }
 
 void
-MainWindow::setStyle()
+MainWindow::setToolButtons()
 {
     int select = tab->isTiled() ? 1 : 0;
+    int lowselected = tab->isShowBottom() ? 1 : 0;
+
+    styleAction->setChecked(select);
+    showhideLowbar->setChecked(lowselected);
 
 #ifdef Q_OS_MAC
     styleSelector->setSelected(select, true);
+    lowbar->setSelected(lowselected);
 #else
     if (styleSelector->isSegmentSelected(select) == false)
         styleSelector->setSegmentSelected(select, true);

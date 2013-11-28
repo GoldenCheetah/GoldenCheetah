@@ -105,7 +105,7 @@ class MainWindow : public QMainWindow
         void showToolbar(bool want);
         void resetWindowLayout();
         void toggleStyle();
-        void setStyle();
+        void setToolButtons(); // set toolbar buttons to match tabview
         void setStyleFromSegment(int); // special case for linux/win qtsegmentcontrol toggline
         void toggleLowbar();
         void showLowbar(bool want);

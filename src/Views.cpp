@@ -23,6 +23,7 @@
 #include "LTMSidebar.h"
 #include "BlankState.h"
 #include "TrainDB.h"
+#include "ComparePane.h"
 
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
@@ -35,6 +36,8 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
     setSidebar(s);
     setPage(a);
     setBlank(b);
+    //setBottom(new ComparePane(this, ComparePane::interval));
+    setBottom(new QWidget(this));
 }
 
 AnalysisView::~AnalysisView()
