@@ -157,7 +157,13 @@ class LTMWindow : public GcChartWindow
 #endif
 
         LTMSettings getSettings() const { return settings; }
-        void applySettings(LTMSettings x) { settings = x; settings.ltmTool = ltmTool; ltmTool->applySettings(); }
+        void applySettings(LTMSettings x) { 
+            bool events =settings.events; // remember - they don't get saved in settings..
+            settings = x; 
+            settings.events = events; 
+            settings.ltmTool = ltmTool;
+            ltmTool->applySettings();
+        }
 
     public slots:
         void rideSelected();
