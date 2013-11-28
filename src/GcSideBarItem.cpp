@@ -197,7 +197,7 @@ GcSubSplitter::createHandle()
     if(_insertedWidget != 0) {
         GcSplitterItem* _item = dynamic_cast<GcSplitterItem*>(_insertedWidget);
         if(_item != 0) {
-            _item->splitterHandle = new GcSplitterHandle(_item->title, _item, orientation(), this);
+            _item->splitterHandle = new GcSplitterHandle(_item->title, orientation(), this);
             _item->splitterHandle->addActions(_item->actions());
             _item->controlAction = new QAction(_item->icon, _item->title, this);
             _item->controlAction->setStatusTip(_item->title);
@@ -212,12 +212,12 @@ GcSubSplitter::createHandle()
     return QSplitter::createHandle();
 }
 
-GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSubSplitter *parent) : QSplitterHandle(orientation, parent), widget(widget), title(title)
+GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent) : QSplitterHandle(orientation, parent), title(title)
 {
     setContentsMargins(0,0,0,0);
     setFixedHeight(23);
 
-    gcSplitter = parent;
+    gcSplitter = (GcSubSplitter*)parent;
 
     titleLayout = new QHBoxLayout(this);
     titleLayout->setContentsMargins(0,0,0,0);

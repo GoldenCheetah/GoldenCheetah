@@ -251,6 +251,7 @@ HEADERS += \
         Colors.h \
         ColorButton.h \
         CommPort.h \
+        ComparePane.h \
         Computrainer.h \
         Computrainer3dpFile.h \
         ConfigDialog.h \
@@ -438,6 +439,7 @@ SOURCES += \
         Colors.cpp \
         ColorButton.cpp \
         CommPort.cpp \
+        ComparePane.cpp \
         Computrainer.cpp \
         Computrainer3dpFile.cpp \
         ConfigDialog.cpp \

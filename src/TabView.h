@@ -25,9 +25,11 @@
 #include <QStackedWidget>
 
 #include "HomeWindow.h"
+#include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
 
 class Tab;
+class ViewSplitter;
 class Context;
 class BlankStatePage;
 
@@ -52,6 +54,8 @@ class TabView : public QWidget
         HomeWindow *page() { return page_;}
         void setBlank(BlankStatePage *blank);
         BlankStatePage *blank() { return blank_; }
+        void setBottom(QWidget *bottom);
+        QWidget *bottom() { return bottom_; }
 
         // sidebar
         void setSidebarEnabled(bool x) { _sidebar=x; sidebarChanged(); }
@@ -60,6 +64,11 @@ class TabView : public QWidget
         // tiled
         void setTiled(bool x) { _tiled=x; tileModeChanged(); }
         bool isTiled() const { return _tiled; }
+
+        // bottom
+        void setShowBottom(bool x) { if (bottom_) x ? bottom_->show() : bottom_->hide(); }
+        bool isShowBottom() { if (bottom_) return bottom_->isVisible(); return false; }
+        bool hasBottom() { return (bottom_!=NULL); }
 
         // select / deselect view
         void setSelected(bool x) { _selected=x; selectionChanged(); }
@@ -110,10 +119,31 @@ class TabView : public QWidget
 
         QStackedWidget *stack;
         QSplitter *splitter;
+        ViewSplitter *mainSplitter;
         QWidget *sidebar_;
+        QWidget *bottom_;
         HomeWindow *page_;
         BlankStatePage *blank_;
 
+};
+
+// we make our own view splitter for the bespoke handle
+class ViewSplitter : public QSplitter
+{
+public:
+    ViewSplitter(Qt::Orientation orientation, QString name, QWidget *parent=0) :
+        orientation(orientation), name(name), QSplitter(orientation, parent) {}
+
+protected:
+    QSplitterHandle *createHandle() {
+qDebug()<<"create a  handle"<<name;
+        return new GcSplitterHandle(name, orientation, this);
+    }
+    int handleWidth() { return 23; };
+
+private:
+    Qt::Orientation orientation;
+    QString name;
 };
 
 #endif // _GC_TabView_h

@@ -32,7 +32,8 @@
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
     _sidebar(true), _tiled(false), _selected(false), 
-    stack(NULL), splitter(NULL), sidebar_(NULL), page_(NULL), blank_(NULL)
+    stack(NULL), splitter(NULL), mainSplitter(NULL), 
+    sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
 {
     // setup the basic widget
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -56,6 +57,12 @@ TabView::TabView(Context *context, int type) :
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
     splitter->setOpaqueResize(true); // redraw when released, snappier UI
     stack->insertWidget(0, splitter); // splitter always at index 0
+
+    mainSplitter = new ViewSplitter(Qt::Vertical, "Compare Intervals", this);
+    mainSplitter->setHandleWidth(23);
+    mainSplitter->setFrameStyle(QFrame::NoFrame);
+    mainSplitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
+    mainSplitter->setOpaqueResize(true); // redraw when released, snappier UI
 
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 }
@@ -98,18 +105,27 @@ TabView::setPage(HomeWindow *page)
 {
     page_ = page;
 
+    // add to mainSplitter
     // now reset the splitter
-    splitter->insertWidget(-1, page);
-    splitter->setStretchFactor(0,0);
-    splitter->setStretchFactor(1,1);
-    splitter->setCollapsible(0, true);
-    splitter->setCollapsible(1, true);
+    mainSplitter->insertWidget(-1, page);
+    mainSplitter->setStretchFactor(0,0);
+    mainSplitter->setCollapsible(0, false);
+    splitter->insertWidget(-1, mainSplitter);
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
     if (splitterSizes.toByteArray().size() > 1 ) {
         splitter->restoreState(splitterSizes.toByteArray());
     }
+}
 
+void
+TabView::setBottom(QWidget *widget)
+{
+    bottom_ = widget;
+    bottom_->hide();
+    mainSplitter->insertWidget(-1, bottom_);
+    mainSplitter->setCollapsible(1, true); // XXX we need a ComparePane widget ...
+    mainSplitter->setStretchFactor(1,1);
 }
 
 void

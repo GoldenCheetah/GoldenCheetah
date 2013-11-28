@@ -53,6 +53,11 @@ class Tab: public QWidget
         void setSidebarEnabled(bool);
         bool isSidebarEnabled();
 
+        // bottom
+        void setShowBottom(bool);
+        bool isShowBottom();
+        bool hasBottom();
+
         // layout
         void resetLayout();
         void addChart(GcWinID);

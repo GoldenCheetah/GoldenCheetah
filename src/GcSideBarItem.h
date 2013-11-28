@@ -91,7 +91,7 @@ class GcSplitterHandle : public QSplitterHandle
     friend class ::GcSplitterItem;
 
 public:
-    GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSubSplitter *parent = 0);
+    GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent = 0);
 
     QSize sizeHint() const;
     GcSubSplitter *splitter() const;
@@ -105,8 +105,6 @@ protected:
 
 private:
     void paintBackground(QPaintEvent *);
-
-    GcSplitterItem *widget;
 
     QHBoxLayout *titleLayout;
     GcLabel *titleLabel;
