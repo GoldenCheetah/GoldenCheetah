@@ -136,7 +136,6 @@ public:
 
 protected:
     QSplitterHandle *createHandle() {
-qDebug()<<"create a  handle"<<name;
         return new GcSplitterHandle(name, orientation, this);
     }
     int handleWidth() { return 23; };
