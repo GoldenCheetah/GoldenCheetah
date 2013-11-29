@@ -64,6 +64,9 @@ TabView::TabView(Context *context, int type) :
     mainSplitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
     mainSplitter->setOpaqueResize(true); // redraw when released, snappier UI
 
+    // the animator
+    anim = new QPropertyAnimation(mainSplitter, "hpos");
+
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 }
 
@@ -138,12 +141,28 @@ TabView::setShowBottom(bool x)
     // basic version for now .. remembers and sets horizontal position precisely
     // adding animation should be easy from here
 
+
     if (bottom_) {
         if (x) {
+
             // set to the last value....
             bottom_->show();
-            mainSplitter->setProperty("hpos", mainSplitter->maxhpos() - (lastHeight+22));
+
+            anim->setDuration(200);
+            anim->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
+            anim->setKeyValueAt(0,mainSplitter->maxhpos()-22);
+            anim->setKeyValueAt(1,mainSplitter->maxhpos()-(lastHeight+22));
+            anim->start();
+
         } else {
+
+            // need a hide animator to hide on timeout
+            //anim->setDuration(200);
+            //anim->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
+            //anim->setKeyValueAt(0,mainSplitter->maxhpos()-(lastHeight+22));
+            //anim->setKeyValueAt(1,mainSplitter->maxhpos()-22);
+            //anim->start();
+
             bottom_->hide();
         }
     }
