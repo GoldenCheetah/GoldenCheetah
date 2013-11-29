@@ -121,6 +121,7 @@ class TabView : public QWidget
         QStackedWidget *stack;
         QSplitter *splitter;
         ViewSplitter *mainSplitter;
+        QPropertyAnimation *anim;
         QWidget *sidebar_;
         QWidget *bottom_;
         HomeWindow *page_;
@@ -135,7 +136,9 @@ class ViewSplitter : public QSplitter
 
 public:
     ViewSplitter(Qt::Orientation orientation, QString name, QWidget *parent=0) :
-        orientation(orientation), name(name), QSplitter(orientation, parent) {}
+        orientation(orientation), name(name), QSplitter(orientation, parent) {
+        qRegisterMetaType<ViewSplitter*>("hpos");
+    }
 
 protected:
     QSplitterHandle *createHandle() {
@@ -147,7 +150,7 @@ public:
     Q_PROPERTY(int hpos READ hpos WRITE sethpos USER true)
 
     // handle position
-    int hpos() const { return sizes()[0]; }
+    int hpos() const { if (sizes().count() == 2) return sizes()[0]; else return 0; }
 
     void sethpos(int x) { 
         if (x<0) return; //r requested size too small!
