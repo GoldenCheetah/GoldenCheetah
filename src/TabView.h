@@ -66,7 +66,7 @@ class TabView : public QWidget
         bool isTiled() const { return _tiled; }
 
         // bottom
-        void setShowBottom(bool x) { if (bottom_) x ? bottom_->show() : bottom_->hide(); }
+        void setShowBottom(bool x);
         bool isShowBottom() { if (bottom_) return bottom_->isVisible(); return false; }
         bool hasBottom() { return (bottom_!=NULL); }
 
@@ -116,6 +116,7 @@ class TabView : public QWidget
         bool _sidebar;
         bool _tiled;
         bool _selected;
+        int lastHeight; // last height of splitter, default to 100...
 
         QStackedWidget *stack;
         QSplitter *splitter;
@@ -130,6 +131,8 @@ class TabView : public QWidget
 // we make our own view splitter for the bespoke handle
 class ViewSplitter : public QSplitter
 {
+    Q_OBJECT
+
 public:
     ViewSplitter(Qt::Orientation orientation, QString name, QWidget *parent=0) :
         orientation(orientation), name(name), QSplitter(orientation, parent) {}
@@ -139,6 +142,31 @@ protected:
         return new GcSplitterHandle(name, orientation, this);
     }
     int handleWidth() { return 23; };
+
+public:
+    Q_PROPERTY(int hpos READ hpos WRITE sethpos USER true)
+
+    // handle position
+    int hpos() const { return sizes()[0]; }
+
+    void sethpos(int x) { 
+        if (x<0) return; //r requested size too small!
+        QList<int> csizes = sizes();
+        if (csizes.count() != 2) return; //don't have two widgets!
+        int tot = csizes[0] + csizes[1];
+        if (tot < x) return; // requested size too big!
+        csizes[0] = x;
+        csizes[1] = tot-x;
+        setSizes(csizes);
+    }
+
+    // max hpos
+    int maxhpos() {
+        QList<int> csizes = sizes();
+        if (csizes.count() != 2) return 0; //don't have two widgets!
+        int tot = csizes[0] + csizes[1];
+        return tot - 1;
+    }
 
 private:
     Qt::Orientation orientation;
