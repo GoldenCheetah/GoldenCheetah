@@ -31,7 +31,7 @@
 
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
-    _sidebar(true), _tiled(false), _selected(false), 
+    _sidebar(true), _tiled(false), _selected(false), lastHeight(100),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
 {
@@ -126,6 +126,27 @@ TabView::setBottom(QWidget *widget)
     mainSplitter->insertWidget(-1, bottom_);
     mainSplitter->setCollapsible(1, true); // XXX we need a ComparePane widget ...
     mainSplitter->setStretchFactor(1,1);
+}
+
+// hide and show bottom - but with a little animation ...
+void
+TabView::setShowBottom(bool x) 
+{
+    // remember last height used when hidind
+    if (!x && bottom_) lastHeight = bottom_->height();
+
+    // basic version for now .. remembers and sets horizontal position precisely
+    // adding animation should be easy from here
+
+    if (bottom_) {
+        if (x) {
+            // set to the last value....
+            bottom_->show();
+            mainSplitter->setProperty("hpos", mainSplitter->maxhpos() - (lastHeight+22));
+        } else {
+            bottom_->hide();
+        }
+    }
 }
 
 void
