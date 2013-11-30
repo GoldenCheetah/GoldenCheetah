@@ -31,7 +31,7 @@
 
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
-    _sidebar(true), _tiled(false), _selected(false), lastHeight(100),
+    _sidebar(true), _tiled(false), _selected(false), lastHeight(130),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
 {
@@ -148,7 +148,7 @@ TabView::setShowBottom(bool x)
             // set to the last value....
             bottom_->show();
 
-            anim->setDuration(200);
+            anim->setDuration(lastHeight * 3);
             anim->setEasingCurve(QEasingCurve(QEasingCurve::Linear));
             anim->setKeyValueAt(0,mainSplitter->maxhpos()-22);
             anim->setKeyValueAt(1,mainSplitter->maxhpos()-(lastHeight+22));
