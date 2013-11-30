@@ -417,10 +417,12 @@ HomeWindow::styleChanged(int id)
 void
 HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 {
+#if 0 // drah and drop chart no longer part of the UX
     if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
         event->accept();
         dropPending = true;
     }
+#endif
 }
 
 void
@@ -447,6 +449,7 @@ HomeWindow::appendChart(GcWinID id)
 void
 HomeWindow::dropEvent(QDropEvent *event)
 {
+#if 0 // drah and drop chart no longer part of the UX
     QStandardItemModel model;
     model.dropMimeData(event->mimeData(), Qt::CopyAction, -1,-1, QModelIndex());
     QString chart = model.data(model.index(0,0), Qt::DisplayRole).toString();
@@ -471,6 +474,7 @@ HomeWindow::dropEvent(QDropEvent *event)
     winWidget->repaint();
 
     return;
+#endif
 }
 
 void
