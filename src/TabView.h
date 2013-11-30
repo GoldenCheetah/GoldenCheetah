@@ -149,18 +149,26 @@ protected:
     int handleWidth() { return 23; };
 
     virtual void dragEnterEvent(QDragEnterEvent *event) {
-        if (showForDrag == false && event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
+        if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
             if (tabView->hasBottom() && tabView->isShowBottom() == false) {
                 showForDrag = true;
                 tabView->setShowBottom(true);
-                event->acceptProposedAction();
             }
+            event->acceptProposedAction(); // always accept for this mimeData type
+                                           // so we continue to get the leave events we ignore (!)
         }
     }
 
-    virtual void dragLeaveEvent(QDragLeaveEvent *) {
+    virtual void dragLeaveEvent(QDragLeaveEvent *event) {
 
-        if (showForDrag == true && tabView->hasBottom() && tabView->isShowBottom() == true) {
+        int X = this->mapFromGlobal(QCursor::pos()).x();
+        int Y = this->mapFromGlobal(QCursor::pos()).y();
+
+        // ignore events when the cursor doesn't actually leave the bounds
+        // of our view -- its just going over multiple widgets
+        if (X>0 && Y>0 && X <= geometry().width() && Y <= geometry().height()) return;
+
+        if (showForDrag == true && !underMouse() && tabView->hasBottom() && tabView->isShowBottom() == true) {
             showForDrag = false;
             tabView->setShowBottom(false);
         }
