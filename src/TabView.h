@@ -135,8 +135,10 @@ class ViewSplitter : public QSplitter
     Q_OBJECT
 
 public:
-    ViewSplitter(Qt::Orientation orientation, QString name, QWidget *parent=0) :
-        orientation(orientation), name(name), QSplitter(orientation, parent) {
+    ViewSplitter(Qt::Orientation orientation, QString name, TabView *parent=0) :
+        orientation(orientation), name(name), tabView(parent), showForDrag(false),
+        QSplitter(orientation, parent) {
+        setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
     }
 
@@ -145,6 +147,24 @@ protected:
         return new GcSplitterHandle(name, orientation, this);
     }
     int handleWidth() { return 23; };
+
+    virtual void dragEnterEvent(QDragEnterEvent *event) {
+        if (showForDrag == false && event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
+            if (tabView->hasBottom() && tabView->isShowBottom() == false) {
+                showForDrag = true;
+                tabView->setShowBottom(true);
+                event->acceptProposedAction();
+            }
+        }
+    }
+
+    virtual void dragLeaveEvent(QDragLeaveEvent *) {
+
+        if (showForDrag == true && tabView->hasBottom() && tabView->isShowBottom() == true) {
+            showForDrag = false;
+            tabView->setShowBottom(false);
+        }
+    }
 
 public:
     Q_PROPERTY(int hpos READ hpos WRITE sethpos USER true)
@@ -174,6 +194,8 @@ public:
 private:
     Qt::Orientation orientation;
     QString name;
+    TabView *tabView;
+    bool showForDrag;
 };
 
 #endif // _GC_TabView_h
