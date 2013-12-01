@@ -93,6 +93,19 @@ GcUpgrade::upgrade(const QDir &home)
     // Versions after 3 should add their upgrade processing at this point
     // DO NOT CHANGE THE VERSION 3 UPGRADE PROCESS ABOVE, ADD TO IT BELOW
 
+    if (last < VERSION3_SP1_RC1_BUILD) {
+
+        // 2. Remove old CLucece 'index'
+        QFile index(QString("%1/index").arg(home.canonicalPath()));
+        if (index.exists()) {
+            removeIndex(index);
+        }
+
+        // 3. Remove metricDBv3 - force rebuild including the search index
+        QFile db(QString("%1/metricDBv3").arg(home.canonicalPath()));
+        if (db.exists()) db.remove();
+    }
+
     return 0;
 }
 

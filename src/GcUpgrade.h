@@ -30,11 +30,14 @@
 // 3006 - V3 RC6
 // 3007 - V3 RC7
 // 3010 - V3 RELEASE (June 7 2013)
+// 3020 - V3 SP1 RC1
+// 3040 - V3.1 DEVELOPMENT // different branch
 
-#define VERSION_LATEST 3010
-#define VERSION_STRING "V3.0"
+#define VERSION_LATEST 3020
+#define VERSION_STRING "V3.0 SP1-RC1"
 
 #define VERSION3_BUILD 3010
+#define VERSION3_SP1_RC1_BUILD 3020
 
 class GcUpgrade
 {
