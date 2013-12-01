@@ -13,6 +13,13 @@ QT += xml sql network webkit script svg
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm $${LIBZ_LIBS}
 
+# if we are building in debug mode
+# then set MACRO -DGC_DEBUG so we can
+# add / turnoff code for debugging purposes
+CONFIG(debug, debug|release) {
+    QMAKE_CXXFLAGS += -DGC_DEBUG
+}
+
 !isEmpty( LIBOAUTH_INSTALL ) {
     isEmpty( LIBOAUTH_INCLUDE ) { LIBOAUTH_INCLUDE += $${LIBOAUTH_INSTALL}/include }
     isEmpty( LIBOAUTH_LIBS ) {

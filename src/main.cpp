@@ -66,7 +66,12 @@ main(int argc, char *argv[])
     QStringList sargs, args;
     for (int i=0; i<argc; i++) sargs << argv[i];
 
+#ifdef GC_DEBUG
+    bool debug = true;
+#else
     bool debug = false;
+#endif
+
     bool help = false;
 
     // honour command line switches
@@ -78,15 +83,23 @@ main(int argc, char *argv[])
             help = true;
             fprintf(stderr, "GoldenCheetah %s (%d)\nusage: GoldenCheetah [[directory] athlete]\n\n", VERSION_STRING, VERSION_LATEST);
             fprintf(stderr, "--help or --version to print this message and exit\n");
+#ifdef GC_DEBUG
+            fprintf(stderr, "--debug             to turn on redirection of messages to goldencheetah.log [debug build]\n");
+#else
             fprintf(stderr, "--debug             to direct diagnostic messages to the terminal instead of goldencheetah.log\n");
+#endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "Specify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
         } else if (arg == "--debug") {
 
+#ifdef GC_DEBUG
             // debug, so don't redirect stderr!
+            debug = false;
+#else
             debug = true;
+#endif
 
         } else {
 
