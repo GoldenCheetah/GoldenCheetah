@@ -33,6 +33,9 @@ class ComparePane : public QWidget
         ComparePane(QWidget *parent, CompareMode mode=interval);
 
     protected:
+        void dragEnterEvent(QDragEnterEvent*);
+        void dragLeaveEvent(QDragLeaveEvent*);
+        void dropEvent(QDropEvent *);
 
     signals:
 

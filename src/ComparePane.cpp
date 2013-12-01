@@ -20,4 +20,40 @@
 
 ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidget(parent)
 {
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    setAcceptDrops(true);
+    setAutoFillBackground(true);
+    QPalette pal;
+    pal.setBrush(QPalette::Active, QPalette::Window, Qt::white);
+    pal.setBrush(QPalette::Inactive, QPalette::Window, Qt::white);
+    setPalette(pal);
+#if 0
+    // just add a label for now
+    QLabel *filler = new QLabel(tr("Drag and drop here..."), this);
+    filler->setPalette(pal);
+    layout->addWidget(filler);
+#endif
+}
+
+
+void 
+ComparePane::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
+        qDebug()<<"compare pane: enter event";
+        event->acceptProposedAction();
+    }
+}
+
+void 
+ComparePane::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    qDebug()<<"compare pane: leave event";
+}
+
+void
+ComparePane::dropEvent(QDropEvent *)
+{
+    qDebug()<<"compare pane: drop event";
 }
