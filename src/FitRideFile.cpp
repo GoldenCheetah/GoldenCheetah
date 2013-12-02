@@ -557,23 +557,28 @@ struct FitFileReaderState
             std::vector<fit_value_t> values;
             foreach(const FitField &field, def.fields) {
                 fit_value_t v;
+                int size;
                 switch (field.type) {
-                    case 0: v = read_uint8(&count); break;
-                    case 1: v = read_int8(&count); break;
-                    case 2: v = read_uint8(&count); break;
-                    case 3: v = read_int16(def.is_big_endian, &count); break;
-                    case 4: v = read_uint16(def.is_big_endian, &count); break;
-                    case 5: v = read_int32(def.is_big_endian, &count); break;
-                    case 6: v = read_uint32(def.is_big_endian, &count); break;
-                    case 10: v = read_uint8z(&count); break;
-                    case 11: v = read_uint16z(def.is_big_endian, &count); break;
-                    case 12: v = read_uint32z(def.is_big_endian, &count); break;
+                    case 0: v = read_uint8(&count); size = 1; break;
+                    case 1: v = read_int8(&count); size = 1;  break;
+                    case 2: v = read_uint8(&count); size = 1;  break;
+                    case 3: v = read_int16(def.is_big_endian, &count); size = 2;  break;
+                    case 4: v = read_uint16(def.is_big_endian, &count); size = 2;  break;
+                    case 5: v = read_int32(def.is_big_endian, &count); size = 4;  break;
+                    case 6: v = read_uint32(def.is_big_endian, &count); size = 4;  break;
+                    case 10: v = read_uint8z(&count); size = 1; break;
+                    case 11: v = read_uint16z(def.is_big_endian, &count); size = 2; break;
+                    case 12: v = read_uint32z(def.is_big_endian, &count); size = 4; break;
                     // we may need to add support for float, string + byte base types here
                     default:
                         read_unknown( field.size, &count );
                         v = NA_VALUE;
                         unknown_base_type.insert(field.num);
                 }
+                // Quick fix : we need to support multivalues
+                if (size < field.size)
+                    read_unknown( field.size-size, &count );
+
                 values.push_back(v);
                 //printf( " field: type=%d num=%d value=%lld\n",
                 //    field.type, field.num, v );
