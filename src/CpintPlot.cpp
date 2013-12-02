@@ -81,7 +81,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
 
     curveTitle.attach(this);
     curveTitle.setXValue(5);
-    curveTitle.setYValue(20);
+    curveTitle.setYValue(60);
     curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
 
     zoomer = new penTooltip(static_cast<QwtPlotCanvas*>(this->canvas()));
@@ -93,6 +93,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     configChanged(); // apply colors
+
+    ecp = new ExtendedCriticalPower(context);
 }
 
 void
@@ -329,6 +331,8 @@ CpintPlot::deriveCPParameters()
             );
 }
 
+
+
 void
 CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently displaying
                          double cp,
@@ -395,7 +399,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (series == RideFile::wattsKg)
         curveTitle.setYValue(0.6);
     else
-        curveTitle.setYValue(20);
+        curveTitle.setYValue(70);
 
     CPCurve = new QwtPlotCurve(curve_title);
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
@@ -406,6 +410,46 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     CPCurve->setPen(pen);
     CPCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
     CPCurve->attach(thisPlot);
+
+
+    // Extended CP 2
+    /*if (extendedCPCurve2) {
+        delete extendedCPCurve2;
+        extendedCPCurve2 = NULL;
+    }
+    extendedCPCurve2 = ecp->getPlotCurveForExtendedCP_2_3(athleteModeleCP2);
+    extendedCPCurve2->attach(thisPlot);
+
+    if (extendedCurveTitle) {
+        delete extendedCurveTitle;
+        extendedCurveTitle = NULL;
+    }
+    extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_2_3(athleteModeleCP2);
+    extendedCurveTitle->setXValue(5);
+    extendedCurveTitle->setYValue(45);
+    extendedCurveTitle->attach(thisPlot);*/
+
+
+    // Extended CP 4
+    if (extendedCPCurve4) {
+        delete extendedCPCurve4;
+        extendedCPCurve4 = NULL;
+    }
+    if (extendedCurveTitle2) {
+        delete extendedCurveTitle2;
+        extendedCurveTitle2 = NULL;
+    }
+
+    if (useExtendedCP) {
+        extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
+        extendedCPCurve4->attach(thisPlot);
+
+
+        extendedCurveTitle2 = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
+        extendedCurveTitle2->setXValue(5);
+        extendedCurveTitle2->setYValue(20);
+        extendedCurveTitle2->attach(thisPlot);
+    }
 }
 
 void
@@ -601,6 +645,22 @@ CpintPlot::calculate(RideItem *rideItem)
             // calculate CP model from all-time best data
             cp  = tau = t0  = 0;
             deriveCPParameters();
+
+            if (useExtendedCP) {
+                // calculate extended CP model from all-time best data
+                //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+
+
+                athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+
+
+                /*double best5sec = context->ride->ride()->getWeight() * 24.04;
+                double best1min = context->ride->ride()->getWeight() * 11.50;
+                double best5min = context->ride->ride()->getWeight() * 7.60;
+                double best1hour = context->ride->ride()->getWeight() * 6.40;
+                //worldClassModeleCP2 = ecp->deriveExtendedCP_2_3_ParametersForBest(best5sec, best1min, best5min, best1hour);
+                worldClassModeleCP4 = ecp->deriveExtendedCP_4_3_ParametersForBest(best5sec, best1min, best5min, best1hour);*/
+            }
         }
 
         //
@@ -858,14 +918,20 @@ CpintPlot::setShadeMode(int x)
 
 // model parameters!
 void 
-CpintPlot::setModel(int i1, int i2, int i3, int i4, bool useT0)
+CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, bool useT0, bool useExtendedCP)
 {
-    anI1 = double(i1) / double(60.00f);
-    anI2 = double(i2) / double(60.00f);
-    aeI1 = double(i3) / double(60.00f);
-    aeI2 = double(i4) / double(60.00f);
+    this->anI1 = double(anI1) / double(60.00f);
+    this->anI2 = double(anI2) / double(60.00f);
+    this->aeI1 = double(aeI1) / double(60.00f);
+    this->aeI2 = double(aeI2) / double(60.00f);
+
+    this->sanI1 = double(sanI1) / double(60.00f);
+    this->sanI2 = double(sanI2) / double(60.00f);
+    this->laeI1 = double(laeI1) / double(60.00f);
+    this->laeI2 = double(laeI2) / double(60.00f);
 
     this->useT0 = useT0;
+    this->useExtendedCP = useExtendedCP;
 
     // wipe away previous effort
     if (CPCurve) {

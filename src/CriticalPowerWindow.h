@@ -55,6 +55,12 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int ani2 READ anI2 WRITE setAnI2 USER true)
     Q_PROPERTY(int aei1 READ aeI1 WRITE setAeI1 USER true)
     Q_PROPERTY(int aei2 READ aeI2 WRITE setAeI2 USER true)
+    Q_PROPERTY(int sani1 READ sanI1 WRITE setSanI1 USER true)
+    Q_PROPERTY(int sani2 READ sanI2 WRITE setSanI2 USER true)
+    Q_PROPERTY(int laei1 READ laeI1 WRITE setLaeI1 USER true)
+    Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
+    Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
+    Q_PROPERTY(int useExtendedCP READ useExtendedCP WRITE setUseExtendedCP USER true)
 
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -110,6 +116,21 @@ class CriticalPowerWindow : public GcChartWindow
 
         int aeI2() const { return aeI2SpinBox->value(); }
         void setAeI2(int x) { return aeI2SpinBox->setValue(x); }
+
+        int sanI1() const { return sanI1SpinBox->value(); }
+        void setSanI1(int x) { return sanI1SpinBox->setValue(x); }
+
+        int sanI2() const { return sanI2SpinBox->value(); }
+        void setSanI2(int x) { return sanI2SpinBox->setValue(x); }
+
+        int laeI1() const { return laeI1SpinBox->value(); }
+        void setLaeI1(int x) { return laeI1SpinBox->setValue(x); }
+
+        int laeI2() const { return laeI2SpinBox->value(); }
+        void setLaeI2(int x) { return laeI2SpinBox->setValue(x); }
+
+        int useExtendedCP() const { return ckExtendedCP->checkState(); }
+        void setUseExtendedCP(int x) { return ckExtendedCP->setChecked(x); }
 
         RideFile::SeriesType series() { 
             return static_cast<RideFile::SeriesType>
@@ -182,6 +203,7 @@ class CriticalPowerWindow : public GcChartWindow
         QComboBox *modelCombo;
         QComboBox *cComboSeason;
         QComboBox *shadeCombo;
+        QCheckBox *ckExtendedCP;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;
@@ -193,7 +215,10 @@ class CriticalPowerWindow : public GcChartWindow
 #endif
         QList<QwtPlotCurve*> intervalCurves;
 
-        QDoubleSpinBox *anI1SpinBox, *anI2SpinBox, *aeI1SpinBox, *aeI2SpinBox;
+        QDoubleSpinBox *sanI1SpinBox, *sanI2SpinBox;
+        QDoubleSpinBox *anI1SpinBox, *anI2SpinBox;
+        QDoubleSpinBox *aeI1SpinBox, *aeI2SpinBox;
+        QDoubleSpinBox *laeI1SpinBox, *laeI2SpinBox;
 
         bool rangemode;
         bool isfiltered;

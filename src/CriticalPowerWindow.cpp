@@ -201,7 +201,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *anLayout = new QHBoxLayout;
     anLayout->addWidget(anI1SpinBox);
     anLayout->addWidget(anI2SpinBox);
-    cl->addRow(new QLabel(tr("Interval 1 (seconds)")), anLayout);
+    cl->addRow(new QLabel(tr("Anaerobic search interval (seconds)")), anLayout);
 
     aeI1SpinBox = new QDoubleSpinBox(this);
     aeI1SpinBox->setDecimals(0);
@@ -217,12 +217,57 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     aeI2SpinBox->setMaximum(3600);
     aeI2SpinBox->setSingleStep(1.0);
     aeI2SpinBox->setAlignment(Qt::AlignRight);
-    aeI2SpinBox->setValue(3600); // 30 minutes
+    aeI2SpinBox->setValue(3600); // 60 minutes
 
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
     aeLayout->addWidget(aeI2SpinBox);
-    cl->addRow(new QLabel(tr("Interval 2 (seconds)")), aeLayout);
+    cl->addRow(new QLabel(tr("Aerobic search interval (seconds)")), aeLayout);
+
+    ckExtendedCP = new QCheckBox(this);
+    cl->addRow(new QLabel(tr("Use Extended CP Model")), ckExtendedCP);
+
+    sanI1SpinBox = new QDoubleSpinBox(this);
+    sanI1SpinBox->setDecimals(0);
+    sanI1SpinBox->setMinimum(15);
+    sanI1SpinBox->setMaximum(45);
+    sanI1SpinBox->setSingleStep(1.0);
+    sanI1SpinBox->setAlignment(Qt::AlignRight);
+    sanI1SpinBox->setValue(30); // 30 secs
+
+    sanI2SpinBox = new QDoubleSpinBox(this);
+    sanI2SpinBox->setDecimals(0);
+    sanI2SpinBox->setMinimum(15);
+    sanI2SpinBox->setMaximum(300);
+    sanI2SpinBox->setSingleStep(1.0);
+    sanI2SpinBox->setAlignment(Qt::AlignRight);
+    sanI2SpinBox->setValue(60); // 100 secs
+
+    QHBoxLayout *sanLayout = new QHBoxLayout(this);
+    sanLayout->addWidget(sanI1SpinBox);
+    sanLayout->addWidget(sanI2SpinBox);
+    cl->addRow(new QLabel(tr("Short anaerobic search interval (seconds)")), sanLayout);
+
+    laeI1SpinBox = new QDoubleSpinBox(this);
+    laeI1SpinBox->setDecimals(0);
+    laeI1SpinBox->setMinimum(3000);
+    laeI1SpinBox->setMaximum(9000);
+    laeI1SpinBox->setSingleStep(1.0);
+    laeI1SpinBox->setAlignment(Qt::AlignRight);
+    laeI1SpinBox->setValue(3000);
+
+    laeI2SpinBox = new QDoubleSpinBox(this);
+    laeI2SpinBox->setDecimals(0);
+    laeI2SpinBox->setMinimum(4000);
+    laeI2SpinBox->setMaximum(30000);
+    laeI2SpinBox->setSingleStep(1.0);
+    laeI2SpinBox->setAlignment(Qt::AlignRight);
+    laeI2SpinBox->setValue(30000);
+
+    QHBoxLayout *laeLayout = new QHBoxLayout(this);
+    laeLayout->addWidget(laeI1SpinBox);
+    laeLayout->addWidget(laeI2SpinBox);
+    cl->addRow(new QLabel(tr("Long aerobic search interval (seconds)")), laeLayout);
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
@@ -253,6 +298,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(anI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(aeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(aeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(sanI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(sanI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(laeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(laeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
+    connect(ckExtendedCP, SIGNAL(stateChanged(int)), this, SLOT(modelParametersChanged()));
+
 
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
@@ -320,11 +371,16 @@ CriticalPowerWindow::modelParametersChanged()
     if (active == true) return;
 
     // tell the plot
-    cpintPlot->setModel(anI1SpinBox->value(),
+    cpintPlot->setModel(sanI1SpinBox->value(),
+                        sanI2SpinBox->value(),
+                        anI1SpinBox->value(),
                         anI2SpinBox->value(),
                         aeI1SpinBox->value(),
                         aeI2SpinBox->value(),
-                        modelCombo->currentIndex() > 0 ? true : false); // true=use 3point model
+                        laeI1SpinBox->value(),
+                        laeI2SpinBox->value(),
+                        modelCombo->currentIndex() > 0 ? true : false,
+                        ckExtendedCP->checkState());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {
