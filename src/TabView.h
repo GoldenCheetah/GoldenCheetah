@@ -66,6 +66,7 @@ class TabView : public QWidget
         bool isTiled() const { return _tiled; }
 
         // bottom
+        void dragEvent(bool); // showbottom on drag event
         void setShowBottom(bool x);
         bool isShowBottom() { if (bottom_) return bottom_->isVisible(); return false; }
         bool hasBottom() { return (bottom_!=NULL); }
@@ -152,7 +153,7 @@ protected:
         if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
             if (tabView->hasBottom() && tabView->isShowBottom() == false) {
                 showForDrag = true;
-                tabView->setShowBottom(true);
+                tabView->dragEvent(true);
             }
             event->acceptProposedAction(); // always accept for this mimeData type
                                            // so we continue to get the leave events we ignore (!)
@@ -170,7 +171,7 @@ protected:
 
         if (showForDrag == true && !underMouse() && tabView->hasBottom() && tabView->isShowBottom() == true) {
             showForDrag = false;
-            tabView->setShowBottom(false);
+            tabView->dragEvent(false);
         }
     }
 

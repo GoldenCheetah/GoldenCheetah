@@ -26,6 +26,7 @@
 #include "GcWindowRegistry.h"
 #include "TrainDB.h"
 #include "MetricAggregator.h"
+#include "MainWindow.h"
 
 #include "Settings.h"
 
@@ -132,6 +133,13 @@ TabView::setBottom(QWidget *widget)
     mainSplitter->insertWidget(-1, bottom_);
     mainSplitter->setCollapsible(1, true); // XXX we need a ComparePane widget ...
     mainSplitter->setStretchFactor(1,1);
+}
+
+void 
+TabView::dragEvent(bool x)
+{
+    setShowBottom(x);
+    context->mainWindow->setToolButtons(); // toolbuttons reflect show/hide status
 }
 
 // hide and show bottom - but with a little animation ...
