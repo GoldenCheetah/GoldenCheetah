@@ -174,11 +174,13 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
             emit lostInfo(number);
 
-            channel_type=CHANNEL_TYPE_UNUSED;
-            channel_type_flags=0;
-            device_number=0;
-            value2=value=0;
-            setId();
+            // Don't wipe out the channel settings when the search times out,
+            // else can not reconnect to the device once back in range..
+            //channel_type=CHANNEL_TYPE_UNUSED;
+            //channel_type_flags=0;
+            //device_number=0;
+            //value2=value=0;
+            //setId();
 
             parent->sendMessage(ANTMessage::unassignChannel(number));
         }
