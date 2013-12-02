@@ -21,7 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideFileCache.h"
-
+#include "ExtendedCriticalPower.h"
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_zoomer.h>
@@ -89,15 +89,23 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
-        void setModel(int i1, int i2, int i3, int i4, bool useT0);
+        void setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, bool useT0, bool useExtendedCP);
 
         // model type & intervals
-        bool useT0;
-        int anI1, anI2, aeI1, aeI2;
+        bool useT0, useExtendedCP;
+        double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
 
         double cp, tau, t0; // CP model parameters
+
+        Model_eCP athleteModeleCP2;
+        Model_eCP athleteModeleCP4;
+        Model_eCP worldClassModeleCP2;
+        Model_eCP worldClassModeleCP4;
+
         double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
+        void deriveExtendedCPParameters();
+
         void changeSeason(const QDate &start, const QDate &end);
         void setAxisTitle(int axis, QString label);
         void setSeries(RideFile::SeriesType);
@@ -125,10 +133,11 @@ class CpintPlot : public QwtPlot
 
         QString path;
         QwtPlotCurve *thisCurve;
-        QwtPlotCurve *CPCurve;
+        QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4;
         QList<QwtPlotCurve*> allCurves;
         QwtPlotCurve *allCurve; // bests but not zoned
         QwtPlotMarker curveTitle;
+        QwtPlotMarker *extendedCurveTitle, *extendedCurveTitle2;
         QList<QwtPlotMarker*> allZoneLabels;
         void clear_CP_Curves();
         QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
@@ -141,6 +150,8 @@ class CpintPlot : public QwtPlot
         void refreshReferenceLines(RideItem*);
         QList<QwtPlotMarker*> referenceLines;
 
+        ExtendedCriticalPower *ecp;
+
         RideFileCache *current, *bests;
         LTMCanvasPicker *canvasPicker;
         penTooltip *zoomer;
@@ -149,6 +160,7 @@ class CpintPlot : public QwtPlot
         bool isFiltered;
         int shadeMode;
         bool rangemode;
+
 
 };
 

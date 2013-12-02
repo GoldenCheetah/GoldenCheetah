@@ -298,6 +298,7 @@ HEADERS += \
         ErgDB.h \
         ErgDBDownloadDialog.h \
         ErgFilePlot.h \
+        ExtendedCriticalPower.h \
         FitlogRideFile.h \
         FitlogParser.h \
         FitRideFile.h \
@@ -486,6 +487,7 @@ SOURCES += \
         ErgDBDownloadDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
+        ExtendedCriticalPower.cpp \
         FitlogRideFile.cpp \
         FitlogParser.cpp \
         FitRideFile.cpp \
