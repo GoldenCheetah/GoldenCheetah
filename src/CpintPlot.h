@@ -135,6 +135,9 @@ class CpintPlot : public QwtPlot
         RideFile::SeriesType series;
         Context *context;
 
+        void refreshReferenceLines(RideItem*);
+        QList<QwtPlotMarker*> referenceLines;
+
         RideFileCache *current, *bests;
         LTMCanvasPicker *canvasPicker;
         penTooltip *zoomer;

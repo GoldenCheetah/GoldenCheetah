@@ -767,6 +767,7 @@ CpintPlot::calculate(RideItem *rideItem)
         }
     }
 
+    refreshReferenceLines(rideItem);
     replot();
 }
 
@@ -850,5 +851,43 @@ CpintPlot::setModel(int i1, int i2, int i3, int i4, bool useT0)
         delete CPCurve;
         CPCurve = NULL;
         clear_CP_Curves();
+    }
+}
+
+void
+CpintPlot::refreshReferenceLines(RideItem *rideItem)
+{
+    // we only do refs for a specific ride
+    if (rangemode) return;
+
+    // wipe existing
+    foreach(QwtPlotMarker *referenceLine, referenceLines) {
+        referenceLine->detach();
+        delete referenceLine;
+    }
+    referenceLines.clear();
+
+    if (!rideItem && !rideItem->ride()) return;
+
+    // horizontal lines at reference points
+    if (series == RideFile::aPower || series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts  || series == RideFile::wattsKg) {
+
+        if (rideItem->ride()) {
+            foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
+
+                if (referencePoint->watts != 0) {
+                    QwtPlotMarker *referenceLine = new QwtPlotMarker;   
+                    QPen p;
+                    p.setColor(GColor(CPLOTMARKER));
+                    p.setWidth(1);
+                    p.setStyle(Qt::DashLine);
+                    referenceLine->setLinePen(p);
+                    referenceLine->setLineStyle(QwtPlotMarker::HLine);
+                    referenceLine->setYValue(referencePoint->watts);
+                    referenceLine->attach(this);
+                    referenceLines.append(referenceLine);
+                }
+            }
+        }
     }
 }
