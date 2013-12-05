@@ -339,6 +339,8 @@ LTMWindow::filterChanged()
     }
 
     refreshPlot();
+
+    repaint(); // just for the title..
 }
 
 void
