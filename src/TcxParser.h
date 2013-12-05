@@ -26,6 +26,7 @@
 #include <QDateTime>
 #include <QXmlDefaultHandler>
 #include "Settings.h"
+#include "locale.h" // for LC_LOCALE definition used in strtod
 
 class TcxParser : public QXmlDefaultHandler
 {
