@@ -22,6 +22,8 @@
 #include "TabView.h"
 #include "Views.h"
 
+class RideNavigator;
+
 class Tab: public QWidget
 {
     Q_OBJECT
@@ -35,6 +37,8 @@ class Tab: public QWidget
         ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
         int currentView() { return views->currentIndex(); }
         TabView *view(int index);
+
+        RideNavigator *rideNavigator(); // to get logical headings
 
     signals:
 

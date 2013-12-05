@@ -27,16 +27,21 @@
 
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
-    AnalysisSidebar *s = new AnalysisSidebar(context);
+    analSidebar = new AnalysisSidebar(context);
     HomeWindow *a = new HomeWindow(context, "analysis", "Analysis");
     controls->addWidget(a->controls());
     controls->setCurrentIndex(0);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
 
-    setSidebar(s);
+    setSidebar(analSidebar);
     setPage(a);
     setBlank(b);
     setBottom(new ComparePane(this, ComparePane::interval));
+}
+
+RideNavigator *AnalysisView::rideNavigator()
+{
+    return analSidebar->rideNavigator;
 }
 
 AnalysisView::~AnalysisView()

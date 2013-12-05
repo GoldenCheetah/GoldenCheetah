@@ -54,7 +54,7 @@ class DiaryWindow : public GcWindow
         void setView(int /* x */ ) { /* viewMode->setCurrentIndex(x); */ }
 
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return context->isfiltered; }
+        bool isFiltered() const { return (context->ishomefiltered || context->isfiltered); }
 #endif
 
     public slots:

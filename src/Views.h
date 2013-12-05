@@ -21,7 +21,9 @@
 
 #include "TabView.h"
 class TrainSidebar;
+class AnalysisSidebar;
 class QDialog;
+class RideNavigator;
 
 class AnalysisView : public TabView
 {
@@ -35,9 +37,14 @@ class AnalysisView : public TabView
         void setRide(RideItem*ride);
         void addIntervals();
 
+        RideNavigator *rideNavigator();
+
     public slots:
 
         bool isBlank();
+
+    private:
+        AnalysisSidebar *analSidebar;
 
 };
 class DiaryView : public TabView

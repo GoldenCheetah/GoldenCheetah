@@ -107,7 +107,7 @@ Athlete::Athlete(Context *context, const QDir &home)
 
     // Search / filter
 #ifdef GC_HAVE_LUCENE
-    namedSearches = new NamedSearches(home); // must be before navigator
+    namedSearches = new NamedSearches(this); // must be before navigator
     lucene = new Lucene(context, context); // before metricDB attempts to refresh
 #endif
 

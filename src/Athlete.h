@@ -112,10 +112,12 @@ class Athlete : public QObject
 
         void notifyZonesChanged() { zonesChanged(); }
         void notifySeasonsChanged() { seasonsChanged(); }
+        void notifyNamedSearchesChanged() { namedSearchesChanged(); }
 
     signals:
         void zonesChanged();
         void seasonsChanged();
+        void namedSearchesChanged();
 
     public slots:
         void rideTreeWidgetSelectionChanged();

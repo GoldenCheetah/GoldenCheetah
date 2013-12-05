@@ -92,12 +92,25 @@ NamedSearch NamedSearches::get(QString name)
     return returning;
 }
 
+NamedSearch NamedSearches::get(int index)
+{
+    return list[index];
+}
+
 void
 NamedSearches::write()
 {
     // update namedSearchs.xml
     QString file = QString(home.absolutePath() + "/namedsearches.xml");
     NamedSearchParser::serialize(file, list);
+    athlete->notifyNamedSearchesChanged();
+}
+
+void
+NamedSearches::deleteNamedSearch(int index)
+{
+    list.removeAt(index);
+    write();
 }
 
 bool NamedSearchParser::startDocument()
@@ -185,7 +198,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     filterIcon = iconFromPNG(":images/toolbar/filter3.png", false);
     searchIcon = iconFromPNG(":images/toolbar/search3.png", false);
 
-    setWindowTitle(tr("Manage Favourites"));
+    setWindowTitle(tr("Manage Filters"));
     setWindowFlags(windowFlags() | Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowModality(Qt::NonModal);

@@ -18,6 +18,7 @@
 
 #include "SearchBox.h"
 #include "Context.h"
+#include "Tab.h"
 #include "Athlete.h"
 #include "NamedSearch.h"
 #include "RideNavigator.h"
@@ -188,14 +189,14 @@ void SearchBox::checkMenu()
 void SearchBox::setMenu()
 {
     dropMenu->clear();
-    if (text() != "") dropMenu->addAction(tr("Add to Favourites"));
+    if (text() != "") dropMenu->addAction(tr("Add to Named Filters"));
     if (context->athlete->namedSearches->getList().count()) {
         if (text() != "") dropMenu->addSeparator();
         foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
             dropMenu->addAction(x.name);
         }
         dropMenu->addSeparator();
-        dropMenu->addAction(tr("Manage Favourites"));
+        dropMenu->addAction(tr("Manage Filters"));
     }
     if (!nochooser) dropMenu->addAction(tr("Column Chooser"));
 }
@@ -203,8 +204,8 @@ void SearchBox::setMenu()
 void SearchBox::runMenu(QAction *x)
 {
     // just qdebug for now
-    if (x->text() == tr("Add to Favourites")) addNamed();
-    else if (x->text() == tr("Manage Favourites")) {
+    if (x->text() == tr("Add to Named Filters")) addNamed();
+    else if (x->text() == tr("Manage Filters")) {
 
         EditNamedSearches *editor = new EditNamedSearches(this, context);
         editor->move(QCursor::pos()-QPoint(230,-5));
@@ -212,14 +213,9 @@ void SearchBox::runMenu(QAction *x)
 
     } else if (x->text() == tr("Column Chooser")) {
 
-        QStringList logicalHeadings;
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-            if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
-                logicalHeadings << context->specialFields.displayName(field.name);
-            }
-        }
-        ColumnChooser *selector = new ColumnChooser(logicalHeadings);
+        ColumnChooser *selector = new ColumnChooser(context->tab->rideNavigator()->logicalHeadings);
         selector->show();
+
     } else {
         NamedSearch get = context->athlete->namedSearches->get(x->text());
         if (get.name == x->text()) {
@@ -292,5 +288,6 @@ SearchBox::addNamed()
         x.type = mode;
         x.count = 0;
         context->athlete->namedSearches->getList().append(x);
+        context->athlete->namedSearches->write();
     }
 }

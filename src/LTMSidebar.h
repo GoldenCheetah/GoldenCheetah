@@ -1,4 +1,7 @@
 /*
+
+// named searchs
+#include "NamedSearch.h"
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -72,6 +75,12 @@ class LTMSidebar : public QWidget
         void deleteEvent();
         void addEvent();
 
+        void filterTreeWidgetSelectionChanged();
+        void resetFilters(); // rebuild the seasons list if it changes
+        void filterPopup();
+        void manageFilters();
+        void deleteFilter();
+
         // config etc
         void configChanged();
         void resetSeasons(); // rebuild the seasons list if it changes
@@ -94,6 +103,10 @@ class LTMSidebar : public QWidget
         GcSplitterItem *eventsWidget;
         QTreeWidget *eventTree;
         QTreeWidgetItem *allEvents;
+
+        GcSplitterItem *filtersWidget;
+        QTreeWidget *filterTree;
+        QTreeWidgetItem *allFilters;
 
         QWebView *summary;
 

@@ -129,7 +129,7 @@ class RideFileCache
 
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.
-        RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList());
+        RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList(), bool onhome = true);
 
         // not actually a copy constructor -- but we call it IN the constructor.
         RideFileCache(RideFileCache *other) { *this = *other; }

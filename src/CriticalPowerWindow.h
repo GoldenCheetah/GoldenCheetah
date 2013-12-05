@@ -83,7 +83,7 @@ class CriticalPowerWindow : public GcChartWindow
 
 #ifdef GC_HAVE_LUCENE
         // filter
-        bool isFiltered() const { return (searchBox->isFiltered() || context->isfiltered); }
+        bool isFiltered() const { return (searchBox->isFiltered() || context->ishomefiltered || context->isfiltered); }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif

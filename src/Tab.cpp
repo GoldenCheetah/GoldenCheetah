@@ -91,6 +91,11 @@ Tab::~Tab()
     delete views;
 }
 
+RideNavigator *Tab::rideNavigator()
+{
+    analysisView->rideNavigator();
+}
+
 void
 Tab::close()
 {

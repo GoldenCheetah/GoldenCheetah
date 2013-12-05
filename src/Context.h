@@ -58,7 +58,9 @@ class Context : public QObject
 
         // search filter
         bool isfiltered;
-        QStringList filters;
+        bool ishomefiltered;
+        QStringList filters; // searchBox filters
+        QStringList homeFilters; // homewindow sidebar filters
 
         // *********************************************
         // APPLICATION EVENTS
@@ -68,6 +70,9 @@ class Context : public QObject
                                     // signal emitted to notify its children
 
         // filters
+        void setHomeFilter(QStringList&f) { homeFilters=f; ishomefiltered=true; emit homeFilterChanged(); }
+        void clearHomeFilter() { homeFilters.clear(); ishomefiltered=false; emit homeFilterChanged(); }
+
         void setFilter(QStringList&f) { filters=f; isfiltered=true; emit filterChanged(); }
         void clearFilter() { filters.clear(); isfiltered=false; emit filterChanged(); }
 
@@ -101,6 +106,7 @@ class Context : public QObject
 
         // global filter changed
         void filterChanged();
+        void homeFilterChanged();
 
         void configChanged();
 

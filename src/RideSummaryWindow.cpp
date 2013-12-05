@@ -93,6 +93,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
         connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
         connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
+        connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
 
         // date settings
         connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -348,7 +349,19 @@ RideSummaryWindow::htmlSummary() const
 
                  // get the value - from metrics or from data array
                  if (ridesummary) s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
-                 else s = s.arg(SummaryMetrics::getAggregated(context, symbol, data, filters, filtered, useMetricUnits));
+                 else {
+                      QStringList filterList = filters;
+                      if (context->ishomefiltered) {
+                          if (filtered) {
+                              foreach (QString file, filters) {
+                                  if (context->homeFilters.contains(file)) 
+                                      filterList << file;
+                              }
+                          } else {
+                              filterList = context->homeFilters;
+                          }
+                      }
+                      s = s.arg(SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, useMetricUnits));            }
 
              } else {
                  if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
@@ -364,7 +377,20 @@ RideSummaryWindow::htmlSummary() const
 
                     double pace;
                     if (ridesummary) pace  = metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion()) + (useMetricUnits ? 0 : m->conversionSum());
-                    else pace = SummaryMetrics::getAggregated(context, symbol, data, filters, filtered, useMetricUnits).toDouble();
+                    else {
+                      QStringList filterList = filters;
+                      if (context->ishomefiltered) {
+                          if (filtered) {
+                              foreach (QString file, filters) {
+                                  if (context->homeFilters.contains(file)) 
+                                      filterList << file;
+                              }
+                          } else {
+                              filterList = context->homeFilters;
+                          }
+                      }
+                      pace = SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, useMetricUnits).toDouble();
+                    }
 
                     s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
 
@@ -373,7 +399,20 @@ RideSummaryWindow::htmlSummary() const
                     // get the value - from metrics or from data array
                     if (ridesummary) s = s.arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
                                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
-                    else s = s.arg(SummaryMetrics::getAggregated(context, symbol, data, filters, filtered, useMetricUnits));
+                    else {
+                      QStringList filterList = filters;
+                      if (context->ishomefiltered) {
+                          if (filtered) {
+                              foreach (QString file, filters) {
+                                  if (context->homeFilters.contains(file)) 
+                                      filterList << file;
+                              }
+                          } else {
+                              filterList = context->homeFilters;
+                          }
+                      }
+                      s = s.arg(SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, useMetricUnits));
+                   }
                  }
             }
 
@@ -400,7 +439,18 @@ RideSummaryWindow::htmlSummary() const
             summary = summary.arg(m->name());
 
             // get top n
-            QList<SummaryBest> bests = SummaryMetrics::getBests(context, bestsColumn[i], 10, data, filters, filtered, useMetricUnits);
+            QStringList filterList = filters;
+            if (context->ishomefiltered) {
+                if (filtered) {
+                    foreach (QString file, filters) {
+                        if (context->homeFilters.contains(file)) 
+                            filterList << file;
+                    }
+                } else {
+                    filterList = context->homeFilters;
+                }
+            }
+            QList<SummaryBest> bests = SummaryMetrics::getBests(context, bestsColumn[i], 10, data, filterList, context->ishomefiltered || filtered, useMetricUnits);
 
             QColor color = QApplication::palette().alternateBase().color();
             color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
@@ -453,7 +503,20 @@ RideSummaryWindow::htmlSummary() const
 
             // if using metrics or data
             if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
-            else time_in_zone[i] = SummaryMetrics::getAggregated(context, timeInZones[i], data, filters, filtered, useMetricUnits, true).toDouble();
+            else {
+                QStringList filterList = filters;
+                if (context->ishomefiltered) {
+                    if (filtered) {
+                        foreach (QString file, filters) {
+                            if (context->homeFilters.contains(file)) 
+                                filterList << file;
+                        }
+                    } else {
+                        filterList = context->homeFilters;
+                    }
+                }
+                time_in_zone[i] = SummaryMetrics::getAggregated(context, timeInZones[i], data, filterList, context->ishomefiltered || filtered, useMetricUnits, true).toDouble();
+            }
         }
         summary += tr("<h3>Power Zones</h3>");
         summary += context->athlete->zones()->summarize(range, time_in_zone); //aggregating
@@ -487,7 +550,20 @@ RideSummaryWindow::htmlSummary() const
 
             // if using metrics or data
             if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
-            else time_in_zone[i] = SummaryMetrics::getAggregated(context, timeInZonesHR[i], data, filters, filtered, useMetricUnits, true).toDouble();
+            else {
+                QStringList filterList = filters;
+                if (context->ishomefiltered) {
+                    if (filtered) {
+                        foreach (QString file, filters) {
+                            if (context->homeFilters.contains(file)) 
+                                filterList << file;
+                        }
+                    } else {
+                        filterList = context->homeFilters;
+                    }
+                }
+                time_in_zone[i] = SummaryMetrics::getAggregated(context, timeInZonesHR[i], data, filterList, context->ishomefiltered || filtered, useMetricUnits, true).toDouble();
+            }
         }
 
         summary += tr("<h3>Heart Rate Zones</h3>");
@@ -587,11 +663,12 @@ RideSummaryWindow::htmlSummary() const
         // we have after filtering has been applied, otherwise it is just
         // the number of entries
         int activities = 0;
-        if (context->isfiltered || filtered) {
+        if (context->ishomefiltered || context->isfiltered || filtered) {
 
             foreach (SummaryMetrics activity, data) {
                 if (filtered && !filters.contains(activity.getFileName())) continue;
                 if (context->isfiltered && !context->filters.contains(activity.getFileName())) continue;
+                if (context->ishomefiltered && !context->homeFilters.contains(activity.getFileName())) continue;
                 activities++;
             }
 
@@ -606,7 +683,7 @@ RideSummaryWindow::htmlSummary() const
         else totalCols = rtotalColumn.count();
         int metricCols = metricColumn.count() > 7 ? 7 : metricColumn.count();
 
-        if (context->isfiltered || filtered) {
+        if (context->ishomefiltered || context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
             summary += ("<p><h3>" + 
@@ -669,6 +746,7 @@ RideSummaryWindow::htmlSummary() const
             // apply the filter if there is one active
             if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
             if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
+            if (context->ishomefiltered && !context->homeFilters.contains(rideMetrics.getFileName())) continue;
 
             if (even) summary += "<tr>";
             else {

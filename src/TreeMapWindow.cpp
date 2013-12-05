@@ -138,6 +138,7 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh(void)));
 
     connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
 
