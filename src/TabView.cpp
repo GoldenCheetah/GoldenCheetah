@@ -88,6 +88,8 @@ TabView::setRide(RideItem*ride)
 void
 TabView::splitterMoved(int pos,int)
 {
+    if (sidebar_ == NULL) return; // we haven't set sidebar yet.
+
     // show / hide sidebar as dragged..
     if ((pos == 0  && sidebarEnabled())) setSidebarEnabled(false);
 
@@ -118,10 +120,32 @@ TabView::setPage(HomeWindow *page)
     mainSplitter->setStretchFactor(0,0);
     mainSplitter->setCollapsible(0, false);
     splitter->insertWidget(-1, mainSplitter);
+
+    // restore sizes
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, setting); 
+
+    // new (3.1) mechanism 
     if (splitterSizes.toByteArray().size() > 1 ) {
         splitter->restoreState(splitterSizes.toByteArray());
+    } else {
+
+        // use old (v3 or earlier) mechanism
+        QVariant splitterSizes = appsettings->cvalue(context->athlete->cyclist, GC_SETTINGS_SPLITTER_SIZES); 
+        if (splitterSizes.toByteArray().size() > 1 ) {
+
+            splitter->restoreState(splitterSizes.toByteArray());
+
+        } else {
+
+            // sensible default as never run before!
+            QList<int> sizes;
+
+            sizes.append(200);
+            sizes.append(context->mainWindow->width()-200);
+            splitter->setSizes(sizes);
+            
+        }
     }
 }
 
@@ -198,6 +222,8 @@ TabView::setBlank(BlankStatePage *blank)
 void
 TabView::sidebarChanged()
 {
+    if (sidebar_ == NULL) return;
+
     if (sidebarEnabled()) {
 
         sidebar_->show();
