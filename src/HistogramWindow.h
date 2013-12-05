@@ -104,7 +104,7 @@ class HistogramWindow : public GcChartWindow
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { if (rangemode) return (isfiltered || context->isfiltered);
+        bool isFiltered() const { if (rangemode) return (isfiltered || context->ishomefiltered || context->isfiltered);
                                   else return false; }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }

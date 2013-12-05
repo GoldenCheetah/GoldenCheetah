@@ -25,6 +25,8 @@
 #include <QDir>
 class SearchBox;
 
+#include "Athlete.h"
+
 class NamedSearch
 {
 	public:
@@ -42,18 +44,24 @@ class NamedSearches : public QObject {
     Q_OBJECT;
 
     public:
-        NamedSearches(QDir home) : home(home) { read(); }
+        NamedSearches(Athlete *athlete) : athlete(athlete) { 
+            home = athlete->home;
+            read();
+        }
         void read();
         void write();
 
         QList<NamedSearch> &getList() { return list; }
         NamedSearch get(QString name);
+        NamedSearch get(int index);
+        void deleteNamedSearch(int index);
 
     signals:
         void changed();
 
 
     private:
+        Athlete *athlete;
         QDir home;
         QList<NamedSearch> list;
 };

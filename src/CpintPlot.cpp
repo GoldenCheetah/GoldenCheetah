@@ -568,7 +568,7 @@ CpintPlot::calculate(RideItem *rideItem)
     current = new RideFileCache(context, context->athlete->home.absolutePath() + "/" + fileName);
 
     // get aggregates - incase not initialised from date change
-    if (bests == NULL) bests = new RideFileCache(context, startDate, endDate, isFiltered, files);
+    if (bests == NULL) bests = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode);
 
     //
     // PLOT MODEL CURVE (DERIVED)

@@ -64,7 +64,7 @@ double StressCalculator::min(void) {
 
 
 
-void StressCalculator::calculateStress(Context *context, QString, const QString &metric, bool isfilter, QStringList filter)
+void StressCalculator::calculateStress(Context *context, QString, const QString &metric, bool isfilter, QStringList filter, bool onhome)
 {
     // get all metric data from the year 1900 - 3000
     QList<SummaryMetrics> results;
@@ -77,6 +77,17 @@ void StressCalculator::calculateStress(Context *context, QString, const QString 
         QList<SummaryMetrics> filteredresults;
         foreach (SummaryMetrics x, results) {
             if (filter.contains(x.getFileName()))
+                filteredresults << x;
+        }
+        results = filteredresults;
+    }
+
+    if (onhome && context->ishomefiltered) {
+
+        // remove any we don't have filtered
+        QList<SummaryMetrics> filteredresults;
+        foreach (SummaryMetrics x, results) {
+            if (context->homeFilters.contains(x.getFileName()))
                 filteredresults << x;
         }
         results = filteredresults;

@@ -53,7 +53,7 @@ class StressCalculator:public QObject {
 
 	StressCalculator(QString cyclist, QDateTime startDate, QDateTime endDate, int shortTermDays, int longTermDays);
 
-	void calculateStress(Context *, QString, const QString &metric, bool filter = false, QStringList files = QStringList());
+	void calculateStress(Context *, QString, const QString &metric, bool filter = false, QStringList files = QStringList(), bool onhome=true);
 
 	// x axes:
 	double *getSTSvalues() { return stsvalues.data(); }

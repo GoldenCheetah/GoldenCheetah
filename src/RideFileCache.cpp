@@ -911,16 +911,20 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 
 }
 
-RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filter, QStringList files)
+RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filter, QStringList files, bool onhome)
                : start(start), end(end), context(context), rideFileName(""), ride(0) 
 {
 
     // Oh lets get from the cache if we can -- but not if filtered
     if (!filter && !context->isfiltered) {
-        foreach(RideFileCache *p, context->athlete->cpxCache) {
-            if (p->start == start && p->end == end) {
-                *this = *p;
-                return;
+
+        // oh and not if we're onhome and homefiltered
+        if ((onhome && !context->ishomefiltered) || !onhome) {
+            foreach(RideFileCache *p, context->athlete->cpxCache) {
+                if (p->start == start && p->end == end) {
+                    *this = *p;
+                    return;
+                }
             }
         }
     }
@@ -965,6 +969,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
 
             // skip globally filtered values
             if (context->isfiltered && !context->filters.contains(rideFileName)) continue;
+            if (onhome && context->ishomefiltered && !context->homeFilters.contains(rideFileName)) continue;
 
             // get its cached values (will refresh if needed...)
             RideFileCache rideCache(context, context->athlete->home.absolutePath() + "/" + rideFileName);
@@ -1003,7 +1008,8 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     context->mainWindow->setCursor(Qt::ArrowCursor);
 
     // lets add to the cache for others to re-use -- but not if filtered
-    if (!context->isfiltered && !filter) {
+    if (!context->isfiltered && (!context->ishomefiltered || !onhome) && !filter) {
+
         if (context->athlete->cpxCache.count() > maxcache) {
             delete(context->athlete->cpxCache.at(0));
             context->athlete->cpxCache.removeAt(0);

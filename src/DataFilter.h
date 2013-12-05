@@ -73,7 +73,7 @@ class DataFilter : public QObject
         QMap<QString,bool> lookupType; // true if a number, false if a string
 
     public slots:
-        QStringList parseFilter(QString query);
+        QStringList parseFilter(QString query, QStringList *list=0);
         void clearFilter();
         void configUpdate();
 

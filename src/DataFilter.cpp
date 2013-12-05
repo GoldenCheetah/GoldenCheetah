@@ -199,7 +199,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
 
-QStringList DataFilter::parseFilter(QString query)
+QStringList DataFilter::parseFilter(QString query, QStringList *list)
 {
     //DataFilterdebug = 2; // no debug -- needs bison -t in src.pro
     root = NULL;
@@ -250,6 +250,7 @@ QStringList DataFilter::parseFilter(QString query)
             }
         }
         emit results(filenames);
+        if (list) *list = filenames;
     }
 
     errors = DataFiltererrors;

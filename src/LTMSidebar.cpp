@@ -33,6 +33,10 @@
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
+// named searchs
+#include "NamedSearch.h"
+#include "DataFilter.h"
+
 // metadata support
 #include "RideMetadata.h"
 #include "SpecialFields.h"
@@ -69,12 +73,38 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #endif
     seasonsWidget->addWidget(dateRangeTree);
 
+    // filters
+    filtersWidget = new GcSplitterItem(tr("Filters"), iconFromPNG(":images/toolbar/filter3.png"), this);
+    QAction *moreFilterAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    filtersWidget->addAction(moreFilterAct);
+    connect(moreFilterAct, SIGNAL(triggered(void)), this, SLOT(filterPopup(void)));
 
+    filterTree = new QTreeWidget;
+    filterTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    allFilters = filterTree->invisibleRootItem();
+    allFilters->setText(0, tr("Filters"));
+    allFilters->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    filterTree->setFrameStyle(QFrame::NoFrame);
+    filterTree->setColumnCount(1);
+    filterTree->setSelectionBehavior(QAbstractItemView::SelectRows);
+    filterTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    filterTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    filterTree->header()->hide();
+    filterTree->setIndentation(5);
+    filterTree->expandItem(allFilters);
+    filterTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    filterTree->horizontalScrollBar()->setDisabled(true);
+    filterTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef Q_OS_MAC
+    filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    filtersWidget->addWidget(filterTree);
+
+    // events
     eventsWidget = new GcSplitterItem(tr("Events"), iconFromPNG(":images/sidebar/bookmark.png"), this);
     QAction *moreEventAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
-
 
     eventTree = new QTreeWidget;
     eventTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -96,11 +126,13 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     seasons = context->athlete->seasons;
     resetSeasons(); // reset the season list
+    resetFilters(); // reset the filters list
 
     configChanged(); // will reset the metric tree
 
     splitter = new GcSplitter(Qt::Vertical);
     splitter->addWidget(seasonsWidget);
+    splitter->addWidget(filtersWidget);
     splitter->addWidget(eventsWidget);
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
@@ -128,10 +160,13 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
+    connect(filterTree,SIGNAL(itemSelectionChanged()), this, SLOT(filterTreeWidgetSelectionChanged()));
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
+
     // GC signal
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
+    connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
 
@@ -396,6 +431,134 @@ LTMSidebar::eventPopup()
 
     // execute the menu
     menu.exec(splitter->mapToGlobal(QPoint(eventsWidget->pos().x()+eventsWidget->width()-20, eventsWidget->pos().y())));
+}
+
+void
+LTMSidebar::manageFilters()
+{
+    EditNamedSearches *editor = new EditNamedSearches(this, context);
+    editor->move(QCursor::pos()+QPoint(10,-200));
+    editor->show();
+}
+
+void 
+LTMSidebar::filterTreeWidgetSelectionChanged()
+{
+    int selected = filterTree->selectedItems().count();
+
+    if (selected) {
+
+        QStringList errors, files; // results of all the selections
+        bool first = true;
+        int index=0;
+
+        foreach (QTreeWidgetItem *item, filterTree->selectedItems()) {
+
+            int index = filterTree->invisibleRootItem()->indexOfChild(item);
+
+            NamedSearch ns = context->athlete->namedSearches->get(index);
+            QStringList errors, results;
+
+            switch(ns.type) {
+
+            case NamedSearch::filter :
+                {
+                    // use a data filter
+                    DataFilter f(this, context);
+                    errors = f.parseFilter(ns.text, &results);
+                }
+                break;
+
+            case NamedSearch::search :
+                {
+                    // use clucence
+                    //XXX todo
+                }
+
+            }
+
+            // lets filter the results!
+            if (first) files = results;
+            else {
+                QStringList filtered;
+                foreach(QString file, files)
+                    if (results.contains(file))
+                        filtered << file;
+                files = filtered;
+            }
+
+            first = false;
+        }
+
+        context->setHomeFilter(files);
+
+    } else
+        context->clearHomeFilter();
+}
+
+void
+LTMSidebar::resetFilters()
+{
+    if (active == true) return;
+
+    active = true;
+    int i;
+    for (i=allFilters->childCount(); i > 0; i--) {
+        delete allFilters->takeChild(0);
+    }
+
+    foreach(NamedSearch ns, context->athlete->namedSearches->getList()) {
+        
+        QTreeWidgetItem *add = new QTreeWidgetItem(allFilters, 0);
+
+        // No Drag/Drop for filters
+        add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        add->setText(0, ns.name);
+    }
+
+    active = false;
+}
+
+void
+LTMSidebar::filterPopup()
+{
+    // is one selected for deletion?
+    int selected = filterTree->selectedItems().count();
+
+    QMenu menu(filterTree);
+
+    // we can always add, regardless of any event being selected...
+    QAction *addEvent = new QAction(tr("Manage Filters"), filterTree);
+    menu.addAction(addEvent);
+    connect(addEvent, SIGNAL(triggered(void)), this, SLOT(manageFilters(void)));
+
+    if (selected) {
+
+        QAction *del = new QAction(QString(tr("Delete Filter%1")).arg(selected>1 ? "s" : ""), filterTree);
+        menu.addAction(del);
+
+        // connect menu to functions
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteFilter(void)));
+    }
+
+    // execute the menu
+    menu.exec(splitter->mapToGlobal(QPoint(filtersWidget->pos().x()+filtersWidget->width()-20, filtersWidget->pos().y())));
+}
+
+void
+LTMSidebar::deleteFilter()
+{
+    if (filterTree->selectedItems().count() <= 0) return;
+
+    active = true; // no need to reset tree when items deleted from model!
+    while (filterTree->selectedItems().count()) {
+        int index = allFilters->indexOfChild(filterTree->selectedItems().first());
+
+        // now delete!
+        delete allFilters->takeChild(index);
+        context->athlete->namedSearches->deleteNamedSearch(index);
+    }
+    active = false;
 }
 
 void

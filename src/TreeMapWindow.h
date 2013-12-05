@@ -67,7 +67,7 @@ class TreeMapWindow : public GcWindow
         ~TreeMapWindow();
 
 #ifdef GC_HAVE_LUCENE
-        bool isFiltered() const { return context->isfiltered; }
+        bool isFiltered() const { return context->ishomefiltered || context->isfiltered; }
 #endif
         QString f1() const { return field1->currentText(); }
         void setf1(QString x) const { field1->setCurrentIndex(field1->findText(x)); }

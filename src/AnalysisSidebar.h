@@ -38,6 +38,7 @@ class AnalysisSidebar : public QWidget
         AnalysisSidebar(Context *context);
         void close();
         void setWidth(int x) { rideNavigator->setWidth(x); }
+        RideNavigator *rideNavigator;
 
     signals:
 
@@ -76,12 +77,6 @@ class AnalysisSidebar : public QWidget
         void zoomOut();
         void frontInterval();
         void backInterval();
-
-
-    protected:
-
-        friend class ::SearchBox;
-        RideNavigator *rideNavigator;
 
     private:
 

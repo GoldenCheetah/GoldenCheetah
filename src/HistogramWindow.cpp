@@ -309,6 +309,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
+    connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
 }
 
 //
@@ -825,7 +826,7 @@ HistogramWindow::updateChart()
                 // plotting a data series, so refresh the ridefilecache
 
 #ifdef GC_HAVE_LUCENE
-                source = new RideFileCache(context, use.from, use.to, isfiltered, files);
+                source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
 #else
                 source = new RideFileCache(context, use.from, use.to);
 #endif

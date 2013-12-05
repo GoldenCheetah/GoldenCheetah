@@ -752,6 +752,7 @@ RideNavigator::removeColumn()
 void
 RideNavigator::showColumnChooser()
 {
+qDebug()<<logicalHeadings;
     ColumnChooser *selector = new ColumnChooser(logicalHeadings);
     selector->show();
 }

@@ -137,6 +137,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+    connect(context, SIGNAL(homeFilterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(rGroupBy, SIGNAL(valueChanged(int)), this, SLOT(rGroupBySelected(int)));
     //!!! connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
@@ -305,6 +306,29 @@ LTMWindow::filterChanged()
         QList<SummaryMetrics> filteredbestsresults;
         foreach (SummaryMetrics x, bestsresults) {
             if (ltmTool->filters().contains(x.getFileName()))
+                filteredbestsresults << x;
+        }
+        bestsresults = filteredbestsresults;
+
+        settings.data = &results;
+        settings.measures = &measures;
+        settings.bests = &bestsresults;
+    }
+
+    if (context->ishomefiltered) {
+
+        // metrics filtering
+        QList<SummaryMetrics> filteredresults;
+        foreach (SummaryMetrics x, results) {
+            if (context->homeFilters.contains(x.getFileName()))
+                filteredresults << x;
+        }
+        results = filteredresults;
+
+        // metrics filtering
+        QList<SummaryMetrics> filteredbestsresults;
+        foreach (SummaryMetrics x, bestsresults) {
+            if (context->homeFilters.contains(x.getFileName()))
                 filteredbestsresults << x;
         }
         bestsresults = filteredbestsresults;
