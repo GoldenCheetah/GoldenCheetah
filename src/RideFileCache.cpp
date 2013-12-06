@@ -1280,7 +1280,7 @@ RideFileCache::best(Context *context, QString filename, RideFile::SeriesType ser
         }
 
         // jump to correct offset
-        long offset = offsetForMeanMax(head, series) + (sizeof(float) * (duration-1));
+        long offset = offsetForMeanMax(head, series) + (sizeof(float) * (duration));
         inFile.skipRawData(offset);
 
         float readhere = 0;
@@ -1412,7 +1412,7 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
                 // get the values and place into the summarymetric map
                 long offset = offsetForMeanMax(head, workitem.series) + 
                               (sizeof(head)) +
-                              (sizeof(float) * ((workitem.duration*workitem.duration_units)-1));
+                              (sizeof(float) * ((workitem.duration*workitem.duration_units)));
 
                 cacheFile.seek(qint64(offset));
                 inFile.readRawData((char*)&value, sizeof(float));
