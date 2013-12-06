@@ -44,7 +44,9 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
 #else
     QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
-    setFixedSize(530,580);
+
+    QFont defaultFont;
+    setFixedSize(53 * defaultFont.pointSize(),580);
 #endif
 
     // icons
