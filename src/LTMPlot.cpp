@@ -63,6 +63,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     grid->attach(this);
 
     settings = NULL;
+    cogganPMC = skibaPMC = NULL; // cache when replotting a PMC
 
     configUpdate(); // set basic colors
 
@@ -100,6 +101,15 @@ LTMPlot::setAxisTitle(int axis, QString label)
 void
 LTMPlot::setData(LTMSettings *set)
 {
+    QTime timer;
+    timer.start();
+
+    //qDebug()<<"Starting.."<<timer.elapsed();
+
+    // wipe away last cached stress calculator
+    if (cogganPMC) { delete cogganPMC; cogganPMC=NULL; }
+    if (skibaPMC) { delete cogganPMC; cogganPMC=NULL; }
+
     settings = set;
 
     // For each metric in chart, translate units and name if default uname
@@ -176,6 +186,8 @@ LTMPlot::setData(LTMSettings *set)
         return;
     }
 
+    //qDebug()<<"Wiped previous.."<<timer.elapsed();
+
     // count the bars since we format them side by side and need
     // to now how to offset them from each other
     // unset stacking if not a bar chart too since we don't support
@@ -228,6 +240,8 @@ LTMPlot::setData(LTMSettings *set)
             r++;
         }
     }
+
+    //qDebug()<<"Created curve data.."<<timer.elapsed();
 
     // setup the curves
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
@@ -391,6 +405,7 @@ LTMPlot::setData(LTMSettings *set)
 
     } // end of reverse for stacked plots
 
+    //qDebug()<<"First plotting iteration.."<<timer.elapsed();
 
     // do all curves excepts stacks in order
     // we skip stacked entries because they
@@ -408,6 +423,8 @@ LTMPlot::setData(LTMSettings *set)
             createCurveData(settings, metricDetail, xdata, ydata, count);
         else
             createTODCurveData(settings, metricDetail, xdata, ydata, count);
+
+        //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
@@ -709,6 +726,8 @@ LTMPlot::setData(LTMSettings *set)
         current->setData(xdata.data(),ydata.data(), count + 1);
         current->setBaseline(metricDetail.baseline);
 
+        //qDebug()<<"Set Curve Data.."<<timer.elapsed();
+
         // update min/max Y values for the chosen axis
         if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
         if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
@@ -716,6 +735,9 @@ LTMPlot::setData(LTMSettings *set)
         current->attach(this);
 
     }
+
+    //qDebug()<<"Second plotting iteration.."<<timer.elapsed();
+
 
     if (settings->groupBy != LTM_TOD) {
 
@@ -774,8 +796,13 @@ LTMPlot::setData(LTMSettings *set)
     if (settings->groupBy != LTM_TOD)
         refreshMarkers(settings->start.date(), settings->end.date(), settings->groupBy);
 
+    //qDebug()<<"Final tidy.."<<timer.elapsed();
+
     // plot
     replot();
+
+    //qDebug()<<"Replot and done.."<<timer.elapsed();
+
 }
 
 void
@@ -981,14 +1008,23 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
 
     // create the Stress Calculation List
     // FOR ALL RIDE FILES
-	StressCalculator *sc = new StressCalculator(
-            context->athlete->cyclist,
-		    settings->start,
-		    settings->end,
-		    (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
-            (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
+	StressCalculator *sc ;
 
-    sc->calculateStress(context, context->athlete->home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
+    if (scoreType == "coggan_tss" && cogganPMC) {
+        sc = cogganPMC;
+    } else if (scoreType == "skiba_bike_score" && skibaPMC) {
+        sc = skibaPMC;
+    } else {
+        sc = new StressCalculator(
+                context->athlete->cyclist,
+		        settings->start,
+		        settings->end,
+		        (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
+                (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
+
+        sc->calculateStress(context, context->athlete->home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
+
+    }
 
     // pick out any data that is in the date range selected
     // convert to SummaryMetric Format used on the plot
@@ -1037,7 +1073,14 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
         customData << add;
 
     }
-    delete sc;
+
+    if (scoreType == "coggan_tss") {
+        cogganPMC = sc;
+    } else if (scoreType == "skiba_bike_score") {
+        skibaPMC = sc;
+    } else {
+        delete sc;
+    }
 }
 
 int

@@ -37,6 +37,7 @@ class LTMPlotBackground;
 class LTMWindow;
 class LTMPlotZoneLabel;
 class LTMScaleDraw;
+class StressCalculator;
 
 class LTMPlot : public QwtPlot
 {
@@ -97,6 +98,10 @@ class LTMPlot : public QwtPlot
         int chooseYAxis(QString);
         void refreshZoneLabels(int);
         void refreshMarkers(QDate from, QDate to, int groupby);
+
+        // remember the coggan or skiba stress calculators
+        // so it isn't recalculated for each data series!
+        StressCalculator *cogganPMC, *skibaPMC;
 };
 
 // Produce Labels for X-Axis
