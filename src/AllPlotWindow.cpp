@@ -488,8 +488,7 @@ AllPlotWindow::configChanged()
     QPalette palette;
     palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     allPlotFrame->setPalette(palette);
-    stackFrame->setPalette(palette);
-    //stackWidget->setPalette(palette);
+    stackFrame->widget()->setPalette(palette);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
 
     // ok replot with the new config!
@@ -1755,7 +1754,7 @@ AllPlotWindow::setupStackPlots()
     // set new widgets
     QWidget *stackWidget = new QWidget;
     stackWidget->setPalette(palette);
-    stackWidget->setAutoFillBackground(false);
+    stackWidget->setAutoFillBackground(true);
     stackWidget->setLayout(newLayout);
     stackFrame->setWidget(stackWidget);
 

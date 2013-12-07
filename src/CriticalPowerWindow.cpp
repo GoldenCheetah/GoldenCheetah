@@ -259,7 +259,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
@@ -270,6 +270,18 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     modelParametersChanged();
+
+    configChanged(); // get colors set
+}
+
+void
+CriticalPowerWindow::configChanged()
+{
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    setPalette(palette);
+
+    rideSelected();
 }
 
 void
