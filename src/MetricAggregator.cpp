@@ -161,6 +161,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         long elapsedtime = elapsed.elapsed();
         if (elapsedtime > 6000 && bar == NULL) {
             bar = new QProgressDialog(title, tr("Abort"), 0, filenames.count(), context->mainWindow);
+            bar->setWindowFlags(bar->windowFlags() | Qt::FramelessWindowHint);
             bar->setWindowModality(Qt::WindowModal);
             bar->setMinimumDuration(0);
             bar->show(); // lets hide until elapsed time is > 6 seconds
