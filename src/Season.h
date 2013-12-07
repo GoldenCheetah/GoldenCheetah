@@ -50,6 +50,7 @@ class Season
         QDate getEnd();
         int getSeed() { return _seed; }
         int getLow() { return _low; }
+        int getMaxRamp() { return _ramp; }
         QString getName();
         int days() { return _days; } // how many days in the season, -1 if never ending
         int getType();
@@ -61,6 +62,7 @@ class Season
         void setType(int _type);
         void setSeed(int x) { _seed = x; }
         void setLow(int x) { _low = x; }
+        void setMaxRamp(int x) { _ramp = x; }
         QUuid id() const { return _id; }
         void setId(QUuid x) { _id = x; }
         QVector<int> &load() { return _load; }
@@ -70,6 +72,7 @@ class Season
         int _days; // how many days in this season?
         int _seed;
         int _low; // low point for SB .. default to -50
+        int _ramp; // max ramp rate for CTL we want to see
         QUuid _id; // unique id
 
         QString name; // name, typically users name them by year e.g. "2011 Season"

@@ -114,6 +114,7 @@ void GCColor::setupColors()
         { tr("Left Balance"), "CBALANCELEFT", QColor(178,0,0) },
         { tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
         { tr("W' Balance"), "CWBAL", Qt::red },
+        { tr("Ride CP Curve"), "CRIDECP", Qt::black },
         { "", "", QColor(0,0,0) },
     };
 

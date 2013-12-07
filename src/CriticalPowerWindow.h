@@ -143,6 +143,7 @@ class CriticalPowerWindow : public GcChartWindow
         void cpintTimeValueEntered();
         void pickerMoved(const QPoint &pos);
         void rideSelected();
+        void configChanged();
         void intervalSelected();
         void intervalsChanged();
         void seasonSelected(int season);

@@ -29,6 +29,7 @@
 #include <qwt_plot_layout.h>
 #include <qwt_plot_marker.h>
 #include <qwt_scale_engine.h>
+#include <qwt_scale_widget.h>
 #include "RideItem.h"
 #include "LogTimeScaleDraw.h"
 #include "LogTimeScaleEngine.h"
@@ -55,6 +56,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     rangemode(rangemode)
 {
     setInstanceName("CP Plot");
+    setAutoFillBackground(true);
 
     setAxisTitle(xBottom, tr("Interval Length"));
     LogTimeScaleDraw *ld = new LogTimeScaleDraw;
@@ -95,6 +97,15 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
 void
 CpintPlot::configChanged()
 {
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
+
+    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+
     setCanvasBackground(GColor(CPLOTBACKGROUND));
     //QPen gridPen(GColor(CPLOTGRID));
     //gridPen.setStyle(Qt::DotLine);
@@ -742,7 +753,7 @@ CpintPlot::calculate(RideItem *rideItem)
             thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
             thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen black;
-            black.setColor(Qt::black);
+            black.setColor(GColor(CRIDECP));
             black.setWidth(2.0);
             thisCurve->setPen(black);
             thisCurve->attach(this);
