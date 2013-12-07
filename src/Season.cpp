@@ -41,6 +41,7 @@ Season::Season()
     type = season;  // by default seasons are of type season
     _id = QUuid::createUuid(); // in case it isn't set yet
     _seed = 0;
+    _low = -50;
 }
 
 QString Season::getName() {
@@ -99,6 +100,7 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     QLabel *from = new QLabel(tr("From"));
     QLabel *to = new QLabel(tr("To"));
     QLabel *seed = new QLabel(tr("Starting LTS"));
+    QLabel *low  = new QLabel(tr("Lowest SB"));
 
     nameEdit = new QLineEdit(this);
     nameEdit->setText(season->getName());
@@ -123,6 +125,14 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     seedEdit->setAlignment(Qt::AlignLeft);
     seedEdit->setValue(season->getSeed());
     
+    lowEdit = new QDoubleSpinBox(this);
+    lowEdit->setDecimals(0);
+    lowEdit->setRange(-500, 0);
+    lowEdit->setSingleStep(1.0);
+    lowEdit->setWrapping(true);
+    lowEdit->setAlignment(Qt::AlignLeft);
+    lowEdit->setValue(season->getLow());
+    
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
@@ -134,6 +144,8 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     grid->addWidget(toEdit, 3,1);
     grid->addWidget(seed, 4,0);
     grid->addWidget(seedEdit, 4,1);
+    grid->addWidget(low, 5,0);
+    grid->addWidget(lowEdit, 5,1);
 
     mainLayout->addLayout(grid);
 
@@ -160,6 +172,7 @@ EditSeasonDialog::applyClicked()
     season->setStart(fromEdit->date());
     season->setEnd(toEdit->date());
     season->setSeed(seedEdit->value());
+    season->setLow(lowEdit->value());
     accept();
 }
 void
