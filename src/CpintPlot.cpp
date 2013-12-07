@@ -121,6 +121,7 @@ CpintPlot::setAxisTitle(int axis, QString label)
     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
     QwtText title(label);
+    title.setColor(GColor(CPLOTMARKER));
     title.setFont(stGiles);
     QwtPlot::setAxisFont(axis, stGiles);
     QwtPlot::setAxisTitle(axis, title);
@@ -382,8 +383,13 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         series == RideFile::aPower ||
         series == RideFile::xPower ||
         series == RideFile::NP ||
-        series == RideFile::wattsKg) 
-        curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
+        series == RideFile::wattsKg) {
+
+
+        QwtText text(curve_title, QwtText::PlainText);
+        text.setColor(GColor(CPLOTMARKER));
+        curveTitle.setLabel(text);
+    }
 
     if (series == RideFile::wattsKg)
         curveTitle.setYValue(0.6);
