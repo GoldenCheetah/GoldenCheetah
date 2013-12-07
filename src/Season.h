@@ -49,6 +49,7 @@ class Season
         QDate getStart();
         QDate getEnd();
         int getSeed() { return _seed; }
+        int getLow() { return _low; }
         QString getName();
         int days() { return _days; } // how many days in the season, -1 if never ending
         int getType();
@@ -59,6 +60,7 @@ class Season
         void setName(QString _name);
         void setType(int _type);
         void setSeed(int x) { _seed = x; }
+        void setLow(int x) { _low = x; }
         QUuid id() const { return _id; }
         void setId(QUuid x) { _id = x; }
         QVector<int> &load() { return _load; }
@@ -67,6 +69,7 @@ class Season
         QDate end; // last day of the season
         int _days; // how many days in this season?
         int _seed;
+        int _low; // low point for SB .. default to -50
         QUuid _id; // unique id
 
         QString name; // name, typically users name them by year e.g. "2011 Season"
@@ -98,6 +101,7 @@ class EditSeasonDialog : public QDialog
         QComboBox *typeEdit;
         QDateEdit *fromEdit, *toEdit;
         QDoubleSpinBox *seedEdit;
+        QDoubleSpinBox *lowEdit;
 };
 
 class EditSeasonEventDialog : public QDialog
