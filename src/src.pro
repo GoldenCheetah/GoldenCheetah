@@ -9,7 +9,7 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
-QT += xml sql network webkitwidgets script svg widgets
+QT += core xml sql network webkitwidgets script svg widgets
 macx {
     QT += macextras
 }
