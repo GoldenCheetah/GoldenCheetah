@@ -18,6 +18,7 @@
 
 #ifndef _MergeActivityWizard_h
 #define _MergeActivityWizard_h
+
 #include "GoldenCheetah.h"
 #include "RideItem.h"
 #include "RideFile.h"
@@ -26,12 +27,17 @@
 #include "Settings.h"
 #include "SmallPlot.h"
 #include "JsonRideFile.h"
+
 #include <qwt_plot_marker.h>
+
 #include <QtGui>
-
-
-
-
+#include <QButtonGroup>
+#include <QLineEdit>
+#include <QRadioButton>
+#include <QWizard>
+#include <QWizardPage>
+#include <QLabel>
+#include <QFileDialog>
 
 class MainWindow;
 class SmallPlot;

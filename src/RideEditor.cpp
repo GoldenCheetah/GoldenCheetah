@@ -58,7 +58,6 @@ static void secsMsecs(double value, int &secs, int &msecs)
 
 RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
 {
-    setInstanceName("Ride Editor");
     setControls(NULL);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;

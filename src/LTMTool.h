@@ -30,7 +30,15 @@
 #endif
 
 #include <QDir>
+#include <QFileDialog>
 #include <QtGui>
+#include <QTableWidget>
+#include <QStackedWidget>
+#include <QTextEdit>
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QHeaderView>
+#include <QColorDialog>
 
 // tree widget types
 #define ROOT_TYPE   1

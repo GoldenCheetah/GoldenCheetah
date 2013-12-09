@@ -22,6 +22,8 @@
 #include <QtGui>
 #include <QList>
 #include <QAction>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 class GcToolBar : public QWidget
 {

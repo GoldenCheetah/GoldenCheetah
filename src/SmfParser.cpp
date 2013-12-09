@@ -36,7 +36,7 @@ SmfParser::startElement( const QString&, const QString&,
     (void)qName;
     (void)qAttributes;
 
-    return TRUE;
+    return true;
 }
 
 bool
@@ -144,11 +144,11 @@ SmfParser::endElement( const QString&, const QString&, const QString& qName)
         gain.insert("value", QString("%1").arg(g));
         rideFile->metricOverrides.insert("elevation_gain", gain);
     }
-    return TRUE;
+    return true;
 }
 
 bool SmfParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }

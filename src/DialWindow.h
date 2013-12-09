@@ -22,7 +22,9 @@
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
-
+#include <QLabel>
+#include <QLineEdit>
+#include <QFormLayout>
 
 #include "Context.h"
 #include "Zones.h" // for data series types

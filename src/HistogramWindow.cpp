@@ -41,8 +41,6 @@ static const int cadDigits   = 0;
 //
 HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), useCustom(false), useToToday(false), precision(99)
 {
-    setInstanceName("Histogram Window");
-
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
     QFormLayout *cl = new QFormLayout(c);

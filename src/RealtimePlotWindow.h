@@ -22,6 +22,9 @@
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QLabel>
 
 
 #include "Context.h"

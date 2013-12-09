@@ -88,7 +88,7 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
 
     }
 
-    return TRUE;
+    return true;
 }
 
 bool
@@ -216,11 +216,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         last_distance = distance;
         last_time = time;
     }
-    return TRUE;
+    return true;
 }
 
 bool TcxParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }

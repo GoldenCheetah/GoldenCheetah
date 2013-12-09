@@ -22,11 +22,14 @@
 
 #include <QtGui>
 #include <QTimer>
+#include <QCheckBox>
+
 #include "Context.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Units.h"
 #include "math.h"
+
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>

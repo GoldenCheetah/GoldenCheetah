@@ -24,7 +24,6 @@ HelpWindow::HelpWindow(Context *context) : QDialog(context->mainWindow)
     setWindowTitle("Help");
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
-    setInstanceName("Help Window");
 
     view = new QWebView();
     layout = new QVBoxLayout();

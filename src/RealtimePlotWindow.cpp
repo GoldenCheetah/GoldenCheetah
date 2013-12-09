@@ -24,7 +24,6 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     GcWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
-    setInstanceName("RT Plot");
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
     QWidget *c = new QWidget;

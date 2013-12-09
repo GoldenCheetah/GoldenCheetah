@@ -20,8 +20,10 @@
 #define _GC_HrPwWindow_h 1
 
 #include <QWidget>
-#include "GoldenCheetah.h"
+#include <QFormLayout>
 
+#include "GoldenCheetah.h"
+#include "LTMWindow.h" // for tooltip/canvaspicker
 
 class QCheckBox;
 class QLineEdit;
@@ -31,7 +33,6 @@ class Context;
 class SmallPlot;
 class QSlider;
 
-#include "LTMWindow.h" // for tooltip/canvaspicker
 
 
 class HrPwWindow : public GcChartWindow

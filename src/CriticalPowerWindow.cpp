@@ -44,8 +44,6 @@
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
     GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false)
 {
-    setInstanceName("Critical Power Window");
-
     //
     // reveal controls widget
     //
@@ -872,7 +870,7 @@ void CriticalPowerWindow::seasonSelected(int iSeason)
 {
     if (iSeason >= seasons->seasons.count() || iSeason < 0) return;
     Season season = seasons->seasons.at(iSeason);
-    _dateRange = season.id();
+    //XXX BROKEM CODE IN 5.1 PORT // _dateRange = season.id();
     cpintPlot->changeSeason(season.getStart(), season.getEnd());
     cpintPlot->calculate(currentRide);
 }

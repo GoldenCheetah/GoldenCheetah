@@ -62,7 +62,7 @@ SlfParser::startElement( const QString&, const QString&,
         restSec = qAttributes.value("zeit").toDouble();
     }
 
-    return TRUE;
+    return true;
 }
 
 bool
@@ -153,11 +153,11 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
             secs += samplingRate;
         }
     }
-    return TRUE;
+    return true;
 }
 
 bool SlfParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }

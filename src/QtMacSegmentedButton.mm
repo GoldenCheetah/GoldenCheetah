@@ -18,11 +18,15 @@
 
 #include "QtMacSegmentedButton.h"
 
+// mac specials
+#include <qmacfunctions.h>
+
 #import <AppKit/NSButton.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSFont.h>
 #import <AppKit/NSSegmentedControl.h>
+#import <AppKit/NSSegmentedCell.h>
 #import <AppKit/NSBezierPath.h>
 
 CocoaInitializer::CocoaInitializer()
@@ -44,7 +48,8 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
 
 static NSImage *fromQPixmap(const QPixmap *pixmap)
 {
-    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap->toMacCGImageRef()];
+    CGImageRef cgImage = QtMac::toCGImageRef(*pixmap);
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
     [bitmapRep release];

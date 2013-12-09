@@ -21,6 +21,11 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QLabel>
+
 #include <qwt_plot_zoomer.h>
 
 class Context;

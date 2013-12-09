@@ -18,12 +18,19 @@
 
 #include "QtMacButton.h"
 
+// mac specials
+#include <qmacfunctions.h>
+#include <QtWidgets>
+#include <Cocoa/Cocoa.h>
+#include <QMacCocoaViewContainer>
+
 #import "AppKit/NSButton.h"
 #import "AppKit/NSFont.h"
 
 static NSImage *fromQPixmap(const QPixmap *pixmap)
 {
-    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap->toMacCGImageRef()];
+    CGImageRef cgImage = QtMac::toCGImageRef(*pixmap);
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
     [bitmapRep release];
@@ -39,13 +46,15 @@ static inline NSString* fromQString(const QString &string)
 }
 
 // nice little trick from qocoa
-static inline void setupLayout(void *cocoaView, QWidget *parent)
+static inline void setupLayout(NSView *cocoaView, QWidget *parent)
 {
     parent->setAttribute(Qt::WA_NativeWindow);
     QVBoxLayout *layout = new QVBoxLayout(parent);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
-    layout->addWidget(new QMacCocoaViewContainer(cocoaView, parent));
+    QMacCocoaViewContainer *cont = new QMacCocoaViewContainer(0, parent);
+    cont->setCocoaView(cocoaView);
+    layout->addWidget(cont);
 }
 
 // Lets wrap up all the NSButton complexity in this private

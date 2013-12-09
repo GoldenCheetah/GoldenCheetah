@@ -22,6 +22,9 @@
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
+#include <QFormLayout>
+#include <QStyle>
+#include <QStyleFactory>
 
 class AllPlot;
 class Context;

@@ -87,7 +87,7 @@ bool GpxParser::startElement( const QString&, const QString&,
             lon = lastLon;
         }
     }
-    return TRUE;
+    return true;
 }
 
 #define PI 3.14159265
@@ -153,7 +153,7 @@ bool
             last_time = time;
             lastLon = lon;
             lastLat = lat;
-            return TRUE;
+            return true;
         }
         // we need to figure out the distance by using the lon,lat
         // using teh haversine formula
@@ -254,11 +254,11 @@ bool
         lastLat = lat;
     }
 
-    return TRUE;
+    return true;
 }
 
 bool GpxParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }

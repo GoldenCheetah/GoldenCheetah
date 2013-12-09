@@ -79,7 +79,7 @@ Serial::open(QString &err)
     // Linux and Mac OSX use stdio / termio / tcsetattr
     //
     assert(fd < 0);
-    fd = ::open(path.toAscii().constData(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+    fd = ::open(path.toLatin1().constData(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0) {
         err = QString("open: ") + strerror(errno);
         return false;

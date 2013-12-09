@@ -24,7 +24,6 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     GcWindow(context), context(context)
 {
     setContentsMargins(0,0,0,0);
-    setInstanceName("RT Plot");
     setControls(NULL);
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 

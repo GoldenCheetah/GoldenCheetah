@@ -153,7 +153,7 @@ PowerTapDevice::download( const QDir &tmpdir,
 	}
 	if (PT_DEBUG) {
 	    printf("read version \"%s\"\n",
-		   cEscape(vbuf, version_len).toAscii().constData());
+		   cEscape(vbuf, version_len).toLatin1().constData());
 	}
 	version = QByteArray(vbuf, version_len);
 
@@ -192,7 +192,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     if (PT_DEBUG) {
         printf("read header \"%s\"\n",
                cEscape((char*) header,
-                       sizeof(header)).toAscii().constData());
+                       sizeof(header)).toLatin1().constData());
     }
     QVector<unsigned char> records;
     for (size_t i = 0; i < sizeof(header); ++i)
@@ -219,7 +219,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         }
         if (PT_DEBUG) {
             printf("read 2 bytes: \"%s\"\n",
-                   cEscape((char*) buf, 2).toAscii().constData());
+                   cEscape((char*) buf, 2).toLatin1().constData());
         }
         if (hasNewline((char*) buf, 2))
             break;
@@ -236,7 +236,7 @@ PowerTapDevice::download( const QDir &tmpdir,
             }
             if (PT_DEBUG) {
                 printf("read %d bytes: \"%s\"\n", n,
-                       cEscape((char*) buf + count, n).toAscii().constData());
+                       cEscape((char*) buf + count, n).toLatin1().constData());
             }
             count += n;
         }

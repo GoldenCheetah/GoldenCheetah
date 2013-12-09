@@ -22,6 +22,12 @@
 
 #include <QDialog>
 #include <QDir>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QLabel>
+#include <QDialog>
 
 class QListWidget;
 class QListWidgetItem;

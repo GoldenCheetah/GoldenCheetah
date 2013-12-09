@@ -20,7 +20,6 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
-#include <QHttp>
 #include <QUrl>
 #include "TimeUtils.h"
 

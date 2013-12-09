@@ -23,6 +23,11 @@
 #include <qwt_plot.h>
 #include <qwt_series_data.h>
 #include <QtGui>
+
+#include <QTableWidget>
+#include <QTextEdit>
+#include <QStackedWidget>
+
 #include "LTMWindow.h" // for tooltip/canvaspicker
 
 // forward references

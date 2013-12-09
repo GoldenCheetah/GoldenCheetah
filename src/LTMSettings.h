@@ -22,7 +22,9 @@
 
 #include <QtGui>
 #include <QList>
+#include <QDialog>
 #include <QDataStream>
+#include <QMessageBox>
 
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>

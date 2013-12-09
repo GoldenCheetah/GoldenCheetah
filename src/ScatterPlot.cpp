@@ -151,7 +151,6 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
 
 ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
-    setInstanceName("2D Plot");
     all = NULL;
     grid = NULL;
     canvas()->setFrameStyle(QFrame::NoFrame);

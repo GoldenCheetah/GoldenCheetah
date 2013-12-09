@@ -38,6 +38,9 @@
 #include "MainWindow.h"
 
 #include <QtGui>
+#include <QTextStream>
+#include <QTableView>
+#include <QItemDelegate>
 #include <QDebug>
 #include "qxtscheduleview.h"
 #include "Context.h"
@@ -132,7 +135,7 @@ public slots:
             arr->append(j);
             dateToRows.insert(dateTime.date(), arr);
         }
-        reset();
+        resetInternalData();
 
     }
 

@@ -19,7 +19,6 @@
 #include "ShareDialog.h"
 #include "Athlete.h"
 #include "Settings.h"
-#include <QHttp>
 #include <QUrl>
 #include <QHttpMultiPart>
 #include <QScriptEngine>
@@ -321,11 +320,11 @@ StravaUploader::requestUploadStrava()
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    multiPart->setBoundary(boundary.toAscii());
+    multiPart->setBoundary(boundary.toLatin1());
 
     QHttpPart accessTokenPart;
     accessTokenPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"access_token\""));
-    accessTokenPart.setBody(token.toAscii());
+    accessTokenPart.setBody(token.toLatin1());
 
     QHttpPart activityTypePart;
     activityTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_type\""));
@@ -333,7 +332,7 @@ StravaUploader::requestUploadStrava()
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"activity_name\""));
-    activityNamePart.setBody(QString(parent->titleEdit->text()).toAscii());
+    activityNamePart.setBody(QString(parent->titleEdit->text()).toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data_type\""));
@@ -632,7 +631,7 @@ RideWithGpsUploader::requestUploadRideWithGPS()
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload ride... Sending to RideWithGPS"));
 
-    networkMgr.post( request, out.toAscii());
+    networkMgr.post( request, out.toLatin1());
     eventLoop.exec();
 }
 
@@ -773,13 +772,13 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    multiPart->setBoundary(boundary.toAscii());
+    multiPart->setBoundary(boundary.toLatin1());
 
-    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toAscii());
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
 
     QHttpPart activityNamePart;
     activityNamePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"title\""));
-    activityNamePart.setBody(QString(parent->titleEdit->text()).toAscii());
+    activityNamePart.setBody(QString(parent->titleEdit->text()).toLatin1());
 
     QHttpPart dataTypePart;
     dataTypePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"format\""));
@@ -953,15 +952,15 @@ SelfLoopsUploader::requestUploadSelfLoops()
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::MixedType);
-    multiPart->setBoundary(boundary.toAscii());
+    multiPart->setBoundary(boundary.toLatin1());
 
     QHttpPart emailPart;
     emailPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"email\""));
-    emailPart.setBody(username.toAscii());
+    emailPart.setBody(username.toLatin1());
 
     QHttpPart passwordPart;
     passwordPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"pw\""));
-    passwordPart.setBody(password.toAscii());
+    passwordPart.setBody(password.toLatin1());
 
     QHttpPart filePart;
     filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"tcxfile\"; filename=\"myfile.tcx.gz\"; type=\"application/x-gzip\""));

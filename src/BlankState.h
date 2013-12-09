@@ -21,7 +21,10 @@
 
 #include "GoldenCheetah.h"
 #include "Settings.h"
+
 #include <QtGui>
+#include <QCheckBox>
+#include <QLabel>
 
 struct ShortCut
 {

@@ -21,12 +21,16 @@
 #include "Context.h"
 #include "Colors.h"
 #include "Settings.h"
+
 #include <QDebug>
+#include <QLabel>
 #include <QPainter>
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
 #include <QGraphicsDropShadowEffect>
+
+Q_DECLARE_METATYPE(QWidget*)
 
 QWidget *GcWindow::controls() const
 {
@@ -45,6 +49,7 @@ void GcWindow::setControls(QWidget *x)
     }
 }
 
+#if 0
 QString GcWindow::instanceName() const
 {
     return _instanceName;
@@ -54,6 +59,7 @@ void GcWindow::_setInstanceName(QString x)
 {
     _instanceName = x;
 }
+#endif
 
 QString GcWindow::subtitle() const
 {
@@ -166,7 +172,7 @@ GcWindow::GcWindow()
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-    setProperty("color", Qt::white);
+    setProperty("color", QColor(Qt::white));
     setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
@@ -203,7 +209,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-    setProperty("color", Qt::white);
+    setProperty("color", QColor(Qt::white));
     setProperty("nomenu", false);
 
     // make sure its underneath the toggle button

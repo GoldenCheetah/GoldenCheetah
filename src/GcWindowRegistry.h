@@ -64,6 +64,7 @@ enum gcwinid {
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
+Q_DECLARE_METATYPE(GcWinID)
 
 // when declaring a window, what view is it relevant for?
 #define VIEW_TRAIN    0x01

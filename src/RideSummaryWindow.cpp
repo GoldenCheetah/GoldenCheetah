@@ -35,7 +35,6 @@
 RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
      GcChartWindow(context), context(context), ridesummary(ridesummary), useCustom(false), useToToday(false), filtered(false)
 {
-    setInstanceName("Ride Summary Window");
     setRideItem(NULL);
 
     // allow user to select date range if in summary mode

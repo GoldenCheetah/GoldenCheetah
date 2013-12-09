@@ -40,8 +40,6 @@ bool TreeMapLessThan(const TreeMap *a, const TreeMap *b) {
 TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, Context *context)
             : QWidget (parent), parent(parent), context(context)
 {
-    setInstanceName("TreeMap Plot");
-
     settings = NULL;
 
     root = new TreeMap;

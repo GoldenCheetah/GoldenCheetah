@@ -50,6 +50,7 @@ class DateRange : QObject
     signals:
         void changed(QDate from, QDate to);
 };
+Q_DECLARE_METATYPE(DateRange)
 
 class DateSettingsEdit : public QWidget
 {

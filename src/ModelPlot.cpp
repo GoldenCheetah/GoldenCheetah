@@ -999,8 +999,6 @@ ModelPlot::ModelPlot(Context *context, ModelSettings *settings) : QFrame(context
     // the distinction between a model plot and a basic model plot
     // is only to provide a frame for the qwt3d plot (it looks odd
     // when compared to the other plots without one)
-    setInstanceName("3D Plot");
-
     layout = new QVBoxLayout;
     setLineWidth(1);
     setFrameStyle(QFrame::NoFrame);

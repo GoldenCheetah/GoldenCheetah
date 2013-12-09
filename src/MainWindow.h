@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QSqlDatabase>
 #include <QtGui>
+#include <QMainWindow>
 #include "RideItem.h"
 #include "TimeUtils.h"
 
@@ -31,7 +32,6 @@
 #include <AvailabilityMacros.h>
 #endif
 
-class LionFullScreen;
 class QTFullScreen;
 class QtMacSegmentedButton;
 class QtMacButton;
@@ -44,6 +44,7 @@ class SaveSingleDialogWidget;
 class MainWindow;
 class Athlete;
 class Context;
+class Tab;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 extern QDesktopWidget *desktop;         // how many screens / res etc
@@ -170,9 +171,6 @@ class MainWindow : public QMainWindow
         GcScopeBar *scopebar;
         Tab *tab;
 
-#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
-        LionFullScreen *fullScreen;
-#endif
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
 #endif

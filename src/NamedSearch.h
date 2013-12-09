@@ -19,14 +19,17 @@
 #ifndef Gc_NamedSearch_h
 #define Gc_NamedSearch_h
 #include "GoldenCheetah.h"
+#include "Athlete.h"
 
 #include <QXmlDefaultHandler>
 #include <QString>
+#include <QHeaderView>
 #include <QDir>
+#include <QDialog>
+#include <QLabel>
+
+
 class SearchBox;
-
-#include "Athlete.h"
-
 class NamedSearch
 {
 	public:

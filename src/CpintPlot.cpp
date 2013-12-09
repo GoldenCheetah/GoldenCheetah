@@ -55,7 +55,6 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     shadeMode(2),
     rangemode(rangemode)
 {
-    setInstanceName("CP Plot");
     setAutoFillBackground(true);
 
     setAxisTitle(xBottom, tr("Interval Length"));

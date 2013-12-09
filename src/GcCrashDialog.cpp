@@ -214,14 +214,6 @@ QString GcCrashDialog::versionHTML()
     clucene = _CL_VERSION;
     #endif
 
-    // -- LION SUPPORT ----
-    #ifdef Q_OS_MAC
-    QString lionSupport = "no";
-    #ifdef GC_HAVE_LION
-    lionSupport = "yes";
-    #endif
-    #endif
-
     #ifdef GC_HAVE_WFAPI
     QString wfapi = WFApi::getInstance()->apiVersion();
     #else
@@ -262,9 +254,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
             "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
             "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
-            #ifdef Q_OS_MAC
-            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%15</td></tr>"
-            #endif
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -281,9 +270,6 @@ QString GcCrashDialog::versionHTML()
             .arg(wfapi)
             .arg(vlc)
             .arg(clucene)
-            #ifdef Q_OS_MAC
-            .arg(lionSupport)
-            #endif
             ;
 
     QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");

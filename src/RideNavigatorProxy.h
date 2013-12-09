@@ -490,7 +490,7 @@ public slots:
     void sourceModelChanged() {
         clearGroups();
         setGroupBy(groupBy+2); // accomodate virtual columns
-        reset();
+        resetInternalData();
 
         // lets expand column 0 for the groupBy heading
         for (int i=0; i < groupCount(); i++)

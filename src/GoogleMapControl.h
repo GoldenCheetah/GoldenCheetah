@@ -22,6 +22,11 @@
 
 #include <QWidget>
 #include <QtWebKit>
+#include <QDialog>
+#include <QWebPage>
+#include <QWebView>
+#include <QWebFrame>
+
 #include <string>
 #include <iostream>
 #include <sstream>

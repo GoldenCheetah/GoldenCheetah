@@ -224,15 +224,15 @@ bool HrZones::read(QFile &file)
                         // set up the range, capturing LT if it's specified
                         // range = new ZoneRange(begin, end);
                         int nLT = (r ? 11 : 7);
-                        if (rangerx[r].numCaptures() >= (nLT)) lt = rangerx[r].cap(nLT).toInt();
+                        if (rangerx[r].captureCount() >= (nLT)) lt = rangerx[r].cap(nLT).toInt();
                         else lt = 0;
 
                         int nRestHr = (r ? 14 : 10);
-                        if (rangerx[r].numCaptures() >= (nRestHr)) restHr = rangerx[r].cap(nRestHr).toInt();
+                        if (rangerx[r].captureCount() >= (nRestHr)) restHr = rangerx[r].cap(nRestHr).toInt();
                         else restHr = 0;
 
                         int nMaxHr = (r ? 17 : 13);
-                        if (rangerx[r].numCaptures() >= (nRestHr)) maxHr = rangerx[r].cap(nMaxHr).toInt();
+                        if (rangerx[r].captureCount() >= (nRestHr)) maxHr = rangerx[r].cap(nMaxHr).toInt();
                         else maxHr = 0;
 
                         // bleck

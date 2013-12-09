@@ -1,10 +1,10 @@
-#include <QtGui/QIcon>
-#include <QtGui/QMenu>
-#include <QtGui/QPainter>
-#include <QtGui/QStyleOption>
-#include <QtGui/QMouseEvent>
-#include <QtCore/QDebug>
-#include <QtGui/QPixmapCache>
+#include <QIcon>
+#include <QMenu>
+#include <QPainter>
+#include <QStyleOption>
+#include <QMouseEvent>
+#include <QDebug>
+#include <QPixmapCache>
 
 #include "qtsegmentcontrol.h"
 

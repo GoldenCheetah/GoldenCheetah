@@ -20,13 +20,14 @@
 #define _GC_CriticalPowerWindow_h 1
 #include "GoldenCheetah.h"
 #include "MainWindow.h" // for isfiltered and filters
-
-#include <QtGui>
 #include "Season.h"
 #include "RideFile.h"
 #ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
 #endif
+
+#include <QtGui>
+#include <QFormLayout>
 
 class CpintPlot;
 class QwtPlotCurve;

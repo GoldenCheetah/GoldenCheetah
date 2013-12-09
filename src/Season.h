@@ -22,8 +22,12 @@
 
 #include <QString>
 #include <QDate>
+#include <QDialog>
 #include <QFile>
 #include <QApplication>
+#include <QTreeWidget>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "Context.h"
 

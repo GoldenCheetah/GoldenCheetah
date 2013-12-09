@@ -50,7 +50,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     // ride list...
     rides = new QTableWidget(this);
 #ifdef Q_OS_LINUX // QT 4.7 bug on Linux, selection-background-color is ignored (no transparency)
-    QWindowsStyle *style = new QWindowsStyle();
+    QStyle *style = QStyleFactory::create("fusion");
     rides->setStyle(style);
 #endif
     rides->setFrameStyle(QFrame::NoFrame);

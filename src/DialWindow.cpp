@@ -27,7 +27,6 @@ DialWindow::DialWindow(Context *context) :
     rolling.resize(150); // enough for 30 seconds at 5hz
 
     setContentsMargins(0,0,0,0);
-    setInstanceName("Dial");
 
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);

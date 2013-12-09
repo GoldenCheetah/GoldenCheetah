@@ -98,7 +98,7 @@ static QwtSymbol::Style intToSymbol(int x)
 bool LTMChartParser::startDocument()
 {
     buffer.clear();
-    return TRUE;
+    return true;
 }
 
 static QString unprotect(QString buffer)
@@ -167,7 +167,7 @@ bool LTMChartParser::endElement( const QString&, const QString&, const QString &
         settings.append(setting);
     else if (qName == "charts") { // <charts></charts> block top-level
     } // do nothing for now
-    return TRUE;
+    return true;
 }
 
 bool LTMChartParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
@@ -189,13 +189,13 @@ bool LTMChartParser::startElement( const QString&, const QString&, const QString
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 bool LTMChartParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }
 
 QList<LTMSettings>
@@ -206,7 +206,7 @@ LTMChartParser::getSettings()
 
 bool LTMChartParser::endDocument()
 {
-    return TRUE;
+    return true;
 }
 
 // static helper to protect special xml characters

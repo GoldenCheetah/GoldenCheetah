@@ -124,14 +124,14 @@ SrmDevice::open( QString &err )
         // serial port device anyway.
 
 #ifdef SRMIO_HAVE_WINCOM
-        io = srmio_iow32_new( dev->name().toAscii().constData(), &serr );
+        io = srmio_iow32_new( dev->name().toLatin1().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
                 .arg(serr.message);
             return false;
         }
 #elif defined(SRMIO_HAVE_TERMIOS)
-        io = srmio_ios_new( dev->name().toAscii().constData(), &serr );
+        io = srmio_ios_new( dev->name().toLatin1().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
                 .arg(serr.message);
@@ -146,7 +146,7 @@ SrmDevice::open( QString &err )
     } else if( dev->type() == "D2XX" ){
 #ifdef SRMIO_HAVE_D2XX
         io = srmio_d2xx_description_new(
-            dev->name().toAscii().constData(), &serr );
+            dev->name().toLatin1().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
                 .arg(serr.message);
@@ -560,7 +560,7 @@ SrmDevice::download( const QDir &tmpdir,
         }
         file.startTime.setTime_t( 0.1 * stime );
 
-        fh = fopen( file.name.toAscii().constData(), "wb" );
+        fh = fopen( file.name.toLatin1().constData(), "wb" );
         if( ! fh ){
             srmio_data_free(fixed);
             err = tr( "failed to open file %1: %2")

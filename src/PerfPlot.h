@@ -19,15 +19,26 @@
 #ifndef _GC_PerfPlot_h
 #define _GC_PerfPlot_h 1
 #include "GoldenCheetah.h"
-
+#include "Settings.h"
 #include "StressCalculator.h"
+#include "RideItem.h"
+#include "RideFile.h"
+#include "PerfPlot.h"
+#include "StressCalculator.h"
+#include "Colors.h"
+
 #include <QtGui>
+
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_draw.h>
-#include "Settings.h"
+#include <qwt_series_data.h>
+#include <qwt_legend.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_scale_widget.h>
+
 
 
 class PPTimeScaleDraw;

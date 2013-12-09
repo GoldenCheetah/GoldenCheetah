@@ -20,6 +20,7 @@
 #define INTERVALSUMMARYWINDOW_H_
 
 #include <QtGui>
+#include <QTextEdit>
 
 class Context;
 class IntervalItem;

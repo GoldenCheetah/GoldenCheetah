@@ -23,6 +23,8 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QMessageBox>
+
 #include "Context.h"
 #include "Settings.h"
 /* #include "CalendarParser.h" */

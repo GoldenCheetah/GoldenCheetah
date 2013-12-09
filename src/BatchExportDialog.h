@@ -31,6 +31,8 @@
 #include <QTableWidget>
 #include <QProgressBar>
 #include <QList>
+#include <QFileDialog>
+#include <QCheckBox>
 #include <QLabel>
 #include <QListIterator>
 #include <QDebug>

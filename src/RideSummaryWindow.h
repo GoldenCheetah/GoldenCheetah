@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QWebView>
 #include <QWebFrame>
+#include <QFormLayout>
 
 #include "SummaryMetrics.h"
 

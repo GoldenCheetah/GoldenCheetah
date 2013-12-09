@@ -141,10 +141,13 @@ TtbDialog::requestSettings()
     QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
-    QUrl url( TTB_URL + "/settings/list" );
-    url.addQueryItem( "view", "xml" );
-    url.addQueryItem( "user", username );
-    url.addQueryItem( "pass", password );
+    QUrlQuery urlquery( TTB_URL + "/settings/list" );
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "user", username );
+    urlquery.addQueryItem( "pass", password );
+
+    QUrl url;
+    url.setQuery(urlquery);
 
     QNetworkRequest request = QNetworkRequest(url);
     request.setRawHeader( "Accept-Encoding", "identity" );
@@ -165,10 +168,13 @@ TtbDialog::requestSession()
     QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
-    QUrl url( TTB_URL + "/login/sso" );
-    url.addQueryItem( "view", "xml" );
-    url.addQueryItem( "user", username );
-    url.addQueryItem( "pass", password );
+    QUrlQuery urlquery( TTB_URL + "/login/sso" );
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "user", username );
+    urlquery.addQueryItem( "pass", password );
+
+    QUrl url;
+    url.setQuery(urlquery);
 
     QNetworkRequest request = QNetworkRequest(url);
     request.setRawHeader( "Accept-Encoding", "identity" );
@@ -228,9 +234,12 @@ TtbDialog::requestUpload()
 
     currentRequest = reqUpload;
 
-    QUrl url( TTB_URL + "/file/upload" );
-    url.addQueryItem( "view", "xml" );
-    url.addQueryItem( "sso", sessionId );
+    QUrlQuery urlquery( TTB_URL + "/file/upload" );
+    urlquery.addQueryItem( "view", "xml" );
+    urlquery.addQueryItem( "sso", sessionId );
+
+    QUrl url;
+    url.setQuery(urlquery);
 
     QNetworkRequest request = QNetworkRequest(url);
     request.setRawHeader( "Accept-Encoding", "identity" );

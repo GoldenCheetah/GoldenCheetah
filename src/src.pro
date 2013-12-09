@@ -9,7 +9,11 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
-QT += xml sql network webkit script svg
+QT += xml sql network webkitwidgets script svg widgets
+macx {
+    QT += macextras
+}
+
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm $${LIBZ_LIBS}
 
@@ -139,21 +143,16 @@ CONFIG(debug, debug|release) {
 # Mac specific build for
 # Segmented mac style button
 # Video playback using Quicktime Framework
-# Lion fullscreen playback
 # search box for title bar
 macx {
     LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
     HEADERS +=  QtMacVideoWindow.h \
-                LionFullScreen.h \
                 QtMacSegmentedButton.h \
-                QtMacButton.h \
-                QtMacPopUpButton.h
+                QtMacButton.h 
 
     OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
-                            LionFullScreen.mm \
                             QtMacSegmentedButton.mm \
-                            QtMacButton.mm \
-                            QtMacPopUpButton.mm
+                            QtMacButton.mm 
 
     # on a mac we need to install the Wahoo API for BTLE/Kickr support
     # This requires **v3.0 (beta)** of the WF API which is not yet

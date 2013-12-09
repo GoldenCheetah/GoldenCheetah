@@ -23,10 +23,17 @@
 #include "RideFile.h"
 #include "RideFileCommand.h"
 #include "RideItem.h"
+
+#include <QtGui>
+#include <QWidget>
+#include <QDialog>
 #include <QDate>
 #include <QDir>
+#include <QLabel>
 #include <QFile>
 #include <QList>
+#include <QTextEdit>
+#include <QLineEdit>
 #include <QMap>
 #include <QVector>
 
@@ -45,9 +52,6 @@
 // ManualDataProcessorDialog is a dialog box to manually execute a
 // dataprocessor on the current ride and is called from the mainWindow menus
 //
-
-
-#include <QtGui>
 
 // every data processor must supply a configuration Widget
 // when its processorConfig member is called

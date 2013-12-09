@@ -27,8 +27,12 @@
 #include "JsonRideFile.h"
 #include "Units.h"
 #include "Colors.h"
+
 #include <QWizard>
 #include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QMessageBox>
+#include <QLabel>
 
 #include <qwt_plot_marker.h>
 

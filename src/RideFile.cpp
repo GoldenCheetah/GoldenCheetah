@@ -882,7 +882,7 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
     QRegExp rx(rideFileRegExp);
     if (!rx.exactMatch(name))
             return false;
-    assert(rx.numCaptures() == 8);
+    assert(rx.captureCount() == 8);
     QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
     QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
     if ((! date.isValid()) || (! time.isValid())) {

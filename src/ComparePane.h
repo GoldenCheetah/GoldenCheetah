@@ -20,6 +20,9 @@
 #define _GC_ComparePane_h 1
 
 #include <QWidget>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+
 #include "GcSideBarItem.h"
 
 class ComparePane : public QWidget

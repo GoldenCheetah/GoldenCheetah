@@ -23,6 +23,8 @@
 #include "RideSummaryWindow.h"
 #include "RideMetadata.h"
 
+#include <QSplitter>
+
 class Context;
 
 class SummaryWindow : public GcWindow

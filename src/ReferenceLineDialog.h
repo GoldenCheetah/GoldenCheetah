@@ -22,6 +22,11 @@
 #include "AllPlot.h"
 
 #include <QtGui>
+#include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QTableWidget>
+#include <QHeaderView>
 
 class Context;
 class RideFile;

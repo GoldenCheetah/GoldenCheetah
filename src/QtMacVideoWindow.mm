@@ -39,8 +39,7 @@ GcWindow(context), home(home), context(context), hasMovie(false)
 {
 
     setControls(NULL);
-    setInstanceName("Video Window");
-    setProperty("color", Qt::black);
+    setProperty("color", QColor(Qt::black));
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);

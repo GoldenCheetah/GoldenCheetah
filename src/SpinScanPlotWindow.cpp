@@ -24,7 +24,6 @@ SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
     GcWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
-    setInstanceName("SpinScan Plot");
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
     // setup controls

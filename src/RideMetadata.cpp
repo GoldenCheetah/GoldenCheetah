@@ -1011,7 +1011,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     else if (qName == "colorfield")
         colorfield = unprotect(buffer);
 
-    return TRUE;
+    return true;
 }
 
 bool MetadataXMLParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
@@ -1035,16 +1035,16 @@ bool MetadataXMLParser::startElement( const QString&, const QString&, const QStr
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 bool MetadataXMLParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }
 
 bool MetadataXMLParser::endDocument()
 {
-    return TRUE;
+    return true;
 }

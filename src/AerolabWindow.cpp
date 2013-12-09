@@ -29,7 +29,6 @@
 
 AerolabWindow::AerolabWindow(Context *context) :
   GcWindow(context), context(context) {
-    setInstanceName("Aerolab Window");
     setControls(NULL);
 
   // Aerolab tab layout:

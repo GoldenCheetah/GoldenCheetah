@@ -22,6 +22,10 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QDialog>
+#include <QGroupBox>
 #include <qdatetimeedit.h>
 
 class Context;

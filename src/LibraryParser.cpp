@@ -28,7 +28,7 @@ static inline QString unquote(QString quoted)
 bool LibraryParser::startDocument()
 {
     buffer.clear();
-    return TRUE;
+    return true;
 }
 
 bool LibraryParser::endElement( const QString&, const QString&, const QString &qName )
@@ -45,7 +45,7 @@ bool LibraryParser::endElement( const QString&, const QString&, const QString &q
     if (qName == "ref") {
         library->refs.append(buffer.trimmed());
     }
-    return TRUE;
+    return true;
 }
 
 bool LibraryParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs)
@@ -59,13 +59,13 @@ bool LibraryParser::startElement( const QString&, const QString&, const QString 
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 bool LibraryParser::characters(const QString& str)
 {
     buffer += str;
-    return TRUE;
+    return true;
 }
 
 bool

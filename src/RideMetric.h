@@ -29,13 +29,13 @@
 #include <QDebug>
 
 #include "RideFile.h"
-#include "Context.h"
 
 class Zones;
 class HrZones;
 class Context;
-
 class RideMetric;
+class RideFile;
+
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 class RideMetric {

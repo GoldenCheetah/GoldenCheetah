@@ -25,7 +25,17 @@
 #include "RideFile.h"
 #include "RideFileCommand.h"
 #include "RideFileTableModel.h"
+
 #include <QtGui>
+#include <QGroupBox>
+#include <QCheckBox>
+#include <QTableView>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QDesktopWidget>
+#include <QToolBar>
+#include <QItemDelegate>
 
 class EditorData;
 class CellDelegate;

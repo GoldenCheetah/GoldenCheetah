@@ -34,7 +34,6 @@ HrPwWindow::HrPwWindow(Context *context) :
      GcChartWindow(context), context(context), current(NULL)
 {
     setControls(NULL);
-    setInstanceName("HrPw");
 
     //
     // reveal controls widget

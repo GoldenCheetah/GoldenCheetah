@@ -18,8 +18,6 @@
 
 #ifndef _Gc_WithingsParser_h
 #define _Gc_WithingsParser_h
-#include "GoldenCheetah.h"
-
 #include <QString>
 #include <QStringList>
 #include <QDateTime>

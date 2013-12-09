@@ -18,7 +18,6 @@
 
 #include "DataFilter.h"
 #include "Context.h"
-#include "Context.h"
 #include "Athlete.h"
 #include "RideNavigator.h"
 #include "RideFileCache.h"

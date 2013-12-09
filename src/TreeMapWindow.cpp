@@ -39,8 +39,6 @@
 TreeMapWindow::TreeMapWindow(Context *context) :
             GcWindow(context), context(context), active(false), dirty(true), useCustom(false), useToToday(false)
 {
-    setInstanceName("Treemap Window");
-
     // the plot
     mainLayout = new QVBoxLayout;
     ltmPlot = new TreeMapPlot(this, context);

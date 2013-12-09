@@ -16,19 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
-#include <QDebug>
-#include <qwt_series_data.h>
-#include <qwt_legend.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_canvas.h>
-#include <qwt_plot_grid.h>
-#include <qwt_scale_widget.h>
-#include "RideItem.h"
-#include "RideFile.h"
 #include "PerfPlot.h"
-#include "StressCalculator.h"
-#include "Colors.h"
 
 // handle x-axis names
 class PPTimeScaleDraw: public QwtScaleDraw
@@ -58,8 +46,6 @@ class PPTimeScaleDraw: public QwtScaleDraw
 
 PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(NULL)
 {
-    setInstanceName("PM Plot");
-
     xsd = new PPTimeScaleDraw(QDateTime());
     xsd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::xBottom, xsd);

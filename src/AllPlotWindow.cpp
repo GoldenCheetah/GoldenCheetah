@@ -45,7 +45,8 @@
 
 // span slider specials
 #include <qxtspanslider.h>
-#include <QCleanlooksStyle>
+#include <QStyleFactory>
+#include <QStyle>
 
 // tooltip
 #include "LTMWindow.h"
@@ -56,8 +57,6 @@
 AllPlotWindow::AllPlotWindow(Context *context) :
     GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false)
 {
-    setInstanceName("Ride Plot Window");
-
     QWidget *c = new QWidget;
     QVBoxLayout *clv = new QVBoxLayout(c);
     QHBoxLayout *cl = new QHBoxLayout;
@@ -230,7 +229,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
 
     allPlot = new AllPlot(this, context);
-    allPlot->setInstanceName("allPlot");
     allPlot->setContentsMargins(0,0,0,0);
     //allPlot->axisWidget(QwtPlot::yLeft)->installEventFilter(this);
 
@@ -355,14 +353,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-    QCleanlooksStyle *style = new QCleanlooksStyle();
+    QStyle *style = QStyleFactory::create("fusion");
     spanSlider->setStyle(style);
     scrollLeft->setStyle(style);
     scrollRight->setStyle(style);
 #endif
 
     fullPlot = new AllPlot(this, context);
-    fullPlot->setInstanceName("fullPlot");
     fullPlot->grid->enableY(false);
     fullPlot->setFixedHeight(100);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
@@ -1702,7 +1699,6 @@ AllPlotWindow::setupStackPlots()
 
         // create that plot
         AllPlot *_allPlot = new AllPlot(this, context);
-        _allPlot->setInstanceName("stackPlot");
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
 

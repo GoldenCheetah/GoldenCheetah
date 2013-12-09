@@ -22,6 +22,9 @@
 
 #include <QtGui>
 #include <QTimer>
+#include <QCheckBox>
+#include <QFormLayout>
+
 #include "qxtstringspinbox.h"
 #include "Context.h"
 #include "RideItem.h"

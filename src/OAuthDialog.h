@@ -23,7 +23,12 @@
 #include <QObject>
 #include <QtGui>
 #include <QWidget>
+#include <QStackedLayout>
 #include <QtWebKit>
+#include <QWebView>
+#include <QWebFrame>
+#include <QUrl>
+#include <QUrlQuery>
 
 class OAuthDialog : public QDialog
 {

@@ -19,6 +19,9 @@
 
 #include <QDateTime>
 #include <QtGui>
+#include <QDialog>
+#include <QLineEdit>
+#include <QLabel>
 
 class ToolsDialog : public QDialog
 {

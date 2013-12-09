@@ -30,6 +30,8 @@
 
 #include <QSqlTableModel>
 #include <QTableView>
+#include <QHeaderView>
+#include <QScrollBar>
 
 class NavigatorCellDelegate;
 class GroupByModel;

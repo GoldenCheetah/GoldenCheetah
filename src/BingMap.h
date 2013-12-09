@@ -21,7 +21,9 @@
 #include "GoldenCheetah.h"
 
 #include <QWidget>
-#include <QtWebKit>
+#include <QWebFrame>
+#include <QWebView>
+#include <QDialog>
 #include <string>
 #include <iostream>
 #include <sstream>

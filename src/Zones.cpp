@@ -215,7 +215,7 @@ bool Zones::read(QFile &file)
                         // set up the range, capturing CP if it's specified
                         // range = new ZoneRange(begin, end);
                         int nCP = (r ? 11 : 7);
-                        if (rangerx[r].numCaptures() == (nCP)) cp = rangerx[r].cap(nCP).toInt();
+                        if (rangerx[r].captureCount() == (nCP)) cp = rangerx[r].cap(nCP).toInt();
                         else cp = 0;
 
                         // bleck

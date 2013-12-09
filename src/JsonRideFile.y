@@ -84,7 +84,7 @@ static QString protect(const QString string)
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const QString string)
 {
-    QString string2 = QString::fromLocal8Bit(string.toAscii().data());
+    QString string2 = QString::fromLocal8Bit(string.toLatin1().data());
 
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
