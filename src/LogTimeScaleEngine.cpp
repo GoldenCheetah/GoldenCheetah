@@ -31,9 +31,9 @@
 /*!
   Return a transformation, for logarithmic (base 10) scales
 */
-QwtScaleTransformation *LogTimeScaleEngine::transformation() const
+QwtTransform *LogTimeScaleEngine::transformation() const
 {
-    return new QwtScaleTransformation(QwtScaleTransformation::Log10);
+    return new QwtLogTransform;
     //, log10XForm, QwtScaleTransformation::log10InvXForm);
 }
 

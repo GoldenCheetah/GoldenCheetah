@@ -156,13 +156,12 @@ RealtimePlot::RealtimePlot() :
     // Setup the axis (of evil :-)
     setAxisTitle(yLeft, "Watts");
     setAxisTitle(yRight, "Cadence / HR");
-    setAxisTitle(yRight2, "Speed");
+    setAxisTitle(QwtAxisId(QwtAxis::yRight,2).id, "Speed");
     setAxisTitle(xBottom, "Seconds Ago");
     setAxisMaxMinor(xBottom, 0);
     setAxisMaxMinor(yLeft, 0);
-    setAxisMaxMinor(yLeft2, 0);
     setAxisMaxMinor(yRight, 0);
-    setAxisMaxMinor(yRight2, 0);
+    setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
 
     QPalette pal;
     setAxisScale(yLeft, 0, 500); // watts
@@ -183,19 +182,19 @@ RealtimePlot::RealtimePlot() :
     axisWidget(QwtPlot::xBottom)->setPalette(pal);
     axisWidget(QwtPlot::xBottom)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    setAxisScale(yRight2, 0, 60); // speed km/h - 60kmh on a turbo is good going!
+    setAxisScale(QwtAxisId(QwtAxis::yRight,2).id, 0, 60); // speed km/h - 60kmh on a turbo is good going!
     pal.setColor(QPalette::WindowText, GColor(CSPEED));
     pal.setColor(QPalette::Text, GColor(CSPEED));
-    axisWidget(QwtPlot::yRight2)->setPalette(pal);
-    axisWidget(QwtPlot::yRight2)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+    axisWidget(QwtAxisId(QwtAxis::yRight,2).id)->setPalette(pal);
+    axisWidget(QwtAxisId(QwtAxis::yRight,2).id)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-	setAxisLabelRotation(yRight2,90);
-	setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
+	setAxisLabelRotation(QwtAxisId(QwtAxis::yRight,2).id,90);
+	setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight,2).id,Qt::AlignVCenter);
 
     enableAxis(xBottom, false); // very little value and some cpu overhead
     enableAxis(yLeft, true);
     enableAxis(yRight, true);
-    enableAxis(yRight2, true);
+    enableAxis(QwtAxisId(QwtAxis::yRight,2).id, true);
 
     // 30s Power curve
     pwr30Curve = new QwtPlotCurve("30s Power");
@@ -235,7 +234,7 @@ RealtimePlot::RealtimePlot() :
     //spdCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     spdCurve->setData(spdData);
     spdCurve->attach(this);
-    spdCurve->setYAxis(QwtPlot::yRight2);
+    spdCurve->setYAxis(QwtAxisId(QwtAxis::yRight,2).id);
 
     // Load
 //    lodCurve = new QwtPlotCurve("Load");
@@ -330,7 +329,7 @@ RealtimePlot::showSpeed(int state)
 {
     showSpeedState = state;
     spdCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight2, state == Qt::Checked);
+    enableAxis(QwtAxisId(QwtAxis::yRight,2).id, state == Qt::Checked);
     replot();
 }
 

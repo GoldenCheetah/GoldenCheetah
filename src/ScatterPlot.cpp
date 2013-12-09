@@ -216,14 +216,14 @@ void ScatterPlot::setData (ScatterSettings *settings)
         }
     }
 
-    QwtSymbol sym;
-    sym.setStyle(QwtSymbol::Ellipse);
-    sym.setSize(6);
-    sym.setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
-    sym.setBrush(QBrush(Qt::NoBrush));
+    QwtSymbol *sym = new QwtSymbol;
+    sym->setStyle(QwtSymbol::Ellipse);
+    sym->setSize(6);
+    sym->setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
+    sym->setBrush(QBrush(Qt::NoBrush));
     QPen p;
     p.setColor(GColor(CPLOTSYMBOL));
-    sym.setPen(p);
+    sym->setPen(p);
 
     // wipe away existing
 	if (all) {
@@ -234,10 +234,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
     // setup the framing curve
     if (settings->frame) {
         all = new QwtPlotCurve();
-        all->setSymbol(new QwtSymbol(sym));
+        all->setSymbol(sym);
         all->setStyle(QwtPlotCurve::Dots);
         all->setRenderHint(QwtPlotItem::RenderAntialiased);
-	    all->setData(x.constData(), y.constData(), points);
+	    all->setSamples(x.constData(), y.constData(), points);
         all->attach(this);
     } else {
         all = NULL;
@@ -336,14 +336,14 @@ void ScatterPlot::setData (ScatterSettings *settings)
             QColor intervalColor;
             intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
             pen.setColor(intervalColor);
-            sym.setPen(pen);
+            sym->setPen(pen);
 
             QwtPlotCurve *curve = new QwtPlotCurve();
 
-            curve->setSymbol(new QwtSymbol(sym));
+            curve->setSymbol(sym);
             curve->setStyle(QwtPlotCurve::Dots);
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            curve->setData(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
+            curve->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
             curve->attach(this);
 
             intervalCurves.append(curve);
@@ -379,20 +379,20 @@ ScatterPlot::showTime(ScatterSettings *settings, int offset, int secs)
         int startidx = settings->ride->ride()->timeIndex(begin);
         int stopidx = settings->ride->ride()->timeIndex(offset);
 
-        QwtSymbol sym;
-        sym.setStyle(QwtSymbol::Rect);
-        sym.setSize(6);
-        sym.setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
-        sym.setBrush(QBrush(Qt::NoBrush));
+        QwtSymbol *sym = new QwtSymbol;
+        sym->setStyle(QwtSymbol::Rect);
+        sym->setSize(6);
+        sym->setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
+        sym->setBrush(QBrush(Qt::NoBrush));
 
         QPen pen;
         pen.setColor(Qt::red);
-        sym.setPen(pen);
+        sym->setPen(pen);
 
-        time->setSymbol(new QwtSymbol(sym));
+        time->setSymbol(sym);
         time->setStyle(QwtPlotCurve::Dots);
         time->setRenderHint(QwtPlotItem::RenderAntialiased);
-        time->setData(x.constData()+startidx, y.constData()+startidx, stopidx-startidx);
+        time->setSamples(x.constData()+startidx, y.constData()+startidx, stopidx-startidx);
 
         // make it on top
         time->detach();

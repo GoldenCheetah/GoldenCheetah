@@ -141,7 +141,7 @@ void PerfPlot::plot() {
     //       line below  ------------------+
     //                                     |
     //                                     V
-    DAYcurve->setData(_sc->getDays()+xmin -1 ,_sc->getDAYvalues()+xmin,num);
+    DAYcurve->setSamples(_sc->getDays()+xmin -1 ,_sc->getDAYvalues()+xmin,num);
     DAYcurve->setYAxis(yRight);
     DAYcurve->attach(this);
 
@@ -155,7 +155,7 @@ void PerfPlot::plot() {
     QPen stspen = QPen(GColor(CSTS));
     stspen.setWidth(width);
     STScurve->setPen(stspen);
-    STScurve->setData(_sc->getDays()+xmin,_sc->getSTSvalues()+xmin,num);
+    STScurve->setSamples(_sc->getDays()+xmin,_sc->getSTSvalues()+xmin,num);
     STScurve->attach(this);
 
 
@@ -169,7 +169,7 @@ void PerfPlot::plot() {
     QPen ltspen = QPen(GColor(CLTS));
     ltspen.setWidth(width);
     LTScurve->setPen(ltspen);
-    LTScurve->setData(_sc->getDays()+xmin,_sc->getLTSvalues()+xmin,num);
+    LTScurve->setSamples(_sc->getDays()+xmin,_sc->getLTSvalues()+xmin,num);
     LTScurve->attach(this);
 
 
@@ -183,7 +183,7 @@ void PerfPlot::plot() {
     QPen sbpen = QPen(GColor(CSB));
     sbpen.setWidth(width);
     SBcurve->setPen(sbpen);
-    SBcurve->setData(_sc->getDays()+xmin,_sc->getSBvalues()+xmin,num);
+    SBcurve->setSamples(_sc->getDays()+xmin,_sc->getSBvalues()+xmin,num);
     SBcurve->attach(this);
 
     axisWidget(QwtPlot::xBottom)->update();

@@ -264,9 +264,9 @@ Aerolab::Aerolab(
   intervalHighlighterCurve = new QwtPlotCurve();
   intervalHighlighterCurve->setBaseline(-5000);
   intervalHighlighterCurve->setYAxis( yLeft );
-  intervalHighlighterCurve->setData( new IntervalAerolabData( this, context ) );
+  intervalHighlighterCurve->setSamples( new IntervalAerolabData( this, context ) );
   intervalHighlighterCurve->attach( this );
-  this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
+  //XXX broken this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
 
   grid = new QwtPlotGrid();
   grid->enableX(false);
@@ -300,7 +300,7 @@ Aerolab::configChanged()
   ihlbrush.setAlpha(40);
   intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
 
-  this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
+  //XXX broken this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
 }
 
 void
@@ -447,7 +447,7 @@ void
 Aerolab::adjustEoffset() {
 
     if (autoEoffset && !altArray.empty()) {
-        double idx = axisScaleDiv( QwtPlot::xBottom )->lowerBound();
+        double idx = axisScaleDiv( QwtPlot::xBottom ).lowerBound();
         parent->eoffsetSlider->setEnabled(false);
 
         if (bydist) {
@@ -482,10 +482,10 @@ Aerolab::recalc( bool new_zoom ) {
     QVector<double> data;
 
     if (!veArray.empty()){
-      veCurve->setData(data, data);
+      veCurve->setSamples(data, data);
     }
     if( !altArray.empty()) {
-      altCurve->setData(data, data);
+      altCurve->setSamples(data, data);
     }
     return;
   }
@@ -496,11 +496,11 @@ Aerolab::recalc( bool new_zoom ) {
 
   // set curves
   if (!veArray.empty()) {
-      veCurve->setData(xaxis.data() + startingIndex, veArray.data() + startingIndex, totalPoints);
+      veCurve->setSamples(xaxis.data() + startingIndex, veArray.data() + startingIndex, totalPoints);
   }
 
   if (!altArray.empty()){
-      altCurve->setData(xaxis.data() + startingIndex, altArray.data() + startingIndex, totalPoints);
+      altCurve->setSamples(xaxis.data() + startingIndex, altArray.data() + startingIndex, totalPoints);
   }
 
   if( new_zoom )

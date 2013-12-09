@@ -363,12 +363,12 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->grid->enableY(false);
     fullPlot->setFixedHeight(100);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-    fullPlot->setCanvasLineWidth(0);
+    fullPlot->canvas()->setBorderRadius(0);
     fullPlot->enableAxis(QwtPlot::yLeft, false);
-    fullPlot->enableAxis(QwtPlot::yLeft2, false);
+    fullPlot->enableAxis(QwtAxisId(QwtAxis::yLeft,2).id, false);
     fullPlot->enableAxis(QwtPlot::yRight, false);
-    fullPlot->enableAxis(QwtPlot::yRight2, false);
-    fullPlot->enableAxis(QwtPlot::yRight3, false);
+    fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
+    fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,3).id, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
     //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
@@ -534,13 +534,13 @@ AllPlotWindow::redrawFullPlot()
     fullPlot->setShowPower(1);
     //We now use the window background color
     //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
-    fullPlot->setCanvasLineWidth(0);
+    fullPlot->canvas()->setBorderRadius(0);
     fullPlot->grid->enableY(false);
     fullPlot->enableAxis(QwtPlot::yLeft, false);
-    fullPlot->enableAxis(QwtPlot::yLeft2, false);
+    fullPlot->enableAxis(QwtAxisId(QwtAxis::yLeft,2).id, false);
     fullPlot->enableAxis(QwtPlot::yRight, false);
-    fullPlot->enableAxis(QwtPlot::yRight2, false);
-    fullPlot->enableAxis(QwtPlot::yRight3, false);
+    fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
+    fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,3).id, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
     //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
@@ -1717,10 +1717,10 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
         _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yLeft2, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,2), 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yRight2, 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yRight3, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,3).id, 0);
 
         // controls
         _allPlot->setShadeZones(showPower->currentIndex() == 0);

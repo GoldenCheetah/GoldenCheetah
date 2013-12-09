@@ -402,7 +402,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     pen.setWidth(1.0);
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
-    CPCurve->setData(cp_curve_time.data(), cp_curve_power.data(), curve_points);
+    CPCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
     CPCurve->attach(thisPlot);
 }
 
@@ -494,10 +494,10 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             }
 
             if (series == RideFile::none) { // this is Energy mode 
-                curve->setData(time_values.data() + low,
+                curve->setSamples(time_values.data() + low,
                                energyBests.data() + low, high - low + 1);
             } else {
-                curve->setData(time_values.data() + low,
+                curve->setSamples(time_values.data() + low,
                                power_values + low, high - low + 1);
             }
             allCurves.append(curve);
@@ -540,9 +540,9 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         brush_color.setAlpha(200);
         //curve->setBrush(QBrush::None);   // brush fills below the line
         if (series == RideFile::none)
-            curve->setData(time_values.data(), energyBests.data(), n_values);
+            curve->setSamples(time_values.data(), energyBests.data(), n_values);
         else
-            curve->setData(time_values.data(), power_values, n_values);
+            curve->setSamples(time_values.data(), power_values, n_values);
         curve->attach(thisPlot);
         allCurves.append(curve);
     }
@@ -732,7 +732,7 @@ CpintPlot::calculate(RideItem *rideItem)
                 linearGradient.setSpread(QGradient::PadSpread);
                 allCurve->setBrush(linearGradient);
                 allCurve->attach(this);
-                allCurve->setData(timeArray.data() + 1, bests->meanMaxArray(series).constData() + 1, maxNonZero - 1);
+                allCurve->setSamples(timeArray.data() + 1, bests->meanMaxArray(series).constData() + 1, maxNonZero - 1);
             }
         }
     }
@@ -772,12 +772,12 @@ CpintPlot::calculate(RideItem *rideItem)
                     timeArray[i] * 
                     current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
                 }
-                thisCurve->setData(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
+                thisCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
 
             } else {
 
                 // normal
-                thisCurve->setData(timeArray.data() + 1, 
+                thisCurve->setSamples(timeArray.data() + 1, 
                 current->meanMaxArray(series).constData() + 1, maxNonZero - 1);
             }
         }

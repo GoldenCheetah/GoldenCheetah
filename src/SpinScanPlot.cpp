@@ -112,7 +112,7 @@ SpinScanPlot::configChanged()
     col.setAlpha(120);
     QBrush brush = QBrush(col);
     leftCurve->setBrush(brush);
-    leftCurve->setPen(Qt::NoPen);
+    leftCurve->setPen(QPen(Qt::NoPen));
     //spinCurve->setStyle(QwtPlotCurve::Steps);
     leftCurve->setData(leftSpinScanData);
 
@@ -120,7 +120,7 @@ SpinScanPlot::configChanged()
     col2.setAlpha(120);
     QBrush brush2 = QBrush(col2);
     rightCurve->setBrush(brush2);
-    rightCurve->setPen(Qt::NoPen);
+    rightCurve->setPen(QPen(Qt::NoPen));
     //spinCurve->setStyle(QwtPlotCurve::Steps);
     rightCurve->setData(rightSpinScanData);
 }

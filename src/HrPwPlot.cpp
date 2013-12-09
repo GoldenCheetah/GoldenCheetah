@@ -253,7 +253,7 @@ HrPwPlot::recalc()
 
         if (nbpoints-i*nbpoints2>0) {
 
-            hrCurves[i]->setData(plotedWattsArray[i], plotedHrArray[i], (nbpoints-i*nbpoints2<nbpoints2?nbpoints-i*nbpoints2:nbpoints2));
+            hrCurves[i]->setSamples(plotedWattsArray[i], plotedHrArray[i], (nbpoints-i*nbpoints2<nbpoints2?nbpoints-i*nbpoints2:nbpoints2));
             hrCurves[i]->setVisible(true);
 
         } else hrCurves[i]->setVisible(false);
@@ -368,7 +368,7 @@ HrPwPlot::addWattStepCurve(QVector<double> &finalWatts, int nbpoints)
     smoothTimeStep[t] = 0.0;
     smoothWattsStep[t] = t * 10;
 
-    wattsStepCurve->setData(smoothWattsStep.data(), smoothTimeStep.data(), nbSteps+1);
+    wattsStepCurve->setSamples(smoothWattsStep.data(), smoothTimeStep.data(), nbSteps+1);
     delete [] array;
 }
 
@@ -412,7 +412,7 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
     smoothTimeStep2[t] = 0.0;
     smoothHrStep[t] = t * 2;
 
-    hrStepCurve->setData(smoothTimeStep2.data(), smoothHrStep.data(), nbSteps+1);
+    hrStepCurve->setSamples(smoothTimeStep2.data(), smoothHrStep.data(), nbSteps+1);
     delete [] array;
 }
 
@@ -425,7 +425,7 @@ HrPwPlot::addRegLinCurve( double rpente, double rordonnee)
     regWatts[0] = regHr[0]*rpente+rordonnee;
     regWatts[1] = regHr[1]*rpente+rordonnee;
 
-    regCurve->setData(regHr, regWatts, 2);
+    regCurve->setSamples(regHr, regWatts, 2);
 }
 
 void
@@ -484,23 +484,23 @@ HrPwPlot::setJoinLine(bool value)
         QColor color = QColor(255,255,255);
         color.setHsv(60+i*(360/36), 255,255,255);
         if (value) {
-            QwtSymbol sym;
-            sym.setStyle(QwtSymbol::NoSymbol);
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::NoSymbol);
 
             QPen pen = QPen(color);
             pen.setWidth(1);
             hrCurves[i]->setPen(pen);
             hrCurves[i]->setStyle(QwtPlotCurve::Lines);
-            hrCurves[i]->setSymbol(new QwtSymbol(sym));
+            hrCurves[i]->setSymbol(sym);
         } else {
-            QwtSymbol sym;
-            sym.setStyle(QwtSymbol::Ellipse);
-            sym.setSize(5);
-            sym.setPen(QPen(color));
-            sym.setBrush(QBrush(color));
-            hrCurves[i]->setPen(Qt::NoPen);
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(5);
+            sym->setPen(QPen(color));
+            sym->setBrush(QBrush(color));
+            hrCurves[i]->setPen(QPen(Qt::NoPen));
             hrCurves[i]->setStyle(QwtPlotCurve::Dots);
-            hrCurves[i]->setSymbol(new QwtSymbol(sym));
+            hrCurves[i]->setSymbol(sym);
         }
         //hrCurves[i].setRenderHint(QwtPlotItem::RenderAntialiased);
     }

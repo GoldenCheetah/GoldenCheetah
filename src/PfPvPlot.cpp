@@ -190,12 +190,12 @@ PfPvPlot::configChanged()
     setCanvasBackground(GColor(CPLOTBACKGROUND));
 
     // frame with inverse of background
-    QwtSymbol sym;
-    sym.setStyle(QwtSymbol::Ellipse);
-    sym.setSize(6);
-    sym.setPen(QPen(Qt::black));
-    sym.setBrush(QBrush(Qt::NoBrush));
-    curve->setSymbol(new QwtSymbol(sym));
+    QwtSymbol *sym = new QwtSymbol;
+    sym->setStyle(QwtSymbol::Ellipse);
+    sym->setSize(6);
+    sym->setPen(QPen(Qt::black));
+    sym->setBrush(QBrush(Qt::NoBrush));
+    curve->setSymbol(sym);
     curve->setStyle(QwtPlotCurve::Dots);
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
@@ -290,7 +290,7 @@ PfPvPlot::refreshZoneItems()
                     for (int i = 0; i < contour_xvalues.size(); i ++) {
                         contour_yvalues.append( (1e6 * contour_xvalues[i] < watts) ?  1e6 : dwatts / contour_xvalues[i]);
                     }
-                    curve->setData(contour_xvalues, contour_yvalues);
+                    curve->setSamples(contour_xvalues, contour_yvalues);
 
                 } else {
 
@@ -301,7 +301,7 @@ PfPvPlot::refreshZoneItems()
                     contour_x.append(contour_xvalues[contour_xvalues.size() - 1]);
                     contour_y.append(1e6);
                     contour_y.append(1e6);
-                    curve->setData(contour_x, contour_y);
+                    curve->setSamples(contour_x, contour_y);
                 }
 
                 curve->setVisible(shade_zones);
@@ -412,14 +412,15 @@ PfPvPlot::setData(RideItem *_rideItem)
                 ++j;
             }
 
-            curve->setData(cpvArray, aepfArray);
-            QwtSymbol sym;
-            sym.setStyle(QwtSymbol::Ellipse);
-            sym.setSize(6);
-            sym.setBrush(QBrush(Qt::NoBrush));
+            curve->setSamples(cpvArray, aepfArray);
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(6);
+            sym->setBrush(QBrush(Qt::NoBrush));
 
             // now show the data (zone shading would already be visible)
             refreshZoneItems();
+            curve->setSymbol(sym);
             curve->setVisible(true);
         }
     } else {
@@ -507,10 +508,10 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                }
            }
 
-           QwtSymbol sym;
-           sym.setStyle(QwtSymbol::Ellipse);
-           sym.setSize(6);
-           sym.setBrush(QBrush(Qt::NoBrush));
+           QwtSymbol *sym = new QwtSymbol;
+           sym->setStyle(QwtSymbol::Ellipse);
+           sym->setSize(6);
+           sym->setBrush(QBrush(Qt::NoBrush));
 
            // ensure same colors are used for each interval selected
            int num_intervals_defined=0;
@@ -557,12 +558,12 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
                 QPen pen;
                 pen.setColor(intervalColor);
-                sym.setPen(pen);
+                sym->setPen(pen);
 
-                curve->setSymbol(new QwtSymbol(sym));
+                curve->setSymbol(sym);
                 curve->setStyle(QwtPlotCurve::Dots);
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                curve->setData(cpvArrayInterval[z],aepfArrayInterval[z]);
+                curve->setSamples(cpvArrayInterval[z],aepfArrayInterval[z]);
                 curve->attach(this);
 
                 intervalCurves.append(curve);
@@ -702,13 +703,13 @@ PfPvPlot::recalc()
             yvalues[i] = (cpv < cp_ / 1e6) ?  1e6 : cp_ / contour_xvalues[i];
 
         // generate curve at a given power
-        cpCurve->setData(contour_xvalues, yvalues);
+        cpCurve->setSamples(contour_xvalues, yvalues);
 
     } else {
 
         // an empty curve if no power (or zero power) is specified
         QwtArray<double> data;
-        cpCurve->setData(data,data);
+        cpCurve->setSamples(data,data);
     }
 }
 

@@ -139,14 +139,14 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     setAxisScale(yRight, 0, 250); // max cadence and hr
     enableAxis(yRight, false);
-    setAxisScale(yRight2, 0, 60); // max speed of 60mph/60kmh seems ok to me!
-    enableAxis(yRight2, false);
+    setAxisScale(QwtAxisId(QwtAxis::yRight,2).id, 0, 60); // max speed of 60mph/60kmh seems ok to me!
+    enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
 
     // data bridge to ergfile
     lodData = new ErgFileData(context);
     // Load Curve
     LodCurve = new QwtPlotCurve("Course Load");
-    LodCurve->setData(lodData);
+    LodCurve->setSamples(lodData);
     LodCurve->attach(this);
     LodCurve->setBaseline(-1000);
     LodCurve->setYAxis(QwtPlot::yLeft);
@@ -166,7 +166,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     wattsCurve->setYAxis(QwtPlot::yLeft);
     // dgr wattsCurve->setPaintAttribute(QwtPlotCurve::PaintFiltered);
     wattsData = new CurveData;
-    wattsCurve->setData(wattsData->x(), wattsData->y(), wattsData->count());
+    wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
 
     // telemetry history
     hrCurve = new QwtPlotCurve("Heartrate");
@@ -175,7 +175,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     hrCurve->attach(this);
     hrCurve->setYAxis(QwtPlot::yRight);
     hrData = new CurveData;
-    hrCurve->setData(hrData->x(), hrData->y(), hrData->count());
+    hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());
 
     // telemetry history
     cadCurve = new QwtPlotCurve("Cadence");
@@ -184,16 +184,16 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     cadCurve->attach(this);
     cadCurve->setYAxis(QwtPlot::yRight);
     cadData = new CurveData;
-    cadCurve->setData(cadData->x(), cadData->y(), cadData->count());
+    cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
 
     // telemetry history
     speedCurve = new QwtPlotCurve("Speed");
     QPen speedpen = QPen(GColor(CSPEED));
     speedCurve->setPen(speedpen);
     speedCurve->attach(this);
-    speedCurve->setYAxis(QwtPlot::yRight2);
+    speedCurve->setYAxis(QwtAxisId(QwtAxis::yRight,2).id);
     speedData = new CurveData;
-    speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
+    speedCurve->setSamples(speedData->x(), speedData->y(), speedData->count());
 
     // Now data bridge
     nowData = new NowData(context);
@@ -202,7 +202,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     NowCurve = new QwtPlotCurve("Now");
     QPen Nowpen = QPen(Qt::red, 2.0);
     NowCurve->setPen(Nowpen);
-    NowCurve->setData(nowData);
+    NowCurve->setSamples(nowData);
     NowCurve->attach(this);
     NowCurve->setYAxis(QwtPlot::yLeft);
 
@@ -377,7 +377,7 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
     // want to control stepping and tick marking add another 30 mins
-    if (!ergFile && axisScaleDiv(xBottom)->upperBound() <= x) {
+    if (!ergFile && axisScaleDiv(QwtPlot::xBottom).upperBound() <= x) {
         double maxX = x + ( 30 * 60 * 1000);
         setAxisScale(xBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
     }
@@ -408,19 +408,19 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
 
     if (!wattsData->count()) wattsData->append(&zero, &watts, 1);
     wattsData->append(&x, &watts, 1);
-    wattsCurve->setData(wattsData->x(), wattsData->y(), wattsData->count());
+    wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
 
     if (!hrData->count()) hrData->append(&zero, &hr, 1);
     hrData->append(&x, &hr, 1);
-    hrCurve->setData(hrData->x(), hrData->y(), hrData->count());
+    hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());
 
     if (!speedData->count()) speedData->append(&zero, &speed, 1);
     speedData->append(&x, &speed, 1);
-    speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
+    speedCurve->setSamples(speedData->x(), speedData->y(), speedData->count());
 
     if (!cadData->count()) cadData->append(&zero, &cad, 1);
     cadData->append(&x, &cad, 1);
-    cadCurve->setData(cadData->x(), cadData->y(), cadData->count());
+    cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
 }
 
 void
@@ -442,13 +442,13 @@ ErgFilePlot::reset()
     // instead when we place the first points on the plots we add them twice
     // once for time/distance of 0 and once for the current point in time
     wattsData->clear();
-    wattsCurve->setData(wattsData->x(), wattsData->y(), wattsData->count());
+    wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
     cadData->clear();
-    cadCurve->setData(cadData->x(), cadData->y(), cadData->count());
+    cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
     hrData->clear();
-    hrCurve->setData(hrData->x(), hrData->y(), hrData->count());
+    hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());
     speedData->clear();
-    speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
+    speedCurve->setSamples(speedData->x(), speedData->y(), speedData->count());
 }
 
 // curve data.. code snaffled in from the Qwt example (realtime_plot)

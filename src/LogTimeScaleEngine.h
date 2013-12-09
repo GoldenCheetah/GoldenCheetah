@@ -41,7 +41,7 @@ class LogTimeScaleEngine : public QwtScaleEngine
                                         int numMajorSteps, int numMinorSteps,
                                         double stepSize = 0.0) const;
 
-        virtual QwtScaleTransformation *transformation() const;
+        virtual QwtTransform *transformation() const;
 
     protected:
         QwtDoubleInterval log10(const QwtDoubleInterval&) const;

@@ -42,6 +42,7 @@
 
 #include "RealtimeData.h"
 #include <qwt_series_data.h>
+#include <qwt_point_data.h>
 
 
 class ErgFileData : public QwtPointArrayData
