@@ -1,0 +1,38 @@
+Qwt TODO list
+
+Ideas
+------
+- Improve Documention
+- QAbstractModel -> QwtSeriesData
+- Box/Whisker plot item
+- QwtSeriesData + functors
+- QwtSeriesData/QwtPlotCurve + Level of details (Douglas Peucker)
+- Common zoom stack for all navigation objects
+- Watermark Item
+- Contour algorithm for vectors: http://apptree.net/conrec.htm
+- QwtPlotCanvas rendered via FBO, PBO
+- Time/Date scale engine
+- TeX texts
+- Grid of QwtPlots
+- Interval scale labels ( between 2 ticks )
+- More than 4 axes
+- QwtIntervalSymbol + QPainterPath/...
+- QwtPlotScene + breaking composite architecture
+- Using QStaticText for markers ( and scales ? )
+- Scales/Grid item like in QwtPolarGrid
+- Container for a 2D matrix
+- Waterfall plots
+- transform/invTransform for polygons and lines
+- cursor item
+- line marker with a line from the position to the axis
+- quadtree
+- QwtText supporting Qt::TextElideMode
+- Multitouch events
+- QwtKnob/QwtDial fixed contents size mode
+- controls ( f.e QwtWheel ) with a very dark palette
+
+Bugs/Change requests
+--------------------
+- Remove QwtScaleTransformation::copy()
+- Reference value for QwtThermo
+- Transparent canvas background + backingstore
