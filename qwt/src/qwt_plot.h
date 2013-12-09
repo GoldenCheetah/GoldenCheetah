@@ -14,6 +14,7 @@
 #include "qwt_axis_id.h"
 #include "qwt_text.h"
 #include "qwt_plot_dict.h"
+#include "qwt_plot_canvas.h"
 #include "qwt_scale_map.h"
 #include "qwt_interval.h"
 #include <qframe.h>
@@ -152,10 +153,10 @@ public:
 
     // Canvas
 
-    void setCanvas( QWidget * );
+    void setCanvas( QwtPlotCanvas * );
 
-    QWidget *canvas();
-    const QWidget *canvas() const;
+    QwtPlotCanvas *canvas();
+    const QwtPlotCanvas *canvas() const;
 
     void setCanvasBackground( const QBrush & );
     QBrush canvasBackground() const;
