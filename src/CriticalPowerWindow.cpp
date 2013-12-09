@@ -510,7 +510,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     QBrush brush = QBrush(intervalColor);
     curve->setBrush(brush);
     curve->setPen(pen);
-    curve->setData(x.data(), y.data(), x.count()-1);
+    curve->setSamples(x.data(), y.data(), x.count()-1);
 
     // attach and register
     curve->attach(cpintPlot);

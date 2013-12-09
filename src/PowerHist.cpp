@@ -171,7 +171,7 @@ PowerHist::configChanged()
 
     } else {
         pen.setWidth(width);
-        curve->setPen(Qt::NoPen);
+        curve->setPen(QPen(Qt::NoPen));
     }
 
     // intervalselection
@@ -373,8 +373,8 @@ PowerHist::recalc(bool force)
     if (!array || arrayLength == 0 || (source == Ride && !rideItem->ride()->isDataPresent(baseSeries))) {
         // create empty curves when no data
         const double zero = 0;
-        curve->setData(&zero, &zero, 0);
-        curveSelected->setData(&zero, &zero, 0);
+        curve->setSamples(&zero, &zero, 0);
+        curveSelected->setSamples(&zero, &zero, 0);
         updatePlot();
         return;
     }
@@ -419,8 +419,8 @@ PowerHist::recalc(bool force)
             percentify(totalTimeSelected, 1);
         }
 
-        curve->setData(parameterValue.data(), totalTime.data(), count + 2);
-        curveSelected->setData(parameterValue.data(), totalTimeSelected.data(), count + 2);
+        curve->setSamples(parameterValue.data(), totalTime.data(), count + 2);
+        curveSelected->setSamples(parameterValue.data(), totalTimeSelected.data(), count + 2);
 
         QwtScaleDraw *sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -498,8 +498,8 @@ PowerHist::recalc(bool force)
         }
 
         // set those curves
-        curve->setData(xaxis.data(), yaxis.data(), xaxis.size());
-        curveSelected->setData(selectedxaxis.data(), selectedyaxis.data(), selectedxaxis.size());
+        curve->setSamples(xaxis.data(), yaxis.data(), xaxis.size());
+        curveSelected->setSamples(selectedxaxis.data(), selectedyaxis.data(), selectedxaxis.size());
 
         // zone scale draw
         if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && rideItem->zones) {
@@ -973,8 +973,8 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
         // create empty curves when no data
         const double zero = 0;
-        curve->setData(&zero, &zero, 0);
-        curveSelected->setData(&zero, &zero, 0);
+        curve->setSamples(&zero, &zero, 0);
+        curveSelected->setSamples(&zero, &zero, 0);
         updatePlot();
     }
     curveSelected->show();
@@ -1009,7 +1009,7 @@ PowerHist::setlnY(bool value)
     lny=value;
     if (lny && !zoned) {
 
-        setAxisScaleEngine(yLeft, new QwtLog10ScaleEngine);
+        setAxisScaleEngine(yLeft, new QwtLogScaleEngine);
         curve->setBaseline(1e-6);
         curveSelected->setBaseline(1e-6);
 

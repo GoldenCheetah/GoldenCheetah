@@ -58,7 +58,7 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     QColor brush_color = GColor(CALTITUDEBRUSH);
     brush_color.setAlpha(180);
     altCurve->setBrush(brush_color);
-    altCurve->setYAxis(yLeft1);
+    altCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,2).id);
     altCurve->attach(this);
 
     // grid lines on such a small plot look AWFUL
@@ -104,9 +104,9 @@ SmallPlot::recalc()
     int rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
-        wattsCurve->setData(data, data);
-        hrCurve->setData(data, data);
-        altCurve->setData(data, data);
+        wattsCurve->setSamples(data, data);
+        hrCurve->setSamples(data, data);
+        altCurve->setSamples(data, data);
         return;
     }
 
@@ -168,9 +168,9 @@ SmallPlot::recalc()
         }
         smoothTime[secs]  = secs / 60.0;
     }
-    wattsCurve->setData(smoothTime.constData(), smoothWatts.constData(), rideTimeSecs + 1);
-    hrCurve->setData(smoothTime.constData(), smoothHr.constData(), rideTimeSecs + 1);
-    altCurve->setData(smoothTime.constData(), smoothAlt.constData(), rideTimeSecs + 1);
+    wattsCurve->setSamples(smoothTime.constData(), smoothWatts.constData(), rideTimeSecs + 1);
+    hrCurve->setSamples(smoothTime.constData(), smoothHr.constData(), rideTimeSecs + 1);
+    altCurve->setSamples(smoothTime.constData(), smoothAlt.constData(), rideTimeSecs + 1);
     setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
 
     setYMax();
@@ -198,8 +198,8 @@ SmallPlot::setYMax()
     }
     setAxisScale(yLeft, 0.0, ymax * 1.1);
     setAxisTitle(yLeft, ylabel);
-    setAxisScale(yLeft1, 0.0, y1max * 1.1);
-    setAxisTitle(yLeft1, y1label);
+    setAxisScale(QwtAxisId(QwtAxis::yLeft,2).id, 0.0, y1max * 1.1);
+    setAxisTitle(QwtAxisId(QwtAxis::yLeft,2).id, y1label);
     enableAxis(yLeft, false); // hide for a small plot
 }
 

@@ -56,7 +56,7 @@ public:
     }
     void setData(QVector<double> &xData, QVector<double> &yData)
     {
-        workoutCurve->setData(xData, yData);
+        workoutCurve->setSamples(xData, yData);
     }
 };
 

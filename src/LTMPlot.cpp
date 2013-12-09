@@ -42,7 +42,13 @@
 
 #include <math.h> // for isinf() isnan()
 
-static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1, QwtPlot::yRight1, QwtPlot::yLeft2, QwtPlot::yRight2, QwtPlot::yLeft3, QwtPlot::yRight3 };
+static int supported_axes[] = { QwtPlot::yLeft,
+                                QwtPlot::yRight,
+                                QwtAxisId(QwtAxis::yLeft,2).id,
+                                QwtAxisId(QwtAxis::yRight,2).id,
+                                QwtAxisId(QwtAxis::yLeft,3).id,
+                                QwtAxisId(QwtAxis::yRight,3).id
+                              };
 
 LTMPlot::LTMPlot(LTMWindow *parent, Context *context) : 
     bg(NULL), parent(parent), context(context), highlighter(NULL)
@@ -290,8 +296,8 @@ LTMPlot::setData(LTMSettings *set)
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
 
-        QwtSymbol sym;
-        sym.setStyle(metricDetail.symbolStyle);
+        QwtSymbol *sym = new QwtSymbol;
+        sym->setStyle(metricDetail.symbolStyle);
 
         // choose the axis
         int axisid = chooseYAxis(metricDetail.uunits);
@@ -336,11 +342,11 @@ LTMPlot::setData(LTMSettings *set)
                 current->setBrush(linearGradient);
             }
 
-            current->setPen(Qt::NoPen);
+            current->setPen(QPen(Qt::NoPen));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-            sym.setStyle(QwtSymbol::NoSymbol);
-            current->setSymbol(new QwtSymbol(sym));
+            sym->setStyle(QwtSymbol::NoSymbol);
+            current->setSymbol(sym);
 
             // fudge for date ranges, not for time of day graph
             // and fudge qwt'S lack of a decent bar chart
@@ -387,7 +393,7 @@ LTMPlot::setData(LTMSettings *set)
         }
 
         // set the data series
-        current->setData(xdata.data(),ydata.data(), count + 1);
+        current->setSamples(xdata.data(),ydata.data(), count + 1);
         current->setBaseline(metricDetail.baseline);
 
         // update stack data so we can index off them
@@ -437,8 +443,8 @@ LTMPlot::setData(LTMSettings *set)
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
 
-        QwtSymbol sym;
-        sym.setStyle(metricDetail.symbolStyle);
+        QwtSymbol *sym = new QwtSymbol;
+        sym->setStyle(metricDetail.symbolStyle);
 
         // choose the axis
         int axisid = chooseYAxis(metricDetail.uunits);
@@ -499,7 +505,7 @@ LTMPlot::setData(LTMSettings *set)
             // since we may be forecasting...
             xtrend[1] = maxX;
             ytrend[1] = regress.getYforX(maxX);
-            trend->setData(xtrend,ytrend, 2);
+            trend->setSamples(xtrend,ytrend, 2);
 
             trend->attach(this);
             curves.insert(trendSymbol, trend);
@@ -542,15 +548,15 @@ LTMPlot::setData(LTMSettings *set)
             // we might have hidden the symbols for this curve
             // if its set to none then default to a rectangle
             if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
-                sym.setStyle(QwtSymbol::Rect);
-            sym.setSize(20);
+                sym->setStyle(QwtSymbol::Rect);
+            sym->setSize(20);
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(50);
-            sym.setPen(metricDetail.penColor);
-            sym.setBrush(lighter);
+            sym->setPen(metricDetail.penColor);
+            sym->setBrush(lighter);
 
-            out->setSymbol(new QwtSymbol(sym));
-            out->setData(hxdata.data(),hydata.data(), metricDetail.topOut);
+            out->setSymbol(sym);
+            out->setSamples(hxdata.data(),hydata.data(), metricDetail.topOut);
             out->setBaseline(0);
             out->setYAxis(axisid);
             out->attach(this);
@@ -605,15 +611,15 @@ LTMPlot::setData(LTMSettings *set)
             // we might have hidden the symbols for this curve
             // if its set to none then default to a rectangle
             if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
-                sym.setStyle(QwtSymbol::Rect);
-            sym.setSize(12);
+                sym->setStyle(QwtSymbol::Rect);
+            sym->setSize(12);
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(200);
-            sym.setPen(metricDetail.penColor);
-            sym.setBrush(lighter);
+            sym->setPen(metricDetail.penColor);
+            sym->setBrush(lighter);
 
-            top->setSymbol(new QwtSymbol(sym));
-            top->setData(hxdata.data(),hydata.data(), counter);
+            top->setSymbol(sym);
+            top->setSamples(hxdata.data(),hydata.data(), counter);
             top->setBaseline(0);
             top->setYAxis(axisid);
             top->attach(this);
@@ -629,11 +635,11 @@ LTMPlot::setData(LTMSettings *set)
             linearGradient.setColorAt(1.0, brushColor);
             linearGradient.setSpread(QGradient::PadSpread);
             current->setBrush(linearGradient);
-            current->setPen(Qt::NoPen);
+            current->setPen(QPen(Qt::NoPen));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-            sym.setStyle(QwtSymbol::NoSymbol);
-            current->setSymbol(new QwtSymbol(sym));
+            sym->setStyle(QwtSymbol::NoSymbol);
+            current->setSymbol(sym);
 
             // fudge for date ranges, not for time of day graph
             // fudge qwt'S lack of a decent bar chart
@@ -683,11 +689,11 @@ LTMPlot::setData(LTMSettings *set)
 
             QPen cpen = QPen(metricDetail.penColor);
             cpen.setWidth(width);
-            sym.setSize(6);
-            sym.setStyle(metricDetail.symbolStyle);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(new QwtSymbol(sym));
+            sym->setSize(6);
+            sym->setStyle(metricDetail.symbolStyle);
+            sym->setPen(QPen(metricDetail.penColor));
+            sym->setBrush(QBrush(metricDetail.penColor));
+            current->setSymbol(sym);
             current->setPen(cpen);
 
             // fill below the line
@@ -699,19 +705,19 @@ LTMPlot::setData(LTMSettings *set)
 
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
-            sym.setSize(6);
-            sym.setStyle(metricDetail.symbolStyle);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(new QwtSymbol(sym));
+            sym->setSize(6);
+            sym->setStyle(metricDetail.symbolStyle);
+            sym->setPen(QPen(metricDetail.penColor));
+            sym->setBrush(QBrush(metricDetail.penColor));
+            current->setSymbol(sym);
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
-            sym.setSize(4);
-            sym.setStyle(metricDetail.symbolStyle);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(Qt::white));
-            current->setSymbol(new QwtSymbol(sym));
+            sym->setSize(4);
+            sym->setStyle(metricDetail.symbolStyle);
+            sym->setPen(QPen(metricDetail.penColor));
+            sym->setBrush(QBrush(Qt::white));
+            current->setSymbol(sym);
 
         }
 
@@ -721,7 +727,7 @@ LTMPlot::setData(LTMSettings *set)
         }
 
         // set the data series
-        current->setData(xdata.data(),ydata.data(), count + 1);
+        current->setSamples(xdata.data(),ydata.data(), count + 1);
         current->setBaseline(metricDetail.baseline);
 
         //qDebug()<<"Set Curve Data.."<<timer.elapsed();
@@ -774,7 +780,7 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     QString format = axisTitle(yLeft).text();
-    parent->toolTip()->setAxis(xBottom, yLeft);
+    parent->toolTip()->setAxes(xBottom, yLeft);
     parent->toolTip()->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
@@ -788,7 +794,7 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     // show legend?
-    if (settings->legend == false) this->legend()->clear();
+    if (settings->legend == false) this->legend()->hide();
 
     // markers
     if (settings->groupBy != LTM_TOD)

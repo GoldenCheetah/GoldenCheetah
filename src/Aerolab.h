@@ -22,8 +22,11 @@
 
 #include <qwt_plot.h>
 #include <qwt_series_data.h>
+#include <qwt_plot_canvas.h>
 #include <QtGui>
 
+#include <QWidget>
+#include <QFrame>
 #include <QTableWidget>
 #include <QTextEdit>
 #include <QStackedWidget>
