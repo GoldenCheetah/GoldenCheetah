@@ -42,7 +42,7 @@ static QString protect(const QString string)
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const QString string)
 {
-    QString string2 = QString::fromLocal8Bit(string.toAscii().data());
+    QString string2 = QString::fromLocal8Bit(string.toLatin1().data());
 
     // this is a quoted string
     QString s = string2.mid(1,string2.length()-2);
@@ -116,7 +116,7 @@ NamedSearches::deleteNamedSearch(int index)
 bool NamedSearchParser::startDocument()
 {
     buffer.clear();
-    return TRUE;
+    return true;
 }
 
 bool NamedSearchParser::endElement( const QString&, const QString&, const QString &qName )
@@ -133,7 +133,7 @@ bool NamedSearchParser::endElement( const QString&, const QString&, const QStrin
 
         result.append(namedSearch);
     }
-    return TRUE;
+    return true;
 }
 
 bool NamedSearchParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes & )
@@ -143,18 +143,18 @@ bool NamedSearchParser::startElement( const QString&, const QString&, const QStr
         namedSearch = NamedSearch();
     }
 
-    return TRUE;
+    return true;
 }
 
 bool NamedSearchParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }
 
 bool NamedSearchParser::endDocument()
 {
-    return TRUE;
+    return true;
 }
 
 bool

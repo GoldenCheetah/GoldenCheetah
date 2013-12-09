@@ -36,7 +36,13 @@
 #include "ANTChannel.h"
 #include "NullController.h"
 #include "Settings.h"
+
 #include <QWizard>
+#include <QFormLayout>
+#include <QHeaderView>
+#include <QProgressBar>
+#include <QFileDialog>
+#include <QCommandLinkButton>
 
 class DeviceScanner;
 

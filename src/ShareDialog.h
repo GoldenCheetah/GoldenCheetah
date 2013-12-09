@@ -26,6 +26,13 @@
 #include <QSslError>
 #include "MainWindow.h"
 #include "RideItem.h"
+#include <QDialog>
+#include <QProgressBar>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QCheckBox>
+#include <QGroupBox>
 
 #ifdef GC_HAVE_LIBOAUTH
 extern "C" {

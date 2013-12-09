@@ -21,10 +21,15 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QDialog>
+#include <QLabel>
+#include <QCheckBox>
 #include <QTableWidget>
+#include <QHeaderView>
 #include <QProgressBar>
 #include <QList>
 #include <QListIterator>
+#include <QItemDelegate>
 #include "Context.h"
 
 // Dialog class to show filenames, import progress and to capture user input

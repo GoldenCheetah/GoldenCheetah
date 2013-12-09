@@ -21,6 +21,7 @@
 
 #include <QDir>
 #include <QSqlDatabase>
+#include <QTreeWidget>
 #include <QtGui>
 #include <QNetworkReply>
 

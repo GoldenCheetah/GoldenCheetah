@@ -64,7 +64,6 @@ RideWindow::RideWindow(Context *context) :
     rideLoaded(false),
     context(context)
 {
-    setInstanceName("Ride Window");
     view = new QWebView();
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(view);

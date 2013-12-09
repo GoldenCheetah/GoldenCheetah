@@ -28,7 +28,7 @@ static inline QString unquote(QString quoted)
 bool SeasonParser::startDocument()
 {
     buffer.clear();
-    return TRUE;
+    return true;
 }
 
 bool SeasonParser::endElement( const QString&, const QString&, const QString &qName )
@@ -65,7 +65,7 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         }
         seasons.append(season);
     }
-    return TRUE;
+    return true;
 }
 
 bool SeasonParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
@@ -83,13 +83,13 @@ bool SeasonParser::startElement( const QString&, const QString&, const QString &
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 bool SeasonParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }
 
 QList<Season> SeasonParser::getSeasons()
@@ -123,7 +123,7 @@ bool SeasonParser::endDocument()
         if (seasons[seasons.size()-1].getEnd() == QDate())
             seasons[seasons.size()-1].setEnd(QDate::currentDate().addYears(10));
     }
-    return TRUE;
+    return true;
 }
 
 bool

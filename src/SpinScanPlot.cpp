@@ -56,8 +56,6 @@ void SpinScanData::init() { }
 
 SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent), leftCurve(NULL), rightCurve(NULL), spinData(spinData)
 {
-    setInstanceName("SpinScan Plot");
-
     // Setup the axis
     setAxisTitle(yLeft, "SpinScan");
     setAxisMaxMinor(xBottom, 0);

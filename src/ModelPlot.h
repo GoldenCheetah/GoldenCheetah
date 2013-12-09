@@ -22,6 +22,10 @@
 
 #include <QtGui>
 #include <QTimer>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QDialog>
+#include <QLabel>
 #include "Context.h"
 
 #include <qwt3d_global.h>

@@ -5,12 +5,14 @@
 #include <QtGui>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QGroupBox>
 #include <QCalendarWidget>
 #include <QPushButton>
 #include <QTreeWidget>
 #include <QTableView>
 #include <QModelIndex>
 #include <QCheckBox>
+#include <QListWidget>
 #include <QList>
 #include "Zones.h"
 #include "HrZones.h"
@@ -20,6 +22,7 @@
 #include <QValidator>
 #include <QGridLayout>
 #include <QProgressDialog>
+#include <QFontComboBox>
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "RideMetadata.h"

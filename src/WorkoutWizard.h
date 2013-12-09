@@ -18,12 +18,11 @@
 
 #ifndef _GC_WORKOUTEDITOR_H
 #define _GC_WORKOUTEDITOR_H
+
+// qt
 #include <QWizard>
-
-
 #include <QFileDialog>
 #include <QDebug>
-#include "Settings.h"
 #include <QTextStream>
 #include <QRadioButton>
 #include <QButtonGroup>
@@ -32,22 +31,28 @@
 #include <QLCDNumber>
 #include <QDebug>
 #include <QSpinBox>
+#include <QLabel>
+#include <QHeaderView>
+#include <QTableWidget>
+
+// gc
+#include "Settings.h"
 #include "RideFile.h"
 #include "Context.h"
 #include "GoldenCheetah.h"
 #include "Settings.h"
-class QwtPlotCurve;
-class RideItem;
-
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
 #include "RideItem.h"
 #include "Units.h"
-#include <QTableWidget>
 #include "Zones.h"
 
-#include "Settings.h"
+// qwt
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+
+class QwtPlotCurve;
+class RideItem;
 class WorkoutPlot;
+
 
 class WorkoutItem : public QTableWidgetItem
 {

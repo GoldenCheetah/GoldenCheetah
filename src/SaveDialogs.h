@@ -22,7 +22,13 @@
 
 #include <QtGui>
 #include <QDialog>
+#include <QCheckBox>
+#include <QLabel>
+#include <QTableWidget>
+#include <QHeaderView>
+
 #include "RideItem.h"
+#include "Context.h"
 
 class MainWindow;
 

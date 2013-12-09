@@ -102,7 +102,7 @@ FitlogParser::startElement( const QString&, const QString&,
                               point.watts,point.alt,point.lon,point.lat, point.headwind,
                               0.0, RideFile::noTemp, 0.0, point.interval);
     }
-    return TRUE;
+    return true;
 }
 
 bool
@@ -207,12 +207,12 @@ FitlogParser::endElement( const QString&, const QString&, const QString& qName)
         rideFile->setTag("Notes", buffer);
     }
 
-    return TRUE;
+    return true;
 }
 bool FitlogParser::characters( const QString& str )
 {
     buffer += str;
-    return TRUE;
+    return true;
 }
 
 static const double EARTH_RADIUS = 6378.140; // in km

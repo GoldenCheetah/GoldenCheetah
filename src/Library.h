@@ -19,9 +19,11 @@
 #ifndef _Library_h
 #define _Library_h
 #include "GoldenCheetah.h"
+
 #include <QDir>
 #include <QLabel>
 #include <QDialog>
+#include <QFileDialog>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QTextEdit>

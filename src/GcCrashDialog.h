@@ -22,6 +22,7 @@
 #include <QDialog>
 #include <QDir>
 #include <QWebView>
+#include <QFileDialog>
 
 class GcCrashDialog : public QDialog
 {

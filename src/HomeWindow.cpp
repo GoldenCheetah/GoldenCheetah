@@ -33,8 +33,6 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     GcWindow(context), context(context), name(name), active(false),
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
-    setInstanceName("Home Window");
-
     // setup control area
     QWidget *cw = new QWidget(this);
     cw->setContentsMargins(0,0,0,0);
@@ -428,9 +426,11 @@ HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 void
 HomeWindow::appendChart(GcWinID id)
 {
+    GcWindow *newone = NULL;
+
     // GcWindowDialog is delete on close, so no need to delete
-    GcWindowDialog *f = new GcWindowDialog(id, context);
-    GcWindow *newone = f->exec();
+    GcWindowDialog *f = new GcWindowDialog(id, context, &newone);
+    f->exec();
 
     // returns null if cancelled or closed
     if (newone) {
@@ -1014,7 +1014,7 @@ HomeWindow::drawCursor()
     }
 }
 
-GcWindowDialog::GcWindowDialog(GcWinID type, Context *context) : context(context), type(type)
+GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here) : context(context), type(type), here(here)
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
@@ -1081,12 +1081,16 @@ void GcWindowDialog::okClicked()
 
 void GcWindowDialog::cancelClicked() { reject(); }
 
-GcWindow *
+int
 GcWindowDialog::exec()
 {
     if (QDialog::exec()) {
-        return win;
-    } else return NULL;
+
+        *here = win;
+    } else {
+        *here = NULL;
+    } 
+    return 0;
 }
 
 /*----------------------------------------------------------------------
@@ -1225,7 +1229,7 @@ HomeWindow::restoreState(bool useDefault)
 //
 bool ViewParser::startDocument()
 {
-    return TRUE;
+    return true;
 }
 
 bool ViewParser::endElement( const QString&, const QString&, const QString &qName )
@@ -1233,7 +1237,7 @@ bool ViewParser::endElement( const QString&, const QString&, const QString &qNam
     if (qName == "chart") { // add to the list
         charts.append(chart);
     }
-    return TRUE;
+    return true;
 }
 
 bool ViewParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
@@ -1262,7 +1266,6 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         chart = GcWindowRegistry::newGcWindow(type, context);
         chart->hide();
         chart->setProperty("title", QVariant(title));
-        chart->setProperty("instanceName", QVariant(name));
 
     }
     else if (name == "property") {
@@ -1294,18 +1297,18 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         }
 
     }
-    return TRUE;
+    return true;
 }
 
 bool ViewParser::characters( const QString&)
 {
-    return TRUE;
+    return true;
 }
 
 
 bool ViewParser::endDocument()
 {
-    return TRUE;
+    return true;
 }
 
 void HomeWindow::closeWindow(GcWindow*thisone)

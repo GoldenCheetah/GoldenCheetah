@@ -21,7 +21,11 @@
 
 #include <QtGui>
 #include <QList>
+#include <QSplitter>
+#include <QToolBar>
 #include <QAction>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 class GcSubSplitter;
 class GcSplitterControl;

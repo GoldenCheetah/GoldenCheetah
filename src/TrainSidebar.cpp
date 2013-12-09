@@ -49,6 +49,8 @@
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #include <CoreServices/CoreServices.h>
+#include <QStyle>
+#include <QStyleFactory>
 #endif
 
 #include <math.h> // isnan and isinf
@@ -57,8 +59,6 @@
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context)
 {
-    setInstanceName("Train Controls");
-
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
     QVBoxLayout *cl = new QVBoxLayout(c);
@@ -236,7 +236,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 intensitySlider->hide(); //XXX!!! temporary
 
 #ifdef Q_OS_MAC
-    QWindowsStyle *macstyler = new QWindowsStyle();
+    QStyle *macstyler = QStyleFactory::create("fusion");
     play->setStyle(macstyler);
     stop->setStyle(macstyler);
     rewind->setStyle(macstyler);

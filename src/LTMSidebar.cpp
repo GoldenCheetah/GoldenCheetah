@@ -22,9 +22,11 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
+
 #include <QApplication>
 #include <QWebView>
 #include <QWebFrame>
+#include <QScrollBar>
 #include <QtGui>
 
 // seasons support

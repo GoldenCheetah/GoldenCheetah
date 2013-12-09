@@ -21,6 +21,11 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsGridLayout>
+#include <QGraphicsProxyWidget>
+
 #include "Colors.h"
 
 class GcPane : public QWidget

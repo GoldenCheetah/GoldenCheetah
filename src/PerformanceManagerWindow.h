@@ -24,6 +24,7 @@
 
 #include <QtGui>
 #include <QSlider>
+#include <QLineEdit>
 
 #include <qwt_plot_picker.h>
 #include "Settings.h"

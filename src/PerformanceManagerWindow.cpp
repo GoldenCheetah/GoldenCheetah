@@ -13,7 +13,6 @@
 PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
     GcWindow(context), context(context), active(false), isfiltered(false)
 {
-    setInstanceName("PM Window");
     setControls(NULL);
 
     days = count = 0;

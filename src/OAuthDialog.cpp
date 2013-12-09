@@ -20,8 +20,6 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
-#include <QHttp>
-#include <QUrl>
 #include "TimeUtils.h"
 
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
@@ -81,7 +79,7 @@ OAuthDialog::urlChanged(const QUrl &url)
         QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
 
         QByteArray data;
-        QUrl params;
+        QUrlQuery params;
         QString urlstr = "";
 
         if (site == STRAVA) {
@@ -106,9 +104,9 @@ OAuthDialog::urlChanged(const QUrl &url)
         }
         params.addQueryItem("code", code);
 
-        data = params.encodedQuery();
+        data.append(params.query(QUrl::FullyEncoded));
 
-        QUrl url = QUrl( urlstr);
+        QUrl url = QUrl(urlstr);
         QNetworkRequest request = QNetworkRequest(url);
         request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 

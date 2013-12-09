@@ -67,8 +67,6 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
 PfPvWindow::PfPvWindow(Context *context) :
     GcChartWindow(context), context(context), current(NULL)
 {
-    setInstanceName("Pf/Pv Window");
-
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);

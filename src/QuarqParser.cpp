@@ -72,7 +72,7 @@ QuarqParser::startElement( const QString&, const QString&,
       seconds_from_start = 0.0;
       initial_seconds = -1;
 
-      return TRUE;
+      return true;
     }
 
 #define CheckQuarqXml(name,unit,dest)  do { 				\
@@ -85,7 +85,7 @@ QuarqParser::startElement( const QString&, const QString&,
 	  dest = name.toDouble();					\
 	  incrementTime(timestamp.toDouble());				\
 	}								\
-	return TRUE;							\
+	return true;							\
       }									\
     } while (0);
 
@@ -103,7 +103,7 @@ QuarqParser::startElement( const QString&, const QString&,
     // only print the first time and unknown happens
     if (!unknown_keys[qName]++)
       std::cerr << "Unknown Element " << qPrintable(qName) << std::endl;
-    return TRUE;
+    return true;
 }
 
 bool
@@ -116,12 +116,12 @@ QuarqParser::endElement( const QString&, const QString&, const QString& qName)
                             kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0, RideFile::noTemp, 0.0, 0);
     }
 
-    return TRUE;
+    return true;
 }
 
 bool
 QuarqParser::characters( const QString& str )
 {
     buf += str;
-    return TRUE;
+    return true;
 }

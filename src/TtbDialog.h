@@ -22,13 +22,17 @@
 
 #include <QObject>
 #include <QtGui>
-#include <QHttp>
+#include <QDialog>
+#include <QProgressBar>
+#include <QLabel>
 #include <QUrl>
+#include <QUrlQuery>
 #include <QHttpMultiPart>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 #include <QXmlDefaultHandler>
 #include <QNetworkReply>
+
 #include "Context.h"
 #include "RideItem.h"
 

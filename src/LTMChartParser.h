@@ -21,6 +21,8 @@
 #include "GoldenCheetah.h"
 
 #include <QXmlDefaultHandler>
+#include <QDialog>
+
 #include "LTMSettings.h"
 #include "LTMTool.h"
 

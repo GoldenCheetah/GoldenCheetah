@@ -145,8 +145,6 @@ RealtimePlot::RealtimePlot() :
     showAltState(Qt::Checked),
     smooth(0)
 {
-    setInstanceName("Realtime Plot");
-
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     pwr30Data = new Realtime30PwrData;
     pwrData = new RealtimePwrData;

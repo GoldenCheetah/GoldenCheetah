@@ -22,6 +22,7 @@
 #include <QtGui>
 #include <QList>
 #include <QAction>
+#include <QHBoxLayout>
 
 class Context;
 #ifdef Q_OS_MAC

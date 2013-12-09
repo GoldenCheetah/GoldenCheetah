@@ -26,8 +26,16 @@
 #include "MetricAggregator.h"
 #include "RideMetric.h"
 
-#include <QDir>
 #include <QtGui>
+#include <QDir>
+#include <QStyle>
+#include <QStyleFactory>
+#include <QtGui>
+#include <QDialog>
+#include <QTextEdit>
+#include <QHeaderView>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 
 class LTMPopup : public QWidget
 {

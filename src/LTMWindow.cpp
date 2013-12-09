@@ -41,7 +41,6 @@
 LTMWindow::LTMWindow(Context *context) :
             GcChartWindow(context), context(context), dirty(true)
 {
-    setInstanceName("Metric Window");
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
 

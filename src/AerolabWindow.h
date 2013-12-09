@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QMessageBox>
 
 class Aerolab;
 class Context;

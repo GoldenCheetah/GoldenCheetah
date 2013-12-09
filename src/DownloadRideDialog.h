@@ -21,7 +21,12 @@
 #include "GoldenCheetah.h"
 
 #include "CommPort.h"
+
 #include <QtGui>
+#include <QLabel>
+#include <QDialog>
+#include <QMessageBox>
+#include <QTextEdit>
 
 class Context;
 

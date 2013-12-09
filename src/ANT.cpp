@@ -834,7 +834,7 @@ int ANT::openPort()
     // a USB1 stick so default to 4 channels
     channels = 4;
 
-    if ((devicePort=open(deviceFilename.toAscii(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1)
+    if ((devicePort=open(deviceFilename.toLatin1(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1)
         return errno;
 
     tcflush(devicePort, TCIOFLUSH); // clear out the garbage

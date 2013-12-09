@@ -21,7 +21,6 @@
 MetadataWindow::MetadataWindow(Context *context) :
     GcChartWindow(context), context(context)
 {
-    setInstanceName("Metadata Window");
     setControls(NULL);
     setRideItem(NULL);
     setContentsMargins(0,0,0,0);

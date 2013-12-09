@@ -542,14 +542,14 @@ bool
 JoulePacket::write(CommPortPtr dev, QString &err)
 {
     QByteArray bytes = dataArrayForUnit();
-    const char *msg = cEscape(bytes.data(), bytes.count()).toAscii().constData();
+    const char *msg = cEscape(bytes.data(), bytes.count()).toLatin1().constData();
 
     if (JOULE_DEBUG) printf("writing '%s' to device\n", msg);
 
     int n = dev->write(bytes.data(), bytes.count() , err); //
     if (n != bytes.count()) {
         if (n < 0) {
-            if (JOULE_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toAscii().constData());
+            if (JOULE_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toLatin1().constData());
             err = QString(tr("failed to write to device: %1")).arg(err);
         }
         else {

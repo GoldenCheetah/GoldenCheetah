@@ -21,6 +21,12 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QTableWidget>
+#include <QCheckBox>
+#include <QDialog>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QLabel>
 
 class Context;
 class RideFile;

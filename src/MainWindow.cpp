@@ -21,7 +21,11 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
+#include <QDesktopWidget>
 #include <QNetworkProxyQuery>
+#include <QMenuBar>
+#include <QStyle>
+#include <QStyleFactory>
 
 // DATA STRUCTURES
 #include "MainWindow.h"
@@ -75,11 +79,7 @@
 #include "HomeWindow.h"
 #include "GcScopeBar.h"
 #ifdef Q_OS_MAC
-#ifdef GC_HAVE_LION
-#include "LionFullScreen.h" // mac and lion or later
-#endif
 #include "QtMacButton.h" // mac
-#include "QtMacPopUpButton.h" // mac
 #include "QtMacSegmentedButton.h" // mac
 #else
 #include "QTFullScreen.h" // not mac!
@@ -111,7 +111,6 @@ MainWindow::MainWindow(const QDir &home)
     context = new Context(this);
     context->athlete = new Athlete(context, home);
 
-    setInstanceName(context->athlete->cyclist);
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home.dirName());
     setContentsMargins(0,0,0,0);
@@ -143,9 +142,6 @@ MainWindow::MainWindow(const QDir &home)
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
-#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
-    fullScreen = new LionFullScreen(context);
-#endif
 #ifndef Q_OS_MAC
     fullScreen = new QTFullScreen(context);
 #endif
@@ -302,7 +298,7 @@ MainWindow::MainWindow(const QDir &home)
 
 #ifdef GC_HAVE_LUCENE
     SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
-    QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
+    QStyle *toolStyle = QStyleFactory::create("fusion");
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(200);
     head->addWidget(searchBox);
@@ -319,7 +315,7 @@ MainWindow::MainWindow(const QDir &home)
 
     head = new GcToolBar(this);
 
-    QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
+    QStyle *toolStyle = QStyleFactory::create("fusion");
     QPalette metal;
     metal.setColor(QPalette::Button, QColor(215,215,215));
 
@@ -437,7 +433,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // Add chart is on the scope bar
     chartMenu = new QMenu(this);
-    QCleanlooksStyle *styler = new QCleanlooksStyle();
+    QStyle *styler = QStyleFactory::create("fusion");
     QPushButton *newchart = new QPushButton("+", this);
     scopebar->addWidget(newchart);
     newchart->setStyle(styler);

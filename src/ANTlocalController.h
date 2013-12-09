@@ -23,6 +23,8 @@
 #include "ANTLogger.h"
 #include "ConfigDialog.h"
 
+#include <QMessageBox>
+
 // Abstract base class for Realtime device controllers
 
 #ifndef _GC_ANTlocalController_h

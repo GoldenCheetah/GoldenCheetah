@@ -25,7 +25,6 @@
 DiaryWindow::DiaryWindow(Context *context) :
     GcWindow(context), context(context), active(false)
 {
-    setInstanceName("Diary Window");
     setControls(NULL);
 
     // get config
@@ -66,8 +65,8 @@ DiaryWindow::DiaryWindow(Context *context) :
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);
     monthlyView->setModel(calendarModel);
-    monthlyView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-    monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+    monthlyView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    monthlyView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     monthlyView->verticalHeader()->hide();
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);

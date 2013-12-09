@@ -85,8 +85,6 @@ QPointF NowData::sample(size_t i) const
 
 ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
-    setInstanceName("ErgFile Plot");
-
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     canvas()->setFrameStyle(QFrame::NoFrame);

@@ -34,6 +34,7 @@
 #include "GoldenCheetah.h"
 
 #include <QString>
+#include <QDialog>
 #include <QDebug>
 #include <QThread>
 #include <QMutex>

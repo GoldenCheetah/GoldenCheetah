@@ -25,6 +25,8 @@
 #include <QDir>
 #include <QHash>
 #include <QtSql>
+#include <QMessageBox>
+
 #include "SummaryMetrics.h"
 #include "Context.h"
 #include "Season.h"

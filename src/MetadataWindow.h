@@ -19,6 +19,7 @@
 #ifndef _GC_MetadataWindow_h
 #define _GC_MetadataWindow_h 1
 #include "GoldenCheetah.h"
+#include "RideItem.h"
 #include "RideMetadata.h"
 
 class Context;

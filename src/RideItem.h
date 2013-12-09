@@ -95,4 +95,5 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         double timeInHrZone(int zone);
 #endif
 };
+Q_DECLARE_METATYPE(RideItem*)
 #endif // _GC_RideItem_h

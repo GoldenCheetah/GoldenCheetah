@@ -48,8 +48,6 @@ ModelWindow::addStandardChannels(QComboBox *box)
 ModelWindow::ModelWindow(Context *context, const QDir &home) :
     GcChartWindow(context), home(home), context(context), ride(NULL), current(NULL)
 {
-    setInstanceName("3D Window");
-
     QWidget *c = new QWidget;
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);

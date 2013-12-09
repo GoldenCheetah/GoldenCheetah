@@ -22,6 +22,13 @@
 
 #include <QObject>
 #include <QtGui>
+#include <QCheckBox>
+#include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QGroupBox>
+#include <QtGui>
 #include "MainWindow.h"
 #include "RideItem.h"
 
@@ -29,6 +36,8 @@
 #include "RideMetric.h"
 #include "MetricAggregator.h"
 #include "DBAccess.h"
+
+#include "Context.h"
 
 #ifdef GC_HAVE_LIBOAUTH
 extern "C" {

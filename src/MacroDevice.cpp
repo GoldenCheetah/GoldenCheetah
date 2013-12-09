@@ -352,14 +352,14 @@ MacroPacket::data()
 bool
 MacroPacket::write(CommPortPtr dev, QString &err)
 {
-    const char *msg = cEscape(data(), payload.count()+2).toAscii().constData();
+    const char *msg = cEscape(data(), payload.count()+2).toLatin1().constData();
 
     if (MACRO_DEBUG) printf("writing '%s' to device\n", msg);
 
     int n = dev->write(data(), payload.count()+2, err);
     if (n != payload.count()+2) {
         if (n < 0) {
-            if (MACRO_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toAscii().constData());
+            if (MACRO_DEBUG) printf("failed to write %s to device: %s\n", msg, err.toLatin1().constData());
             err = QString(tr("failed to write to device: %1")).arg(err);
         }
         else {
@@ -385,7 +385,7 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
         }
         checksum += command;
         len--;
-        if (MACRO_DEBUG) printf("command %s\n" ,cEscape(&command,n).toAscii().constData());
+        if (MACRO_DEBUG) printf("command %s\n" ,cEscape(&command,n).toLatin1().constData());
     }
 
     if (MACRO_DEBUG) printf("reading %d from device\n", len);
@@ -401,7 +401,7 @@ MacroPacket::read(CommPortPtr dev, int len, QString &err)
         return false;
     }
 
-    if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toAscii().constData());
+    if (MACRO_DEBUG) printf("payload %s\n" ,cEscape(buf,n).toLatin1().constData());
     addToPayload(buf,n);
 
     return true;

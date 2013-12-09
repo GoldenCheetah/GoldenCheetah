@@ -23,7 +23,13 @@
 #include "Context.h"
 #include "SpecialFields.h"
 #include <QWidget>
+#include <QLabel>
+#include <QCheckBox>
+#include <QScrollArea>
 #include <QXmlDefaultHandler>
+#include <QTextEdit>
+#include <QCompleter>
+#include <QMessageBox>
 
 // field types
 #define FIELD_TEXT      0
@@ -163,7 +169,7 @@ class MetadataXMLParser : public QXmlDefaultHandler
 {
 
 public:
-    bool startDocument() { return TRUE; }
+    bool startDocument() { return true; }
     bool endDocument();
     bool endElement( const QString&, const QString&, const QString &qName );
     bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );

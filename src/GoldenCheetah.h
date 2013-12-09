@@ -18,13 +18,12 @@
 
 #ifndef _GC_GoldenCheetah_h
 #define _GC_GoldenCheetah_h
-#include "TimeUtils.h"
-class RideItem;
 class GcWindow;
 class Context;
 
-#define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
-#define setInstanceName(x) setProperty("instanceName", x)
+#define G_OBJECT
+//#define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
+//#define setInstanceName(x) setProperty("instanceName", x)
 #define myRideItem property("ride").value<RideItem*>()
 #define myDateRange property("dateRange").value<DateRange>()
 
@@ -33,6 +32,7 @@ class Context;
 #include <QPushButton>
 #include <QToolButton>
 #include <QWidget>
+#include <QStackedLayout>
 #include <QObject>
 #include <QMetaObject>
 #include <QVariant>
@@ -41,11 +41,9 @@ class Context;
 #include <QtGui>
 
 #include "GcWindowRegistry.h"
+#include "TimeUtils.h"
 
-Q_DECLARE_METATYPE(QWidget*)
-Q_DECLARE_METATYPE(RideItem*)
-Q_DECLARE_METATYPE(GcWinID)
-Q_DECLARE_METATYPE(DateRange)
+class RideItem;
 
 
 class GcWindow : public QFrame
@@ -58,7 +56,7 @@ private:
 
     // each window has an instance name - default set
     // by the widget constructor but overide from layou manager
-    Q_PROPERTY(QString instanceName READ instanceName WRITE _setInstanceName USER true)
+    //Q_PROPERTY(QString instanceName READ instanceName WRITE _setInstanceName USER true)
 
     // controls are updated by widget when it is constructed
     Q_PROPERTY(QWidget* controls READ controls WRITE setControls NOTIFY controlsChanged)
@@ -87,7 +85,7 @@ private:
 
     QString _title;
     QString _subtitle;
-    QString _instanceName;
+    //QString _instanceName;
     RideItem *_rideItem;
     GcWinID _type;
     DateRange _dr;
@@ -128,8 +126,8 @@ public:
     ~GcWindow();
     GcWindow(Context *context);
 
-    void _setInstanceName(QString x); // GOBJECTS can set their instance name, but not be GcWindows
-    QString instanceName() const;
+    //void _setInstanceName(QString x); // GOBJECTS can set their instance name, but not be GcWindows
+    //QString instanceName() const;
 
     void setControls(QWidget *x);
     QWidget *controls() const;

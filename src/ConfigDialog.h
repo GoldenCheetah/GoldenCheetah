@@ -22,6 +22,9 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <QMainWindow>
+#include <QStackedWidget>
+
 #include "Pages.h"
 #include "Context.h"
 

@@ -23,8 +23,7 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
     GcWindow(context), home(home), context(context), m_MediaChanged(false)
 {
     setControls(NULL);
-    setInstanceName("Video Window");
-    setProperty("color", Qt::black);
+    setProperty("color", QColor(Qt::black));
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
@@ -64,7 +63,7 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
     /* This is a non working code that show how to hooks into a window,
      * if we have a window around */
 #ifdef Q_OS_LINUX
-     x11Container = new QX11EmbedContainer(this);
+     x11Container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
      layout->addWidget(x11Container);
      libvlc_media_player_set_xwindow (mp, x11Container->winId());
 #endif
@@ -87,7 +86,7 @@ VideoWindow::~VideoWindow()
 {
 #ifdef Q_OS_LINUX
     // unembed vlc backend first
-    x11Container->discardClient();
+    //x11Container->discardClient(); //XXX PORT TO QT 5.1 BROKEN CODE XXX
 #endif
 
     stopPlayback();

@@ -27,6 +27,9 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
+// diag messages
+#include <QMessageBox>
+
 // set user and password
 #include <QAuthenticator>
 #include "Context.h"

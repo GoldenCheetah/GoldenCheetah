@@ -809,7 +809,7 @@ int Computrainer::openPort()
     int ldisc=N_TTY; // LINUX
 #endif
 
-    if ((devicePort=open(deviceFilename.toAscii(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) return errno;
+    if ((devicePort=open(deviceFilename.toLatin1(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) return errno;
 
     tcflush(devicePort, TCIOFLUSH); // clear out the garbage
 

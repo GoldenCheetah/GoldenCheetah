@@ -21,7 +21,6 @@
 SummaryWindow::SummaryWindow(Context *context) :
     GcWindow(context), context(context)
 {
-    setInstanceName("Summary Window");
     setControls(NULL);
     setRideItem(NULL);
 

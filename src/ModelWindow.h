@@ -22,6 +22,11 @@
 
 #include <QtGui>
 #include <QTimer>
+#include <QDialog>
+#include <QCheckBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QFormLayout>
 #include "Context.h"
 
 class ModelPlot; // we don't include the header because it uses namespaces

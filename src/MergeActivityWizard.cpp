@@ -400,7 +400,7 @@ MergeSync::printDelays()
             seriesName = "alt";
         else if (series==4)
             seriesName = "hr";
-        fprintf(stderr, "  series %d %s\n", series, seriesName.toAscii().constData());
+        fprintf(stderr, "  series %d %s\n", series, seriesName.toLatin1().constData());
 
         for (int i=0;i<delay[series].count();i++) {
             fprintf(stderr, "   delay for %d.%d: %d - %f\n", i, series, delay[series].at(i), minR[series].at(i));

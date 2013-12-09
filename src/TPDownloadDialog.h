@@ -22,6 +22,10 @@
 
 #include <QtGui>
 #include <QDialog>
+#include <QHeaderView>
+#include <QProgressBar>
+#include <QMessageBox>
+
 #include "RideFile.h"
 #include "TPDownload.h"
 #include "TPUpload.h"

@@ -24,6 +24,14 @@
 #include "Units.h"
 #include "Settings.h"
 
+#include <QtGui>
+#include <QLineEdit>
+#include <QDialog>
+#include <QTextEdit>
+#include <QLabel>
+#include <QFileDialog>
+#include <QMessageBox>
+
 class NewCyclistDialog : public QDialog
 {
     Q_OBJECT

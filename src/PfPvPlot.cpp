@@ -120,8 +120,6 @@ public:
 PfPvPlot::PfPvPlot(Context *context)
     : rideItem (NULL), context(context), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
-    setInstanceName("PfPv Plot");
-
     setCanvasBackground(Qt::white);
     canvas()->setFrameStyle(QFrame::NoFrame);
 

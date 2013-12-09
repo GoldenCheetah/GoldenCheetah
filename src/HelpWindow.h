@@ -21,7 +21,10 @@
 #include "GoldenCheetah.h"
 
 #include <QWidget>
+#include <QDialog>
 #include <QtWebKit>
+#include <QWebView>
+
 #include "Context.h"
 
 class HelpWindow : public QDialog

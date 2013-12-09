@@ -31,11 +31,18 @@
 
 // standard stuff
 #include <QDir>
+#include <QDialog>
 #include <QtGui>
+#include <QCheckBox>
+#include <QLabel>
+#include <QDebug>
+#include <QTreeWidgetItem>
+#include <QHeaderView>
+#include <QFormLayout>
+#include <QSqlTableModel>
+
 #include "math.h" // for round()
 #include "Units.h" // for MILES_PER_KM
-#include <QDebug>
-#include <QSqlTableModel>
 
 // Status settings
 #define RT_MODE_ERGO        0x0001        // load generation modes

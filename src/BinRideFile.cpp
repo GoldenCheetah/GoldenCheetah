@@ -774,9 +774,9 @@ struct BinFileReaderState
                 foreach(int num, set) {
                     int record_type = unexpected_format_identifiers_for_record_types.keys(set).takeFirst();
                     errors << QString("unexpected format identifier \"%1\" (%2) in \"%3\" (%4)\n")
-                            .arg(global_format_identifiers[num].toAscii().constData())
+                            .arg(global_format_identifiers[num].toLatin1().constData())
                             .arg(num)
-                            .arg(global_record_types[record_type].toAscii().constData())
+                            .arg(global_record_types[record_type].toLatin1().constData())
                             .arg(record_type);
                 }
             }

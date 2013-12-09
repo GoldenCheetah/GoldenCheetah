@@ -19,6 +19,7 @@
 #ifndef _GC_GcWindowLayout_h
 #define _GC_GcWindowLayout_h
 
+#include <QWidget>
 #include <QLayout>
 #include <QRect>
 #include <QStyle>

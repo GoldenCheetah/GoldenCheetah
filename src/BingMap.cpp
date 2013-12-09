@@ -33,7 +33,6 @@
 
 BingMap::BingMap(Context *context) : GcWindow(context), context(context), range(-1), current(NULL)
 {
-    setInstanceName("Google Map");
     setControls(NULL);
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout();

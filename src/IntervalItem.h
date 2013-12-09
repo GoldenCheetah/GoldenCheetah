@@ -21,6 +21,10 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QDialog>
+#include <QLabel>
+#include <QTreeWidgetItem>
+#include <QLineEdit>
 
 class RideFile;
 

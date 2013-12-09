@@ -43,6 +43,8 @@
 #include <qwt_series_data.h>
 #include <QMultiMap>
 
+#include <string.h> // for memcpy
+
 class IntervalPlotData : public QwtSeriesData<QPointF>
 {
     public:
@@ -245,8 +247,6 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     context(context),
     parent(parent)
 {
-    setInstanceName("AllPlot");
-
     referencePlot = NULL;
 
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false)
@@ -1420,7 +1420,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     tempCurve->setData(xaxis, smoothTE, stopidx-startidx);
 
     QVector<QwtIntervalSample> tmpWND(stopidx-startidx);
-    qMemCopy( tmpWND.data(), smoothRS, (stopidx-startidx) * sizeof( QwtIntervalSample ) );
+    memcpy(tmpWND.data(), smoothRS, (stopidx-startidx) * sizeof(QwtIntervalSample));
     windCurve->setData(new QwtIntervalSeriesData(tmpWND));
     torqueCurve->setData(xaxis, smoothNM, stopidx-startidx);
     balanceLCurve->setData(xaxis, smoothBALL, stopidx-startidx);

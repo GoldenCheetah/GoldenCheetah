@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QTreeWidget>
 
 class Context;
 

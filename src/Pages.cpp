@@ -19,8 +19,9 @@
 #include "Athlete.h"
 #include <QtGui>
 #include <QIntValidator>
-#include <QHttp>
+
 #include <assert.h>
+
 #include "Pages.h"
 #include "Units.h"
 #include "Settings.h"

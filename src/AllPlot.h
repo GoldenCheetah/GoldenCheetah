@@ -28,6 +28,10 @@
 #include <qwt_compat.h>
 #include <QtGui>
 
+#include <QTableWidget>
+#include <QStackedWidget>
+#include <QTextEdit>
+
 class QwtPlotCurve;
 class QwtPlotIntervalCurve;
 class QwtPlotGrid;

@@ -22,6 +22,8 @@
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
+#include <QStackedWidget>
+#include <QLabel>
 
 
 #include "Context.h"

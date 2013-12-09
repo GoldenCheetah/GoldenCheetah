@@ -24,8 +24,17 @@
 #include "GcWindowLayout.h"
 
 #include <QtGui>
+#include <QScrollArea>
+#include <QFormLayout>
 #include <QXmlDefaultHandler>
+#include <QMessageBox>
+#include <QLabel>
+#include <QDialog>
+#include <QCheckBox>
+#include <QStackedWidget>
+
 #include "Context.h"
+#include "RideItem.h"
 
 #ifdef Q_OS_MAC
 #include "QtMacSegmentedButton.h"
@@ -136,8 +145,8 @@ class GcWindowDialog : public QDialog
     Q_OBJECT
 
     public:
-        GcWindowDialog(GcWinID, Context *);
-        GcWindow *exec();               // return pointer to window, or NULL if cancelled
+        GcWindowDialog(GcWinID, Context *, GcWindow **);
+        int exec();               // return pointer to window, or NULL if cancelled
 
     public slots:
         void okClicked();
@@ -146,6 +155,7 @@ class GcWindowDialog : public QDialog
     protected:
         Context *context;
         GcWinID type;
+        GcWindow **here;
 
         // we remove from the layout at the end
         QHBoxLayout *layout;

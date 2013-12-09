@@ -32,8 +32,6 @@
 #include "RideFileCache.h"
 #include "RideItem.h"
 #include "Settings.h"
-#include <QtGui>
-#include <assert.h>
 
 #include "Zones.h"
 #include "HrZones.h"
@@ -47,6 +45,11 @@
 #endif
 
 #include <QtGui>
+#include <QFormLayout>
+#include <QTextEdit>
+#include <QHeaderView>
+
+#include <assert.h>
 
 class Context;
 class PowerHist;

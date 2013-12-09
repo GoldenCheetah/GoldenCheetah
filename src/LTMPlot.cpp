@@ -47,8 +47,6 @@ static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1
 LTMPlot::LTMPlot(LTMWindow *parent, Context *context) : 
     bg(NULL), parent(parent), context(context), highlighter(NULL)
 {
-    setInstanceName("Metric Plot");
-
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, tr(""));
