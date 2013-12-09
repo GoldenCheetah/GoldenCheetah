@@ -14,7 +14,8 @@
 CONFIG           += qt     
 CONFIG           += warn_on
 CONFIG           += no_keywords
-CONFIG           += silent
+#CONFIG           += silent
+CONFIG           += static
 
 ######################################################################
 # release/debug mode
@@ -32,7 +33,7 @@ win32 {
 }
 else {
 
-    CONFIG           += debug
+    CONFIG           += release
 
     VER_MAJ           = $${QWT_VER_MAJ}
     VER_MIN           = $${QWT_VER_MIN}
