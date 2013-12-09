@@ -32,7 +32,6 @@
 #include <qwt_scale_widget.h>
 #include "RideItem.h"
 #include "LogTimeScaleDraw.h"
-#include "LogTimeScaleEngine.h"
 #include "RideFile.h"
 #include "Season.h"
 #include "Settings.h"
@@ -61,7 +60,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     LogTimeScaleDraw *ld = new LogTimeScaleDraw;
     ld->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(xBottom, ld);
-    setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
+    setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
     setAxisScale(xBottom, (double)0.017, (double)60);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
@@ -150,7 +149,7 @@ CpintPlot::setSeries(RideFile::SeriesType x)
     series = x;
 
     // Log scale for all bar Energy
-    setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
+    setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
     setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
     setAxisTitle(xBottom, tr("Interval Length"));
 

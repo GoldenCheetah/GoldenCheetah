@@ -26,6 +26,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_draw.h>
+#include <qwt_axis_id.h>
 
 #include "LTMTool.h"
 #include "LTMSettings.h"
@@ -102,6 +103,8 @@ class LTMPlot : public QwtPlot
         // remember the coggan or skiba stress calculators
         // so it isn't recalculated for each data series!
         StressCalculator *cogganPMC, *skibaPMC;
+
+        int supported_axes[8];
 };
 
 // Produce Labels for X-Axis

@@ -118,7 +118,6 @@ class MetricDetail {
 // do this
 QDataStream &operator<<(QDataStream &out, const LTMSettings &settings);
 QDataStream &operator>>(QDataStream &in, LTMSettings &settings);
-Q_DECLARE_METATYPE(LTMSettings);
 
 // used to maintain details about the metrics being plotted
 class LTMSettings {
@@ -128,6 +127,8 @@ class LTMSettings {
         LTMSettings() {
             // we need to register the stream operators
             qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
+            data = measures = bests = NULL;
+            ltmTool = NULL;
         }
 
         void writeChartXML(QDir, QList<LTMSettings>);
@@ -150,6 +151,7 @@ class LTMSettings {
         LTMTool *ltmTool;
         QString field1, field2;
 };
+Q_DECLARE_METATYPE(LTMSettings);
 
 class EditChartDialog : public QDialog
 {

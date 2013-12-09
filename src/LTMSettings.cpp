@@ -128,6 +128,9 @@ LTMSettings::readChartXML(QDir home, QList<LTMSettings> &charts)
  *----------------------------------------------------------------------*/
 QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
 {
+    // 4.6 - 4.9 all the same
+    out.setVersion(QDataStream::Qt_4_9);
+
     // all the baisc fields first
     out<<settings.name;
     out<<settings.title;
@@ -176,6 +179,9 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
 
 QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
 {
+    // 4.6 - 4.9 all the same
+    in.setVersion(QDataStream::Qt_4_9);
+
     RideMetricFactory &factory = RideMetricFactory::instance();
     int counter=0;
     int version=0;
@@ -198,8 +204,7 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
         in>>version;
         in>>counter;
     }
-
-    while(counter--) {
+while(counter-- && !in.atEnd()) {
         MetricDetail m;
         in>>m.type;
         in>>m.stack;

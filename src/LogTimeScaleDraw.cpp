@@ -48,7 +48,24 @@ struct tick_info_t {
     char *label;
 };
 
-extern tick_info_t tick_info[];
+static tick_info_t tick_info[] = {
+    {  1.0/60.0,    "1s" },
+    {  5.0/60.0,    "5s" },
+    { 15.0/60.0,   "15s" },
+    {       0.5,   "30s" },
+    {       1.0,    "1m" },
+    {       2.0,    "2m" },
+    {       3.0,    "3m" },
+    {       5.0,    "5m" },
+    {      10.0,   "10m" },
+    {      20.0,   "20m" },
+    {      30.0,   "30m" },
+    {      60.0,    "1h" },
+    {     120.0,    "2h" },
+    {     180.0,    "3h" },
+    {     300.0,    "5h" },
+    {      -1.0,    NULL }
+};
 
 void
 LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
