@@ -6,3 +6,10 @@ Makefile
 # osx noise
 .DS_Store
 profile
+
+moc/
+obj/
+lib/
+bin/
+plugins/
+resources/

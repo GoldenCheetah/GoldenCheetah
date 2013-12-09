@@ -34,6 +34,7 @@
 #include <QSettings>
 
 #include <qwt_series_data.h>
+#include <qwt_scale_widget.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_curve_fitter.h>
@@ -42,17 +43,43 @@
 
 #include <math.h> // for isinf() isnan()
 
-static int supported_axes[] = { QwtPlot::yLeft,
-                                QwtPlot::yRight,
-                                QwtAxisId(QwtAxis::yLeft,2).id,
-                                QwtAxisId(QwtAxis::yRight,2).id,
-                                QwtAxisId(QwtAxis::yLeft,3).id,
-                                QwtAxisId(QwtAxis::yRight,3).id
-                              };
-
 LTMPlot::LTMPlot(LTMWindow *parent, Context *context) : 
     bg(NULL), parent(parent), context(context), highlighter(NULL)
 {
+    // don't do this ..
+    setAutoReplot(false);
+
+    // setup my axes
+    // for now we limit to 4 on left and 4 on right
+    setAxesCount(QwtAxis::yLeft, 2);
+    setAxesCount(QwtAxis::yRight, 2);
+
+    int n=0;
+    for (int i=0; i<2; i++) {
+
+        // lefts
+        supported_axes[n++] = QwtAxisId(QwtAxis::yLeft, i).id;
+        
+        QwtScaleDraw *sd = new QwtScaleDraw;
+        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        sd->enableComponent(QwtScaleDraw::Ticks, false);
+        sd->enableComponent(QwtScaleDraw::Backbone, false);
+        setAxisScaleDraw(supported_axes[n], sd);
+        setAxisMaxMinor(supported_axes[n], 0);
+        setAxisVisible(supported_axes[n], false);
+
+        // lefts
+        supported_axes[n++] = QwtAxisId(QwtAxis::yLeft, i).id;
+        
+        sd = new QwtScaleDraw;
+        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        sd->enableComponent(QwtScaleDraw::Ticks, false);
+        sd->enableComponent(QwtScaleDraw::Backbone, false);
+        setAxisScaleDraw(supported_axes[n], sd);
+        setAxisMaxMinor(supported_axes[n], 0);
+        setAxisVisible(supported_axes[n], false);
+    }
+
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, tr(""));
@@ -163,7 +190,11 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     // disable all y axes until we have populated
-    for (int i=0; i<8; i++) enableAxis(supported_axes[i], false);
+    for (int i=0; i<4; i++) {
+        setAxisVisible(supported_axes[i], false);
+        enableAxis(supported_axes[i], false);
+        axisWidget(supported_axes[i])->hide();
+    }
     axes.clear();
 
     // reset all min/max Y values
@@ -296,9 +327,6 @@ LTMPlot::setData(LTMSettings *set)
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
 
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(metricDetail.symbolStyle);
-
         // choose the axis
         int axisid = chooseYAxis(metricDetail.uunits);
         current->setYAxis(axisid);
@@ -345,6 +373,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setPen(QPen(Qt::NoPen));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
+            QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::NoSymbol);
             current->setSymbol(sym);
 
@@ -442,9 +471,6 @@ LTMPlot::setData(LTMSettings *set)
         cpen.setWidth(width);
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
-
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(metricDetail.symbolStyle);
 
         // choose the axis
         int axisid = chooseYAxis(metricDetail.uunits);
@@ -547,8 +573,11 @@ LTMPlot::setData(LTMSettings *set)
 
             // we might have hidden the symbols for this curve
             // if its set to none then default to a rectangle
+            QwtSymbol *sym = new QwtSymbol;
             if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
                 sym->setStyle(QwtSymbol::Rect);
+            else
+                sym->setStyle(metricDetail.symbolStyle);
             sym->setSize(20);
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(50);
@@ -610,8 +639,11 @@ LTMPlot::setData(LTMSettings *set)
 
             // we might have hidden the symbols for this curve
             // if its set to none then default to a rectangle
+            QwtSymbol *sym = new QwtSymbol;
             if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
                 sym->setStyle(QwtSymbol::Rect);
+            else
+                sym->setStyle(metricDetail.symbolStyle);
             sym->setSize(12);
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(200);
@@ -638,6 +670,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setPen(QPen(Qt::NoPen));
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
+            QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::NoSymbol);
             current->setSymbol(sym);
 
@@ -689,6 +722,7 @@ LTMPlot::setData(LTMSettings *set)
 
             QPen cpen = QPen(metricDetail.penColor);
             cpen.setWidth(width);
+            QwtSymbol *sym = new QwtSymbol;
             sym->setSize(6);
             sym->setStyle(metricDetail.symbolStyle);
             sym->setPen(QPen(metricDetail.penColor));
@@ -705,6 +739,8 @@ LTMPlot::setData(LTMSettings *set)
 
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
+
+            QwtSymbol *sym = new QwtSymbol;
             sym->setSize(6);
             sym->setStyle(metricDetail.symbolStyle);
             sym->setPen(QPen(metricDetail.penColor));
@@ -713,6 +749,7 @@ LTMPlot::setData(LTMSettings *set)
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
+            QwtSymbol *sym = new QwtSymbol;
             sym->setSize(4);
             sym->setStyle(metricDetail.symbolStyle);
             sym->setPen(QPen(metricDetail.penColor));
@@ -780,8 +817,8 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     QString format = axisTitle(yLeft).text();
-    parent->toolTip()->setAxes(xBottom, yLeft);
-    parent->toolTip()->setFormat(format);
+    //XXX parent->toolTip()->setAxes(xBottom, yLeft);
+    //XXX parent->toolTip()->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
     // cause no watts are being displayed
@@ -901,7 +938,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
     bool wantZero = (metricDetail.curveStyle == QwtPlotCurve::Steps);
-    foreach (SummaryMetrics rideMetrics, *data) {
+    foreach (SummaryMetrics rideMetrics, *data) { 
 
         // filter out unwanted rides but not for PMC type metrics
         // because that needs to be done in the stress calculator
@@ -1094,18 +1131,14 @@ LTMPlot::chooseYAxis(QString units)
 
     // return the YAxis to use
     if ((chosen = axes.value(units, -1)) != -1) return chosen;
-    else if (axes.count() < 8) {
+    else if (axes.count() < 4) {
         chosen = supported_axes[axes.count()];
         if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
         enableAxis(chosen, true);
+        setAxisVisible(chosen, true);
+        axisWidget(chosen)->show();
         axes.insert(units, chosen);
-        QwtScaleDraw *sd = new QwtScaleDraw;
-        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-        sd->enableComponent(QwtScaleDraw::Ticks, false);
-        sd->enableComponent(QwtScaleDraw::Backbone, false);
-        setAxisScaleDraw(chosen, sd);
-        setAxisMaxMinor(chosen, 0);
         return chosen;
     } else {
         // eek!

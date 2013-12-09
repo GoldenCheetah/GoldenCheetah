@@ -105,6 +105,7 @@ DBAccess::initDatabase(QDir home)
     db->setDatabaseName(home.absolutePath() + "/metricDBv3"); 
 
     if (!db->database(sessionid).isOpen()) {
+
         QMessageBox::critical(0, qApp->translate("DBAccess","Cannot open database"),
                        qApp->translate("DBAccess","Unable to establish a database connection.\n"
                                        "This feature requires SQLite support. Please read "
@@ -156,6 +157,7 @@ bool DBAccess::createMetricsTable()
             }
         }
     }
+
     // we need to create it!
     if (rc && createTables) {
         QString createMetricTable = "create table metrics (filename varchar primary key,"
@@ -293,6 +295,7 @@ bool DBAccess::createDatabase()
 
 void DBAccess::checkDBVersion()
 {
+
     // get a CRC for metadata.xml
     QString metadataXML =  QString(context->athlete->home.absolutePath()) + "/metadata.xml";
     int metadatacrcnow = computeFileCRC(metadataXML);
@@ -334,20 +337,24 @@ void DBAccess::checkDBVersion()
     bool dropMeasures = false;
 
     while (query.next()) {
+
         QString table_name = query.value(0).toString();
         int currentversion = query.value(1).toInt();
         //int creationdate = query.value(2).toInt(); // not relevant anymore, we use version/crc
         int crc = query.value(3).toInt();
 
         if (table_name == "metrics" && (currentversion != DBSchemaVersion || crc != metadatacrcnow)) {
+
             dropMetric = true;
         }
 
         if (table_name == "measures" && crc != measurescrcnow) {
+
             dropMeasures = true;
         }
     }
     query.finish();
+
 
     // "metrics" table, is it up-to-date?
     if (dropMetric) {
@@ -540,6 +547,7 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
             }
         }
     }
+    query.finish();
     return found;
 }
 
@@ -566,10 +574,12 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
                        " ORDER BY ride_date;";
 
     // execute the select statement
-    QSqlQuery query(selectStatement, db->database(sessionid));
+    QSqlQuery query(db->database(sessionid));
+    query.prepare(selectStatement);
     query.bindValue(":start", start.date());
     query.bindValue(":end", end.date());
     query.exec();
+
     while(query.next())
     {
         SummaryMetrics summaryMetrics;
@@ -612,11 +622,13 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
             selectStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
         }
     }
-    selectStatement += " FROM metrics where filename == :filename ;";
+    selectStatement += " FROM metrics WHERE filename = :filename ;";
 
     // execute the select statement
-    QSqlQuery query(selectStatement, db->database(sessionid));
-    query.bindValue(":filename", filename);
+    QSqlQuery query(db->database(sessionid));
+    query.prepare(selectStatement);
+    query.bindValue(":filename", QVariant(filename));
+
     query.exec();
     while(query.next())
     {

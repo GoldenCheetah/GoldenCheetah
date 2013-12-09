@@ -93,6 +93,7 @@ LTMWindow::LTMWindow(Context *context) :
     popupLayout->addWidget(ltmPopup);
     popup->setLayout(popupLayout);
 
+#if 0
     // zoomer on the plot
     ltmZoomer = new QwtPlotZoomer(ltmPlot->canvas());
     ltmZoomer->setRubberBand(QwtPicker::RectRubberBand);
@@ -120,6 +121,7 @@ LTMWindow::LTMWindow(Context *context) :
     picker->setEnabled(true);
 
     _canvasPicker = new LTMCanvasPicker(ltmPlot);
+#endif
 
     ltmTool = new LTMTool(context, &settings);
 
@@ -153,8 +155,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
 
     // connect pickers to ltmPlot
-    connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
-    connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), ltmPlot, SLOT(pointClicked(QwtPlotCurve*, int)));
+    //XXX connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
+    //XXX connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), ltmPlot, SLOT(pointClicked(QwtPlotCurve*, int)));
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));

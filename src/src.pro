@@ -309,7 +309,6 @@ HEADERS += \
         Library.h \
         LibraryParser.h \
         LogTimeScaleDraw.h \
-        LogTimeScaleEngine.h \
         LTMCanvasPicker.h \
         LTMChartParser.h \
         LTMOutliers.h \
@@ -502,7 +501,6 @@ SOURCES += \
         Library.cpp \
         LibraryParser.cpp \
         LogTimeScaleDraw.cpp \
-        LogTimeScaleEngine.cpp \
         LTMCanvasPicker.cpp \
         LTMChartParser.cpp \
         LTMOutliers.cpp \

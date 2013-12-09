@@ -262,6 +262,10 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     canvas()->setFrameStyle(QFrame::NoFrame);
 
+    // set the axes that we use..
+    setAxesCount(QwtAxis::yLeft, 2);
+    setAxesCount(QwtAxis::yRight, 3);
+
     setXTitle();
 
     wattsCurve = new QwtPlotCurve(tr("Power"));
@@ -277,23 +281,23 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     apCurve->setYAxis(yLeft);
 
     hrCurve = new QwtPlotCurve(tr("Heart Rate"));
-    hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+    hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     speedCurve = new QwtPlotCurve(tr("Speed"));
     speedCurve->setYAxis(yRight);
 
     cadCurve = new QwtPlotCurve(tr("Cadence"));
-    cadCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+    cadCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     altCurve = new QwtPlotCurve(tr("Altitude"));
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    altCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
+    altCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
 
     tempCurve = new QwtPlotCurve(tr("Temperature"));
     if (context->athlete->useMetricUnits)
         tempCurve->setYAxis(yRight); // with speed
     else
-        tempCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2)); // with cadence
+        tempCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1)); // with cadence
 
     windCurve = new QwtPlotIntervalCurve(tr("Wind"));
     windCurve->setYAxis(yRight);
@@ -302,17 +306,17 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     torqueCurve->setYAxis(yRight);
 
     balanceLCurve = new QwtPlotCurve(tr("Left Balance"));
-    balanceLCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+    balanceLCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     balanceRCurve = new QwtPlotCurve(tr("Right Balance"));
-    balanceRCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+    balanceRCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     wCurve = new QwtPlotCurve(tr("W' Balance (j)"));
-    wCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    wCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
 
     mCurve = new QwtPlotCurve(tr("Matches"));
     mCurve->setStyle(QwtPlotCurve::Dots);
-    mCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    mCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
 
     curveTitle.attach(this);
     curveTitle.setLabelAlignment(Qt::AlignRight);
@@ -333,9 +337,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     plotLayout()->setAlignCanvasToScales(true);
     setAxisMaxMinor(xBottom, 0);
     setAxisMaxMinor(yLeft, 0);
-    setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft, 2), 0);
+    setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft, 1), 0);
     setAxisMaxMinor(yRight, 0);
-    setAxisMaxMinor(QwtAxisId(QwtAxis::yRight, 2), 0);
+    setAxisMaxMinor(QwtAxisId(QwtAxis::yRight, 1), 0);
 
     axisWidget(QwtPlot::yLeft)->installEventFilter(this);
 
@@ -524,10 +528,10 @@ AllPlot::configChanged()
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 2), sd);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 1), sd);
     pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
     pal.setColor(QPalette::Text, GColor(CHEARTRATE));
-    axisWidget(QwtAxisId(QwtAxis::yLeft, 2))->setPalette(pal);
+    axisWidget(QwtAxisId(QwtAxis::yLeft, 1))->setPalette(pal);
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -542,20 +546,20 @@ AllPlot::configChanged()
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 2), sd);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 1), sd);
     pal.setColor(QPalette::WindowText, GColor(CALTITUDE));
     pal.setColor(QPalette::Text, GColor(CALTITUDE));
-    axisWidget(QwtAxisId(QwtAxis::yRight, 2))->setPalette(pal);
+    axisWidget(QwtAxisId(QwtAxis::yRight, 1))->setPalette(pal);
 
     sd = new QwtScaleDraw;
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
     sd->setLabelRotation(90);// in the 000s
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 3), sd);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 2), sd);
     pal.setColor(QPalette::WindowText, GColor(CWBAL));
     pal.setColor(QPalette::Text, GColor(CWBAL));
-    axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
+    axisWidget(QwtAxisId(QwtAxis::yRight, 2))->setPalette(pal);
 }
 
 struct DataPoint {
@@ -914,7 +918,7 @@ AllPlot::recalc()
 
     if (!hrArray.empty()) {
         hrCurve->setSamples(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
     if (!speedArray.empty()) {
@@ -924,12 +928,12 @@ AllPlot::recalc()
 
     if (!cadArray.empty()) {
         cadCurve->setSamples(xaxis.data() + startingIndex, smoothCad.data() + startingIndex, totalPoints);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
     if (!altArray.empty()) {
         altCurve->setSamples(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     }
 
     if (!tempArray.empty()) {
@@ -937,7 +941,7 @@ AllPlot::recalc()
         if (context->athlete->useMetricUnits)
             intervalHighlighterCurve->setYAxis(yRight);
         else
-            intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+            intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
 
@@ -953,9 +957,9 @@ AllPlot::recalc()
 
     if (!balanceArray.empty()) {
         balanceLCurve->setSamples(xaxis.data() + startingIndex, smoothBalanceL.data() + startingIndex, totalPoints);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
         balanceRCurve->setSamples(xaxis.data() + startingIndex, smoothBalanceR.data() + startingIndex, totalPoints);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
     setYMax();
@@ -964,7 +968,7 @@ AllPlot::recalc()
     refreshCalibrationMarkers();
     refreshZoneLabels();
 
-    //replot();
+    replot();
 }
 
 void
@@ -1118,9 +1122,9 @@ AllPlot::setYMax()
     // set axis scales
     if (wCurve->isVisible()) {
 
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 3).id, tr("W' Balance (j)"));
-        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),parent->wpData->minY-1000,parent->wpData->maxY+1000);
-        setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 2).id, tr("W' Balance (j)"));
+        setAxisScale(QwtAxisId(QwtAxis::yRight, 2),parent->wpData->minY-1000,parent->wpData->maxY+1000);
+        setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
 
     if (wattsCurve->isVisible()) {
@@ -1203,8 +1207,8 @@ AllPlot::setYMax()
         for (int i=0;i<ymax;i+=step)
             xytick[QwtScaleDiv::MajorTick]<<i;
 
-        setAxisTitle(QwtAxisId(QwtAxis::yLeft, 2).id, labels.join(" / "));
-        setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 2),QwtScaleDiv(ymin, ymax, xytick));
+        setAxisTitle(QwtAxisId(QwtAxis::yLeft, 1).id, labels.join(" / "));
+        setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1),QwtScaleDiv(ymin, ymax, xytick));
         //setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible() || (context->athlete->useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
@@ -1247,7 +1251,7 @@ AllPlot::setYMax()
         //setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 2).id, context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 1).id, context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin,ymax;
 
         if (referencePlot == NULL) {
@@ -1274,16 +1278,22 @@ AllPlot::setYMax()
             xytick[QwtScaleDiv::MajorTick]<<i;
 
         //setAxisScale(QwtAxisId(QwtAxis::yRight, 2), ymin, ymax);
-        setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 2),QwtScaleDiv(ymin,ymax,xytick));
+        setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 1),QwtScaleDiv(ymin,ymax,xytick));
         //setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
         altCurve->setBaseline(ymin);
     }
 
     enableAxis(yLeft, wattsCurve->isVisible() || npCurve->isVisible() || xpCurve->isVisible() || apCurve->isVisible());
-    enableAxis(QwtAxisId(QwtAxis::yLeft, 2).id, hrCurve->isVisible() || cadCurve->isVisible());
+    enableAxis(QwtAxisId(QwtAxis::yLeft, 1).id, hrCurve->isVisible() || cadCurve->isVisible());
     enableAxis(yRight, speedCurve->isVisible());
-    enableAxis(QwtAxisId(QwtAxis::yRight, 2).id, altCurve->isVisible());
-    enableAxis(QwtAxisId(QwtAxis::yRight, 3).id, wCurve->isVisible());
+    enableAxis(QwtAxisId(QwtAxis::yRight, 1).id, altCurve->isVisible());
+    enableAxis(QwtAxisId(QwtAxis::yRight, 2).id, wCurve->isVisible());
+
+    setAxisVisible(yLeft, wattsCurve->isVisible() || npCurve->isVisible() || xpCurve->isVisible() || apCurve->isVisible());
+    setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1).id, hrCurve->isVisible() || cadCurve->isVisible());
+    setAxisVisible(yRight, speedCurve->isVisible());
+    setAxisVisible(QwtAxisId(QwtAxis::yRight, 1).id, altCurve->isVisible());
+    setAxisVisible(QwtAxisId(QwtAxis::yRight, 2).id, wCurve->isVisible());
 }
 
 void
@@ -1444,19 +1454,138 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         sym->setStyle(QwtSymbol::NoSymbol);
         sym->setSize(0);
     }
-
     wCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     wattsCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     npCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     xpCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     apCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     hrCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     speedCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     cadCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     altCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     tempCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     torqueCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     balanceLCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     balanceRCurve->setSymbol(sym);
 
     setYMax();
@@ -1465,7 +1594,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     if (!plot->smoothAltitude.empty()) {
         altCurve->attach(this);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     }
     if (parent->wpData->xdata().count()) {
         wCurve->attach(this);
@@ -1489,7 +1618,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (!plot->smoothHr.empty()) {
         hrCurve->attach(this);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
     if (!plot->smoothSpeed.empty()) {
         speedCurve->attach(this);
@@ -1497,7 +1626,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (!plot->smoothCad.empty()) {
         cadCurve->attach(this);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
     if (!plot->smoothTemp.empty()) {
         tempCurve->attach(this);
@@ -1514,7 +1643,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->smoothBalanceL.empty()) {
         balanceLCurve->attach(this);
         balanceRCurve->attach(this);
-        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+        intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
 

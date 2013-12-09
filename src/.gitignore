@@ -39,3 +39,6 @@ GoldenCheetah.app
 
 #ignore ctags for vim
 tags
+
+#ignore patches
+*.patch
