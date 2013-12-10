@@ -144,7 +144,7 @@ LTMPlot::setData(LTMSettings *set)
     settings = set;
 
     // For each metric in chart, translate units and name if default uname
-    LTMTool::translateMetrics(context, settings);
+    //XXX BROKEN XXX LTMTool::translateMetrics(context, settings);
 
     // crop dates to at least within a year of the data available, but only if we have some data
     if (settings->data != NULL && (*settings->data).count() != 0) {
