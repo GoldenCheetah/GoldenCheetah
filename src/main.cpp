@@ -89,7 +89,6 @@ main(int argc, char *argv[])
             fprintf(stderr, "--debug             to direct diagnostic messages to the terminal instead of goldencheetah.log\n");
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
-            fprintf(stderr, "Specify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
         } else if (arg == "--debug") {
