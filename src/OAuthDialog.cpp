@@ -79,7 +79,11 @@ OAuthDialog::urlChanged(const QUrl &url)
         QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
 
         QByteArray data;
+#if QT_VERSION > 0x050000
         QUrlQuery params;
+#else
+        QUrl params;
+#endif
         QString urlstr = "";
 
         if (site == STRAVA) {
@@ -104,7 +108,11 @@ OAuthDialog::urlChanged(const QUrl &url)
         }
         params.addQueryItem("code", code);
 
+#if QT_VERSION > 0x050000
         data.append(params.query(QUrl::FullyEncoded));
+#else
+        data=params.encodedQuery();
+#endif
 
         QUrl url = QUrl(urlstr);
         QNetworkRequest request = QNetworkRequest(url);

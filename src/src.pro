@@ -2,30 +2,45 @@
 
 include( gcconfig.pri )
 
+#
+# What we are making and core dependencies
+#
 TEMPLATE = app
 TARGET = GoldenCheetah
-
 !isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
 DEPENDPATH += .
 
+## qwt and libz
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
-QT += core xml sql network webkitwidgets script svg widgets
-macx {
-    QT += macextras
-}
-
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm $${LIBZ_LIBS}
+
+#
+# We support 4.8.4 or higher
+#            5.2.0 or higher
+#
+## common modules
+QT += xml sql network script svg
+
+lessThan(QT_MAJOR_VERSION, 5) {
+
+    ## QT4 specific modules
+    QT += webkit
+
+} else {
+
+    ## QT5 specific modules
+    QT += webkitwidgets widgets
+    macx {
+        QT += macextras
+    }
+}
 
 # if we are building in debug mode
 # then set MACRO -DGC_DEBUG so we can
 # add / turnoff code for debugging purposes
 CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS += -DGC_DEBUG
-}
-
-!isEmpty( ZLIB_INCLUDE ) {
-    INCLUDEPATH += $${ZLIB_INCLUDE}
 }
 
 !isEmpty( LIBOAUTH_INSTALL ) {

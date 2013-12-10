@@ -19,7 +19,6 @@
 #include <QApplication>
 #include <QtGui>
 #include <QFile>
-#include <QStandardPaths>
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
@@ -48,6 +47,10 @@ void nostderr(QString dir)
 
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
+#endif
+
+#if QT_VERSION > 0x050000
+#include <QStandardPaths>
 #endif
 
 QApplication *application;
@@ -161,13 +164,16 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-        //4.8 etc QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
+#if QT_VERSION > 0x050000 // windows and qt5
         QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
-	QString libraryPath = paths.at(0) + "/GoldenCheetah";
-#else
+	    QString libraryPath = paths.at(0) + "/GoldenCheetah";
+#else // windows not qt5
+        QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
+#endif // qt5
+#else // not windows or osx (must be Linux or OpenBSD)
         // Q_OS_LINUX et al
         QString libraryPath=".goldencheetah";
-#endif
+#endif //
 
         // or did we override in settings?
         QString sh;

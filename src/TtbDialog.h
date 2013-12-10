@@ -26,12 +26,16 @@
 #include <QProgressBar>
 #include <QLabel>
 #include <QUrl>
-#include <QUrlQuery>
 #include <QHttpMultiPart>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 #include <QXmlDefaultHandler>
 #include <QNetworkReply>
+
+// QUrl split into QUrlQuerty in QT5
+#if QT_VERSION > 0x050000
+#include <QUrlQuery>
+#endif
 
 #include "Context.h"
 #include "RideItem.h"
