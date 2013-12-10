@@ -862,7 +862,7 @@ int Computrainer::openPort()
     else
        portSpec = "\\\\.\\" + deviceFilename;
     wchar_t deviceFilenameW[32]; // \\.\COM32 needs 9 characters, 32 should be enough?
-    MultiByteToWideChar(CP_ACP, 0, portSpec.toAscii(), -1, (LPWSTR)deviceFilenameW,
+    MultiByteToWideChar(CP_ACP, 0, portSpec.toLatin1(), -1, (LPWSTR)deviceFilenameW,
                     sizeof(deviceFilenameW));
 
     // win32 commport API

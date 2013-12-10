@@ -70,7 +70,7 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
 #ifdef WIN32
      container = new QWidget(this);
      layout->addWidget(container);
-     libvlc_media_player_set_hwnd (mp, container->winId());
+     libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
 #endif
 
     connect(context, SIGNAL(stop()), this, SLOT(stopPlayback()));

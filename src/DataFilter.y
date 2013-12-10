@@ -53,7 +53,7 @@ extern Leaf *root; // root node for parsed statement
 %token <leaf> SYMBOL
 
 // Constants can be a string or a number
-%token <leaf> STRING INTEGER FLOAT
+%token <leaf> DF_STRING DF_INTEGER DF_FLOAT
 %token <function> BEST TIZ
 
 // comparative operators
@@ -144,12 +144,12 @@ symbol : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
 
 value : symbol                      { $$ = $1; }
 
-      | STRING                      { $$ = new Leaf(); $$->type = Leaf::String;
+      | DF_STRING                      { $$ = new Leaf(); $$->type = Leaf::String;
                                       QString s2(DataFiltertext);
                                       $$->lvalue.s = new QString(s2.mid(1,s2.length()-2)); }
-      | FLOAT                       { $$ = new Leaf(); $$->type = Leaf::Float;
+      | DF_FLOAT                       { $$ = new Leaf(); $$->type = Leaf::Float;
                                       $$->lvalue.f = QString(DataFiltertext).toFloat(); }
-      | INTEGER                     { $$ = new Leaf(); $$->type = Leaf::Integer;
+      | DF_INTEGER                     { $$ = new Leaf(); $$->type = Leaf::Integer;
                                       $$->lvalue.i = QString(DataFiltertext).toInt(); }
 
       | BEST '(' symbol ',' lexpr ')' { $$ = new Leaf(); $$->type = Leaf::Function;

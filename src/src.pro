@@ -24,6 +24,10 @@ CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS += -DGC_DEBUG
 }
 
+!isEmpty( ZLIB_INCLUDE ) {
+    INCLUDEPATH += $${ZLIB_INCLUDE}
+}
+
 !isEmpty( LIBOAUTH_INSTALL ) {
     isEmpty( LIBOAUTH_INCLUDE ) { LIBOAUTH_INCLUDE += $${LIBOAUTH_INSTALL}/include }
     isEmpty( LIBOAUTH_LIBS ) {
@@ -193,10 +197,11 @@ macx {
 }
 
 win32 {
+
     INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
     LIBS += -lws2_32
-    QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-                   -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
+    //QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
+    //               -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
     //QMAKE_CXXFLAGS += -fdata-sections
     RC_FILE = windowsico.rc
 

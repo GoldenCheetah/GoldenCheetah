@@ -126,7 +126,7 @@ Q_UNUSED(err);
     // then we need to open "\\.\COMX" not "COMX"
 	QString portSpec = "\\\\.\\" + path;
     wchar_t deviceFilenameW[32]; // \\.\COM32 needs 9 characters, 32 should be enough?
-    MultiByteToWideChar(CP_ACP, 0, portSpec.toAscii(), -1, (LPWSTR)deviceFilenameW,
+    MultiByteToWideChar(CP_ACP, 0, portSpec.toLatin1(), -1, (LPWSTR)deviceFilenameW,
                     sizeof(deviceFilenameW));
 
     // win32 commport API
@@ -392,7 +392,7 @@ find_devices(char *result[], int capacity)
         QString shortCOM = QString("COM%1").arg(i);
 	    QString longCOM = "\\\\.\\" + shortCOM;
         wchar_t deviceFilenameW[32];
-        MultiByteToWideChar(CP_ACP, 0, longCOM.toAscii(), -1, (LPWSTR)deviceFilenameW,
+        MultiByteToWideChar(CP_ACP, 0, longCOM.toLatin1(), -1, (LPWSTR)deviceFilenameW,
                         sizeof(deviceFilenameW));
 
         // Try to open the port
