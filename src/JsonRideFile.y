@@ -105,7 +105,7 @@ static QString unprotect(const QString string)
 
 %}
 
-%token STRING INTEGER FLOAT
+%token JS_STRING JS_INTEGER JS_FLOAT
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
@@ -260,11 +260,11 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
 /*
  * Primitives
  */
-number: INTEGER                         { JsonNumber = QString(JsonRideFiletext).toInt(); }
-        | FLOAT                         { JsonNumber = QString(JsonRideFiletext).toDouble(); }
+number: JS_INTEGER                         { JsonNumber = QString(JsonRideFiletext).toInt(); }
+        | JS_FLOAT                         { JsonNumber = QString(JsonRideFiletext).toDouble(); }
         ;
 
-string: STRING                          { JsonString = unprotect(JsonRideFiletext); }
+string: JS_STRING                          { JsonString = unprotect(JsonRideFiletext); }
         ;
 %%
 

@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QtGui>
 #include <QFile>
+#include <QStandardPaths>
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
@@ -160,7 +161,9 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-        QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
+        //4.8 etc QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
+        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+	QString libraryPath = paths.at(0) + "/GoldenCheetah";
 #else
         // Q_OS_LINUX et al
         QString libraryPath=".goldencheetah";

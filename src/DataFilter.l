@@ -53,10 +53,10 @@
 [Oo][Rr]                                    DataFilterlval.op = OR; return OR;
 
 
-[-+]?[0-9]+                                 return INTEGER;
-[-+]?[0-9]+e-[0-9]+                         return FLOAT;
-[-+]?[0-9]+\.[-e0-9]*                       return FLOAT;
-\"([^\"]|\\\")*\"                           return STRING;  /* contains non-quotes or escaped-quotes */
+[-+]?[0-9]+                                 return DF_INTEGER;
+[-+]?[0-9]+e-[0-9]+                         return DF_FLOAT;
+[-+]?[0-9]+\.[-e0-9]*                       return DF_FLOAT;
+\"([^\"]|\\\")*\"                           return DF_STRING;  /* contains non-quotes or escaped-quotes */
 
 
 "TRIMP(100)_Points"                         return SYMBOL; /* special case */
