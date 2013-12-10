@@ -135,7 +135,11 @@ public slots:
             arr->append(j);
             dateToRows.insert(dateTime.date(), arr);
         }
-        resetInternalData();
+#if QT_VERSION > 0x050000
+        resetInternalData(); //XXX BROKEN!
+#else
+        reset();
+#endif
 
     }
 
