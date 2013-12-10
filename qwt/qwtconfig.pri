@@ -159,5 +159,5 @@ QWT_CONFIG     += QwtPlayground
 
 macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
 
-    QWT_CONFIG += QwtFramework
+    #QWT_CONFIG += QwtFramework
 }  
