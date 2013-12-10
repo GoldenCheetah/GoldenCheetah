@@ -88,6 +88,9 @@ public slots:
 
         if (!sourceModel()) return; // no model yet!
 
+        // ok, let em know we're about to reset!
+        beginResetModel();
+
         QDate first = QDate(year, month, 1);
         // Date array
         int monthDays = first.daysTo(first.addMonths(1)); // how many days in this month?
@@ -135,12 +138,9 @@ public slots:
             arr->append(j);
             dateToRows.insert(dateTime.date(), arr);
         }
-#if QT_VERSION > 0x050000
-        resetInternalData(); //XXX BROKEN!
-#else
-        reset();
-#endif
 
+        // reset completed
+	endResetModel();
     }
 
 public:

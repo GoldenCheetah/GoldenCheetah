@@ -488,13 +488,14 @@ public:
 
 public slots:
     void sourceModelChanged() {
+
+        // notify everyone we're changing
+        beginResetModel();
+
         clearGroups();
         setGroupBy(groupBy+2); // accomodate virtual columns
-#if QT_VERSION > 0x050000
-        resetInternalData(); //XXX BROKEN!
-#else
-        reset();
-#endif
+
+        endResetModel();// we're clean
 
         // lets expand column 0 for the groupBy heading
         for (int i=0; i < groupCount(); i++)
