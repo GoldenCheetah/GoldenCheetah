@@ -18,9 +18,12 @@
 
 #include "QtMacButton.h"
 
+#if QT_VERSION > 0x050000
 // mac specials
-#include <qmacfunctions.h>
 #include <QtWidgets>
+#include <qmacfunctions.h>
+#endif
+
 #include <Cocoa/Cocoa.h>
 #include <QMacCocoaViewContainer>
 
@@ -29,7 +32,11 @@
 
 static NSImage *fromQPixmap(const QPixmap *pixmap)
 {
+#if QT_VERSION > 0x050000
     CGImageRef cgImage = QtMac::toCGImageRef(*pixmap);
+#else
+    CGImageRef cgImage = pixmap->toMacCGImageRef();
+#endif
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
