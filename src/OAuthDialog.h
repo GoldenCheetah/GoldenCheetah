@@ -24,11 +24,16 @@
 #include <QtGui>
 #include <QWidget>
 #include <QStackedLayout>
+#include <QUrl>
 #include <QtWebKit>
 #include <QWebView>
 #include <QWebFrame>
-#include <QUrl>
+
+// QUrl split into QUrlQuerty in QT5
+#if QT_VERSION > 0x050000
 #include <QUrlQuery>
+#endif
+
 
 class OAuthDialog : public QDialog
 {

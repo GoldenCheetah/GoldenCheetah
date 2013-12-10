@@ -63,10 +63,15 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
     /* This is a non working code that show how to hooks into a window,
      * if we have a window around */
 #ifdef Q_OS_LINUX
+#if QT_VERSION > 0x050000
      x11Container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
+#else
+     x11Container = new QX11EmbedContainer(this);
+#endif
      layout->addWidget(x11Container);
      libvlc_media_player_set_xwindow (mp, x11Container->winId());
 #endif
+
 #ifdef WIN32
      container = new QWidget(this);
      layout->addWidget(container);
@@ -84,9 +89,9 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
 
 VideoWindow::~VideoWindow()
 {
-#ifdef Q_OS_LINUX
+#ifdef Q_OS_LINUX && QT_VERSION < 0x050000 //XXX IN PORT TO QT 5.1 THIS IS BROKEN CODE XXX
     // unembed vlc backend first
-    //x11Container->discardClient(); //XXX PORT TO QT 5.1 BROKEN CODE XXX
+    x11Container->discardClient(); 
 #endif
 
     stopPlayback();

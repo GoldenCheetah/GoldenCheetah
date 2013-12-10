@@ -141,15 +141,22 @@ TtbDialog::requestSettings()
     QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
+#if QT_VERSION > 0x050000
     QUrlQuery urlquery( TTB_URL + "/settings/list" );
+#else
+    QUrl urlquery( TTB_URL + "/settings/list" );
+#endif
     urlquery.addQueryItem( "view", "xml" );
     urlquery.addQueryItem( "user", username );
     urlquery.addQueryItem( "pass", password );
 
+#if QT_VERSION > 0x050000
     QUrl url;
     url.setQuery(urlquery);
-
     QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
     request.setRawHeader( "Accept-Encoding", "identity" );
     request.setRawHeader( "Accept", "application/xml" );
     request.setRawHeader( "Accept-Charset", "utf-8" );
@@ -168,15 +175,23 @@ TtbDialog::requestSession()
     QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
     QString password = appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS).toString();
 
+#if QT_VERSION > 0x050000
     QUrlQuery urlquery( TTB_URL + "/login/sso" );
+#else
+    QUrl urlquery( TTB_URL + "/login/sso" );
+#endif
     urlquery.addQueryItem( "view", "xml" );
     urlquery.addQueryItem( "user", username );
     urlquery.addQueryItem( "pass", password );
 
+#if QT_VERSION > 0x050000
     QUrl url;
     url.setQuery(urlquery);
-
     QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
+
     request.setRawHeader( "Accept-Encoding", "identity" );
     request.setRawHeader( "Accept", "application/xml" );
     request.setRawHeader( "Accept-Charset", "utf-8" );
@@ -234,14 +249,22 @@ TtbDialog::requestUpload()
 
     currentRequest = reqUpload;
 
+#if QT_VERSION > 0x050000
     QUrlQuery urlquery( TTB_URL + "/file/upload" );
+#else
+    QUrl urlquery( TTB_URL + "/file/upload" );
+#endif
     urlquery.addQueryItem( "view", "xml" );
     urlquery.addQueryItem( "sso", sessionId );
 
+#if QT_VERSION > 0x050000
     QUrl url;
     url.setQuery(urlquery);
-
     QNetworkRequest request = QNetworkRequest(url);
+#else
+    QNetworkRequest request = QNetworkRequest(urlquery);
+#endif
+
     request.setRawHeader( "Accept-Encoding", "identity" );
     request.setRawHeader( "Accept", "application/xml" );
     request.setRawHeader( "Accept-Charset", "utf-8" );

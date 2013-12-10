@@ -39,6 +39,10 @@ extern "C" {
 #include "RealtimeData.h"
 #include "TrainSidebar.h"
 
+#ifdef Q_OS_LINUX && QT_VERSION < 0x050000
+#include <QX11EmbedContainer>
+#endif
+
 class MediaHelper
 {
     public:
@@ -92,8 +96,13 @@ class VideoWindow : public GcWindow
         libvlc_media_t *m;
 
 #ifdef Q_OS_LINUX
+#if QT_VERSION > 0x050000
         QWidget *x11Container;
+#else
+        QX11EmbedContainer *x11Container;
 #endif
+#endif
+
 #ifdef WIN32
         QWidget *container;
 #endif
