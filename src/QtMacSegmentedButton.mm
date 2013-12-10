@@ -18,8 +18,10 @@
 
 #include "QtMacSegmentedButton.h"
 
+#if QT_VERSION > 0x050000
 // mac specials
 #include <qmacfunctions.h>
+#endif
 
 #import <AppKit/NSButton.h>
 #import <AppKit/NSApplication.h>
@@ -48,7 +50,11 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
 
 static NSImage *fromQPixmap(const QPixmap *pixmap)
 {
+#if QT_VERSION > 0x050000
     CGImageRef cgImage = QtMac::toCGImageRef(*pixmap);
+#else
+    CGImageRef cgImage = pixmap->toMacCGImageRef();
+#endif
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
