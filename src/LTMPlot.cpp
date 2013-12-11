@@ -51,39 +51,42 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
 
     // setup my axes
     // for now we limit to 4 on left and 4 on right
-    setAxesCount(QwtAxis::yLeft, 2);
-    setAxesCount(QwtAxis::yRight, 2);
+    setAxesCount(QwtAxis::yLeft, 4);
+    setAxesCount(QwtAxis::yRight, 4);
 
     int n=0;
-    for (int i=0; i<2; i++) {
+    for (int i=0; i<4; i++) {
 
         // lefts
-        supported_axes[n++] = QwtAxisId(QwtAxis::yLeft, i).id;
+        QwtAxisId left(QwtAxis::yLeft, i);
+        supportedAxes << left;
         
         QwtScaleDraw *sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->enableComponent(QwtScaleDraw::Ticks, false);
         sd->enableComponent(QwtScaleDraw::Backbone, false);
-        setAxisScaleDraw(supported_axes[n], sd);
-        setAxisMaxMinor(supported_axes[n], 0);
-        setAxisVisible(supported_axes[n], false);
+
+        setAxisScaleDraw(left, sd);
+        setAxisMaxMinor(left, 0);
+        setAxisVisible(left, false);
+
+        QwtAxisId right(QwtAxis::yRight, i);
+        supportedAxes << right;
 
         // lefts
-        supported_axes[n++] = QwtAxisId(QwtAxis::yLeft, i).id;
-        
         sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->enableComponent(QwtScaleDraw::Ticks, false);
         sd->enableComponent(QwtScaleDraw::Backbone, false);
-        setAxisScaleDraw(supported_axes[n], sd);
-        setAxisMaxMinor(supported_axes[n], 0);
-        setAxisVisible(supported_axes[n], false);
+        setAxisScaleDraw(right, sd);
+        setAxisMaxMinor(right, 0);
+        setAxisVisible(right, false);
     }
 
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setAxisTitle(yLeft, tr(""));
-    setAxisTitle(xBottom, tr("Date"));
+    setAxisTitle(QwtAxis::yLeft, tr(""));
+    setAxisTitle(QwtAxis::xBottom, tr("Date"));
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -116,7 +119,7 @@ LTMPlot::configUpdate()
 }
 
 void
-LTMPlot::setAxisTitle(int axis, QString label)
+LTMPlot::setAxisTitle(QwtAxisId axis, QString label)
 {
     // setup the default fonts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
@@ -190,10 +193,9 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     // disable all y axes until we have populated
-    for (int i=0; i<4; i++) {
-        setAxisVisible(supported_axes[i], false);
-        enableAxis(supported_axes[i], false);
-        axisWidget(supported_axes[i])->hide();
+    for (int i=0; i<8; i++) {
+        setAxisVisible(supportedAxes[i], false);
+        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
 
@@ -328,7 +330,7 @@ LTMPlot::setData(LTMSettings *set)
         current->setStyle(metricDetail.curveStyle);
 
         // choose the axis
-        int axisid = chooseYAxis(metricDetail.uunits);
+        QwtAxisId axisid = chooseYAxis(metricDetail.uunits);
         current->setYAxis(axisid);
 
         // left and right offset for bars
@@ -431,8 +433,8 @@ LTMPlot::setData(LTMSettings *set)
         *stackY[stackcounter+1] = ydata;
         
         // update min/max Y values for the chosen axis
-        if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
-        if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
+        if (current->maxYValue() > maxY[supportedAxes.indexOf(axisid)]) maxY[supportedAxes.indexOf(axisid)] = current->maxYValue();
+        if (current->minYValue() < minY[supportedAxes.indexOf(axisid)]) minY[supportedAxes.indexOf(axisid)] = current->minYValue();
 
         current->attach(this);
 
@@ -473,7 +475,7 @@ LTMPlot::setData(LTMSettings *set)
         current->setStyle(metricDetail.curveStyle);
 
         // choose the axis
-        int axisid = chooseYAxis(metricDetail.uunits);
+        QwtAxisId axisid = chooseYAxis(metricDetail.uunits);
         current->setYAxis(axisid);
 
         // left and right offset for bars
@@ -770,8 +772,8 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Set Curve Data.."<<timer.elapsed();
 
         // update min/max Y values for the chosen axis
-        if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
-        if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
+        if (current->maxYValue() > maxY[supportedAxes.indexOf(axisid)]) maxY[supportedAxes.indexOf(axisid)] = current->maxYValue();
+        if (current->minYValue() < minY[supportedAxes.indexOf(axisid)]) minY[supportedAxes.indexOf(axisid)] = current->minYValue();
 
         current->attach(this);
 
@@ -823,11 +825,11 @@ LTMPlot::setData(LTMSettings *set)
     // draw zone labels axisid of -1 means delete whats there
     // cause no watts are being displayed
     if (settings->shadeZones == true) {
-        int axisid = axes.value("watts", -1);
-        if (axisid == -1) axisid = axes.value(tr("watts"), -1); // Try translated version
+        QwtAxisId axisid = axes.value("watts", QwtAxisId(-1,-1));
+        if (axisid == QwtAxisId(-1,-1)) axisid = axes.value(tr("watts"), QwtAxisId(-1,-1)); // Try translated version
         refreshZoneLabels(axisid);
     } else {
-        refreshZoneLabels(-1); // turn em off
+        refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
     }
 
     // show legend?
@@ -1124,25 +1126,24 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
     }
 }
 
-int
+QwtAxisId
 LTMPlot::chooseYAxis(QString units)
 {
-    int chosen;
+    QwtAxisId chosen(-1,-1);
 
     // return the YAxis to use
-    if ((chosen = axes.value(units, -1)) != -1) return chosen;
-    else if (axes.count() < 4) {
-        chosen = supported_axes[axes.count()];
+    if ((chosen = axes.value(units, QwtAxisId(-1,-1))) != QwtAxisId(-1,-1)) return chosen;
+    else if (axes.count() < 8) {
+        chosen = supportedAxes[axes.count()];
         if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
-        enableAxis(chosen, true);
+        enableAxis(chosen.id, true);
         setAxisVisible(chosen, true);
-        axisWidget(chosen)->show();
         axes.insert(units, chosen);
         return chosen;
     } else {
         // eek!
-        return yLeft; // just re-use the current yLeft axis
+        return QwtAxis::yLeft; // just re-use the current yLeft axis
     }
 }
 
@@ -1271,7 +1272,7 @@ class LTMPlotBackground: public QwtPlotItem
 
     public:
 
-        LTMPlotBackground(LTMPlot *_parent, int axisid)
+        LTMPlotBackground(LTMPlot *_parent, QwtAxisId axisid)
         {
             //setAxis(QwtPlot::xBottom, axisid);
             setXAxis(axisid);
@@ -1340,7 +1341,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
         QwtText text;
 
     public:
-        LTMPlotZoneLabel(LTMPlot *_parent, int _zone_number, int axisid, LTMSettings *settings)
+        LTMPlotZoneLabel(LTMPlot *_parent, int _zone_number, QwtAxisId axisid, LTMSettings *settings)
         {
             parent = _parent;
             zone_number = _zone_number;
@@ -1456,7 +1457,7 @@ LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
 }
 
 void
-LTMPlot::refreshZoneLabels(int axisid)
+LTMPlot::refreshZoneLabels(QwtAxisId axisid)
 {
     foreach(LTMPlotZoneLabel *label, zoneLabels) {
         label->detach();
@@ -1469,7 +1470,7 @@ LTMPlot::refreshZoneLabels(int axisid)
         delete bg;
         bg = NULL;
     }
-    if (axisid == -1) return; // our job is done - no zones to plot
+    if (axisid == QwtAxisId(-1,-1)) return; // our job is done - no zones to plot
 
     const Zones *zones       = context->athlete->zones();
 

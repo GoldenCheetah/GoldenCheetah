@@ -50,7 +50,7 @@ class LTMPlot : public QwtPlot
         LTMPlot(LTMWindow *, Context *context);
         ~LTMPlot();
         void setData(LTMSettings *);
-        void setAxisTitle(int axis, QString label);
+        void setAxisTitle(QwtAxisId axis, QString label);
 
     public slots:
         void pointHover(QwtPlotCurve*, int);
@@ -78,7 +78,7 @@ class LTMPlot : public QwtPlot
         QwtPlotCurve *highlighter;
 
         QHash<QString, QwtPlotCurve*> curves; // metric symbol with curve object
-        QHash<QString, int> axes;             // units and associated axis
+        QHash<QString, QwtAxisId> axes;             // units and associated axis
         LTMScaleDraw *scale;
         QwtPlotGrid *grid;
         QDate firstDate,
@@ -96,15 +96,15 @@ class LTMPlot : public QwtPlot
                              QVector<double>&, QVector<double>&, int&);
         void createPMCCurveData(LTMSettings *, MetricDetail, QList<SummaryMetrics> &);
         void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a
-        int chooseYAxis(QString);
-        void refreshZoneLabels(int);
+        QwtAxisId chooseYAxis(QString);
+        void refreshZoneLabels(QwtAxisId);
         void refreshMarkers(QDate from, QDate to, int groupby);
 
         // remember the coggan or skiba stress calculators
         // so it isn't recalculated for each data series!
         StressCalculator *cogganPMC, *skibaPMC;
 
-        int supported_axes[8];
+        QList<QwtAxisId> supportedAxes;
 };
 
 // Produce Labels for X-Axis
