@@ -39,7 +39,7 @@ extern "C" {
 #include "RealtimeData.h"
 #include "TrainSidebar.h"
 
-#ifdef Q_OS_LINUX && QT_VERSION < 0x050000
+#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000)
 #include <QX11EmbedContainer>
 #endif
 
