@@ -76,7 +76,7 @@ class AllPlot : public QwtPlot
         void refreshCalibrationMarkers();
         void refreshReferenceLines();
         void refreshReferenceLinesForAllPlots();
-        void setAxisTitle(int axis, QString label);
+        void setAxisTitle(QwtAxisId axis, QString label);
 
         // refresh data / plot parameters
         void recalc();
