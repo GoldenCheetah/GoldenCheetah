@@ -246,7 +246,7 @@ Aerolab::Aerolab(
 
   insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
   setCanvasBackground(Qt::white);
-  canvas()->setFrameStyle(QFrame::NoFrame);
+  static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
   setXTitle();
   setAxisTitle(yLeft, tr("Elevation (m)"));

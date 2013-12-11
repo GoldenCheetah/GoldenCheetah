@@ -31,6 +31,7 @@
 #include "Units.h" // for MILES_PER_KM
 #include "Colors.h" // for MILES_PER_KM
 #include <qwt_plot_layout.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_picker.h>
@@ -365,7 +366,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->grid->enableY(false);
     fullPlot->setFixedHeight(100);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-    fullPlot->canvas()->setBorderRadius(0);
+    static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->enableAxis(QwtPlot::yLeft, false);
     fullPlot->enableAxis(QwtAxisId(QwtAxis::yLeft,2).id, false);
     fullPlot->enableAxis(QwtPlot::yRight, false);
@@ -537,7 +538,7 @@ AllPlotWindow::redrawFullPlot()
     fullPlot->setShowPower(1);
     //We now use the window background color
     //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
-    fullPlot->canvas()->setBorderRadius(0);
+    static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->grid->enableY(false);
     fullPlot->enableAxis(QwtPlot::yLeft, false);
     fullPlot->enableAxis(QwtAxisId(QwtAxis::yLeft,2).id, false);

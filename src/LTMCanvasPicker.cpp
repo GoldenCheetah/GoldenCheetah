@@ -19,7 +19,7 @@ LTMCanvasPicker::LTMCanvasPicker(QwtPlot *plot):
     d_selectedCurve(NULL),
     d_selectedPoint(-1)
 {
-    QwtPlotCanvas *canvas = plot->canvas();
+    QwtPlotCanvas *canvas = static_cast<QwtPlotCanvas*>(plot->canvas());
 
     canvas->installEventFilter(this);
 

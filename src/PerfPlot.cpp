@@ -55,7 +55,7 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
     setAxisTitle(xBottom, tr("Time (days)"));
     setAxisTitle(yRight, tr("Daily Stress"));
     enableAxis(yRight, true);
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAxisMaxMinor(xBottom, 0);
     setAxisMaxMinor(yLeft, 0);

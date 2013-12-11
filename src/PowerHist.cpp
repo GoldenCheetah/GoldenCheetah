@@ -74,7 +74,7 @@ PowerHist::PowerHist(Context *context):
     hrbg->attach(this);
 
     setCanvasBackground(Qt::white);
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setParameterAxisTitle();
     setAxisTitle(yLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));

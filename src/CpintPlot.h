@@ -23,6 +23,7 @@
 #include "RideFileCache.h"
 
 #include <qwt_plot.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
@@ -42,7 +43,7 @@ class LTMCanvasPicker;
 class penTooltip: public QwtPlotZoomer
 {
     public:
-         penTooltip(QwtPlotCanvas *canvas):
+         penTooltip(QWidget *canvas):
              QwtPlotZoomer(canvas), tip("")
          {
                  // With some versions of Qt/Qwt, setting this to AlwaysOn

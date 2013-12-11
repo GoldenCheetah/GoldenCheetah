@@ -87,7 +87,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     //courseData = data;                      // what we plot
 
     // Setup the left axis (Power)

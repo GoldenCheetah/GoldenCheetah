@@ -38,7 +38,7 @@ static double inline max(double a, double b) { if (a > b) return a; else return 
 SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
 {
     setCanvasBackground(GColor(CPLOTBACKGROUND));
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setXTitle();
 
