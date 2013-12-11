@@ -153,7 +153,7 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
     all = NULL;
     grid = NULL;
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAxisMaxMinor(xBottom, 0);
     setAxisMaxMinor(yLeft, 0);

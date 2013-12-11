@@ -37,6 +37,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_curve_fitter.h>
 #include <qwt_plot_grid.h>
 #include <qwt_symbol.h>
@@ -92,7 +93,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
@@ -827,8 +828,8 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     QString format = axisTitle(yLeft).text();
-    //XXX parent->toolTip()->setAxes(xBottom, yLeft);
-    //XXX parent->toolTip()->setFormat(format);
+    parent->toolTip()->setAxes(xBottom, yLeft);
+    parent->toolTip()->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
     // cause no watts are being displayed

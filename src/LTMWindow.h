@@ -37,7 +37,6 @@
 
 class QwtPlotPanner;
 class QwtPlotPicker;
-class QwtPlotZoomer;
 
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
@@ -51,7 +50,7 @@ class LTMToolTip : public QwtPlotPicker
 {
     public:
     LTMToolTip(int xaxis, int yaxis,
-                RubberBand rb, DisplayMode dm, QwtPlotCanvas *pc, QString fmt) :
+                RubberBand rb, DisplayMode dm, QWidget *pc, QString fmt) :
                 QwtPlotPicker(xaxis, yaxis, rb, dm, pc),
         format(fmt) { setStateMachine(new QwtPickerDragPointMachine());}
     virtual QwtText trackerText(const QPoint &/*pos*/) const
@@ -211,7 +210,6 @@ class LTMWindow : public GcChartWindow
 
         // Widgets
         LTMPlot *ltmPlot;
-        QwtPlotZoomer *ltmZoomer;
         LTMTool *ltmTool;
 
         // reveal controls

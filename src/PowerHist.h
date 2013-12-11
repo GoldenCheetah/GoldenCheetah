@@ -28,6 +28,7 @@
 #include "HrZones.h"
 
 #include <qwt_plot.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_point_3d.h>
 #include <qwt_compat.h>
@@ -54,7 +55,7 @@ class SummaryMetrics;
 class penTooltip: public QwtPlotZoomer
 {
     public:
-         penTooltip(QwtPlotCanvas *canvas): QwtPlotZoomer(canvas), tip("") {
+         penTooltip(QWidget *canvas): QwtPlotZoomer(canvas), tip("") {
              // With some versions of Qt/Qwt, setting this to AlwaysOn
              // causes an infinite recursion.
              //setTrackerMode(AlwaysOn);

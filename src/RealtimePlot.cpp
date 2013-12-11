@@ -248,7 +248,7 @@ RealtimePlot::RealtimePlot() :
 //    lodCurve->setData(lodData);
 //    lodCurve->attach(this);
 //    lodCurve->setYAxis(QwtPlot::yLeft);
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     configChanged(); // set colors
 }
 

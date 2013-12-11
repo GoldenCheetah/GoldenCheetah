@@ -96,7 +96,7 @@ SpinScanPolarPlot::SpinScanPolarPlot(QWidget *parent, uint8_t *spinData) : QwtPl
     leftCurve->setYAxis(QwtPlot::yLeft);
     leftSpinScanPolarData = new SpinScanPolarData(spinData, true);
 
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     configChanged(); // set colors
 }
 

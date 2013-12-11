@@ -31,6 +31,7 @@
 #include "WPrime.h"
 
 #include <qwt_plot_curve.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_layout.h>
@@ -260,7 +261,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     // set the axes that we use..
     setAxesCount(QwtAxis::yLeft, 2);

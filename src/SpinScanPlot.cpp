@@ -85,7 +85,7 @@ SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent)
     leftSpinScanData = new SpinScanData(spinData, true);
     rightSpinScanData = new SpinScanData(spinData, false);
 
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     configChanged(); // set colors
 }
 

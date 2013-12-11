@@ -46,7 +46,7 @@ HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
     minHr(50), minWatt(50), maxWatt(500)
 {
     setCanvasBackground(Qt::white);
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     setXTitle(); // Power (Watts)
 
     // Linear Regression Curve

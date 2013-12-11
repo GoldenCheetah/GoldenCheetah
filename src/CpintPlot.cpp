@@ -81,12 +81,12 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     curveTitle.setYValue(20);
     curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
 
-    zoomer = new penTooltip(this->canvas());
+    zoomer = new penTooltip(static_cast<QwtPlotCanvas*>(this->canvas()));
     zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
                             Qt::LeftButton, Qt::ShiftModifier);
 
     canvasPicker = new LTMCanvasPicker(this);
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     configChanged(); // apply colors

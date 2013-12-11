@@ -121,7 +121,7 @@ PfPvPlot::PfPvPlot(Context *context)
     : rideItem (NULL), context(context), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
     setCanvasBackground(Qt::white);
-    canvas()->setFrameStyle(QFrame::NoFrame);
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAxisTitle(yLeft, tr("Average Effective Pedal Force (N)"));
     setAxisScale(yLeft, 0, 600);
