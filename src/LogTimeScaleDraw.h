@@ -32,12 +32,19 @@
 
 class LogTimeScaleDraw : public QwtScaleDraw
 {
+    public:
+        static const QList<double> ticks;
+        static const QList<double> ticksEnergy;
+
     protected:
 
-    virtual void drawLabel(QPainter *p, double val) const;
-    virtual const QwtText & tickLabel(const QFont &font, double value) const;
+        virtual void drawLabel(QPainter *p, double val) const;
+        virtual const QwtText & tickLabel(const QFont &font, double value) const;
 
-    mutable QMap<double, QwtText> labelCache;
+        mutable QMap<double, QwtText> labelCache;
+
+    private:
+
 };
 
 #endif // _GC_LogTimeScaleDraw_h

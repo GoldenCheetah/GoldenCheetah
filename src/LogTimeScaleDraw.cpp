@@ -67,6 +67,13 @@ static tick_info_t tick_info[] = {
     {      -1.0,    NULL }
 };
 
+QList<double> const
+LogTimeScaleDraw::ticks = QList<double>() << 1.0/60.0 << 5.0/60.0 << 15.0/60.0 << 0.5 << 1 << 2 << 3 << 5 << 10 << 20 << 30 << 60 << 120 << 180 << 300;
+
+QList<double> const
+LogTimeScaleDraw::ticksEnergy = QList<double>() << 1 << 5 << 10 << 20 << 30 << 60 << 120 << 180 << 300;
+
+
 void
 LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
 {
