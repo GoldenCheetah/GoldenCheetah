@@ -58,6 +58,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
 
     setAxisTitle(xBottom, tr("Interval Length"));
     LogTimeScaleDraw *ld = new LogTimeScaleDraw;
+
     ld->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(xBottom, ld);
     setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
@@ -550,10 +551,19 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // linear in interval duration--up to about 1 hour.
     double xmax = (series == RideFile::none)  ? 60.0 : time_values[n_values - 1];
 
-    if (series == RideFile::vam)
+    /*if (series == RideFile::vam)
         thisPlot->setAxisScale(thisPlot->xBottom, (double) 4.993, (double)xmax);
     else
-        thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
+        thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);*/
+
+    QwtScaleDiv div((series == RideFile::vam ? (double) 4.993: (double) 0.017), (double)xmax);
+    if (series == RideFile::none)
+        div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
+    else
+        div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
+
+    thisPlot->setAxisScaleDiv(QwtPlot::xBottom, div);
+
 
     double ymax;
     if (series == RideFile::none) {
