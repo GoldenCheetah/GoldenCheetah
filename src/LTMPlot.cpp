@@ -53,6 +53,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     // for now we limit to 4 on left and 4 on right
     setAxesCount(QwtAxis::yLeft, 4);
     setAxesCount(QwtAxis::yRight, 4);
+    setAxesCount(QwtAxis::xBottom, 1);
 
     int n=0;
     for (int i=0; i<4; i++) {
@@ -85,8 +86,9 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
 
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setAxisTitle(QwtAxis::yLeft, tr(""));
     setAxisTitle(QwtAxis::xBottom, tr("Date"));
+    enableAxis(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xBottom, true);
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -175,6 +177,8 @@ LTMPlot::setData(LTMSettings *set)
         setAxisTitle(xBottom, tr("Date"));
     else
         setAxisTitle(xBottom, tr("Time of Day"));
+    enableAxis(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xBottom, true);
 
     // wipe existing curves/axes details
     QHashIterator<QString, QwtPlotCurve*> c(curves);
@@ -212,6 +216,8 @@ LTMPlot::setData(LTMSettings *set)
         setAxisScale(xBottom, 0, maxX);
         setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
+        enableAxis(QwtAxis::xBottom, true);
+        setAxisVisible(QwtAxis::xBottom, true);
 
         // remove the shading if it exists
         refreshZoneLabels(-1);
@@ -808,6 +814,8 @@ LTMPlot::setData(LTMSettings *set)
         setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
+    enableAxis(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xBottom, true);
 
     // run through the Y axis
     for (int i=0; i<10; i++) {
