@@ -120,7 +120,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     groupBox2->setLayout(vbox2);
     mainLayout->addWidget(groupBox2);
 
-    QGroupBox *groupBox3 = new QGroupBox(tr("Choose which channels you wish to send: "));
+    QGroupBox *groupBox3 = new QGroupBox(tr("Choose which data series you wish to send: "));
 
     //gpsChk = new QCheckBox(tr("GPS"));
     altitudeChk = new QCheckBox(tr("Altitude"));
