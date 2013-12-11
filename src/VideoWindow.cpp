@@ -89,7 +89,7 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
 
 VideoWindow::~VideoWindow()
 {
-#ifdef Q_OS_LINUX && QT_VERSION < 0x050000 //XXX IN PORT TO QT 5.1 THIS IS BROKEN CODE XXX
+#if (defined Q_OS_LINUX) && (QT_VERSION < 0x050000) //XXX IN PORT TO QT 5.1 THIS IS BROKEN CODE XXX
     // unembed vlc backend first
     x11Container->discardClient(); 
 #endif
