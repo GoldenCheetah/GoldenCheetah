@@ -230,6 +230,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     allPlot = new AllPlot(this, context);
     allPlot->setContentsMargins(0,0,0,0);
+    allPlot->enableAxis(QwtPlot::xBottom, true);
+    allPlot->setAxisVisible(QwtPlot::xBottom, true);
     //allPlot->axisWidget(QwtPlot::yLeft)->installEventFilter(this);
 
     // sort out default values
@@ -370,6 +372,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
     fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,3).id, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
+    fullPlot->setAxisVisible(QwtPlot::xBottom, false);
     //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
     fullPlot->setContentsMargins(0,0,0,0);
@@ -542,6 +545,7 @@ AllPlotWindow::redrawFullPlot()
     fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
     fullPlot->enableAxis(QwtAxisId(QwtAxis::yRight,3).id, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
+    fullPlot->setAxisVisible(QwtPlot::xBottom, false);
     //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
 
@@ -1714,6 +1718,8 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setFixedHeight(120+stackWidth*2);
 
         // No x axis titles
+        _allPlot->setAxisVisible(QwtPlot::xBottom, true);
+        _allPlot->enableAxis(QwtPlot::xBottom, true);
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
         _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);

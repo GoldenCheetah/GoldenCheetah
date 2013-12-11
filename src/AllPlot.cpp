@@ -265,6 +265,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     // set the axes that we use..
     setAxesCount(QwtAxis::yLeft, 2);
     setAxesCount(QwtAxis::yRight, 3);
+    setAxesCount(QwtAxis::xBottom, 1);
 
     setXTitle();
 
@@ -333,9 +334,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     grid->enableY(true);
     grid->attach(this);
 
-    // get rid of nasty blank space on right of the plot
-    plotLayout()->setAlignCanvasToScales(true);
     setAxisMaxMinor(xBottom, 0);
+    enableAxis(xBottom, true);
+    setAxisVisible(xBottom, true);
     setAxisMaxMinor(yLeft, 0);
     setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft, 1), 0);
     setAxisMaxMinor(yRight, 0);
@@ -574,7 +575,7 @@ bool AllPlot::shadeZones() const
 }
 
 void
-AllPlot::setAxisTitle(int axis, QString label)
+AllPlot::setAxisTitle(QwtAxisId axis, QString label)
 {
     // setup the default fonts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
@@ -1122,7 +1123,7 @@ AllPlot::setYMax()
     // set axis scales
     if (wCurve->isVisible()) {
 
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 2).id, tr("W' Balance (j)"));
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (j)"));
         setAxisScale(QwtAxisId(QwtAxis::yRight, 2),parent->wpData->minY-1000,parent->wpData->maxY+1000);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
@@ -1207,7 +1208,7 @@ AllPlot::setYMax()
         for (int i=0;i<ymax;i+=step)
             xytick[QwtScaleDiv::MajorTick]<<i;
 
-        setAxisTitle(QwtAxisId(QwtAxis::yLeft, 1).id, labels.join(" / "));
+        setAxisTitle(QwtAxisId(QwtAxis::yLeft, 1), labels.join(" / "));
         setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1),QwtScaleDiv(ymin, ymax, xytick));
         //setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
@@ -1251,7 +1252,7 @@ AllPlot::setYMax()
         //setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 1).id, context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 1), context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin,ymax;
 
         if (referencePlot == NULL) {
@@ -1290,10 +1291,10 @@ AllPlot::setYMax()
     enableAxis(QwtAxisId(QwtAxis::yRight, 2).id, wCurve->isVisible());
 
     setAxisVisible(yLeft, wattsCurve->isVisible() || npCurve->isVisible() || xpCurve->isVisible() || apCurve->isVisible());
-    setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1).id, hrCurve->isVisible() || cadCurve->isVisible());
+    setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), hrCurve->isVisible() || cadCurve->isVisible());
     setAxisVisible(yRight, speedCurve->isVisible());
-    setAxisVisible(QwtAxisId(QwtAxis::yRight, 1).id, altCurve->isVisible());
-    setAxisVisible(QwtAxisId(QwtAxis::yRight, 2).id, wCurve->isVisible());
+    setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), altCurve->isVisible());
+    setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), wCurve->isVisible());
 }
 
 void
