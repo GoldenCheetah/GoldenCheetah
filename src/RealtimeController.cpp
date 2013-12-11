@@ -182,8 +182,8 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 15 : //  TACX SATORI SETTING 2
         {
         double V = rtData.getSpeed();
-        double slope = 5.33;
-        double intercept = -36.67;
+        double slope = 3.9;
+        double intercept = -19.5;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
@@ -191,8 +191,8 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 16 : //  TACX SATORI SETTING 4
         {
         double V = rtData.getSpeed();
-        double slope = 8.27;
-        double intercept = -47.33;
+        double slope = 6.66;
+        double intercept = -52.3;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
@@ -200,8 +200,8 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 17 : //  TACX SATORI SETTING 6
         {
         double V = rtData.getSpeed();
-        double slope = 11.400;
-        double intercept = -67.00;
+        double slope = 9.43;
+        double intercept = -43.65;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
@@ -209,8 +209,8 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 18 : //  TACX SATORI SETTING 8
         {
         double V = rtData.getSpeed();
-        double slope = 14.40;
-        double intercept = -82.00;
+        double slope = 13.73;
+        double intercept = -51.15;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
@@ -218,8 +218,8 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     case 19 : //  TACX SATORI SETTING 10
         {
         double V = rtData.getSpeed();
-        double slope = 17.73;
-        double intercept = -114.67;
+        double slope = 17.7;
+        double intercept = -76.0;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
