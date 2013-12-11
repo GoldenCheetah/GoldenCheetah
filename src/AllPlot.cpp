@@ -1298,6 +1298,8 @@ AllPlot::setYMax()
     setAxisVisible(yRight, speedCurve->isVisible());
     setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), altCurve->isVisible());
     setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), wCurve->isVisible());
+    enableAxis(xBottom, true);
+    setAxisVisible(xBottom, true);
 }
 
 void
