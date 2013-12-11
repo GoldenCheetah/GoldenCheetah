@@ -515,6 +515,8 @@ AllPlot::configChanged()
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    enableAxis(xBottom, true);
+    setAxisVisible(xBottom, true);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -1304,6 +1306,8 @@ AllPlot::setXTitle()
         setAxisTitle(xBottom, context->athlete->useMetricUnits ? "KM" : "Miles");
     else
         setAxisTitle(xBottom, tr("")); // time is bloody obvious, less noise
+    enableAxis(xBottom, true);
+    setAxisVisible(xBottom, true);
 }
 
 void
@@ -1592,6 +1596,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setYMax();
 
     setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx-1]);
+    enableAxis(xBottom, true);
+    setAxisVisible(xBottom, true);
 
     if (!plot->smoothAltitude.empty()) {
         altCurve->attach(this);
