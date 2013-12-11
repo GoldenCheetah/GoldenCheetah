@@ -1,5 +1,3 @@
-#define QWT_NO_OPENGL
-
 #include <qglobal.h>
 #include <qwt_painter.h>
 #include <qwt_plot_canvas.h>

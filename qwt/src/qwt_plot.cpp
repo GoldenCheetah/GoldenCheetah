@@ -110,7 +110,7 @@ class QwtPlot::PrivateData
 public:
     QPointer<QwtTextLabel> titleLabel;
     QPointer<QwtTextLabel> footerLabel;
-    QPointer<QwtPlotCanvas> canvas;
+    QPointer<QWidget> canvas;
     QPointer<QwtAbstractLegend> legend;
     QwtPlotLayout *layout;
 
@@ -241,7 +241,7 @@ void QwtPlot::initPlot( const QwtText &title )
   \param canvas Canvas Widget
   \sa canvas()
  */
-void QwtPlot::setCanvas( QwtPlotCanvas *canvas )
+void QwtPlot::setCanvas( QWidget *canvas )
 {
     if ( canvas == d_data->canvas )
         return;
@@ -491,7 +491,7 @@ const QwtAbstractLegend *QwtPlot::legend() const
 /*!
   \return the plot's canvas
 */
-QwtPlotCanvas *QwtPlot::canvas()
+QWidget *QwtPlot::canvas()
 {
     return d_data->canvas;
 }
@@ -499,7 +499,7 @@ QwtPlotCanvas *QwtPlot::canvas()
 /*!
   \return the plot's canvas
 */
-const QwtPlotCanvas *QwtPlot::canvas() const
+const QWidget *QwtPlot::canvas() const
 {
     return d_data->canvas;
 }

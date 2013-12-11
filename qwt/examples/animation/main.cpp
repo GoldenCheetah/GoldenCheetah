@@ -2,7 +2,7 @@
 #include "plot.h"
 
 #ifndef QWT_NO_OPENGL
-#define USE_OPENGL 0
+#define USE_OPENGL 1
 #endif
 
 #if USE_OPENGL
