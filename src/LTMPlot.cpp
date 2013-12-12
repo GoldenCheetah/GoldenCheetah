@@ -842,7 +842,15 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     // show legend?
-    if (settings->legend == false) this->legend()->hide();
+    if (settings->legend == false) {
+        this->legend()->hide();
+        QHashIterator<QString, QwtPlotCurve*> c(curves);
+        while (c.hasNext()) {
+            c.next();
+            c.value()->setItemAttribute(QwtPlotItem::Legend, false);
+        }
+        updateLegend();
+    }
 
     // markers
     if (settings->groupBy != LTM_TOD)
