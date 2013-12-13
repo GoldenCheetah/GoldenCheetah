@@ -24,6 +24,7 @@
 #include <qwt_axis_id.h>
 #include <qwt_series_data.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
 #include <qwt_compat.h>

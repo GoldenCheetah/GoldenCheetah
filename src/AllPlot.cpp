@@ -271,31 +271,40 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     setXTitle();
 
     wattsCurve = new QwtPlotCurve(tr("Power"));
+    wattsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     wattsCurve->setYAxis(yLeft);
 
     npCurve = new QwtPlotCurve(tr("NP"));
+    npCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     npCurve->setYAxis(yLeft);
 
     xpCurve = new QwtPlotCurve(tr("xPower"));
+    xpCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     xpCurve->setYAxis(yLeft);
 
     apCurve = new QwtPlotCurve(tr("aPower"));
+    apCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     apCurve->setYAxis(yLeft);
 
     hrCurve = new QwtPlotCurve(tr("Heart Rate"));
+    hrCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     speedCurve = new QwtPlotCurve(tr("Speed"));
+    speedCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     speedCurve->setYAxis(yRight);
 
     cadCurve = new QwtPlotCurve(tr("Cadence"));
+    cadCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     cadCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     altCurve = new QwtPlotCurve(tr("Altitude"));
+    altCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     altCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
 
     tempCurve = new QwtPlotCurve(tr("Temperature"));
+    tempCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     if (context->athlete->useMetricUnits)
         tempCurve->setYAxis(yRight); // with speed
     else
@@ -305,18 +314,23 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context):
     windCurve->setYAxis(yRight);
 
     torqueCurve = new QwtPlotCurve(tr("Torque"));
+    torqueCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     torqueCurve->setYAxis(yRight);
 
     balanceLCurve = new QwtPlotCurve(tr("Left Balance"));
+    balanceLCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     balanceLCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     balanceRCurve = new QwtPlotCurve(tr("Right Balance"));
+    balanceRCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     balanceRCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     wCurve = new QwtPlotCurve(tr("W' Balance (j)"));
+    wCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     wCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
 
     mCurve = new QwtPlotCurve(tr("Matches"));
+    mCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     mCurve->setStyle(QwtPlotCurve::Dots);
     mCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
 
