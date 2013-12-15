@@ -24,6 +24,7 @@
 #include <QTreeWidget>
 #include <QtGui>
 #include <QNetworkReply>
+#include <QHeaderView>
 
 class MetricAggregator;
 class Zones;
