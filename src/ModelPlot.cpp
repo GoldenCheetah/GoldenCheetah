@@ -873,7 +873,7 @@ BasicModelPlot::configChanged()
 
     // set grid lines
     QColor grid = GColor(CPLOTGRID);
-    RGBA gr(grid.red()/255.0, grid.green()/255.0, grid.blue()/255.0, 0.5);
+    RGBA gr(grid.red()/255.0, grid.green()/255.0, grid.blue()/255.0, 255);
     coordinates()->setGridLinesColor(gr);
     coordinates()->setLineWidth(1);
 }
