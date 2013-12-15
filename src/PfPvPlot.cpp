@@ -34,6 +34,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_widget.h>
 #include <qwt_symbol.h>
 #include <set>
 
@@ -120,9 +121,9 @@ public:
 PfPvPlot::PfPvPlot(Context *context)
     : rideItem (NULL), context(context), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
-    setCanvasBackground(Qt::white);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
+    setAutoFillBackground(true);
     setAxisTitle(yLeft, tr("Average Effective Pedal Force (N)"));
     setAxisScale(yLeft, 0, 600);
     setAxisTitle(xBottom, tr("Circumferential Pedal Velocity (m/s)"));
@@ -193,11 +194,20 @@ PfPvPlot::configChanged()
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
     sym->setSize(6);
-    sym->setPen(QPen(Qt::black));
+    sym->setPen(QPen(Qt::red));
     sym->setBrush(QBrush(Qt::NoBrush));
     curve->setSymbol(sym);
     curve->setStyle(QwtPlotCurve::Dots);
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
+
+    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtPlot::yLeft)->setPalette(palette);
 
     // use grid line color for mX, mY and CPcurve
     QPen marker = GColor(CPLOTMARKER);
@@ -207,6 +217,8 @@ PfPvPlot::configChanged()
     cpCurve->setPen(cp);
 
     setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
+
+    replot();
 }
 
 void
@@ -413,10 +425,15 @@ PfPvPlot::setData(RideItem *_rideItem)
             }
 
             curve->setSamples(cpvArray, aepfArray);
+
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
             sym->setSize(6);
+            sym->setPen(QPen(Qt::red));
             sym->setBrush(QBrush(Qt::NoBrush));
+            curve->setSymbol(sym);
+            curve->setStyle(QwtPlotCurve::Dots);
+            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
             // now show the data (zone shading would already be visible)
             refreshZoneItems();
