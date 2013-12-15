@@ -102,6 +102,7 @@ class PfPvWindow : public GcChartWindow
         void setFrameIntervalsPfPvFromCheckBox();
         void setrFrameIntervalsPfPvFromCheckBox();
         void doubleClicked(int, int);
+        void configChanged();
 
     protected:
 
