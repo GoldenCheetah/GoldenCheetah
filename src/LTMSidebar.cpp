@@ -76,6 +76,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     seasonsWidget->addWidget(dateRangeTree);
 
     // filters
+#ifdef GC_HAVE_LUCENE
     filtersWidget = new GcSplitterItem(tr("Filters"), iconFromPNG(":images/toolbar/filter3.png"), this);
     QAction *moreFilterAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     filtersWidget->addAction(moreFilterAct);
@@ -101,6 +102,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     filtersWidget->addWidget(filterTree);
+#endif
 
     // events
     eventsWidget = new GcSplitterItem(tr("Events"), iconFromPNG(":images/sidebar/bookmark.png"), this);
@@ -134,7 +136,9 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     splitter = new GcSplitter(Qt::Vertical);
     splitter->addWidget(seasonsWidget);
+#ifdef GC_HAVE_LUCENE
     splitter->addWidget(filtersWidget);
+#endif
     splitter->addWidget(eventsWidget);
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
@@ -162,7 +166,9 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
+#ifdef GC_HAVE_LUCENE
     connect(filterTree,SIGNAL(itemSelectionChanged()), this, SLOT(filterTreeWidgetSelectionChanged()));
+#endif
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
@@ -438,14 +444,17 @@ LTMSidebar::eventPopup()
 void
 LTMSidebar::manageFilters()
 {
+#ifdef GC_HAVE_LUCENE
     EditNamedSearches *editor = new EditNamedSearches(this, context);
     editor->move(QCursor::pos()+QPoint(10,-200));
     editor->show();
+#endif
 }
 
 void 
 LTMSidebar::filterTreeWidgetSelectionChanged()
 {
+#ifdef GC_HAVE_LUCENE
     int selected = filterTree->selectedItems().count();
 
     if (selected) {
@@ -496,11 +505,13 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
 
     } else
         context->clearHomeFilter();
+#endif
 }
 
 void
 LTMSidebar::resetFilters()
 {
+#ifdef GC_HAVE_LUCENE
     if (active == true) return;
 
     active = true;
@@ -519,11 +530,13 @@ LTMSidebar::resetFilters()
     }
 
     active = false;
+#endif
 }
 
 void
 LTMSidebar::filterPopup()
 {
+#ifdef GC_HAVE_LUCENE
     // is one selected for deletion?
     int selected = filterTree->selectedItems().count();
 
@@ -545,11 +558,13 @@ LTMSidebar::filterPopup()
 
     // execute the menu
     menu.exec(splitter->mapToGlobal(QPoint(filtersWidget->pos().x()+filtersWidget->width()-20, filtersWidget->pos().y())));
+#endif
 }
 
 void
 LTMSidebar::deleteFilter()
 {
+#ifdef GC_HAVE_LUCENE
     if (filterTree->selectedItems().count() <= 0) return;
 
     active = true; // no need to reset tree when items deleted from model!
@@ -561,6 +576,7 @@ LTMSidebar::deleteFilter()
         context->athlete->namedSearches->deleteNamedSearch(index);
     }
     active = false;
+#endif
 }
 
 void
