@@ -80,10 +80,16 @@ BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(mai
 
     const RideFileFactory &rff = RideFileFactory::instance();
     foreach(QString suffix, rff.writeSuffixes()) format->addItem(rff.description(suffix));
+    format->setCurrentIndex(appsettings->value(this, GC_BE_LASTFMT, "0").toInt());
 
     selectDir = new QPushButton(tr("Browse"), this);
     dirLabel = new QLabel (tr("Export to"), this);
-    dirName = new QLabel(QDir::home().absolutePath(), this);
+
+    // default to last used
+    QString dirDefault = appsettings->value(this, GC_BE_LASTDIR, QDir::home().absolutePath()).toString();
+    if (!QDir(dirDefault).exists()) dirDefault = QDir::home().absolutePath();
+
+    dirName = new QLabel(dirDefault, this);
     all = new QCheckBox(tr("check/uncheck all"), this);
     all->setChecked(true);
 
@@ -159,6 +165,8 @@ BatchExportDialog::okClicked()
         status->show();
         cancel->hide();
         ok->setText(tr("Abort"));
+        appsettings->setValue(GC_BE_LASTDIR, dirName->text());
+        appsettings->setValue(GC_BE_LASTFMT, format->currentIndex());
         exportFiles();
         status->setText(QString(tr("%1 activities exported, %2 failed or skipped.")).arg(exports).arg(fails));
         ok->setText(tr("Finish"));
