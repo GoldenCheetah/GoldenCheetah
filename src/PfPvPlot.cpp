@@ -245,7 +245,7 @@ PfPvPlot::refreshZoneItems()
         while (i.hasNext()) {
             QwtPlotCurve *curve = i.next();
             curve->detach();
-            delete curve;
+            //delete curve;
         }
     }
     zoneCurves.clear();
@@ -362,7 +362,7 @@ PfPvPlot::setData(RideItem *_rideItem)
        while (i.hasNext()) {
            QwtPlotCurve *curve = i.next();
            curve->detach();
-           delete curve;
+           //delete curve;
        }
     }
     intervalCurves.clear();
@@ -461,7 +461,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        while (i.hasNext()) {
            QwtPlotCurve *curve = i.next();
            curve->detach();
-           delete curve;
+           //delete curve;
        }
     }
     intervalCurves.clear();
