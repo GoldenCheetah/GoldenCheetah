@@ -195,6 +195,10 @@
 #define FORTIUS_FIRMWARE          "fortius/firmware"
 #define TRAIN_MULTI               "train/multi"
 
+// batch export last options
+#define GC_BE_LASTDIR             "batchexport/lastdir"
+#define GC_BE_LASTFMT             "batchexport/lastfmt"
+
 #include <QSettings>
 #include <QFileInfo>
 
