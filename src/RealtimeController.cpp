@@ -268,6 +268,42 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts((slope * V) + intercept);
         }
         break;
+        
+    case 25 : //  TACX BLUE TWIST SETTING 1
+        {
+        double V = rtData.getSpeed();
+        double slope = 3.2;
+        double intercept = -24;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 26 : //  TACX BLUE TWIST SETTING 3
+        {
+        double V = rtData.getSpeed();
+        double slope = 6.525;
+        double intercept = -46.5;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 27 : //  TACX BLUE TWIST SETTING 5
+        {
+        double V = rtData.getSpeed();
+        double slope = 9.775;
+        double intercept = -66.5;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 28 : //  TACX BLUE TWIST SETTING 7
+        {
+        double V = rtData.getSpeed();
+        double slope = 13.075;
+        double intercept = -89.5;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
 
     default : // unknown - do nothing
         break;
