@@ -151,7 +151,7 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
                   "\t\t<type>%4</type>\n"
                   "\t\t<id>%5</id>\n"
                   "\t\t<seed>%6</seed>\n"
-                  "\t\t<low>%7</seed>\n") .arg(season.getName())
+                  "\t\t<low>%7</low>\n") .arg(season.getName())
                                            .arg(season.getStart().toString("yyyy-MM-dd"))
                                            .arg(season.getEnd().toString("yyyy-MM-dd"))
                                            .arg(season.getType())
