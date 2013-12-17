@@ -29,6 +29,10 @@ LTMTrend::LTMTrend(double *xdata, double *ydata, int count) :
     if (count <= 2) return;
 
     for (int i = 0; i < count; i++) {
+
+        // ignore zero points
+        if (ydata[i] == 0.00) continue;
+
         points++;
         sumX += xdata[i];
         sumY += ydata[i];
