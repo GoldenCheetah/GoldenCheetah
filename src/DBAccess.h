@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Justin F. Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -52,6 +53,7 @@ class DBAccess
 
         // get schema version
         int getDBVersion();
+        QList<FieldDefinition> &getMetadataFields() { return mfieldDefinitions; }
 
         // create and drop connections
 	    DBAccess(Context *context);

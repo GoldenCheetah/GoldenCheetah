@@ -38,6 +38,9 @@
 // named searchs
 #include "NamedSearch.h"
 #include "DataFilter.h"
+#ifdef GC_HAVE_LUCENE
+#include "Lucene.h"
+#endif
 
 // metadata support
 #include "RideMetadata.h"
@@ -483,7 +486,8 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
             case NamedSearch::search :
                 {
                     // use clucence
-                    //XXX todo
+                    Lucene s(this, context);
+                    results = s.search(ns.text);
                 }
 
             }

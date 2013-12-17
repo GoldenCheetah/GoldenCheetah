@@ -57,7 +57,7 @@ protected:
 
 public slots:
     // search
-    int search(QString query); // run query and return number of results found
+    QList<QString> search(QString query); // run query and return number of results found
 
 signals:
     void results(QStringList);
