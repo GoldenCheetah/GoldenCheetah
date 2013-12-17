@@ -1112,6 +1112,15 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Tacx Flow (4)"));
     virtualPower->addItem(tr("Power - Tacx Flow (6)"));
     virtualPower->addItem(tr("Power - Tacx Flow (8)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (1)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (3)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (5)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Twist (7)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (2)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (4)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (6)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (8)"));
+    virtualPower->addItem(tr("Power - Tacx Blue Motion (10)"));
 
     wheelSize->addItem(tr("Road/Cross (700C/622)")); // 2100mm
     wheelSize->addItem(tr("Tri/TT (650C)")); // 1960mm
