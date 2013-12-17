@@ -26,6 +26,8 @@ class LTMTrend
         // Constructor using arrays of x values and y values
         LTMTrend(double *, double *, int);
         double getYforX(double x) const { return (a + b * x); }
+        double intercept() { return a; }
+        double slope() { return b; }
 
     protected:
         long points;

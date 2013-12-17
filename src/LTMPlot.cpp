@@ -536,8 +536,8 @@ LTMPlot::setData(LTMSettings *set)
 
             // cosmetics
             QPen cpen = QPen(metricDetail.penColor.darker(200));
-            cpen.setWidth(width*2); // double thickness for trend lines
-            cpen.setStyle(Qt::DotLine);
+            cpen.setWidth(2); // double thickness for trend lines
+            cpen.setStyle(Qt::SolidLine);
             trend->setPen(cpen);
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
                 trend->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -547,6 +547,11 @@ LTMPlot::setData(LTMSettings *set)
 
             // perform linear regression
             LTMTrend regress(xdata.data(), ydata.data(), count);
+
+            // override class variable as doing it temporarily for trend line only
+            double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                groupForDate(settings->start.date(), settings->groupBy);
+
             double xtrend[2], ytrend[2];
             xtrend[0] = 0.0;
             ytrend[0] = regress.getYforX(0.0);
