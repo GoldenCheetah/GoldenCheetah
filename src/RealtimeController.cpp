@@ -273,7 +273,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         {
         double V = rtData.getSpeed();
         double slope = 3.2;
-        double intercept = -24;
+        double intercept = -24.0;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
@@ -301,6 +301,51 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         double V = rtData.getSpeed();
         double slope = 13.075;
         double intercept = -89.5;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 29 : //  TACX BLUE MOTION SETTING 2
+        {
+        double V = rtData.getSpeed();
+        double slope = 5.225;
+        double intercept = -36.5;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 30 : //  TACX BLUE MOTION SETTING 4
+        {
+        double V = rtData.getSpeed();
+        double slope = 8.25;
+        double intercept = -53.0;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 31 : //  TACX BLUE MOTION SETTING 6
+        {
+        double V = rtData.getSpeed();
+        double slope = 11.45;
+        double intercept = -74.0;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 32 : //  TACX BLUE MOTION SETTING 8
+        {
+        double V = rtData.getSpeed();
+        double slope = 14.45;
+        double intercept = -89.0;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 33 : //  TACX BLUE MOTION SETTING 10
+        {
+        double V = rtData.getSpeed();
+        double slope = 17.575;
+        double intercept = -110.5;
         rtData.setWatts((slope * V) + intercept);
         }
         break;
