@@ -560,7 +560,7 @@ LTMPlot::setData(LTMSettings *set)
             QVector<double> xtrend;
             QVector<double> ytrend;
 
-            double inc = (regress.maxx - regress.minx) / 300;
+            double inc = (regress.maxx - regress.minx) / 100;
             for (double i=regress.minx; i<=(regress.maxx+inc); i+= inc) {
                 xtrend << i;
                 ytrend << regress.yForX(i);
