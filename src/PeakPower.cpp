@@ -22,6 +22,46 @@
 #include <math.h>
 #include <QApplication>
 
+class FatigueIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(FatigueIndex)
+    double maxp;
+    double minp;
+
+    public:
+
+    FatigueIndex() : maxp(0.0), minp(10000)
+    {
+        setType(RideMetric::Average);
+        setSymbol("power_fatigue_index");
+        setInternalName("Fatigue Index");
+        setName(tr("Fatigue Index"));
+        setMetricUnits(tr("%"));
+        setPrecision(1); // e.g. 99.9%
+        setImperialUnits(tr("%"));
+
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
+            // no data
+            setValue(0.0);
+
+        } else {
+            foreach(const RideFilePoint *point, ride->dataPoints()) {
+                if (point->watts < minp && point->watts != 0) minp = point->watts;
+                if (point->watts > maxp && point->watts != 0) maxp = point->watts;
+            }
+
+            if (minp > maxp) setValue(0.00); // minp wasn't changed, all zeroes?
+            else setValue(100 * ((maxp-minp)/maxp)); // as a percentage
+        }
+    }
+    RideMetric *clone() const { return new FatigueIndex(*this); }
+};
+
 class PeakPower : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(PeakPower)
     double watts;
@@ -474,6 +514,8 @@ class PeakPowerHr60m : public PeakPowerHr {
 };
 
 static bool addAllPeaks() {
+    RideMetricFactory::instance().addMetric(FatigueIndex()); // added here instead of new function
+
     RideMetricFactory::instance().addMetric(PeakPower1s());
     RideMetricFactory::instance().addMetric(PeakPower5s());
     RideMetricFactory::instance().addMetric(PeakPower10s());

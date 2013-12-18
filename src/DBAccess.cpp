@@ -71,8 +71,9 @@
 // 50  29  Oct 2013 Mark Liversedge    Added percentage time in heartrate zone
 // 51  05  Nov 2013 Mark Liversedge    Added average aPower
 // 52  05  Nov 2013 Mark Liversedge    Added EOA - Effect of Altitude
+// 53  18  Dec 2013 Mark Liversedge    Added Fatigue Index (for power)
 
-int DBSchemaVersion = 52;
+int DBSchemaVersion = 53;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
