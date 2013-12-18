@@ -222,13 +222,13 @@ void ScatterPlot::setData (ScatterSettings *settings)
     sym->setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
     sym->setBrush(QBrush(Qt::NoBrush));
     QPen p;
-    p.setColor(GColor(CPLOTSYMBOL));
+    p.setColor(Qt::red);
     sym->setPen(p);
 
     // wipe away existing
 	if (all) {
         all->detach();
-	    delete all;
+	    //delete all;
     }
 
     // setup the framing curve
@@ -248,7 +248,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     if (grid) {
         grid->detach();
-        delete grid;
+        //delete grid;
     }
 
     if (settings->gridlines) {
@@ -280,7 +280,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
        while (i.hasNext()) {
            QwtPlotCurve *curve = i.next();
            curve->detach();
-           delete curve;
+           //delete curve;
        }
     }
     intervalCurves.clear();
