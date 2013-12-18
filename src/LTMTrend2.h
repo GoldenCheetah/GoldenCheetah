@@ -18,7 +18,7 @@ class LTMTrend2
                 : sx4(0), sx3(0), sx2(0), sx(0), sx2y(0), sxy(0), sy(0),
                   minx(10000), miny(10000), maxx(-10000), maxy(-10000), count(count)
         {
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i <= count; i++) {
                 addPoint(xdata[i], ydata[i]);
             }
         }
