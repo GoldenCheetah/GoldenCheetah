@@ -21,6 +21,7 @@
 #include "LTMPlot.h"
 #include "LTMTool.h"
 #include "LTMTrend.h"
+#include "LTMTrend2.h"
 #include "LTMOutliers.h"
 #include "LTMWindow.h"
 #include "MetricAggregator.h"
@@ -545,21 +546,24 @@ LTMPlot::setData(LTMSettings *set)
             trend->setYAxis(axisid);
             trend->setStyle(QwtPlotCurve::Lines);
 
-            // perform linear regression
-            LTMTrend regress(xdata.data(), ydata.data(), count);
+            // perform quadratic curve fit to data
+            LTMTrend2 regress(xdata.data(), ydata.data(), count);
 
             // override class variable as doing it temporarily for trend line only
             double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
                 groupForDate(settings->start.date(), settings->groupBy);
 
-            double xtrend[2], ytrend[2];
-            xtrend[0] = 0.0;
-            ytrend[0] = regress.getYforX(0.0);
+            QVector<double> xtrend;
+            QVector<double> ytrend;
+
+            double inc = (regress.maxx - regress.minx) / 100;
+            for (double i=regress.minx; i<=(regress.maxx+inc); i+= inc) {
+                xtrend << i;
+                ytrend << regress.yForX(i);
+            }
             // point 2 is at far right of chart, not the last point
             // since we may be forecasting...
-            xtrend[1] = maxX;
-            ytrend[1] = regress.getYforX(maxX);
-            trend->setSamples(xtrend,ytrend, 2);
+            trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
             trend->attach(this);
             curves.insert(trendSymbol, trend);

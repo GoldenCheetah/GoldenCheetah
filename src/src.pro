@@ -338,6 +338,7 @@ HEADERS += \
         LTMSettings.h \
         LTMTool.h \
         LTMTrend.h \
+        LTMTrend2.h \
         LTMWindow.h \
         MacroDevice.h \
         MainWindow.h \

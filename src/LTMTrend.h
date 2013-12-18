@@ -29,6 +29,8 @@ class LTMTrend
         double intercept() { return a; }
         double slope() { return b; }
 
+        double minX, maxX, minY, maxY; // for the data set we have
+
     protected:
         long points;
         double sumX, sumY;
@@ -36,6 +38,7 @@ class LTMTrend
                sumYsquared;
         double sumXY;
         double a, b;   // a = intercept, b = slope
+
 };
 
 #endif
