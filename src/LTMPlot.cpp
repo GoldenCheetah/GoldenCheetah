@@ -57,6 +57,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     setAxesCount(QwtAxis::yLeft, 4);
     setAxesCount(QwtAxis::yRight, 4);
     setAxesCount(QwtAxis::xBottom, 1);
+    setAxesCount(QwtAxis::xTop, 0);
 
     int n=0;
     for (int i=0; i<4; i++) {
@@ -92,6 +93,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     setAxisTitle(QwtAxis::xBottom, tr("Date"));
     enableAxis(QwtAxis::xBottom, true);
     setAxisVisible(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xTop, false);
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -195,6 +197,7 @@ LTMPlot::setData(LTMSettings *set)
         setAxisTitle(xBottom, tr("Time of Day"));
     enableAxis(QwtAxis::xBottom, true);
     setAxisVisible(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xTop, false);
 
     // wipe existing curves/axes details
     QHashIterator<QString, QwtPlotCurve*> c(curves);
@@ -234,6 +237,7 @@ LTMPlot::setData(LTMSettings *set)
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
         enableAxis(QwtAxis::xBottom, true);
         setAxisVisible(QwtAxis::xBottom, true);
+        setAxisVisible(QwtAxis::xTop, false);
 
         // remove the shading if it exists
         refreshZoneLabels(-1);
@@ -556,7 +560,7 @@ LTMPlot::setData(LTMSettings *set)
             QVector<double> xtrend;
             QVector<double> ytrend;
 
-            double inc = (regress.maxx - regress.minx) / 100;
+            double inc = (regress.maxx - regress.minx) / 300;
             for (double i=regress.minx; i<=(regress.maxx+inc); i+= inc) {
                 xtrend << i;
                 ytrend << regress.yForX(i);
@@ -840,13 +844,14 @@ LTMPlot::setData(LTMSettings *set)
     }
     enableAxis(QwtAxis::xBottom, true);
     setAxisVisible(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xTop, false);
 
     // run through the Y axis
-    for (int i=0; i<10; i++) {
+    for (int i=0; i<8; i++) {
         // set the scale on the axis
         if (i != xBottom && i != xTop) {
             maxY[i] *= 1.1; // add 10% headroom
-            setAxisScale(i, minY[i], maxY[i]);
+            setAxisScale(supportedAxes[i], minY[i], maxY[i]);
         }
     }
 
@@ -1170,7 +1175,6 @@ QwtAxisId
 LTMPlot::chooseYAxis(QString units)
 {
     QwtAxisId chosen(-1,-1);
-
     // return the YAxis to use
     if ((chosen = axes.value(units, QwtAxisId(-1,-1))) != QwtAxisId(-1,-1)) return chosen;
     else if (axes.count() < 8) {
