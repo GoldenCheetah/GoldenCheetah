@@ -142,7 +142,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(2); // version 2
+    out<<int(3); // version 2
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         out<<metric.type;
@@ -173,6 +173,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.duration_units;
         out<<metric.bestSymbol;
         out<<static_cast<int>(metric.series);
+        out<<metric.trendtype;
     }
     return out;
 }
@@ -244,6 +245,17 @@ while(counter-- && !in.atEnd()) {
             in>>m.bestSymbol;
             in>>x;
             m.series = static_cast<RideFile::SeriesType>(x);
+        }
+
+        if (version >= 3) { // trendtype added
+            in>>m.trendtype;
+        } else {
+            m.trendtype = 0; // default!
+        }
+
+        if (m.trend == true) { // migrating from old trendline checkbox
+            m.trendtype = 1;
+            m.trend = false; // lets forget it now
         }
         // get a metric pointer (if it exists)
         m.metric = factory.rideMetric(m.symbol);

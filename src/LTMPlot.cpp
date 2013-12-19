@@ -529,48 +529,92 @@ LTMPlot::setData(LTMSettings *set)
         }
 
         // trend - clone the data for the curve and add a curvefitted
-        //         curve with no symbols and use a dashed pen
-        // need more than 2 points for a trend line
-        if (metricDetail.trend == true && count > 2) {
+        if (metricDetail.trendtype) {
 
-            QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
-            QString trendSymbol = QString("%1_trend")
-                                  .arg(metricDetail.type == METRIC_BEST ? 
+            // linear regress
+            if (metricDetail.trendtype == 1 && count > 2) {
+
+                // override class variable as doing it temporarily for trend line only
+                double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                    groupForDate(settings->start.date(), settings->groupBy);
+
+                QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                QString trendSymbol = QString("%1_trend")
+                                       .arg(metricDetail.type == METRIC_BEST ? 
                                        metricDetail.bestSymbol : metricDetail.symbol);
-            QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
-            // cosmetics
-            QPen cpen = QPen(metricDetail.penColor.darker(200));
-            cpen.setWidth(2); // double thickness for trend lines
-            cpen.setStyle(Qt::SolidLine);
-            trend->setPen(cpen);
-            if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
-                trend->setRenderHint(QwtPlotItem::RenderAntialiased);
-            trend->setBaseline(0);
-            trend->setYAxis(axisid);
-            trend->setStyle(QwtPlotCurve::Lines);
+                QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
-            // perform quadratic curve fit to data
-            LTMTrend2 regress(xdata.data(), ydata.data(), count);
+                // cosmetics
+                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                cpen.setWidth(2); // double thickness for trend lines
+                cpen.setStyle(Qt::SolidLine);
+                trend->setPen(cpen);
+                if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                    trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                trend->setBaseline(0);
+                trend->setYAxis(axisid);
+                trend->setStyle(QwtPlotCurve::Lines);
 
-            // override class variable as doing it temporarily for trend line only
-            double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
-                groupForDate(settings->start.date(), settings->groupBy);
+                // perform linear regression
+                LTMTrend regress(xdata.data(), ydata.data(), count);
+                double xtrend[2], ytrend[2];
+                xtrend[0] = 0.0; 
+                ytrend[0] = regress.getYforX(0.0);
+                // point 2 is at far right of chart, not the last point
+                // since we may be forecasting...
+                xtrend[1] = maxX;
+                ytrend[1] = regress.getYforX(maxX);
+                trend->setSamples(xtrend,ytrend, 2);
 
-            QVector<double> xtrend;
-            QVector<double> ytrend;
+                trend->attach(this);
+                curves.insert(trendSymbol, trend);
 
-            double inc = (regress.maxx - regress.minx) / 100;
-            for (double i=regress.minx; i<=(regress.maxx+inc); i+= inc) {
-                xtrend << i;
-                ytrend << regress.yForX(i);
             }
-            // point 2 is at far right of chart, not the last point
-            // since we may be forecasting...
-            trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
-            trend->attach(this);
-            curves.insert(trendSymbol, trend);
+            // quadratic lsm regression
+            if (metricDetail.trendtype == 2 && count > 3) {
+                QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                QString trendSymbol = QString("%1_trend")
+                                       .arg(metricDetail.type == METRIC_BEST ? 
+                                       metricDetail.bestSymbol : metricDetail.symbol);
+
+                QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+
+                // cosmetics
+                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                cpen.setWidth(2); // double thickness for trend lines
+                cpen.setStyle(Qt::SolidLine);
+                trend->setPen(cpen);
+                if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                    trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                trend->setBaseline(0);
+                trend->setYAxis(axisid);
+                trend->setStyle(QwtPlotCurve::Lines);
+
+                // perform quadratic curve fit to data
+                LTMTrend2 regress(xdata.data(), ydata.data(), count);
+
+                // override class variable as doing it temporarily for trend line only
+                double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                    groupForDate(settings->start.date(), settings->groupBy);
+
+                QVector<double> xtrend;
+                QVector<double> ytrend;
+
+                double inc = (regress.maxx - regress.minx) / 100;
+                for (double i=regress.minx; i<=(regress.maxx+inc); i+= inc) {
+                    xtrend << i;
+                    ytrend << regress.yForX(i);
+                }
+
+                // point 2 is at far right of chart, not the last point
+                // since we may be forecasting...
+                trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                trend->attach(this);
+                curves.insert(trendSymbol, trend);
+            }
         }
 
         // highlight outliers
