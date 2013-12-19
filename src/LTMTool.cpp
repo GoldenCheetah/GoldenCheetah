@@ -1095,6 +1095,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     curveTrend = new QCheckBox(tr("Trend Line"), this);
     curveTrend->setChecked(metricDetail->trend);
+    curveTrend->hide(); // for now .. in 3.1 we moved to a checkbox, but this is 
+                        // kept for backward compatibility with the settings etc
+
+    trendType = new QComboBox(this);
+    trendType->addItem(tr("No trend Line"));
+    trendType->addItem(tr("Linear Trend"));
+    trendType->addItem(tr("Quadratic Trend"));
+    trendType->setCurrentIndex(metricDetail->trendtype);
 
     // add to grid
     grid->addLayout(radioButtons, 0, 0, 1, 1, Qt::AlignTop|Qt::AlignLeft);
@@ -1125,8 +1133,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(showOut, 4,3);
     grid->addWidget(baseline, 5, 2);
     grid->addWidget(baseLine, 5,3);
-    grid->addWidget(curveSmooth, 7,2);
-    grid->addWidget(curveTrend, 8,2);
+    grid->addWidget(trendType, 7,2);
+    grid->addWidget(curveSmooth, 8,2);
 
     mainLayout->addLayout(grid);
 
@@ -1220,6 +1228,7 @@ EditMetricDetailDialog::metricSelected()
     showOut->setValue(ltmTool->metrics[index].topOut);
     baseLine->setValue(ltmTool->metrics[index].baseline);
     penColor = ltmTool->metrics[index].penColor;
+    trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
     setButtonIcon(penColor);
 
     // curve style
@@ -1317,6 +1326,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();
+    metricDetail->trendtype = trendType->currentIndex();
     accept();
 }
 
