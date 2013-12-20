@@ -680,8 +680,8 @@ CpintPlot::calculate(RideItem *rideItem)
                 CPCurve->setPen(pen);
             }
 
-            if (useExtendedCP) CPCurve->setVisible(false);
-            else CPCurve->setVisible(true);
+            if (useExtendedCP && CPCurve) CPCurve->setVisible(false);
+            else if (CPCurve) CPCurve->setVisible(true);
         }
 
         //
