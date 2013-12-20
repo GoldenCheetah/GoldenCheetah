@@ -652,7 +652,6 @@ CpintPlot::calculate(RideItem *rideItem)
                 // calculate extended CP model from all-time best data
                 //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
 
-
                 athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
 
 

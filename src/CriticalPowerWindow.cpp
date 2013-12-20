@@ -176,6 +176,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     modelCombo= new QComboBox(this);
     modelCombo->addItem("2 parameter");
     modelCombo->addItem("3 parameter");
+    modelCombo->addItem("ExtendedCP");
     modelCombo->setCurrentIndex(0);
 
     cl->addWidget(new QLabel("")); //spacing
@@ -227,9 +228,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     aeLayout->addWidget(aeI2SpinBox);
     cl->addRow(new QLabel(tr("Aerobic")), aeLayout);
 
-    ckExtendedCP = new QCheckBox(this);
-    cl->addRow(new QLabel(tr("Use Extended CP Model")), ckExtendedCP);
-
     sanI1SpinBox = new QDoubleSpinBox(this);
     sanI1SpinBox->setDecimals(0);
     sanI1SpinBox->setMinimum(15);
@@ -246,10 +244,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     sanI2SpinBox->setAlignment(Qt::AlignRight);
     sanI2SpinBox->setValue(60); // 100 secs
 
+    sanLabel = new QLabel(tr("Short anaerobic"));
+
     QHBoxLayout *sanLayout = new QHBoxLayout();
     sanLayout->addWidget(sanI1SpinBox);
     sanLayout->addWidget(sanI2SpinBox);
-    cl->addRow(new QLabel(tr("Short anaerobic")), sanLayout);
+    cl->addRow(sanLabel, sanLayout);
 
     laeI1SpinBox = new QDoubleSpinBox(this);
     laeI1SpinBox->setDecimals(0);
@@ -267,10 +267,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     laeI2SpinBox->setAlignment(Qt::AlignRight);
     laeI2SpinBox->setValue(30000);
 
+    laeLabel = new QLabel(tr("Long aerobic"));
+
     QHBoxLayout *laeLayout = new QHBoxLayout();
     laeLayout->addWidget(laeI1SpinBox);
     laeLayout->addWidget(laeI2SpinBox);
-    cl->addRow(new QLabel(tr("Long aerobic")), laeLayout);
+    cl->addRow(laeLabel, laeLayout);
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
@@ -305,8 +307,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(sanI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
-    connect(ckExtendedCP, SIGNAL(stateChanged(int)), this, SLOT(modelParametersChanged()));
-
 
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
@@ -348,6 +348,14 @@ CriticalPowerWindow::modelChanged()
     switch (modelCombo->currentIndex()) {
 
     case 0 : // 2 param model
+
+            sanLabel->hide();
+            sanI1SpinBox->hide();
+            sanI2SpinBox->hide();
+            laeLabel->hide();
+            laeI1SpinBox->hide();
+            laeI2SpinBox->hide();
+
             anI1SpinBox->setValue(180);
             anI2SpinBox->setValue(360);
             aeI1SpinBox->setValue(1800);
@@ -356,10 +364,36 @@ CriticalPowerWindow::modelChanged()
 
     case 1 : // 3 param model
 
+            sanLabel->hide();
+            sanI1SpinBox->hide();
+            sanI2SpinBox->hide();
+            laeLabel->hide();
+            laeI1SpinBox->hide();
+            laeI2SpinBox->hide();
+
             anI1SpinBox->setValue(1800);
             anI2SpinBox->setValue(2400);
             aeI1SpinBox->setValue(2400);
             aeI2SpinBox->setValue(3600);
+            break;
+
+    case 2 : // ExtendedCP
+
+            sanLabel->show();
+            sanI1SpinBox->show();
+            sanI2SpinBox->show();
+            laeLabel->show();
+            laeI1SpinBox->show();
+            laeI2SpinBox->show();
+
+            sanI1SpinBox->setValue(30);
+            sanI2SpinBox->setValue(90);
+            anI1SpinBox->setValue(120);
+            anI2SpinBox->setValue(300);
+            aeI1SpinBox->setValue(600);
+            aeI2SpinBox->setValue(3000);
+            laeI1SpinBox->setValue(4000);
+            laeI2SpinBox->setValue(30000);
             break;
     }
     active = false;
@@ -382,8 +416,8 @@ CriticalPowerWindow::modelParametersChanged()
                         aeI2SpinBox->value(),
                         laeI1SpinBox->value(),
                         laeI2SpinBox->value(),
-                        modelCombo->currentIndex() > 0 ? true : false,
-                        ckExtendedCP->checkState());
+                        modelCombo->currentIndex() == 1 ? true : false,
+                        modelCombo->currentIndex() == 2 ? true : false);
 
     // and apply
     if (amVisible() && myRideItem != NULL) {
