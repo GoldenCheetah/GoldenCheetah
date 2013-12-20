@@ -71,10 +71,13 @@ class GcSubSplitter : public QSplitter
     Q_OBJECT
 
 public:
-    GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent);
+    GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent, bool plainstyle=false);
+
+    // plainstyle splitters have no control (pass NULL), no metal styling and no toolbar on the handle
 
     void addWidget(QWidget *widget);
     void insertWidget(int index, QWidget *widget);
+    GcSplitterItem *removeItem(QString text);
 
 protected:
     QSplitterHandle *createHandle();
@@ -85,6 +88,7 @@ private:
 
     GcSplitterControl *control;
     GcSplitter *gcSplitter;
+    bool plainstyle;
 
 };
 
@@ -95,8 +99,9 @@ class GcSplitterHandle : public QSplitterHandle
     friend class ::GcSplitterItem;
 
 public:
-    GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent = 0);
+    GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent = 0, bool metal = true);
 
+    QString title() const { return _title; }
     QSize sizeHint() const;
     GcSubSplitter *splitter() const;
     void addAction(QAction *action);
@@ -113,9 +118,10 @@ private:
     QHBoxLayout *titleLayout;
     GcLabel *titleLabel;
 
-    QString title;
+    QString _title;
     int fullHeight;
     QLinearGradient active, inactive;
+    bool metal;
 };
 
 class GcSplitterControl : public QToolBar

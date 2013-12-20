@@ -80,10 +80,14 @@ class LTMSidebar : public QWidget
         void filterPopup();
         void manageFilters();
         void deleteFilter();
+        void autoFilterChanged(); // users turned on/off an item
+        void autoFilterSelectionChanged(); // users selected a value 
+        void filterNotify(); // merge/update when auto or query filter applied
 
         // config etc
         void configChanged();
         void resetSeasons(); // rebuild the seasons list if it changes
+        void setAutoFilterMenu();
 
         // gui components
         void setSummary(DateRange);
@@ -108,9 +112,17 @@ class LTMSidebar : public QWidget
         QTreeWidget *filterTree;
         QTreeWidgetItem *allFilters;
 
+        QMenu *autoFilterMenu;
+        QList<bool> autoFilterState;
+
         QWebView *summary;
 
         GcSplitter *splitter;
+        GcSubSplitter *filterSplitter;
+
+        // filter state
+        bool isautofilter, isqueryfilter;
+        QStringList autoFilterFiles, queryFilterFiles;
 };
 
 #endif // _GC_LTMSidebar_h
