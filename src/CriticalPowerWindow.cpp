@@ -182,6 +182,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
+    cl->addRow(new QLabel(tr(" ")));
+    cl->addRow(new QLabel(tr("Search Interval")), new QLabel(tr("(seconds)")));
+
     anI1SpinBox = new QDoubleSpinBox(this);
     anI1SpinBox->setDecimals(0);
     anI1SpinBox->setMinimum(0);
@@ -201,7 +204,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *anLayout = new QHBoxLayout;
     anLayout->addWidget(anI1SpinBox);
     anLayout->addWidget(anI2SpinBox);
-    cl->addRow(new QLabel(tr("Anaerobic search interval (seconds)")), anLayout);
+    cl->addRow(new QLabel(tr("Anaerobic")), anLayout);
 
     aeI1SpinBox = new QDoubleSpinBox(this);
     aeI1SpinBox->setDecimals(0);
@@ -222,7 +225,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
     aeLayout->addWidget(aeI2SpinBox);
-    cl->addRow(new QLabel(tr("Aerobic search interval (seconds)")), aeLayout);
+    cl->addRow(new QLabel(tr("Aerobic")), aeLayout);
 
     ckExtendedCP = new QCheckBox(this);
     cl->addRow(new QLabel(tr("Use Extended CP Model")), ckExtendedCP);
@@ -246,7 +249,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *sanLayout = new QHBoxLayout();
     sanLayout->addWidget(sanI1SpinBox);
     sanLayout->addWidget(sanI2SpinBox);
-    cl->addRow(new QLabel(tr("Short anaerobic search interval (seconds)")), sanLayout);
+    cl->addRow(new QLabel(tr("Short anaerobic")), sanLayout);
 
     laeI1SpinBox = new QDoubleSpinBox(this);
     laeI1SpinBox->setDecimals(0);
@@ -267,7 +270,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *laeLayout = new QHBoxLayout();
     laeLayout->addWidget(laeI1SpinBox);
     laeLayout->addWidget(laeI2SpinBox);
-    cl->addRow(new QLabel(tr("Long aerobic search interval (seconds)")), laeLayout);
+    cl->addRow(new QLabel(tr("Long aerobic")), laeLayout);
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
