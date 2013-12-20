@@ -163,17 +163,21 @@ GcSplitter::insertWidget(int index, QWidget *widget)
     splitter->insertWidget(index, widget);
 }
 
-GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent) : QSplitter(orientation, parent), control(control), gcSplitter (parent)
+GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent, bool plainstyle) : QSplitter(orientation, parent), control(control), gcSplitter (parent), plainstyle(plainstyle)
 {
     _insertedWidget = NULL;
 
     // we add a fake widget to ensure the first real widget
     // that is added has a handle (even though it cannot be moved)
-    QLabel *fake = new QLabel("fake");
-    fake->setFixedHeight(0);
-    setHandleWidth(0);
-    QSplitter::addWidget(fake);
-    //setStretchFactor(0,0);
+    if (!plainstyle) {
+        QLabel *fake = new QLabel("fake");
+        fake->setFixedHeight(0);
+        setHandleWidth(0);
+        QSplitter::addWidget(fake);
+        //setStretchFactor(0,0);
+    } else {
+        QSplitter::addWidget((QWidget*)control);
+    }
 }
 
 void
@@ -190,6 +194,18 @@ GcSubSplitter::insertWidget(int index, QWidget *widget)
     _insertedWidget = widget;
     QSplitter::insertWidget(index, widget);
 }
+GcSplitterItem *
+GcSubSplitter::removeItem(QString text)
+{
+    for(int i=1; i<= count(); i++) {
+        const GcSplitterHandle *h = static_cast<GcSplitterHandle*>(handle(i));
+        if (h && h->title() == text) {
+            return static_cast<GcSplitterItem*>(widget(i));
+        }
+    }
+    return NULL; // didn't find it!
+}
+
 
 QSplitterHandle*
 GcSubSplitter::createHandle()
@@ -197,14 +213,17 @@ GcSubSplitter::createHandle()
     if(_insertedWidget != 0) {
         GcSplitterItem* _item = dynamic_cast<GcSplitterItem*>(_insertedWidget);
         if(_item != 0) {
-            _item->splitterHandle = new GcSplitterHandle(_item->title, orientation(), this);
+            _item->splitterHandle = new GcSplitterHandle(_item->title, orientation(), this, !plainstyle);
             _item->splitterHandle->addActions(_item->actions());
-            _item->controlAction = new QAction(_item->icon, _item->title, this);
-            _item->controlAction->setStatusTip(_item->title);
-            control->addAction(_item->controlAction);
 
-            connect(_item->controlAction, SIGNAL(triggered(void)), _item, SLOT(selectHandle(void)));
-            connect(_item->controlAction, SIGNAL(triggered(void)), gcSplitter, SLOT(saveSettings()));
+            if (!plainstyle) {
+                _item->controlAction = new QAction(_item->icon, _item->title, this);
+                _item->controlAction->setStatusTip(_item->title);
+                control->addAction(_item->controlAction);
+
+                connect(_item->controlAction, SIGNAL(triggered(void)), _item, SLOT(selectHandle(void)));
+                connect(_item->controlAction, SIGNAL(triggered(void)), gcSplitter, SLOT(saveSettings()));
+            }
             return _item->splitterHandle;
         }
     }
@@ -212,10 +231,13 @@ GcSubSplitter::createHandle()
     return QSplitter::createHandle();
 }
 
-GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent) : QSplitterHandle(orientation, parent), title(title)
+GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent, bool metal) : QSplitterHandle(orientation, parent), _title(title), metal(metal)
 {
     setContentsMargins(0,0,0,0);
-    setFixedHeight(23);
+    if (metal)
+        setFixedHeight(23);
+    else
+        setFixedHeight(18);
 
     gcSplitter = (GcSubSplitter*)parent;
 
@@ -226,19 +248,30 @@ GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, Q
     titleLabel = new GcLabel(title, this);
     titleLabel->setXOff(0);
 
+    int shade, inshade;
+    if (metal) {
 #ifdef Q_OS_MAC
-    int shade = 178;
-    int inshade = 225;
+        shade = 178;
+        inshade = 225;
 #else
-    int shade = 200;
-    int inshade = 250;
+        shade = 200;
+        inshade = 250;
 #endif
-    active = QLinearGradient(0, 0, 0, 23);
+    } else {
+#ifdef Q_OS_MAC
+        inshade = 225;
+        shade = 210;
+#else
+        inshade = 250;
+        shade = 225;
+#endif
+    }
+    active = QLinearGradient(0, 0, 0, metal ? 23 :18);
     active.setColorAt(0.0, QColor(shade,shade,shade, 100));
     active.setColorAt(0.5, QColor(shade,shade,shade, 180));
     active.setColorAt(1.0, QColor(shade,shade,shade, 255));
     active.setSpread(QGradient::PadSpread);
-    inactive = QLinearGradient(0, 0, 0, 23);
+    inactive = QLinearGradient(0, 0, 0, metal ? 23 :18);
     inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
     inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
     inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
@@ -272,7 +305,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, Q
 QSize
 GcSplitterHandle::sizeHint() const
 {
-    return QSize(200, 23);
+    return QSize(200, metal ? 23 :18);
 }
 
 GcSubSplitter*
