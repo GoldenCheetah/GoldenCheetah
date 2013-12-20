@@ -61,7 +61,10 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
     //text.sprintf( tr("%.2f m/s (%.0f rpm), %.2f N (%.0f watts)"), pos.x(), p.x(), pos.y(), p.y() );
     QString text = QString(tr("%1 rpm, %2 watts")).arg(p.x()).arg(p.y());
 
-    return QwtText( text );
+    QwtText returning(text);
+    returning.setColor(GColor(CPLOTMARKER));
+
+    return returning;
 }
 
 PfPvWindow::PfPvWindow(Context *context) :
@@ -111,6 +114,7 @@ PfPvWindow::PfPvWindow(Context *context) :
     vlayout->addWidget(pfPvPlot);
 
     setChartLayout(vlayout);
+    setAutoFillBackground(true);
 
     // allow zooming
     pfpvZoomer = new QwtPlotZoomer(pfPvPlot->canvas());
@@ -191,7 +195,19 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
+
+    configChanged();
+}
+
+void
+PfPvWindow::configChanged()
+{
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+
+    setPalette(palette);
 }
 
 void

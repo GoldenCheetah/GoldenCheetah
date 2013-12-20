@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Justin Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -70,8 +71,9 @@
 // 50  29  Oct 2013 Mark Liversedge    Added percentage time in heartrate zone
 // 51  05  Nov 2013 Mark Liversedge    Added average aPower
 // 52  05  Nov 2013 Mark Liversedge    Added EOA - Effect of Altitude
+// 53  18  Dec 2013 Mark Liversedge    Added Fatigue Index (for power)
 
-int DBSchemaVersion = 52;
+int DBSchemaVersion = 53;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
@@ -549,6 +551,25 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
     }
     query.finish();
     return found;
+}
+
+QList<QString> DBAccess::getDistinctValues(FieldDefinition field)
+{
+    QStringList returning;
+
+    // what are we querying?
+    QString fieldname = QString("Z%1").arg(context->specialFields.makeTechName(field.name));
+
+    QString selectStatement = QString("SELECT DISTINCT(%1) FROM METRICS ORDER BY %1;").arg(fieldname);
+
+    QSqlQuery query(db->database(sessionid));
+    query.prepare(selectStatement);
+    query.exec();
+
+    while(query.next()) {
+        returning << query.value(0).toString();
+    }
+    return returning;
 }
 
 QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)

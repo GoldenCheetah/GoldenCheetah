@@ -38,6 +38,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
+#include <qwt_scale_widget.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
@@ -157,7 +158,7 @@ PowerHist::configChanged()
     }
 
     // use a linear gradient
-    brush_color.setAlpha(64);
+    brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
     QColor brush_color1 = brush_color.darker();
     QLinearGradient linearGradient(0, 0, 0, height());
     linearGradient.setColorAt(0.0, brush_color);
@@ -179,13 +180,24 @@ PowerHist::configChanged()
     ivl.setWidth(width);
     curveSelected->setPen(ivl);
     QColor ivlbrush = GColor(CINTERVALHIGHLIGHTER);
-    ivlbrush.setAlpha(64);
+    ivlbrush.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
     curveSelected->setBrush(ivlbrush);   // fill below the line
 
     // grid
     QPen gridPen(GColor(CPLOTGRID));
     //gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
+
+    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+
+    setAutoFillBackground(true);
 }
 
 PowerHist::~PowerHist() {

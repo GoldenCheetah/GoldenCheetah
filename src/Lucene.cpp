@@ -149,10 +149,11 @@ void Lucene::optimise()
     }
 }
 
-int Lucene::search(QString query)
+QList<QString> Lucene::search(QString query)
 {
-
+    filenames.clear();
     try {
+
         // parse query
         QueryParser parser(_T("contents"), &analyzer);
         parser.setPhraseSlop(4);
@@ -160,14 +161,13 @@ int Lucene::search(QString query)
         std::wstring querystring = query.toStdWString();
         Query* lquery = parser.parse(querystring.c_str());
 
-        if (lquery == NULL) return 0;
+        if (lquery == NULL) return filenames;
 
         IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
         IndexSearcher *searcher = new IndexSearcher(reader);           // to perform searches
 
         // go find hits
         hits = searcher->search(lquery);
-        filenames.clear();
 
         for (size_t i=0; i< hits->length(); i++) {
             Document *d = &hits->doc(i);
@@ -185,10 +185,10 @@ int Lucene::search(QString query)
     } catch (CLuceneError &e) {
 
         //qDebug()<<"clucene error:"<<e.what();
-        return 0;
+        return filenames;
     }
 
     emit results(filenames);
 
-    return filenames.count();
+    return filenames;
 }

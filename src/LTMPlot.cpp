@@ -21,6 +21,7 @@
 #include "LTMPlot.h"
 #include "LTMTool.h"
 #include "LTMTrend.h"
+#include "LTMTrend2.h"
 #include "LTMOutliers.h"
 #include "LTMWindow.h"
 #include "MetricAggregator.h"
@@ -49,12 +50,14 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
 {
     // don't do this ..
     setAutoReplot(false);
+    setAutoFillBackground(true);
 
     // setup my axes
     // for now we limit to 4 on left and 4 on right
     setAxesCount(QwtAxis::yLeft, 4);
     setAxesCount(QwtAxis::yRight, 4);
     setAxesCount(QwtAxis::xBottom, 1);
+    setAxesCount(QwtAxis::xTop, 0);
 
     int n=0;
     for (int i=0; i<4; i++) {
@@ -90,6 +93,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     setAxisTitle(QwtAxis::xBottom, tr("Date"));
     enableAxis(QwtAxis::xBottom, true);
     setAxisVisible(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xTop, false);
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -119,6 +123,19 @@ LTMPlot::configUpdate()
     QPen gridPen(GColor(CPLOTGRID));
     //gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
+
+    foreach (QwtAxisId x, supportedAxes) {
+        axisWidget(x)->setPalette(palette);
+        axisWidget(x)->setPalette(palette);
+    }
+    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    this->legend()->setPalette(palette);
 }
 
 void
@@ -180,6 +197,7 @@ LTMPlot::setData(LTMSettings *set)
         setAxisTitle(xBottom, tr("Time of Day"));
     enableAxis(QwtAxis::xBottom, true);
     setAxisVisible(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xTop, false);
 
     // wipe existing curves/axes details
     QHashIterator<QString, QwtPlotCurve*> c(curves);
@@ -219,6 +237,7 @@ LTMPlot::setData(LTMSettings *set)
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
         enableAxis(QwtAxis::xBottom, true);
         setAxisVisible(QwtAxis::xBottom, true);
+        setAxisVisible(QwtAxis::xTop, false);
 
         // remove the shading if it exists
         refreshZoneLabels(-1);
@@ -510,40 +529,92 @@ LTMPlot::setData(LTMSettings *set)
         }
 
         // trend - clone the data for the curve and add a curvefitted
-        //         curve with no symbols and use a dashed pen
-        // need more than 2 points for a trend line
-        if (metricDetail.trend == true && count > 2) {
+        if (metricDetail.trendtype) {
 
-            QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
-            QString trendSymbol = QString("%1_trend")
-                                  .arg(metricDetail.type == METRIC_BEST ? 
+            // linear regress
+            if (metricDetail.trendtype == 1 && count > 2) {
+
+                // override class variable as doing it temporarily for trend line only
+                double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                    groupForDate(settings->start.date(), settings->groupBy);
+
+                QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                QString trendSymbol = QString("%1_trend")
+                                       .arg(metricDetail.type == METRIC_BEST ? 
                                        metricDetail.bestSymbol : metricDetail.symbol);
-            QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
-            // cosmetics
-            QPen cpen = QPen(metricDetail.penColor.darker(200));
-            cpen.setWidth(width*2); // double thickness for trend lines
-            cpen.setStyle(Qt::DotLine);
-            trend->setPen(cpen);
-            if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
-                trend->setRenderHint(QwtPlotItem::RenderAntialiased);
-            trend->setBaseline(0);
-            trend->setYAxis(axisid);
-            trend->setStyle(QwtPlotCurve::Lines);
+                QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
-            // perform linear regression
-            LTMTrend regress(xdata.data(), ydata.data(), count);
-            double xtrend[2], ytrend[2];
-            xtrend[0] = 0.0;
-            ytrend[0] = regress.getYforX(0.0);
-            // point 2 is at far right of chart, not the last point
-            // since we may be forecasting...
-            xtrend[1] = maxX;
-            ytrend[1] = regress.getYforX(maxX);
-            trend->setSamples(xtrend,ytrend, 2);
+                // cosmetics
+                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                cpen.setWidth(2); // double thickness for trend lines
+                cpen.setStyle(Qt::SolidLine);
+                trend->setPen(cpen);
+                if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                    trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                trend->setBaseline(0);
+                trend->setYAxis(axisid);
+                trend->setStyle(QwtPlotCurve::Lines);
 
-            trend->attach(this);
-            curves.insert(trendSymbol, trend);
+                // perform linear regression
+                LTMTrend regress(xdata.data(), ydata.data(), count);
+                double xtrend[2], ytrend[2];
+                xtrend[0] = 0.0; 
+                ytrend[0] = regress.getYforX(0.0);
+                // point 2 is at far right of chart, not the last point
+                // since we may be forecasting...
+                xtrend[1] = maxX;
+                ytrend[1] = regress.getYforX(maxX);
+                trend->setSamples(xtrend,ytrend, 2);
+
+                trend->attach(this);
+                curves.insert(trendSymbol, trend);
+
+            }
+
+            // quadratic lsm regression
+            if (metricDetail.trendtype == 2 && count > 3) {
+                QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                QString trendSymbol = QString("%1_trend")
+                                       .arg(metricDetail.type == METRIC_BEST ? 
+                                       metricDetail.bestSymbol : metricDetail.symbol);
+
+                QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+
+                // cosmetics
+                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                cpen.setWidth(2); // double thickness for trend lines
+                cpen.setStyle(Qt::SolidLine);
+                trend->setPen(cpen);
+                if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                    trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+                trend->setBaseline(0);
+                trend->setYAxis(axisid);
+                trend->setStyle(QwtPlotCurve::Lines);
+
+                // perform quadratic curve fit to data
+                LTMTrend2 regress(xdata.data(), ydata.data(), count);
+
+                // override class variable as doing it temporarily for trend line only
+                double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                    groupForDate(settings->start.date(), settings->groupBy);
+
+                QVector<double> xtrend;
+                QVector<double> ytrend;
+
+                double inc = (regress.maxx - regress.minx) / 100;
+                for (double i=regress.minx; i<=(regress.maxx+inc); i+= inc) {
+                    xtrend << i;
+                    ytrend << regress.yForX(i);
+                }
+
+                // point 2 is at far right of chart, not the last point
+                // since we may be forecasting...
+                trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
+
+                trend->attach(this);
+                curves.insert(trendSymbol, trend);
+            }
         }
 
         // highlight outliers
@@ -817,13 +888,14 @@ LTMPlot::setData(LTMSettings *set)
     }
     enableAxis(QwtAxis::xBottom, true);
     setAxisVisible(QwtAxis::xBottom, true);
+    setAxisVisible(QwtAxis::xTop, false);
 
     // run through the Y axis
-    for (int i=0; i<10; i++) {
+    for (int i=0; i<8; i++) {
         // set the scale on the axis
         if (i != xBottom && i != xTop) {
             maxY[i] *= 1.1; // add 10% headroom
-            setAxisScale(i, minY[i], maxY[i]);
+            setAxisScale(supportedAxes[i], minY[i], maxY[i]);
         }
     }
 
@@ -1147,7 +1219,6 @@ QwtAxisId
 LTMPlot::chooseYAxis(QString units)
 {
     QwtAxisId chosen(-1,-1);
-
     // return the YAxis to use
     if ((chosen = axes.value(units, QwtAxisId(-1,-1))) != QwtAxisId(-1,-1)) return chosen;
     else if (axes.count() < 8) {

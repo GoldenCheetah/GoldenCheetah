@@ -78,6 +78,7 @@
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
 #define GC_LTM_LAST_DATE_RANGE "ltmwindow/lastDateRange"
+#define GC_LTM_AUTOFILTERS "ltmwindow/autofilters"
 #define GC_BLANK_ANALYSIS "blank/analysis"
 #define GC_BLANK_TRAIN    "blank/train"
 #define GC_BLANK_HOME     "blank/home"
@@ -194,6 +195,10 @@
 
 #define FORTIUS_FIRMWARE          "fortius/firmware"
 #define TRAIN_MULTI               "train/multi"
+
+// batch export last options
+#define GC_BE_LASTDIR             "batchexport/lastdir"
+#define GC_BE_LASTFMT             "batchexport/lastfmt"
 
 #include <QSettings>
 #include <QFileInfo>

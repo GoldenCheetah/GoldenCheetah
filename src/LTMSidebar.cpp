@@ -38,6 +38,9 @@
 // named searchs
 #include "NamedSearch.h"
 #include "DataFilter.h"
+#ifdef GC_HAVE_LUCENE
+#include "Lucene.h"
+#endif
 
 // metadata support
 #include "RideMetadata.h"
@@ -46,7 +49,8 @@
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
 
-LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context(context), active(false)
+LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context(context), active(false),
+                                           isqueryfilter(false), isautofilter(false)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -75,33 +79,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #endif
     seasonsWidget->addWidget(dateRangeTree);
 
-    // filters
-    filtersWidget = new GcSplitterItem(tr("Filters"), iconFromPNG(":images/toolbar/filter3.png"), this);
-    QAction *moreFilterAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
-    filtersWidget->addAction(moreFilterAct);
-    connect(moreFilterAct, SIGNAL(triggered(void)), this, SLOT(filterPopup(void)));
-
-    filterTree = new QTreeWidget;
-    filterTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    allFilters = filterTree->invisibleRootItem();
-    allFilters->setText(0, tr("Filters"));
-    allFilters->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    filterTree->setFrameStyle(QFrame::NoFrame);
-    filterTree->setColumnCount(1);
-    filterTree->setSelectionBehavior(QAbstractItemView::SelectRows);
-    filterTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    filterTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    filterTree->header()->hide();
-    filterTree->setIndentation(5);
-    filterTree->expandItem(allFilters);
-    filterTree->setContextMenuPolicy(Qt::CustomContextMenu);
-    filterTree->horizontalScrollBar()->setDisabled(true);
-    filterTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-#ifdef Q_OS_MAC
-    filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#endif
-    filtersWidget->addWidget(filterTree);
-
     // events
     eventsWidget = new GcSplitterItem(tr("Events"), iconFromPNG(":images/sidebar/bookmark.png"), this);
     QAction *moreEventAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
@@ -126,16 +103,51 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #endif
     eventsWidget->addWidget(eventTree);
 
+    // filters
+#ifdef GC_HAVE_LUCENE
+    filtersWidget = new GcSplitterItem(tr("Filters"), iconFromPNG(":images/toolbar/filter3.png"), this);
+    QAction *moreFilterAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    filtersWidget->addAction(moreFilterAct);
+    connect(moreFilterAct, SIGNAL(triggered(void)), this, SLOT(filterPopup(void)));
+
+
+    filterTree = new QTreeWidget;
+    filterTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    allFilters = filterTree->invisibleRootItem();
+    allFilters->setText(0, tr("Filters"));
+    allFilters->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    filterTree->setFrameStyle(QFrame::NoFrame);
+    filterTree->setColumnCount(1);
+    filterTree->setSelectionBehavior(QAbstractItemView::SelectRows);
+    filterTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    filterTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    filterTree->header()->hide();
+    filterTree->setIndentation(5);
+    filterTree->expandItem(allFilters);
+    filterTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    filterTree->horizontalScrollBar()->setDisabled(true);
+    filterTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef Q_OS_MAC
+    filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    // we cast the filter tree and this because we use the same constructor XXX fix this!!!
+    filterSplitter = new GcSubSplitter(Qt::Vertical, (GcSplitterControl*)filterTree, (GcSplitter*)this, true);
+    filtersWidget->addWidget(filterSplitter);
+#endif
+
     seasons = context->athlete->seasons;
     resetSeasons(); // reset the season list
     resetFilters(); // reset the filters list
 
-    configChanged(); // will reset the metric tree
+    autoFilterMenu = new QMenu(tr("Autofilter"),this);
+    configChanged(); // will reset the metric tree and the autofilters
 
     splitter = new GcSplitter(Qt::Vertical);
-    splitter->addWidget(seasonsWidget);
+    splitter->addWidget(seasonsWidget); // goes alongside events
+    splitter->addWidget(eventsWidget); // goes alongside date ranges
+#ifdef GC_HAVE_LUCENE
     splitter->addWidget(filtersWidget);
-    splitter->addWidget(eventsWidget);
+#endif
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
@@ -162,7 +174,9 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
+#ifdef GC_HAVE_LUCENE
     connect(filterTree,SIGNAL(itemSelectionChanged()), this, SLOT(filterTreeWidgetSelectionChanged()));
+#endif
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
@@ -180,6 +194,11 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 void
 LTMSidebar::configChanged()
 {
+    setAutoFilterMenu();
+
+    // set or reset the autofilter widgets
+    autoFilterChanged();
+
 }
 
 /*----------------------------------------------------------------------
@@ -438,14 +457,124 @@ LTMSidebar::eventPopup()
 void
 LTMSidebar::manageFilters()
 {
+#ifdef GC_HAVE_LUCENE
     EditNamedSearches *editor = new EditNamedSearches(this, context);
     editor->move(QCursor::pos()+QPoint(10,-200));
     editor->show();
+#endif
+}
+
+void
+LTMSidebar::setAutoFilterMenu()
+{
+#ifdef GC_HAVE_LUCENE
+    QStringList on = appsettings->cvalue(context->athlete->cyclist, GC_LTM_AUTOFILTERS, tr("Workout Code|Sport")).toString().split("|");
+    autoFilterMenu->clear();
+    autoFilterState.clear();
+
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+
+        if (field.tab != "" && (field.type == 0 || field.type == 2)) { // we only do text or shorttext fields
+
+            QAction *action = new QAction(field.name, this);
+            action->setCheckable(true);
+
+            if (on.contains(field.name)) action->setChecked(true);
+            connect(action, SIGNAL(triggered()), this, SLOT(autoFilterChanged()));
+
+            autoFilterMenu->addAction(action);
+            autoFilterState << false;
+        }
+    }
+#endif
+}
+
+void 
+LTMSidebar::autoFilterChanged()
+{
+
+    QString on;
+
+    // boop
+    int i=0;
+    foreach (QAction *action, autoFilterMenu->actions()) {
+
+        // activate
+        if (action->isChecked() && autoFilterState.at(i) == false) {
+            autoFilterState[i] = true;
+
+            GcSplitterItem *item = new GcSplitterItem(action->text(), QIcon(), this);
+
+            // get a tree of values
+            QTreeWidget *tree = new QTreeWidget(item);
+            tree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            tree->setFrameStyle(QFrame::NoFrame);
+            tree->setColumnCount(1);
+            tree->setSelectionBehavior(QAbstractItemView::SelectRows);
+            tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+            tree->setSelectionMode(QAbstractItemView::MultiSelection);
+            tree->header()->hide();
+            tree->setIndentation(5);
+            tree->expandItem(tree->invisibleRootItem());
+            tree->setContextMenuPolicy(Qt::CustomContextMenu);
+            tree->horizontalScrollBar()->setDisabled(true);
+            tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef Q_OS_MAC
+            tree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+            item->addWidget(tree);
+            filterSplitter->addWidget(item);
+
+            // update the values available in the tree
+            foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+                if (field.name == action->text()) {
+                    foreach (QString value, context->athlete->metricDB->db()->getDistinctValues(field)) {
+                        if (value == "") value = "(blank)";
+                        QTreeWidgetItem *add = new QTreeWidgetItem(tree->invisibleRootItem(), 0);
+
+                        // No Drag/Drop for autofilters
+                        add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                        add->setText(0, value);
+                    }
+                }
+            }
+            connect(tree,SIGNAL(itemSelectionChanged()), this, SLOT(autoFilterSelectionChanged()));
+        }
+
+        // deactivate
+        if (!action->isChecked() && autoFilterState.at(i) == true) {
+            autoFilterState[i] = false;
+
+            // remove from tree
+            GcSplitterItem *item = filterSplitter->removeItem(action->text());
+            if (item) {
+                // if there were items selected in the tree and we 
+                // remove it we need to clear the filter
+                bool selected = static_cast<QTreeWidget*>(item->content)->selectedItems().count() > 0;
+
+                // will remove from the splitter (is only way to do this!)
+                delete item; // splitter deletes handle too !
+
+                // clear any results of the selection
+                if (selected) autoFilterSelectionChanged();
+            }
+        }
+
+        // reset the selected fields
+        if (action->isChecked())  {
+            if (on != "") on += "|";
+            on += action->text();
+        }
+
+        i++;
+    }
+    appsettings->setCValue(context->athlete->cyclist, GC_LTM_AUTOFILTERS, on);
 }
 
 void 
 LTMSidebar::filterTreeWidgetSelectionChanged()
 {
+#ifdef GC_HAVE_LUCENE
     int selected = filterTree->selectedItems().count();
 
     if (selected) {
@@ -474,7 +603,8 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
             case NamedSearch::search :
                 {
                     // use clucence
-                    //XXX todo
+                    Lucene s(this, context);
+                    results = s.search(ns.text);
                 }
 
             }
@@ -492,15 +622,113 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
             first = false;
         }
 
-        context->setHomeFilter(files);
+        queryFilterFiles = files;
+        isqueryfilter = true;
 
-    } else
+    } else {
+
+        queryFilterFiles.clear();
+        isqueryfilter = false;
+    }
+
+    // tell the world
+    filterNotify();
+#endif
+}
+
+void
+LTMSidebar::filterNotify()
+{
+    // either the auto filter or query filter
+    // has been updated, so we need to merge the results
+    // of both and then notify via context
+
+    // no filter so clear
+    if (isqueryfilter == false && isautofilter == false) {
         context->clearHomeFilter();
+    } else {
+
+        if (isqueryfilter == false) {
+
+            // autofilter only
+            context->setHomeFilter(autoFilterFiles);
+
+        } else if (isautofilter == false) {
+
+            // queryfilter only
+            context->setHomeFilter(queryFilterFiles);
+
+        } else {
+
+            // both are set, so merge results
+            QStringList merged = autoFilterFiles.toSet().intersect(queryFilterFiles.toSet()).toList();
+            context->setHomeFilter(merged);
+        }
+
+    }
+}
+
+void
+LTMSidebar::autoFilterSelectionChanged()
+{
+    // only fetch when we know we need to filter ..
+    QList<SummaryMetrics> allRides;
+    QSet<QString> matched;
+
+    // assume nothing to do...
+    isautofilter = false;
+
+    // are any auto filters applied?
+    for (int i=1; i<filterSplitter->count(); i++) {
+
+        GcSplitterItem *item = static_cast<GcSplitterItem*>(filterSplitter->widget(i));
+        QTreeWidget *tree = static_cast<QTreeWidget*>(item->content);
+
+        // are some values selected?
+        if (tree->selectedItems().count() > 0) {
+
+            // we have a selection!
+            if (isautofilter == false) {
+                isautofilter = true;
+                allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
+                foreach(SummaryMetrics x, allRides) matched << x.getFileName();
+            }
+
+            // what is the field?
+            QString fieldname = item->splitterHandle->title();
+
+            // what values are highlighted
+            QStringList values;
+            foreach (QTreeWidgetItem *wi, tree->selectedItems()) values << wi->text(0);
+
+            // get a set of filenames that match
+            QSet<QString> matches;
+            foreach(SummaryMetrics x, allRides) {
+
+                // we use XXX___XXX___XXX because it is not likely to exist
+                QString value = x.getText(fieldname, "XXX___XXX___XXX");
+                if (value == "") value = "(blank)"; // match blanks!
+
+                if (values.contains(value)) matches << x.getFileName();
+            }
+
+            // now remove items from the matched list that
+            // are not in my list of matches
+            matched = matched.intersect(matches);
+        }
+    }
+
+    // all done
+    autoFilterFiles = matched.toList();
+
+    // tell the world
+    filterNotify();
 }
 
 void
 LTMSidebar::resetFilters()
 {
+#ifdef GC_HAVE_LUCENE
     if (active == true) return;
 
     active = true;
@@ -519,11 +747,13 @@ LTMSidebar::resetFilters()
     }
 
     active = false;
+#endif
 }
 
 void
 LTMSidebar::filterPopup()
 {
+#ifdef GC_HAVE_LUCENE
     // is one selected for deletion?
     int selected = filterTree->selectedItems().count();
 
@@ -543,13 +773,18 @@ LTMSidebar::filterPopup()
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteFilter(void)));
     }
 
+    menu.addSeparator();
+    menu.addMenu(autoFilterMenu);
+
     // execute the menu
     menu.exec(splitter->mapToGlobal(QPoint(filtersWidget->pos().x()+filtersWidget->width()-20, filtersWidget->pos().y())));
+#endif
 }
 
 void
 LTMSidebar::deleteFilter()
 {
+#ifdef GC_HAVE_LUCENE
     if (filterTree->selectedItems().count() <= 0) return;
 
     active = true; // no need to reset tree when items deleted from model!
@@ -561,6 +796,7 @@ LTMSidebar::deleteFilter()
         context->athlete->namedSearches->deleteNamedSearch(index);
     }
     active = false;
+#endif
 }
 
 void

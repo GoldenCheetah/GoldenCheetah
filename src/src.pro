@@ -298,6 +298,7 @@ HEADERS += \
         ErgDB.h \
         ErgDBDownloadDialog.h \
         ErgFilePlot.h \
+        ExtendedCriticalPower.h \
         FitlogRideFile.h \
         FitlogParser.h \
         FitRideFile.h \
@@ -338,6 +339,7 @@ HEADERS += \
         LTMSettings.h \
         LTMTool.h \
         LTMTrend.h \
+        LTMTrend2.h \
         LTMWindow.h \
         MacroDevice.h \
         MainWindow.h \
@@ -485,6 +487,7 @@ SOURCES += \
         ErgDBDownloadDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
+        ExtendedCriticalPower.cpp \
         FitlogRideFile.cpp \
         FitlogParser.cpp \
         FitRideFile.cpp \

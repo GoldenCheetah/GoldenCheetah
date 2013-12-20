@@ -29,6 +29,7 @@
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
+#include <QLineEdit>
 
 // shorthand when looking up our ride via  Q_PROPERTY
 #define ourRideItem meta->property("ride").value<RideItem*>()

@@ -85,7 +85,8 @@ class MetricDetail {
 
     // user configurable settings
     bool smooth,         // smooth the curve
-         trend;          // add a trend line
+         trend;          // add a trend line XX deprecated XX
+    int trendtype;       // 0 - no trend, 1 - linear, 2 - quadratic
     int topN;            // highlight top N points
     int topOut;          // highlight N ranked outlier points
     double baseline;     // baseline for chart

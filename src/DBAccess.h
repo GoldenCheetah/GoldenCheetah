@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Justin F. Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -52,6 +53,7 @@ class DBAccess
 
         // get schema version
         int getDBVersion();
+        QList<FieldDefinition> &getMetadataFields() { return mfieldDefinitions; }
 
         // create and drop connections
 	    DBAccess(Context *context);
@@ -69,6 +71,7 @@ class DBAccess
         QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
             return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
         }
+        QList<QString> getDistinctValues(FieldDefinition field);
 
         bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
         QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);

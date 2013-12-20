@@ -23,12 +23,17 @@
 #include <QDebug>
 
 LTMTrend::LTMTrend(double *xdata, double *ydata, int count) :
+          minX(0.0), maxX(0.0), minY(0.0), maxY(0.0),
           points(0.0), sumX(0.0), sumY(0.0), sumXsquared(0.0),
           sumYsquared(0.0), sumXY(0.0), a(0.0), b(0.0)
 {
     if (count <= 2) return;
 
     for (int i = 0; i < count; i++) {
+
+        // ignore zero points
+        if (ydata[i] == 0.00) continue;
+
         points++;
         sumX += xdata[i];
         sumY += ydata[i];
