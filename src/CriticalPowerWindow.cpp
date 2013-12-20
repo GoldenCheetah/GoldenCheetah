@@ -243,7 +243,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     sanI2SpinBox->setAlignment(Qt::AlignRight);
     sanI2SpinBox->setValue(60); // 100 secs
 
-    QHBoxLayout *sanLayout = new QHBoxLayout(this);
+    QHBoxLayout *sanLayout = new QHBoxLayout();
     sanLayout->addWidget(sanI1SpinBox);
     sanLayout->addWidget(sanI2SpinBox);
     cl->addRow(new QLabel(tr("Short anaerobic search interval (seconds)")), sanLayout);
@@ -256,7 +256,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     laeI1SpinBox->setAlignment(Qt::AlignRight);
     laeI1SpinBox->setValue(3000);
 
-    laeI2SpinBox = new QDoubleSpinBox(this);
+    laeI2SpinBox = new QDoubleSpinBox();
     laeI2SpinBox->setDecimals(0);
     laeI2SpinBox->setMinimum(4000);
     laeI2SpinBox->setMaximum(30000);
@@ -264,7 +264,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     laeI2SpinBox->setAlignment(Qt::AlignRight);
     laeI2SpinBox->setValue(30000);
 
-    QHBoxLayout *laeLayout = new QHBoxLayout(this);
+    QHBoxLayout *laeLayout = new QHBoxLayout();
     laeLayout->addWidget(laeI1SpinBox);
     laeLayout->addWidget(laeI2SpinBox);
     cl->addRow(new QLabel(tr("Long aerobic search interval (seconds)")), laeLayout);

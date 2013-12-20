@@ -95,6 +95,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     configChanged(); // apply colors
 
     ecp = new ExtendedCriticalPower(context);
+    extendedCPCurve4 = NULL;
+    extendedCurveTitle2 = NULL;
 }
 
 void
