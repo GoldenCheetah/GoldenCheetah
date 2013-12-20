@@ -679,6 +679,9 @@ CpintPlot::calculate(RideItem *rideItem)
                 pen.setStyle(Qt::DashLine);
                 CPCurve->setPen(pen);
             }
+
+            if (useExtendedCP) CPCurve->setVisible(false);
+            else CPCurve->setVisible(true);
         }
 
         //
