@@ -23,6 +23,7 @@
 #include "RideFileCache.h"
 
 #include <QtGui>
+#include <QMessageBox>
 
 ExtendedCriticalPower::ExtendedCriticalPower(Context *context) : context(context)
 {
