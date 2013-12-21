@@ -386,7 +386,7 @@ CriticalPowerWindow::modelChanged()
             laeI1SpinBox->show();
             laeI2SpinBox->show();
 
-            sanI1SpinBox->setValue(30);
+            sanI1SpinBox->setValue(20);
             sanI2SpinBox->setValue(90);
             anI1SpinBox->setValue(120);
             anI2SpinBox->setValue(300);
