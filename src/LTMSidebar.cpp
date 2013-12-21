@@ -180,7 +180,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(autoFilterChanged()));
+    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(autoFilterRefresh()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
@@ -666,6 +666,36 @@ LTMSidebar::filterNotify()
             context->setHomeFilter(merged);
         }
 
+    }
+}
+
+void
+LTMSidebar::autoFilterRefresh()
+{
+    // the data has changed so refresh the trees
+    for (int i=1; i<filterSplitter->count(); i++) {
+
+        GcSplitterItem *item = static_cast<GcSplitterItem*>(filterSplitter->widget(i));
+        QTreeWidget *tree = static_cast<QTreeWidget*>(item->content);
+
+        qDeleteAll(tree->invisibleRootItem()->takeChildren());
+
+        // what is the field?
+        QString fieldname = item->splitterHandle->title();
+
+            // update the values available in the tree
+        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            if (field.name == fieldname) {
+                foreach (QString value, context->athlete->metricDB->db()->getDistinctValues(field)) {
+                    if (value == "") value = "(blank)";
+                    QTreeWidgetItem *add = new QTreeWidgetItem(tree->invisibleRootItem(), 0);
+
+                    // No Drag/Drop for autofilters
+                    add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                    add->setText(0, value);
+                }
+            }
+        }
     }
 }
 
