@@ -578,13 +578,12 @@ RideSummaryWindow::htmlSummary() const
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(m ? m->name() : "");
         }
         for (j = 0; j< metricCols; ++j) {
             QString symbol = metricColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
-
-            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+            summary += QString("<td align=\"center\">%1</td>").arg(m ? m->name() : "");
         }
         summary += "</tr>";
 
@@ -595,7 +594,7 @@ RideSummaryWindow::htmlSummary() const
             QString symbol = rtotalColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            QString units = m->units(useMetricUnits);
+            QString units = m ? m->units(useMetricUnits) : "";
             if (units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
@@ -603,7 +602,7 @@ RideSummaryWindow::htmlSummary() const
             QString symbol = metricColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
 
-            QString units = m->units(useMetricUnits);
+            QString units = m ? m->units(useMetricUnits) : "";
             if (units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
