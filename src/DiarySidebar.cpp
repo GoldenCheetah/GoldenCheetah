@@ -31,7 +31,7 @@
 DiarySidebar::DiarySidebar(Context *context) : context(context)
 {
     setContentsMargins(0,0,0,0);
-    //setAutoFillBackground(true);
+    setAutoFillBackground(true);
 
     month = year = 0;
     _ride = NULL;
@@ -64,7 +64,6 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 
     // summary widget
     QWidget *sum = new QWidget(this);
-    sum->setAutoFillBackground(true);
     sum->setPalette(pal);
     sum->setContentsMargins(0,0,0,0);
     QVBoxLayout *slayout = new QVBoxLayout(sum);

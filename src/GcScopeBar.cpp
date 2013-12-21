@@ -24,6 +24,7 @@
 
 GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
+
     setFixedHeight(23);
     setContentsMargins(10,0,10,0);
     layout = new QHBoxLayout(this);
@@ -171,8 +172,11 @@ GcScopeBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
-#ifndef Q_OS_MAC
+#ifdef Q_OS_MAC
+    int shade = isActiveWindow() ? 178 : 225;
+#else
     int shade = isActiveWindow() ? 200 : 250;
+#endif
     QLinearGradient linearGradient(0, 0, 0, 23);
     linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
     linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
@@ -181,13 +185,13 @@ GcScopeBar::paintBackground(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, linearGradient);
 
-    QPen gray(QColor(230,230,230));
-    painter.setPen(gray);
-    painter.drawLine(0,0, width()-1, 0);
-#endif
     QPen black(QColor(100,100,100));
     painter.setPen(black);
     painter.drawLine(0,height()-1, width()-1, height()-1);
+
+    QPen gray(QColor(230,230,230));
+    painter.setPen(gray);
+    painter.drawLine(0,0, width()-1, 0);
 
     painter.restore();
 }
