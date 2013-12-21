@@ -179,7 +179,7 @@ class MainWindow : public QMainWindow
         // Mac Native Support
         QtMacButton *import, *compose, *sidebar, *lowbar;
         QtMacSegmentedButton *actbuttons, *styleSelector;
-        QHBoxLayout *head;
+        QToolBar *head;
 #else
         // Not on Mac so use other types
         QPushButton *import, *compose, *sidebar, *lowbar;

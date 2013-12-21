@@ -107,7 +107,6 @@ MainWindow::MainWindow(const QDir &home)
      *  Bootstrap
      *--------------------------------------------------------------------*/
     setAttribute(Qt::WA_DeleteOnClose);
-    setAttribute(Qt::WA_MacBrushedMetal, true); // only works on Mac
     mainwindows.append(this);  // add us to the list of open windows
     context = new Context(this);
     context->athlete = new Athlete(context, home);
@@ -203,14 +202,8 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 #ifdef Q_OS_MAC 
     setUnifiedTitleAndToolBarOnMac(true);
-    head = new QHBoxLayout;//addToolBar(context->athlete->cyclist);
+    head = addToolBar(context->athlete->cyclist);
     head->setContentsMargins(0,0,0,0);
-    head->setSpacing(10);
-
-    // left spacer
-    QLabel *leftspacer = new QLabel("", this);
-    leftspacer->setFixedSize(8,25);
-    head->addWidget(leftspacer);
 
     // widgets
     QWidget *macAnalButtons = new QWidget(this);
@@ -312,11 +305,6 @@ MainWindow::MainWindow(const QDir &home)
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
 #endif
-
-    // right spacer
-    QLabel *rightspacer = new QLabel("", this);
-    rightspacer->setFixedSize(8,25);
-    head->addWidget(rightspacer);
 
 #endif 
 
@@ -479,8 +467,6 @@ MainWindow::MainWindow(const QDir &home)
 #ifndef Q_OS_MAC // nonmac toolbar on main view -- its not 
                  // unified with the title bar.
     mainLayout->addWidget(head);
-#else
-    mainLayout->addLayout(head);
 #endif
     mainLayout->addWidget(scopebar);
     mainLayout->addWidget(tab);
@@ -684,7 +670,6 @@ MainWindow::showLowbar(bool want)
 void
 MainWindow::showToolbar(bool want)
 {
-#ifndef Q_OS_MAC
     if (want) {
         head->show();
         scopebar->show();
@@ -693,7 +678,6 @@ MainWindow::showToolbar(bool want)
         head->hide();
         scopebar->hide();
     }
-#endif
 }
 
 void
@@ -825,7 +809,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 #ifdef Q_OS_MAC
-    //head->updateGeometry();
+    head->updateGeometry();
     repaint();
 #endif
 }
