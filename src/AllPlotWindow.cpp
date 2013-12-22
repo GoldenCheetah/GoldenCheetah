@@ -1611,7 +1611,7 @@ void
 AllPlotWindow::resetSeriesStackedDatas()
 {
     if (!current) return;
-qDebug()<<"reset series stacked datas!";
+
     // just reset from AllPlot
     bool first = true;
     foreach(AllPlot *p, seriesPlots) {
@@ -1758,7 +1758,7 @@ AllPlotWindow::showStackChanged(int value)
 
             // refresh plots
             resetSeriesStackedDatas();
-qDebug()<<"replotting!";
+
             // now they are all set, lets replot them
             foreach(AllPlot *plot, seriesPlots) plot->replot();
 
@@ -1790,8 +1790,6 @@ AllPlotWindow::setupSeriesStackPlots()
 {
     if (!showStack->isChecked() || !showBySeries->isChecked() || setupSeriesStack) return;
 
-    qDebug()<<"setup series stack plots just 5 for now"<<setupSeriesStack;
-
     QVBoxLayout *newLayout = new QVBoxLayout;
 
     // this is NOT a memory leak (see ZZZ below)
@@ -1822,8 +1820,6 @@ AllPlotWindow::setupSeriesStackPlots()
 
     bool first = true;
     foreach(RideFile::SeriesType x, serieslist) {
-
-qDebug()<<"added a plot"<<x;
 
         // create that plot
         AllPlot *_allPlot = new AllPlot(this, context, x);

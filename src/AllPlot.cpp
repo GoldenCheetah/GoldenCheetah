@@ -1684,7 +1684,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 void
 AllPlot::setDataFromPlot(AllPlot *plot, bool first)
 {
-qDebug()<<"set data from plot";
     if (plot == NULL) {
         rideItem = NULL;
         return;
@@ -1692,7 +1691,6 @@ qDebug()<<"set data from plot";
 
     referencePlot = plot;
 
-qDebug()<<"check it has data";
     // You got to give me some data first!
     //if (!plot->distanceArray.count() || !plot->timeArray.count()) return;
 
@@ -1700,7 +1698,6 @@ qDebug()<<"check it has data";
     rideItem = plot->rideItem;
     bydist = plot->bydist;
 
-qDebug()<<"set invisible";
     // remove all curves from the plot
     wCurve->detach();
     mCurve->detach();
@@ -1766,7 +1763,6 @@ qDebug()<<"set invisible";
     }
 #endif
 
-qDebug()<<"clone curves..";
     QwtPlotCurve *ourCurve = NULL, *thereCurve = NULL;
     QString title;
 
