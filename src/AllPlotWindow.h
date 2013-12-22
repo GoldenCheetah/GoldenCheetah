@@ -53,6 +53,7 @@ class AllPlotWindow : public GcChartWindow
     // in this example we might show a stacked plot and a ride
     // plot at the same time.
     Q_PROPERTY(bool stacked READ isStacked WRITE setStacked USER true)
+    Q_PROPERTY(bool byseries READ isBySeries WRITE setBySeries USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
@@ -86,6 +87,7 @@ class AllPlotWindow : public GcChartWindow
 
         // get properties - the setters are below
         bool isStacked() const { return showStack->isChecked(); }
+        bool isBySeries() const { return showBySeries->isChecked(); }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
         int isShowHr() const { return showHr->checkState(); }
@@ -140,6 +142,7 @@ class AllPlotWindow : public GcChartWindow
         void setSmoothing(int value);
         void setByDistance(int value);
         void setStacked(int value);
+        void setBySeries(int value);
 
         // trap widget signals
         void zoomChanged();
@@ -148,6 +151,7 @@ class AllPlotWindow : public GcChartWindow
         void moveLeft();
         void moveRight();
         void showStackChanged(int state);
+        void showBySeriesChanged(int state);
 
     protected:
 
@@ -169,6 +173,7 @@ class AllPlotWindow : public GcChartWindow
         AllPlot *allPlot;
         AllPlot *fullPlot;
         QList <AllPlot *> allPlots;
+        QList <AllPlot *> seriesPlots;
         QwtPlotPanner *allPanner;
         QwtPlotZoomer *allZoomer;
 
@@ -176,6 +181,12 @@ class AllPlotWindow : public GcChartWindow
         QScrollArea *stackFrame;
         QVBoxLayout *stackPlotLayout;
         QWidget *stackWidget;
+
+        // series stack view
+        QScrollArea *seriesstackFrame;
+        QVBoxLayout *seriesstackPlotLayout;
+        QWidget *seriesstackWidget;
+
         QwtArrowButton *stackZoomDown;
         QwtArrowButton *stackZoomUp;
 
@@ -186,6 +197,7 @@ class AllPlotWindow : public GcChartWindow
         // Common controls
         QGridLayout *controlsLayout;
         QCheckBox *showStack;
+        QCheckBox *showBySeries;
         QCheckBox *showGrid;
         QCheckBox *showFull;
         QCheckBox *paintBrush;
@@ -212,21 +224,25 @@ class AllPlotWindow : public GcChartWindow
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
-        QCheckBox *rStack, *rFull;
+        QCheckBox *rStack, *rBySeries, *rFull;
+        QStackedWidget *allPlotStack;
 
         // reset/redraw all the plots
         void setupStackPlots();
+        void setupSeriesStackPlots();
         void redrawAllPlot();
         void redrawFullPlot();
         void redrawStackPlot();
 
         void showInfo(QString);
         void resetStackedDatas();
+        void resetSeriesStackedDatas();
         int stackWidth;
 
         bool active;
         bool stale;
         bool setupStack; // we optimise this out, its costly
+        bool setupSeriesStack; // we optimise this out, its costly
 
     private slots:
 

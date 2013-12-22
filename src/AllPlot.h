@@ -34,6 +34,8 @@
 #include <QStackedWidget>
 #include <QTextEdit>
 
+#include "RideFile.h"
+
 class QwtPlotCurve;
 class QwtPlotIntervalCurve;
 class QwtPlotGrid;
@@ -58,13 +60,15 @@ class AllPlot : public QwtPlot
 
     public:
 
-        AllPlot(AllPlotWindow *parent, Context *context);
+        // you can declare which series to plot, none means do them all
+        AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType series = RideFile::none);
 
         bool eventFilter(QObject *object, QEvent *e);
 
         // set the curve data e.g. when a ride is selected
         void setDataFromRide(RideItem *_rideItem);
         void setDataFromPlot(AllPlot *plot, int startidx, int stopidx);
+        void setDataFromPlot(AllPlot *plot, bool first = false); // used for single series plotting
 
         // convert from time/distance to index in *smoothed* datapoints
         int timeIndex(double) const;
@@ -73,8 +77,8 @@ class AllPlot : public QwtPlot
         // plot redraw functions
         bool shadeZones() const;
         void refreshZoneLabels();
-        void refreshIntervalMarkers();
-        void refreshCalibrationMarkers();
+        void refreshIntervalMarkers(bool withtext=true);
+        void refreshCalibrationMarkers(bool withtext=true);
         void refreshReferenceLines();
         void refreshReferenceLinesForAllPlots();
         void setAxisTitle(QwtAxisId axis, QString label);
@@ -206,6 +210,9 @@ class AllPlot : public QwtPlot
         int arrayLength;
         int smooth;
         bool bydist;
+
+        // scope of plot (none means all, or just for a specific series
+        RideFile::SeriesType scope;
 
     private:
         Context *context;

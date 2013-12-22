@@ -56,7 +56,7 @@
 #include "WPrime.h"
 
 AllPlotWindow::AllPlotWindow(Context *context) :
-    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false)
+    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false)
 {
     QWidget *c = new QWidget;
     QVBoxLayout *clv = new QVBoxLayout(c);
@@ -92,6 +92,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     rSmoothSlider->setMinimum(1);
     rSmoothSlider->setMaximum(100);
     rStack = new QCheckBox(tr("Stacked"));
+    rBySeries = new QCheckBox(tr("by series"));
     rFull = new QCheckBox(tr("Fullplot"));
 
     // layout reveal controls
@@ -102,7 +103,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     r->addWidget(rSmoothEdit);
     r->addWidget(rSmoothSlider);
     QVBoxLayout *v = new QVBoxLayout;
-    v->addWidget(rStack);
+    QHBoxLayout *s = new QHBoxLayout;
+    s->addWidget(rStack);
+    s->addWidget(rBySeries);
+    v->addLayout(s);
     v->addWidget(rFull);
     r->addSpacing(20);
     r->addLayout(v);
@@ -119,6 +123,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showStack = new QCheckBox(tr("Stacked view"), this);
     showStack->setCheckState(Qt::Unchecked);
     cl1->addRow(showLabel, showStack);
+
+    showBySeries = new QCheckBox(tr("By Series"), this);
+    showBySeries->setCheckState(Qt::Unchecked);
+    cl1->addRow(new QLabel("", this), showBySeries);
 
     stackWidth = 15;
     stackZoomUp = new QwtArrowButton(1, Qt::UpArrow,this);
@@ -233,6 +241,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlot->setContentsMargins(0,0,0,0);
     allPlot->enableAxis(QwtPlot::xBottom, true);
     allPlot->setAxisVisible(QwtPlot::xBottom, true);
+    //allPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //allPlot->axisWidget(QwtPlot::yLeft)->installEventFilter(this);
 
     // sort out default values
@@ -319,6 +328,26 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackFrame->setPalette(palette);
 
     //
+    // series stack view
+    //
+    seriesstackPlotLayout = new QVBoxLayout();
+    seriesstackPlotLayout->setSpacing(0);
+    seriesstackPlotLayout->setContentsMargins(0,0,0,0);
+    seriesstackWidget = new QWidget();
+    seriesstackWidget->setAutoFillBackground(false);
+    seriesstackWidget->setLayout(seriesstackPlotLayout);
+    seriesstackWidget->setPalette(palette);
+
+    seriesstackFrame = new QScrollArea();
+    seriesstackFrame->hide();
+    seriesstackFrame->setAutoFillBackground(false);
+    seriesstackFrame->setWidgetResizable(true);
+    seriesstackFrame->setWidget(seriesstackWidget);
+    seriesstackFrame->setFrameStyle(QFrame::NoFrame);
+    seriesstackFrame->setContentsMargins(0,0,0,0);
+    seriesstackFrame->setPalette(palette);
+
+    //
     // allPlot view
     //
     allPlotLayout = new QVBoxLayout;
@@ -378,7 +407,14 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     //fullPlot->setTitle("");
     fullPlot->setContentsMargins(0,0,0,0);
 
-    allPlotLayout->addWidget(allPlot);
+    // allPlotStack contains the allPlot and the stack by series
+    // because both want the optional fullplot at the botton
+    allPlotStack = new QStackedWidget(this);
+    allPlotStack->addWidget(allPlot);
+    allPlotStack->addWidget(seriesstackFrame);
+    allPlotStack->setCurrentIndex(0);
+
+    allPlotLayout->addWidget(allPlotStack);
     allPlotFrame->setLayout(allPlotLayout);
 
     // controls...
@@ -434,6 +470,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
+    connect(showBySeries, SIGNAL(stateChanged(int)), this, SLOT(showBySeriesChanged(int)));
+    connect(rBySeries, SIGNAL(stateChanged(int)), this, SLOT(showBySeriesChanged(int)));
     connect(rFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(paintBrush, SIGNAL(stateChanged(int)), this, SLOT(setPaintBrush(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
@@ -501,7 +539,9 @@ AllPlotWindow::configChanged()
 void
 AllPlotWindow::redrawAllPlot()
 {
-    if (!showStack->isChecked() && current) {
+    // refresh if shown or used as basis for stacked series (ie zooming off fullPlot)
+    if (((showStack->isChecked() && showBySeries->isChecked()) || !showStack->isChecked())  && current) {
+
         RideItem *ride = current;
 
         int startidx, stopidx;
@@ -570,11 +610,26 @@ AllPlotWindow::redrawStackPlot()
         // to screen flicker
         stackFrame->setUpdatesEnabled(false);
 
-        // remove current plots - then recreate
-        resetStackedDatas();
 
-        // now they are all set, lets replot
-        foreach(AllPlot *plot, allPlots) plot->replot();
+        // plot stack view ..
+        if (!showBySeries->isChecked()) {
+
+            // BY TIME / DISTANCE
+
+            // remove current plots - then recreate
+            resetStackedDatas();
+
+            // now they are all set, lets replot
+            foreach(AllPlot *plot, allPlots) plot->replot();
+
+        } else {
+
+            // BY SERIES
+            resetSeriesStackedDatas();
+
+            // now they are all set, lets replot
+            foreach(AllPlot *plot, seriesPlots) plot->replot();
+        }
 
         // we're done, go update the display now
         stackFrame->setUpdatesEnabled(true);
@@ -585,6 +640,7 @@ void
 AllPlotWindow::zoomChanged()
 {
     redrawAllPlot();
+    redrawStackPlot(); // series stacks!
 }
 
 void
@@ -625,7 +681,7 @@ AllPlotWindow::rideSelected()
     // ignore if not active
     if (!amVisible()) {
         stale = true;
-        setupStack = false;
+        setupSeriesStack = setupStack = false;
         return;
     }
 
@@ -678,8 +734,10 @@ AllPlotWindow::rideSelected()
 
     // we need to reset the stacks as the ride has changed
     // but it may ignore if not in stacked mode.
-    setupStack = false;
+    setupSeriesStack = setupStack = false;
+
     setupStackPlots();
+    setupSeriesStackPlots();
 
     stale = false;
 }
@@ -731,6 +789,13 @@ AllPlotWindow::intervalsChanged()
         plot->refreshIntervalMarkers();
         plot->replot();
     }
+
+    // and then the series plots
+    foreach (AllPlot *plot, seriesPlots) {
+        plot->refreshIntervalMarkers();
+        plot->replot();
+    }
+
 }
 
 void
@@ -749,8 +814,14 @@ AllPlotWindow::intervalSelected()
     // which mode we are in...
     hideSelection();
     if (showStack->isChecked()) {
-        foreach (AllPlot *plot, allPlots)
-            plot->replot();
+
+        if (showBySeries->isChecked()) {
+            foreach (AllPlot *plot, seriesPlots)
+                plot->replot();
+        } else {
+            foreach (AllPlot *plot, allPlots)
+                plot->replot();
+        }
     } else {
         fullPlot->replot();
         allPlot->replot();
@@ -762,6 +833,22 @@ AllPlotWindow::setStacked(int value)
 {
     showStack->setChecked(value);
     rStack->setChecked(value);
+
+    // enables / disable as needed
+    if (showStack->isChecked()) {
+        showBySeries->setEnabled(true);
+        rBySeries->setEnabled(true);
+    } else {
+        showBySeries->setEnabled(false);
+        rBySeries->setEnabled(false);
+    }
+}
+
+void
+AllPlotWindow::setBySeries(int value)
+{
+    showBySeries->setChecked(value);
+    rBySeries->setChecked(value);
 }
 
 void
@@ -896,7 +983,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 
     // now set the visible plots, depending upon whether
     // we are in stacked mode or not
-    if (showStack->isChecked()) {
+    if (showStack->isChecked() && !showBySeries->isChecked()) {
 
         // hide normal view
         allPlotFrame->hide();
@@ -924,6 +1011,9 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         // show normal view
         allPlotFrame->show();
         allPlot->show();
+
+        if (showStack->isChecked() && showBySeries->isChecked()) allPlotStack->setCurrentIndex(1);
+        else allPlotStack->setCurrentIndex(0);
 
         if (showFull->isChecked()) {
             fullPlot->show();
@@ -1497,6 +1587,7 @@ AllPlotWindow::setByDistance(int value)
     redrawFullPlot();
     redrawAllPlot();
     setupStackPlots();
+    setupSeriesStackPlots();
 
     active = false;
 }
@@ -1516,6 +1607,18 @@ AllPlotWindow::setSmoothing(int value)
     redrawStackPlot();
 }
 
+void
+AllPlotWindow::resetSeriesStackedDatas()
+{
+    if (!current) return;
+qDebug()<<"reset series stacked datas!";
+    // just reset from AllPlot
+    bool first = true;
+    foreach(AllPlot *p, seriesPlots) {
+        p->setDataFromPlot(allPlot, first);
+        first = false;
+    }
+}
 //
 // Runs through the stacks and updates their contents
 //
@@ -1583,6 +1686,7 @@ AllPlotWindow::setStackZoomUp()
 
         stackWidth = ceil(stackWidth * 1.25);
         setupStackPlots();
+        setupSeriesStackPlots();
         stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
         stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     }
@@ -1597,6 +1701,7 @@ AllPlotWindow::setStackZoomDown()
 
         stackWidth = floor(stackWidth / 1.25);
         setupStackPlots();
+        setupSeriesStackPlots();
         stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
         stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     }
@@ -1610,6 +1715,17 @@ AllPlotWindow::showStackChanged(int value)
     showStack->setCheckState((Qt::CheckState)value);
     rStack->setCheckState((Qt::CheckState)value);
 
+    // enables / disable as needed
+    if (showStack->isChecked()) {
+        showBySeries->setEnabled(true);
+        rBySeries->setEnabled(true);
+        allPlotStack->setCurrentIndex(0);
+    } else {
+        showBySeries->setEnabled(false);
+        rBySeries->setEnabled(false);
+        allPlotStack->setCurrentIndex(1);
+    }
+
     // when we swap from normal to
     // stacked view, save the mode so
     // we can startup with the 'preferred'
@@ -1620,14 +1736,33 @@ AllPlotWindow::showStackChanged(int value)
     // and the right widgets are hidden/shown.
     if (value) {
 
-        // setup the stack plots if needed
-        setupStackPlots();
+        if (!showBySeries->isChecked()) {
 
-        // refresh plots
-        resetStackedDatas();
+            // BY TIME / DISTANCE
 
-        // now they are all set, lets replot them
-        foreach(AllPlot *plot, allPlots) plot->replot();
+            // setup the stack plots if needed
+            setupStackPlots();
+
+            // refresh plots
+            resetStackedDatas();
+
+            // now they are all set, lets replot them
+            foreach(AllPlot *plot, allPlots) plot->replot();
+
+        } else {
+
+            // BY SERIES
+
+            // setup the stack plots if needed
+            setupSeriesStackPlots();
+
+            // refresh plots
+            resetSeriesStackedDatas();
+qDebug()<<"replotting!";
+            // now they are all set, lets replot them
+            foreach(AllPlot *plot, seriesPlots) plot->replot();
+
+        }
 
     } else {
         // refresh plots
@@ -1636,6 +1771,120 @@ AllPlotWindow::showStackChanged(int value)
 
     // reset the view
     setAllPlotWidgets(current);
+}
+
+void
+AllPlotWindow::showBySeriesChanged(int value)
+{
+    if (!current) return;
+
+    showBySeries->setCheckState((Qt::CheckState)value);
+    rBySeries->setCheckState((Qt::CheckState)value);
+
+    // XXX ???
+    showStackChanged(showStack->checkState()); // force replot etc
+}
+
+void
+AllPlotWindow::setupSeriesStackPlots()
+{
+    if (!showStack->isChecked() || !showBySeries->isChecked() || setupSeriesStack) return;
+
+    qDebug()<<"setup series stack plots just 5 for now"<<setupSeriesStack;
+
+    QVBoxLayout *newLayout = new QVBoxLayout;
+
+    // this is NOT a memory leak (see ZZZ below)
+    seriesPlots.clear();
+
+    RideItem* rideItem = current;
+    if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
+
+    QPalette palette;
+    palette.setBrush(QPalette::Background, Qt::NoBrush);
+
+    QList<RideFile::SeriesType> serieslist;
+
+    // lets get a list of what we need to plot
+    if (showPower->currentIndex() < 2 && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::watts;
+    if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) serieslist << RideFile::hr;
+    if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) serieslist << RideFile::cad;
+    if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) serieslist << RideFile::kph;
+    if (showTorque->isChecked() && rideItem->ride()->areDataPresent()->nm) serieslist << RideFile::nm;
+    if (showAlt->isChecked() && rideItem->ride()->areDataPresent()->alt) serieslist << RideFile::alt;
+    if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) serieslist << RideFile::temp;
+    if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) serieslist << RideFile::headwind;
+    if (showBalance->isChecked() && rideItem->ride()->areDataPresent()->lrbalance) serieslist << RideFile::lrbalance;
+    if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::NP;
+    if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::xPower;
+    if (showAP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::aPower;
+    //if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::bpm;
+
+    bool first = true;
+    foreach(RideFile::SeriesType x, serieslist) {
+
+qDebug()<<"added a plot"<<x;
+
+        // create that plot
+        AllPlot *_allPlot = new AllPlot(this, context, x);
+        _allPlot->setAutoFillBackground(false);
+        _allPlot->setPalette(palette);
+        _allPlot->setDataFromPlot(allPlot, first); // will clone all settings and data for the series
+                                                   // being plotted, only works for one series plotting
+
+        first = false;
+
+        // add to the list
+        seriesPlots.append(_allPlot);
+        addPickers(_allPlot);
+        newLayout->addWidget(_allPlot);
+        _allPlot->setFixedHeight(120);
+
+        // No x axis titles
+        _allPlot->setAxisVisible(QwtPlot::xBottom, true);
+        _allPlot->enableAxis(QwtPlot::xBottom, true);
+        _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
+        _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,2), 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,3).id, 0);
+
+        // controls
+	    _allPlot->replot();
+    }
+    newLayout->addStretch();
+
+    // the refresh takes a while and is prone
+    // to lots of flicker, we turn off updates
+    // whilst we switch from the old to the new
+    // stackWidget and plots
+    seriesstackFrame->setUpdatesEnabled(false);
+
+    // set new widgets
+    QWidget *stackWidget = new QWidget;
+    stackWidget->setPalette(palette);
+    stackWidget->setAutoFillBackground(true);
+    stackWidget->setLayout(newLayout);
+    seriesstackFrame->setWidget(stackWidget);
+
+    // ZZZZ zap old widgets - is NOT required
+    //                        since setWidget above will destroy
+    //                        the ScrollArea's children
+    // not neccessary --> foreach (AllPlot *plot, oldPlots) delete plot;
+    // not neccessary --> delete stackPlotLayout;
+    // not neccessary --> delete stackWidget;
+
+    // we are now happy for a screen refresh to take place
+    seriesstackFrame->setUpdatesEnabled(true);
+
+#if 0
+    // first lets wipe out the current plots
+    // since we cache out above we need to
+    // track and manage via below
+#endif
+    setupSeriesStack = true; // we're clean
 }
 
 void
@@ -1648,7 +1897,7 @@ AllPlotWindow::setupStackPlots()
     // with a new one. This is to avoid some
     // nasty flickers and simplifies the code
     // for refreshing.
-    if (!showStack->isChecked() || setupStack) return;
+    if (!showStack->isChecked() || showBySeries->isChecked() || setupStack) return;
 
     // since we cache out above we need to
     // track and manage via below
