@@ -26,33 +26,19 @@ PCV on Mac OS X</a> for further information.
 
 <p>
 <font face="arial,helvetica,sanserif">
-<big><strong>Known Issues in Release 3.0.0</strong></big>
-</font>
-</p>
-<ul>
-<li>Twitter posting is broken. (API change after release.)
-<li>Strava upload is broken. (API change after release.)
-<li>Google Maps is broken. (API change after release.)
-<li>Realtime trainer with wheelsizes of 20"/26"/650C give incorrect speed readings.
-<li>Several other minor issues.
-</ul>
-
-Fixes have been made to the code base and we are working on a new release to address these issues being released by the end of 2013.
-
-<p>
-<font face="arial,helvetica,sanserif">
-<big><strong>Download Release 3.0.0</strong></big>
+<big><strong>Download Release 3.0.1</strong></big>
 </font>
 </p>
 
+<p>This is a bug fix release with a few new features.</p>
+
 <ul>
-<li><a href="GoldenCheetah_3.0.0_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
-<li><a href="GoldenCheetah_3.0.0_Mac_32bit.dmg">Mac OS X Intel 32bit (10.6+)</a><br>
-<li><a href="GoldenCheetah_3.0.0_Mac_64bit.dmg">Mac OS X Intel 64bit (10.6+)</a><br>
+<li><a href="GoldenCheetah_3.0.1_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
+<li><a href="GoldenCheetah_3.0.1_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
 </ul>
 
 <p>
-Installation is simple. Download the file for your operationg system.<br>
+Installation is simple. Download the file for your operating system.<br>
 On Mac, open the DMG and drag and drop where you would like to install.<br>
 For Windows, run the Installer and follow the prompts.<br>
 </p>
@@ -66,7 +52,7 @@ There is the older Version 2.1.0  <a href="/users-guide.html">User's Guide</a> o
 and use Golden Cheetah that can assist also.
 </p>
 <p>
-You can also <a href="release-notes.html">view the release notes</a> for 3.0
+You can also <a href="release-notes.html">view the release notes</a> for 3.0.1
 or <a href="older-releases.html">download older releases</a> of Golden Cheetah.
 </p>
 

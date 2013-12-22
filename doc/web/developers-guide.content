@@ -11,7 +11,8 @@ Installing dependencies
 </font></big>
 
 <p>GC requires a number of libraries.  On Mac OS X, you can get most of these
-through <a href="http://www.macports.org/">Mac Ports</a>.  On Linux and other
+through <a href="http://www.macports.org/">Mac Ports</a> or
+<a href="http://www.brew.sh/">Homebrew</a>.  On Linux and other
 Unixes, you can use whatever package manager your distribution provides.  (We
 list the package names for MacPorts and Ubuntu below.)  On Windows, you'll
 probably need to download and install everything by hand.  You might also want
