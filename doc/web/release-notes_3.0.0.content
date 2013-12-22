@@ -1,0 +1,1860 @@
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>GoldenCheetah 3.0.0</strong></big>
+</font>
+</p>
+
+<p>
+New Features and Enhancements
+  <ul>
+  <li>See the full log below.</li>
+  <li>See the <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Release.pdf?raw=true">Release Notes</a> PDF on GitHub.</li>
+  <li>A PDF <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Manual.pdf?raw=true">User's Manual</a></li>
+  <li>A PDF <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-FAQ.pdf?raw=true">Frequently Asked Questions (FAQ)</a></li>
+ <li>Welcome Screens to help setup the program.</li>
+  </ul>
+</p>
+
+<p>
+Internationalisation
+  <ul>
+  <li>German (Tilman Schmiedeberg)</li>
+  <li>Italian (Marco Piccirilli)</li>
+  <li>Japanese (Okano Takayoshi)</li>
+  <li>Spanish (Alejandro Martinez)</li>
+  </ul>
+</p>
+
+<p>
+Development Builds
+  <ul>
+  <li>Gareth Coco</li>
+  <li>Jamie Kimberley</li>
+  </ul>
+</p>
+
+<p>
+Full Change Log
+</p>
+<pre>
+Alejandro Martinez (49):
+      Change Pace metric to follow metric/imperial units as configured
+      Automatic CdA and Crr Estimation in Aerolab
+      Add es and pt translation files set lang default according to system default
+      Enable metrics translations     The code setting metric names and units was moved from constructors to     an initialize method, to be called after translator initialization.     English Name is preserved as InternalName for metadata.xlm compatibility     in metric override.     Q_DECLARE_TR_FUNCTIONS(class-name) macro is used to set tr() context     when class-name is not QObject sub-class.
+      Enable translation on LeftRight metric
+      Enable Metadata translation     This patch keeps the original english name of SpecialFields and SpecialTabs     as internalName, to preserve compatibility, while it uses a translated     displayName for user interfase in other languages.
+      Enable translations in RideSummary     Includes default zone descriptions
+      Enable AllPlot and Aerolab translations     Also update spanish translation
+      Enable PerfPlot and PfPvPlot translations     Also includes a minor change in LTMSidebar
+      Enable LTM Translations     Includes translation of default chart names, these     should be in sync with those defined in charts.xml
+      Enable DataProcessor Translation     Also includes download instructions translation
+      Enable Colors translations     Includes loading translations for system dialogs and     using default units according to system settings
+      Enable Rho and Twitter translations
+      Enable 3d chart translations
+      Enable HomeWindow Translations
+      New metricsDetails method in LTMTools
+      Translate metrics names and units
+      Enable Diary Translations
+      Enable chart names translation
+      Enable RideNavigator Translation
+      Enable RideFile seriesName translation     Also changed all references to QObject::tr for a version with the proper context
+      Translate axis labels LTMPlot     Fixes #29
+      Enable Measures Translation     For use in LTM metrics list
+      Fix RideNavigator Translation     column names from xml file need to be translated to match translated headings,     other posibility would be to match before translation, but this option needed     fewer changes.
+      Options Toolbar & Keywords Translations
+      Fix minor translations related issues
+      Enable fieldChooser and field types translation
+      Enable translations in Devices and update spanish translation
+      Merge branch 'master' of https://github.com/GoldenCheetah/GoldenCheetah
+      Merge branch 'master' of https://github.com/GoldenCheetah/GoldenCheetah
+      Enable translation of welcome text in BlankState.cpp and Wheelsize in Pages.cpp
+      Enabled translation of supported devices legend in DeviceTypes.cpp
+      Enabled ScatterPlot axis legend translation
+      Merge branch 'master' of https://github.com/GoldenCheetah/GoldenCheetah
+      Enabled translation of Search and Group By     Update spanish translation     Update italian translation (by Marco Piccirilli)
+      Merge branch 'master' of https://github.com/GoldenCheetah/GoldenCheetah
+      Merge branch 'master' of https://github.com/GoldenCheetah/GoldenCheetah
+      Enabled translation of Season and Event details     Updated spanish translation     Updated german translation (by Tilman Schmiedeberg)
+      UI Nits: enlarge Aerolab Crr box to fit the allowed 6 decimal places
+      Enabled translation of BatchExportDialog     Updated Spanish Translation     Updated Italian Translation (by Marco Piccirilli)
+      Enabled translation of GroupBy labels and formats in RideNavigator
+      Use Distance as a PMC metric     Fixes #570
+      Enabled progress translation in PowerTap download     Updated spanish translation
+      Enabled progress translation in PowerTap download     Updated spanish translation
+      Updated spanish translation
+      Enabled translation of Cancel/Save in NewCyclistDialog
+      Updated translations     Italian by Marco Piccirilli     Japanese by Okano Takayoshi
+      Updated German Translation by Tilman Schmiedeberg
+      Update spanish translation with event creation warning
+
+Andrew Bryson (9):
+      Reset the lap timer based on erg file
+      Lap Averages in Real Time mode
+      Fixed lap averages only working with lap button
+      Add lap time remaining data series
+      Fix quarq power and cadence glitches when coasting
+      Fix power blips from Standard Power with Quarq
+      Initialise stdNullCount
+      Allow more duplicate messgaes in standard mode
+      Allow user to select another video when paused
+
+Andrew Bryspn (1):
+      Allow videos to be in subdirectories. They can also be symlinked from the place where videos normally live.
+
+Andy Bryson (8):
+      Issue #357 - Y axis is unclear
+      361 - Y axis is still unclear
+      Chart Settings (show legend and show zone) were not persistent.
+      Stacked Plot Improvements     Make first plot the same size as the others in stacked view     Stop RPM scale clutter
+      Remove Boost Dependency - The Easy Bits
+      Remove Boost Dependency - Devices
+      Remove Boost
+      Fix build error on Arch Linux
+
+Chris Cleeland (2):
+      Pre-patched version of libusb tarball
+      Fix issue #553: take metricDetail->fillCurve from the checkbox state     rather than using the pointer.
+
+Claus Assmann (6):
+      Support download for OpenBSD USB Serial devices
+      Add Support for Joule CSV Poweragent Files
+      Update INSTALL-LINUX for needing > Flex 2.5.9
+      Poweragent 7.5.7.34 CSV date format
+      Fix typos in FixHRSpikes
+      OpenBSD support for ANT sticks
+
+Damien (142):
+      enhancement for HrPw
+      Add summary metrics list to preferences
+      Correct crash with truncated files
+      Altitude scale present with no altitude data.
+      Add a TCX ride exporter
+      Modification to handle odd start page and compatible with qt 4.6
+      Correct interval in SyncRideFile
+      Modify TRIMP formula to use time_riding instead of workout time
+      Modify Aerolab to add interval highlight and zoom + auto offset
+      Aerolab : Change LCD display to LineEdit
+      Correct bug in the peakPowerHr formula
+      Add a Maximums column in the ride summary
+      Correct temp plot for smoothing
+      Add average for Power, Cadence and Heartrate
+      Add ResponseIndex and EfficiencyFactor
+      Correct encoding in json parser
+      Correct heartrate zone labels position for X axis not beginning at 0
+      Correct bug #496 for longitude < -65
+      Remove Joule warings
+      Fix CriticalPowerWindow handle seasons changed
+      Select active ride in the ride navigator
+      Reorganise intervals by drag and drop
+      Qwt 6 support
+      Change speed to double in Bin parser
+      Qwt 6.0.1 Support
+      Plot relative headwind
+      Correct intialisation of altitude for TCX without altitude
+      Add torque on the plot
+      Find intervals by time/distance
+      Correct typo in peakpower intervals
+      Add Upload to RideWithGPS.com
+      Add Watts/Kg in the cpx cache files and in the CP plot
+      Add Left/Right Power Support
+      Modify TM processing
+      Correct memory leak in HrPw plot
+      Keep/Save last value for showBalance
+      About dialog
+      Fix Joule GPS time recording gap error.
+      Show hh:mm:ss on x-axis in ride plot
+      add seconds to plot scale label under 5 minutes
+      Ignore/correct invalid start time for an interval
+      Add FileType to RideFile
+      Correct copy/paste errors for File Format
+      Enable withings weight for Watts per Kilogram metric
+      Add myzeo data download Add ZQ and sleep time metrics
+      Refresh metrics for rides after a new weight form Withings download
+      Correct error in the erase function for Joule GPS
+      Correct copy/paste errors for File Format
+      Enable withings weight for Watts per Kilogram metric
+      Add myzeo data download Add ZQ and sleep time metrics
+      Refresh metrics for rides after a new weight form Withings download
+      Correct error in the erase function for Joule GPS
+      Minor changes in Joule GPS download
+      Choose channels (Altitude, Power, Cadence, Heartrate) to upload to Strava
+      Correct error in last commit
+      Add a column Start Time in the ride navigator
+      Modify Joule download to include Joule 1.0        Need to modify parser now
+      Correct bug with the new virtual column for Ride Time
+      Modify getUnitVersion for Joule 1.0
+      Modify date reader for Joule 1.0
+      Another change on date for Joule 1.0
+      Correct bug with the new virtual column for Ride Time
+      Modify getUnitVersion for Joule 1.0
+      Modify date reader for Joule 1.0
+      Another change on date for Joule 1.0
+      Choose Metric/Imperial units in New Athlete dialog
+      Correct crash for Joule 2.0 files without temperature for first seconds
+      Correct Zeo data download : only one message box after new values
+      Update translation (ts) files
+      Update translation (ts) files
+      Change series id for histograms after ids were changed by mistake in commit #b116d3a
+      Implements WattsKg in histogram
+      The getWeight() method should find the last value of weight in measures if the last measure has no weight value
+      Return cached value
+      Correct binWidth if not valid for the selected series
+      Add shaded power zones for watt per kilogram series in histogram
+      Correct invalid json if no hr in Strava upload
+      Add label for seasons with same start date
+      Mismatching allocation and deallocation
+      Update French translation for V3.0 (1/3)
+      Update French translation for V3.0 (2/3)
+      Remove warnings
+      Update French translation for V3.0 (3/3)
+      Remove some warnings
+      ISODate format for UTC date end by "Z"
+      ISODate format for UTC date end by "Z"
+      Blank state
+      Add images for BlankStatePages
+      initialise default value for reveal control     synchronize reveal slider with standard slider
+      Initialisation of reveal controls
+      Transparent background for reveal controls     Add controls for HrPwWindow
+      Add reveal controls for CP Plot and PfPv Plot
+      Add reveal controls for ScatterWindow
+      Animation for reveal controls
+      Change animation for reveal on AllPlotWindow
+      Animation for AllPlot only for background
+      Wait before controls appear on AllPlot
+      UI Nits: Reveal controls for GcChartWindow     Add a new Class GcChartWindow with reveal widget and animations
+      Hide reveal control after animation     Update HistogramWindow reveal controls
+      UI Nits: GcChartWindow for PfPvWindow and HrPwWindow
+      UI Nits: GcChartWindow for CriticalPowerWindow and ModelWindow
+      Show picker info in CriticalPowerWindow     Correct previous commit
+      Re-order seasons with drag drop     fixes #445
+      Translation update     Use metric symbol insteed of name for summary metric data
+      Blank state : no GPS image for Google Map     Add an image when no GPS data present
+      Blank State : default image for no data available
+      BlankState: No data available for HistogramWindow     Use the default blank state in HistogramWindow where data not present
+      BlankState: No data available for HrPwWindow     Use the default blank state in HrPwWindow when data not present
+      BlankState: No data available for AllPlotWindow     Use the default blank state in AllPlotWindow when data not present
+      BlankState: No data available for PfPvWindow     Use the default blank state in PfPvWindow when data not present
+      BlankState : ScatterWindow     Blank state only if no ride or no data point
+      UI Nits: PfPvWindow double click to change quarters (CP and cadence)
+      PfPvWindow : Double Click     Update edit values for CP et CAD after double click
+      UI Nits: Add titlebar for splitters
+      Correct : splitters not resizing after expanded
+      Sidebar : Use QSplitterhandle
+      Add Strava activity download feature
+      UI Nits : Add a splitter control
+      Add missing images in last commit for sidebar
+      Strava download : add error messages
+      UI Nits: Sidebar WIP
+      UI Nits: Sidebar WIP     Move extra menu
+      UI Nits: Sidebar, invisible root item for intervals
+      Strava upload: Use TCX format to handle stationary trainer ride
+      LTMSidebar: store/use last selected date range
+      Joule GPS : handle negative temperature
+      Edit interval
+      Display negative temperatures (and respect temperature units) in AllPlot     fixes #466
+      Correct min value for speed axis
+      Strava upload : send selected channels only in TCX mode
+      RidePlot: Correct min value for altitudes less than zero     fixes #527
+      FitFile: Add O Synce in manufacturer and navi2coach in product
+      SyncRideFile: Uniformise manufacturer name
+      FitRideFile: Correct wrong copy-past
+      FitRideFile: Use the slope value
+      RideFile: If we have temperature but the first point have no value use 0 insteed of noTemp value.
+      No resize of left sidebar after reshow
+      Restore sizes after sidebar reshow     fixes #568
+      AllPlot: Save last showTemp value for ridePlot
+      BinRideFile: correct altitude      handle negative value for altitude
+      BinRideFile: Support for left-right pedal balance
+      JsonRideFile: add support to the references for forward compatibility
+
+Damien Grauser (7):
+      SRMWIN Style HrPw Plot
+      O_Sync Macro X device support
+      Add PeakPowerHr metric (average HR during peak power)
+      Add Temperature and Slope Data Series
+      Add temperature to AllPlot
+      Add temperature icon to GCBubble
+      Joule GPS Support
+
+Darren Hague (4):
+      Native ANT+ part 2 - USB2 Support and minor improvements
+      Dynamic load of libusb0.dll
+      Improve stability when libusb0.dll is not present
+      Fix CycleOps Fluid 2 virtual power calculation
+
+Dean Junk (3):
+      Fix TCX Export Schema Compliance
+      Enhance TCX export
+      Updates for XML schema compliance.
+
+Eamonn Doyle (1):
+      Fix Linux README
+
+Eric Brandt (1):
+      Added 'interval summary' window below the interval tree
+
+Eric Murray (1):
+      User Configurable Hysteresis
+
+Frank Zschockelt (2):
+      Included 4 sample sigma files in the test/rides directory
+      Support for Sigma SLF/SMF file formats
+
+Gareth Coco (29):
+      Change start date from UTC to localtime for bin ride file
+      Fix Windows LibUsb compile error
+      Initialise LAT/LON to zero (0.0) in the parser
+      Update default Chart Titles
+      Add right click - Upload Activity to Calendar - functionality
+      Update default chart titles - Analysis view
+      mingw uses Sleep()
+      Allow CdA to lowest possible in AerolabWindow.cpp
+      Don't build QwtDesigner in qwt
+      Overhaul gcconfig.pri.in and src.pro
+      Fixes for Manual Ride Entry
+      Comment added and replace tabs with spaces
+      v3.0dev - Allow ride to be added with no Average HR
+      Documentation updates
+      Fix file name for RideWithGPS.com patch
+      Add back in the ROBOT for Realtime testing
+      Added Garmin Forerunner 110
+      Typo fix - F2XX is meant to be D2XX
+      D2XX Drivers installer for MAC OS
+      Update website with new issue tracker/WIKI
+      Added MAC OSX file for WIKI download
+      Needs to be: #include "TimeUtils.h"
+      Sigma 2.1 Test files
+      Website updates for broken links.
+      HTML formatting
+      Update binary translations
+      Allow make to compile translations before building
+      Appearence fixes
+      Minor website update.
+
+Greg Lonnon (10):
+      kJoules, BikeScore, xpower displayed, fixed length speed/avg speed, refactored grid layout.
+      Computrainer Workout Wizard
+      realtime mode: during a workout, if the +/- keys are hit during a workout,     then the rider is able to control the controlller manually.
+      workoutwizard: fixed the LAP feature in mrc and erg files
+      Added Map and StreetView charts to the TrainTool.
+      added reset window layout to all the HomeWindows.
+      fixed the gps parser to take mapmyride routes
+      strava map jagged fix - issue was the conversion of gps coord to string       didn't have enough precision.
+      Strava Upload date corrected.
+      moved v2.1 doc to master.
+
+Ilja Booij (1):
+      Fix Heartrate support for Tacx Fortius
+
+Jaime (28):
+      Added CNUMOFCFGCOLORS macro to define the number of configurable metric colors are available     Added macro entries for Load, TSS and BikeScore
+      Added use of CNUMOFCFGCOLORS macro in ColorList and DefaultColorList arrays     Added Load, TSS and BikeScore support in setupColors()
+      Added support for configurable colors for Load, TSS and BikeScore
+      Added CRIDEPLOTXAXIS and CRIDEPLOTYAXIS for ErgFilePlot axis color configuration
+      Added Ride Plot X and Y Axis color configuration.  Default to blue and red.
+      In ErgFilePlot(), made the X and Y axis color configurable.
+      Merge remote-tracking branch 'upstream/master'
+      Merge remote-tracking branch 'upstream/master'
+      Added GC_DPFHRS_MAX to support fixing HR spikes
+      Added FixHRSpikes.cpp
+      Add support to Fix hear rate spikes and dropouts
+      In guiUpdate(), fixed an issue with updating now to current time so that it is updated about every 1 second.
+      Merge remote-tracking branch 'upstream/master'
+      Changes to fix CT calibration issues with the real time Train plot.
+      Logic changes to enable real time plotting to resume properly after calibration.     Minor cosmetic fixes of missing #defines for media support
+      Move initialization of curveTitle to CpintPlot constructor from calculate() so the Cp title doesn't get overriden to blank after its first showing.
+      Fixed side bar to properly toggle the Hide/Show state when switching modes     Minor fixes to #defines for Q_OS_MAC on side/scopebar
+      Fix thread warning exit realtime
+      Added removal of double quotes from Racermate TXT data files
+      Racermate test TXT file with double quoted data
+      Noticed that slope was not being initialized to 0.0, so reworked the constructor ro initialize the variables in the order they are listed in RealtimeData.h
+      Fixes in CT support to ensure Gradient/Slope is being defaulted and updated properly between the CTConroller and TrainTool.     Fix to preselect ERG mode in workoutTree.
+      Restore load/gradient after done with calibration
+      Mac Buttons Icon Corruption
+      Icon Toolbar Memory Management
+      Code Cleanup: Ride Editor memory leak
+      Code Cleanup: HrPw memory leak
+      Code Cleanup: CpintPlot Memory leak
+
+Jamie Kimberley (3):
+      V3-force use of no elide and scrollbars in tabbed view
+      Add other TRIMP metrics to performance manager-v3.
+      fix unit conversion error in max cadence calc
+
+John Nye (1):
+      update to fix ticket #457
+
+Jon Escombe (10):
+      Fix lap number issue
+      Fix CRS file granularity
+      Fix for 'stuck in full screen' issue
+      Fix QIODevice errors in ANTLogger
+      Add delay after ANT reset message
+      Change usb_bulk_read() timeout back to 125ms
+      Move early ANT setup after receive loop is started
+      Close ANT channels before stopping session
+      Postpone ANT debug log close
+      Whitespace cleanup (tabs to spaces)
+
+Josef Gebel (1):
+      Fix AllPlot Show by Distance Bug
+
+Justin Knotzke (1):
+      Upload to Strava
+
+Magnus Gille (3):
+      Added support for MotoACTV csv files
+      Added test files for MotoACTV
+      Fixed a missing -1 to make non motoactv files parsable again
+
+Marc Boudreau (3):
+      Fix:     - incorrect RegEx to read some CRS files     - all files were assumed to be metric - (UNITS = ENGLISH) now converts     - scaling adjusted to not clip the top when some graphs were longer
+      Notes (<cmt/>) from PWX files not added as RideFile tags...
+      Notes (<cmt/>) from PWX files not added as RideFile tags...
+
+Marco Piccirilli (1):
+      v3.0 Italian Translation
+
+Mark Liversedge (1325):
+      Inital V3 Branch
+      Julian Candy
+      Fix homewindow bugs
+      merge origin/master fixups.
+      Make libical optional
+      Allow user to drag/resize tiles on homewindow.
+      fix close chart crash.
+      Tidy up bar chart in metrics
+      Move tiles on HomeWindow
+      HomeWindow chart move/drop
+      Merge branch 'realtime3' of https://github.com/glonnon/GoldenCheetah into release_3.0.0dev
+      Merge Master into V3 Branch
+      Fix addchart crash on empty homewindow
+      Single click moves chart to end of homewindow
+      Segmented button on Mac fix show selected.
+      fix homewindow resize cursor bug.
+      Drag cursor support Qt < 4.7
+      Export Metrics to CSV
+      Fix gcc 4.5 compile error/warning in HrPwPlot.cpp
+      Upload Ride to calDAV based calendars
+      Cosmetic tidy on DiaryWindow, tidy CalDAV code.
+      Improved Calendar Support
+      merge master into release_3.0.0dev.
+      merge master into release_3.0.0dev
+      merge master into release_3.0.0dev
+      Improved Season Support
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Native ANT+ Support (1 of 3)
+      Fix Computrainer with Stereo FTDI adaptor
+      post merge master into release3.0.0dev fixups.
+      Fix TreeMap Crash & Cosmetics
+      Flex/Bison instructions in gcconfig.pri.in
+      post merge master into release3.0.0dev
+      post merge master fixups.
+      post merge master in release_3.0.0dev fixups.
+      Native ANT+ Support (2 of 3)
+      Fix WorkoutWizard.h use of <> instead of "" for win32 build
+      Native ANT+ debug, temporary for testing.
+      Native ANT+ Part 2 - tweaks
+      Native ANT+ Part 2 - Garmin USB1 Stick on Windows
+      Fix ASSERT crash in Weekly Summary for No Zones
+      Remove RideSummary from Metadata default config in V3
+      Native ANT+ Part 2 - Improved Power Support
+      Fix Flex/Bison issues on Win32
+      QMAKE_DEL should have been QMAKE_DEL_FILE in previous commit.
+      Native ANT+ Part 2 - antlog.bin dignostics
+      Fixup USBXpress.h when SDK is not installed.
+      USBXpress SDK fixup missed USBXpress.cpp on last commit.
+      Fix SEGV in WorkoutWizard when no ride selected.
+      Training Mode Improvements - Part 1 of 3
+      Fix video on startup.
+      HomeWindow takes a name to load/save layout.
+      Fix Weekly Summary Crash
+      Version 3 - No Ridefiles Bugs Bonanza
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Fix Crash on show/hide sidebar in V3
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Reintroduce Heartrate Zone Summary on RideSummary Window
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Reintroduce Heartrate Zone Summary on WeeklySummary Window
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Realtime checkpoint - WIN32 and Configurable Realtime
+      Fix Workout Code null string for Bin (Joule) ride files.
+      Fix Crash in Histogram for show in Zones before Zones configured
+      Fix Crash on Interval selection when last ride deleted
+      Fix RideEditor crash on last delete
+      More NULL ride bug fixes
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Less jarring use of pixmaps in look and feel.
+      No more CPU hog in Native ANT.
+      Plot more data on the CP plot and use a binary cache file
+      Plot more data on the CP plot and use a binary cache file
+      Missed from previous commit.
+      Fix CP calculation crash
+      merge srhea/GoldenCheetah.git release_3.0.0dev fixups.
+      Fill in Gaps in recording when computing CP charts
+      Remove dumb cut/paste error that increased CP calc work.
+      Temporary Fix for Ride Selection after NULL ride selected
+      Fix CP curve only shows first 6 seconds bug
+      Fix CP calculation for files with sub-recIntSecs samples
+      Fix typo to get cadence CP chart back.
+      Add xPower and Normalized Power to Critical Plot
+      Tooltip in CP chart
+      Ride Statistics performance improvements
+      Plot seasons / date ranges on Histogram Plot
+      Added INSTALL-LINUX build notes/instructions to root of src tree
+      Added Gareth Coco's WIN32 build notes as INSTALL-WIN32
+      Histogram plot by zone for seasons
+      Store pre-computed statistics as floats not longs
+      Mark Rages' Superfast Mean Max Computer
+      CP Plot xPower/NP with color zones.
+      Fix CP xPower/NP zoning.
+      Merge pull request #4 from markrages/mark-fix
+      Enable -O3 flag for g++
+      Move CXXFLAGS -O3 to gcconfig.pri.in
+      Less assert in HrZones
+      Refresh CPX file when importing ride files.
+      Remove orphaned central widget in MainWindow
+      More 'orphaned' Widgets
+      Add metadata window to charts
+      Add Realtime Plot Window
+      Missed from previous commit.
+      Add WorkoutPlotWindow
+      Make Training View Configurable
+      Metric refresh performance improvement (nosync)
+      Clean compile time nits
+      More Metric Refresh Performance Improvements
+      Fix intermittent crash in adding charts to home
+      Make Analysis view configurable
+      Fix Hr numZones bug
+      MainWindow Housekeeping
+      Make toolbar color configurable
+      Increase margins on RideEditor
+      Better rounding of time in AllPlot
+      More compile time nits
+      Fix First Ride File Import Crashes
+      Fix temp file permissions issue with Google Map
+      Fix 64bit WKO parsing GPS data
+      Fix WKO parser for Ergomo users
+      Sidebar, Ride List and Aeshetics
+      Simplify and Clean UI
+      Remove superfluous heading
+      Fix Ride Plot Steals Focus
+      UI Cosmetics & Nits
+      Reinstate Tab view
+      Fixup Tab mode for Mac
+      Re-introduce Dropshadow on Win/Mac
+      Possible fix for Add Chart crash
+      Ride Plot Axis coloring
+      Enable/disable dropshadow in appearances.
+      Potential fix for Add Chart crash
+      Missed in last commit
+      Remove unneccessary mutable in RealtimePlot.h
+      Further UI fixups
+      Fixup UI for Mac
+      More Tab / UI fixups
+      #include <Windows.h> becomes <windows.h>
+      Fix annoying gap in CP curve.
+      Google Map UI Changes
+      Sidebar adjustments, wip
+      Google Maps Enhancement
+      Fix too many QString::arg() in GoogleMapControl.cpp/
+      Summary Window Title
+      Remove carbon references on Mac in GcPane.
+      Fix refresh metric losing ride selection
+      Change close window icon. Minor cosmetics.
+      Fix Map Jaggies & Stoptime
+      GPS Data Precision Errors
+      Merge branch 'pc7' of github.com:rclasen/GoldenCheetah into release_3.0.0dev
+      Update gcconfig.pri.in to reflect srmio pc6/7 support.
+      Merge branch 'pc7' of github.com:rclasen/GoldenCheetah into release_3.0.0dev
+      Fix window refresh when selecting tile/scroll layout
+      Merge branch 'pc7' of github.com:rclasen/GoldenCheetah into release_3.0.0dev
+      Remove console error for seasons.xml
+      Enhanced New Cyclist Dialog
+      Fix right-click crash on ridelist with no rides
+      More mucking about with Ride list
+      Code Cleanup GoogleMapControl
+      Fix WKO+ file reader GPS 'drops'
+      Fixup for V3 Ride List (RideNavigator)
+      Stop Map inerfering with Chart drag & drop
+      Microsoft Bing Map
+      Force hide of virtual column in ride navigator.
+      Better support for Negative, Inf, NaN and High Values
+      Do not allow user to open same cyclist twice
+      Open cyclist show all cyclists
+      Show anomaly list in ride editor controls
+      Fix date/time handling when importing rides
+      Fix delete ride to remove .notes file
+      Fix Configure Pane 'on top' obscuring other windows
+      Fix RideEditor find dialog for 'between'
+      Deprecate .notes in WkoRideFile
+      Fix crash on 'dodgy' .man file in v3
+      Show "hidden" metadata in an 'Extras' tab
+      Default dropshadows to NO
+      Refresh metrics without delay
+      Fix Save when old .bak exists
+      Reset colors to default in options
+      Fix Diary doesn't select ride on Mac
+      Fix LTM plot to always bin in Mon-Sun weeks
+      Don't allow Nan or Inf sample values
+      Fix SummaryWindow crash
+      Support Garmin Training Center Export Files
+      Missed off previous commit
+      Fencepost Error for TcxParser and GTC Exports
+      Free Memory in Ride Import
+      Fix SEGV in AllPlot on empty ride.
+      Fix Lat/Lon precision in TCX export
+      Fix LogY Intervals on Histogram
+      Fit files sometimes go backwards
+      Refresh CP curve when rides added/deleted
+      Remove duplicate metricDB in StressCalculator
+      Improve metricDB query performance
+      Fix Metric Chart Fencepost Bug
+      Metric chart refreshes when ride added/deleted
+      Histogram chart refreshes when ride added/deleted
+      Fix delete ride SEGV
+      Critical Power Window delete current ride crash
+      Make tab view the default in v3
+      Guess ride date time for Poweragent CSV files
+      Drag and Drop straight onto Layout
+      Allow user to rename chart
+      Remove drop shadows
+      Add VAM to CP curve
+      Diary Window now uses HomeWindow Layouts
+      Fix title edit when no charts on HomeWindow
+      Fix AllPlot Smoothing
+      Honour Show grid property
+      Fix exit Warning dialogs
+      Reinstate CP/AWC CP curve parameters on CP plot
+      Remove unneccessary methods from MainWindow
+      Missed off last commit.
+      Check Duplicates when importing rides
+      Fix Macro device data crash
+      Add qwtplot3d instructions in INSTALL-LINUX
+      Remove Ugly Frame in 3d Plot
+      Change style turn updates off
+      HomeWindow block updates on rideselected
+      Fix HR Zone summary bug
+      Avoid QTabWidget setUpdatesEnabled bug
+      Fix Style selection change resize bug
+      Eradicate QGraphicsDropShadowEffect from HomeWindow
+      Increment MetricDB version for PeakPwrHr update.
+      Fix set CdA from slider
+      Plot Cosmetics Update
+      Support FR310xt latest firmware
+      Fix ErgFilPlot axis setting
+      Use CascadingResizeSections in RideNavigator
+      Fix HR Histogram x-axis
+      PowerHist HR x-axis
+      Fix AllPlot delete ride crash.
+      Distance 2 decimal places
+      More configurable Ride Plot
+      Merge branch 'pc7' of github.com:rclasen/GoldenCheetah into release_3.0.0dev
+      Fix FitRideFile for header change
+      Fix AllPlot smoothing property
+      Stacked View honours Chart Controls
+      Prettify Histogram by Zone
+      Fix PowerHist coloring bug.
+      Fix Torque/Speed binning in Histogram Window
+      Re-instate zoom interval in MainWindow/AllPlot
+      Zoom Interval in Aerolab
+      Add Zoom to Interval on Maps
+      Reinstate View and add Window menu
+      Hide 3d plot when bad data
+      Add Activity Details to Sidebar
+      metadata icon, missed off previous commit.
+      Maximum Max replace in RideSummaryWindow
+      Workout Controls for Train View
+      Be consistent 'Athlete' not 'Cyclist'
+      Choose Athlete not Cyclist
+      Start to use consistent terminology
+      SplitRide overwrites existing file
+      Mainwindow Menu Alt-A Alt-A clash
+      User definable value list for Metadata fields
+      Swap Zoom and Select on LTM/Ride Plot
+      AllPlot select left-click in stacked view
+      MainWindow help in local browser
+      Extended Help menu
+      Activity Intervals rename
+      Pretty Toolbar
+      More compact controls
+      WorkoutPlot reduce whitespace margins.
+      Allow show any widget in GcToolBar.
+      Fix CP chart SEGV when season deleted
+      Reinstate Colors on Calendar
+      Fix setByDistance bug in allplot
+      Fix Summary SEGV no summary metrics and dirty file
+      Convert RideSummary to use QStringList
+      Code hooks for activity tooltip bubble
+      Revert "SplitRide overwrites existing file"
+      Fix RideSummaryWindow crash
+      Fix possible SEGV in RideSummaryWindow
+      Activity Popup Bubble
+      Bubble popup support for Vertical Orientation
+      Smart Layout in Tile View
+      Refactor WkoRideFile reader
+      Improved WKO+ file support
+      Merge branch 'streetmap2' of https://github.com/glonnon/GoldenCheetah into release_3.0.0dev
+      Fix recIntSecs in Wko reader
+      Wko+ bitsize change lost
+      Finalise full support for earlt WKO+ file formats
+      WKO+ Improved Support for v7 files
+      Formally support v7 WKO+ Files
+      WKO+ File sanity checks and fix v12 support
+      Minor fixups for RideSummaryWindow
+      Notes in WKO file format v1
+      Fix default train layout
+      Pushed wrong version in previous commit
+      Fix Train mode SEGV in Course/Ergo Mode
+      Split Activity Wizard
+      Fix Split Ride file loss bug
+      Use old split ride for now
+      Check Date/Time unique
+      Improved Split Activity Wizard
+      Retain intervals when splitting rides
+      WKO+ file reader further fixups
+      missed off previous commit
+      WKO+ iBike fixup was wrong
+      Fix WKO+ iBike import
+      Better device type handling for WKO+ files
+      Summary fixups
+      Build Config Fixups
+      Update .gitignore
+      File Export (part 1 of 2)
+      File Export (part 2 of 2)
+      Tile Resizing Snaps to Grid
+      Fix interval highlighter when no power
+      Merge branch 'resetlayout' of git://github.com/glonnon/GoldenCheetah into release_3.0.0dev
+      Fixup reset layout
+      SportTracks File Support
+      missed off previous commit.
+      RideNavigator as a Window
+      Fixup RideNavigator on Linux
+      PfPv plot adjust axis for track sprinters
+      Tweak Split Activity Wizard
+      Add zooming on PfPv Plot
+      Realtime honours color settings
+      Realtime controls honour colors
+      More Realtime colours
+      Improvements for Train View
+      Fix SEGV in train view
+      TrainingPeaks does not have a space in it
+      Further SEGV on Server list
+      Initial 'proper' support for Video Playback
+      Realtime Controls tweak
+      Support Garmin USB2 sticks on Linux
+      Support Garmin USB2 ANT+ sticks on Mac OS X
+      use # not // for comments in src.pro
+      Add virtual power for LeMond Revolution
+      Tweak Virtual Power
+      missing break statement in virtual power calculation.
+      Mac Video Playback via QTKit not VLC
+      Fixup QTKit Video Playback
+      Fix memory leak in Video Window on Mac (QTKit)
+      Fix repaint() when resizing
+      Fix memory leak in Video Window on Mac (QTKit)
+      Fullscreen Support for Mac OSX Lion
+      Remove QTMovieOpenAsyncRequiredAttribute
+      Support Control-Cmd-F to exit full screen
+      Ctrl-Cmd-F *toggles* fullscreen
+      Mac QTKit Video OpenForPlayback conditional
+      Mac OSX SDK10.4 CALayer.h 'slots' variable
+      Fix MAC_OS_X_VERSION_MAX_ALLOWED
+      LionFullScreen.h moc error on non-Mac
+      Fix HEADERS += LionFullScreen.h in src.pro
+      LionFullScreen saga. Ugh.
+      Add Support for FullScreen on Linux/Windows
+      LibUsb does not have usb_reset on Windows
+      Metric/Imperial bug in Realtime
+      Show kJoules, TSS/BikeScore et al on Train View
+      Disable Screensaver on Mac OS X
+      Workout (ErgFile) computes metrics
+      Reverse unwanted change to ErgFile::wattsAt()
+      Remove VLC debug output console on Windows
+      Fix slow startup of Train View on Windows
+      Remove Globals from ErgFilePlot
+      Further realtime improvements
+      Mac OS X Realtime Fixups
+      Train View controls in Toolbar
+      Fix GcToolBar paint artefacts.
+      ToolBar even more like Flare
+      minor alignment fix in train buttons.
+      Fix play icon after stop pressed.
+      signpost toggle fullscreen is F11.
+      Plot marker default color now Gray
+      Allow smaller widths in tile view
+      Workout Plot remove gap on Load Curve.
+      VLC --no-xlib on Linux
+      QTMovieView has autoresize enabled.
+      Windows/Linux (VLC) DVD Playback
+      Show/Hide Sidebar toolbar button
+      Mac Video use GC_HAVE_LION
+      Add support for Tacx/RLV Workout (.pgmf)
+      Linux/Win disable screensaver using VLC
+      Fix RideFileCache taking too long on dodgy files
+      Remove executable bit on source files
+      Move tab/tile to Toolbar
+      Spacing around tab bar.
+      Toggle FullScreen button on Toolbar
+      Less prominent "view" icons.
+      Fixup toolbar button spacing on a Mac.
+      Reinstate Lap button
+      Fixup .pgmf support (set mode)
+      Auto extend workout plot when no workout selected
+      Only resort to cached calendar if it exists!
+      Add Chart from Toolbar menu
+      Remove Activity Details from Sidebar
+      Fix bounds checking in RideNavigatorProxy
+      Use OBJECTIVE_SOURCES in src.pro
+      Toolbar buttons didn't move on a Mac
+      Fix missing ';' in update to MainWindow.cpp
+      Fix crash on exit (WinIdChange).
+      Fix Crash in ErgFilePlot TimeScaleDraw
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Add a Mac INSTALL guide
+      Add Chart Menu fixups
+      Fix FullScreen Crash on Mac
+      Fix FullScreen on Lion compile errors
+      Add ToolTips to Toolbar Buttons
+      Use strtod() to convert text to double
+      Version 3 to use metricDBv3
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Remove Smart Layouts
+      Add a Watts per kilogram metric
+      Fix FTDI Adaptor on Linux and Mac
+      Computrainer Calibration Mode on F3
+      Fix double save of Configuration
+      Download from ErgDB
+      Removed accidental commented out code
+      missing src.pro
+      Fix Serious Delay after saving Preferences
+      ErgDB download should say exists not exported.
+      Fix SEGV on Mac on Save Preferences.
+      Better Bounds Checking in RideFile::intervalBegin()
+      VLC Filename convert to file:// URL
+      Windows URIs are file:///c: not file://c:
+      Added SpinScan Plot
+      Fix Target load Dial
+      SpinScan L/R different colors
+      Add Polar SpinScan Plot
+      Remember mode in pedalstroke chart.
+      Use uint8_t* not void* in memcpy()
+      Fix PfPv refresh bug
+      Remove need for cadence on virtual power
+      Computrainer +/- keys and load zero
+      Tacx Fortius Support
+      Mingw build fixups
+      Mingw has not sleep(), uses WinAPI Sleep().
+      Introduce OperatingSystem global variable
+      Tacx Fortius fixes for Mac OSX
+      Merge branch 'release_3.0.0dev' of github.com:srhea/GoldenCheetah into release_3.0.0dev
+      TrainTool make Fortius dependant upon GC_HAVE_LIBUSB.
+      Rename EF to Efficiency Factor.
+      Fix zero speed in TxtRideFile for Imperial units
+      Remove dynamic load of libusb on Windows
+      Tacx Fortius Driver Stubs
+      Add Virtual Power for 1UP USA bike trainer
+      ANT+ Use Cadence from Standard Power Messages
+      List last month, not year for TrainingPeaks.com
+      Fix Fortius Power Smoothing
+      remove debug from Fortius.cpp.
+      Virtual Speed
+      Rolling Average Power/Cadence/HR tweaks
+      Fix nan/inf values for Virtual Speed.
+      Training Dials have own Color setting
+      CP chart 'best date' doesn't fit
+      Show date on CP bests tooltip
+      Fix color array offset broken in commit 3c95f54
+      Simplify Diary Window
+      Close Window or Quit all Windows
+      Set default workout directory for Train view
+      BioBike Support
+      Realtime Plot shows last 60s, not last 10s
+      Dual ANT+ Power Fixups
+      Honour line width settings in realtime plot
+      AltPower gets smoothing in DialWindow.
+      More configurable realtime plot
+      Add Multi-device support in Train View
+      Clear device list before reload on config change
+      Cosmetic fixup to Device config.
+      Fix JSON ride files going "missing"
+      Support TrainerRoad.com TCX Files
+      Restore SpinScan
+      Fix need to 'reset' USB2 stick between sessions
+      Further fixup for USB2 sticks
+      ErgFile now supports 'named' intervals
+      Fix ANT.cpp comppile error (LIBUSB is optional)
+      Fix Computrainer Manual Ergo Mode LOAD display
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Save Garmin Smart Record setting
+      Save Garmin Threshold Config Setting
+      FitRideFile distance of zero bug
+      FFwd and Rewind Video (VLC)
+      FFwd/rewind Video on Mac
+      Fix QTKit Video Playback on QT 4.8 RC
+      Reinstate Chart Setup Dialog
+      Hold down FFwd/Rewind Buttons to skip
+      Configure Seasons in ConfigDialog
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Disable roch text in metadata
+      Fix Crash on no ErgFile selected
+      Add Wheelsize Config
+      ANT+ Use Cadence from Standard Power Messages
+      Season Config - don't delete!
+      Constrain AEPF to 2500N on PfPv plot
+      Tcx speed is Meters/Second not KPH
+      Refresh on ride add/deleted
+      Refresh PMC when rides added/deleted
+      Support Wattbike TXT data exports
+      Wattbike test rides
+      Add Temperature to Ride Summary
+      Fix precision error for Temp in Summary
+      Add Device Wizard
+      Remember LIBUSB is optional
+      Fox initialisation of ANT::channels without LIBUSB
+      More LIBUSB problems
+      Fix SEGV on Finish AddDeviceWizard
+      Realtime Robot
+      Fix AddDeviceWizard AddSearch not completing
+      Fix SEGV on cancel long search
+      Fix interpolation of GPS data for bad samples
+      Toolbar buttons for Analsysis View
+      Remove quarq devices
+      Save button enable/disable
+      Fix redclaration of macstyler in MainWindow.cpp
+      Fix Analysis quick button nits
+      Fix crash if TRIMP zones > 5
+      Add Chart Menus
+      Remove reading of .notes from LTMPopup
+      Reinstate ride calendar
+      Fix axis display for Temperature
+      Chart settings dialog no longer fixed size
+      Fix SEGV in AllPlot when smooth adjust
+      Libical is optional.
+      Refresh mini calendar
+      ANTChannel Standard Power bug
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Fix PWX file intervals
+      Merge branch 'release_3.0.0dev' of github.com:/srhea/GoldenCheetah into release_3.0.0dev
+      Fix SEGV on empty/dodgy FIT files
+      Merge pull request #10 from glonnon/strava_fix
+      Revert "Qwt 6 support"
+      Merge branch 'v3' of git://github.com/rclasen/GoldenCheetah into release_3.0.0dev
+      Fix comment in WKO ride file
+      Honour wheelsize configuration
+      Add Popup Bubble to new Calendar Widget
+      Add Minute Mile Pace metric
+      Merge pull request #19 from rclasen/master
+      Fix Bounds checking SEGV
+      Remove 'qollector_interpret' warning
+      Link compress libs (-lz) by default
+      Enable Measures in v3.0
+      Merge branch 'master' of github.com:/srhea/GoldenCheetah
+      Watts per kilo slight changes
+      Withings Weight and Watts per Kilogram
+      Manual entries compute metrics
+      Fix (TM) processing
+      Increment DB version
+      Only set PWX weight from metadata tag "Weight"
+      Support "CP" metadata field
+      Virtual Power for Minoura V100
+      Search/Filter using Lucene
+      Lucene should be optional
+      Fix Ride List not refreshing
+      Fix Crash in Split Wizard
+      CLucene better exception handling
+      Refactoring CLucene
+      MAC Lucene added to install notes
+      Initialise ismultisave variable.
+      Searchbox toggle search/filter
+      Added contributors.txt
+      Merge branch 'master' of github.com:srhea/GoldenCheetah
+      Change Search Strategy
+      Merge branch 'master' of github.com:/srhea/GoldenCheetah
+      Data Filter (Part 1 of 3)
+      DataFilter fix compile on Mac
+      About Dialog too big
+      About Dialog Tidy
+      Data Filter (Part 2 of 3)
+      Silly cut and paste coding error
+      Data Filter (Part 3 of 3)
+      Basic default for the home view
+      missed from last commit
+      missing stdint.h in Bin2RideFile.h
+      Mac UI Sidebar Cosmetics
+      UI Nits: Ride list column widths fixup
+      UI Nits: Named Search Input Box
+      UI Nits: About Contributors alignment
+      UI Nits: SearchBox menu and Tooltip
+      UI Nits: Chart settings and Chart Close Menu
+      UI Nits: Filter Tooltip colors
+      UI Nits: Analysis sidebar rides & intervals
+      UI Nits: Save/Restore Splitter sizes
+      UI Nits: Move Calendar from RHS to LHS Sidebar
+      Bin2RideFile <stdint.h>
+      termio not needed for Joule
+      Skip C99 and just use uint_16
+      Experiment: Support for Tacx Fortius 0x1932
+      UI Nits: Metadata gap in tab widget
+      UI Nits: Fewer default columns
+      README - update to reflect reality
+      Use hh:mm:ss format in Allplot tooltip
+      Calendar sidebar cosmetics
+      UI Nits: Mini calendar use prefs
+      UI Nits: Add Brief Summary on Calendar Sidebar
+      UI Nits: Auto select toolbox
+      UI Nits: Added Splitter for Diary sidebar
+      UI Nits: Ride list horiz scrollbar
+      UI Nits: smaller font in cal sidebar
+      UI Nits: Introducing GcWindow property Daterange
+      UI Nits: Daily/Weekly/Monthly Summary
+      UI Nits: RideNavigator margins to allow resize
+      UI Nits: Reinstate drop shadow option
+      Revert "UI Nits: Reinstate drop shadow option"
+      UI Nits: Calendar cosmetics
+      Bugfix duplicate temp on summary
+      UI Nits: Ridelist cosmetics
+      UI Nits: Indent first column ridenav
+      Fix Google Map navigation
+      Fortius 0x1932 added to find logic
+      Merge branch 'master' of github.com:/srhea/GoldenCheetah
+      Mac Native UI (Part 1 of 3)
+      Fortius 0x1932 added to find logic
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Minor Fixups for Mac Native
+      UI Polish: Mac toolbar buttons too narrow
+      UI Polish: Mac Style Selector
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Merge pull request #354 from rclasen/bug737
+      Merge pull request #353 from rclasen/pm-now
+      UI Nits: Goodbye ToolBox
+      UI Nits: train labels in white
+      Add OpenBSD compile support
+      UI Polish: Diary sidebar hover color
+      UI Nits: Small font in Details Screen
+      UI Polish: Toolbar spacing reduced
+      UI Polish: Scope Bar for Mac Native
+      the last commit needed one or two #ifdef Q_OS_MACs
+      UI Polish: Move train view controls to scope bar
+      UI Polish: Show/Hide Sidebar on ScopeBar for Mac
+      UI Nits: No menu on list view
+      Fix ride navigator crash on search
+      UI Nits: Non-Mac searchbox fix
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      User configure Field to set colors from
+      UI Nits: Non-Mac searchbox fix
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      UI Nits: Ride navigator contents margins
+      UI Nits: Don't delete last column
+      Set Application Proxy from Operating System
+      Fix SEGV on close chart in HomeWindow
+      UI Nits: LTM Sidebar (Part 1 of 3)
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      UI Nits: LTMSidebar performance
+      UI Nits: LTMSidebar performance
+      Fix SEGV on GcBubble
+      UI Nits: LTM Sidebar (Part 2 of 3)
+      Merge pull request #360 from andybryson/charts
+      Fix split ride SEGV on bad recording interval
+      Concise metric names in sidebars
+      Histogram nointerval curve on season chart
+      Add Events to Seasons.xml
+      Season preferences don't lose events
+      Mainain Events in LTM Sidebar
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      I Nits: LTM Sidebar (Part 3 of 3)
+      Events on LTM work for different group by
+      UI Nits: GcBubble positioning
+      UI Nits: Fix bubble vanish!
+      UI Nits: Disable GcBubble on Mac
+      Merge pull request #361 from andybryson/morecharts
+      Fix SEGV on ESC in chart settings
+      UI Nits: RideNavigator honout font metrics
+      UI Nits: LTM popup fugly
+      UI Nits: Fix fugly LTM settings dialog
+      Fix SEGV on cancel remove chart
+      Fix Weight stored in KGs
+      UI Nits: Importing GTC Export screen updates
+      UI Nits: New athlete splitter sizes
+      UI Nits: LTM add chart use a default date range
+      UI Nits: Fix GcBubble on Mac
+      Performance Manager Date Labels
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Uncomment code from last commit.
+      W/KG fixup distribution/histogram
+      UI Nits: Ride Navigator weird gap fix
+      UI Nits: Remove unused LTM metric options
+      UI Nits: LTM popup stretch
+      TCX Parser: Strtod is locale specific
+      TreeMap Chart - refactor away LTM
+      TreeMap show rides when cell clicked
+      UI Nits: Ride list scrollbar on Mac
+      Merge pull request #366 from amtriathlon/metrics
+      UI Nits: Fixup after ridelist scrollbar
+      Merge pull request #367 from amtriathlon/metrics
+      Merge pull request #368 from amtriathlon/metadata
+      Merge pull request #369 from amtriathlon/aerolab
+      LTMSidebar: Add season
+      Merge pull request #370 from amtriathlon/ridesummary
+      Tidy up Preferences Dialog
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Merge pull request #371 from amtriathlon/aerolab-allplot
+      Image missed from last commit.
+      UI Nits: Config Dialog Size on Linux
+      Merge branch 'pmc-qa' of https://github.com/amtriathlon/GoldenCheetah into amtriathlon-pmc-qa
+      UI Nits: Config Dialog toolbar not movable
+      UI Nits: Config Dialog Cosmetics
+      UI Nits: GcBubble border color
+      UI Nits: Simple frame for tab mode
+      Hysteresis label too long.
+      Merge pull request #373 from amtriathlon/ltm
+      Default Configuration Files
+      Fix Ridesummary SEGV
+      Update LTMTool chart translation table
+      Merge pull request #374 from amtriathlon/DataProc
+      Merge pull request #375 from amtriathlon/colors
+      Merge pull request #376 from amtriathlon/rho
+      Need -lGLU for 3d link on Ubuntu
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Update LINUX-INSTALL for 3D on Ubuntu 12.10
+      Merge pull request #377 from amtriathlon/3d
+      -lGLU only needed on Unix
+      Handle -lGLU in qmake for mac where unix is true.
+      Remove RideFileCache compile time warnings
+      UI Nits: Geometry and setUnifiedTitleAndToolBar
+      ConfigDialog was missing copyright messages
+      Fix Split Ride SEGV
+      UI Nits: Manual Ride Dialog fugly
+      Fix SEGV in CPPlot when ride added/deleted
+      Manual Ride Dialog Fixups
+      Context Menu for Devices in Train View
+      Added Blank GC Icon
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      UI Nit: toolbar selection wrong
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Merge pull request #386 from andybryson/chart_settings
+      Merge pull request #378 from amtriathlon/home
+      UI Polish: Linear gradient in ErgFilePlot
+      Merge pull request #389 from amtriathlon/calendar
+      Merge pull request #390 from amtriathlon/chartname
+      Merge pull request #391 from dhague/master
+      Merge pull request #395 from amtriathlon/navigator
+      Trimmed PMC/Manual Preferences
+      Merge pull request #397 from andybryson/stacking
+      Workout Library Part 1 of 3
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Oops: left in a qdebug
+      Fix user units lost in translation
+      Stop double updating LTM Plots
+      LTMPlot refresh optimisation
+      Library Part 1 fixups
+      More Library Part 1 fixups
+      Merge pull request #399 from amtriathlon/ridefile
+      UX: Chart Setup simplified
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      AVI isn't supported by Quicktime
+      ErgFile lookup CP
+      Workout Library Part 2 of 3
+      Library Part 2 fixups
+      UI Polish: Bit more linear gradient
+      UI Polish: More linear gradient on histogram
+      UI Polish: More linear gradient on CP curve
+      Tone down CP linear gradient
+      CP 'this' curve more prominent
+      LTMPlot linear gradient was upside down
+      Workout Library Part 3 of 3
+      Fix Z-order for chart settings
+      Workout Library Part 3 fixups
+      Support PC7 /dev entry
+      Merge pull request #402 from objectiveous/master
+      Further Workout Library 3 fixups
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Further Workout Library Fixups
+      Workout Library fixups
+      CP Calculator is really and Estimator
+      VLC is Optional - don't SEGV
+      Add Chart on Scope Bar
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      UI Nits: Prefs pane cosmetics
+      UI Nits: Pref Pane Fields page
+      UI Nits: QMactyle QToolButtons are ugly
+      LTM Sidebar add season
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      UI Nits: Color prefs
+      UI Nits: Non-Mac Toolbar
+      UI Nits: Add Chart on Linux/Windows
+      UI Nits: Mac + chart button too wide
+      Merge pull request #403 from andybryson/rem_boost
+      Fix -Wdelete-non-virtual-dtor warnings
+      Saris Powerbeam PRO Virtual Power
+      UI Nits: Fix Mac button icons weirdness
+      Fix Batch Export Dir choice on Mac
+      UI Nits: Download/Compose Mac button icons
+      Missing break.
+      UI Nits: Metadata TextEdit double frame
+      Measures on LTMPlot got lost
+      UI Nits: Autorepeat on open is wrong
+      Merge pull request #405 from amtriathlon/units
+      Merge pull request #406 from amtriathlon/measures
+      Merge pull request #407 from amtriathlon/RideNavigator
+      Merge pull request #408 from amtriathlon/options
+      Merge pull request #409 from andybryson/boost_crc
+      remove boost from docs
+      Merge pull request #412 from amtriathlon/translations
+      Merge pull request #414 from amtriathlon/fields
+      Chart Dates: Part 1 of 3
+      Chart Dates: Part 2 of 3
+      Chart Dates: Part 2 of 3 fixup
+      Chart Dates: refresh a bit less often
+      Chart Dates: Part 2 of 3 update
+      accidentally left in qDebug() statement
+      Chart Dates: Part 3a of 3
+      Chart Dates: Part 3b of 3
+      Chart Dates: Part 3c of 3
+      Fix date settings needed a restart
+      Chart Dates: Part 3d of 3 (final)
+      Fix KML needing boost in gcconfig and src.pro
+      Edit times using a QTimeEdit in Metadata
+      clang 4.1 fixups
+      Show Pace in Summary as mm:ss
+      Fix zooming in histogram
+      Fix date selection in Tile Mode
+      Temporary - remove missing images from qrc file
+      add images back to qrc file
+      Blank state train view action
+      Add ErgDB to train view blank state
+      Blank state for train view
+      No chart menu in blank state
+      Linux fixup for BlankState
+      UI Nits: Choose Athlete Dialog Buttons
+      UI Nits: Cosmetic gui updates
+      UI Nits: Sensible defaults for screen/font size
+      Fix conflict with Qwtplot3d
+      UI Nits: BlankState cosmetics
+      Merge pull request #434 from jjofre/master
+      UI Nits: Reformat allplot chart settings
+      UI Nits: Hist chart controls errant label
+      Fix pause/unpause bug
+      Use the device wheelsize!!!
+      Merge pull request #439 from jjofre/master
+      Fix delete intervals
+      Remove BlankState menu
+      UI Nits: default chart fonts smaller
+      Let user close blank state
+      Don't export HR if it is zero
+      Clear blankstate screen if conditions change
+      BlankState basics completed
+      Autohidden chart settings framework
+      Chart settings reveal adjust mouse positions
+      Reveal Controls: Histogram
+      Reveal Controls: AllPlot
+      Fix thru today date selection on LTM
+      UseThruToday: Fix CP chart
+      UseThruToday: Fix Histogram chart
+      UseThruToday: Summary
+      UseThruToday: TreeMap
+      Change 'hotspot' for reveal/unreveal
+      UI Nits:Histogram Window border
+      Reveal Controls: AllPlot update
+      Reveal Controls: HrPw update
+      UI Nits: Aerolab title
+      UI Nits: LTMPlot remove old markers
+      fix compiler warning in LTMPlot
+      Merge pull request #451 from jjofre/master
+      Merge pull request #452 from jjofre/master
+      Add Jaime Jofre as a contributor
+      Added contributor
+      Added gcconfig.pri tab to About
+      About cosmetics
+      Wahoo Fitness API Framework
+      Autorelease pool on Mac
+      Tone down "HUD" close button
+      UI Nits: Reveal controls on black bg
+      Wahoo Fitness API Abstraction Part 1
+      Wahoo Fitness API Abstraction Part 2
+      State Changed missed.
+      Kickr linker fixups, still crashes
+      UI Nits: Tile Mode cleaner
+      Fixed WFAPI Crash
+      Kickr Skeleton Code
+      remove  WFAPI hack code in mainwindow
+      Drag n Drop on Splash Train Vew
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Fix Kickr compile error
+      Fix Kickr compile error
+      UI Nits: Allplot reveal controls
+      Merge pull request #456 from andybryson/QNetworkProxyQuery
+      Kickr Checkpoint Commit
+      AddDeviceWizard cannot be modal
+      Device scanner delay accidentally set to 5s
+      Kickr device configuration complete
+      Fix another compile error if WFAPI not available
+      Kickr checkpoint, connect errors
+      Fixed initial Kickr connection issues
+      Kickr connect should fail if no BTLE hardware
+      Fix SEGV when pairing ANT+ Speed
+      Kickr basic functionality
+      Kickr speed calculation
+      Kickr mutex for thread safety
+      Merge pull request #458 from johnnye/master
+      Previous pull request missing commit
+      Kickr BTLE Support (Beta)
+      Framing color less in your face
+      Merge pull request #461 from jjofre/master
+      Cleanup tabs and whitespace
+      TRIMP fallback to workout time if time riding 0
+      Merge pull request #463 from jjofre/master
+      UI Nits: Reveal Controls Cosmetics
+      Merge pull request #464 from jjofre/master
+      UI Nits: Allplot reveal
+      Reveal slow, unreveal instant
+      Add animation in more charts
+      UI Nits: QA reveal controls
+      UINits: QPixmap to NSImage
+      Reveal: Add an easing curve
+      UI Nits: CP today 'gap'
+      Cocoa Memory Management Fixups
+      Kickr: Disable firmware Check
+      Clean compiler warnings in WF Api Code
+      UI Nits: Style selection wonky
+      Fix crash on wake from sleep
+      Update install instructions for Mac
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Reveal experiment with Histogram
+      Reveal experiment, faster and in-sync.
+      Kickr: Clean WF API
+      Kickr: Load setting fixup
+      Kickr load setting fixups
+      Merge pull request #468 from jjofre/master
+      Merge pull request #469 from jjofre/master
+      tabs to spaces
+      Fix all plot reveal size
+      Kickr BTLE connection fixup
+      Kickr autorelease pool when scanning
+      WF Api support multiple connections
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      BT40 Skeleton code
+      BT40 / Kickr device discovery
+      BT40 AddDeviceWizard updates
+      BT40 device discovery fixups
+      Fix compile time error for WF API
+      LTM Show Events Checkbox
+      Add reveal controls to LTM chart
+      Don't hide Histogram when in range mode
+      RideEditor: Stop hiding controls
+      Chart Settings menu is All Chart Settings
+      BlankState: Minor cosmetics
+      BlankState: Analysis view more blanks
+      BlankState: Cosmetics
+      Fix compiler warnings
+      Merge pull request #473 from jjofre/master
+      replace tabs with spaces
+      Update docs for build
+      Mac buttons retain
+      Fix SEGV in ride editor
+      Kickr connection fail gracefully
+      Code Cleaning: LTM sources
+      Code Cleaning: ANT+ sources
+      Code Cleanup: RideNavigator
+      Code Cleanup: Home and GcWindows
+      Code Cleanup: Add Device Wizard
+      Fix colorpicker focus loss on Mac
+      Code Cleanup: TP upload/download
+      Code Cleanup: Train
+      Fix mac toolbar icon corruption
+      MetricAggregator less heap
+      UI Nits: border on metadata
+      Fix split manual ride SEGV
+      UI Nits: Mac toolbar tidy
+      Add Tacx Satori Virtual Power
+      Silence CLucene compile time warning
+      UI Nits: Mac focus rectangle on ErgDB download
+      Code Cleanup: Ride Data and Friends
+      Code Cleanup: Model Plot
+      Code Cleanup: Aerolab
+      Code Cleanup: Calendar menu
+      Code Cleanup: Scatterplot
+      Code Cleanup: Stress Calculator
+      Code cleanup: Video player
+      Code Cleanup: MainWindow
+      Code Cleanup: RideFile readers
+      Code Cleanup: Calendar and Diary
+      Code Cleanup: Fix tools
+      Code Cleanup: CP chart
+      Code Cleanup: DBAccess
+      Code Cleanup: GUI elements
+      Code Cleanup: Data processors
+      Code Cleanup: GcCalendarModel
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Code Cleanup: Notes deprecated
+      Code Cleanup: src.pro
+      Code Cleanup: Deprecating stuff
+      Code Cleanup: Deprecated
+      Code Cleanup: Minor Valgrind grumbles
+      Code Cleanup: Valgrind Memory
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Fix assert SEGV on Trimp Points
+      Code Cleanup: ErgFile
+      Code Cleanup: Device Downloading
+      Code Cleanup: Charts
+      Code Cleanup: RideFileCommand
+      Code Cleanup: RealtimeController
+      Code Cleanup: LibUsb
+      Code Cleanup: Remove #if 0 code
+      HrPwPlot: Show/Hide fullplot
+      Less heap more stack
+      Tacx Flow Virtual Power
+      Fix SEGV on finf intervals on a blank activity
+      RideEditor anomaly button enable/disable
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Code Cleanup: More compile time errors/warnings
+      Code Cleanup: Compiler nits
+      Code Cleanup: ? and + operator precedence warnings
+      Code Cleanup: Workout Wizard
+      Code Cleanup: Power Hist
+      Code Cleanup: RideFileCache
+      Fix metric/imperial in LTMSidebar
+      Code Cleanup: Last Xcode semantic warnings
+      Code Cleanup: SplitActivityWizard.h
+      Code Cleanup: TrainTool.h
+      Code Cleanup: win32 fixups
+      UI Nits: Manual dialog
+      UI Nits: remove reveal on 3d plot
+      Fix VAM on CP chart out by factor of 10
+      Garmin Device Types
+      Code Cleanup: Suppress Xcode warnings
+      Revert "Code Cleanup: Suppress Xcode warnings"
+      Shade Selector on CP chart
+      Fixup last commit
+      Add script to build xcode 4.6 project files
+      Code Cleanup: Fix Xcode 4.6 compiler warnings
+      Merge pull request #492 from Walibu/master
+      Code Cleanup: Fix yyinput warnings
+      UI Nits: OCD cosmetics for splitter handles
+      UI Nits: Seriously OCD
+      Fix season drag and drop SEGV
+      UI Nits: Sidebar cosmetics
+      UI Nits: splitter color
+      UI Nits: Font tweaking splitter
+      UI Nits: Splitter handles cosmetics
+      Code Cleanup: Json lexer memory leak
+      Code Cleanup: RideFile EditorData memory leak
+      Code Cleanup: Deprecate Train Streaming
+      Code Cleanup: RideFileCache remove mallocs
+      Support old flex or lex
+      UI Nits: Diary Sidebar
+      UI Nits: Less vibrant gradients
+      QA/2d customise symbol color
+      Weight entry honours user preference
+      Minor fixups to new Splitter
+      UI Nits: Sidebar WIP
+      Fix SEGV on unsupported device types
+      Handle button too small on Linux
+      Splitter for Train View
+      UI Nits: Fix splitter expanding
+      UI Nits: Splitter decor
+      New sidebar splitter on Analysis and Diary
+      Splitter menu position and tooltips
+      INSTALL-MAC libusb instructions
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Remove german translations for weekly summary
+      Allow manual collapse sidebar
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Mac sidebar button image
+      Mac Sidebar button in toolbar
+      LTMPlot fix baseline setting
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      UI Nits: QSplitter cosmetics
+      Fixup sidebar cosmetics for Linux
+      UI Nits: QSplitter colors on Linux
+      UI Nits: Splitter icons adjust
+      UI Nits: Sidebar remember their state
+      UI Nits: Stop unhiding the sidebar
+      UI Nits: Images embossed
+      UI Nits: Center Icon Bar
+      UI Nits: Emboss Splitter + - menu icons
+      UI Nits: Groove highlight line
+      Fix SEGV on add/delete event in LTMSidebar
+      Code Cleanup: Strava download Xcode warning
+      Fix SEGV on edit event details
+      Fix Home Sidebar Season Editing
+      UI Nits: Splitter actions for TrainTool Devices
+      UI Nits: TrainTool splitter shortcuts
+      UI Nits: Analysis view menu only
+      UI Nits: Simplify splitter to just one menu
+      UI Nits: LTMSidebar Splitter simplify to menu
+      Dumbass spelling mistake.
+      Add function to delete workouts
+      Add support for deleting videos
+      UI Nits: Splitter interval functions
+      Fix rename interval SEGV
+      LTM tooltip for groupby weeks is misleading
+      Fix custom date range muddle when groupby weeks
+      Less right-click on Activity list
+      Fix sidebar groupby column names error
+      Explicit memory allocation for CLucene
+      Use QT file dialogs on Linux
+      Speed up sidebar painting
+      Fix Histogram window custom date selection
+      Reinstate mini calendar on sidebar
+      More Linux file dialog workarounds
+      UI Nits: Splitter handle show/hide button gone
+      Calendar sidebars now show multiple months
+      Remove big numbers at top of Diary calendar
+      Fix LTM group by selection
+      Fix JSON reader ignoring open fail
+      Replace fopen() in JSON ride file reader
+      GcLabel paint is a CPU hog
+      Windows Look and Feel
+      Windows Look and Feel Mac Fixups
+      Fix Windows Look and Feel crash on ICAL
+      Windows: Toolbar buttons style
+      Windows: Font sizes and cosmetics
+      Windows: View selection
+      Windows: Toolbar tweaks
+      Fix WIN startup SEGV with scopebar no ICAL
+      Windows: style selection fixup
+      Windows: Tooltips
+      Windows: GcLabel/GcCalendar font bug
+      UI Nits: Side Calendar border
+      UI Nits: Date Settings "un-scrunched"
+      Code Cleanup: Win compile with CLucene
+      LTM: Add fill curves option
+      UI Nits: Calendar '<' and '>' icons
+      UI Nits: Use our own icons not standardIcons
+      Kickr Fixups for WF Api 3.0beta08
+      Rename/Renumber intervals
+      Fix SEGV on delete first activity
+      Fixup edit interval
+      Add interval sort function
+      Missed ModelPlot for IntervalItem.h
+      Remove rename single interval functionality
+      Documentation: User Documentation Content
+      Documentation: Completed FAQ content
+      Documentation: Initial FAQ
+      Documentation: Fix menu for makeinfo on FAQ
+      Documentation: Added a Makefile
+      Documentation: Filenames too generic
+      Documentation: Add the doc outputs to git
+      UI tweaks: Slightly darker toolbar buttons
+      Documentation: V3 Release Notes
+      Fix egregious ommission in the V3 credits
+      Add Starting LTS to Season
+      Documentation: Full User Manual Structure
+      Seed LTS from Season used in PMC
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Documentation: Update FAQ for seeding CTL
+      Documentation: Manual structure and markup
+      Documentation: Manual fixup and Makefile
+      Fix Sidebar multicalendar refresh bug
+      Fix multicalendar repaint bug
+      UI Nits: Splitter menu button sizes
+      Documentation: Manual images sorted
+      Strava download fix SEGV
+      Search/Filter applies to Calendar
+      Fixup search highlighting
+      Search highlighting on Calendar
+      Calendar highlighting tweaks
+      Add FAQ for close chart and find preferences pane
+      UI Nits: Sidebar calendar expanding
+      Fix Diary view refresh on first select
+      Documentation: Makefile adjusted
+      Deprecate 'Save CP' button on CP curve
+      UI Tweaks: Splitter pushbuttons problem
+      UI Nits: Splitterhandle cosmetic on Linux
+      UI Nits: Bubble use antialias
+      UI Nits: RideMetadata clean look on Windows
+      Datafilter support older versions of Flex
+      Documentation: Manual Chapter 1 completed.
+      Documentation: Indentation and Item Lists
+      Documentation: Manual Chapter 2 Completed
+      Documentation: Palatino Fonts
+      Fix foreign characters (e.g.Umlaut) in JSON parser
+      Fix calendar issue for Italian translation
+      Fix searchbox dropdown alignment
+      Fix color bug "in Italian"
+      Documentation: Chapter 3 update
+      UI Nits: Use a toolbutton on the handle
+      Merge pull request #532 from dresco/geometry-fix
+      Improved deduction of PWX recording interval
+      Add Timex PWX file to test rides
+      Invalidate incore cache when refreshing
+      Refresh all curve when spikes edited and saved
+      Translation: More texts now available
+      DataFilters: Summary should have a filter
+      Defer metric refresh till end RideImportWizard
+      Revert "Code Cleanup: RideFileCache remove mallocs"
+      Multicalendar double update fixups
+      MultiCalendar updateEnabled setting
+      GcCalendarModel optimise updates
+      Clear stale flag when update!
+      GcCalendar optimizations
+      Repaint in DiaryWindow
+      Update gcconfig.pri.in for latest libkml
+      Added CLucene patch for Win32
+      Documentation: Manual Chapter 3 WIP
+      Merge pull request #541 from amtriathlon/27740dbe5c3c23d2f2f5112b926b2fae0955e8bc
+      RideSummary summarise Activities
+      CLucene is optional!
+      WIN32: NSI build script updated
+      Merge pull request #544 from amtriathlon/master
+      WIN32 NSI missed off libusb0.dll
+      Merge pull request #547 from amtriathlon/master
+      Fix stresscalculator 2-a-day bug.
+      Merge pull request #551 from amtriathlon/1fedaf4e7233af54c5441f77cb46744581cc36f1
+      Merge pull request #554 from cleeland/master
+      Merge pull request #555 from amtriathlon/b7f7b3aa3729366f0f3ee1a17aefcb04a2f8880a
+      Fix filtering on ridesummary window
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Search/Filter on toolbar applies to Charts
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Mac allow search AND filter on toolbar
+      UI Nits: Searchboxm on a Mac cosmetics
+      Images missed off on 2 prior commits
+      Search Box Rounded Corners for Linux/Windows
+      Merge pull request #559 from amtriathlon/master
+      UI Nits: Search Box Height 21px
+      UI Nits: SearchBox icon/tool position tweak.
+      Fix calendar hide/show crash
+      Don't start in full screen]
+      Remove bubble from DiaryWindow
+      UI Nits: Activity list cosmetic
+      Deprecate QtMacSearchBox
+      UI Nits: Search box clear icon
+      Fix white specs on Download Icon
+      UI Nits: Move searchbox toolbutton
+      Minor focus/highlight fixups Linux
+      Color fixups for Windows
+      Merge pull request #561 from amtriathlon/master
+      New chart dialog no stay on top
+      Fix LTM useToToday bug
+      Deprecate the old INITIAL[SL]TS settings
+      RideImport MUST notify charts
+      Fix StressCalculator SEGV
+      Further updates for Windows NSI script
+      Version String Error
+      Fix CP chart SEGV on delete ride
+      Merge pull request #566 from amtriathlon/master
+      Fix repaint of intervals when one changes
+      Merge pull request #567 from amtriathlon/master
+      Use Work as a PMC metric
+      Fix PerformanceManager curve disappear
+      Merge pull request #571 from amtriathlon/master
+      Merge pull request #574 from amtriathlon/master
+      Merge pull request #579 from MrMarc/master
+      Metric Histogram Plot
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Fix array bound SEGV
+      Metric Distribution
+      Update v3 release notes
+      Fix FitRideFile 'hangs'
+      Choose Columns Matrix on Netbooks
+      Column Chooser Still Too Big
+      Fix urls in FAQ document
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Visual signpost for search/filter
+      Fix 2 Google Map SEGV
+      Add Column Chooser for SearchBox
+      Visual cue for filter
+      Fixup CLucene OPTIONAL!
+      Fix Filter on BikeScore and 95% heart rate
+      Edit Named Searches
+      UI Nits: Edit Faves on a Mac
+      UI Nits: Scope Bar Font on Mac
+      Named Search Menu
+      ModelPlot (3d) redraw
+      Added Upgrade processing
+      UI Nits: Add chart frame on chart
+      Added Jon Escombe to Contributors
+      Merge pull request #589 from dresco/ANT
+      About Dialog Config Tab
+      Update QT install instructions INSTALL-LINUX
+      TRIMP(100)_Points in DataFilter
+      Left/Right Balance in DataFilter
+      DBSchema increment to 44
+      PWX support make/model for TP.com upload
+      Add Fatigue Profiling Peak Power Durations
+      LTM Show top 1 not 5 by default
+      UI Nits: Fixup ScopeBar button widths
+      Translation: German Analysis -> Analyse
+      Crash Reporting
+      Add version details to Crash report
+      HUD fix Avg HR and Max Cadence
+      BasiRideMetric handle no speed/distance gracefully
+      Documentation: Makeinfo compatibility
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      ANT Logging Fixups
+      ANTLogger farce continues
+      Recognise Satoru Kurashiki
+      Fix RawRidFile fdopen assert crash
+      More File Closing
+      v3.0 RC4
+      Fix RideFileCache threaded db access
+      RideFileCache dbaccess thread ...again
+      getWeight() always sets weight_ to non-zero
+      Upgrade: Set default weight to non-zero
+      FitRideFile fix truncated read crash
+      Merge pull request #605 from amtriathlon/master
+      Upgrade should only try once
+      RC5 Update Build ID and String
+      No CLucene optimise on Windows
+      UI Nits: Defaut sidebar settings
+      Fix WPK interval metric crash
+      Ready to publish v3.0-RC5X
+      Clean up measures.xml
+      Merge pull request #610 from amtriathlon/master
+      More WPK interval SEGV fixing
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Merge pull request #612 from amtriathlon/master
+      Recognise Okano Takayoshi
+      Recognise Tilman Schmiedeberg
+      Build Id and String update for RC6
+      Fix HrPw array offset SEGV
+      Added very short (12s) test ride
+      Fix QFile/Fclose conflict in RawRideFile SEGV
+      Don't publish Withings key in crash report
+      GcCalendar - setRide on show
+      Calendar Sidebar on no ride
+      Support gpxtpx:hr elements in GPX files
+      Move tests to top level directory
+      Fix RidePlot draw performance
+      UI Nits: AllPlot interval too hard to see
+      Documentation: Withings setup in FAQ
+      Documentation: How to create/edit Seasons/Events
+      Fix date range popup for cycles/adhoc
+      Merge branch 'master' of github.com:/GoldenCheetah/GoldenCheetah
+      Fix Editor find results sorting
+      Merge branch 'master' of github.com:GoldenCheetah/GoldenCheetah
+      Deprecate overwrite existing files on import
+      Fix first file SEGV
+      Diary Sidebar Calendar ignores first ride
+      Only refresh calendar if visible
+      Fix delete ride SEGV
+      Warning on add event
+      Add Darren Hague copyright message
+      Add alpha support for Dynastream OEM USB ant+
+      Update for RC7
+      Fix ScatterPlot setTime() SEGV
+      Fix reset layout 'crash'
+      Fixup reset layout for tile mode
+      Remove Column Chooser from Chart Settings
+      Merge pull request #630 from amtriathlon/master
+      New LTM Chart Setup Mockups
+      Version 3 Release
+
+Mark Rages (1):
+      Added comment explaining meanmax algorithm
+
+Rainer Clasen (49):
+      Fit: ignore unknown message types
+      Fit: support big/little endian data
+      Fit: handle unknown fields gracefully
+      fix reading signed values from srm files
+      whitespace cleanup
+      gitignore lex/yacc generated files
+      MacroDevice: use backwards compatible toTime_t
+      CommPort: keep device names seperate
+      use new srmio API - allowing PC7 support
+      CommPort: added isOpen method
+      split Device class to allow keeping download state
+      SrmDevice: re-use open code
+      allow download of multiple files - for PC7
+      Download: made status text scrollable
+      SrmDevice: switched to full API
+      SrmDevice: re-added data fixup
+      download: port list comfort
+      SrmRideFile: turned assertions into graceful fail
+      SrmDevice: support D2XX with srmio, as well
+      SrmDevice: sync port support with srmio
+      PowerTapDevice: fix date initialisation
+      DownloadDialog: handle unset/invalid timestamps
+      Download: provide end time for ride blocks
+      use new srmio error reporting
+      SrmDevice: use srmio win-comm when available
+      Device: allow status updates from all methods
+      SrmDevice: moved status reporting to open method
+      SrmDevice: fix rideList population
+      SrmDevice: fix counting skipped blocks
+      SrmDevice: use srmio logging callback
+      Download: indicate download stage
+      SrmDevice: fixed marker offsets
+      fixed duplicate main window hotkeys
+      fix: refuse writing bad power zone settings
+      SrmRide: Import marker names, aswell
+      SrmRide: suppress empty intervalls
+      SrmRide: set Tags
+      fix: remember state of showTorque in ride dialog
+      main: allow passing athlete as argument
+      added non-zero average power metric
+      PM: show upcoming days, aswell
+      added upload to trainingstagebuch.org
+      Download: remeber last used device/port
+      SrmDevice: fix catching broken downloads
+      SrmRideFile: don't truncate comment
+      SrmRideFile: handle bad/truncated files
+      SrmRideFile: handle bad marker start
+      PM: by default show values up to "now"
+      Remove Boost - SrmDevice
+
+Robert Evans (1):
+      Adding macports instructions for qt dependency install
+
+Ron Alford (2):
+      Correcting the haversine distance calculation for GPX imports
+      Changing TCX export to convert to UTC time
+
+Steven Gribble (1):
+      added a new air density (rho) estimator dialog box, hooked it into the Tools menu, and updated src.pro to add compilation dependencies for it
+
+Tilman Schmiedeberg (2):
+      Initial v3 German Translation
+      German Translation for V3.0
+
+Tom Weichmann (6):
+      New ints show mph and mi + extra digit for dist.
+      Changes to make TPUpload dialog honor user unit preferences
+      Makes GcBubble honor user unit preference for distance
+      Added notes to pwx <cmt> tag
+      Change GcBubble time format to match Gc standard
+      Honour units in Realtime Plots
+
+Walter Bürki (2):
+      Fix Histogram Crash
+      added left/right balance values into ridefile
+
+dhague (1):
+      Refactor antlog.bin output into ANTLogger class
+
+g3rg (2):
+      Fixed tab order of fields on New Cyclist Dialog
+      #381 Prevent statistics from refreshing for each file saved on close, and just run for the last file. Also covers #506 and #656 which are duplicates.
+
+gcoco (23):
+      Merge pull request #12 from glonnon/strava_date_fix
+      Merge pull request #9 from gcoco/release_3.0.0dev
+      Merge pull request #20 from rclasen/master
+      Merge pull request #22 from rclasen/bug715
+      URL updates
+      Update doc/bug-tracker.content
+      Update doc/download.content
+      Update doc/developers-guide.content
+      Update doc/developers-guide.content
+      Fix git URL
+      Fit git URL
+      Fix git URLs
+      Fix
+      Remove data from default settings
+      Reset defaults
+      Reset defaults
+      D2XX.cpp requires #include <assert.h>
+      Add some Garmin Device Types
+      Accuracy is important
+      Added Garmin Edge 510
+      Add Garmin Edge 810
+      Added notes on the build
+      Whitespace cleanup
+
+unknown (1):
+      Add error reporting to Estimate CdA and Crr
+</pre>
