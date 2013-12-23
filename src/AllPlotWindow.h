@@ -54,6 +54,7 @@ class AllPlotWindow : public GcChartWindow
     // plot at the same time.
     Q_PROPERTY(bool stacked READ isStacked WRITE setStacked USER true)
     Q_PROPERTY(bool byseries READ isBySeries WRITE setBySeries USER true)
+    Q_PROPERTY(int stackWidth READ _stackWidth WRITE setStackWidth USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
@@ -88,6 +89,7 @@ class AllPlotWindow : public GcChartWindow
         // get properties - the setters are below
         bool isStacked() const { return showStack->isChecked(); }
         bool isBySeries() const { return showBySeries->isChecked(); }
+        int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
         int isShowHr() const { return showHr->checkState(); }
@@ -121,8 +123,7 @@ class AllPlotWindow : public GcChartWindow
         void setSmoothingFromLineEdit();
         void setrSmoothingFromSlider();
         void setrSmoothingFromLineEdit();
-        void setStackZoomUp();
-        void setStackZoomDown();
+        void setStackWidth(int x);
         void setShowPower(int state);
         void setShowHr(int state);
         void setShowNP(int state);
@@ -148,6 +149,8 @@ class AllPlotWindow : public GcChartWindow
         void zoomChanged();
         void zoomOut();
         void zoomInterval(IntervalItem *);
+        void stackZoomSliderChanged();
+        void resizeSeriesPlots();
         void moveLeft();
         void moveRight();
         void showStackChanged(int state);
@@ -187,8 +190,10 @@ class AllPlotWindow : public GcChartWindow
         QVBoxLayout *seriesstackPlotLayout;
         QWidget *seriesstackWidget;
 
-        QwtArrowButton *stackZoomDown;
-        QwtArrowButton *stackZoomUp;
+        // stack zoomer for setting stack width
+        // has 7 settings from 0 - 6
+        QSlider *stackZoomSlider;
+        const int stackZoomWidth[7] = { 5, 10, 15, 20, 30, 45, 60 };
 
         // Normal view
         QScrollArea *allPlotFrame;
@@ -248,9 +253,6 @@ class AllPlotWindow : public GcChartWindow
     private slots:
 
         void addPickers(AllPlot *allPlot2);
-        bool stackZoomUpShouldEnable(int sw);
-        bool stackZoomDownShouldEnable(int sw);
-
         void plotPickerMoved(const QPoint &);
         void plotPickerSelected(const QPoint &);
 };
