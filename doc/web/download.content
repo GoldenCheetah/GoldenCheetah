@@ -35,12 +35,15 @@ PCV on Mac OS X</a> for further information.
 <ul>
 <li><a href="GoldenCheetah_3.0.1_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
 <li><a href="GoldenCheetah_3.0.1_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
+<li><a href="GoldenCheetah-3.0.1-1.fc18.x86_64.rpm">Fedora 18 RPM (x86_64)</a><br>
+<li><a href="GoldenCheetah-3.0.1-1.fc19.x86_64.rpm">Fedora 19 RPM (x86_64)</a><br>
 </ul>
 
 <p>
 Installation is simple. Download the file for your operating system.<br>
 On Mac, open the DMG and drag and drop where you would like to install.<br>
 For Windows, run the Installer and follow the prompts.<br>
+For Fedora, install as root (rpm -Uvh filename.rpm) or using sudo (sudo rpm -Uvh filename.rpm).<br>
 </p>
 <p>
 There is a <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Manual.pdf?raw=true">Manual</a>
