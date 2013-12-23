@@ -44,6 +44,9 @@ void nostderr(QString dir)
 }
 #endif
 
+#ifdef Q_OS_MAC
+#include "QtMacSegmentedButton.h" // for cocoa initialiser
+#endif
 
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
@@ -135,6 +138,11 @@ main(int argc, char *argv[])
 
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
+
+#ifdef Q_OS_MAC
+    // get an autorelease pool setup
+    static CocoaInitializer cocoaInitializer;
+#endif
 
     // set defaultfont
     QFont font;

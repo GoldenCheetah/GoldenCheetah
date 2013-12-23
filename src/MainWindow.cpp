@@ -118,10 +118,6 @@ MainWindow::MainWindow(const QDir &home)
     GCColor *GCColorSet = new GCColor(context); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
 
-    #ifdef Q_OS_MAC
-    // get an autorelease pool setup
-    static CocoaInitializer cocoaInitializer;
-    #endif
     #ifdef GC_HAVE_WFAPI
     WFApi *w = WFApi::getInstance(); // ensure created on main thread
     w->apiVersion();//shutup compiler
