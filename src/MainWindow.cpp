@@ -198,6 +198,34 @@ MainWindow::MainWindow(const QDir &home)
 
 
     /*----------------------------------------------------------------------
+     * ScopeBar
+     *--------------------------------------------------------------------*/
+    scopebar = new GcScopeBar(context);
+    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
+    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
+    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
+    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
+
+#if 0
+    // Add chart is on the scope bar
+    chartMenu = new QMenu(this);
+    QStyle *styler = QStyleFactory::create("fusion");
+    QPushButton *newchart = new QPushButton("+", this);
+    scopebar->addWidget(newchart);
+    newchart->setStyle(styler);
+    newchart->setFixedHeight(20);
+    newchart->setFixedWidth(24);
+    newchart->setFlat(true);
+    newchart->setFocusPolicy(Qt::NoFocus);
+    newchart->setToolTip(tr("Add Chart"));
+    newchart->setAutoFillBackground(false);
+    newchart->setAutoDefault(false);
+    newchart->setMenu(chartMenu);
+    connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
+    connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
+#endif
+
+    /*----------------------------------------------------------------------
      *  Mac Toolbar
      *--------------------------------------------------------------------*/
 #ifdef Q_OS_MAC 
@@ -211,7 +239,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // lhs buttons
     QHBoxLayout *lb = new QHBoxLayout(macAnalButtons);
-    lb->setContentsMargins(0,0,0,0);
+    lb->setContentsMargins(0,0,10,8);
     lb->setSpacing(0);
     import = new QtMacButton(this, QtMacButton::TexturedRounded);
     QPixmap *importImg = new QPixmap(":images/mac/download.png");
@@ -262,7 +290,6 @@ MainWindow::MainWindow(const QDir &home)
     actbuttons->setImage(2, new QPixmap(":images/mac/trash.png"));
     pp->addWidget(actbuttons);
     lb->addWidget(acts);
-    lb->addStretch();
     connect(actbuttons, SIGNAL(clicked(int,bool)), this, SLOT(actionClicked(int)));
 
     lb->addWidget(new Spacer(this));
@@ -275,7 +302,6 @@ MainWindow::MainWindow(const QDir &home)
     QHBoxLayout *ps = new QHBoxLayout;
     ps->setContentsMargins(0,0,0,0);
     ps->setSpacing (2); // low and sidebar button close together
-    ps->addStretch();
     ps->addWidget(sidebar);
     ps->addWidget(lowbar);
     ps->addStretch();
@@ -293,6 +319,7 @@ MainWindow::MainWindow(const QDir &home)
     // setup Mac thetoolbar
     head->addWidget(macAnalButtons);
     head->addWidget(new Spacer(this));
+    head->addWidget(scopebar);
     head->addWidget(new Spacer(this));
     head->addWidget(viewsel);
 
@@ -404,6 +431,8 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(actbuttons);
 
     head->addStretch();
+    head->addWidget(scopebar);
+    head->addStretch();
     head->addWidget(sidebar);
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
@@ -421,32 +450,6 @@ MainWindow::MainWindow(const QDir &home)
     spacer->setFixedWidth(5);
     head->addWidget(spacer);
 #endif
-
-    /*----------------------------------------------------------------------
-     * ScopeBar
-     *--------------------------------------------------------------------*/
-    scopebar = new GcScopeBar(context);
-    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
-    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
-    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
-    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
-
-    // Add chart is on the scope bar
-    chartMenu = new QMenu(this);
-    QStyle *styler = QStyleFactory::create("fusion");
-    QPushButton *newchart = new QPushButton("+", this);
-    scopebar->addWidget(newchart);
-    newchart->setStyle(styler);
-    newchart->setFixedHeight(20);
-    newchart->setFixedWidth(24);
-    newchart->setFlat(true);
-    newchart->setFocusPolicy(Qt::NoFocus);
-    newchart->setToolTip(tr("Add Chart"));
-    newchart->setAutoFillBackground(false);
-    newchart->setAutoDefault(false);
-    newchart->setMenu(chartMenu);
-    connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
-    connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -468,7 +471,6 @@ MainWindow::MainWindow(const QDir &home)
                  // unified with the title bar.
     mainLayout->addWidget(head);
 #endif
-    mainLayout->addWidget(scopebar);
     mainLayout->addWidget(tab);
     setCentralWidget(central);
 

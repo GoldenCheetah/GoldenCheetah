@@ -94,9 +94,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     layout->addWidget(train);
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
 
-    layout->addStretch();
     //layout->addWidget(traintool); //XXX!!! eek
-    layout->addStretch();
 
     // we now need to adjust the buttons according to their text size
     // this is particularly bad for German's who, as a nation, must
@@ -159,7 +157,7 @@ void
 GcScopeBar::paintEvent (QPaintEvent *event)
 {
     // paint the darn thing!
-    paintBackground(event);
+    //paintBackground(event);
     QWidget::paintEvent(event);
 }
 
