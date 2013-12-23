@@ -229,6 +229,7 @@ class AllPlotWindow : public GcChartWindow
 
         // reset/redraw all the plots
         void setupStackPlots();
+        void forceSetupSeriesStackPlots();
         void setupSeriesStackPlots();
         void redrawAllPlot();
         void redrawFullPlot();

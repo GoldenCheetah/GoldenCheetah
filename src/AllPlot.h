@@ -61,14 +61,16 @@ class AllPlot : public QwtPlot
     public:
 
         // you can declare which series to plot, none means do them all
-        AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType series = RideFile::none);
+        // wanttext is to say if plot markers should have text
+        AllPlot(AllPlotWindow *parent, Context *context, 
+                RideFile::SeriesType series = RideFile::none, bool wanttext = true);
 
         bool eventFilter(QObject *object, QEvent *e);
 
         // set the curve data e.g. when a ride is selected
         void setDataFromRide(RideItem *_rideItem);
         void setDataFromPlot(AllPlot *plot, int startidx, int stopidx);
-        void setDataFromPlot(AllPlot *plot, bool first = false); // used for single series plotting
+        void setDataFromPlot(AllPlot *plot); // used for single series plotting
 
         // convert from time/distance to index in *smoothed* datapoints
         int timeIndex(double) const;
@@ -77,8 +79,8 @@ class AllPlot : public QwtPlot
         // plot redraw functions
         bool shadeZones() const;
         void refreshZoneLabels();
-        void refreshIntervalMarkers(bool withtext=true);
-        void refreshCalibrationMarkers(bool withtext=true);
+        void refreshIntervalMarkers();
+        void refreshCalibrationMarkers();
         void refreshReferenceLines();
         void refreshReferenceLinesForAllPlots();
         void setAxisTitle(QwtAxisId axis, QString label);
@@ -128,6 +130,7 @@ class AllPlot : public QwtPlot
         RideItem *rideItem;
         AllPlotBackground *bg;
         QSettings *settings;
+        bool wanttext;
 
         // controls
         bool shade_zones;

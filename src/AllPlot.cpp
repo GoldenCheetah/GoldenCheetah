@@ -228,7 +228,7 @@ class TimeScaleDraw: public QwtScaleDraw
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType scope):
+AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType scope, bool wanttext):
     QwtPlot(parent),
     rideItem(NULL),
     shade_zones(true),
@@ -247,7 +247,8 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     bydist(false),
     scope(scope),
     context(context),
-    parent(parent)
+    parent(parent),
+    wanttext(wanttext)
 {
     referencePlot = NULL;
 
@@ -991,7 +992,7 @@ AllPlot::recalc()
 }
 
 void
-AllPlot::refreshIntervalMarkers(bool withtext)
+AllPlot::refreshIntervalMarkers()
 {
     foreach(QwtPlotMarker *mrk, d_mrk) {
         mrk->detach();
@@ -1015,7 +1016,7 @@ AllPlot::refreshIntervalMarkers(bool withtext)
             QString name(interval.name);
             if (interval.name.startsWith(tr("Match"))) name = QString("\n%1").arg(interval.name);
 
-            QwtText text(withtext ? name : "");
+            QwtText text(wanttext ? name : "");
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             if (interval.name.startsWith(tr("Match"))) 
                 text.setColor(GColor(CWBAL));
@@ -1032,7 +1033,7 @@ AllPlot::refreshIntervalMarkers(bool withtext)
 }
 
 void
-AllPlot::refreshCalibrationMarkers(bool withtext)
+AllPlot::refreshCalibrationMarkers()
 {
     foreach(QwtPlotMarker *mrk, cal_mrk) {
         mrk->detach();
@@ -1048,7 +1049,7 @@ AllPlot::refreshCalibrationMarkers(bool withtext)
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
             mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
-            QwtText text(withtext ? ("\n\n"+calibration.name) : "");
+            QwtText text(wanttext ? ("\n\n"+calibration.name) : "");
             text.setFont(QFont("Helvetica", 9, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
             if (!bydist)
@@ -1064,6 +1065,10 @@ AllPlot::refreshCalibrationMarkers(bool withtext)
 void
 AllPlot::refreshReferenceLines()
 {
+    // only on power based charts
+    if (scope != RideFile::none && scope != RideFile::watts &&
+        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+
     foreach(QwtPlotCurve *referenceLine, referenceLines) {
         referenceLine->detach();
         delete referenceLine;
@@ -1072,7 +1077,7 @@ AllPlot::refreshReferenceLines()
     if (rideItem->ride()) {
         foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
             QwtPlotCurve *referenceLine = plotReferenceLine(referencePoint);
-            referenceLines.append(referenceLine);
+            if (referenceLine) referenceLines.append(referenceLine);
         }
     }
 }
@@ -1080,18 +1085,17 @@ AllPlot::refreshReferenceLines()
 QwtPlotCurve*
 AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
 {
+    // only on power based charts
+    if (scope != RideFile::none && scope != RideFile::watts &&
+        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
+
     QwtPlotCurve *referenceLine = NULL;
 
     QVector<double> xaxis;
     QVector<double> yaxis;
-    if (bydist) {
-        xaxis.append(referencePlot == NULL ? smoothDistance.first() : referencePlot->smoothDistance.first());
-        xaxis.append(referencePlot == NULL ? smoothDistance.last() : referencePlot->smoothDistance.last());
 
-    } else {
-        xaxis.append(referencePlot == NULL ? smoothTime.first() : referencePlot->smoothTime.first());
-        xaxis.append(referencePlot == NULL ? smoothTime.last() : referencePlot->smoothTime.last());
-    }
+    xaxis << axisScaleDiv(QwtPlot::xBottom).lowerBound();
+    xaxis << axisScaleDiv(QwtPlot::xBottom).upperBound();
 
     if (referencePoint->watts != 0)  {
         referenceLine = new QwtPlotCurve(tr("Power Ref"));
@@ -1682,7 +1686,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 }
 
 void
-AllPlot::setDataFromPlot(AllPlot *plot, bool first)
+AllPlot::setDataFromPlot(AllPlot *plot)
 {
     if (plot == NULL) {
         rideItem = NULL;
@@ -1690,9 +1694,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
     }
 
     referencePlot = plot;
-
-    // You got to give me some data first!
-    //if (!plot->distanceArray.count() || !plot->timeArray.count()) return;
 
     // reference the plot for data and state
     rideItem = plot->rideItem;
@@ -1731,39 +1732,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
     balanceLCurve->setVisible(false);
     balanceRCurve->setVisible(false);
 
-#if 0
-    // attach appropriate curves
-    //if (this->legend()) this->legend()->hide();
-    if (showW && parent->wpData->TAU > 0) {
-
-        // center the curve title
-        curveTitle.setYValue(30);
-        curveTitle.setXValue(2);
-
-        // matches cost
-        double burnt=0;
-        int count=0;
-        foreach(struct Match match, parent->wpData->matches)
-            if (match.cost > 2000) { //XXX how to decide the threshold for a match?
-                burnt += match.cost;
-                count++;
-            }
-
-        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ)").arg(parent->wpData->TAU)
-                                                    .arg(parent->wpData->CP)
-                                                    .arg(parent->wpData->WPRIME)
-                                                    .arg(count)
-                                                    .arg(burnt/1000.00, 0, 'f', 1));
-
-        text.setFont(QFont("Helvetica", 10, QFont::Bold));
-        text.setColor(GColor(CWBAL));
-        curveTitle.setLabel(text);
-    } else {
-        curveTitle.setLabel(QwtText(""));
-    }
-#endif
-
     QwtPlotCurve *ourCurve = NULL, *thereCurve = NULL;
+    QwtPlotCurve *ourCurve2 = NULL, *thereCurve2 = NULL;
+    QwtPlotIntervalCurve *ourICurve = NULL, *thereICurve = NULL;
     QString title;
 
     // which curve are we interested in ?
@@ -1809,6 +1780,16 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
         }
         break;
 
+    case RideFile::wprime:
+        {
+        ourCurve = wCurve;
+        ourCurve2 = mCurve;
+        thereCurve = referencePlot->wCurve;
+        thereCurve2 = referencePlot->mCurve;
+        title = tr("W'bal");
+        }
+        break;
+
     case RideFile::alt:
         {
         ourCurve = altCurve;
@@ -1819,7 +1800,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
 
     case RideFile::headwind:
         {
-        //XXX fixme! QwtPlotIntervalCurve *windCurve;
+        ourICurve = windCurve;
+        thereICurve = referencePlot->windCurve;
         title = tr("Headwind");
         }
         break;
@@ -1850,8 +1832,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
 
     case RideFile::lrbalance:
         {
-        //XXX fixme ourCurve = balanceLCurve;
-        //XXX fixme ourCurve = balanceRCurve;
+        ourCurve = balanceLCurve;
+        ourCurve2 = balanceRCurve;
+        thereCurve = referencePlot->balanceLCurve;
+        thereCurve2 = referencePlot->balanceRCurve;
         title = tr("L/R Balance");
         }
         break;
@@ -1877,17 +1861,76 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
     }
 
     // lets clone !
-    if (ourCurve && thereCurve) {
+    if ((ourCurve && thereCurve) || (ourICurve && thereICurve)) {
 
-        // no way to get values, so we run through them
-        ourCurve->setVisible(true);
-        ourCurve->attach(this);
+        if (ourCurve && thereCurve) {
+            // no way to get values, so we run through them
+            ourCurve->setVisible(true);
+            ourCurve->attach(this);
 
-        // lets clone the data
-        QVector<QPointF> array;
-        for (int i=0; i<thereCurve->data()->size(); i++) array << thereCurve->data()->sample(i);
+            // lets clone the data
+            QVector<QPointF> array;
+            for (int i=0; i<thereCurve->data()->size(); i++) array << thereCurve->data()->sample(i);
 
-        ourCurve->setSamples(array);
+            ourCurve->setSamples(array);
+            ourCurve->setYAxis(yLeft);
+            ourCurve->setBaseline(thereCurve->baseline());
+
+            // symbol when zoomed in super close
+            if (array.size() < 150) {
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setPen(QPen(GColor(CPLOTMARKER)));
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(3);
+                ourCurve->setSymbol(sym);
+            } else {
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::NoSymbol);
+                sym->setSize(0);
+                ourCurve->setSymbol(sym);
+            }
+        }
+
+        if (ourCurve2 && thereCurve2) {
+
+            ourCurve2->setVisible(true);
+            ourCurve2->attach(this);
+
+            // lets clone the data
+            QVector<QPointF> array;
+            for (int i=0; i<thereCurve2->data()->size(); i++) array << thereCurve2->data()->sample(i);
+
+            ourCurve2->setSamples(array);
+            ourCurve2->setYAxis(yLeft);
+            ourCurve2->setBaseline(thereCurve2->baseline());
+
+            // symbol when zoomed in super close
+            if (array.size() < 150) {
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setPen(QPen(GColor(CPLOTMARKER)));
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(3);
+                ourCurve2->setSymbol(sym);
+            } else {
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::NoSymbol);
+                sym->setSize(0);
+                ourCurve2->setSymbol(sym);
+            }
+        }
+
+        if (ourICurve && thereICurve) {
+
+            ourICurve->setVisible(true);
+            ourICurve->attach(this);
+
+            // lets clone the data
+            QVector<QwtIntervalSample> array;
+            for (int i=0; i<thereICurve->data()->size(); i++) array << thereICurve->data()->sample(i);
+
+            ourICurve->setSamples(array);
+            ourICurve->setYAxis(yLeft);
+        }
 
         // x-axis
         setAxisScale(QwtPlot::xBottom, thereCurve->minXValue(), thereCurve->maxXValue());
@@ -1895,7 +1938,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
         setAxisVisible(QwtPlot::xBottom, true);
 
         // y-axis yLeft
-        ourCurve->setYAxis(yLeft);
         setAxisVisible(yLeft, true);
         setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
         QwtScaleDraw *sd = new QwtScaleDraw;
@@ -1920,33 +1962,17 @@ AllPlot::setDataFromPlot(AllPlot *plot, bool first)
         // plot grid
         grid->setVisible(referencePlot->grid->isVisible());
 
-        // symbol when zoomed in super close
-        if (array.size() < 150) {
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setPen(QPen(GColor(CPLOTMARKER)));
-            sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(3);
-            ourCurve->setSymbol(sym);
-        } else {
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setStyle(QwtSymbol::NoSymbol);
-            sym->setSize(0);
-            ourCurve->setSymbol(sym);
-        }
-
-        // intervals and calibration
-        refreshIntervalMarkers(first);
-        refreshCalibrationMarkers(first);
-
-#if 0
-        QwtPlotCurve *wCurve;
-        QwtPlotCurve *mCurve;
-        QwtPlotCurve *lrCurve;
-        //XXX setgrids, shade zones etc etc etc etc
+        // plot markers etc
+        refreshIntervalMarkers();
+        refreshCalibrationMarkers();
         refreshReferenceLines();
+
+        // always draw against yLeft in series mode
+        intervalHighlighterCurve->setYAxis(yLeft);
+        intervalHighlighterCurve->setBaseline(thereCurve->minYValue());
+#if 0
         refreshZoneLabels();
 #endif
-
     }
 }
 
@@ -2580,9 +2606,14 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 void
 AllPlot::plotTmpReference(int axis, int x, int y)
 {
+    // only on power based charts
+    if (scope != RideFile::none && scope != RideFile::watts &&
+        scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
+
     if (x>0) {
-        RideFilePoint *refPoint = new RideFilePoint();
-        refPoint->watts = invTransform(axis, y);
+
+        RideFilePoint *referencePoint = new RideFilePoint();
+        referencePoint->watts = invTransform(axis, y);
 
         foreach(QwtPlotCurve *curve, tmpReferenceLines) {
             if (curve) {
@@ -2592,20 +2623,46 @@ AllPlot::plotTmpReference(int axis, int x, int y)
         }
         tmpReferenceLines.clear();
 
-        tmpReferenceLines.append(parent->allPlot->plotReferenceLine(refPoint));
-        parent->allPlot->replot();
+        // only plot if they are relevant to the plot.
+        QwtPlotCurve *referenceLine = parent->allPlot->plotReferenceLine(referencePoint);
+        if (referenceLine) {
+            tmpReferenceLines.append(referenceLine);
+            parent->allPlot->replot();
+        }
+
+        // now do the series plots
+        foreach(AllPlot *plot, parent->seriesPlots) {
+            QwtPlotCurve *referenceLine = plot->plotReferenceLine(referencePoint);
+            if (referenceLine) {
+                tmpReferenceLines.append(referenceLine);
+                plot->replot();
+            }
+        }
+
+        // now the stack plots
         foreach(AllPlot *plot, parent->allPlots) {
-            tmpReferenceLines.append(plot->plotReferenceLine(refPoint));
+            QwtPlotCurve *referenceLine = plot->plotReferenceLine(referencePoint);
+            if (referenceLine) {
+                tmpReferenceLines.append(referenceLine);
+                plot->replot();
+            }
+        }
+
+
+    } else  {
+
+        // wipe any we don't want
+        foreach(QwtPlotCurve *curve, tmpReferenceLines) {
+            if (curve) {
+                curve->detach();
+                delete curve;
+            }
+        }
+        tmpReferenceLines.clear();
+        parent->allPlot->replot();
+        foreach(AllPlot *plot, parent->seriesPlots) {
             plot->replot();
         }
-    } else  {
-        foreach(QwtPlotCurve *curve, tmpReferenceLines) {
-            if (curve) {
-                curve->detach();
-                delete curve;
-            }
-        }
-        tmpReferenceLines.clear();
         parent->allPlot->replot();
         foreach(AllPlot *plot, parent->allPlots) {
             plot->replot();
@@ -2618,6 +2675,9 @@ AllPlot::refreshReferenceLinesForAllPlots()
 {
     parent->allPlot->refreshReferenceLines();
     foreach(AllPlot *plot, parent->allPlots) {
+        plot->refreshReferenceLines();
+    }
+    foreach(AllPlot *plot, parent->seriesPlots) {
         plot->refreshReferenceLines();
     }
 }
