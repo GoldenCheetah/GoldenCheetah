@@ -128,22 +128,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showBySeries->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel("", this), showBySeries);
 
-    stackWidth = 15;
-    stackZoomUp = new QwtArrowButton(1, Qt::UpArrow,this);
-    stackZoomUp->setFixedHeight(15);
-    stackZoomUp->setFixedWidth(15);
-    stackZoomUp->setEnabled(false);
-    stackZoomUp->setContentsMargins(0,0,0,0);
-    stackZoomUp->setFlat(true);
-    cl1->addRow(new QLabel(""),stackZoomUp);
-
-    stackZoomDown = new QwtArrowButton(1, Qt::DownArrow,this);
-    stackZoomDown->setFixedHeight(15);
-    stackZoomDown->setFixedWidth(15);
-    stackZoomDown->setEnabled(false);
-    stackZoomDown->setContentsMargins(0,0,0,0);
-    stackZoomDown->setFlat(true);
-    cl1->addRow(new QLabel(""), stackZoomDown);
+    stackWidth = 20;
+    stackZoomSlider = new QSlider(Qt::Horizontal,this);
+    stackZoomSlider->setMinimum(0);
+    stackZoomSlider->setMaximum(6);
+    stackZoomSlider->setTickInterval(1);
+    stackZoomSlider->setValue(3);
+    cl1->addRow(new QLabel("Stack Zoom"), stackZoomSlider); 
 
     showFull = new QCheckBox(tr("Full plot"), this);
     showFull->setCheckState(Qt::Checked);
@@ -485,10 +476,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(spanSlider, SIGNAL(upperPositionChanged(int)), this, SLOT(zoomChanged()));
 
     // stacked view
-    connect(stackZoomUp, SIGNAL(clicked()), this, SLOT(setStackZoomUp()));
-    connect(stackZoomDown, SIGNAL(clicked()), this, SLOT(setStackZoomDown()));
     connect(scrollLeft, SIGNAL(clicked()), this, SLOT(moveLeft()));
     connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
+    connect(stackZoomSlider, SIGNAL(valueChanged(int)), this, SLOT(stackZoomSliderChanged()));
 
     // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -995,17 +985,11 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         scrollLeft->hide();
         scrollRight->hide();
 
-        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
-
         // show stacked view
         stackFrame->show();
 
     } else {
 
-        // hide stack view
-        stackZoomDown->setEnabled(false);
-        stackZoomUp->setEnabled(false);
         stackFrame->hide();
 
         // show normal view
@@ -1030,9 +1014,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             scrollLeft->hide();
             scrollRight->hide();
         }
-
-        stackZoomUp->setEnabled(false);
-        stackZoomDown->setEnabled(false);
     }
 }
 
@@ -1682,59 +1663,39 @@ AllPlotWindow::resetStackedDatas()
 
 }
 
-bool
-AllPlotWindow::stackZoomUpShouldEnable(int sw)
+void
+AllPlotWindow::stackZoomSliderChanged()
 {
-    if (!current) return false;
-
-    if (sw >= 200  || sw >= current->ride()->dataPoints().last()->secs/60) {
-        return false;
-    }
-    else {
-        return true;
-    }
-}
-
-bool
-AllPlotWindow::stackZoomDownShouldEnable(int sw)
-{
-    if (sw <= 4) {
-        return false;
-    }
-    else {
-        return true;
-    }
-
+    // slider moved!
+    setStackWidth(stackZoomWidth[stackZoomSlider->value()]);
 }
 
 void
-AllPlotWindow::setStackZoomUp()
+AllPlotWindow::setStackWidth(int width)
 {
-    if (!current) return;
+    // derive width from allowed values -- this is for backward 
+    // compatibility to ensure we always use a size that we are
+    // expecting and set the slider to the appropriate value
+    int i=0;
+    for (; i<7; i++) // there are 7 pre-set sizes
+        if (width <= stackZoomWidth[i]) break;
 
-    if (stackWidth<200 && stackWidth<current->ride()->dataPoints().last()->secs/60) {
+    // we never found it
+    if (i == 7) i=6;
 
-        stackWidth = ceil(stackWidth * 1.25);
-        setupStackPlots();
-        setupSeriesStackPlots();
-        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
-    }
-}
+    // did anything actually change?
+    if (stackZoomWidth[i] == stackWidth) return;
 
-void
-AllPlotWindow::setStackZoomDown()
-{
-    if (!current) return;
+    // set the value and the slider
+    stackWidth = stackZoomWidth[i];
+    stackZoomSlider->setValue(i);
 
-    if (stackWidth>4) {
+    resizeSeriesPlots(); // its only the size that needs to change
+                         // no need to replot
 
-        stackWidth = floor(stackWidth / 1.25);
-        setupStackPlots();
-        setupSeriesStackPlots();
-        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
-    }
+    // now lets do the plots...
+    setupStack = false; // force resize
+    setupStackPlots();
 }
 
 void
@@ -1823,6 +1784,13 @@ AllPlotWindow::forceSetupSeriesStackPlots()
 }
 
 void
+AllPlotWindow::resizeSeriesPlots()
+{
+    foreach (AllPlot *plot, seriesPlots)
+        plot->setFixedHeight(100 + (stackWidth *3));
+}
+
+void
 AllPlotWindow::setupSeriesStackPlots()
 {
     if (!showStack->isChecked() || !showBySeries->isChecked() || setupSeriesStack) return;
@@ -1871,7 +1839,7 @@ AllPlotWindow::setupSeriesStackPlots()
         seriesPlots.append(_allPlot);
         addPickers(_allPlot);
         newLayout->addWidget(_allPlot);
-        _allPlot->setFixedHeight(120);
+        _allPlot->setFixedHeight(120+(stackWidth*3));
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtPlot::xBottom, true);
@@ -1998,7 +1966,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setDataFromPlot(fullPlot, startIndex, stopIndex);
         _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
 
-        _allPlot->setFixedHeight(120+stackWidth*2);
+        _allPlot->setFixedHeight(120+stackWidth*3);
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtPlot::xBottom, true);
