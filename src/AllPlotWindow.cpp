@@ -131,7 +131,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackWidth = 20;
     stackZoomSlider = new QSlider(Qt::Horizontal,this);
     stackZoomSlider->setMinimum(0);
-    stackZoomSlider->setMaximum(6);
+    stackZoomSlider->setMaximum(7);
     stackZoomSlider->setTickInterval(1);
     stackZoomSlider->setValue(3);
     cl1->addRow(new QLabel("Stack Zoom"), stackZoomSlider); 
@@ -1677,11 +1677,11 @@ AllPlotWindow::setStackWidth(int width)
     // compatibility to ensure we always use a size that we are
     // expecting and set the slider to the appropriate value
     int i=0;
-    for (; i<7; i++) // there are 7 pre-set sizes
+    for (; i<8; i++) // there are 8 pre-set sizes
         if (width <= stackZoomWidth[i]) break;
 
     // we never found it
-    if (i == 7) i=6;
+    if (i == 8) i=7;
 
     // did anything actually change?
     if (stackZoomWidth[i] == stackWidth) return;
@@ -1786,8 +1786,10 @@ AllPlotWindow::forceSetupSeriesStackPlots()
 void
 AllPlotWindow::resizeSeriesPlots()
 {
+    seriesstackFrame->setUpdatesEnabled(false);
     foreach (AllPlot *plot, seriesPlots)
         plot->setFixedHeight(100 + (stackWidth *3));
+    seriesstackFrame->setUpdatesEnabled(true);
 }
 
 void
