@@ -68,6 +68,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
     Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
     Q_PROPERTY(int shading READ shading WRITE setShading USER true)
+    Q_PROPERTY(int ridePlotMode READ ridePlotMode WRITE setRidePlotMode USER true)
     Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
@@ -93,6 +94,9 @@ class CriticalPowerWindow : public GcChartWindow
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif
+
+        int ridePlotMode() const { return ridePlotStyleCombo->currentIndex(); }
+        void setRidePlotMode(int x) { ridePlotStyleCombo->setCurrentIndex(x); }
 
         // for retro compatibility
         QString season() const { return cComboSeason->itemText(cComboSeason->currentIndex()); }
@@ -166,6 +170,7 @@ class CriticalPowerWindow : public GcChartWindow
         void intervalsChanged();
         void seasonSelected(int season);
         void shadingSelected(int shading);
+        void setRidePlotStyle(int index);
         void setSeries(int index);
         void resetSeasons();
         void filterChanged();
@@ -198,6 +203,7 @@ class CriticalPowerWindow : public GcChartWindow
         QComboBox *seriesCombo;
         QComboBox *modelCombo;
         QComboBox *cComboSeason;
+        QComboBox *ridePlotStyleCombo;
         QComboBox *shadeCombo;
         QwtPlotPicker *picker;
         void addSeries();

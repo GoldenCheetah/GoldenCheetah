@@ -99,8 +99,6 @@ class CpintPlot : public QwtPlot
 
         Model_eCP athleteModeleCP2;
         Model_eCP athleteModeleCP4;
-        Model_eCP worldClassModeleCP2;
-        Model_eCP worldClassModeleCP4;
 
         double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
@@ -128,6 +126,7 @@ class CpintPlot : public QwtPlot
         void setDateCP(int x) { dateCP = x; }
         void clearFilter();
         void setFilter(QStringList);
+        void setRidePlotStyle(int index);
 
     protected:
 
@@ -160,6 +159,9 @@ class CpintPlot : public QwtPlot
         bool isFiltered;
         int shadeMode;
         bool rangemode;
+
+        int ridePlotStyle;
+        void calculateCentile(RideItem *rideItem);
 
 
 };
