@@ -55,6 +55,8 @@
 // W' calculator
 #include "WPrime.h"
 
+static const int stackZoomWidth[8] = { 5, 10, 15, 20, 30, 45, 60, 120 };
+
 AllPlotWindow::AllPlotWindow(Context *context) :
     GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false)
 {
