@@ -1933,13 +1933,22 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         }
 
         // x-axis
-        setAxisScale(QwtPlot::xBottom, thereCurve->minXValue(), thereCurve->maxXValue());
+        if (thereCurve)
+            setAxisScale(QwtPlot::xBottom, thereCurve->minXValue(), thereCurve->maxXValue());
+        else if (thereICurve)
+            setAxisScale(QwtPlot::xBottom, thereICurve->boundingRect().left(), thereICurve->boundingRect().right());
+
         enableAxis(QwtPlot::xBottom, true);
         setAxisVisible(QwtPlot::xBottom, true);
 
         // y-axis yLeft
         setAxisVisible(yLeft, true);
-        setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
+        if (thereCurve)
+            setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
+        if (thereICurve)
+            setAxisScale(QwtPlot::yLeft, thereICurve->boundingRect().top(), 1.1f * thereICurve->boundingRect().bottom());
+
+
         QwtScaleDraw *sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->enableComponent(QwtScaleDraw::Ticks, false);
@@ -1949,8 +1958,13 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         // title and colour
         setAxisTitle(yLeft, title);
         QPalette pal;
-        pal.setColor(QPalette::WindowText, thereCurve->pen().color());
-        pal.setColor(QPalette::Text, thereCurve->pen().color());
+        if (thereCurve) {
+            pal.setColor(QPalette::WindowText, thereCurve->pen().color());
+            pal.setColor(QPalette::Text, thereCurve->pen().color());
+        } else if (thereICurve) {
+            pal.setColor(QPalette::WindowText, thereICurve->pen().color());
+            pal.setColor(QPalette::Text, thereICurve->pen().color());
+        }
         axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
         // hide other y axes
@@ -1969,7 +1983,10 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
         // always draw against yLeft in series mode
         intervalHighlighterCurve->setYAxis(yLeft);
-        intervalHighlighterCurve->setBaseline(thereCurve->minYValue());
+        if (thereCurve)
+            intervalHighlighterCurve->setBaseline(thereCurve->minYValue());
+        else if (thereICurve)
+            intervalHighlighterCurve->setBaseline(thereICurve->boundingRect().top());
 #if 0
         refreshZoneLabels();
 #endif
