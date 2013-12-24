@@ -464,6 +464,11 @@ CpintPlot::clear_CP_Curves()
         allCurves.clear();
     }
 
+    if (thisCurve) {
+        delete thisCurve;
+        thisCurve = NULL;
+    }
+
     // now delete any labels
     if (allZoneLabels.size()) {
         foreach (QwtPlotMarker *label, allZoneLabels)
@@ -478,7 +483,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                          int n_values,
                          const double *power_values)
 {
-    clear_CP_Curves();
+    //clear_CP_Curves();
 
     QVector<double> energyBests(n_values);
     QVector<double> time_values(n_values);
@@ -624,6 +629,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 void
 CpintPlot::calculate(RideItem *rideItem)
 {
+    clear_CP_Curves();
     if (!rideItem) return;
 
     QString fileName = rideItem->fileName;
@@ -651,16 +657,7 @@ CpintPlot::calculate(RideItem *rideItem)
             if (useExtendedCP) {
                 // calculate extended CP model from all-time best data
                 //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-
                 athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-
-
-                /*double best5sec = context->ride->ride()->getWeight() * 24.04;
-                double best1min = context->ride->ride()->getWeight() * 11.50;
-                double best5min = context->ride->ride()->getWeight() * 7.60;
-                double best1hour = context->ride->ride()->getWeight() * 6.40;
-                //worldClassModeleCP2 = ecp->deriveExtendedCP_2_3_ParametersForBest(best5sec, best1min, best5min, best1hour);
-                worldClassModeleCP4 = ecp->deriveExtendedCP_4_3_ParametersForBest(best5sec, best1min, best5min, best1hour);*/
             }
         }
 
@@ -806,48 +803,52 @@ CpintPlot::calculate(RideItem *rideItem)
         }
     }
 
-    //
-    // PLOT THIS RIDE CURVE
-    //
-    if (thisCurve) {
-        delete thisCurve;
-        thisCurve = NULL;
-    }
-
-    if (!rangemode && current->meanMaxArray(series).size()) {
-        int maxNonZero = 0;
-        QVector<double> timeArray(current->meanMaxArray(series).size());
-        for (int i = 0; i < current->meanMaxArray(series).size(); ++i) {
-            timeArray[i] = i / 60.0;
-            if (current->meanMaxArray(series)[i] > 0) maxNonZero = i;
+    if (ridePlotStyle == 1)
+        calculateCentile(rideItem);
+    else if (ridePlotStyle < 2)  {
+        //
+        // PLOT THIS RIDE CURVE
+        //
+        if (thisCurve) {
+            delete thisCurve;
+            thisCurve = NULL;
         }
 
-        if (maxNonZero > 1) {
+        if (!rangemode && current->meanMaxArray(series).size()) {
+            int maxNonZero = 0;
+            QVector<double> timeArray(current->meanMaxArray(series).size());
+            for (int i = 0; i < current->meanMaxArray(series).size(); ++i) {
+                timeArray[i] = i / 60.0;
+                if (current->meanMaxArray(series)[i] > 0) maxNonZero = i;
+            }
 
-            thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
-            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            QPen black;
-            black.setColor(GColor(CRIDECP));
-            black.setWidth(2.0);
-            thisCurve->setPen(black);
-            thisCurve->attach(this);
+            if (maxNonZero > 1) {
 
-            if (series == RideFile::none) {
+                thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+                thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                QPen black;
+                black.setColor(GColor(CRIDECP));
+                black.setWidth(2.0);
+                thisCurve->setPen(black);
+                thisCurve->attach(this);
 
-                // Calculate Energy
-                QVector<double> energyArray(current->meanMaxArray(RideFile::watts).size());
-                for (int i = 0; i <= maxNonZero; ++i) {
-                    energyArray[i] = 
-                    timeArray[i] * 
-                    current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
+                if (series == RideFile::none) {
+
+                    // Calculate Energy
+                    QVector<double> energyArray(current->meanMaxArray(RideFile::watts).size());
+                    for (int i = 0; i <= maxNonZero; ++i) {
+                        energyArray[i] =
+                        timeArray[i] *
+                        current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
+                    }
+                    thisCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
+
+                } else {
+
+                    // normal
+                    thisCurve->setSamples(timeArray.data() + 1,
+                    current->meanMaxArray(series).constData() + 1, maxNonZero - 1);
                 }
-                thisCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
-
-            } else {
-
-                // normal
-                thisCurve->setSamples(timeArray.data() + 1, 
-                current->meanMaxArray(series).constData() + 1, maxNonZero - 1);
             }
         }
     }
@@ -981,4 +982,266 @@ CpintPlot::refreshReferenceLines(RideItem *rideItem)
             }
         }
     }
+}
+
+void
+CpintPlot::setRidePlotStyle(int index)
+{
+    ridePlotStyle = index;
+}
+
+void
+CpintPlot::calculateCentile(RideItem *rideItem)
+{
+    qDebug() << "calculateCentile";
+    QTime elapsed;
+    elapsed.start();
+
+    qDebug() << "prepare datas ";
+    cpintdata data;
+    data.rec_int_ms = (int) round(rideItem->ride()->recIntSecs() * 1000.0);
+    double lastsecs = 0;
+    bool first = true;
+    double offset = 0;
+
+    foreach (const RideFilePoint *p, rideItem->ride()->dataPoints()) {
+
+        // get offset to apply on all samples if first sample
+        if (first == true) {
+            offset = p->secs;
+            first = false;
+        }
+
+        // drag back to start at 0s
+        double psecs = p->secs - offset;
+
+        // fill in any gaps in recording - use same dodgy rounding as before
+        int count = (psecs - lastsecs - rideItem->ride()->recIntSecs()) / rideItem->ride()->recIntSecs();
+
+        // gap more than an hour, damn that ride file is a mess
+        if (count > 3600) count = 1;
+
+        for(int i=0; i<count; i++) {
+            data.points.append(cpintpoint(round(lastsecs+((i+1)*rideItem->ride()->recIntSecs() *1000.0)/1000), 0));
+        }
+
+        lastsecs = psecs;
+
+        double secs = round(psecs * 1000.0) / 1000;
+        if (secs > 0)  {
+            if (round(p->value(RideFile::watts))>1400)
+                qDebug() << "append point " <<  round(p->value(RideFile::watts)) ;
+            data.points.append(cpintpoint(secs, (int) round(p->value(RideFile::watts))));
+        }
+    }
+
+    int total_secs = (int) ceil(rideItem->ride()->dataPoints().back()->secs);
+
+    QVector < QVector<double> > ride_centiles(10);
+    // Initialisation
+    for (int i = 0; i < ride_centiles.size(); ++i) {
+        ride_centiles[i] = QVector <double>(total_secs);
+    }
+
+    qDebug() << "end prepare datas " << elapsed.elapsed();
+    qDebug() << "calcul for first 6min ";
+
+    // loop through the decritized data from top
+    // FIRST 6 MINUTES DO BESTS FOR EVERY SECOND
+    // WE DO NOT DO THIS FOR NP or xPower SINCE
+    // IT IS WELL KNOWN THAT THEY ARE NOT VALID
+    // FOR SUCH SHORT DURATIONS AND IT IS VERY
+    // CPU INTENSIVE, SO WE DON'T BOTHER
+
+    double samplerate = rideItem->ride()->recIntSecs();
+
+    for (int slice = 1; slice < 360;) {
+        int windowsize = slice / samplerate;
+        QVector<double> sums(data.points.size()-windowsize+1);
+
+        int index=0;
+        double sum=0;
+
+        for (int i=0; i<data.points.size(); i++) {
+            sum += data.points[i].value;
+
+            if (i>windowsize-1)
+                sum -= data.points[i-windowsize].value;
+
+            if (i>=windowsize-1) {
+                sums[index++] = sum/windowsize;
+            }
+
+        }
+        //qSort(sums.begin(), sums.end());
+        qSort(sums);
+
+        qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
+
+        ride_centiles[9][slice] = sums[sums.size()-1];
+
+        for (int i = ride_centiles.size()-1; i > 0; --i) {
+            sum = 0;
+            int count = 0;
+
+            for (int n = (0.1*i)*sums.size(); n < (0.1*(i+1))*sums.size(); ++n) {
+                sum += sums[n];
+                count++;
+            }
+            if (sum > 0) {
+                if (sum > 0) {
+                    double avg = sum / count;
+                    ride_centiles[i-1][slice]=avg;
+                }
+            } else {
+                ride_centiles[i-1][slice]=ride_centiles[i][slice];
+            }
+        }
+
+        slice ++;
+    }
+
+    qDebug() << "end calcul for first 6min " << elapsed.elapsed();
+    qDebug() << "downsampling to 5s after 6min ";
+
+    QVector<double> downsampled(0);
+
+    // moving to 5s samples would INCREASE the work...
+    if (rideItem->ride()->recIntSecs() >= 5) {
+        samplerate = rideItem->ride()->recIntSecs();
+        for (int i=0; i<data.points.size(); i++)
+            downsampled.append(data.points[i].value);
+        } else {
+            // moving to 5s samples is DECREASING the work...
+            samplerate = 5;
+            // we are downsampling to 5s
+            long five=5; // start at 1st 5s sample
+            double fivesum=0;
+
+            int fivecount=0;
+
+            for (int i=0; i<data.points.size(); i++) {
+                if (data.points[i].secs <= five) {
+                    fivesum += data.points[i].value;
+                    fivecount++;
+                }
+                else {
+                downsampled.append(fivesum / fivecount);
+                fivecount = 1;
+                fivesum = data.points[i].value;
+
+                five += 5;
+            }
+        }
+    }
+
+    qDebug() << "end downsampling to 5s after 6min " << elapsed.elapsed();
+    qDebug() << "calcul for rest of ride ";
+
+    for (int slice = 360; slice < ride_centiles[9].size();) {
+        int windowsize = slice / samplerate;
+        QVector<double> sums(downsampled.size()-windowsize+2);
+
+
+        int index=0;
+        double sum=0;
+
+        for (int i=0; i<downsampled.size(); i++) {
+            sum += downsampled[i];
+
+            if (i>windowsize-1)
+                sum -= downsampled[i-windowsize];
+            if (i>=windowsize-1)
+                sums[index++] = sum / windowsize;
+
+        }
+        //qSort(sums.begin(), sums.end());
+        qSort(sums);
+
+        qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
+
+
+
+        ride_centiles[9][slice] = sums[sums.size()-1];
+
+        for (int i = ride_centiles.size()-1; i > 0; --i) {
+            sum = 0;
+            int count = 0;
+
+            for (int n = (0.1*i)*sums.size(); n < (0.1*(i+1))*sums.size(); ++n) {
+                if (sums[n]>0)  {
+                    sum += sums[n];
+                    count++;
+                }
+            }
+            if (sum > 0) {
+                double avg = sum / count;
+                ride_centiles[i-1][slice]=avg;
+            } else {
+                ride_centiles[i-1][slice]=ride_centiles[i][slice];
+            }
+        }
+
+
+
+        // increment interval duration we are going to search
+        // for next, gaps increase as duration increases to
+        // reduce overall work, since we require far less
+        // precision as the ride duration increases
+        if (slice < 3600) slice +=20; // 20s up to one hour
+        else if (slice < 7200) slice +=60; // 1m up to two hours
+        else if (slice < 10800) slice += 300; // 5mins up to three hours
+        else slice += 600; // 10mins after that
+    }
+
+    qDebug() << "end calcul for rest of ride " << elapsed.elapsed();
+    qDebug() << "fill gaps ";
+
+    /*for (int i = 0; i<ride_centiles.size(); i++) {
+        double last=0.0;
+        for (int j=ride_centiles[i].size()-1; j; j--) {
+            if (ride_centiles[i][j] == 0) ride_centiles[i][j]=last;
+            else last = ride_centiles[i][j];
+        }
+    }*/
+
+    for (int i = ride_centiles.size()-1; i>=0; i--) {
+        double last=0.0;
+        for (int j=0; j<ride_centiles[i].size(); j++) {
+            if (ride_centiles[i][j] == 0) ride_centiles[i][j]=last;
+            else last = ride_centiles[i][j];
+        }
+    }
+
+    qDebug() << "end fill gaps " << elapsed.elapsed();
+    qDebug() << "plotting ";
+
+
+    for (int i = 0; i<ride_centiles.size(); i++) {
+        int maxNonZero = 0;
+        QVector<double> timeArray(ride_centiles[i].size());
+        for (int j = 0; j < ride_centiles[i].size(); ++j) {
+            timeArray[j] = j / 60.0;
+            if (ride_centiles[i][j] > 0) maxNonZero = j;
+        }
+
+        if (maxNonZero > 1) {
+
+            QwtPlotCurve *thisCurve = new QwtPlotCurve(tr("%10 %").arg(i+1));
+            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            QPen pen(QColor(250-(i*20),0,00));
+            pen.setStyle(Qt::DashLine); // Qt::SolidLine
+            pen.setWidth(0);
+            thisCurve->setPen(pen);
+            thisCurve->attach(this);
+
+
+            thisCurve->setSamples(timeArray.data() + 1, ride_centiles[i].constData() + 1, maxNonZero - 1);
+            allCurves.append(thisCurve);
+        }
+    }
+
+
+    qDebug() << "end plotting " << elapsed.elapsed();
+
 }

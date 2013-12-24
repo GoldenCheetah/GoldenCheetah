@@ -171,6 +171,14 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    ridePlotStyleCombo = new QComboBox(this);
+    ridePlotStyleCombo->addItem(tr("Ride Mean Max"));
+    ridePlotStyleCombo->addItem(tr("Ride Centile"));
+    ridePlotStyleCombo->addItem(tr("No Ride"));
+
+    cl->addWidget(new QLabel("")); //spacing
+    cl->addRow(new QLabel(tr("Current Ride")), ridePlotStyleCombo);
+
     // model config
     // 2 or 3 point model ?
     modelCombo= new QComboBox(this);
@@ -179,7 +187,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     modelCombo->addItem("ExtendedCP");
     modelCombo->setCurrentIndex(0);
 
-    cl->addWidget(new QLabel("")); //spacing
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
@@ -294,6 +301,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
+    connect(ridePlotStyleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setRidePlotStyle(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
@@ -979,4 +987,11 @@ CriticalPowerWindow::shadingSelected(int shading)
     cpintPlot->setShadeMode(shading);
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
+}
+
+void
+CriticalPowerWindow::setRidePlotStyle(int index)
+{
+    cpintPlot->setRidePlotStyle(index);
+    cpintPlot->calculate(currentRide);
 }
