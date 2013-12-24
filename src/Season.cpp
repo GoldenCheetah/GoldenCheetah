@@ -412,3 +412,36 @@ SeasonTreeView::dropEvent(QDropEvent* event)
     // emit the itemMoved signal
     Q_EMIT itemMoved(item, idx1, idx2);
 }
+
+QStringList 
+SeasonTreeView::mimeTypes() const
+{
+    QStringList returning;
+    returning << "application/x-gc-seasons";
+
+    return returning;
+}
+
+QMimeData *
+SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
+{
+    QMimeData *returning = new QMimeData;
+
+    // we need to pack into a byte array
+    QByteArray rawData;
+    QDataStream stream(&rawData, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+
+    // pack data 
+    stream << items.count();
+    foreach (QTreeWidgetItem *p, items) {
+
+        // serialize
+        stream << p->text(0); // name
+
+    }
+
+    // and return as mime data
+    returning->setData("application/x-gc-seasons", rawData);
+    return returning;
+}
