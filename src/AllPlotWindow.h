@@ -193,7 +193,6 @@ class AllPlotWindow : public GcChartWindow
         // stack zoomer for setting stack width
         // has 8 settings from 0 - 7
         QSlider *stackZoomSlider;
-        const int stackZoomWidth[8] = { 5, 10, 15, 20, 30, 45, 60, 120 };
 
         // Normal view
         QScrollArea *allPlotFrame;
