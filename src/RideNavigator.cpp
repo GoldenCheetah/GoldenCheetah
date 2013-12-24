@@ -282,7 +282,7 @@ void RideNavigator::setWidth(int x)
 
     active = true;
 
-#if defined (QT_OS_MAC) && (QT_VERSION < 0x050000) // on QT5 the scrollbars have no width
+#if !defined (Q_OS_MAC) || (defined (Q_OS_MAC) && (QT_VERSION < 0x050000)) // on QT5 the scrollbars have no width
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
              + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
