@@ -150,7 +150,10 @@ protected:
     int handleWidth() { return 23; };
 
     virtual void dragEnterEvent(QDragEnterEvent *event) {
-        if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
+
+        // we handle intervals or seasons
+        if (event->mimeData()->formats().contains("application/x-gc-intervals") ||
+            event->mimeData()->formats().contains("application/x-gc-seasons")) {
             if (tabView->hasBottom() && tabView->isShowBottom() == false) {
                 showForDrag = true;
                 tabView->dragEvent(true);

@@ -40,8 +40,8 @@ ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidg
 void 
 ComparePane::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
-        qDebug()<<"compare pane: enter event";
+    if (event->mimeData()->formats().contains("application/x-gc-intervals") ||
+        event->mimeData()->formats().contains("application/x-gc-seasons")) {
         event->acceptProposedAction();
     }
 }
@@ -49,11 +49,14 @@ ComparePane::dragEnterEvent(QDragEnterEvent *event)
 void 
 ComparePane::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    qDebug()<<"compare pane: leave event";
+    // we might consider hiding on this?
 }
 
 void
-ComparePane::dropEvent(QDropEvent *)
+ComparePane::dropEvent(QDropEvent *event)
 {
-    qDebug()<<"compare pane: drop event";
+    qDebug()<<"compare pane: dropped:"<<event->mimeData()->formats();
+    // XXX event->acceptProposedAction(); // WE DON'T ACCEPT OTHERWISE ITS WIPED FROM SOURCE
+
+    // here we can unpack and add etc...
 }
