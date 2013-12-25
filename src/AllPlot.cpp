@@ -882,6 +882,8 @@ AllPlot::recalc()
             smoothTime.append(dp->secs/60);
             smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
+            if (dp->temp == RideFile::noTemp && !smoothTemp.empty())
+                dp->temp = smoothTemp.last();
             smoothTemp.append(context->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
             smoothWind.append(context->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             smoothTorque.append(dp->nm);
