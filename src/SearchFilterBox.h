@@ -37,6 +37,11 @@ public:
     void setFilter(QString); // filter:text or search:text
     bool isFiltered() const { return searchbox->isFiltered(); }
 
+    QString text() const { return searchbox->text(); }
+    void setText(QString t) { searchbox->setText(t); }
+
+    void setContext(Context *c) { context = c; searchbox->setContext(c); }
+
 private slots:
 
 signals:

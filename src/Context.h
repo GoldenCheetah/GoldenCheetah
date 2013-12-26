@@ -40,6 +40,13 @@ class Context : public QObject
     public:
         Context(MainWindow *mainWindow);
 
+        // mainwindow state
+        int viewIndex;
+        bool showSidebar, showLowbar, showToolbar, showTabbar;
+        int style;
+        QString searchText;
+        bool scopehighlighted;
+
         // ride item
         RideItem *rideItem() const { return ride; }
         const RideFile *currentRide();

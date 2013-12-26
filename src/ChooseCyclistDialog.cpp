@@ -23,8 +23,7 @@
 #include "Athlete.h"
 #include <QtGui>
 
-ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
-    home(home)
+ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
 {
     setWindowTitle(tr("Choose an Athlete"));
 
@@ -38,9 +37,14 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
         // only allow selection of cyclists which are not already open
-        foreach (MainWindow *x, mainwindows)
-            if (x->contextmain()->athlete->cyclist == name)
-                newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
+        foreach (MainWindow *x, mainwindows) {
+            QMapIterator<QString, Tab*> t(x->tabs);
+            while (t.hasNext()) {
+                t.next();
+                if (t.key() == name)
+                    newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
+            }
+        }
     }
 
     if (allowNew)

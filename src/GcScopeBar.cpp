@@ -242,9 +242,27 @@ GcScopeBar::clickedTrain()
     emit selectTrain();
 }
 
-void
-GcScopeBar::selected(int index)
+int
+GcScopeBar::selected()
 {
+    if (home->isChecked()) return 0;
+#ifdef GC_HAVE_ICAL
+    if (diary->isChecked()) return 1;
+    if (anal->isChecked()) return 2;
+    if (train->isChecked()) return 3;
+#else
+    if (anal->isChecked()) return 1;
+    if (train->isChecked()) return 2;
+#endif
+
+}
+
+void
+GcScopeBar::setSelected(int index)
+{
+    // we're already there
+    if (index == selected()) return;
+
     // mainwindow wants to tell us to switch to a selection
     home->setChecked(false);
 #ifdef GC_HAVE_ICAL

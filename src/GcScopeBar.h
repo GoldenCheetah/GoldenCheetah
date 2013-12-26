@@ -36,8 +36,10 @@ class GcScopeButton : public QWidget
         GcScopeButton(QWidget *parent);
         void setText(QString _text) { text = _text; }
         void setChecked(bool _checked) { checked = _checked; repaint(); }
+        bool isChecked() { return checked; }
         void setWidth(int x) { setFixedWidth(x); }
         void setHighlighted(bool x) { highlighted = x; }
+        bool ishighlighted() const { return highlighted; }
 
     signals:
         void clicked(bool);
@@ -72,10 +74,13 @@ public slots:
     void clickedDiary();
 
     // mainwindow tells us when it switched without user clicking.
-    void selected(int index);
+    int selected();
+    void setSelected(int index);
+    void setHighlighted();
+    void setContext(Context *c) { context = c; }
+
     void addWidget(QWidget*);
 
-    void setHighlighted();
 
 signals:
     void selectHome();

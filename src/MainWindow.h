@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2012 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -40,6 +41,8 @@ class GcScopeBar;
 class Library;
 class QtSegmentControl;
 class SaveSingleDialogWidget;
+class ChooseCyclistDialog;
+class SearchFilterBox;
 
 class MainWindow;
 class Athlete;
@@ -48,6 +51,7 @@ class Tab;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 extern QDesktopWidget *desktop;         // how many screens / res etc
+extern QString gcroot;                  // root directory for gc
 
 class MainWindow : public QMainWindow
 {
@@ -59,11 +63,14 @@ class MainWindow : public QMainWindow
         MainWindow(const QDir &home);
         ~MainWindow(); // temp to zap db - will move to tab //
 
-        // temporary access to the context
-        Context *contextmain() { return context; } // by ChooseCyclistDialog
         void byebye() { close(); } // go bye bye for a restart
 
     protected:
+
+        // used by ChooseCyclistDialog to see which athletes
+        // have already been opened
+        friend class ::ChooseCyclistDialog;
+        QMap<QString,Tab*> tabs;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -80,13 +87,28 @@ class MainWindow : public QMainWindow
         void aboutDialog();
         void helpView();
         void logBug();
-        void closeAll();
         void actionClicked(int);
+
+        // open and closing windows and tabs
+        void closeAll();    // close all windows and tabs
+
+        void setOpenWindowMenu(); // set the Open Window menu
+        void newCyclistWindow();  // create a new Cyclist
+        void openWindow(QString name);
+        void closeWindow();
+
+        void setOpenTabMenu(); // set the Open Tab menu
+        void newCyclistTab();  // create a new Cyclist
+        void openTab(QString name);
+        bool closeTab();       // close current, might not if the user 
+                               // changes mind if there are unsaved changes.
+        void removeTab(Tab*);  // remove without question
+
+        void switchTab(int index); // for switching between one tab and another
 
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();
-
 
         void selectHome();
         void selectDiary();
@@ -96,14 +118,13 @@ class MainWindow : public QMainWindow
         void setChartMenu();
         void setSubChartMenu();
         void addChart(QAction*);
-        void setWindowMenu();
-        void selectWindow(QAction*);
 
         void showOptions();
 
         void toggleSidebar();
         void showSidebar(bool want);
         void showToolbar(bool want);
+        void showTabbar(bool want);
         void resetWindowLayout();
         void toggleStyle();
         void setToolButtons(); // set toolbar buttons to match tabview
@@ -133,13 +154,8 @@ class MainWindow : public QMainWindow
         void downloadMeasures();
         void downloadMeasuresFromZeo();
 
-        // Athlete Collection
-        void newCyclist();
-        void openCyclist();
-
         // Activity Collection
         void addIntervals(); // pass thru to tab
-        void rideSelected(RideItem*ride);
         bool saveRideSingleDialog(RideItem *);
         void saveSilent(RideItem *);
         void downloadRide();
@@ -165,14 +181,22 @@ class MainWindow : public QMainWindow
         void revertRide();
         bool saveRideExitDialog();              // save dirty rides on exit dialog
 
+        // save and restore state to context
+        void saveState(Context *);
+        void restoreState(Context *);
+
     private:
 
-        Context *context;
         GcScopeBar *scopebar;
-        Tab *tab;
+        Tab *currentTab;
+        QList<Tab*> tabList;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
+#endif
+
+#ifdef GC_HAVE_LUCENE
+        SearchFilterBox *searchBox;
 #endif
 
 #ifdef Q_OS_MAC
@@ -190,19 +214,25 @@ class MainWindow : public QMainWindow
         QIcon importIcon, composeIcon, intervalIcon, splitIcon,
               deleteIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 #endif
+        // tab bar
+        QTabBar *tabbar;
+        QStackedWidget *tabStack;
+
+        // window and tab menu
+        QMenu *openWindowMenu, *openTabMenu;
+        QSignalMapper *windowMapper, *tabMapper;
 
         // chart menus
         QMenu *chartMenu;
         QMenu *subChartMenu;
 
-        // Application menu
-        QMenu *windowMenu;
-
-        // Application actions
-        // only keeping those used outside of mainwindow constructor
+        // Toolbar state checkables in View menu / context
         QAction *styleAction;
         QAction *showhideSidebar;
         QAction *showhideLowbar;
+        QAction *showhideToolbar;
+        QAction *showhideTabbar;
+
         QAction *tweetAction;
         QAction *shareAction;
         QAction *ttbAction;
