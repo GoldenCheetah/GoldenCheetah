@@ -25,6 +25,7 @@
 #include <QSqlDatabase>
 #include <QtGui>
 #include <QMainWindow>
+#include <QStackedWidget>
 #include "RideItem.h"
 #include "TimeUtils.h"
 
