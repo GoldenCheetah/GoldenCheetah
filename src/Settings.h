@@ -200,6 +200,9 @@
 #define GC_BE_LASTDIR             "batchexport/lastdir"
 #define GC_BE_LASTFMT             "batchexport/lastfmt"
 
+// show tabbar
+#define GC_TABBAR                 "show/tabbar"
+
 #include <QSettings>
 #include <QFileInfo>
 
