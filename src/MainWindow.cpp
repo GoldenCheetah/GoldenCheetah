@@ -661,6 +661,7 @@ MainWindow::MainWindow(const QDir &home)
      * Lets go, choose latest ride and get GUI up and running
      *--------------------------------------------------------------------*/
 
+    showTabbar(appsettings->value(NULL, GC_TABBAR, "0").toBool());
 
     //XXX!!! We really do need a mechanism for showing if a ride needs saving...
     //connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
@@ -887,6 +888,9 @@ MainWindow::closeEvent(QCloseEvent* event)
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
             qDebug()<<"closeEvent: mainwindows list error";
+
+        // save global mainwindow settings
+        appsettings->setValue(GC_TABBAR, showhideTabbar->isChecked());
     }
 }
 
@@ -1304,6 +1308,9 @@ MainWindow::openTab(QString name)
 
     setUpdatesEnabled(false);
 
+    // show the tabbar if we're gonna open tabs!
+    showTabbar(true);
+
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
@@ -1342,8 +1349,9 @@ MainWindow::closeTab()
     // if its the last tab we close the window
     if (tabList.count() == 1)
         closeWindow();
-    else 
+    else {
         removeTab(currentTab);
+    }
 
     // we did it
     return true;
@@ -1354,6 +1362,8 @@ void
 MainWindow::removeTab(Tab *tab)
 {
     setUpdatesEnabled(false);
+
+    if (tabList.count() == 2) showTabbar(false); // don't need it for one!
 
 #ifdef GC_HAVE_LUCENE
     // save the named searches
