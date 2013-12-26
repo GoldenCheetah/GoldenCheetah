@@ -63,7 +63,7 @@ class AllPlot : public QwtPlot
         // you can declare which series to plot, none means do them all
         // wanttext is to say if plot markers should have text
         AllPlot(AllPlotWindow *parent, Context *context, 
-                RideFile::SeriesType series = RideFile::none, bool wanttext = true);
+                RideFile::SeriesType series = RideFile::none, RideFile::SeriesType secSeries = RideFile::none, bool wanttext = true);
 
         bool eventFilter(QObject *object, QEvent *e);
 
@@ -216,6 +216,7 @@ class AllPlot : public QwtPlot
 
         // scope of plot (none means all, or just for a specific series
         RideFile::SeriesType scope;
+        RideFile::SeriesType secondaryScope;
 
     private:
         Context *context;
