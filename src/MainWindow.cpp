@@ -461,9 +461,6 @@ MainWindow::MainWindow(const QDir &home)
     QPalette tabbarPalette;
     tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
-#ifdef Q_OS_MAC
-    tabbar->setDocumentMode(true);
-#endif
 
     tabStack = new QStackedWidget(this);
     currentTab = new Tab(context);
