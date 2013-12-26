@@ -802,11 +802,12 @@ void GcChartWindow:: hideRevealControls()
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this,"Save PNG ",  QString(), title()+".png");
+    fileName = QFileDialog::getSaveFileName(this,"Save PNG ",  QString(), title()+".png (*.png)");
 
    if ( !fileName.isEmpty() )
    {
        QPixmap picture;
+       menuButton->hide();
        picture = QPixmap::grabWidget (this);
 
        picture.save(fileName);
