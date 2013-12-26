@@ -25,6 +25,7 @@
 #include <QNetworkProxyQuery>
 #include <QMenuBar>
 #include <QStyle>
+#include <QTabBar>
 #include <QStyleFactory>
 
 // DATA STRUCTURES
@@ -108,7 +109,9 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
-    context = new Context(this);
+
+    // bootstrap
+    Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
 
     setWindowIcon(QIcon(":images/gc.png"));
@@ -320,7 +323,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(viewsel);
 
 #ifdef GC_HAVE_LUCENE
-    SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
+    searchBox = new SearchFilterBox(this,context,false);
     QStyle *toolStyle = QStyleFactory::create("fusion");
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(200);
@@ -435,7 +438,7 @@ MainWindow::MainWindow(const QDir &home)
 
 #ifdef GC_HAVE_LUCENE
     // add a search box on far right, but with a little space too
-    SearchFilterBox *searchBox = new SearchFilterBox(this,context,false);
+    searchBox = new SearchFilterBox(this,context,false);
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(200);
     head->addWidget(searchBox);
@@ -451,7 +454,27 @@ MainWindow::MainWindow(const QDir &home)
      * Central Widget
      *--------------------------------------------------------------------*/
 
-    tab = new Tab(context);
+    QPalette tabbarPalette;
+    tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    tabbar = new QTabBar(this);
+    tabbar->setPalette(tabbarPalette);
+    tabbar->setAutoFillBackground(true);
+    tabbar->setShape(QTabBar::RoundedSouth);
+    tabbar->setDrawBase(false);
+
+    tabStack = new QStackedWidget(this);
+    currentTab = new Tab(context);
+
+    // first tab
+    tabs.insert(currentTab->context->athlete->home.dirName(), currentTab);
+
+    // stack, list and bar all share a common index
+    tabList.append(currentTab);
+    tabbar->addTab(currentTab->context->athlete->home.dirName());
+    tabStack->addWidget(currentTab);
+    tabStack->setCurrentIndex(0);
+
+    connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -467,7 +490,8 @@ MainWindow::MainWindow(const QDir &home)
                  // unified with the title bar.
     mainLayout->addWidget(head);
 #endif
-    mainLayout->addWidget(tab);
+    mainLayout->addWidget(tabbar);
+    mainLayout->addWidget(tabStack);
     setCentralWidget(central);
 
     /*----------------------------------------------------------------------
@@ -479,12 +503,26 @@ MainWindow::MainWindow(const QDir &home)
     menuBar()->setContentsMargins(0,0,0,0);
 #endif
 
+    // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
-    fileMenu->addAction(tr("&New..."), this, SLOT(newCyclist()), tr("Ctrl+N"));
-    fileMenu->addAction(tr("&Open..."), this, SLOT(openCyclist()), tr("Ctrl+O"));
-    fileMenu->addAction(tr("&Close Window"), this, SLOT(close()), tr ("Ctrl+W"));
+
+    openWindowMenu = fileMenu->addMenu(tr("Open &Window"));
+    openTabMenu = fileMenu->addMenu(tr("Open &Tab"));
+    connect(openWindowMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenWindowMenu()));
+    connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
+    
+    windowMapper = new QSignalMapper(this); // maps each option
+    connect(windowMapper, SIGNAL(mapped(const QString &)), this, SLOT(openWindow(const QString &)));
+
+    tabMapper = new QSignalMapper(this); // maps each option
+    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
+
+    fileMenu->addSeparator();
+    fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
+    fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
     fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
 
+    // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
     rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
@@ -520,6 +558,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Merge activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
 
+    // TOOLS MENU
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
     optionsMenu->addAction(tr("CP and W' Estimator..."), this, SLOT(showTools()));
@@ -568,6 +607,7 @@ MainWindow::MainWindow(const QDir &home)
         }
     }
 
+    // VIEW MENU
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 #ifndef Q_OS_MAC
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
@@ -579,14 +619,13 @@ MainWindow::MainWindow(const QDir &home)
     showhideLowbar->setCheckable(true);
     showhideLowbar->setChecked(false);
 #ifndef Q_OS_MAC // not on a Mac
-    QAction *showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
+    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
 #endif
-
-    styleAction = viewMenu->addAction(tr("Tabbed View"), this, SLOT(toggleStyle()));
-    styleAction->setCheckable(true);
-    styleAction->setChecked(true);
+    showhideTabbar = viewMenu->addAction(tr("Show Athlete Tabs"), this, SLOT(showTabbar(bool)));
+    showhideTabbar->setCheckable(true);
+    showhideTabbar->setChecked(true);
 
     //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
     viewMenu->addSeparator();
@@ -599,14 +638,16 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
     viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
+    styleAction = viewMenu->addAction(tr("Tabbed not Tiled"), this, SLOT(toggleStyle()));
+    styleAction->setCheckable(true);
+    styleAction->setChecked(true);
 
-    windowMenu = menuBar()->addMenu(tr("&Window"));
-    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(setWindowMenu()));
+
     connect(rideMenu, SIGNAL(aboutToShow()), this, SLOT(setActivityMenu()));
     connect(subChartMenu, SIGNAL(aboutToShow()), this, SLOT(setSubChartMenu()));
     connect(subChartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
-    connect(windowMenu, SIGNAL(triggered(QAction*)), this, SLOT(selectWindow(QAction*)));
 
+    // HELP MENU
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&User Guide"), this, SLOT(helpView()));
     helpMenu->addAction(tr("&Log a bug or feature request"), this, SLOT(logBug()));
@@ -617,19 +658,12 @@ MainWindow::MainWindow(const QDir &home)
      * Lets go, choose latest ride and get GUI up and running
      *--------------------------------------------------------------------*/
 
-    // selects the latest ride in the list:
-    if (context->athlete->allRides->childCount() != 0)
-        context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(context->athlete->allRides->childCount()-1));
 
     //XXX!!! We really do need a mechanism for showing if a ride needs saving...
     //connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
-    // cpx aggregate cache check
-    connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
-
-    // Kick off - select a ride and switch to Analysis View
-    context->athlete->rideTreeWidgetSelectionChanged();
+    saveState(currentTab->context); // set to whatever we started with
     selectAnalysis();
 }
 
@@ -640,42 +674,57 @@ MainWindow::MainWindow(const QDir &home)
 void
 MainWindow::toggleSidebar()
 {
-    tab->toggleSidebar();
+    currentTab->toggleSidebar();
     setToolButtons();
 }
 
 void
 MainWindow::showSidebar(bool want)
 {
-    tab->setSidebarEnabled(want);
+    currentTab->setSidebarEnabled(want);
+    showhideSidebar->setChecked(want);
     setToolButtons();
 }
 
 void
 MainWindow::toggleLowbar()
 {
-    if (tab->hasBottom()) tab->setShowBottom(!tab->isShowBottom());
+    if (currentTab->hasBottom()) currentTab->setShowBottom(!currentTab->isShowBottom());
     setToolButtons();
 }
 
 void
 MainWindow::showLowbar(bool want)
 {
-    if (tab->hasBottom()) tab->setShowBottom(want);
+    if (currentTab->hasBottom()) currentTab->setShowBottom(want);
+    showhideLowbar->setChecked(want);
     setToolButtons();
+}
+
+void
+MainWindow::showTabbar(bool want)
+{
+    showhideTabbar->setChecked(want);
+    if (want) {
+        tabbar->show();
+    }
+    else {
+        tabbar->hide();
+    }
 }
 
 void
 MainWindow::showToolbar(bool want)
 {
+#ifndef Q_OS_MAC
+    showhideToolbar->setChecked(want);
     if (want) {
         head->show();
-        scopebar->show();
     }
     else {
         head->hide();
-        scopebar->hide();
     }
+#endif
 }
 
 void
@@ -686,7 +735,7 @@ MainWindow::setChartMenu()
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
-    switch(tab->currentView()) {
+    switch(currentTab->currentView()) {
         case 0 : mask = VIEW_HOME; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
@@ -710,7 +759,7 @@ MainWindow::setSubChartMenu()
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
-    switch(tab->currentView()) {
+    switch(currentTab->currentView()) {
         case 0 : mask = VIEW_HOME; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
@@ -731,10 +780,10 @@ void
 MainWindow::setActivityMenu()
 {
     // enable/disable upload if already uploaded
-    if (context->ride && context->ride->ride()) {
+    if (currentTab->context->ride && currentTab->context->ride->ride()) {
 
         
-        QString activityId = context->ride->ride()->getTag("TtbExercise", "");
+        QString activityId = currentTab->context->ride->ride()->getTag("TtbExercise", "");
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
         
@@ -754,42 +803,21 @@ MainWindow::addChart(QAction*action)
         }
     }
     if (id != GcWindowTypes::None)
-        tab->addChart(id); // called from MainWindow to inset chart
-}
-
-void
-MainWindow::setWindowMenu()
-{
-    windowMenu->clear();
-    foreach (MainWindow *m, mainwindows) {
-        windowMenu->addAction(m->context->athlete->cyclist);
-    }
-}
-
-void
-MainWindow::selectWindow(QAction *act)
-{
-    foreach (MainWindow *m, mainwindows) {
-        if (m->context->athlete->cyclist == act->text()) {
-            m->activateWindow();
-            m->raise();
-            break;
-        }
-    }
+        currentTab->addChart(id); // called from MainWindow to inset chart
 }
 
 void
 MainWindow::setStyleFromSegment(int segment)
 {
-    tab->setTiled(segment);
+    currentTab->setTiled(segment);
     styleAction->setChecked(!segment);
 }
 
 void
 MainWindow::toggleStyle()
 {
-    tab->toggleTile();
-    styleAction->setChecked(tab->isTiled());
+    currentTab->toggleTile();
+    styleAction->setChecked(currentTab->isTiled());
     setToolButtons();
 }
 
@@ -815,7 +843,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(context->athlete->home, context->athlete->zones_, context);
+    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home, currentTab->context->athlete->zones_, currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
@@ -831,39 +859,43 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
-    if (saveRideExitDialog() == false) event->ignore();
+    QList<Tab*> closing = tabList;
+    bool needtosave = false;
+
+    // close all the tabs .. if any refuse we need to ignore
+    //                       the close event
+    foreach(Tab *tab, closing) {
+
+        // do we need to save?
+        if (tab->context->mainWindow->saveRideExitDialog() == true)
+            removeTab(tab);
+        else
+            needtosave = true;
+    }
+
+    // were any left hanging around?
+    if (needtosave) event->ignore();
     else {
 
-#ifdef GC_HAVE_LUCENE
-        // save the named searches
-        context->athlete->namedSearches->write();
-#endif
-
+        // finish off the job and leave
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
-
-        // close the tab
-        tab->close();
-
-        // close athlete 
-        context->athlete->close();
 
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
             qDebug()<<"closeEvent: mainwindows list error";
-
     }
 }
 
 MainWindow::~MainWindow()
 {
-    delete tab;
-    delete context->athlete;
+    // aside from the tabs, we may need to clean
+    // up any dangling widgets created in MainWindow::MainWindow (?)
 }
 
 // global search/data filter
-void MainWindow::setFilter(QStringList f) { context->setFilter(f); }
-void MainWindow::clearFilter() { context->clearFilter(); }
+void MainWindow::setFilter(QStringList f) { currentTab->context->setFilter(f); }
+void MainWindow::clearFilter() { currentTab->context->clearFilter(); }
 
 void
 MainWindow::closeAll()
@@ -871,16 +903,17 @@ MainWindow::closeAll()
     QList<MainWindow *> windows = mainwindows; // get a copy, since it is updated as closed
 
     foreach(MainWindow *window, windows) 
-        if (window != this) window->close();
+        if (window != this) 
+            window->closeWindow();
 
     // now close us down!
-    close();
+    closeWindow();
 }
 
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog *ad = new AboutDialog(context, context->athlete->home);
+    AboutDialog *ad = new AboutDialog(currentTab->context, currentTab->context->athlete->home);
     ad->exec();
 }
 
@@ -892,19 +925,19 @@ void MainWindow::showTools()
 
 void MainWindow::showRhoEstimator()
 {
-   ToolsRhoEstimator *tre = new ToolsRhoEstimator(context);
+   ToolsRhoEstimator *tre = new ToolsRhoEstimator(currentTab->context);
    tre->show();
 }
 
 void MainWindow::showWorkoutWizard()
 {
-   WorkoutWizard *ww = new WorkoutWizard(context);
+   WorkoutWizard *ww = new WorkoutWizard(currentTab->context);
    ww->show();
 }
 
 void MainWindow::resetWindowLayout()
 {
-    tab->resetLayout();
+    currentTab->resetLayout();
 }
 
 void MainWindow::manualProcess(QString name)
@@ -914,9 +947,9 @@ void MainWindow::manualProcess(QString name)
     // and also show the explanation
     // of what this function does
     // then call it!
-    RideItem *rideitem = (RideItem*)context->currentRideItem();
+    RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
     if (rideitem) {
-        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(context, name, rideitem);
+        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
     }
@@ -937,36 +970,36 @@ MainWindow::helpView()
 void
 MainWindow::selectAnalysis()
 {
-    tab->selectView(1);
+    currentTab->selectView(1);
     setToolButtons();
 }
 
 void
 MainWindow::selectTrain()
 {
-    tab->selectView(3);
+    currentTab->selectView(3);
     setToolButtons();
 }
 
 void
 MainWindow::selectDiary()
 {
-    tab->selectView(2);
+    currentTab->selectView(2);
     setToolButtons();
 }
 
 void
 MainWindow::selectHome()
 {
-    tab->selectView(0);
+    currentTab->selectView(0);
     setToolButtons();
 }
 
 void
 MainWindow::setToolButtons()
 {
-    int select = tab->isTiled() ? 1 : 0;
-    int lowselected = tab->isShowBottom() ? 1 : 0;
+    int select = currentTab->isTiled() ? 1 : 0;
+    int lowselected = currentTab->isShowBottom() ? 1 : 0;
 
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
@@ -978,6 +1011,36 @@ MainWindow::setToolButtons()
     if (styleSelector->isSegmentSelected(select) == false)
         styleSelector->setSegmentSelected(select, true);
 #endif
+
+    int index = currentTab->currentView();
+
+    //XXX WTAF! The index used is fucked up XXX
+    //          hack around this and then come back
+    //          and look at this as a separate fixup
+#ifdef GC_HAVE_ICAL
+    switch (index) {
+    case 0: // home no change
+    case 3: // train no change
+    default:
+        break;
+    case 1:
+        index = 2; // analysis
+        break;
+    case 2:
+        index = 1; // diary
+        break; 
+    }
+#else
+    switch (index) {
+    case 0: // home no change
+    case 1:
+    default:
+        break;
+    case 3:
+        index = 2; // train
+    }
+#endif
+    scopebar->setSelected(index);
 }
 
 /*----------------------------------------------------------------------
@@ -1004,15 +1067,15 @@ MainWindow::dropEvent(QDropEvent *event)
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.isEmpty()) return;
 
-    if (tab->currentView() != 3) { // we're not on train view
+    if (currentTab->currentView() != 3) { // we're not on train view
         // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (&urls, context->athlete->home, context);
+        RideImportWizard *dialog = new RideImportWizard (&urls, currentTab->context->athlete->home, currentTab->context);
         dialog->process(); // do it!
     } else {
         QStringList filenames;
         for (int i=0; i<urls.count(); i++)
             filenames.append(QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath());
-        Library::importFiles(context, filenames);
+        Library::importFiles(currentTab->context, filenames);
     }
     return;
 }
@@ -1025,28 +1088,28 @@ MainWindow::dropEvent(QDropEvent *event)
 void
 MainWindow::downloadRide()
 {
-    (new DownloadRideDialog(context, context->athlete->home))->show();
+    (new DownloadRideDialog(currentTab->context, currentTab->context->athlete->home))->show();
 }
 
 
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(context))->show();
+    (new ManualRideDialog(currentTab->context))->show();
 }
 
 void
 MainWindow::exportBatch()
 {
-    BatchExportDialog *d = new BatchExportDialog(context);
+    BatchExportDialog *d = new BatchExportDialog(currentTab->context);
     d->exec();
 }
 
 void
 MainWindow::exportRide()
 {
-    if ((context->athlete->treeWidget->selectedItems().size() != 1)
-        || (context->athlete->treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+    if ((currentTab->context->athlete->treeWidget->selectedItems().size() != 1)
+        || (currentTab->context->athlete->treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
         QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
@@ -1068,7 +1131,7 @@ MainWindow::exportRide()
     getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    bool result = RideFileFactory::instance().writeRideFile(context, context->currentRide(), file, getSuffix.cap(1));
+    bool result = RideFileFactory::instance().writeRideFile(currentTab->context, currentTab->context->currentRide(), file, getSuffix.cap(1));
 
     if (result == false) {
         QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
@@ -1098,7 +1161,7 @@ MainWindow::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        RideImportWizard *import = new RideImportWizard(fileNamesCopy, context->athlete->home, context);
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentTab->context->athlete->home, currentTab->context);
         import->process();
     }
 }
@@ -1106,8 +1169,8 @@ MainWindow::importFile()
 void
 MainWindow::saveRide()
 {
-    if (context->ride)
-        saveRideSingleDialog(context->ride); // will signal save to everyone
+    if (currentTab->context->ride)
+        saveRideSingleDialog(currentTab->context->ride); // will signal save to everyone
     else {
         QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
                          tr("There is no currently selected ride to save."));
@@ -1119,20 +1182,20 @@ MainWindow::saveRide()
 void
 MainWindow::revertRide()
 {
-    context->ride->freeMemory();
-    context->ride->ride(); // force re-load
+    currentTab->context->ride->freeMemory();
+    currentTab->context->ride->ride(); // force re-load
 
     // in case reverted ride has different starttime
-    context->ride->setStartTime(context->ride->ride()->startTime()); // Note: this will also signal rideSelected()
-    context->ride->ride()->emitReverted();
+    currentTab->context->ride->setStartTime(currentTab->context->ride->ride()->startTime()); // Note: this will also signal rideSelected()
+    currentTab->context->ride->ride()->emitReverted();
 }
 
 void
 MainWindow::splitRide()
 {
-    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(context))->exec();
+    if (currentTab->context->ride && currentTab->context->ride->ride() && currentTab->context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(currentTab->context))->exec();
     else {
-        if (!context->ride || !context->ride->ride())
+        if (!currentTab->context->ride || !currentTab->context->ride->ride())
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to split"));
@@ -1142,9 +1205,9 @@ MainWindow::splitRide()
 void
 MainWindow::mergeRide()
 {
-    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) (new MergeActivityWizard(context))->exec();
+    if (currentTab->context->ride && currentTab->context->ride->ride() && currentTab->context->ride->ride()->dataPoints().count()) (new MergeActivityWizard(currentTab->context))->exec();
     else {
-        if (!context->ride || !context->ride->ride())
+        if (!currentTab->context->ride || !currentTab->context->ride->ride())
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to merge"));
@@ -1154,7 +1217,7 @@ MainWindow::mergeRide()
 void
 MainWindow::deleteRide()
 {
-    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
+    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) {
         QMessageBox::critical(this, tr("Delete Activity"), tr("No activity selected!"));
         return;
@@ -1169,7 +1232,7 @@ MainWindow::deleteRide()
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
-        context->athlete->removeCurrentRide();
+        currentTab->context->athlete->removeCurrentRide();
 }
 
 /*----------------------------------------------------------------------
@@ -1180,7 +1243,7 @@ MainWindow::addDevice()
 {
 
     // lets get a new one
-    AddDeviceWizard *p = new AddDeviceWizard(context);
+    AddDeviceWizard *p = new AddDeviceWizard(currentTab->context);
     p->show();
 
 }
@@ -1190,33 +1253,272 @@ MainWindow::addDevice()
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::newCyclist()
+MainWindow::newCyclistWindow()
 {
-    QDir newHome = context->athlete->home;
+    QDir newHome = currentTab->context->athlete->home;
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
-    if (!name.isEmpty()) {
-        newHome.cd(name);
-        if (!newHome.exists()) return;
-        MainWindow *main = new MainWindow(newHome);
-        main->show();
-    }
+    if (!name.isEmpty()) openWindow(name);
 }
 
 void
-MainWindow::openCyclist()
+MainWindow::newCyclistTab()
 {
-    QDir newHome = context->athlete->home;
+    QDir newHome = currentTab->context->athlete->home;
     newHome.cdUp();
-    ChooseCyclistDialog d(newHome, false);
-    d.setModal(true);
-    if (d.exec() == QDialog::Accepted) {
-        newHome.cd(d.choice());
-        if (!newHome.exists()) return;
-        MainWindow *main = new MainWindow(newHome);
-        main->show();
-    }
+    QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
+    if (!name.isEmpty()) openTab(name);
 }
+
+void
+MainWindow::openWindow(QString name)
+{
+    // open window...
+    QDir home(gcroot);
+    home.cd(name);
+
+    if (!home.exists()) return;
+
+    // main window will register itself
+    MainWindow *main = new MainWindow(home);
+    main->show();
+}
+
+void
+MainWindow::closeWindow()
+{
+    // just call close, we might do more later
+    close();
+}
+
+void
+MainWindow::openTab(QString name)
+{
+    QDir home(gcroot);
+    home.cd(name);
+
+    if (!home.exists()) return;
+
+    setUpdatesEnabled(false);
+
+    // bootstrap
+    Context *context = new Context(this);
+    context->athlete = new Athlete(context, home);
+
+    // now open up a new tab
+    currentTab = new Tab(context);
+
+    // first tab
+    tabs.insert(currentTab->context->athlete->home.dirName(), currentTab);
+
+    // stack, list and bar all share a common index
+    tabList.append(currentTab);
+    tabbar->addTab(currentTab->context->athlete->home.dirName());
+    tabStack->addWidget(currentTab);
+
+    // switch to newly created athlete
+    tabbar->setCurrentIndex(tabList.count()-1);
+
+    // kick off on analysis
+    setWindowTitle(currentTab->context->athlete->home.dirName());
+    selectAnalysis(); // sets scope bar ..
+
+    // now apply current
+    saveState(currentTab->context);
+    restoreState(currentTab->context);
+
+    setUpdatesEnabled(true);
+}
+
+bool
+MainWindow::closeTab()
+{
+    // wipe it down ...
+    if (saveRideExitDialog() == false) return false;
+
+    // if its the last tab we close the window
+    if (tabList.count() == 1)
+        closeWindow();
+    else 
+        removeTab(currentTab);
+
+    // we did it
+    return true;
+}
+
+// no questions asked just wipe away the current tab
+void
+MainWindow::removeTab(Tab *tab)
+{
+    setUpdatesEnabled(false);
+
+#ifdef GC_HAVE_LUCENE
+    // save the named searches
+    tab->context->athlete->namedSearches->write();
+#endif
+
+    // clear the clipboard if neccessary
+    QApplication::clipboard()->setText("");
+
+    // Remember where we were
+    QString name = tab->context->athlete->cyclist;
+
+    // switch to neighbour (currentTab will change)
+    int index = tabList.indexOf(tab);
+
+    // if we're not the last then switch
+    // before removing so the GUI is clean
+    if (tabList.count() > 1) {
+        if (index) switchTab(index-1);
+        else switchTab(index+1);
+    }
+
+    // close gracefully
+    tab->close();
+    tab->context->athlete->close();
+
+    // remove from state
+    tabs.remove(name);
+    tabList.removeAt(index);
+    tabbar->removeTab(index);
+    tabStack->removeWidget(tab);
+
+    // delete the objects
+    Context *context = tab->context;
+    Athlete *athlete = tab->context->athlete;
+
+    delete tab;
+    delete athlete;
+    delete context;
+
+    setUpdatesEnabled(true);
+
+    return;
+}
+
+void
+MainWindow::setOpenWindowMenu()
+{
+    // wipe existing
+    openWindowMenu->clear();
+
+    // get a list of all cyclists
+    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+    while (i.hasNext()) {
+
+        QString name = i.next();
+
+        // new action
+        QAction *action = new QAction(QString("%1").arg(name), this);
+
+        // only allow selection of cyclists which are not already open
+        foreach (MainWindow *x, mainwindows) {
+            QMapIterator<QString, Tab*> t(x->tabs);
+            while (t.hasNext()) {
+                t.next();
+                if (t.key() == name)
+                    action->setEnabled(false);
+            }
+        }
+
+        // add to menu
+        openWindowMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
+        windowMapper->setMapping(action, name);
+    }
+
+    // add create new option
+    openWindowMenu->addSeparator();
+    openWindowMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistWindow()), tr("Ctrl+N"));
+}
+
+void
+MainWindow::setOpenTabMenu()
+{
+    // wipe existing
+    openTabMenu->clear();
+
+    // get a list of all cyclists
+    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+    while (i.hasNext()) {
+
+        QString name = i.next();
+
+        // new action
+        QAction *action = new QAction(QString("%1").arg(name), this);
+
+        // only allow selection of cyclists which are not already open
+        foreach (MainWindow *x, mainwindows) {
+            QMapIterator<QString, Tab*> t(x->tabs);
+            while (t.hasNext()) {
+                t.next();
+                if (t.key() == name)
+                    action->setEnabled(false);
+            }
+        }
+
+        // add to menu
+        openTabMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), tabMapper, SLOT(map()));
+        tabMapper->setMapping(action, name);
+    }
+
+    // add create new option
+    openTabMenu->addSeparator();
+    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), tr("Ctrl+N"));
+}
+
+void
+MainWindow::saveState(Context *context)
+{
+    // save all the current state to the supplied context
+    context->showSidebar = showhideSidebar->isChecked();
+    context->showTabbar = showhideTabbar->isChecked();
+    context->showLowbar = showhideLowbar->isChecked();
+    context->showToolbar = showhideToolbar->isChecked();
+#ifdef GC_HAVE_LUCENE
+    context->searchText = searchBox->text();
+#endif
+    context->viewIndex = scopebar->selected();  
+    context->style = styleAction->isChecked();
+    context->viewIndex = scopebar->selected();
+}
+
+void
+MainWindow::restoreState(Context *context)
+{
+    // restore window state from the supplied context
+    showSidebar(context->showSidebar);
+    showToolbar(context->showToolbar);
+    showTabbar(context->showToolbar);
+    showLowbar(context->showLowbar);
+    scopebar->setSelected(context->viewIndex);
+    scopebar->setContext(context);
+    scopebar->setHighlighted(); // to reflect context
+#ifdef GC_HAVE_LUCENE
+    searchBox->setContext(context);
+    searchBox->setText(context->searchText);
+#endif
+}
+
+void
+MainWindow::switchTab(int index)
+{
+    if (index < 0) return;
+
+    // save how we are
+    saveState(currentTab->context);
+
+    currentTab = tabList[index];
+    tabStack->setCurrentIndex(index);
+
+    // restore back
+    restoreState(currentTab->context);
+
+    setWindowTitle(currentTab->context->athlete->home.dirName());
+
+}
+
 
 /*----------------------------------------------------------------------
  * MetricDB
@@ -1228,7 +1530,7 @@ MainWindow::exportMetrics()
     QString fileName = QFileDialog::getSaveFileName( this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
     if (fileName.length() == 0)
         return;
-    context->athlete->metricDB->writeAsCSV(fileName);
+    currentTab->context->athlete->metricDB->writeAsCSV(fileName);
 }
 
 /*----------------------------------------------------------------------
@@ -1238,13 +1540,13 @@ MainWindow::exportMetrics()
 void
 MainWindow::tweetRide()
 {
-    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
+    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        TwitterDialog *twitterDialog = new TwitterDialog(context, item);
+        TwitterDialog *twitterDialog = new TwitterDialog(currentTab->context, item);
         twitterDialog->setWindowModality(Qt::ApplicationModal);
         twitterDialog->exec();
     }
@@ -1257,13 +1559,13 @@ MainWindow::tweetRide()
 void
 MainWindow::share()
 {
-    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
+    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        ShareDialog d(context, item);
+        ShareDialog d(currentTab->context, item);
         d.exec();
     }
 }
@@ -1276,13 +1578,13 @@ MainWindow::share()
 void
 MainWindow::uploadTtb()
 {
-    QTreeWidgetItem *_item = context->athlete->treeWidget->currentItem();
+    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE) return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        TtbDialog d(context, item);
+        TtbDialog d(currentTab->context, item);
         d.exec();
     }
 }
@@ -1313,7 +1615,7 @@ MainWindow::importWorkout()
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
 
         // import them via the workoutimporter
-        Library::importFiles(context, fileNamesCopy);
+        Library::importFiles(currentTab->context, fileNamesCopy);
     }
 }
 /*----------------------------------------------------------------------
@@ -1328,7 +1630,7 @@ MainWindow::downloadErgDB()
     QFileInfo fi(workoutDir);
 
     if (fi.exists() && fi.isDir()) {
-        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(context);
+        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(currentTab->context);
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"), 
@@ -1344,7 +1646,7 @@ MainWindow::downloadErgDB()
 void
 MainWindow::manageLibrary()
 {
-    LibrarySearchDialog *search = new LibrarySearchDialog(context);
+    LibrarySearchDialog *search = new LibrarySearchDialog(currentTab->context);
     search->exec();
 }
 
@@ -1356,8 +1658,8 @@ MainWindow::manageLibrary()
 void
 MainWindow::uploadTP()
 {
-    if (context->ride) {
-        TPUploadDialog uploader(context->athlete->cyclist, context->currentRide(), context);
+    if (currentTab->context->ride) {
+        TPUploadDialog uploader(currentTab->context->athlete->cyclist, currentTab->context->currentRide(), currentTab->context);
         uploader.exec();
     }
 }
@@ -1365,7 +1667,7 @@ MainWindow::uploadTP()
 void
 MainWindow::downloadTP()
 {
-    TPDownloadDialog downloader(context);
+    TPDownloadDialog downloader(currentTab->context);
     downloader.exec();
 }
 #endif
@@ -1423,21 +1725,21 @@ Athlete::configChanged()
 void
 MainWindow::downloadMeasures()
 {
-    context->athlete->withingsDownload->download();
+    currentTab->context->athlete->withingsDownload->download();
 }
 
 void
 MainWindow::downloadMeasuresFromZeo()
 {
-    context->athlete->zeoDownload->download();
+    currentTab->context->athlete->zeoDownload->download();
 }
 
 void
 MainWindow::refreshCalendar()
 {
 #ifdef GC_HAVE_ICAL
-    context->athlete->davCalendar->download();
-    context->athlete->calendarDownload->download();
+    currentTab->context->athlete->davCalendar->download();
+    currentTab->context->athlete->calendarDownload->download();
 #endif
 }
 
@@ -1449,7 +1751,7 @@ MainWindow::refreshCalendar()
 void
 MainWindow::uploadCalendar()
 {
-    context->athlete->davCalendar->upload((RideItem*)context->currentRideItem()); // remove const coz it updates the ride
+    currentTab->context->athlete->davCalendar->upload((RideItem*)currentTab->context->currentRideItem()); // remove const coz it updates the ride
                                                // to set GID and upload date
 }
 #endif
@@ -1460,7 +1762,7 @@ MainWindow::actionClicked(int index)
     switch(index) {
 
     default:
-    case 0: tab->addIntervals();
+    case 0: currentTab->addIntervals();
             break;
 
     case 1 : splitRide();
@@ -1475,44 +1777,6 @@ MainWindow::actionClicked(int index)
 void
 MainWindow::addIntervals()
 {
-    tab->addIntervals();
-}
-
-void
-MainWindow::rideSelected(RideItem*)
-{
-
-    // update the ride property on all widgets
-    // to let them know they need to replot new
-    // selected ride
-    tab->setRide(context->ride);
-
-    if (!context->ride) return;
-
-    // refresh interval list for bottom left
-    // first lets wipe away the existing intervals
-    QList<QTreeWidgetItem *> intervals = context->athlete->allIntervals->takeChildren();
-    for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
-
-    // now add the intervals for the current ride
-    if (context->ride) { // only if we have a ride pointer
-        RideFile *selected = context->ride->ride();
-        if (selected) {
-            // get all the intervals in the currently selected RideFile
-            QList<RideFileInterval> intervals = selected->intervals();
-            for (int i=0; i < intervals.count(); i++) {
-                // add as a child to context->athlete->allIntervals
-                IntervalItem *add = new IntervalItem(selected,
-                                                        intervals.at(i).name,
-                                                        intervals.at(i).start,
-                                                        intervals.at(i).stop,
-                                                        selected->timeToDistance(intervals.at(i).start),
-                                                        selected->timeToDistance(intervals.at(i).stop),
-                                                        context->athlete->allIntervals->childCount()+1);
-                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
-                context->athlete->allIntervals->addChild(add);
-            }
-        }
-    }
+    currentTab->addIntervals();
 }
 

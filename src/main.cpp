@@ -59,6 +59,9 @@ void nostderr(QString dir)
 QApplication *application;
 bool restarting = false;
 
+// root directory shared by all
+QString gcroot;
+
 int
 main(int argc, char *argv[])
 {
@@ -212,6 +215,9 @@ main(int argc, char *argv[])
                 home.cd(libraryPath);
             }
         }
+
+        // set global root directory
+        gcroot = home.absolutePath();
 
         // now redirect stderr
 #ifndef WIN32

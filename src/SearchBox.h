@@ -44,6 +44,7 @@ public:
     void setText(QString);
     SearchBoxMode getMode() { return mode; }
     bool isFiltered() const { return filtered; }
+    void setContext(Context *c) { context = c; }
 
 protected:
     void resizeEvent(QResizeEvent *);

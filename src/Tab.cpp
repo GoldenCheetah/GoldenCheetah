@@ -19,6 +19,8 @@
 
 #include "Tab.h"
 #include "Views.h"
+#include "Athlete.h"
+#include "IntervalItem.h"
 #include "MainWindow.h"
 
 Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
@@ -80,6 +82,16 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     chartSettings->setMaximumWidth(450);
     chartSettings->setMaximumHeight(600);
     chartSettings->hide();
+
+    // cpx aggregate cache check
+    connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
+
+    // selects the latest ride in the list:
+    if (context->athlete->allRides->childCount() != 0)
+        context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(context->athlete->allRides->childCount()-1));
+
+    // Kick off - select a ride and switch to Analysis View
+    context->athlete->rideTreeWidgetSelectionChanged();
 }
 
 Tab::~Tab()
@@ -158,3 +170,41 @@ Tab::selectView(int index)
     view(index)->setSelected(true);
     masterControls->setCurrentIndex(index);
 }
+
+void
+Tab::rideSelected(RideItem*)
+{
+    // update the ride property on all widgets
+    // to let them know they need to replot new
+    // selected ride
+    setRide(context->ride);
+
+    if (!context->ride) return;
+
+    // refresh interval list for bottom left
+    // first lets wipe away the existing intervals
+    QList<QTreeWidgetItem *> intervals = context->athlete->allIntervals->takeChildren();
+    for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
+
+    // now add the intervals for the current ride
+    if (context->ride) { // only if we have a ride pointer
+        RideFile *selected = context->ride->ride();
+        if (selected) {
+            // get all the intervals in the currently selected RideFile
+            QList<RideFileInterval> intervals = selected->intervals();
+            for (int i=0; i < intervals.count(); i++) {
+                // add as a child to context->athlete->allIntervals
+                IntervalItem *add = new IntervalItem(selected,
+                                                        intervals.at(i).name,
+                                                        intervals.at(i).start,
+                                                        intervals.at(i).stop,
+                                                        selected->timeToDistance(intervals.at(i).start),
+                                                        selected->timeToDistance(intervals.at(i).stop),
+                                                        context->athlete->allIntervals->childCount()+1);
+                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+                context->athlete->allIntervals->addChild(add);
+            }
+        }
+    }
+}
+

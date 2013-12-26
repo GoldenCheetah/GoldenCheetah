@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "MainWindow.h"
+#include "Tab.h"
 #include "Athlete.h"
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
@@ -93,8 +94,8 @@ MainWindow::saveRideExitDialog()
     // have we been told to not warn on exit?
     if (warnExit() == false) return true; // just close regardless!
 
-    for (int i=0; i<context->athlete->allRides->childCount(); i++) {
-        RideItem *curr = (RideItem *)context->athlete->allRides->child(i);
+    for (int i=0; i<currentTab->context->athlete->allRides->childCount(); i++) {
+        RideItem *curr = (RideItem *)currentTab->context->athlete->allRides->child(i);
         if (curr->isDirty() == true) dirtyList.append(curr);
     }
 
@@ -175,7 +176,7 @@ MainWindow::saveSilent(RideItem *rideItem)
 
     // save in GC format
     JsonFileReader reader;
-    reader.writeRideFile(context, rideItem->ride(), savedFile);
+    reader.writeRideFile(currentTab->context, rideItem->ride(), savedFile);
 
     // rename the file and update the rideItem list to reflect the change
     if (convert) {
