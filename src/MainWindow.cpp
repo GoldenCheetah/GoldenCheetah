@@ -454,13 +454,16 @@ MainWindow::MainWindow(const QDir &home)
      * Central Widget
      *--------------------------------------------------------------------*/
 
-    QPalette tabbarPalette;
-    tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar = new QTabBar(this);
-    tabbar->setPalette(tabbarPalette);
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
+    QPalette tabbarPalette;
+    tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    tabbar->setPalette(tabbarPalette);
+#ifdef Q_OS_MAC
+    tabbar->setDocumentMode(true);
+#endif
 
     tabStack = new QStackedWidget(this);
     currentTab = new Tab(context);
@@ -1475,7 +1478,9 @@ MainWindow::saveState(Context *context)
     context->showSidebar = showhideSidebar->isChecked();
     context->showTabbar = showhideTabbar->isChecked();
     context->showLowbar = showhideLowbar->isChecked();
+#ifndef Q_OS_MAC // not on a Mac
     context->showToolbar = showhideToolbar->isChecked();
+#endif
 #ifdef GC_HAVE_LUCENE
     context->searchText = searchBox->text();
 #endif
@@ -1489,8 +1494,10 @@ MainWindow::restoreState(Context *context)
 {
     // restore window state from the supplied context
     showSidebar(context->showSidebar);
+#ifndef Q_OS_MAC // not on a Mac
     showToolbar(context->showToolbar);
-    showTabbar(context->showToolbar);
+#endif
+    showTabbar(context->showTabbar);
     showLowbar(context->showLowbar);
     scopebar->setSelected(context->viewIndex);
     scopebar->setContext(context);
