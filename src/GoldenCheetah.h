@@ -129,7 +129,7 @@ public:
     //void _setInstanceName(QString x); // GOBJECTS can set their instance name, but not be GcWindows
     //QString instanceName() const;
 
-    void setControls(QWidget *x);
+    void virtual setControls(QWidget *x);
     QWidget *controls() const;
 
     void setSubTitle(QString x);
@@ -236,8 +236,11 @@ public:
 
     void setIsBlank(bool value);
 
+    void setControls(QWidget *x);
+
 public slots:
     void hideRevealControls();
+    void saveImage();
 };
 
 
