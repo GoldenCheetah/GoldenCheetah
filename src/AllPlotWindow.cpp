@@ -1804,6 +1804,7 @@ AllPlotWindow::setupSeriesStackPlots()
     // this is NOT a memory leak (see ZZZ below)
     seriesPlots.clear();
 
+    bool addHeadwind = false;
     RideItem* rideItem = current;
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
 
@@ -1819,7 +1820,7 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) serieslist << RideFile::cad;
     if (showAlt->isChecked() && rideItem->ride()->areDataPresent()->alt) serieslist << RideFile::alt;
     if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) serieslist << RideFile::temp;
-    if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) serieslist << RideFile::headwind;
+    if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) addHeadwind=true; //serieslist << RideFile::headwind;
     if (showTorque->isChecked() && rideItem->ride()->areDataPresent()->nm) serieslist << RideFile::nm;
     if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::NP;
     if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::xPower;
@@ -1831,7 +1832,7 @@ AllPlotWindow::setupSeriesStackPlots()
     foreach(RideFile::SeriesType x, serieslist) {
 
         // create that plot
-        AllPlot *_allPlot = new AllPlot(this, context, x, first);
+        AllPlot *_allPlot = new AllPlot(this, context, x, (addHeadwind && x == RideFile::kph ? RideFile::headwind : RideFile::none), first);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
         _allPlot->setDataFromPlot(allPlot); // will clone all settings and data for the series

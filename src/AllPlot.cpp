@@ -228,7 +228,7 @@ class TimeScaleDraw: public QwtScaleDraw
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType scope, bool wanttext):
+AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType scope, RideFile::SeriesType secScope, bool wanttext):
     QwtPlot(parent),
     rideItem(NULL),
     shade_zones(true),
@@ -246,6 +246,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     showBalance(true),
     bydist(false),
     scope(scope),
+    secondaryScope(secScope),
     context(context),
     parent(parent),
     wanttext(wanttext)
@@ -1762,6 +1763,10 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         {
         ourCurve = speedCurve;
         thereCurve = referencePlot->speedCurve;
+        if (secondaryScope == RideFile::headwind) {
+            ourICurve = windCurve;
+            thereICurve = referencePlot->windCurve;
+        }
         title = tr("Speed");
         }
         break;
