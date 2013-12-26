@@ -22,7 +22,8 @@
 // This metric computes aerobic decoupling percentage as described
 // by Joe Friel:
 //
-//   http://www.trainingbible.com/pdf/AeT_Training.pdf
+//   http://www.trainingbible.com/bkp-all/pdf/AeT_Training.pdf
+//   http://home.trainingpeaks.com/blog/article/aerobic-endurance-and-decoupling
 //
 // Aerobic decoupling is a measure of how much heart rate rises or
 // how much power falls off during the course of a long ride.  Joe suggests
@@ -87,9 +88,15 @@ class AerobicDecoupling : public RideMetric {
             secondHalfPower /= secondHalfCount;
             firstHalfHR /= firstHalfCount;
             secondHalfHR /= secondHalfCount;
-            double firstHalfRatio = firstHalfHR / firstHalfPower;
-            double secondHalfRatio = secondHalfHR / secondHalfPower;
-            percent = 100.0 * (secondHalfRatio - firstHalfRatio) / firstHalfRatio;
+
+            // was wrong (Christoph Ernst raise an issue)
+            //     double firstHalfRatio = firstHalfHR / firstHalfPower;
+            //     double secondHalfRatio = secondHalfHR / secondHalfPower;
+            //     percent = 100.0 * (secondHalfRatio - firstHalfRatio) / firstHalfRatio;
+            // should be :
+            double firstHalfRatio = firstHalfPower / firstHalfHR;
+            double secondHalfRatio = secondHalfPower / secondHalfHR;
+            percent = 100.0 * (firstHalfRatio - secondHalfRatio) / firstHalfRatio;
         }
         setValue(percent);
     }
