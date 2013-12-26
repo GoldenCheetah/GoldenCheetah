@@ -1486,7 +1486,7 @@ MainWindow::saveState(Context *context)
 {
     // save all the current state to the supplied context
     context->showSidebar = showhideSidebar->isChecked();
-    context->showTabbar = showhideTabbar->isChecked();
+    //context->showTabbar = showhideTabbar->isChecked();
     context->showLowbar = showhideLowbar->isChecked();
 #ifndef Q_OS_MAC // not on a Mac
     context->showToolbar = showhideToolbar->isChecked();
@@ -1507,7 +1507,7 @@ MainWindow::restoreState(Context *context)
 #ifndef Q_OS_MAC // not on a Mac
     showToolbar(context->showToolbar);
 #endif
-    showTabbar(context->showTabbar);
+    //showTabbar(context->showTabbar);
     showLowbar(context->showLowbar);
     scopebar->setSelected(context->viewIndex);
     scopebar->setContext(context);
