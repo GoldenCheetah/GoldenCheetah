@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QFileDialog>
 #include <QGraphicsDropShadowEffect>
 
 Q_DECLARE_METATYPE(QWidget*)
