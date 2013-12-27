@@ -272,7 +272,7 @@ void
 RideEditor::saveFile()
 {
     if (ride && ride->isDirty()) {
-        context->mainWindow->saveRideSingleDialog(ride);
+        context->mainWindow->saveRideSingleDialog(context, ride);
     }
 }
 
