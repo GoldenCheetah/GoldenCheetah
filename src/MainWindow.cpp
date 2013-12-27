@@ -868,7 +868,7 @@ MainWindow::closeEvent(QCloseEvent* event)
     foreach(Tab *tab, closing) {
 
         // do we need to save?
-        if (tab->context->mainWindow->saveRideExitDialog() == true)
+        if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
             removeTab(tab);
         else
             needtosave = true;
@@ -1174,7 +1174,7 @@ void
 MainWindow::saveRide()
 {
     if (currentTab->context->ride)
-        saveRideSingleDialog(currentTab->context->ride); // will signal save to everyone
+        saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
     else {
         QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
                          tr("There is no currently selected ride to save."));
@@ -1341,7 +1341,7 @@ bool
 MainWindow::closeTab()
 {
     // wipe it down ...
-    if (saveRideExitDialog() == false) return false;
+    if (saveRideExitDialog(currentTab->context) == false) return false;
 
     // if its the last tab we close the window
     if (tabList.count() == 1)

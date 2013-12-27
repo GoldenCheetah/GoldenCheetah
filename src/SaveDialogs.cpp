@@ -62,7 +62,7 @@ setWarnExit(bool setting)
 // User selected Save... menu option, prompt if conversion is needed
 //----------------------------------------------------------------------
 bool
-MainWindow::saveRideSingleDialog(RideItem *rideItem)
+MainWindow::saveRideSingleDialog(Context *context, RideItem *rideItem)
 {
     if (rideItem->isDirty() == false) return false; // nothing to save you must be a ^S addict.
 
@@ -73,12 +73,12 @@ MainWindow::saveRideSingleDialog(RideItem *rideItem)
 
     // either prompt etc, or just save that file away!
     if (currentType != "GC" && warnOnConvert() == true) {
-        SaveSingleDialogWidget dialog(this, rideItem);
+        SaveSingleDialogWidget dialog(this, context, rideItem);
         dialog.exec();
         return true;
     } else {
         // go for it, the user doesn't want warnings!
-        saveSilent(rideItem);
+        saveSilent(context, rideItem);
         return true;
     }
 }
@@ -87,21 +87,21 @@ MainWindow::saveRideSingleDialog(RideItem *rideItem)
 // Check if data needs saving on exit and prompt user for action
 //----------------------------------------------------------------------
 bool
-MainWindow::saveRideExitDialog()
+MainWindow::saveRideExitDialog(Context *context)
 {
     QList<RideItem*> dirtyList;
 
     // have we been told to not warn on exit?
     if (warnExit() == false) return true; // just close regardless!
 
-    for (int i=0; i<currentTab->context->athlete->allRides->childCount(); i++) {
-        RideItem *curr = (RideItem *)currentTab->context->athlete->allRides->child(i);
+    for (int i=0; i<context->athlete->allRides->childCount(); i++) {
+        RideItem *curr = (RideItem *)context->athlete->allRides->child(i);
         if (curr->isDirty() == true) dirtyList.append(curr);
     }
 
     // we have some files to save...
     if (dirtyList.count() > 0) {
-        SaveOnExitDialogWidget dialog(this, dirtyList);
+        SaveOnExitDialogWidget dialog(this, context, dirtyList);
         int result = dialog.exec();
         if (result == QDialog::Rejected) return false; // cancel that closeEvent!
     }
@@ -114,7 +114,7 @@ MainWindow::saveRideExitDialog()
 // Silently save ride and convert to GC format without warning user
 //----------------------------------------------------------------------
 void
-MainWindow::saveSilent(RideItem *rideItem)
+MainWindow::saveSilent(Context *context, RideItem *rideItem)
 {
     QFile   currentFile(rideItem->path + QDir::separator() + rideItem->fileName);
     QFileInfo currentFI(currentFile);
@@ -176,7 +176,7 @@ MainWindow::saveSilent(RideItem *rideItem)
 
     // save in GC format
     JsonFileReader reader;
-    reader.writeRideFile(currentTab->context, rideItem->ride(), savedFile);
+    reader.writeRideFile(context, rideItem->ride(), savedFile);
 
     // rename the file and update the rideItem list to reflect the change
     if (convert) {
@@ -197,8 +197,8 @@ MainWindow::saveSilent(RideItem *rideItem)
 //----------------------------------------------------------------------
 // Save Single File Dialog Widget
 //----------------------------------------------------------------------
-SaveSingleDialogWidget::SaveSingleDialogWidget(MainWindow *mainWindow, RideItem *rideItem) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), rideItem(rideItem)
+SaveSingleDialogWidget::SaveSingleDialogWidget(MainWindow *mainWindow, Context *context, RideItem *rideItem) :
+    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), context(context), rideItem(rideItem)
 {
     setWindowTitle(tr("Save and Conversion"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -232,7 +232,7 @@ SaveSingleDialogWidget::SaveSingleDialogWidget(MainWindow *mainWindow, RideItem 
 void
 SaveSingleDialogWidget::saveClicked()
 {
-    mainWindow->saveSilent(rideItem);
+    mainWindow->saveSilent(context, rideItem);
     accept();
 }
 
@@ -259,8 +259,8 @@ SaveSingleDialogWidget::warnSettingClicked()
 // Save on Exit File Dialog Widget
 //----------------------------------------------------------------------
 
-SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, QList<RideItem *>dirtyList) :
-    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), dirtyList(dirtyList)
+SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, Context *context, QList<RideItem *>dirtyList) :
+    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), context(context), dirtyList(dirtyList)
 {
     setWindowTitle("Save Changes");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -325,7 +325,7 @@ SaveOnExitDialogWidget::saveClicked()
     for (int i=0; i<dirtyList.count(); i++) {
         QCheckBox *c = (QCheckBox *)dirtyFiles->cellWidget(i,0);
         if (c->isChecked()) {
-            mainWindow->saveRideSingleDialog(dirtyList.at(i));
+            mainWindow->saveRideSingleDialog(context, dirtyList.at(i));
         }
     }
     accept();
