@@ -101,6 +101,7 @@ class MainWindow : public QMainWindow
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
         void openTab(QString name);
+        void closeTabClicked(int index); // user clicked to close tab
         bool closeTab();       // close current, might not if the user 
                                // changes mind if there are unsaved changes.
         void removeTab(Tab*);  // remove without question
