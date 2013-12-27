@@ -109,6 +109,9 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
+#ifdef Q_OS_MAC
+    head = NULL; // early resize event causes a crash
+#endif
 
     // bootstrap
     Context *context = new Context(this);
@@ -836,10 +839,12 @@ MainWindow::toggleFullScreen()
 void
 MainWindow::resizeEvent(QResizeEvent*)
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 #ifdef Q_OS_MAC
-    head->updateGeometry();
-    repaint();
+    if (head) {
+        appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+        head->updateGeometry();
+        repaint();
+    }
 #endif
 }
 
@@ -1307,9 +1312,6 @@ MainWindow::openTab(QString name)
 
     setUpdatesEnabled(false);
 
-    // show the tabbar if we're gonna open tabs!
-    showTabbar(true);
-
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
@@ -1335,6 +1337,10 @@ MainWindow::openTab(QString name)
     // now apply current
     saveState(currentTab->context);
     restoreState(currentTab->context);
+
+    // show the tabbar if we're gonna open tabs -- but wait till the last second
+    // to show it to avoid crappy paint artefacts
+    showTabbar(true);
 
     setUpdatesEnabled(true);
 }
@@ -1534,9 +1540,15 @@ MainWindow::switchTab(int index)
 
     setUpdatesEnabled(false);
 
+#ifdef Q_OS_MAC // close buttons on the left on Mac
+    // Only have close button on current tab (prettier)
+    for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
+    tabbar->tabButton(index, QTabBar::LeftSide)->show();
+#else
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
     tabbar->tabButton(index, QTabBar::RightSide)->show();
+#endif
 
     // save how we are
     saveState(currentTab->context);

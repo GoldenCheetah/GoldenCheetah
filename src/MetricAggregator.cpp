@@ -160,7 +160,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // create the dialog if we need to show progress for long running uodate
         long elapsedtime = elapsed.elapsed();
         if ((first || elapsedtime > 6000) && bar == NULL) {
-            bar = new QProgressDialog(title, tr("Abort"), 0, filenames.count(), context->mainWindow);
+            bar = new QProgressDialog(title, tr("Abort"), 0, filenames.count()); // not owned by mainwindow
             bar->setWindowFlags(bar->windowFlags() | Qt::FramelessWindowHint);
             bar->setWindowModality(Qt::WindowModal);
             bar->setMinimumDuration(0);
