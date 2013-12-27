@@ -9,6 +9,8 @@ OTHER= 3d.png choose-a-cyclist.png cpint.gp cpint.png critical-power-plot.png cr
        sample.png weekly-summary.png google-earth.png aerolab.png
 
 BIN=    GoldenCheetah_3.0.1_Mac_Universal.dmg \
+        GoldenCheetah-3.0.1-1.fc18.x86_64.rpm \
+        GoldenCheetah-3.0.1-1.fc19.x86_64.rpm \
         GoldenCheetah_3.0.1_Windows_Installer.exe
 
 all: $(HTML)
