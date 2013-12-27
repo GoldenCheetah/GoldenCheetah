@@ -458,6 +458,7 @@ MainWindow::MainWindow(const QDir &home)
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
+    tabbar->setTabsClosable(true);
     QPalette tabbarPalette;
     tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
@@ -475,6 +476,7 @@ MainWindow::MainWindow(const QDir &home)
     tabStack->setCurrentIndex(0);
 
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
+    connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int)));
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -1337,6 +1339,16 @@ MainWindow::openTab(QString name)
     setUpdatesEnabled(true);
 }
 
+void
+MainWindow::closeTabClicked(int index)
+{
+    Tab *tab = tabList[index];
+    if (saveRideExitDialog(tab->context) == false) return;
+
+    // lets wipe it
+    removeTab(tab);
+}
+
 bool
 MainWindow::closeTab()
 {
@@ -1520,6 +1532,12 @@ MainWindow::switchTab(int index)
 {
     if (index < 0) return;
 
+    setUpdatesEnabled(false);
+
+    // Only have close button on current tab (prettier)
+    for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
+    tabbar->tabButton(index, QTabBar::RightSide)->show();
+
     // save how we are
     saveState(currentTab->context);
 
@@ -1531,6 +1549,7 @@ MainWindow::switchTab(int index)
 
     setWindowTitle(currentTab->context->athlete->home.dirName());
 
+    setUpdatesEnabled(true);
 }
 
 
