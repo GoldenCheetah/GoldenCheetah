@@ -67,6 +67,7 @@ class MetricAggregator : public QObject
     private:
         Context *context;
         DBAccess *dbaccess;
+        bool first;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);
