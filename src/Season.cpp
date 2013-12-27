@@ -116,7 +116,7 @@ EditSeasonDialog::EditSeasonDialog(MainWindow *mainWindow, Season *season) :
 
     seedEdit = new QDoubleSpinBox(this);
     seedEdit->setDecimals(0);
-    seedEdit->setRange(0.0, 100.0);
+    seedEdit->setRange(0.0, 300.0);
     seedEdit->setSingleStep(1.0);
     seedEdit->setWrapping(true);
     seedEdit->setAlignment(Qt::AlignLeft);
