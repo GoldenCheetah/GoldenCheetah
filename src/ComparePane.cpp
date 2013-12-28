@@ -72,6 +72,7 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
     table = new QTableWidget(this);
 #ifdef Q_OS_MAC
     table->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    table->horizontalHeader()->setSortIndicatorShown(false); // blue looks nasty
 #endif
     table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -138,24 +139,8 @@ ComparePane::refreshTable()
         table->setSortingEnabled(true);
         table->verticalHeader()->hide();
         table->setShowGrid(false);
-        table->setSelectionMode(QAbstractItemView::SingleSelection);
+        table->setSelectionMode(QAbstractItemView::MultiSelection);
         table->setSelectionBehavior(QAbstractItemView::SelectRows);
-        table->horizontalHeader()->setStretchLastSection(true);
-
-        // now set what the user can do
-        table->resizeColumnsToContents();
-
-#if QT_VERSION > 0x050000 // fix the first two if we can
-        for (int i=0; i<list.count(); i++) {
-            if (i < 2) {
-                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
-            } else {
-                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
-            }
-        }
-#else
-        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-#endif
 
         // STEP TWO : CLEAR AND RE-ADD TO REFLECT CHANGES
 
@@ -239,12 +224,25 @@ ComparePane::refreshTable()
 
             // align center
             for (int i=3; i<(worklist.count()+5); i++)
-                table->item(counter,i)->setTextAlignment(Qt::AlignHCenter);
+                table->item(counter,i)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
-            table->setRowHeight(counter, 20);
+            table->setRowHeight(counter, 23);
             counter++;
         }
 
+        table->resizeColumnsToContents(); // set columns to fit
+#if QT_VERSION > 0x050000 // fix the first two if we can
+        for (int i=0; i<list.count(); i++) {
+            if (i < 2) {
+                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
+            } else {
+                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
+            }
+        }
+#else
+        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+#endif
+        table->horizontalHeader()->setStretchLastSection(true);
 
     } else { //SEASONS
 
