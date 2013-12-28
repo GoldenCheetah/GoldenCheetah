@@ -388,7 +388,7 @@ Seasons::writeSeasons()
     seasonsChanged(); // signal!
 }
 
-SeasonTreeView::SeasonTreeView()
+SeasonTreeView::SeasonTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragDropOverwriteMode(true);
@@ -433,6 +433,7 @@ SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     stream.setVersion(QDataStream::Qt_4_6);
 
     // pack data 
+    stream << (quint64)(context); // where did this come from?
     stream << items.count();
     foreach (QTreeWidgetItem *p, items) {
 

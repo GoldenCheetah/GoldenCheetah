@@ -28,6 +28,7 @@
 #include <QStackedWidget>
 #include "RideItem.h"
 #include "TimeUtils.h"
+#include "DragBar.h"
 
 #ifdef Q_OS_MAC
 // What versions are supported by this SDK?
@@ -216,8 +217,8 @@ class MainWindow : public QMainWindow
         QIcon importIcon, composeIcon, intervalIcon, splitIcon,
               deleteIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 #endif
-        // tab bar
-        QTabBar *tabbar;
+        // tab bar (that supports swtitching on drag and drop)
+        DragBar *tabbar;
         QStackedWidget *tabStack;
 
         // window and tab menu

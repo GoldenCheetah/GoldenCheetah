@@ -17,6 +17,8 @@
  */
 
 #include "ComparePane.h"
+#include "Context.h"
+#include "Athlete.h"
 
 ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidget(parent)
 {
@@ -34,8 +36,8 @@ ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidg
 void 
 ComparePane::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->formats().contains("application/x-gc-intervals") ||
-        event->mimeData()->formats().contains("application/x-gc-seasons")) {
+    if ((mode_ == interval && event->mimeData()->formats().contains("application/x-gc-intervals")) ||
+        (mode_ == season && event->mimeData()->formats().contains("application/x-gc-seasons"))) {
         event->acceptProposedAction();
     }
 }
@@ -57,4 +59,19 @@ ComparePane::dropEvent(QDropEvent *event)
     event->accept();
 
     // here we can unpack and add etc...
+    // lets get the context!
+    QString fmt = (mode_ == interval) ? "application/x-gc-intervals" : "application/x-gc-seasons";
+
+    // get the context out
+    QByteArray rawData = event->encodedData(fmt.toLatin1());
+    QDataStream stream(&rawData, QIODevice::ReadOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+
+    // pack data 
+    quint64 from;
+    stream >> from; // where did this come from?
+
+    // lets look at the context..
+    Context *c = (Context*)(from);
+    qDebug()<<c->athlete->cyclist<<"compare pane: dropped:"<<event->mimeData()->formats();
 }

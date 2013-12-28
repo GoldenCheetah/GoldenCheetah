@@ -457,7 +457,7 @@ MainWindow::MainWindow(const QDir &home)
      * Central Widget
      *--------------------------------------------------------------------*/
 
-    tabbar = new QTabBar(this);
+    tabbar = new DragBar(this);
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
@@ -478,6 +478,7 @@ MainWindow::MainWindow(const QDir &home)
     tabStack->addWidget(currentTab);
     tabStack->setCurrentIndex(0);
 
+    connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchTab(int)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
     connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int)));
 
@@ -1068,8 +1069,10 @@ MainWindow::dragEnterEvent(QDragEnterEvent *event)
         if (url.toString().startsWith("http"))
             accept = false;
 
-    if (accept) event->acceptProposedAction(); // whatever you wanna drop we will try and process!
-    else event->ignore();
+    if (accept) {
+        event->acceptProposedAction(); // whatever you wanna drop we will try and process!
+        raise();
+    } else event->ignore();
 }
 
 void
