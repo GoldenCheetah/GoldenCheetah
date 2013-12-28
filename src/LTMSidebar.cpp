@@ -62,7 +62,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     seasonsWidget->addAction(moreSeasonAct);
     connect(moreSeasonAct, SIGNAL(triggered(void)), this, SLOT(dateRangePopup(void)));
 
-    dateRangeTree = new SeasonTreeView;
+    dateRangeTree = new SeasonTreeView(context); // context needed for drag/drop across contexts
     allDateRanges=dateRangeTree->invisibleRootItem();
     // Drop for Seasons
     allDateRanges->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);

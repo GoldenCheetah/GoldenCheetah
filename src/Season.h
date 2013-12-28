@@ -159,7 +159,7 @@ class SeasonTreeView : public QTreeWidget
     Q_OBJECT
 
     public:
-        SeasonTreeView();
+        SeasonTreeView(Context *);
 
         // for drag/drop
         QStringList mimeTypes () const;
@@ -170,6 +170,7 @@ class SeasonTreeView : public QTreeWidget
 
     protected:
         void dropEvent(QDropEvent* event);
+        Context *context;
 
 
 };

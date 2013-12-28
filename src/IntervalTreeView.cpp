@@ -65,6 +65,7 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     stream.setVersion(QDataStream::Qt_4_6);
 
     // pack data 
+    stream << (quint64)(context); // where did this come from?
     stream << items.count();
     foreach (QTreeWidgetItem *p, items) {
 
@@ -73,7 +74,7 @@ IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
 
         // serialize
         stream << p->text(0); // name
-        stream << static_cast<const void*>(i->ride);
+        stream << (quint64)(i->ride);
         stream << i->start << i->stop; // start and stop in secs
         stream << i->startKM << i->stopKM; // start and stop km
         stream << i->displaySequence;

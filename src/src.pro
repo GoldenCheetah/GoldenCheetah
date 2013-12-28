@@ -293,6 +293,7 @@ HEADERS += \
         DeviceConfiguration.h \
         DialWindow.h \
         DiarySidebar.h \
+        DragBar.h \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgDB.h \
@@ -483,6 +484,7 @@ SOURCES += \
         DialWindow.cpp \
         DiarySidebar.cpp \
         DownloadRideDialog.cpp \
+        DragBar.cpp \
         ErgDB.cpp \
         ErgDBDownloadDialog.cpp \
         ErgFile.cpp \
