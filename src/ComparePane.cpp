@@ -17,12 +17,41 @@
  */
 
 #include "ComparePane.h"
-#include "Context.h"
-#include "Athlete.h"
+#include "Settings.h"
+#include "RideFile.h"
+#include "RideMetric.h"
+#include "SummaryMetrics.h"
+#include "ColorButton.h"
+#include "TimeUtils.h"
+#include "Units.h"
+#include "Zones.h"
 
-ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidget(parent)
+//
+// A selection of distinct colours, user can adjust also
+//
+static QList<QColor> standardColors;
+static bool initStandardColors()
+{
+    standardColors << QColor(Qt::red);
+    standardColors << QColor(Qt::green);
+    standardColors << QColor(Qt::blue);
+    standardColors << QColor(Qt::magenta);
+    standardColors << QColor(Qt::cyan);
+    standardColors << QColor(Qt::yellow);
+    standardColors << QColor(Qt::gray);
+    standardColors << QColor(Qt::darkCyan);
+    standardColors << QColor(Qt::darkRed);
+    standardColors << QColor(Qt::darkGreen);
+    standardColors << QColor(Qt::darkBlue);
+    standardColors << QColor(Qt::darkMagenta);
+}
+static bool init = initStandardColors();
+
+ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : context(context), mode_(mode), QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     setAcceptDrops(true);
     setAutoFillBackground(true);
@@ -30,8 +59,219 @@ ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidg
     pal.setBrush(QPalette::Active, QPalette::Window, Qt::white);
     pal.setBrush(QPalette::Inactive, QPalette::Window, Qt::white);
     setPalette(pal);
+
+    scrollArea = new QScrollArea(this);
+    scrollArea->setAutoFillBackground(false);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameStyle(QFrame::NoFrame);
+    scrollArea->setContentsMargins(0,0,0,0);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    layout->addWidget(scrollArea);
+
+    table = new QTableWidget(this);
+#ifdef Q_OS_MAC
+    table->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setWidget(table);
+
+    configChanged(); // set up ready to go...
+
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 }
 
+void
+ComparePane::configChanged()
+{
+    // refresh table...
+    refreshTable();
+}
+
+void
+ComparePane::refreshTable()
+{
+    if (mode_ == interval) { // INTERVALS
+
+        // STEP ONE : SET THE TABLE HEADINGS
+
+        // clear current contents
+        table->clear();
+        table->setRowCount(0);
+
+        // metric summary
+        QStringList always;
+        always << "workout_time" << "total_distance";
+        QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+        QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
+
+        // called after config is updated typically
+        QStringList list;
+        list << "" // checkbox
+            << "" // color
+            << "Athlete"
+            << "Date"
+            << "Time";
+
+        QStringList worklist; // metrics to compute
+        RideMetricFactory &factory = RideMetricFactory::instance();
+
+        foreach(QString metric, metricColumns) {
+
+            // get the metric name
+            const RideMetric *m = factory.rideMetric(metric);
+            if (m) {
+                worklist << metric;
+                QString units;
+                if (m->units(context->athlete->useMetricUnits) != "seconds") units = m->units(context->athlete->useMetricUnits);
+                if (units != "") list << QString("%1 (%2)").arg(m->name()).arg(units);
+                else list << QString("%1").arg(m->name());
+            }
+        }
+
+        list << "Interval";
+
+        table->setColumnCount(list.count());
+        table->setHorizontalHeaderLabels(list);
+        table->setSortingEnabled(true);
+        table->verticalHeader()->hide();
+        table->setShowGrid(false);
+        table->setSelectionMode(QAbstractItemView::SingleSelection);
+        table->setSelectionBehavior(QAbstractItemView::SelectRows);
+        table->horizontalHeader()->setStretchLastSection(true);
+
+        // now set what the user can do
+        table->resizeColumnsToContents();
+
+#if QT_VERSION > 0x050000 // fix the first two if we can
+        for (int i=0; i<list.count(); i++) {
+            if (i < 2) {
+                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
+            } else {
+                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
+            }
+        }
+#else
+        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+#endif
+
+        // STEP TWO : CLEAR AND RE-ADD TO REFLECT CHANGES
+
+        table->setRowCount(context->compareIntervals.count());
+        int counter = 0;
+        foreach(CompareInterval x, context->compareIntervals) {
+
+            // compute the metrics for this ride
+            SummaryMetrics metrics;
+            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, x.data, context->athlete->zones(), context->athlete->hrZones(), worklist);
+            for(int i = 0; i < worklist.count(); ++i) {
+                if (worklist[i] != "") {
+                    RideMetricPtr m = computed.value(worklist[i]);
+                    if (m) metrics.setForSymbol(worklist[i], m->value(true));
+                    else metrics.setForSymbol(worklist[i], 0.00);
+                }
+            }
+
+            // First few cols always the same
+            // check - color - athlete - date - time
+            // now create a row on the compare pane
+
+            // Checkbox
+            QCheckBox *check = new QCheckBox(this);
+            check->setChecked(x.checked);
+            table->setCellWidget(counter, 0, check);
+            connect(check, SIGNAL(stateChanged(int)), this, SLOT(intervalButtonsChanged()));
+
+            // Color Button
+            ColorButton *colorButton = new ColorButton(this, "Color", x.color);
+            table->setCellWidget(counter, 1, colorButton);
+            connect(colorButton, SIGNAL(colorChosen(QColor)), this, SLOT(intervalButtonsChanged()));
+
+            // athlete
+            QTableWidgetItem *t = new QTableWidgetItem;
+            t->setText(x.sourceContext->athlete->cyclist);
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, 2, t);
+
+            // date
+            t = new QTableWidgetItem;
+            t->setText(x.data->startTime().date().toString("dd MMM, yyyy"));
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, 3, t);
+
+            // time
+            t = new QTableWidgetItem;
+            t->setText(x.data->startTime().time().toString("hh:mm:ss"));
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, 4, t);
+
+            // metrics
+            for(int i = 0; i < worklist.count(); ++i) {
+
+                RideMetricPtr m = computed.value(worklist[i]);
+
+                // get value and convert if needed
+                double value = metrics.getForSymbol(worklist[i]) 
+                               * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
+                               + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
+
+                // use right precision
+                QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
+
+                // or maybe its a duration (worry about local lang or translated)
+                if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
+                    strValue = time_to_string(value);
+
+                // add to the table
+                t = new QTableWidgetItem;
+                t->setText(strValue);
+                t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+                table->setItem(counter, i + 5, t);
+            }
+
+            // Interval name
+            t = new QTableWidgetItem;
+            t->setText(x.name);
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, worklist.count() + 5, t);
+
+            // align center
+            for (int i=3; i<(worklist.count()+5); i++)
+                table->item(counter,i)->setTextAlignment(Qt::AlignHCenter);
+
+            table->setRowHeight(counter, 20);
+            counter++;
+        }
+
+
+    } else { //SEASONS
+
+        //XXX seasons not written yet
+    }
+}
+
+void
+ComparePane::intervalButtonsChanged()
+{
+    // run through the table and see if anything changed
+    bool changed = false;
+    for (int i=0; i<table->rowCount(); i++) {
+
+        bool isChecked = static_cast<QCheckBox*>(table->cellWidget(i,0))->isChecked();
+        QColor color =  static_cast<ColorButton*>(table->cellWidget(i,1))->getColor();
+
+        if (context->compareIntervals[i].checked != isChecked ||
+            context->compareIntervals[i].color != color) {
+
+            context->compareIntervals[i].checked = isChecked;
+            context->compareIntervals[i].color = color;
+            changed = true;
+        }
+    }
+    if (changed) context->notifyCompareIntervalsChanged();
+}
 
 void 
 ComparePane::dragEnterEvent(QDragEnterEvent *event)
@@ -51,8 +291,6 @@ ComparePane::dragLeaveEvent(QDragLeaveEvent *event)
 void
 ComparePane::dropEvent(QDropEvent *event)
 {
-    qDebug()<<"compare pane: dropped:"<<event->mimeData()->formats();
-
     // set action to copy and accept that so the source data
     // is left intact and not wiped or removed
     event->setDropAction(Qt::CopyAction);
@@ -72,6 +310,101 @@ ComparePane::dropEvent(QDropEvent *event)
     stream >> from; // where did this come from?
 
     // lets look at the context..
-    Context *c = (Context*)(from);
-    qDebug()<<c->athlete->cyclist<<"compare pane: dropped:"<<event->mimeData()->formats();
+    Context *sourceContext = (Context*)(from);
+
+    // NOW LETS UNPACK
+    if (mode_ == interval) { // INTERVALS
+
+        int count;
+
+        QList<CompareInterval> newOnes;
+
+        // lets get the basic data
+        stream >> count;
+        for (int i=0; i<count; i++) {
+
+            CompareInterval add;
+
+            add.checked = true;                     // UPDATE COMPARE INTERVAL
+            add.context = context;                  // UPDATE COMPARE INTERVAL
+            add.sourceContext = sourceContext;      // UPDATE COMPARE INTERVAL
+
+            quint64 ridep;
+            quint64 start, stop, startKM, stopKM;
+            quint64 seq; // not relevant here
+
+            // serialize
+            stream >> add.name;                     // UPDATE COMPARE INTERVAL
+
+            stream >> ridep;
+            RideFile *ride = (RideFile*)ridep;
+
+            // index into ridefile
+            stream >> start;
+            stream >> stop;
+            stream >> startKM;
+            stream >> stopKM;
+            stream >> seq;
+
+            // construct a ridefile for the interval
+
+            //XXX RideFile *data;
+            add.data = new RideFile(ride->startTime(), ride->recIntSecs());
+            add.data->context = context;
+
+            // manage offsets
+            bool first = true;
+            double offset = 0.0f, offsetKM = 0.0f;
+
+            foreach(RideFilePoint *p, ride->dataPoints()) {
+
+                if (p->secs > stop) break;
+
+                if (p->secs >= start) {
+
+                    // intervals always start from zero when comparing
+                    if (first) {
+                        first = false;
+                        offset = p->secs;
+                        offsetKM = p->km;
+                    }
+
+                    add.data->appendPoint(p->secs - offset, p->cad, p->hr, p->km - offsetKM, p->kph, p->nm,
+                                          p->watts, p->alt, p->lon, p->lat, p->headwind,
+                                          p->slope, p->temp, p->lrbalance, 0);
+
+                    // get derived data calculated
+                    RideFilePoint *l = add.data->dataPoints().last();
+                    l->np = p->np;
+                    l->xp = p->xp;
+                    l->apower = p->apower;
+                }
+            }
+
+            // just use standard colors and cycle round
+            // we will of course repeat, but the user can
+            // just edit them using the button
+            add.color = standardColors.at((i + context->compareIntervals.count()) % standardColors.count());
+
+            // now add but only if not empty
+            if (!add.data->dataPoints().empty()) newOnes << add;
+
+        }
+        // how many we get ?
+        if (newOnes.count()) {
+
+            context->compareIntervals.append(newOnes);
+
+            // refresh the table to reflect the new list
+            refreshTable();
+
+            // let all the charts know
+            context->notifyCompareIntervalsChanged();
+        }
+
+    } else { // SEASONS
+
+        //XXX not written yet!
+
+    }
 }

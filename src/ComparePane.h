@@ -22,8 +22,13 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QTableWidget>
+#include <QScrollArea>
 
 #include "GcSideBarItem.h"
+#include "Context.h"
+#include "Athlete.h"
+#include "CompareInterval.h"
 
 class ComparePane : public QWidget
 {
@@ -33,7 +38,7 @@ class ComparePane : public QWidget
         enum mode { season, interval };
         typedef enum mode CompareMode;
 
-        ComparePane(QWidget *parent, CompareMode mode=interval);
+        ComparePane(Context *context, QWidget *parent, CompareMode mode=interval);
 
     protected:
         void dragEnterEvent(QDragEnterEvent*);
@@ -42,12 +47,18 @@ class ComparePane : public QWidget
 
     signals:
 
-    private slots:
+    public slots:
+        void configChanged();
+        void intervalButtonsChanged();
 
     protected:
+        void refreshTable();
 
     private:
-    CompareMode mode_; // remember the mode we were created as...
+        Context *context;
+        CompareMode mode_; // remember the mode we were created as...
+        QTableWidget *table;
+        QScrollArea *scrollArea;
 };
 
 #endif // _GC_ComparePane_h

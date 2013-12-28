@@ -36,7 +36,7 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
     setSidebar(analSidebar);
     setPage(a);
     setBlank(b);
-    setBottom(new ComparePane(this, ComparePane::interval));
+    setBottom(new ComparePane(context, this, ComparePane::interval));
 }
 
 RideNavigator *AnalysisView::rideNavigator()
@@ -124,7 +124,7 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
     setSidebar(s);
     setPage(h);
     setBlank(b);
-    setBottom(new ComparePane(this, ComparePane::season));
+    setBottom(new ComparePane(context, this, ComparePane::season));
 
     connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
