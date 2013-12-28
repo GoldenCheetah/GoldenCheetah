@@ -26,6 +26,8 @@
 #include "Units.h"
 #include "Zones.h"
 
+#include <QCheckBox>
+
 //
 // A selection of distinct colours, user can adjust also
 //
@@ -299,7 +301,7 @@ ComparePane::dropEvent(QDropEvent *event)
     QString fmt = (mode_ == interval) ? "application/x-gc-intervals" : "application/x-gc-seasons";
 
     // get the context out
-    QByteArray rawData = event->encodedData(fmt.toLatin1());
+    QByteArray rawData = event->mimeData()->data(fmt);
     QDataStream stream(&rawData, QIODevice::ReadOnly);
     stream.setVersion(QDataStream::Qt_4_6);
 
