@@ -97,6 +97,10 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     ecp = new ExtendedCriticalPower(context);
     extendedCPCurve4 = NULL;
     extendedCurveTitle2 = NULL;
+
+    extendedCPCurve_P1 = NULL;
+    extendedCPCurve_WPrime = NULL;
+    extendedCPCurve_CP = NULL;
 }
 
 void
@@ -441,11 +445,31 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         delete extendedCurveTitle2;
         extendedCurveTitle2 = NULL;
     }
+    if (extendedCPCurve_P1) {
+        delete extendedCPCurve_P1;
+        extendedCPCurve_P1 = NULL;
+    }
+    if (extendedCPCurve_WPrime) {
+        delete extendedCPCurve_WPrime;
+        extendedCPCurve_WPrime = NULL;
+    }
+    if (extendedCPCurve_CP) {
+        delete extendedCPCurve_CP;
+        extendedCPCurve_CP = NULL;
+    }
+
+
 
     if (useExtendedCP) {
         extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
         extendedCPCurve4->attach(thisPlot);
 
+        /*extendedCPCurve_P1 = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
+        extendedCPCurve_P1->attach(thisPlot);
+        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_4_3_WPrime(athleteModeleCP4);
+        extendedCPCurve_WPrime->attach(thisPlot);
+        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_4_3_CP(athleteModeleCP4);
+        extendedCPCurve_CP->attach(thisPlot);*/
 
         extendedCurveTitle2 = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
         extendedCurveTitle2->setXValue(5);
