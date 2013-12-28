@@ -133,6 +133,7 @@ class CpintPlot : public QwtPlot
         QString path;
         QwtPlotCurve *thisCurve;
         QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4;
+        QwtPlotCurve *extendedCPCurve_CP, *extendedCPCurve_WPrime, *extendedCPCurve_P1;
         QList<QwtPlotCurve*> allCurves;
         QwtPlotCurve *allCurve; // bests but not zoned
         QwtPlotMarker curveTitle;
