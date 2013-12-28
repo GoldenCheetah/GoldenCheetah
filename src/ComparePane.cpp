@@ -28,12 +28,6 @@ ComparePane::ComparePane(QWidget *parent, CompareMode mode) : mode_(mode), QWidg
     pal.setBrush(QPalette::Active, QPalette::Window, Qt::white);
     pal.setBrush(QPalette::Inactive, QPalette::Window, Qt::white);
     setPalette(pal);
-#if 0
-    // just add a label for now
-    QLabel *filler = new QLabel(tr("Drag and drop here..."), this);
-    filler->setPalette(pal);
-    layout->addWidget(filler);
-#endif
 }
 
 
@@ -56,7 +50,11 @@ void
 ComparePane::dropEvent(QDropEvent *event)
 {
     qDebug()<<"compare pane: dropped:"<<event->mimeData()->formats();
-    // XXX event->acceptProposedAction(); // WE DON'T ACCEPT OTHERWISE ITS WIPED FROM SOURCE
+
+    // set action to copy and accept that so the source data
+    // is left intact and not wiped or removed
+    event->setDropAction(Qt::CopyAction);
+    event->accept();
 
     // here we can unpack and add etc...
 }
