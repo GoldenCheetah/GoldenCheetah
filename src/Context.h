@@ -22,6 +22,7 @@
 #include "TimeUtils.h" // for class DateRange
 #include "RealtimeData.h" // for class RealtimeData
 #include "SpecialFields.h" // for class RealtimeData
+#include "CompareInterval.h" // what intervals are being compared?
 
 class RideFile;
 class RideItem;
@@ -69,6 +70,10 @@ class Context : public QObject
         QStringList filters; // searchBox filters
         QStringList homeFilters; // homewindow sidebar filters
 
+        // comparing things
+        bool isCompareIntervals;
+        QList<CompareInterval> compareIntervals;
+
         // *********************************************
         // APPLICATION EVENTS
         // *********************************************
@@ -109,6 +114,9 @@ class Context : public QObject
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
 
+        void notifyCompareIntervals(bool state) { isCompareIntervals = state; emit compareIntervalsStateChanged(state); }
+        void notifyCompareIntervalsChanged() { emit compareIntervalsChanged(); }
+
     signals:
 
         // global filter changed
@@ -141,5 +149,8 @@ class Context : public QObject
         void pause();
         void stop();
 
+        // comparing things
+        void compareIntervalsStateChanged(bool);
+        void compareIntervalsChanged();
 };
 #endif // _GC_Context_h
