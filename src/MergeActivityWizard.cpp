@@ -270,10 +270,12 @@ QVector<DataPoint*>
 MergeSync::getSamplesForRide(RideFile *ride1)
 {
     QVector<DataPoint*> sample;
+    if (!ride1->isDataPresent(RideFile::secs))
+        return sample;
 
     int index = 0;
 
-    double minTime = ride1->getPointValue(0, RideFile::secs);
+    double minTime = ride1->getMinPoint(RideFile::secs).toDouble();
     double maxTime = ride1->getMaxPoint(RideFile::secs).toDouble();
 
     DataPoint *previousPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
