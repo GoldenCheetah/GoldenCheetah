@@ -255,6 +255,8 @@ GcScopeBar::selected()
     if (train->isChecked()) return 2;
 #endif
 
+    // never gets here - shutup compiler
+    return 0;
 }
 
 void

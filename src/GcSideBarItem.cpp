@@ -214,9 +214,9 @@ GcSubSplitter::createHandle()
         GcSplitterItem* _item = dynamic_cast<GcSplitterItem*>(_insertedWidget);
         if(_item != 0) {
             _item->splitterHandle = new GcSplitterHandle(_item->title, orientation(), this, !plainstyle);
-            _item->splitterHandle->addActions(_item->actions());
 
             if (!plainstyle) {
+                _item->splitterHandle->addActions(_item->actions());
                 _item->controlAction = new QAction(_item->icon, _item->title, this);
                 _item->controlAction->setStatusTip(_item->title);
                 control->addAction(_item->controlAction);
@@ -233,6 +233,23 @@ GcSubSplitter::createHandle()
 
 GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent, bool metal) : QSplitterHandle(orientation, parent), _title(title), metal(metal)
 {
+    
+    init(title, orientation, NULL, NULL, NULL, parent, metal);
+}
+
+GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, 
+                QWidget *left, QWidget *mid, QWidget *right,
+                QSplitter *parent, bool metal) : QSplitterHandle(orientation, parent), _title(title), metal(metal)
+{
+    init(title, orientation, left, mid, right, parent, metal);
+}
+
+void
+GcSplitterHandle::init(QString title, Qt::Orientation orientation, 
+                QWidget *left, QWidget *mid, QWidget *right, QSplitter *parent, bool metal) 
+{
+    Q_UNUSED(orientation);
+
     setContentsMargins(0,0,0,0);
     if (metal)
         setFixedHeight(23);
@@ -297,8 +314,15 @@ GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, Q
 
     titleLayout->addSpacing(10);
     titleLayout->addWidget(titleLabel);
+
+    // widgets
+    if (left) titleLayout->addWidget(left);
     titleLayout->addStretch();
 
+    if (mid) titleLayout->addWidget(mid);
+    titleLayout->addStretch();
+
+    if (right) titleLayout->addWidget(right);
     setCursor(Qt::ArrowCursor);
 }
 
