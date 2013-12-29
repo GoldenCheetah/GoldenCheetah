@@ -140,14 +140,23 @@ public:
         QSplitter(orientation, parent), orientation(orientation), name(name), tabView(parent), showForDrag(false) {
         setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
+
     }
 
 protected:
     QSplitterHandle *createHandle() {
-        return new GcSplitterHandle(name, orientation, this);
+        return new GcSplitterHandle(name, orientation, NULL, NULL, newtoggle(), this);
     }
     int handleWidth() { return 23; };
 
+    QPushButton *newtoggle() {
+        toggle = new QPushButton("OFF", this);
+        toggle->setCheckable(true);
+        toggle->setChecked(false);
+        connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
+
+        return toggle;
+    }
     virtual void dragEnterEvent(QDragEnterEvent *event) {
 
         // we handle intervals or seasons
@@ -202,11 +211,17 @@ public:
         return tot - 1;
     }
 
+public slots:
+    void toggled() {
+        if (toggle->isChecked()) toggle->setText("ON");
+        else toggle->setText("OFF");
+    }
 private:
     Qt::Orientation orientation;
     QString name;
     TabView *tabView;
     bool showForDrag;
+    QPushButton *toggle;
 };
 
 #endif // _GC_TabView_h
