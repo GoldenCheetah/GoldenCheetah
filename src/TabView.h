@@ -137,8 +137,7 @@ class ViewSplitter : public QSplitter
 
 public:
     ViewSplitter(Qt::Orientation orientation, QString name, TabView *parent=0) :
-        orientation(orientation), name(name), tabView(parent), showForDrag(false),
-        QSplitter(orientation, parent) {
+        QSplitter(orientation, parent), orientation(orientation), name(name), tabView(parent), showForDrag(false) {
         setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
     }
@@ -163,7 +162,7 @@ protected:
         }
     }
 
-    virtual void dragLeaveEvent(QDragLeaveEvent *event) {
+    virtual void dragLeaveEvent(QDragLeaveEvent *) {
 
         int X = this->mapFromGlobal(QCursor::pos()).x();
         int Y = this->mapFromGlobal(QCursor::pos()).y();

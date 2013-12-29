@@ -408,11 +408,15 @@ SeasonTreeView::dropEvent(QDropEvent* event)
     int idx1 = invisibleRootItem()->indexOfChild(item);
     int idx2 = indexAt(event->pos()).row();
 
-    // finalise drop event
-    QTreeWidget::dropEvent(event);
+    // don't move temp 'system generated' date ranges!
+    if (context->athlete->seasons->seasons[idx1].type != Season::temporary) {
 
-    // emit the itemMoved signal
-    Q_EMIT itemMoved(item, idx1, idx2);
+        // finalise drop event
+        QTreeWidget::dropEvent(event);
+
+        // emit the itemMoved signal
+        Q_EMIT itemMoved(item, idx1, idx2);
+    }
 }
 
 QStringList 
