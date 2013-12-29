@@ -314,12 +314,12 @@ ComparePane::refreshTable()
             QCheckBox *check = new QCheckBox(this);
             check->setChecked(x.checked);
             table->setCellWidget(counter, 0, check);
-            connect(check, SIGNAL(stateChanged(int)), this, SLOT(intervalButtonsChanged()));
+            connect(check, SIGNAL(stateChanged(int)), this, SLOT(daterangeButtonsChanged()));
 
             // Color Button
             ColorButton *colorButton = new ColorButton(this, "Color", x.color);
             table->setCellWidget(counter, 1, colorButton);
-            connect(colorButton, SIGNAL(colorChosen(QColor)), this, SLOT(intervalButtonsChanged()));
+            connect(colorButton, SIGNAL(colorChosen(QColor)), this, SLOT(daterangeButtonsChanged()));
 
             // athlete
             QTableWidgetItem *t = new QTableWidgetItem;
@@ -401,6 +401,27 @@ ComparePane::intervalButtonsChanged()
         }
     }
     if (changed) context->notifyCompareIntervalsChanged();
+}
+
+void
+ComparePane::daterangeButtonsChanged()
+{
+    // run through the table and see if anything changed
+    bool changed = false;
+    for (int i=0; i<table->rowCount(); i++) {
+
+        bool isChecked = static_cast<QCheckBox*>(table->cellWidget(i,0))->isChecked();
+        QColor color =  static_cast<ColorButton*>(table->cellWidget(i,1))->getColor();
+
+        if (context->compareDateRanges[i].checked != isChecked ||
+            context->compareDateRanges[i].color != color) {
+
+            context->compareDateRanges[i].checked = isChecked;
+            context->compareDateRanges[i].color = color;
+            changed = true;
+        }
+    }
+    if (changed) context->notifyCompareDateRangesChanged();
 }
 
 void 
