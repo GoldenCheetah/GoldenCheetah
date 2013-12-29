@@ -231,6 +231,17 @@ MainWindow::MainWindow(const QDir &home)
      *  Mac Toolbar
      *--------------------------------------------------------------------*/
 #ifdef Q_OS_MAC 
+#if QT_VERSION > 0x50000
+    head = addToolBar(context->athlete->cyclist);
+    head->setContentsMargins(20,0,20,0);
+    head->setFloatable(false);
+    head->setMovable(false);
+
+    // widgets
+    QWidget *macAnalButtons = new QWidget(this);
+    macAnalButtons->setContentsMargins(20,5,20,0);
+
+#else
     setUnifiedTitleAndToolBarOnMac(true);
     head = addToolBar(context->athlete->cyclist);
     head->setContentsMargins(0,0,0,0);
@@ -238,6 +249,8 @@ MainWindow::MainWindow(const QDir &home)
     // widgets
     QWidget *macAnalButtons = new QWidget(this);
     macAnalButtons->setContentsMargins(0,0,20,0);
+
+#endif
 
     // lhs buttons
     QHBoxLayout *lb = new QHBoxLayout(macAnalButtons);
