@@ -340,7 +340,11 @@ MainWindow::MainWindow(const QDir &home)
 
 #ifdef GC_HAVE_LUCENE
     searchBox = new SearchFilterBox(this,context,false);
+#if QT_VERSION > 0x50000
     QStyle *toolStyle = QStyleFactory::create("fusion");
+#else
+    QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
+#endif
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(200);
     head->addWidget(searchBox);
@@ -357,7 +361,11 @@ MainWindow::MainWindow(const QDir &home)
 
     head = new GcToolBar(this);
 
+#if QT_VERSION > 0x50000
     QStyle *toolStyle = QStyleFactory::create("fusion");
+#else
+    QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
+#endif
     QPalette metal;
     metal.setColor(QPalette::Button, QColor(215,215,215));
 
