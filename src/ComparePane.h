@@ -50,6 +50,7 @@ class ComparePane : public QWidget
     public slots:
         void configChanged();
         void intervalButtonsChanged();
+        void daterangeButtonsChanged();
 
     protected:
         void refreshTable();
