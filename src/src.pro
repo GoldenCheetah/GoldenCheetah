@@ -277,6 +277,7 @@ HEADERS += \
         Colors.h \
         ColorButton.h \
         CommPort.h \
+        CompareDateRange.h \
         CompareInterval.h \
         ComparePane.h \
         Computrainer.h \
@@ -468,6 +469,7 @@ SOURCES += \
         Colors.cpp \
         ColorButton.cpp \
         CommPort.cpp \
+        CompareDateRange.cpp \
         CompareInterval.cpp \
         ComparePane.cpp \
         Computrainer.cpp \

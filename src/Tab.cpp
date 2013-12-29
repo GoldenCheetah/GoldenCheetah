@@ -105,7 +105,7 @@ Tab::~Tab()
 
 RideNavigator *Tab::rideNavigator()
 {
-    analysisView->rideNavigator();
+    return analysisView->rideNavigator();
 }
 
 void

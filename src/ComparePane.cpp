@@ -21,6 +21,7 @@
 #include "RideFile.h"
 #include "RideMetric.h"
 #include "SummaryMetrics.h"
+#include "MetricAggregator.h"
 #include "ColorButton.h"
 #include "TimeUtils.h"
 #include "Units.h"
@@ -46,10 +47,12 @@ static bool initStandardColors()
     standardColors << QColor(Qt::darkGreen);
     standardColors << QColor(Qt::darkBlue);
     standardColors << QColor(Qt::darkMagenta);
+
+    return true;
 }
 static bool init = initStandardColors();
 
-ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : context(context), mode_(mode), QWidget(parent)
+ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : QWidget(parent), context(context), mode_(mode)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
@@ -152,7 +155,9 @@ ComparePane::refreshTable()
 
             // compute the metrics for this ride
             SummaryMetrics metrics;
-            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, x.data, context->athlete->zones(), context->athlete->hrZones(), worklist);
+            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, x.data,
+                                                     context->athlete->zones(), context->athlete->hrZones(), worklist);
+
             for(int i = 0; i < worklist.count(); ++i) {
                 if (worklist[i] != "") {
                     RideMetricPtr m = computed.value(worklist[i]);
@@ -248,7 +253,132 @@ ComparePane::refreshTable()
 
     } else { //SEASONS
 
-        //XXX seasons not written yet
+        // STEP ONE : SET THE TABLE HEADINGS
+
+        // clear current contents
+        table->clear();
+        table->setRowCount(0);
+
+        // metric summary
+        QStringList always;
+        always << "workout_time" << "total_distance";
+        QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+        QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
+
+        // called after config is updated typically
+        QStringList list;
+        list << "" // checkbox
+            << "" // color
+            << "Athlete"
+            << "From"
+            << "To";
+
+        QStringList worklist; // metrics to compute
+        RideMetricFactory &factory = RideMetricFactory::instance();
+
+        foreach(QString metric, metricColumns) {
+
+            // get the metric name
+            const RideMetric *m = factory.rideMetric(metric);
+            if (m) {
+                worklist << metric;
+                QString units;
+                if (m->units(context->athlete->useMetricUnits) != "seconds") units = m->units(context->athlete->useMetricUnits);
+                if (units != "") list << QString("%1 (%2)").arg(m->name()).arg(units);
+                else list << QString("%1").arg(m->name());
+            }
+        }
+
+        list << "Date Range";
+
+        table->setColumnCount(list.count());
+        table->setHorizontalHeaderLabels(list);
+        table->setSortingEnabled(true);
+        table->verticalHeader()->hide();
+        table->setShowGrid(false);
+        table->setSelectionMode(QAbstractItemView::MultiSelection);
+        table->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+        // STEP TWO : CLEAR AND RE-ADD TO REFLECT CHANGES
+
+        table->setRowCount(context->compareDateRanges.count());
+        int counter = 0;
+        foreach(CompareDateRange x, context->compareDateRanges) {
+
+            // First few cols always the same
+            // check - color - athlete - date - time
+            // now create a row on the compare pane
+
+            // Checkbox
+            QCheckBox *check = new QCheckBox(this);
+            check->setChecked(x.checked);
+            table->setCellWidget(counter, 0, check);
+            connect(check, SIGNAL(stateChanged(int)), this, SLOT(intervalButtonsChanged()));
+
+            // Color Button
+            ColorButton *colorButton = new ColorButton(this, "Color", x.color);
+            table->setCellWidget(counter, 1, colorButton);
+            connect(colorButton, SIGNAL(colorChosen(QColor)), this, SLOT(intervalButtonsChanged()));
+
+            // athlete
+            QTableWidgetItem *t = new QTableWidgetItem;
+            t->setText(x.sourceContext->athlete->cyclist);
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, 2, t);
+
+            // date from
+            t = new QTableWidgetItem;
+            t->setText(x.start.toString("dd MMM, yyyy"));
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, 3, t);
+
+            // date to
+            t = new QTableWidgetItem;
+            t->setText(x.end.toString("dd MMM, yyyy"));
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, 4, t);
+
+            // metrics
+            for(int i = 0; i < worklist.count(); ++i) {
+
+                QString value = SummaryMetrics::getAggregated(x.sourceContext, worklist[i], 
+                                                              x.metrics, QStringList(), false, context->athlete->useMetricUnits);
+
+                // add to the table
+                t = new QTableWidgetItem;
+                t->setText(value);
+                t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+                table->setItem(counter, i + 5, t);
+            }
+
+            // Date Range name
+            t = new QTableWidgetItem;
+            t->setText(x.name);
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, worklist.count() + 5, t);
+
+            // align center
+            for (int i=3; i<(worklist.count()+5); i++)
+                table->item(counter,i)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+
+            table->setRowHeight(counter, 23);
+            counter++;
+        }
+
+        table->resizeColumnsToContents(); // set columns to fit
+#if QT_VERSION > 0x050000 // fix the first two if we can
+        for (int i=0; i<list.count(); i++) {
+            if (i < 2) {
+                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
+            } else {
+                table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
+            }
+        }
+#else
+        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+#endif
+        table->horizontalHeader()->setStretchLastSection(true);
     }
 }
 
@@ -283,7 +413,7 @@ ComparePane::dragEnterEvent(QDragEnterEvent *event)
 }
 
 void 
-ComparePane::dragLeaveEvent(QDragLeaveEvent *event)
+ComparePane::dragLeaveEvent(QDragLeaveEvent *)
 {
     // we might consider hiding on this?
 }
@@ -348,7 +478,7 @@ ComparePane::dropEvent(QDropEvent *event)
 
             // construct a ridefile for the interval
 
-            //XXX RideFile *data;
+            // RideFile *data;
             add.data = new RideFile(ride->startTime(), ride->recIntSecs());
             add.data->context = context;
 
@@ -404,7 +534,51 @@ ComparePane::dropEvent(QDropEvent *event)
 
     } else { // SEASONS
 
-        //XXX not written yet!
+        int count;
+
+        QList<CompareDateRange> newOnes;
+
+        // lets get the basic data
+        stream >> count;
+        for (int i=0; i<count; i++) {
+
+            CompareDateRange add;
+
+            add.checked = true;                     // UPDATE COMPARE INTERVAL
+            add.context = context;                  // UPDATE COMPARE INTERVAL
+            add.sourceContext = sourceContext;      // UPDATE COMPARE INTERVAL
+
+            stream >> add.name;
+            stream >> add.start;
+            stream >> add.end;
+            stream >> add.days;
+
+            // get summary metrics for the season
+            // FROM THE SOURCE CONTEXT
+            // WE DON'T FETCH BESTS -- THEY NEED TO BE DONE AS NEEDED
+            add.metrics = sourceContext->athlete->metricDB->getAllMetricsFor(QDateTime(add.start, QTime()),QDateTime(add.end, QTime()));
+            add.measures = sourceContext->athlete->metricDB->getAllMeasuresFor(QDateTime(add.start, QTime()),QDateTime(add.end, QTime()));
+
+            // just use standard colors and cycle round
+            // we will of course repeat, but the user can
+            // just edit them using the button
+            add.color = standardColors.at((i + context->compareDateRanges.count()) % standardColors.count());
+
+            // even empty date ranges are valid
+            newOnes << add;
+
+        }
+        // how many we get ?
+        if (newOnes.count()) {
+
+            context->compareDateRanges.append(newOnes);
+
+            // refresh the table to reflect the new list
+            refreshTable();
+
+            // let all the charts know
+            context->notifyCompareDateRangesChanged();
+        }
 
     }
 }
