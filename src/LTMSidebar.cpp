@@ -271,11 +271,8 @@ LTMSidebar::resetSeasons()
         if (season.id().toString()==id)
             add->setSelected(true);
 
-        // No Drag/Drop for temporary  Season
-        if (season.getType() == Season::temporary)
-            add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        else
-            add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
+        // Drag and Drop is FINE for temporary seasons -- IT IS JUST A DATE RANGE!
+        add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         add->setText(0, season.getName());
     }
 
