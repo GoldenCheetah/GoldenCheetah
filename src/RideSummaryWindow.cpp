@@ -173,11 +173,13 @@ RideSummaryWindow::refresh()
 {
     if (!amVisible()) return; // only if you can see me!
 
-    if (isCompare()) {
+    if (isCompare()) { // COMPARE MODE
 
         setSubTitle(tr("Compare")); // fallback to this
+
         if (ridesummary) {
 
+            // comparing intervals
             if (context->compareIntervals.count() == 2) {
 
                 setSubTitle(QString("%2 on %1  vs  %4 on %3")
@@ -193,11 +195,23 @@ RideSummaryWindow::refresh()
             }
         } else {
 
-            // summary of seasons
+            // comparing seasons
+            if (context->compareDateRanges.count() == 2) {
+
+                setSubTitle(QString("%1  vs  %2")
+                            .arg(context->compareDateRanges.at(0).name)
+                            .arg(context->compareDateRanges.at(1).name));
+
+            } else if (context->compareDateRanges.count() > 2) {
+                setSubTitle(QString("%1  vs  %2 others")
+                            .arg(context->compareDateRanges.at(0).name)
+                            .arg(context->compareDateRanges.count()-1));
+            }
         }
         rideSummary->page()->mainFrame()->setHtml(htmlCompareSummary());
 
-    } else {
+    } else { // NOT COMPARE MODE - NORMAL MODE
+
         // if we're summarising a ride but have no ride to summarise
         if (ridesummary && !myRideItem) {
             setSubTitle(tr("Summary"));
@@ -850,14 +864,12 @@ RideSummaryWindow::htmlCompareSummary() const
 
     // All the metrics we will display -- same as non compare mode FOR NOW
     static const QStringList columnNames = QStringList() << tr("Totals") << tr("Averages") << tr("Maximums") << tr("Metrics*");
-    static QStringList totalColumn = QStringList()
+    static const QStringList totalColumn = QStringList()
         << "workout_time"
         << "time_riding"
         << "total_distance"
         << "total_work"
         << "elevation_gain";
-
-    if (!ridesummary) totalColumn << "ride_count"; // number of rides
 
     static const QStringList rtotalColumn = QStringList()
         << "workout_time"
@@ -1227,7 +1239,10 @@ RideSummaryWindow::htmlCompareSummary() const
                          // we want the metrics towards the top of the screen as they
                          // are more important than the maximums (generally anyway)
 
-                case 0: metricsList = totalColumn; columnName = columnNames[0]; break;
+                case 0: metricsList = totalColumn;
+                        columnName = columnNames[0]; 
+                        metricsList << "ride_count"; // number of rides
+                        break;
                 case 1: metricsList = metricColumn; columnName = columnNames[3]; break;
                 case 2: metricsList = averageColumn; columnName = columnNames[1]; break;
                 default: 
