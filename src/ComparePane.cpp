@@ -52,6 +52,55 @@ static bool initStandardColors()
 }
 static bool init = initStandardColors();
 
+// we need to fix the sort order!
+class CTableWidgetItem : public QTableWidgetItem
+{
+    public:
+        CTableWidgetItem(int type = Type) : QTableWidgetItem(type) {}
+        ~CTableWidgetItem() {}
+
+        bool operator<(const QTableWidgetItem&other) const // for sorting our way
+        { 
+            switch(column()) {
+
+                case 2 : return text() < other.text(); // athlete
+                case 3 : return QDate::fromString(text(), "dd, MMM yyyy") <
+                                QDate::fromString(other.text(), "dd, MMM yyyy"); // date
+                case 4 : // date or time depending on which view
+                         if (text().contains(":")) {
+
+                             return QTime::fromString(text(), "hh:mm:ss") <
+                                    QTime::fromString(other.text(), "hh:mm:ss");
+
+                         } else {
+
+                            return QDate::fromString(text(), "dd, MMM yyyy") <
+                                   QDate::fromString(other.text(), "dd, MMM yyyy"); // date
+
+                         }
+                case 5 : return QTime::fromString(text(), "hh:mm") < // Duration
+                                QTime::fromString(other.text(), "hh:mm");
+
+                default: // work it out ..
+                         if (text().contains(":")) { // time
+
+                             return QTime::fromString(text()) <
+                                    QTime::fromString(other.text());
+
+                         } else if (text().contains(QRegExp("[^0-9.,]")) ||
+                                    other.text().contains(QRegExp("[^0-9.,]"))) { // alpha
+
+                            return text() < other.text();
+
+                         } else { // assume numeric
+
+                            return text().toDouble() < other.text().toDouble();
+                        }
+                        break;
+                }
+        }
+};
+
 ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : QWidget(parent), context(context), mode_(mode)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -81,6 +130,7 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
 #endif
     table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    table->setAcceptDrops(false);
     scrollArea->setWidget(table);
 
     configChanged(); // set up ready to go...
@@ -185,19 +235,19 @@ ComparePane::refreshTable()
             connect(colorButton, SIGNAL(colorChosen(QColor)), this, SLOT(intervalButtonsChanged()));
 
             // athlete
-            QTableWidgetItem *t = new QTableWidgetItem;
+            CTableWidgetItem *t = new CTableWidgetItem;
             t->setText(x.sourceContext->athlete->cyclist);
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 2, t);
 
             // date
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(x.data->startTime().date().toString("dd MMM, yyyy"));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 3, t);
 
             // time
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(x.data->startTime().time().toString("hh:mm:ss"));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 4, t);
@@ -220,20 +270,20 @@ ComparePane::refreshTable()
                     strValue = time_to_string(value);
 
                 // add to the table
-                t = new QTableWidgetItem;
+                t = new CTableWidgetItem;
                 t->setText(strValue);
                 t->setFlags(t->flags() & (~Qt::ItemIsEditable));
                 table->setItem(counter, i + 5, t);
             }
 
             // Interval name
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(x.name);
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, worklist.count() + 5, t);
 
             // INDEX
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(QString("%1").arg(counter));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, worklist.count() + 6, t);
@@ -333,19 +383,19 @@ ComparePane::refreshTable()
             connect(colorButton, SIGNAL(colorChosen(QColor)), this, SLOT(daterangeButtonsChanged()));
 
             // athlete
-            QTableWidgetItem *t = new QTableWidgetItem;
+            CTableWidgetItem *t = new CTableWidgetItem;
             t->setText(x.sourceContext->athlete->cyclist);
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 2, t);
 
             // date from
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(x.start.toString("dd MMM, yyyy"));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 3, t);
 
             // date to
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(x.end.toString("dd MMM, yyyy"));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 4, t);
@@ -357,20 +407,20 @@ ComparePane::refreshTable()
                                                               x.metrics, QStringList(), false, context->athlete->useMetricUnits);
 
                 // add to the table
-                t = new QTableWidgetItem;
+                t = new CTableWidgetItem;
                 t->setText(value);
                 t->setFlags(t->flags() & (~Qt::ItemIsEditable));
                 table->setItem(counter, i + 5, t);
             }
 
             // Date Range name
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(x.name);
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, worklist.count() + 5, t);
 
             // INDEX
-            t = new QTableWidgetItem;
+            t = new CTableWidgetItem;
             t->setText(QString("%1").arg(counter));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, worklist.count() + 6, t);
