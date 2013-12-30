@@ -182,16 +182,22 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // model config
     // 2 or 3 point model ?
     modelCombo= new QComboBox(this);
+    modelCombo->addItem("None");
     modelCombo->addItem("2 parameter");
     modelCombo->addItem("3 parameter");
     modelCombo->addItem("ExtendedCP");
-    modelCombo->setCurrentIndex(0);
+    modelCombo->setCurrentIndex(1);
 
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
     cl->addRow(new QLabel(tr(" ")));
-    cl->addRow(new QLabel(tr("Search Interval")), new QLabel(tr("(seconds)")));
+
+    intervalLabel = new QLabel(tr("Search Interval"));
+    secondsLabel = new QLabel(tr("(seconds)"));
+    cl->addRow(intervalLabel, secondsLabel);
+
+    anLabel = new QLabel(tr("Anaerobic"));
 
     anI1SpinBox = new QDoubleSpinBox(this);
     anI1SpinBox->setDecimals(0);
@@ -212,7 +218,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *anLayout = new QHBoxLayout;
     anLayout->addWidget(anI1SpinBox);
     anLayout->addWidget(anI2SpinBox);
-    cl->addRow(new QLabel(tr("Anaerobic")), anLayout);
+    cl->addRow(anLabel, anLayout);
+
+    aeLabel = new QLabel(tr("Aerobic"));
 
     aeI1SpinBox = new QDoubleSpinBox(this);
     aeI1SpinBox->setDecimals(0);
@@ -233,7 +241,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
     aeLayout->addWidget(aeI2SpinBox);
-    cl->addRow(new QLabel(tr("Aerobic")), aeLayout);
+    cl->addRow(aeLabel, aeLayout);
 
     sanI1SpinBox = new QDoubleSpinBox(this);
     sanI1SpinBox->setDecimals(0);
@@ -293,11 +301,19 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
+
+        // Compare
+        connect(context, SIGNAL(compareDateRangesStateChanged(bool)), SLOT(forceReplot()));
+        connect(context, SIGNAL(compareDateRangesChanged()), SLOT(forceReplot()));
     } else {
         // when working on a ride we can selecct intervals!
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
+
+        // Compare
+        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), SLOT(forceReplot()));
+        connect(context, SIGNAL(compareIntervalsChanged()), SLOT(forceReplot()));
     }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
@@ -355,45 +371,89 @@ CriticalPowerWindow::modelChanged()
     active = true;
     switch (modelCombo->currentIndex()) {
 
-    case 0 : // 2 param model
+    case 0 : // None
 
+            intervalLabel->hide();
+            secondsLabel->hide();
             sanLabel->hide();
             sanI1SpinBox->hide();
             sanI2SpinBox->hide();
+            anLabel->hide();
+            anI1SpinBox->hide();
+            anI2SpinBox->hide();
+            aeLabel->hide();
+            aeI1SpinBox->hide();
+            aeI2SpinBox->hide();
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
 
+            // No default values !
+
+            break;
+
+    case 1 : // 2 param model
+
+            intervalLabel->show();
+            secondsLabel->show();
+            anLabel->show();
+            sanLabel->hide();
+            sanI1SpinBox->hide();
+            sanI2SpinBox->hide();
+            anLabel->show();
+            anI1SpinBox->show();
+            anI2SpinBox->show();
+            aeLabel->show();
+            aeI1SpinBox->show();
+            aeI2SpinBox->show();
+            laeLabel->hide();
+            laeI1SpinBox->hide();
+            laeI2SpinBox->hide();
+
+            // Default values
             anI1SpinBox->setValue(180);
             anI2SpinBox->setValue(360);
             aeI1SpinBox->setValue(1800);
             aeI2SpinBox->setValue(3600);
+
             break;
 
-    case 1 : // 3 param model
+    case 2 : // 3 param model
 
+            intervalLabel->show();
+            secondsLabel->show();
             sanLabel->hide();
             sanI1SpinBox->hide();
             sanI2SpinBox->hide();
+            anLabel->show();
+            anI1SpinBox->show();
+            anI2SpinBox->show();
+            aeLabel->show();
+            aeI1SpinBox->show();
+            aeI2SpinBox->show();
             laeLabel->hide();
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
 
+            // Default values
             anI1SpinBox->setValue(1800);
             anI2SpinBox->setValue(2400);
             aeI1SpinBox->setValue(2400);
             aeI2SpinBox->setValue(3600);
+
             break;
 
-    case 2 : // ExtendedCP
+    case 3 : // ExtendedCP
 
             sanLabel->show();
+            secondsLabel->show();
             sanI1SpinBox->show();
             sanI2SpinBox->show();
             laeLabel->show();
             laeI1SpinBox->show();
             laeI2SpinBox->show();
 
+            // Default values
             sanI1SpinBox->setValue(20);
             sanI2SpinBox->setValue(90);
             anI1SpinBox->setValue(120);
@@ -402,6 +462,7 @@ CriticalPowerWindow::modelChanged()
             aeI2SpinBox->setValue(3000);
             laeI1SpinBox->setValue(4000);
             laeI2SpinBox->setValue(30000);
+
             break;
     }
     active = false;
@@ -424,8 +485,7 @@ CriticalPowerWindow::modelParametersChanged()
                         aeI2SpinBox->value(),
                         laeI1SpinBox->value(),
                         laeI2SpinBox->value(),
-                        modelCombo->currentIndex() == 1 ? true : false,
-                        modelCombo->currentIndex() == 2 ? true : false);
+                        modelCombo->currentIndex());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {

@@ -216,7 +216,10 @@ class CriticalPowerWindow : public GcChartWindow
 #endif
         QList<QwtPlotCurve*> intervalCurves;
 
+        QLabel *intervalLabel, *secondsLabel;
         QLabel *sanLabel;
+        QLabel *anLabel;
+        QLabel *aeLabel;
         QLabel *laeLabel;
 
         QDoubleSpinBox *sanI1SpinBox, *sanI2SpinBox;

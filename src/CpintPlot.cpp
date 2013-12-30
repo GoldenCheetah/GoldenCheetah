@@ -329,7 +329,7 @@ CpintPlot::deriveCPParameters()
         }
 
         // update t0 if we're using that model
-        if (useT0) 
+        if (model == 2)
             t0 = tau / (bests->meanMaxArray(series)[1] / cp - 1) - 1 / 60.0;
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) ||
@@ -354,9 +354,13 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (cp <= 0)
         return;
 
+    // if no model, then there's nothing to do
+    if (model == 0)
+        return;
+
     // populate curve data with a CP curve
     const int curve_points = 100;
-    double tmin = useT0 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
+    double tmin = model == 2 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
     double tmax = 180.0;
     QVector<double> cp_curve_power(curve_points);
     QVector<double> cp_curve_time(curve_points);
@@ -375,7 +379,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     // generate a plot
     QString curve_title;
 #if 0 //XXX ?
-    if (useT0) {
+    if (model == 2) {
 
         curve_title.sprintf("CP=%.1f w; W'/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
 
@@ -460,7 +464,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
 
 
-    if (useExtendedCP) {
+    if (model == 3) {
         extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
         extendedCPCurve4->attach(thisPlot);
 
@@ -505,7 +509,9 @@ CpintPlot::clear_CP_Curves()
 void
 CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                          int n_values,
-                         const double *power_values)
+                         const double *power_values,
+                         QColor plotColor,
+                         bool forcePlotColor)
 {
     //clear_CP_Curves();
 
@@ -555,6 +561,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(color.darker(200));
+            if (forcePlotColor) // not default
+               pen.setColor(plotColor);
             pen.setWidth(2.0);
             curve->setPen(pen);
             curve->attach(thisPlot);
@@ -610,7 +618,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         QwtPlotCurve *curve = new QwtPlotCurve(tr("maximal power"));
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen pen(GColor(CCP));
+        QPen pen((plotColor));
         pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
         curve->setPen(pen);
         QColor brush_color = GColor(CCP);
@@ -654,6 +662,11 @@ void
 CpintPlot::calculate(RideItem *rideItem)
 {
     clear_CP_Curves();
+
+    // Compare Mode
+    if (context->isCompareDateRanges)
+        return calculateForDateRanges(context->compareDateRanges);
+
     if (!rideItem) return;
 
     QString fileName = rideItem->fileName;
@@ -678,7 +691,7 @@ CpintPlot::calculate(RideItem *rideItem)
             cp  = tau = t0  = 0;
             deriveCPParameters();
 
-            if (useExtendedCP) {
+            if (model == 3) {
                 // calculate extended CP model from all-time best data
                 //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
                 athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
@@ -700,7 +713,7 @@ CpintPlot::calculate(RideItem *rideItem)
                 CPCurve->setPen(pen);
             }
 
-            if (useExtendedCP && CPCurve) CPCurve->setVisible(false);
+            if (model == 3 && CPCurve) CPCurve->setVisible(false);
             else if (CPCurve) CPCurve->setVisible(true);
         }
 
@@ -712,7 +725,7 @@ CpintPlot::calculate(RideItem *rideItem)
             for (int i = 0; i < bests->meanMaxArray(series).size(); ++i) {
                 if (bests->meanMaxArray(series)[i] > 0) maxNonZero = i;
             }
-            plot_allCurve(this, maxNonZero, bests->meanMaxArray(series).constData() + 1);
+            plot_allCurve(this, maxNonZero, bests->meanMaxArray(series).constData() + 1, GColor(CCP), false);
         }
     } else {
 
@@ -878,6 +891,9 @@ CpintPlot::calculate(RideItem *rideItem)
     }
 
     refreshReferenceLines(rideItem);
+
+    if (context->isCompareIntervals)
+        return calculateForIntervals(context->compareIntervals);
     replot();
 }
 
@@ -947,7 +963,7 @@ CpintPlot::setShadeMode(int x)
 
 // model parameters!
 void 
-CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, bool useT0, bool useExtendedCP)
+CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model)
 {
     this->anI1 = double(anI1) / double(60.00f);
     this->anI2 = double(anI2) / double(60.00f);
@@ -959,8 +975,7 @@ CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2
     this->laeI1 = double(laeI1) / double(60.00f);
     this->laeI2 = double(laeI2) / double(60.00f);
 
-    this->useT0 = useT0;
-    this->useExtendedCP = useExtendedCP;
+    this->model = model;
 
     // wipe away previous effort
     if (CPCurve) {
@@ -1268,4 +1283,118 @@ CpintPlot::calculateCentile(RideItem *rideItem)
 
     qDebug() << "end plotting " << elapsed.elapsed();
 
+}
+
+void
+CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
+{
+    clear_CP_Curves();
+    // If no range
+    if (compareDateRanges.count() == 0) return;
+
+    int shadeModeOri = shadeMode;
+    int modelOri = model;
+
+    double ymax = 0;
+    QList<RideFileCache> bests;
+
+    model = 0; // no model in compareDateRanges
+
+    // prepare aggregates
+    for (int i = 0; i < compareDateRanges.size(); ++i) {
+        CompareDateRange range = compareDateRanges.at(i);
+        if (range.isChecked())  {
+            RideFileCache bestsForRange(context, range.start, range.end, isFiltered, files, rangemode);
+            bests.append(bestsForRange);
+
+            if (bestsForRange.meanMaxArray(series).size()) {
+                int maxNonZero = 0;
+                for (int i = 0; i < bestsForRange.meanMaxArray(series).size(); ++i) {
+                    if (bestsForRange.meanMaxArray(series)[i] > 0) maxNonZero = i;
+                }
+                if (i>0)
+                    shadeMode = 0;
+                plot_allCurve(this, maxNonZero, bestsForRange.meanMaxArray(series).constData() + 1, range.color, true);
+
+                foreach(double v, bestsForRange.meanMaxArray(series)) {
+                    if (v > ymax) ymax = v;
+                }
+            }
+        }
+    }
+    setAxisScale(yLeft, 0, 1.1*ymax);
+    shadeMode = shadeModeOri;
+    model = modelOri;
+
+    replot();
+}
+
+void
+CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
+{
+    // unselect current intervals
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        context->athlete->allIntervalItems()->child(i)->setSelected(false);
+    }
+
+    // Remove curve from current Ride
+    if (thisCurve) {
+        delete thisCurve;
+        thisCurve = NULL;
+    }
+
+
+    // If no intervals
+    if (compareIntervals.count() == 0) return;
+
+    // prepare aggregates
+    for (int i = 0; i < compareIntervals.size(); ++i) {
+        CompareInterval interval = compareIntervals.at(i);
+
+        if (interval.isChecked())  {
+            // compute the mean max
+            QVector<float>vector;
+            MeanMaxComputer thread1(interval.data, vector, series); thread1.run();
+            thread1.wait();
+
+            // no data!
+            if (vector.count() == 0) return;
+
+            // create curve data arrays
+            plot_interval(this, vector, interval.color);
+        }
+    }
+
+    replot();
+}
+
+void
+CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor intervalColor)
+{
+    int i=0;
+    QVector<double>x;
+    QVector<double>y;
+    x.resize(vector.size());
+    y.resize(vector.size());
+    foreach(float yv, vector) { x << i / 60.00; y << yv; i++; }
+
+    // create a curve!
+    QwtPlotCurve *curve = new QwtPlotCurve();
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    // set its color - based upon index in intervals!
+    QPen pen(intervalColor);
+    pen.setWidth(2.0);
+    pen.setStyle(Qt::DotLine);
+    intervalColor.setAlpha(64);
+    QBrush brush = QBrush(intervalColor);
+    curve->setBrush(brush);
+    curve->setPen(pen);
+    curve->setSamples(x.data(), y.data(), x.count()-1);
+
+    // attach and register
+    curve->attach(thisPlot);
+
+    allCurves.append(curve);
 }
