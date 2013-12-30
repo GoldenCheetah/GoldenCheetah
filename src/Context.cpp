@@ -25,7 +25,7 @@ Context::Context(MainWindow *mainWindow)
     ride = NULL;
     workout = NULL;
     isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = true;
+    isCompareIntervals = isCompareDateRanges = false;
 }
 
 const RideFile *

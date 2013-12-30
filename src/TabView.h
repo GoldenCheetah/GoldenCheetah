@@ -71,6 +71,8 @@ class TabView : public QWidget
         bool isShowBottom() { if (bottom_) return bottom_->isVisible(); return false; }
         bool hasBottom() { return (bottom_!=NULL); }
 
+        ViewSplitter *bottomSplitter() { return mainSplitter; }
+
         // select / deselect view
         void setSelected(bool x) { _selected=x; selectionChanged(); }
         bool isSelected() const { return _selected; }
@@ -153,6 +155,7 @@ protected:
         toggle = new QPushButton("OFF", this);
         toggle->setCheckable(true);
         toggle->setChecked(false);
+        toggle->setFixedWidth(40);
         connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
 
         return toggle;
@@ -211,10 +214,16 @@ public:
         return tot - 1;
     }
 
+signals:
+    void compareChanged(bool);
+
 public slots:
     void toggled() {
         if (toggle->isChecked()) toggle->setText("ON");
         else toggle->setText("OFF");
+
+        // we started compare mode
+        emit compareChanged(toggle->isChecked());
     }
 private:
     Qt::Orientation orientation;

@@ -85,6 +85,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
         connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
+        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged(bool)));
 
     } else {
 
@@ -93,6 +94,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
         connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
+        connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged(bool)));
 
         // date settings
         connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -120,6 +122,13 @@ RideSummaryWindow::setFilter(QStringList list)
     refresh();
 }
 #endif
+
+void
+RideSummaryWindow::compareChanged(bool state)
+{
+    // don't do much for now
+    repaint();
+}
 
 void
 RideSummaryWindow::rideSelected()

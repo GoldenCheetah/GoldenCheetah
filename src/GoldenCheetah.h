@@ -172,6 +172,9 @@ public:
     // is filtered?
     virtual bool isFiltered() const { return false;}
 
+    // is comparing?
+    virtual bool isCompare() const { return false;}
+
     // for sorting... we look at x
     bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
 

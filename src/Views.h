@@ -42,6 +42,7 @@ class AnalysisView : public TabView
     public slots:
 
         bool isBlank();
+        void compareChanged(bool);
 
     private:
         AnalysisSidebar *analSidebar;
@@ -99,6 +100,7 @@ class HomeView : public TabView
         bool isBlank();
         void justSelected();
         void dateRangeChanged(DateRange);
+        void compareChanged(bool);
 
 };
 

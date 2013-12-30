@@ -37,6 +37,8 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
     setPage(a);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
+
+    connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
 }
 
 RideNavigator *AnalysisView::rideNavigator()
@@ -59,6 +61,13 @@ void
 AnalysisView::addIntervals()
 {
     static_cast<AnalysisSidebar*>(sidebar())->addIntervals(); // save settings
+}
+
+void
+AnalysisView::compareChanged(bool state)
+{
+    // we turned compare on / off
+    context->notifyCompareIntervals(state);
 }
 
 void AnalysisView::close()
@@ -128,10 +137,18 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
 
     connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
+    connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
 }
 
 HomeView::~HomeView()
 {
+}
+
+void
+HomeView::compareChanged(bool state)
+{
+    // we turned compare on / off
+    context->notifyCompareDateRanges(state);
 }
 
 void

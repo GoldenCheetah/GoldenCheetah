@@ -54,6 +54,8 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
 #ifdef GC_HAVE_LUCENE
     connect(context, SIGNAL(filterChanged()), this, SLOT(setHighlighted()));
 #endif
+    connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(setCompare()));
+    connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(setCompare()));
 
     // Mac uses QtMacButton - recessed etc
 #ifdef Q_OS_MAC
@@ -140,6 +142,16 @@ GcScopeBar::setHighlighted()
 #endif
 #endif
     }
+#endif
+}
+
+void
+GcScopeBar::setCompare()
+{
+#ifndef Q_OS_MAC
+    home->setRed(context->isCompareDateRanges);
+    anal->setRed(context->isCompareIntervals);
+    repaint();
 #endif
 }
 
@@ -294,7 +306,7 @@ GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(20);
     setFixedWidth(60);
-    highlighted = checked = false;
+    red = highlighted = checked = false;
     QFont font;
     font.setFamily("Helvetica");
 #ifdef WIN32
@@ -332,11 +344,23 @@ GcScopeButton::paintEvent(QPaintEvent *)
             painter.setBrush(over);
             painter.drawRoundedRect(body, 19, 11);
         }
+        if (red) {
+            QColor over = QColor(Qt::red);
+            over.setAlpha(180);
+            painter.setBrush(over);
+            painter.drawRoundedRect(body, 19, 11);
+        }
     } else if (checked && !underMouse()) {
         painter.setBrush(QBrush(QColor(120,120,120)));     
         painter.drawRoundedRect(body, 19, 11);
         if (highlighted) {
             QColor over = GColor(CCALCURRENT);
+            over.setAlpha(180);
+            painter.setBrush(over);
+            painter.drawRoundedRect(body, 19, 11);
+        }
+        if (red) {
+            QColor over = QColor(Qt::red);
             over.setAlpha(180);
             painter.setBrush(over);
             painter.drawRoundedRect(body, 19, 11);
