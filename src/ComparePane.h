@@ -49,6 +49,8 @@ class ComparePane : public QWidget
 
     public slots:
         void configChanged();
+
+        void itemsWereSorted();
         void intervalButtonsChanged();
         void daterangeButtonsChanged();
 
