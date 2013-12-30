@@ -40,6 +40,7 @@ class GcScopeButton : public QWidget
         void setWidth(int x) { setFixedWidth(x); }
         void setHighlighted(bool x) { highlighted = x; }
         bool ishighlighted() const { return highlighted; }
+        void setRed(bool x) { red = x; }
 
     signals:
         void clicked(bool);
@@ -51,6 +52,7 @@ class GcScopeButton : public QWidget
     private:
         bool checked;
         bool highlighted;
+        bool red;
         QString text;
 };
 
@@ -76,6 +78,7 @@ public slots:
     // mainwindow tells us when it switched without user clicking.
     int selected();
     void setSelected(int index);
+    void setCompare(); // is compare mode active?
     void setHighlighted();
     void setContext(Context *c) { context = c; }
 

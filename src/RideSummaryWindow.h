@@ -78,6 +78,9 @@ class RideSummaryWindow : public GcChartWindow
         void setFilter(QString x) { if (!ridesummary) searchBox->setFilter(x); }
 #endif
 
+        bool isCompare() const { return ((ridesummary && context->isCompareIntervals)
+                                      || (!ridesummary && context->isCompareDateRanges)); }
+
     protected slots:
 
         void refresh();
@@ -95,6 +98,9 @@ class RideSummaryWindow : public GcChartWindow
         void clearFilter();
         void setFilter(QStringList);
 #endif
+
+        // compare mode started
+        void compareChanged(bool);
 
     protected:
 
