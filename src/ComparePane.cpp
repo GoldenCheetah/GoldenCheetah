@@ -86,6 +86,7 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
     configChanged(); // set up ready to go...
 
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(itemsWereSorted()));
 }
 
 void
@@ -139,7 +140,8 @@ ComparePane::refreshTable()
 
         list << "Interval";
 
-        table->setColumnCount(list.count());
+        table->setColumnCount(list.count()+1);
+        table->horizontalHeader()->setSectionHidden(list.count(), true);
         table->setHorizontalHeaderLabels(list);
         table->setSortingEnabled(true);
         table->verticalHeader()->hide();
@@ -230,6 +232,12 @@ ComparePane::refreshTable()
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, worklist.count() + 5, t);
 
+            // INDEX
+            t = new QTableWidgetItem;
+            t->setText(QString("%1").arg(counter));
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, worklist.count() + 6, t);
+
             // align center
             for (int i=3; i<(worklist.count()+5); i++)
                 table->item(counter,i)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
@@ -293,7 +301,8 @@ ComparePane::refreshTable()
 
         list << "Date Range";
 
-        table->setColumnCount(list.count());
+        table->setColumnCount(list.count()+1);
+        table->horizontalHeader()->setSectionHidden(list.count(), true);
         table->setHorizontalHeaderLabels(list);
         table->setSortingEnabled(true);
         table->verticalHeader()->hide();
@@ -360,6 +369,13 @@ ComparePane::refreshTable()
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, worklist.count() + 5, t);
 
+            // INDEX
+            t = new QTableWidgetItem;
+            t->setText(QString("%1").arg(counter));
+            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            table->setItem(counter, worklist.count() + 6, t);
+
+
             // align center
             for (int i=3; i<(worklist.count()+5); i++)
                 table->item(counter,i)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
@@ -381,6 +397,51 @@ ComparePane::refreshTable()
         table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 #endif
         table->horizontalHeader()->setStretchLastSection(true);
+    }
+}
+
+void
+ComparePane::itemsWereSorted()
+{
+    if (mode_ == interval) {
+
+        QList<CompareInterval> newOrder;
+
+        for(int i=0;i<table->rowCount(); i++) {
+            QCheckBox *check = static_cast<QCheckBox*>(table->cellWidget(i,0));
+            if (i) check->setEnabled(true);
+            else {
+                check->setChecked(true);
+                check->setEnabled(false);
+            }
+            int oldIndex = table->item(i,table->columnCount()-1)->text().toInt();
+            table->item(i,table->columnCount()-1)->setText(QString("%1").arg(i));
+            newOrder << context->compareIntervals.at(oldIndex);
+        }
+
+        context->compareIntervals = newOrder;
+        context->notifyCompareIntervalsChanged();
+
+    }
+ else {
+
+        QList<CompareDateRange> newOrder;
+
+        for(int i=0;i<table->rowCount(); i++) {
+            QCheckBox *check = static_cast<QCheckBox*>(table->cellWidget(i,0));
+            if (i) check->setEnabled(true);
+            else {
+                check->setChecked(true);
+                check->setEnabled(false);
+            }
+            int oldIndex = table->item(i,table->columnCount()-1)->text().toInt();
+            table->item(i,table->columnCount()-1)->setText(QString("%1").arg(i));
+            newOrder << context->compareDateRanges.at(oldIndex);
+        }
+
+        context->compareDateRanges = newOrder;
+        context->notifyCompareDateRangesChanged();
+
     }
 }
 
