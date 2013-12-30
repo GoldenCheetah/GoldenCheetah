@@ -175,37 +175,62 @@ RideSummaryWindow::refresh()
 
     if (isCompare()) { // COMPARE MODE
 
-        setSubTitle(tr("Compare")); // fallback to this
-
         if (ridesummary) {
 
+            // offsets into compare array taking into account checks..
+            int checkcount=0;
+            int versus=0;
+
+            for(int i=0; i<context->compareIntervals.count(); i++) {
+                if (context->compareIntervals.at(i).isChecked()) {
+                    checkcount++;
+                    versus=i;
+                }
+            }
+
             // comparing intervals
-            if (context->compareIntervals.count() == 2) {
+            if (checkcount == 2) {
 
                 setSubTitle(QString("%2 on %1  vs  %4 on %3")
                             .arg(context->compareIntervals.at(0).data->startTime().toString("dd MMM yy"))
                             .arg(context->compareIntervals.at(0).name)
-                            .arg(context->compareIntervals.at(1).data->startTime().toString("dd MMM yy"))
-                            .arg(context->compareIntervals.at(1).name));
+                            .arg(context->compareIntervals.at(versus).data->startTime().toString("dd MMM yy"))
+                            .arg(context->compareIntervals.at(versus).name));
             } else if (context->compareIntervals.count() > 2) {
                 setSubTitle(QString("%2 on %1  vs  %3 others")
                             .arg(context->compareIntervals.at(0).data->startTime().toString("dd MMM yy"))
                             .arg(context->compareIntervals.at(0).name)
-                            .arg(context->compareIntervals.count()-1));
+                            .arg(checkcount-1));
+            } else {
+                setSubTitle(tr("Compare")); // fallback to this
             }
+
         } else {
 
+            // offsets into compare array taking into account checks..
+            int checkcount=0;
+            int versus=0;
+
+            for(int i=0; i<context->compareDateRanges.count(); i++) {
+                if (context->compareDateRanges.at(i).isChecked()) {
+                    checkcount++;
+                    versus=i;
+                }
+            }
+
             // comparing seasons
-            if (context->compareDateRanges.count() == 2) {
+            if (checkcount == 2) {
 
                 setSubTitle(QString("%1  vs  %2")
                             .arg(context->compareDateRanges.at(0).name)
-                            .arg(context->compareDateRanges.at(1).name));
+                            .arg(context->compareDateRanges.at(versus).name));
 
-            } else if (context->compareDateRanges.count() > 2) {
+            } else if (checkcount > 2) {
                 setSubTitle(QString("%1  vs  %2 others")
                             .arg(context->compareDateRanges.at(0).name)
-                            .arg(context->compareDateRanges.count()-1));
+                            .arg(checkcount-1));
+            } else {
+                setSubTitle(tr("Compare")); // fallback to this
             }
         }
         rideSummary->page()->mainFrame()->setHtml(htmlCompareSummary());
@@ -1023,10 +1048,17 @@ RideSummaryWindow::htmlCompareSummary() const
 
             // then one row for each interval
             int counter = 0;
+            int rows = 0;
             foreach (SummaryMetrics metrics, intervalMetrics) {
 
+                // skip if isn't checked
+                if (!context->compareIntervals[counter].isChecked()) {
+                    counter++;
+                    continue;
+                }
+
                 // alternating shading
-                if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                if (rows%2) summary += "<tr bgcolor='" + color.name() + "'>";
                 else summary += "<tr>";
 
                 summary += "<td>" + context->compareIntervals[counter].name + "</td>";
@@ -1077,7 +1109,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 }
                 summary += "</tr>";
-                counter++;
+                rows ++; counter++;
             }
             summary += "</table>";
         }
@@ -1112,9 +1144,16 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // now the sumamry
                 int counter = 0;
+                int rows = 0;
                 foreach (SummaryMetrics metrics, intervalMetrics) {
 
-                    if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                    // only ones that are checked
+                    if (!context->compareIntervals[counter].isChecked()) {
+                        counter++;
+                        continue;
+                    }
+
+                    if (rows%2) summary += "<tr bgcolor='" + color.name() + "'>";
                     else summary += "<tr>";
 
                     summary += "<td>" + context->compareIntervals[counter].name + "</td>";
@@ -1140,7 +1179,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     }
                     summary += "</tr>";
-                    counter++;
+                    rows++; counter++;
                 }
 
                 // done
@@ -1178,9 +1217,16 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // now the sumamry
                 int counter = 0;
+                int rows = 0;
                 foreach (SummaryMetrics metrics, intervalMetrics) {
 
-                    if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                    // skip if not checked
+                    if (!context->compareIntervals[counter].isChecked()) {
+                        counter++;
+                        continue;
+                    }
+
+                    if (rows%2) summary += "<tr bgcolor='" + color.name() + "'>";
                     else summary += "<tr>";
 
                     summary += "<td>" + context->compareIntervals[counter].name + "</td>";
@@ -1206,7 +1252,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     }
                     summary += "</tr>";
-                    counter++;
+                    rows++; counter++;
                 }
 
                 // done
@@ -1280,6 +1326,9 @@ RideSummaryWindow::htmlCompareSummary() const
             // then one row for each interval
             int counter = 0;
             foreach (CompareDateRange dr, context->compareDateRanges) {
+
+                // skip if not checked
+                if (!dr.isChecked()) continue;
 
                 // alternating shading
                 if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
@@ -1369,6 +1418,9 @@ RideSummaryWindow::htmlCompareSummary() const
                 int counter = 0;
                 foreach (CompareDateRange dr, context->compareDateRanges) {
 
+                    // skip if not checked
+                    if (!dr.isChecked()) continue;
+
                     if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
                     else summary += "<tr>";
 
@@ -1438,6 +1490,9 @@ RideSummaryWindow::htmlCompareSummary() const
                 // now the sumamry
                 int counter = 0;
                 foreach (CompareDateRange dr, context->compareDateRanges) {
+
+                    // skip if not checked
+                    if (!dr.isChecked()) continue;
 
                     if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
                     else summary += "<tr>";

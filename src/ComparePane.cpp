@@ -173,6 +173,7 @@ ComparePane::refreshTable()
             // Checkbox
             QCheckBox *check = new QCheckBox(this);
             check->setChecked(x.checked);
+            if (!counter) check->setEnabled(false);
             table->setCellWidget(counter, 0, check);
             connect(check, SIGNAL(stateChanged(int)), this, SLOT(intervalButtonsChanged()));
 
@@ -313,6 +314,7 @@ ComparePane::refreshTable()
             // Checkbox
             QCheckBox *check = new QCheckBox(this);
             check->setChecked(x.checked);
+            if (!counter) check->setEnabled(false);
             table->setCellWidget(counter, 0, check);
             connect(check, SIGNAL(stateChanged(int)), this, SLOT(daterangeButtonsChanged()));
 
