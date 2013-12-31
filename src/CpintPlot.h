@@ -124,6 +124,7 @@ class CpintPlot : public QwtPlot
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
         void setShadeMode(int x);
+        void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
         void clearFilter();
         void setFilter(QStringList);
@@ -163,6 +164,7 @@ class CpintPlot : public QwtPlot
         QStringList files;
         bool isFiltered;
         int shadeMode;
+        bool shadeIntervals;
         bool rangemode;
 
         int ridePlotStyle;
