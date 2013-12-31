@@ -52,6 +52,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     bests(NULL),
     isFiltered(false),
     shadeMode(2),
+    shadeIntervals(true),
     rangemode(rangemode)
 {
     setAutoFillBackground(true);
@@ -916,7 +917,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
         // add when to tooltip if its all curve
         if (allCurves.contains(curve)) {
             int index = xvalue * 60;
-            if (index >= 0 && getBests().count() > index) {
+            if (index >= 0 && bests && getBests().count() > index) {
                 QDate date = getBestDates()[index];
                 dateStr = date.toString("\nddd, dd MMM yyyy");
             }
@@ -959,6 +960,12 @@ void
 CpintPlot::setShadeMode(int x)
 {
     shadeMode = x;
+}
+
+void
+CpintPlot::setShadeIntervals(int x)
+{
+    shadeIntervals = x;
 }
 
 // model parameters!
@@ -1389,7 +1396,8 @@ CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor inte
     pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);
-    curve->setBrush(brush);
+    if (shadeIntervals) curve->setBrush(brush);
+    else curve->setBrush(Qt::NoBrush);
     curve->setPen(pen);
     curve->setSamples(x.data(), y.data(), x.count()-1);
 

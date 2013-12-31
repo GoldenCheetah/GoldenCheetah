@@ -171,6 +171,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    shadeIntervalsCheck = new QCheckBox(this);
+    shadeIntervalsCheck->setChecked(true); // default on
+    QLabel *shadies = new QLabel(tr("Shade Intervals"));
+    cl->addRow(shadies, shadeIntervalsCheck);
+
     ridePlotStyleCombo = new QComboBox(this);
     ridePlotStyleCombo->addItem(tr("Ride Mean Max"));
     ridePlotStyleCombo->addItem(tr("Ride Centile"));
@@ -341,6 +346,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
+    connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -628,7 +634,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     f.setRecIntSecs(myRideItem->ride()->recIntSecs());
    
     foreach(RideFilePoint *p, myRideItem->ride()->dataPoints()) { 
-       if (p->secs+f.recIntSecs() > current->start && p->secs< current->stop) {
+       if ((p->secs+f.recIntSecs()) >= current->start && p->secs <= (current->stop+f.recIntSecs())) {
            f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                        p->watts, p->alt, p->lon, p->lat, p->headwind,
                        p->slope, p->temp, p->lrbalance, 0);
@@ -648,12 +654,12 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     if (vector.count() == 0) return;
 
     // create curve data arrays
-    int i=0;
     QVector<double>x;
     QVector<double>y;
-    x.resize(vector.size());
-    y.resize(vector.size());
-    foreach(float yv, vector) { x << i / 60.00; y << yv; i++; }
+    for (int i=1; i<vector.count(); i++) {
+        x << double(i)/60.00f;
+        y << vector[i];
+    }
 
     // create a curve!
     QwtPlotCurve *curve = new QwtPlotCurve();
@@ -666,10 +672,11 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     intervalColor.setHsv(index * (255/count), 255,255);
     QPen pen(intervalColor);
     pen.setWidth(2.0);
-    pen.setStyle(Qt::DotLine);
+    //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);
-    curve->setBrush(brush);
+    if (shadeIntervalsCheck->isChecked()) curve->setBrush(brush);
+    else curve->setBrush(Qt::NoBrush);
     curve->setPen(pen);
     curve->setSamples(x.data(), y.data(), x.count()-1);
 
@@ -1045,6 +1052,14 @@ void
 CriticalPowerWindow::shadingSelected(int shading)
 {
     cpintPlot->setShadeMode(shading);
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpintPlot->calculate(currentRide);
+}
+
+void
+CriticalPowerWindow::shadeIntervalsChanged(int state)
+{
+    cpintPlot->setShadeIntervals(state);
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
 }
