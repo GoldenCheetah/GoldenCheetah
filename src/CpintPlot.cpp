@@ -1378,12 +1378,12 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 void
 CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor intervalColor)
 {
-    int i=0;
     QVector<double>x;
     QVector<double>y;
-    x.resize(vector.size());
-    y.resize(vector.size());
-    foreach(float yv, vector) { x << i / 60.00; y << yv; i++; }
+    for (int i=1; i<vector.count(); i++) {
+        x << double(i)/60.00f;
+        y << vector[i];
+    }
 
     // create a curve!
     QwtPlotCurve *curve = new QwtPlotCurve();
@@ -1393,7 +1393,7 @@ CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor inte
     // set its color - based upon index in intervals!
     QPen pen(intervalColor);
     pen.setWidth(2.0);
-    pen.setStyle(Qt::DotLine);
+    //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);
     if (shadeIntervals) curve->setBrush(brush);
