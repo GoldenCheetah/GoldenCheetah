@@ -39,6 +39,7 @@ class RideItem;
 class Zones;
 class Context;
 class LTMCanvasPicker;
+class CriticalPowerWindow;
 
 class penTooltip: public QwtPlotZoomer
 {
@@ -134,6 +135,8 @@ class CpintPlot : public QwtPlot
         void calculateForIntervals(QList<CompareInterval> compareIntervals);
 
     protected:
+
+        friend class ::CriticalPowerWindow;
 
         QString path;
         QwtPlotCurve *thisCurve;
