@@ -685,7 +685,8 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     int count=context->athlete->allIntervalItems()->childCount();
     intervalColor.setHsv(index * (255/count), 255,255);
     QPen pen(intervalColor);
-    pen.setWidth(2.0);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);

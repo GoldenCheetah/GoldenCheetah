@@ -416,7 +416,8 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
         CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen pen(GColor(CCP));
-    pen.setWidth(1.0);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
     CPCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
@@ -564,7 +565,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             QPen pen(color.darker(200));
             if (forcePlotColor) // not default
                pen.setColor(plotColor);
-            pen.setWidth(2.0);
+            double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+            pen.setWidth(width);
             curve->setPen(pen);
             curve->attach(thisPlot);
 
@@ -708,7 +710,8 @@ CpintPlot::calculate(RideItem *rideItem)
             else {
                 // make sure color reflects latest config
                 QPen pen(GColor(CCP));
-                pen.setWidth(1.0);
+                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                pen.setWidth(width);
                 pen.setStyle(Qt::DashLine);
                 CPCurve->setPen(pen);
             }
@@ -865,7 +868,8 @@ CpintPlot::calculate(RideItem *rideItem)
                 thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen black;
                 black.setColor(GColor(CRIDECP));
-                black.setWidth(2.0);
+                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                black.setWidth(width);
                 thisCurve->setPen(black);
                 thisCurve->attach(this);
 
@@ -1016,7 +1020,8 @@ CpintPlot::refreshReferenceLines(RideItem *rideItem)
                     QwtPlotMarker *referenceLine = new QwtPlotMarker;   
                     QPen p;
                     p.setColor(GColor(CPLOTMARKER));
-                    p.setWidth(1);
+                    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                    p.setWidth(width);
                     p.setStyle(Qt::DashLine);
                     referenceLine->setLinePen(p);
                     referenceLine->setLineStyle(QwtPlotMarker::HLine);
@@ -1276,7 +1281,8 @@ CpintPlot::calculateCentile(RideItem *rideItem)
             thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(QColor(250-(i*20),0,00));
             pen.setStyle(Qt::DashLine); // Qt::SolidLine
-            pen.setWidth(0);
+            double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+            pen.setWidth(width);
             thisCurve->setPen(pen);
             thisCurve->attach(this);
 
@@ -1393,7 +1399,8 @@ CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor inte
 
     // set its color - based upon index in intervals!
     QPen pen(intervalColor);
-    pen.setWidth(2.0);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);
