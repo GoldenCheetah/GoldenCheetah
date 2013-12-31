@@ -1134,7 +1134,7 @@ CpintPlot::calculateCentile(RideItem *rideItem)
             sum = 0;
             int count = 0;
 
-            for (int n = (0.1*i)*sums.size(); n < (0.1*(i+1))*sums.size(); ++n) {
+            for (int n = (0.1*i)*sums.size(); n < sums.size()-1 && n < (0.1*(i+1))*sums.size(); ++n) {
                 sum += sums[n];
                 count++;
             }
@@ -1218,7 +1218,7 @@ CpintPlot::calculateCentile(RideItem *rideItem)
             sum = 0;
             int count = 0;
 
-            for (int n = (0.1*i)*sums.size(); n < (0.1*(i+1))*sums.size(); ++n) {
+            for (int n = (0.1*i)*sums.size(); n < sums.size() && n < (0.1*(i+1))*sums.size(); ++n) {
                 if (sums[n]>0)  {
                     sum += sums[n];
                     count++;
