@@ -664,9 +664,8 @@ CpintPlot::calculate(RideItem *rideItem)
 {
     clear_CP_Curves();
 
-    // Compare Mode
-    if (context->isCompareDateRanges)
-        return calculateForDateRanges(context->compareDateRanges);
+    // Season Compare Mode
+    if (rangemode && context->isCompareDateRanges) return calculateForDateRanges(context->compareDateRanges);
 
     if (!rideItem) return;
 
@@ -893,7 +892,7 @@ CpintPlot::calculate(RideItem *rideItem)
 
     refreshReferenceLines(rideItem);
 
-    if (context->isCompareIntervals)
+    if (!rangemode && context->isCompareIntervals)
         return calculateForIntervals(context->compareIntervals);
     replot();
 }
@@ -1339,6 +1338,8 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 void
 CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 {
+    if (rangemode) return;
+
     // unselect current intervals
     for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
         context->athlete->allIntervalItems()->child(i)->setSelected(false);

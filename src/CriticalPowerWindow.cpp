@@ -567,6 +567,20 @@ CriticalPowerWindow::intervalSelected()
 {
     if (rangemode) return; // do nothing for ranges!
 
+    // in compare mode we don't plot intervals from the sidebar
+    if (!rangemode && context->isCompareIntervals) {
+
+        // wipe away any we might have
+        foreach(QwtPlotCurve *p, intervalCurves) {
+            if (p) {
+                p->detach();
+                delete p;
+            }
+        }
+
+        return;
+    }
+
     // nothing to plot
     if (!amVisible() || myRideItem == NULL) return;
     if (context->athlete->allIntervalItems() == NULL) return; // not inited yet!
