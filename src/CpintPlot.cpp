@@ -1310,7 +1310,7 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
     for (int i = 0; i < compareDateRanges.size(); ++i) {
         CompareDateRange range = compareDateRanges.at(i);
         if (range.isChecked())  {
-            RideFileCache bestsForRange(context, range.start, range.end, isFiltered, files, rangemode);
+            RideFileCache bestsForRange(range.sourceContext, range.start, range.end, isFiltered, files, rangemode);
             bests.append(bestsForRange);
 
             if (bestsForRange.meanMaxArray(series).size()) {
