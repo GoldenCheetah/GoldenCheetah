@@ -28,6 +28,7 @@
 
 #include <QtGui>
 #include <QFormLayout>
+#include <QCheckBox>
 
 class CpintPlot;
 class QwtPlotCurve;
