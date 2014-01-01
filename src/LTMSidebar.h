@@ -88,6 +88,7 @@ class LTMSidebar : public QWidget
         void configChanged();
         void resetSeasons(); // rebuild the seasons list if it changes
         void setAutoFilterMenu();
+        void autoFilterRefresh(); // refresh the value lists
 
         // gui components
         void setSummary(DateRange);

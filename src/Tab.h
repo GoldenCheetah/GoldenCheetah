@@ -23,6 +23,7 @@
 #include "Views.h"
 
 class RideNavigator;
+class MainWindow;
 
 class Tab: public QWidget
 {
@@ -40,9 +41,16 @@ class Tab: public QWidget
 
         RideNavigator *rideNavigator(); // to get logical headings
 
+    protected:
+
+        friend class ::MainWindow;
+        Context *context;
+
     signals:
 
     public slots:
+
+        void rideSelected(RideItem*);
 
         // set Ride
         void setRide(RideItem*);
@@ -74,7 +82,6 @@ class Tab: public QWidget
 
     private:
 
-        Context *context;
 
         // Each of the views
         QStackedWidget *views;

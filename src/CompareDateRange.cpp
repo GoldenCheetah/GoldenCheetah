@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,20 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "CompareDateRange.h"
+
 #include "Context.h"
-#include "Athlete.h"
-
-Context::Context(MainWindow *mainWindow)
-{
-    this->mainWindow = mainWindow;
-    ride = NULL;
-    workout = NULL;
-    isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
-}
-
-const RideFile *
-Context::currentRide()
-{
-    return athlete->currentRide();
-}
+#include "Season.h"
+#include "SummaryMetrics.h"
+#include <QColor>

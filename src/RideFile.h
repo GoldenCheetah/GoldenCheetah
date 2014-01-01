@@ -111,7 +111,8 @@ class RideFile : public QObject // QObject to emit signals
         virtual ~RideFile();
 
         // Working with DATASERIES
-        enum seriestype { secs=0, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, NP, xPower, vam, wattsKg, lrbalance, aPower, none };
+        enum seriestype { secs=0, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, 
+                          interval, NP, xPower, vam, wattsKg, lrbalance, aPower, wprime, none };
         enum specialValues { noTemp = -255 };
 
         typedef enum seriestype SeriesType;

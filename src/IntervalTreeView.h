@@ -32,6 +32,10 @@ class IntervalTreeView : public QTreeWidget
     public:
         IntervalTreeView(Context *context);
 
+        // for drag/drop
+        QStringList mimeTypes () const;
+        QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
+
     protected:
         Context *context;
 

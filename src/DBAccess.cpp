@@ -95,11 +95,10 @@ void
 DBAccess::initDatabase(QDir home)
 {
 
-
-    if(db && db->database(sessionid).isOpen()) return;
-
     QString cyclist = QFileInfo(home.path()).baseName();
     sessionid = QString("%1").arg(context->athlete->cyclist);
+
+    if(db && db->database(sessionid).isOpen()) return;
 
     // use different name for v3 metricDB to avoid constant rebuilding
     // when switching between v2 stable and v3 development builds

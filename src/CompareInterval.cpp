@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,20 +16,13 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "CompareInterval.h"
+
 #include "Context.h"
-#include "Athlete.h"
+#include "RideFile.h"
+#include <QColor>
 
-Context::Context(MainWindow *mainWindow)
+CompareInterval::CompareInterval(Context *context, QString name, RideFile *data, QColor color, Context *sourceContext, bool checked) :
+    context(context), name(name), data(data), color(color), sourceContext(sourceContext), checked(checked)
 {
-    this->mainWindow = mainWindow;
-    ride = NULL;
-    workout = NULL;
-    isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
-}
-
-const RideFile *
-Context::currentRide()
-{
-    return athlete->currentRide();
 }

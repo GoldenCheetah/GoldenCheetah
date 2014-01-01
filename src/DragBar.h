@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,20 +16,29 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Context.h"
-#include "Athlete.h"
+#ifndef _GC_DragBar_h
+#define _GC_DragBar_h
 
-Context::Context(MainWindow *mainWindow)
-{
-    this->mainWindow = mainWindow;
-    ride = NULL;
-    workout = NULL;
-    isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
-}
+#include <QTabBar>
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 
-const RideFile *
-Context::currentRide()
+class DragBar : public QTabBar
 {
-    return athlete->currentRide();
-}
+    Q_OBJECT;
+
+    public:
+        DragBar(QWidget*parent);
+
+        void dragEnterEvent(QDragEnterEvent*);
+        void dragLeaveEvent(QDragLeaveEvent*);
+        void dragMoveEvent(QDragMoveEvent*);
+        void dropEvent(QDropEvent *);
+
+    signals:
+        void dragTab(int index); // let them know we dragged onto a tab
+};
+
+#endif

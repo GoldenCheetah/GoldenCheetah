@@ -171,19 +171,38 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    shadeIntervalsCheck = new QCheckBox(this);
+    shadeIntervalsCheck->setChecked(true); // default on
+    QLabel *shadies = new QLabel(tr("Shade Intervals"));
+    cl->addRow(shadies, shadeIntervalsCheck);
+
+    ridePlotStyleCombo = new QComboBox(this);
+    ridePlotStyleCombo->addItem(tr("Ride Mean Max"));
+    ridePlotStyleCombo->addItem(tr("Ride Centile"));
+    ridePlotStyleCombo->addItem(tr("No Ride"));
+
+    cl->addWidget(new QLabel("")); //spacing
+    cl->addRow(new QLabel(tr("Current Ride")), ridePlotStyleCombo);
+
     // model config
     // 2 or 3 point model ?
     modelCombo= new QComboBox(this);
+    modelCombo->addItem("None");
     modelCombo->addItem("2 parameter");
     modelCombo->addItem("3 parameter");
-    modelCombo->setCurrentIndex(0);
+    modelCombo->addItem("ExtendedCP");
+    modelCombo->setCurrentIndex(1);
 
-    cl->addWidget(new QLabel("")); //spacing
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
     cl->addRow(new QLabel(tr(" ")));
-    cl->addRow(new QLabel(tr("Search Interval")), new QLabel(tr("(seconds)")));
+
+    intervalLabel = new QLabel(tr("Search Interval"));
+    secondsLabel = new QLabel(tr("(seconds)"));
+    cl->addRow(intervalLabel, secondsLabel);
+
+    anLabel = new QLabel(tr("Anaerobic"));
 
     anI1SpinBox = new QDoubleSpinBox(this);
     anI1SpinBox->setDecimals(0);
@@ -204,7 +223,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *anLayout = new QHBoxLayout;
     anLayout->addWidget(anI1SpinBox);
     anLayout->addWidget(anI2SpinBox);
-    cl->addRow(new QLabel(tr("Anaerobic")), anLayout);
+    cl->addRow(anLabel, anLayout);
+
+    aeLabel = new QLabel(tr("Aerobic"));
 
     aeI1SpinBox = new QDoubleSpinBox(this);
     aeI1SpinBox->setDecimals(0);
@@ -225,10 +246,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
     aeLayout->addWidget(aeI2SpinBox);
-    cl->addRow(new QLabel(tr("Aerobic")), aeLayout);
-
-    ckExtendedCP = new QCheckBox(this);
-    cl->addRow(new QLabel(tr("Use Extended CP Model")), ckExtendedCP);
+    cl->addRow(aeLabel, aeLayout);
 
     sanI1SpinBox = new QDoubleSpinBox(this);
     sanI1SpinBox->setDecimals(0);
@@ -246,10 +264,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     sanI2SpinBox->setAlignment(Qt::AlignRight);
     sanI2SpinBox->setValue(60); // 100 secs
 
+    sanLabel = new QLabel(tr("Short anaerobic"));
+
     QHBoxLayout *sanLayout = new QHBoxLayout();
     sanLayout->addWidget(sanI1SpinBox);
     sanLayout->addWidget(sanI2SpinBox);
-    cl->addRow(new QLabel(tr("Short anaerobic")), sanLayout);
+    cl->addRow(sanLabel, sanLayout);
 
     laeI1SpinBox = new QDoubleSpinBox(this);
     laeI1SpinBox->setDecimals(0);
@@ -267,10 +287,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     laeI2SpinBox->setAlignment(Qt::AlignRight);
     laeI2SpinBox->setValue(30000);
 
+    laeLabel = new QLabel(tr("Long aerobic"));
+
     QHBoxLayout *laeLayout = new QHBoxLayout();
     laeLayout->addWidget(laeI1SpinBox);
     laeLayout->addWidget(laeI2SpinBox);
-    cl->addRow(new QLabel(tr("Long aerobic")), laeLayout);
+    cl->addRow(laeLabel, laeLayout);
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
@@ -284,14 +306,23 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
+
+        // Compare
+        connect(context, SIGNAL(compareDateRangesStateChanged(bool)), SLOT(forceReplot()));
+        connect(context, SIGNAL(compareDateRangesChanged()), SLOT(forceReplot()));
     } else {
         // when working on a ride we can selecct intervals!
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
+
+        // Compare
+        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), SLOT(forceReplot()));
+        connect(context, SIGNAL(compareIntervalsChanged()), SLOT(forceReplot()));
     }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
+    connect(ridePlotStyleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setRidePlotStyle(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
@@ -305,8 +336,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(sanI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI1SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
     connect(laeI2SpinBox, SIGNAL(valueChanged(double)), this, SLOT(modelParametersChanged()));
-    connect(ckExtendedCP, SIGNAL(stateChanged(int)), this, SLOT(modelParametersChanged()));
-
 
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
@@ -317,6 +346,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
+    connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -347,19 +377,98 @@ CriticalPowerWindow::modelChanged()
     active = true;
     switch (modelCombo->currentIndex()) {
 
-    case 0 : // 2 param model
+    case 0 : // None
+
+            intervalLabel->hide();
+            secondsLabel->hide();
+            sanLabel->hide();
+            sanI1SpinBox->hide();
+            sanI2SpinBox->hide();
+            anLabel->hide();
+            anI1SpinBox->hide();
+            anI2SpinBox->hide();
+            aeLabel->hide();
+            aeI1SpinBox->hide();
+            aeI2SpinBox->hide();
+            laeLabel->hide();
+            laeI1SpinBox->hide();
+            laeI2SpinBox->hide();
+
+            // No default values !
+
+            break;
+
+    case 1 : // 2 param model
+
+            intervalLabel->show();
+            secondsLabel->show();
+            anLabel->show();
+            sanLabel->hide();
+            sanI1SpinBox->hide();
+            sanI2SpinBox->hide();
+            anLabel->show();
+            anI1SpinBox->show();
+            anI2SpinBox->show();
+            aeLabel->show();
+            aeI1SpinBox->show();
+            aeI2SpinBox->show();
+            laeLabel->hide();
+            laeI1SpinBox->hide();
+            laeI2SpinBox->hide();
+
+            // Default values
             anI1SpinBox->setValue(180);
             anI2SpinBox->setValue(360);
             aeI1SpinBox->setValue(1800);
             aeI2SpinBox->setValue(3600);
+
             break;
 
-    case 1 : // 3 param model
+    case 2 : // 3 param model
 
+            intervalLabel->show();
+            secondsLabel->show();
+            sanLabel->hide();
+            sanI1SpinBox->hide();
+            sanI2SpinBox->hide();
+            anLabel->show();
+            anI1SpinBox->show();
+            anI2SpinBox->show();
+            aeLabel->show();
+            aeI1SpinBox->show();
+            aeI2SpinBox->show();
+            laeLabel->hide();
+            laeI1SpinBox->hide();
+            laeI2SpinBox->hide();
+
+            // Default values
             anI1SpinBox->setValue(1800);
             anI2SpinBox->setValue(2400);
             aeI1SpinBox->setValue(2400);
             aeI2SpinBox->setValue(3600);
+
+            break;
+
+    case 3 : // ExtendedCP
+
+            sanLabel->show();
+            secondsLabel->show();
+            sanI1SpinBox->show();
+            sanI2SpinBox->show();
+            laeLabel->show();
+            laeI1SpinBox->show();
+            laeI2SpinBox->show();
+
+            // Default values
+            sanI1SpinBox->setValue(20);
+            sanI2SpinBox->setValue(90);
+            anI1SpinBox->setValue(120);
+            anI2SpinBox->setValue(300);
+            aeI1SpinBox->setValue(600);
+            aeI2SpinBox->setValue(3000);
+            laeI1SpinBox->setValue(4000);
+            laeI2SpinBox->setValue(30000);
+
             break;
     }
     active = false;
@@ -382,8 +491,7 @@ CriticalPowerWindow::modelParametersChanged()
                         aeI2SpinBox->value(),
                         laeI1SpinBox->value(),
                         laeI2SpinBox->value(),
-                        modelCombo->currentIndex() > 0 ? true : false,
-                        ckExtendedCP->checkState());
+                        modelCombo->currentIndex());
 
     // and apply
     if (amVisible() && myRideItem != NULL) {
@@ -459,6 +567,20 @@ CriticalPowerWindow::intervalSelected()
 {
     if (rangemode) return; // do nothing for ranges!
 
+    // in compare mode we don't plot intervals from the sidebar
+    if (!rangemode && context->isCompareIntervals) {
+
+        // wipe away any we might have
+        foreach(QwtPlotCurve *p, intervalCurves) {
+            if (p) {
+                p->detach();
+                delete p;
+            }
+        }
+
+        return;
+    }
+
     // nothing to plot
     if (!amVisible() || myRideItem == NULL) return;
     if (context->athlete->allIntervalItems() == NULL) return; // not inited yet!
@@ -526,7 +648,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     f.setRecIntSecs(myRideItem->ride()->recIntSecs());
    
     foreach(RideFilePoint *p, myRideItem->ride()->dataPoints()) { 
-       if (p->secs+f.recIntSecs() > current->start && p->secs< current->stop) {
+       if ((p->secs+f.recIntSecs()) >= current->start && p->secs <= (current->stop+f.recIntSecs())) {
            f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                        p->watts, p->alt, p->lon, p->lat, p->headwind,
                        p->slope, p->temp, p->lrbalance, 0);
@@ -546,12 +668,12 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     if (vector.count() == 0) return;
 
     // create curve data arrays
-    int i=0;
     QVector<double>x;
     QVector<double>y;
-    x.resize(vector.size());
-    y.resize(vector.size());
-    foreach(float yv, vector) { x << i / 60.00; y << yv; i++; }
+    for (int i=1; i<vector.count(); i++) {
+        x << double(i)/60.00f;
+        y << vector[i];
+    }
 
     // create a curve!
     QwtPlotCurve *curve = new QwtPlotCurve();
@@ -563,11 +685,13 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     int count=context->athlete->allIntervalItems()->childCount();
     intervalColor.setHsv(index * (255/count), 255,255);
     QPen pen(intervalColor);
-    pen.setWidth(2.0);
-    pen.setStyle(Qt::DotLine);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
+    //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);
-    curve->setBrush(brush);
+    if (shadeIntervalsCheck->isChecked()) curve->setBrush(brush);
+    else curve->setBrush(Qt::NoBrush);
     curve->setPen(pen);
     curve->setSamples(x.data(), y.data(), x.count()-1);
 
@@ -773,7 +897,7 @@ CriticalPowerWindow::updateCpint(double minutes)
     {
       QString label;
       int index = (int) ceil(minutes * 60);
-      if (index >= 0 && cpintPlot->getBests().count() > index) {
+      if (index >= 0 && cpintPlot->bests && cpintPlot->getBests().count() > index) {
           QDate date = cpintPlot->getBestDates()[index];
           double value = cpintPlot->getBests()[index];
 
@@ -945,4 +1069,19 @@ CriticalPowerWindow::shadingSelected(int shading)
     cpintPlot->setShadeMode(shading);
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
+}
+
+void
+CriticalPowerWindow::shadeIntervalsChanged(int state)
+{
+    cpintPlot->setShadeIntervals(state);
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpintPlot->calculate(currentRide);
+}
+
+void
+CriticalPowerWindow::setRidePlotStyle(int index)
+{
+    cpintPlot->setRidePlotStyle(index);
+    cpintPlot->calculate(currentRide);
 }

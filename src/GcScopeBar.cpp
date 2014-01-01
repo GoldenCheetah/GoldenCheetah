@@ -54,6 +54,8 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
 #ifdef GC_HAVE_LUCENE
     connect(context, SIGNAL(filterChanged()), this, SLOT(setHighlighted()));
 #endif
+    connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(setCompare()));
+    connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(setCompare()));
 
     // Mac uses QtMacButton - recessed etc
 #ifdef Q_OS_MAC
@@ -94,9 +96,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     layout->addWidget(train);
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
 
-    layout->addStretch();
     //layout->addWidget(traintool); //XXX!!! eek
-    layout->addStretch();
 
     // we now need to adjust the buttons according to their text size
     // this is particularly bad for German's who, as a nation, must
@@ -146,6 +146,16 @@ GcScopeBar::setHighlighted()
 }
 
 void
+GcScopeBar::setCompare()
+{
+#ifndef Q_OS_MAC
+    home->setRed(context->isCompareDateRanges);
+    anal->setRed(context->isCompareIntervals);
+    repaint();
+#endif
+}
+
+void
 GcScopeBar::addWidget(QWidget *p)
 {
     layout->addWidget(p);
@@ -159,7 +169,7 @@ void
 GcScopeBar::paintEvent (QPaintEvent *event)
 {
     // paint the darn thing!
-    paintBackground(event);
+    //paintBackground(event);
     QWidget::paintEvent(event);
 }
 
@@ -244,9 +254,29 @@ GcScopeBar::clickedTrain()
     emit selectTrain();
 }
 
-void
-GcScopeBar::selected(int index)
+int
+GcScopeBar::selected()
 {
+    if (home->isChecked()) return 0;
+#ifdef GC_HAVE_ICAL
+    if (diary->isChecked()) return 1;
+    if (anal->isChecked()) return 2;
+    if (train->isChecked()) return 3;
+#else
+    if (anal->isChecked()) return 1;
+    if (train->isChecked()) return 2;
+#endif
+
+    // never gets here - shutup compiler
+    return 0;
+}
+
+void
+GcScopeBar::setSelected(int index)
+{
+    // we're already there
+    if (index == selected()) return;
+
     // mainwindow wants to tell us to switch to a selection
     home->setChecked(false);
 #ifdef GC_HAVE_ICAL
@@ -276,7 +306,7 @@ GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(20);
     setFixedWidth(60);
-    highlighted = checked = false;
+    red = highlighted = checked = false;
     QFont font;
     font.setFamily("Helvetica");
 #ifdef WIN32
@@ -314,11 +344,23 @@ GcScopeButton::paintEvent(QPaintEvent *)
             painter.setBrush(over);
             painter.drawRoundedRect(body, 19, 11);
         }
+        if (red) {
+            QColor over = QColor(Qt::red);
+            over.setAlpha(180);
+            painter.setBrush(over);
+            painter.drawRoundedRect(body, 19, 11);
+        }
     } else if (checked && !underMouse()) {
         painter.setBrush(QBrush(QColor(120,120,120)));     
         painter.drawRoundedRect(body, 19, 11);
         if (highlighted) {
             QColor over = GColor(CCALCURRENT);
+            over.setAlpha(180);
+            painter.setBrush(over);
+            painter.drawRoundedRect(body, 19, 11);
+        }
+        if (red) {
+            QColor over = QColor(Qt::red);
             over.setAlpha(180);
             painter.setBrush(over);
             painter.drawRoundedRect(body, 19, 11);

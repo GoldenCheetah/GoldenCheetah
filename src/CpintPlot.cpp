@@ -52,6 +52,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     bests(NULL),
     isFiltered(false),
     shadeMode(2),
+    shadeIntervals(true),
     rangemode(rangemode)
 {
     setAutoFillBackground(true);
@@ -97,6 +98,10 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     ecp = new ExtendedCriticalPower(context);
     extendedCPCurve4 = NULL;
     extendedCurveTitle2 = NULL;
+
+    extendedCPCurve_P1 = NULL;
+    extendedCPCurve_WPrime = NULL;
+    extendedCPCurve_CP = NULL;
 }
 
 void
@@ -325,7 +330,7 @@ CpintPlot::deriveCPParameters()
         }
 
         // update t0 if we're using that model
-        if (useT0) 
+        if (model == 2)
             t0 = tau / (bests->meanMaxArray(series)[1] / cp - 1) - 1 / 60.0;
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) ||
@@ -350,9 +355,13 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (cp <= 0)
         return;
 
+    // if no model, then there's nothing to do
+    if (model == 0)
+        return;
+
     // populate curve data with a CP curve
     const int curve_points = 100;
-    double tmin = useT0 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
+    double tmin = model == 2 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
     double tmax = 180.0;
     QVector<double> cp_curve_power(curve_points);
     QVector<double> cp_curve_time(curve_points);
@@ -371,7 +380,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     // generate a plot
     QString curve_title;
 #if 0 //XXX ?
-    if (useT0) {
+    if (model == 2) {
 
         curve_title.sprintf("CP=%.1f w; W'/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
 
@@ -407,7 +416,8 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
         CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen pen(GColor(CCP));
-    pen.setWidth(1.0);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
     CPCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
@@ -441,11 +451,31 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         delete extendedCurveTitle2;
         extendedCurveTitle2 = NULL;
     }
+    if (extendedCPCurve_P1) {
+        delete extendedCPCurve_P1;
+        extendedCPCurve_P1 = NULL;
+    }
+    if (extendedCPCurve_WPrime) {
+        delete extendedCPCurve_WPrime;
+        extendedCPCurve_WPrime = NULL;
+    }
+    if (extendedCPCurve_CP) {
+        delete extendedCPCurve_CP;
+        extendedCPCurve_CP = NULL;
+    }
 
-    if (useExtendedCP) {
+
+
+    if (model == 3) {
         extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
         extendedCPCurve4->attach(thisPlot);
 
+        /*extendedCPCurve_P1 = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
+        extendedCPCurve_P1->attach(thisPlot);
+        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_4_3_WPrime(athleteModeleCP4);
+        extendedCPCurve_WPrime->attach(thisPlot);
+        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_4_3_CP(athleteModeleCP4);
+        extendedCPCurve_CP->attach(thisPlot);*/
 
         extendedCurveTitle2 = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
         extendedCurveTitle2->setXValue(5);
@@ -464,6 +494,11 @@ CpintPlot::clear_CP_Curves()
         allCurves.clear();
     }
 
+    if (thisCurve) {
+        delete thisCurve;
+        thisCurve = NULL;
+    }
+
     // now delete any labels
     if (allZoneLabels.size()) {
         foreach (QwtPlotMarker *label, allZoneLabels)
@@ -476,9 +511,11 @@ CpintPlot::clear_CP_Curves()
 void
 CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                          int n_values,
-                         const double *power_values)
+                         const double *power_values,
+                         QColor plotColor,
+                         bool forcePlotColor)
 {
-    clear_CP_Curves();
+    //clear_CP_Curves();
 
     QVector<double> energyBests(n_values);
     QVector<double> time_values(n_values);
@@ -526,7 +563,10 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(color.darker(200));
-            pen.setWidth(2.0);
+            if (forcePlotColor) // not default
+               pen.setColor(plotColor);
+            double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+            pen.setWidth(width);
             curve->setPen(pen);
             curve->attach(thisPlot);
 
@@ -581,7 +621,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         QwtPlotCurve *curve = new QwtPlotCurve(tr("maximal power"));
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen pen(GColor(CCP));
+        QPen pen((plotColor));
         pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
         curve->setPen(pen);
         QColor brush_color = GColor(CCP);
@@ -624,6 +664,11 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 void
 CpintPlot::calculate(RideItem *rideItem)
 {
+    clear_CP_Curves();
+
+    // Season Compare Mode
+    if (rangemode && context->isCompareDateRanges) return calculateForDateRanges(context->compareDateRanges);
+
     if (!rideItem) return;
 
     QString fileName = rideItem->fileName;
@@ -648,20 +693,10 @@ CpintPlot::calculate(RideItem *rideItem)
             cp  = tau = t0  = 0;
             deriveCPParameters();
 
-            if (useExtendedCP) {
+            if (model == 3) {
                 // calculate extended CP model from all-time best data
                 //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-
-
                 athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-
-
-                /*double best5sec = context->ride->ride()->getWeight() * 24.04;
-                double best1min = context->ride->ride()->getWeight() * 11.50;
-                double best5min = context->ride->ride()->getWeight() * 7.60;
-                double best1hour = context->ride->ride()->getWeight() * 6.40;
-                //worldClassModeleCP2 = ecp->deriveExtendedCP_2_3_ParametersForBest(best5sec, best1min, best5min, best1hour);
-                worldClassModeleCP4 = ecp->deriveExtendedCP_4_3_ParametersForBest(best5sec, best1min, best5min, best1hour);*/
             }
         }
 
@@ -675,12 +710,13 @@ CpintPlot::calculate(RideItem *rideItem)
             else {
                 // make sure color reflects latest config
                 QPen pen(GColor(CCP));
-                pen.setWidth(1.0);
+                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                pen.setWidth(width);
                 pen.setStyle(Qt::DashLine);
                 CPCurve->setPen(pen);
             }
 
-            if (useExtendedCP && CPCurve) CPCurve->setVisible(false);
+            if (model == 3 && CPCurve) CPCurve->setVisible(false);
             else if (CPCurve) CPCurve->setVisible(true);
         }
 
@@ -692,7 +728,7 @@ CpintPlot::calculate(RideItem *rideItem)
             for (int i = 0; i < bests->meanMaxArray(series).size(); ++i) {
                 if (bests->meanMaxArray(series)[i] > 0) maxNonZero = i;
             }
-            plot_allCurve(this, maxNonZero, bests->meanMaxArray(series).constData() + 1);
+            plot_allCurve(this, maxNonZero, bests->meanMaxArray(series).constData() + 1, GColor(CCP), false);
         }
     } else {
 
@@ -807,53 +843,61 @@ CpintPlot::calculate(RideItem *rideItem)
         }
     }
 
-    //
-    // PLOT THIS RIDE CURVE
-    //
-    if (thisCurve) {
-        delete thisCurve;
-        thisCurve = NULL;
-    }
-
-    if (!rangemode && current->meanMaxArray(series).size()) {
-        int maxNonZero = 0;
-        QVector<double> timeArray(current->meanMaxArray(series).size());
-        for (int i = 0; i < current->meanMaxArray(series).size(); ++i) {
-            timeArray[i] = i / 60.0;
-            if (current->meanMaxArray(series)[i] > 0) maxNonZero = i;
+    if (ridePlotStyle == 1)
+        calculateCentile(rideItem);
+    else if (ridePlotStyle < 2)  {
+        //
+        // PLOT THIS RIDE CURVE
+        //
+        if (thisCurve) {
+            delete thisCurve;
+            thisCurve = NULL;
         }
 
-        if (maxNonZero > 1) {
+        if (!rangemode && current->meanMaxArray(series).size()) {
+            int maxNonZero = 0;
+            QVector<double> timeArray(current->meanMaxArray(series).size());
+            for (int i = 0; i < current->meanMaxArray(series).size(); ++i) {
+                timeArray[i] = i / 60.0;
+                if (current->meanMaxArray(series)[i] > 0) maxNonZero = i;
+            }
 
-            thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
-            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            QPen black;
-            black.setColor(GColor(CRIDECP));
-            black.setWidth(2.0);
-            thisCurve->setPen(black);
-            thisCurve->attach(this);
+            if (maxNonZero > 1) {
 
-            if (series == RideFile::none) {
+                thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+                thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                QPen black;
+                black.setColor(GColor(CRIDECP));
+                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                black.setWidth(width);
+                thisCurve->setPen(black);
+                thisCurve->attach(this);
 
-                // Calculate Energy
-                QVector<double> energyArray(current->meanMaxArray(RideFile::watts).size());
-                for (int i = 0; i <= maxNonZero; ++i) {
-                    energyArray[i] = 
-                    timeArray[i] * 
-                    current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
+                if (series == RideFile::none) {
+
+                    // Calculate Energy
+                    QVector<double> energyArray(current->meanMaxArray(RideFile::watts).size());
+                    for (int i = 0; i <= maxNonZero; ++i) {
+                        energyArray[i] =
+                        timeArray[i] *
+                        current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
+                    }
+                    thisCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
+
+                } else {
+
+                    // normal
+                    thisCurve->setSamples(timeArray.data() + 1,
+                    current->meanMaxArray(series).constData() + 1, maxNonZero - 1);
                 }
-                thisCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
-
-            } else {
-
-                // normal
-                thisCurve->setSamples(timeArray.data() + 1, 
-                current->meanMaxArray(series).constData() + 1, maxNonZero - 1);
             }
         }
     }
 
     refreshReferenceLines(rideItem);
+
+    if (!rangemode && context->isCompareIntervals)
+        return calculateForIntervals(context->compareIntervals);
     replot();
 }
 
@@ -876,7 +920,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
         // add when to tooltip if its all curve
         if (allCurves.contains(curve)) {
             int index = xvalue * 60;
-            if (index >= 0 && getBests().count() > index) {
+            if (index >= 0 && bests && getBests().count() > index) {
                 QDate date = getBestDates()[index];
                 dateStr = date.toString("\nddd, dd MMM yyyy");
             }
@@ -921,9 +965,15 @@ CpintPlot::setShadeMode(int x)
     shadeMode = x;
 }
 
+void
+CpintPlot::setShadeIntervals(int x)
+{
+    shadeIntervals = x;
+}
+
 // model parameters!
 void 
-CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, bool useT0, bool useExtendedCP)
+CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model)
 {
     this->anI1 = double(anI1) / double(60.00f);
     this->anI2 = double(anI2) / double(60.00f);
@@ -935,8 +985,7 @@ CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2
     this->laeI1 = double(laeI1) / double(60.00f);
     this->laeI2 = double(laeI2) / double(60.00f);
 
-    this->useT0 = useT0;
-    this->useExtendedCP = useExtendedCP;
+    this->model = model;
 
     // wipe away previous effort
     if (CPCurve) {
@@ -971,7 +1020,8 @@ CpintPlot::refreshReferenceLines(RideItem *rideItem)
                     QwtPlotMarker *referenceLine = new QwtPlotMarker;   
                     QPen p;
                     p.setColor(GColor(CPLOTMARKER));
-                    p.setWidth(1);
+                    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                    p.setWidth(width);
                     p.setStyle(Qt::DashLine);
                     referenceLine->setLinePen(p);
                     referenceLine->setLineStyle(QwtPlotMarker::HLine);
@@ -982,4 +1032,385 @@ CpintPlot::refreshReferenceLines(RideItem *rideItem)
             }
         }
     }
+}
+
+void
+CpintPlot::setRidePlotStyle(int index)
+{
+    ridePlotStyle = index;
+}
+
+void
+CpintPlot::calculateCentile(RideItem *rideItem)
+{
+    qDebug() << "calculateCentile";
+    QTime elapsed;
+    elapsed.start();
+
+    qDebug() << "prepare datas ";
+    cpintdata data;
+    data.rec_int_ms = (int) round(rideItem->ride()->recIntSecs() * 1000.0);
+    double lastsecs = 0;
+    bool first = true;
+    double offset = 0;
+
+    foreach (const RideFilePoint *p, rideItem->ride()->dataPoints()) {
+
+        // get offset to apply on all samples if first sample
+        if (first == true) {
+            offset = p->secs;
+            first = false;
+        }
+
+        // drag back to start at 0s
+        double psecs = p->secs - offset;
+
+        // fill in any gaps in recording - use same dodgy rounding as before
+        int count = (psecs - lastsecs - rideItem->ride()->recIntSecs()) / rideItem->ride()->recIntSecs();
+
+        // gap more than an hour, damn that ride file is a mess
+        if (count > 3600) count = 1;
+
+        for(int i=0; i<count; i++) {
+            data.points.append(cpintpoint(round(lastsecs+((i+1)*rideItem->ride()->recIntSecs() *1000.0)/1000), 0));
+        }
+
+        lastsecs = psecs;
+
+        double secs = round(psecs * 1000.0) / 1000;
+        if (secs > 0)  {
+            if (round(p->value(RideFile::watts))>1400)
+                qDebug() << "append point " <<  round(p->value(RideFile::watts)) ;
+            data.points.append(cpintpoint(secs, (int) round(p->value(RideFile::watts))));
+        }
+    }
+
+    int total_secs = (int) ceil(rideItem->ride()->dataPoints().back()->secs);
+
+    QVector < QVector<double> > ride_centiles(10);
+    // Initialisation
+    for (int i = 0; i < ride_centiles.size(); ++i) {
+        ride_centiles[i] = QVector <double>(total_secs);
+    }
+
+    qDebug() << "end prepare datas " << elapsed.elapsed();
+    qDebug() << "calcul for first 6min ";
+
+    // loop through the decritized data from top
+    // FIRST 6 MINUTES DO BESTS FOR EVERY SECOND
+    // WE DO NOT DO THIS FOR NP or xPower SINCE
+    // IT IS WELL KNOWN THAT THEY ARE NOT VALID
+    // FOR SUCH SHORT DURATIONS AND IT IS VERY
+    // CPU INTENSIVE, SO WE DON'T BOTHER
+
+    double samplerate = rideItem->ride()->recIntSecs();
+
+    for (int slice = 1; slice < 360;) {
+        int windowsize = slice / samplerate;
+        QVector<double> sums(data.points.size()-windowsize+1);
+
+        int index=0;
+        double sum=0;
+
+        for (int i=0; i<data.points.size(); i++) {
+            sum += data.points[i].value;
+
+            if (i>windowsize-1)
+                sum -= data.points[i-windowsize].value;
+
+            if (i>=windowsize-1) {
+                sums[index++] = sum/windowsize;
+            }
+
+        }
+        //qSort(sums.begin(), sums.end());
+        qSort(sums);
+
+        qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
+
+        ride_centiles[9][slice] = sums[sums.size()-1];
+
+        for (int i = ride_centiles.size()-1; i > 0; --i) {
+            sum = 0;
+            int count = 0;
+
+            for (int n = (0.1*i)*sums.size(); n < sums.size()-1 && n < (0.1*(i+1))*sums.size(); ++n) {
+                sum += sums[n];
+                count++;
+            }
+            if (sum > 0) {
+                if (sum > 0) {
+                    double avg = sum / count;
+                    ride_centiles[i-1][slice]=avg;
+                }
+            } else {
+                ride_centiles[i-1][slice]=ride_centiles[i][slice];
+            }
+        }
+
+        slice ++;
+    }
+
+    qDebug() << "end calcul for first 6min " << elapsed.elapsed();
+    qDebug() << "downsampling to 5s after 6min ";
+
+    QVector<double> downsampled(0);
+
+    // moving to 5s samples would INCREASE the work...
+    if (rideItem->ride()->recIntSecs() >= 5) {
+        samplerate = rideItem->ride()->recIntSecs();
+        for (int i=0; i<data.points.size(); i++)
+            downsampled.append(data.points[i].value);
+        } else {
+            // moving to 5s samples is DECREASING the work...
+            samplerate = 5;
+            // we are downsampling to 5s
+            long five=5; // start at 1st 5s sample
+            double fivesum=0;
+
+            int fivecount=0;
+
+            for (int i=0; i<data.points.size(); i++) {
+                if (data.points[i].secs <= five) {
+                    fivesum += data.points[i].value;
+                    fivecount++;
+                }
+                else {
+                downsampled.append(fivesum / fivecount);
+                fivecount = 1;
+                fivesum = data.points[i].value;
+
+                five += 5;
+            }
+        }
+    }
+
+    qDebug() << "end downsampling to 5s after 6min " << elapsed.elapsed();
+    qDebug() << "calcul for rest of ride ";
+
+    for (int slice = 360; slice < ride_centiles[9].size();) {
+        int windowsize = slice / samplerate;
+        QVector<double> sums(downsampled.size()-windowsize+2);
+
+
+        int index=0;
+        double sum=0;
+
+        for (int i=0; i<downsampled.size(); i++) {
+            sum += downsampled[i];
+
+            if (i>windowsize-1)
+                sum -= downsampled[i-windowsize];
+            if (i>=windowsize-1)
+                sums[index++] = sum / windowsize;
+
+        }
+        //qSort(sums.begin(), sums.end());
+        qSort(sums);
+
+        qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
+
+
+
+        ride_centiles[9][slice] = sums[sums.size()-1];
+
+        for (int i = ride_centiles.size()-1; i > 0; --i) {
+            sum = 0;
+            int count = 0;
+
+            for (int n = (0.1*i)*sums.size(); n < sums.size() && n < (0.1*(i+1))*sums.size(); ++n) {
+                if (sums[n]>0)  {
+                    sum += sums[n];
+                    count++;
+                }
+            }
+            if (sum > 0) {
+                double avg = sum / count;
+                ride_centiles[i-1][slice]=avg;
+            } else {
+                ride_centiles[i-1][slice]=ride_centiles[i][slice];
+            }
+        }
+
+
+
+        // increment interval duration we are going to search
+        // for next, gaps increase as duration increases to
+        // reduce overall work, since we require far less
+        // precision as the ride duration increases
+        if (slice < 3600) slice +=20; // 20s up to one hour
+        else if (slice < 7200) slice +=60; // 1m up to two hours
+        else if (slice < 10800) slice += 300; // 5mins up to three hours
+        else slice += 600; // 10mins after that
+    }
+
+    qDebug() << "end calcul for rest of ride " << elapsed.elapsed();
+    qDebug() << "fill gaps ";
+
+    /*for (int i = 0; i<ride_centiles.size(); i++) {
+        double last=0.0;
+        for (int j=ride_centiles[i].size()-1; j; j--) {
+            if (ride_centiles[i][j] == 0) ride_centiles[i][j]=last;
+            else last = ride_centiles[i][j];
+        }
+    }*/
+
+    for (int i = ride_centiles.size()-1; i>=0; i--) {
+        double last=0.0;
+        for (int j=0; j<ride_centiles[i].size(); j++) {
+            if (ride_centiles[i][j] == 0) ride_centiles[i][j]=last;
+            else last = ride_centiles[i][j];
+        }
+    }
+
+    qDebug() << "end fill gaps " << elapsed.elapsed();
+    qDebug() << "plotting ";
+
+
+    for (int i = 0; i<ride_centiles.size(); i++) {
+        int maxNonZero = 0;
+        QVector<double> timeArray(ride_centiles[i].size());
+        for (int j = 0; j < ride_centiles[i].size(); ++j) {
+            timeArray[j] = j / 60.0;
+            if (ride_centiles[i][j] > 0) maxNonZero = j;
+        }
+
+        if (maxNonZero > 1) {
+
+            QwtPlotCurve *thisCurve = new QwtPlotCurve(tr("%10 %").arg(i+1));
+            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            QPen pen(QColor(250-(i*20),0,00));
+            pen.setStyle(Qt::DashLine); // Qt::SolidLine
+            double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+            pen.setWidth(width);
+            thisCurve->setPen(pen);
+            thisCurve->attach(this);
+
+
+            thisCurve->setSamples(timeArray.data() + 1, ride_centiles[i].constData() + 1, maxNonZero - 1);
+            allCurves.append(thisCurve);
+        }
+    }
+
+
+    qDebug() << "end plotting " << elapsed.elapsed();
+
+}
+
+void
+CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
+{
+    clear_CP_Curves();
+    // If no range
+    if (compareDateRanges.count() == 0) return;
+
+    int shadeModeOri = shadeMode;
+    int modelOri = model;
+
+    double ymax = 0;
+    QList<RideFileCache> bests;
+
+    model = 0; // no model in compareDateRanges
+
+    // prepare aggregates
+    for (int i = 0; i < compareDateRanges.size(); ++i) {
+        CompareDateRange range = compareDateRanges.at(i);
+        if (range.isChecked())  {
+            RideFileCache bestsForRange(range.sourceContext, range.start, range.end, isFiltered, files, rangemode);
+            bests.append(bestsForRange);
+
+            if (bestsForRange.meanMaxArray(series).size()) {
+                int maxNonZero = 0;
+                for (int i = 0; i < bestsForRange.meanMaxArray(series).size(); ++i) {
+                    if (bestsForRange.meanMaxArray(series)[i] > 0) maxNonZero = i;
+                }
+                if (i>0)
+                    shadeMode = 0;
+                plot_allCurve(this, maxNonZero, bestsForRange.meanMaxArray(series).constData() + 1, range.color, true);
+
+                foreach(double v, bestsForRange.meanMaxArray(series)) {
+                    if (v > ymax) ymax = v;
+                }
+            }
+        }
+    }
+    setAxisScale(yLeft, 0, 1.1*ymax);
+    shadeMode = shadeModeOri;
+    model = modelOri;
+
+    replot();
+}
+
+void
+CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
+{
+    if (rangemode) return;
+
+    // unselect current intervals
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        context->athlete->allIntervalItems()->child(i)->setSelected(false);
+    }
+
+    // Remove curve from current Ride
+    if (thisCurve) {
+        delete thisCurve;
+        thisCurve = NULL;
+    }
+
+
+    // If no intervals
+    if (compareIntervals.count() == 0) return;
+
+    // prepare aggregates
+    for (int i = 0; i < compareIntervals.size(); ++i) {
+        CompareInterval interval = compareIntervals.at(i);
+
+        if (interval.isChecked())  {
+            // compute the mean max
+            QVector<float>vector;
+            MeanMaxComputer thread1(interval.data, vector, series); thread1.run();
+            thread1.wait();
+
+            // no data!
+            if (vector.count() == 0) return;
+
+            // create curve data arrays
+            plot_interval(this, vector, interval.color);
+        }
+    }
+
+    replot();
+}
+
+void
+CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor intervalColor)
+{
+    QVector<double>x;
+    QVector<double>y;
+    for (int i=1; i<vector.count(); i++) {
+        x << double(i)/60.00f;
+        y << vector[i];
+    }
+
+    // create a curve!
+    QwtPlotCurve *curve = new QwtPlotCurve();
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    // set its color - based upon index in intervals!
+    QPen pen(intervalColor);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
+    //pen.setStyle(Qt::DotLine);
+    intervalColor.setAlpha(64);
+    QBrush brush = QBrush(intervalColor);
+    if (shadeIntervals) curve->setBrush(brush);
+    else curve->setBrush(Qt::NoBrush);
+    curve->setPen(pen);
+    curve->setSamples(x.data(), y.data(), x.count()-1);
+
+    // attach and register
+    curve->attach(thisPlot);
+
+    allCurves.append(curve);
 }

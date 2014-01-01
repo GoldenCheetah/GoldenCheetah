@@ -28,6 +28,7 @@
 
 #include <QtGui>
 #include <QFormLayout>
+#include <QCheckBox>
 
 class CpintPlot;
 class QwtPlotCurve;
@@ -60,7 +61,6 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int laei1 READ laeI1 WRITE setLaeI1 USER true)
     Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
     Q_PROPERTY(int laei2 READ laeI2 WRITE setLaeI2 USER true)
-    Q_PROPERTY(int useExtendedCP READ useExtendedCP WRITE setUseExtendedCP USER true)
 
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -69,11 +69,18 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
     Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
     Q_PROPERTY(int shading READ shading WRITE setShading USER true)
+    Q_PROPERTY(int shadeIntervals READ shadeIntervals WRITE setShadeIntervals USER true)
+    Q_PROPERTY(int ridePlotMode READ ridePlotMode WRITE setRidePlotMode USER true)
     Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
 
         CriticalPowerWindow(const QDir &home, Context *context, bool range = false);
+
+        // compare is supported
+        bool isCompare() const {
+            return (rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals);
+        }
 
         // reveal
         bool hasReveal() { return false; }
@@ -94,6 +101,9 @@ class CriticalPowerWindow : public GcChartWindow
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif
+
+        int ridePlotMode() const { return ridePlotStyleCombo->currentIndex(); }
+        void setRidePlotMode(int x) { ridePlotStyleCombo->setCurrentIndex(x); }
 
         // for retro compatibility
         QString season() const { return cComboSeason->itemText(cComboSeason->currentIndex()); }
@@ -129,9 +139,6 @@ class CriticalPowerWindow : public GcChartWindow
         int laeI2() const { return laeI2SpinBox->value(); }
         void setLaeI2(int x) { return laeI2SpinBox->setValue(x); }
 
-        int useExtendedCP() const { return ckExtendedCP->checkState(); }
-        void setUseExtendedCP(int x) { return ckExtendedCP->setChecked(x); }
-
         RideFile::SeriesType series() { 
             return static_cast<RideFile::SeriesType>
                 (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
@@ -158,6 +165,9 @@ class CriticalPowerWindow : public GcChartWindow
         int shading() { return shadeCombo->currentIndex(); }
         void setShading(int x) { return shadeCombo->setCurrentIndex(x); }
 
+        int shadeIntervals() { return shadeIntervalsCheck->isChecked(); }
+        void setShadeIntervals(int x) { return shadeIntervalsCheck->setChecked(x); }
+
 
     protected slots:
         void forceReplot();
@@ -170,6 +180,8 @@ class CriticalPowerWindow : public GcChartWindow
         void intervalsChanged();
         void seasonSelected(int season);
         void shadingSelected(int shading);
+        void shadeIntervalsChanged(int state);
+        void setRidePlotStyle(int index);
         void setSeries(int index);
         void resetSeasons();
         void filterChanged();
@@ -202,8 +214,9 @@ class CriticalPowerWindow : public GcChartWindow
         QComboBox *seriesCombo;
         QComboBox *modelCombo;
         QComboBox *cComboSeason;
+        QComboBox *ridePlotStyleCombo;
         QComboBox *shadeCombo;
-        QCheckBox *ckExtendedCP;
+        QCheckBox *shadeIntervalsCheck;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;
@@ -214,6 +227,12 @@ class CriticalPowerWindow : public GcChartWindow
         SearchFilterBox *searchBox;
 #endif
         QList<QwtPlotCurve*> intervalCurves;
+
+        QLabel *intervalLabel, *secondsLabel;
+        QLabel *sanLabel;
+        QLabel *anLabel;
+        QLabel *aeLabel;
+        QLabel *laeLabel;
 
         QDoubleSpinBox *sanI1SpinBox, *sanI2SpinBox;
         QDoubleSpinBox *anI1SpinBox, *anI2SpinBox;

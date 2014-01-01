@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QSplitter>
+#include <QFont>
 #include <QMetaObject>
 #include <QStackedWidget>
 
@@ -70,6 +71,8 @@ class TabView : public QWidget
         void setShowBottom(bool x);
         bool isShowBottom() { if (bottom_) return bottom_->isVisible(); return false; }
         bool hasBottom() { return (bottom_!=NULL); }
+
+        ViewSplitter *bottomSplitter() { return mainSplitter; }
 
         // select / deselect view
         void setSelected(bool x) { _selected=x; selectionChanged(); }
@@ -137,20 +140,33 @@ class ViewSplitter : public QSplitter
 
 public:
     ViewSplitter(Qt::Orientation orientation, QString name, TabView *parent=0) :
-        orientation(orientation), name(name), tabView(parent), showForDrag(false),
-        QSplitter(orientation, parent) {
+        QSplitter(orientation, parent), orientation(orientation), name(name), tabView(parent), showForDrag(false) {
         setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
+
     }
 
 protected:
     QSplitterHandle *createHandle() {
-        return new GcSplitterHandle(name, orientation, this);
+        return new GcSplitterHandle(name, orientation, NULL, NULL, newtoggle(), this);
     }
     int handleWidth() { return 23; };
 
+    QPushButton *newtoggle() {
+        toggle = new QPushButton("OFF", this);
+        toggle->setCheckable(true);
+        toggle->setChecked(false);
+        toggle->setFixedWidth(40);
+        toggle->setFocusPolicy(Qt::NoFocus);
+        connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
+
+        return toggle;
+    }
     virtual void dragEnterEvent(QDragEnterEvent *event) {
-        if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
+
+        // we handle intervals or seasons
+        if (event->mimeData()->formats().contains("application/x-gc-intervals") ||
+            event->mimeData()->formats().contains("application/x-gc-seasons")) {
             if (tabView->hasBottom() && tabView->isShowBottom() == false) {
                 showForDrag = true;
                 tabView->dragEvent(true);
@@ -160,7 +176,7 @@ protected:
         }
     }
 
-    virtual void dragLeaveEvent(QDragLeaveEvent *event) {
+    virtual void dragLeaveEvent(QDragLeaveEvent *) {
 
         int X = this->mapFromGlobal(QCursor::pos()).x();
         int Y = this->mapFromGlobal(QCursor::pos()).y();
@@ -200,11 +216,33 @@ public:
         return tot - 1;
     }
 
+signals:
+    void compareChanged(bool);
+
+public slots:
+    void toggled() {
+        QFont font;
+        if (toggle->isChecked()) {
+            font.setWeight(QFont::Bold);
+            toggle->setFont(font);
+            toggle->setStyleSheet("color: red");
+            toggle->setText("ON");
+        } else {
+            font.setWeight(QFont::Normal);
+            toggle->setFont(font);
+            toggle->setStyleSheet("");
+            toggle->setText("OFF");
+        }
+
+        // we started compare mode
+        emit compareChanged(toggle->isChecked());
+    }
 private:
     Qt::Orientation orientation;
     QString name;
     TabView *tabView;
     bool showForDrag;
+    QPushButton *toggle;
 };
 
 #endif // _GC_TabView_h

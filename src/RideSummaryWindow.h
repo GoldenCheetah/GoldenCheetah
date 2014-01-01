@@ -78,6 +78,9 @@ class RideSummaryWindow : public GcChartWindow
         void setFilter(QString x) { if (!ridesummary) searchBox->setFilter(x); }
 #endif
 
+        bool isCompare() const { return ((ridesummary && context->isCompareIntervals)
+                                      || (!ridesummary && context->isCompareDateRanges)); }
+
     protected slots:
 
         void refresh();
@@ -96,9 +99,13 @@ class RideSummaryWindow : public GcChartWindow
         void setFilter(QStringList);
 #endif
 
+        // compare mode started or items to compare changed
+        void compareChanged();
+
     protected:
 
-        QString htmlSummary() const;
+        QString htmlSummary() const;        // summary of a ride or a date range
+        QString htmlCompareSummary() const; // comparing intervals or seasons
 
         Context *context;
         QWebView *rideSummary;

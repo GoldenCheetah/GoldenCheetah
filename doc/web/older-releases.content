@@ -19,6 +19,50 @@ please see <a href="download.html">the download page</a> instead.
 </tr>
 
 <tr>
+<td valign="top">3.0.0</td>
+<td valign="top">
+<a href="GoldenCheetah_3.0.0_Mac_32bit.dmg">Mac OS X Intel (32bit)</a><br>
+<a href="GoldenCheetah_3.0.0_Mac_64bit.dmg">Mac OS X Intel (64bit)</a><br>
+<a href="GoldenCheetah_3.0.0_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+New Features and Enhancements
+  <ul>
+  <li>See the full log below.</li>
+  <li>See the <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Release.pdf?raw=true">Release Notes</a> PDF on GitHub.</li>
+  <li>A PDF <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-Manual.pdf?raw=true">User's Manual</a></li>
+  <li>A PDF <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/GC3-FAQ.pdf?raw=true">Frequently Asked Questions (FAQ)</a></li>
+ <li>Welcome Screens to help setup the program.</li>
+  </ul>
+</p>
+
+<p>
+Internationalisation
+  <ul>
+  <li>German (Tilman Schmiedeberg)</li>
+  <li>Italian (Marco Piccirilli)</li>
+  <li>Japanese (Okano Takayoshi)</li>
+  <li>Spanish (Alejandro Martinez)</li>
+  </ul>
+</p>
+
+<p>
+Development Builds
+  <ul>
+  <li>Gareth Coco</li>
+  <li>Jamie Kimberley</li>
+  </ul>
+</p>
+
+<p>
+<a href="release-notes_3.0.0.html">Full Version 3.0.0 change log.</a><br>
+</p>
+</td>
+</tr>
+<p>
+
+<tr>
 <td valign="top">2.1.0</td>
 <td valign="top">
 <a href="GoldenCheetah_2.1.0_Linux_x86.tgz">Linux x86</a><br>

@@ -36,7 +36,7 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
-MetricAggregator::MetricAggregator(Context *context) : QObject(context), context(context)
+MetricAggregator::MetricAggregator(Context *context) : QObject(context), context(context), first(true)
 {
     colorEngine = new ColorEngine(context);
     dbaccess = new DBAccess(context);
@@ -131,7 +131,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // showing a progress bar as we go
     QTime elapsed;
     elapsed.start();
-    QString title = tr("Refreshing Ride Statistics...\nStarted");
+    QString title = tr("Updating Statistics\nStarted");
     QProgressDialog *bar = NULL;
 
     int processed=0;
@@ -159,8 +159,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
         // create the dialog if we need to show progress for long running uodate
         long elapsedtime = elapsed.elapsed();
-        if (elapsedtime > 6000 && bar == NULL) {
-            bar = new QProgressDialog(title, tr("Abort"), 0, filenames.count(), context->mainWindow);
+        if ((first || elapsedtime > 6000) && bar == NULL) {
+            bar = new QProgressDialog(title, tr("Abort"), 0, filenames.count()); // not owned by mainwindow
             bar->setWindowFlags(bar->windowFlags() | Qt::FramelessWindowHint);
             bar->setWindowModality(Qt::WindowModal);
             bar->setMinimumDuration(0);
@@ -168,13 +168,13 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         }
 
         // update the dialog always after 6 seconds
-        if (elapsedtime > 6000) {
+        if (first || elapsedtime > 6000) {
 
             // update progress bar
             QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
                                                 .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
                                                 .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
-            QString title = tr("Refreshing Ride Statistics...\nElapsed: %1\n%2").arg(elapsedString).arg(name);
+            QString title = tr("%1\n\nUpdate Statistics\nElapsed: %2\n\n%3").arg(context->athlete->cyclist).arg(elapsedString).arg(name);
             bar->setLabelText(title);
             bar->setValue(processed);
         }
@@ -239,6 +239,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     out << "METRIC REFRESH ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
     log.close();
+
+    first = false;
 }
 
 /*----------------------------------------------------------------------

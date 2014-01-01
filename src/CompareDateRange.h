@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,20 +16,32 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Context.h"
-#include "Athlete.h"
+#ifndef _GC_CompareDateRange_h
+#define _GC_CompareDateRange_h
 
-Context::Context(MainWindow *mainWindow)
-{
-    this->mainWindow = mainWindow;
-    ride = NULL;
-    workout = NULL;
-    isfiltered = ishomefiltered = false;
-    isCompareIntervals = isCompareDateRanges = false;
-}
+class Context;
+#include "SummaryMetrics.h"
 
-const RideFile *
-Context::currentRide()
+#include <QColor>
+#include <QDate>
+#include <QString>
+
+class CompareDateRange
 {
-    return athlete->currentRide();
-}
+    public:
+        CompareDateRange() : context(NULL), days(0), sourceContext(NULL), checked(false) {}
+
+        Context *context;
+        QString name;
+        QColor color;
+        QList<SummaryMetrics> metrics, measures;
+        QDate start, end;
+        int days;
+        Context *sourceContext;
+        bool checked;
+
+        bool isChecked() const { return checked; }
+        void setChecked(bool x) { checked=x; }
+};
+
+#endif

@@ -39,6 +39,7 @@ class RideItem;
 class Zones;
 class Context;
 class LTMCanvasPicker;
+class CriticalPowerWindow;
 
 class penTooltip: public QwtPlotZoomer
 {
@@ -89,18 +90,16 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
-        void setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, bool useT0, bool useExtendedCP);
+        void setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model);
 
         // model type & intervals
-        bool useT0, useExtendedCP;
+        int model;
         double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
 
         double cp, tau, t0; // CP model parameters
 
         Model_eCP athleteModeleCP2;
         Model_eCP athleteModeleCP4;
-        Model_eCP worldClassModeleCP2;
-        Model_eCP worldClassModeleCP4;
 
         double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
@@ -121,19 +120,28 @@ class CpintPlot : public QwtPlot
         void showGrid(int state);
         void calculate(RideItem *rideItem);
         void plot_CP_curve(CpintPlot *plot, double cp, double tau, double t0n);
-        void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values);
+        void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values, QColor plotColor, bool forcePlotColor);
+        void plot_interval(CpintPlot *plot, QVector<float> vector, QColor plotColor);
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
         void setShadeMode(int x);
+        void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
         void clearFilter();
         void setFilter(QStringList);
+        void setRidePlotStyle(int index);
+
+        void calculateForDateRanges(QList<CompareDateRange> compareDateRanges);
+        void calculateForIntervals(QList<CompareInterval> compareIntervals);
 
     protected:
+
+        friend class ::CriticalPowerWindow;
 
         QString path;
         QwtPlotCurve *thisCurve;
         QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4;
+        QwtPlotCurve *extendedCPCurve_CP, *extendedCPCurve_WPrime, *extendedCPCurve_P1;
         QList<QwtPlotCurve*> allCurves;
         QwtPlotCurve *allCurve; // bests but not zoned
         QwtPlotMarker curveTitle;
@@ -159,7 +167,11 @@ class CpintPlot : public QwtPlot
         QStringList files;
         bool isFiltered;
         int shadeMode;
+        bool shadeIntervals;
         bool rangemode;
+
+        int ridePlotStyle;
+        void calculateCentile(RideItem *rideItem);
 
 
 };

@@ -159,13 +159,18 @@ class SeasonTreeView : public QTreeWidget
     Q_OBJECT
 
     public:
-        SeasonTreeView();
+        SeasonTreeView(Context *);
+
+        // for drag/drop
+        QStringList mimeTypes () const;
+        QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
 
     signals:
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
 
     protected:
         void dropEvent(QDropEvent* event);
+        Context *context;
 
 
 };

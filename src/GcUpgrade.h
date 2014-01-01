@@ -22,20 +22,23 @@
 
 // Build ID History
 //
-// 3001 - V3 RC1
-// 3002 - V3 RC2
-// 3003 - V3 RC3
-// 3004 - V3 RC4 / 4X
-// 3005 - V3 RC5 / 5X
-// 3006 - V3 RC6
-// 3007 - V3 RC7
-// 3010 - V3 RELEASE (June 7 2013)
-// 3040 - V3.1 DEV BUILDS
-#define VERSION3_BUILD 3010 // this was the official v3 build -- don't change this line!
+// 3001 - V3.0 RC1
+// 3002 - V3.0 RC2
+// 3003 - V3.0 RC3
+// 3004 - V3.0 RC4 / 4X
+// 3005 - V3.0 RC5 / 5X
+// 3006 - V3.0 RC6
+// 3007 - V3.0 RC7
+// 3010 - V3.0 RELEASE (June 7 2013)
+// 3020 - V3.0 SP1 RC1
+// 3030 - V3.0 SP1 RELEASE (December 2013)
+// 3040 - V3.1 DEVELOPMENT
 
-// add new versions below
-#define VERSION_LATEST 3040 // this is the very latest build -- increment for new dev branch or releases
-#define VERSION_STRING "V3.1"
+#define VERSION3_BUILD 3010 // released
+#define VERSION3_SP1   3030 // released
+
+#define VERSION_LATEST 3040
+#define VERSION_STRING "V3.1 (dev)"
 
 class GcUpgrade
 {

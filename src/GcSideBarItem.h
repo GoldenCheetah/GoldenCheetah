@@ -100,6 +100,8 @@ class GcSplitterHandle : public QSplitterHandle
 
 public:
     GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent = 0, bool metal = true);
+    GcSplitterHandle(QString title, Qt::Orientation orientation, QWidget *left, QWidget *mid, QWidget *right,
+                     QSplitter *parent = 0, bool metal = true);
 
     QString title() const { return _title; }
     QSize sizeHint() const;
@@ -113,6 +115,8 @@ protected:
     int index;
 
 private:
+    void init(QString title, Qt::Orientation orientation, QWidget *left, QWidget *mid, QWidget *right,
+                     QSplitter *parent, bool metal);
     void paintBackground(QPaintEvent *);
 
     QHBoxLayout *titleLayout;

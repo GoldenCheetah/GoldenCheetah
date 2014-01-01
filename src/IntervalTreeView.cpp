@@ -24,7 +24,7 @@
 IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
-    setDragDropOverwriteMode(true);
+    setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -35,7 +35,7 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 void
 IntervalTreeView::dropEvent(QDropEvent* event)
 {
-qDebug()<<"interval tree drop event!!";
+qDebug()<<"interval tree drop event!!"<<event->mimeData()->urls();
 
     IntervalItem* item1 = (IntervalItem *)itemAt(event->pos());
     QTreeWidget::dropEvent(event);
@@ -43,4 +43,45 @@ qDebug()<<"interval tree drop event!!";
 
     if (item1==topLevelItem(0) || item1 != item2)
         QTreeWidget::itemChanged(item2, 0);
+}
+
+QStringList 
+IntervalTreeView::mimeTypes() const
+{
+    QStringList returning;
+    returning << "application/x-gc-intervals";
+
+    return returning;
+}
+
+QMimeData *
+IntervalTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
+{
+    QMimeData *returning = new QMimeData;
+
+    // we need to pack into a byte array
+    QByteArray rawData;
+    QDataStream stream(&rawData, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+
+    // pack data 
+    stream << (quint64)(context); // where did this come from?
+    stream << (int)items.count();
+    foreach (QTreeWidgetItem *p, items) {
+
+        // convert to one of ours
+        IntervalItem *i = static_cast<IntervalItem*>(p);
+
+        // serialize
+        stream << p->text(0); // name
+        stream << (quint64)(i->ride);
+        stream << (quint64)i->start << (quint64)i->stop; // start and stop in secs
+        stream << (quint64)i->startKM << (quint64)i->stopKM; // start and stop km
+        stream << (quint64)i->displaySequence;
+
+    }
+
+    // and return as mime data
+    returning->setData("application/x-gc-intervals", rawData);
+    return returning;
 }

@@ -44,6 +44,9 @@ void nostderr(QString dir)
 }
 #endif
 
+#ifdef Q_OS_MAC
+#include "QtMacSegmentedButton.h" // for cocoa initialiser
+#endif
 
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
@@ -55,6 +58,9 @@ void nostderr(QString dir)
 
 QApplication *application;
 bool restarting = false;
+
+// root directory shared by all
+QString gcroot;
 
 int
 main(int argc, char *argv[])
@@ -136,6 +142,11 @@ main(int argc, char *argv[])
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
 
+#ifdef Q_OS_MAC
+    // get an autorelease pool setup
+    static CocoaInitializer cocoaInitializer;
+#endif
+
     // set defaultfont
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
@@ -204,6 +215,9 @@ main(int argc, char *argv[])
                 home.cd(libraryPath);
             }
         }
+
+        // set global root directory
+        gcroot = home.absolutePath();
 
         // now redirect stderr
 #ifndef WIN32

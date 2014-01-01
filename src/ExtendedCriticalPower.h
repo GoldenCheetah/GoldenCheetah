@@ -120,6 +120,13 @@ class ExtendedCriticalPower
         Model_eCP deriveExtendedCP_4_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
         QwtPlotCurve* getPlotCurveForExtendedCP_4_3(Model_eCP athleteModeleCP2);
         QwtPlotMarker* getPlotMarkerForExtendedCP_4_3(Model_eCP athleteModeleCP2);
+        QwtPlotCurve* getPlotLevelForExtendedCP_4_3(Model_eCP athleteModeleCP2);
+
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_CP(Model_eCP athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WPrime(Model_eCP athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_CP_WPrime(Model_eCP athleteModeleCP2);
+        QwtPlotCurve* getPlotCurveForExtendedCP_4_3_P1(Model_eCP athleteModeleCP2);
+
 
     private:
         Context *context;

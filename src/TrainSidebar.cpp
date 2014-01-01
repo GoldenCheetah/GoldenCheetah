@@ -236,7 +236,11 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 intensitySlider->hide(); //XXX!!! temporary
 
 #ifdef Q_OS_MAC
+#if QT_VERSION > 0x5000
     QStyle *macstyler = QStyleFactory::create("fusion");
+#else
+    QStyle *macstyler = QStyleFactory::create("Cleanlooks");
+#endif
     play->setStyle(macstyler);
     stop->setStyle(macstyler);
     rewind->setStyle(macstyler);

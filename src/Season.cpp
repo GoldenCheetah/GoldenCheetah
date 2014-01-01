@@ -18,6 +18,8 @@
 
 #include "Season.h"
 #include "MainWindow.h"
+#include "Context.h"
+#include "Athlete.h"
 #include <QString>
 #include <QFile>
 #include <QXmlInputSource>
@@ -119,7 +121,7 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
 
     seedEdit = new QDoubleSpinBox(this);
     seedEdit->setDecimals(0);
-    seedEdit->setRange(0.0, 100.0);
+    seedEdit->setRange(0.0, 300.0);
     seedEdit->setSingleStep(1.0);
     seedEdit->setWrapping(true);
     seedEdit->setAlignment(Qt::AlignLeft);
@@ -388,7 +390,7 @@ Seasons::writeSeasons()
     seasonsChanged(); // signal!
 }
 
-SeasonTreeView::SeasonTreeView()
+SeasonTreeView::SeasonTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragDropOverwriteMode(true);
@@ -406,9 +408,53 @@ SeasonTreeView::dropEvent(QDropEvent* event)
     int idx1 = invisibleRootItem()->indexOfChild(item);
     int idx2 = indexAt(event->pos()).row();
 
-    // finalise drop event
-    QTreeWidget::dropEvent(event);
+    // don't move temp 'system generated' date ranges!
+    if (context->athlete->seasons->seasons[idx1].type != Season::temporary) {
 
-    // emit the itemMoved signal
-    Q_EMIT itemMoved(item, idx1, idx2);
+        // finalise drop event
+        QTreeWidget::dropEvent(event);
+
+        // emit the itemMoved signal
+        Q_EMIT itemMoved(item, idx1, idx2);
+    }
+}
+
+QStringList 
+SeasonTreeView::mimeTypes() const
+{
+    QStringList returning;
+    returning << "application/x-gc-seasons";
+
+    return returning;
+}
+
+QMimeData *
+SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
+{
+    QMimeData *returning = new QMimeData;
+
+    // we need to pack into a byte array
+    QByteArray rawData;
+    QDataStream stream(&rawData, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+
+    // pack data 
+    stream << (quint64)(context); // where did this come from?
+    stream << items.count();
+    foreach (QTreeWidgetItem *p, items) {
+
+        // get the season this is for
+        int index = p->treeWidget()->invisibleRootItem()->indexOfChild(p);
+
+        // season[index] ...
+        stream << context->athlete->seasons->seasons[index].name; // name
+        stream << context->athlete->seasons->seasons[index].start;
+        stream << context->athlete->seasons->seasons[index].end;
+        stream << (quint64)context->athlete->seasons->seasons[index]._days;
+
+    }
+
+    // and return as mime data
+    returning->setData("application/x-gc-seasons", rawData);
+    return returning;
 }

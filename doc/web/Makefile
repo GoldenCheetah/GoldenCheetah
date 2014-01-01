@@ -8,9 +8,10 @@ OTHER= 3d.png choose-a-cyclist.png cpint.gp cpint.png critical-power-plot.png cr
        pm.png power.zones realtime.png ride-plot.png ride-plot2.png ride-summary.png sample.gp \
        sample.png weekly-summary.png google-earth.png aerolab.png
 
-BIN=    GoldenCheetah_3.0.0_Mac_32bit.dmg \
-        GoldenCheetah_3.0.0_Mac_64bit.dmg \
-        GoldenCheetah_3.0.0_Windows_Installer.exe
+BIN=    GoldenCheetah_3.0.1_Mac_Universal.dmg \
+        GoldenCheetah-3.0.1-1.fc18.x86_64.rpm \
+        GoldenCheetah-3.0.1-1.fc19.x86_64.rpm \
+        GoldenCheetah_3.0.1_Windows_Installer.exe
 
 all: $(HTML)
 .PHONY: all clean install
@@ -52,6 +53,9 @@ release-notes.html: release-notes.content genpage.pl
 
 release-notes_2.1.0.html: release-notes_2.1.0.content genpage.pl
 	./genpage.pl "Release Notes 2.1.0" $< > $@
+
+release-notes_3.0.0.html: release-notes_3.0.0.content genpage.pl
+	./genpage.pl "Release Notes 3.0.0" $< > $@
 
 faq.html: faq.content genpage.pl
 	./genpage.pl "Frequently Asked Questions" $< > $@
