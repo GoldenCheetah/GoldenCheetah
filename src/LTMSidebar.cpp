@@ -180,7 +180,9 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
+#ifdef GC_HAVE_LUCENE
     connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(autoFilterRefresh()));
+#endif
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
