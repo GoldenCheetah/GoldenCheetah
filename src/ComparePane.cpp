@@ -649,6 +649,7 @@ ComparePane::dropEvent(QDropEvent *event)
                     l->apower = p->apower;
                 }
             }
+            add.data->recalculateDerivedSeries();
 
             // just use standard colors and cycle round
             // we will of course repeat, but the user can
