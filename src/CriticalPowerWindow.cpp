@@ -451,13 +451,20 @@ CriticalPowerWindow::modelChanged()
 
     case 3 : // ExtendedCP
 
-            sanLabel->show();
+            intervalLabel->show();
             secondsLabel->show();
+            sanLabel->show();
             sanI1SpinBox->show();
             sanI2SpinBox->show();
+            anLabel->show();
+            anI1SpinBox->show();
+            anI2SpinBox->show();
+            aeLabel->show();
+            aeI1SpinBox->show();
+            aeI2SpinBox->show();
             laeLabel->show();
             laeI1SpinBox->show();
-            laeI2SpinBox->show();
+            laeI2SpinBox->show();         
 
             // Default values
             sanI1SpinBox->setValue(20);
