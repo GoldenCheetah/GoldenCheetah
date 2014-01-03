@@ -1075,6 +1075,19 @@ void
 CriticalPowerWindow::shadeIntervalsChanged(int state)
 {
     cpintPlot->setShadeIntervals(state);
+
+    // any existing interval curves need brush or no brush
+    foreach(QwtPlotCurve *p, intervalCurves) {
+    if (p) {
+            if (state) {
+                QColor curveColor = p->pen().color();
+                curveColor.setAlpha(64);
+                QBrush brush(curveColor);
+                p->setBrush(brush);
+            }
+            else p->setBrush(Qt::NoBrush);
+        }
+    }
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
 }

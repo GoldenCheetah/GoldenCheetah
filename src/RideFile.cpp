@@ -94,7 +94,37 @@ RideFile::seriesName(SeriesType series)
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("VAM"));
     case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
+    case RideFile::wprime: return QString(tr("W' balance"));
     default: return QString(tr("Unknown"));
+    }
+}
+
+QColor
+RideFile::colorFor(SeriesType series)
+{
+    switch (series) {
+    case RideFile::cad: return GColor(CCADENCE);
+    case RideFile::hr: return GColor(CHEARTRATE);
+    case RideFile::kph: return GColor(CSPEED);
+    case RideFile::nm: return GColor(CTORQUE);
+    case RideFile::watts: return GColor(CPOWER);
+    case RideFile::xPower: return GColor(CXPOWER);
+    case RideFile::aPower: return GColor(CAPOWER);
+    case RideFile::NP: return GColor(CNPOWER);
+    case RideFile::alt: return GColor(CALTITUDE);
+    case RideFile::headwind: return GColor(CWINDSPEED);
+    case RideFile::temp: return GColor(CTEMP);
+    case RideFile::lrbalance: return GColor(CBALANCELEFT);
+    case RideFile::interval: return GColor(CBALANCERIGHT);
+    case RideFile::wattsKg: return GColor(CPOWER);
+    case RideFile::wprime: return GColor(CWBAL);
+    case RideFile::secs:
+    case RideFile::km:
+    case RideFile::vam:
+    case RideFile::lon:
+    case RideFile::lat:
+    case RideFile::slope:
+    default: return GColor(CPLOTMARKER);
     }
 }
 
@@ -124,6 +154,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("meters per hour"));
     case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/lb"));
+    case RideFile::wprime: return QString(useMetricUnits ? tr("joules") : tr("joules"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -570,6 +601,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case temp : dataPresent.temp = value; break;
         case lrbalance : dataPresent.lrbalance = value; break;
         case interval : dataPresent.interval = value; break;
+        case wprime : dataPresent.wprime = value; break;
         default:
         case none : break;
     }
@@ -717,6 +749,7 @@ RideFile::decimalsFor(SeriesType series)
         case vam : return 0; break;
         case wattsKg : return 2; break;
         case lrbalance : return 1; break;
+        case wprime : return 0; break;
         case none : break;
     }
     return 2; // default
@@ -746,6 +779,7 @@ RideFile::maximumFor(SeriesType series)
         case vam : return 9999; break;
         case wattsKg : return 50; break;
         case lrbalance : return 100; break;
+        case wprime : return 99999; break;
         case none : break;
     }
     return 9999; // default
@@ -775,6 +809,7 @@ RideFile::minimumFor(SeriesType series)
         case vam : return 0; break;
         case wattsKg : return 0; break;
         case lrbalance : return 0; break;
+        case wprime : return 0; break;
         case none : break;
     }
     return 0; // default

@@ -122,7 +122,7 @@ class LTMSidebar : public QWidget
         GcSubSplitter *filterSplitter;
 
         // filter state
-        bool isautofilter, isqueryfilter;
+        bool isqueryfilter, isautofilter;
         QStringList autoFilterFiles, queryFilterFiles;
 };
 

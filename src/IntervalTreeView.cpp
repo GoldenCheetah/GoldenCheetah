@@ -35,8 +35,6 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 void
 IntervalTreeView::dropEvent(QDropEvent* event)
 {
-qDebug()<<"interval tree drop event!!"<<event->mimeData()->urls();
-
     IntervalItem* item1 = (IntervalItem *)itemAt(event->pos());
     QTreeWidget::dropEvent(event);
     IntervalItem* item2 = (IntervalItem *)itemAt(event->pos());

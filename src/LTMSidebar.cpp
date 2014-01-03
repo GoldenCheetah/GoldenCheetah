@@ -581,7 +581,6 @@ LTMSidebar::filterTreeWidgetSelectionChanged()
 
         QStringList errors, files; // results of all the selections
         bool first = true;
-        int index=0;
 
         foreach (QTreeWidgetItem *item, filterTree->selectedItems()) {
 

@@ -58,14 +58,14 @@ struct RideFileDataPresent
     bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance, interval;
 
     // derived
-    bool np,xp,apower;
+    bool np,xp,apower,wprime;
 
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), lrbalance(false), interval(false),
-        np(false), xp(false), apower(false) {}
+        np(false), xp(false), apower(false), wprime(false) {}
 };
 
 struct RideFileInterval
@@ -121,6 +121,7 @@ class RideFile : public QObject // QObject to emit signals
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);
         static double minimumFor(SeriesType series);
+        static QColor colorFor(SeriesType series);
         static bool parseRideFileName(const QString &name, QDateTime *dt);
 
         // Working with DATAPOINTS -- ***use command to modify***

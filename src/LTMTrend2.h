@@ -21,19 +21,14 @@
 
 class LTMTrend2
 {
-    /* calculated as points added then used to derive a b and c */
-    int count;
-    double sx4, sx3, sx2, sx; // sum x^4, ^3, ^2 and just sum x
-    double sx2y, sxy, sy;     // sum x^2 * y, sum x * y, and just sum y
-
     public:
 
         double minx, miny, maxx, maxy;
 
         // constructor just initialises variables
         LTMTrend2(double *xdata, double *ydata, int count) 
-                : sx4(0), sx3(0), sx2(0), sx(0), sx2y(0), sxy(0), sy(0),
-                  minx(10000), miny(10000), maxx(-10000), maxy(-10000), count(count)
+                : minx(10000), miny(10000), maxx(-10000), maxy(-10000), count(count),
+                  sx4(0), sx3(0), sx2(0), sx(0), sx2y(0), sxy(0), sy(0)
         {
             for (int i = 0; i < count; i++) {
                 addPoint(xdata[i], ydata[i]);
@@ -125,6 +120,11 @@ class LTMTrend2
         return ss_err;
     }
 #endif
+
+    /* calculated as points added then used to derive a b and c */
+    int count;
+    double sx4, sx3, sx2, sx; // sum x^4, ^3, ^2 and just sum x
+    double sx2y, sxy, sy;     // sum x^2 * y, sum x * y, and just sum y
 
 
 };

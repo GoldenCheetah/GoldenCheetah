@@ -902,7 +902,7 @@ CpintPlot::calculate(RideItem *rideItem)
 }
 
 void
-CpintPlot::showGrid(int state)
+CpintPlot::showGrid(int )
 {
     //grid->setVisible(state == Qt::Checked);
     //replot();
@@ -1313,19 +1313,23 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
     model = 0; // no model in compareDateRanges
 
     // prepare aggregates
-    for (int i = 0; i < compareDateRanges.size(); ++i) {
-        CompareDateRange range = compareDateRanges.at(i);
+    for (int j = 0; j < compareDateRanges.size(); ++j) {
+
+        CompareDateRange range = compareDateRanges.at(j);
+
         if (range.isChecked())  {
             RideFileCache bestsForRange(range.sourceContext, range.start, range.end, isFiltered, files, rangemode);
             bests.append(bestsForRange);
 
             if (bestsForRange.meanMaxArray(series).size()) {
+
                 int maxNonZero = 0;
-                for (int i = 0; i < bestsForRange.meanMaxArray(series).size(); ++i) {
+                int i=0;
+                for (; i < bestsForRange.meanMaxArray(series).size(); ++i) {
                     if (bestsForRange.meanMaxArray(series)[i] > 0) maxNonZero = i;
                 }
-                if (i>0)
-                    shadeMode = 0;
+                if (i>0) shadeMode = 0;
+
                 plot_allCurve(this, maxNonZero, bestsForRange.meanMaxArray(series).constData() + 1, range.color, true);
 
                 foreach(double v, bestsForRange.meanMaxArray(series)) {
