@@ -356,6 +356,8 @@ int PfPvPlot::intervalCount() const
 void
 PfPvPlot::setData(RideItem *_rideItem)
 {
+    if (context->isCompareIntervals) return;
+
     // clear out any interval curves which are presently defined
     if (intervalCurves.size()) {
        QListIterator<QwtPlotCurve *> i(intervalCurves);
@@ -453,6 +455,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 void
 PfPvPlot::showIntervals(RideItem *_rideItem)
 {
+    if (context->isCompareIntervals) return;
     if (!rideItem) return;
 
     // clear out any interval curves which are presently defined
@@ -799,3 +802,120 @@ PfPvPlot::setFrameIntervals(bool value)
     frame_intervals = value;
     showIntervals(rideItem);
 }
+
+void
+PfPvPlot::showCompareIntervals(bool show)
+{
+    // Remove interval curve
+    if (intervalCurves.size()) {
+       QListIterator<QwtPlotCurve *> i(intervalCurves);
+       while (i.hasNext()) {
+           QwtPlotCurve *curve = i.next();
+           curve->detach();
+           //delete curve;
+       }
+    }
+    intervalCurves.clear();
+
+    // quickly erase old data
+    curve->setVisible(false);
+
+    int num_intervals = context->compareIntervals.count();
+
+    // If not compare mode or no intervals
+    if (!show || context->compareIntervals.count() == 0) return;
+
+    QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
+    long tot_cad = 0;
+    long tot_cad_points = 0;
+
+    // prepare aggregates
+    for (int high=-1, i = 0; i < context->compareIntervals.size(); ++i) {
+        CompareInterval interval = context->compareIntervals.at(i);
+
+        if (interval.isChecked())  {
+            ++high;
+
+            foreach(const RideFilePoint *p1, interval.data->dataPoints()) {
+                if (p1->watts != 0 && p1->cad != 0) {
+                    double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                    double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                    if (mergeIntervals())
+                        dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+                    else
+                        dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
+
+                    tot_cad += p1->cad;
+                    tot_cad_points++;
+                }
+            }
+        }
+
+    }
+
+    if (tot_cad_points > 0) {
+
+        // Now that we have the set of points, transform them into the
+        // QwtArrays needed to set the curve's data.
+        QVector<QwtArray<double> > aepfArrayInterval(num_intervals);
+        QVector<QwtArray<double> > cpvArrayInterval(num_intervals);
+
+        for (int i=0;i<num_intervals;i++) {
+            std::set<std::pair<double, double> >::const_iterator l(dataSetInterval[i].begin());
+            while (l != dataSetInterval[i].end()) {
+                const std::pair<double, double>& dataPoint = *l;
+
+                aepfArrayInterval[i].push_back(dataPoint.first);
+                cpvArrayInterval[i].push_back(dataPoint.second);
+
+                ++l;
+            }
+        }
+
+        // ensure same colors are used for each interval selected
+        QMap<int, CompareInterval> intervalmap;
+        int count=0;
+
+        if (num_intervals > 0) {
+            for (int g=0; g<num_intervals; g++) {
+                CompareInterval interval = context->compareIntervals.at(g);
+                if (interval.checked) intervalmap.insert(count++, interval);
+            }
+        }
+
+        QMapIterator<int, CompareInterval> order(intervalmap);
+        while (order.hasNext()) {
+            order.next();
+            CompareInterval interval = order.value();
+
+            QwtPlotCurve *_curve;
+            _curve = new QwtPlotCurve();
+
+            QColor intervalColor;
+            if (mergeIntervals())
+                intervalColor = Qt::red;
+            else
+                intervalColor = interval.color;
+
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(6);
+            sym->setBrush(QBrush(Qt::NoBrush));
+
+            QPen pen;
+            pen.setColor(intervalColor);
+            sym->setPen(pen);
+
+            _curve->setSymbol(sym);
+            _curve->setStyle(QwtPlotCurve::Dots);
+            _curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            _curve->setSamples(cpvArrayInterval[order.key()],aepfArrayInterval[order.key()]);
+            _curve->attach(this);
+
+            intervalCurves.append(_curve);
+        }
+    }
+    replot();
+}
+
