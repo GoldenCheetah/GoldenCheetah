@@ -59,7 +59,6 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context) :
     setAxesCount(QwtAxis::xBottom, 1);
     setAxesCount(QwtAxis::xTop, 0);
 
-    int n=0;
     for (int i=0; i<4; i++) {
 
         // lefts
@@ -594,10 +593,6 @@ LTMPlot::setData(LTMSettings *set)
 
                 // perform quadratic curve fit to data
                 LTMTrend2 regress(xdata.data(), ydata.data(), count);
-
-                // override class variable as doing it temporarily for trend line only
-                double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
-                    groupForDate(settings->start.date(), settings->groupBy);
 
                 QVector<double> xtrend;
                 QVector<double> ytrend;

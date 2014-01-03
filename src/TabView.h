@@ -143,7 +143,7 @@ public:
         QSplitter(orientation, parent), orientation(orientation), name(name), tabView(parent), showForDrag(false) {
         setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
-
+        toggle=NULL;
     }
 
 protected:
@@ -153,6 +153,7 @@ protected:
     int handleWidth() { return 23; };
 
     QPushButton *newtoggle() {
+        if (toggle) delete toggle; // we only need one!
         toggle = new QPushButton("OFF", this);
         toggle->setCheckable(true);
         toggle->setChecked(false);
@@ -233,7 +234,6 @@ public slots:
             toggle->setStyleSheet("");
             toggle->setText("OFF");
         }
-
         // we started compare mode
         emit compareChanged(toggle->isChecked());
     }
