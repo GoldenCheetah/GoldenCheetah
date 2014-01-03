@@ -45,6 +45,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     thisCurve(NULL),
     CPCurve(NULL),
     allCurve(NULL),
+    curveTitle(NULL),
     zones(zones),
     series(RideFile::watts),
     context(context),
@@ -80,11 +81,6 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     //grid->enableX(true);
     //grid->attach(this);
 
-    curveTitle.attach(this);
-    curveTitle.setXValue(5);
-    curveTitle.setYValue(60);
-    curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
-
     zoomer = new penTooltip(static_cast<QwtPlotCanvas*>(this->canvas()));
     zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
                             Qt::LeftButton, Qt::ShiftModifier);
@@ -96,12 +92,15 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     configChanged(); // apply colors
 
     ecp = new ExtendedCriticalPower(context);
-    extendedCPCurve4 = NULL;
-    extendedCurveTitle2 = NULL;
 
-    extendedCPCurve_P1 = NULL;
+    extendedCPCurve4 = NULL;
+    extendedCPCurve5 = NULL;
+    extendedCPCurve6 = NULL;
+
+    extendedCPCurve_WSecond = NULL;
     extendedCPCurve_WPrime = NULL;
     extendedCPCurve_CP = NULL;
+    extendedCPCurve_WPrime_CP = NULL;
 }
 
 void
@@ -395,6 +394,13 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     }
 #endif
 
+    if (curveTitle) {
+        delete curveTitle;
+        curveTitle = NULL;
+    }
+    curveTitle = new QwtPlotMarker("");
+    curveTitle->setXValue(5);
+
     if (series == RideFile::watts ||
         series == RideFile::aPower ||
         series == RideFile::xPower ||
@@ -404,13 +410,14 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
         QwtText text(curve_title, QwtText::PlainText);
         text.setColor(GColor(CPLOTMARKER));
-        curveTitle.setLabel(text);
+        curveTitle->setLabel(text);
     }
 
     if (series == RideFile::wattsKg)
-        curveTitle.setYValue(0.6);
+        curveTitle->setYValue(0.6);
     else
-        curveTitle.setYValue(70);
+        curveTitle->setYValue(70);
+    curveTitle->attach(thisPlot);
 
     CPCurve = new QwtPlotCurve(curve_title);
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
@@ -424,36 +431,14 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     CPCurve->attach(thisPlot);
 
 
-    // Extended CP 2
-    /*if (extendedCPCurve2) {
-        delete extendedCPCurve2;
-        extendedCPCurve2 = NULL;
-    }
-    extendedCPCurve2 = ecp->getPlotCurveForExtendedCP_2_3(athleteModeleCP2);
-    extendedCPCurve2->attach(thisPlot);
-
-    if (extendedCurveTitle) {
-        delete extendedCurveTitle;
-        extendedCurveTitle = NULL;
-    }
-    extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_2_3(athleteModeleCP2);
-    extendedCurveTitle->setXValue(5);
-    extendedCurveTitle->setYValue(45);
-    extendedCurveTitle->attach(thisPlot);*/
-
-
     // Extended CP 4
     if (extendedCPCurve4) {
         delete extendedCPCurve4;
         extendedCPCurve4 = NULL;
     }
-    if (extendedCurveTitle2) {
-        delete extendedCurveTitle2;
-        extendedCurveTitle2 = NULL;
-    }
-    if (extendedCPCurve_P1) {
-        delete extendedCPCurve_P1;
-        extendedCPCurve_P1 = NULL;
+    if (extendedCPCurve_WSecond) {
+        delete extendedCPCurve_WSecond;
+        extendedCPCurve_WSecond = NULL;
     }
     if (extendedCPCurve_WPrime) {
         delete extendedCPCurve_WPrime;
@@ -463,24 +448,68 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         delete extendedCPCurve_CP;
         extendedCPCurve_CP = NULL;
     }
+    if (extendedCPCurve_WPrime_CP) {
+        delete extendedCPCurve_WPrime_CP;
+        extendedCPCurve_WPrime_CP = NULL;
+    }
+
+    if (extendedCPCurve5) {
+        delete extendedCPCurve5;
+        extendedCPCurve5 = NULL;
+    }
+
+    if (extendedCPCurve6) {
+        delete extendedCPCurve6;
+        extendedCPCurve6 = NULL;
+    }
 
 
 
     if (model == 3) {
-        extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
-        extendedCPCurve4->attach(thisPlot);
+        if (curveTitle) {
+            delete curveTitle;
+            curveTitle = NULL;
+        }
+        //extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
+        //extendedCPCurve4->attach(thisPlot);
 
-        /*extendedCPCurve_P1 = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
-        extendedCPCurve_P1->attach(thisPlot);
+        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
+        extendedCPCurve_WSecond->attach(thisPlot);
         extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_4_3_WPrime(athleteModeleCP4);
         extendedCPCurve_WPrime->attach(thisPlot);
         extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_4_3_CP(athleteModeleCP4);
         extendedCPCurve_CP->attach(thisPlot);*/
 
-        extendedCurveTitle2 = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
-        extendedCurveTitle2->setXValue(5);
-        extendedCurveTitle2->setYValue(20);
-        extendedCurveTitle2->attach(thisPlot);
+        /*extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
+        extendedCurveTitle->attach(thisPlot);*/
+
+        //extendedCPCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
+        //extendedCPCurve5->attach(thisPlot);
+
+        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5);
+        extendedCPCurve_WSecond->attach(thisPlot);
+        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5);
+        extendedCPCurve_WPrime->attach(thisPlot);
+        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_5_3_CP(athleteModeleCP5);
+        extendedCPCurve_CP->attach(thisPlot);
+        extendedCPCurve_WPrime_CP = ecp->getPlotCurveForExtendedCP_5_3_WPrime_CP(athleteModeleCP5);
+        extendedCPCurve_WPrime_CP->attach(thisPlot);*/
+
+        extendedCPCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
+        extendedCPCurve6->attach(thisPlot);
+
+        extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, true);
+        extendedCPCurve_WSecond->attach(thisPlot);
+        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, true);
+        extendedCPCurve_WPrime->attach(thisPlot);
+        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, true);
+        extendedCPCurve_CP->attach(thisPlot);
+
+
+        curveTitle = ecp->getPlotMarkerForExtendedCP(athleteModeleCP6);
+        curveTitle->setXValue(5);
+        curveTitle->setYValue(70);
+        curveTitle->attach(thisPlot);
     }
 }
 
@@ -697,6 +726,9 @@ CpintPlot::calculate(RideItem *rideItem)
                 // calculate extended CP model from all-time best data
                 //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
                 athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+                athleteModeleCP5 = ecp->deriveExtendedCP_5_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+                athleteModeleCP6 = ecp->deriveExtendedCP_6_3_Parameters(true, bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+
             }
         }
 
