@@ -191,12 +191,18 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(rFrameInterval, SIGNAL(stateChanged(int)),
                 this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
+
+    // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
+
+    // comparing things
+    connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
+    connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
     configChanged();
 }
@@ -341,5 +347,24 @@ PfPvWindow::doubleClicked(int cad, int watts)
     pfPvPlot->setCAD(cad);
     qaCadValue->setText(QString("%1").arg(cad));
     pfPvPlot->replot();
+}
+
+void
+PfPvWindow::compareChanged()
+{
+
+    if (!amVisible()) {
+        return;
+    }
+
+    // we get busy so lets turn off updates till we're done
+    setUpdatesEnabled(false);
+
+    if (context->isCompareIntervals)
+        pfPvPlot->showCompareIntervals(true);
+    else
+        pfPvPlot->setData(myRideItem);
+
+    setUpdatesEnabled(true);
 }
 
