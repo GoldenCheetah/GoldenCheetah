@@ -477,7 +477,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        int num_intervals=intervalCount();
 
        if (mergeIntervals()) num_intervals = 1;
-       if (frameIntervals() || num_intervals==0) curve->setVisible(true);
+       if (frameIntervals() || num_intervals==0) {curve->setVisible(true);
        if (frameIntervals()==false && num_intervals) curve->setVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
@@ -528,10 +528,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                }
            }
 
-           QwtSymbol *sym = new QwtSymbol;
-           sym->setStyle(QwtSymbol::Ellipse);
-           sym->setSize(6);
-           sym->setBrush(QBrush(Qt::NoBrush));
+
 
            // ensure same colors are used for each interval selected
            int num_intervals_defined=0;
@@ -575,6 +572,11 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                     intervalColor = Qt::red;
                 else
                     intervalColor.setHsv((intervalmap.count() > 0 ? intervalmap.at(z) : 1) * 255/num_intervals_defined, 255,255);
+
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(6);
+                sym->setBrush(QBrush(Qt::NoBrush));
 
                 QPen pen;
                 pen.setColor(intervalColor);
@@ -804,7 +806,7 @@ PfPvPlot::setFrameIntervals(bool value)
 }
 
 void
-PfPvPlot::showCompareIntervals(bool show)
+PfPvPlot::showCompareIntervals()
 {
     // Remove interval curve
     if (intervalCurves.size()) {
