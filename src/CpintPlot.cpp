@@ -498,12 +498,12 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         extendedCPCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
         extendedCPCurve6->attach(thisPlot);
 
-        extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, true);
+        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, true);
         extendedCPCurve_WSecond->attach(thisPlot);
         extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, true);
         extendedCPCurve_WPrime->attach(thisPlot);
         extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, true);
-        extendedCPCurve_CP->attach(thisPlot);
+        extendedCPCurve_CP->attach(thisPlot);*/
 
 
         curveTitle = ecp->getPlotMarkerForExtendedCP(athleteModeleCP6);
