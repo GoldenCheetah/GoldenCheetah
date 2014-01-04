@@ -477,7 +477,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        int num_intervals=intervalCount();
 
        if (mergeIntervals()) num_intervals = 1;
-       if (frameIntervals() || num_intervals==0) {curve->setVisible(true);
+       if (frameIntervals() || num_intervals==0) curve->setVisible(true);
        if (frameIntervals()==false && num_intervals) curve->setVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
@@ -825,7 +825,7 @@ PfPvPlot::showCompareIntervals()
     int num_intervals = context->compareIntervals.count();
 
     // If not compare mode or no intervals
-    if (!show || context->compareIntervals.count() == 0) return;
+    if (context->compareIntervals.count() == 0) return;
 
     QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
     long tot_cad = 0;
