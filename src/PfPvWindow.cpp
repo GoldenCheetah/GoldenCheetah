@@ -361,7 +361,7 @@ PfPvWindow::compareChanged()
     setUpdatesEnabled(false);
 
     if (context->isCompareIntervals)
-        pfPvPlot->showCompareIntervals(true);
+        pfPvPlot->showCompareIntervals();
     else
         pfPvPlot->setData(myRideItem);
 

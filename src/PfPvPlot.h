@@ -71,7 +71,7 @@ class PfPvPlot : public QwtPlot
         void setFrameIntervals(bool value);
         void setAxisTitle(int axis, QString label);
 
-        void showCompareIntervals(bool show);
+        void showCompareIntervals();
 
     public slots:
         void configChanged();
