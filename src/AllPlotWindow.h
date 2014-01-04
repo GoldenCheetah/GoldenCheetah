@@ -263,9 +263,9 @@ class AllPlotWindow : public GcChartWindow
 
         bool active;
         bool stale;
-        bool setupStack; // we optimise this out, its costly
+        bool setupStack;       // we optimise this out, its costly
         bool setupSeriesStack; // we optimise this out, its costly
-        bool init;          // compare init one off setup
+        bool compareStale;     // compare init one off setup
 
     private slots:
 

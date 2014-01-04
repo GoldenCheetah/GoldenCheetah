@@ -59,7 +59,7 @@
 static const int stackZoomWidth[8] = { 5, 10, 15, 20, 30, 45, 60, 120 };
 
 AllPlotWindow::AllPlotWindow(Context *context) :
-    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false), init(false)
+    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false), compareStale(true)
 {
     QWidget *c = new QWidget;
     QVBoxLayout *clv = new QVBoxLayout(c);
@@ -569,7 +569,7 @@ AllPlotWindow::compareChanged()
 //XXXXX
 
     if (!amVisible()) {
-        stale = true;
+        compareStale = true;
         return;
     }
 
@@ -811,6 +811,9 @@ AllPlotWindow::compareChanged()
         rideSelected();
     }
 
+    // were not stale anymore
+    compareStale = false;
+
     // set the widgets straight
     setAllPlotWidgets(NULL);
 
@@ -974,8 +977,8 @@ void
 AllPlotWindow::rideSelected()
 {
     // compare mode ignores ride selection
-    if (init == true && context->isCompareIntervals) {
-        stale = true;
+    if (isVisible() && isCompare()) {
+        if (compareStale) compareChanged();
         return;
     }
 
@@ -1045,12 +1048,6 @@ AllPlotWindow::rideSelected()
     setupSeriesStackPlots();
 
     stale = false;
-
-    // we wanted a full setup to occur since
-    // we haven't seen an init take place
-    init = true;
-    if (context->isCompareIntervals) compareChanged();
-
 }
 
 void
