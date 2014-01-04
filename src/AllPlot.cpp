@@ -1243,6 +1243,9 @@ AllPlot::refreshCalibrationMarkers()
 void
 AllPlot::refreshReferenceLines()
 {
+    // not supported in compare mode
+    if (context->isCompareIntervals) return;
+
     // only on power based charts
     if (scope != RideFile::none && scope != RideFile::watts &&
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
@@ -1252,7 +1255,8 @@ AllPlot::refreshReferenceLines()
         delete referenceLine;
     }
     standard->referenceLines.clear();
-    if (rideItem->ride()) {
+
+    if (rideItem && rideItem->ride()) {
         foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
             QwtPlotCurve *referenceLine = plotReferenceLine(referencePoint);
             if (referenceLine) standard->referenceLines.append(referenceLine);
@@ -1263,6 +1267,9 @@ AllPlot::refreshReferenceLines()
 QwtPlotCurve*
 AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
 {
+    // not supported in compare mode
+    if (context->isCompareIntervals) return NULL;
+
     // only on power based charts
     if (scope != RideFile::none && scope != RideFile::watts &&
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
@@ -3346,6 +3353,9 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 void
 AllPlot::plotTmpReference(int axis, int x, int y)
 {
+    // not supported in compare mode
+    if (context->isCompareIntervals) return;
+
     // only on power based charts
     if (scope != RideFile::none && scope != RideFile::watts &&
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
@@ -3413,6 +3423,9 @@ AllPlot::plotTmpReference(int axis, int x, int y)
 void
 AllPlot::refreshReferenceLinesForAllPlots()
 {
+    // not supported in compare mode
+    if (context->isCompareIntervals) return;
+
     parent->allPlot->refreshReferenceLines();
     foreach(AllPlot *plot, parent->allPlots) {
         plot->refreshReferenceLines();
@@ -3425,6 +3438,9 @@ AllPlot::refreshReferenceLinesForAllPlots()
 void
 AllPlot::confirmTmpReference(double value, int axis, bool allowDelete)
 {
+    // not supported in compare mode
+    if (context->isCompareIntervals) return;
+
     ReferenceLineDialog *p = new ReferenceLineDialog(this, context, allowDelete);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
     p->setValueForAxis(value, axis);
