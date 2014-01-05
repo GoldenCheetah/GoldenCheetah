@@ -1356,11 +1356,20 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             scrollRight->show();
         } else {
             fullPlot->hide();
-            controlsLayout->setRowStretch(0, 100);
-            controlsLayout->setRowStretch(1, 00);
-            spanSlider->hide();
-            scrollLeft->hide();
-            scrollRight->hide();
+
+            if (isCompare()) {
+                controlsLayout->setRowStretch(0, 100);
+                controlsLayout->setRowStretch(1, 00);
+                spanSlider->show();
+                scrollLeft->show();
+                scrollRight->show();
+            } else {
+                controlsLayout->setRowStretch(0, 100);
+                controlsLayout->setRowStretch(1, 00);
+                spanSlider->hide();
+                scrollLeft->hide();
+                scrollRight->hide();
+            }
         }
     }
 }
@@ -1978,9 +1987,12 @@ AllPlotWindow::setShowFull(int value)
     }
     else {
         fullPlot->hide();
-        spanSlider->hide();
-        scrollLeft->hide();
-        scrollRight->hide();
+
+        if (!isCompare()) {
+            spanSlider->hide();
+            scrollLeft->hide();
+            scrollRight->hide();
+        }
         allPlotLayout->setStretch(1,0);
     }
 }

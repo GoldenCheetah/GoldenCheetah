@@ -48,6 +48,9 @@ class ComparePane : public QWidget
     signals:
 
     public slots:
+
+        void clear(); // wipe away whatever is there
+
         void configChanged();
 
         void itemsWereSorted();
