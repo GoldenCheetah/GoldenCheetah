@@ -100,6 +100,8 @@ class CpintPlot : public QwtPlot
 
         Model_eCP athleteModeleCP2;
         Model_eCP athleteModeleCP4;
+        Model_eCP athleteModeleCP5;
+        Model_eCP athleteModeleCP6;
 
         double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
@@ -140,12 +142,14 @@ class CpintPlot : public QwtPlot
 
         QString path;
         QwtPlotCurve *thisCurve;
-        QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4;
-        QwtPlotCurve *extendedCPCurve_CP, *extendedCPCurve_WPrime, *extendedCPCurve_P1;
+        QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4, *extendedCPCurve5, *extendedCPCurve6;
+
+        QwtPlotIntervalCurve *extendedCPCurve_WSecond, *extendedCPCurve_WPrime, *extendedCPCurve_CP, *extendedCPCurve_WPrime_CP;
+
         QList<QwtPlotCurve*> allCurves;
         QwtPlotCurve *allCurve; // bests but not zoned
-        QwtPlotMarker curveTitle;
-        QwtPlotMarker *extendedCurveTitle, *extendedCurveTitle2;
+        QwtPlotMarker *curveTitle;
+
         QList<QwtPlotMarker*> allZoneLabels;
         void clear_CP_Curves();
         QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
