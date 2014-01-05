@@ -124,23 +124,26 @@ class ExtendedCriticalPower
         QwtPlotCurve* getPlotCurveForExtendedCP_4_3_CP(Model_eCP athleteModeleCP2);
         QwtPlotCurve* getPlotCurveForExtendedCP_4_3_WPrime_CP(Model_eCP athleteModeleCP2);
 
+        // Extended CP Model version 5
         Model_eCP deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
         QwtPlotCurve* getPlotCurveForExtendedCP_5_3(Model_eCP athleteModeleCP2);
 
-        QwtPlotCurve* getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP athleteModeleCP2);
-        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP athleteModeleCP2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_5_3_CP(Model_eCP athleteModeleCP2);
-        QwtPlotCurve* getPlotCurveForExtendedCP_5_3_WPrime_CP(Model_eCP athleteModeleCP2);
+        // Contributions
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP athleteModeleCP2, bool stacked);
+        QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_CP(Model_eCP athleteModeleCP2, bool stacked);
 
-        Model_eCP deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
-
-
-        QwtPlotMarker* getPlotMarkerForExtendedCP(Model_eCP athleteModeleCP2);
+        // Extended CP Model version 6
+        Model_eCP deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);      
         QwtPlotCurve* getPlotCurveForExtendedCP_6_3(Model_eCP athleteModeleCP2);
 
+        // Contributions
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP athleteModeleCP2, bool stacked);
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_WPrime(Model_eCP athleteModeleCP2, bool stacked);
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_6_3_CP(Model_eCP athleteModeleCP2, bool stacked);
+
+        // Marker for Model
+        QwtPlotMarker* getPlotMarkerForExtendedCP(Model_eCP athleteModeleCP2);
 
     private:
         Context *context;
