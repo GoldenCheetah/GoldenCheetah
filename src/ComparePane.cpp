@@ -501,6 +501,37 @@ ComparePane::itemsWereSorted()
 }
 
 void
+ComparePane::clear()
+{
+    if (mode_ == interval) { // INTERVALS
+
+        // wipe all away
+        foreach(CompareInterval ci, context->compareIntervals) {
+            delete ci.data;
+        }
+        context->compareIntervals.clear();
+
+        // refresh table
+        refreshTable();
+
+        // tell the charts
+        context->notifyCompareIntervalsChanged();
+
+    } else {
+
+        // wipe em
+        context->compareDateRanges.clear();
+
+        // refresh table
+        refreshTable();
+
+        // tell the charts
+        context->notifyCompareDateRangesChanged();
+
+    }
+}
+
+void
 ComparePane::intervalButtonsChanged()
 {
     // run through the table and see if anything changed
