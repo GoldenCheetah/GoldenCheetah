@@ -54,6 +54,7 @@ class PfPvPlot : public QwtPlot
         double getCL();
         void setCL(double cranklen);
         void recalc();
+        void recalcCompare();
 
         // zone shader uses this
         double maxAEPF;
@@ -82,6 +83,9 @@ class PfPvPlot : public QwtPlot
         void changedCL( const QString& );
 
     protected:
+
+        friend class ::PfPvPlotZoneLabel;
+
         int intervalCount() const;
 
         Context *context;
