@@ -68,7 +68,7 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
 }
 
 PfPvWindow::PfPvWindow(Context *context) :
-    GcChartWindow(context), context(context), current(NULL)
+    GcChartWindow(context), context(context), current(NULL), compareStale(true)
 {
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);
@@ -216,11 +216,25 @@ PfPvWindow::configChanged()
     setPalette(palette);
 }
 
+bool
+PfPvWindow::isCompare() const
+{
+    return context->isCompareIntervals;
+}
+
 void
 PfPvWindow::rideSelected()
 {
-    if (!amVisible())
+    // we need to refresh for compare mode
+    if (isVisible() && isCompare() && compareStale) {
+        compareChanged(); 
         return;
+    }
+    
+    if (!amVisible()) {
+        compareStale = true;
+        return;
+    }
 
 
     RideItem *ride = myRideItem;
@@ -354,15 +368,23 @@ PfPvWindow::compareChanged()
 {
 
     if (!amVisible()) {
+        compareStale = true;
         return;
     }
 
     // we get busy so lets turn off updates till we're done
     setUpdatesEnabled(false);
 
-    if (context->isCompareIntervals)
+    // ensure redraws happen
+    current = NULL; // we don't have a current ride
+    compareStale = false; // but compare is no longer stale
+
+    if (context->isCompareIntervals) {
+
+        // set the scale and zones
         pfPvPlot->showCompareIntervals();
-    else
+
+    } else
         pfPvPlot->setData(myRideItem);
 
     setUpdatesEnabled(true);

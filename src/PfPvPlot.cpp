@@ -58,11 +58,36 @@ public:
     PfPvPlotZoneLabel(PfPvPlot *_parent, int _zone_number)
     {
         parent = _parent;
+        RideItem *rideItem = parent->rideItem;
         zone_number = _zone_number;
 
-        RideItem *rideItem = parent->rideItem;
-        const Zones *zones = rideItem->zones;
-        int zone_range = rideItem->zoneRange();
+        // get zone data from ride or athlete ...
+        const Zones *zones;
+        int zone_range = -1;
+
+        if (parent->context->isCompareIntervals) {
+
+            zones = parent->context->athlete->zones();
+            if (!zones) return;
+
+            // use first compare interval date
+            if (parent->context->compareIntervals.count())
+                zone_range = zones->whichRange(parent->context->compareIntervals[0].data->startTime().date());
+
+            // still not set 
+            if (zone_range == -1)
+                zone_range = zones->whichRange(QDate::currentDate());
+
+        } else if (rideItem) {
+
+            zones = rideItem->zones;
+            zone_range = rideItem->zoneRange();
+
+        } else {
+
+            return; // nulls
+
+        }
 
         setZ(1.0 + zone_number / 100.0);
 
@@ -262,11 +287,38 @@ PfPvPlot::refreshZoneItems()
     }
     zoneLabels.clear();
 
-    // give up for a null ride
-    if (! rideItem) return;
+    // set zones from ride or athlete and date of
+    // first item in the compare set
+    const Zones *zones;
+    int zone_range = -1;
 
-    const Zones *zones = rideItem->zones;
-    int zone_range = rideItem->zoneRange();
+    // comparing does zones for items selected not current ride
+    if (context->isCompareIntervals) {
+
+        zones = context->athlete->zones();
+
+        // no athlete zones anyway!
+        if (!zones) return;
+
+        // use first compare interval date
+        if (context->compareIntervals.count()) {
+            zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
+        }
+
+        // still not set 
+        if (zone_range == -1) {
+            zone_range = zones->whichRange(QDate::currentDate());
+        }
+
+    } else if (rideItem) {
+
+        zones = rideItem->zones;
+        zone_range = rideItem->zoneRange();
+
+    } else {
+
+        return; // null ride and not compare etc
+    }
 
     if (zone_range >= 0) {
         setCP(zones->getCP(zone_range));
@@ -596,8 +648,132 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 }
 
 void
+PfPvPlot::recalcCompare()
+{
+    // do all the calcuations for compare mode
+    // we do as a separate method to 'isolate' compare mode
+    // updates to ensure we don't break all the charts !!
+    maxAEPF = 600;
+    maxCPV = 3;
+
+    foreach(CompareInterval ci, context->compareIntervals) {
+
+        if (!ci.isChecked()) continue;
+
+        // calculate maximums
+        foreach(const RideFilePoint *p1, ci.data->dataPoints()) {
+
+            if (p1->watts != 0 && p1->cad != 0) {
+
+                double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                if (aepf < 255 && aepf > maxAEPF) maxAEPF = aepf;
+                if (cpv > maxCPV) maxCPV = cpv;
+            }
+        }
+    }
+
+    if (maxAEPF > 600) {
+
+        setAxisScale(yLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
+        tiqMarker[0]->setYValue(maxAEPF);
+        tiqMarker[1]->setYValue(maxAEPF);
+
+    } else {
+
+        maxAEPF = 600; // for background shading and CP curve
+        setAxisScale(yLeft, 0, 600);
+        tiqMarker[0]->setYValue(580);
+        tiqMarker[1]->setYValue(580);
+    }
+
+    if (maxCPV > 3) {
+
+        // round *UP* to next integer for axis to fill nicely
+        maxCPV = round(maxCPV + 0.5);
+        setAxisScale(xBottom, 0, maxCPV);
+        tiqMarker[0]->setXValue(maxCPV - 0.5);
+        tiqMarker[3]->setXValue(maxCPV - 0.5);
+
+    } else {
+
+        maxCPV = 3; // for background shading and CP curve
+        setAxisScale(xBottom, 0, 3);
+        tiqMarker[0]->setXValue(2.9);
+        tiqMarker[3]->setXValue(2.9);
+    }
+
+    // initialize x values used for contours
+    contour_xvalues.clear();
+    for (double x = 0; x <= maxCPV; x += x / 20 + 0.02) contour_xvalues.append(x);
+    contour_xvalues.append(maxCPV);
+
+    double cpv = (cad_ * cl_ * 2.0 * PI) / 60.0;
+    mX->setXValue(cpv);
+
+    double aepf = (cp_ * 60.0) / (cad_ * cl_ * 2.0 * PI);
+    mY->setYValue(aepf);
+
+    // reset to zero in  case there are none
+    timeInQuadrant[0]=
+    timeInQuadrant[1]=
+    timeInQuadrant[2]=
+    timeInQuadrant[3]= 0.0;
+
+    // watch out for null rides
+    foreach(CompareInterval ci, context->compareIntervals) {
+
+        if (!ci.isChecked()) continue;
+
+        foreach(const RideFilePoint *p1, ci.data->dataPoints()) {
+            if (p1->watts != 0 && p1->cad != 0) {
+
+                double aepf_ = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv_ = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                // classic QA quadrants I II III and IV
+                if (aepf_ > aepf && cpv_ > cpv) timeInQuadrant[0] += ci.data->recIntSecs();
+                else if (aepf_ > aepf && cpv_ <= cpv) timeInQuadrant[1] += ci.data->recIntSecs();
+                else if (aepf_ <= aepf && cpv_ <= cpv) timeInQuadrant[2] += ci.data->recIntSecs();
+                else if (aepf_ <= aepf && cpv_ > cpv) timeInQuadrant[3] += ci.data->recIntSecs();
+
+            }
+        }
+    }
+
+    double totaltime = timeInQuadrant[0] + timeInQuadrant[1] + timeInQuadrant[2] + timeInQuadrant[3] ;
+
+    if (totaltime) {
+
+        tiqMarker[0]->setLabel(QwtText(QString("%1%")
+                      .arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+        tiqMarker[1]->setLabel(QwtText(QString("%1%")
+                      .arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+        tiqMarker[2]->setLabel(QwtText(QString("%1%")
+                      .arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+        tiqMarker[3]->setLabel(QwtText(QString("%1%")
+                      .arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+
+    } else {
+
+        tiqMarker[0]->setLabel(QwtText("",QwtText::PlainText));
+        tiqMarker[1]->setLabel(QwtText("",QwtText::PlainText));
+        tiqMarker[2]->setLabel(QwtText("",QwtText::PlainText));
+        tiqMarker[3]->setLabel(QwtText("",QwtText::PlainText));
+
+    }
+}
+
+void
 PfPvPlot::recalc()
 {
+    // we're for a ride only..
+    if (context->isCompareIntervals) {
+        recalcCompare();
+        return;
+    }
+
     // adjust the scales if we have some big values
     // this can happen with track sprinters who put
     // out big numbers for power and cadence since
@@ -827,6 +1003,8 @@ PfPvPlot::showCompareIntervals()
     // If not compare mode or no intervals
     if (context->compareIntervals.count() == 0) return;
 
+    recalcCompare();
+
     QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
     long tot_cad = 0;
     long tot_cad_points = 0;
@@ -918,6 +1096,8 @@ PfPvPlot::showCompareIntervals()
             intervalCurves.append(_curve);
         }
     }
+
+    refreshZoneItems();
     replot();
 }
 
