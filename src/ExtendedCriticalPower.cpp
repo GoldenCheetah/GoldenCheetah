@@ -648,7 +648,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3(Model_eCP model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP2");
     if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CHEARTRATE));
+    QPen e2pen(Qt::yellow);
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -927,7 +927,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
         model.paa_dec = -2;
 
     if (model.ecp_del == 0)
-        model.ecp_del = -0.7;
+        model.ecp_del = -0.9;
 
     if (model.tau_del == 0)
         model.tau_del = -4.8;
@@ -1053,7 +1053,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
         model.paa = paa_min;
         double _avg_paa = 0.0;
         count=1;
-        for (i = 1; i <= 8; i++) {
+        for (i = 2; i <= 8; i++) {
             double paan = (bests->meanMaxArray(series)[i] - model.ecp * (1-exp(model.tau_del*i/60.0)) * (1-exp(model.ecp_del*i/60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/(i/60.0))) * ( 1 + model.etau/(i/60.0))) / exp(model.paa_dec*(i/60.0)) / (1.20-0.20*exp(-1*(i/60.0)));
             _avg_paa = (double)((count-1)*_avg_paa+paan)/count;
 
@@ -1127,7 +1127,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CHEARTRATE));
+    QPen e2pen(GColor(CCP)); // Qt::cyan
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -1136,31 +1136,33 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
     return extendedCPCurve2;
 }
 
-QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model)
+QwtPlotIntervalCurve*
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
-    QVector<double> extended_cp_curve2_power(extendedCurve2_points);
-    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
+    QVector<QwtIntervalSample> extended_cp_curve_power(extendedCurve2_points);
+
     double tmin = 1.0/60;
     double tmax = 600;
 
     for (int i = 0; i < extendedCurve2_points; i ++) {
         double x = (double) i / (extendedCurve2_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
-        extended_cp_curve2_time[i] = t;
-        extended_cp_curve2_power[i] = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
+
+        double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
+
+        extended_cp_curve_power[i] = QwtIntervalSample(t, 0, power_wsecond);
     }
 
-    QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3_WSecond");
+    QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_WSecond");
     if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
-        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+        extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CCADENCE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
-    extendedCPCurve2->setPen(e2pen);
+    extendedCPCurve->setPen(e2pen);
 
     QColor color1 = GColor(CCADENCE);
     color1.setAlpha(64);
@@ -1169,44 +1171,41 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model)
     linearGradient.setColorAt(0.0, color1);
     linearGradient.setColorAt(1.0, color2);
     linearGradient.setSpread(QGradient::PadSpread);
-    extendedCPCurve2->setBrush(linearGradient);   // fill below the line
+    extendedCPCurve->setBrush(linearGradient);   // fill below the line
 
-    extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
+    extendedCPCurve->setSamples(new QwtIntervalSeriesData(extended_cp_curve_power));
 
-    return extendedCPCurve2;
+    return extendedCPCurve;
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP model)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
-    QVector<double> extended_cp_curve2_power_wsecond(extendedCurve2_points);
-    QVector<double> extended_cp_curve2_power_wprime(extendedCurve2_points);
+    QVector<QwtIntervalSample> extended_cp_curve_power(extendedCurve2_points);
 
-    QVector<QwtIntervalSample> extended_cp_curve2_power(extendedCurve2_points);
-    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
     double tmin = 1.0/60;
     double tmax = 600;
 
     for (int i = 0; i < extendedCurve2_points; i ++) {
         double x = (double) i / (extendedCurve2_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
-        extended_cp_curve2_time[i] = t;
-        extended_cp_curve2_power_wsecond[i] = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
-        extended_cp_curve2_power_wprime[i] = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
-        extended_cp_curve2_power[i] = QwtIntervalSample(t, extended_cp_curve2_power_wsecond[i], extended_cp_curve2_power_wprime[i] + extended_cp_curve2_power_wsecond[i]);
+
+        double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
+        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
+
+        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?power_wsecond:0), (stacked?power_wprime + power_wsecond:power_wprime));
     }
 
-    //QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3_WPrime");
-    QwtPlotIntervalCurve *extendedCPCurve2 = new QwtPlotIntervalCurve("eCP_5_3_WPrime");
+    QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_WPrime");
     if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
-        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+        extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CPOWER));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
-    extendedCPCurve2->setPen(e2pen);
+    extendedCPCurve->setPen(e2pen);
 
     QColor color1 = GColor(CPOWER);
     color1.setAlpha(64);
@@ -1215,40 +1214,43 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP model)
     linearGradient.setColorAt(0.0, color1);
     linearGradient.setColorAt(1.0, color2);
     linearGradient.setSpread(QGradient::PadSpread);
-    extendedCPCurve2->setBrush(linearGradient);   // fill below the line
+    extendedCPCurve->setBrush(linearGradient);   // fill below the line
 
-    //extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
-    extendedCPCurve2->setSamples(new QwtIntervalSeriesData(extended_cp_curve2_power));
+    extendedCPCurve->setSamples(new QwtIntervalSeriesData(extended_cp_curve_power));
 
 
-    return extendedCPCurve2;
+    return extendedCPCurve;
 }
 
-QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(Model_eCP model)
+QwtPlotIntervalCurve*
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(Model_eCP model, bool stacked)
 {
     const int extendedCurve2_points = 1000;
 
-    QVector<double> extended_cp_curve2_power(extendedCurve2_points);
-    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
+    QVector<QwtIntervalSample> extended_cp_curve_power(extendedCurve2_points);
+
     double tmin = 1.0/60;
     double tmax = 600;
 
     for (int i = 0; i < extendedCurve2_points; i ++) {
         double x = (double) i / (extendedCurve2_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
-        extended_cp_curve2_time[i] = t;
-        extended_cp_curve2_power[i] = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
+
+        double power_wsecond = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t));
+        double power_wprime = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( model.etau/(t) );
+        double power_cp = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 );
+
+        extended_cp_curve_power[i] = QwtIntervalSample(t, (stacked?power_wprime + power_wsecond:0), (stacked?power_wprime + power_wsecond + power_cp:power_cp));
     }
 
-    QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3_CP");
+    QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_CP");
     if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
-        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+        extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CHEARTRATE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
-    extendedCPCurve2->setPen(e2pen);
+    extendedCPCurve->setPen(e2pen);
 
     QColor color1 = GColor(CHEARTRATE);
     color1.setAlpha(64);
@@ -1257,40 +1259,11 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(Model_eCP model)
     linearGradient.setColorAt(0.0, color1);
     linearGradient.setColorAt(1.0, color2);
     linearGradient.setSpread(QGradient::PadSpread);
-    extendedCPCurve2->setBrush(linearGradient);   // fill below the line
+    extendedCPCurve->setBrush(linearGradient);   // fill below the line
 
-    extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
+    extendedCPCurve->setSamples(new QwtIntervalSeriesData(extended_cp_curve_power));
 
-    return extendedCPCurve2;
-}
-
-QwtPlotCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime_CP(Model_eCP model)
-{
-    const int extendedCurve2_points = 1000;
-
-    QVector<double> extended_cp_curve2_power(extendedCurve2_points);
-    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
-    double tmin = 1.0/60;
-    double tmax = 600;
-
-    for (int i = 0; i < extendedCurve2_points; i ++) {
-        double x = (double) i / (extendedCurve2_points - 1);
-        double t = pow(tmax, x) * pow(tmin, 1-x);
-        extended_cp_curve2_time[i] = t;
-        extended_cp_curve2_power[i] = model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 + model.etau/(t));
-    }
-
-    QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3_WPrime_CP");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
-        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CCP));
-    e2pen.setWidth(1);
-    e2pen.setStyle(Qt::DashLine);
-    extendedCPCurve2->setPen(e2pen);
-    extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
-
-    return extendedCPCurve2;
+    return extendedCPCurve;
 }
 
 Model_eCP
@@ -1568,7 +1541,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(Model_eCP model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_6_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CCP));
+    QPen e2pen(Qt::cyan);
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);

@@ -483,30 +483,28 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         /*extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
         extendedCurveTitle->attach(thisPlot);*/
 
-        //extendedCPCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
-        //extendedCPCurve5->attach(thisPlot);
+        extendedCPCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
+        extendedCPCurve5->attach(thisPlot);
 
-        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5);
+        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5, false);
         extendedCPCurve_WSecond->attach(thisPlot);
-        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5);
+        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5, false);
         extendedCPCurve_WPrime->attach(thisPlot);
-        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_5_3_CP(athleteModeleCP5);
-        extendedCPCurve_CP->attach(thisPlot);
-        extendedCPCurve_WPrime_CP = ecp->getPlotCurveForExtendedCP_5_3_WPrime_CP(athleteModeleCP5);
-        extendedCPCurve_WPrime_CP->attach(thisPlot);*/
+        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_5_3_CP(athleteModeleCP5, false);
+        extendedCPCurve_CP->attach(thisPlot);*/
 
-        extendedCPCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
-        extendedCPCurve6->attach(thisPlot);
+        //extendedCPCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
+        //extendedCPCurve6->attach(thisPlot);
 
-        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, true);
+        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, false);
         extendedCPCurve_WSecond->attach(thisPlot);
-        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, true);
+        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, false);
         extendedCPCurve_WPrime->attach(thisPlot);
-        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, true);
+        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, false);
         extendedCPCurve_CP->attach(thisPlot);*/
 
 
-        curveTitle = ecp->getPlotMarkerForExtendedCP(athleteModeleCP6);
+        curveTitle = ecp->getPlotMarkerForExtendedCP(athleteModeleCP5);
         curveTitle->setXValue(5);
         curveTitle->setYValue(70);
         curveTitle->attach(thisPlot);
