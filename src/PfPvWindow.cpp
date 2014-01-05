@@ -226,8 +226,8 @@ void
 PfPvWindow::rideSelected()
 {
     // we need to refresh for compare mode
-    if (isVisible() && isCompare() && compareStale) {
-        compareChanged(); 
+    if (isCompare()) {
+        if (isVisible() && compareStale) compareChanged(); 
         return;
     }
     
@@ -376,6 +376,7 @@ PfPvWindow::compareChanged()
     setUpdatesEnabled(false);
 
     // ensure redraws happen
+    setIsBlank(false);
     current = NULL; // we don't have a current ride
     compareStale = false; // but compare is no longer stale
 
@@ -384,8 +385,11 @@ PfPvWindow::compareChanged()
         // set the scale and zones
         pfPvPlot->showCompareIntervals();
 
-    } else
-        pfPvPlot->setData(myRideItem);
+    } else {
+
+        // same as tab selected etc
+        rideSelected();
+    }
 
     setUpdatesEnabled(true);
 }
