@@ -35,14 +35,14 @@
 static QList<QColor> standardColors;
 static bool initStandardColors()
 {
-    standardColors << QColor(Qt::red);
-    standardColors << QColor(Qt::green);
-    standardColors << QColor(Qt::blue);
     standardColors << QColor(Qt::magenta);
     standardColors << QColor(Qt::cyan);
     standardColors << QColor(Qt::yellow);
+    standardColors << QColor(Qt::red);
+    standardColors << QColor(Qt::blue);
     standardColors << QColor(Qt::gray);
     standardColors << QColor(Qt::darkCyan);
+    standardColors << QColor(Qt::green);
     standardColors << QColor(Qt::darkRed);
     standardColors << QColor(Qt::darkGreen);
     standardColors << QColor(Qt::darkBlue);
