@@ -651,7 +651,7 @@ AllPlotWindow::compareChanged()
             // referencing fullPlot for the user prefs etc
             AllPlot *ap = new AllPlot(this, context);
             ap->bydist = fullPlot->bydist;
-            ap->setDataFromObject(compareIntervalCurves[i], allPlot);
+            ap->setDataFromObject(compareIntervalCurves[i], fullPlot);
 
             // simpler to keep the indexes aligned
             if (!ci.isChecked()) ap->hide();
