@@ -790,7 +790,7 @@ AllPlotWindow::compareChanged()
 
         // now remove any series plots that are empty
         for(int i=0; i<seriesPlots.count();) {
-            if (seriesPlots[i]->compares.count() == 0) {
+            if (seriesPlots[i]->compares.count() == 0 || seriesPlots[i]->compares[0]->data()->size() == 0) {
                 delete seriesPlots[i];
                 seriesPlots.removeAt(i);
             } else {
