@@ -744,6 +744,7 @@ AllPlotWindow::compareChanged()
             connect(plot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), plot, SLOT(pointHover(QwtPlotCurve*, int)));
             // No x axis titles
             plot->bydist = fullPlot->bydist;
+            plot->setShadeZones(showPower->currentIndex() == 0);
             plot->setAxisVisible(QwtPlot::xBottom, true);
             plot->enableAxis(QwtPlot::xBottom, true);
             plot->setAxisTitle(QwtPlot::xBottom,NULL);
@@ -2350,6 +2351,7 @@ AllPlotWindow::setupSeriesStackPlots()
         _allPlot->setDataFromPlot(allPlot); // will clone all settings and data for the series
                                                    // being plotted, only works for one series plotting
 
+        _allPlot->setShadeZones(showPower->currentIndex() == 0);
         first = false;
 
         // add to the list
