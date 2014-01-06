@@ -651,6 +651,7 @@ AllPlotWindow::compareChanged()
             // referencing fullPlot for the user prefs etc
             AllPlot *ap = new AllPlot(this, context);
             ap->bydist = fullPlot->bydist;
+            ap->setShadeZones(showPower->currentIndex() == 0);
             ap->setDataFromObject(compareIntervalCurves[i], fullPlot);
 
             // simpler to keep the indexes aligned
@@ -700,7 +701,7 @@ AllPlotWindow::compareChanged()
 
         // work out what we want to see
         QList<RideFile::SeriesType> wanted;
-        if (showPower->currentIndex()) wanted << RideFile::watts;
+        if (showPower->currentIndex() < 2) wanted << RideFile::watts;
         if (showHr->isChecked()) wanted << RideFile::hr;
         if (showSpeed->isChecked()) wanted << RideFile::kph;
         if (showCad->isChecked()) wanted << RideFile::cad;
@@ -744,7 +745,8 @@ AllPlotWindow::compareChanged()
             connect(plot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), plot, SLOT(pointHover(QwtPlotCurve*, int)));
             // No x axis titles
             plot->bydist = fullPlot->bydist;
-            plot->setShadeZones(showPower->currentIndex() == 0);
+            if (x == RideFile::watts) plot->setShadeZones(showPower->currentIndex() == 0);
+            else plot->setShadeZones(false);
             plot->setAxisVisible(QwtPlot::xBottom, true);
             plot->enableAxis(QwtPlot::xBottom, true);
             plot->setAxisTitle(QwtPlot::xBottom,NULL);
@@ -2351,7 +2353,8 @@ AllPlotWindow::setupSeriesStackPlots()
         _allPlot->setDataFromPlot(allPlot); // will clone all settings and data for the series
                                                    // being plotted, only works for one series plotting
 
-        _allPlot->setShadeZones(showPower->currentIndex() == 0);
+        if (x == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
+        else _allPlot->setShadeZones(false);
         first = false;
 
         // add to the list

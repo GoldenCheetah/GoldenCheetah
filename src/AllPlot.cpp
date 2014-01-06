@@ -92,11 +92,34 @@ class AllPlotBackground: public QwtPlotItem
     {
         RideItem *rideItem = parent->rideItem;
 
-        if (! rideItem)
-            return;
+        // get zone data from ride or athlete ...
+        const Zones *zones;
+        int zone_range = -1;
 
-        const Zones *zones       = rideItem->zones;
-        int zone_range     = rideItem->zoneRange();
+        if (parent->context->isCompareIntervals) {
+
+            zones = parent->context->athlete->zones();
+            if (!zones) return;
+
+            // use first compare interval date
+            if (parent->context->compareIntervals.count())
+                zone_range = zones->whichRange(parent->context->compareIntervals[0].data->startTime().date());
+
+            // still not set 
+            if (zone_range == -1)
+                zone_range = zones->whichRange(QDate::currentDate());
+
+        } else if (rideItem) {
+
+            zones = rideItem->zones;
+            zone_range = rideItem->zoneRange();
+
+        } else {
+
+            return; // nulls
+
+        }
+
         if (parent->shadeZones() && (zone_range >= 0)) {
             QList <int> zone_lows = zones->getZoneLows(zone_range);
             int num_zones = zone_lows.size();
@@ -140,13 +163,33 @@ class AllPlotZoneLabel: public QwtPlotItem
 
             RideItem *rideItem = parent->rideItem;
 
+            // get zone data from ride or athlete ...
+            const Zones *zones;
+            int zone_range = -1;
 
-            if (! rideItem)
-                return;
+            if (parent->context->isCompareIntervals) {
 
+                zones = parent->context->athlete->zones();
+                if (!zones) return;
 
-            const Zones *zones       = rideItem->zones;
-            int zone_range     = rideItem->zoneRange();
+                // use first compare interval date
+                if (parent->context->compareIntervals.count())
+                    zone_range = zones->whichRange(parent->context->compareIntervals[0].data->startTime().date());
+
+                // still not set 
+                if (zone_range == -1)
+                    zone_range = zones->whichRange(QDate::currentDate());
+
+            } else if (rideItem) {
+
+                zones = rideItem->zones;
+                zone_range = rideItem->zoneRange();
+
+            } else {
+
+                return; // nulls
+
+            }
 
             // create new zone labels if we're shading
             if (parent->shadeZones() && (zone_range >= 0)) {
@@ -2524,6 +2567,13 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     setAxisVisible(yRight, false);
     setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), false);
     setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), false);
+
+    // refresh zone background (if needed)
+    if (shade_zones) {
+        bg->attach(this);
+        refreshZoneLabels();
+    } else
+        bg->detach();
 #if 0
 
     // plot standard->grid
@@ -2541,7 +2591,6 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     else if (thereICurve)
         intervalHighlighterCurve->setBaseline(thereICurve->boundingRect().top());
 #if 0
-    refreshZoneLabels();
 #endif
 #endif
 }
@@ -2702,6 +2751,13 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     // set the y-axis scales now
     referencePlot = NULL;
     setYMax();
+
+    // refresh zone background (if needed)
+    if (shade_zones) {
+        bg->attach(this);
+        refreshZoneLabels();
+    } else
+        bg->detach();
 
     replot();
 }
@@ -2898,6 +2954,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (maxKM > here->maxKM) here->maxKM = maxKM;
         if (maxSECS > here->maxSECS) here->maxSECS = maxSECS;
     }
+
 }
 
 void
