@@ -303,7 +303,11 @@ class Vo2max : public RideMetric {
                  const Context *) {
 
         PeakWPK5m *wpk5m = dynamic_cast<PeakWPK5m*>(deps.value("5m_peak_wpk"));
-        setValue(wpk5m->value(false) * 12 + 3.5);
+
+        // Using New ACSM formula also outlined here:
+        // http://blue.utb.edu/mbailey/pdf/MetCalnew.pdf
+        // 10.8 * Watts / KG + 7 (3.5 per leg)
+        setValue(10.8 * wpk5m->value(false) + 7);
         setCount(1);
     }
     RideMetric *clone() const { return new Vo2max(*this); }
