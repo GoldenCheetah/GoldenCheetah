@@ -74,7 +74,7 @@
 // 53  18  Dec 2013 Mark Liversedge    Added Fatigue Index (for power)
 // 54  07  Jan 2014 Mark Liversedge    Revised Estimated VO2MAX metric formula
 
-int DBSchemaVersion = 53;
+int DBSchemaVersion = 54;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
