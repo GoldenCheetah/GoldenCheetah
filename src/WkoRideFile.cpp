@@ -1354,6 +1354,7 @@ WkoParser::optpad(WKO_UCHAR *p)
     switch (us) {
 
     case 0x8007 :       /* all done */
+    case 0x8009 :       /* Patrick McNally files Jan 2014 */
     case 0x800a :       /* after fixup for distchart Jan 2010 */
     case 0x800b :
     case 0x800c :       /* after fixup for distchart Jan 2010 */
