@@ -105,7 +105,7 @@ void GCColor::setupColors()
         { tr("Chart Bar Unselected"), "CTILEBAR", Qt::gray },
         { tr("Chart Bar Selected"), "CTILEBARSELECT", Qt::yellow },
         { tr("ToolBar Background"), "CTOOLBAR", Qt::white },
-        { tr("Activity History Group"), "CRIDEGROUP", QColor(236,246,255) },
+        { tr("Ride History Group"), "CRIDEGROUP", QColor(236,246,255) },
         { tr("SpinScan Left"), "CSPINSCANLEFT", Qt::gray },
         { tr("SpinScan Right"), "CSPINSCANRIGHT", Qt::cyan },
         { tr("Temperature"), "COLORTEMPERATURE", Qt::yellow },

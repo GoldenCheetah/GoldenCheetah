@@ -74,7 +74,7 @@ GcWindowRegistry::initialize()
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
     { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
-    { VIEW_ANALYSIS, tr("Activity Summary"),GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS, tr("Ride Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
     { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },

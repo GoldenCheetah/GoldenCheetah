@@ -57,14 +57,14 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
 // welcome
 MergeWelcome::MergeWelcome(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Merge Activity"));
+    setTitle(tr("Merge Ride"));
     setSubTitle(tr("Lets get started"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
     QLabel *label = new QLabel("This wizard will help you to merge 2 different files\n"
-                               "from the same activity into a single file.");
+                               "from the same ride into a single file.");
     label->setWordWrap(true);
 
     layout->addWidget(label);
@@ -80,12 +80,12 @@ MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *ride1Label = new QLabel(tr("Current activity")+" "+parent->ride1->dateTime.toString("MMM d, yyyy - hh:mm:ss"));
+    QLabel *ride1Label = new QLabel(tr("Current ride")+" "+parent->ride1->dateTime.toString("MMM d, yyyy - hh:mm:ss"));
     layout->addWidget(ride1Label);
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum,QSizePolicy::Expanding );
     layout->addItem( spacer );
 
-    QLabel *label = new QLabel("Select the file to merge to this activity.");
+    QLabel *label = new QLabel("Select the file to merge to this ride.");
     label->setWordWrap(true);
 
     layout->addWidget(label);
@@ -156,7 +156,7 @@ MergeUpload::importFile(QList<QString> files)
             if (ride) {
                 //wizard->addRideFile(ride);
                 labelSuccess->setText("File uploaded");
-                ride2Label->setText(tr("Second activity")+" "+ride->startTime().toString("MMM d, yyyy - hh:mm:ss"));
+                ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString("MMM d, yyyy - hh:mm:ss"));
 
                 wizard->ride2 = ride;
             }
@@ -174,7 +174,7 @@ MergeUpload::importFile(QList<QString> files)
 MergeSync::MergeSync(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Synchronise"));
-    setSubTitle(tr("Start of activities"));
+    setSubTitle(tr("Start of rides"));
 
     // Plot files
     QVBoxLayout *layout = new QVBoxLayout;

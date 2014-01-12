@@ -1321,7 +1321,7 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     // Map default (english) title to external (Localized) name, new default
     // charts in *layout.xml need to be added to this list to be translated
     QMap<QString, QString> titleMap;
-    titleMap.insert("Activity Log", tr("Activity Log"));
+    titleMap.insert("Ride Log", tr("Ride Log"));
     titleMap.insert("Aerobic Power", tr("Aerobic Power"));
     titleMap.insert("Anaerobic Power", tr("Anaerobic Power"));
     titleMap.insert("Cadence", tr("Cadence"));

@@ -76,7 +76,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
 #endif
 
     // now set the text for each one
-    home->setText(tr("Home"));
+    home->setText(tr("Trends"));
     layout->addWidget(home);
     connect(home, SIGNAL(clicked(bool)), this, SLOT(clickedHome()));
 
@@ -86,7 +86,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     connect(diary, SIGNAL(clicked(bool)), this, SLOT(clickedDiary()));
 #endif
 
-    anal->setText(tr("Analysis"));
+    anal->setText(tr("Rides"));
     anal->setWidth(70);
     anal->setChecked(true);
     layout->addWidget(anal);

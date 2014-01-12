@@ -922,7 +922,7 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
     QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
     if ((! date.isValid()) || (! time.isValid())) {
 	QMessageBox::warning(NULL,
-			     tr("Invalid Activity File Name"),
+			     tr("Invalid Ride File Name"),
 			     tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name)
 			     );
 	return false;

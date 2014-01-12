@@ -24,7 +24,7 @@
 // Minimum gap in recording to find a natural break to split
 static const double defaultMinimumGap = 1; // 1 minute
 
-// Minimum size of segment to identify as a new activity
+// Minimum size of segment to identify as a new ride
 static const double defaultMinimumSegmentSize = 5; // 5 minutes
 
 // Main wizard
@@ -42,7 +42,7 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
     setMinimumWidth(600);
 
     // title
-    setWindowTitle(tr("Split Activity"));
+    setWindowTitle(tr("Split Ride"));
 
     // set ride - unconst since we will wipe it away eventually
     rideItem = const_cast<RideItem*>(context->currentRideItem());
@@ -154,7 +154,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
                     // we have a candidate
                     segments.append(RideFileInterval(segmentStart, segmentEnd,
-                                    QString(tr("Activity Segment #%1")).arg(++counter)));
+                                    QString(tr("Ride Segment #%1")).arg(++counter)));
 
                 }
                 segmentEnd = segmentStart = p->secs;
@@ -173,7 +173,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
         // we have a candidate
         segments.append(RideFileInterval(segmentStart, segmentEnd,
-                                             QString(tr("Activity Segment #%1")).arg(++counter)));
+                                             QString(tr("Ride Segment #%1")).arg(++counter)));
 
     }
 
@@ -186,21 +186,21 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
     double lastsecs = rideItem->ride()->dataPoints().first()->secs;
     int gapnum = 0;
-    foreach(RideFileInterval activity, segments) {
-        if (activity.start > lastsecs) {
+    foreach(RideFileInterval ride, segments) {
+        if (ride.start > lastsecs) {
             // we have a gap
             gapnum++;
 
             // add to gap list
             RideFileInterval *gap = new RideFileInterval(lastsecs,
-                                                         activity.start,
+                                                         ride.start,
                                                          QString(tr("Gap in recording #%1")).arg(gapnum));
             gaps.append(gap);
 
             // add to interval list
             segments.append(RideFileInterval(*gap));
         }
-        lastsecs = activity.stop;
+        lastsecs = ride.stop;
     }
     if (lastsecs < rideItem->ride()->dataPoints().last()->secs) {
         // gap at the end
@@ -220,7 +220,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
     // so we can mark the start and stop for splitting
     segments.insert(0, RideFileInterval(rideItem->ride()->dataPoints().first()->secs,
                                      rideItem->ride()->dataPoints().last()->secs,
-                                     tr("Entire Activity")));
+                                     tr("Entire Ride")));
 
     // now fold in the ride intervals
     segments.append(rideItem->ride()->intervals());
@@ -241,7 +241,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 
         // we set these intervals as checked by default
         bool checkit = (interval.name.startsWith(tr("Gap in recording")) ||
-                        interval.name == tr("Entire Activity"));
+                        interval.name == tr("Entire Ride"));
 
         // disable checkbox editing (i.e. mandatory split) at gaps in recording
         // we have turned this off from user requests, may reinstate or choose
@@ -445,22 +445,22 @@ SplitActivityWizard::conflicts(QDateTime datetime)
 // welcome
 SplitWelcome::SplitWelcome(SplitActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Split Activity"));
+    setTitle(tr("Split Ride"));
     setSubTitle(tr("Lets get started"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel(tr("This wizard will help you split the current activity "
-                               "into multiple activities\n\n"
+    QLabel *label = new QLabel(tr("This wizard will help you split the current ride "
+                               "into multiple rides\n\n"
                                "The wizard will identify segments of uninterrupted "
-                               "activity and allow you to select which ones to "
-                               "save as new activities. You will also be able to "
+                               "ride and allow you to select which ones to "
+                               "save as new rides. You will also be able to "
                                "select any currently defined intervals too.\n\n"
-                               "If the newly created activity clashes with an existing "
-                               "activity (same date and time) then the wizard will adjust "
+                               "If the newly created ride clashes with an existing "
+                               "ride (same date and time) then the wizard will adjust "
                                "the start time by one or more seconds to avoid losing or "
-                               "overwriting any existing activities."));
+                               "overwriting any existing rides."));
     label->setWordWrap(true);
 
     layout->addWidget(label);
@@ -471,20 +471,20 @@ SplitWelcome::SplitWelcome(SplitActivityWizard *parent) : QWizardPage(parent), w
 SplitKeep::SplitKeep(SplitActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Keep original"));
-    setSubTitle(tr("Do you want to keep the original activity?"));
+    setSubTitle(tr("Do you want to keep the original ride?"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel(tr("If you want to keep the current activity then you "
+    QLabel *label = new QLabel(tr("If you want to keep the current ride then you "
                                "should ensure you have clicked on the \"Keep original "
-                               "activity\" check box below.\n\n"
-                               "If you do not choose to keep the original activity "
+                               "ride\" check box below.\n\n"
+                               "If you do not choose to keep the original ride "
                                "it will be backed up before removing it from the "
-                               "activity history.\n\n"));
+                               "ride history.\n\n"));
     label->setWordWrap(true);
 
-    keepOriginal = new QCheckBox(tr("Keep original activity"), this);
+    keepOriginal = new QCheckBox(tr("Keep original ride"), this);
     keepOriginal->setChecked(wizard->keepOriginal);
 
     warning = new QLabel(this);
@@ -512,7 +512,7 @@ SplitParameters::SplitParameters(SplitActivityWizard *parent) : QWizardPage(pare
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel(tr("This wizard will find segments of activity to save "
+    QLabel *label = new QLabel(tr("This wizard will find segments of ride to save "
                                "by looking for gaps in recording. \n\n"
                                "You can define the minimum length, in time, a gap "
                                "in recording should be in order to mark the end of "
@@ -583,7 +583,7 @@ SplitKeep::setWarning()
 SplitSelect::SplitSelect(SplitActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Select Split Markers"));
-    setSubTitle(tr("Activity will be split between marker points selected"));
+    setSubTitle(tr("Ride will be split between marker points selected"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -658,7 +658,7 @@ SplitSelect::refreshMarkers()
 SplitConfirm::SplitConfirm(SplitActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Confirm"));
-    setSubTitle(tr("Split Activity cannot be undone"));
+    setSubTitle(tr("Split ride cannot be undone"));
 
     setCommitPage(true);
     setButtonText(QWizard::CommitButton, tr("Confirm"));
@@ -686,7 +686,7 @@ SplitConfirm::initializePage()
     foreach(long mark, wizard->marks) points.append(mark); // marks are indexes to ensure absolute accuracy
     qSort(points.begin(), points.end());
 
-    // Create a new activity for each marked segment
+    // Create a new ride for each marked segment
     long lastmark = -1;
     foreach(long mark, points) {
 
@@ -812,7 +812,7 @@ SplitConfirm::validatePage()
             current->setText(5, tr("Removed"));
         }
 
-        // whizz through and create each new activity
+        // whizz through and create each new ride
         int off = wizard->keepOriginal ? 0 : 1; // skip first line to remove or not?
         for(int i=0; i<wizard->activities.count(); i++) {
 
@@ -830,7 +830,7 @@ SplitConfirm::validatePage()
 
         // now make this page the last (so we can see what was done)
         setTitle(tr("Completed"));
-        setSubTitle(tr("Split Activity Completed"));
+        setSubTitle(tr("Split Ride Completed"));
 
         wizard->done = true;
 
