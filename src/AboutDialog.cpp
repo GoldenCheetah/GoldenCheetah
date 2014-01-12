@@ -69,7 +69,7 @@ AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
                 "<p>Source code can be obtained from<br>"
                 "<a href=\"http://goldencheetah.org/\">"
                 "http://goldencheetah.org/</a>."
-                "<p>Activity files and other data are stored in<br>"
+                "<p>Ride files and other data are stored in<br>"
                 "<a href=\"%1\">%2</a>"
                 "<p>Trademarks used with permission<br>"
                 "TSS, NP, IF courtesy of <a href=\"http://www.peaksware.com\">"

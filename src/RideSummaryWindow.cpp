@@ -769,13 +769,13 @@ RideSummaryWindow::htmlSummary() const
             // "n of x activities" shown in header of list when filtered
             summary += ("<p><h3>" + 
                         QString("%1 of %2").arg(activities).arg(data.count()) 
-                                           + (data.count() == 1 ? tr(" activity") : tr(" activities")) +
+                                           + (data.count() == 1 ? tr(" ride") : tr(" rides")) +
                         "</h3><p>");
         } else {
 
             // just "n activities" shown in header of list when not filtered
             summary += ("<p><h3>" + 
-                        QString("%1").arg(activities) + (activities == 1 ? tr(" activity") : tr(" activities")) +
+                        QString("%1").arg(activities) + (activities == 1 ? tr(" ride") : tr(" rides")) +
                         "</h3><p>");
         }
         

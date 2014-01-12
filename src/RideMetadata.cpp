@@ -119,7 +119,7 @@ RideMetadata::warnDateTime(QDateTime datetime)
 
         QString conflict = context->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
         if (QFile(conflict).exists() && QFileInfo(conflict).fileName() != rideItem()->fileName) {
-            QMessageBox::warning(this, "Date/Time Entry", "An activity already exists with that date/time, if you do not change it then you will overwrite and lose existing data");
+            QMessageBox::warning(this, "Date/Time Entry", "A ride already exists with that date/time, if you do not change it then you will overwrite and lose existing data");
             return; // only warn on the first conflict!
         }
     }
