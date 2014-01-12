@@ -102,10 +102,10 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     // this is particularly bad for German's who, as a nation, must
     // suffer from RSI from typing and writing more than any other nation ;)
     QFontMetrics fontMetric(font);
-    int width = fontMetric.width(tr("Home"));
+    int width = fontMetric.width(tr("Trends"));
     home->setWidth(width+20);
 
-    width = fontMetric.width(tr("Analysis"));
+    width = fontMetric.width(tr("Rides"));
     anal->setWidth(width+20);
 
     width = fontMetric.width(tr("Train"));

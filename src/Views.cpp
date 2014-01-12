@@ -28,7 +28,7 @@
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
-    HomeWindow *a = new HomeWindow(context, "analysis", "Analysis");
+    HomeWindow *a = new HomeWindow(context, "analysis", "Rides");
     controls->addWidget(a->controls());
     controls->setCurrentIndex(0);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -125,7 +125,7 @@ DiaryView::isBlank()
 HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_HOME)
 {
     LTMSidebar *s = new LTMSidebar(context);
-    HomeWindow *h = new HomeWindow(context, "home", "Home");
+    HomeWindow *h = new HomeWindow(context, "home", "Trends");
     controls->addWidget(h->controls());
     controls->setCurrentIndex(0);
     BlankStateHomePage *b = new BlankStateHomePage(context);
