@@ -59,14 +59,17 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     setAutoFillBackground(true);
 
     setAxisTitle(xBottom, tr("Interval Length"));
-    LogTimeScaleDraw *ld = new LogTimeScaleDraw;
 
+    // Log scale on x-axis
+    LogTimeScaleDraw *ld = new LogTimeScaleDraw;
     ld->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(xBottom, ld);
     setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
-    QwtScaleDiv div( (double)0.017, (double)60 );
-    div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-    setAxisScaleDiv(QwtPlot::xBottom, div);
+
+    //COMMENTED OUT AS CAUSED ISSUES WITH RESIZING
+    //QwtScaleDiv div( (double)0.017, (double)60 );
+    //div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
+    //setAxisScaleDiv(QwtPlot::xBottom, div);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
