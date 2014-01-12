@@ -268,6 +268,11 @@ main(int argc, char *argv[])
 
             // no parameters passed lets open the last athlete we worked with
             lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
+
+            // but hang on, did they crash? if so we need to open with a menu
+            if(appsettings->cvalue(lastOpened.toString(), GC_SAFEEXIT, true).toBool() != true)
+                lastOpened = QVariant();
+            
         }
 
         // lets attempt to open as asked/remembered

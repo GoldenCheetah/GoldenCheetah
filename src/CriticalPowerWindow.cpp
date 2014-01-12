@@ -451,13 +451,20 @@ CriticalPowerWindow::modelChanged()
 
     case 3 : // ExtendedCP
 
-            sanLabel->show();
+            intervalLabel->show();
             secondsLabel->show();
+            sanLabel->show();
             sanI1SpinBox->show();
             sanI2SpinBox->show();
+            anLabel->show();
+            anI1SpinBox->show();
+            anI2SpinBox->show();
+            aeLabel->show();
+            aeI1SpinBox->show();
+            aeI2SpinBox->show();
             laeLabel->show();
             laeI1SpinBox->show();
-            laeI2SpinBox->show();
+            laeI2SpinBox->show();         
 
             // Default values
             sanI1SpinBox->setValue(20);
@@ -1075,6 +1082,19 @@ void
 CriticalPowerWindow::shadeIntervalsChanged(int state)
 {
     cpintPlot->setShadeIntervals(state);
+
+    // any existing interval curves need brush or no brush
+    foreach(QwtPlotCurve *p, intervalCurves) {
+    if (p) {
+            if (state) {
+                QColor curveColor = p->pen().color();
+                curveColor.setAlpha(64);
+                QBrush brush(curveColor);
+                p->setBrush(brush);
+            }
+            else p->setBrush(Qt::NoBrush);
+        }
+    }
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
 }

@@ -118,11 +118,11 @@ class Context : public QObject
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
 
-        void notifyCompareIntervals(bool state) { isCompareIntervals = state; emit compareIntervalsStateChanged(state); }
-        void notifyCompareIntervalsChanged() { emit compareIntervalsChanged(); }
+        void notifyCompareIntervals(bool state);
+        void notifyCompareIntervalsChanged();
 
-        void notifyCompareDateRanges(bool state) { isCompareDateRanges = state; emit compareDateRangesStateChanged(state); }
-        void notifyCompareDateRangesChanged() { emit compareDateRangesChanged(); }
+        void notifyCompareDateRanges(bool state);
+        void notifyCompareDateRangesChanged();
 
     signals:
 

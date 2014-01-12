@@ -52,6 +52,95 @@ class Context;
 class LTMToolTip;
 class LTMCanvasPicker;
 
+class AllPlot;
+class AllPlotObject : public QObject
+{
+    Q_OBJECT;
+
+    // one set for every ride being plotted, which
+    // as standard is just one, its only when we start
+    // compare mode that we get more...
+
+    public:
+
+    AllPlotObject(AllPlot*); // construct associate with a plot
+    ~AllPlotObject(); // delete and disassociate from a plot
+
+    void setVisible(bool); // show or hide objects
+    void setColor(QColor color); // set ALL curves the same color
+    void hideUnwanted(); // hide curves we are not interested in
+                         // using setVisible ...
+
+    QwtPlotGrid *grid;
+    QVector<QwtPlotMarker*> d_mrk;
+    QVector<QwtPlotMarker*> cal_mrk;
+    QwtPlotMarker curveTitle;
+    QwtPlotMarker *allMarker1;
+    QwtPlotMarker *allMarker2;
+    // reference lines
+    QVector<QwtPlotCurve*> referenceLines;
+    QVector<QwtPlotCurve*> tmpReferenceLines;
+
+    QwtPlotCurve *wattsCurve;
+    QwtPlotCurve *npCurve;
+    QwtPlotCurve *xpCurve;
+    QwtPlotCurve *apCurve;
+    QwtPlotCurve *hrCurve;
+    QwtPlotCurve *speedCurve;
+    QwtPlotCurve *cadCurve;
+    QwtPlotCurve *altCurve;
+    QwtPlotCurve *tempCurve;
+    QwtPlotIntervalCurve *windCurve;
+    QwtPlotCurve *torqueCurve;
+    QwtPlotCurve *balanceLCurve;
+    QwtPlotCurve *balanceRCurve;
+    QwtPlotCurve *wCurve;
+    QwtPlotCurve *mCurve;
+
+    // source data
+    QVector<double> hrArray;
+    QVector<double> wattsArray;
+    QVector<double> npArray;
+    QVector<double> xpArray;
+    QVector<double> apArray;
+    QVector<double> speedArray;
+    QVector<double> cadArray;
+    QVector<double> timeArray;
+    QVector<double> distanceArray;
+    QVector<double> altArray;
+    QVector<double> tempArray;
+    QVector<double> windArray;
+    QVector<double> torqueArray;
+    QVector<double> balanceArray;
+
+    // smoothed data
+    QVector<double> smoothWatts;
+    QVector<double> smoothNP;
+    QVector<double> smoothAP;
+    QVector<double> smoothXP;
+    QVector<double> smoothHr;
+    QVector<double> smoothSpeed;
+    QVector<double> smoothCad;
+    QVector<double> smoothTime;
+    QVector<double> smoothDistance;
+    QVector<double> smoothAltitude;
+    QVector<double> smoothTemp;
+    QVector<double> smoothWind;
+    QVector<double> smoothTorque;
+    QVector<double> smoothBalanceL;
+    QVector<double> smoothBalanceR;
+    QVector<QwtIntervalSample> smoothRelSpeed;
+
+    // highlighting intervals
+    QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
+
+    // the plot we work for
+    AllPlot *plot;
+
+    // some handy stuff
+    double maxSECS, maxKM;
+};
+
 class AllPlot : public QwtPlot
 {
     Q_OBJECT
@@ -64,13 +153,18 @@ class AllPlot : public QwtPlot
         // wanttext is to say if plot markers should have text
         AllPlot(AllPlotWindow *parent, Context *context, 
                 RideFile::SeriesType series = RideFile::none, RideFile::SeriesType secSeries = RideFile::none, bool wanttext = true);
+        ~AllPlot();
 
         bool eventFilter(QObject *object, QEvent *e);
 
         // set the curve data e.g. when a ride is selected
         void setDataFromRide(RideItem *_rideItem);
+        void setDataFromRideFile(RideFile *ride, AllPlotObject *object); // when plotting lots of rides on fullPlot
         void setDataFromPlot(AllPlot *plot, int startidx, int stopidx);
         void setDataFromPlot(AllPlot *plot); // used for single series plotting
+        void setDataFromPlots(QList<AllPlot*>); // user for single series comparing
+        void setDataFromObject(AllPlotObject *object, AllPlot *reference); // for allplot when one per ride in a stack
+                                                                           // reference is for settings et al
 
         // convert from time/distance to index in *smoothed* datapoints
         int timeIndex(double) const;
@@ -86,9 +180,10 @@ class AllPlot : public QwtPlot
         void setAxisTitle(QwtAxisId axis, QString label);
 
         // refresh data / plot parameters
-        void recalc();
+        void recalc(AllPlotObject *objects);
         void setYMax();
         void setXTitle();
+        void setHighlightIntervals(bool);
 
         void plotTmpReference(int axis, int x, int y);
         void confirmTmpReference(double value, int axis, bool allowDelete);
@@ -114,6 +209,7 @@ class AllPlot : public QwtPlot
         void setShadeZones(bool x) { shade_zones=x; }
         void setSmoothing(int value);
         void setByDistance(int value);
+        void setWantAxis(bool x) { wantaxis = x;}
         void configChanged();
 
         // for tooltip
@@ -130,7 +226,6 @@ class AllPlot : public QwtPlot
         RideItem *rideItem;
         AllPlotBackground *bg;
         QSettings *settings;
-        bool wanttext;
 
         // controls
         bool shade_zones;
@@ -149,68 +244,12 @@ class AllPlot : public QwtPlot
         bool showBalance;
 
         // plot objects
-        QwtPlotGrid *grid;
-        QVector<QwtPlotMarker*> d_mrk;
-        QVector<QwtPlotMarker*> cal_mrk;
-        QwtPlotMarker curveTitle;
-        QwtPlotMarker *allMarker1;
-        QwtPlotMarker *allMarker2;
-        QwtPlotCurve *wattsCurve;
-        QwtPlotCurve *npCurve;
-        QwtPlotCurve *xpCurve;
-        QwtPlotCurve *apCurve;
-        QwtPlotCurve *hrCurve;
-        QwtPlotCurve *speedCurve;
-        QwtPlotCurve *cadCurve;
-        QwtPlotCurve *altCurve;
-        QwtPlotCurve *tempCurve;
-        QwtPlotIntervalCurve *windCurve;
-        QwtPlotCurve *torqueCurve;
-        QwtPlotCurve *balanceLCurve;
-        QwtPlotCurve *balanceRCurve;
-        QwtPlotCurve *wCurve;
-        QwtPlotCurve *mCurve;
-        QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
+        AllPlotObject *standard;
+        QList<QwtPlotCurve*> compares; // when plotting single series in compare mode
+
         QList <AllPlotZoneLabel *> zoneLabels;
-        QVector<QwtPlotCurve*> referenceLines;
-        QVector<QwtPlotCurve*> tmpReferenceLines;
-
-        // source data
-        QVector<double> hrArray;
-        QVector<double> wattsArray;
-        QVector<double> npArray;
-        QVector<double> xpArray;
-        QVector<double> apArray;
-        QVector<double> speedArray;
-        QVector<double> cadArray;
-        QVector<double> timeArray;
-        QVector<double> distanceArray;
-        QVector<double> altArray;
-        QVector<double> tempArray;
-        QVector<double> windArray;
-        QVector<double> torqueArray;
-        QVector<double> balanceArray;
-
-        // smoothed data
-        QVector<double> smoothWatts;
-        QVector<double> smoothNP;
-        QVector<double> smoothAP;
-        QVector<double> smoothXP;
-        QVector<double> smoothHr;
-        QVector<double> smoothSpeed;
-        QVector<double> smoothCad;
-        QVector<double> smoothTime;
-        QVector<double> smoothDistance;
-        QVector<double> smoothAltitude;
-        QVector<double> smoothTemp;
-        QVector<double> smoothWind;
-        QVector<double> smoothTorque;
-        QVector<double> smoothBalanceL;
-        QVector<double> smoothBalanceR;
-        QVector<QwtIntervalSample> smoothRelSpeed;
 
         // array / smooth state
-        int arrayLength;
         int smooth;
         bool bydist;
 
@@ -218,11 +257,15 @@ class AllPlot : public QwtPlot
         RideFile::SeriesType scope;
         RideFile::SeriesType secondaryScope;
 
-    private:
+    protected:
+        friend class ::AllPlotObject;
         Context *context;
+
+    private:
 
         AllPlot *referencePlot;
         AllPlotWindow *parent;
+        bool wanttext, wantaxis;
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 

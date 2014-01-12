@@ -68,7 +68,7 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
 }
 
 PfPvWindow::PfPvWindow(Context *context) :
-    GcChartWindow(context), context(context), current(NULL)
+    GcChartWindow(context), context(context), current(NULL), compareStale(true)
 {
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);
@@ -191,12 +191,18 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(rFrameInterval, SIGNAL(stateChanged(int)),
                 this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
+
+    // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
+
+    // comparing things
+    connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
+    connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
     configChanged();
 }
@@ -210,11 +216,25 @@ PfPvWindow::configChanged()
     setPalette(palette);
 }
 
+bool
+PfPvWindow::isCompare() const
+{
+    return context->isCompareIntervals;
+}
+
 void
 PfPvWindow::rideSelected()
 {
-    if (!amVisible())
+    // we need to refresh for compare mode
+    if (isCompare()) {
+        if (isVisible() && compareStale) compareChanged(); 
         return;
+    }
+    
+    if (!amVisible()) {
+        compareStale = true;
+        return;
+    }
 
 
     RideItem *ride = myRideItem;
@@ -341,5 +361,36 @@ PfPvWindow::doubleClicked(int cad, int watts)
     pfPvPlot->setCAD(cad);
     qaCadValue->setText(QString("%1").arg(cad));
     pfPvPlot->replot();
+}
+
+void
+PfPvWindow::compareChanged()
+{
+
+    if (!amVisible()) {
+        compareStale = true;
+        return;
+    }
+
+    // we get busy so lets turn off updates till we're done
+    setUpdatesEnabled(false);
+
+    // ensure redraws happen
+    setIsBlank(false);
+    current = NULL; // we don't have a current ride
+    compareStale = false; // but compare is no longer stale
+
+    if (context->isCompareIntervals) {
+
+        // set the scale and zones
+        pfPvPlot->showCompareIntervals();
+
+    } else {
+
+        // same as tab selected etc
+        rideSelected();
+    }
+
+    setUpdatesEnabled(true);
 }
 

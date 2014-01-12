@@ -33,3 +33,33 @@ Context::currentRide()
 {
     return athlete->currentRide();
 }
+
+void 
+Context::notifyCompareIntervals(bool state) 
+{ 
+    isCompareIntervals = state; 
+    emit compareIntervalsStateChanged(state); 
+}
+
+void 
+Context::notifyCompareIntervalsChanged() 
+{
+    if (isCompareIntervals) {
+        emit compareIntervalsChanged(); 
+    }
+}
+
+void 
+Context::notifyCompareDateRanges(bool state)
+{
+    isCompareDateRanges = state;
+    emit compareDateRangesStateChanged(state); 
+}
+
+void 
+Context::notifyCompareDateRangesChanged()
+{ 
+    if (isCompareDateRanges) {
+        emit compareDateRangesChanged(); 
+    }
+}

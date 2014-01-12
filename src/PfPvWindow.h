@@ -84,6 +84,8 @@ class PfPvWindow : public GcChartWindow
         bool frame() const { return frameIntervalPfPvCheckBox->isChecked(); }
         void setFrame(bool x) { frameIntervalPfPvCheckBox->setChecked(x); }
 
+        bool isCompare() const;
+
     public slots:
 
         void rideSelected();
@@ -103,6 +105,7 @@ class PfPvWindow : public GcChartWindow
         void setrFrameIntervalsPfPvFromCheckBox();
         void doubleClicked(int, int);
         void configChanged();
+        void compareChanged();
 
     protected:
 
@@ -121,6 +124,7 @@ class PfPvWindow : public GcChartWindow
     private:
         // reveal controls
         QCheckBox *rShade, *rMergeInterval, *rFrameInterval;
+        bool compareStale;
 };
 
 #endif // _GC_PfPvWindow_h

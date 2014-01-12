@@ -72,8 +72,9 @@
 // 51  05  Nov 2013 Mark Liversedge    Added average aPower
 // 52  05  Nov 2013 Mark Liversedge    Added EOA - Effect of Altitude
 // 53  18  Dec 2013 Mark Liversedge    Added Fatigue Index (for power)
+// 54  07  Jan 2014 Mark Liversedge    Revised Estimated VO2MAX metric formula
 
-int DBSchemaVersion = 53;
+int DBSchemaVersion = 54;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

@@ -27,6 +27,7 @@
 #include <QStyleFactory>
 
 class AllPlot;
+class AllPlotObject;
 class Context;
 class QwtPlotPanner;
 class QwtPlotZoomer;
@@ -78,6 +79,7 @@ class AllPlotWindow : public GcChartWindow
         AllPlotWindow(Context *context);
         void setData(RideItem *ride);
 
+        bool isCompare() const { return context->isCompareIntervals; }
         bool hasReveal() { return true; }
 
         // highlight a selection on the plots
@@ -151,10 +153,14 @@ class AllPlotWindow : public GcChartWindow
         void zoomInterval(IntervalItem *);
         void stackZoomSliderChanged();
         void resizeSeriesPlots();
+        void resizeComparePlots();
         void moveLeft();
         void moveRight();
         void showStackChanged(int state);
         void showBySeriesChanged(int state);
+
+        // compare mode started or items to compare changed
+        void compareChanged();
 
     protected:
 
@@ -179,6 +185,14 @@ class AllPlotWindow : public GcChartWindow
         QList <AllPlot *> seriesPlots;
         QwtPlotPanner *allPanner;
         QwtPlotZoomer *allZoomer;
+
+        QStackedWidget *allStack; // for normal allplot of stacked al plot in compare mode
+
+        // compare mode all plot (is a stack view, not a single plot)
+        QScrollArea *comparePlotFrame;
+        QVBoxLayout *comparePlotLayout;
+        QWidget *comparePlotWidget;
+        QList<AllPlot*> allComparePlots; // allplot as a series of charts
 
         // Stacked view
         QScrollArea *stackFrame;
@@ -231,6 +245,9 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *rStack, *rBySeries, *rFull;
         QStackedWidget *allPlotStack;
 
+        // comparing 
+        QList<AllPlotObject*> compareIntervalCurves; // one per compareInterval
+
         // reset/redraw all the plots
         void setupStackPlots();
         void forceSetupSeriesStackPlots();
@@ -246,8 +263,9 @@ class AllPlotWindow : public GcChartWindow
 
         bool active;
         bool stale;
-        bool setupStack; // we optimise this out, its costly
+        bool setupStack;       // we optimise this out, its costly
         bool setupSeriesStack; // we optimise this out, its costly
+        bool compareStale;     // compare init one off setup
 
     private slots:
 

@@ -237,6 +237,10 @@ MainWindow::MainWindow(const QDir &home)
     head->setFloatable(false);
     head->setMovable(false);
 
+    // make the normal toolbar in QT5 have same colors as the tabs and when inactive
+    // make it the same 'light' colour as the other widgets do.
+    head->setStyleSheet(" QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #C6C6C6, stop: 1 #A5A5A5 ); } "
+                        " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } "); 
     // widgets
     QWidget *macAnalButtons = new QWidget(this);
     macAnalButtons->setContentsMargins(20,5,20,0);
@@ -479,13 +483,17 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 
     tabbar = new DragBar(this);
+    tabbar->setTabsClosable(true);
+#ifdef Q_OS_MAC
+    tabbar->setDocumentMode(true);
+#else
+    QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
-    tabbar->setTabsClosable(true);
-    QPalette tabbarPalette;
     tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
+#endif
 
     tabStack = new QStackedWidget(this);
     currentTab = new Tab(context);
@@ -734,9 +742,17 @@ MainWindow::showTabbar(bool want)
 {
     showhideTabbar->setChecked(want);
     if (want) {
+#ifdef Q_OS_MAC
+    setDocumentMode(true);
+    tabbar->setDocumentMode(true);
+#endif
         tabbar->show();
     }
     else {
+#ifdef Q_OS_MAC
+    setDocumentMode(false);
+    tabbar->setDocumentMode(false);
+#endif
         tabbar->hide();
     }
 }

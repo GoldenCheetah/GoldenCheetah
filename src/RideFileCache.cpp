@@ -141,6 +141,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::wattsKg : return 2; break;
         case RideFile::aPower : return 0; break;
         case RideFile::lrbalance : return 1; break;
+        case RideFile::wprime :  return 0; break;
         case RideFile::none : break;
     }
     return 2; // default

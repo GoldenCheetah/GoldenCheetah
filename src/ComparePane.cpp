@@ -35,14 +35,14 @@
 static QList<QColor> standardColors;
 static bool initStandardColors()
 {
-    standardColors << QColor(Qt::red);
-    standardColors << QColor(Qt::green);
-    standardColors << QColor(Qt::blue);
     standardColors << QColor(Qt::magenta);
     standardColors << QColor(Qt::cyan);
     standardColors << QColor(Qt::yellow);
+    standardColors << QColor(Qt::red);
+    standardColors << QColor(Qt::blue);
     standardColors << QColor(Qt::gray);
     standardColors << QColor(Qt::darkCyan);
+    standardColors << QColor(Qt::green);
     standardColors << QColor(Qt::darkRed);
     standardColors << QColor(Qt::darkGreen);
     standardColors << QColor(Qt::darkBlue);
@@ -160,8 +160,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS, GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
 
         // called after config is updated typically
@@ -210,7 +210,7 @@ ComparePane::refreshTable()
             QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, x.data,
                                                      context->athlete->zones(), context->athlete->hrZones(), worklist);
 
-            for(int i = 0; i < worklist.count(); ++i) {
+            for(int i = 0; i < worklist.count(); i++) {
                 if (worklist[i] != "") {
                     RideMetricPtr m = computed.value(worklist[i]);
                     if (m) metrics.setForSymbol(worklist[i], m->value(true));
@@ -253,21 +253,26 @@ ComparePane::refreshTable()
             table->setItem(counter, 4, t);
 
             // metrics
-            for(int i = 0; i < worklist.count(); ++i) {
+            for(int i = 0; i < worklist.count(); i++) {
 
                 RideMetricPtr m = computed.value(worklist[i]);
 
-                // get value and convert if needed
-                double value = metrics.getForSymbol(worklist[i]) 
-                               * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
-                               + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
+                QString strValue;
 
-                // use right precision
-                QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
+                if (m) {
+                    // get value and convert if needed
+                    double value = metrics.getForSymbol(worklist[i]) 
+                                * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
+                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
 
-                // or maybe its a duration (worry about local lang or translated)
-                if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
-                    strValue = time_to_string(value);
+                    // use right precision
+                    strValue = QString("%1").arg(value, 0, 'f', m->precision());
+    
+                    // or maybe its a duration (worry about local lang or translated)
+                    if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
+                        strValue = time_to_string(value);
+
+                }
 
                 // add to the table
                 t = new CTableWidgetItem;
@@ -401,7 +406,7 @@ ComparePane::refreshTable()
             table->setItem(counter, 4, t);
 
             // metrics
-            for(int i = 0; i < worklist.count(); ++i) {
+            for(int i = 0; i < worklist.count(); i++) {
 
                 QString value = SummaryMetrics::getAggregated(x.sourceContext, worklist[i], 
                                                               x.metrics, QStringList(), false, context->athlete->useMetricUnits);
@@ -490,6 +495,37 @@ ComparePane::itemsWereSorted()
         }
 
         context->compareDateRanges = newOrder;
+        context->notifyCompareDateRangesChanged();
+
+    }
+}
+
+void
+ComparePane::clear()
+{
+    if (mode_ == interval) { // INTERVALS
+
+        // wipe all away
+        foreach(CompareInterval ci, context->compareIntervals) {
+            delete ci.data;
+        }
+        context->compareIntervals.clear();
+
+        // refresh table
+        refreshTable();
+
+        // tell the charts
+        context->notifyCompareIntervalsChanged();
+
+    } else {
+
+        // wipe em
+        context->compareDateRanges.clear();
+
+        // refresh table
+        refreshTable();
+
+        // tell the charts
         context->notifyCompareDateRangesChanged();
 
     }
@@ -644,6 +680,7 @@ ComparePane::dropEvent(QDropEvent *event)
                     l->apower = p->apower;
                 }
             }
+            add.data->recalculateDerivedSeries();
 
             // just use standard colors and cycle round
             // we will of course repeat, but the user can
