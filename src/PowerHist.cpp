@@ -644,6 +644,12 @@ PowerHist::setData(RideFileCache *cache)
     curveSelected->hide();
 }
 
+void
+PowerHist::setDataFromCompareIntervals()
+{
+    // set all the curves based upon whats in the compare intervals array
+}
+
 void 
 PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
                      bool isFiltered, QStringList files)

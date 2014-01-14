@@ -289,6 +289,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+
+        // comparing things
+        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareIntervalsStateChanged(bool)));
+        connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareIntervalsChanged()));
     }
 
     // if any of the controls change we pass the chart everything
@@ -308,6 +312,41 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
+}
+
+bool
+HistogramWindow::isCompare() const
+{
+    if (!rangemode && context->isCompareIntervals) return true;
+
+    return false;
+}
+
+void 
+HistogramWindow::compareIntervalsStateChanged(bool)
+{
+    // ...
+    compareChanged();
+}
+
+void 
+HistogramWindow::compareIntervalsChanged()
+{
+    // ...
+    compareChanged();
+}
+
+void 
+HistogramWindow::compareChanged()
+{
+    stale = true; // the 'standard' plots will need to be updated
+
+    // Now create / delete curves etc
+    // ...
+    
+    // replot!
+    powerHist->replot();
+    repaint();
 }
 
 //
@@ -621,7 +660,7 @@ HistogramWindow::rideSelected()
 
     RideItem *ride = myRideItem;
 
-    if (!ride || (rangemode && !stale)) return;
+    if (!ride || isCompare() || (rangemode && !stale)) return;
 
     if (rangemode) {
         // get range that applies to this ride
@@ -644,7 +683,7 @@ HistogramWindow::intervalSelected()
     RideItem *ride = myRideItem;
 
     // null? or not plotting current ride, ignore signal
-    if (!ride || rangemode) return;
+    if (!ride || isCompare() || rangemode) return;
 
     // update
     interval = true;

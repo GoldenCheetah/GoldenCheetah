@@ -123,7 +123,7 @@ class CpintPlot : public QwtPlot
         void calculate(RideItem *rideItem);
         void plot_CP_curve(CpintPlot *plot, double cp, double tau, double t0n);
         void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values, QColor plotColor, bool forcePlotColor);
-        void plot_interval(CpintPlot *plot, QVector<float> vector, QColor plotColor);
+        void plot_interval(CpintPlot *plot, QVector<double> vector, QColor plotColor);
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
         void setShadeMode(int x);

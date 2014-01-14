@@ -117,6 +117,62 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     }
 }
 
+RideFileCache::RideFileCache(RideFile *ride) :
+               context(ride->context), rideFileName(""), ride(ride)
+{
+    // resize all the arrays to zero
+    wattsMeanMax.resize(0);
+    hrMeanMax.resize(0);
+    cadMeanMax.resize(0);
+    nmMeanMax.resize(0);
+    kphMeanMax.resize(0);
+    xPowerMeanMax.resize(0);
+    npMeanMax.resize(0);
+    vamMeanMax.resize(0);
+    wattsKgMeanMax.resize(0);
+    aPowerMeanMax.resize(0);
+    wattsDistribution.resize(0);
+    hrDistribution.resize(0);
+    cadDistribution.resize(0);
+    nmDistribution.resize(0);
+    kphDistribution.resize(0);
+    xPowerDistribution.resize(0);
+    npDistribution.resize(0);
+    wattsKgDistribution.resize(0);
+    aPowerDistribution.resize(0);
+
+    // time in zone are fixed to 10 zone max
+    wattsTimeInZone.resize(10);
+    hrTimeInZone.resize(10);
+
+    ride->getWeight();
+
+    // calculate all the arrays
+    compute();
+
+    // setup the doubles the users use
+    doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);
+    doubleArray(hrMeanMaxDouble, hrMeanMax, RideFile::hr);
+    doubleArray(cadMeanMaxDouble, cadMeanMax, RideFile::cad);
+    doubleArray(nmMeanMaxDouble, nmMeanMax, RideFile::nm);
+    doubleArray(kphMeanMaxDouble, kphMeanMax, RideFile::kph);
+    doubleArray(npMeanMaxDouble, npMeanMax, RideFile::NP);
+    doubleArray(vamMeanMaxDouble, vamMeanMax, RideFile::vam);
+    doubleArray(xPowerMeanMaxDouble, xPowerMeanMax, RideFile::xPower);
+    doubleArray(wattsKgMeanMaxDouble, wattsKgMeanMax, RideFile::wattsKg);
+    doubleArray(aPowerMeanMaxDouble, aPowerMeanMax, RideFile::aPower);
+
+    doubleArray(wattsDistributionDouble, wattsDistribution, RideFile::watts);
+    doubleArray(hrDistributionDouble, hrDistribution, RideFile::hr);
+    doubleArray(cadDistributionDouble, cadDistribution, RideFile::cad);
+    doubleArray(nmDistributionDouble, nmDistribution, RideFile::nm);
+    doubleArray(kphDistributionDouble, kphDistribution, RideFile::kph);
+    doubleArray(xPowerDistributionDouble, xPowerDistribution, RideFile::xPower);
+    doubleArray(npDistributionDouble, npDistribution, RideFile::NP);
+    doubleArray(wattsKgDistributionDouble, wattsKgDistribution, RideFile::wattsKg);
+    doubleArray(aPowerDistributionDouble, aPowerDistribution, RideFile::aPower);
+}
+
 int
 RideFileCache::decimalsFor(RideFile::SeriesType series)
 {
@@ -292,6 +348,12 @@ RideFileCache::distributionArray(RideFile::SeriesType series)
             return wattsMeanMaxDouble;
             break;
     }
+}
+
+RideFileCache *
+RideFileCache::createCacheFor(RideFile*rideFile)
+{
+    return new RideFileCache(rideFile);
 }
 
 //

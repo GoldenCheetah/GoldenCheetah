@@ -1403,16 +1403,12 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         CompareInterval interval = compareIntervals.at(i);
 
         if (interval.isChecked())  {
-            // compute the mean max
-            QVector<float>vector;
-            MeanMaxComputer thread1(interval.data, vector, series); thread1.run();
-            thread1.wait();
 
-            // no data!
-            if (vector.count() == 0) return;
+            // no data ?
+            if (interval.rideFileCache()->meanMaxArray(series).count() == 0) return;
 
             // create curve data arrays
-            plot_interval(this, vector, interval.color);
+            plot_interval(this, interval.rideFileCache()->meanMaxArray(series), interval.color);
         }
     }
 
@@ -1420,7 +1416,7 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 }
 
 void
-CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor intervalColor)
+CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<double> vector, QColor intervalColor)
 {
     QVector<double>x;
     QVector<double>y;

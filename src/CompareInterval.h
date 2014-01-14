@@ -21,6 +21,7 @@
 
 class Context;
 class RideFile;
+class RideFileCache;
 
 #include <QObject>
 #include <QColor>
@@ -29,17 +30,22 @@ class CompareInterval
 {
     public:
         CompareInterval(Context *context, QString name, RideFile *data, QColor color, Context *sourceContext, bool checked);
-        CompareInterval() : context(NULL), data(NULL), sourceContext(NULL), checked(false) {}
+        CompareInterval();
+        ~CompareInterval();
 
         Context *context;
         QString name;
         RideFile *data;
         QColor color;
         Context *sourceContext;
+        RideFileCache *rideFileCache();
         bool checked;
 
         bool isChecked() const { return checked; }
         void setChecked(bool x) { checked=x; }
+
+    private:
+        RideFileCache *cache;
 };
 
 #endif
