@@ -19,6 +19,7 @@
 #include "ComparePane.h"
 #include "Settings.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "RideMetric.h"
 #include "SummaryMetrics.h"
 #include "MetricAggregator.h"
@@ -681,6 +682,9 @@ ComparePane::dropEvent(QDropEvent *event)
                 }
             }
             add.data->recalculateDerivedSeries();
+
+            // force the cache to be computed when added -- may optimise this out later
+            add.rideFileCache()->meanMaxArray(RideFile::watts).size(); // force the cache to be computed straight away.
 
             // just use standard colors and cycle round
             // we will of course repeat, but the user can

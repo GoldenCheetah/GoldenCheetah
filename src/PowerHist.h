@@ -115,6 +115,9 @@ class PowerHist : public QwtPlot
         // set data from a ride
         void setData(RideItem *_rideItem, bool force=false);
 
+        // set data from the compare intervals
+        void setDataFromCompareIntervals();
+
         // set data from a ridefile cache
         void setData(RideFileCache *source);
 
