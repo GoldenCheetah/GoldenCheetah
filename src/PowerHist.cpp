@@ -321,62 +321,62 @@ PowerHist::recalc(bool force)
     if (source == Metric) {
 
         // we use the metricArray
-        array = &metricArray;
-        arrayLength = metricArray.size();
+        array = &standard.metricArray;
+        arrayLength = standard.metricArray.size();
         selectedArray = NULL;
 
     } else if (series == RideFile::watts && zoned == false) {
 
-        array = &wattsArray;
-        arrayLength = wattsArray.size();
-        selectedArray = &wattsSelectedArray;
+        array = &standard.wattsArray;
+        arrayLength = standard.wattsArray.size();
+        selectedArray = &standard.wattsSelectedArray;
 
     } else if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned == true) {
 
-        array = &wattsZoneArray;
-        arrayLength = wattsZoneArray.size();
-        selectedArray = &wattsZoneSelectedArray;
+        array = &standard.wattsZoneArray;
+        arrayLength = standard.wattsZoneArray.size();
+        selectedArray = &standard.wattsZoneSelectedArray;
 
     } else if (series == RideFile::aPower && zoned == false) {
 
-        array = &aPowerArray;
-        arrayLength = aPowerArray.size();
-        selectedArray = &aPowerSelectedArray;
+        array = &standard.aPowerArray;
+        arrayLength = standard.aPowerArray.size();
+        selectedArray = &standard.aPowerSelectedArray;
 
     } else if (series == RideFile::wattsKg && zoned == false) {
 
-        array = &wattsKgArray;
-        arrayLength = wattsKgArray.size();
-        selectedArray = &wattsKgSelectedArray;
+        array = &standard.wattsKgArray;
+        arrayLength = standard.wattsKgArray.size();
+        selectedArray = &standard.wattsKgSelectedArray;
 
     } else if (series == RideFile::nm) {
 
-        array = &nmArray;
-        arrayLength = nmArray.size();
-        selectedArray = &nmSelectedArray;
+        array = &standard.nmArray;
+        arrayLength = standard.nmArray.size();
+        selectedArray = &standard.nmSelectedArray;
 
     } else if (series == RideFile::hr && zoned == false) {
 
-        array = &hrArray;
-        arrayLength = hrArray.size();
-        selectedArray = &hrSelectedArray;
+        array = &standard.hrArray;
+        arrayLength = standard.hrArray.size();
+        selectedArray = &standard.hrSelectedArray;
 
     } else if (series == RideFile::hr && zoned == true) {
 
-        array = &hrZoneArray;
-        arrayLength = hrZoneArray.size();
-        selectedArray = &hrZoneSelectedArray;
+        array = &standard.hrZoneArray;
+        arrayLength = standard.hrZoneArray.size();
+        selectedArray = &standard.hrZoneSelectedArray;
 
     } else if (series == RideFile::kph) {
 
-        array = &kphArray;
-        arrayLength = kphArray.size();
-        selectedArray = &kphSelectedArray;
+        array = &standard.kphArray;
+        arrayLength = standard.kphArray.size();
+        selectedArray = &standard.kphSelectedArray;
 
     } else if (series == RideFile::cad) {
-        array = &cadArray;
-        arrayLength = cadArray.size();
-        selectedArray = &cadSelectedArray;
+        array = &standard.cadArray;
+        arrayLength = standard.cadArray.size();
+        selectedArray = &standard.cadSelectedArray;
     }
 
     RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ? RideFile::watts : series;
@@ -443,8 +443,8 @@ PowerHist::recalc(bool force)
         // if we're working with HR data...
         minX=0;
         if (!withz && series == RideFile::hr) {
-            for (int i=1; i<hrArray.size(); i++) {
-                if (hrArray[i] > 0.1) {
+            for (int i=1; i<standard.hrArray.size(); i++) {
+                if (standard.hrArray[i] > 0.1) {
                     minX = i;
                     break;
                 }
@@ -596,49 +596,49 @@ PowerHist::setData(RideFileCache *cache)
 
     // Now go set all those tedious arrays from
     // the ride cache
-    wattsArray.resize(0);
-    wattsZoneArray.resize(10);
-    wattsKgArray.resize(0);
-    aPowerArray.resize(0);
-    nmArray.resize(0);
-    hrArray.resize(0);
-    hrZoneArray.resize(10);
-    kphArray.resize(0);
-    cadArray.resize(0);
+    standard.wattsArray.resize(0);
+    standard.wattsZoneArray.resize(10);
+    standard.wattsKgArray.resize(0);
+    standard.aPowerArray.resize(0);
+    standard.nmArray.resize(0);
+    standard.hrArray.resize(0);
+    standard.hrZoneArray.resize(10);
+    standard.kphArray.resize(0);
+    standard.cadArray.resize(0);
 
     // we do not use the selected array since it is
     // not meaningful to overlay interval selection
     // with long term data
-    wattsSelectedArray.resize(0);
-    wattsZoneSelectedArray.resize(0);
-    wattsKgSelectedArray.resize(0);
-    aPowerSelectedArray.resize(0);
-    nmSelectedArray.resize(0);
-    hrSelectedArray.resize(0);
-    hrZoneSelectedArray.resize(0);
-    kphSelectedArray.resize(0);
-    cadSelectedArray.resize(0);
+    standard.wattsSelectedArray.resize(0);
+    standard.wattsZoneSelectedArray.resize(0);
+    standard.wattsKgSelectedArray.resize(0);
+    standard.aPowerSelectedArray.resize(0);
+    standard.nmSelectedArray.resize(0);
+    standard.hrSelectedArray.resize(0);
+    standard.hrZoneSelectedArray.resize(0);
+    standard.kphSelectedArray.resize(0);
+    standard.cadSelectedArray.resize(0);
 
-    longFromDouble(wattsArray, cache->distributionArray(RideFile::watts));
-    longFromDouble(wattsKgArray, cache->distributionArray(RideFile::wattsKg));
-    longFromDouble(aPowerArray, cache->distributionArray(RideFile::aPower));
-    longFromDouble(hrArray, cache->distributionArray(RideFile::hr));
-    longFromDouble(nmArray, cache->distributionArray(RideFile::nm));
-    longFromDouble(cadArray, cache->distributionArray(RideFile::cad));
-    longFromDouble(kphArray, cache->distributionArray(RideFile::kph));
+    longFromDouble(standard.wattsArray, cache->distributionArray(RideFile::watts));
+    longFromDouble(standard.wattsKgArray, cache->distributionArray(RideFile::wattsKg));
+    longFromDouble(standard.aPowerArray, cache->distributionArray(RideFile::aPower));
+    longFromDouble(standard.hrArray, cache->distributionArray(RideFile::hr));
+    longFromDouble(standard.nmArray, cache->distributionArray(RideFile::nm));
+    longFromDouble(standard.cadArray, cache->distributionArray(RideFile::cad));
+    longFromDouble(standard.kphArray, cache->distributionArray(RideFile::kph));
 
     if (!context->athlete->useMetricUnits) {
         double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
         double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : 0.62137119);
 
-        for(int i=0; i<nmArray.size(); i++) nmArray[i] = nmArray[i] * torque_factor;
-        for(int i=0; i<kphArray.size(); i++) kphArray[i] = kphArray[i] * speed_factor;
+        for(int i=0; i<standard.nmArray.size(); i++) standard.nmArray[i] = standard.nmArray[i] * torque_factor;
+        for(int i=0; i<standard.kphArray.size(); i++) standard.kphArray[i] = standard.kphArray[i] * speed_factor;
     }
 
     // zone array
     for (int i=0; i<10; i++) {
-        wattsZoneArray[i] = cache->wattsZoneArray()[i];
-        hrZoneArray[i] = cache->hrZoneArray()[i];
+        standard.wattsZoneArray[i] = cache->wattsZoneArray()[i];
+        standard.hrZoneArray[i] = cache->hrZoneArray()[i];
     }
 
     curveSelected->hide();
@@ -706,8 +706,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
     // now run thru the data again, but this time
     // populate the metricArray
     // we add 1 to account for possible rounding up
-    metricArray.resize(1 + (int)(max)-(int)(min));
-    metricArray.fill(0);
+    standard.metricArray.resize(1 + (int)(max)-(int)(min));
+    standard.metricArray.fill(0);
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE ABOVE
     // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
@@ -747,7 +747,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (tm->units(context->athlete->useMetricUnits) == tr("seconds")) t /= 60;
 
         // sum up
-        metricArray[(int)(v)-min] += t;
+        standard.metricArray[(int)(v)-min] += t;
     }
 
     // we certainly don't want the interval curve when plotting
@@ -824,25 +824,25 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         // recording interval in minutes
         dt = ride->recIntSecs() / 60.0;
 
-        wattsArray.resize(0);
-        wattsZoneArray.resize(0);
-        wattsKgArray.resize(0);
-        aPowerArray.resize(0);
-        nmArray.resize(0);
-        hrArray.resize(0);
-        hrZoneArray.resize(0);
-        kphArray.resize(0);
-        cadArray.resize(0);
+        standard.wattsArray.resize(0);
+        standard.wattsZoneArray.resize(0);
+        standard.wattsKgArray.resize(0);
+        standard.aPowerArray.resize(0);
+        standard.nmArray.resize(0);
+        standard.hrArray.resize(0);
+        standard.hrZoneArray.resize(0);
+        standard.kphArray.resize(0);
+        standard.cadArray.resize(0);
 
-        wattsSelectedArray.resize(0);
-        wattsZoneSelectedArray.resize(0);
-        wattsKgSelectedArray.resize(0);
-        aPowerSelectedArray.resize(0);
-        nmSelectedArray.resize(0);
-        hrSelectedArray.resize(0);
-        hrZoneSelectedArray.resize(0);
-        kphSelectedArray.resize(0);
-        cadSelectedArray.resize(0);
+        standard.wattsSelectedArray.resize(0);
+        standard.wattsZoneSelectedArray.resize(0);
+        standard.wattsKgSelectedArray.resize(0);
+        standard.aPowerSelectedArray.resize(0);
+        standard.nmSelectedArray.resize(0);
+        standard.hrSelectedArray.resize(0);
+        standard.hrZoneSelectedArray.resize(0);
+        standard.kphSelectedArray.resize(0);
+        standard.cadSelectedArray.resize(0);
 
         // unit conversion factor for imperial units for selected parameters
         double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
@@ -854,14 +854,14 @@ PowerHist::setData(RideItem *_rideItem, bool force)
             // watts array
             int wattsIndex = int(floor(p1->watts / wattsDelta));
             if (wattsIndex >= 0 && wattsIndex < maxSize) {
-                if (wattsIndex >= wattsArray.size())
-                    wattsArray.resize(wattsIndex + 1);
-                wattsArray[wattsIndex]++;
+                if (wattsIndex >= standard.wattsArray.size())
+                    standard.wattsArray.resize(wattsIndex + 1);
+                standard.wattsArray[wattsIndex]++;
 
                 if (selected) {
-                    if (wattsIndex >= wattsSelectedArray.size())
-                        wattsSelectedArray.resize(wattsIndex + 1);
-                    wattsSelectedArray[wattsIndex]++;
+                    if (wattsIndex >= standard.wattsSelectedArray.size())
+                        standard.wattsSelectedArray.resize(wattsIndex + 1);
+                    standard.wattsSelectedArray[wattsIndex]++;
                 }
             }
 
@@ -874,14 +874,14 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                 wattsIndex = zones->whichZone(zoneRange, p1->watts);
 
                 if (wattsIndex >= 0 && wattsIndex < maxSize) {
-                    if (wattsIndex >= wattsZoneArray.size())
-                        wattsZoneArray.resize(wattsIndex + 1);
-                    wattsZoneArray[wattsIndex]++;
+                    if (wattsIndex >= standard.wattsZoneArray.size())
+                        standard.wattsZoneArray.resize(wattsIndex + 1);
+                    standard.wattsZoneArray[wattsIndex]++;
 
                     if (selected) {
-                        if (wattsIndex >= wattsZoneSelectedArray.size())
-                            wattsZoneSelectedArray.resize(wattsIndex + 1);
-                        wattsZoneSelectedArray[wattsIndex]++;
+                        if (wattsIndex >= standard.wattsZoneSelectedArray.size())
+                            standard.wattsZoneSelectedArray.resize(wattsIndex + 1);
+                        standard.wattsZoneSelectedArray[wattsIndex]++;
                     }
                 }
             }
@@ -889,54 +889,54 @@ PowerHist::setData(RideItem *_rideItem, bool force)
             // aPower array
             int aPowerIndex = int(floor(p1->apower / wattsDelta));
             if (aPowerIndex >= 0 && aPowerIndex < maxSize) {
-                if (aPowerIndex >= aPowerArray.size())
-                    aPowerArray.resize(aPowerIndex + 1);
-                aPowerArray[aPowerIndex]++;
+                if (aPowerIndex >= standard.aPowerArray.size())
+                    standard.aPowerArray.resize(aPowerIndex + 1);
+                standard.aPowerArray[aPowerIndex]++;
 
                 if (selected) {
-                    if (aPowerIndex >= aPowerSelectedArray.size())
-                        aPowerSelectedArray.resize(aPowerIndex + 1);
-                    aPowerSelectedArray[aPowerIndex]++;
+                    if (aPowerIndex >= standard.aPowerSelectedArray.size())
+                        standard.aPowerSelectedArray.resize(aPowerIndex + 1);
+                    standard.aPowerSelectedArray[aPowerIndex]++;
                 }
             }
 
             // wattsKg array
             int wattsKgIndex = int(floor(p1->watts / ride->getWeight() / wattsKgDelta));
             if (wattsKgIndex >= 0 && wattsKgIndex < maxSize) {
-                if (wattsKgIndex >= wattsKgArray.size())
-                    wattsKgArray.resize(wattsKgIndex + 1);
-                wattsKgArray[wattsKgIndex]++;
+                if (wattsKgIndex >= standard.wattsKgArray.size())
+                    standard.wattsKgArray.resize(wattsKgIndex + 1);
+                standard.wattsKgArray[wattsKgIndex]++;
 
                 if (selected) {
-                    if (wattsKgIndex >= wattsKgSelectedArray.size())
-                        wattsKgSelectedArray.resize(wattsKgIndex + 1);
-                    wattsKgSelectedArray[wattsKgIndex]++;
+                    if (wattsKgIndex >= standard.wattsKgSelectedArray.size())
+                        standard.wattsKgSelectedArray.resize(wattsKgIndex + 1);
+                    standard.wattsKgSelectedArray[wattsKgIndex]++;
                 }
             }
 
             int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
             if (nmIndex >= 0 && nmIndex < maxSize) {
-                if (nmIndex >= nmArray.size())
-                    nmArray.resize(nmIndex + 1);
-                nmArray[nmIndex]++;
+                if (nmIndex >= standard.nmArray.size())
+                    standard.nmArray.resize(nmIndex + 1);
+                standard.nmArray[nmIndex]++;
 
                 if (selected) {
-                    if (nmIndex >= nmSelectedArray.size())
-                        nmSelectedArray.resize(nmIndex + 1);
-                    nmSelectedArray[nmIndex]++;
+                    if (nmIndex >= standard.nmSelectedArray.size())
+                        standard.nmSelectedArray.resize(nmIndex + 1);
+                    standard.nmSelectedArray[nmIndex]++;
                 }
             }
 
             int hrIndex = int(floor(p1->hr / hrDelta));
             if (hrIndex >= 0 && hrIndex < maxSize) {
-                if (hrIndex >= hrArray.size())
-                    hrArray.resize(hrIndex + 1);
-                hrArray[hrIndex]++;
+                if (hrIndex >= standard.hrArray.size())
+                    standard.hrArray.resize(hrIndex + 1);
+                standard.hrArray[hrIndex]++;
 
                 if (selected) {
-                    if (hrIndex >= hrSelectedArray.size())
-                        hrSelectedArray.resize(hrIndex + 1);
-                    hrSelectedArray[hrIndex]++;
+                    if (hrIndex >= standard.hrSelectedArray.size())
+                        standard.hrSelectedArray.resize(hrIndex + 1);
+                    standard.hrSelectedArray[hrIndex]++;
                 }
             }
 
@@ -948,41 +948,41 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                 hrIndex = context->athlete->hrZones()->whichZone(hrZoneRange, p1->hr);
 
                 if (hrIndex >= 0 && hrIndex < maxSize) {
-                    if (hrIndex >= hrZoneArray.size())
-                        hrZoneArray.resize(hrIndex + 1);
-                    hrZoneArray[hrIndex]++;
+                    if (hrIndex >= standard.hrZoneArray.size())
+                        standard.hrZoneArray.resize(hrIndex + 1);
+                    standard.hrZoneArray[hrIndex]++;
 
                     if (selected) {
-                        if (hrIndex >= hrZoneSelectedArray.size())
-                            hrZoneSelectedArray.resize(hrIndex + 1);
-                        hrZoneSelectedArray[hrIndex]++;
+                        if (hrIndex >= standard.hrZoneSelectedArray.size())
+                            standard.hrZoneSelectedArray.resize(hrIndex + 1);
+                        standard.hrZoneSelectedArray[hrIndex]++;
                     }
                 }
             }
 
             int kphIndex = int(floor(p1->kph * speed_factor / kphDelta));
             if (kphIndex >= 0 && kphIndex < maxSize) {
-                if (kphIndex >= kphArray.size())
-                    kphArray.resize(kphIndex + 1);
-                kphArray[kphIndex]++;
+                if (kphIndex >= standard.kphArray.size())
+                    standard.kphArray.resize(kphIndex + 1);
+                standard.kphArray[kphIndex]++;
 
                 if (selected) {
-                    if (kphIndex >= kphSelectedArray.size())
-                        kphSelectedArray.resize(kphIndex + 1);
-                    kphSelectedArray[kphIndex]++;
+                    if (kphIndex >= standard.kphSelectedArray.size())
+                        standard.kphSelectedArray.resize(kphIndex + 1);
+                    standard.kphSelectedArray[kphIndex]++;
                 }
             }
 
             int cadIndex = int(floor(p1->cad / cadDelta));
             if (cadIndex >= 0 && cadIndex < maxSize) {
-                if (cadIndex >= cadArray.size())
-                    cadArray.resize(cadIndex + 1);
-                cadArray[cadIndex]++;
+                if (cadIndex >= standard.cadArray.size())
+                    standard.cadArray.resize(cadIndex + 1);
+                standard.cadArray[cadIndex]++;
 
                 if (selected) {
-                    if (cadIndex >= cadSelectedArray.size())
-                        cadSelectedArray.resize(cadIndex + 1);
-                    cadSelectedArray[cadIndex]++;
+                    if (cadIndex >= standard.cadSelectedArray.size())
+                        standard.cadSelectedArray.resize(cadIndex + 1);
+                    standard.cadSelectedArray[cadIndex]++;
                 }
             }
         }
