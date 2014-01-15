@@ -87,6 +87,22 @@ class penTooltip: public QwtPlotZoomer
         QString tip;
 };
 
+class HistData // each curve needs a lot of data (!? this may need refactoring, it seems all over the place)
+{
+    public:
+
+        // storage for data counts
+        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
+                              hrZoneArray, kphArray, cadArray, metricArray;
+
+        // storage for data counts in interval selected
+        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray, wattsZoneSelectedArray,
+                              wattsKgSelectedArray,
+                              nmSelectedArray, hrSelectedArray,
+                              hrZoneSelectedArray, kphSelectedArray,
+                              cadSelectedArray;
+};
+
 class PowerHist : public QwtPlot
 {
     Q_OBJECT
@@ -182,9 +198,17 @@ class PowerHist : public QwtPlot
         HrHistBackground *hrbg;
         penTooltip *zoomer;
         LTMCanvasPicker *canvasPicker;
+
+        // curves when NOT in compare mode
         QwtPlotCurve *curve, *curveSelected;
+
+        // curves when ARE in compare mode
+        QList<QwtPlotCurve>*compareCurves;
+
+        // background shading
         QList <PowerHistZoneLabel *> zoneLabels;
         QList <HrHistZoneLabel *> hrzoneLabels;
+
         QString metricX, metricY;
         int digits;
         double delta;
@@ -192,16 +216,10 @@ class PowerHist : public QwtPlot
         // source cache
         RideFileCache *cache;
 
-        // storage for data counts
-        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
-                              hrZoneArray, kphArray, cadArray, metricArray;
+        // data arrays -- for one curve, not in compare mode
+        HistData standard;
+        QList<HistData> compareData;
 
-        // storage for data counts in interval selected
-        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray, wattsZoneSelectedArray,
-                              wattsKgSelectedArray,
-                              nmSelectedArray, hrSelectedArray,
-                              hrZoneSelectedArray, kphSelectedArray,
-                              cadSelectedArray;
 
         enum Source { Ride, Cache, Metric } source, LASTsource;
         QColor metricColor;
