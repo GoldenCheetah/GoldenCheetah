@@ -325,14 +325,14 @@ HistogramWindow::isCompare() const
 void 
 HistogramWindow::compareIntervalsStateChanged(bool)
 {
-    // ...
+    // just redraw for now
     compareChanged();
 }
 
 void 
 HistogramWindow::compareIntervalsChanged()
 {
-    // ...
+    // just redraw for now
     compareChanged();
 }
 
@@ -341,11 +341,33 @@ HistogramWindow::compareChanged()
 {
     stale = true; // the 'standard' plots will need to be updated
 
-    // Now create / delete curves etc
-    // ...
-    
+    setUpdatesEnabled(false);
+
+    if (isCompare()) {
+
+        // is blank?
+        setIsBlank(false); // current ride irrelevant!
+
+        // hide normal curves
+        powerHist->hideStandard(true);
+
+        // set data and create empty curves
+        powerHist->setDataFromCompareIntervals();
+        powerHist->recalcCompareIntervals();
+
+    } else {
+
+        // show our normal curves and wipe rest
+        powerHist->hideStandard(false);
+        rideSelected(); // back to where we were
+    }
+
+    setUpdatesEnabled(true);
+
     // replot!
     powerHist->replot();
+
+    // repaint (in case optimised out)
     repaint();
 }
 
