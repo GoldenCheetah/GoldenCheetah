@@ -162,11 +162,16 @@ class PowerHist : public QwtPlot
         void pointHover(QwtPlotCurve *curve, int index);
 
         // get told to refresh
-        void recalc(bool force=false);
+        void recalc(bool force=false); // normal mode recalc
+        void recalcCompareIntervals(); // compare mode recalc
         void refreshZoneLabels();
 
         // redraw, reset zoom base
         void updatePlot();
+
+        // hide / show curves etc
+        void hideStandard(bool);
+        void setComparePens();
 
     protected:
 
@@ -203,7 +208,7 @@ class PowerHist : public QwtPlot
         QwtPlotCurve *curve, *curveSelected;
 
         // curves when ARE in compare mode
-        QList<QwtPlotCurve>*compareCurves;
+        QList<QwtPlotCurve*> compareCurves;
 
         // background shading
         QList <PowerHistZoneLabel *> zoneLabels;
