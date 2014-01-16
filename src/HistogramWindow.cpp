@@ -82,7 +82,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(10);
-    powerHist = new PowerHist(context);
+    powerHist = new PowerHist(context, rangemode);
     vlayout->addWidget(powerHist);
 
     setChartLayout(vlayout);
