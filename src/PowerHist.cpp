@@ -45,9 +45,10 @@
 
 #include "LTMCanvasPicker.h" // for tooltip
 
-PowerHist::PowerHist(Context *context):
+PowerHist::PowerHist(Context *context, bool rangemode) :
     minX(0),
     maxX(0),
+    rangemode(rangemode),
     rideItem(NULL),
     context(context),
     series(RideFile::watts),
@@ -303,7 +304,7 @@ PowerHist::recalcCompareIntervals()
     // Set curves .. they will always have been created 
     //               in setDataFromCompareIntervals, but no samples set
 
-    if (!isVisible() && !context->isCompareIntervals) return;
+    if (!isVisible() && (rangemode || !context->isCompareIntervals)) return;
 
     double ncols = 0;
     foreach(CompareInterval x, context->compareIntervals) {
@@ -540,7 +541,7 @@ PowerHist::recalcCompareIntervals()
 void
 PowerHist::recalc(bool force)
 {
-    if (context->isCompareIntervals) { //XXX bodge for now
+    if (!rangemode && context->isCompareIntervals) {
         recalcCompareIntervals();
         return;
     }
@@ -831,7 +832,7 @@ PowerHist::setYMax()
 {
     double MaxY=0;
 
-    if (context->isCompareIntervals) {
+    if (!rangemode && context->isCompareIntervals) {
         int i=0;
         foreach (QwtPlotCurve *p, compareCurves) {
 
@@ -1034,7 +1035,7 @@ void
 PowerHist::setComparePens()
 {
     // no compare? don't bother
-    if (!context->isCompareIntervals) return;
+    if (rangemode || !context->isCompareIntervals) return;
 
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
     for (int i=0; i<context->compareIntervals.count(); i++) {

@@ -116,11 +116,12 @@ class PowerHist : public QwtPlot
 
     public:
 
-        PowerHist(Context *context);
+        PowerHist(Context *context, bool rangemode);
         ~PowerHist();
 
         double minX;
         double maxX;
+        bool rangemode;
 
     public slots:
 
