@@ -310,6 +310,7 @@ PowerHist::recalcCompareIntervals()
         if (x.isChecked()) ncols++;
     }
     int acol = 0;
+    int maxX = 0;
     for (int intervalNumber=0; intervalNumber < context->compareIntervals.count(); intervalNumber++) {
 
         HistData &cid = compareData[intervalNumber];
@@ -424,7 +425,15 @@ PowerHist::recalcCompareIntervals()
                     }
                 }
             }
-            setAxisScale(xBottom, minX, parameterValue[count + 1]);
+
+            // only set X-axis to largest value with significant value
+            int truncate = count;
+            while (truncate > 0) {
+                if (!absolutetime && totalTime[truncate] >= 0.1) break;
+                if (absolutetime && totalTime[truncate] >= 0.1) break;
+                truncate--;
+            }
+            if (parameterValue[truncate] > maxX) maxX = parameterValue[truncate];
 
             // we only do zone labels when using absolute values
             refreshZoneLabels();
@@ -516,6 +525,14 @@ PowerHist::recalcCompareIntervals()
         }
     }
 
+    // set axis etc
+    if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::wattsKg 
+                                                                           && series != RideFile::hr))) {
+        //normal
+        setAxisScale(xBottom, minX, maxX);
+    } else {
+        // zoned
+    }
     setYMax(); 
     updatePlot();
 }
@@ -815,10 +832,15 @@ PowerHist::setYMax()
     double MaxY=0;
 
     if (context->isCompareIntervals) {
-
+        int i=0;
         foreach (QwtPlotCurve *p, compareCurves) {
-            double my = p->maxYValue();
-            if (my > MaxY) MaxY = my;
+
+            // if its not visible don't set for it
+            if (context->compareIntervals[i].isChecked()) {
+                double my = p->maxYValue();
+                if (my > MaxY) MaxY = my;
+            }
+            i++;
         }
 
     } else {
