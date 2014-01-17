@@ -363,7 +363,7 @@ PowerHist::recalcCompareIntervals()
             arrayLength = cid.cadArray.size();
         }
 
-        RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ? RideFile::watts : series;
+        // UNUSEDRideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ? RideFile::watts : series;
 
         // null curve please -- we have no data!
         if (!array || arrayLength == 0) {
@@ -482,39 +482,44 @@ PowerHist::recalcCompareIntervals()
             curve->setPen(QPen(Qt::NoPen));
             curve->setSamples(xaxis.data(), yaxis.data(), xaxis.size());
 
-            // zone scale draw
-            if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && rideItem->zones) {
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
-                if (rideItem->zoneRange() >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
-                else
-                    setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
+            //
+            // POWER ZONES
+            //
+            const Zones *zones;
+            int zone_range = -1;
+            zones = context->athlete->zones();
+
+            if (zones) {
+                if (context->compareIntervals.count())
+                    zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
+                if (zone_range == -1) zone_range = zones->whichRange(QDate::currentDate());
+
+            }
+            if (zones && zone_range != -1) {
+                if ((series == RideFile::watts || series == RideFile::wattsKg)) {
+                    setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(zones, zone_range));
+                    setAxisScale(QwtPlot::xBottom, -0.99, zones->numZones(zone_range), 1);
+                }
             }
 
-            // hr scale draw
-            int hrRange;
-            if (series == RideFile::hr && zoned && rideItem && context->athlete->hrZones() &&
-                (hrRange=context->athlete->hrZones()->whichRange(rideItem->dateTime.date())) != -1) {
-                setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(context->athlete->hrZones(), hrRange));
+            //
+            // HR ZONES
+            //
+            const HrZones *hrzones;
+            int hrzone_range = -1;
+            hrzones = context->athlete->hrZones();
 
-                if (hrRange >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->hrZones()->numZones(hrRange), 1);
-                else
-                    setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
-            }
+            if (hrzones) {
+                if (context->compareIntervals.count())
+                    hrzone_range = hrzones->whichRange(context->compareIntervals[0].data->startTime().date());
+                if (hrzone_range == -1) hrzone_range = hrzones->whichRange(QDate::currentDate());
 
-            // watts zoned for a time range
-            if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && context->athlete->zones()) {
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(), 0));
-                if (context->athlete->zones()->getRangeSize())
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones()->numZones(0), 1); // use zones from first defined range
             }
-    
-            // hr zoned for a time range
-            if (source == Cache && zoned && series == RideFile::hr && context->athlete->hrZones()) {
-                setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(context->athlete->hrZones(), 0));
-                if (context->athlete->hrZones()->getRangeSize())
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->hrZones()->numZones(0), 1); // use zones from first defined range
+            if (hrzones && hrzone_range != -1) {
+                if (series == RideFile::hr) {
+                    setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(hrzones, hrzone_range));
+                    setAxisScale(QwtPlot::xBottom, -0.99, hrzones->numZones(hrzone_range), 1);
+                }
             }
 
             setAxisMaxMinor(QwtPlot::xBottom, 0);
