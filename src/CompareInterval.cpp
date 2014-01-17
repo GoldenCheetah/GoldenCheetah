@@ -40,5 +40,8 @@ RideFileCache *CompareInterval::rideFileCache()
 
 CompareInterval::~CompareInterval()
 {
-    //if (cache) delete cache;
+    if (cache) {
+        delete cache;
+        cache = NULL;
+    }
 }
