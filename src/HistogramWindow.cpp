@@ -39,7 +39,7 @@ static const int cadDigits   = 0;
 //
 // Constructor
 //
-HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), useCustom(false), useToToday(false), precision(99)
+HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), compareStale(true), useCustom(false), useToToday(false), precision(99)
 {
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
@@ -340,8 +340,16 @@ void
 HistogramWindow::compareChanged()
 {
     stale = true; // the 'standard' plots will need to be updated
+    compareStale = true;
+
+    if (!isVisible()) return;
 
     setUpdatesEnabled(false);
+
+    // to stop getting into an infinite loop
+    // when turning off coimpare mode and using
+    // rideSelected to refresh
+    compareStale = false;
 
     if (isCompare()) {
 
@@ -350,6 +358,18 @@ HistogramWindow::compareChanged()
 
         // hide normal curves
         powerHist->hideStandard(true);
+
+        // now set the controls
+        RideFile::SeriesType series = static_cast<RideFile::SeriesType>
+                                      (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+        powerHist->setSeries(series);
+
+        // and now the controls
+        powerHist->setShading(shadeZones->isChecked() ? true : false);
+        powerHist->setZoned(showInZones->isChecked() ? true : false);
+        powerHist->setlnY(showLnY->isChecked() ? true : false);
+        powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
+        powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
 
         // set data and create empty curves
         powerHist->setDataFromCompareIntervals();
@@ -368,6 +388,7 @@ HistogramWindow::compareChanged()
     // repaint (in case optimised out)
     repaint();
 
+    // and we're done
     setUpdatesEnabled(true);
 }
 
@@ -681,6 +702,9 @@ HistogramWindow::rideSelected()
     if (!amVisible()) return;
 
     RideItem *ride = myRideItem;
+
+    // handle catch up to compare changed
+    if (compareStale) compareChanged();
 
     if (!ride || isCompare() || (rangemode && !stale)) return;
 

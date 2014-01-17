@@ -228,6 +228,7 @@ class HistogramWindow : public GcChartWindow
         bool active,  // active switching mode between data series and metric
              bactive; // active setting binwidth
         bool rangemode;
+        bool compareStale;
         DateSettingsEdit *dateSetting;
         bool useCustom;
         bool useToToday;
