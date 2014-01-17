@@ -103,7 +103,7 @@ PowerHist::PowerHist(Context *context, bool rangemode) :
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     // usually hidden, but shown for compare mode
-    insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
+    //XXX insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
 
     setAxisMaxMinor(xBottom, 0);
     setAxisMaxMinor(yLeft, 0);
@@ -1018,15 +1018,15 @@ PowerHist::setDataFromCompareIntervals()
         newCurve->attach(this);
 
         // we do want a legend in compare mode
-        newCurve->setItemAttribute(QwtPlotItem::Legend, true);
+        //XXX newCurve->setItemAttribute(QwtPlotItem::Legend, true);
 
         // add to our collection
         compareCurves << newCurve;
     }
 
     // show legend in compare mode
-    legend()->show();
-    updateLegend();
+    //XXX legend()->show();
+    //XXX updateLegend();
 }
 
 void
@@ -1193,8 +1193,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         setAxisTitle(xBottom, QString(tr("%1 of Ride")).arg(m->name()));
 
     // dont show legend in metric mode
-    legend()->hide();
-    updateLegend();
+    //XXX legend()->hide();
+    //XXX updateLegend();
 }
 
 void
@@ -1415,8 +1415,8 @@ PowerHist::setData(RideItem *_rideItem, bool force)
     zoomer->setZoomBase();
 
     // dont show legend in metric mode
-    legend()->hide();
-    updateLegend();
+    //XXX legend()->hide();
+    //XXX updateLegend();
 }
 
 void

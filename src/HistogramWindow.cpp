@@ -362,13 +362,13 @@ HistogramWindow::compareChanged()
         rideSelected(); // back to where we were
     }
 
-    setUpdatesEnabled(true);
-
     // replot!
     powerHist->replot();
 
     // repaint (in case optimised out)
     repaint();
+
+    setUpdatesEnabled(true);
 }
 
 //
