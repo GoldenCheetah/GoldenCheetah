@@ -442,13 +442,11 @@ PowerHist::recalcCompareIntervals()
     
         } else { // ZONED
 
-            // 0.9 is used for the columns, so each column when comparing
-            // will have 0.9 / ncols available to it, but needs to leave
-            // 10% space between it and its neighbour too, that col needs
-            // to only be 0.9 / ncols * 0.9 wide
+            // 0.625 = golden ratio for gaps betwen group of cols
+            // 0.9 = 10% space between each col in group
 
-            double width = (0.90f / ncols) * 0.90f;
-            double jump = acol * (0.90f / ncols);
+            double width = (0.625 / ncols) * 0.90f;
+            double jump = acol * (0.625 / ncols);
             
             // we're not binning instead we are prettyfing the columnar
             // display in much the same way as the weekly summary workds
@@ -459,7 +457,7 @@ PowerHist::recalcCompareIntervals()
             // samples to time
             for (int i=0, offset=0; i<array->size(); i++) {
 
-                double x = (double) i - 0.5;
+                double x = double(i) - (0.625f * 0.90f / 2.0f);
                 double y = dt * (double)(*array)[i];
 
                 xaxis[offset] = x +jump;
