@@ -1341,7 +1341,6 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
     int modelOri = model;
 
     double ymax = 0;
-    QList<RideFileCache> bests;
 
     model = 0; // no model in compareDateRanges
 
@@ -1351,21 +1350,20 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         CompareDateRange range = compareDateRanges.at(j);
 
         if (range.isChecked())  {
-            RideFileCache bestsForRange(range.sourceContext, range.start, range.end, isFiltered, files, rangemode);
-            bests.append(bestsForRange);
+            RideFileCache *cache = range.rideFileCache();
 
-            if (bestsForRange.meanMaxArray(series).size()) {
+            if (cache->meanMaxArray(series).size()) {
 
                 int maxNonZero = 0;
                 int i=0;
-                for (; i < bestsForRange.meanMaxArray(series).size(); ++i) {
-                    if (bestsForRange.meanMaxArray(series)[i] > 0) maxNonZero = i;
+                for (; i < cache->meanMaxArray(series).size(); ++i) {
+                    if (cache->meanMaxArray(series)[i] > 0) maxNonZero = i;
                 }
                 if (i>0) shadeMode = 0;
 
-                plot_allCurve(this, maxNonZero, bestsForRange.meanMaxArray(series).constData() + 1, range.color, true);
+                plot_allCurve(this, maxNonZero, cache->meanMaxArray(series).constData() + 1, range.color, true);
 
-                foreach(double v, bestsForRange.meanMaxArray(series)) {
+                foreach(double v, cache->meanMaxArray(series)) {
                     if (v > ymax) ymax = v;
                 }
             }

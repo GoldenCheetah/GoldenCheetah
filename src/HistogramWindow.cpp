@@ -39,7 +39,7 @@ static const int cadDigits   = 0;
 //
 // Constructor
 //
-HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), compareStale(true), useCustom(false), useToToday(false), precision(99)
+HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), compareStale(false), useCustom(false), useToToday(false), precision(99)
 {
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
@@ -285,14 +285,18 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         lagger->setSingleShot(true);
         connect(lagger, SIGNAL(timeout()), this, SLOT(treeSelectionTimeout()));
 
+        // comparing things
+        connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));
+        connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(compareChanged()));
+
     } else {
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
 
         // comparing things
-        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareIntervalsStateChanged(bool)));
-        connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareIntervalsChanged()));
+        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
+        connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
     }
 
     // if any of the controls change we pass the chart everything
@@ -300,7 +304,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(showZeroes, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
-    connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShade(int)));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
@@ -317,23 +321,13 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 bool
 HistogramWindow::isCompare() const
 {
+    // compare intervals ?
     if (!rangemode && context->isCompareIntervals) return true;
 
+    // compare date ranges ?
+    if (rangemode && context->isCompareDateRanges) return true;
+
     return false;
-}
-
-void 
-HistogramWindow::compareIntervalsStateChanged(bool)
-{
-    // just redraw for now
-    compareChanged();
-}
-
-void 
-HistogramWindow::compareIntervalsChanged()
-{
-    // just redraw for now
-    compareChanged();
 }
 
 void 
@@ -361,7 +355,7 @@ HistogramWindow::compareChanged()
 
         // now set the controls
         RideFile::SeriesType series = static_cast<RideFile::SeriesType>
-                                      (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+                                        (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         powerHist->setSeries(series);
 
         // and now the controls
@@ -372,14 +366,14 @@ HistogramWindow::compareChanged()
         powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
 
         // set data and create empty curves
-        powerHist->setDataFromCompareIntervals();
-        powerHist->recalcCompareIntervals();
+        powerHist->setDataFromCompare();
+        powerHist->recalcCompare();
 
     } else {
 
-        // show our normal curves and wipe rest
-        powerHist->hideStandard(false);
-        rideSelected(); // back to where we were
+            // show our normal curves and wipe rest
+            powerHist->hideStandard(false);
+            rideSelected(); // back to where we were
     }
 
     // replot!
@@ -702,7 +696,6 @@ HistogramWindow::rideSelected()
     if (!amVisible()) return;
 
     RideItem *ride = myRideItem;
-
     // handle catch up to compare changed
     if (compareStale) compareChanged();
 
@@ -781,6 +774,9 @@ HistogramWindow::useThruToday()
 
 void HistogramWindow::dateRangeChanged(DateRange dateRange)
 {
+    // compare mode?
+    if (amVisible() && compareStale) compareChanged();
+
     // if we're using a custom one lets keep it
     if (rangemode && (useCustom || useToToday)) dateRange = custom;
 
@@ -788,7 +784,9 @@ void HistogramWindow::dateRangeChanged(DateRange dateRange)
     if (dateRange.from != cfrom || dateRange.to != cto) 
         stale = true;
 
-    if (!amVisible() || !stale) return;
+    // don't do it if we're invisible, in compare or
+    // nothing has changed since last time ..
+    if (!amVisible() || isCompare() || !stale) return;
 
     updateChart();
 }
@@ -861,13 +859,32 @@ HistogramWindow::forceReplot()
 void
 HistogramWindow::updateChart()
 {
+    // What is the selected series?
+    RideFile::SeriesType series = static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+
+    // compare mode does its own thing so ignore
+    // this request (but set stale) if we're comparing
+    // we WILL get called when compare ends
     if (!amVisible()) {
         stale = true;
         return;
     }
 
-    // What is the selected series?
-    RideFile::SeriesType series = static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+    // just reflect chart setting changes
+    if (isCompare()) {
+        powerHist->setSeries(series);
+
+        // and now the controls
+        powerHist->setShading(shadeZones->isChecked() ? true : false);
+        powerHist->setZoned(showInZones->isChecked() ? true : false);
+        powerHist->setlnY(showLnY->isChecked() ? true : false);
+        powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
+        powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
+        powerHist->recalcCompare();
+        powerHist->replot();
+
+        return;
+    }
 
     // If no data present show the blank state page
     if (!rangemode) {

@@ -19,6 +19,22 @@
 #include "CompareDateRange.h"
 
 #include "Context.h"
+#include "RideFileCache.h"
 #include "Season.h"
 #include "SummaryMetrics.h"
 #include <QColor>
+
+RideFileCache *
+CompareDateRange::rideFileCache()
+{
+    if (cache) return cache;
+    else return (cache = new RideFileCache(sourceContext, start, end, false, QStringList(), true));
+}
+
+CompareDateRange::~CompareDateRange()
+{
+    if (cache) {
+        //XXX need to reference count! delete cache;
+        cache = NULL;
+    }
+}
