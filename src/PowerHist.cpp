@@ -301,6 +301,9 @@ PowerHist::refreshHRZoneLabels()
 void
 PowerHist::recalcCompare()
 {
+    // not for metric plots sonny
+    if (source == Metric) return;
+
     // Set curves .. they will always have been created 
     //               in setDataFromCompareIntervals, but no samples set
 
@@ -964,6 +967,9 @@ PowerHist::setData(RideFileCache *cache)
 void
 PowerHist::setDataFromCompare()
 {
+    // not for metric plots sonny
+    if (source == Metric) return;
+
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
 
     // set all the curves based upon whats in the compare intervals array
