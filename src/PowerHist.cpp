@@ -762,19 +762,19 @@ PowerHist::recalc(bool force)
         // samples to time
         for (int i=0, offset=0; i<array->size(); i++) {
 
-            double x = (double) i - 0.5;
+            double x = (double) i - (0.625f / 2.0f);
             double y = dt * (double)(*array)[i];
 
-            xaxis[offset] = x +0.05;
+            xaxis[offset] = x;
             yaxis[offset] = 0;
             offset++;
-            xaxis[offset] = x+0.05;
+            xaxis[offset] = x;
             yaxis[offset] = y;
             offset++;
-            xaxis[offset] = x+0.95;
+            xaxis[offset] = x+0.625;
             yaxis[offset] = y;
             offset++;
-            xaxis[offset] = x +0.95;
+            xaxis[offset] = x +0.625;
             yaxis[offset] = 0;
             offset++;
         }
