@@ -133,14 +133,15 @@ class PowerHist : public QwtPlot
         void setData(RideItem *_rideItem, bool force=false);
 
         // set data from the compare intervals -or- dateranges
-        void setDataFromCompare();
+        void setDataFromCompare(); // cache
+        void setDataFromCompare(QString totalMetric, QString distMetric); // metric
 
         // set data from a ridefile cache
         void setData(RideFileCache *source);
 
         // set data from metrics
         void setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
-                     bool isFiltered, QStringList files);
+                     bool isFiltered, QStringList files, HistData *data);
 
         void setlnY(bool value);
         void setWithZeros(bool value);
@@ -196,6 +197,8 @@ class PowerHist : public QwtPlot
         double dt;         // length of sample
         bool absolutetime; // do we sum absolute or percentage?
 
+        HistData standard;
+
     private:
 
         // plot objects
@@ -223,7 +226,6 @@ class PowerHist : public QwtPlot
         RideFileCache *cache;
 
         // data arrays -- for one curve, not in compare mode
-        HistData standard;
         QList<HistData> compareData;
 
 
