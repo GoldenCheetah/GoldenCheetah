@@ -366,7 +366,15 @@ HistogramWindow::compareChanged()
         powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
 
         // set data and create empty curves
-        powerHist->setDataFromCompare();
+        if (data->isChecked()) {
+            // using the bests (ride file cache)
+            powerHist->setDataFromCompare();
+        } else {
+            // using the metric arrays
+            powerHist->setDelta(getDelta());
+            powerHist->setDigits(getDigits());
+            powerHist->setDataFromCompare(totalMetric(), distMetric());
+        }
         powerHist->recalcCompare();
 
     } else {
@@ -962,8 +970,8 @@ HistogramWindow::updateChart()
 
                 }
 
-		if (results.count() == 0) setIsBlank(true);
-		else setIsBlank(false);
+                if (results.count() == 0) setIsBlank(true);
+                else setIsBlank(false);
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
@@ -971,9 +979,9 @@ HistogramWindow::updateChart()
                 powerHist->setDelta(getDelta());
                 powerHist->setDigits(getDigits());
 #ifdef GC_HAVE_LUCENE
-                powerHist->setData(results, totalMetric(), distMetric(), isfiltered, files);
+                powerHist->setData(results, totalMetric(), distMetric(), isfiltered, files, &powerHist->standard);
 #else
-                powerHist->setData(results, totalMetric(), distMetric(), false, QStringList());
+                powerHist->setData(results, totalMetric(), distMetric(), false, QStringList(), &powerHist->standard);
 #endif
                 powerHist->setColor(colorButton->getColor());
 
