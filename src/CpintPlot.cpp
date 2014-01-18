@@ -59,14 +59,17 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     setAutoFillBackground(true);
 
     setAxisTitle(xBottom, tr("Interval Length"));
-    LogTimeScaleDraw *ld = new LogTimeScaleDraw;
 
+    // Log scale on x-axis
+    LogTimeScaleDraw *ld = new LogTimeScaleDraw;
     ld->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(xBottom, ld);
     setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
-    QwtScaleDiv div( (double)0.017, (double)60 );
-    div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-    setAxisScaleDiv(QwtPlot::xBottom, div);
+
+    //COMMENTED OUT AS CAUSED ISSUES WITH RESIZING
+    //QwtScaleDiv div( (double)0.017, (double)60 );
+    //div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
+    //setAxisScaleDiv(QwtPlot::xBottom, div);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -1400,16 +1403,12 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         CompareInterval interval = compareIntervals.at(i);
 
         if (interval.isChecked())  {
-            // compute the mean max
-            QVector<float>vector;
-            MeanMaxComputer thread1(interval.data, vector, series); thread1.run();
-            thread1.wait();
 
-            // no data!
-            if (vector.count() == 0) return;
+            // no data ?
+            if (interval.rideFileCache()->meanMaxArray(series).count() == 0) return;
 
             // create curve data arrays
-            plot_interval(this, vector, interval.color);
+            plot_interval(this, interval.rideFileCache()->meanMaxArray(series), interval.color);
         }
     }
 
@@ -1417,7 +1416,7 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 }
 
 void
-CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<float> vector, QColor intervalColor)
+CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<double> vector, QColor intervalColor)
 {
     QVector<double>x;
     QVector<double>y;

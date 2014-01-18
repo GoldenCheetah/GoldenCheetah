@@ -20,9 +20,28 @@
 
 #include "Context.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include <QColor>
 
 CompareInterval::CompareInterval(Context *context, QString name, RideFile *data, QColor color, Context *sourceContext, bool checked) :
-    context(context), name(name), data(data), color(color), sourceContext(sourceContext), checked(checked)
+    context(context), name(name), data(data), color(color), sourceContext(sourceContext), checked(checked), cache(NULL)
 {
+}
+
+CompareInterval::CompareInterval() : context(NULL), data(NULL), sourceContext(NULL), checked(false), cache(NULL)
+{
+}
+
+RideFileCache *CompareInterval::rideFileCache()
+{   
+    if (cache) return cache;
+    else return (cache = RideFileCache::createCacheFor(data));
+}
+
+CompareInterval::~CompareInterval()
+{
+    if (cache) {
+        delete cache;
+        cache = NULL;
+    }
 }

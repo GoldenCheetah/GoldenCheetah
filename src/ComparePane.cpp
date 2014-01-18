@@ -19,6 +19,7 @@
 #include "ComparePane.h"
 #include "Settings.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "RideMetric.h"
 #include "SummaryMetrics.h"
 #include "MetricAggregator.h"
@@ -163,6 +164,7 @@ ComparePane::refreshTable()
         QString s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS, GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString();
         if (s == "") s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
+        metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
         // called after config is updated typically
         QStringList list;
@@ -329,6 +331,7 @@ ComparePane::refreshTable()
         QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
         if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
+        metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
         // called after config is updated typically
         QStringList list;

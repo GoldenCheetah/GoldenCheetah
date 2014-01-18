@@ -120,11 +120,24 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     //
 
     // controls widget and layout
-    QWidget *c = new QWidget;
-    QFormLayout *cl = new QFormLayout(c);
+    QTabWidget *settingsTabs = new QTabWidget(this);
+    mainLayout->addWidget(settingsTabs);
+
+    QWidget *settingsWidget = new QWidget(this);
+    settingsWidget->setContentsMargins(0,0,0,0);
+    settingsTabs->addTab(settingsWidget, tr("Basic"));
+
+    QFormLayout *cl = new QFormLayout(settingsWidget);;
     cl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
-    setControls(c);
+    QWidget *modelWidget = new QWidget(this);
+    modelWidget->setContentsMargins(0,0,0,0);
+    settingsTabs->addTab(modelWidget, tr("Model"));
+
+    QFormLayout *mcl = new QFormLayout(modelWidget);;
+    mcl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+
+    setControls(settingsTabs);
 
 #ifdef GC_HAVE_LUCENE
     // filter / searchbox
@@ -193,14 +206,13 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     modelCombo->addItem("ExtendedCP");
     modelCombo->setCurrentIndex(1);
 
-    cl->addWidget(new QLabel("")); //spacing
-    cl->addRow(new QLabel(tr("CP Model")), modelCombo);
+    mcl->addRow(new QLabel(tr("CP Model")), modelCombo);
 
-    cl->addRow(new QLabel(tr(" ")));
+    mcl->addRow(new QLabel(tr(" ")));
 
     intervalLabel = new QLabel(tr("Search Interval"));
     secondsLabel = new QLabel(tr("(seconds)"));
-    cl->addRow(intervalLabel, secondsLabel);
+    mcl->addRow(intervalLabel, secondsLabel);
 
     anLabel = new QLabel(tr("Anaerobic"));
 
@@ -223,7 +235,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *anLayout = new QHBoxLayout;
     anLayout->addWidget(anI1SpinBox);
     anLayout->addWidget(anI2SpinBox);
-    cl->addRow(anLabel, anLayout);
+    mcl->addRow(anLabel, anLayout);
 
     aeLabel = new QLabel(tr("Aerobic"));
 
@@ -246,7 +258,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
     aeLayout->addWidget(aeI2SpinBox);
-    cl->addRow(aeLabel, aeLayout);
+    mcl->addRow(aeLabel, aeLayout);
 
     sanI1SpinBox = new QDoubleSpinBox(this);
     sanI1SpinBox->setDecimals(0);
@@ -269,7 +281,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *sanLayout = new QHBoxLayout();
     sanLayout->addWidget(sanI1SpinBox);
     sanLayout->addWidget(sanI2SpinBox);
-    cl->addRow(sanLabel, sanLayout);
+    mcl->addRow(sanLabel, sanLayout);
 
     laeI1SpinBox = new QDoubleSpinBox(this);
     laeI1SpinBox->setDecimals(0);
@@ -292,7 +304,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *laeLayout = new QHBoxLayout();
     laeLayout->addWidget(laeI1SpinBox);
     laeLayout->addWidget(laeI2SpinBox);
-    cl->addRow(laeLabel, laeLayout);
+    mcl->addRow(laeLabel, laeLayout);
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 

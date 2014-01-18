@@ -139,7 +139,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
 BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePage(context)
 {  
     dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_ANALYSIS, false).toBool());
-    welcomeTitle->setText(tr("Analysis"));
+    welcomeTitle->setText(tr("Rides"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/analysis.png"));
@@ -168,7 +168,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
 BlankStateHomePage::BlankStateHomePage(Context *context) : BlankStatePage(context)
 {
     dontShow->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_BLANK_HOME, false).toBool());
-    welcomeTitle->setText(tr("Home"));
+    welcomeTitle->setText(tr("Trends"));
     welcomeText->setText(tr("No ride ?\nLet's start with some data."));
 
     img->setIcon(QPixmap(":images/home.png"));

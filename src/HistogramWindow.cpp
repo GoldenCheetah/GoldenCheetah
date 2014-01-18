@@ -39,7 +39,7 @@ static const int cadDigits   = 0;
 //
 // Constructor
 //
-HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), useCustom(false), useToToday(false), precision(99)
+HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), compareStale(true), useCustom(false), useToToday(false), precision(99)
 {
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
@@ -82,7 +82,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(10);
-    powerHist = new PowerHist(context);
+    powerHist = new PowerHist(context, rangemode);
     vlayout->addWidget(powerHist);
 
     setChartLayout(vlayout);
@@ -289,6 +289,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+
+        // comparing things
+        connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareIntervalsStateChanged(bool)));
+        connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareIntervalsChanged()));
     }
 
     // if any of the controls change we pass the chart everything
@@ -308,6 +312,84 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
+}
+
+bool
+HistogramWindow::isCompare() const
+{
+    if (!rangemode && context->isCompareIntervals) return true;
+
+    return false;
+}
+
+void 
+HistogramWindow::compareIntervalsStateChanged(bool)
+{
+    // just redraw for now
+    compareChanged();
+}
+
+void 
+HistogramWindow::compareIntervalsChanged()
+{
+    // just redraw for now
+    compareChanged();
+}
+
+void 
+HistogramWindow::compareChanged()
+{
+    stale = true; // the 'standard' plots will need to be updated
+    compareStale = true;
+
+    if (!isVisible()) return;
+
+    setUpdatesEnabled(false);
+
+    // to stop getting into an infinite loop
+    // when turning off coimpare mode and using
+    // rideSelected to refresh
+    compareStale = false;
+
+    if (isCompare()) {
+
+        // is blank?
+        setIsBlank(false); // current ride irrelevant!
+
+        // hide normal curves
+        powerHist->hideStandard(true);
+
+        // now set the controls
+        RideFile::SeriesType series = static_cast<RideFile::SeriesType>
+                                      (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+        powerHist->setSeries(series);
+
+        // and now the controls
+        powerHist->setShading(shadeZones->isChecked() ? true : false);
+        powerHist->setZoned(showInZones->isChecked() ? true : false);
+        powerHist->setlnY(showLnY->isChecked() ? true : false);
+        powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
+        powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
+
+        // set data and create empty curves
+        powerHist->setDataFromCompareIntervals();
+        powerHist->recalcCompareIntervals();
+
+    } else {
+
+        // show our normal curves and wipe rest
+        powerHist->hideStandard(false);
+        rideSelected(); // back to where we were
+    }
+
+    // replot!
+    powerHist->replot();
+
+    // repaint (in case optimised out)
+    repaint();
+
+    // and we're done
+    setUpdatesEnabled(true);
 }
 
 //
@@ -621,7 +703,10 @@ HistogramWindow::rideSelected()
 
     RideItem *ride = myRideItem;
 
-    if (!ride || (rangemode && !stale)) return;
+    // handle catch up to compare changed
+    if (compareStale) compareChanged();
+
+    if (!ride || isCompare() || (rangemode && !stale)) return;
 
     if (rangemode) {
         // get range that applies to this ride
@@ -644,7 +729,7 @@ HistogramWindow::intervalSelected()
     RideItem *ride = myRideItem;
 
     // null? or not plotting current ride, ignore signal
-    if (!ride || rangemode) return;
+    if (!ride || isCompare() || rangemode) return;
 
     // update
     interval = true;

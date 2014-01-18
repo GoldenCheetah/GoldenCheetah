@@ -72,7 +72,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     activityLayout->setContentsMargins(0,0,0,0);
     activityLayout->addWidget(rideNavigator);
 
-    activityItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
+    activityItem = new GcSplitterItem(tr("Rides"), iconFromPNG(":images/sidebar/folder.png"), this);
     QAction *activityAction = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     activityItem->addAction(activityAction);
     connect(activityAction, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
@@ -171,7 +171,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
     if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
 
     RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
-    if (rideItem != NULL && rideItem->text(0) != tr("All Activities")) {
+    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
         QMenu menu(context->athlete->treeWidget);
 
 
@@ -181,10 +181,10 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *revertRide = new QAction(tr("Revert to Saved version"), context->athlete->treeWidget);
         connect(revertRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(revertRide()));
 
-        QAction *actDeleteRide = new QAction(tr("Delete Activity"), context->athlete->treeWidget);
+        QAction *actDeleteRide = new QAction(tr("Delete Ride"), context->athlete->treeWidget);
         connect(actDeleteRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(deleteRide()));
 
-        QAction *actSplitRide = new QAction(tr("Split Activity"), context->athlete->treeWidget);
+        QAction *actSplitRide = new QAction(tr("Split Ride"), context->athlete->treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(splitRide()));
 
         if (rideItem->isDirty() == true) {
@@ -195,7 +195,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         menu.addAction(actDeleteRide);
         menu.addAction(actSplitRide);
 #ifdef GC_HAVE_ICAL
-        QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), context->athlete->treeWidget);
+        QAction *actUploadCalendar = new QAction(tr("Upload Ride to Calendar"), context->athlete->treeWidget);
         connect(actUploadCalendar, SIGNAL(triggered(void)), context->mainWindow, SLOT(uploadCalendar()));
         menu.addAction(actUploadCalendar);
 #endif
@@ -353,9 +353,9 @@ AnalysisSidebar::addIntervals()
     } else {
 
         if (!context->ride || !context->ride->ride())
-            QMessageBox::critical(this, tr("Find Intervals"), tr("No activity selected"));
+            QMessageBox::critical(this, tr("Find Intervals"), tr("No ride selected"));
         else
-            QMessageBox::critical(this, tr("Find Intervals"), tr("Current activity contains no data"));
+            QMessageBox::critical(this, tr("Find Intervals"), tr("Current ride contains no data"));
     }
 }
 
@@ -406,9 +406,9 @@ AnalysisSidebar::findPowerPeaks()
 
     } else {
         if (!context->ride || !context->ride->ride())
-            QMessageBox::critical(this, tr("Find Power Peaks"), tr("No activity selected"));
+            QMessageBox::critical(this, tr("Find Power Peaks"), tr("No ride selected"));
         else
-            QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current activity contains no data"));
+            QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current ride contains no data"));
     }
 }
 

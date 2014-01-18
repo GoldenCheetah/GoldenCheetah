@@ -237,7 +237,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
-    addButton = new QPushButton(tr("&Add to Activity"));
+    addButton = new QPushButton(tr("&Add to Ride"));
     buttonLayout->addWidget(addButton);
     buttonLayout->addStretch();
     mainLayout->addLayout(buttonLayout);

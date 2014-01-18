@@ -143,6 +143,9 @@ class HistogramWindow : public GcChartWindow
         // bin width editor
         void setBinEditors();
 
+        // comparing things
+        bool isCompare() const;
+
     public slots:
 
         void rideSelected();
@@ -169,6 +172,11 @@ class HistogramWindow : public GcChartWindow
 
         void setZoned(int);
         void setShade(int);
+
+        // comparing things
+        void compareIntervalsStateChanged(bool);
+        void compareIntervalsChanged();
+        void compareChanged();
 
     protected slots:
 
@@ -220,6 +228,7 @@ class HistogramWindow : public GcChartWindow
         bool active,  // active switching mode between data series and metric
              bactive; // active setting binwidth
         bool rangemode;
+        bool compareStale;
         DateSettingsEdit *dateSetting;
         bool useCustom;
         bool useToToday;

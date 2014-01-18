@@ -134,6 +134,9 @@ class RideFileCache
         // not actually a copy constructor -- but we call it IN the constructor.
         RideFileCache(RideFileCache *other) { *this = *other; }
 
+        // just from a raw ride file class (usually for intervals)
+        RideFileCache(RideFile*);
+
         // get a single best or time in zone value from the cache file
         // intended to be very fast (using lseek to jump direct to the value requested
         static double best(Context *context, QString fileName, RideFile::SeriesType series, int duration);
@@ -144,6 +147,9 @@ class RideFileCache
         static QList<SummaryMetrics> getAllBestsFor(Context *context, QList<MetricDetail>, QDateTime from, QDateTime to);
 
         static int decimalsFor(RideFile::SeriesType series);
+
+        // compute the cache and return it for the ride
+        static RideFileCache *createCacheFor(RideFile*);
 
         // get data
         QVector<double> &meanMaxArray(RideFile::SeriesType); // return meanmax array for the given series

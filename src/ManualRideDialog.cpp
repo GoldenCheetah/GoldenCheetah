@@ -117,7 +117,7 @@ ManualRideDialog::deriveFactors()
 ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(tr("Manual Activity Entry"));
+    setWindowTitle(tr("Manual Ride Entry"));
 #ifdef Q_OS_MAC
     setFixedSize(610,415);
 #else
@@ -500,7 +500,7 @@ ManualRideDialog::okClicked()
         // work it out -- they may actually want to keep an existing ride, so we shouldn't
         // rename it silently.
         QMessageBox oops(QMessageBox::Critical, tr("Unable to save"),
-                         tr("There is already an activity with the same start time or you do not have permissions to save a file."));
+                         tr("There is already an ride with the same start time or you do not have permissions to save a file."));
         oops.exec();
     }
 }
