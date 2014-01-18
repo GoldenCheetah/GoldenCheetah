@@ -301,9 +301,6 @@ PowerHist::refreshHRZoneLabels()
 void
 PowerHist::recalcCompare()
 {
-    // not for metric plots sonny
-    if (source == Metric) return;
-
     // Set curves .. they will always have been created 
     //               in setDataFromCompareIntervals, but no samples set
 
@@ -333,7 +330,13 @@ PowerHist::recalcCompare()
         QVector<unsigned int> *array = NULL;
         int arrayLength = 0;
 
-        if (series == RideFile::watts && zoned == false) {
+        if (source == Metric) {
+
+            // we use the metricArray
+            array = &cid.metricArray;
+            arrayLength = cid.metricArray.size();
+
+        } else if (series == RideFile::watts && zoned == false) {
 
             array = &cid.wattsArray;
             arrayLength = cid.wattsArray.size();
@@ -1112,9 +1115,74 @@ PowerHist::setComparePens()
     }
 }
 
+// set the metric arrays up for each date range using the
+// summary metrics in the Context::CompareDateRange array
+void
+PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
+{
+
+    // set the data for each compare date range using
+    // the metric results in the compare data range
+    // and create the HistData and curves associated
+    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+
+    // remove old data and curves
+    compareData.clear();
+    foreach(QwtPlotCurve *x, compareCurves) {
+        x->detach();
+        delete x;
+    }
+    compareCurves.clear();
+
+    // now lets setup a HistData for each CompareDate Range
+    foreach(CompareDateRange cd, context->compareDateRanges) {
+
+        // set the data even if not checked
+        HistData add;
+
+        // set it from the metric
+        setData(cd.metrics,  totalMetric, distMetric, false, QStringList(), &add);
+
+        // add to the list
+        compareData << add;
+
+        // now add a curve for recalc to play with
+        QwtPlotCurve *newCurve = new QwtPlotCurve("");
+        newCurve->setStyle(QwtPlotCurve::Steps);
+
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+            newCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+        // curve has no brush .. too confusing...
+        QPen pen;
+        pen.setColor(cd.color);
+        pen.setWidth(width);
+        newCurve->setPen(pen);
+
+        QColor brush_color = cd.color;
+        brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
+        QColor brush_color1 = brush_color.darker();
+        //QLinearGradient linearGradient(0, 0, 0, height());
+        //linearGradient.setColorAt(0.0, brush_color);
+        //linearGradient.setColorAt(1.0, brush_color1);
+        //linearGradient.setSpread(QGradient::PadSpread);
+        newCurve->setBrush(brush_color1);   // fill below the line
+
+        // hide and show, but always attach
+        newCurve->setVisible(cd.isChecked());
+        newCurve->attach(this);
+
+        // we do want a legend in compare mode
+        //XXX newCurve->setItemAttribute(QwtPlotItem::Legend, true);
+
+        // add to our collection
+        compareCurves << newCurve;
+    }
+}
+
 void 
 PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
-                     bool isFiltered, QStringList files)
+                     bool isFiltered, QStringList files, HistData *data)
 {
     // what metrics are we plotting?
     source = Metric;
@@ -1168,8 +1236,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
     // now run thru the data again, but this time
     // populate the metricArray
     // we add 1 to account for possible rounding up
-    standard.metricArray.resize(1 + (int)(max)-(int)(min));
-    standard.metricArray.fill(0);
+    data->metricArray.resize(1 + (int)(max)-(int)(min));
+    data->metricArray.fill(0);
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE ABOVE
     // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
@@ -1209,7 +1277,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (tm->units(context->athlete->useMetricUnits) == tr("seconds")) t /= 60;
 
         // sum up
-        standard.metricArray[(int)(v)-min] += t;
+        data->metricArray[(int)(v)-min] += t;
     }
 
     // we certainly don't want the interval curve when plotting
