@@ -41,7 +41,7 @@ RideFileCache *CompareInterval::rideFileCache()
 CompareInterval::~CompareInterval()
 {
     if (cache) {
-        delete cache;
+        //XXX need to reference count! delete cache;
         cache = NULL;
     }
 }

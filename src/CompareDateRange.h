@@ -20,6 +20,8 @@
 #define _GC_CompareDateRange_h
 
 class Context;
+class RideFileCache;
+
 #include "SummaryMetrics.h"
 
 #include <QColor>
@@ -29,7 +31,8 @@ class Context;
 class CompareDateRange
 {
     public:
-        CompareDateRange() : context(NULL), days(0), sourceContext(NULL), checked(false) {}
+        CompareDateRange() : context(NULL), days(0), sourceContext(NULL), checked(false), cache(NULL) {}
+        ~CompareDateRange();
 
         Context *context;
         QString name;
@@ -42,6 +45,11 @@ class CompareDateRange
 
         bool isChecked() const { return checked; }
         void setChecked(bool x) { checked=x; }
+
+        RideFileCache *rideFileCache();
+
+    private:
+        RideFileCache *cache;
 };
 
 #endif

@@ -174,8 +174,6 @@ class HistogramWindow : public GcChartWindow
         void setShade(int);
 
         // comparing things
-        void compareIntervalsStateChanged(bool);
-        void compareIntervalsChanged();
         void compareChanged();
 
     protected slots:
