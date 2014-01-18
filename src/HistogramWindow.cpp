@@ -366,7 +366,7 @@ HistogramWindow::compareChanged()
         powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
 
         // set data and create empty curves
-        if (data->isChecked()) {
+        if (!rangemode || data->isChecked()) {
             // using the bests (ride file cache)
             powerHist->setDataFromCompare();
         } else {

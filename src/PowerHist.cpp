@@ -374,6 +374,7 @@ PowerHist::recalcCompare()
         } else if (series == RideFile::kph) {
 
             array = &cid.kphArray;
+            arrayLength = cid.kphArray.size();
 
         } else if (series == RideFile::cad) {
             array = &cid.cadArray;
