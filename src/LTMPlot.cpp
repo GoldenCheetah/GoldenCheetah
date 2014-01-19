@@ -161,7 +161,7 @@ LTMPlot::setData(LTMSettings *set)
 
     // wipe away last cached stress calculator
     if (cogganPMC) { delete cogganPMC; cogganPMC=NULL; }
-    if (skibaPMC) { delete cogganPMC; cogganPMC=NULL; }
+    if (skibaPMC) { delete skibaPMC; skibaPMC=NULL; }
 
     settings = set;
 
@@ -1073,6 +1073,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
                 } else {
                     n++;
                 }
+
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
                 secondsPerGroupBy = seconds; // reset for new group
@@ -1115,6 +1116,7 @@ void
 LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
                             QList<SummaryMetrics> &customData)
 {
+
     QDate earliest, latest; // rides
     QString scoreType;
 
