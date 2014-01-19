@@ -79,3 +79,6 @@ Move_2013_08_06_18_00_35.xlsx
    A Suunto Ambit export from the movescount website, the original
    file can be viewed at http://www.movescount.com/moves/move16837909
 
+Move_2014_01_16_19_48_44.gpx
+Move_2014_01_17_09_33_11.gpx
+   A couple of Suunto Ambit export with milliseconds as time units
