@@ -170,7 +170,8 @@ bool
 
         // compute the elapsed time and distance traveled since the
         // last recorded trackpoint
-        double delta_t = last_time.secsTo(time);
+        // use msec in case there are msec in QDateTime
+        double delta_t_ms = last_time.msecsTo(time);
         if (delta_d<0)
         {
             delta_d=0;
@@ -181,9 +182,9 @@ bool
         // for the first trackpoint -- so set speed to 0.0 instead of
         // dividing by zero.
         double speed = 0.0;
-        if (delta_t > 0.0)
+        if (delta_t_ms > 0.0)
         {
-            speed=delta_d / delta_t * 3600.0;
+            speed= 1000.0 * delta_d / delta_t_ms * 3600.0;
         }
 
         // Time from beginning of activity
