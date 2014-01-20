@@ -143,30 +143,41 @@ WPrime::setRide(RideFile *input)
 
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
 
-    // wipe away whatever is there
+    // initialise with Wbal equal to W' and therefore 0 expenditure
+    double Wbal = WPRIME;
+    double Wexp = 0;
+    int u = 0;
+
+    // lets run forward from 0s to end of ride
     minY = maxY = 0;
     values.resize(last+1);
     xvalues.resize(last+1);
-    for(int i=last; i>=0; i--) {
 
-        // used by AllPlot to plot the curve, we might as well
-        // create it here whilst we're iterating. But bear in mind
-        // that its in minutes, a bit of a legacy that one.
-        xvalues[i] = double(i)/60.00f;
+    for (int t=0; t<=last; t++) {
 
-        // W' is a SUMPRODUCT of the previous 1200 samples
-        // of power over CP * the associated decay factor * the mult factor
-        // it will be zero for first 20 minutes
+        // because we work with watts per second
+        // joules = watts * 1 i.e. joules = watts
+        double watts = smoothed.value(t);
+        if (watts > CP) {
 
-        double sumproduct = 0;
-        for (int j=0; j<1200 && (i-j) > 0; j++) {
-            sumproduct += inputArray.at(i-j) * pow(E, -(double(j)/TAU)); 
+            Wbal -= (watts-CP); // expending
+            Wexp = WPRIME-Wbal;
+            u = t; 
+
+        } else {
+
+            // calculate bal
+            Wbal = WPRIME - (Wexp * pow(E, -(double(t-u)/TAU)));
         }
-        values[i] = WPRIME - (sumproduct * WprimeMultConst);
+
+        // update arrays
+        xvalues[t] = double(t)/60.00f;
+        values[t] = Wbal;
 
         // min / max
-        if (values[i] < minY) minY = values[i];
-        if (values[i] > maxY) maxY = values[i];
+        if (Wbal < minY) minY = Wbal;
+        if (Wbal > maxY) maxY = Wbal;
+        
     }
 
     // STEP 3: FIND MATCHES
