@@ -54,7 +54,7 @@ class WPrime {
 
         double maxMatch();
         double minY, maxY;
-        double TAU, CP, WPRIME;
+        double TAU, CP, WPRIME, EXP;
 
         QList<Match> matches;       // matches burned with associated cost
 
