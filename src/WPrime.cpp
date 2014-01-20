@@ -335,10 +335,42 @@ class MaxMatch : public RideMetric {
     RideMetric *clone() const { return new MaxMatch(*this); }
 };
 
+class WPrimeTau : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(WPrimeTau);
+
+    public:
+
+    WPrimeTau()
+    {
+        setSymbol("skiba_wprime_tau");
+        setInternalName("W'bal TAU");
+    }
+    void initialize() {
+        setName(tr("W'bal TAU"));
+        setType(RideMetric::Low);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setPrecision(0);
+    }
+    void compute(const RideFile *r, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        WPrime w;
+        w.setRide((RideFile*)r);
+        setValue(w.TAU);
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new WPrimeTau(*this); }
+};
+
 // add to catalogue
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
     RideMetricFactory::instance().addMetric(MaxMatch());
+    RideMetricFactory::instance().addMetric(WPrimeTau());
     return true;
 }
 

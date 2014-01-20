@@ -74,6 +74,7 @@
 // 53  18  Dec 2013 Mark Liversedge    Added Fatigue Index (for power)
 // 54  07  Jan 2014 Mark Liversedge    Revised Estimated VO2MAX metric formula
 // 55  20  Jan 2014 Mark Liversedge    Added back Minimum W'bal metric and MaxMatch
+// 56  20  Jan 2014 Mark Liversedge    Added W' TAU to be able to track it
 
 int DBSchemaVersion = 55;
 
