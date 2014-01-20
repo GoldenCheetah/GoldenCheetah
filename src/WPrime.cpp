@@ -125,6 +125,7 @@ WPrime::setRide(RideFile *input)
     double totalBelowCP=0;
     double countBelowCP=0;
     QVector<int> inputArray(last+1);
+    EXP = 0;
     for (int i=0; i<last; i++) {
 
         int value = smoothed.value(i);
@@ -133,7 +134,7 @@ WPrime::setRide(RideFile *input)
         if (value < CP) {
             totalBelowCP += value;
             countBelowCP++;
-        }
+        } else EXP += value; // total expenditure above CP
     }
 
     TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
@@ -316,7 +317,7 @@ class MaxMatch : public RideMetric {
     }
     void initialize() {
         setName(tr("Maximum W'bal Match"));
-        setType(RideMetric::Low);
+        setType(RideMetric::Peak);
         setMetricUnits(tr("Kj"));
         setImperialUnits(tr("Kj"));
         setPrecision(1);
@@ -366,11 +367,43 @@ class WPrimeTau : public RideMetric {
     RideMetric *clone() const { return new WPrimeTau(*this); }
 };
 
+class WPrimeExp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(WPrimeExp);
+
+    public:
+
+    WPrimeExp()
+    {
+        setSymbol("skiba_wprime_exp");
+        setInternalName("W' expenditure");
+    }
+    void initialize() {
+        setName(tr("W' expenditure"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("Kj"));
+        setImperialUnits(tr("Kj"));
+        setPrecision(1);
+    }
+    void compute(const RideFile *r, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        WPrime w;
+        w.setRide((RideFile*)r);
+        setValue(w.EXP/1000);
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new WPrimeExp(*this); }
+};
+
 // add to catalogue
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
     RideMetricFactory::instance().addMetric(MaxMatch());
     RideMetricFactory::instance().addMetric(WPrimeTau());
+    RideMetricFactory::instance().addMetric(WPrimeExp());
     return true;
 }
 

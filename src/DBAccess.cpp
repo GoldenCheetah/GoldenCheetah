@@ -75,8 +75,9 @@
 // 54  07  Jan 2014 Mark Liversedge    Revised Estimated VO2MAX metric formula
 // 55  20  Jan 2014 Mark Liversedge    Added back Minimum W'bal metric and MaxMatch
 // 56  20  Jan 2014 Mark Liversedge    Added W' TAU to be able to track it
+// 57  20  Jan 2014 Mark Liversedge    Added W' Expenditure for total energy spent above CP
 
-int DBSchemaVersion = 55;
+int DBSchemaVersion = 57;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
