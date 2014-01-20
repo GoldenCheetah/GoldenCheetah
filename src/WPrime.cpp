@@ -61,8 +61,8 @@ WPrime::setRide(RideFile *input)
     values.resize(0); // the memory is kept for next time so this is efficient
     xvalues.resize(0);
 
-    minY = maxY = 0;
     CP = WPRIME = TAU=0;
+    minY = maxY = WPRIME;
         
     // no data or no power data then forget it.
     if (!input || input->dataPoints().count() == 0 || input->areDataPresent()->watts == false) {
@@ -149,7 +149,8 @@ WPrime::setRide(RideFile *input)
     int u = 0;
 
     // lets run forward from 0s to end of ride
-    minY = maxY = 0;
+    minY = WPRIME;
+    maxY = WPRIME;
     values.resize(last+1);
     xvalues.resize(last+1);
 
@@ -258,22 +259,32 @@ WPrime::setRide(RideFile *input)
     }
 }
 
+double
+WPrime::maxMatch()
+{
+    double max=0;
+    foreach(struct Match match, matches) 
+        if (match.cost > max) max = match.cost;
+
+    return max;
+}
+
 //
 // Associated Metrics
 //
 
 class MinWPrime : public RideMetric {
-    Q_DECLARE_TR_FUNCTIONS(WPrimeMin)
+    Q_DECLARE_TR_FUNCTIONS(MinWPrime);
 
     public:
 
     MinWPrime()
     {
         setSymbol("skiba_wprime_low");
-        setInternalName("Minimum W'");
+        setInternalName("Minimum W'bal");
     }
     void initialize() {
-        setName(tr("Minimum W'"));
+        setName(tr("Minimum W' bal"));
         setType(RideMetric::Low);
         setMetricUnits(tr("Kj"));
         setImperialUnits(tr("Kj"));
@@ -293,12 +304,42 @@ class MinWPrime : public RideMetric {
     RideMetric *clone() const { return new MinWPrime(*this); }
 };
 
-#if 0 // NEEDS OPTIMISING -- DISABLED UNTIL ISSUE RESOLVED
+class MaxMatch : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxMatch);
+
+    public:
+
+    MaxMatch()
+    {
+        setSymbol("skiba_wprime_maxmatch");
+        setInternalName("Maximum W'bal Match");
+    }
+    void initialize() {
+        setName(tr("Maximum W'bal Match"));
+        setType(RideMetric::Low);
+        setMetricUnits(tr("Kj"));
+        setImperialUnits(tr("Kj"));
+        setPrecision(1);
+    }
+    void compute(const RideFile *r, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        WPrime w;
+        w.setRide((RideFile*)r);
+        setValue(w.maxMatch()/1000.00f);
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new MaxMatch(*this); }
+};
+
 // add to catalogue
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
+    RideMetricFactory::instance().addMetric(MaxMatch());
     return true;
 }
 
 static bool added = addMetrics();
-#endif
