@@ -52,6 +52,7 @@ class WPrime {
         QVector<double> &mydata() { return mvalues; }
         QVector<double> &mxdata() { return mxvalues; }
 
+        double maxMatch();
         double minY, maxY;
         double TAU, CP, WPRIME;
 
