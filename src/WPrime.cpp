@@ -61,7 +61,7 @@ WPrime::setRide(RideFile *input)
     values.resize(0); // the memory is kept for next time so this is efficient
     xvalues.resize(0);
 
-    CP = WPRIME = TAU=0;
+    EXP = CP = WPRIME = TAU=0;
     minY = maxY = WPRIME;
         
     // no data or no power data then forget it.
