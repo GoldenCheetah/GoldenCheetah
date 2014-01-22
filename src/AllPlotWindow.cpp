@@ -53,9 +53,6 @@
 // tooltip
 #include "LTMWindow.h"
 
-// W' calculator
-#include "WPrime.h"
-
 static const int stackZoomWidth[8] = { 5, 10, 15, 20, 30, 45, 60, 120 };
 
 AllPlotWindow::AllPlotWindow(Context *context) :
@@ -247,9 +244,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     smoothLineEdit->setText(QString("%1").arg(allPlot->smooth));
     rSmoothSlider->setValue(allPlot->smooth);
     rSmoothEdit->setText(QString("%1").arg(allPlot->smooth));
-
-    // W' calculator
-    wpData = new WPrime();
 
     allZoomer = new QwtPlotZoomer(allPlot->canvas());
     allZoomer->setRubberBand(QwtPicker::RectRubberBand);
@@ -1013,9 +1007,6 @@ AllPlotWindow::rideSelected()
 
     // clear any previous selections
     clearSelection();
-
-    // recalculate W' data
-    if (showW->isChecked()) wpData->setRide(ride->ride());
 
     // setup the control widgets, dependant on
     // data present in this ride, needs to happen
@@ -1924,8 +1915,7 @@ AllPlotWindow::setShowW(int value)
         plot->setShowW(checked);
 
     // refresh W' data if needed
-    if (checked && current && current->ride() && wpData->ride() != current->ride()) {
-        wpData->setRide(current->ride());
+    if (checked && current && current->ride()) {
 
         // redraw
         redrawFullPlot();

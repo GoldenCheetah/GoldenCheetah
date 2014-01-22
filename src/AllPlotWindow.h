@@ -175,7 +175,6 @@ class AllPlotWindow : public GcChartWindow
         RideItem *current;
         int selection;
         Context *context;
-        WPrime *wpData;
 
         // All the plot widgets
         QVBoxLayout *allPlotLayout;

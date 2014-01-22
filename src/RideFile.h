@@ -29,6 +29,7 @@
 #include <QObject>
 
 class RideItem;
+class WPrime;
 class RideFile;
 struct RideFilePoint;
 struct RideFileDataPresent;
@@ -201,6 +202,8 @@ class RideFile : public QObject // QObject to emit signals
         Context *context;
         double getWeight();
 
+        WPrime *wprimeData(); // return wprime, init/refresh if needed
+
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
 
@@ -255,6 +258,8 @@ class RideFile : public QObject // QObject to emit signals
         QList<RideFileCalibration> calibrations_;
         QMap<QString,QString> tags_;
         EditorData *data;
+        WPrime *wprime_;
+        bool wstale;
         double weight_; // cached to save calls to getWeight();
         double totalCount;
 

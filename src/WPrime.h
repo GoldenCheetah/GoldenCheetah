@@ -54,9 +54,11 @@ class WPrime {
 
         double maxMatch();
         double minY, maxY;
-        double TAU, CP, WPRIME, EXP;
+        double TAU, PCP, CP, WPRIME, EXP;
 
         QList<Match> matches;       // matches burned with associated cost
+
+        int minForCP(int CP);
 
     private:
 
@@ -66,6 +68,9 @@ class WPrime {
     
         QVector<double> mvalues;      // W' time series in 1s intervals
         QVector<double> mxvalues;      // W' time series in 1s intervals
+
+        QwtSpline smoothed;
+        int last;
 };
 
 #endif
