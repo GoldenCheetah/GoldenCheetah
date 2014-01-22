@@ -18,6 +18,7 @@
  */
 
 #include "RideFile.h"
+#include "WPrime.h"
 #include "Athlete.h"
 #include "DataProcessor.h"
 #include "RideEditor.h"
@@ -41,7 +42,7 @@
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), weight_(0),
-            totalCount(0), dstale(true)
+            totalCount(0), dstale(true), wprime_(NULL), wstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -51,7 +52,7 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
     totalPoint = new RideFilePoint();
 }
 
-RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0), totalCount(0), dstale(true)
+RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0), totalCount(0), dstale(true), wprime_(NULL), wstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -67,7 +68,19 @@ RideFile::~RideFile()
     foreach(RideFilePoint *point, dataPoints_)
         delete point;
     delete command;
+    if (wprime_) delete wprime_;
     //!!! if (data) delete data; // need a mechanism to notify the editor
+}
+
+WPrime *
+RideFile::wprimeData()
+{
+    if (wprime_ == NULL || wstale) {
+        if (!wprime_) wprime_ = new WPrime();
+        wprime_->setRide(const_cast<RideFile*>(this)); // recompute
+        wstale = false;
+    }
+    return wprime_;
 }
 
 QString
@@ -845,7 +858,7 @@ void
 RideFile::emitSaved()
 {
     weight_ = 0;
-    dstale = true;
+    wstale = dstale = true;
     emit saved();
 }
 
@@ -853,7 +866,7 @@ void
 RideFile::emitReverted()
 {
     weight_ = 0;
-    dstale = true;
+    wstale = dstale = true;
     emit reverted();
 }
 
@@ -861,7 +874,7 @@ void
 RideFile::emitModified()
 {
     weight_ = 0;
-    dstale = true;
+    wstale = dstale = true;
     emit modified();
 }
 

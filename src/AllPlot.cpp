@@ -1131,8 +1131,10 @@ AllPlot::recalc(AllPlotObject *objects)
     // set curves - we set the intervalHighlighter to whichver is available
 
     //W' curve set to whatever data we have
-    objects->wCurve->setSamples(parent->wpData->xdata().data(), parent->wpData->ydata().data(), parent->wpData->xdata().count());
-    objects->mCurve->setSamples(parent->wpData->mxdata().data(), parent->wpData->mydata().data(), parent->wpData->mxdata().count());
+    if (rideItem && rideItem->ride()) {
+        objects->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata().count());
+        objects->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata().count());
+    }
 
     if (!objects->wattsArray.empty()) {
         objects->wattsCurve->setSamples(xaxis.data() + startingIndex, objects->smoothWatts.data() + startingIndex, totalPoints);
@@ -1371,10 +1373,10 @@ void
 AllPlot::setYMax()
 {
     // set axis scales
-    if (standard->wCurve->isVisible()) {
+    if (standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (j)"));
-        setAxisScale(QwtAxisId(QwtAxis::yRight, 2),parent->wpData->minY-1000,parent->wpData->maxY+1000);
+        setAxisScale(QwtAxisId(QwtAxis::yRight, 2),rideItem->ride()->wprimeData()->minY-1000,rideItem->ride()->wprimeData()->maxY+1000);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
 
@@ -1624,22 +1626,28 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     // attach appropriate curves
     //if (this->legend()) this->legend()->hide();
-    if (showW && parent->wpData->TAU > 0) {
+    if (showW && rideItem->ride()->wprimeData()->TAU > 0) {
 
         // matches cost
         double burnt=0;
         int count=0;
-        foreach(struct Match match, parent->wpData->matches)
+        foreach(struct Match match, rideItem->ride()->wprimeData()->matches)
             if (match.cost > 2000) { //XXX how to decide the threshold for a match?
                 burnt += match.cost;
                 count++;
             }
 
-        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ)").arg(parent->wpData->TAU)
-                                                    .arg(parent->wpData->CP)
-                                                    .arg(parent->wpData->WPRIME)
+        QString warn;
+        if (rideItem->ride()->wprimeData()->minY < 0) {
+            warn = QString("Minimum CP=%1").arg(rideItem->ride()->wprimeData()->PCP);
+        }
+
+        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ) %6").arg(rideItem->ride()->wprimeData()->TAU)
+                                                    .arg(rideItem->ride()->wprimeData()->CP)
+                                                    .arg(rideItem->ride()->wprimeData()->WPRIME)
                                                     .arg(count)
-                                                    .arg(burnt/1000.00, 0, 'f', 1));
+                                                    .arg(burnt/1000.00, 0, 'f', 1)
+                                                    .arg(warn));
 
         text.setFont(QFont("Helvetica", 10, QFont::Bold));
         text.setColor(GColor(CWBAL));
@@ -1680,8 +1688,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
     standard->balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
-    standard->wCurve->setSamples(parent->wpData->xdata().data(),parent->wpData->ydata().data(),parent->wpData->xdata().count());
-    standard->mCurve->setSamples(parent->wpData->mxdata().data(),parent->wpData->mydata().data(),parent->wpData->mxdata().count());
+    standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata().count());
+    standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata().count());
     standard->wattsCurve->setSamples(xaxis,smoothW,stopidx-startidx);
     standard->npCurve->setSamples(xaxis,smoothN,stopidx-startidx);
     standard->xpCurve->setSamples(xaxis,smoothX,stopidx-startidx);
@@ -1861,7 +1869,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         standard->altCurve->attach(this);
         standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     }
-    if (parent->wpData->xdata().count()) {
+    if (rideItem->ride()->wprimeData()->xdata().count()) {
         standard->wCurve->attach(this);
         standard->mCurve->attach(this);
     }
@@ -2643,8 +2651,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     int totalPoints = xaxis.count();
 
     //W' curve set to whatever data we have
-    //object->wCurve->setSamples(parent->wpData->xdata().data(), parent->wpData->ydata().data(), parent->wpData->xdata().count());
-    //object->mCurve->setSamples(parent->wpData->mxdata().data(), parent->wpData->mydata().data(), parent->wpData->mxdata().count());
+    //object->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata().count());
+    //object->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata().count());
 
     if (!object->wattsArray.empty()) {
         standard->wattsCurve->setSamples(xaxis.data(), object->smoothWatts.data(), totalPoints);
@@ -2821,7 +2829,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (!here->npArray.empty()) here->npCurve->attach(this);
         if (!here->xpArray.empty()) here->xpCurve->attach(this);
         if (!here->apArray.empty()) here->apCurve->attach(this);
-        if (!parent->wpData->ydata().empty()) {
+        if (ride && !ride->wprimeData()->ydata().empty()) {
             here->wCurve->attach(this);
             here->mCurve->attach(this);
         }
@@ -3060,7 +3068,7 @@ AllPlot::setShowW(bool show)
     showW = show;
     standard->wCurve->setVisible(show);
     standard->mCurve->setVisible(show);
-    if (!showW || parent->wpData->TAU <= 0) {
+    if (!showW || (rideItem && rideItem->ride() && rideItem->ride()->wprimeData()->TAU <= 0)) {
         standard->curveTitle.setLabel(QwtText(""));
     }
     setYMax();
