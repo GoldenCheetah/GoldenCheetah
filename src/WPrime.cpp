@@ -61,7 +61,7 @@ WPrime::setRide(RideFile *input)
     values.resize(0); // the memory is kept for next time so this is efficient
     xvalues.resize(0);
 
-    EXP = CP = WPRIME = TAU=0;
+    EXP = PCP_ = CP = WPRIME = TAU=0;
 
     // no data or no power data then forget it.
     if (!input || input->dataPoints().count() == 0 || input->areDataPresent()->watts == false) {
@@ -129,9 +129,8 @@ WPrime::setRide(RideFile *input)
     }
     minY = maxY = WPRIME;
 
-    // since we will be running up and down the data series multiple times
-    // as we iterate and run a SUMPRODUCT it is best to extract the data
-    // into a vector of ints for the watts above CP
+    // input array contains the actual W' expenditure
+    // and will also contain non-zero values
     double totalBelowCP=0;
     double countBelowCP=0;
     QVector<int> inputArray(last+1);
@@ -171,37 +170,33 @@ WPrime::setRide(RideFile *input)
 
     for (int t=0; t<=last; t++) {
 
-        // because we work with watts per second
-        // joules = watts * 1 i.e. joules = watts
-        int watts = smoothed.value(t);
-        if (watts > CP) {
-            Wbal -= (watts-CP); // expending
-            Wexp = WPRIME-Wbal;
-            u = t; 
-
-        } else {
-            // calculate bal
-            Wbal = WPRIME - (Wexp * pow(E, -(double(t-u)/TAU)));
-        }
-
-        // update arrays
+        // for each value in the input array apply the decay
+        // and integrate across the target output, but lets
+        // bound it;
+        // input is 0 then don't bother adding lots of zeroes
+        // only integrate 1200s into the future, as per the spreadsheet
+        // stop integrating when it has decayed to less than 0.1 watts (exponential sum)
         xvalues[t] = double(t)/60.00f;
-        values[t] = Wbal;
 
-        // min / max
-        if (Wbal < minY) minY = Wbal;
-        if (Wbal > maxY) maxY = Wbal;
-        
+        if (inputArray[t] <= 0) continue;
+
+        for (int i=0; i<1200 && t+i <= last; i++) {
+
+            double value = inputArray[t] * pow(E, -(double(i)/TAU));
+            if (value < 0.1) break;
+ 
+            // integrate
+            values[t+i] += value;
+        }
     }
 
-    // that didn't work!
-    if (minY < 0) {
-        for (int i=CP; i<500; i++) {
-            if (minForCP(i) > 0) {
-                PCP = i;
-                break;
-            }
-        }
+    // now subtract WPRIME and work out minimum etc
+    for(int t=0; t <= last; t++) {
+        double value = WPRIME - values[t];
+        values[t] = value;
+
+        if (value > maxY) maxY = value;
+        if (value < minY) minY = value;
     }
 
     // STEP 3: FIND MATCHES
@@ -282,52 +277,88 @@ WPrime::setRide(RideFile *input)
     }
 }
 
+double
+WPrime::PCP()
+{
+    if (PCP_) return PCP_;
+
+    int cp = CP;
+    do {
+    
+        if (minForCP(cp) > 0) return PCP_=cp;
+        else cp++;
+
+    } while (cp < 500);
+
+    PCP_ = cp;
+}
+
 int 
 WPrime::minForCP(int cp)
 {
-    int totalBelowCP=0, countBelowCP=0;
+    // input array contains the actual W' expenditure
+    // and will also contain non-zero values
+    double tau;
+    double totalBelowCP=0;
+    double countBelowCP=0;
+    QVector<int> inputArray(last+1);
     for (int i=0; i<last; i++) {
 
         int value = smoothed.value(i);
+        inputArray[i] = value > cp ? value-cp : 0;
 
         if (value < cp) {
             totalBelowCP += value;
             countBelowCP++;
-        } 
+        }
     }
 
-    double tau;
-
     if (countBelowCP > 0)
-        tau = 546.00f * pow(E,-0.01*(cp - (totalBelowCP/countBelowCP))) + 316.00f;
+        tau = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
     else
-        tau = 546.00f * pow(E,-0.01*(cp)) + 316.00f;
+        tau = 546.00f * pow(E,-0.01*(CP)) + 316.00f;
 
     tau = int(tau); // round it down
 
+    //qDebug()<<"data preparation took"<<time.elapsed();
+
+    // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
+
+    // initialise with Wbal equal to W' and therefore 0 expenditure
     double Wbal = WPRIME;
     double Wexp = 0;
-    int u=0;
+    int u = 0;
+
+    // lets run forward from 0s to end of ride
     int min = WPRIME;
+    QVector<double> myvalues(last+1);
+
     for (int t=0; t<=last; t++) {
 
-        // because we work with watts per second
-        // joules = watts * 1 i.e. joules = watts
-        int watts = smoothed.value(t);
-        if (watts > cp) {
-            Wbal -= (watts-cp); // expending
-            Wexp = WPRIME-Wbal;
-            u = t; 
+        // for each value in the input array apply the decay
+        // and integrate across the target output, but lets
+        // bound it;
+        // input is 0 then don't bother adding lots of zeroes
+        // only integrate 1200s into the future, as per the spreadsheet
+        // stop integrating when it has decayed to less than 0.1 watts (exponential sum)
+        if (inputArray[t] <= 0) continue;
 
-        } else {
-            // calculate bal
-            Wbal = WPRIME - (Wexp * pow(E, -(double(t-u)/tau)));
+        for (int i=0; i<1200 && t+i <= last; i++) {
+
+            double value = inputArray[t] * pow(E, -(double(i)/tau));
+            if (value < 0.1) break;
+ 
+            // integrate
+            myvalues[t+i] += value;
         }
-
-        // min / max
-        if (Wbal < min) min = Wbal;
-        
     }
+
+    // now subtract WPRIME and work out minimum etc
+    for(int t=0; t <= last; t++) {
+        double value = WPRIME - myvalues[t];
+        if (value < min) min = value;
+    }
+qDebug()<<"min="<<min<<"CP="<<cp;
     return min;
 }
 double
