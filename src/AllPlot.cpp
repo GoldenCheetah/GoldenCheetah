@@ -627,10 +627,6 @@ AllPlot::configChanged()
     QPen tempPen = QPen(GColor(CTEMP));
     tempPen.setWidth(width);
     standard->tempCurve->setPen(tempPen);
-    if (smooth == 1)
-        standard->tempCurve->setStyle(QwtPlotCurve::Dots);
-    else
-        standard->tempCurve->setStyle(QwtPlotCurve::Lines);
     //QPen windPen = QPen(GColor(CWINDSPEED));
     //windPen.setWidth(width);
     standard->windCurve->setPen(QPen(Qt::NoPen));
@@ -710,6 +706,10 @@ AllPlot::configChanged()
         p.setAlpha(64);
         standard->torqueCurve->setBrush(QBrush(p));
 
+        p = standard->tempCurve->pen().color();
+        p.setAlpha(64);
+        standard->tempCurve->setBrush(QBrush(p));
+
         /*p = standard->balanceLCurve->pen().color();
         p.setAlpha(64);
         standard->balanceLCurve->setBrush(QBrush(p));
@@ -727,6 +727,7 @@ AllPlot::configChanged()
         standard->speedCurve->setBrush(Qt::NoBrush);
         standard->cadCurve->setBrush(Qt::NoBrush);
         standard->torqueCurve->setBrush(Qt::NoBrush);
+        standard->tempCurve->setBrush(Qt::NoBrush);
         //standard->balanceLCurve->setBrush(Qt::NoBrush);
         //standard->balanceRCurve->setBrush(Qt::NoBrush);
     }
