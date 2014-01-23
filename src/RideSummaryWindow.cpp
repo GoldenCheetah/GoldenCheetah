@@ -298,12 +298,14 @@ RideSummaryWindow::htmlSummary() const
         << "time_riding"
         << "total_distance"
         << "total_work"
+        << "skiba_wprime_exp"
         << "elevation_gain";
 
     static const QStringList rtotalColumn = QStringList()
         << "workout_time"
         << "total_distance"
         << "total_work"
+        << "skiba_wprime_exp"
         << "elevation_gain";
 
     QStringList averageColumn = QStringList() // not const as modified below..
@@ -894,6 +896,7 @@ RideSummaryWindow::htmlCompareSummary() const
         << "time_riding"
         << "total_distance"
         << "total_work"
+        << "skiba_wprime_exp"
         << "elevation_gain";
 
     static const QStringList rtotalColumn = QStringList()
