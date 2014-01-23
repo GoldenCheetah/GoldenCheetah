@@ -472,21 +472,31 @@ class WPrimeExp : public RideMetric {
     WPrimeExp()
     {
         setSymbol("skiba_wprime_exp");
-        setInternalName("W' expenditure");
+        setInternalName("W' Work");
     }
     void initialize() {
-        setName(tr("W' expenditure"));
+        setName(tr("W' Work"));
         setType(RideMetric::Total);
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
-        setPrecision(1);
+        setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *, int,
+    void compute(const RideFile *r, const Zones *zones, int zonerange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
 
-        setValue(const_cast<RideFile*>(r)->wprimeData()->EXP/1000);
+        int cp = r->getTag("CP","0").toInt();
+        if (!cp) cp = zones->getCP(zonerange);
+    
+        double total = 0;
+        double secs = 0;
+        foreach(const RideFilePoint *point, r->dataPoints()) {
+            if (cp && point->watts > cp) total += point->watts;
+            secs += r->recIntSecs();
+        }
+        setValue(total/1000.00f);
+        setCount(secs);
     }
 
     bool canAggregate() { return false; }
