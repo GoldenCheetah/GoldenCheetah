@@ -147,7 +147,11 @@ WPrime::setRide(RideFile *input)
         } else EXP += value; // total expenditure above CP
     }
 
-    TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+    if (countBelowCP > 0)
+        TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+    else
+        TAU = 546.00f * pow(E,-0.01*(CP)) + 316.00f;
+
     TAU = int(TAU); // round it down
 
     //qDebug()<<"data preparation took"<<time.elapsed();
@@ -292,7 +296,13 @@ WPrime::minForCP(int cp)
         } 
     }
 
-    double tau = 546.00f * pow(E,-0.01*(cp - (totalBelowCP/countBelowCP))) + 316.00f;
+    double tau;
+
+    if (countBelowCP > 0)
+        tau = 546.00f * pow(E,-0.01*(cp - (totalBelowCP/countBelowCP))) + 316.00f;
+    else
+        tau = 546.00f * pow(E,-0.01*(cp)) + 316.00f;
+
     tau = int(tau); // round it down
 
     double Wbal = WPRIME;
