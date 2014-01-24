@@ -481,9 +481,17 @@ RideSummaryWindow::htmlSummary() const
                  } else {
 
                     // get the value - from metrics or from data array
-                    if (ridesummary) s = s.arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
-                                               + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
-                    else {
+                    if (ridesummary) {
+                            QString v = QString("%1").arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
+                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
+
+                            // W' over 100% is not a good thing!
+                            if (symbol == "skiba_wprime_max" && metrics.getForSymbol(symbol) > 100) {
+                                v = QString("<font color=\"red\">%1<font color=\"black\">").arg(v);
+                            }
+                            s = s.arg(v);
+        
+                    } else {
                       QStringList filterList = filters;
                       if (context->ishomefiltered) {
                           if (filtered) {
