@@ -418,10 +418,10 @@ class MaxWPrime : public RideMetric {
     MaxWPrime()
     {
         setSymbol("skiba_wprime_max"); // its expressing min W'bal as as percentage of WPrime
-        setInternalName("Max W' Exp");
+        setInternalName("Max W' Expended");
     }
     void initialize() {
-        setName(tr("Max W' Exp"));
+        setName(tr("Max W' Expended"));
         setType(RideMetric::Peak);
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
