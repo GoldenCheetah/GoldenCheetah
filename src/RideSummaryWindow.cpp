@@ -318,7 +318,8 @@ RideSummaryWindow::htmlSummary() const
         << "max_speed"
         << "max_power"
         << "max_heartrate"
-        << "max_cadence";
+        << "max_cadence"
+        << "skiba_wprime_max";
 
     // show average and max temp if it is available (in ride summary mode)
     if (ridesummary && (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-")) {
@@ -915,7 +916,8 @@ RideSummaryWindow::htmlCompareSummary() const
         << "max_speed"
         << "max_power"
         << "max_heartrate"
-        << "max_cadence";
+        << "max_cadence"
+        << "skiba_wprime_max";
 
 #if 0 // XXX do /any/ of them have temperature -or- do they /all/ need to ???
     // show average and max temp if it is available (in ride summary mode)

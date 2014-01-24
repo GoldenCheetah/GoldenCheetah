@@ -77,8 +77,9 @@
 // 56  20  Jan 2014 Mark Liversedge    Added W' TAU to be able to track it
 // 57  20  Jan 2014 Mark Liversedge    Added W' Expenditure for total energy spent above CP
 // 58  23  Jan 2014 Mark Liversedge    W' work rename and calculate without reference to WPrime class (speed)
+// 59  24  Jan 2014 Mark Liversedge    Added Maximum W' exp which is same as W'bal bur expressed as used not left
 
-int DBSchemaVersion = 58;
+int DBSchemaVersion = 59;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

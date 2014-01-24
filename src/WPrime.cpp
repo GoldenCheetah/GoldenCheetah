@@ -403,13 +403,40 @@ class MinWPrime : public RideMetric {
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
 
-        WPrime w;
-        w.setRide((RideFile*)r);
-        setValue(w.minY/1000.00f);
+        setValue(const_cast<RideFile*>(r)->wprimeData()->minY / 1000.00f);
     }
 
     bool canAggregate() { return false; }
     RideMetric *clone() const { return new MinWPrime(*this); }
+};
+
+class MaxWPrime : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxWPrime);
+
+    public:
+
+    MaxWPrime()
+    {
+        setSymbol("skiba_wprime_max"); // its expressing min W'bal as as percentage of WPrime
+        setInternalName("Max W' Exp");
+    }
+    void initialize() {
+        setName(tr("Max W' Exp"));
+        setType(RideMetric::Peak);
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setPrecision(0);
+    }
+    void compute(const RideFile *r, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        setValue(const_cast<RideFile*>(r)->wprimeData()->maxE());
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new MaxWPrime(*this); }
 };
 
 class MaxMatch : public RideMetric {
@@ -512,6 +539,7 @@ class WPrimeExp : public RideMetric {
 // add to catalogue
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
+    RideMetricFactory::instance().addMetric(MaxWPrime()); // same thing expressed as a maximum
     RideMetricFactory::instance().addMetric(MaxMatch());
     RideMetricFactory::instance().addMetric(WPrimeTau());
     RideMetricFactory::instance().addMetric(WPrimeExp());
