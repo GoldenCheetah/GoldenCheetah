@@ -87,7 +87,7 @@ WPrime::setRide(RideFile *input)
             // fill gaps in recording with zeroes
             if (lp)
                 for(int t=lp->secs+input->recIntSecs();
-                    t < p->secs;
+                    (t + input->recIntSecs()) < p->secs;
                     t += input->recIntSecs())
                     points << QPointF(t-offset, 0);
 
