@@ -286,9 +286,9 @@ WPrime::PCP()
     do {
     
         if (minForCP(cp) > 0) return PCP_=cp;
-        else cp++;
+        else cp += 3; // +/- 3w is ok, especially since +/- 2kJ is typical accuracy for W' anyway
 
-    } while (cp < 500);
+    } while (cp <= 500);
 
     PCP_ = cp;
 }
