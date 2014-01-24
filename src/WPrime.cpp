@@ -73,7 +73,7 @@ WPrime::setRide(RideFile *input)
     QVector<QPointF> points;
 
     last=0;
-    int offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
+    double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
     bool first = true;
     if (input->recIntSecs() >= 1) {
         RideFilePoint *lp=NULL;
