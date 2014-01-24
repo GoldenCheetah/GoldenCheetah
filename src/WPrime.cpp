@@ -36,7 +36,7 @@
 #include "WPrime.h"
 
 const double WprimeMultConst = 1.0;
-const int WprimeDecayPeriod = 1200; // 1200 seconds or 20 minutes
+const int WprimeDecayPeriod = 1500; // 1500 seconds or 25 minutes
 const double E = 2.71828183;
 
 const int WprimeMatchSmoothing = 25; // 25 sec smoothing looking for matches
@@ -180,16 +180,15 @@ WPrime::setRide(RideFile *input)
         // and integrate across the target output, but lets
         // bound it;
         // input is 0 then don't bother adding lots of zeroes
-        // only integrate 1200s into the future, as per the spreadsheet
+        // only integrate WprimeDecayPeriod into the future, as per the spreadsheet
         // stop integrating when it has decayed to less than 0.1 watts (exponential sum)
         xvalues[t] = double(t)/60.00f;
 
         if (inputArray[t] <= 0) continue;
 
-        for (int i=0; i<1200 && t+i <= last; i++) {
+        for (int i=0; i<WprimeDecayPeriod && t+i <= last; i++) {
 
             double value = inputArray[t] * pow(E, -(double(i)/TAU));
-            if (value < 0.1) break;
  
             // integrate
             values[t+i] += value;
@@ -345,14 +344,13 @@ WPrime::minForCP(int cp)
         // and integrate across the target output, but lets
         // bound it;
         // input is 0 then don't bother adding lots of zeroes
-        // only integrate 1200s into the future, as per the spreadsheet
+        // only integrate WprimeDecayPeriod into the future, as per the spreadsheet
         // stop integrating when it has decayed to less than 0.1 watts (exponential sum)
         if (inputArray[t] <= 0) continue;
 
-        for (int i=0; i<1200 && t+i <= last; i++) {
+        for (int i=0; i<WprimeDecayPeriod && t+i <= last; i++) {
 
             double value = inputArray[t] * pow(E, -(double(i)/tau));
-            if (value < 0.1) break;
  
             // integrate
             myvalues[t+i] += value;
