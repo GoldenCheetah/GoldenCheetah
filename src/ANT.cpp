@@ -634,11 +634,9 @@ ANT::sendMessage(ANTMessage m) {
 
     rawWrite((uint8_t*)m.data, m.length);
 
-    // Jan 2014: AFTER MUCH DISCUSSION IT BECAME CLEAR THAT THIS IS
-    // NOT DOING ANYTHING AND CAUSES ERRORS SO HAS BEEN COMMENTED OUT.
-    ////// this padding is important - do not remove it
-    ////// we need to be sure the message is at least 12 bytes
-    //////rawWrite((uint8_t*)padding, 5);
+    // this padding is important - do not remove it
+    // we need to be sure the message is at least 12 bytes
+    rawWrite((uint8_t*)padding, 5);
 }
 
 void
