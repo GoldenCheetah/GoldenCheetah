@@ -79,6 +79,9 @@ WPrime::setRide(RideFile *input)
         RideFilePoint *lp=NULL;
         foreach(RideFilePoint *p, input->dataPoints()) {
 
+            // yuck! nasty data
+            if (p->secs > (25*60*60)) return;
+
             if (first) {
                 offset = p->secs;
                 first = false;
@@ -102,6 +105,9 @@ WPrime::setRide(RideFile *input)
     } else {
 
         foreach(RideFilePoint *p, input->dataPoints()) {
+
+            // yuck! nasty data
+            if (p->secs > (25*60*60)) return;
 
             if (first) {
                 offset = p->secs;
