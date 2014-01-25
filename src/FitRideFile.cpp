@@ -641,6 +641,7 @@ struct FitFileReaderState
                         read_unknown( field.size, &count );
                         v = NA_VALUE;
                         unknown_base_type.insert(field.num);
+                        size = field.size;
                 }
                 // Quick fix : we need to support multivalues
                 if (size < field.size)
