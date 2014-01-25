@@ -159,14 +159,7 @@ WPrime::setRide(RideFile *input)
 
     TAU = int(TAU); // round it down
 
-    //qDebug()<<"data preparation took"<<time.elapsed();
-
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
-
-    // initialise with Wbal equal to W' and therefore 0 expenditure
-    double Wbal = WPRIME;
-    double Wexp = 0;
-    int u = 0;
 
     // lets run forward from 0s to end of ride
     minY = WPRIME;
@@ -174,25 +167,23 @@ WPrime::setRide(RideFile *input)
     values.resize(last+1);
     xvalues.resize(last+1);
 
+    QVector<double> myvalues(last+1);
+
+    int stop = last / 2;
+
+    WPrimeIntegrator a(inputArray, 0, stop, TAU);
+    WPrimeIntegrator b(inputArray, stop+1, last, TAU);
+
+    a.start();
+    b.start();
+
+    a.wait();
+    b.wait();
+
+    // sum values
     for (int t=0; t<=last; t++) {
-
-        // for each value in the input array apply the decay
-        // and integrate across the target output, but lets
-        // bound it;
-        // input is 0 then don't bother adding lots of zeroes
-        // only integrate WprimeDecayPeriod into the future, as per the spreadsheet
-        // stop integrating when it has decayed to less than 0.1 watts (exponential sum)
-        xvalues[t] = double(t)/60.00f;
-
-        if (inputArray[t] <= 0) continue;
-
-        for (int i=0; i<WprimeDecayPeriod && t+i <= last; i++) {
-
-            double value = inputArray[t] * pow(E, -(double(i)/TAU));
- 
-            // integrate
-            values[t+i] += value;
-        }
+        values[t] = a.output[t] + b.output[t];
+        xvalues[t] = double(t) / 60.00f;
     }
 
     // now subtract WPRIME and work out minimum etc
@@ -203,6 +194,8 @@ WPrime::setRide(RideFile *input)
         if (value > maxY) maxY = value;
         if (value < minY) minY = value;
     }
+
+    //qDebug()<<"compute W'bal curve took"<<time.elapsed();
 
     // STEP 3: FIND MATCHES
 
@@ -295,12 +288,15 @@ WPrime::PCP()
 
     } while (cp <= 500);
 
-    PCP_ = cp;
+    return PCP_=cp;
 }
 
 int 
 WPrime::minForCP(int cp)
 {
+    QTime time; // for profiling performance of the code
+    time.start();
+
     // input array contains the actual W' expenditure
     // and will also contain non-zero values
     double tau;
@@ -325,46 +321,38 @@ WPrime::minForCP(int cp)
 
     tau = int(tau); // round it down
 
-    //qDebug()<<"data preparation took"<<time.elapsed();
 
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
-
-    // initialise with Wbal equal to W' and therefore 0 expenditure
-    double Wbal = WPRIME;
-    double Wexp = 0;
-    int u = 0;
 
     // lets run forward from 0s to end of ride
     int min = WPRIME;
     QVector<double> myvalues(last+1);
 
-    for (int t=0; t<=last; t++) {
+    int stop = last / 2;
 
-        // for each value in the input array apply the decay
-        // and integrate across the target output, but lets
-        // bound it;
-        // input is 0 then don't bother adding lots of zeroes
-        // only integrate WprimeDecayPeriod into the future, as per the spreadsheet
-        // stop integrating when it has decayed to less than 0.1 watts (exponential sum)
-        if (inputArray[t] <= 0) continue;
+    WPrimeIntegrator a(inputArray, 0, stop, tau);
+    WPrimeIntegrator b(inputArray, stop+1, last, tau);
 
-        for (int i=0; i<WprimeDecayPeriod && t+i <= last; i++) {
+    a.start();
+    b.start();
 
-            double value = inputArray[t] * pow(E, -(double(i)/tau));
- 
-            // integrate
-            myvalues[t+i] += value;
-        }
-    }
+    a.wait();
+    b.wait();
+
+    // sum values
+    for (int t=0; t<=last; t++) 
+        myvalues[t] = a.output[t] + b.output[t];
 
     // now subtract WPRIME and work out minimum etc
     for(int t=0; t <= last; t++) {
         double value = WPRIME - myvalues[t];
         if (value < min) min = value;
     }
+    //qDebug()<<"compute time="<<time.elapsed();
 qDebug()<<"min="<<min<<"CP="<<cp;
     return min;
 }
+
 double
 WPrime::maxMatch()
 {
@@ -373,6 +361,32 @@ WPrime::maxMatch()
         if (match.cost > max) max = match.cost;
 
     return max;
+}
+
+// decay and integrate -- split into threads for
+// best performance
+WPrimeIntegrator::WPrimeIntegrator(QVector<int> &source, int begin, int end, double TAU) :
+    source(source), begin(begin), end(end), TAU(TAU)
+{
+    output.resize(source.size());
+}
+
+void
+WPrimeIntegrator::run()
+{
+    // run from start to stop adding decay to end
+    for (int t=begin; t<end; t++) {
+
+        if (source[t] <= 0) continue;
+
+        for (int i=0; i<WprimeDecayPeriod && t+i < source.size(); i++) {
+
+            double value = source[t] * pow(E, -(double(i)/TAU));
+ 
+            // integrate
+            output[t+i] += value;
+        }
+    }
 }
 
 //

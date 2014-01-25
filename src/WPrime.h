@@ -25,6 +25,7 @@
 #include "Zones.h"
 #include "RideMetric.h"
 #include <QVector>
+#include <QThread>
 #include <qwt_spline.h> // smoothing
 #include <math.h>
 
@@ -76,4 +77,21 @@ class WPrime {
         int last;
 };
 
+class WPrimeIntegrator : public QThread
+{
+    public:
+        WPrimeIntegrator(QVector<int> &source, int begin, int end, double TAU);
+
+        // integrate from start to stop from source into output
+        // basically sums in the exponential decays, but we break it
+        // into threads to parallelise the work
+        void run();
+
+        QVector<int> &source;
+        int begin, end;
+        double TAU;
+
+        // resized to match source holds results
+        QVector<double> output;
+};
 #endif
