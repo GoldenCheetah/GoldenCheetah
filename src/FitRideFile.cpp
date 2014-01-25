@@ -639,7 +639,7 @@ struct FitFileReaderState
                     case 10: v = read_uint8z(&count); size = 1; break;
                     case 11: v = read_uint16z(def.is_big_endian, &count); size = 2; break;
                     case 12: v = read_uint32z(def.is_big_endian, &count); size = 4; break;
-                    //case 13: // FLOAT64
+                    //case 13: // BYTE
 
                     // we may need to add support for float, string + byte base types here
                     default:
