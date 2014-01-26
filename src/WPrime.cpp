@@ -28,10 +28,25 @@
 // The actual code is derived from an MS Office Excel spreadsheet shared
 // privately to assist in the development of the code.
 // 
-// There is definitely room form a performance improvement from anyone
-// with a greater math expertise than this developer. I suspect that is
-// most!
+// To optimise the original implementation that computed the integral at
+// each point t as a function of the preceding power above CP at time u through t
+// we did 2 things;
 //
+// 1. compute the exp decay for each poweer above CP and integrate the decay
+//    into the future -- but crucially, no need to bother if power above CP is 0.
+//    This typically reduces the cpu cycles by a factor of 4
+//
+// 2. Because the decay is calculated forward at time u we can do these in paralle;
+//    i.e. run multiple threads for t=0 through t=time/nthreads. This reduced the
+//    elapsed time by a factor of about 2/3rds on a dual core processor.
+//
+// We could extend the threading to have more than 2 threads on PCs with more cores
+// but this would conflict with the ridefilecache computations anyway.
+//
+// There may be room for improvement by adopting a different integration strategy
+// in the future, but now, a typical 4 hour hilly ride can be computed in 250ms on
+// and Athlon dual core CPU where previously it took 4000ms.
+
 
 #include "WPrime.h"
 
