@@ -535,8 +535,8 @@ class WPrimeExp : public RideMetric {
                  const Context *) {
 
         int cp = r->getTag("CP","0").toInt();
-        if (!cp) cp = zones->getCP(zonerange);
-    
+        if (!cp && zones && zonerange >=0) cp = zones->getCP(zonerange);
+
         double total = 0;
         double secs = 0;
         foreach(const RideFilePoint *point, r->dataPoints()) {
