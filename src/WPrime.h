@@ -56,7 +56,7 @@ class WPrime {
         double maxMatch();
         double minY, maxY;
         double TAU, PCP_, CP, WPRIME, EXP;
-        double maxE() { return ((WPRIME - minY) / WPRIME) * 100.00f; }
+        double maxE() { return WPRIME ? (((WPRIME - minY) / WPRIME) * 100.00f) : 0; }
 
         double PCP();
 

@@ -280,6 +280,9 @@ WPrime::PCP()
 {
     if (PCP_) return PCP_;
 
+    // check WPRIME is correct otherwise we will run forever!
+    if (WPRIME < 10000) return PCP_ = CP; // Wprime not set properly
+
     int cp = CP;
     do {
     
