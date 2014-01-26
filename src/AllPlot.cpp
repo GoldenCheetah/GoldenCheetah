@@ -527,6 +527,8 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     wantaxis = true;
     setAutoDelete(false); // no - we are managing it via the AllPlotObjects now
     referencePlot = NULL;
+    tooltip = NULL;
+    _canvasPicker = NULL;
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
@@ -570,6 +572,8 @@ AllPlot::~AllPlot()
 
     // wipe the standard stuff
     delete standard;
+    if (tooltip) delete tooltip;
+    if (_canvasPicker) delete _canvasPicker;
 }
 
 void
