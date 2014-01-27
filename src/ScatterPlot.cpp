@@ -151,6 +151,7 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
 
 ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
+    setAutoDelete(false); // no don't delete on detach !
     all = NULL;
     grid = NULL;
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
