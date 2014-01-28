@@ -564,7 +564,7 @@ WPrimeIntegrator::run()
 
         if (source[t] <= 0) continue;
 
-        for (int i=0; i<WprimeDecayPeriod && t+i < source.size(); i++) {
+        for (int i=0; t+i < source.size(); i++) {
 
             double value = source[t] * pow(E, -(double(i)/TAU));
  
