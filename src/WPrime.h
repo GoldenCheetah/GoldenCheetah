@@ -20,6 +20,7 @@
 #define _gc_wprime_include
 
 #include "RideFile.h"
+#include "ErgFile.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Zones.h"
@@ -42,8 +43,10 @@ class WPrime {
         // construct and calculate series/metrics
         WPrime();
 
-        // recalc from ride selected
+        // recalc from ride selected or workout selected in train mode
         void setRide(RideFile *ride);
+        void setErg(ErgFile *erg);
+
         RideFile *ride() { return rideFile; }
 
         // W' 1second time series from 0

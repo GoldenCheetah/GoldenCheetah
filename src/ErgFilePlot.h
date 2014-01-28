@@ -36,6 +36,7 @@
 #include <qwt_symbol.h>
 #include <qwt_compat.h>
 #include "ErgFile.h"
+#include "WPrime.h"
 
 #include "Settings.h"
 #include "Colors.h"
@@ -44,6 +45,7 @@
 #include <qwt_series_data.h>
 #include <qwt_point_data.h>
 
+#define DEFAULT_TAU 450
 
 class ErgFileData : public QwtPointArrayData
 {
@@ -143,12 +145,15 @@ class ErgFilePlot : public QwtPlot
 
     private:
 
+    WPrime calculator;
     Context *context;
     bool bydist;
     ErgFile *ergFile;
 
 	QwtPlotGrid *grid;
 	QwtPlotCurve *LodCurve;
+    QwtPlotCurve *wbalCurveActual;
+    QwtPlotCurve *wbalCurvePredict;
 	QwtPlotCurve *wattsCurve;
 	QwtPlotCurve *hrCurve;
 	QwtPlotCurve *cadCurve;

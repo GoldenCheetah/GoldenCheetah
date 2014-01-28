@@ -111,8 +111,9 @@ class ErgFile
         double XP, RI, BS, SVI; // Skiba for erg / mrc
         double ELE, ELEDIST, GRADE;    // crs
 
-    private:
         Context *context;
+
+    private:
         int &mode;
         int nomode;
 };

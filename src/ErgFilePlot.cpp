@@ -18,6 +18,7 @@
 
 
 #include "ErgFilePlot.h"
+#include "WPrime.h"
 #include "Context.h"
 
 // Bridge between QwtPlot and ErgFile to avoid having to
@@ -89,6 +90,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     //courseData = data;                      // what we plot
+    setAutoDelete(false);
+    setAxesCount(QwtAxis::yRight, 4);
 
     // Setup the left axis (Power)
     setAxisTitle(yLeft, "Watts");
@@ -157,6 +160,31 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     LodCurve->setBrush(brush_color);   // fill below the line
     QPen Lodpen = QPen(Qt::blue, 1.0);
     LodCurve->setPen(Lodpen);
+
+    wbalCurvePredict = new QwtPlotCurve("W'bal Predict");
+    wbalCurvePredict->attach(this);
+    wbalCurvePredict->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    QColor predict = GColor(CWBAL).darker();
+    predict.setAlpha(200);
+    QPen wbalPen = QPen(predict, 2.0); // predict darker...
+    wbalCurvePredict->setPen(wbalPen);
+    wbalCurvePredict->setVisible(true);
+
+    wbalCurveActual = new QwtPlotCurve("W'bal Actual");
+    wbalCurveActual->attach(this);
+    wbalCurveActual->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    QPen wbalPenA = QPen(GColor(CWBAL), 1.0); // actual lighter
+    wbalCurveActual->setPen(wbalPenA);
+
+    sd = new QwtScaleDraw;
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->setLabelRotation(90);// in the 000s
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 3), sd);
+    pal.setColor(QPalette::WindowText, GColor(CWBAL));
+    pal.setColor(QPalette::Text, GColor(CWBAL));
+    axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
 
     // telemetry history
     wattsCurve = new QwtPlotCurve("Power");
@@ -338,6 +366,21 @@ ErgFilePlot::setData(ErgFile *ergfile)
                     setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new HourTimeScaleDraw()));
             }
         }
+
+        // wbal predict curve and clear actual curve
+        QVector<double> empty;
+        wbalCurveActual->setSamples(empty, empty);
+
+        // compute wbal curve for the erg file
+        calculator;
+        calculator.setErg(ergfile);
+
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("W' Balance (j)"));
+        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),calculator.minY-1000,calculator.maxY+1000);
+        setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
+
+        // and the values ... but avoid sharing!
+        wbalCurvePredict->setSamples(calculator.xdata(), calculator.ydata());
 
     } else {
 
