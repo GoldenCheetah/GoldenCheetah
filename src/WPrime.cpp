@@ -51,7 +51,8 @@
 #include "WPrime.h"
 
 const double WprimeMultConst = 1.0;
-const int WprimeDecayPeriod = 1500; // 1500 seconds or 25 minutes
+const int WPrimeDecayPeriod = 3600; // 1 hour, tried infinite but costly and limited value
+                                    //         on long rides anyway
 const double E = 2.71828183;
 
 const int WprimeMatchSmoothing = 25; // 25 sec smoothing looking for matches
@@ -564,7 +565,7 @@ WPrimeIntegrator::run()
 
         if (source[t] <= 0) continue;
 
-        for (int i=0; t+i < source.size(); i++) {
+        for (int i=0; i < WPrimeDecayPeriod && t+i < source.size(); i++) {
 
             double value = source[t] * pow(E, -(double(i)/TAU));
  
