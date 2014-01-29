@@ -32,31 +32,40 @@
 
 class NullController : public RealtimeController
 {
- public:
+    Q_OBJECT;
 
-  TrainSidebar *parent;
+    public:
 
-  // hostname and port are the hostname/port of the server to which
-  // this NullControlller should connect.
-  NullController(TrainSidebar *parent,
-                          DeviceConfiguration *dc);
-  ~NullController() { }
+        TrainSidebar *parent;
 
-  int start();
-  int stop();
-  int pause();
-  int restart();
-  bool find();
-  bool discover(QString) {  return true;  }
-  bool doesPush() {  return false; }
-  bool doesPull() {  return true; }
-  bool doesLoad() {  return false; }
-  void setLoad(double watts) { load = watts; }
-  void getRealtimeData(RealtimeData &rtData);
-  void pushRealtimeData(RealtimeData &rtData);
+        // hostname and port are the hostname/port of the server to which
+        // this NullControlller should connect.
+        NullController(TrainSidebar *parent, DeviceConfiguration *dc);
+        ~NullController() { }
 
- private:
-    double load;
+        int start();
+        int stop();
+        int pause();
+        int restart();
+        bool find();
+        bool discover(QString) {  return true;  }
+        bool doesPush() {  return false; }
+        bool doesPull() {  return true; }
+        bool doesLoad() {  return false; }
+        void setLoad(double watts) { load = watts; }
+        void getRealtimeData(RealtimeData &rtData);
+        void pushRealtimeData(RealtimeData &rtData);
+
+    signals:
+
+        // signal instantly on data receipt for R-R data
+        // made a special case to support HRV tool without complication
+        void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+
+    private:
+
+        double load;
+        int beats,count; // send an R-R signal every 4th call
 };
 
 

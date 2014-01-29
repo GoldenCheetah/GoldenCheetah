@@ -31,6 +31,7 @@ NullController::NullController(TrainSidebar *parent,
 }
 
 int NullController::start() {
+  count = 0;
   return 0;
 }
 
@@ -58,6 +59,18 @@ void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setCadence(85 + ((rand()%10)-5));
     rtData.setHr(145 + ((rand()%3)-2));
     processRealtimeData(rtData); // for testing virtual power etc
+
+    // generate an R-R data signal based upon 60bpm +/- 2bpm
+    if (count++%5 == 0) {
+
+        // emit measurementTime 1/1024s plus a little randomness, incremental beat count, bpm of 60 +/- 2
+        uint16_t m = (beats * 1024) + (rand()%50);
+        uint8_t b = ++beats;
+        uint8_t bpm =60+(rand()%2);
+
+        qDebug()<<"rrdata:"<<m<<b<<bpm;
+        emit rrData(m, b, bpm);
+    }
 }
 
 void NullController::pushRealtimeData(RealtimeData &) {
