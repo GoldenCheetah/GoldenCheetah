@@ -141,6 +141,7 @@ class LTMSettings {
         QDateTime end;
         int groupBy;
         bool shadeZones;
+        bool showData;
         bool legend;
         bool events;
 

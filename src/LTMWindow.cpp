@@ -32,6 +32,8 @@
 #include <QtGui>
 #include <QString>
 #include <QDebug>
+#include <QWebView>
+#include <QWebFrame>
 
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
@@ -47,7 +49,25 @@ LTMWindow::LTMWindow(Context *context) :
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
     ltmPlot = new LTMPlot(this, context);
-    mainLayout->addWidget(ltmPlot);
+
+    // the data table
+    dataSummary = new QWebView(this);
+    dataSummary->setContentsMargins(0,0,0,0);
+    dataSummary->page()->view()->setContentsMargins(0,0,0,0);
+    dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    dataSummary->setAcceptDrops(false);
+
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+    dataSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    dataSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+
+
+    // the stack
+    stack = new QStackedWidget(this);
+    stack->addWidget(ltmPlot);
+    stack->addWidget(dataSummary);
+    stack->setCurrentIndex(0);
+    mainLayout->addWidget(stack);
     setChartLayout(mainLayout);
 
     // reveal controls
@@ -67,12 +87,12 @@ LTMWindow::LTMWindow(Context *context) :
     rGroupBy->setValue(0);
 
     revealLayout->addWidget(rGroupBy);
-    rShade = new QCheckBox(tr("Shade zones"), this);
+    rData = new QCheckBox(tr("Data Table"), this);
     rEvents = new QCheckBox(tr("Show events"), this);
     QVBoxLayout *checks = new QVBoxLayout;
     checks->setSpacing(2);
     checks->setContentsMargins(0,0,0,0);
-    checks->addWidget(rShade);
+    checks->addWidget(rData);
     checks->addWidget(rEvents);
     revealLayout->addLayout(checks);
     revealLayout->addStretch();
@@ -117,7 +137,8 @@ LTMWindow::LTMWindow(Context *context) :
     settings.legend = ltmTool->showLegend->isChecked();
     settings.events = ltmTool->showEvents->isChecked();
     settings.shadeZones = ltmTool->shadeZones->isChecked();
-    rShade->setChecked(ltmTool->shadeZones->isChecked());
+    settings.showData = ltmTool->showData->isChecked();
+    rData->setChecked(ltmTool->showData->isChecked());
     rEvents->setChecked(ltmTool->showEvents->isChecked());
     cl->addWidget(ltmTool);
 
@@ -129,7 +150,8 @@ LTMWindow::LTMWindow(Context *context) :
     //!!! connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
     connect(ltmTool->applyButton, SIGNAL(clicked(bool)), this, SLOT(applyClicked(void)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
-    connect(rShade, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
+    connect(ltmTool->showData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
+    connect(rData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
     connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(showEventsClicked(int)));
     connect(rEvents, SIGNAL(stateChanged(int)), this, SLOT(showEventsClicked(int)));
@@ -160,9 +182,16 @@ void
 LTMWindow::refreshPlot()
 {
     if (amVisible() == true) {
-        plotted = DateRange(settings.start.date(), settings.end.date());
-        ltmPlot->setData(&settings);
-        dirty = false;
+
+        if (ltmTool->showData->isChecked()) {
+
+            refreshDataTable();
+
+        } else {
+            plotted = DateRange(settings.start.date(), settings.end.date());
+            ltmPlot->setData(&settings);
+            dirty = false;
+        }
     }
 }
 
@@ -349,13 +378,29 @@ LTMWindow::groupBySelected(int selected)
 }
 
 void
+LTMWindow::showDataClicked(int state)
+{
+    bool checked = state;
+
+    // only change if changed, to avoid endless looping
+    if (ltmTool->showData->isChecked() != checked) ltmTool->showData->setChecked(checked);
+    if (rData->isChecked()!=checked) rData->setChecked(checked);
+
+    if (settings.showData != checked) {
+
+        settings.showData = checked;
+        refreshPlot();
+        stack->setCurrentIndex(checked ? 1 : 0);
+    }
+}
+
+void
 LTMWindow::shadeZonesClicked(int state)
 {
     bool checked = state;
 
     // only change if changed, to avoid endless looping
     if (ltmTool->shadeZones->isChecked() != checked) ltmTool->shadeZones->setChecked(checked);
-    if (rShade->isChecked() != checked) rShade->setChecked(checked);
     settings.shadeZones = state;
     refreshPlot();
 }
@@ -427,9 +472,9 @@ LTMWindow::saveClicked()
 }
 
 int
-LTMWindow::groupForDate(QDate date, int groupby)
+LTMWindow::groupForDate(QDate date)
 {
-    switch(groupby) {
+    switch(settings.groupBy) {
     case LTM_WEEK:
         {
         // must start from 1 not zero!
@@ -449,9 +494,260 @@ LTMWindow::pointClicked(QwtPlotCurve*curve, int index)
     // get the date range for this point
     QDate start, end;
     LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
-                        groupForDate(settings.start.date(), settings.groupBy),
+                        groupForDate(settings.start.date()),
                         settings.groupBy);
     lsd->dateRange((int)round(curve->sample(index).x()), start, end);
     ltmPopup->setData(settings, start, end);
     popup->show();
+}
+
+class GroupedData {
+
+    public:
+        QVector<double> x, y; // x and y data for each metric
+        int maxdays;
+};
+
+void
+LTMWindow::refreshDataTable()
+{
+    // update the webview to the data table
+	dataSummary->page()->mainFrame()->setHtml("");
+
+    // now set to new (avoids a weird crash)
+    QString summary;
+
+    summary = "<center>";
+
+    // device summary for ride summary, otherwise how many activities?
+    summary += "<p><h3>" + settings.title + tr(" grouped by ");
+
+    switch (settings.groupBy) {
+    case LTM_DAY :
+        summary += tr("time of day");
+        break;
+    case LTM_WEEK :
+        summary += tr("week");
+        break;
+    case LTM_MONTH :
+        summary += tr("month");
+        break;
+    case LTM_YEAR :
+        summary += tr("year");
+        break;
+    case LTM_TOD :
+        summary += tr("time of day");
+        break;
+    }
+    summary += "</h3><p>";
+
+    //
+    // STEP1: AGGREGATE DATA INTO GROUPBY FOR EACH METRIC
+    //        This is essentially a refactored version of createCurveData
+    //        from LTMPlot, but updated to produce aggregates for all metrics
+    //        at once, so we can embed into an HTML table
+    //
+    QList<GroupedData> aggregates;
+
+    foreach (MetricDetail metricDetail, settings.metrics) {
+
+        QList<SummaryMetrics> *data = NULL; // source data (metrics, bests etc)
+        GroupedData a; // aggregated data
+
+        // resize the curve array to maximum possible size
+        a.maxdays = groupForDate(settings.end.date()) - groupForDate(settings.start.date());
+        a.x.resize(a.maxdays+1);
+        a.y.resize(a.maxdays+1);
+
+        // set source for data
+        QList<SummaryMetrics> PMCdata;
+        if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
+            data = settings.data;
+        } else if (metricDetail.type == METRIC_MEASURE) {
+            data = settings.measures;
+        } else if (metricDetail.type == METRIC_PM) {
+            // PMC fixup later
+            ltmPlot->createPMCCurveData(&settings, metricDetail, PMCdata);
+            data = &PMCdata;
+        } else if (metricDetail.type == METRIC_BEST) {
+            data = settings.bests;
+        }
+
+        // initialise before looping through the data for this metric
+        int n=-1;
+        int lastDay=0;
+        unsigned long secondsPerGroupBy=0;
+        bool wantZero = true;
+
+        foreach (SummaryMetrics rideMetrics, *data) { 
+
+            // filter out unwanted rides but not for PMC type metrics
+            // because that needs to be done in the stress calculator
+            if (metricDetail.type != METRIC_PM && context->isfiltered && 
+                !context->filters.contains(rideMetrics.getFileName())) continue;
+
+            // day we are on
+            int currentDay = groupForDate(rideMetrics.getRideDate().date());
+
+            // value for day -- measures are stored differently
+            double value;
+            if (metricDetail.type == METRIC_MEASURE)
+                value = rideMetrics.getText(metricDetail.symbol, "0.0").toDouble();
+            else if (metricDetail.type == METRIC_BEST)
+                value = rideMetrics.getForSymbol(metricDetail.bestSymbol);
+            else
+                value = rideMetrics.getForSymbol(metricDetail.symbol);
+
+            // check values are bounded to stop QWT going berserk
+            if (isnan(value) || isinf(value)) value = 0;
+
+            // Special computed metrics (LTS/STS) have a null metric pointer
+            if (metricDetail.type != METRIC_BEST && metricDetail.metric) {
+                // convert from stored metric value to imperial
+                if (context->athlete->useMetricUnits == false) {
+                    value *= metricDetail.metric->conversion();
+                    value += metricDetail.metric->conversionSum();
+                }
+
+            // convert seconds to hours
+            if (metricDetail.metric->units(true) == "seconds" ||
+                metricDetail.metric->units(true) == tr("seconds")) value /= 3600;
+            }
+
+            if (value || wantZero) {
+                unsigned long seconds = rideMetrics.getForSymbol("workout_time");
+                if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_MEASURE) seconds = 1;
+                if (currentDay > lastDay) {
+                    if (lastDay && wantZero) {
+                        while (lastDay<currentDay) {
+                            lastDay++;
+                            n++;
+                            a.x[n]=lastDay - groupForDate(settings.start.date());
+                            a.y[n]=0;
+                        }
+                    } else {
+                        n++;
+                    }
+
+                    a.y[n] = value;
+                    a.x[n] = currentDay - groupForDate(settings.start.date());
+                    secondsPerGroupBy = seconds; // reset for new group
+                } else {
+                    // sum totals, average averages and choose best for Peaks
+                    int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
+
+                    if (metricDetail.uunits == "Ramp" ||
+                        metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
+
+                    if (metricDetail.type == METRIC_BEST) type = RideMetric::Peak;
+
+                    switch (type) {
+                    case RideMetric::Total:
+                        a.y[n] += value;
+                        break;
+                    case RideMetric::Average:
+                        {
+                        // average should be calculated taking into account
+                        // the duration of the ride, otherwise high value but
+                        // short rides will skew the overall average
+                        a.y[n] = ((a.y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                        break;
+                        }
+                    case RideMetric::Low:
+                        if (value < a.y[n]) a.y[n] = value;
+                        break;
+                    case RideMetric::Peak:
+                        if (value > a.y[n]) a.y[n] = value;
+                        break;
+                    }
+                    secondsPerGroupBy += seconds; // increment for same group
+                }
+                lastDay = currentDay;
+            }
+        }
+
+        // save to our list
+        aggregates << a;
+    }
+
+    //
+    // STEP 2: PREPARE HTML TABLE FROM AGGREGATED DATA
+    //         But note there will be no data if there are no curves of if there
+    //         is no date range selected of no data anyway!
+    //
+    if (aggregates.count()) {
+
+        // formatting ...
+        QColor color = QApplication::palette().alternateBase().color();
+        color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+        LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
+
+        // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
+        summary += "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>Date</b></td>";
+        summary = summary.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20)));
+
+        // metric name
+        for (int i=0; i < settings.metrics.count(); i++) {
+            summary += "<td align=\"center\" valign=\"top\">"
+                       "<b>%1</b></td>";
+
+            QString name = settings.metrics[i].name;
+            if (name == "Coggan Acute Training Load") name = "ATL";
+            if (name == "Coggan Chronic Training Load") name = "CTL";
+            if (name == "Coggan Training Stress Balance") name = "TSB";
+
+            summary = summary.arg(name);
+        }
+        summary += "</tr><tr><td></td>";
+
+        // units
+        for (int i=0; i < settings.metrics.count(); i++) {
+            summary += "<td align=\"center\" valign=\"top\">"
+                       "<b>%1</b></td>";
+            QString units = settings.metrics[i].uunits;
+            if (units == tr("seconds")) units = tr("hours");
+            summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
+        }
+        summary += "</tr>";
+
+        for(int i=0; i<aggregates[0].y.count(); i++) {
+
+            if (i%2) summary += "<tr bgcolor='" + color.name() + "'>";
+            else summary += "<tr>";
+
+            // date / month year etc
+            summary += "<td align=\"center\" valign=\"top\">%1</td>";
+            summary = summary.arg(lsd.label(aggregates[0].x[i]+0.5).text());
+
+            // each metric value
+            for(int j=0; j<aggregates.count(); j++) {
+                summary += "<td align=\"center\" valign=\"top\">%1</td>";
+
+                // now format the actual value....
+                const RideMetric *m = settings.metrics[j].metric;
+                if (m != NULL) {
+
+                    // handle precision of 1 for seconds converted to hours
+                    int precision = m->precision();
+                    if (settings.metrics[j].uunits == "seconds") precision=1;
+
+                    // we have a metric so lets be precise ...
+                    QString v = QString("%1").arg(aggregates[j].y[i] * (context->athlete->useMetricUnits ? 1 : m->conversion())
+                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum()), 0, 'f', precision);
+
+                    summary = summary.arg(v);
+
+                } else {
+                    // no precision
+                    summary = summary.arg(QString("%1").arg(aggregates[j].y[i], 0, 'f', 0));
+                }
+            }
+            summary += "</tr>";
+        }
+        summary += "</table>";
+    }
+    summary += "</center>";
+
+    // now set it
+	dataSummary->page()->mainFrame()->setHtml(summary);
 }
