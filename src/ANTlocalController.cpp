@@ -30,6 +30,9 @@ ANTlocalController::ANTlocalController(TrainSidebar *parent, DeviceConfiguration
     connect(myANTlocal, SIGNAL(lostDevice(int)), this, SIGNAL(lostDevice(int)));
     connect(myANTlocal, SIGNAL(searchTimeout(int)), this, SIGNAL(searchTimeout(int)));
 
+    // collecting R-R HRV data?
+    connect(myANTlocal, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)), this, SIGNAL(rrData(uint16_t, uint8_t, uint8_t)));
+
     // Connect a logger
     connect(myANTlocal, SIGNAL(receivedAntMessage(const ANTMessage ,const timeval )), &logger, SLOT(logRawAntMessage(const ANTMessage ,const timeval)));
 }

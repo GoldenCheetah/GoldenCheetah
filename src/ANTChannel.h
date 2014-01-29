@@ -181,5 +181,8 @@ class ANTChannel : public QObject {
         void staleInfo(int number);   // the connection is stale
         void searchTimeout(int number); // search timed out
         void searchComplete(int number); // search completed successfully
+
+        // signal instantly on data receipt for R-R data
+        void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 };
 #endif

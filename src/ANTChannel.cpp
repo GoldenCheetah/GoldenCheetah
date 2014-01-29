@@ -488,6 +488,10 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    nullCount = 0;
                    parent->setBPM(antMessage.instantHeartrate);
                    value2 = value = antMessage.instantHeartrate;
+
+                    // lets emit a signal for collected HR R-R data
+                    emit rrData(antMessage.measurementTime, antMessage.heartrateBeats, antMessage.instantHeartrate);
+
                } else {
                    nullCount++;
                    if (nullCount >= 12) {
