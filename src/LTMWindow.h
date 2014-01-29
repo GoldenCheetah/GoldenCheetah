@@ -22,6 +22,8 @@
 #include "MainWindow.h" // for isfiltered and filters
 
 #include <QtGui>
+#include <QStackedWidget>
+#include <QWebView>
 #include <QTimer>
 #include "Context.h"
 #include "MetricAggregator.h"
@@ -88,6 +90,7 @@ class LTMWindow : public GcChartWindow
                                                               // but it may be helpful to some users
     Q_PROPERTY(int bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
+    Q_PROPERTY(bool data READ data WRITE setData USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(bool events READ events WRITE setEvents USER true)
 #ifdef GC_HAVE_LUCENE
@@ -122,6 +125,8 @@ class LTMWindow : public GcChartWindow
         void setBin(int x) { rGroupBy->setValue(x); ltmTool->groupBy->setCurrentIndex(x); }
         bool shade() const { return ltmTool->shadeZones->isChecked(); }
         void setShade(bool x) { ltmTool->shadeZones->setChecked(x); }
+        bool data() const { return ltmTool->showData->isChecked(); }
+        void setData(bool x) { ltmTool->showData->setChecked(x); }
         bool legend() const { return ltmTool->showLegend->isChecked(); }
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
         bool events() const { return ltmTool->showEvents->isChecked(); }
@@ -167,18 +172,20 @@ class LTMWindow : public GcChartWindow
     public slots:
         void rideSelected();
         void refreshPlot();
+        void refreshDataTable();
         void dateRangeChanged(DateRange);
         void filterChanged();
         void groupBySelected(int);
         void rGroupBySelected(int);
         void shadeZonesClicked(int);
+        void showDataClicked(int);
         void showEventsClicked(int);
         void showLegendClicked(int);
         void saveClicked();
         void applyClicked();
         void refresh();
         void pointClicked(QwtPlotCurve*, int);
-        int groupForDate(QDate, int);
+        int groupForDate(QDate);
 
         void useCustomRange(DateRange);
         void useStandardRange();
@@ -191,6 +198,12 @@ class LTMWindow : public GcChartWindow
         bool useCustom;
         bool useToToday; // truncate to today
         DateRange custom; // custom date range supplied
+
+        // stack for plot or summary
+        QStackedWidget *stack;
+
+        // summary view
+        QWebView *dataSummary;
 
         // qwt picker
         LTMToolTip *picker;
@@ -214,7 +227,7 @@ class LTMWindow : public GcChartWindow
 
         // reveal controls
         QxtStringSpinBox    *rGroupBy;
-        QCheckBox           *rShade,
+        QCheckBox           *rData,
                             *rEvents;
 };
 

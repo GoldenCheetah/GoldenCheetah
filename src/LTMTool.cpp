@@ -95,6 +95,10 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     basicsettingsLayout->addRow(new QLabel(tr("Group by")), groupBy);
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 
+    showData = new QCheckBox(tr("Data Table"));
+    showData->setChecked(false);
+    basicsettingsLayout->addRow(new QLabel(""), showData);
+
     shadeZones = new QCheckBox(tr("Shade Zones"));
     basicsettingsLayout->addRow(new QLabel(""), shadeZones);
 
