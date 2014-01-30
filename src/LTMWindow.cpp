@@ -511,6 +511,17 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
+    // truncate date range to the actual data!
+    if (settings.data != NULL && (*settings.data).count() != 0) {
+        // end
+        if (settings.end == QDateTime() || settings.end > (*settings.data).last().getRideDate())
+                settings.end = (*settings.data).last().getRideDate();
+
+        // start
+        if (settings.start == QDateTime() || settings.start < (*settings.data).first().getRideDate()) 
+            settings.start = (*settings.data).first().getRideDate();
+    }
+
     // update the webview to the data table
 	dataSummary->page()->mainFrame()->setHtml("");
 
@@ -524,7 +535,7 @@ LTMWindow::refreshDataTable()
 
     switch (settings.groupBy) {
     case LTM_DAY :
-        summary += tr("time of day");
+        summary += tr("day");
         break;
     case LTM_WEEK :
         summary += tr("week");
@@ -575,9 +586,9 @@ LTMWindow::refreshDataTable()
 
         // initialise before looping through the data for this metric
         int n=-1;
-        int lastDay=0;
+        int lastDay=groupForDate(settings.start.date());
         unsigned long secondsPerGroupBy=0;
-        bool wantZero = true;
+        bool wantZero = settings.groupBy != LTM_DAY; // not zeros for days -- too many blank lines!
 
         foreach (SummaryMetrics rideMetrics, *data) { 
 
@@ -617,9 +628,9 @@ LTMWindow::refreshDataTable()
             if (value || wantZero) {
                 unsigned long seconds = rideMetrics.getForSymbol("workout_time");
                 if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_MEASURE) seconds = 1;
-                if (currentDay > lastDay) {
+                if (n < a.x.size() && currentDay > lastDay) {
                     if (lastDay && wantZero) {
-                        while (lastDay<currentDay) {
+                        while (n<(a.x.size()-1) && lastDay<currentDay) {
                             lastDay++;
                             n++;
                             a.x[n]=lastDay - groupForDate(settings.start.date());
@@ -640,6 +651,9 @@ LTMWindow::refreshDataTable()
                         metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
                     if (metricDetail.type == METRIC_BEST) type = RideMetric::Peak;
+
+                    // just in case
+                    if (n < 0) n=0;
 
                     switch (type) {
                     case RideMetric::Total:
@@ -664,6 +678,12 @@ LTMWindow::refreshDataTable()
                 }
                 lastDay = currentDay;
             }
+        }
+
+        // truncate if skipping zeros
+        if (n>0 && !wantZero) {
+            a.x.resize(n);
+            a.y.resize(n);
         }
 
         // save to our list
