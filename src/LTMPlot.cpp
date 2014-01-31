@@ -855,7 +855,13 @@ LTMPlot::setData(LTMSettings *set)
             // loop through each NONZERO value and add a label
             for  (int i=0; i<xdata.count(); i++) {
 
-                if (ydata[i]) {
+                // we only want to do once per bar, which has 4 points
+                if (metricDetail.curveStyle == QwtPlotCurve::Steps && (i+1)%4) continue;
+
+                double value = metricDetail.curveStyle == QwtPlotCurve::Steps ? ydata[i-1] : ydata[i];
+
+                // bar headings always need to be centered
+                if (value) {
 
                     // format the label appropriately
                     const RideMetric *m = metricDetail.metric;
@@ -868,12 +874,12 @@ LTMPlot::setData(LTMSettings *set)
                         if (metricDetail.uunits == "seconds") precision=1;
 
                         // we have a metric so lets be precise ...
-                        labelString = QString("%1").arg(ydata[i] * (context->athlete->useMetricUnits ? 1 : m->conversion())
+                        labelString = QString("%1").arg(value * (context->athlete->useMetricUnits ? 1 : m->conversion())
                                     + (context->athlete->useMetricUnits ? 0 : m->conversionSum()), 0, 'f', precision);
 
                     } else {
                         // no precision
-                        labelString = (QString("%1").arg(ydata[i], 0, 'f', 0));
+                        labelString = (QString("%1").arg(value, 0, 'f', 0));
                     }
 
 
@@ -886,10 +892,20 @@ LTMPlot::setData(LTMSettings *set)
                     QwtPlotMarker *label = new QwtPlotMarker();
                     label->setLabel(text);
                     label->setValue(xdata[i], ydata[i]);
-                    label->setSpacing(3); // 3px space
+                    label->setYAxis(axisid);
+                    label->setSpacing(3); // not px but by yaxis value !? mad.
 
                     // Bars(steps) / sticks / dots: label above centered
-                    // Line: label above/below depending upon the shape of the curve
+                    // but bars have multiple points offset from their actual
+                    // so need to adjust bars to centre above the top of the bar
+                    if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+
+                        // We only get every fourth point, so center
+                        // between second and third point of bar "square"
+                        label->setValue((xdata[i-1]+xdata[i-2])/2.00f, ydata[i-1]);
+                    }
+
+                    // Lables on a Line curve should be above/below depending upon the shape of the curve
                     if (metricDetail.curveStyle == QwtPlotCurve::Lines) {
 
                         label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
