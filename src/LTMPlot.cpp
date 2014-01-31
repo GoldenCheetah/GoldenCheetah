@@ -923,7 +923,7 @@ LTMPlot::setData(LTMSettings *set)
                             // first point on curve
                             label->setLabelAlignment(Qt::AlignBottom | Qt::AlignCenter);
 
-                        } else if ((i == ydata.count()-3) && ydata[i-1] > ydata[i]) {
+                        } else if (i && (i == ydata.count()-3) && ydata[i-1] > ydata[i]) {
 
                             // last point on curve
                             label->setLabelAlignment(Qt::AlignBottom | Qt::AlignCenter);
