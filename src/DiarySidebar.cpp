@@ -89,7 +89,7 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     summarySelect->addItem(tr("Day Summary"));
     summarySelect->addItem(tr("Weekly Summary"));
     summarySelect->addItem(tr("Monthly Summary"));
-    summarySelect->setCurrentIndex(1); // default to weekly
+    summarySelect->setCurrentIndex(2); // default to monthly
     h->addStretch();
     h->addWidget(summarySelect, Qt::AlignCenter);
     h->addStretch();
