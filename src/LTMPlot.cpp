@@ -912,7 +912,12 @@ LTMPlot::setData(LTMSettings *set)
 
                         // we could simplify this into one if clause but it wouldn't be
                         // so obvious what we were doing
-                        if (i && i < ydata.count()) {
+                        if (i && (i == ydata.count()-3) && ydata[i-1] > ydata[i]) {
+
+                            // last point on curve
+                            label->setLabelAlignment(Qt::AlignBottom | Qt::AlignCenter);
+
+                        } else if (i && i < ydata.count()) {
 
                             // is a low / valley
                             if (ydata[i-1] > ydata[i] && ydata[i+1] > ydata[i])
@@ -922,12 +927,6 @@ LTMPlot::setData(LTMSettings *set)
 
                             // first point on curve
                             label->setLabelAlignment(Qt::AlignBottom | Qt::AlignCenter);
-
-                        } else if (i && (i == ydata.count()-3) && ydata[i-1] > ydata[i]) {
-
-                            // last point on curve
-                            label->setLabelAlignment(Qt::AlignBottom | Qt::AlignCenter);
-
                         }
 
                     } else {
