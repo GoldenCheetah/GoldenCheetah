@@ -81,6 +81,7 @@ class LTMPlot : public QwtPlot
 
         QHash<QString, QwtPlotCurve*> curves; // metric symbol with curve object
         QHash<QString, QwtAxisId> axes;             // units and associated axis
+        QList<QwtPlotMarker*> labels;                // labels
         LTMScaleDraw *scale;
         QwtPlotGrid *grid;
         QDate firstDate,

@@ -1066,6 +1066,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     fillCurve = new QCheckBox("", this);
     fillCurve->setChecked(metricDetail->fillCurve);
  
+    labels = new QCheckBox(tr("Data labels"), this);
+    labels->setChecked(metricDetail->labels);
+ 
     // color background...
     penColor = metricDetail->penColor;
     setButtonIcon(penColor);
@@ -1139,6 +1142,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(baseLine, 5,3);
     grid->addWidget(trendType, 7,2);
     grid->addWidget(curveSmooth, 8,2);
+    grid->addWidget(labels, 9,2);
 
     mainLayout->addLayout(grid);
 
@@ -1227,6 +1231,7 @@ EditMetricDetailDialog::metricSelected()
     curveSmooth->setChecked(ltmTool->metrics[index].smooth);
     curveTrend->setChecked(ltmTool->metrics[index].trend);
     fillCurve->setChecked(ltmTool->metrics[index].fillCurve);
+    labels->setChecked(ltmTool->metrics[index].labels);
     stack->setChecked(ltmTool->metrics[index].stack);
     showBest->setValue(ltmTool->metrics[index].topN);
     showOut->setValue(ltmTool->metrics[index].topOut);
@@ -1327,6 +1332,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
     metricDetail->fillCurve = fillCurve->isChecked();
+    metricDetail->labels = labels->isChecked();
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();

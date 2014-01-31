@@ -62,7 +62,7 @@ class MetricDetail {
     MetricDetail() : type(METRIC_DB), stack(false), name(""), metric(NULL), smooth(false), trend(false), topN(0),
                      topOut(0), baseline(0.0), curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
-                     brushColor(Qt::black), brushAlpha(0), fillCurve(false) {}
+                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false) {}
 
     bool operator< (MetricDetail right) const { return name < right.name; }
 
@@ -112,6 +112,9 @@ class MetricDetail {
 
     // fill curve
     bool fillCurve;
+
+    // text labels against values
+    bool labels;
 };
 
 // so we can marshal and unmarshall LTMSettings when we save
