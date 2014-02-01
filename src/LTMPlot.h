@@ -67,6 +67,7 @@ class LTMPlot : public QwtPlot
 
         LTMWindow *parent;
         double minY[10], maxY[10], maxX;      // for all possible 10 curves
+        void resetPMC();
         void createPMCCurveData(LTMSettings *, MetricDetail, QList<SummaryMetrics> &);
 
     private:
