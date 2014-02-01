@@ -742,7 +742,66 @@ LTMPlot::setData(LTMSettings *set)
             top->setBaseline(0);
             top->setYAxis(axisid);
             top->attach(this);
+
+            // if we haven't already got data labels selected for this curve
+            // then lets put some on, just for the topN, since they are of
+            // interest to the user and typically the first thing they do
+            // is move mouse over to get a tooltip anyway!
+            if (!metricDetail.labels) {
+
+                QFont labelFont;
+                labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+                labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+                // loop through each NONZERO value and add a label
+                for  (int i=0; i<hxdata.count(); i++) {
+
+                    double value = hydata[i];
+
+                    // bar headings always need to be centered
+                    if (value) {
+
+                        // format the label appropriately
+                        const RideMetric *m = metricDetail.metric;
+                        QString labelString;
+
+                        if (m != NULL) {
+
+                            // handle precision of 1 for seconds converted to hours
+                            int precision = m->precision();
+                            if (metricDetail.uunits == "seconds") precision=1;
+
+                            // we have a metric so lets be precise ...
+                            labelString = QString("%1").arg(value * (context->athlete->useMetricUnits ? 1 : m->conversion())
+                                        + (context->athlete->useMetricUnits ? 0 : m->conversionSum()), 0, 'f', precision);
+
+                        } else {
+                            // no precision
+                            labelString = (QString("%1").arg(value, 0, 'f', 0));
+                        }
+
+
+                        // Qwt uses its own text objects
+                        QwtText text(labelString);
+                        text.setFont(labelFont);
+                        text.setColor(metricDetail.penColor);
+
+                        // make that mark -- always above with topN
+                        QwtPlotMarker *label = new QwtPlotMarker();
+                        label->setLabel(text);
+                        label->setValue(hxdata[i], hydata[i]);
+                        label->setYAxis(axisid);
+                        label->setSpacing(3); // not px but by yaxis value !? mad.
+                        label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
+
+                        // and attach
+                        label->attach(this);
+                        labels << label;
+                    }
+                }
+            }
         }
+
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
             
             // fill the bars
