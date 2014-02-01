@@ -791,7 +791,7 @@ LTMPlot::setData(LTMSettings *set)
                         label->setLabel(text);
                         label->setValue(hxdata[i], hydata[i]);
                         label->setYAxis(axisid);
-                        label->setSpacing(3); // not px but by yaxis value !? mad.
+                        label->setSpacing(6); // not px but by yaxis value !? mad.
                         label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
 
                         // and attach
