@@ -73,6 +73,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devConf(devConf)
 {
     qRegisterMetaType<ANTMessage>("ANTMessage");
+    qRegisterMetaType<uint16_t>("uint16_t");
+    qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<struct timeval>("struct timeval");
 
     // device status and settings

@@ -1,4 +1,4 @@
-/*;
+/*
  * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
  * Copyright (c) 2009 Mark Rages (Quarq)
  *
@@ -19,6 +19,8 @@
 
 #include "ANT.h"
 #include <QDebug>
+
+//static uint16_t mtlast=0;
 
 //
 // This ANTMessage class is to decode and Encode ANT Messages
@@ -369,6 +371,10 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 measurementTime = message[8] + (message[9]<<8);
                 heartrateBeats =  message[10];
                 instantHeartrate = message[11];
+
+                //if (measurementTime - mtlast)
+                //qDebug()<<"measurement"<<(measurementTime-mtlast)<<"hr="<<instantHeartrate<<"beats="<<heartrateBeats;
+                //mtlast = measurementTime;
                 break;
 
 /*
