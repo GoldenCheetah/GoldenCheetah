@@ -402,6 +402,10 @@ ErgFilePlot::setData(ErgFile *ergfile)
             setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new HourTimeScaleDraw()));
         setAxisScale(xBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
     }
+
+    // make the xBottom scale visible
+    enableAxis(xBottom, true);
+    setAxisVisible(xBottom, true);
 }
 
 void
