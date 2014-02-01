@@ -230,7 +230,6 @@ LTMWindow::refresh()
 
     // refresh for changes to ridefiles / zones
     if (amVisible() == true && context->athlete->metricDB != NULL) {
-
         results.clear(); // clear any old data
         results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
@@ -511,16 +510,20 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
-    // truncate date range to the actual data!
+    // truncate date range to the actual data when not set to any date
     if (settings.data != NULL && (*settings.data).count() != 0) {
+
         // end
-        if (settings.end == QDateTime() || settings.end > (*settings.data).last().getRideDate())
+        if (settings.end == QDateTime() || settings.end.date() > QDate::currentDate().addYears(40))
                 settings.end = (*settings.data).last().getRideDate();
 
         // start
-        if (settings.start == QDateTime() || settings.start < (*settings.data).first().getRideDate()) 
+        if (settings.start == QDateTime() || settings.start.date() < QDate::currentDate().addYears(-40))
             settings.start = (*settings.data).first().getRideDate();
     }
+
+    // need to redo this
+    ltmPlot->resetPMC();
 
     // update the webview to the data table
 	dataSummary->page()->mainFrame()->setHtml("");
@@ -588,7 +591,7 @@ LTMWindow::refreshDataTable()
         int n=-1;
         int lastDay=groupForDate(settings.start.date());
         unsigned long secondsPerGroupBy=0;
-        bool wantZero = settings.groupBy != LTM_DAY; // not zeros for days -- too many blank lines!
+        bool wantZero = true;
 
         foreach (SummaryMetrics rideMetrics, *data) { 
 
@@ -680,14 +683,14 @@ LTMWindow::refreshDataTable()
             }
         }
 
-        // truncate if skipping zeros
-        if (n>0 && !wantZero) {
-            a.x.resize(n);
-            a.y.resize(n);
-        }
-
         // save to our list
         aggregates << a;
+    }
+
+    // fill in the remainder if data doesn't extend to
+    // the period we are summarising
+    for (int n=0; n < aggregates[0].x.count(); n++) {
+        aggregates[0].x[n] = n;
     }
 
     //
@@ -731,6 +734,18 @@ LTMWindow::refreshDataTable()
         summary += "</tr>";
 
         for(int i=0; i<aggregates[0].y.count(); i++) {
+
+            // in day mode we don't list all the zeroes .. its too many!
+            bool nonzero = false;
+            if (settings.groupBy == LTM_DAY) {
+
+                // nonzeros?
+                for(int j=0; j<aggregates.count(); j++) 
+                    if (int(aggregates[j].y[i])) nonzero = true;
+
+                // skip all zeroes if day mode
+                if (nonzero == false) continue;
+            }
 
             if (i%2) summary += "<tr bgcolor='" + color.name() + "'>";
             else summary += "<tr>";

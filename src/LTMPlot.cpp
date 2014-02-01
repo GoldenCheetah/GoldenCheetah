@@ -152,6 +152,13 @@ LTMPlot::setAxisTitle(QwtAxisId axis, QString label)
 }
 
 void
+LTMPlot::resetPMC()
+{
+    if (cogganPMC) { delete cogganPMC; cogganPMC=NULL; }
+    if (skibaPMC) { delete skibaPMC; skibaPMC=NULL; }
+}
+
+void
 LTMPlot::setData(LTMSettings *set)
 {
     QTime timer;
