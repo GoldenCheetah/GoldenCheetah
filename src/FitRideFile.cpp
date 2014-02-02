@@ -690,39 +690,49 @@ struct FitFileReaderState
             delete rideFile;
             return NULL;
         }
-        int header_size = read_uint8();
-        if (header_size != 12 && header_size != 14) {
-            errors << QString("bad header size: %1").arg(header_size);
-            file.close();
-            delete rideFile;
+
+        int data_size = 0;
+        try {
+
+            // read the header
+            int header_size = read_uint8();
+            if (header_size != 12 && header_size != 14) {
+                errors << QString("bad header size: %1").arg(header_size);
+                file.close();
+                delete rideFile;
+                return NULL;
+            }
+            int protocol_version = read_uint8();
+            (void) protocol_version;
+
+            // if the header size is 14 we have profile minor then profile major
+            // version. We still don't do anything with this information
+            int profile_version = read_uint16(false); // always littleEndian
+            (void) profile_version; // not sure what to do with this
+
+            data_size = read_uint32(false); // always littleEndian
+            char fit_str[5];
+            if (file.read(fit_str, 4) != 4) {
+                errors << "truncated header";
+                file.close();
+                delete rideFile;
+                return NULL;
+            }
+            fit_str[4] = '\0';
+            if (strcmp(fit_str, ".FIT") != 0) {
+                errors << QString("bad header, expected \".FIT\" but got \"%1\"").arg(fit_str);
+                file.close();
+                delete rideFile;
+                return NULL;
+            }
+
+            // read the rest of the header
+            if (header_size == 14) read_uint16(false);
+
+        } catch (TruncatedRead &e) {
+            errors << "truncated file body";
             return NULL;
         }
-        int protocol_version = read_uint8();
-        (void) protocol_version;
-
-        // if the header size is 14 we have profile minor then profile major
-        // version. We still don't do anything with this information
-        int profile_version = read_uint16(false); // always littleEndian
-        (void) profile_version; // not sure what to do with this
-
-        int data_size = read_uint32(false); // always littleEndian
-        char fit_str[5];
-        if (file.read(fit_str, 4) != 4) {
-            errors << "truncated header";
-            file.close();
-            delete rideFile;
-            return NULL;
-        }
-        fit_str[4] = '\0';
-        if (strcmp(fit_str, ".FIT") != 0) {
-            errors << QString("bad header, expected \".FIT\" but got \"%1\"").arg(fit_str);
-            file.close();
-            delete rideFile;
-            return NULL;
-        }
-
-        // read the rest of the header
-        if (header_size == 14) read_uint16(false);
 
         int bytes_read = 0;
         bool stop = false;
