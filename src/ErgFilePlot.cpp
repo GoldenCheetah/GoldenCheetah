@@ -134,6 +134,9 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
     axisWidget(QwtPlot::xBottom)->setPalette(pal);
 
+    // axis 1 not currently used
+    setAxisVisible(QwtAxisId(QwtAxis::yRight,1), false); // max speed of 60mph/60kmh seems ok to me!
+    enableAxis(QwtAxisId(QwtAxis::yRight,1).id, false);
 
     // set all the orher axes off but scaled
     setAxisScale(yLeft, 0, 300); // max cadence and hr
@@ -142,7 +145,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     setAxisScale(yRight, 0, 250); // max cadence and hr
     enableAxis(yRight, false);
-    setAxisScale(QwtAxisId(QwtAxis::yRight,2).id, 0, 60); // max speed of 60mph/60kmh seems ok to me!
+    setAxisScale(QwtAxisId(QwtAxis::yRight,2), 0, 60); // max speed of 60mph/60kmh seems ok to me!
+    setAxisVisible(QwtAxisId(QwtAxis::yRight,2), false); // max speed of 60mph/60kmh seems ok to me!
     enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
 
     // data bridge to ergfile
@@ -185,6 +189,10 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     pal.setColor(QPalette::WindowText, GColor(CWBAL));
     pal.setColor(QPalette::Text, GColor(CWBAL));
     axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
+    QwtPlot::setAxisFont(QwtAxisId(QwtAxis::yRight, 3), stGiles);
+    QwtText title2("W'bal");
+    title2.setFont(stGiles);
+    QwtPlot::setAxisTitle(QwtAxisId(QwtAxis::yRight,3), title2);
 
     // telemetry history
     wattsCurve = new QwtPlotCurve("Power");
@@ -372,7 +380,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
         wbalCurveActual->setSamples(empty, empty);
 
         // compute wbal curve for the erg file
-        calculator;
         calculator.setErg(ergfile);
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("W' Balance (j)"));
