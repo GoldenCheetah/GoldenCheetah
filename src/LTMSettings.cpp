@@ -142,7 +142,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(6); // version 6
+    out<<int(7); // version 7
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         out<<metric.type;
@@ -178,6 +178,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     }
     out<<settings.showData;
     out<<settings.stack;
+    out<<settings.stackWidth;
     return out;
 }
 
@@ -271,6 +272,9 @@ while(counter-- && !in.atEnd()) {
     if (version >= 4) in >> settings.showData;
     if (version >= 6) {
         in >>settings.stack;
+    }
+    if (version >= 7) {
+        in >>settings.stackWidth;
     }
 
     return in;

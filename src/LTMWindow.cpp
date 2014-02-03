@@ -158,6 +158,7 @@ LTMWindow::LTMWindow(Context *context) :
     settings.shadeZones = ltmTool->shadeZones->isChecked();
     settings.showData = ltmTool->showData->isChecked();
     settings.stack = ltmTool->showStack->isChecked();
+    settings.stackWidth = ltmTool->stackSlider->value();
     rData->setChecked(ltmTool->showData->isChecked());
     rStack->setChecked(ltmTool->showStack->isChecked());
     cl->addWidget(ltmTool);
@@ -174,6 +175,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(rData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
     connect(ltmTool->showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
+    connect(ltmTool->stackSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomSliderChanged()));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
     connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(refresh()));
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -300,7 +302,6 @@ LTMWindow::refreshStackPlots()
         // create and setup the plot
         LTMPlot *plot = new LTMPlot(this, context);
         plot->setData(&plotSettings.last());
-        plot->setFixedHeight(200); // maybe make this adjustable later
 
         // now add
         plotsLayout->addWidget(plot);
@@ -310,9 +311,26 @@ LTMWindow::refreshStackPlots()
     // squash em up
     plotsLayout->addStretch();
 
+    // resize to choice
+    zoomSliderChanged();
+
     // we no longer dirty
     stackDirty = false;
 
+    setUpdatesEnabled(true);
+}
+
+void
+LTMWindow::zoomSliderChanged()
+{
+    static int add[] = { 0, 20, 50, 80, 100, 150, 200, 400 };
+    int index = ltmTool->stackSlider->value();
+
+    settings.stackWidth = ltmTool->stackSlider->value();
+    setUpdatesEnabled(false);
+    foreach(LTMPlot *plot, plots) {
+        plot->setFixedHeight(150 + add[index]);
+    }
     setUpdatesEnabled(true);
 }
 
