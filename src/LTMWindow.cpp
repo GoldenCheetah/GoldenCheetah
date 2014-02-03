@@ -714,7 +714,7 @@ LTMWindow::refreshDataTable()
             summary += "<td align=\"center\" valign=\"top\">"
                        "<b>%1</b></td>";
 
-            QString name = settings.metrics[i].name;
+            QString name = settings.metrics[i].uname;
             if (name == "Coggan Acute Training Load") name = "ATL";
             if (name == "Coggan Chronic Training Load") name = "CTL";
             if (name == "Coggan Training Stress Balance") name = "TSB";
@@ -729,6 +729,7 @@ LTMWindow::refreshDataTable()
                        "<b>%1</b></td>";
             QString units = settings.metrics[i].uunits;
             if (units == tr("seconds")) units = tr("hours");
+            if (units == settings.metrics[i].uname) units = "";
             summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
         }
         summary += "</tr>";
