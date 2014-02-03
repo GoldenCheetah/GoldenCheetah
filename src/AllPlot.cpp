@@ -77,7 +77,7 @@ class AllPlotBackground: public QwtPlotItem
     public:
         AllPlotBackground(AllPlot *_parent)
         {
-            setZ(0.0);
+            setZ(-100.0);
             parent = _parent;
         }
 
@@ -222,7 +222,7 @@ class AllPlotZoneLabel: public QwtPlotItem
                 }
             }
 
-            setZ(1.0 + zone_number / 100.0);
+            setZ(-99.00 + zone_number / 100.0);
         }
         virtual int rtti() const
         {
