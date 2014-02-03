@@ -538,10 +538,8 @@ LTMWindow::showStackClicked(int state)
     if (ltmTool->showStack->isChecked() != checked) ltmTool->showStack->setChecked(checked);
     if (rStack->isChecked() != checked) rStack->setChecked(checked);
 
-    if (settings.stack != checked) {
-        settings.stack = checked;
-        refreshPlot();
-    }
+    settings.stack = checked;
+    refreshPlot();
 }
 
 void
