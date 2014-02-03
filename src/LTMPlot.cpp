@@ -668,11 +668,13 @@ LTMPlot::setData(LTMSettings *set)
             // we might have hidden the symbols for this curve
             // if its set to none then default to a rectangle
             QwtSymbol *sym = new QwtSymbol;
-            if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
-                sym->setStyle(QwtSymbol::Rect);
-            else
+            if (metricDetail.symbolStyle == QwtSymbol::NoSymbol) {
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(10);
+            } else {
                 sym->setStyle(metricDetail.symbolStyle);
-            sym->setSize(20);
+                sym->setSize(20);
+            }
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(50);
             sym->setPen(metricDetail.penColor);
@@ -734,11 +736,13 @@ LTMPlot::setData(LTMSettings *set)
             // we might have hidden the symbols for this curve
             // if its set to none then default to a rectangle
             QwtSymbol *sym = new QwtSymbol;
-            if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
-                sym->setStyle(QwtSymbol::Rect);
-            else
+            if (metricDetail.symbolStyle == QwtSymbol::NoSymbol) {
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(6);
+            } else {
                 sym->setStyle(metricDetail.symbolStyle);
-            sym->setSize(12);
+                sym->setSize(12);
+            }
             QColor lighter = metricDetail.penColor;
             lighter.setAlpha(200);
             sym->setPen(metricDetail.penColor);
