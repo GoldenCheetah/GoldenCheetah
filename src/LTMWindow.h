@@ -92,6 +92,7 @@ class LTMWindow : public GcChartWindow
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool data READ data WRITE setData USER true)
     Q_PROPERTY(bool stack READ stack WRITE setStack USER true)
+    Q_PROPERTY(int stackWidth READ stackW WRITE setStackW USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(bool events READ events WRITE setEvents USER true)
 #ifdef GC_HAVE_LUCENE
@@ -134,6 +135,8 @@ class LTMWindow : public GcChartWindow
         void setEvents(bool x) { ltmTool->showEvents->setChecked(x); }
         bool stack() const { return ltmTool->showStack->isChecked(); }
         void setStack(bool x) { ltmTool->showStack->setChecked(x); }
+        int stackW() const { return ltmTool->stackSlider->value(); }
+        void setStackW(int x) { ltmTool->stackSlider->setValue(x); }
 
         // preset selection kind of pointless...
         int chart() const { return 0; }
@@ -186,6 +189,7 @@ class LTMWindow : public GcChartWindow
         void shadeZonesClicked(int);
         void showDataClicked(int);
         void showStackClicked(int);
+        void zoomSliderChanged();
         void showLegendClicked(int);
         void saveClicked();
         void applyClicked();

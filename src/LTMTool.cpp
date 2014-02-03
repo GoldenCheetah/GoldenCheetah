@@ -112,6 +112,14 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     showEvents = new QCheckBox(tr("Show Events"));
     basicsettingsLayout->addRow(new QLabel(""), showEvents);
 
+    stackSlider = new QSlider(Qt::Horizontal,this);
+    stackSlider->setMinimum(0);
+    stackSlider->setMaximum(7);
+    stackSlider->setTickInterval(1);
+    stackSlider->setValue(3);
+    stackSlider->setFixedWidth(100);
+    basicsettingsLayout->addRow(new QLabel("Stack Zoom"), stackSlider); 
+
     // controls
     QGridLayout *presetLayout = new QGridLayout;
     basicLayout->addLayout(presetLayout);
