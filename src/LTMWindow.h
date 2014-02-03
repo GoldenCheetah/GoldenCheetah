@@ -91,6 +91,7 @@ class LTMWindow : public GcChartWindow
     Q_PROPERTY(int bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool data READ data WRITE setData USER true)
+    Q_PROPERTY(bool stack READ stack WRITE setStack USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(bool events READ events WRITE setEvents USER true)
 #ifdef GC_HAVE_LUCENE
@@ -131,6 +132,8 @@ class LTMWindow : public GcChartWindow
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
         bool events() const { return ltmTool->showEvents->isChecked(); }
         void setEvents(bool x) { ltmTool->showEvents->setChecked(x); }
+        bool stack() const { return ltmTool->showStack->isChecked(); }
+        void setStack(bool x) { ltmTool->showStack->setChecked(x); }
 
         // preset selection kind of pointless...
         int chart() const { return 0; }
@@ -170,16 +173,19 @@ class LTMWindow : public GcChartWindow
         }
 
     public slots:
-        void rideSelected();
-        void refreshPlot();
-        void refreshDataTable();
+        void rideSelected();        // notification to refresh
+
+        void refreshPlot();         // normal mode
+        void refreshStackPlots();   // stacked plots
+        void refreshDataTable();    // data table
+
         void dateRangeChanged(DateRange);
         void filterChanged();
         void groupBySelected(int);
         void rGroupBySelected(int);
         void shadeZonesClicked(int);
         void showDataClicked(int);
-        void showEventsClicked(int);
+        void showStackClicked(int);
         void showLegendClicked(int);
         void saveClicked();
         void applyClicked();
@@ -200,7 +206,7 @@ class LTMWindow : public GcChartWindow
         DateRange custom; // custom date range supplied
 
         // stack for plot or summary
-        QStackedWidget *stack;
+        QStackedWidget *stackWidget;
 
         // summary view
         QWebView *dataSummary;
@@ -216,10 +222,19 @@ class LTMWindow : public GcChartWindow
 
         // local state
         bool dirty;
+        bool stackDirty;
+
         LTMSettings settings; // all the plot settings
         QList<SummaryMetrics> results;
         QList<SummaryMetrics> measures;
         QList<SummaryMetrics> bestsresults;
+
+        // when one curve per plot we split the settings
+        QScrollArea *plotArea;
+        QWidget *plotsWidget;
+        QVBoxLayout *plotsLayout;
+        QList<LTMSettings> plotSettings;
+        QList<LTMPlot *> plots;
 
         // Widgets
         LTMPlot *ltmPlot;
@@ -228,7 +243,7 @@ class LTMWindow : public GcChartWindow
         // reveal controls
         QxtStringSpinBox    *rGroupBy;
         QCheckBox           *rData,
-                            *rEvents;
+                            *rStack;
 };
 
 #endif // _GC_LTMWindow_h

@@ -142,7 +142,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(5); // version 5
+    out<<int(6); // version 6
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         out<<metric.type;
@@ -177,6 +177,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.labels;
     }
     out<<settings.showData;
+    out<<settings.stack;
     return out;
 }
 
@@ -263,11 +264,14 @@ while(counter-- && !in.atEnd()) {
         if (version >= 5) {
             in >>m.labels;
         }
-
         // get a metric pointer (if it exists)
         m.metric = factory.rideMetric(m.symbol);
         settings.metrics.append(m);
     }
     if (version >= 4) in >> settings.showData;
+    if (version >= 6) {
+        in >>settings.stack;
+    }
+
     return in;
 }
