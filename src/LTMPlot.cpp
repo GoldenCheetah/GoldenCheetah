@@ -781,6 +781,7 @@ LTMPlot::setData(LTMSettings *set)
                             // handle precision of 1 for seconds converted to hours
                             int precision = m->precision();
                             if (metricDetail.uunits == "seconds") precision=1;
+                            if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
                             labelString = QString("%1").arg(value * (context->athlete->useMetricUnits ? 1 : m->conversion())
@@ -942,6 +943,7 @@ LTMPlot::setData(LTMSettings *set)
                         // handle precision of 1 for seconds converted to hours
                         int precision = m->precision();
                         if (metricDetail.uunits == "seconds") precision=1;
+                        if (metricDetail.uunits == "km") precision=0;
 
                         // we have a metric so lets be precise ...
                         labelString = QString("%1").arg(value * (context->athlete->useMetricUnits ? 1 : m->conversion())
