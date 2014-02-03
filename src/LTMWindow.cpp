@@ -41,7 +41,7 @@
 #include <qwt_plot_marker.h>
 
 LTMWindow::LTMWindow(Context *context) :
-            GcChartWindow(context), context(context), dirty(true)
+            GcChartWindow(context), context(context), dirty(true), stackDirty(true)
 {
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
@@ -49,6 +49,24 @@ LTMWindow::LTMWindow(Context *context) :
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
     ltmPlot = new LTMPlot(this, context);
+
+    // the stack of plots
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+
+    plotsWidget = new QWidget(this);
+    plotsWidget->setPalette(palette);
+    plotsLayout = new QVBoxLayout(plotsWidget);
+    plotsLayout->setSpacing(0);
+    plotsLayout->setContentsMargins(0,0,0,0);
+
+    plotArea = new QScrollArea(this);
+    plotArea->setAutoFillBackground(false);
+    plotArea->setWidgetResizable(true);
+    plotArea->setWidget(plotsWidget);
+    plotArea->setFrameStyle(QFrame::NoFrame);
+    plotArea->setContentsMargins(0,0,0,0);
+    plotArea->setPalette(palette);
 
     // the data table
     dataSummary = new QWebView(this);
@@ -63,11 +81,12 @@ LTMWindow::LTMWindow(Context *context) :
 
 
     // the stack
-    stack = new QStackedWidget(this);
-    stack->addWidget(ltmPlot);
-    stack->addWidget(dataSummary);
-    stack->setCurrentIndex(0);
-    mainLayout->addWidget(stack);
+    stackWidget = new QStackedWidget(this);
+    stackWidget->addWidget(ltmPlot);
+    stackWidget->addWidget(dataSummary);
+    stackWidget->addWidget(plotArea);
+    stackWidget->setCurrentIndex(0);
+    mainLayout->addWidget(stackWidget);
     setChartLayout(mainLayout);
 
     // reveal controls
@@ -88,12 +107,12 @@ LTMWindow::LTMWindow(Context *context) :
 
     revealLayout->addWidget(rGroupBy);
     rData = new QCheckBox(tr("Data Table"), this);
-    rEvents = new QCheckBox(tr("Show events"), this);
+    rStack = new QCheckBox(tr("Stacked"), this);
     QVBoxLayout *checks = new QVBoxLayout;
     checks->setSpacing(2);
     checks->setContentsMargins(0,0,0,0);
     checks->addWidget(rData);
-    checks->addWidget(rEvents);
+    checks->addWidget(rStack);
     revealLayout->addLayout(checks);
     revealLayout->addStretch();
     setRevealLayout(revealLayout);
@@ -138,8 +157,9 @@ LTMWindow::LTMWindow(Context *context) :
     settings.events = ltmTool->showEvents->isChecked();
     settings.shadeZones = ltmTool->shadeZones->isChecked();
     settings.showData = ltmTool->showData->isChecked();
+    settings.stack = ltmTool->showStack->isChecked();
     rData->setChecked(ltmTool->showData->isChecked());
-    rEvents->setChecked(ltmTool->showEvents->isChecked());
+    rStack->setChecked(ltmTool->showStack->isChecked());
     cl->addWidget(ltmTool);
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
@@ -152,9 +172,10 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
     connect(rData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
+    connect(ltmTool->showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
+    connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
-    connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(showEventsClicked(int)));
-    connect(rEvents, SIGNAL(stateChanged(int)), this, SLOT(showEventsClicked(int)));
+    connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(refresh()));
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -185,14 +206,114 @@ LTMWindow::refreshPlot()
 
         if (ltmTool->showData->isChecked()) {
 
+            //  DATA TABLE
+            stackWidget->setCurrentIndex(1);
             refreshDataTable();
 
         } else {
-            plotted = DateRange(settings.start.date(), settings.end.date());
-            ltmPlot->setData(&settings);
-            dirty = false;
+
+            if (ltmTool->showStack->isChecked()) {
+
+                // STACK PLOTS
+                refreshStackPlots();
+                stackWidget->setCurrentIndex(2);
+                stackDirty = false;
+
+            } else {
+
+                // NORMAL PLOTS
+                plotted = DateRange(settings.start.date(), settings.end.date());
+                ltmPlot->setData(&settings);
+                stackWidget->setCurrentIndex(0);
+                dirty = false;
+            }
+
         }
     }
+}
+
+void 
+LTMWindow::refreshStackPlots()
+{
+    // setup stacks but only if needed
+    //if (!stackDirty) return; // lets come back to that!
+
+    setUpdatesEnabled(false);
+
+    // delete old and create new...
+    //    QScrollArea *plotArea;
+    //    QWidget *plotsWidget;
+    //    QVBoxLayout *plotsLayout;
+    //    QList<LTMSettings> plotSettings;
+    foreach (LTMPlot *p, plots) {
+        plotsLayout->removeWidget(p);
+        delete p;
+    }
+    plots.clear();
+    plotSettings.clear();
+
+    if (plotsLayout->count() == 1) {
+        plotsLayout->takeAt(0); // remove the stretch
+    }
+
+    // now lets create them all again
+    // based upon the current setttings
+    // we create a plot for each curve
+    // but where they are stacked we put
+    // them all in the SAME plot
+    // so we go once through picking out
+    // the stacked items and once through
+    // for all the rest of the curves
+    LTMSettings plotSetting = settings;
+    plotSetting.metrics.clear();
+    foreach(MetricDetail m, settings.metrics) {
+        if (m.stack) plotSetting.metrics << m;
+    }
+
+    // create ltmPlot with this
+    if (plotSetting.metrics.count()) {
+
+        plotSettings << plotSetting;
+
+        // create and setup the plot
+        LTMPlot *stacked = new LTMPlot(this, context);
+        stacked->setData(&plotSettings.last());
+        stacked->setFixedHeight(200); // maybe make this adjustable later
+
+        // now add
+        plotsLayout->addWidget(stacked);
+        plots << stacked;
+    }
+
+    // OK, now one plot for each curve
+    // that isn't stacked!
+    foreach(MetricDetail m, settings.metrics) {
+
+        // ignore stacks
+        if (m.stack) continue;
+
+        plotSetting = settings;
+        plotSetting.metrics.clear();
+        plotSetting.metrics << m;
+        plotSettings << plotSetting;
+
+        // create and setup the plot
+        LTMPlot *plot = new LTMPlot(this, context);
+        plot->setData(&plotSettings.last());
+        plot->setFixedHeight(200); // maybe make this adjustable later
+
+        // now add
+        plotsLayout->addWidget(plot);
+        plots << plot;
+    }
+
+    // squash em up
+    plotsLayout->addStretch();
+
+    // we no longer dirty
+    stackDirty = false;
+
+    setUpdatesEnabled(true);
 }
 
 void
@@ -238,10 +359,9 @@ LTMWindow::refresh()
         bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
         refreshPlot();
         repaint(); // title changes color when filters change
-        dirty = false;
 
     } else {
-        dirty = true;
+        stackDirty = dirty = true;
     }
 }
 
@@ -386,10 +506,8 @@ LTMWindow::showDataClicked(int state)
     if (rData->isChecked()!=checked) rData->setChecked(checked);
 
     if (settings.showData != checked) {
-
         settings.showData = checked;
         refreshPlot();
-        stack->setCurrentIndex(checked ? 1 : 0);
     }
 }
 
@@ -412,15 +530,18 @@ LTMWindow::showLegendClicked(int state)
 }
 
 void
-LTMWindow::showEventsClicked(int state)
+LTMWindow::showStackClicked(int state)
 {
     bool checked = state;
 
     // only change if changed, to avoid endless looping
-    if (ltmTool->showEvents->isChecked() != checked) ltmTool->showEvents->setChecked(checked);
-    if (rEvents->isChecked() != checked) rEvents->setChecked(checked);
-    settings.events = state;
-    refreshPlot();
+    if (ltmTool->showStack->isChecked() != checked) ltmTool->showStack->setChecked(checked);
+    if (rStack->isChecked() != checked) rStack->setChecked(checked);
+
+    if (settings.stack != checked) {
+        settings.stack = checked;
+        refreshPlot();
+    }
 }
 
 void
@@ -435,6 +556,7 @@ LTMWindow::applyClicked()
         int groupBy = settings.groupBy;
         bool legend = settings.legend;
         bool events = settings.events;
+        bool stack = settings.stack;
         bool shadeZones = settings.shadeZones;
         QDateTime start = settings.start;
         QDateTime end = settings.end;
@@ -449,6 +571,7 @@ LTMWindow::applyClicked()
         settings.groupBy = groupBy;
         settings.legend = legend;
         settings.events = events;
+        settings.stack = stack;
         settings.shadeZones = shadeZones;
         settings.start = start;
         settings.end = end;

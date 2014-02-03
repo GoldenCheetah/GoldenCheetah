@@ -86,6 +86,7 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QCheckBox *showData;
         QCheckBox *showEvents;
+        QCheckBox *showStack;
         QPushButton *saveButton;
         QPushButton *applyButton;
         QPushButton *newButton;

@@ -99,6 +99,10 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     showData->setChecked(false);
     basicsettingsLayout->addRow(new QLabel(""), showData);
 
+    showStack = new QCheckBox(tr("Show Stack"));
+    showStack->setChecked(false);
+    basicsettingsLayout->addRow(new QLabel(""), showStack);
+
     shadeZones = new QCheckBox(tr("Shade Zones"));
     basicsettingsLayout->addRow(new QLabel(""), shadeZones);
 

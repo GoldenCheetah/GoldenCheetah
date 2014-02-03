@@ -147,6 +147,7 @@ class LTMSettings {
         bool showData;
         bool legend;
         bool events;
+        bool stack;
 
         QList<MetricDetail> metrics;
         QList<SummaryMetrics> *data;
