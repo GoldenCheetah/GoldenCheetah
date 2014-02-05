@@ -38,6 +38,7 @@ class LTMPlotBackground;
 class LTMWindow;
 class LTMPlotZoneLabel;
 class LTMScaleDraw;
+class CompareScaleDraw;
 class StressCalculator;
 
 class LTMPlot : public QwtPlot
@@ -50,6 +51,7 @@ class LTMPlot : public QwtPlot
         LTMPlot(LTMWindow *, Context *context);
         ~LTMPlot();
         void setData(LTMSettings *);
+        void setCompareData(LTMSettings *);
         void setAxisTitle(QwtAxisId axis, QString label);
 
     public slots:
@@ -68,7 +70,7 @@ class LTMPlot : public QwtPlot
         LTMWindow *parent;
         double minY[10], maxY[10], maxX;      // for all possible 10 curves
         void resetPMC();
-        void createPMCCurveData(LTMSettings *, MetricDetail, QList<SummaryMetrics> &);
+        void createPMCCurveData(Context *,LTMSettings *, MetricDetail, QList<SummaryMetrics> &);
 
     private:
         Context *context;
@@ -94,10 +96,8 @@ class LTMPlot : public QwtPlot
         QVector< QVector<double>* > stackY;
 
         int groupForDate(QDate , int);
-        void createCurveData(LTMSettings *, MetricDetail,
-                             QVector<double>&, QVector<double>&, int&);
-        void createTODCurveData(LTMSettings *, MetricDetail,
-                             QVector<double>&, QVector<double>&, int&);
+        void createCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
         void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a
         QwtAxisId chooseYAxis(QString);
         void refreshZoneLabels(QwtAxisId);
@@ -108,6 +108,17 @@ class LTMPlot : public QwtPlot
         StressCalculator *cogganPMC, *skibaPMC;
 
         QList<QwtAxisId> supportedAxes;
+};
+
+class CompareScaleDraw: public QwtScaleDraw
+{
+    public:
+        CompareScaleDraw() {}
+
+    virtual QwtText label(double v) const {
+
+        return QwtText(QString("%1%2").arg(v ? "+" : "").arg(int(v)));
+    }
 };
 
 // Produce Labels for X-Axis

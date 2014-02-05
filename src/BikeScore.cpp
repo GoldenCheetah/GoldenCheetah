@@ -181,6 +181,48 @@ class RelativeIntensity : public RideMetric {
     RideMetric *clone() const { return new RelativeIntensity(*this); }
 };
 
+class CriticalPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(CriticalPower)
+
+    public:
+
+    CriticalPower()
+    {
+        setSymbol("cp_setting");
+        setInternalName("CP setting");
+    }
+    void initialize() {
+        setName(tr("Critical Power"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setPrecision(0);
+    }
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        // did user override for this ride?
+        int cp = r->getTag("CP","0").toInt();
+
+        // not overriden so use the set value
+        // if it has been set at all
+        if (!cp && zones && zoneRange >= 0) 
+            cp = zones->getCP(zoneRange);
+        
+        setValue(cp);
+    }
+
+    bool canAggregate() { return true; }
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+        setValue(other.value(true) > value(true) ? other.value(true) : value(true));
+    }
+
+    RideMetric *clone() const { return new CriticalPower(*this); }
+};
+
 class BikeScore : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(BikeScore)
     double score;
@@ -258,7 +300,8 @@ class ResponseIndex : public RideMetric {
     RideMetric *clone() const { return new ResponseIndex(*this); }
 };
 
-static bool addAllFive() {
+static bool addAllSix() {
+    RideMetricFactory::instance().addMetric(CriticalPower());
     RideMetricFactory::instance().addMetric(XPower());
     QVector<QString> deps;
     deps.append("skiba_xpower");
@@ -276,5 +319,5 @@ static bool addAllFive() {
     return true;
 }
 
-static bool allFiveAdded = addAllFive();
+static bool allSixAdded = addAllSix();
 
