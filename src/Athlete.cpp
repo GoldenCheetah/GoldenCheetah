@@ -43,6 +43,8 @@
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "LTMSettings.h"
+#include "Route.h"
+#include "RouteWindow.h"
 
 #include "GcUpgrade.h" // upgrade wizard
 #include "GcCrashDialog.h" // recovering from a crash?
@@ -138,6 +140,9 @@ Athlete::Athlete(Context *context, const QDir &home)
     davCalendar = new CalDAV(context); // remote caldav
     davCalendar->download(); // refresh the diary window
 #endif
+
+    // Routes
+    routes = new Routes(context, home);
 
     // RIDE TREE -- transitionary
     treeWidget = new QTreeWidget;

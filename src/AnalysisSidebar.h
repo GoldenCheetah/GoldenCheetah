@@ -75,6 +75,7 @@ class AnalysisSidebar : public QWidget
         void deleteIntervalSelected(void); // from menu popup
         void zoomIntervalSelected(void); // from menu popup
         void zoomOut();
+        void createRouteIntervalSelected(void); // from menu popup
         void frontInterval();
         void backInterval();
 

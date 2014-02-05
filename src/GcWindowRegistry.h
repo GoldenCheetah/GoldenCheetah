@@ -60,7 +60,8 @@ enum gcwinid {
         SpinScanPlot = 31,
         DateRangeSummary = 32,
         CriticalPowerSummary = 33,
-        Distribution = 34
+        Distribution = 34,
+        RouteSegment = 35
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

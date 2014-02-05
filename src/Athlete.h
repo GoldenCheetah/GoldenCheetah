@@ -48,6 +48,7 @@ class IntervalTreeView;
 class QSqlTableModel;
 class PDEstimate;
 class LTMSettings;
+class Routes;
 
 class Context;
 
@@ -75,6 +76,7 @@ class Athlete : public QObject
         RideMetadata *rideMetadata_;
         Seasons *seasons;
         QList<PDEstimate> PDEstimates;
+        Routes *routes;
         QList<RideFileCache*> cpxCache;
 
         // athlete's calendar
