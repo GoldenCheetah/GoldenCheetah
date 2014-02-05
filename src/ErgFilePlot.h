@@ -116,7 +116,7 @@ public:
 
     virtual QwtText label(double v) const { 
         v /= 1000;
-        QTime t = QTime().addSecs(v);
+        QTime t = QTime(0,0,0,0).addSecs(v);
         if (scaleMap().sDist() > 5)
             return t.toString("hh:mm");
         return t.toString("hh:mm:ss");

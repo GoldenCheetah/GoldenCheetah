@@ -246,6 +246,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     ergFile = NULL;
 
     setAutoReplot(false);
+	setData(ergFile);
 }
 
 void
