@@ -398,6 +398,10 @@ HEADERS += \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
+        Route.h \
+        RouteItem.h \
+        RouteParser.h \
+        RouteWindow.h \
         ScatterPlot.h \
         ScatterWindow.h \
         Season.h \
@@ -602,6 +606,10 @@ SOURCES += \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
+        Route.cpp \
+        RouteItem.cpp \
+        RouteParser.cpp \
+        RouteWindow.cpp \
         SaveDialogs.cpp \
         ScatterPlot.cpp \
         ScatterWindow.cpp \

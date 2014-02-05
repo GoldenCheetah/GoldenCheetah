@@ -33,6 +33,9 @@
 #include "AddIntervalDialog.h"
 #include "BestIntervalDialog.h"
 
+// working with routes
+#include "Route.h"
+
 AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow), context(context)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -298,14 +301,17 @@ AnalysisSidebar::intervalPopup()
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), context->athlete->intervalWidget);
         QAction *actEditInt = new QAction(tr("Edit interval"), context->athlete->intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), context->athlete->intervalWidget);
+        //QAction *actCreateRouteInt = new QAction(tr("Create route for interval"), context->athlete->intervalWidget);
 
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+        //connect(actCreateRouteInt, SIGNAL(triggered(void)), this, SLOT(createRouteIntervalSelected(void)));
 
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
         menu.addAction(actDeleteInt);
+        //menu.addAction(actCreateRouteInt);
     }
 
     if (context->athlete->intervalWidget->selectedItems().count() > 1) {
@@ -589,6 +595,12 @@ void
 AnalysisSidebar::zoomInterval() {
     // zoom into this interval on allPlot
     context->notifyIntervalZoom(activeInterval);
+}
+
+void
+AnalysisSidebar::createRouteIntervalSelected() {
+    // create a new route for this interval
+    context->athlete->routes->createRouteFromInterval(activeInterval);
 }
 
 void
