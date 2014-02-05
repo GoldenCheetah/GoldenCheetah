@@ -41,7 +41,7 @@
 #include <qwt_plot_marker.h>
 
 LTMWindow::LTMWindow(Context *context) :
-            GcChartWindow(context), context(context), dirty(true), stackDirty(true)
+            GcChartWindow(context), context(context), dirty(true), stackDirty(true), compareDirty(true)
 {
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
@@ -79,12 +79,27 @@ LTMWindow::LTMWindow(Context *context) :
     dataSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
     dataSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
 
+    // compare plot page
+    compareplotsWidget = new QWidget(this);
+    compareplotsWidget->setPalette(palette);
+    compareplotsLayout = new QVBoxLayout(compareplotsWidget);
+    compareplotsLayout->setSpacing(0);
+    compareplotsLayout->setContentsMargins(0,0,0,0);
+
+    compareplotArea = new QScrollArea(this);
+    compareplotArea->setAutoFillBackground(false);
+    compareplotArea->setWidgetResizable(true);
+    compareplotArea->setWidget(compareplotsWidget);
+    compareplotArea->setFrameStyle(QFrame::NoFrame);
+    compareplotArea->setContentsMargins(0,0,0,0);
+    compareplotArea->setPalette(palette);
 
     // the stack
     stackWidget = new QStackedWidget(this);
     stackWidget->addWidget(ltmPlot);
     stackWidget->addWidget(dataSummary);
     stackWidget->addWidget(plotArea);
+    stackWidget->addWidget(compareplotArea);
     stackWidget->setCurrentIndex(0);
     mainLayout->addWidget(stackWidget);
     setChartLayout(mainLayout);
@@ -184,6 +199,10 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(curvesChanged()), this, SLOT(refresh()));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
 
+    // comparing things
+    connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));
+    connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(compareChanged()));
+
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), ltmPlot, SLOT(pointClicked(QwtPlotCurve*, int)));
@@ -199,6 +218,28 @@ LTMWindow::~LTMWindow()
 }
 
 void
+LTMWindow::compareChanged()
+{
+    if (!amVisible()) {
+        compareDirty = true;
+        return;
+    }
+
+    if (isCompare()) {
+
+        // refresh plot handles the compare case
+        refreshPlot();
+
+    } else {
+
+        // forced refresh back to normal
+        stackDirty = dirty = true;
+        filterChanged(); // forces reread etc
+    }
+    repaint();
+}
+
+void
 LTMWindow::rideSelected() { } // deprecated
 
 void
@@ -206,7 +247,13 @@ LTMWindow::refreshPlot()
 {
     if (amVisible() == true) {
 
-        if (ltmTool->showData->isChecked()) {
+        if (isCompare()) {
+
+            // COMPARE PLOTS
+            stackWidget->setCurrentIndex(3);
+            refreshCompare();
+
+        } else if (ltmTool->showData->isChecked()) {
 
             //  DATA TABLE
             stackWidget->setCurrentIndex(1);
@@ -234,9 +281,101 @@ LTMWindow::refreshPlot()
     }
 }
 
+void
+LTMWindow::refreshCompare()
+{
+    // not if in compare mode
+    if (!isCompare()) return; 
+
+    // setup stacks but only if needed
+    //if (!stackDirty) return; // lets come back to that!
+
+    setUpdatesEnabled(false);
+
+    // delete old and create new...
+    //    QScrollArea *plotArea;
+    //    QWidget *plotsWidget;
+    //    QVBoxLayout *plotsLayout;
+    //    QList<LTMSettings> plotSettings;
+    foreach (LTMPlot *p, compareplots) {
+        compareplotsLayout->removeWidget(p);
+        delete p;
+    }
+    compareplots.clear();
+    compareplotSettings.clear();
+
+    if (compareplotsLayout->count() == 1) {
+        compareplotsLayout->takeAt(0); // remove the stretch
+    }
+
+    // now lets create them all again
+    // based upon the current setttings
+    // we create a plot for each curve
+    // but where they are stacked we put
+    // them all in the SAME plot
+    // so we go once through picking out
+    // the stacked items and once through
+    // for all the rest of the curves
+    LTMSettings plotSetting = settings;
+    plotSetting.metrics.clear();
+    foreach(MetricDetail m, settings.metrics) {
+        if (m.stack) plotSetting.metrics << m;
+    }
+
+    // create ltmPlot with this
+    if (plotSetting.metrics.count()) {
+
+        compareplotSettings << plotSetting;
+
+        // create and setup the plot
+        LTMPlot *stacked = new LTMPlot(this, context);
+        stacked->setCompareData(&compareplotSettings.last()); // setData using the compare data
+        stacked->setFixedHeight(200); // maybe make this adjustable later
+
+        // now add
+        compareplotsLayout->addWidget(stacked);
+        compareplots << stacked;
+    }
+
+    // OK, now one plot for each curve
+    // that isn't stacked!
+    foreach(MetricDetail m, settings.metrics) {
+
+        // ignore stacks
+        if (m.stack) continue;
+
+        plotSetting = settings;
+        plotSetting.metrics.clear();
+        plotSetting.metrics << m;
+        compareplotSettings << plotSetting;
+
+        // create and setup the plot
+        LTMPlot *plot = new LTMPlot(this, context);
+        plot->setCompareData(&compareplotSettings.last()); // setData using the compare data
+
+        // now add
+        compareplotsLayout->addWidget(plot);
+        compareplots << plot;
+    }
+
+    // squash em up
+    compareplotsLayout->addStretch();
+
+    // resize to choice
+    zoomSliderChanged();
+
+    // we no longer dirty
+    compareDirty = false;
+
+    setUpdatesEnabled(true);
+}
+
 void 
 LTMWindow::refreshStackPlots()
 {
+    // not if in compare mode
+    if (isCompare()) return; 
+
     // setup stacks but only if needed
     //if (!stackDirty) return; // lets come back to that!
 
@@ -328,7 +467,14 @@ LTMWindow::zoomSliderChanged()
 
     settings.stackWidth = ltmTool->stackSlider->value();
     setUpdatesEnabled(false);
+
+    // do the compare and the noncompare plots
+    // at the same time, as we don't need to worry
+    // about optimising out as its fast anyway
     foreach(LTMPlot *plot, plots) {
+        plot->setFixedHeight(150 + add[index]);
+    }
+    foreach(LTMPlot *plot, compareplots) {
         plot->setFixedHeight(150 + add[index]);
     }
     setUpdatesEnabled(true);
@@ -366,6 +512,8 @@ LTMWindow::useThruToday()
 void
 LTMWindow::refresh()
 {
+    // not if in compare mode
+    if (isCompare()) return; 
 
     // refresh for changes to ridefiles / zones
     if (amVisible() == true && context->athlete->metricDB != NULL) {
@@ -396,14 +544,30 @@ LTMWindow::dateRangeChanged(DateRange range)
          settings.measures = &measures;
          settings.bests = &bestsresults;
 
-        // apply filter to new date range too -- will also refresh plot
-        filterChanged();
+        // we let all the state get updated, but lets not actually plot
+        // whilst in compare mode -- but when compare mode ends we will
+        // call filterChanged, so need to record the fact that the date
+        // range changed whilst we were in compare mode
+        if (!isCompare()) {
+
+            // apply filter to new date range too -- will also refresh plot
+            filterChanged();
+        } else {
+
+            // we've been told to redraw so maybe
+            // compare mode was switched whilst we were
+            // not visible, lets refresh
+            if (compareDirty) compareChanged();
+        }
     }
 }
 
 void
 LTMWindow::filterChanged()
 {
+    // ignore in compare mode
+    if (isCompare()) return;
+
     if (amVisible() == false || context->athlete->metricDB == NULL) return;
 
     if (useCustom) {
@@ -720,7 +884,7 @@ LTMWindow::refreshDataTable()
             data = settings.measures;
         } else if (metricDetail.type == METRIC_PM) {
             // PMC fixup later
-            ltmPlot->createPMCCurveData(&settings, metricDetail, PMCdata);
+            ltmPlot->createPMCCurveData(context, &settings, metricDetail, PMCdata);
             data = &PMCdata;
         } else if (metricDetail.type == METRIC_BEST) {
             data = settings.bests;

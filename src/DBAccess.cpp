@@ -78,8 +78,9 @@
 // 57  20  Jan 2014 Mark Liversedge    Added W' Expenditure for total energy spent above CP
 // 58  23  Jan 2014 Mark Liversedge    W' work rename and calculate without reference to WPrime class (speed)
 // 59  24  Jan 2014 Mark Liversedge    Added Maximum W' exp which is same as W'bal bur expressed as used not left
+// 60  05  Feb 2014 Mark Liversedge    Added Critical Power as a metric -- retreives from settings for now
 
-int DBSchemaVersion = 59;
+int DBSchemaVersion = 60;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
