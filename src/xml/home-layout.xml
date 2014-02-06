@@ -1,28 +1,68 @@
 <layout name="home" style="0">
-	<chart id="32" name="Ride Summary Window" title="Summary" >
-		<property name="instanceName" type="QString" value="Ride Summary Window" />
+	<chart id="32" name="" title="Summary" >
 		<property name="title" type="QString" value="Summary" />
+		<property name="subtitle" type="QString" value="All Dates" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="7" name="" title="Tracker" >
+		<property name="title" type="QString" value="Tracker" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
+		<property name="chart" type="int" value="0" />
+		<property name="bin" type="int" value="2" />
+		<property name="shade" type="bool" value="0" />
+		<property name="data" type="bool" value="0" />
+		<property name="stack" type="bool" value="1" />
+		<property name="stackWidth" type="int" value="4" />
+		<property name="legend" type="bool" value="1" />
+		<property name="events" type="bool" value="1" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Wed Oct 30 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="settings" type="LTMSettings" value="/////wAAABoATABhAHMAdAAgADYAIABtAG8AbgB0AGgAcwAle78AAAAA/wAlfHcAAAAA/wAAAAMAAf///////////////wAAAAcAAAAHAAAAAQAAAAAcAHQAbwB0AGEAbABfAGQAaQBzAHQAYQBuAGMAZQAAABAARABpAHMAdABhAG4AYwBlAAAAEABEAGkAcwB0AGEAbgBjAGUAAAAEAGsAbQAAAAAAAAAAAAAAAAAAAAAAAAEAAH//AAB/FhND2dAAAAAAB3888AAAAAEAAAAAAf//AAAAAP//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAA+cAAA4Q/////wAAAAYAAAAAAQAAAAEAAAAAGAB3AG8AcgBrAG8AdQB0AF8AdABpAG0AZQAAABAARAB1AHIAYQB0AGkAbwBuAAAAEABEAHUAcgBhAHQAaQBvAG4AAAAOAHMAZQBjAG8AbgBkAHMAAAAAAAAAAAAAAAAAAAAAAAABAAB//wAAfxYTQ9nQAAAAAAd/PPAAAAABAAAAAAH//wAAqqr//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAPnAAAOEP////8AAAAGAAAAAAEAAAAFAP////8AAAAAAAAAIgA2ADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAABQAAAAAAAAAAAAAAAAEAAH+SAAAAAAOq5fAAAH//krTqAP//////////Af//qqpVVf//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAQAAADwAAAA8AAAAKABQAGUAYQBrAF8ANgAwAF8AbQBpAG4AdQB0AGUAXwBQAG8AdwBlAHIAAAAGAAAAAAAAAAABAAAAABQAYQB2AGUAcgBhAGcAZQBfAGgAcgAAACQAQQB2AGUAcgBhAGcAZQAgAEgAZQBhAHIAdAAgAFIAYQB0AGUAAAAkAEEAdgBlAHIAYQBnAGUAIABIAGUAYQByAHQAIABSAGEAdABlAAAABgBiAHAAbQAAAAAAAAAAAAAAAAAAAAAAAAEAAH//AAB/FhND2dAAAAAAB3888P////8AAAAAAf////8AAAAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAYAAAAAAQAAAAIAAAAAFABjAG8AZwBnAGEAbgBfAGMAdABsAAAAOABDAG8AZwBnAGEAbgAgAEMAaAByAG8AbgBpAGMAIABUAHIAYQBpAG4AaQBuAGcAIABMAG8AYQBkAAAAOABDAG8AZwBnAGEAbgAgAEMAaAByAG8AbgBpAGMAIABUAHIAYQBpAG4AaQBuAGcAIABMAG8AYQBkAAAABgBDAFQATAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAADj28AAAABuAAAAW///////////Af//AAAAAP//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAQAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEAAAAAIgA1AG0AXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAgADUAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAgADUAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAABAAAAAAAAAAAAAAAAAEAAH//AAB/khYrCdAAAAAABEQhoP//////////Af//qqpVVf//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAQAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEAAAAAFABjAHAAXwBzAGUAdAB0AGkAbgBnAAAAHABDAHIAaQB0AGkAYwBhAGwAIABQAG8AdwBlAHIAAAAcAEMAcgBpAHQAaQBjAGEAbAAgAFAAbwB3AGUAcgAAABwAQwByAGkAdABpAGMAYQBsACAAUABvAHcAZQByAAAAAAAEAAAAAAAAAAAAAAAAAQAAf/8AAAAAA2icwAAAf//ykfmi/////wAAAAAB//+ZmQAAAAAAAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAAD5wAADhD/////AAAAAQAAAAAAAAEAAAAE" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="7" name="Metric Window" title="PMC" >
-		<property name="instanceName" type="QString" value="Metric Window" />
+	<chart id="7" name="" title="PMC" >
 		<property name="title" type="QString" value="PMC" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="chart" type="int" value="13" />
+		<property name="chart" type="int" value="0" />
 		<property name="bin" type="int" value="0" />
 		<property name="shade" type="bool" value="0" />
+		<property name="data" type="bool" value="0" />
+		<property name="stack" type="bool" value="0" />
+		<property name="stackWidth" type="int" value="2" />
 		<property name="legend" type="bool" value="1" />
+		<property name="events" type="bool" value="1" />
 		<property name="filter" type="QString" value="search:" />
-		<property name="settings" type="LTMSettings" value="/////wAAAAgAMgAwADAAOQAldGgAAAAA/wAldl8AAAAA/wAAAAEAAf//////////AAAABgAAAAEBAAAAHgB0AGkAbQBlAF8AaQBuAF8AegBvAG4AZQBfAEwAMwAAAB4ATAAzACAAVABpAG0AZQAgAGkAbgAgAFoAbwBuAGUAAAAeAEwAMwAgAFQAaQBtAGUAIABpAG4AIABaAG8AbgBlAAAADgBzAGUAYwBvAG4AZABzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABBKcwAAAAf/9fv5zQAAAAAQAAAAAB///Dw8PDw8MAAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAABAQAAAB4AdABpAG0AZQBfAGkAbgBfAHoAbwBuAGUAXwBMADQAAAAeAEwANAAgAFQAaQBtAGUAIABpAG4AIABaAG8AbgBlAAAAHgBMADQAIABUAGkAbQBlACAAaQBuACAAWgBvAG4AZQAAAA4AcwBlAGMAbwBuAGQAcwAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQSnMAAAAH//X7+c0AAAAAEAAAAAAf//1NTZ2ff3AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQEAAAAeAHQAaQBtAGUAXwBpAG4AXwB6AG8AbgBlAF8ATAA1AAAAHgBMADUAIABUAGkAbQBlACAAaQBuACAAWgBvAG4AZQAAAB4ATAA1ACAAVABpAG0AZQAgAGkAbgAgAFoAbwBuAGUAAAAOAHMAZQBjAG8AbgBkAHMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEEpzAAAAB//1+/nNAAAAABAAAAAAH/////7u7v7wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAIAAAAAFABjAG8AZwBnAGEAbgBfAGEAdABsAAAANABDAG8AZwBnAGEAbgAgAEEAYwB1AHQAZQAgAFQAcgBhAGkAbgBpAG4AZwAgAEwAbwBhAGQAAAA0AEMAbwBnAGcAYQBuACAAQQBjAHUAdABlACAAVAByAGEAaQBuAGkAbgBnACAATABvAGEAZAAAAAwAUwB0AHIAZQBzAHMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEEpzAAAAB//1+/nND/////AAAAAQH/////AAD//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAIAAAAAFABjAG8AZwBnAGEAbgBfAGMAdABsAAAAOABDAG8AZwBnAGEAbgAgAEMAaAByAG8AbgBpAGMAIABUAHIAYQBpAG4AaQBuAGcAIABMAG8AYQBkAAAAOABDAG8AZwBnAGEAbgAgAEMAaAByAG8AbgBpAGMAIABUAHIAYQBpAG4AaQBuAGcAIABMAG8AYQBkAAAADABTAHQAcgBlAHMAcwAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQSnMAAAAH//X7+c0P////8AAAABAf//AAAAAP//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAgAAAAAUAGMAbwBnAGcAYQBuAF8AdABzAGIAAAA8AEMAbwBnAGcAYQBuACAAVAByAGEAaQBuAGkAbgBnACAAUwB0AHIAZQBzAHMAIABCAGEAbABhAG4AYwBlAAAAPABDAG8AZwBnAGEAbgAgAFQAcgBhAGkAbgBpAG4AZwAgAFMAdAByAGUAcwBzACAAQgBhAGwAYQBuAGMAZQAAAAwAUwB0AHIAZQBzAHMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEEpzAAAAB//1+/nND/////AAAAAAH//wAAy8sAAAAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAA==" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Sat Aug 17 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="settings" type="LTMSettings" value="AAAACgBQAE0AQwArACsAAAAaAEwAYQBzAHQAIAA2ACAAbQBvAG4AdABoAHMAJXu/AAAAAP8AJXx3AAAAAP8AAAABAAH///////////////8AAAAHAAAAAwAAAAIAAAAAFABjAG8AZwBnAGEAbgBfAGEAdABsAAAANABDAG8AZwBnAGEAbgAgAEEAYwB1AHQAZQAgAFQAcgBhAGkAbgBpAG4AZwAgAEwAbwBhAGQAAAA0AEMAbwBnAGcAYQBuACAAQQBjAHUAdABlACAAVAByAGEAaQBuAGkAbgBnACAATABvAGEAZAAAAAwAUwB0AHIAZQBzAHMAAAAAAAAAAAAAAAAAAAAAAAABAAB//wAAAAACeMOoAAAAAAJ70Dj//////////wH/////AAD//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAACAAAOEP////8AAAACAAAAAAAAAAACAAAAABQAYwBvAGcAZwBhAG4AXwBjAHQAbAAAADgAQwBvAGcAZwBhAG4AIABDAGgAcgBvAG4AaQBjACAAVAByAGEAaQBuAGkAbgBnACAATABvAGEAZAAAADgAQwBvAGcAZwBhAG4AIABDAGgAcgBvAG4AaQBjACAAVAByAGEAaQBuAGkAbgBnACAATABvAGEAZAAAAAwAUwB0AHIAZQBzAHMAAAAAAAAAAAAAAAAAAAAAAAABAAB//wAAAAACeMOoAAAAAAJ70Dj//////////wH//wAAAAD//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAACAAAOEP////8AAAACAAAAAAAAAAACAAAAABQAYwBvAGcAZwBhAG4AXwB0AHMAYgAAADwAQwBvAGcAZwBhAG4AIABUAHIAYQBpAG4AaQBuAGcAIABTAHQAcgBlAHMAcwAgAEIAYQBsAGEAbgBjAGUAAAA8AEMAbwBnAGcAYQBuACAAVAByAGEAaQBuAGkAbgBnACAAUwB0AHIAZQBzAHMAIABCAGEAbABhAG4AYwBlAAAADABTAHQAcgBlAHMAcwAAAAAAAAAAAADAjzgAAAAAAAEAAH//AAAAAAJ4w6gAAAAAAnvQOP//////////Af//9PTa2g8PAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAQAAAAIAAA4Q/////wAAAAIAAAAAAAAAAAAAAg==" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="33" name="Critical Power Window" title="CP" >
-		<property name="instanceName" type="QString" value="Critical Power Window" />
+	<chart id="33" name="" title="CP" >
 		<property name="title" type="QString" value="CP" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
@@ -31,25 +71,102 @@
 		<property name="filter" type="QString" value="search:" />
 		<property name="mode" type="int" value="0" />
 		<property name="season" type="QString" value="" />
+		<property name="cpmodel" type="int" value="3" />
+		<property name="ani1" type="int" value="120" />
+		<property name="ani2" type="int" value="300" />
+		<property name="aei1" type="int" value="600" />
+		<property name="aei2" type="int" value="3000" />
+		<property name="sani1" type="int" value="20" />
+		<property name="sani2" type="int" value="90" />
+		<property name="laei1" type="int" value="4000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="shading" type="int" value="0" />
+		<property name="shadeIntervals" type="int" value="1" />
+		<property name="ridePlotMode" type="int" value="0" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="34" name="Histogram Window" title="W/kg" >
-		<property name="instanceName" type="QString" value="Histogram Window" />
-		<property name="title" type="QString" value="W/kg" />
+	<chart id="34" name="" title="Power" >
+		<property name="title" type="QString" value="Power" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="series" type="int" value="1" />
 		<property name="percent" type="int" value="1" />
-		<property name="bin" type="double" value="4" />
 		<property name="logY" type="bool" value="0" />
 		<property name="zeroes" type="bool" value="0" />
 		<property name="shade" type="bool" value="0" />
 		<property name="zoned" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="0.04" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="7" name="Metric Window" title="Time In Zone" >
-		<property name="instanceName" type="QString" value="Metric Window" />
+	<chart id="7" name="" title="Aerobic Power" >
+		<property name="title" type="QString" value="Aerobic Power" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="chart" type="int" value="0" />
+		<property name="bin" type="int" value="2" />
+		<property name="shade" type="bool" value="0" />
+		<property name="data" type="bool" value="0" />
+		<property name="stack" type="bool" value="0" />
+		<property name="stackWidth" type="int" value="3" />
+		<property name="legend" type="bool" value="0" />
+		<property name="events" type="bool" value="1" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="settings" type="LTMSettings" value="/////wAAABIAQQBsAGwAIABEAGEAdABlAHMAJXArA0/HQP8AJXt4A1ismP8AAAADAAD///////////////8AAAAHAAAABQAAAAEAAAAAJAA2ADAAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIANgAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgA2ADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAAAwAAAAAAAAAAAAAAAAEAAAAAAAAAAAUlDeAAAH9soXHxCP////8AAAAAAf////8AAAAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEAAAAAJAAzADAAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIAMwAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgAzADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAAAwAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrf////8AAAAAAf//VVWqqv//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEAAAAAJAAyADAAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIAMgAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgAyADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAAAwAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrf////8AAAAAAf//AABVVX9/AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEAAAAAJAAxADAAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIAMQAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgAxADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAAAwAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrf////8AAAAAAf//AACqqgAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEAAAAAIgA1AG0AXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAgADUAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAgADUAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAAAwAAAAAAAAAAAAAAAAEAAH94AAAAAAAAARgAAAAAAz8OgP////8AAAAAAf////+7uwAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAA+cAAA4Q/////wAAAAYAAAAAAAAAAAAAAw==" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="7" name="" title="Anaerobic Power" >
+		<property name="title" type="QString" value="Anaerobic Power" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="chart" type="int" value="0" />
+		<property name="bin" type="int" value="2" />
+		<property name="shade" type="bool" value="0" />
+		<property name="data" type="bool" value="0" />
+		<property name="stack" type="bool" value="0" />
+		<property name="stackWidth" type="int" value="3" />
+		<property name="legend" type="bool" value="0" />
+		<property name="events" type="bool" value="1" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="settings" type="LTMSettings" value="/////wAAAAgAMgAwADAAOQAldJgAAAAA/wAldkEAAAAA/wAAAAMAAP///////////////wAAAAcAAAAGAAAAAQAAAAAiADEAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACAAMQAgAG0AaQBuACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACAAMQAgAG0AaQBuACAAUABlAGEAawAgAFAAbwB3AGUAcgAAAAoAdwBhAHQAdABzAAAAAAADAAAAAAAAAAAAAAAAAQAAAAAAAAAABOVxYAAAf2yhcfEI/////wAAAAAB/////6qqAAAAAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAAAAAAADhD/////AAAABgAAAAAAAAAABQAAAAAiADEAcwBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACAAMQAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACYAUABlAGEAawAgADEAIABzAGUAYwBvAG4AZAAgAFAAbwB3AGUAcgAAAAoAdwBhAHQAdABzAAAAAAADAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAf2yhce+t/////wAAAAAB/////wAAAAAAAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAmAFAAZQBhAGsAXwAxAF8AcwBlAGMAbwBuAGQAXwBQAG8AdwBlAHIAAAAGAAAAAAAAAAABAAAAACQAMQAwAHMAXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADEAMAAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMQAwACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAMAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAAH//wAA//8AAAAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAAAAAAOEP////8AAAAGAAAAAAAAAAABAAAAACQAMQA1AHMAXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADEANQAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMQA1ACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAMAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAAH//wAAqqoAAAAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAAAAAAOEP////8AAAAGAAAAAAAAAAABAAAAACQAMgAwAHMAXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADIAMAAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMgAwACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAMAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAAH//wAAqqr//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAAAAAAOEP////8AAAAGAAAAAAAAAAABAAAAACQAMwAwAHMAXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADMAMAAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMwAwACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAMAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAAH//6qqVVX//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAAAAAAOEP////8AAAAGAAAAAAAAAAAAAAM=" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="7" name="" title="Time In Zone" >
 		<property name="title" type="QString" value="Time In Zone" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
@@ -58,40 +175,22 @@
 		<property name="chart" type="int" value="0" />
 		<property name="bin" type="int" value="1" />
 		<property name="shade" type="bool" value="0" />
+		<property name="data" type="bool" value="0" />
+		<property name="stack" type="bool" value="0" />
+		<property name="stackWidth" type="int" value="7" />
 		<property name="legend" type="bool" value="1" />
+		<property name="events" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
-		<property name="settings" type="LTMSettings" value="/////wAAAAgAMgAwADAAOQAldGMAAAAA/wAldl8AAAAA/wAAAAIAAf//////////AAAAAwAAAAEBAAAAHgB0AGkAbQBlAF8AaQBuAF8AegBvAG4AZQBfAEwAMwAAAB4ATAAzACAAVABpAG0AZQAgAGkAbgAgAFoAbwBuAGUAAAAeAEwAMwAgAFQAaQBtAGUAIABpAG4AIABaAG8AbgBlAAAADgBzAGUAYwBvAG4AZABzAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAABSuN4AAAf2yhcfEIAAAAAQAAAAAB///NzdnZ//8AAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAABAQAAAB4AdABpAG0AZQBfAGkAbgBfAHoAbwBuAGUAXwBMADQAAAAeAEwANAAgAFQAaQBtAGUAIABpAG4AIABaAG8AbgBlAAAAHgBMADQAIABUAGkAbQBlACAAaQBuACAAWgBvAG4AZQAAAA4AcwBlAGMAbwBuAGQAcwAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrQAAAAEAAAAAAf//VVVgYP//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQEAAAAeAHQAaQBtAGUAXwBpAG4AXwB6AG8AbgBlAF8ATAA1AAAAHgBMADUAIABUAGkAbQBlACAAaQBuACAAWgBvAG4AZQAAAB4ATAA1ACAAVABpAG0AZQAgAGkAbgAgAFoAbwBuAGUAAAAOAHMAZQBjAG8AbgBkAHMAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx760AAAABAAAAAAH/////wMBaWgAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAA==" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="settings" type="LTMSettings" value="/////wAAAAgAMgAwADAAOQAldJQAAAAA/wAldkEAAAAA/wAAAAIAAf///////////////wAAAAcAAAADAAAAAQEAAAAeAHQAaQBtAGUAXwBpAG4AXwB6AG8AbgBlAF8ATAAzAAAAHgBMADMAIABUAGkAbQBlACAAaQBuACAAWgBvAG4AZQAAAB4ATAAzACAAVABpAG0AZQAgAGkAbgAgAFoAbwBuAGUAAAAOAHMAZQBjAG8AbgBkAHMAAAAAAAMAAAAAAAAAAAAAAAABAAAAAAAAAAAFK43gAAB/bKFx8QgAAAABAAAAAAH//83N2dn//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAAAAAAOEP////8AAAAGAAAAAAAAAAABAQAAAB4AdABpAG0AZQBfAGkAbgBfAHoAbwBuAGUAXwBMADQAAAAeAEwANAAgAFQAaQBtAGUAIABpAG4AIABaAG8AbgBlAAAAHgBMADQAIABUAGkAbQBlACAAaQBuACAAWgBvAG4AZQAAAA4AcwBlAGMAbwBuAGQAcwAAAAAAAwAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrQAAAAEAAAAAAf//VVVgYP//AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAA4Q/////wAAAAYAAAAAAAAAAAEBAAAAHgB0AGkAbQBlAF8AaQBuAF8AegBvAG4AZQBfAEwANQAAAB4ATAA1ACAAVABpAG0AZQAgAGkAbgAgAFoAbwBuAGUAAAAeAEwANQAgAFQAaQBtAGUAIABpAG4AIABaAG8AbgBlAAAADgBzAGUAYwBvAG4AZABzAAAAAAADAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAf2yhce+tAAAAAQAAAAAB//8AAAAAf38AAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAAAAAAADhD/////AAAABgAAAAAAAAAAAAAH" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="7" name="Metric Window" title="Aerobic Power" >
-		<property name="instanceName" type="QString" value="Metric Window" />
-		<property name="title" type="QString" value="Aerobic Power" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
-		<property name="resizable" type="bool" value="0" />
-		<property name="chart" type="int" value="8" />
-		<property name="bin" type="int" value="2" />
-		<property name="shade" type="bool" value="0" />
-		<property name="legend" type="bool" value="1" />
-		<property name="filter" type="QString" value="search:" />
-		<property name="settings" type="LTMSettings" value="/////wAAAAgAMgAwADAAOQAldGgAAAAA/wAldl8AAAAA/wAAAAMAAf//////////AAAABAAAAAEAAAAAJAA2ADAAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIANgAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgA2ADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAABQAAAAAAAAAAAAAAAAEAAAAAAAAAAAUlDeAAAH9soXHxCP////8AAAABAf////8AAAAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQAAAAAkADMAMABtAF8AYwByAGkAdABpAGMAYQBsAF8AcABvAHcAZQByAAAAIgAzADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAiADMAMAAgAG0AaQBuACAAUABlAGEAawAgAFAAbwB3AGUAcgAAAAoAdwBhAHQAdABzAAAAAAAFAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAf2yhce+t/////wAAAAEB//9VVaqq//8AAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAABAAAAACQAMgAwAG0AXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADIAMAAgAG0AaQBuACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMgAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAUAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAQH//wAAVVV/fwAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAEAAAAAJAAxADAAbQBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIAMQAwACAAbQBpAG4AIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgAxADAAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAABQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrf////8AAAABAf//AACqqgAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAA" />
-	</chart>
-	<chart id="7" name="Metric Window" title="Anaerobic Power" >
-		<property name="instanceName" type="QString" value="Metric Window" />
-		<property name="title" type="QString" value="Anaerobic Power" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
-		<property name="resizable" type="bool" value="0" />
-		<property name="chart" type="int" value="-1" />
-		<property name="bin" type="int" value="2" />
-		<property name="shade" type="bool" value="0" />
-		<property name="legend" type="bool" value="1" />
-		<property name="filter" type="QString" value="search:" />
-		<property name="settings" type="LTMSettings" value="/////wAAAAgAMgAwADAAOQAldGgAAAAA/wAldl8AAAAA/wAAAAMAAf//////////AAAABgAAAAEAAAAAIgAxAG0AXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAgADEAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAgADEAIABtAGkAbgAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAABQAAAAAAAAAAAAAAAAEAAAAAAAAAAATlcWAAAH9soXHxCP////8AAAABAf////+qqgAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQAAAAAiADEAcwBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACAAMQAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACAAMQAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAAAoAdwBhAHQAdABzAAAAAAAFAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAf2yhce+t/////wAAAAEB/////wAAAAAAAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAABAAAAACQAMQAwAHMAXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADEAMAAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMQAwACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAUAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAQH//wAA//8AAAAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAEAAAAAJAAxADUAcwBfAGMAcgBpAHQAaQBjAGEAbABfAHAAbwB3AGUAcgAAACIAMQA1ACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAAIgAxADUAIABzAGUAYwAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAKAHcAYQB0AHQAcwAAAAAABQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAH9soXHvrf////8AAAABAf//AACqqgAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQAAAAAkADIAMABzAF8AYwByAGkAdABpAGMAYQBsAF8AcABvAHcAZQByAAAAIgAyADAAIABzAGUAYwAgAFAAZQBhAGsAIABQAG8AdwBlAHIAAAAiADIAMAAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAAAoAdwBhAHQAdABzAAAAAAAFAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAf2yhce+t/////wAAAAEB//8AAKqq//8AAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAABAAAAACQAMwAwAHMAXwBjAHIAaQB0AGkAYwBhAGwAXwBwAG8AdwBlAHIAAAAiADMAMAAgAHMAZQBjACAAUABlAGEAawAgAFAAbwB3AGUAcgAAACIAMwAwACAAcwBlAGMAIABQAGUAYQBrACAAUABvAHcAZQByAAAACgB3AGEAdAB0AHMAAAAAAAUAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAB/bKFx763/////AAAAAQH//6qqVVX//wAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAA==" />
-	</chart>
-	<chart id="18" name="Treemap Window" title="Workout" >
-		<property name="instanceName" type="QString" value="Treemap Window" />
+	<chart id="18" name="" title="Workout" >
 		<property name="title" type="QString" value="Workout" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
@@ -100,5 +199,12 @@
 		<property name="f1" type="QString" value="Sport" />
 		<property name="f2" type="QString" value="Workout Code" />
 		<property name="metric" type="QString" value="coggan_tss" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
 </layout>
