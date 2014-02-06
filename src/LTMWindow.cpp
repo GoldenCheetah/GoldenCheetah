@@ -48,7 +48,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    ltmPlot = new LTMPlot(this, context);
+    ltmPlot = new LTMPlot(this, context, true);
 
     // the stack of plots
     QPalette palette;
@@ -192,7 +192,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackClicked(int)));
     connect(ltmTool->stackSlider, SIGNAL(valueChanged(int)), this, SLOT(zoomSliderChanged()));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
-    connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(refresh()));
+    connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(showEventsClicked(int)));
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -322,15 +322,20 @@ LTMWindow::refreshCompare()
         if (m.stack) plotSetting.metrics << m;
     }
 
+    bool first = true;
+
     // create ltmPlot with this
     if (plotSetting.metrics.count()) {
 
         compareplotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *stacked = new LTMPlot(this, context);
+        LTMPlot *stacked = new LTMPlot(this, context, first);
         stacked->setCompareData(&compareplotSettings.last()); // setData using the compare data
         stacked->setFixedHeight(200); // maybe make this adjustable later
+
+        // no longer first
+        first = false;
 
         // now add
         compareplotsLayout->addWidget(stacked);
@@ -350,8 +355,11 @@ LTMWindow::refreshCompare()
         compareplotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *plot = new LTMPlot(this, context);
+        LTMPlot *plot = new LTMPlot(this, context, first);
         plot->setCompareData(&compareplotSettings.last()); // setData using the compare data
+
+        // no longer first
+        first = false;
 
         // now add
         compareplotsLayout->addWidget(plot);
@@ -360,6 +368,18 @@ LTMWindow::refreshCompare()
 
     // squash em up
     compareplotsLayout->addStretch();
+
+    // set a common X-AXIS
+    if (settings.groupBy != LTM_TOD) {
+        int MAXX=0;
+        foreach(LTMPlot *p, compareplots) {
+            if (p->getMaxX() > MAXX) MAXX=p->getMaxX();
+        }
+        foreach(LTMPlot *p, compareplots) {
+            p->setMaxX(MAXX);
+        }
+    }
+
 
     // resize to choice
     zoomSliderChanged();
@@ -411,15 +431,20 @@ LTMWindow::refreshStackPlots()
         if (m.stack) plotSetting.metrics << m;
     }
 
+    bool first = true;
+
     // create ltmPlot with this
     if (plotSetting.metrics.count()) {
 
         plotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *stacked = new LTMPlot(this, context);
+        LTMPlot *stacked = new LTMPlot(this, context, first);
         stacked->setData(&plotSettings.last());
         stacked->setFixedHeight(200); // maybe make this adjustable later
+
+        // no longer first
+        first = false;
 
         // now add
         plotsLayout->addWidget(stacked);
@@ -439,8 +464,11 @@ LTMWindow::refreshStackPlots()
         plotSettings << plotSetting;
 
         // create and setup the plot
-        LTMPlot *plot = new LTMPlot(this, context);
+        LTMPlot *plot = new LTMPlot(this, context, first);
         plot->setData(&plotSettings.last());
+
+        // no longer first
+        first = false;
 
         // now add
         plotsLayout->addWidget(plot);
@@ -708,6 +736,13 @@ void
 LTMWindow::showLegendClicked(int state)
 {
     settings.legend = state;
+    refreshPlot();
+}
+
+void
+LTMWindow::showEventsClicked(int state)
+{
+    settings.events = bool(state);
     refreshPlot();
 }
 
