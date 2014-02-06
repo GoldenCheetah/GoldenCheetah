@@ -19,12 +19,14 @@
 #ifndef _GC_AllPlot_h
 #define _GC_AllPlot_h 1
 #include "GoldenCheetah.h"
+#include "Colors.h"
 
 #include <qwt_plot.h>
 #include <qwt_axis_id.h>
 #include <qwt_series_data.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_dict.h>
 #include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
 #include <qwt_compat.h>
@@ -51,6 +53,56 @@ class IntervalPlotData;
 class Context;
 class LTMToolTip;
 class LTMCanvasPicker;
+
+class CurveColors
+{
+    public:
+        CurveColors(QwtPlot *plot) : plot(plot) {
+            saveState();
+        }
+
+        void restoreState() {
+
+            // make all the curves have the right pen
+            QHashIterator<QwtPlotCurve *, QPen> c(state);
+            while (c.hasNext()) {
+                c.next();
+                c.key()->setPen(c.value());
+            }
+        }
+
+        void saveState() {
+            state.clear();
+
+            // get a list of plots and colors
+            foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotCurve)) {
+                state.insert(static_cast<QwtPlotCurve*>(item), 
+                             static_cast<QwtPlotCurve*>(item)->pen());
+            }
+        }
+
+        void isolate(QwtPlotCurve *curve) {
+
+            // make the curve colored but all others go dull
+            QHashIterator<QwtPlotCurve *, QPen> c(state);
+            while (c.hasNext()) {
+                c.next();
+                if (c.key() == curve) {
+                    c.key()->setPen(c.value());
+                } else {
+
+                    // dull others
+                    QPen x = c.value();
+                    x.setColor(plot->canvasBackground().color());
+                    c.key()->setPen(x);
+                }
+            }
+        }
+
+    private:
+        QwtPlot *plot;
+        QHash<QwtPlotCurve *, QPen> state;
+};
 
 class AllPlot;
 class AllPlotObject : public QObject
@@ -188,6 +240,9 @@ class AllPlot : public QwtPlot
         void plotTmpReference(int axis, int x, int y);
         void confirmTmpReference(double value, int axis, bool allowDelete);
         QwtPlotCurve* plotReferenceLine(const RideFilePoint *referencePoint);
+
+        // remembering state etc
+        CurveColors *curveColors;
 
     public slots:
 
