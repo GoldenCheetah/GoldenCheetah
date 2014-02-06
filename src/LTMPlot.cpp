@@ -1545,13 +1545,13 @@ LTMPlot::setCompareData(LTMSettings *set)
                     double maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
                         groupForDate(settings->start.date(), settings->groupBy);
 
-                    QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                    QString trendName = QString(tr("%1 %2 trend")).arg(cd.name).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
                                         .arg(metricDetail.type == METRIC_BEST ? 
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
-                    QwtPlotCurve *trend = new QwtPlotCurve("");
-                    curves.insert("", trend);
+                    QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                    curves.insert(trendName, trend);
 
                     // cosmetics
                     QPen cpen = QPen(cd.color.darker(200));
@@ -1582,13 +1582,13 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                 // quadratic lsm regression
                 if (metricDetail.trendtype == 2 && count > 3) {
-                    QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
+                    QString trendName = QString(tr("%1 %2 trend")).arg(cd.name).arg(metricDetail.uname);
                     QString trendSymbol = QString("%1_trend")
                                         .arg(metricDetail.type == METRIC_BEST ? 
                                         metricDetail.bestSymbol : metricDetail.symbol);
 
-                    QwtPlotCurve *trend = new QwtPlotCurve("");
-                    curves.insert("", trend);
+                    QwtPlotCurve *trend = new QwtPlotCurve(trendName);
+                    curves.insert(trendName, trend);
 
                     // cosmetics
                     QPen cpen = QPen(cd.color.darker(200));
@@ -1618,7 +1618,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
                     trend->attach(this);
-                    curves.insert(trendSymbol, trend);
+                    curves.insert(trendName, trend);
                 }
             }
 
@@ -1641,17 +1641,14 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                 // lets setup a curve with this data then!
                 QString outName;
-                if (metricDetail.topOut > 1)
-                    outName = QString(tr("%1 Top %2 Outliers"))
-                            .arg(metricDetail.uname)
-                            .arg(metricDetail.topOut);
-                else
-                    outName = QString(tr("%1 Outlier")).arg(metricDetail.uname);
+                outName = QString(tr("%1 %2 Outliers"))
+                          .arg(cd.name)
+                          .arg(metricDetail.uname);
 
                 QString outSymbol = QString("%1_outlier").arg(metricDetail.type == METRIC_BEST ?
                                                             metricDetail.bestSymbol : metricDetail.symbol);
-                QwtPlotCurve *out = new QwtPlotCurve("");
-                curves.insert("", out);
+                QwtPlotCurve *out = new QwtPlotCurve(outName);
+                curves.insert(outName, out);
 
                 out->setRenderHint(QwtPlotItem::RenderAntialiased);
                 out->setStyle(QwtPlotCurve::Dots);
@@ -1707,19 +1704,12 @@ LTMPlot::setCompareData(LTMSettings *set)
                 }
 
                 // lets setup a curve with this data then!
-                QString topName;
-                if (counter > 1)
-                    topName = QString(tr("%1 Best %2"))
-                            .arg(metricDetail.uname)
-                            .arg(counter); // starts from zero
-                else
-                    topName = QString(tr("Best %1")).arg(metricDetail.uname);
-
+                QString topName = QString(tr("%1 %2 Best")).arg(cd.name).arg(metricDetail.uname);
                 QString topSymbol = QString("%1_topN")
                                     .arg(metricDetail.type == METRIC_BEST ? 
                                         metricDetail.bestSymbol : metricDetail.symbol);
-                QwtPlotCurve *top = new QwtPlotCurve("");
-                curves.insert("", top);
+                QwtPlotCurve *top = new QwtPlotCurve(topName);
+                curves.insert(topName, top);
 
                 top->setRenderHint(QwtPlotItem::RenderAntialiased);
                 top->setStyle(QwtPlotCurve::Dots);
@@ -2095,7 +2085,9 @@ LTMPlot::setCompareData(LTMSettings *set)
     QHashIterator<QString, QwtPlotCurve*> p(curves);
     while (p.hasNext()) {
         p.next();
-        if (p.key() == "") // hide bollocksy curves
+
+        // always hide bollocksy curves
+        if (p.key().endsWith(tr("trend")) || p.key().endsWith(tr("Outliers")) || p.key().endsWith(tr("Best")))
             p.value()->setItemAttribute(QwtPlotItem::Legend, false);
         else
             p.value()->setItemAttribute(QwtPlotItem::Legend, settings->legend);
