@@ -103,12 +103,27 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) :
     grid->enableX(false);
     grid->attach(this);
 
+    // manage our own picker
+    picker = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::VLineRubberBand, QwtPicker::AlwaysOn, canvas(), "");
+    picker->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
+    picker->setTrackerPen(QColor(Qt::black));
+
+    QColor inv(Qt::white);
+    inv.setAlpha(0);
+    picker->setRubberBandPen(inv); // make it invisible
+    picker->setEnabled(true);
+    _canvasPicker = new LTMCanvasPicker(this);
+
     settings = NULL;
     cogganPMC = skibaPMC = NULL; // cache when replotting a PMC
 
     configUpdate(); // set basic colors
 
     connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    // connect pickers to ltmPlot
+    connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
+    connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), this, SLOT(pointClicked(QwtPlotCurve*, int)));
+
 }
 
 LTMPlot::~LTMPlot()
@@ -1084,8 +1099,8 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     QString format = axisTitle(yLeft).text();
-    parent->toolTip()->setAxes(xBottom, yLeft);
-    parent->toolTip()->setFormat(format);
+    picker->setAxes(xBottom, yLeft);
+    picker->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
     // cause no watts are being displayed
@@ -2098,8 +2113,8 @@ LTMPlot::setCompareData(LTMSettings *set)
     }
 
     QString format = axisTitle(yLeft).text();
-    parent->toolTip()->setAxes(xBottom, yLeft);
-    parent->toolTip()->setFormat(format);
+    picker->setAxes(xBottom, yLeft);
+    picker->setFormat(format);
 
     // show legend?
     if (settings->legend == false) this->legend()->hide();
@@ -2482,15 +2497,17 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         int precision = 0;
         QString datestr;
 
-        LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);
-        QwtText startText = lsd->label((int)(curve->sample(index).x()+0.5));
+        if (!parent->isCompare()) {
+            LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);
+            QwtText startText = lsd->label((int)(curve->sample(index).x()+0.5));
 
-        if (settings->groupBy != LTM_WEEK)
-            datestr = startText.text();
-        else
-            datestr = QString(tr("Week Commencing %1")).arg(startText.text());
+            if (settings->groupBy != LTM_WEEK)
+                datestr = startText.text();
+            else
+                datestr = QString(tr("Week Commencing %1")).arg(startText.text());
 
-        datestr = datestr.replace('\n', ' ');
+            datestr = datestr.replace('\n', ' ');
+        }
 
         // we reference the metric definitions of name and
         // units to decide on the level of precision required
@@ -2527,23 +2544,34 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 
         // output the tooltip
-        QString text = QString("%1\n%2\n%3 %4")
+        QString text;
+        if (!parent->isCompare()) {
+            text = QString("%1\n%2\n%3 %4")
                         .arg(datestr)
                         .arg(curve->title().text())
                         .arg(value, 0, 'f', precision)
                         .arg(this->axisTitle(curve->yAxis()).text());
+        } else {
+            text = QString("%1\n%2 %3")
+                        .arg(curve->title().text())
+                        .arg(value, 0, 'f', precision)
+                        .arg(this->axisTitle(curve->yAxis()).text());
+        }
 
         // set that text up
-        parent->toolTip()->setText(text);
+        picker->setText(text);
     } else {
         // no point
-        parent->toolTip()->setText("");
+        picker->setText("");
     }
 }
 
 void
 LTMPlot::pointClicked(QwtPlotCurve *curve, int index)
 {
+    // do nothin on a compare chart
+    if (parent->isCompare()) return;
+
     if (index >= 0 && curve != highlighter) {
         // setup the popup
         parent->pointClicked(curve, index);

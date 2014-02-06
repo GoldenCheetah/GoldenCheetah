@@ -147,21 +147,6 @@ LTMWindow::LTMWindow(Context *context) :
     popupLayout->addWidget(ltmPopup);
     popup->setLayout(popupLayout);
 
-    picker = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::VLineRubberBand,
-                               QwtPicker::AlwaysOn,
-                               ltmPlot->canvas(),
-                               "");
-    picker->setMousePattern(QwtEventPattern::MouseSelect1,
-                            Qt::LeftButton);
-    picker->setTrackerPen(QColor(Qt::black));
-    QColor inv(Qt::white);
-    inv.setAlpha(0);
-    picker->setRubberBandPen(inv); // make it invisible
-    picker->setEnabled(true);
-
-    _canvasPicker = new LTMCanvasPicker(ltmPlot);
-
     ltmTool = new LTMTool(context, &settings);
 
     // initialise
@@ -202,10 +187,6 @@ LTMWindow::LTMWindow(Context *context) :
     // comparing things
     connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));
     connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(compareChanged()));
-
-    // connect pickers to ltmPlot
-    connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
-    connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), ltmPlot, SLOT(pointClicked(QwtPlotCurve*, int)));
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));

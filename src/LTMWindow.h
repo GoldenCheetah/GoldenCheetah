@@ -111,7 +111,6 @@ class LTMWindow : public GcChartWindow
 
         LTMWindow(Context *);
         ~LTMWindow();
-        LTMToolTip *toolTip() { return picker; }
 
         // reveal / filters
         bool hasReveal() { return true; }
@@ -221,9 +220,6 @@ class LTMWindow : public GcChartWindow
         // summary view
         QWebView *dataSummary;
 
-        // qwt picker
-        LTMToolTip *picker;
-        LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 
         // popup - the GcPane to display within
         //         and the LTMPopup contents widdget

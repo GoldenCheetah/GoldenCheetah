@@ -30,6 +30,7 @@
 
 #include "LTMTool.h"
 #include "LTMSettings.h"
+#include "LTMCanvasPicker.h"
 #include "MetricAggregator.h"
 
 #include "Context.h"
@@ -40,6 +41,7 @@ class LTMPlotZoneLabel;
 class LTMScaleDraw;
 class CompareScaleDraw;
 class StressCalculator;
+class LTMToolTip;
 
 class LTMPlot : public QwtPlot
 {
@@ -75,6 +77,10 @@ class LTMPlot : public QwtPlot
         // just to make sure all plots have a common x axis in a stack
         int getMaxX();
         void setMaxX(int x);
+
+        // qwt picker
+        LTMToolTip *picker;
+        LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 
     private:
         Context *context;
