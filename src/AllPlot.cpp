@@ -530,6 +530,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     tooltip = NULL;
     _canvasPicker = NULL;
 
+    // curve color object
+    curveColors = new CurveColors(this);
+
     // create a background object for shading
     bg = new AllPlotBackground(this);
     bg->attach(this);
@@ -1932,6 +1935,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     //if (this->legend()) this->legend()->show();
     //replot();
+
+    // remember the curves and colors
+    curveColors->saveState();
 }
 
 void
@@ -2245,6 +2251,9 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         refreshZoneLabels();
 #endif
     }
+
+    // remember the curves and colors
+    curveColors->saveState();
 }
 
 void
@@ -2606,6 +2615,9 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 #if 0
 #endif
 #endif
+
+    // remember the curves and colors
+    curveColors->saveState();
 }
 
 // used to setup array of allplots where there is one for
@@ -2772,6 +2784,9 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     } else
         bg->detach();
 
+    // remember the curves and colors
+    curveColors->saveState();
+
     replot();
 }
 
@@ -2789,6 +2804,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     standard->curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
 
     setDataFromRideFile(rideItem->ride(), standard);
+
+    // remember the curves and colors
+    curveColors->saveState();
 }
 
 void
@@ -2968,6 +2986,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (maxSECS > here->maxSECS) here->maxSECS = maxSECS;
     }
 
+    // remember the curves and colors
+    curveColors->saveState();
 }
 
 void
@@ -3338,7 +3358,7 @@ QRectF IntervalPlotData::boundingRect() const
 void
 AllPlot::pointHover(QwtPlotCurve *curve, int index)
 {
-    if (index >= 0 && curve != standard->intervalHighlighterCurve) {
+    if (index >= 0 && curve != standard->intervalHighlighterCurve && curve->isVisible()) {
 
         double yvalue = curve->sample(index).y();
         double xvalue = curve->sample(index).x();
@@ -3361,10 +3381,18 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         // set that text up
         tooltip->setText(text);
 
+        // isolate me -- maybe do this via the legend ?
+        //curveColors->isolate(curve);
+        //replot();
+
     } else {
 
         // no point
         tooltip->setText("");
+
+        // get colors back -- maybe do this via the legend?
+        //curveColors->restoreState();
+        //replot();
     }
 }
 
