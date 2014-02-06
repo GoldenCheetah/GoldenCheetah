@@ -2284,10 +2284,15 @@ AllPlotWindow::forceSetupSeriesStackPlots()
 void
 AllPlotWindow::resizeSeriesPlots()
 {
-    seriesstackFrame->setUpdatesEnabled(false);
+    // calling setupdates enabled when its disabled
+    // causes all paint events to be flushed. We want
+    // to avoid that, since it causes a flicker.
+    bool update = seriesstackFrame->updatesEnabled();
+
+    if (update) seriesstackFrame->setUpdatesEnabled(false);
     foreach (AllPlot *plot, seriesPlots)
         plot->setFixedHeight(100 + (stackWidth *3));
-    seriesstackFrame->setUpdatesEnabled(true);
+    if (update) seriesstackFrame->setUpdatesEnabled(true);
 }
 
 void
@@ -2312,6 +2317,12 @@ AllPlotWindow::setupSeriesStackPlots()
     bool addHeadwind = false;
     RideItem* rideItem = current;
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
+
+    // the refresh takes a while and is prone
+    // to lots of flicker, we turn off updates
+    // whilst we switch from the old to the new
+    // stackWidget and plots
+    seriesstackFrame->setUpdatesEnabled(false);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, Qt::NoBrush);
@@ -2369,11 +2380,8 @@ AllPlotWindow::setupSeriesStackPlots()
     }
     newLayout->addStretch();
 
-    // the refresh takes a while and is prone
-    // to lots of flicker, we turn off updates
-    // whilst we switch from the old to the new
-    // stackWidget and plots
-    seriesstackFrame->setUpdatesEnabled(false);
+    // lets make sure the size matches the user preferences
+    resizeSeriesPlots(); // << checks if updates enabled and doesn't reenable
 
     // set new widgets
     QWidget *stackWidget = new QWidget;
