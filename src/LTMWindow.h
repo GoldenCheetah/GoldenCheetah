@@ -190,6 +190,7 @@ class LTMWindow : public GcChartWindow
         void dateRangeChanged(DateRange);
         void filterChanged();
         void groupBySelected(int);
+        void showEventsClicked(int);
         void rGroupBySelected(int);
         void shadeZonesClicked(int);
         void showDataClicked(int);
