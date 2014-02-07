@@ -517,7 +517,8 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     secondaryScope(secScope),
     context(context),
     parent(parent),
-    wanttext(wanttext)
+    wanttext(wanttext),
+    isolation(false)
 {
 
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false)
@@ -3488,11 +3489,11 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         QMouseEvent *m = static_cast<QMouseEvent*>(event);
         if (m->x()>axisWidget(axis)->width()) {
             confirmTmpReference(invTransform(axis, m->y()),axis,false); // don't show delete stuff
-        }
-        else  {
+            return false;
+        } else  if (standard->tmpReferenceLines.count()) {
             plotTmpReference(axis, 0, 0); //unplot
+            return true;
         }
-        return false;
     }
 
     // is it for other objects ?
@@ -3522,12 +3523,32 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         //qDebug()<<"event on="<<id<< static_cast<QwtScaleWidget*>(obj)->title().text() <<"event="<<event->type();
 
         // isolate / restore on mouse enter leave
-        if (event->type() == QEvent::Enter) {
+        if (!isolation && event->type() == QEvent::Enter) {
+
+            // isolate curve on hover
             curveColors->isolateAxis(id);
             replot();
-        } else if (event->type() == QEvent::Leave) {
+
+        } else if (!isolation && event->type() == QEvent::Leave) {
+
+            // return to normal when leave
             curveColors->restoreState();
             replot();
+
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+
+            // click on any axis to toggle isolation
+            // if isolation is on, just turns it off
+            // if isolation is off, turns it on for the axis clicked
+            if (isolation) {
+                isolation = false;
+                curveColors->restoreState();
+                replot();
+            } else {
+                isolation = true;
+                curveColors->isolateAxis(id);
+                replot();
+            }
         }
     }
 
