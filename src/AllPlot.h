@@ -53,6 +53,7 @@ class IntervalPlotData;
 class Context;
 class LTMToolTip;
 class LTMCanvasPicker;
+class QwtAxisId;
 
 class CurveColors
 {
@@ -334,6 +335,7 @@ class AllPlot : public QwtPlot
         AllPlot *referencePlot;
         AllPlotWindow *parent;
         bool wanttext, wantaxis;
+        bool isolation;
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 
