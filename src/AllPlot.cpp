@@ -1309,6 +1309,7 @@ AllPlot::refreshReferenceLines()
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     foreach(QwtPlotCurve *referenceLine, standard->referenceLines) {
+        curveColors->remove(referenceLine);
         referenceLine->detach();
         delete referenceLine;
     }
@@ -1373,6 +1374,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
     }
 
     if (referenceLine) {
+        curveColors->insert(referenceLine);
         referenceLine->setSamples(xaxis,yaxis);
         referenceLine->attach(this);
         referenceLine->setVisible(true);
@@ -2977,6 +2979,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->cal_mrk.clear();
 
         foreach(QwtPlotCurve *referenceLine, here->referenceLines) {
+            curveColors->remove(referenceLine);
             referenceLine->detach();
             delete referenceLine;
         }
@@ -3572,6 +3575,7 @@ AllPlot::plotTmpReference(int axis, int x, int y)
 
         foreach(QwtPlotCurve *curve, standard->tmpReferenceLines) {
             if (curve) {
+                curveColors->remove(curve); // ignored if not already there
                 curve->detach();
                 delete curve;
             }
@@ -3609,6 +3613,7 @@ AllPlot::plotTmpReference(int axis, int x, int y)
         // wipe any we don't want
         foreach(QwtPlotCurve *curve, standard->tmpReferenceLines) {
             if (curve) {
+                curveColors->remove(curve); // ignored if not already there
                 curve->detach();
                 delete curve;
             }

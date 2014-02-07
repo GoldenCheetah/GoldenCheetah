@@ -77,9 +77,19 @@ class CurveColors
 
             // get a list of plots and colors
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotCurve)) {
+
                 state.insert(static_cast<QwtPlotCurve*>(item), 
                              static_cast<QwtPlotCurve*>(item)->isVisible());
             }
+        }
+
+        // remove curve if being zapped (e.g. reference line)
+        void remove(QwtPlotCurve *remove) {
+            state.remove(remove);
+        }
+
+        void insert(QwtPlotCurve *add) {
+            state.insert(add, add->isVisible());
         }
 
         void isolate(QwtPlotCurve *curve) {
