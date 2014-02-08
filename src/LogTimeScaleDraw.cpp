@@ -56,8 +56,10 @@ static tick_info_t tick_info[] = {
     {       1.0,    "1m" },
     {       2.0,    "2m" },
     {       3.0,    "3m" },
+    {       4.0,    "4m" },
     {       5.0,    "5m" },
     {      10.0,   "10m" },
+    {      12.0,   "12m" },
     {      20.0,   "20m" },
     {      30.0,   "30m" },
     {      60.0,    "1h" },
@@ -77,7 +79,12 @@ LogTimeScaleDraw::ticksEnergy = QList<double>() << 1 << 5 << 10 << 20 << 30 << 6
 void
 LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
 {
-    QwtText lbl = tickLabel(painter->font(), value);
+    double tickValue = value;
+    if (inv_time)
+        tickValue = 1.0 / value;
+
+    QwtText lbl = tickLabel(painter->font(), tickValue);
+
     if ( lbl.isEmpty() )
         return;
 
