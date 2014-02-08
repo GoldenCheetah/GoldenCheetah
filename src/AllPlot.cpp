@@ -3498,28 +3498,35 @@ AllPlot::nextStep( int& step )
 bool
 AllPlot::eventFilter(QObject *obj, QEvent *event)
 {
-    int axis = -1;
-    if (obj == axisWidget(QwtPlot::yLeft))
-        axis=QwtPlot::yLeft;
 
-    if (axis>-1 && event->type() == QEvent::MouseButtonDblClick) {
-        QMouseEvent *m = static_cast<QMouseEvent*>(event);
-        confirmTmpReference(invTransform(axis, m->y()),axis, true); // do show delete stuff
-        return false;
-    }
-    if (axis>-1 && event->type() == QEvent::MouseMove) {
-        QMouseEvent *m = static_cast<QMouseEvent*>(event);
-        plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y());
-        return false;
-    }
-    if (axis>-1 && event->type() == QEvent::MouseButtonRelease) {
-        QMouseEvent *m = static_cast<QMouseEvent*>(event);
-        if (m->x()>axisWidget(axis)->width()) {
-            confirmTmpReference(invTransform(axis, m->y()),axis,false); // don't show delete stuff
+    // if power is going on we worry about reference lines
+    // otherwise not so much ..
+    if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts ||
+        scope == RideFile::NP || scope == RideFile::aPower || scope == RideFile::xPower) {
+
+        int axis = -1;
+        if (obj == axisWidget(QwtPlot::yLeft))
+            axis=QwtPlot::yLeft;
+
+        if (axis>-1 && event->type() == QEvent::MouseButtonDblClick) {
+            QMouseEvent *m = static_cast<QMouseEvent*>(event);
+            confirmTmpReference(invTransform(axis, m->y()),axis, true); // do show delete stuff
             return false;
-        } else  if (standard->tmpReferenceLines.count()) {
-            plotTmpReference(axis, 0, 0); //unplot
-            return true;
+        }
+        if (axis>-1 && event->type() == QEvent::MouseMove) {
+            QMouseEvent *m = static_cast<QMouseEvent*>(event);
+            plotTmpReference(axis, m->x()-axisWidget(axis)->width(), m->y());
+            return false;
+        }
+        if (axis>-1 && event->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent *m = static_cast<QMouseEvent*>(event);
+            if (m->x()>axisWidget(axis)->width()) {
+                confirmTmpReference(invTransform(axis, m->y()),axis,false); // don't show delete stuff
+                return false;
+            } else  if (standard->tmpReferenceLines.count()) {
+                plotTmpReference(axis, 0, 0); //unplot
+                return true;
+            }
         }
     }
 
