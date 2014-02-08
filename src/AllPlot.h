@@ -65,7 +65,7 @@ class CurveColors
         void restoreState() {
 
             // make all the curves have the right pen
-            QHashIterator<QwtPlotCurve *, bool> c(state);
+            QHashIterator<QwtPlotSeriesItem *, bool> c(state);
             while (c.hasNext()) {
                 c.next();
                 c.key()->setVisible(c.value());
@@ -77,25 +77,28 @@ class CurveColors
 
             // get a list of plots and colors
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotCurve)) {
-
-                state.insert(static_cast<QwtPlotCurve*>(item), 
-                             static_cast<QwtPlotCurve*>(item)->isVisible());
+                state.insert(static_cast<QwtPlotSeriesItem*>(item),
+                             static_cast<QwtPlotSeriesItem*>(item)->isVisible());
+            }
+            foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotIntervalCurve)) {
+                state.insert(static_cast<QwtPlotSeriesItem*>(item),
+                             static_cast<QwtPlotSeriesItem*>(item)->isVisible());
             }
         }
 
         // remove curve if being zapped (e.g. reference line)
-        void remove(QwtPlotCurve *remove) {
+        void remove(QwtPlotSeriesItem *remove) {
             state.remove(remove);
         }
 
-        void insert(QwtPlotCurve *add) {
+        void insert(QwtPlotSeriesItem *add) {
             state.insert(add, add->isVisible());
         }
 
-        void isolate(QwtPlotCurve *curve) {
+        void isolate(QwtPlotSeriesItem *curve) {
 
             // make the curve colored but all others go dull
-            QHashIterator<QwtPlotCurve *, bool> c(state);
+            QHashIterator<QwtPlotSeriesItem *, bool> c(state);
             while (c.hasNext()) {
                 c.next();
                 if (c.key() == curve) {
@@ -109,7 +112,7 @@ class CurveColors
         }
 
         void isolateAxis(QwtAxisId id) {
-            QHashIterator<QwtPlotCurve *, bool> c(state);
+            QHashIterator<QwtPlotSeriesItem *, bool> c(state);
             while (c.hasNext()) {
                 c.next();
 
@@ -125,7 +128,7 @@ class CurveColors
 
     private:
         QwtPlot *plot;
-        QHash<QwtPlotCurve *, bool> state;
+        QHash<QwtPlotSeriesItem *, bool> state;
 };
 
 class AllPlot;
