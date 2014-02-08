@@ -870,6 +870,10 @@ AllPlot::recalc(AllPlotObject *objects)
     if (objects->timeArray.empty())
         return;
 
+    // if anything is going on, lets stop it now!
+    isolation = false;
+    curveColors->restoreState();
+
     int rideTimeSecs = (int) ceil(objects->timeArray[objects->timeArray.count()-1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
@@ -1944,6 +1948,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     //replot();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 }
 
@@ -2260,6 +2265,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     }
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 }
 
@@ -2624,6 +2630,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 #endif
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 }
 
@@ -2792,6 +2799,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         bg->detach();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 
     replot();
@@ -2813,6 +2821,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     setDataFromRideFile(rideItem->ride(), standard);
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 }
 
@@ -2995,6 +3004,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
     }
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 }
 
@@ -3014,6 +3024,7 @@ AllPlot::setShowPower(int id)
         bg->detach();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
 }
 
@@ -3025,6 +3036,7 @@ AllPlot::setShowNP(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3037,6 +3049,7 @@ AllPlot::setShowXP(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3049,6 +3062,7 @@ AllPlot::setShowAP(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3061,6 +3075,7 @@ AllPlot::setShowHr(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3073,6 +3088,7 @@ AllPlot::setShowSpeed(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3085,6 +3101,7 @@ AllPlot::setShowCad(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3097,6 +3114,7 @@ AllPlot::setShowAlt(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3109,6 +3127,7 @@ AllPlot::setShowTemp(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3121,6 +3140,7 @@ AllPlot::setShowWind(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3137,6 +3157,7 @@ AllPlot::setShowW(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3149,6 +3170,7 @@ AllPlot::setShowTorque(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3162,6 +3184,7 @@ AllPlot::setShowBalance(bool show)
     setYMax();
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
@@ -3172,6 +3195,7 @@ AllPlot::setShowGrid(bool show)
     standard->grid->setVisible(show);
 
     // remember the curves and colors
+    isolation = false;
     curveColors->saveState();
     replot();
 }
