@@ -20,6 +20,7 @@
 #define _GC_CpintPlot_h 1
 #include "GoldenCheetah.h"
 
+#include "CriticalPowerWindow.h"
 #include "RideFileCache.h"
 #include "ExtendedCriticalPower.h"
 #include <qwt_plot.h>
@@ -109,10 +110,10 @@ class CpintPlot : public QwtPlot
 
         void changeSeason(const QDate &start, const QDate &end);
         void setAxisTitle(int axis, QString label);
-        void setSeries(RideFile::SeriesType);
+        void setSeries(CriticalPowerWindow::CriticalSeriesType);
 
-        QVector<double> getBests() { return bests->meanMaxArray(series); }
-        QVector<QDate> getBestDates() { return bests->meanMaxDates(series); }
+        QVector<double> getBests() { return bests->meanMaxArray(rideSeries); }
+        QVector<QDate> getBestDates() { return bests->meanMaxDates(rideSeries); }
 
         QDate startDate;
         QDate endDate;
@@ -156,7 +157,10 @@ class CpintPlot : public QwtPlot
         QwtPlotGrid *grid;
         const Zones *zones;
         int dateCP;
-        RideFile::SeriesType series;
+
+        RideFile::SeriesType rideSeries;
+        CriticalPowerWindow::CriticalSeriesType criticalSeries;
+
         Context *context;
 
         void refreshReferenceLines(RideItem*);

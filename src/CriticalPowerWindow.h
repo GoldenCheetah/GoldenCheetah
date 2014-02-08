@@ -139,10 +139,18 @@ class CriticalPowerWindow : public GcChartWindow
         int laeI2() const { return laeI2SpinBox->value(); }
         void setLaeI2(int x) { return laeI2SpinBox->setValue(x); }
 
-        RideFile::SeriesType series() { 
-            return static_cast<RideFile::SeriesType>
+        enum criticalseriestype { watts, wattsd, wattsKg, xPower, NP, hr, hrd, kph, kphd, cad, cadd, nm, nmd, vam, aPower, work, watts_inv_time};
+
+        typedef enum criticalseriestype CriticalSeriesType;
+
+        QString seriesName(CriticalSeriesType series);
+
+        CriticalSeriesType series() {
+            return static_cast<CriticalSeriesType>
                 (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         }
+
+        static RideFile::SeriesType getRideSeries(CriticalSeriesType series);
 
         int useSelected() { return dateSetting->mode(); }
         void setUseSelected(int x) { dateSetting->setMode(x); }
@@ -202,6 +210,8 @@ class CriticalPowerWindow : public GcChartWindow
 
         QString _dateRange;
 
+        double curve_to_point(double x, const QwtPlotCurve *curve, CriticalSeriesType serie);
+
     protected:
 
         QDir home;
@@ -222,7 +232,7 @@ class CriticalPowerWindow : public GcChartWindow
         Seasons *seasons;
         QList<Season> seasonsList;
         RideItem *currentRide;
-        QList<RideFile::SeriesType> seriesList;
+        QList<CriticalSeriesType> seriesList;
 #ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
 #endif

@@ -36,6 +36,8 @@ class LogTimeScaleDraw : public QwtScaleDraw
         static const QList<double> ticks;
         static const QList<double> ticksEnergy;
 
+        bool inv_time = false;
+
     protected:
 
         virtual void drawLabel(QPainter *p, double val) const;
