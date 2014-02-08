@@ -870,10 +870,6 @@ AllPlot::recalc(AllPlotObject *objects)
     if (objects->timeArray.empty())
         return;
 
-    // if anything is going on, lets stop it now!
-    isolation = false;
-    curveColors->restoreState();
-
     int rideTimeSecs = (int) ceil(objects->timeArray[objects->timeArray.count()-1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
@@ -2272,6 +2268,9 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 void
 AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 {
+    isolation = false;
+    curveColors->saveState();
+
     // remove all curves from the plot
     standard->wCurve->detach();
     standard->mCurve->detach();
@@ -3274,6 +3273,12 @@ void
 AllPlot::setSmoothing(int value)
 {
     smooth = value;
+
+    // if anything is going on, lets stop it now!
+    // ACTUALLY its quite handy to play with smooting!
+    isolation = false;
+    curveColors->restoreState();
+
     recalc(standard);
 }
 
@@ -3282,6 +3287,11 @@ AllPlot::setByDistance(int id)
 {
     bydist = (id == 1);
     setXTitle();
+
+    // if anything is going on, lets stop it now!
+    isolation = false;
+    curveColors->restoreState();
+
     recalc(standard);
 }
 
