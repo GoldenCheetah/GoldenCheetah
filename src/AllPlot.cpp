@@ -1144,7 +1144,7 @@ AllPlot::recalc(AllPlotObject *objects)
     // set curves - we set the intervalHighlighter to whichver is available
 
     //W' curve set to whatever data we have
-    if (rideItem && rideItem->ride()) {
+    if (rideItem && rideItem->ride() && objects->wCurve->isVisible()) {
         objects->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata().count());
         objects->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata().count());
     }
@@ -1388,7 +1388,7 @@ void
 AllPlot::setYMax()
 {
     // set axis scales
-    if (standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
+    if (showW && standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (j)"));
         setAxisScale(QwtAxisId(QwtAxis::yRight, 2),rideItem->ride()->wprimeData()->minY-1000,rideItem->ride()->wprimeData()->maxY+1000);
@@ -1703,8 +1703,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
     standard->balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
-    standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata().count());
-    standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata().count());
+    if (showW) {
+        standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata().count());
+        standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata().count());
+    }
     standard->wattsCurve->setSamples(xaxis,smoothW,stopidx-startidx);
     standard->npCurve->setSamples(xaxis,smoothN,stopidx-startidx);
     standard->xpCurve->setSamples(xaxis,smoothX,stopidx-startidx);
@@ -1884,7 +1886,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         standard->altCurve->attach(this);
         standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     }
-    if (rideItem->ride()->wprimeData()->xdata().count()) {
+    if (showW && rideItem->ride()->wprimeData()->xdata().count()) {
         standard->wCurve->attach(this);
         standard->mCurve->attach(this);
     }
@@ -2867,7 +2869,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (!here->npArray.empty()) here->npCurve->attach(this);
         if (!here->xpArray.empty()) here->xpCurve->attach(this);
         if (!here->apArray.empty()) here->apCurve->attach(this);
-        if (ride && !ride->wprimeData()->ydata().empty()) {
+        if (showW && ride && !ride->wprimeData()->ydata().empty()) {
             here->wCurve->attach(this);
             here->mCurve->attach(this);
         }
