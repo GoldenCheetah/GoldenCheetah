@@ -168,6 +168,7 @@ void WorkoutMetricsSummary::updateMetrics(QStringList &order, QHash<QString,Ride
         if(!metricMap.contains(name))
         {
             QLabel *label = new QLabel((rmp->name()) + ":");
+			label->setTextFormat(Qt::RichText);
             QLabel *lcd = new QLabel();
             metricMap[name] = QPair<QLabel*,QLabel*>(label,lcd);
             layout->addWidget(label,metricMap.size(),0);
