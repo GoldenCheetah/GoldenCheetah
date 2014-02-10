@@ -79,6 +79,8 @@ struct RideFileInterval
 
     // order bu start time
     bool operator< (RideFileInterval right) const { return start < right.start; }
+    bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop; }
+    bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
 };
 
 struct RideFileCalibration
@@ -191,6 +193,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // Index offset calculations
         double timeToDistance(double) const;  // get distance in km at time in secs
+        double distanceToTime(double km) const; // det time from distance
         int timeIndex(double) const;          // get index offset for time in secs
         int distanceIndex(double) const;      // get index offset for distance in KM
 

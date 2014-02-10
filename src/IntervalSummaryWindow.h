@@ -22,6 +22,8 @@
 #include <QtGui>
 #include <QTextEdit>
 
+#include "RideFile.h"
+
 class Context;
 class IntervalItem;
 
@@ -35,9 +37,11 @@ public:
 public slots:
 
     void intervalSelected();
+    void intervalHover(RideFileInterval);
 
 protected:
     void calcInterval(IntervalItem* interval, QString& html);
+    void calcInterval(RideFileInterval interval, QString& html);
 
     Context *context;
 };

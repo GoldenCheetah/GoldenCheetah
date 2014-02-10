@@ -25,6 +25,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "IntervalTreeView.h"
 #include "Settings.h"
 #include "Units.h"
 #include "Zones.h"
@@ -344,8 +345,15 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     curveTitle.setLabelAlignment(Qt::AlignRight);
 
     intervalHighlighterCurve = new QwtPlotCurve();
-    intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+    intervalHighlighterCurve->setBaseline(-20); // go below axis
+    intervalHighlighterCurve->setZ(-20); // behind alt but infront of zones
     intervalHighlighterCurve->attach(plot);
+    intervalHoverCurve = new QwtPlotCurve();
+    intervalHoverCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 2));
+    intervalHoverCurve->setBaseline(-20); // go below axis
+    intervalHoverCurve->setZ(-20); // behind alt but infront of zones
+    intervalHoverCurve->attach(plot);
 
     // setup that standard->grid
     grid = new QwtPlotGrid();
@@ -434,6 +442,7 @@ AllPlotObject::setVisible(bool show)
         balanceLCurve->detach();
         balanceRCurve->detach();
         intervalHighlighterCurve->detach();
+        intervalHoverCurve->detach();
 
         // marks, calibrations and reference lines
         foreach(QwtPlotMarker *mrk, d_mrk) {
@@ -464,6 +473,7 @@ AllPlotObject::setVisible(bool show)
         balanceRCurve->attach(plot);
 
         intervalHighlighterCurve->attach(plot);
+        intervalHoverCurve->attach(plot);
 
         // marks, calibrations and reference lines
         foreach(QwtPlotMarker *mrk, d_mrk) {
@@ -542,8 +552,8 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
-    // set the axes that we use..
-    setAxesCount(QwtAxis::yLeft, 2);
+    // set the axes that we use.. yLeft 3 is ALWAYS the highlighter axes and never visible
+    setAxesCount(QwtAxis::yLeft, 3);
     setAxesCount(QwtAxis::yRight, 3);
     setAxesCount(QwtAxis::xBottom, 1);
 
@@ -556,6 +566,20 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     setAxisMaxMinor(xBottom, 0);
     enableAxis(xBottom, true);
     setAxisVisible(xBottom, true);
+
+    // highlighter
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 2);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 2), sd);
+    QPalette pal;
+    pal.setColor(QPalette::WindowText, QColor(Qt::gray));
+    pal.setColor(QPalette::Text, QColor(Qt::gray));
+    axisWidget(QwtAxisId(QwtAxis::yLeft, 2))->setPalette(pal);
+    setAxisScale(QwtAxisId(QwtAxis::yLeft, 2), 0, 100);
+    setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false); // hide interval axis
+
     setAxisMaxMinor(yLeft, 0);
     setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft, 1), 0);
     setAxisMaxMinor(yRight, 0);
@@ -606,6 +630,7 @@ AllPlot::configChanged()
         standard->balanceLCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->balanceRCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->intervalHoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
@@ -670,10 +695,14 @@ AllPlot::configChanged()
     standard->mCurve->setSymbol(sym);
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
-    standard->intervalHighlighterCurve->setPen(ihlPen);
+    standard->intervalHighlighterCurve->setPen(QPen(Qt::NoPen));
+    standard->intervalHoverCurve->setPen(QPen(Qt::NoPen));
     QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
     ihlbrush.setAlpha(128);
     standard->intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
+    QColor hbrush = QColor(Qt::lightGray);
+    hbrush.setAlpha(50);
+    standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
     QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
@@ -806,8 +835,13 @@ AllPlot::configChanged()
 void 
 AllPlot::setHighlightIntervals(bool state)
 {
-    if (state) standard->intervalHighlighterCurve->attach(this);
-    else standard->intervalHighlighterCurve->detach();
+    if (state) {
+        standard->intervalHighlighterCurve->attach(this);
+        standard->intervalHoverCurve->attach(this);
+    } else {
+        standard->intervalHighlighterCurve->detach();
+        standard->intervalHoverCurve->detach();
+    }
 }
 
 struct DataPoint {
@@ -1151,68 +1185,52 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!objects->wattsArray.empty()) {
         objects->wattsCurve->setSamples(xaxis.data() + startingIndex, objects->smoothWatts.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
 
     if (!objects->npArray.empty()) {
         objects->npCurve->setSamples(xaxis.data() + startingIndex, objects->smoothNP.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
 
     if (!objects->xpArray.empty()) {
         objects->xpCurve->setSamples(xaxis.data() + startingIndex, objects->smoothXP.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
 
     if (!objects->apArray.empty()) {
         objects->apCurve->setSamples(xaxis.data() + startingIndex, objects->smoothAP.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
 
     if (!objects->hrArray.empty()) {
         objects->hrCurve->setSamples(xaxis.data() + startingIndex, objects->smoothHr.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
     if (!objects->speedArray.empty()) {
         objects->speedCurve->setSamples(xaxis.data() + startingIndex, objects->smoothSpeed.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
 
     if (!objects->cadArray.empty()) {
         objects->cadCurve->setSamples(xaxis.data() + startingIndex, objects->smoothCad.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
     if (!objects->altArray.empty()) {
         objects->altCurve->setSamples(xaxis.data() + startingIndex, objects->smoothAltitude.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     }
 
     if (!objects->tempArray.empty()) {
         objects->tempCurve->setSamples(xaxis.data() + startingIndex, objects->smoothTemp.data() + startingIndex, totalPoints);
-        if (context->athlete->useMetricUnits)
-            standard->intervalHighlighterCurve->setYAxis(yRight);
-        else
-            standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
 
     if (!objects->windArray.empty()) {
         objects->windCurve->setSamples(new QwtIntervalSeriesData(objects->smoothRelSpeed));
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
 
     if (!objects->torqueArray.empty()) {
         objects->torqueCurve->setSamples(xaxis.data() + startingIndex, objects->smoothTorque.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
 
     if (!objects->balanceArray.empty()) {
         objects->balanceLCurve->setSamples(xaxis.data() + startingIndex, objects->smoothBalanceL.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
         objects->balanceRCurve->setSamples(xaxis.data() + startingIndex, objects->smoothBalanceR.data() + startingIndex, totalPoints);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
     setYMax();
@@ -1387,6 +1405,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
 void
 AllPlot::setYMax()
 {
+
     // set axis scales
     if (showW && standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
 
@@ -1558,6 +1577,7 @@ AllPlot::setYMax()
         setAxisVisible(yRight, standard->speedCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
+        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false);
         setAxisVisible(xBottom, true);
 
     } else {
@@ -1884,7 +1904,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     if (!plot->standard->smoothAltitude.empty()) {
         standard->altCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     }
     if (showW && rideItem->ride()->wprimeData()->xdata().count()) {
         standard->wCurve->attach(this);
@@ -1892,48 +1911,37 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (!plot->standard->smoothWatts.empty()) {
         standard->wattsCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
     if (!plot->standard->smoothNP.empty()) {
         standard->npCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
     if (!plot->standard->smoothXP.empty()) {
         standard->xpCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
     if (!plot->standard->smoothAP.empty()) {
         standard->apCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
     }
     if (!plot->standard->smoothHr.empty()) {
         standard->hrCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
     if (!plot->standard->smoothSpeed.empty()) {
         standard->speedCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
     if (!plot->standard->smoothCad.empty()) {
         standard->cadCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
     if (!plot->standard->smoothTemp.empty()) {
         standard->tempCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
     if (!plot->standard->smoothWind.empty()) {
         standard->windCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
     if (!plot->standard->smoothTorque.empty()) {
         standard->torqueCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(yRight);
     }
     if (!plot->standard->smoothBalanceL.empty()) {
         standard->balanceLCurve->attach(this);
         standard->balanceRCurve->attach(this);
-        standard->intervalHighlighterCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
     }
 
 
@@ -2251,12 +2259,6 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         refreshCalibrationMarkers();
         refreshReferenceLines();
 
-        // always draw against yLeft in series mode
-        standard->intervalHighlighterCurve->setYAxis(yLeft);
-        if (thereCurve)
-            standard->intervalHighlighterCurve->setBaseline(thereCurve->minYValue());
-        else if (thereICurve)
-            standard->intervalHighlighterCurve->setBaseline(thereICurve->boundingRect().top());
 #if 0
         refreshZoneLabels();
 #endif
@@ -2660,6 +2662,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->balanceLCurve->detach();
     standard->balanceRCurve->detach();
     standard->intervalHighlighterCurve->detach();
+    standard->intervalHoverCurve->detach();
 
     standard->wCurve->setVisible(false);
     standard->mCurve->setVisible(false);
@@ -2677,6 +2680,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->balanceLCurve->setVisible(false);
     standard->balanceRCurve->setVisible(false);
     standard->intervalHighlighterCurve->setVisible(false);
+    standard->intervalHoverCurve->setVisible(false);
 
     // NOW SET OUR CURVES USING THEIR DATA ...
     QVector<double> &xaxis = referencePlot->bydist ? object->smoothDistance : object->smoothTime;
@@ -3421,10 +3425,10 @@ double IntervalPlotData::y(size_t i) const
 {
     // which point are we returning?
     switch (i%4) {
-    case 0 : return -100; // bottom left
-    case 1 : return 5000; // top left - set to out of bound value
-    case 2 : return 5000; // top right - set to out of bound value
-    case 3 : return -100;  // bottom right
+    case 0 : return -20; // bottom left
+    case 1 : return 100; // top left - set to out of bound value
+    case 2 : return 100; // top right - set to out of bound value
+    case 3 : return -20;  // bottom right
     }
     return 0;
 }
@@ -3438,16 +3442,21 @@ QPointF IntervalPlotData::sample(size_t i) const {
 
 QRectF IntervalPlotData::boundingRect() const
 {
-    return QRectF(-100, 5000, 5100, 5100);
+    return QRectF(0, 5000, 5100, 5100);
 }
 
 void
 AllPlot::pointHover(QwtPlotCurve *curve, int index)
 {
-    if (index >= 0 && curve != standard->intervalHighlighterCurve && curve->isVisible()) {
+    double X=0.0f;
+
+    if (index >= 0 && curve != standard->intervalHighlighterCurve && 
+                      curve != standard->intervalHoverCurve && curve->isVisible()) {
 
         double yvalue = curve->sample(index).y();
         double xvalue = curve->sample(index).x();
+
+        X = xvalue;
 
         QString xstring;
         if (bydist) {
@@ -3476,10 +3485,138 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         // no point
         tooltip->setText("");
 
+        // ok now we highlight intervals
+        QPoint cursor = QCursor::pos();
+        X = tooltip->invTransform(canvas()->mapFromGlobal(cursor)).x();
+
         // get colors back -- maybe do this via the legend?
         //curveColors->restoreState();
         //replot();
     }
+
+    // we have intervals selected so no need to mouse over
+    if (context->athlete->intervalWidget->selectedItems().count()) return;
+
+    if (!context->isCompareIntervals && rideItem && rideItem->ride()) {
+
+        // convert from distance to time
+        if (bydist) X = rideItem->ride()->distanceToTime(X) / 60.00f;
+
+        RideFileInterval chosen;
+        int duration = -1;
+
+        // loop through intervals and select FIRST we are in
+        foreach(RideFileInterval i, rideItem->ride()->intervals()) {
+            if (i.start < (X*60.00f) && i.stop > (X*60.00f)) {
+                if (duration == -1 || (i.stop-i.start) < duration) {
+                    duration = i.stop - i.start;
+                    chosen = i;
+                }
+            }
+        }
+
+        // we already chose it!
+        if (duration > 0 && chosen == hovered) return;
+
+        QVector<double>xdata, ydata;
+        if (duration > 0) {
+
+            // hover curve color aligns to the type of interval we are highlighting
+            QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
+            if (chosen.name.startsWith(tr("Peak")) || chosen.name.startsWith("Peak")) hbrush = QColor(Qt::lightGray);
+            if (chosen.name.startsWith(tr("Match"))) hbrush = QColor(Qt::red);
+            hbrush.setAlpha(50);
+            standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
+
+            // we chose one?
+            if (bydist) {
+
+                double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+                double start = multiplier * rideItem->ride()->timeToDistance(chosen.start);
+                double stop = multiplier * rideItem->ride()->timeToDistance(chosen.stop);
+
+                xdata << start;
+                ydata << -20;
+                xdata << start;
+                ydata << 100;
+                xdata << stop;
+                ydata << 100;
+                xdata << stop;
+                ydata << -20;
+
+            } else {
+
+                xdata << chosen.start / 60.00f;
+                ydata << -20;
+                xdata << chosen.start / 60.00f;
+                ydata << 100;
+                xdata << chosen.stop / 60.00f;
+                ydata << 100;
+                xdata << chosen.stop / 60.00f;
+                ydata << -20;
+            }
+
+        }
+        standard->intervalHoverCurve->setSamples(xdata,ydata);
+        replot();
+
+        // remember for next time!
+        hovered = chosen;
+
+        // tell the charts -- and block signals whilst they occur
+        blockSignals(true);
+        context->notifyIntervalHover(hovered);
+        blockSignals(false);
+
+    }
+}
+
+void
+AllPlot::intervalHover(RideFileInterval chosen)
+{
+    // no point!
+    if (!isVisible() || chosen == hovered) return;
+
+    QVector<double>xdata, ydata;
+    if (chosen != RideFileInterval()) {
+
+        // hover curve color aligns to the type of interval we are highlighting
+        QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
+        if (chosen.name.startsWith(tr("Peak")) || chosen.name.startsWith("Peak")) hbrush = QColor(Qt::lightGray);
+        if (chosen.name.startsWith(tr("Match"))) hbrush = QColor(Qt::red);
+        hbrush.setAlpha(40);
+        standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
+
+        if (bydist) {
+            double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+            double start = multiplier * rideItem->ride()->timeToDistance(chosen.start);
+            double stop = multiplier * rideItem->ride()->timeToDistance(chosen.stop);
+
+            xdata << start;
+            ydata << -20;
+            xdata << start;
+            ydata << 100;
+            xdata << stop;
+            ydata << 100;
+            xdata << stop;
+            ydata << -20;
+        } else {
+            xdata << chosen.start / 60.00f;
+            ydata << -20;
+            xdata << chosen.start / 60.00f;
+            ydata << 100;
+            xdata << chosen.stop / 60.00f;
+            ydata << 100;
+            xdata << chosen.stop / 60.00f;
+            ydata << -20;
+        }
+    }
+
+    // update state
+    hovered = chosen;
+
+    standard->intervalHoverCurve->setSamples(xdata,ydata); 
+    replot();
 }
 
 void

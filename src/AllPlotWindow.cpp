@@ -283,6 +283,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlot->tooltip->setEnabled(true);
 
     allPlot->_canvasPicker = new LTMCanvasPicker(allPlot);
+    connect(context, SIGNAL(intervalHover(RideFileInterval)), allPlot, SLOT(intervalHover(RideFileInterval)));
     connect(allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));
@@ -2370,7 +2371,7 @@ AllPlotWindow::setupSeriesStackPlots()
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
         _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,2), 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,1), 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
         _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
         _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,3).id, 0);
@@ -2497,7 +2498,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
         _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,2), 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,1), 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
         _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
         _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,3).id, 0);
@@ -2576,6 +2577,7 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     _allPlot->tooltip->setEnabled(true);
 
     _allPlot->_canvasPicker = new LTMCanvasPicker(_allPlot);
+    connect(context, SIGNAL(intervalHover(RideFileInterval)), _allPlot, SLOT(intervalHover(RideFileInterval)));
     connect(_allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), _allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(_allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));
