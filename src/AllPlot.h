@@ -143,8 +143,8 @@ class CurveColors
             while (c.hasNext()) {
                 c.next();
 
-                // isolate on axis hover
-                if (c.key()->yAxis() == id) {
+                // isolate on axis hover (but leave huighlighters alone)
+                if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::yLeft,2)) {
                     c.key()->setVisible(c.value());
                 } else {
                     // hide others
@@ -259,7 +259,8 @@ class AllPlotObject : public QObject
     QVector<QwtIntervalSample> smoothRelSpeed;
 
     // highlighting intervals
-    QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
+    QwtPlotCurve *intervalHighlighterCurve,  // highlight selected intervals on the Plot
+                 *intervalHoverCurve;
 
     // the plot we work for
     AllPlot *plot;
@@ -344,6 +345,7 @@ class AllPlot : public QwtPlot
 
         // for tooltip
         void pointHover(QwtPlotCurve*, int);
+        void intervalHover(RideFileInterval h);
 
     protected:
 
@@ -356,6 +358,7 @@ class AllPlot : public QwtPlot
         RideItem *rideItem;
         AllPlotBackground *bg;
         QSettings *settings;
+        RideFileInterval hovered;
 
         // controls
         bool shade_zones;

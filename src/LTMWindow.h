@@ -39,6 +39,7 @@
 
 class QwtPlotPanner;
 class QwtPlotPicker;
+class AllPlot;
 
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
@@ -74,6 +75,10 @@ class LTMToolTip : public QwtPlotPicker
     }
     void setFormat(QString fmt) { format = fmt; }
     void setText(QString txt) { tip = txt; }
+
+    protected:
+    friend class ::AllPlot;
+
     private:
     QString format;
     QString tip;

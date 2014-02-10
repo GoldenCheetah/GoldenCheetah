@@ -24,8 +24,8 @@
 #include "SpecialFields.h" // for class RealtimeData
 #include "CompareInterval.h" // what intervals are being compared?
 #include "CompareDateRange.h" // what intervals are being compared?
+#include "RideFile.h"
 
-class RideFile;
 class RideItem;
 class IntervalItem;
 class ErgFile;
@@ -115,6 +115,7 @@ class Context : public QObject
         void notifyZoomOut() { emit zoomOut(); }
         void notifyIntervalSelected() { intervalSelected(); }
         void notifyIntervalsChanged() { emit intervalsChanged(); }
+        void notifyIntervalHover(RideFileInterval x) { emit intervalHover(x); }
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
 
@@ -137,6 +138,7 @@ class Context : public QObject
         void rideDeleted(RideItem *);
         void intervalSelected();
         void intervalsChanged();
+        void intervalHover(RideFileInterval);
         void intervalZoom(IntervalItem*);
         void zoomOut();
         void rideDirty(RideItem*);

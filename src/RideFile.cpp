@@ -224,6 +224,20 @@ RideFile::intervalBegin(const RideFileInterval &interval) const
 }
 
 double
+RideFile::distanceToTime(double km) const
+{
+    RideFilePoint p;
+    p.km = km;
+
+    // Check we have some data and the secs is in bounds
+    if (dataPoints_.isEmpty()) return 0;
+    if (km < dataPoints_.first()->km) return dataPoints_.first()->secs;
+    if (km > dataPoints_.last()->km) return dataPoints_.last()->secs;
+
+    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(dataPoints_.begin(), dataPoints_.end(), &p, ComparePointKm());
+    return (*i)->secs;
+}
+double
 RideFile::timeToDistance(double secs) const
 {
     RideFilePoint p;

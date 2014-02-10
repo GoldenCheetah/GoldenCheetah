@@ -254,6 +254,7 @@ Athlete::rideTreeWidgetSelectionChanged()
 void
 Athlete::intervalTreeWidgetSelectionChanged()
 {
+    context->notifyIntervalHover(RideFileInterval()); // clear
     context->notifyIntervalSelected();
 }
 
