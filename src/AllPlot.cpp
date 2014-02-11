@@ -3502,61 +3502,69 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         // convert from distance to time
         if (bydist) X = rideItem->ride()->distanceToTime(X) / 60.00f;
 
+        QVector<double>xdata, ydata;
         RideFileInterval chosen;
-        int duration = -1;
 
-        // loop through intervals and select FIRST we are in
-        foreach(RideFileInterval i, rideItem->ride()->intervals()) {
-            if (i.start < (X*60.00f) && i.stop > (X*60.00f)) {
-                if (duration == -1 || (i.stop-i.start) < duration) {
-                    duration = i.stop - i.start;
-                    chosen = i;
+        if (rideItem->ride()->dataPoints().count() > 1) {
+
+            // set duration to length of ride, and keep the value to compare
+            int rideduration = rideItem->ride()->dataPoints().last()->secs -
+                                  rideItem->ride()->dataPoints().first()->secs;
+
+            int duration = rideduration;
+
+            // loop through intervals and select FIRST we are in
+            foreach(RideFileInterval i, rideItem->ride()->intervals()) {
+                if (i.start < (X*60.00f) && i.stop > (X*60.00f)) {
+                    if ((i.stop-i.start) < duration) {
+                        duration = i.stop - i.start;
+                        chosen = i;
+                    }
+                }
+            }
+
+            // we already chose it!
+            if (chosen == hovered) return;
+
+            if (duration < rideduration) {
+
+                // hover curve color aligns to the type of interval we are highlighting
+                QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
+                if (chosen.name.startsWith(tr("Peak")) || chosen.name.startsWith("Peak")) hbrush = QColor(Qt::lightGray);
+                if (chosen.name.startsWith(tr("Match"))) hbrush = QColor(Qt::red);
+                hbrush.setAlpha(50);
+                standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
+
+                // we chose one?
+                if (bydist) {
+
+                    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+                    double start = multiplier * rideItem->ride()->timeToDistance(chosen.start);
+                    double stop = multiplier * rideItem->ride()->timeToDistance(chosen.stop);
+
+                    xdata << start;
+                    ydata << -20;
+                    xdata << start;
+                    ydata << 100;
+                    xdata << stop;
+                    ydata << 100;
+                    xdata << stop;
+                    ydata << -20;
+
+                } else {
+
+                    xdata << chosen.start / 60.00f;
+                    ydata << -20;
+                    xdata << chosen.start / 60.00f;
+                    ydata << 100;
+                    xdata << chosen.stop / 60.00f;
+                    ydata << 100;
+                    xdata << chosen.stop / 60.00f;
+                    ydata << -20;
                 }
             }
         }
 
-        // we already chose it!
-        if (duration > 0 && chosen == hovered) return;
-
-        QVector<double>xdata, ydata;
-        if (duration > 0) {
-
-            // hover curve color aligns to the type of interval we are highlighting
-            QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
-            if (chosen.name.startsWith(tr("Peak")) || chosen.name.startsWith("Peak")) hbrush = QColor(Qt::lightGray);
-            if (chosen.name.startsWith(tr("Match"))) hbrush = QColor(Qt::red);
-            hbrush.setAlpha(50);
-            standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
-
-            // we chose one?
-            if (bydist) {
-
-                double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
-                double start = multiplier * rideItem->ride()->timeToDistance(chosen.start);
-                double stop = multiplier * rideItem->ride()->timeToDistance(chosen.stop);
-
-                xdata << start;
-                ydata << -20;
-                xdata << start;
-                ydata << 100;
-                xdata << stop;
-                ydata << 100;
-                xdata << stop;
-                ydata << -20;
-
-            } else {
-
-                xdata << chosen.start / 60.00f;
-                ydata << -20;
-                xdata << chosen.start / 60.00f;
-                ydata << 100;
-                xdata << chosen.stop / 60.00f;
-                ydata << 100;
-                xdata << chosen.stop / 60.00f;
-                ydata << -20;
-            }
-
-        }
         standard->intervalHoverCurve->setSamples(xdata,ydata);
         replot();
 
