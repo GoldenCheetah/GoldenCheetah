@@ -269,7 +269,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // TODO: zoomer doesn't interact well with automatic axis resizing
 
     // tooltip on hover over point
-    allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
+    allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                allPlot->canvas(),
@@ -653,7 +653,7 @@ AllPlotWindow::compareChanged()
             if (!ci.isChecked()) ap->hide();
 
             // tooltip on hover over point -- consider moving this to AllPlot (!)
-            ap->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
+            ap->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
                                     QwtPicker::VLineRubberBand,
                                     QwtPicker::AlwaysOn,
                                     ap->canvas(),
@@ -723,7 +723,7 @@ AllPlotWindow::compareChanged()
             plot->setFixedHeight(120+(stackWidth*3));
 
             // tooltip on hover over point -- consider moving this to AllPlot (!)
-            plot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
+            plot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
                                     QwtPicker::VLineRubberBand,
                                     QwtPicker::AlwaysOn,
                                     plot->canvas(),
@@ -2563,7 +2563,7 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     _allPlot->standard->allMarker2 = allMarker2;
 
     // use the tooltip picker rather than a standard picker
-    _allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
+    _allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                _allPlot->canvas(),
