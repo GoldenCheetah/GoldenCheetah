@@ -232,6 +232,9 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 #ifdef Q_OS_MAC 
 #if QT_VERSION > 0x50000
+#if QT_VERSION >= 0x50201
+    setUnifiedTitleAndToolBarOnMac(true);
+#endif
     head = addToolBar(context->athlete->cyclist);
     head->setContentsMargins(20,0,20,0);
     head->setFloatable(false);
@@ -239,8 +242,14 @@ MainWindow::MainWindow(const QDir &home)
 
     // make the normal toolbar in QT5 have same colors as the tabs and when inactive
     // make it the same 'light' colour as the other widgets do.
+#if QT_VERSION < 0x50201
     head->setStyleSheet(" QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #C6C6C6, stop: 1 #A5A5A5 ); } "
                         " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } "); 
+#else
+    head->setStyleSheet(" QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
+                        " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } "); 
+#endif
+
     // widgets
     QWidget *macAnalButtons = new QWidget(this);
     macAnalButtons->setContentsMargins(20,5,20,0);
