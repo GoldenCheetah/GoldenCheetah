@@ -672,7 +672,7 @@ MainWindow::MainWindow(const QDir &home)
     showhideLowbar = viewMenu->addAction(tr("Show Compare Pane"), this, SLOT(showLowbar(bool)));
     showhideLowbar->setCheckable(true);
     showhideLowbar->setChecked(false);
-#ifndef Q_OS_MAC // not on a Mac
+#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201) // not on a Mac
     showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
@@ -785,7 +785,7 @@ MainWindow::showTabbar(bool want)
 void
 MainWindow::showToolbar(bool want)
 {
-#ifndef Q_OS_MAC
+#if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201)
     showhideToolbar->setChecked(want);
     if (want) {
         head->show();
