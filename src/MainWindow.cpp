@@ -720,6 +720,9 @@ MainWindow::MainWindow(const QDir &home)
 
     saveState(currentTab->context); // set to whatever we started with
     selectAnalysis();
+
+    //grab focus
+    currentTab->setFocus();
 }
 
 /*----------------------------------------------------------------------
