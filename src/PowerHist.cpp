@@ -55,6 +55,7 @@ PowerHist::PowerHist(Context *context, bool rangemode) :
     lny(false),
     shade(false),
     zoned(false),
+    cpzoned(false),
     binw(3),
     withz(true),
     dt(1),
@@ -582,6 +583,7 @@ PowerHist::recalc(bool force)
         LASTuseMetricUnits == context->athlete->useMetricUnits &&
         LASTlny == lny &&
         LASTzoned == zoned &&
+        LASTcpzoned == cpzoned &&
         LASTbinw == binw &&
         LASTwithz == withz &&
         LASTdt == dt &&
@@ -599,6 +601,7 @@ PowerHist::recalc(bool force)
         LASTuseMetricUnits = context->athlete->useMetricUnits;
         LASTlny = lny;
         LASTzoned = zoned;
+        LASTcpzoned = cpzoned;
         LASTbinw = binw;
         LASTwithz = withz;
         LASTdt = dt;
@@ -606,10 +609,14 @@ PowerHist::recalc(bool force)
     }
 
 
-    if (source == Ride && !rideItem) return;
+    if (source == Ride && !rideItem) { 
+        return;
+    }
 
     // make sure the interval length is set if not plotting metrics
-    if (source != Metric && dt <= 0) return;
+    if (source != Metric && dt <= 0) {
+        return;
+    }
 
     if (source == Metric) {
 
@@ -625,10 +632,15 @@ PowerHist::recalc(bool force)
         selectedArray = &standard.wattsSelectedArray;
 
     } else if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned == true) {
-
-        array = &standard.wattsZoneArray;
-        arrayLength = standard.wattsZoneArray.size();
-        selectedArray = &standard.wattsZoneSelectedArray;
+        if (cpzoned) {
+            array = &standard.wattsCPZoneArray;
+            arrayLength = standard.wattsCPZoneArray.size();
+            selectedArray = &standard.wattsCPZoneSelectedArray;
+        } else {
+            array = &standard.wattsZoneArray;
+            arrayLength = standard.wattsZoneArray.size();
+            selectedArray = &standard.wattsZoneSelectedArray;
+        }
 
     } else if (series == RideFile::aPower && zoned == false) {
 
@@ -808,11 +820,17 @@ PowerHist::recalc(bool force)
 
         // zone scale draw
         if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && rideItem->zones) {
-            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
-            if (rideItem->zoneRange() >= 0)
-                setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
-            else
-                setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
+
+            if (cpzoned) {
+                setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
+                setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
+            } else {
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
+                if (rideItem->zoneRange() >= 0)
+                    setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
+                else
+                    setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
+            }
         }
 
         // hr scale draw
@@ -829,9 +847,14 @@ PowerHist::recalc(bool force)
 
         // watts zoned for a time range
         if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && context->athlete->zones()) {
-            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(), 0));
-            if (context->athlete->zones()->getRangeSize())
-                setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones()->numZones(0), 1); // use zones from first defined range
+            if (cpzoned) {
+                setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
+                setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
+            } else {
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(), 0));
+                if (context->athlete->zones()->getRangeSize())
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones()->numZones(0), 1); // use zones from first defined range
+            }
         }
 
         // hr zoned for a time range
@@ -922,6 +945,7 @@ PowerHist::setData(RideFileCache *cache)
     // the ride cache
     standard.wattsArray.resize(0);
     standard.wattsZoneArray.resize(10);
+    standard.wattsCPZoneArray.resize(4);
     standard.wattsKgArray.resize(0);
     standard.aPowerArray.resize(0);
     standard.nmArray.resize(0);
@@ -964,6 +988,12 @@ PowerHist::setData(RideFileCache *cache)
         standard.wattsZoneArray[i] = cache->wattsZoneArray()[i];
         standard.hrZoneArray[i] = cache->hrZoneArray()[i];
     }
+
+    // polarised zones
+    standard.wattsCPZoneArray[0] = cache->wattsCPZoneArray()[1];
+    if (withz) standard.wattsCPZoneArray[0] += cache->wattsCPZoneArray()[0]; // add in zero watts
+    standard.wattsCPZoneArray[1] = cache->wattsCPZoneArray()[2];
+    standard.wattsCPZoneArray[2] = cache->wattsCPZoneArray()[3];
 
     curveSelected->hide();
 }
@@ -1361,6 +1391,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
         standard.wattsArray.resize(0);
         standard.wattsZoneArray.resize(0);
+        standard.wattsCPZoneArray.resize(0);
         standard.wattsKgArray.resize(0);
         standard.aPowerArray.resize(0);
         standard.nmArray.resize(0);
@@ -1383,6 +1414,12 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         double torque_factor = (context->athlete->useMetricUnits ? 1.0 : 0.73756215);
         double speed_factor  = (context->athlete->useMetricUnits ? 1.0 : 0.62137119);
 
+        // cp and zones
+        int CP = 0;
+        const Zones *zones = rideItem->zones;
+        int zoneRange = zones ? zones->whichRange(ride->startTime().date()) : -1;
+        if (zoneRange != -1) CP=zones->getCP(zoneRange);
+    
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
             bool selected = isSelected(p1, ride->recIntSecs());
 
@@ -1401,13 +1438,26 @@ PowerHist::setData(RideItem *_rideItem, bool force)
             }
 
             // watts zoned array
-            const Zones *zones = rideItem->zones;
-            int zoneRange = zones ? zones->whichRange(ride->startTime().date()) : -1;
 
             // Only calculate zones if we have a valid range and check zeroes
             if (zoneRange > -1 && (withz || (!withz && p1->watts))) {
+
+                // get the zone
                 wattsIndex = zones->whichZone(zoneRange, p1->watts);
 
+                // cp zoned
+                if (standard.wattsCPZoneArray.size() < 4) standard.wattsCPZoneArray.resize(4);
+                if (p1->watts < 1 && withz) // moderate zero watts
+                    standard.wattsCPZoneArray[0] += ride->recIntSecs();
+                if (wattsIndex < 2) // moderate
+                    standard.wattsCPZoneArray[0] += ride->recIntSecs();
+                else if (p1->watts < CP) // heavy
+                    standard.wattsCPZoneArray[1] += ride->recIntSecs();
+                else // severe
+                    standard.wattsCPZoneArray[2] += ride->recIntSecs();
+
+
+                // zoned
                 if (wattsIndex >= 0 && wattsIndex < maxSize) {
                     if (wattsIndex >= standard.wattsZoneArray.size())
                         standard.wattsZoneArray.resize(wattsIndex + 1);
@@ -1543,6 +1593,13 @@ PowerHist::setBinWidth(double value)
 {
     if (!value) value = 1; // binwidth must be nonzero
     binw = value;
+}
+
+void
+PowerHist::setCPZoned(bool value)
+{
+    cpzoned = value;
+    setComparePens();
 }
 
 void
