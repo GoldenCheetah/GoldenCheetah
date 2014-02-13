@@ -759,6 +759,7 @@ MainWindow::showLowbar(bool want)
 void
 MainWindow::showTabbar(bool want)
 {
+    setUpdatesEnabled(false);
     showhideTabbar->setChecked(want);
     if (want) {
 #ifdef Q_OS_MAC
@@ -780,12 +781,14 @@ MainWindow::showTabbar(bool want)
 #endif
         tabbar->hide();
     }
+    setUpdatesEnabled(true);
 }
 
 void
 MainWindow::showToolbar(bool want)
 {
 #if (!defined Q_OS_MAC) || (QT_VERSION >= 0x50201)
+    setUpdatesEnabled(false);
     showhideToolbar->setChecked(want);
     if (want) {
         head->show();
@@ -793,6 +796,7 @@ MainWindow::showToolbar(bool want)
     else {
         head->hide();
     }
+    setUpdatesEnabled(true);
 #endif
 }
 
