@@ -68,6 +68,7 @@ class HistogramWindow : public GcChartWindow
     Q_PROPERTY(bool zeroes READ zeroes WRITE setZeroes USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool zoned READ zoned WRITE setZoned USER true)
+    Q_PROPERTY(bool cpZoned READ cpZoned WRITE setCPZoned USER true)
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
@@ -104,6 +105,8 @@ class HistogramWindow : public GcChartWindow
         void setZeroes(bool x) { showZeroes->setChecked(x); }
         bool shade() const { return shadeZones->isChecked(); }
         void setShade(bool x) { shadeZones->setChecked(x); }
+        bool cpZoned() const { return showInCPZones->isChecked(); }
+        void setCPZoned(bool x) { return showInCPZones->setChecked(x); }
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
 #ifdef GC_HAVE_LUCENE
@@ -171,6 +174,7 @@ class HistogramWindow : public GcChartWindow
         void switchMode();
 
         void setZoned(int);
+        void setCPZoned(int);
         void setShade(int);
 
         // comparing things
@@ -200,6 +204,7 @@ class HistogramWindow : public GcChartWindow
         QComboBox *showSumY;            // ??
         QCheckBox *shadeZones;      // Shade zone background
         QCheckBox *showInZones;       // Plot by Zone
+        QCheckBox *showInCPZones;       // Plot by CP domain Moderate/Heavy/Severe Zone
         QComboBox *seriesCombo;         // Which data series to plot
 
         // reveal controls
@@ -238,7 +243,7 @@ class HistogramWindow : public GcChartWindow
         QLabel *comboLabel, *metricLabel1, *metricLabel2, *showLabel,
                *blankLabel1, *blankLabel2,
                *blankLabel3, *blankLabel4, *blankLabel5, *blankLabel6,
-               *colorLabel;
+               *blankLabel7, *colorLabel;
 
         // in range mode we can also plot a distribution chart
         // based upon metrics and not just data series

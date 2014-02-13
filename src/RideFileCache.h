@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 9;
+static const unsigned int RideFileCacheVersion = 10;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -52,6 +52,7 @@ static const unsigned int RideFileCacheVersion = 9;
 // 7        03-Dec-12    Fixed W/kg calculations!
 // 8        13-Feb-13    Fixed VAM calculations
 // 9        06-Nov-13    Added aPower
+// 10       13-Feb-14    Added Moderate, Heavy and Severe domains
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -156,6 +157,7 @@ class RideFileCache
         QVector<QDate> &meanMaxDates(RideFile::SeriesType series); // the dates of the bests
         QVector<double> &distributionArray(RideFile::SeriesType); // return distribution array for the given series
         QVector<float> &wattsZoneArray() { return wattsTimeInZone; }
+        QVector<float> &wattsCPZoneArray() { return wattsCPTimeInZone; } // moderate, heavy and severe domains
         QVector<float> &hrZoneArray() { return hrTimeInZone; }
 
         // explain the array binning / sampling
@@ -253,6 +255,7 @@ class RideFileCache
 
 
         QVector<float> wattsTimeInZone;   // time in zone in seconds
+        QVector<float> wattsCPTimeInZone;   // time in zone in seconds for moderate, heavy and severe domains
         QVector<float> hrTimeInZone;      // time in zone in seconds
 
         // we need to return doubles not longs, we just use longs

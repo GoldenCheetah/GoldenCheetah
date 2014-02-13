@@ -92,11 +92,14 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
     public:
 
         // storage for data counts
-        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
+        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsCPZoneArray, wattsKgArray, nmArray, hrArray,
                               hrZoneArray, kphArray, cadArray, metricArray;
 
         // storage for data counts in interval selected
-        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray, wattsZoneSelectedArray,
+        QVector<unsigned int> aPowerSelectedArray, 
+                              wattsSelectedArray, 
+                              wattsZoneSelectedArray, 
+                              wattsCPZoneSelectedArray,
                               wattsKgSelectedArray,
                               nmSelectedArray, hrSelectedArray,
                               hrZoneSelectedArray, kphSelectedArray,
@@ -146,6 +149,7 @@ class PowerHist : public QwtPlot
         void setlnY(bool value);
         void setWithZeros(bool value);
         void setZoned(bool value);
+        void setCPZoned(bool value);
         void setSumY(bool value);
         void configChanged();
         void setAxisTitle(int axis, QString label);
@@ -192,6 +196,7 @@ class PowerHist : public QwtPlot
         bool lny;
         bool shade;
         bool zoned;        // show in zones
+        bool cpzoned;        // show in cp zones
         double binw;
         bool withz;        // whether zeros are included in histogram
         double dt;         // length of sample
@@ -240,6 +245,7 @@ class PowerHist : public QwtPlot
         bool LASTuseMetricUnits;  // whether metric units are used (or imperial)
         bool LASTlny;
         bool LASTzoned;        // show in zones
+        bool LASTcpzoned;        // show in zones
         double LASTbinw;
         bool LASTwithz;        // whether zeros are included in histogram
         double LASTdt;         // length of sample
