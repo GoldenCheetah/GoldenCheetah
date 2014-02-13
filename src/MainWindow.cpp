@@ -247,7 +247,7 @@ MainWindow::MainWindow(const QDir &home)
                         " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } "); 
 #else
     head->setStyleSheet(" QToolBar:!active { border: 0px; black; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
-                        " QToolBar:active { border: 0px; black; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } "); 
+                        " QToolBar:active { border: 0px; black; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #A5A5A5 ); } "); 
 #endif
 
     // widgets
@@ -536,14 +536,14 @@ MainWindow::MainWindow(const QDir &home)
 #endif
     mainLayout->addWidget(tabbar);
 #if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
-    QWidget *line = new QWidget(this);
-    line->setContentsMargins(0,0,0,0);
-    line->setFixedHeight(1);
+    blackline = new QWidget(this);
+    blackline->setContentsMargins(0,0,0,0);
+    blackline->setFixedHeight(1);
     QPalette linePalette;
     linePalette.setBrush(backgroundRole(), Qt::darkGray);
-    line->setPalette(linePalette);
-    line->setAutoFillBackground(true);
-    mainLayout->addWidget(line);
+    blackline->setPalette(linePalette);
+    blackline->setAutoFillBackground(true);
+    mainLayout->addWidget(blackline);
 #endif
     mainLayout->addWidget(tabStack);
     setCentralWidget(central);
@@ -764,6 +764,9 @@ MainWindow::showTabbar(bool want)
 #ifdef Q_OS_MAC
     setDocumentMode(true);
     tabbar->setDocumentMode(true);
+#if QT_VERSION >= 0x50201
+    blackline->hide();
+#endif
 #endif
         tabbar->show();
     }
@@ -771,6 +774,9 @@ MainWindow::showTabbar(bool want)
 #ifdef Q_OS_MAC
     setDocumentMode(false);
     tabbar->setDocumentMode(false);
+#if QT_VERSION >= 0x50201
+    blackline->show();
+#endif
 #endif
         tabbar->hide();
     }

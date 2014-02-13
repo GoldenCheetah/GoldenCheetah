@@ -268,26 +268,16 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     int shade, inshade;
     if (metal) {
 #ifdef Q_OS_MAC
-#if QT_VERSION >= 0x50201
-        shade = 0xD9;
-        inshade = 232;
-#else
         shade = 178;
         inshade = 225;
-#endif
 #else
         shade = 200;
         inshade = 250;
 #endif
     } else {
 #ifdef Q_OS_MAC
-#if QT_VERSION >= 0x50201
-        shade = 0xD9;
-        inshade = 232;
-#else
         inshade = 225;
         shade = 210;
-#endif
 #else
         inshade = 250;
         shade = 225;

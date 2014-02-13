@@ -242,6 +242,10 @@ class MainWindow : public QMainWindow
 
         // Miscellany
         QSignalMapper *toolMapper;
+
+#if (defined Q_OS_MAC) && (QT_VERSION >= 0x50201)
+        QWidget *blackline;
+#endif
 };
 
 #endif // _GC_MainWindow_h
