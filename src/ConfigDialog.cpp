@@ -41,6 +41,8 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     QToolBar *head = addToolBar(tr("Preferences"));
     setFixedSize(525,540);
     setUnifiedTitleAndToolBarOnMac(true);
+    head->setFloatable(false);
+    head->setMovable(false);
 #else
     QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
