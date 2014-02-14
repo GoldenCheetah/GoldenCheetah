@@ -59,6 +59,8 @@ class WPrime {
         double maxMatch();
         double minY, maxY;
         double TAU, PCP_, CP, WPRIME, EXP;
+
+        // lowest we got as a percentage
         double maxE() { return WPRIME ? (((WPRIME - minY) / WPRIME) * 100.00f) : 0; }
 
         double PCP();
