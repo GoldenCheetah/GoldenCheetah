@@ -991,7 +991,9 @@ PowerHist::setData(RideFileCache *cache)
 
     // polarised zones
     standard.wattsCPZoneArray[0] = cache->wattsCPZoneArray()[1];
-    if (withz) standard.wattsCPZoneArray[0] += cache->wattsCPZoneArray()[0]; // add in zero watts
+    if (withz) {
+        standard.wattsCPZoneArray[0] += cache->wattsCPZoneArray()[0]; // add in zero watts
+    }
     standard.wattsCPZoneArray[1] = cache->wattsCPZoneArray()[2];
     standard.wattsCPZoneArray[2] = cache->wattsCPZoneArray()[3];
 
@@ -1449,11 +1451,11 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                 if (standard.wattsCPZoneArray.size() < 4) standard.wattsCPZoneArray.resize(4);
                 if (p1->watts < 1 && withz) // moderate zero watts
                     standard.wattsCPZoneArray[0] += ride->recIntSecs();
-                if (wattsIndex < 2) // moderate
+                else if (p1->watts >=1 && wattsIndex < 2) // moderate
                     standard.wattsCPZoneArray[0] += ride->recIntSecs();
-                else if (p1->watts < CP) // heavy
+                else if (p1->watts >=1 && p1->watts < CP) // heavy
                     standard.wattsCPZoneArray[1] += ride->recIntSecs();
-                else // severe
+                else if (p1->watts > CP) // severe
                     standard.wattsCPZoneArray[2] += ride->recIntSecs();
 
 
