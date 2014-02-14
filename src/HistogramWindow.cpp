@@ -231,7 +231,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     cl->addRow(blankLabel6 = new QLabel(""), showInZones);
 
     showInCPZones = new QCheckBox;
-    showInCPZones->setText(tr("Use Polarised Intensity Domains"));
+    showInCPZones->setText(tr("Use Exercise Intensity Domains"));
     cl->addRow(blankLabel7 = new QLabel(""), showInCPZones);
 
     // bin width
@@ -964,9 +964,6 @@ HistogramWindow::updateChart()
                 if (old) delete old; // guarantee source pointer changes
                 stale = false; // well we tried
 
-                // set the data on the plot
-                powerHist->setData(source);
-
                 // and which series to plot
                 powerHist->setSeries(series);
 
@@ -977,6 +974,9 @@ HistogramWindow::updateChart()
                 powerHist->setlnY(showLnY->isChecked() ? true : false);
                 powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
                 powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
+
+                // set the data on the plot
+                powerHist->setData(source);
 
             } else {
 
@@ -1009,10 +1009,6 @@ HistogramWindow::updateChart()
 
         } else {
 
-            powerHist->setData(myRideItem, interval); // intervals selected forces data to
-                                                  // be recomputed since interval selection
-                                                  // has changed.
-
             // and which series to plot
             powerHist->setSeries(series);
 
@@ -1023,6 +1019,11 @@ HistogramWindow::updateChart()
             powerHist->setlnY(showLnY->isChecked() ? true : false);
             powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
             powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
+
+            // do once the controls are set
+            powerHist->setData(myRideItem, true); // intervals selected forces data to
+                                                  // be recomputed since interval selection
+                                                  // has changed.
 
         }
 
