@@ -1683,7 +1683,11 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
         QString warn;
         if (rideItem->ride()->wprimeData()->minY < 0) {
-            warn = QString("Minimum CP=%1").arg(rideItem->ride()->wprimeData()->PCP());
+            int minCP = rideItem->ride()->wprimeData()->PCP();
+            if (minCP)
+                warn = QString("** Minimum CP=%1 **").arg(rideItem->ride()->wprimeData()->PCP());
+            else
+                warn = QString("** Check W' is set correctly **");
         }
 
         QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ) %6").arg(rideItem->ride()->wprimeData()->TAU)

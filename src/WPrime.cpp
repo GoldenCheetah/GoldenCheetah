@@ -465,7 +465,8 @@ WPrime::PCP()
     if (PCP_) return PCP_;
 
     // check WPRIME is correct otherwise we will run forever!
-    if (WPRIME < 10000) return PCP_ = CP; // Wprime not set properly
+    // if its way off don't even try!
+    if (minY < -10000 || WPRIME < 10000) return PCP_ = 0; // Wprime not set properly
 
     int cp = CP;
     do {
