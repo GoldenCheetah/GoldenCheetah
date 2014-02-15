@@ -30,6 +30,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
 #include <qwt_compat.h>
 #include <qwt_scale_draw.h>
@@ -222,6 +223,9 @@ class PowerHist : public QwtPlot
         // background shading
         QList <PowerHistZoneLabel *> zoneLabels;
         QList <HrHistZoneLabel *> hrzoneLabels;
+
+        // zone data labels (actual values)
+        QList <QwtPlotMarker *> zoneDataLabels;
 
         QString metricX, metricY;
         int digits;

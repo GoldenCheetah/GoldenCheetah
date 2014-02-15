@@ -310,6 +310,13 @@ PowerHist::recalcCompare()
         ((rangemode && !context->isCompareDateRanges)
         || (!rangemode && !context->isCompareIntervals))) return;
 
+    // zap any zone data labels
+    foreach (QwtPlotMarker *label, zoneDataLabels) {
+        label->detach();
+        delete label;
+    }
+    zoneDataLabels.clear();
+
     // loop through intervals or dateranges, depending upon mode
     // counting columns
     double ncols = 0;
@@ -468,6 +475,10 @@ PowerHist::recalcCompare()
     
         } else { // ZONED
 
+            QFont labelFont;
+            labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+            labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
             // 0.625 = golden ratio for gaps betwen group of cols
             // 0.9 = 10% space between each col in group
 
@@ -479,6 +490,10 @@ PowerHist::recalcCompare()
             // Each zone column will have 4 points
             QVector<double> xaxis (array->size() * 4);
             QVector<double> yaxis (array->size() * 4);
+
+            // so we can calculate percentage for the labels
+            double total=0;
+            for (int i=0; i<array->size(); i++) total += dt * (double)(*array)[i];
 
             // samples to time
             for (int i=0, offset=0; i<array->size(); i++) {
@@ -498,6 +513,30 @@ PowerHist::recalcCompare()
                 xaxis[offset] = x +jump +width;
                 yaxis[offset] = 0;
                 offset++;
+
+                double yval = absolutetime ? y : (y /total * 100.00f);
+
+                if (yval > 0) {
+
+                    QColor color = rangemode ? context->compareDateRanges[intervalNumber].color.darker(200)
+                                             : context->compareIntervals[intervalNumber].color.darker(200);
+
+                    // now add a label above the bar
+                    QwtPlotMarker *label = new QwtPlotMarker();
+                    QwtText text(QString("%1%2").arg(int(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
+                    text.setFont(labelFont);
+                    text.setColor(color);
+                    label->setLabel(text);
+                    label->setValue(x+jump+(width/2.00f), yval);
+                    label->setYAxis(QwtPlot::yLeft);
+                    label->setSpacing(5); // not px but by yaxis value !? mad.
+                    label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
+            
+                    // and attach
+                    label->attach(this);
+                    zoneDataLabels << label;
+
+                }
             }
 
             if (!absolutetime) {
@@ -632,6 +671,13 @@ PowerHist::recalc(bool force)
     if (source != Metric && dt <= 0) {
         return;
     }
+
+    // zap any zone data labels
+    foreach (QwtPlotMarker *label, zoneDataLabels) {
+        label->detach();
+        delete label;
+    }
+    zoneDataLabels.clear();
 
     if (source == Metric) {
 
@@ -778,6 +824,10 @@ PowerHist::recalc(bool force)
 
     } else {
 
+        QFont labelFont;
+        labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+        labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
         // we're not binning instead we are prettyfing the columnar
         // display in much the same way as the weekly summary workds
         // Each zone column will have 4 points
@@ -785,6 +835,10 @@ PowerHist::recalc(bool force)
         QVector<double> yaxis (array->size() * 4);
         QVector<double> selectedxaxis (selectedArray->size() * 4);
         QVector<double> selectedyaxis (selectedArray->size() * 4);
+
+        // so we can calculate percentage for the labels
+        double total=0;
+        for (int i=0; i<array->size(); i++) total += dt * (double)(*array)[i];
 
         // samples to time
         for (int i=0, offset=0; i<array->size(); i++) {
@@ -804,6 +858,28 @@ PowerHist::recalc(bool force)
             xaxis[offset] = x +0.625;
             yaxis[offset] = 0;
             offset++;
+
+            double yval = absolutetime ? y : (y /total * 100.00f);
+
+            if (yval > 0) {
+
+                // now add a label above the bar
+                QwtPlotMarker *label = new QwtPlotMarker();
+                QwtText text(QString("%1%2").arg(int(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
+                text.setFont(labelFont);
+                text.setColor(series == RideFile::watts ? GColor(CPOWER).darker(200) : GColor(CHEARTRATE).darker(200));
+                label->setLabel(text);
+                label->setValue(x+0.312f, yval);
+                label->setYAxis(QwtPlot::yLeft);
+                label->setSpacing(5); // not px but by yaxis value !? mad.
+                label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
+            
+                // and attach
+                label->attach(this);
+                zoneDataLabels << label;
+
+            }
+
         }
 
         for (int i=0, offset=0; i<selectedArray->size(); i++) {
@@ -822,6 +898,7 @@ PowerHist::recalc(bool force)
             selectedxaxis[offset] = x +0.95;
             selectedyaxis[offset] = 0;
             offset++;
+
         }
 
         if (!absolutetime) {
@@ -960,7 +1037,7 @@ PowerHist::setData(RideFileCache *cache)
     // the ride cache
     standard.wattsArray.resize(0);
     standard.wattsZoneArray.resize(10);
-    standard.wattsCPZoneArray.resize(4);
+    standard.wattsCPZoneArray.resize(3);
     standard.wattsKgArray.resize(0);
     standard.aPowerArray.resize(0);
     standard.nmArray.resize(0);
@@ -1055,7 +1132,7 @@ PowerHist::setDataFromCompare()
         // the ride cache
         add.wattsArray.resize(0);
         add.wattsZoneArray.resize(10);
-        add.wattsCPZoneArray.resize(4);
+        add.wattsCPZoneArray.resize(3);
         add.wattsKgArray.resize(0);
         add.aPowerArray.resize(0);
         add.nmArray.resize(0);
@@ -1471,7 +1548,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                 wattsIndex = zones->whichZone(zoneRange, p1->watts);
 
                 // cp zoned
-                if (standard.wattsCPZoneArray.size() < 4) standard.wattsCPZoneArray.resize(4);
+                if (standard.wattsCPZoneArray.size() < 4) standard.wattsCPZoneArray.resize(3);
                 if (p1->watts < 1 && withz) // moderate zero watts
                     standard.wattsCPZoneArray[0] += ride->recIntSecs();
                 else if (p1->watts >=1 && wattsIndex < 2) // moderate
