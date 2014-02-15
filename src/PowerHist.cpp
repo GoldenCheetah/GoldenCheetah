@@ -344,8 +344,16 @@ PowerHist::recalcCompare()
 
         } else if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned == true) {
 
-            array = &cid.wattsZoneArray;
-            arrayLength = cid.wattsZoneArray.size();
+            if (cpzoned) {
+
+                array = &cid.wattsCPZoneArray;
+                arrayLength = cid.wattsCPZoneArray.size();
+
+            } else {
+
+                array = &cid.wattsZoneArray;
+                arrayLength = cid.wattsZoneArray.size();
+            }
 
         } else if (series == RideFile::aPower && zoned == false) {
 
@@ -503,20 +511,27 @@ PowerHist::recalcCompare()
             //
             // POWER ZONES
             //
-            const Zones *zones;
-            int zone_range = -1;
-            zones = context->athlete->zones();
+            if (cpzoned) {
 
-            if (zones) {
-                if (context->compareIntervals.count())
-                    zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
-                if (zone_range == -1) zone_range = zones->whichRange(QDate::currentDate());
+                setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
+                setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
 
-            }
-            if (zones && zone_range != -1) {
-                if ((series == RideFile::watts || series == RideFile::wattsKg)) {
-                    setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(zones, zone_range));
-                    setAxisScale(QwtPlot::xBottom, -0.99, zones->numZones(zone_range), 1);
+            } else {
+                const Zones *zones;
+                int zone_range = -1;
+                zones = context->athlete->zones();
+
+                if (zones) {
+                    if (context->compareIntervals.count())
+                        zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
+                    if (zone_range == -1) zone_range = zones->whichRange(QDate::currentDate());
+
+                }
+                if (zones && zone_range != -1) {
+                    if ((series == RideFile::watts || series == RideFile::wattsKg)) {
+                        setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(zones, zone_range));
+                        setAxisScale(QwtPlot::xBottom, -0.99, zones->numZones(zone_range), 1);
+                    }
                 }
             }
 
@@ -1040,6 +1055,7 @@ PowerHist::setDataFromCompare()
         // the ride cache
         add.wattsArray.resize(0);
         add.wattsZoneArray.resize(10);
+        add.wattsCPZoneArray.resize(4);
         add.wattsKgArray.resize(0);
         add.aPowerArray.resize(0);
         add.nmArray.resize(0);
@@ -1070,6 +1086,13 @@ PowerHist::setDataFromCompare()
             add.wattsZoneArray[i] = s->wattsZoneArray()[i];
             add.hrZoneArray[i] = s->hrZoneArray()[i];
         }
+        // polarised zones
+        add.wattsCPZoneArray[0] = s->wattsCPZoneArray()[1];
+        if (withz) {
+            add.wattsCPZoneArray[0] += s->wattsCPZoneArray()[0]; // add in zero watts
+        }
+        add.wattsCPZoneArray[1] = s->wattsCPZoneArray()[2];
+        add.wattsCPZoneArray[2] = s->wattsCPZoneArray()[3];
 
         // add to the list
         compareData << add;
