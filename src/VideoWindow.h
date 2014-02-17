@@ -20,6 +20,9 @@
 #define _GC_VideoWindow_h 1
 #include "GoldenCheetah.h"
 
+// QT5.2 we adopt the native video player
+#if QT_VERSION < 0x50201
+
 // for vlc
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +32,14 @@ extern "C" {
 #include <vlc/vlc.h>
 #include <vlc/libvlc_media.h>
 }
+
+#else
+
+#include <QVideoWidget>
+#include <QMediaPlayer>
+#include <QMediaContent>
+
+#endif
 
 // QT stuff etc
 #include <QtGui>
@@ -57,7 +68,9 @@ class MediaHelper
 
     private:
         QStringList supported;
+#if QT_VERSION < 0x50201
         libvlc_instance_t * inst;
+#endif
 };
 
 class VideoWindow : public GcWindow
@@ -90,10 +103,20 @@ class VideoWindow : public GcWindow
 
         bool m_MediaChanged;
 
+#if QT_VERSION < 0x50201
+
+        // vlc for older QT
         libvlc_instance_t * inst;
         //libvlc_exception_t exceptions;
         libvlc_media_player_t *mp;
         libvlc_media_t *m;
+#else
+
+        // QT native
+        QMediaContent mc;
+        QVideoWidget *wd;
+        QMediaPlayer *mp;
+#endif
 
 #ifdef Q_OS_LINUX
 #if QT_VERSION > 0x050000

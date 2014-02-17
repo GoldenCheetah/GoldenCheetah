@@ -33,6 +33,8 @@ lessThan(QT_MAJOR_VERSION, 5) {
     QT += webkitwidgets widgets
     macx {
         QT += macextras
+    } else {
+        QT += multimedia multimediawidgets
     }
 }
 
