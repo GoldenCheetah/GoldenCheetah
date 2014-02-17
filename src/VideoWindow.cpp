@@ -28,6 +28,11 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
 
+#if QT_VERSION < 0x50201
+    //
+    // USE VLC VIDEOPLAYER
+    //
+
     // config paramaters to libvlc
     const char * const vlc_args[] = {
                     "-I", "dummy", /* Don't use any interface */
@@ -63,7 +68,7 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
     /* This is a non working code that show how to hooks into a window,
      * if we have a window around */
 #ifdef Q_OS_LINUX
-#if QT_VERSION > 0x050000
+#if QT_VERSION > 0x50000
      x11Container = new QWidget(this); //XXX PORT TO 5.1 BROKEN CODE XXX
 #else
      x11Container = new QX11EmbedContainer(this);
@@ -76,6 +81,17 @@ VideoWindow::VideoWindow(Context *context, const QDir &home)  :
      container = new QWidget(this);
      layout->addWidget(container);
      libvlc_media_player_set_hwnd (mp, (HWND)(container->winId()));
+#endif
+
+#else
+    // USE QT VIDEO PLAYER
+    wd = new QVideoWidget(this);
+    wd->show();
+
+    mp = new QMediaPlayer(this);
+    mp->setVideoOutput(wd);
+
+    layout->addWidget(wd);
 #endif
 
     connect(context, SIGNAL(stop()), this, SLOT(stopPlayback()));
@@ -96,6 +112,10 @@ VideoWindow::~VideoWindow()
 
     stopPlayback();
 
+#if QT_VERSION < 0x50201
+
+    // VLC
+
     /* No need to keep the media now */
     if (m) libvlc_media_release (m);
 
@@ -104,6 +124,12 @@ VideoWindow::~VideoWindow()
 
     // unload vlc 
     libvlc_release (inst);
+#else
+
+    // QT MEDIA
+    delete mp;
+    delete wd;
+#endif
 }
 
 void VideoWindow::resizeEvent(QResizeEvent * )
@@ -113,6 +139,7 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
+#if QT_VERSION < 0x50201
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
@@ -125,25 +152,38 @@ void VideoWindow::startPlayback()
     libvlc_media_player_play (mp);
 
     m_MediaChanged = false;
+#else
+    // open the media object
+    mp->play();
+#endif
 }
 void VideoWindow::stopPlayback()
 {
+#if QT_VERSION < 0x50201
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
     libvlc_media_player_stop (mp);
+#else
+    mp->stop();
+#endif
 }
 
 void VideoWindow::pausePlayback()
 {
+#if QT_VERSION < 0x50201
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
     libvlc_media_player_pause (mp);
+#else
+    mp->pause();
+#endif
 }
 
 void VideoWindow::resumePlayback()
 {
+#if QT_VERSION < 0x50201
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
@@ -151,18 +191,29 @@ void VideoWindow::resumePlayback()
         startPlayback();
     else
         libvlc_media_player_pause (mp);
+#else
+    mp->play();
+#endif
 }
 
 void VideoWindow::seekPlayback(long ms)
 {
+#if QT_VERSION < 0x50201
     if (!m) return;
 
     // seek to ms position in current file
     libvlc_media_player_set_time(mp, (libvlc_time_t) ms);
+#else
+    mp->setPosition(ms);
+#endif
 }
 
 void VideoWindow::mediaSelected(QString filename)
 {
+#if QT_VERSION < 0x50201
+
+    // VLC
+
     // stop any current playback
     stopPlayback();
 
@@ -188,6 +239,11 @@ void VideoWindow::mediaSelected(QString filename)
 
         m_MediaChanged = true;
     }
+#else
+    // QT MEDIA
+    mc = QMediaContent(QUrl::fromLocalFile(filename));
+    mp->setMedia(mc);
+#endif
 }
 
 MediaHelper::MediaHelper()
