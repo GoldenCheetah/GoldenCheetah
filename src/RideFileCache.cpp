@@ -934,10 +934,9 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
         // CP zones :- moderate(<Z2), heavy (<CP and >Z2), severe (>CP)
         if (series == RideFile::watts && zoneRange != -1 && CP) {
-            int zone = context->athlete->zones()->whichZone(zoneRange, dp->value(series));
             if (dp->value(series) < 1) // moderate zero watts
                 wattsCPTimeInZone[0] += ride->recIntSecs();
-            if (zone < 2) // moderate
+            if (dp->value(series) < (CP*0.85f)) // moderate
                 wattsCPTimeInZone[1] += ride->recIntSecs();
             else if (dp->value(series) < CP) // heavy
                 wattsCPTimeInZone[2] += ride->recIntSecs();

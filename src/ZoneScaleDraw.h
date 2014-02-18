@@ -81,9 +81,9 @@ class PolarisedZoneScaleDraw: public QwtScaleDraw
         PolarisedZoneScaleDraw() {
             setTickLength(QwtScaleDiv::MajorTick, 3);
 
-            labels << "Moderate"; // translate tr macros !?
-            labels << "Heavy";
-            labels << "Severe";
+            labels << "I"; // translate tr macros !?
+            labels << "II";
+            labels << "III";
         }
 
         // return label

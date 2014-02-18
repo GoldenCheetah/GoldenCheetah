@@ -1544,20 +1544,19 @@ PowerHist::setData(RideItem *_rideItem, bool force)
             // Only calculate zones if we have a valid range and check zeroes
             if (zoneRange > -1 && (withz || (!withz && p1->watts))) {
 
-                // get the zone
-                wattsIndex = zones->whichZone(zoneRange, p1->watts);
-
                 // cp zoned
-                if (standard.wattsCPZoneArray.size() < 4) standard.wattsCPZoneArray.resize(3);
+                if (standard.wattsCPZoneArray.size() < 3) standard.wattsCPZoneArray.resize(3);
                 if (p1->watts < 1 && withz) // moderate zero watts
                     standard.wattsCPZoneArray[0] += ride->recIntSecs();
-                else if (p1->watts >=1 && wattsIndex < 2) // moderate
+                else if (p1->watts < (CP * 0.85f)) // moderate
                     standard.wattsCPZoneArray[0] += ride->recIntSecs();
-                else if (p1->watts >=1 && p1->watts < CP) // heavy
+                else if (p1->watts < CP) // heavy
                     standard.wattsCPZoneArray[1] += ride->recIntSecs();
-                else if (p1->watts > CP) // severe
+                else // severe
                     standard.wattsCPZoneArray[2] += ride->recIntSecs();
 
+                // get the zone
+                wattsIndex = zones->whichZone(zoneRange, p1->watts);
 
                 // zoned
                 if (wattsIndex >= 0 && wattsIndex < maxSize) {

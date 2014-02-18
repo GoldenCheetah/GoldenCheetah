@@ -231,7 +231,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     cl->addRow(blankLabel6 = new QLabel(""), showInZones);
 
     showInCPZones = new QCheckBox;
-    showInCPZones->setText(tr("Use Exercise Intensity Domains"));
+    showInCPZones->setText(tr("Use polarised zones"));
     cl->addRow(blankLabel7 = new QLabel(""), showInCPZones);
 
     // bin width
