@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 10;
+static const unsigned int RideFileCacheVersion = 11;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -53,6 +53,7 @@ static const unsigned int RideFileCacheVersion = 10;
 // 8        13-Feb-13    Fixed VAM calculations
 // 9        06-Nov-13    Added aPower
 // 10       13-Feb-14    Added Moderate, Heavy and Severe domains
+// 11       17-Feb-14    Changed 3zone model to have 85% CP < middle < CP
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
