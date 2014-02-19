@@ -32,6 +32,8 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <QScrollBar>
+#include <QDragMoveEvent>
+#include <QDragEnterEvent>
 
 class NavigatorCellDelegate;
 class GroupByModel;
@@ -43,6 +45,7 @@ class BUGFIXQSortFilterProxyModel;
 class DataFilter;
 class GcMiniCalendar;
 class SearchBox;
+class RideTreeView;
 
 //
 // The RideNavigator
@@ -77,7 +80,7 @@ class RideNavigator : public GcWindow
         void borderMenu(const QPoint &pos);
 
         // so the cell delegate can access
-        QTreeView *tableView; // the view
+        RideTreeView *tableView; // the view
 
         Context *context;
 
@@ -243,5 +246,22 @@ public slots:
 private:
     QGridLayout *buttons;
     QSignalMapper *clicked;
+};
+
+class RideTreeView : public QTreeView
+{
+    Q_OBJECT;
+
+    public:
+        RideTreeView();
+
+    protected:
+         void dragEnterEvent(QDragEnterEvent *e) {
+            e->accept();
+        }
+ 
+        void dragMoveEvent(QDragMoveEvent *e) {
+            e->accept();
+        }
 };
 #endif
