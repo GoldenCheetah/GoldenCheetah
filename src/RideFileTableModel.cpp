@@ -138,8 +138,7 @@ RideFileTableModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::ItemIsEditable;
     else
-        return QAbstractTableModel::flags(index) | Qt::ItemIsEditable |
-                                     Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+        return QAbstractTableModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 QVariant

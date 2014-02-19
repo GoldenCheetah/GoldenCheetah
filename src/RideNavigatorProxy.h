@@ -38,6 +38,8 @@
 
 #include <QtGui>
 #include "RideNavigator.h"
+#include "RideItem.h"
+#include "RideFile.h"
 
 // Proxy model for doing groupBy
 class GroupByModel : public QAbstractProxyModel
@@ -191,11 +193,56 @@ public:
     // selectable. If we don't do that then the arrow keys don't work
     // since there are no valid rows to cursor up or down to.
     Qt::ItemFlags flags (const QModelIndex &/*index*/) const {
+
         //if (index.internalPointer() == NULL) {
         //    return Qt::ItemIsEnabled;
         //} else {
-            return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+            return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled;
         //}
+    }
+
+    QStringList mimeTypes() const {
+
+        QStringList returning;
+        returning << "application/x-gc-intervals";
+
+        return returning;
+    }
+
+    QMimeData *mimeData (const QModelIndexList &indexes) const {
+
+        QMimeData *returning = new QMimeData;
+
+        // we need to pack into a byte array
+        QByteArray rawData;
+        QDataStream stream(&rawData, QIODevice::WriteOnly);
+        stream.setVersion(QDataStream::Qt_4_6);
+
+        // pack data 
+        stream << (quint64)(rideNavigator->context); // where did this come from?
+
+        RideItem *ride = rideNavigator->context->ride;  // the currently selected ride
+
+        // if this ride has any kind of content
+        if (ride && ride->ride() && ride->ride()->dataPoints().count() > 1) {
+
+            // serialize
+            stream << (int)1;
+            stream << QString(tr("Entire Ride"));
+            stream << (quint64)(ride->ride()); // ridefile
+            stream << (quint64)ride->ride()->dataPoints().first()->secs
+                   << (quint64)ride->ride()->dataPoints().last()->secs;
+            stream << (quint64)ride->ride()->dataPoints().first()->km
+                   << (quint64)ride->ride()->dataPoints().last()->km;
+            stream << (quint64)1;
+
+        } else {
+            stream << (int)0; // nothing
+        }
+
+        // and return as mime data
+        returning->setData("application/x-gc-intervals", rawData);
+        return returning;
     }
 
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const {
@@ -209,7 +256,7 @@ public:
         QVariant returning;
 
         // if we are not at column 0 or we have a parent
-        //if (proxyIndex.internalPointer() != NULL || proxyIndex.column() > 0) {
+        //if (proxyIndex.internalPointer() != NULL || proxyIndex.column() > 0)
         if (proxyIndex.column() > 0) {
 
             if (role == Qt::UserRole) {

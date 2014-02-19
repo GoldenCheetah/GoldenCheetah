@@ -25,6 +25,7 @@
 
 #include <QtGui>
 #include <QString>
+#include <QTreeView>
 
 RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(context), active(false), _groupBy(-1)
 {
@@ -66,7 +67,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
 #endif
 
     // get setup
-    tableView = new QTreeView;
+    tableView = new RideTreeView;
     delegate = new NavigatorCellDelegate(this);
     tableView->setAnimated(true);
     tableView->setItemDelegate(delegate);
@@ -89,6 +90,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->viewport()->installEventFilter(this);
     tableView->setMouseTracking(true);
     tableView->setFrameStyle(QFrame::NoFrame);
+    tableView->setAcceptDrops(true);
 
     // good to go
     tableView->show();
@@ -1062,4 +1064,15 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
     // we emit signals now, which only the sidebar is interested in trapping
     // so the activity log for example doesn't have a context menu now
     emit customContextMenuRequested(tableView->mapToGlobal(pos+QPoint(0,tableView->header()->geometry().height())));
+}
+
+RideTreeView::RideTreeView()
+{
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragEnabled(true);
+    setDragDropOverwriteMode(false);
+    setDropIndicatorShown(true);
+#ifdef Q_OS_MAC
+    setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
 }
