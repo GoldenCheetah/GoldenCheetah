@@ -37,6 +37,12 @@
 #include <QStackedWidget>
 #include <QTextEdit>
 
+// span slider specials
+#include <qxtspanslider.h>
+#include <QStyleFactory>
+#include <QStyle>
+
+
 #include "RideFile.h"
 
 class QwtPlotCurve;
@@ -56,11 +62,39 @@ class LTMToolTip;
 class LTMCanvasPicker;
 class QwtAxisId;
 
-class CurveColors
+class CurveColors : public QObject
 {
+    Q_OBJECT;
+
     public:
         CurveColors(QwtPlot *plot) : isolated(false), plot(plot) {
             saveState();
+
+            // span slider appears when curve isolated
+            // to enable zooming in and out
+            slider = new QxtSpanSlider(Qt::Vertical, plot);
+            slider->setFocusPolicy(Qt::NoFocus);
+            slider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+            slider->setMinimum(0);
+            slider->setMaximum(100); // %age
+#ifdef Q_OS_MAC
+            // BUG in QMacStyle and painting of spanSlider
+            // so we use a plain style to avoid it, but only
+            // on a MAC, since win and linux are fine
+#if QT_VERSION > 0x5000
+            QStyle *style = QStyleFactory::create("fusion");
+#else
+            QStyle *style = QStyleFactory::create("Cleanlooks");
+#endif
+            slider->setStyle(style);
+#endif
+            slider->hide();
+            connect(slider, SIGNAL(lowerPositionChanged(int)), this, SLOT(zoomChanged()));
+            connect(slider, SIGNAL(upperPositionChanged(int)), this, SLOT(zoomChanged()));
+        }
+
+        ~CurveColors() {
+            delete slider;
         }
 
         void restoreState() {
@@ -79,6 +113,7 @@ class CurveColors
                 s.key()->setPalette(s.value());
             }
 
+            slider->hide();
             isolated = false;
         }
 
@@ -89,6 +124,7 @@ class CurveColors
 
             state.clear();
             colors.clear();
+            lims.clear();
 
             // get a list of plot curves and state
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotCurve)) {
@@ -98,6 +134,14 @@ class CurveColors
 
                 QwtScaleWidget *x = plot->axisWidget(static_cast<QwtPlotSeriesItem*>(item)->yAxis());
                 colors.insert(x, x->palette());
+
+                QwtPlotCurve *curve = static_cast<QwtPlotCurve*>(item);
+
+                QPointF lim;
+                lim.setX(curve->minYValue());
+                lim.setY(curve->maxYValue() * 1.1f);
+
+                lims.insert(curve, lim);
             }
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotIntervalCurve)) {
 
@@ -106,6 +150,7 @@ class CurveColors
 
                 QwtScaleWidget *x = plot->axisWidget(static_cast<QwtPlotSeriesItem*>(item)->yAxis());
                 colors.insert(x, x->palette());
+
             }
         }
 
@@ -136,7 +181,12 @@ class CurveColors
             isolated = true;
         }
 
-        void isolateAxis(QwtAxisId id) {
+        void isolateAxis(QwtAxisId id, bool showslider = false) {
+
+            isolatedIDpos = id.pos;
+            isolatedIDid = id.id;
+            isolatedAxis = plot->axisWidget(id);
+            isolatedDiv = plot->axisScaleDiv(id);
 
             // hide curves that are not ours
             QHashIterator<QwtPlotSeriesItem *, bool> c(state);
@@ -146,6 +196,16 @@ class CurveColors
                 // isolate on axis hover (but leave huighlighters alone)
                 if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::yLeft,2)) {
                     c.key()->setVisible(c.value());
+
+                    if (showslider && c.key()->yAxis() == id) {
+
+                        slider->move(plot->canvas()->pos().x(), 10);
+                        slider->setLowerValue(0);
+                        slider->setUpperValue(100);
+                        slider->setFixedHeight(plot->canvas()->height()-20);
+                        slider->show();
+                    }
+
                 } else {
                     // hide others
                     c.key()->setVisible(false);
@@ -173,10 +233,30 @@ class CurveColors
 
         bool isolated;
 
+    public slots:
+        void zoomChanged() {
+            // change ...
+            if (!slider->isHidden()) {
+
+                plot->setAxisScale(QwtAxisId(isolatedIDpos, isolatedIDid),
+                isolatedDiv.upperBound() * slider->lowerValue() / 100.00f,
+                isolatedDiv.upperBound() * slider->upperValue() / 100.00f);
+                
+                plot->replot();
+            }
+        }
+
     private:
+        QxtSpanSlider *slider;
         QwtPlot *plot;
         QHash<QwtPlotSeriesItem *, bool> state;
         QHash<QwtScaleWidget*, QPalette> colors;
+        QHash<QwtPlotSeriesItem *, QPointF> lims;
+
+        int isolatedIDpos, isolatedIDid;
+        QwtScaleWidget *isolatedAxis;
+        QwtScaleDiv isolatedDiv;
+
 };
 
 class AllPlot;

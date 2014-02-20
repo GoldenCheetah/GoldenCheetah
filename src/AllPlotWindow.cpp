@@ -375,6 +375,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlotFrame->setPalette(palette);
 
     spanSlider = new QxtSpanSlider(Qt::Horizontal);
+    spanSlider->setFocusPolicy(Qt::NoFocus);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     spanSlider->setLowerValue(0);
     spanSlider->setUpperValue(15);
