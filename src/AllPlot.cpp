@@ -3750,7 +3750,7 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
                 replot();
             } else {
                 isolation = true;
-                curveColors->isolateAxis(id);
+                curveColors->isolateAxis(id, true); // with scale adjust
                 replot();
             }
         }
