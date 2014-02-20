@@ -59,8 +59,8 @@ TabView::TabView(Context *context, int type) :
     splitter->setOpaqueResize(true); // redraw when released, snappier UI
     stack->insertWidget(0, splitter); // splitter always at index 0
 
-    QString heading = "Compare Intervals";
-    if (type == VIEW_HOME) heading = "Compare Date Ranges";
+    QString heading = tr("Compare Rides and Intervals");
+    if (type == VIEW_HOME) heading = tr("Compare Date Ranges");
 
     mainSplitter = new ViewSplitter(Qt::Vertical, heading, this);
     mainSplitter->setHandleWidth(23);
