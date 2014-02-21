@@ -296,6 +296,10 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     hrCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
+    accelCurve = new QwtPlotCurve(tr("Acceleration"));
+    accelCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    accelCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
+
     speedCurve = new QwtPlotCurve(tr("Speed"));
     speedCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     speedCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
@@ -368,7 +372,7 @@ void
 AllPlotObject::setColor(QColor color)
 {
     QList<QwtPlotCurve*> worklist;
-    worklist << mCurve << wCurve << wattsCurve << npCurve << xpCurve << speedCurve
+    worklist << mCurve << wCurve << wattsCurve << npCurve << xpCurve << speedCurve << accelCurve
              << apCurve << cadCurve << tempCurve << hrCurve << torqueCurve << balanceLCurve
              << balanceRCurve << altCurve;
 
@@ -398,7 +402,6 @@ AllPlotObject::setColor(QColor color)
     altCurve->setBrush(QBrush(altCurve->pen().color().lighter(150)));
 
 }
-
 // wipe those curves
 AllPlotObject::~AllPlotObject()
 {
@@ -411,6 +414,7 @@ AllPlotObject::~AllPlotObject()
     apCurve->detach(); delete apCurve;
     hrCurve->detach(); delete hrCurve;
     speedCurve->detach(); delete speedCurve;
+    accelCurve->detach(); delete accelCurve;
     cadCurve->detach(); delete cadCurve;
     altCurve->detach(); delete altCurve;
     tempCurve->detach(); delete tempCurve;
@@ -434,6 +438,7 @@ AllPlotObject::setVisible(bool show)
         apCurve->detach();
         hrCurve->detach();
         speedCurve->detach();
+        accelCurve->detach();
         cadCurve->detach();
         altCurve->detach();
         tempCurve->detach();
@@ -465,6 +470,7 @@ AllPlotObject::setVisible(bool show)
         apCurve->attach(plot);
         hrCurve->attach(plot);
         speedCurve->attach(plot);
+        accelCurve->attach(plot);
         cadCurve->attach(plot);
         tempCurve->attach(plot);
         windCurve->attach(plot);
@@ -497,6 +503,7 @@ AllPlotObject::hideUnwanted()
     if (!plot->showW) mCurve->detach();
     if (!plot->showHr) hrCurve->detach();
     if (!plot->showSpeed) speedCurve->detach();
+    if (!plot->showAccel) accelCurve->detach();
     if (!plot->showCad) cadCurve->detach();
     if (!plot->showAlt) altCurve->detach();
     if (!plot->showTemp) tempCurve->detach();
@@ -516,6 +523,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     showAP(false),
     showHr(true),
     showSpeed(true),
+    showAccel(false),
     showCad(true),
     showAlt(true),
     showTemp(true),
@@ -622,6 +630,7 @@ AllPlot::configChanged()
         standard->mCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->accelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->tempCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -652,6 +661,9 @@ AllPlot::configChanged()
     QPen speedPen = QPen(GColor(CSPEED));
     speedPen.setWidth(width);
     standard->speedCurve->setPen(speedPen);
+    QPen accelPen = QPen(GColor(CACCELERATION));
+    accelPen.setWidth(width);
+    standard->accelCurve->setPen(accelPen);
     QPen cadPen = QPen(GColor(CCADENCE));
     cadPen.setWidth(width);
     standard->cadCurve->setPen(cadPen);
@@ -735,6 +747,10 @@ AllPlot::configChanged()
         p.setAlpha(64);
         standard->hrCurve->setBrush(QBrush(p));
 
+        p = standard->accelCurve->pen().color();
+        p.setAlpha(64);
+        standard->accelCurve->setBrush(QBrush(p));
+
         p = standard->speedCurve->pen().color();
         p.setAlpha(64);
         standard->speedCurve->setBrush(QBrush(p));
@@ -766,6 +782,7 @@ AllPlot::configChanged()
         standard->wCurve->setBrush(Qt::NoBrush);
         standard->hrCurve->setBrush(Qt::NoBrush);
         standard->speedCurve->setBrush(Qt::NoBrush);
+        standard->accelCurve->setBrush(Qt::NoBrush);
         standard->cadCurve->setBrush(Qt::NoBrush);
         standard->torqueCurve->setBrush(Qt::NoBrush);
         standard->tempCurve->setBrush(Qt::NoBrush);
@@ -845,9 +862,9 @@ AllPlot::setHighlightIntervals(bool state)
 }
 
 struct DataPoint {
-    double time, hr, watts, np, ap, xp, speed, cad, alt, temp, wind, torque, lrbalance;
-    DataPoint(double t, double h, double w, double n, double l, double x, double s, double c, double a, double te, double wi, double tq, double lrb) :
-        time(t), hr(h), watts(w), np(n), ap(l), xp(x), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb) {}
+    double time, hr, watts, np, ap, xp, speed, cad, alt, temp, wind, torque, lrbalance, kphd;
+    DataPoint(double t, double h, double w, double n, double l, double x, double s, double c, double a, double te, double wi, double tq, double lrb, double kphd) :
+        time(t), hr(h), watts(w), np(n), ap(l), xp(x), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), kphd(kphd) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -923,6 +940,8 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->hrCurve->setSamples(data, data);
         if (!objects->speedArray.empty())
             objects->speedCurve->setSamples(data, data);
+        if (!objects->accelArray.empty())
+            objects->accelCurve->setSamples(data, data);
         if (!objects->cadArray.empty())
             objects->cadCurve->setSamples(data, data);
         if (!objects->altArray.empty())
@@ -950,6 +969,7 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalAP = 0.0;
         double totalHr = 0.0;
         double totalSpeed = 0.0;
+        double totalAccel = 0.0;
         double totalCad = 0.0;
         double totalDist = 0.0;
         double totalAlt = 0.0;
@@ -966,6 +986,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothAP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         objects->smoothHr.resize(rideTimeSecs + 1);
         objects->smoothSpeed.resize(rideTimeSecs + 1);
+        objects->smoothAccel.resize(rideTimeSecs + 1);
         objects->smoothCad.resize(rideTimeSecs + 1);
         objects->smoothTime.resize(rideTimeSecs + 1);
         objects->smoothDistance.resize(rideTimeSecs + 1);
@@ -985,6 +1006,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothAP[secs] = 0.0;
             objects->smoothHr[secs]    = 0.0;
             objects->smoothSpeed[secs] = 0.0;
+            objects->smoothAccel[secs] = 0.0;
             objects->smoothCad[secs]   = 0.0;
             objects->smoothTime[secs]  = secs / 60.0;
             objects->smoothDistance[secs]  = 0.0;
@@ -1012,7 +1034,8 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->tempArray.empty() ? objects->tempArray[i] : 0),
                              (!objects->windArray.empty() ? objects->windArray[i] : 0),
                              (!objects->torqueArray.empty() ? objects->torqueArray[i] : 0),
-                             (!objects->balanceArray.empty() ? objects->balanceArray[i] : 0));
+                             (!objects->balanceArray.empty() ? objects->balanceArray[i] : 0),
+                             (!objects->accelArray.empty() ? objects->accelArray[i] : 0));
                 if (!objects->wattsArray.empty())
                     totalWatts += objects->wattsArray[i];
                 if (!objects->npArray.empty())
@@ -1023,6 +1046,8 @@ AllPlot::recalc(AllPlotObject *objects)
                     totalAP += objects->apArray[i];
                 if (!objects->hrArray.empty())
                     totalHr    += objects->hrArray[i];
+                if (!objects->accelArray.empty())
+                    totalAccel += objects->accelArray[i];
                 if (!objects->speedArray.empty())
                     totalSpeed += objects->speedArray[i];
                 if (!objects->cadArray.empty())
@@ -1057,6 +1082,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalXP -= dp.xp;
                 totalHr    -= dp.hr;
                 totalSpeed -= dp.speed;
+                totalAccel -= dp.kphd;
                 totalCad   -= dp.cad;
                 totalAlt   -= dp.alt;
                 totalTemp   -= dp.temp;
@@ -1074,6 +1100,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothAP[secs] = 0.0;
                 objects->smoothHr[secs]    = 0.0;
                 objects->smoothSpeed[secs] = 0.0;
+                objects->smoothAccel[secs] = 0.0;
                 objects->smoothCad[secs]   = 0.0;
                 objects->smoothAltitude[secs]   = objects->smoothAltitude[secs - 1];
                 objects->smoothTemp[secs]   = 0.0;
@@ -1090,6 +1117,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothAP[secs]    = totalAP / list.size();
                 objects->smoothHr[secs]       = totalHr / list.size();
                 objects->smoothSpeed[secs]    = totalSpeed / list.size();
+                objects->smoothAccel[secs]    = totalAccel / double(list.size());
                 objects->smoothCad[secs]      = totalCad / list.size();
                 objects->smoothAltitude[secs]      = totalAlt / list.size();
                 objects->smoothTemp[secs]      = totalTemp / list.size();
@@ -1123,6 +1151,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothAP.resize(0);
         objects->smoothHr.resize(0);
         objects->smoothSpeed.resize(0);
+        objects->smoothAccel.resize(0);
         objects->smoothCad.resize(0);
         objects->smoothTime.resize(0);
         objects->smoothDistance.resize(0);
@@ -1141,6 +1170,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothAP.append(dp->apower);
             objects->smoothHr.append(dp->hr);
             objects->smoothSpeed.append(context->athlete->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
+            objects->smoothAccel.append(context->athlete->useMetricUnits ? dp->kphd : dp->kphd * MILES_PER_KM);
             objects->smoothCad.append(dp->cad);
             objects->smoothTime.append(dp->secs/60);
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
@@ -1205,6 +1235,10 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!objects->speedArray.empty()) {
         objects->speedCurve->setSamples(xaxis.data() + startingIndex, objects->smoothSpeed.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->accelArray.empty()) {
+        objects->accelCurve->setSamples(xaxis.data() + startingIndex, objects->smoothAccel.data() + startingIndex, totalPoints);
     }
 
     if (!objects->cadArray.empty()) {
@@ -1508,7 +1542,7 @@ AllPlot::setYMax()
         //setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (standard->speedCurve->isVisible() || (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || standard->torqueCurve->isVisible()) {
-        double ymin = 0;
+        double ymin = -10;
         double ymax = 0;
 
         QStringList labels;
@@ -1655,6 +1689,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothT = &plot->standard->smoothTime[startidx];
     double *smoothHR = &plot->standard->smoothHr[startidx];
     double *smoothS = &plot->standard->smoothSpeed[startidx];
+    double *smoothAC = &plot->standard->smoothAccel[startidx];
     double *smoothC = &plot->standard->smoothCad[startidx];
     double *smoothA = &plot->standard->smoothAltitude[startidx];
     double *smoothD = &plot->standard->smoothDistance[startidx];
@@ -1712,6 +1747,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->apCurve->detach();
     standard->hrCurve->detach();
     standard->speedCurve->detach();
+    standard->accelCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
     standard->tempCurve->detach();
@@ -1728,6 +1764,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->mCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
     standard->hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
     standard->speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
+    standard->accelCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showAccel);
     standard->cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCad);
     standard->altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAlt);
     standard->tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTemp);
@@ -1746,6 +1783,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->apCurve->setSamples(xaxis,smoothL,stopidx-startidx);
     standard->hrCurve->setSamples(xaxis, smoothHR,stopidx-startidx);
     standard->speedCurve->setSamples(xaxis, smoothS, stopidx-startidx);
+    standard->accelCurve->setSamples(xaxis, smoothAC, stopidx-startidx);
     standard->cadCurve->setSamples(xaxis, smoothC, stopidx-startidx);
     standard->altCurve->setSamples(xaxis, smoothA, stopidx-startidx);
     standard->tempCurve->setSamples(xaxis, smoothTE, stopidx-startidx);
@@ -1852,6 +1890,17 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         sym->setStyle(QwtSymbol::NoSymbol);
         sym->setSize(0);
     }
+    standard->accelCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
     standard->cadCurve->setSymbol(sym);
 
     sym = new QwtSymbol;
@@ -1937,6 +1986,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->standard->smoothHr.empty()) {
         standard->hrCurve->attach(this);
     }
+    if (!plot->standard->smoothAccel.empty()) {
+        standard->accelCurve->attach(this);
+    }
     if (!plot->standard->smoothSpeed.empty()) {
         standard->speedCurve->attach(this);
     }
@@ -1994,6 +2046,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->apCurve->detach();
     standard->hrCurve->detach();
     standard->speedCurve->detach();
+    standard->accelCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
     standard->tempCurve->detach();
@@ -2010,6 +2063,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
     standard->speedCurve->setVisible(false);
+    standard->accelCurve->setVisible(false);
     standard->cadCurve->setVisible(false);
     standard->altCurve->setVisible(false);
     standard->tempCurve->setVisible(false);
@@ -2039,6 +2093,14 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         ourCurve = standard->hrCurve;
         thereCurve = referencePlot->standard->hrCurve;
         title = tr("Heartrate");
+        }
+        break;
+
+    case RideFile::kphd:
+        {
+        ourCurve = standard->accelCurve;
+        thereCurve = referencePlot->standard->accelCurve;
+        title = tr("Acceleration");
         }
         break;
 
@@ -2297,6 +2359,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->apCurve->detach();
     standard->hrCurve->detach();
     standard->speedCurve->detach();
+    standard->accelCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
     standard->tempCurve->detach();
@@ -2313,6 +2376,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
     standard->speedCurve->setVisible(false);
+    standard->accelCurve->setVisible(false);
     standard->cadCurve->setVisible(false);
     standard->altCurve->setVisible(false);
     standard->tempCurve->setVisible(false);
@@ -2364,6 +2428,15 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->hrCurve;
                 title = tr("Heartrate");
+                }
+                break;
+
+            case RideFile::kphd:
+                {
+                ourCurve = new QwtPlotCurve(tr("Acceleration"));
+                //ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->accelCurve;
+                title = tr("Acceleration");
                 }
                 break;
 
@@ -2667,6 +2740,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->apCurve->detach();
     standard->hrCurve->detach();
     standard->speedCurve->detach();
+    standard->accelCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
     standard->tempCurve->detach();
@@ -2685,6 +2759,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
     standard->speedCurve->setVisible(false);
+    standard->accelCurve->setVisible(false);
     standard->cadCurve->setVisible(false);
     standard->altCurve->setVisible(false);
     standard->tempCurve->setVisible(false);
@@ -2739,6 +2814,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->speedCurve->setVisible(true);
     }
 
+    if (!object->accelArray.empty()) {
+        standard->accelCurve->setSamples(xaxis.data(), object->smoothAccel.data(), totalPoints);
+        standard->accelCurve->attach(this);
+        standard->accelCurve->setVisible(true);
+    }
+
     if (!object->cadArray.empty()) {
         standard->cadCurve->setSamples(xaxis.data(), object->smoothCad.data(), totalPoints);
         standard->cadCurve->attach(this);
@@ -2791,6 +2872,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->apCurve->setVisible(referencePlot->showAP);
     standard->hrCurve->setVisible(referencePlot->showHr);
     standard->speedCurve->setVisible(referencePlot->showSpeed);
+    standard->accelCurve->setVisible(referencePlot->showAccel);
     standard->cadCurve->setVisible(referencePlot->showCad);
     standard->altCurve->setVisible(referencePlot->showAlt);
     standard->tempCurve->setVisible(referencePlot->showTemp);
@@ -2855,6 +2937,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->apArray.resize(dataPresent->apower ? npoints : 0);
         here->hrArray.resize(dataPresent->hr ? npoints : 0);
         here->speedArray.resize(dataPresent->kph ? npoints : 0);
+        here->accelArray.resize(dataPresent->kph ? npoints : 0);
         here->cadArray.resize(dataPresent->cad ? npoints : 0);
         here->altArray.resize(dataPresent->alt ? npoints : 0);
         here->tempArray.resize(dataPresent->temp ? npoints : 0);
@@ -2873,6 +2956,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->apCurve->detach();
         here->hrCurve->detach();
         here->speedCurve->detach();
+        here->accelCurve->detach();
         here->cadCurve->detach();
         here->altCurve->detach();
         here->tempCurve->detach();
@@ -2892,6 +2976,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         }
         if (!here->hrArray.empty()) here->hrCurve->attach(this);
         if (!here->speedArray.empty()) here->speedCurve->attach(this);
+        if (!here->accelArray.empty()) here->accelCurve->attach(this);
         if (!here->cadArray.empty()) here->cadCurve->attach(this);
         if (!here->tempArray.empty()) here->tempCurve->attach(this);
         if (!here->windArray.empty()) here->windCurve->attach(this);
@@ -2909,6 +2994,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->apCurve->setVisible(dataPresent->apower && showAP);
         here->hrCurve->setVisible(dataPresent->hr && showHr);
         here->speedCurve->setVisible(dataPresent->kph && showSpeed);
+        here->accelCurve->setVisible(dataPresent->kph && showAccel);
         here->cadCurve->setVisible(dataPresent->cad && showCad);
         here->altCurve->setVisible(dataPresent->alt && showAlt);
         here->tempCurve->setVisible(dataPresent->temp && showTemp);
@@ -2941,6 +3027,9 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
 
             if (!here->hrArray.empty())
                 here->hrArray[arrayLength]    = max(0, point->hr);
+            if (!here->accelArray.empty())
+                here->accelArray[arrayLength] = context->athlete->useMetricUnits
+                                               ? point->kphd : point->kphd * MILES_PER_KM;
             if (!here->speedArray.empty())
                 here->speedArray[arrayLength] = max(0,
                                               (context->athlete->useMetricUnits
@@ -2989,6 +3078,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->apCurve->detach();
         here->hrCurve->detach();
         here->speedCurve->detach();
+        here->accelCurve->detach();
         here->cadCurve->detach();
         here->altCurve->detach();
         here->tempCurve->detach();
@@ -3103,6 +3193,19 @@ AllPlot::setShowSpeed(bool show)
 {
     showSpeed = show;
     standard->speedCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowAccel(bool show)
+{
+    showAccel = show;
+    standard->accelCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
@@ -3248,6 +3351,10 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         standard->hrCurve->setBrush(QBrush(p));
 
+        p = standard->accelCurve->pen().color();
+        p.setAlpha(64);
+        standard->accelCurve->setBrush(QBrush(p));
+
         p = standard->speedCurve->pen().color();
         p.setAlpha(64);
         standard->speedCurve->setBrush(QBrush(p));
@@ -3279,6 +3386,7 @@ AllPlot::setPaintBrush(int state)
         standard->apCurve->setBrush(Qt::NoBrush);
         standard->hrCurve->setBrush(Qt::NoBrush);
         standard->speedCurve->setBrush(Qt::NoBrush);
+        standard->accelCurve->setBrush(Qt::NoBrush);
         standard->cadCurve->setBrush(Qt::NoBrush);
         standard->tempCurve->setBrush(Qt::NoBrush);
         standard->torqueCurve->setBrush(Qt::NoBrush);
@@ -3481,7 +3589,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // output the tooltip
         QString text = QString("%1 %2\n%3 %4")
-                        .arg(yvalue, 0, 'f', 0)
+                        .arg(yvalue, 0, 'f', 1)
                         .arg(this->axisTitle(curve->yAxis()).text())
                         .arg(xstring)
                         .arg(this->axisTitle(curve->xAxis()).text());

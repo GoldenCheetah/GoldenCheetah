@@ -63,6 +63,7 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showXP READ isShowXP WRITE setShowXP USER true)
     Q_PROPERTY(int showAP READ isShowAP WRITE setShowAP USER true)
     Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
+    Q_PROPERTY(int showAccel READ isShowAccel WRITE setShowAccel USER true)
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
     Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
     Q_PROPERTY(int showTorque READ isShowTorque WRITE setShowTorque USER true)
@@ -99,6 +100,7 @@ class AllPlotWindow : public GcChartWindow
         int isShowXP() const { return showXP->checkState(); }
         int isShowAP() const { return showAP->checkState(); }
         int isShowSpeed() const { return showSpeed->checkState(); }
+        int isShowAccel() const { return showAccel->checkState(); }
         int isShowCad() const { return showCad->checkState(); }
         int isShowAlt() const { return showAlt->checkState(); }
         int isShowTorque() const { return showTorque->checkState(); }
@@ -132,6 +134,7 @@ class AllPlotWindow : public GcChartWindow
         void setShowXP(int state);
         void setShowAP(int state);
         void setShowSpeed(int state);
+        void setShowAccel(int state);
         void setShowCad(int state);
         void setShowAlt(int state);
         void setShowTemp(int state);
@@ -223,6 +226,7 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showXP;
         QCheckBox *showAP;
         QCheckBox *showSpeed;
+        QCheckBox *showAccel;
         QCheckBox *showCad;
         QCheckBox *showAlt;
         QCheckBox *showTemp;

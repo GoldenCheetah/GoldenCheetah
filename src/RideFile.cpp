@@ -92,8 +92,10 @@ RideFile::seriesName(SeriesType series)
     case RideFile::hr: return QString(tr("Heartrate"));
     case RideFile::km: return QString(tr("Distance"));
     case RideFile::kph: return QString(tr("Speed"));
+    case RideFile::kphd: return QString(tr("Acceleration"));
     case RideFile::nm: return QString(tr("Torque"));
     case RideFile::watts: return QString(tr("Power"));
+    case RideFile::wattsd: return QString(tr("Power acceleration"));
     case RideFile::xPower: return QString(tr("xPower"));
     case RideFile::aPower: return QString(tr("aPower"));
     case RideFile::NP: return QString(tr("Normalized Power"));
@@ -119,8 +121,10 @@ RideFile::colorFor(SeriesType series)
     case RideFile::cad: return GColor(CCADENCE);
     case RideFile::hr: return GColor(CHEARTRATE);
     case RideFile::kph: return GColor(CSPEED);
+    case RideFile::kphd: return GColor(CSPEED);
     case RideFile::nm: return GColor(CTORQUE);
     case RideFile::watts: return GColor(CPOWER);
+    case RideFile::wattsd: return GColor(CPOWER);
     case RideFile::xPower: return GColor(CXPOWER);
     case RideFile::aPower: return GColor(CAPOWER);
     case RideFile::NP: return GColor(CNPOWER);
@@ -152,8 +156,10 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::hr: return QString(tr("bpm"));
     case RideFile::km: return QString(useMetricUnits ? tr("km") : tr("miles"));
     case RideFile::kph: return QString(useMetricUnits ? tr("kph") : tr("mph"));
+    case RideFile::kphd: return QString(useMetricUnits ? tr("km/s") : tr("miles/s"));
     case RideFile::nm: return QString(tr("N"));
     case RideFile::watts: return QString(tr("watts"));
+    case RideFile::wattsd: return QString(tr("watts/s"));
     case RideFile::xPower: return QString(tr("watts"));
     case RideFile::aPower: return QString(tr("watts"));
     case RideFile::NP: return QString(tr("watts"));
@@ -692,8 +698,10 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::hr : return hr; break;
         case RideFile::km : return km; break;
         case RideFile::kph : return kph; break;
+        case RideFile::kphd : return kphd; break;
         case RideFile::nm : return nm; break;
         case RideFile::watts : return watts; break;
+        case RideFile::wattsd : return wattsd; break;
         case RideFile::alt : return alt; break;
         case RideFile::lon : return lon; break;
         case RideFile::lat : return lat; break;
@@ -1004,8 +1012,31 @@ RideFile::recalculateDerivedSeries()
     // APower Initialisation -- working variables
     double APtotal=0;
     double APcount=0;
+    
+
+    // last point looked at
+    RideFilePoint *lastP = NULL;
 
     foreach(RideFilePoint *p, dataPoints_) {
+
+        //
+        // Acceleration
+        if (lastP) {
+
+            double deltaSpeed = p->kph - lastP->kph;
+            double deltaTime = p->secs - lastP->secs;
+
+            // from kph to meters /s /s
+            double acc = deltaSpeed;
+
+            if (deltaTime) {
+                acc /= deltaTime;
+                // now from kilometers per hour to m/s/s
+                acc *= 1000; // meters per hour
+                acc /= 3600; // meters per second
+                p->kphd = acc;
+            }
+        }
 
         //
         // NP
@@ -1105,6 +1136,9 @@ RideFile::recalculateDerivedSeries()
 
         APtotal += p->apower;
         APcount++;
+
+        // last point
+        lastP = p;
     }
 
     // Averages and Totals
