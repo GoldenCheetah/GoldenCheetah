@@ -2393,6 +2393,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     compares.clear();
 
     double MAXY = -100;
+    double MINY = 0;
 
     // add all the curves
     int index=0;
@@ -2591,6 +2592,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     ourCurve->setBaseline(thereCurve->baseline());
 
                     if (ourCurve->maxYValue() > MAXY) MAXY = ourCurve->maxYValue();
+                    if (ourCurve->minYValue() < MINY) MINY = ourCurve->minYValue();
 
                     // symbol when zoomed in super close
                     if (array.size() < 150) {
@@ -2628,6 +2630,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     ourCurve2->setBaseline(thereCurve2->baseline());
 
                     if (ourCurve2->maxYValue() > MAXY) MAXY = ourCurve2->maxYValue();
+                    if (ourCurve2->minYValue() < MINY) MINY = ourCurve2->minYValue();
 
                     // symbol when zoomed in super close
                     if (array.size() < 150) {
@@ -2684,7 +2687,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     // set the y-axis for largest value we saw +10%
-    setAxisScale(QwtPlot::yLeft, 0, MAXY * 1.10f);
+    setAxisScale(QwtPlot::yLeft, MINY * 1.10f , MAXY * 1.10f);
 
     // hide other y axes
     setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), false);
