@@ -156,6 +156,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showSpeed->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showSpeed);
 
+    showAccel = new QCheckBox(tr("Acceleration"), this);
+    showAccel->setCheckState(Qt::Checked);
+    cl2->addRow(new QLabel(""), showAccel);
+
     showCad = new QCheckBox(tr("Cadence"), this);
     showCad->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showCad);
@@ -472,6 +476,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showAP, SIGNAL(stateChanged(int)), this, SLOT(setShowAP(int)));
     connect(showHr, SIGNAL(stateChanged(int)), this, SLOT(setShowHr(int)));
     connect(showSpeed, SIGNAL(stateChanged(int)), this, SLOT(setShowSpeed(int)));
+    connect(showAccel, SIGNAL(stateChanged(int)), this, SLOT(setShowAccel(int)));
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
     connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
@@ -700,6 +705,7 @@ AllPlotWindow::compareChanged()
         if (showPower->currentIndex() < 2) wanted << RideFile::watts;
         if (showHr->isChecked()) wanted << RideFile::hr;
         if (showSpeed->isChecked()) wanted << RideFile::kph;
+        if (showAccel->isChecked()) wanted << RideFile::kphd;
         if (showCad->isChecked()) wanted << RideFile::cad;
         if (showAlt->isChecked()) wanted << RideFile::alt;
         if (showTemp->isChecked()) wanted << RideFile::temp;
@@ -1249,6 +1255,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	        showPower->setEnabled(dataPresent->watts);
 	        showHr->setEnabled(dataPresent->hr);
 	        showSpeed->setEnabled(dataPresent->kph);
+	        showAccel->setEnabled(dataPresent->kph);
 	        showCad->setEnabled(dataPresent->cad);
 	        showAlt->setEnabled(dataPresent->alt);
             showTemp->setEnabled(dataPresent->temp);
@@ -1259,6 +1266,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showPower->setEnabled(false);
             showHr->setEnabled(false);
             showSpeed->setEnabled(false);
+            showAccel->setEnabled(false);
             showCad->setEnabled(false);
             showAlt->setEnabled(false);
             showTemp->setEnabled(false);
@@ -1819,6 +1827,26 @@ AllPlotWindow::setShowSpeed(int value)
 }
 
 void
+AllPlotWindow::setShowAccel(int value)
+{
+    showAccel->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showAccel->isEnabled()) ? true : false;
+
+    allPlot->setShowAccel(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowAccel(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
 AllPlotWindow::setShowCad(int value)
 {
     showCad->setChecked(value);
@@ -2335,6 +2363,7 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showPower->currentIndex() < 2 && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::watts;
     if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) serieslist << RideFile::hr;
     if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) serieslist << RideFile::kph;
+    if (showAccel->isChecked() && rideItem->ride()->areDataPresent()->kph) serieslist << RideFile::kphd;
     if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) serieslist << RideFile::cad;
     if (showAlt->isChecked() && rideItem->ride()->areDataPresent()->alt) serieslist << RideFile::alt;
     if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) serieslist << RideFile::temp;
@@ -2509,6 +2538,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShowPower(showPower->currentIndex());
         _allPlot->setShowHr( (showHr->isEnabled()) ? ( showHr->checkState() == Qt::Checked ) : false );
         _allPlot->setShowSpeed((showSpeed->isEnabled()) ? ( showSpeed->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowAccel((showAccel->isEnabled()) ? ( showAccel->checkState() == Qt::Checked ) : false );
         _allPlot->setShowCad((showCad->isEnabled()) ? ( showCad->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAlt((showAlt->isEnabled()) ? ( showAlt->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTemp((showTemp->isEnabled()) ? ( showTemp->checkState() == Qt::Checked ) : false );

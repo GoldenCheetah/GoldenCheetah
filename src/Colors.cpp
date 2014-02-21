@@ -54,6 +54,7 @@ void GCColor::setupColors()
         { tr("Interval Highlighter"), "COLORINTERVALHIGHLIGHTER", Qt::blue },
         { tr("Heart Rate"), "COLORHEARTRATE", Qt::blue },
         { tr("Speed"), "COLORSPEED", Qt::green },
+        { tr("Acceleration"), "COLORACCEL", Qt::cyan },
         { tr("Power"), "COLORPOWER", Qt::red },
         { tr("Normalised Power"), "CNPOWER", Qt::magenta },
         { tr("Skiba xPower"), "CXPOWER", Qt::magenta },
