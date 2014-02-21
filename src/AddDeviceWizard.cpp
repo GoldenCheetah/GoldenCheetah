@@ -1121,6 +1121,14 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Tacx Blue Motion (6)"));
     virtualPower->addItem(tr("Power - Tacx Blue Motion (8)"));
     virtualPower->addItem(tr("Power - Tacx Blue Motion (10)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (1)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (2)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (3)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (4)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (5)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (6)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (7)"));
+    virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));
 
     wheelSize->addItem(tr("Road/Cross (700C/622)")); // 2100mm
     wheelSize->addItem(tr("Tri/TT (650C)")); // 1960mm
