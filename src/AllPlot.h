@@ -70,9 +70,6 @@ class CurveColors : public QObject
         CurveColors(QwtPlot *plot) : isolated(false), plot(plot) {
             saveState();
 
-            QPalette matchCanvas;
-            matchCanvas.setColor(QPalette::Button, GColor(CRIDEPLOTBACKGROUND));
-
             // span slider appears when curve isolated
             // to enable zooming in and out
             slider = new QxtSpanSlider(Qt::Vertical, plot);
@@ -81,7 +78,6 @@ class CurveColors : public QObject
             slider->setMinimum(0);
             slider->setMaximum(100); // %age
             slider->setShowRail(false); // no rail please
-            slider->setPalette(matchCanvas); // don't stand out so much
 
 #ifdef Q_OS_MAC
             // BUG in QMacStyle and painting of spanSlider
