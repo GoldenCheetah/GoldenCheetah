@@ -39,6 +39,7 @@ class QXT_GUI_EXPORT QxtSpanSlider : public QSlider
     Q_PROPERTY(int upperValue READ upperValue WRITE setUpperValue)
     Q_PROPERTY(int lowerPosition READ lowerPosition WRITE setLowerPosition)
     Q_PROPERTY(int upperPosition READ upperPosition WRITE setUpperPosition)
+    Q_PROPERTY(bool showRail READ showRail WRITE setShowRail)
     Q_PROPERTY(HandleMovementMode handleMovementMode READ handleMovementMode WRITE setHandleMovementMode)
     Q_ENUMS(HandleMovementMode)
 
@@ -70,6 +71,8 @@ public:
     int lowerPosition() const;
     int upperPosition() const;
 
+    bool showRail() const;
+
 public Q_SLOTS:
     void setLowerValue(int lower);
     void setUpperValue(int upper);
@@ -77,6 +80,8 @@ public Q_SLOTS:
 
     void setLowerPosition(int lower);
     void setUpperPosition(int upper);
+
+    void setShowRail(bool);
 
 Q_SIGNALS:
     void spanChanged(int lower, int upper);

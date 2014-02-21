@@ -43,7 +43,8 @@ QxtSpanSliderPrivate::QxtSpanSliderPrivate() :
         upperPressed(QStyle::SC_None),
         movement(QxtSpanSlider::FreeMovement),
         firstMovement(false),
-        blockTracking(false)
+        blockTracking(false),
+        showRail(true)
 {
 }
 
@@ -488,6 +489,19 @@ void QxtSpanSlider::setSpan(int lower, int upper)
     }
 }
 
+bool QxtSpanSlider::showRail() const
+{
+    return qxt_d().showRail;
+}
+
+void QxtSpanSlider::setShowRail(bool showrail)
+{
+    // set and hide
+    if (qxt_d().showRail != showrail) {
+        qxt_d().showRail = showrail;
+        update();
+    }
+}
 /*!
     \property QxtSpanSlider::lowerPosition
     \brief the lower position of the span
@@ -701,17 +715,22 @@ void QxtSpanSlider::paintEvent(QPaintEvent* event)
     Q_UNUSED(event);
     QStylePainter painter(this);
 
-    // ticks
     QStyleOptionSlider opt;
-    qxt_d().initStyleOption(&opt);
-    opt.subControls = QStyle::SC_SliderTickmarks;
-    painter.drawComplexControl(QStyle::CC_Slider, opt);
 
-    // groove
-    opt.sliderValue = 0;
-    opt.sliderPosition = 0;
-    opt.subControls = QStyle::SC_SliderGroove;
-    painter.drawComplexControl(QStyle::CC_Slider, opt);
+    //no rail wanted, just the handles
+    if (qxt_d().showRail) {
+
+        // ticks
+        qxt_d().initStyleOption(&opt);
+        opt.subControls = QStyle::SC_SliderTickmarks;
+        painter.drawComplexControl(QStyle::CC_Slider, opt);
+
+        // groove
+        opt.sliderValue = 0;
+        opt.sliderPosition = 0;
+        opt.subControls = QStyle::SC_SliderGroove;
+        painter.drawComplexControl(QStyle::CC_Slider, opt);
+    }
 
     // handle rects
     opt.sliderPosition = qxt_d().lowerPos;
@@ -730,7 +749,9 @@ void QxtSpanSlider::paintEvent(QPaintEvent* event)
         spanRect = QRect(QPoint(minv, c.y() - 2), QPoint(maxv, c.y() + 1));
     else
         spanRect = QRect(QPoint(c.x() - 2, minv), QPoint(c.x() + 1, maxv));
-    qxt_d().drawSpan(&painter, spanRect);
+
+    // we don't want a groove
+    if (qxt_d().showRail) qxt_d().drawSpan(&painter, spanRect);
 
     // handles
     switch (qxt_d().lastPressed)
