@@ -908,7 +908,12 @@ MeanMaxComputer::run()
     //
 
     double last = 0;
+
+    // only care about first 3 minutes MAX for acceleration
+    if (series == RideFile::kphd && ride_bests.count() > 180) ride_bests.resize(180);
+
     array.resize(ride_bests.count());
+
     for (int i=ride_bests.size()-1; i; i--) {
         if (ride_bests[i] == 0) ride_bests[i]=last;
         else last = ride_bests[i];
