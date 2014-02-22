@@ -184,6 +184,10 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             setAxisTitle(yLeft, tr("Average Heartrate (bpm)"));
             break;
 
+        case RideFile::kphd:
+            setAxisTitle(yLeft, tr("Acceleration (m/s/s)"));
+            break;
+
         case RideFile::kph:
             setAxisTitle(yLeft, tr("Average Speed (kph)"));
             break;
@@ -789,6 +793,11 @@ CpintPlot::calculate(RideItem *rideItem)
                 QPen line;
                 QColor fill;
                 switch (series) {
+
+                    case RideFile::kphd:
+                        line.setColor(GColor(CACCELERATION).darker(200));
+                        fill = (GColor(CACCELERATION));
+                        break;
 
                     case RideFile::kph:
                         line.setColor(GColor(CSPEED).darker(200));

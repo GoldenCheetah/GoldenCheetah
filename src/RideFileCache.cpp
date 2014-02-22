@@ -152,6 +152,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     hrTimeInZone.resize(10);
 
     ride->getWeight();
+    ride->recalculateDerivedSeries(); // accel and others
 
     // calculate all the arrays
     compute();
@@ -190,7 +191,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::hr : return 0; break;
         case RideFile::km : return 3; break;
         case RideFile::kph : return 1; break;
-        case RideFile::kphd : return 3; break;
+        case RideFile::kphd : return 2; break;
         case RideFile::nm : return 2; break;
         case RideFile::watts : return 0; break;
         case RideFile::xPower : return 0; break;
@@ -448,12 +449,12 @@ void RideFileCache::RideFileCache::compute()
     MeanMaxComputer thread3(ride, cadMeanMax, RideFile::cad); thread3.start();
     MeanMaxComputer thread4(ride, nmMeanMax, RideFile::nm); thread4.start();
     MeanMaxComputer thread5(ride, kphMeanMax, RideFile::kph); thread5.start();
-    MeanMaxComputer thread11(ride, kphdMeanMax, RideFile::kphd); thread11.start();
     MeanMaxComputer thread6(ride, xPowerMeanMax, RideFile::xPower); thread6.start();
     MeanMaxComputer thread7(ride, npMeanMax, RideFile::NP); thread7.start();
     MeanMaxComputer thread8(ride, vamMeanMax, RideFile::vam); thread8.start();
     MeanMaxComputer thread9(ride, wattsKgMeanMax, RideFile::wattsKg); thread9.start();
     MeanMaxComputer thread10(ride, aPowerMeanMax, RideFile::aPower); thread10.start();
+    MeanMaxComputer thread11(ride, kphdMeanMax, RideFile::kphd); thread11.start();
 
     // all the different distributions
     computeDistribution(wattsDistribution, RideFile::watts);
@@ -705,8 +706,12 @@ MeanMaxComputer::run()
 
     if (series == RideFile::vam) baseSeries = RideFile::alt;
 
+    // there is a distinction between needing it present and using it in calcs
+    RideFile::SeriesType needSeries = baseSeries;
+    if (series == RideFile::kphd) needSeries = RideFile::kph;
+
     // only bother if the data series is actually present
-    if (ride->isDataPresent(baseSeries) == false) return;
+    if (ride->isDataPresent(needSeries) == false) return;
 
     // if we want decimal places only keep to 1 dp max
     // this is a factor that is applied at the end to
@@ -756,8 +761,9 @@ MeanMaxComputer::run()
         lastsecs = psecs;
 
         double secs = round(psecs * 1000.0) / 1000;
-        if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(baseSeries))));
+        if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(baseSeries)*double(decimals))));
     }
+
 
     // don't bother with insufficient data
     if (!data.points.count()) return;
@@ -909,7 +915,7 @@ MeanMaxComputer::run()
 
         // convert from double to long, preserving the
         // precision by applying a multiplier
-        array[i] = ride_bests[i] * decimals;
+        array[i] = ride_bests[i]; // * decimals; -- we did that earlier
     }
 }
 
@@ -919,8 +925,12 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ?
                                       RideFile::watts : series;
 
+    // there is a distinction between needing it present and using it in calcs
+    RideFile::SeriesType needSeries = baseSeries;
+    if (series == RideFile::kphd) needSeries = RideFile::kph;
+
     // only bother if the data series is actually present
-    if (ride->isDataPresent(baseSeries) == false) return;
+    if (ride->isDataPresent(needSeries) == false) return;
 
     // get zones that apply, if any
     int zoneRange = context->athlete->zones() ? context->athlete->zones()->whichRange(ride->startTime().date()) : -1;
