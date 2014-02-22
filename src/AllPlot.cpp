@@ -1170,7 +1170,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothAP.append(dp->apower);
             objects->smoothHr.append(dp->hr);
             objects->smoothSpeed.append(context->athlete->useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
-            objects->smoothAccel.append(context->athlete->useMetricUnits ? dp->kphd : dp->kphd * MILES_PER_KM);
+            objects->smoothAccel.append(dp->kphd);
             objects->smoothCad.append(dp->cad);
             objects->smoothTime.append(dp->secs/60);
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
@@ -3031,8 +3031,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             if (!here->hrArray.empty())
                 here->hrArray[arrayLength]    = max(0, point->hr);
             if (!here->accelArray.empty())
-                here->accelArray[arrayLength] = context->athlete->useMetricUnits
-                                               ? point->kphd : point->kphd * MILES_PER_KM;
+                here->accelArray[arrayLength] = point->kphd;
+
             if (!here->speedArray.empty())
                 here->speedArray[arrayLength] = max(0,
                                               (context->athlete->useMetricUnits

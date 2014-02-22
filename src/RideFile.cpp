@@ -156,7 +156,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::hr: return QString(tr("bpm"));
     case RideFile::km: return QString(useMetricUnits ? tr("km") : tr("miles"));
     case RideFile::kph: return QString(useMetricUnits ? tr("kph") : tr("mph"));
-    case RideFile::kphd: return QString(useMetricUnits ? tr("km/s") : tr("miles/s"));
+    case RideFile::kphd: return QString(tr("m/s/s"));
     case RideFile::nm: return QString(tr("N"));
     case RideFile::watts: return QString(tr("watts"));
     case RideFile::wattsd: return QString(tr("watts/s"));
