@@ -169,6 +169,10 @@ class RideFileCache
         double &distBinSize(RideFile::SeriesType); // return distribution bin size
         double &meanMaxBinSize(RideFile::SeriesType); // return distribution bin size
 
+        // we need to return doubles not longs, we just use longs
+        // to reduce disk storage
+        static void doubleArray(QVector<double> &into, QVector<float> &from, RideFile::SeriesType series);
+
     protected:
 
         void refreshCache();              // compute arrays and update cache
@@ -267,10 +271,6 @@ class RideFileCache
         QVector<float> wattsTimeInZone;   // time in zone in seconds
         QVector<float> wattsCPTimeInZone;   // time in zone in seconds for moderate, heavy and severe domains
         QVector<float> hrTimeInZone;      // time in zone in seconds
-
-        // we need to return doubles not longs, we just use longs
-        // to reduce disk storage
-        void doubleArray(QVector<double> &into, QVector<float> &from, RideFile::SeriesType series);
 };
 
 // Working structured inherited from CpintPlot.cpp

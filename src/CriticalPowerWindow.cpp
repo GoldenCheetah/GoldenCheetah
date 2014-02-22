@@ -672,10 +672,9 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
                        p->watts, p->alt, p->lon, p->lat, p->headwind,
                        p->slope, p->temp, p->lrbalance, 0);
        }
-
-        // for xpower et al
-       f.recalculateDerivedSeries();
     }
+    // for xpower and acceleration et al
+    f.recalculateDerivedSeries();
 
     // compute the mean max, this is BLAZINGLY fast, thanks to Mark Rages'
     // mean-max computer. Does a 11hr ride in 150ms
@@ -687,11 +686,12 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     if (vector.count() == 0) return;
 
     // create curve data arrays
-    QVector<double>x;
     QVector<double>y;
-    for (int i=1; i<vector.count(); i++) {
+    RideFileCache::doubleArray(y, vector, series());
+
+    QVector<double>x;
+    for (int i=0; i<vector.count(); i++) {
         x << double(i)/60.00f;
-        y << vector[i];
     }
 
     // create a curve!
@@ -712,7 +712,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     if (shadeIntervalsCheck->isChecked()) curve->setBrush(brush);
     else curve->setBrush(Qt::NoBrush);
     curve->setPen(pen);
-    curve->setSamples(x.data(), y.data(), x.count()-1);
+    curve->setSamples(x.data()+1, y.data()+1, x.count()-2); // ignore he first 0,0 point
 
     // attach and register
     curve->attach(cpintPlot);

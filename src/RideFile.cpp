@@ -1035,6 +1035,7 @@ RideFile::recalculateDerivedSeries()
                 acc *= 1000; // meters per hour
                 acc /= 3600; // meters per second
                 p->kphd = acc;
+
             }
         }
 
