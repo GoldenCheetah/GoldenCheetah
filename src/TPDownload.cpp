@@ -63,9 +63,13 @@ TPAthlete::list(int type, QString user, QString pass)
 void TPAthlete::getResponse(const QtSoapMessage &message)
 {
     waiting = false;
+    QString resultStr;
     QList< QMap<QString, QString> > athletelist;
 
-    if (!message.isFault()) {
+    if (message.isFault()) {
+        resultStr = tr("Error:") + qPrintable(message.faultString().toString());
+    }
+    else {
         const QtSoapType &response = message.returnValue();
 
         if (response.isValid()) {
@@ -97,8 +101,8 @@ void TPAthlete::getResponse(const QtSoapMessage &message)
         }
     }
 
-    // return what we got (empty if failed)
-    completed(athletelist);
+    // return what we got (empty if non-valid response)
+    completed(resultStr, athletelist);
 }
 
 //
