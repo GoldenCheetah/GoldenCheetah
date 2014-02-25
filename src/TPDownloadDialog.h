@@ -44,7 +44,7 @@ class TPDownloadDialog : public QDialog
         bool useMetricUnits;
 
     public slots:
-        void completedAthlete(QList<QMap<QString,QString> >);
+        void completedAthlete(QString, QList<QMap<QString,QString> >);
         void completedWorkout(QList<QMap<QString,QString> >);
         void completedDownload(QDomDocument);
         void completedUpload(QString);

@@ -31,7 +31,7 @@ TPDownloadDialog::TPDownloadDialog(MainWindow *main) : QDialog(main, Qt::Dialog)
 
     athleter = new TPAthlete(this);
 
-    connect (athleter, SIGNAL(completed(QList<QMap<QString,QString> >)), this, SLOT(completedAthlete(QList<QMap<QString,QString> >)));
+    connect (athleter, SIGNAL(completed(QString, QList<QMap<QString,QString> >)), this, SLOT(completedAthlete(QString, QList<QMap<QString,QString> >)));
     athleter->list(appsettings->cvalue(main->cyclist, GC_TPTYPE, "0").toInt(),
                   appsettings->cvalue(main->cyclist, GC_TPUSER, "null").toString(),
                   appsettings->cvalue(main->cyclist, GC_TPPASS, "null").toString());
@@ -40,7 +40,7 @@ TPDownloadDialog::TPDownloadDialog(MainWindow *main) : QDialog(main, Qt::Dialog)
 }
 
 void
-TPDownloadDialog::completedAthlete(QList<QMap<QString, QString> >athletes)
+TPDownloadDialog::completedAthlete(QString errorStr, QList<QMap<QString, QString> >athletes)
 {
     // did we get any athletes?
     if (athletes.count() == 0) {
@@ -48,7 +48,12 @@ TPDownloadDialog::completedAthlete(QList<QMap<QString, QString> >athletes)
 
         QMessageBox msgBox;
         msgBox.setWindowTitle(tr("Download from TrainingPeaks.com"));
-        msgBox.setText(tr("You must be a premium member to download from TrainingPeaks. Please check your cyclist configurations are correct on the Passwords tab."));
+        if (errorStr.size() != 0) {   // Something went wrong, so there should be a fault message
+            msgBox.setText(errorStr);
+        }
+        else {
+            msgBox.setText(tr("You must be a premium member to download from TrainingPeaks. Please check your cyclist configurations are correct on the Passwords tab."));
+        }
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         reject();
