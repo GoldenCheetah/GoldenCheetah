@@ -58,16 +58,20 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ _stackWidth WRITE setStackWidth USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
-    Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
     Q_PROPERTY(int showNP READ isShowNP WRITE setShowNP USER true)
     Q_PROPERTY(int showXP READ isShowXP WRITE setShowXP USER true)
     Q_PROPERTY(int showAP READ isShowAP WRITE setShowAP USER true)
     Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
     Q_PROPERTY(int showAccel READ isShowAccel WRITE setShowAccel USER true)
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
-    Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
     Q_PROPERTY(int showTorque READ isShowTorque WRITE setShowTorque USER true)
     Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
+    Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
+    Q_PROPERTY(int showCadD READ isShowCadD WRITE setShowCadD USER true)
+    Q_PROPERTY(int showTorqueD READ isShowTorqueD WRITE setShowTorqueD USER true)
+    Q_PROPERTY(int showPowerD READ isShowPowerD WRITE setShowPowerD USER true)
+    Q_PROPERTY(int showHrD READ isShowHrD WRITE setShowHrD USER true)
+    Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
     Q_PROPERTY(int showBalance READ isShowBalance WRITE setShowBalance USER true)
     Q_PROPERTY(int showTemp READ isShowTemp WRITE setShowTemp USER true)
     Q_PROPERTY(int showW READ isShowW WRITE setShowW USER true)
@@ -95,16 +99,20 @@ class AllPlotWindow : public GcChartWindow
         int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
-        int isShowHr() const { return showHr->checkState(); }
         int isShowNP() const { return showNP->checkState(); }
         int isShowXP() const { return showXP->checkState(); }
         int isShowAP() const { return showAP->checkState(); }
+        int isShowAlt() const { return showAlt->checkState(); }
         int isShowSpeed() const { return showSpeed->checkState(); }
         int isShowAccel() const { return showAccel->checkState(); }
-        int isShowCad() const { return showCad->checkState(); }
-        int isShowAlt() const { return showAlt->checkState(); }
-        int isShowTorque() const { return showTorque->checkState(); }
         int isShowPower() const { return showPower->currentIndex(); }
+        int isShowCad() const { return showCad->checkState(); }
+        int isShowTorque() const { return showTorque->checkState(); }
+        int isShowHr() const { return showHr->checkState(); }
+        int isShowPowerD() const { return showPowerD->checkState(); }
+        int isShowCadD() const { return showCadD->checkState(); }
+        int isShowTorqueD() const { return showTorqueD->checkState(); }
+        int isShowHrD() const { return showHrD->checkState(); }
         int isShowBalance() const { return showBalance->checkState(); }
         int isShowTemp() const { return showTemp->checkState(); }
         int isShowW() const { return showW->checkState(); }
@@ -128,18 +136,22 @@ class AllPlotWindow : public GcChartWindow
         void setrSmoothingFromSlider();
         void setrSmoothingFromLineEdit();
         void setStackWidth(int x);
-        void setShowPower(int state);
-        void setShowHr(int state);
         void setShowNP(int state);
         void setShowXP(int state);
         void setShowAP(int state);
         void setShowSpeed(int state);
         void setShowAccel(int state);
-        void setShowCad(int state);
         void setShowAlt(int state);
         void setShowTemp(int state);
         void setShowWind(int state);
+        void setShowPower(int state);
+        void setShowCad(int state);
         void setShowTorque(int state);
+        void setShowHr(int state);
+        void setShowPowerD(int state);
+        void setShowCadD(int state);
+        void setShowTorqueD(int state);
+        void setShowHrD(int state);
         void setShowBalance(int state);
         void setShowW(int state);
         void setShowGrid(int state);
@@ -221,20 +233,24 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showGrid;
         QCheckBox *showFull;
         QCheckBox *paintBrush;
-        QCheckBox *showHr;
+        QCheckBox *showAlt;
         QCheckBox *showNP;
         QCheckBox *showXP;
         QCheckBox *showAP;
         QCheckBox *showSpeed;
         QCheckBox *showAccel;
+        QComboBox *showPower;
         QCheckBox *showCad;
-        QCheckBox *showAlt;
+        QCheckBox *showTorque;
+        QCheckBox *showHr;
+        QCheckBox *showPowerD;
+        QCheckBox *showCadD;
+        QCheckBox *showTorqueD;
+        QCheckBox *showHrD;
         QCheckBox *showTemp;
         QCheckBox *showWind;
-        QCheckBox *showTorque;
         QCheckBox *showBalance;
         QCheckBox *showW;
-        QComboBox *showPower;
         QComboBox *comboDistance;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;

@@ -302,6 +302,10 @@ class AllPlotObject : public QObject
     QwtPlotCurve *hrCurve;
     QwtPlotCurve *speedCurve;
     QwtPlotCurve *accelCurve;
+    QwtPlotCurve *wattsDCurve;
+    QwtPlotCurve *cadDCurve;
+    QwtPlotCurve *nmDCurve;
+    QwtPlotCurve *hrDCurve;
     QwtPlotCurve *cadCurve;
     QwtPlotCurve *altCurve;
     QwtPlotCurve *tempCurve;
@@ -320,6 +324,10 @@ class AllPlotObject : public QObject
     QVector<double> apArray;
     QVector<double> speedArray;
     QVector<double> accelArray;
+    QVector<double> wattsDArray;
+    QVector<double> cadDArray;
+    QVector<double> nmDArray;
+    QVector<double> hrDArray;
     QVector<double> cadArray;
     QVector<double> timeArray;
     QVector<double> distanceArray;
@@ -337,6 +345,10 @@ class AllPlotObject : public QObject
     QVector<double> smoothHr;
     QVector<double> smoothSpeed;
     QVector<double> smoothAccel;
+    QVector<double> smoothWattsD;
+    QVector<double> smoothCadD;
+    QVector<double> smoothNmD;
+    QVector<double> smoothHrD;
     QVector<double> smoothCad;
     QVector<double> smoothTime;
     QVector<double> smoothDistance;
@@ -412,13 +424,17 @@ class AllPlot : public QwtPlot
 
     public slots:
 
+        void setShowAccel(bool show);
+        void setShowPowerD(bool show);
+        void setShowCadD(bool show);
+        void setShowTorqueD(bool show);
+        void setShowHrD(bool show);
         void setShowPower(int id);
         void setShowNP(bool show);
         void setShowXP(bool show);
         void setShowAP(bool show);
         void setShowHr(bool show);
         void setShowSpeed(bool show);
-        void setShowAccel(bool show);
         void setShowCad(bool show);
         void setShowAlt(bool show);
         void setShowTemp(bool show);
@@ -460,6 +476,10 @@ class AllPlot : public QwtPlot
         bool showHr;
         bool showSpeed;
         bool showAccel;
+        bool showPowerD;
+        bool showCadD;
+        bool showTorqueD;
+        bool showHrD;
         bool showCad;
         bool showAlt;
         bool showTemp;

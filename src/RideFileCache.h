@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 13;
+static const unsigned int RideFileCacheVersion = 14;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -56,6 +56,7 @@ static const unsigned int RideFileCacheVersion = 13;
 // 11       17-Feb-14    Changed 3zone model to have 85% CP < middle < CP
 // 12       21-Feb-14    Added Acceleration (speed)
 // 12       22-Feb-14    Acceleration precision way too high!
+// 13       24-Feb-14    Add hr, cad, watts, nm Δ data series
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -77,6 +78,10 @@ struct RideFileCacheHeader {
                  nmMeanMaxCount,
                  kphMeanMaxCount,
                  kphdMeanMaxCount,
+                 wattsdMeanMaxCount,
+                 caddMeanMaxCount,
+                 nmdMeanMaxCount,
+                 hrdMeanMaxCount,
                  xPowerMeanMaxCount,
                  npMeanMaxCount,
                  vamMeanMaxCount,
@@ -88,6 +93,10 @@ struct RideFileCacheHeader {
                  nmDistrCount,
                  kphDistCount,
                  kphdDistCount,
+                 wattsdDistCount,
+                 caddDistCount,
+                 nmdDistCount,
+                 hrdDistCount,
                  xPowerDistCount,
                  npDistCount,
                  wattsKgDistCount,
@@ -207,6 +216,10 @@ class RideFileCache
         QVector<float> nmMeanMax; // RideFile::nm
         QVector<float> kphMeanMax; // RideFile::kph
         QVector<float> kphdMeanMax; // RideFile::kphd
+        QVector<float> wattsdMeanMax; // RideFile::wattsd
+        QVector<float> caddMeanMax; // RideFile::cadd
+        QVector<float> nmdMeanMax; // RideFile::nmd
+        QVector<float> hrdMeanMax; // RideFile::hrd
         QVector<float> xPowerMeanMax; // RideFile::kph
         QVector<float> npMeanMax; // RideFile::kph
         QVector<float> vamMeanMax; // RideFile::vam
@@ -219,6 +232,10 @@ class RideFileCache
         QVector<double> nmMeanMaxDouble; // RideFile::nm
         QVector<double> kphMeanMaxDouble; // RideFile::kph
         QVector<double> kphdMeanMaxDouble; // RideFile::kphd
+        QVector<double> wattsdMeanMaxDouble; // RideFile::wattsd
+        QVector<double> caddMeanMaxDouble; // RideFile::cadd
+        QVector<double> nmdMeanMaxDouble; // RideFile::nmd
+        QVector<double> hrdMeanMaxDouble; // RideFile::hrd
         QVector<double> xPowerMeanMaxDouble; // RideFile::kph
         QVector<double> npMeanMaxDouble; // RideFile::kph
         QVector<double> vamMeanMaxDouble; // RideFile::kph
@@ -231,6 +248,10 @@ class RideFileCache
         QVector<QDate> nmMeanMaxDate; // RideFile::nm
         QVector<QDate> kphMeanMaxDate; // RideFile::kph
         QVector<QDate> kphdMeanMaxDate; // RideFile::kph
+        QVector<QDate> wattsdMeanMaxDate; // RideFile::wattsd
+        QVector<QDate> caddMeanMaxDate; // RideFile::cadd
+        QVector<QDate> nmdMeanMaxDate; // RideFile::nmd
+        QVector<QDate> hrdMeanMaxDate; // RideFile::hrd
         QVector<QDate> xPowerMeanMaxDate; // RideFile::kph
         QVector<QDate> npMeanMaxDate; // RideFile::kph
         QVector<QDate> vamMeanMaxDate; // RideFile::vam
@@ -251,6 +272,10 @@ class RideFileCache
         QVector<float> nmDistribution; // RideFile::nm
         QVector<float> kphDistribution; // RideFile::kph
         QVector<float> kphdDistribution; // RideFile::kphd
+        QVector<float> wattsdDistribution; // RideFile::wattsd
+        QVector<float> caddDistribution; // RideFile::cadd
+        QVector<float> nmdDistribution; // RideFile::nmd
+        QVector<float> hrdDistribution; // RideFile::hrd
         QVector<float> xPowerDistribution; // RideFile::kph
         QVector<float> npDistribution; // RideFile::kph
         QVector<float> wattsKgDistribution; // RideFile::wattsKg
@@ -262,8 +287,12 @@ class RideFileCache
         QVector<double> nmDistributionDouble; // RideFile::nm
         QVector<double> kphDistributionDouble; // RideFile::kph
         QVector<double> kphdDistributionDouble; // RideFile::kph
-        QVector<double> xPowerDistributionDouble; // RideFile::kph
-        QVector<double> npDistributionDouble; // RideFile::kph
+        QVector<double> wattsdDistributionDouble; // RideFile::wattsd
+        QVector<double> caddDistributionDouble; // RideFile::cadd
+        QVector<double> nmdDistributionDouble; // RideFile::nmd
+        QVector<double> hrdDistributionDouble; // RideFile::hrd
+        QVector<double> xPowerDistributionDouble; // RideFile::xpower
+        QVector<double> npDistributionDouble; // RideFile::np
         QVector<double> wattsKgDistributionDouble; // RideFile::wattsKg
         QVector<double> aPowerDistributionDouble; // RideFile::aPower
 

@@ -53,6 +53,8 @@ class Context;      // for context; cyclist, homedir
 // suffixes to the RideFileReader objects capable of converting those files
 // into RideFile objects.
 
+#define DELTA_CHAR "Δ";
+
 struct RideFileDataPresent
 {
     // basic
@@ -114,7 +116,7 @@ class RideFile : public QObject // QObject to emit signals
         virtual ~RideFile();
 
         // Working with DATASERIES
-        enum seriestype { secs=0, cad, hr, km, kph, kphd, nm, watts, wattsd, alt, lon, lat, headwind, slope, temp, 
+        enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd, alt, lon, lat, headwind, slope, temp, 
                           interval, NP, xPower, vam, wattsKg, lrbalance, aPower, wprime, none };
         enum specialValues { noTemp = -255 };
 
@@ -278,7 +280,7 @@ struct RideFilePoint
 {
     // recorded data
     double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance;
-    double wattsd, kphd; // acceleration in watts/s km/s
+    double hrd, cadd, kphd, nmd, wattsd; // acceleration in watts/s km/s
     int interval;
 
     // derived data (we calculate it)
@@ -287,7 +289,7 @@ struct RideFilePoint
 
     // create blank point
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
-        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(-255.0), lrbalance(0), wattsd(0.0), kphd(0.0), interval(0), xp(0), np(0), apower(0) {}
+        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(-255.0), lrbalance(0), hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(0), xp(0), np(0), apower(0) {}
 
     // create point supplying all values
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
