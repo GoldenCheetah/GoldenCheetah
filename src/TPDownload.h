@@ -34,7 +34,7 @@ public:
     void list(int type, QString user, QString pass);
 
 signals:
-    void completed(QList<QMap<QString,QString> >);
+    void completed(QString, QList<QMap<QString,QString> >);
 
 private slots:
     void getResponse(const QtSoapMessage &);
