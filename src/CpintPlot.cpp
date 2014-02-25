@@ -184,6 +184,22 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             setAxisTitle(yLeft, tr("Average Heartrate (bpm)"));
             break;
 
+        case RideFile::wattsd:
+            setAxisTitle(yLeft, tr("Watts Delta (watts/s)"));
+            break;
+
+        case RideFile::cadd:
+            setAxisTitle(yLeft, tr("Cadence Delta (rpm/s)"));
+            break;
+
+        case RideFile::nmd:
+            setAxisTitle(yLeft, tr("Torque Delta (nm/s)"));
+            break;
+
+        case RideFile::hrd:
+            setAxisTitle(yLeft, tr("Heartrate Delta (bpm/s)"));
+            break;
+
         case RideFile::kphd:
             setAxisTitle(yLeft, tr("Acceleration (m/s/s)"));
             break;
@@ -539,6 +555,11 @@ CpintPlot::clear_CP_Curves()
             delete label;
         allZoneLabels.clear();
     }
+
+    if (CPCurve) {
+        delete CPCurve;
+        CPCurve = NULL;
+    }
 }
 
 // plot the all curve, with shading according to the shade mode
@@ -805,16 +826,19 @@ CpintPlot::calculate(RideItem *rideItem)
                         break;
 
                     case RideFile::cad:
+                    case RideFile::cadd:
                         line.setColor(GColor(CCADENCE).darker(200));
                         fill = (GColor(CCADENCE));
                         break;
 
                     case RideFile::nm:
+                    case RideFile::nmd:
                         line.setColor(GColor(CTORQUE).darker(200));
                         fill = (GColor(CTORQUE));
                         break;
 
                     case RideFile::hr:
+                    case RideFile::hrd:
                         line.setColor(GColor(CHEARTRATE).darker(200));
                         fill = (GColor(CHEARTRATE));
                         break;
@@ -826,6 +850,7 @@ CpintPlot::calculate(RideItem *rideItem)
 
                     default:
                     case RideFile::watts: // won't ever get here
+                    case RideFile::wattsd:
                     case RideFile::NP:
                     case RideFile::xPower:
                         line.setColor(GColor(CPOWER).darker(200));

@@ -93,9 +93,12 @@ RideFile::seriesName(SeriesType series)
     case RideFile::km: return QString(tr("Distance"));
     case RideFile::kph: return QString(tr("Speed"));
     case RideFile::kphd: return QString(tr("Acceleration"));
+    case RideFile::wattsd: return QString(tr("Power Δ"));
+    case RideFile::cadd: return QString(tr("Cadence Δ"));
+    case RideFile::nmd: return QString(tr("Torque Δ"));
+    case RideFile::hrd: return QString(tr("Heartrate Δ"));
     case RideFile::nm: return QString(tr("Torque"));
     case RideFile::watts: return QString(tr("Power"));
-    case RideFile::wattsd: return QString(tr("Power acceleration"));
     case RideFile::xPower: return QString(tr("xPower"));
     case RideFile::aPower: return QString(tr("aPower"));
     case RideFile::NP: return QString(tr("Normalized Power"));
@@ -119,10 +122,13 @@ RideFile::colorFor(SeriesType series)
 {
     switch (series) {
     case RideFile::cad: return GColor(CCADENCE);
+    case RideFile::cadd: return GColor(CCADENCE);
     case RideFile::hr: return GColor(CHEARTRATE);
+    case RideFile::hrd: return GColor(CHEARTRATE);
     case RideFile::kph: return GColor(CSPEED);
     case RideFile::kphd: return GColor(CSPEED);
     case RideFile::nm: return GColor(CTORQUE);
+    case RideFile::nmd: return GColor(CTORQUE);
     case RideFile::watts: return GColor(CPOWER);
     case RideFile::wattsd: return GColor(CPOWER);
     case RideFile::xPower: return GColor(CXPOWER);
@@ -153,11 +159,14 @@ RideFile::unitName(SeriesType series, Context *context)
     switch (series) {
     case RideFile::secs: return QString(tr("seconds"));
     case RideFile::cad: return QString(tr("rpm"));
+    case RideFile::cadd: return QString(tr("rpm/s"));
     case RideFile::hr: return QString(tr("bpm"));
+    case RideFile::hrd: return QString(tr("bpm/s"));
     case RideFile::km: return QString(useMetricUnits ? tr("km") : tr("miles"));
     case RideFile::kph: return QString(useMetricUnits ? tr("kph") : tr("mph"));
     case RideFile::kphd: return QString(tr("m/s/s"));
     case RideFile::nm: return QString(tr("N"));
+    case RideFile::nmd: return QString(tr("N/s"));
     case RideFile::watts: return QString(tr("watts"));
     case RideFile::wattsd: return QString(tr("watts/s"));
     case RideFile::xPower: return QString(tr("watts"));
@@ -699,6 +708,9 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::km : return km; break;
         case RideFile::kph : return kph; break;
         case RideFile::kphd : return kphd; break;
+        case RideFile::cadd : return cadd; break;
+        case RideFile::nmd : return nmd; break;
+        case RideFile::hrd : return hrd; break;
         case RideFile::nm : return nm; break;
         case RideFile::watts : return watts; break;
         case RideFile::wattsd : return wattsd; break;
@@ -1019,8 +1031,7 @@ RideFile::recalculateDerivedSeries()
 
     foreach(RideFilePoint *p, dataPoints_) {
 
-        //
-        // Acceleration
+        // Delta
         if (lastP) {
 
             double deltaSpeed = p->kph - lastP->kph;
@@ -1036,6 +1047,19 @@ RideFile::recalculateDerivedSeries()
                 acc /= 3600; // meters per second
                 p->kphd = acc;
 
+
+                // Other delta values -- only interested in growth for power, cadence and torque
+                double pd = (p->watts - lastP->watts) / deltaTime;
+                p->wattsd = pd > 0 ? pd : 0;
+
+                double cd = (p->cad - lastP->cad) / deltaTime;
+                p->cadd = cd > 0 ? cd : 0;
+
+                double nd = (p->nm - lastP->nm) / deltaTime;
+                p->nmd = nd > 0 ? nd : 0;
+
+                // we want recovery and increase times for hr
+                p->hrd = (p->hr - lastP->hr) / deltaTime;
             }
         }
 
