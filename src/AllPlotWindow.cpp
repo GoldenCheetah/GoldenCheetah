@@ -118,15 +118,16 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     //revealControls->hide();
 
     // setup the controls
-    QLabel *showLabel = new QLabel(tr("Show"), c);
+    QLabel *showLabel = new QLabel(tr("View"), c);
 
-    showStack = new QCheckBox(tr("Stacked view"), this);
+    showStack = new QCheckBox(tr("Stack"), this);
     showStack->setCheckState(Qt::Unchecked);
     cl1->addRow(showLabel, showStack);
 
     showBySeries = new QCheckBox(tr("By Series"), this);
     showBySeries->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel("", this), showBySeries);
+    cl1->addRow(new QLabel("", this), new QLabel("",this)); // spacer
 
     stackWidth = 20;
     stackZoomSlider = new QSlider(Qt::Horizontal,this);
