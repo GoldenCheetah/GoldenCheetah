@@ -151,16 +151,16 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     cl1->addRow(new QLabel(""), new QLabel(""));
     cl1->addRow(new QLabel("Delta Series"), new QLabel(""));
 
-    showPowerD = new QCheckBox(tr("Power Δ"), this);
+    showPowerD = new QCheckBox(QString(tr("Power %1").arg(deltaChar)), this);
     showPowerD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showPowerD);
-    showCadD = new QCheckBox(tr("Cadence Δ"), this);
+    showCadD = new QCheckBox(QString(tr("Cadence %1").arg(deltaChar)), this);
     showCadD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showCadD);
-    showTorqueD = new QCheckBox(tr("Torque Δ"), this);
+    showTorqueD = new QCheckBox(QString(tr("Torque %1").arg(deltaChar)), this);
     showTorqueD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showTorqueD);
-    showHrD = new QCheckBox(tr("Heartrate Δ"), this);
+    showHrD = new QCheckBox(QString(tr("Heartrate %1").arg(deltaChar)), this);
     showHrD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showHrD);
 

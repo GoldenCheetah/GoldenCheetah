@@ -39,6 +39,8 @@
     start = point->secs; \
 }
 
+const QChar deltaChar(0x0394);
+
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), weight_(0),
@@ -93,10 +95,10 @@ RideFile::seriesName(SeriesType series)
     case RideFile::km: return QString(tr("Distance"));
     case RideFile::kph: return QString(tr("Speed"));
     case RideFile::kphd: return QString(tr("Acceleration"));
-    case RideFile::wattsd: return QString(tr("Power Δ"));
-    case RideFile::cadd: return QString(tr("Cadence Δ"));
-    case RideFile::nmd: return QString(tr("Torque Δ"));
-    case RideFile::hrd: return QString(tr("Heartrate Δ"));
+    case RideFile::wattsd: return QString(tr("Power %1").arg(deltaChar));
+    case RideFile::cadd: return QString(tr("Cadence %1").arg(deltaChar));
+    case RideFile::nmd: return QString(tr("Torque %1").arg(deltaChar));
+    case RideFile::hrd: return QString(tr("Heartrate %1").arg(deltaChar));
     case RideFile::nm: return QString(tr("Torque"));
     case RideFile::watts: return QString(tr("Power"));
     case RideFile::xPower: return QString(tr("xPower"));
