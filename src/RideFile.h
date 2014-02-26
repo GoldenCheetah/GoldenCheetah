@@ -296,7 +296,8 @@ struct RideFilePoint
                   double nm, double watts, double alt, double lon, double lat,
                   double headwind, double slope, double temp, double lrbalance, int interval) :
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
-        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), slope(slope), temp(temp), lrbalance(lrbalance), interval(interval), xp(0), np(0), apower(0) {}
+        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), slope(slope), temp(temp), lrbalance(lrbalance), 
+        hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(interval), xp(0), np(0), apower(0) {}
 
     // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;
