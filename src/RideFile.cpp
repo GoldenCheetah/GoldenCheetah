@@ -1037,22 +1037,25 @@ RideFile::recalculateDerivedSeries()
             double deltaSpeed = (p->kph - lastP->kph) / 3.60f;
             double deltaTime = p->secs - lastP->secs;
 
-            if (deltaTime) {
+            if (deltaTime > 0) {
 
                 p->kphd = deltaSpeed / deltaTime;
 
                 // Other delta values -- only interested in growth for power, cadence and torque
                 double pd = (p->watts - lastP->watts) / deltaTime;
-                p->wattsd = pd > 0 ? pd : 0;
+                p->wattsd = pd > 0 && pd < 2500 ? pd : 0;
 
                 double cd = (p->cad - lastP->cad) / deltaTime;
-                p->cadd = cd > 0 ? cd : 0;
+                p->cadd = cd > 0 && cd < 200 ? cd : 0;
 
                 double nd = (p->nm - lastP->nm) / deltaTime;
                 p->nmd = nd > 0 ? nd : 0;
 
                 // we want recovery and increase times for hr
                 p->hrd = (p->hr - lastP->hr) / deltaTime;
+                // ignore hr dropouts -- 0 means dropout not dead!
+                if (!p->hr || (lastP && lastP->hr == 0)) p->hrd = 0;
+
             }
         }
 
