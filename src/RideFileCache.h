@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 14;
+static const unsigned int RideFileCacheVersion = 15;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -56,7 +56,7 @@ static const unsigned int RideFileCacheVersion = 14;
 // 11       17-Feb-14    Changed 3zone model to have 85% CP < middle < CP
 // 12       21-Feb-14    Added Acceleration (speed)
 // 12       22-Feb-14    Acceleration precision way too high!
-// 13       24-Feb-14    Add hr, cad, watts, nm Δ data series
+// 13-15    24-Feb-14    Add hr, cad, watts, nm Δ data series
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -92,11 +92,6 @@ struct RideFileCacheHeader {
                  cadDistCount,
                  nmDistrCount,
                  kphDistCount,
-                 kphdDistCount,
-                 wattsdDistCount,
-                 caddDistCount,
-                 nmdDistCount,
-                 hrdDistCount,
                  xPowerDistCount,
                  npDistCount,
                  wattsKgDistCount,
@@ -272,10 +267,6 @@ class RideFileCache
         QVector<float> nmDistribution; // RideFile::nm
         QVector<float> kphDistribution; // RideFile::kph
         QVector<float> kphdDistribution; // RideFile::kphd
-        QVector<float> wattsdDistribution; // RideFile::wattsd
-        QVector<float> caddDistribution; // RideFile::cadd
-        QVector<float> nmdDistribution; // RideFile::nmd
-        QVector<float> hrdDistribution; // RideFile::hrd
         QVector<float> xPowerDistribution; // RideFile::kph
         QVector<float> npDistribution; // RideFile::kph
         QVector<float> wattsKgDistribution; // RideFile::wattsKg
@@ -286,11 +277,6 @@ class RideFileCache
         QVector<double> cadDistributionDouble; // RideFile::cad
         QVector<double> nmDistributionDouble; // RideFile::nm
         QVector<double> kphDistributionDouble; // RideFile::kph
-        QVector<double> kphdDistributionDouble; // RideFile::kph
-        QVector<double> wattsdDistributionDouble; // RideFile::wattsd
-        QVector<double> caddDistributionDouble; // RideFile::cadd
-        QVector<double> nmdDistributionDouble; // RideFile::nmd
-        QVector<double> hrdDistributionDouble; // RideFile::hrd
         QVector<double> xPowerDistributionDouble; // RideFile::xpower
         QVector<double> npDistributionDouble; // RideFile::np
         QVector<double> wattsKgDistributionDouble; // RideFile::wattsKg

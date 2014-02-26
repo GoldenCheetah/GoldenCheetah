@@ -1034,19 +1034,12 @@ RideFile::recalculateDerivedSeries()
         // Delta
         if (lastP) {
 
-            double deltaSpeed = p->kph - lastP->kph;
+            double deltaSpeed = (p->kph - lastP->kph) / 3.60f;
             double deltaTime = p->secs - lastP->secs;
 
-            // from kph to meters /s /s
-            double acc = deltaSpeed;
-
             if (deltaTime) {
-                acc /= deltaTime;
-                // now from kilometers per hour to m/s/s
-                acc *= 1000; // meters per hour
-                acc /= 3600; // meters per second
-                p->kphd = acc;
 
+                p->kphd = deltaSpeed / deltaTime;
 
                 // Other delta values -- only interested in growth for power, cadence and torque
                 double pd = (p->watts - lastP->watts) / deltaTime;
