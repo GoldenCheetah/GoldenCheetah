@@ -53,7 +53,7 @@ class Context;      // for context; cyclist, homedir
 // suffixes to the RideFileReader objects capable of converting those files
 // into RideFile objects.
 
-#define DELTA_CHAR "Δ";
+extern const QChar deltaChar;
 
 struct RideFileDataPresent
 {
