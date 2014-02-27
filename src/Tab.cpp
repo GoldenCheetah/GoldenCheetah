@@ -21,6 +21,7 @@
 #include "Views.h"
 #include "Athlete.h"
 #include "IntervalItem.h"
+#include "IntervalTreeView.h"
 #include "MainWindow.h"
 
 Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
@@ -181,6 +182,10 @@ Tab::rideSelected(RideItem*)
 
     if (!context->ride) return;
 
+    // stop SEGV in widgets watching for intervals being
+    // selected whilst we are deleting them from the tree
+    context->athlete->intervalWidget->blockSignals(true);
+
     // refresh interval list for bottom left
     // first lets wipe away the existing intervals
     QList<QTreeWidgetItem *> intervals = context->athlete->allIntervals->takeChildren();
@@ -206,5 +211,7 @@ Tab::rideSelected(RideItem*)
             }
         }
     }
+    // all done, so connected widgets can receive signals now
+    context->athlete->intervalWidget->blockSignals(false);
 }
 
