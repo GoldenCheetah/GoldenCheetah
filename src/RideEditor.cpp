@@ -1108,12 +1108,10 @@ void
 RideEditor::intervalSelected()
 {
     // is it for the ride item we are editing?
-    if (context->currentRideItem() == ride) {
+    if (ride && context->currentRideItem() == ride) {
 
         // clear all selections
-        table->selectionModel()->select(QItemSelection(model->index(0,0),
-                                                       model->index(ride->ride()->dataPoints().count(),model->columnCount()-1)),
-                                                       QItemSelectionModel::Clear);
+        table->selectionModel()->clear();
 
         // highlight selection and jump to last
         foreach(QTreeWidgetItem *x, context->athlete->allIntervalItems()->treeWidget()->selectedItems()) {
