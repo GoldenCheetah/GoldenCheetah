@@ -32,10 +32,12 @@
 // 3010 - V3.0 RELEASE (June 7 2013)
 // 3020 - V3.0 SP1 RC1
 // 3030 - V3.0 SP1 RELEASE (December 2013)
+// 3032 - V3.0 SP2 RELEASE (March 2014)
 // 3040 - V3.1 DEVELOPMENT
 
 #define VERSION3_BUILD 3010 // released
 #define VERSION3_SP1   3030 // released
+#define VERSION3_SP2   3032 // released
 
 #define VERSION_LATEST 3040
 #define VERSION_STRING "V3.1 (dev)"
