@@ -94,7 +94,7 @@ GcUpgrade::upgrade(const QDir &home)
     // DO NOT CHANGE THE VERSION 3 UPGRADE PROCESS ABOVE, ADD TO IT BELOW
 
     // 3.0 SP1 upgrade processing
-    if (last < VERSION3_SP1) {
+    if (last < VERSION3_SP2) {
 
         // 2. Remove old CLucece 'index'
         QFile index(QString("%1/index").arg(home.canonicalPath()));
