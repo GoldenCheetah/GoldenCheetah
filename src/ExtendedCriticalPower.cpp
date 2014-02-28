@@ -250,10 +250,10 @@ ExtendedCriticalPower::deriveExtendedCP_2_3_Parameters(RideFileCache *bests, Rid
     //qDebug() << iteration << "iterations";
 
     model.pMax = model.paa*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
-    model.cp60 = model.paa*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/(60.0))) * ( 1 + model.etau/(60.0));
+    model.mmp60 = model.paa*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/(60.0))) * ( 1 + model.etau/(60.0));
 
     qDebug() <<"eCP(2.3) " << "paa" << model.paa << "paa_dec" << model.paa_dec << "ecp" << model.ecp << "etau" << model.etau  << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec  << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(2.3) " << "pmax" << model.pMax << "cp60" << model.cp60;
+    qDebug() <<"eCP(2.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
@@ -374,7 +374,7 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCac
 
     // lower bound on tau
     const double paa_min = 100;
-    const double paa_max = 2000;
+    //const double paa_max = 2000;
     const double etau_min = 0.5;
     const double paa_dec_max = -0.25;
     const double paa_dec_min = -3;
@@ -532,10 +532,10 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCac
     //qDebug() << iteration << "iterations";
 
     model.pMax = model.paa*(2.0-exp(-1*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
-    model.cp60 = model.paa*(2.0-exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
+    model.mmp60 = model.paa*(2.0-exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
 
     qDebug() <<"eCP(4.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(4.3) " << "pmax" << model.pMax << "cp60" << model.cp60;
+    qDebug() <<"eCP(4.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
@@ -727,7 +727,7 @@ ExtendedCriticalPower::getPlotMarkerForExtendedCP(Model_eCP model)
     QwtPlotMarker* extendedCurveTitle2 = new QwtPlotMarker();
     QString extendedCurve2_title;
 
-    extendedCurve2_title.sprintf("CP60=%.0d W, Pmax=%.0d W, W'=%.0f kJ (%s)", model.cp60, model.pMax, model.etau*model.ecp* 60.0 / 1000.0, model.version.toLatin1().constData());
+    extendedCurve2_title.sprintf("CP=%.0f W, MMP60=%.0d W, Pmax=%.0d W, W'=%.0f kJ (%s)", model.ecp, model.mmp60, model.pMax, model.etau*model.ecp* 60.0 / 1000.0, model.version.toLatin1().constData());
     extendedCurveTitle2->setLabel(QwtText(extendedCurve2_title, QwtText::PlainText));
 
     return extendedCurveTitle2;
@@ -940,7 +940,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
 
     // lower bound on tau
     const double paa_min = 100;
-    const double paa_max = 2000;
+    //const double paa_max = 2000;
     const double etau_min = 0.5;
     const double paa_dec_max = -0.25;
     const double paa_dec_min = -3;
@@ -1098,10 +1098,10 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
     //qDebug() << iteration << "iterations";
 
     model.pMax = model.paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1-exp(model.tau_del*(1/60.0))) * (1-exp(model.ecp_del*(1/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 + model.etau/(1/60.0));
-    model.cp60 = model.paa*(1.20-0.20*exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.tau_del*(60.0))) * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
+    model.mmp60 = model.paa*(1.20-0.20*exp(-1*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1-exp(model.tau_del*(60.0))) * (1-exp(model.ecp_del*60.0)) * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 + model.etau/(60.0));
 
     qDebug() <<"eCP(5.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(5.3) " << "pmax" << model.pMax << "cp60" << model.cp60;
+    qDebug() <<"eCP(5.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
@@ -1361,7 +1361,7 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
 
     // lower bound on tau
     const double paa_min = 100;
-    const double paa_max = 2000;
+    //const double paa_max = 2000;
     const double etau_min = 0.5;
     const double paa_dec_max = -0.25;
     const double paa_dec_min = -5;
@@ -1519,10 +1519,10 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
     //qDebug() << iteration << "iterations";
 
     model.pMax = model.paa*(1.10-(1.10-1)*exp(-8*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 * (1-exp(model.ecp_del*(1/60.0))) + pow((1-exp(model.tau_del*(1/60.0))),2) * model.etau/(1/60.0));
-    model.cp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
+    model.mmp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
 
     qDebug() <<"eCP(6.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "cp60" << model.cp60;
+    qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
@@ -1786,7 +1786,7 @@ ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCa
 
     // lower bound on tau
     const double paa_min = 100;
-    const double paa_max = 2000;
+    //const double paa_max = 2000;
     const double etau_min = 0.5;
     const double paa_dec_max = -0.25;
     const double paa_dec_min = -5;
@@ -1945,10 +1945,10 @@ ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCa
     //qDebug() << iteration << "iterations";
 
     model.pMax = model.paa*(1.10-(1.10-1)*exp(-8*(1/60.0)))*exp(model.paa_dec*(1/60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/(1/60.0))) * ( 1 * (1-exp(model.ecp_del*(1/60.0))) + pow((1-exp(model.tau_del*(1/60.0))),2) * model.etau/(1/60.0));
-    model.cp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
+    model.mmp60 = model.paa*(1.10-(1.10-1)*exp(-8*60.0))*exp(model.paa_dec*(60.0)) + model.ecp * (1+model.ecp_dec*exp(model.ecp_dec_del/60.0)) * ( 1 * (1-exp(model.ecp_del*60.0)) + pow((1-exp(model.tau_del*(60.0))),2) * model.etau/(60.0));
 
     qDebug() <<"eCP(6.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
-    qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "cp60" << model.cp60;
+    qDebug() <<"eCP(6.3) " << "pmax" << model.pMax << "mmp60" << model.mmp60;
 
     return model;
 }
