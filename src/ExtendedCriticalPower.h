@@ -38,7 +38,7 @@ class Model_eCP
         Model_eCP()  :
             version(""),
             paa(0), paa_dec(0), ecp(0), etau(0), ecp_del(0), tau_del(0), ecp_dec(0), ecp_dec_del(0),
-            pMax(0), cp60(0) {}
+            pMax(0), mmp60(0) {}
 
         QString version;
 
@@ -48,7 +48,7 @@ class Model_eCP
         // Parameters dan
         double p1, t1, p2, t2, a2;
 
-        int pMax, cp60;
+        int pMax, mmp60;
 };
 
 /*class Model_eCP
