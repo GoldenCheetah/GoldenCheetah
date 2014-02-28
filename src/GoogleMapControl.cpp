@@ -137,8 +137,14 @@ void GoogleMapControl::createHtml()
     "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
     "<title>Golden Cheetah Map</title>\n"
-    "<link href=\"http://code.google.com/apis/maps/documentation/javascript/examples/default.css\" rel=\"stylesheet\" type=\"text/css\" /> \n"
+    "<!--<link href=\"http://code.google.com/apis/maps/documentation/javascript/examples/default.css\" rel=\"stylesheet\" type=\"text/css\" />--> \n"
+    "<style type=\"text/css\">\n"
+    "   html { height: 100% }\n"
+    "   body { height: 100%; margin: 0; padding: 0 }\n"
+    "   #map-canvas { height: 100% }\n"
+    "</style>\n"
     "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM&sensor=false\"></script> \n");
+
 
     // local functions
     currentPage += QString("<script type=\"text/javascript\">\n"
