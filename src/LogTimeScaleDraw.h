@@ -33,10 +33,11 @@
 class LogTimeScaleDraw : public QwtScaleDraw
 {
     public:
+        LogTimeScaleDraw() : QwtScaleDraw(), inv_time(false) {}
+
         static const QList<double> ticks;
         static const QList<double> ticksEnergy;
-
-        bool inv_time = false;
+        bool inv_time;
 
     protected:
 
