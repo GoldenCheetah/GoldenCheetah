@@ -32,13 +32,15 @@
 // 3010 - V3.0 RELEASE (June 7 2013)
 // 3020 - V3.0 SP1 RC1
 // 3030 - V3.0 SP1 RELEASE (December 2013)
+// 3032 - V3.0 SP2 RELEASE (March 2013)
 // 3040 - V3.1 DEVELOPMENT // different branch
 
-#define VERSION_LATEST 3030
-#define VERSION_STRING "V3.0 SP1"
+#define VERSION_LATEST 3032
+#define VERSION_STRING "V3.0 SP2"
 
 #define VERSION3_BUILD 3010
 #define VERSION3_SP1   3030
+#define VERSION3_SP2   3032
 
 class GcUpgrade
 {
