@@ -979,10 +979,10 @@ CriticalPowerWindow::seriesName(CriticalSeriesType series)
         case hr: return QString(tr("Heartrate"));
         case kph: return QString(tr("Speed"));
         case kphd: return QString(tr("Acceleration"));
-        case wattsd: return QString(tr("Power Δ"));
-        case cadd: return QString(tr("Cadence Δ"));
-        case nmd: return QString(tr("Torque Δ"));
-        case hrd: return QString(tr("Heartrate Δ"));
+        case wattsd: return QString(tr("Power %1").arg(deltaChar));
+        case cadd: return QString(tr("Cadence %1").arg(deltaChar));
+        case nmd: return QString(tr("Torque %1").arg(deltaChar));
+        case hrd: return QString(tr("Heartrate %1").arg(deltaChar));
         case cad: return QString(tr("Cadence"));
         case nm: return QString(tr("Torque"));
         case vam: return QString(tr("VAM"));
