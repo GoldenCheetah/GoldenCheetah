@@ -743,7 +743,7 @@ AllPlot::configChanged()
     blbrush_color.setAlpha(200);
     standard->balanceRCurve->setBrush(blbrush_color);   // fill below the line
     QPen wPen = QPen(GColor(CWBAL)); 
-    wPen.setWidth(2); // thicken
+    wPen.setWidth(width); // don't thicken
     standard->wCurve->setPen(wPen);
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Rect);
