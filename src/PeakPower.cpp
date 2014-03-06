@@ -70,6 +70,50 @@ class FatigueIndex : public RideMetric {
     RideMetric *clone() const { return new FatigueIndex(*this); }
 };
 
+class PacingIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PacingIndex)
+
+    double maxp;
+    double count, total;
+
+    public:
+
+    PacingIndex() : maxp(0.0), count(0), total(0)
+    {
+        setType(RideMetric::Average);
+        setSymbol("power_pacing_index");
+        setInternalName("Pacing Index");
+        setName(tr("Pacing Index"));
+        setMetricUnits(tr("%"));
+        setPrecision(1); // e.g. 99.9%
+        setImperialUnits(tr("%"));
+
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->dataPoints().isEmpty() || !ride->areDataPresent()->watts) {
+            // no data
+            setValue(0.0);
+
+        } else {
+
+            // find peak and work from that
+            foreach(const RideFilePoint *point, ride->dataPoints()) {
+                if (point->watts > maxp && point->watts != 0) maxp = point->watts;
+                total += point->watts;
+                count++;
+            }
+
+            if (!count || !total) setValue(0.00); // minp wasn't changed, all zeroes?
+            else setValue(((total/count) / maxp) * 100.00f);
+        }
+    }
+    RideMetric *clone() const { return new PacingIndex(*this); }
+};
+
 class PeakPower : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(PeakPower)
     double watts;
@@ -522,7 +566,8 @@ class PeakPowerHr60m : public PeakPowerHr {
 };
 
 static bool addAllPeaks() {
-    RideMetricFactory::instance().addMetric(FatigueIndex()); // added here instead of new function
+    RideMetricFactory::instance().addMetric(FatigueIndex());
+    RideMetricFactory::instance().addMetric(PacingIndex());  
 
     RideMetricFactory::instance().addMetric(PeakPower1s());
     RideMetricFactory::instance().addMetric(PeakPower5s());
