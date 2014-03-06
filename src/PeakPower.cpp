@@ -50,9 +50,17 @@ class FatigueIndex : public RideMetric {
             setValue(0.0);
 
         } else {
+
+            // find peak and work from that
             foreach(const RideFilePoint *point, ride->dataPoints()) {
-                if (point->watts < minp && point->watts != 0) minp = point->watts;
-                if (point->watts > maxp && point->watts != 0) maxp = point->watts;
+                if (point->watts > maxp && point->watts != 0) minp = maxp = point->watts;
+            }
+
+            // now find min after peak
+            bool hitpeak = false;
+            foreach(const RideFilePoint *point, ride->dataPoints()) {
+                if (hitpeak == false && point->watts >= maxp) hitpeak = true;
+                if (hitpeak == true && point->watts < minp && point->watts != 0) minp = point->watts;
             }
 
             if (minp > maxp) setValue(0.00); // minp wasn't changed, all zeroes?
