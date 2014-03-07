@@ -24,7 +24,7 @@ SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
     GcWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     // setup controls
     QWidget *c = new QWidget;

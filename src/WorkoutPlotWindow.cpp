@@ -25,7 +25,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
 {
     setContentsMargins(0,0,0,0);
     setControls(NULL);
-    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
@@ -37,6 +37,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
     connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 }
 
 void
@@ -54,4 +55,11 @@ void
 WorkoutPlotWindow::setNow(long now)
 {
     ergPlot->setNow(now);
+}
+
+void
+WorkoutPlotWindow::configChanged()
+{
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    repaint();
 }

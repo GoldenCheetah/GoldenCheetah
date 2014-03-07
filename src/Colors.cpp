@@ -42,6 +42,7 @@ void GCColor::setupColors()
     Colors init[CNUMOFCFGCOLORS+1] = {
         { tr("Plot Background"), "COLORPLOTBACKGROUND", Qt::white },
         { tr("Ride Plot Background"), "COLORRIDEPLOTBACKGROUND", Qt::black },
+        { tr("Train Plot Background"), "COLORTRAINPLOTBACKGROUND", Qt::black },
         { tr("Plot Symbols"), "COLORRIDEPLOTSYMBOLS", Qt::gray },
         { tr("Ride Plot X Axis"), "COLORRIDEPLOTXAXIS", Qt::blue },
         { tr("Ride Plot Y Axis"), "COLORRIDEPLOTYAXIS", Qt::red },

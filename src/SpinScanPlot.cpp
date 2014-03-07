@@ -106,7 +106,7 @@ SpinScanPlot::setAxisTitle(int axis, QString label)
 void
 SpinScanPlot::configChanged()
 {
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
 
     QColor col = GColor(CSPINSCANLEFT);
     col.setAlpha(120);

@@ -484,7 +484,7 @@ TrainSidebar::mediaPopup()
 void
 TrainSidebar::configChanged()
 {
-    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     // DEVICES
 

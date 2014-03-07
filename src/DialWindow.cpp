@@ -531,7 +531,7 @@ void DialWindow::seriesChanged()
     }
 
     // ugh. we use style sheets becuase palettes don't work on labels
-    background = GColor(CRIDEPLOTBACKGROUND);
+    background = GColor(CTRAINPLOTBACKGROUND);
     setProperty("color", background);
     QString sh = QString("QLabel { background: %1; color: %2; }")
                  .arg(background.name())

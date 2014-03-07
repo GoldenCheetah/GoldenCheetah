@@ -371,10 +371,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 void
 CriticalPowerWindow::configChanged()
 {
-    QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
-    setPalette(palette);
-
     rideSelected();
 }
 

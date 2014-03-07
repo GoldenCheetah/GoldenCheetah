@@ -24,7 +24,7 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     GcWindow(context), context(context), active(false)
 {
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);

@@ -271,7 +271,7 @@ RealtimePlot::configChanged()
 {
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
 
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
     QPen pwr30pen = QPen(GColor(CPOWER), width, Qt::DashLine);
     pwr30Curve->setPen(pwr30pen);
     pwr30Curve->setData(pwr30Data);

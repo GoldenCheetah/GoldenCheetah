@@ -87,7 +87,7 @@ QPointF NowData::sample(size_t i) const
 ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     //courseData = data;                      // what we plot
     setAutoDelete(false);
@@ -247,6 +247,15 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     setAutoReplot(false);
 	setData(ergFile);
+
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+}
+
+void
+ErgFilePlot::configChanged()
+{
+    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
+    replot();
 }
 
 void
