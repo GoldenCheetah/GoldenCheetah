@@ -210,10 +210,6 @@ PfPvWindow::PfPvWindow(Context *context) :
 void
 PfPvWindow::configChanged()
 {
-    QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
-
-    setPalette(palette);
 }
 
 bool
