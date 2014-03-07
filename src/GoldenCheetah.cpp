@@ -262,7 +262,8 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
         painter.setPen(Qt::darkGray);
-        painter.drawRect(QRect(0,0,width()-1,height()-1));
+        //painter.drawRect(QRect(0,0,width()-1,height()-1));
+        painter.drawLine(0,0,width(),0);
 
         // heading
         QFont font;

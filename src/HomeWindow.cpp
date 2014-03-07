@@ -84,7 +84,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     // each style has its own container widget
     QWidget *tabArea = new QWidget(this);
-    tabArea->setContentsMargins(20,20,20,20);
+    tabArea->setContentsMargins(0,20,0,0); // no spacing now, used to be 20px
     QVBoxLayout *tabLayout = new QVBoxLayout(tabArea);
     tabLayout->setContentsMargins(0,0,0,0);
     tabLayout->setSpacing(0);
@@ -101,6 +101,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     tabbed->setUsesScrollButtons(true);
 
     QTabBar *tb = tabbed->findChild<QTabBar*>(QLatin1String("qt_tabwidget_tabbar"));
+    tb->setShape(QTabBar::RoundedSouth);
     tb->setShape(QTabBar::RoundedSouth);
     tb->setDrawBase(false);
     tabbed->setStyleSheet("QTabWidget::tab-bar { alignment: center; }"
