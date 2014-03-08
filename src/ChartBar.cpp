@@ -99,7 +99,11 @@ ChartBar::addWidget(QString title)
 void
 ChartBar::clear()
 {
+#ifdef Q_OS_MAC
+    foreach(QtMacButton *button, buttons) {
+#else
     foreach(GcScopeButton *button, buttons) {
+#endif
         layout->removeWidget(button);
         delete button;
     }
