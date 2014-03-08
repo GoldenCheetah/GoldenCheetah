@@ -213,6 +213,9 @@ struct Bin2FileReaderState
 
         if (data_version >= 4)
             read_bytes(8, bytes_read, sum);
+
+        if (data_version >= 6)
+            read_bytes(8, bytes_read, sum);
     }
 
     void read_interval_summary(int *bytes_read = NULL, int *sum = NULL)
@@ -239,6 +242,12 @@ struct Bin2FileReaderState
         deviceInfo += QString("Smartbelt %1-%2-%3\n").arg(smartbelt_A).arg(smartbelt_B).arg(smartbelt_C);
 
         read_bytes(42, bytes_read, sum);
+
+        if (data_version>=6)
+            read_bytes(4, bytes_read, sum);
+
+        if (data_version>=8)
+            read_bytes(20, bytes_read, sum);
     }
 
     void read_ant_info_record(int *bytes_read = NULL, int *sum = NULL)
