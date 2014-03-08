@@ -274,6 +274,7 @@ HEADERS += \
         BingMap.h \
         BlankState.h \
         CalendarDownload.h \
+        ChartBar.h \
         ChartSettings.h \
         ChooseCyclistDialog.h \
         Colors.h \
@@ -465,6 +466,7 @@ SOURCES += \
         BingMap.cpp \
         BlankState.cpp \
         CalendarDownload.cpp \
+        ChartBar.cpp \
         ChartSettings.cpp \
         ChooseCyclistDialog.cpp \
         Coggan.cpp \

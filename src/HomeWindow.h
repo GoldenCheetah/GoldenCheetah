@@ -41,6 +41,7 @@
 #endif
 
 extern QApplication *application;
+class ChartBar;
 
 class HomeWindow : public GcWindow
 {
@@ -120,7 +121,8 @@ class HomeWindow : public GcWindow
         QStackedWidget *controlStack; // window controls
 
         // each style has its own container widget
-        QTabWidget *tabbed; 
+        ChartBar *chartbar;
+        QStackedWidget *tabbed; 
 
         QScrollArea *tileArea;
         QWidget *tileWidget;

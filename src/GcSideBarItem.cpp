@@ -379,6 +379,7 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
 
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
+    painter.fillRect(all, QColor(Qt::white));
     painter.fillRect(all, isActiveWindow() ? active : inactive);
 
     QPen black(QColor(100,100,100,200));
