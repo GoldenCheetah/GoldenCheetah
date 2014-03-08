@@ -60,7 +60,11 @@ private:
     QHBoxLayout *layout;
 
     QFont buttonFont;
+#ifdef Q_OS_MAC
+    QVector<QtMacButton*> buttons;
+#else
     QVector<GcScopeButton*> buttons;
+#endif
     QSignalMapper *signalMapper;
 
     QLinearGradient active, inactive;
