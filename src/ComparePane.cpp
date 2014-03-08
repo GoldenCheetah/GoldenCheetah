@@ -132,6 +132,7 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
     table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     table->setAcceptDrops(false);
+    table->setStyleSheet("QTableWidget { border: none; }");
     scrollArea->setWidget(table);
 
     configChanged(); // set up ready to go...

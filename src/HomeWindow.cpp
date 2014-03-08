@@ -23,6 +23,7 @@
 #include "LTMTool.h"
 #include "LTMSettings.h"
 #include "Settings.h"
+#include "ChartBar.h"
 
 #include <QGraphicsDropShadowEffect>
 
@@ -84,31 +85,14 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     // each style has its own container widget
     QWidget *tabArea = new QWidget(this);
-    //XXX need scopebar as tabbar before we remove spacing
-    //XXX tabArea->setContentsMargins(0,20,0,0); // no spacing now, used to be 20px
-    tabArea->setContentsMargins(20,20,20,20); // no spacing now, used to be 20px
+    tabArea->setContentsMargins(0,0,0,0); // no spacing now, used to be 20px
     QVBoxLayout *tabLayout = new QVBoxLayout(tabArea);
     tabLayout->setContentsMargins(0,0,0,0);
     tabLayout->setSpacing(0);
-    tabbed = new QTabWidget(this);
-#ifdef Q_OS_MAC
-    tabbed->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#endif
-    tabbed->setContentsMargins(0,0,0,0);
-    tabbed->setTabsClosable(false);
-    tabbed->setPalette(palette);
-    tabbed->setDocumentMode(false);
-    tabbed->setMovable(true);
-    tabbed->setElideMode(Qt::ElideNone);
-    tabbed->setUsesScrollButtons(true);
+    tabbed = new QStackedWidget(this);
 
-    QTabBar *tb = tabbed->findChild<QTabBar*>(QLatin1String("qt_tabwidget_tabbar"));
-    tb->setShape(QTabBar::RoundedSouth);
-    tb->setShape(QTabBar::RoundedSouth);
-    tb->setDrawBase(false);
-    tabbed->setStyleSheet("QTabWidget::tab-bar { alignment: center; }"
-                          "QTabWidget::pane { top: 20px; }");
-
+    chartbar = new ChartBar(context);
+    tabLayout->addWidget(chartbar);
     tabLayout->addWidget(tabbed);
     style->addWidget(tabArea);
 
@@ -161,9 +145,10 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
-    connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
-    connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
+    //connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
+    //connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
+    //connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
+    connect(chartbar, SIGNAL(currentIndexChanged(int)), this, SLOT(tabSelected(int)));
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
     installEventFilter(this);
@@ -231,7 +216,7 @@ HomeWindow::titleChanged()
 
         // rename the tab
         if (!currentStyle) {
-            tabbed->setTabText(controlStack->currentIndex(), titleEdit->text());
+            //XXX move to scope bar tabbed->setTabText(controlStack->currentIndex(), titleEdit->text());
         }
 
         // repaint to reflect
@@ -295,6 +280,7 @@ HomeWindow::tabSelected(int index)
         charts[index]->setProperty("dateRange", property("dateRange"));
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
+        tabbed->setCurrentIndex(index);
     }
 
     active = false;
@@ -345,6 +331,8 @@ HomeWindow::styleChanged(int id)
     // block updates as it is butt ugly
     setUpdatesEnabled(false);
     tabbed->hide(); //This is a QTabWidget setUpdatesEnabled bug (?)
+    chartbar->hide();
+    chartbar->clear();
 
     // move the windows from there current
     // position to there new position
@@ -354,7 +342,7 @@ HomeWindow::styleChanged(int id)
         case 0 : // they are tabs in a TabWidget
             {
             int tabnum = tabbed->indexOf(charts[i]);
-            tabbed->removeTab(tabnum);
+            tabbed->removeWidget(tabbed->widget(tabnum));
             }
             break;
         case 1 : // they are lists in a GridLayout
@@ -373,7 +361,8 @@ HomeWindow::styleChanged(int id)
         // now put into new style
         switch (id) {
         case 0 : // they are tabs in a TabWidget
-            tabbed->addTab(charts[i], charts[i]->property("title").toString());
+            tabbed->addWidget(charts[i]);
+            chartbar->addWidget(charts[i]->property("title").toString());
             charts[i]->setContentsMargins(0,25,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->setProperty("dateRange", property("dateRange"));
@@ -411,7 +400,7 @@ HomeWindow::styleChanged(int id)
     // now refresh as we are done
     setUpdatesEnabled(true);
     tabbed->show(); // QTabWidget setUpdatesEnabled bug
-                    // and resize artefact too.. tread carefully.
+    chartbar->show(); // and resize artefact too.. tread carefully.
     update();
 }
 
@@ -522,7 +511,9 @@ HomeWindow::addChart(GcWindow* newone)
         case 0 :
             newone->setContentsMargins(0,25,0,0);
             newone->setResizable(false); // we need to show on tab selection!
-            tabbed->addTab(newone, newone->property("title").toString());
+            //tabbed->addTab(newone, newone->property("title").toString());
+            tabbed->addWidget(newone);
+            chartbar->addWidget(newone->property("title").toString());
             break;
         case 1 :
             {
@@ -621,7 +612,8 @@ HomeWindow::removeChart(int num, bool confirm)
 
     switch(currentStyle) {
         case 0 : // delete tab and widget
-            tabbed->removeTab(num);
+            chartbar->removeWidget(num);
+            tabbed->removeWidget(tabbed->widget(num));
             break;
         case 1 : // scrolled
             tileGrid->removeWidget(charts[num]);
