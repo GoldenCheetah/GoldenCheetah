@@ -48,6 +48,7 @@ public slots:
     void clear();
     void clicked(int);
     void removeWidget(int);
+    void setText(int index, QString);
     //void setCurrentIndex(int index);
 
 signals:

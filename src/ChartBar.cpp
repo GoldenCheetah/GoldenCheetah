@@ -31,7 +31,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     QHBoxLayout *vlayout = new QHBoxLayout(this);
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(0,0,0,0);
-
     layout = new QHBoxLayout; 
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
@@ -95,6 +94,17 @@ ChartBar::addWidget(QString title)
     connect(newbutton, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
     signalMapper->setMapping(newbutton, buttons.count()-1);
 }
+
+void
+ChartBar::setText(int index, QString text)
+{
+    buttons[index]->setText(text);
+    QFontMetrics fontMetric(buttonFont);
+    int width = fontMetric.width(text);
+    buttons[index]->setWidth(width+20);
+
+}
+
 
 void
 ChartBar::clear()

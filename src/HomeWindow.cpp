@@ -216,7 +216,7 @@ HomeWindow::titleChanged()
 
         // rename the tab
         if (!currentStyle) {
-            //XXX move to scope bar tabbed->setTabText(controlStack->currentIndex(), titleEdit->text());
+            chartbar->setText(controlStack->currentIndex(), titleEdit->text());
         }
 
         // repaint to reflect
