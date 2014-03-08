@@ -45,11 +45,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 #else
     buttonFont.setFamily("Helvetica");
 #endif
-#ifdef WIN32
-    buttonFont.setPointSize(8);
-#else
     buttonFont.setPointSize(10);
-#endif
     buttonFont.setWeight(QFont::Black);
 
     // linear gradients

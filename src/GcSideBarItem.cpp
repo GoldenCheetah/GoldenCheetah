@@ -303,11 +303,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
 #else
     titleLabel->setYOff(1);
     font.setFamily("Helvetica");
-#ifdef WIN32
-    font.setPointSize(8);
-#else
     font.setPointSize(10);
-#endif
 #endif
     font.setWeight(QFont::Black);
     titleLabel->setFont(font);
