@@ -38,12 +38,6 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     vlayout->addLayout(layout);
     vlayout->addStretch();
 
-
-#ifdef Q_OS_MAC
-    buttonFont.setFamily("Lucida Grande");
-#else
-    buttonFont.setFamily("Helvetica");
-#endif
     buttonFont.setPointSize(10);
     buttonFont.setWeight(QFont::Black);
 
