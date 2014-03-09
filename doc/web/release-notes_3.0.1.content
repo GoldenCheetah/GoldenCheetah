@@ -1,0 +1,99 @@
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>GoldenCheetah 3.0.1</strong></big>
+</font>
+</p>
+
+<p>
+Full Change Log
+</p>
+<pre>
+$ git checkout release_3.0.0
+$ git shortlog v3.0-SP1 ^v3.0
+
+Christian Stade-Schuldt (1):
+      Updated Tacx Satori Virtual Power values
+
+Damien (16):
+      CsvRideFile: add temperature and hill slope (%) parsing for ibike csv file
+      Bin2RideFile: Changes in Summary pages for Data version 5
+      Bin2RideFile: correct bug for some GPS data
+      JouleDevice: Remove debug lines
+      JouleDevice: Remove debug lines
+      Aerolab: Add a constant altitude option
+      GoogleMap: Little fix
+      ShareDialog 2/3 : For version 3.0.1
+      FitRideFile: Add Calibration Event parsing
+      Correction for release_3.0.0 branch
+      AllPlot: plot references lines
+      OAuthDialog: Remove qDebug()
+      ShareDialog: Manage null error message
+      ShareDialog: Add upload to CyclingAnalytics and SelfLoops
+      FitRideFile: Correction for last Garmin firmware updates     In last Garmin firmware there is some (unknow) fields with multi
+      FitRideFile: - Add Left/Right TorqueEff and Left/Rigth PedalSmooth                  - Open Truncated file
+
+Dave Waterworth (2):
+      Fix Tacx Fortius Device Support
+      More Fortius Fixes
+
+Eric Johnson (1):
+      Use float division when converting wheel size
+
+G Coco (2):
+      Reinstate Twitter functionality
+      Merge StraveDialog and RideWithGPSDialog
+
+Gareth Coco (3):
+      Website updates for Version 3.0     (cherry picked from commit fb339a527b7937ef8141b90af81cd2fd8017f891)
+      assert cleanup
+      Update translation source files
+
+Jaime (1):
+      Work around to ensure controller key presses aren't missed.  Borrowed from Fortius.cpp
+
+Jon Escombe (3):
+      Detach kernel driver before claiming USB2 ANT+ interface.
+      Don't reset ANT channel settings on search timeout
+      Don't reset ANT channel settings on search timeout
+
+Mark Liversedge (18):
+      Fixup Fit File issue
+      Fix PWX export SEGV
+      Deprecate Strava Support
+      Fix allplot crash on daft power value
+      Recognise Dave Waterworth
+      Merge pull request #694 from gcoco/release_3.0.0
+      Truncate Altitude values
+      Interval Summary Off By 1 Error
+      Add /dev/cu.usbserial as a serial device
+      Merge pull request #713 from gcoco/qwt-fix
+      V3.0 SP1 RC1 Update
+      Fix LC_LOCALE on Xcode 5
+      Fix findBests when no speed/gps
+      Merge branch 'release_3.0.0' of https://github.com/GoldenCheetah/GoldenCheetah into release_3.0.0
+      Batch Export remembers last format/dir
+      Fix 3d grid when users specify background colors
+      Fix SEGV if metric not available
+      V3.1 SP1 (3.0.1) released
+
+Rainer Clasen (9):
+      SrmDevice: fix writing srmio data
+      inlude srmio version + commit in about dialog
+      make srmio details in version dialog conditionally
+      Tcx: fix speed in summary information
+      fix PWX export: handle end of gaps gracefully.
+      fix PWX export: always write summarydata
+      PWX export: keep timestamp + distance precision
+      PWX: read/write temperature
+      use pwx for Trainingstagebuch upload
+
+Walter Bürki (1):
+      adding hr,cad,power,temp of Suunto Ambit gpx files
+
+gcoco (5):
+      Support Twitter API 1.1
+      Twitter API change
+      Kurt Kinetic Road Machine PowerCurve fix
+      Get rid of qwt compile error about format string.
+      Add Garmin Forerunner 910XT
+</pre>

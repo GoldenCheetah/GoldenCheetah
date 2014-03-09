@@ -26,17 +26,15 @@ PCV on Mac OS X</a> for further information.
 
 <p>
 <font face="arial,helvetica,sanserif">
-<big><strong>Download Release 3.0.1</strong></big>
+<big><strong>Download Release 3.0.2</strong></big>
 </font>
 </p>
 
 <p>This is a bug fix release with a few new features.</p>
 
 <ul>
-<li><a href="GoldenCheetah_3.0.1_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
-<li><a href="GoldenCheetah_3.0.1_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
-<li><a href="GoldenCheetah-3.0.1-2.fc18.x86_64.rpm">Fedora 18 RPM (x86_64)</a><br>
-<li><a href="GoldenCheetah-3.0.1-2.fc19.x86_64.rpm">Fedora 19 RPM (x86_64)</a><br>
+<li><a href="GoldenCheetah_3.0.2_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
+<li><a href="GoldenCheetah_3.0.2_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
 </ul>
 
 <p>
@@ -55,7 +53,7 @@ There is the older Version 2.1.0  <a href="/users-guide.html">User's Guide</a> o
 and use Golden Cheetah that can assist also.
 </p>
 <p>
-You can also <a href="release-notes.html">view the release notes</a> for 3.0.1
+You can also <a href="release-notes.html">view the release notes</a> for 3.0.2
 or <a href="older-releases.html">download older releases</a> of Golden Cheetah.
 </p>
 

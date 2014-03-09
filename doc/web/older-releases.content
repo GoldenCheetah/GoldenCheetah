@@ -19,6 +19,19 @@ please see <a href="download.html">the download page</a> instead.
 </tr>
 
 <tr>
+<td valign="top">3.0.1</td>
+<td valign="top">
+<a href="GoldenCheetah_3.0.1_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
+<a href="GoldenCheetah_3.0.1_Windows_Installer.exe">Windows 32-bit</a><br>
+<a href="GoldenCheetah-3.0.1-2.fc18.x86_64.rpm">Fedora 18 RPM (x86_64)</a><br>
+<a href="GoldenCheetah-3.0.1-2.fc19.x86_64.rpm">Fedora 19 RPM (x86_64)</a>
+</td>
+<td valign="top">
+<a href="release-notes_3.0.1.html">Full Version 3.0.1 change log.</a><br>
+</td>
+</tr>
+
+<tr>
 <td valign="top">3.0.0</td>
 <td valign="top">
 <a href="GoldenCheetah_3.0.0_Mac_32bit.dmg">Mac OS X Intel (32bit)</a><br>
@@ -60,7 +73,6 @@ Development Builds
 </p>
 </td>
 </tr>
-<p>
 
 <tr>
 <td valign="top">2.1.0</td>
