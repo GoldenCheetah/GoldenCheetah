@@ -36,11 +36,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     searchLabel->setFixedHeight(20);
     searchLabel->setHighlighted(true);
     QFont font;
-#ifdef Q_OS_MAC
-    font.setFamily("Lucida Grande");
-#else
-    font.setFamily("Helvetica");
-#endif
+
     font.setPointSize(10);
     font.setWeight(QFont::Black);
     searchLabel->setFont(font);
@@ -304,7 +300,6 @@ GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
     setFixedWidth(60);
     red = highlighted = checked = false;
     QFont font;
-    font.setFamily("Helvetica");
     font.setPointSize(10);
     font.setWeight(QFont::Black);
     setFont(font);

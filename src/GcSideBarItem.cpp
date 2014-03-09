@@ -298,11 +298,9 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
 #ifdef Q_OS_MAC
     titleLabel->setFixedHeight(16);
     titleLabel->setYOff(1);
-    font.setFamily("Lucida Grande");
     font.setPointSize(11);
 #else
     titleLabel->setYOff(1);
-    font.setFamily("Helvetica");
     font.setPointSize(10);
 #endif
     font.setWeight(QFont::Black);
