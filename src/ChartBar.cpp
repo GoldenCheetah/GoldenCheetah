@@ -28,15 +28,40 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     setFixedHeight(23);
     setContentsMargins(10,0,10,0);
-    QHBoxLayout *vlayout = new QHBoxLayout(this);
+
+    // main layout
+    QHBoxLayout *mlayout = new QHBoxLayout(this);
+    mlayout->setSpacing(0);
+    mlayout->setContentsMargins(0,0,0,0);
+
+    // buttonBar Widget
+    buttonBar = new ButtonBar(this);
+    buttonBar->setFixedHeight(23);
+    buttonBar->setContentsMargins(0,0,0,0);
+
+    QHBoxLayout *vlayout = new QHBoxLayout(buttonBar); 
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(0,0,0,0);
-    layout = new QHBoxLayout; 
+
+    layout = new QHBoxLayout;
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
-
     vlayout->addLayout(layout);
     vlayout->addStretch();
+
+    // scrollarea
+    scrollArea = new QScrollArea(this);
+    scrollArea->setFixedHeight(23);
+    scrollArea->setAutoFillBackground(false);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameStyle(QFrame::NoFrame);
+    scrollArea->setContentsMargins(0,0,0,0);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setWidget(buttonBar);
+    // scroll area turns it on .. we turn it off!
+    buttonBar->setAutoFillBackground(false);
+    mlayout->addWidget(scrollArea);
 
     buttonFont.setPointSize(10);
     buttonFont.setWeight(QFont::Black);
@@ -195,6 +220,40 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
     painter.fillRect(all, isActiveWindow() ? active : inactive);
+
+    QPen black(QColor(100,100,100,200));
+    painter.setPen(black);
+    painter.drawLine(0,height()-1, width()-1, height()-1);
+
+    QPen gray(QColor(230,230,230));
+    painter.setPen(gray);
+    painter.drawLine(0,0, width()-1, 0);
+
+    painter.restore();
+}
+
+void
+ButtonBar::paintEvent(QPaintEvent *event)
+{
+    // paint the darn thing!
+    paintBackground(event);
+    QWidget::paintEvent(event);
+}
+
+// paint is the same as sidebar
+void
+ButtonBar::paintBackground(QPaintEvent *)
+{
+    // setup a painter and the area to paint
+    QPainter painter(this);
+
+    painter.save();
+    QRect all(0,0,width(),height());
+
+    // fill with a linear gradient
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(all, QColor(Qt::white));
+    painter.fillRect(all, isActiveWindow() ? chartbar->active : chartbar->inactive);
 
     QPen black(QColor(100,100,100,200));
     painter.setPen(black);
