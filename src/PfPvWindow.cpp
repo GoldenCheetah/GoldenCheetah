@@ -210,6 +210,7 @@ PfPvWindow::PfPvWindow(Context *context) :
 void
 PfPvWindow::configChanged()
 {
+    setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
 }
 
 bool

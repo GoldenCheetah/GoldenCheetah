@@ -371,6 +371,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 void
 CriticalPowerWindow::configChanged()
 {
+    setProperty("color", GColor(CPLOTBACKGROUND));
     rideSelected();
 }
 
