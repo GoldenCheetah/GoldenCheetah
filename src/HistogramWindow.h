@@ -180,6 +180,9 @@ class HistogramWindow : public GcChartWindow
         // comparing things
         void compareChanged();
 
+        // update on config
+        void configChanged();
+
     protected slots:
 
         void setrBinWidthFromSlider();

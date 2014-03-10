@@ -521,6 +521,8 @@ LTMWindow::useThruToday()
 void
 LTMWindow::refresh()
 {
+    setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+
     // not if in compare mode
     if (isCompare()) return; 
 
