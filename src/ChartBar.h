@@ -24,6 +24,9 @@
 #include <QAction>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QToolButton>
+#include <QObject>
+#include <QEvent>
 
 class Context;
 #ifdef Q_OS_MAC
@@ -49,12 +52,16 @@ public:
 public slots:
 
     void paintEvent (QPaintEvent *event);
+    bool eventFilter(QObject *object, QEvent *e); // trap resize
     void addWidget(QString);
     void clear();
     void clicked(int);
     void removeWidget(int);
     void setText(int index, QString);
     //void setCurrentIndex(int index);
+    void scrollLeft();
+    void scrollRight();
+    void tidy();
 
 signals:
     void currentIndexChanged(int);
@@ -65,6 +72,7 @@ private:
     Context *context;
 
     ButtonBar *buttonBar;
+    QToolButton *left, *right; // scrollers, hidden if menu fits
     QScrollArea *scrollArea;
     QHBoxLayout *layout;
 

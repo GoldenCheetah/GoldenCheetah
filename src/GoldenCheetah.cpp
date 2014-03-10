@@ -177,25 +177,23 @@ GcWindow::GcWindow()
     setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
-    menuButton = new QToolButton(this);
-    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    menuButton->setCursor(Qt::ArrowCursor);
-    menuButton->setPopupMode(QToolButton::InstantPopup);
-    menuButton->setFixedSize(15,20);
+    menuButton = new QPushButton(this);
+    menuButton->setStyleSheet("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; }");
+    //menuButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    menuButton->setText(tr("More..."));
+    //menuButton->setArrowType(Qt::NoArrow);
+    //menuButton->setPopupMode(QPushButton::InstantPopup);
 
     menu = new QMenu(this);
     menuButton->setMenu(menu);
     menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
-
     menuButton->hide();
 
-
-#ifndef Q_OS_MAC // spacing ..
-    menuButton->move(0,0);
-#endif
+    menuButton->move(00,0);
 }
 
-GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) {
+GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
+{
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
@@ -214,21 +212,19 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
-    menuButton = new QToolButton(this);
-    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    menuButton->setCursor(Qt::ArrowCursor);
-    menuButton->setPopupMode(QToolButton::InstantPopup);
-    menuButton->setFixedSize(15,20);
+    menuButton = new QPushButton(this);
+    menuButton->setStyleSheet("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; }");
+    //menuButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    menuButton->setText(tr("More..."));
+    //menuButton->setArrowType(Qt::NoArrow);
+    //menuButton->setPopupMode(QPushButton::InstantPopup);
 
     menu = new QMenu(this);
     menuButton->setMenu(menu);
     menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
 
     menuButton->hide();
-
-#ifndef Q_OS_MAC // spacing ..
     menuButton->move(0,0);
-#endif
 }
 
 GcWindow::~GcWindow()
@@ -243,7 +239,20 @@ GcWindow::amVisible()
     return true;
 }
 
+void 
+GcWindow::setColor(QColor x)
+{
+    if (_color != x) {
+        _color = x;
+        emit colorChanged(x);
+    }
+}
 
+QColor
+GcWindow::color() const
+{
+    return _color;
+}
 
 void
 GcWindow::paintEvent(QPaintEvent * /*event*/)
@@ -651,8 +660,8 @@ void
 GcWindow::enterEvent(QEvent *)
 {
     if (property("nomenu") == false && property("isManager").toBool() == false) {
-        if (contentsMargins().top() > 20) menuButton->setFixedSize(15,20);
-        else menuButton->setFixedSize(15,15);
+        if (contentsMargins().top() > 20) menuButton->setFixedSize(80,30);
+        else menuButton->setFixedSize(80, 15);
         menuButton->show();
     }
 }
@@ -670,7 +679,8 @@ GcWindow::_closeWindow()
     emit closeWindow(this);
 }
 
-GcChartWindow::GcChartWindow(Context *context) : GcWindow(context) {
+GcChartWindow::GcChartWindow(Context *context) : GcWindow(context) 
+{
     //
     // Default layout
     //
@@ -720,6 +730,8 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context) {
     _mainLayout->addWidget(_revealControls,0,0, Qt::AlignTop);
     _mainWidget->setLayout(_mainLayout);
 
+    connect(this, SIGNAL(colorChanged(QColor)), this, SLOT(colorChanged(QColor)));
+
     //
     // Default Blank layout
     //
@@ -748,6 +760,30 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context) {
     _defaultBlankLayout->addWidget(blankLabel);
     _defaultBlankLayout->addStretch();
     _blank->setLayout(_defaultBlankLayout);
+}
+
+void
+GcChartWindow::colorChanged(QColor z)
+{
+    QColor cRGB = z.convertTo(QColor::Rgb);
+    // lets work it out..
+    int r = cRGB.red() < 128 ? 255 : 0;
+    int g = cRGB.green() < 128 ? 255 : 0;
+    int b = cRGB.blue() < 128 ? 255 : 0;
+    QColor fgColor = QColor(r,g,b);
+
+    // so z is color for bg and fgColor is for fg
+    QString stylesheet = QString("color: rgb(%1, %2, %3); background-color: rgb(%4, %5, %6)")
+                                    .arg(fgColor.red())
+                                    .arg(fgColor.green())
+                                    .arg(fgColor.blue())
+                                    .arg(z.red())
+                                    .arg(z.green())
+                                    .arg(z.blue());
+
+    menuButton->setStyleSheet(QString("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; %1 }").arg(stylesheet));
+    _revealControls->setStyleSheet(stylesheet);
+    menuButton->setStyleSheet(stylesheet);
 }
 
 void
