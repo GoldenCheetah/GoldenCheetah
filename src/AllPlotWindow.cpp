@@ -550,6 +550,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 void
 AllPlotWindow::configChanged()
 {
+    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+
     // we're going to replot, but only if we're active
     // and all the other guff
     RideItem *ride = myRideItem;
@@ -557,9 +559,6 @@ AllPlotWindow::configChanged()
         stale = true;
         return;
     }
-
-    // ignore if null, or manual / empty
-    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) return;
 
     // Container widgets should not paint
     // since they tend to use naff defaults and
@@ -570,6 +569,9 @@ AllPlotWindow::configChanged()
     allPlotFrame->setPalette(palette);
     stackFrame->widget()->setPalette(palette);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+
+    // ignore if null, or manual / empty
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) return;
 
     // reset the charts etc
     if (isCompare()) {

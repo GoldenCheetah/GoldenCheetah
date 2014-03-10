@@ -81,6 +81,9 @@ private:
     Q_PROPERTY(bool resizable READ resizable WRITE setResizable USER true)
     Q_PROPERTY(bool gripped READ gripped WRITE setGripped)
 
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged USER false)
+    QColor _color;
+
     QWidget *_controls;
 
     QString _title;
@@ -111,6 +114,7 @@ signals:
     void rideItemChanged(RideItem*);
     void heightFactorChanged(double);
     void widthFactorChanged(double);
+    void colorChanged(QColor);
     void dateRangeChanged(DateRange);
     void resizing(GcWindow*);
     void moving(GcWindow*);
@@ -150,6 +154,9 @@ public:
 
     void setHeightFactor(double);
     double heightFactor() const;
+
+    void setColor(QColor);
+    QColor color() const;
 
     void setResizable(bool);
     bool resizable() const;
@@ -194,7 +201,7 @@ public:
     void setNewSize(int w, int h);
 
     QPushButton *settingsButton, *closeButton;
-    QToolButton *menuButton;
+    QPushButton *menuButton;
     QMenu *menu;
 };
 
@@ -244,6 +251,7 @@ public:
 public slots:
     void hideRevealControls();
     void saveImage();
+    void colorChanged(QColor);
 };
 
 
