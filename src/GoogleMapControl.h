@@ -100,6 +100,7 @@ class GoogleMapControl : public GcChartWindow
         void createMarkers();
         void drawShadedRoute();
         void zoomInterval(IntervalItem*);
+        void configChanged();
 
     private:
         Context *context;

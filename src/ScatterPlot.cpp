@@ -31,6 +31,7 @@
 #include <QWidget>
 #include <qwt_series_data.h>
 #include <qwt_legend.h>
+#include <qwt_scale_widget.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
@@ -359,6 +360,14 @@ ScatterPlot::configChanged()
 {
     // setColors bg
     setCanvasBackground(GColor(CPLOTBACKGROUND));
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+
+    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtPlot::yLeft)->setPalette(palette);
 }
 
 void

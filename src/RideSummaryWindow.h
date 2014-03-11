@@ -102,6 +102,9 @@ class RideSummaryWindow : public GcChartWindow
         // compare mode started or items to compare changed
         void compareChanged();
 
+        // config changed
+        void configChanged();
+
     protected:
 
         QString htmlSummary() const;        // summary of a ride or a date range

@@ -144,6 +144,8 @@ class RideMetadata : public QWidget
         Context *context;
         SpecialTabs specialTabs;
 
+        QPalette palette; // to be applied to all widgets
+
     public slots:
         void configUpdate();
         void metadataChanged(); // when its changed elsewhere we need to refresh fields

@@ -20,6 +20,7 @@
 #include "ScatterPlot.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "Colors.h"
 
 #include <QtGui>
 #include <QString>
@@ -161,7 +162,22 @@ ScatterWindow::ScatterWindow(Context *context, const QDir &home) :
     connect(ignore, SIGNAL(stateChanged(int)), this, SLOT(setIgnore()));
     connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrame()));
     connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
+    // set colors
+    configChanged();
+}
+
+void
+ScatterWindow::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
 }
 
 void

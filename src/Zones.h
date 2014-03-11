@@ -170,7 +170,7 @@ class Zones : public QObject
                       QString &name, QString &description,
                       int &low, int &high) const;
 
-        QString summarize(int rnum, QVector<double> &time_in_zone) const;
+        QString summarize(int rnum, QVector<double> &time_in_zone, QColor color = QColor(Qt::darkGray)) const;
 
         // get all highs/lows for zones (plot shading uses these)
         int lowsFromCP(QList <int> *lows, int CP) const;

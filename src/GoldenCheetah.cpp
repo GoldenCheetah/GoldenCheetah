@@ -23,6 +23,7 @@
 #include "Settings.h"
 
 #include <QDebug>
+#include <QColor>
 #include <QLabel>
 #include <QPainter>
 #include <QPixmap>
@@ -286,19 +287,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // pen color needs to contrast to background color
         QColor bgColor = property("color").value<QColor>();
-        QColor fgColor;
-
-        if (bgColor == Qt::black) fgColor = Qt::white;
-        else if (bgColor == Qt::white) fgColor = Qt::black;
-        else {
-
-            QColor cRGB = bgColor.convertTo(QColor::Rgb);
-            // lets work it out..
-            int r = cRGB.red() < 128 ? 255 : 0;
-            int g = cRGB.green() < 128 ? 255 : 0;
-            int b = cRGB.blue() < 128 ? 255 : 0;
-            fgColor = QColor(r,g,b);
-        }
+        QColor fgColor = GCColor::invertColor(bgColor); // return the contrasting color
 
         painter.setPen(fgColor);
         painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
@@ -765,12 +754,7 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context)
 void
 GcChartWindow::colorChanged(QColor z)
 {
-    QColor cRGB = z.convertTo(QColor::Rgb);
-    // lets work it out..
-    int r = cRGB.red() < 128 ? 255 : 0;
-    int g = cRGB.green() < 128 ? 255 : 0;
-    int b = cRGB.blue() < 128 ? 255 : 0;
-    QColor fgColor = QColor(r,g,b);
+    QColor fgColor = GCColor::invertColor(z);
 
     // so z is color for bg and fgColor is for fg
     QString stylesheet = QString("color: rgb(%1, %2, %3); background-color: rgb(%4, %5, %6)")
@@ -781,7 +765,7 @@ GcChartWindow::colorChanged(QColor z)
                                     .arg(z.green())
                                     .arg(z.blue());
 
-    menuButton->setStyleSheet(QString("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; %1 }").arg(stylesheet));
+    menuButton->setStyleSheet(QString("QPushButton { border: 0px; padding: 0px; %1 } QPushButton::menu-indicator { image: none; } ").arg(stylesheet));
     _revealControls->setStyleSheet(stylesheet);
     menuButton->setStyleSheet(stylesheet);
 }

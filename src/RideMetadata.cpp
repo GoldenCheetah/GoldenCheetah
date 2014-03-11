@@ -25,6 +25,7 @@
 #include "Athlete.h"
 #include "RideSummaryWindow.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
 
 #include <QXmlDefaultHandler>
@@ -46,12 +47,6 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
-
-    QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
-
-    setAutoFillBackground(false);
-    setPalette(palette);
 
     // setup the tabs widget
     tabs = new QTabWidget(this);
@@ -209,6 +204,24 @@ RideMetadata::metadataChanged()
 void
 RideMetadata::configUpdate()
 {
+    setProperty("color", GColor(CPLOTBACKGROUND));
+
+    palette = QPalette();
+
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+
+    // only change base if moved away from white plots
+    if (GColor(CPLOTBACKGROUND) != Qt::white) {
+        palette.setBrush(QPalette::Base, QBrush(GCColor::alternateColor(GColor(CPLOTBACKGROUND))));
+        palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    }
+
+    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+    tabs->setPalette(palette);
+
     // use default font
     setFont(QFont());
 
@@ -422,6 +435,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     }
 
     label = new QLabel(QString("%1%2").arg(meta->sp.displayName(field.name)).arg(units), this);
+    label->setPalette(meta->palette);
     //label->setFont(font);
     //label->setFixedHeight(18);
 
@@ -516,6 +530,8 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         connect(widget, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
         break;
     }
+
+    widget->setPalette(meta->palette);
     //widget->setFont(font);
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 }

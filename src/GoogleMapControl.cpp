@@ -60,13 +60,21 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     first = true;
+    configChanged();
 }
 
 GoogleMapControl::~GoogleMapControl()
 {
     delete webBridge;
+}
+
+void 
+GoogleMapControl::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
 }
 
 void

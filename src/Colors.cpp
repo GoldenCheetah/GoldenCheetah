@@ -168,6 +168,25 @@ GCColor::GCColor(Context *context) : QObject(context)
     connect(context, SIGNAL(configChanged()), this, SLOT(readConfig()));
 }
 
+QColor GCColor::invertColor(QColor bgColor)
+{
+    QColor cRGB = bgColor.convertTo(QColor::Rgb);
+    // lets work it out..
+    int r = cRGB.red() < 128 ? 255 : 0;
+    int g = cRGB.green() < 128 ? 255 : 0;
+    int b = cRGB.blue() < 128 ? 255 : 0;
+    return QColor(r,g,b);
+}
+
+QColor GCColor::alternateColor(QColor bgColor)
+{
+    //QColor color = QColor::fromHsv(bgColor.hue(), bgColor.saturation() * 2, bgColor.value());
+    if (bgColor.value() < 128)
+        return QColor(Qt::darkGray);
+    else
+        return QColor(Qt::lightGray);
+}
+
 const Colors * GCColor::colorSet()
 {
     return ColorList;

@@ -721,6 +721,8 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
     // mouse moved and tabbed -- should we show/hide chart popup controls?
     if (e->type() == QEvent::MouseMove && currentStyle == 0 && tabbed->currentIndex() >= 0) {
 
+        if (tabbed->currentIndex() >= charts.count()) return false;
+
         QPoint pos = tabbed->widget(tabbed->currentIndex())->mapFromGlobal(QCursor::pos());
         GcWindow *us = charts[tabbed->currentIndex()];
 
