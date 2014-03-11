@@ -94,6 +94,7 @@ class ScatterWindow : public GcChartWindow
 
         void rxSelectorChanged(int);
         void rySelectorChanged(int);
+        void configChanged();
 
         // these set the plot when the properties change
         void setGrid();

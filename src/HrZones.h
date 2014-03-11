@@ -184,7 +184,7 @@ class HrZones : public QObject
                       QString &name, QString &description,
                       int &low, int &high, double &trimp) const;
 
-        QString summarize(int rnum, QVector<double> &time_in_zone) const;
+        QString summarize(int rnum, QVector<double> &time_in_zone, QColor color = QColor(Qt::darkGray)) const;
 
         // get all highs/lows for zones (plot shading uses these)
         int lowsFromLT(QList <int> *lows, int LT) const;

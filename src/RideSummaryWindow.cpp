@@ -104,7 +104,15 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     }
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     setChartLayout(vlayout);
+    configChanged(); // set colors
+}
+
+void
+RideSummaryWindow::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
 }
 
 #ifdef GC_HAVE_LUCENE
@@ -264,6 +272,9 @@ QString
 RideSummaryWindow::htmlSummary() const
 {
     QString summary("");
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor altColor = GCColor::alternateColor(bgColor);
 
     RideItem *rideItem = myRideItem;
     RideFile *ride;
@@ -285,8 +296,9 @@ RideSummaryWindow::htmlSummary() const
         return summary;
     }
 
-    // always centered
-    summary = "<center>";
+    // set those colors
+    summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
+                                                                                        .arg(fgColor.name());
 
     // device summary for ride summary, otherwise how many activities?
     if (ridesummary) summary += ("<p><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3><p>");
@@ -544,14 +556,11 @@ RideSummaryWindow::htmlSummary() const
             }
             QList<SummaryBest> bests = SummaryMetrics::getBests(context, bestsColumn[i], 10, data, filterList, context->ishomefiltered || filtered, useMetricUnits);
 
-            QColor color = QApplication::palette().alternateBase().color();
-            color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
-
             int pos=1;
             foreach(SummaryBest best, bests) {
 
                 // alternating shading
-                if (pos%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                if (pos%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                 else summary += "<tr>";
 
                 summary += QString("<td align=\"center\">%1.</td><td align=\"center\">%2</td><td align=\"center\">%3</td></tr>")
@@ -611,7 +620,7 @@ RideSummaryWindow::htmlSummary() const
             }
         }
         summary += tr("<h3>Power Zones</h3>");
-        summary += context->athlete->zones()->summarize(range, time_in_zone); //aggregating
+        summary += context->athlete->zones()->summarize(range, time_in_zone, altColor); //aggregating
     }
 
     //
@@ -659,7 +668,7 @@ RideSummaryWindow::htmlSummary() const
         }
 
         summary += tr("<h3>Heart Rate Zones</h3>");
-        summary += context->athlete->hrZones()->summarize(hrrange, time_in_zone); //aggregating
+        summary += context->athlete->hrZones()->summarize(hrrange, time_in_zone, altColor); //aggregating
     }
 
     // Only get interval summary for a ride summary
@@ -723,9 +732,7 @@ RideSummaryWindow::htmlSummary() const
                 if (even)
                     summary += "<tr>";
                 else {
-                    QColor color = QApplication::palette().alternateBase().color();
-                    color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
-                    summary += "<tr bgcolor='" + color.name() + "'>";
+                    summary += "<tr bgcolor='" + altColor.name() + "'>";
                 }
                 even = !even;
                 summary += "<td align=\"center\">" + interval.name + "</td>";
@@ -842,9 +849,7 @@ RideSummaryWindow::htmlSummary() const
 
             if (even) summary += "<tr>";
             else {
-                    QColor color = QApplication::palette().alternateBase().color();
-                    color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
-                    summary += "<tr bgcolor='" + color.name() + "'>";
+                    summary += "<tr bgcolor='" + altColor.name() + "'>";
             }
             even = !even;
 
@@ -895,6 +900,10 @@ QString
 RideSummaryWindow::htmlCompareSummary() const
 {
     QString summary;
+
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor altColor = GCColor::alternateColor(bgColor);
 
     // SETUP ALL THE METRICS WE WILL SHOW
 
@@ -1006,12 +1015,8 @@ RideSummaryWindow::htmlCompareSummary() const
         }
 
         // LETS FORMAT THE HTML
-        summary = "<center>";
-
-        // used for alternate shding
-        QColor color = QApplication::palette().alternateBase().color();
-        color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
-
+        summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
+                                                                                        .arg(fgColor.name());
         //
         // TOTALS, AVERAGES, MAX, METRICS
         //
@@ -1043,7 +1048,7 @@ RideSummaryWindow::htmlCompareSummary() const
             summary += "<tr>";
             summary += "<td><b></b></td>"; // removed the text as its blinking obvious.. but left code in
                                              // case we ever come back here or use it for other things.
-            summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+            summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
             foreach (QString symbol, metricsList) {
                 const RideMetric *m = factory.rideMetric(symbol);
@@ -1071,11 +1076,11 @@ RideSummaryWindow::htmlCompareSummary() const
                 }
 
                 // alternating shading
-                if (rows%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                if (rows%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                 else summary += "<tr>";
 
                 summary += "<td>" + context->compareIntervals[counter].name + "</td>";
-                summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                summary += "<td bgcolor='" + bgColor.name() +"'>&nbsp;</td>"; // spacing
 
                 foreach (QString symbol, metricsList) {
 
@@ -1118,7 +1123,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     } else {
                         summary += "<td align=\"center\"></td>";
                     }
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                 }
                 summary += "</tr>";
@@ -1147,11 +1152,11 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // lets get some headings
                 summary += "<tr><td></td>"; // ne need to have a heading for the interval name
-                summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                 foreach (ZoneInfo zone, zones) {
                     summary += QString("<td colspan=\"2\" align=\"center\"><b>%1 (%2)</b></td>").arg(zone.desc).arg(zone.name);
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
                 }
                 summary += "</tr>";
 
@@ -1166,11 +1171,11 @@ RideSummaryWindow::htmlCompareSummary() const
                         continue;
                     }
 
-                    if (rows%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                    if (rows%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                     else summary += "<tr>";
 
                     summary += "<td>" + context->compareIntervals[counter].name + "</td>";
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     int idx=0;
                     foreach (ZoneInfo zone, zones) {
@@ -1187,8 +1192,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                                 .arg(time_to_string(fabs(dt)));
 
                         else summary += "<td></td>";
-
-                        summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                        summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     }
                     summary += "</tr>";
@@ -1220,11 +1224,11 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // lets get some headings
                 summary += "<tr><td></td>"; // ne need to have a heading for the interval name
-                summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                 foreach (HrZoneInfo zone, zones) {
                     summary += QString("<td colspan=\"2\" align=\"center\"><b>%1 (%2)</b></td>").arg(zone.desc).arg(zone.name);
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
                 }
                 summary += "</tr>";
 
@@ -1239,11 +1243,11 @@ RideSummaryWindow::htmlCompareSummary() const
                         continue;
                     }
 
-                    if (rows%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                    if (rows%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                     else summary += "<tr>";
 
                     summary += "<td>" + context->compareIntervals[counter].name + "</td>";
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     int idx=0;
                     foreach (HrZoneInfo zone, zones) {
@@ -1261,7 +1265,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         else summary += "<td></td>";
 
-                        summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                        summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     }
                     summary += "</tr>";
@@ -1277,14 +1281,11 @@ RideSummaryWindow::htmlCompareSummary() const
     } else { // DATE RANGE COMPARE
 
         // LETS FORMAT THE HTML
-        summary = "<center>";
+        summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
+                                                                                        .arg(fgColor.name());
 
         // get metric details here ...
         RideMetricFactory &factory = RideMetricFactory::instance();
-
-        // used for alternate shding
-        QColor color = QApplication::palette().alternateBase().color();
-        color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
 
         //
         // TOTALS, AVERAGES, MAX, METRICS
@@ -1320,7 +1321,7 @@ RideSummaryWindow::htmlCompareSummary() const
             summary += "<tr>";
             summary += "<td><b></b></td>"; // removed the text as its blinking obvious.. but left code in
                                              // case we ever come back here or use it for other things.
-            summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+            summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
             foreach (QString symbol, metricsList) {
                 const RideMetric *m = factory.rideMetric(symbol);
@@ -1344,11 +1345,11 @@ RideSummaryWindow::htmlCompareSummary() const
                 if (!dr.isChecked()) continue;
 
                 // alternating shading
-                if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                if (counter%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                 else summary += "<tr>";
 
                 summary += "<td>" + dr.name + "</td>";
-                summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                summary += "<td bgcolor='" + bgColor.name() +"'>&nbsp;</td>"; // spacing
 
                 foreach (QString symbol, metricsList) {
 
@@ -1390,7 +1391,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     } else {
                         summary += "<td align=\"center\"></td>";
                     }
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                 }
                 summary += "</tr>";
@@ -1419,11 +1420,11 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // lets get some headings
                 summary += "<tr><td></td>"; // ne need to have a heading for the interval name
-                summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                 foreach (ZoneInfo zone, zones) {
                     summary += QString("<td colspan=\"2\" align=\"center\"><b>%1 (%2)</b></td>").arg(zone.desc).arg(zone.name);
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
                 }
                 summary += "</tr>";
 
@@ -1434,11 +1435,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     // skip if not checked
                     if (!dr.isChecked()) continue;
 
-                    if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                    if (counter%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                     else summary += "<tr>";
 
                     summary += "<td>" + dr.name + "</td>";
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     int idx=0;
                     foreach (ZoneInfo zone, zones) {
@@ -1459,8 +1460,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                                 .arg(time_to_string(fabs(dt)));
 
                         else summary += "<td></td>";
-
-                        summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                        summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     }
                     summary += "</tr>";
@@ -1492,11 +1492,11 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 // lets get some headings
                 summary += "<tr><td></td>"; // ne need to have a heading for the interval name
-                summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                 foreach (HrZoneInfo zone, zones) {
                     summary += QString("<td colspan=\"2\" align=\"center\"><b>%1 (%2)</b></td>").arg(zone.desc).arg(zone.name);
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
                 }
                 summary += "</tr>";
 
@@ -1507,11 +1507,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     // skip if not checked
                     if (!dr.isChecked()) continue;
 
-                    if (counter%2) summary += "<tr bgcolor='" + color.name() + "'>";
+                    if (counter%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                     else summary += "<tr>";
 
                     summary += "<td>" + dr.name + "</td>";
-                    summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                    summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     int idx=0;
                     foreach (HrZoneInfo zone, zones) {
@@ -1532,8 +1532,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                                 .arg(time_to_string(fabs(dt)));
 
                         else summary += "<td></td>";
-
-                        summary += "<td bgcolor='white'>&nbsp;</td>"; // spacing
+                        summary += "<td bgcolor='" + bgColor.name() + "'>&nbsp;</td>"; // spacing
 
                     }
                     summary += "</tr>";

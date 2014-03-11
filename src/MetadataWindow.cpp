@@ -17,6 +17,7 @@
  */
 
 #include "MetadataWindow.h"
+#include "Colors.h"
 
 MetadataWindow::MetadataWindow(Context *context) :
     GcChartWindow(context), context(context)
@@ -36,6 +37,10 @@ MetadataWindow::MetadataWindow(Context *context) :
     setChartLayout(vlayout);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    // set colors
+    configChanged();
 }
 
 void
@@ -44,4 +49,10 @@ MetadataWindow::rideItemChanged()
     rideMetadata->setProperty("ride", property("ride"));
     if (myRideItem) setIsBlank(false);
     else setIsBlank(true);
+}
+
+void
+MetadataWindow::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
 }

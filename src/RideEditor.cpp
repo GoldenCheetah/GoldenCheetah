@@ -23,6 +23,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Settings.h"
+#include "Colors.h"
 
 #include <QtGui>
 #include <QString>
@@ -80,8 +81,6 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolbar->setFloatable(true);
     toolbar->setIconSize(QSize(18,18));
-    toolbar->setStyleSheet("background: white;"
-                           "border: 0px;");
 
     QIcon saveIcon(":images/toolbar/save.png");
     saveAct = new QAction(saveIcon, tr("Save"), this);
@@ -145,6 +144,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
@@ -154,10 +154,36 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
 
     // allow us to jump to an anomaly
     connect(anomalyTool->anomalyList, SIGNAL(itemSelectionChanged()), this, SLOT(anomalySelected()));
+
+    // set initial color config
+    configChanged();
 }
 
 void
-RideEditor::configChanged() {}
+RideEditor::configChanged() 
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+    table->setPalette(palette);
+    table->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    toolbar->setStyleSheet(QString("background: %1; border: 0px;").arg(GColor(CPLOTBACKGROUND).name()));
+}
 
 //----------------------------------------------------------------------
 // RideEditor table/model/rideFile utility functions

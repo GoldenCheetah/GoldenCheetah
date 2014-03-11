@@ -851,8 +851,12 @@ LTMWindow::refreshDataTable()
 
     // now set to new (avoids a weird crash)
     QString summary;
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor altColor = GCColor::alternateColor(bgColor);
 
-    summary = "<center>";
+    summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
+                                                                                        .arg(fgColor.name());
 
     // device summary for ride summary, otherwise how many activities?
     summary += "<p><h3>" + settings.title + tr(" grouped by ");
@@ -1022,8 +1026,6 @@ LTMWindow::refreshDataTable()
     if (aggregates.count()) {
 
         // formatting ...
-        QColor color = QApplication::palette().alternateBase().color();
-        color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
         LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
 
         // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
@@ -1069,7 +1071,7 @@ LTMWindow::refreshDataTable()
                 if (nonzero == false) continue;
             }
 
-            if (i%2) summary += "<tr bgcolor='" + color.name() + "'>";
+            if (i%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
             else summary += "<tr>";
 
             // date / month year etc

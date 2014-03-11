@@ -582,7 +582,7 @@ QList <QString> Zones::getZoneNames(int rnum) const {
     return return_values;
 }
 
-QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
+QString Zones::summarize(int rnum, QVector<double> &time_in_zone, QColor color) const
 {
     assert(rnum < ranges.size());
     const ZoneRange &range = ranges[rnum];
@@ -604,8 +604,6 @@ QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
     summary += tr("<td align=\"center\">Time</td>");
     summary += tr("<td align=\"center\">%</td>");
     summary += "</tr>";
-    QColor color = QApplication::palette().alternateBase().color();
-    color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
 
     double duration = 0;
     foreach(double v, time_in_zone) { duration += v; }
