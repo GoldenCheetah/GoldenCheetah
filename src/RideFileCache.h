@@ -224,6 +224,7 @@ class RideFileCache
         QVector<float> aPowerMeanMax; // RideFile::aPower
 
         QVector<float> heatMeanMax; // The heat of training for aggregated power data
+
         bool filter, onhome; // saving parameters re-used when aggregating heat
         QStringList files;
 

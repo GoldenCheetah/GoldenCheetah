@@ -23,10 +23,12 @@
 #include "CriticalPowerWindow.h"
 #include "RideFileCache.h"
 #include "ExtendedCriticalPower.h"
+#include "CpPlotCurve.h"
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_spectrocurve.h>
 #include <qwt_point_3d.h>
 #include <qwt_compat.h>
 
@@ -104,6 +106,8 @@ class CpintPlot : public QwtPlot
         Model_eCP athleteModeleCP5;
         Model_eCP athleteModeleCP6;
 
+        Model_eCP level14ModeleCP5, level15ModeleCP5;
+
         double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
         void deriveExtendedCPParameters();
@@ -128,6 +132,7 @@ class CpintPlot : public QwtPlot
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
         void setShowHeat(bool x);
+        void setShowHeatByDate(bool x);
         void setShadeMode(int x);
         void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
@@ -146,6 +151,9 @@ class CpintPlot : public QwtPlot
         QwtPlotCurve *thisCurve;
         QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4, *extendedCPCurve5, *extendedCPCurve6;
         QwtPlotIntervalCurve *heatCurve;
+        CpPlotCurve *heatCurveByDate;
+
+        QwtPlotCurve *level14Curve5, *level15Curve5;
 
         QwtPlotIntervalCurve *extendedCPCurve_WSecond, *extendedCPCurve_WPrime, *extendedCPCurve_CP, *extendedCPCurve_WPrime_CP;
 
@@ -180,6 +188,7 @@ class CpintPlot : public QwtPlot
         bool shadeIntervals;
         bool rangemode;
         bool showHeat;
+        bool showHeatByDate;
 
         int ridePlotStyle;
         void calculateCentile(RideItem *rideItem);

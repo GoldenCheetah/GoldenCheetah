@@ -131,6 +131,9 @@ class ExtendedCriticalPower
         Model_eCP deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCache *bests, RideFile::SeriesType series, double sanI1, double sanI2, double anI1, double anI2, double aeI1, double aeI2, double laeI1, double laeI2);
         QwtPlotCurve* getPlotCurveForExtendedCP_5_3(Model_eCP athleteModeleCP2);
 
+        Model_eCP deriveExtendedCP_5_3_ParametersForBest(double best5s, double best1min, double best5min, double best60min);
+        QwtPlotCurve* getPlotLevelForExtendedCP_5_3(Model_eCP athleteModeleCP2);
+
         // Contributions
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP athleteModeleCP2, bool stacked);
         QwtPlotIntervalCurve* getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP athleteModeleCP2, bool stacked);

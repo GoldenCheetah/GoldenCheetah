@@ -30,6 +30,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
+#include <qwt_color_map.h>
 #include "CriticalPowerWindow.h"
 #include "RideItem.h"
 #include "LogTimeScaleDraw.h"
@@ -56,7 +57,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     shadeMode(2),
     shadeIntervals(true),
     rangemode(rangemode),
-    showHeat(false)
+    showHeat(false),
+    showHeatByDate(false)
 {
     setAutoFillBackground(true);
 
@@ -102,6 +104,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     extendedCPCurve5 = NULL;
     extendedCPCurve6 = NULL;
     heatCurve = NULL;
+    heatCurveByDate = NULL;
 
     extendedCPCurve_WSecond = NULL;
     extendedCPCurve_WPrime = NULL;
@@ -161,6 +164,10 @@ CpintPlot::changeSeason(const QDate &start, const QDate &end)
     if (heatCurve) {
         delete heatCurve;
         heatCurve = NULL;
+    }
+    if (heatCurveByDate) {
+        delete heatCurveByDate;
+        heatCurveByDate = NULL;
     }
 }
 
@@ -268,6 +275,10 @@ CpintPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     if (heatCurve) {
         delete heatCurve;
         heatCurve = NULL;
+    }
+    if (heatCurveByDate) {
+        delete heatCurveByDate;
+        heatCurveByDate = NULL;
     }
 }
 
@@ -397,6 +408,10 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         delete heatCurve;
         heatCurve = NULL;
     }
+    if (heatCurveByDate) {
+        delete heatCurveByDate;
+        heatCurveByDate = NULL;
+    }
 
     // if there's no cp, then there's nothing to do
     if (cp <= 0)
@@ -504,6 +519,34 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         heatCurve->attach(thisPlot);
     }
 
+    if (showHeatByDate && bests) {
+        // HeatCurveByDate
+        heatCurveByDate = new CpPlotCurve("heat by date");
+
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) heatCurveByDate->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+        heatCurveByDate->setPenWidth(1);
+
+        QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::lightGray, Qt::red);
+        heatCurveByDate->setColorMap(colorMap);
+
+        // generate samples
+        QVector<QwtPoint3D> heatByDateSamples;
+
+        for (int i=0; i<bests->meanMaxArray(rideSeries).count(); i++) {
+            QDate date = bests->meanMaxDates(RideFile::watts)[i];
+            double heat = 1000*(bests->start.daysTo(bests->end)-date.daysTo(bests->end))/(bests->start.daysTo(bests->end));
+
+            QwtPoint3D add(i/60.00f, bests->meanMaxArray(rideSeries)[i], heat);
+
+            heatByDateSamples << add;
+
+        }
+        heatCurveByDate->setSamples(heatByDateSamples);
+        heatCurveByDate->attach(thisPlot);
+
+    }
+
     // Extended CP 4
     if (extendedCPCurve4) {
         delete extendedCPCurve4;
@@ -556,8 +599,21 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         /*extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
         extendedCurveTitle->attach(thisPlot);*/
 
+        /*for (int level=15;level>0;level--) {
+            double best5sec = context->ride->ride()->getWeight() * (23-(15-level)*1);
+            double best1min = context->ride->ride()->getWeight() * (12-(15-level)*0.5);
+            double best5min = context->ride->ride()->getWeight() * (8-(15-level)*0.33333);
+            double best1hour = context->ride->ride()->getWeight() * (6.25-(15-level)*0.25);
+
+            Model_eCP levelModeleCP5 = ecp->deriveExtendedCP_5_3_ParametersForBest(best5sec, best1min, best5min, best1hour);
+            QwtPlotCurve *levelCurve5 = ecp->getPlotLevelForExtendedCP_5_3(levelModeleCP5);
+            levelCurve5->attach(thisPlot);
+        }*/
+
         extendedCPCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
         extendedCPCurve5->attach(thisPlot);
+
+
 
         /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5, false);
         extendedCPCurve_WSecond->attach(thisPlot);
@@ -1106,6 +1162,13 @@ CpintPlot::setShowHeat(bool x)
 {
     showHeat = x;
 }
+
+void
+CpintPlot::setShowHeatByDate(bool x)
+{
+    showHeatByDate = x;
+}
+
 
 void
 CpintPlot::setShadeMode(int x)

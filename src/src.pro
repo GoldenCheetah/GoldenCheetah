@@ -287,6 +287,7 @@ HEADERS += \
         Computrainer3dpFile.h \
         ConfigDialog.h \
         Context.h \
+        CpPlotCurve.h \
         CpintPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
@@ -480,6 +481,7 @@ SOURCES += \
         Computrainer3dpFile.cpp \
         ConfigDialog.cpp \
         Context.cpp \
+        CpPlotCurve.cpp \
         CpintPlot.cpp \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
