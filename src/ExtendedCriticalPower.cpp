@@ -545,8 +545,6 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_ParametersForBest(double best5s, dou
 {
     Model_eCP model;
 
-    bool withoutEd = true;
-
     // initial estimate of tau
     model.paa = 300;
     model.etau = 1;
@@ -1106,6 +1104,81 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
     return model;
 }
 
+Model_eCP
+ExtendedCriticalPower::deriveExtendedCP_5_3_ParametersForBest(double best5s, double best1min, double best5min, double best1hour)
+{
+    Model_eCP model;
+    model.version = "eCP v5.3";
+
+    // initial estimate of tau
+    model.paa = 300;
+    model.paa_dec = -2;
+    model.etau = 1;
+    model.tau_del = -4.8;
+    model.ecp = 300;
+    model.ecp_del = -0.9;
+    model.ecp_dec = 0;
+    model.ecp_dec_del = -180;
+
+    // convergence delta for tau
+    const double etau_delta_max = 1e-4;
+    const double paa_delta_max = 1e-2;
+    const double paa_dec_delta_max = 1e-4;
+
+    // previous loop value of tau and t0
+    double etau_prev;
+    double paa_prev;
+    double paa_dec_prev;
+
+    // maximum number of loops
+    const int max_loops = 100;
+
+    // loop to convergence
+    int iteration = 0;
+    do {
+        if (iteration ++ > max_loops) {
+            QMessageBox::warning(
+                NULL, "Warning",
+                QString("Maximum number of loops %1 exceeded in ecp5 model"
+                        "extraction").arg(max_loops),
+                QMessageBox::Ok,
+                QMessageBox::NoButton);
+            break;
+        }
+
+        // record the previous version of tau, for convergence
+        etau_prev = model.etau;
+        paa_prev = model.paa;
+        paa_dec_prev = model.paa_dec;
+
+        // P = paa* (1.20-0.20*exp(-1*(x/60.0)))*exp(paa_dec*(x/60)) + ecp * (1-exp(tau_del*x/60)) * (1-exp(ecp_del*x/60)) * (1+ecp_dec*exp(-180/x/60) (1 + etau/(x/60))
+        // bests->meanMaxArray(series)[i] = paa*(1.20-0.20*exp(-1*(i/60.0)))*exp(paa_dec*(i/60.0))  + ecp * (1-exp(tau_del*x/60)) * (1-exp(ecp*i/60.0)) * (1+2d*exp(180/i/60.0)) * ( 1 + etau/(i/60.0));
+
+        // estimate ecp
+        model.ecp = (best1hour - model.paa * (1.20-0.20*exp(-1*(3600/60.0))) * exp(model.paa_dec*(3600/60.0))) / (1-exp(model.tau_del*(3600/60.0))) / (1-exp(model.ecp_del*(3600/60.0))) / (1+model.ecp_dec*exp(model.ecp_dec_del/(3600/60.0))) / ( 1 + model.etau/(3600/60.0));
+        //qDebug() << "model.ecp" << model.ecp;
+
+        // estimate etau
+        model.etau = ((best5min - model.paa * (1.20-0.20*exp(-1*(300/60.0))) * exp(model.paa_dec*(300/60.0))) /model.ecp / (1-exp(model.tau_del*(300/60.0))) / (1-exp(model.ecp_del*(300/60.0))) / (1+model.ecp_dec*exp(model.ecp_dec_del/(300/60.0))) - 1) * (300/60.0);
+        //qDebug() << "model.etau" << model.etau;
+
+        // estimate paa_dec
+        model.paa_dec = log((best1min - model.ecp * (1-exp(model.tau_del*(60/60.0))) * (1-exp(model.ecp_del*(60/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(60/60.0))) * ( 1 + model.etau/(60/60.0)) ) / model.paa / (1.20-0.20*exp(-1*(60/60.0))) ) / (60/60.0);
+        //qDebug() << "paa_dec.etau" << model.paa_dec;
+
+        // estimate paa
+        model.paa = (best5s - model.ecp * (1-exp(model.tau_del*(5/60.0))) * (1-exp(model.ecp_del*(5/60.0))) * (1+model.ecp_dec*exp(model.ecp_dec_del/(5/60.0))) * ( 1 + model.etau/(5/60.0))) / exp(model.paa_dec*(5/60.0)) / (1.20-0.20*exp(-1*(5/60.0)));
+        //qDebug() << "model.paa" << model.paa;
+
+    } while ((fabs(model.etau - etau_prev) > etau_delta_max) ||
+             (fabs(model.paa - paa_prev) > paa_delta_max)  ||
+             (fabs(model.paa_dec - paa_dec_prev) > paa_dec_delta_max)
+            );
+
+    qDebug() <<"BEST eCP(5.3) " << "paa" << model.paa  << "ecp" << model.ecp << "etau" << model.etau << "paa_dec" << model.paa_dec << "ecp_del" << model.ecp_del << "ecp_dec" << model.ecp_dec << "ecp_dec_del" << model.ecp_dec_del;
+
+    return model;
+}
 
 QwtPlotCurve*
 ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
@@ -1130,6 +1203,35 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
     QPen e2pen(GColor(CCP)); // Qt::cyan
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
+    extendedCPCurve2->setPen(e2pen);
+    extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
+
+    return extendedCPCurve2;
+}
+
+QwtPlotCurve*
+ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(Model_eCP model)
+{
+    const int extendedCurve2_points = 1000;
+
+    QVector<double> extended_cp_curve2_power(extendedCurve2_points);
+    QVector<double> extended_cp_curve2_time(extendedCurve2_points);
+    double tmin = 1.0/60;
+    double tmax = 600;
+
+    for (int i = 0; i < extendedCurve2_points; i ++) {
+        double x = (double) i / (extendedCurve2_points - 1);
+        double t = pow(tmax, x) * pow(tmin, 1-x);
+        extended_cp_curve2_time[i] = t;
+        extended_cp_curve2_power[i] = model.paa*(1.20-0.20*exp(-1*t))*exp(model.paa_dec*(t)) + model.ecp * (1-exp(model.tau_del*t)) * (1-exp(model.ecp_del*t)) * (1+model.ecp_dec*exp(model.ecp_dec_del/t)) * ( 1 + model.etau/(t));
+    }
+
+    QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("level_eCP_5_3");
+    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+        extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen e2pen(GColor(Qt::lightGray)); // Qt::cyan
+    e2pen.setWidth(1);
+    e2pen.setStyle(Qt::SolidLine);
     extendedCPCurve2->setPen(e2pen);
     extendedCPCurve2->setSamples(extended_cp_curve2_time.data(), extended_cp_curve2_power.data(), extendedCurve2_points);
 
