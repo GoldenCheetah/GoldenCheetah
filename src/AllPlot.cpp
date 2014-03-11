@@ -758,7 +758,7 @@ AllPlot::configChanged()
     ihlbrush.setAlpha(128);
     standard->intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
     QColor hbrush = QColor(Qt::lightGray);
-    hbrush.setAlpha(50);
+    hbrush.setAlpha(75);
     standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
     QPen gridPen(GColor(CPLOTGRID));
@@ -4080,7 +4080,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
                 QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
                 if (chosen.name.startsWith(tr("Peak")) || chosen.name.startsWith("Peak")) hbrush = QColor(Qt::lightGray);
                 if (chosen.name.startsWith(tr("Match"))) hbrush = QColor(Qt::red);
-                hbrush.setAlpha(50);
+                hbrush.setAlpha(75);
                 standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
                 // we chose one?
@@ -4140,7 +4140,7 @@ AllPlot::intervalHover(RideFileInterval chosen)
         QColor hbrush = GColor(CINTERVALHIGHLIGHTER); // for user defined
         if (chosen.name.startsWith(tr("Peak")) || chosen.name.startsWith("Peak")) hbrush = QColor(Qt::lightGray);
         if (chosen.name.startsWith(tr("Match"))) hbrush = QColor(Qt::red);
-        hbrush.setAlpha(40);
+        hbrush.setAlpha(75);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
 
         if (bydist) {
