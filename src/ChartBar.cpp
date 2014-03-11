@@ -133,7 +133,7 @@ ChartBar::addWidget(QString title)
     // make the right size
     QFontMetrics fontMetric(buttonFont);
     int width = fontMetric.width(title);
-    newbutton->setWidth(width+20);
+    newbutton->setFixedWidth(width+20);
 
     // add to layout
     layout->addWidget(newbutton);
@@ -164,6 +164,17 @@ ChartBar::setText(int index, QString text)
 void
 ChartBar::tidy()
 {
+    // resize to button widths + 2px spacing
+    int width = 2;
+#ifdef Q_OS_MAC
+    foreach (QtMacButton *button, buttons) {
+#else
+    foreach (GcScopeButton *button, buttons) {
+#endif
+        width += button->geometry().width() + 2;
+    }
+    buttonBar->setFixedWidth(width);
+
     if (buttonBar->width() > scrollArea->width()) {
         left->show(); right->show();
     } else {
