@@ -173,7 +173,7 @@ ChartBar::tidy()
 #endif
         width += button->geometry().width() + 2;
     }
-    buttonBar->setFixedWidth(width);
+    buttonBar->setMinimumWidth(width);
 
     if (buttonBar->width() > scrollArea->width()) {
         left->show(); right->show();
