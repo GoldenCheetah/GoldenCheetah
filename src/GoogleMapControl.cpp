@@ -131,12 +131,16 @@ void GoogleMapControl::createHtml()
     }
 
     // No GPS data, so sorry no map
+    // No GPS data, so sorry no map
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
     if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {
-        currentPage = tr("No GPS Data Present");
+        currentPage = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>%3</center>").arg(bgColor.name()).arg(fgColor.name()).arg(tr("No GPS Data Present"));
         setIsBlank(true);
         return;
-    } else
+    } else {
         setIsBlank(false);
+    }
 
     // load the Google Map v3 API
     currentPage = QString("<!DOCTYPE html> \n"
@@ -153,6 +157,9 @@ void GoogleMapControl::createHtml()
     "</style>\n"
     "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM&sensor=false\"></script> \n");
 
+    // fg/bg
+    currentPage += QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE>")
+                                          .arg(bgColor.name()).arg(fgColor.name());
 
     // local functions
     currentPage += QString("<script type=\"text/javascript\">\n"
