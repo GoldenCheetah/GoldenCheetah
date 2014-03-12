@@ -243,10 +243,8 @@ GcWindow::amVisible()
 void 
 GcWindow::setColor(QColor x)
 {
-    if (_color != x) {
-        _color = x;
-        emit colorChanged(x);
-    }
+    _color = x;
+    emit colorChanged(x);
 }
 
 QColor
