@@ -24,6 +24,7 @@
 #include "IntervalItem.h"
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
+#include "Colors.h" // for MILES_PER_KM
 
 #include <QtGui>
 #include <QString>
