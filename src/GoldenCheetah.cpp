@@ -767,7 +767,6 @@ GcChartWindow::colorChanged(QColor z)
 
     menuButton->setStyleSheet(QString("QPushButton { border: 0px; padding: 0px; %1 } QPushButton::menu-indicator { image: none; } ").arg(stylesheet));
     _revealControls->setStyleSheet(stylesheet);
-    menuButton->setStyleSheet(stylesheet);
 }
 
 void
