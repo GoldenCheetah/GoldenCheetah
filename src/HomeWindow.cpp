@@ -176,7 +176,9 @@ HomeWindow::addChartFromMenu(QAction*action)
         }
     }
 
-    if (id != GcWindowTypes::None) appendChart(id); // called from Context to inset chart
+    if (id != GcWindowTypes::None) {
+        appendChart(id); // called from Context to inset chart
+    }
 }
 
 void
@@ -281,6 +283,7 @@ HomeWindow::tabSelected(int index)
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
         tabbed->setCurrentIndex(index);
+        chartbar->setCurrentIndex(index);
     }
 
     active = false;
@@ -427,7 +430,7 @@ HomeWindow::appendChart(GcWinID id)
     // returns null if cancelled or closed
     if (newone) {
         addChart(newone);
-        newone->show();
+        //newone->show() //Crash on QT5
     }
 
     // now wipe it
@@ -579,6 +582,7 @@ HomeWindow::addChart(GcWindow* newone)
         titleEdit->setText("");
     }
 
+    // select the last tab just added
     active = false;
 }
 
