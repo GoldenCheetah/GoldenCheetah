@@ -164,6 +164,16 @@ ModelWindow::ModelWindow(Context *context, const QDir &home) :
     connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
     //connect(resetView, SIGNAL(clicked()), this, SLOT(resetViewPoint()));
     connect(zpane, SIGNAL(valueChanged(int)), this, SLOT(setZPane(int)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    // set colors on first run
+    configChanged();
+}
+
+void
+ModelWindow::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
 }
 
 void

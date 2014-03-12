@@ -174,7 +174,7 @@ GcWindow::GcWindow()
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-    setProperty("color", QColor(Qt::white));
+    setProperty("color", GColor(CPLOTBACKGROUND));
     setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
@@ -209,7 +209,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-    setProperty("color", QColor(Qt::white));
+    setProperty("color", GColor(CPLOTBACKGROUND));
     setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
