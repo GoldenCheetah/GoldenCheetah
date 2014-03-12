@@ -150,7 +150,14 @@ LTMPlot::configUpdate()
         axisWidget(x)->setPalette(palette);
     }
     axisWidget(QwtPlot::xBottom)->setPalette(palette);
-    this->legend()->setPalette(palette);
+    QwtLegend *l = static_cast<QwtLegend *>(this->legend());
+    l->setPalette(palette);
+    foreach(QwtPlotCurve *p, curves) {
+        foreach (QWidget *w, l->legendWidgets(itemToInfo(p))) {
+            w->setPalette(palette);
+        }
+    }
+    updateLegend();
 }
 
 void
@@ -1128,6 +1135,9 @@ LTMPlot::setData(LTMSettings *set)
         refreshMarkers(settings, settings->start.date(), settings->end.date(), settings->groupBy, GColor(CPLOTMARKER));
 
     //qDebug()<<"Final tidy.."<<timer.elapsed();
+
+    // update colours etc for plot chrome
+    configUpdate();
 
     // plot
     replot();
