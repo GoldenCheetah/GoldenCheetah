@@ -189,6 +189,16 @@ HrPwWindow::HrPwWindow(Context *context) :
     connect(rDelayEdit, SIGNAL(editingFinished()), this, SLOT(setrDelayFromLineEdit()));
     connect(rDelaySlider, SIGNAL(valueChanged(int)), this, SLOT(setrDelayFromSlider()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    // set colors etc on first run
+    configChanged();
+}
+
+void
+HrPwWindow::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
 }
 
 void
