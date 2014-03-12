@@ -104,10 +104,10 @@ TreeMapPlot::paintEvent(QPaintEvent *)
 
     // Init paint settings
     QPainter painter(this);
-    QColor color = Qt::white;
-    QPen pen(Qt::white);
+    QColor color = GColor(CPLOTBACKGROUND);
+    QPen pen(color);
     pen.setWidth(10); // root
-    QBrush brush(Qt::white);
+    QBrush brush(color);
     painter.setBrush(brush);
     painter.setPen(pen);
 
@@ -121,9 +121,9 @@ TreeMapPlot::paintEvent(QPaintEvent *)
     font.setPointSize(18);
     painter.setFont(font);
     pen.setWidth(5);
-    pen.setColor(Qt::white);
+    pen.setColor(color);
     painter.setPen(pen);
-    color = Qt::black;
+    color = GCColor::invertColor(color);
     //color.setAlpha(127);
 
     int n=1;
