@@ -33,6 +33,7 @@
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
+#include <qwt_scale_widget.h>
 
 
 static inline double
@@ -100,6 +101,11 @@ HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
     r_mrk2->attach(this);
 
     shade_zones = true;
+
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    // setup colors on first run
+    configChanged();
 }
 
 struct DataPoint {
@@ -108,6 +114,21 @@ struct DataPoint {
     DataPoint(double t, double h, double w, int i) :
         time(t), hr(h), watts(w), inter(i) {}
 };
+
+void
+HrPwPlot::configChanged()
+{
+    // setColors bg
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+
+    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+}
 
 void
 HrPwPlot::setAxisTitle(int axis, QString label)

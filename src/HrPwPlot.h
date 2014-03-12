@@ -60,6 +60,7 @@ class HrPwPlot : public QwtPlot
     public slots:
         // for tooltip
         void pointHover(QwtPlotCurve*, int);
+        void configChanged();
 
     protected:
         friend class ::HrPwPlotBackground;
