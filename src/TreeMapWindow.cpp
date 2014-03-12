@@ -202,6 +202,8 @@ TreeMapWindow::refresh()
 {
     if (!amVisible()) return;
 
+    setProperty("color", GColor(CPLOTBACKGROUND));
+
     // refresh for changes to ridefiles / zones
     if (active == false) {
         // setup settings to current user selection
