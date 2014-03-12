@@ -252,6 +252,12 @@ ChartBar::removeWidget(int index)
 }
 
 void
+ChartBar::setCurrentIndex(int index)
+{
+    clicked(index);
+}
+
+void
 ChartBar::clicked(int index)
 {
     setUpdatesEnabled(false);
