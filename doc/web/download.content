@@ -2,13 +2,13 @@
 
 <p>
 Golden Cheetah is available in binary form for
-Linux x86, Mac OS X (universal binary), and Windows.
+Fedora (RPMs), Mac OS X (Universal Intel binary), and Windows.
 It is also available as source code.
 </p>
 
 <p>
 Golden Cheetah downloads data from all versions of the PowerTap
-computer including the new Joule. Previously you needed to have the
+computer including the new Joule GPS. Previously you needed to have the
 FTDI USB Drivers installed if you were using the PowerTap USB cradle
 (as opposed to the older, serial cable). This should not be necessary.
 If you are having problems then you can manually install the
@@ -16,7 +16,7 @@ If you are having problems then you can manually install the
 </p>
 
 <p>
-On Linux and Mac OS X, Golden Cheetah also downloads from the SRM PCV.  On Mac
+On Windows, Linux and Mac OS X, Golden Cheetah also downloads from the SRM PCV.  On Mac
 OS X, you'll need to install <a href="http://osx-pl2303.sourceforge.net/">the
 open source PL2303 driver</a> to download from an SRM. Please see the
 <a href="https://github.com/GoldenCheetah/GoldenCheetah/wiki/Installing-the-d2xx-drivers-on-mac-os">WIKI</a> article
@@ -33,8 +33,14 @@ PCV on Mac OS X</a> for further information.
 <p>This is a bug fix release with a few new features.</p>
 
 <ul>
-<li><a href="GoldenCheetah_3.0.2_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
-<li><a href="GoldenCheetah_3.0.2_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
+<li><a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah_3.0.2_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
+<li><a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah_3.0.2_Mac_Universal.dmg">Mac OS X Intel Universal (10.6+)</a><br>
+<li>Fedora 18 RPMS - <a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah-3.0.2-1.fc18.i686.rpm">32bit</a>
+ / <a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah-3.0.2-1.fc18.x86_64.rpm">64 bit</a><br>
+<li>Fedora 19 RPMS - <a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah-3.0.2-1.fc19.i686.rpm">32bit</a>
+ / <a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah-3.0.2-1.fc19.x86_64.rpm">64 bit</a><br>
+<li>Fedora 20 RPMS - <a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah-3.0.2-1.fc20.i686.rpm">32bit</a>
+ / <a href="https://github.com/GoldenCheetah/GoldenCheetah/releases/download/v3.0-SP2/GoldenCheetah-3.0.2-1.fc20.x86_64.rpm">64 bit</a><br>
 </ul>
 
 <p>
