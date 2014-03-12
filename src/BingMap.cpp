@@ -31,14 +31,14 @@
 
 #include <QDebug>
 
-BingMap::BingMap(Context *context) : GcWindow(context), context(context), range(-1), current(NULL)
+BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), range(-1), current(NULL)
 {
     setControls(NULL);
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout();
     layout->setSpacing(0);
     layout->setContentsMargins(2,0,2,2);
-    setLayout(layout);
+    setChartLayout(layout);
 
     view = new QWebView();
     view->setContentsMargins(0,0,0,0);
@@ -54,8 +54,19 @@ BingMap::BingMap(Context *context) : GcWindow(context), context(context), range(
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     first = true;
+
+    // get the colors setup for first run
+    configChanged();
+}
+
+void
+BingMap::configChanged()
+{
+    setProperty("color", GColor(CPLOTBACKGROUND));
+    rideSelected();
 }
 
 void
@@ -106,10 +117,16 @@ void BingMap::createHtml()
         }
     }
 
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+
     // No GPS data, so sorry no map
     if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {
-        currentPage = tr("No GPS Data Present");
+        currentPage = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>%3</center>").arg(bgColor.name()).arg(fgColor.name()).arg(tr("No GPS Data Present"));
+        setIsBlank(true);
         return;
+    } else {
+        setIsBlank(false);
     }
 
     // load the Google Map v3 API
@@ -122,6 +139,9 @@ void BingMap::createHtml()
     "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\n"
     "<script type=\"text/javascript\" src=\"http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0\"></script>\n");
 
+    // colors
+    currentPage += QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE>")
+                                          .arg(bgColor.name()).arg(fgColor.name());
     // local functions
     currentPage += QString("<script type=\"text/javascript\">\n"
 

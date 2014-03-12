@@ -70,7 +70,7 @@ class BWebBridge : public QObject
         void drawIntervals();
 };
 
-class BingMap : public GcWindow
+class BingMap : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -81,6 +81,8 @@ class BingMap : public GcWindow
         bool first;
 
     public slots:
+
+        void configChanged();
         void rideSelected();
         void createMarkers();
         void drawShadedRoute();
