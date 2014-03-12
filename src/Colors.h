@@ -67,7 +67,6 @@ class GCColor : public QObject
         static const Colors *colorSet();
         static const Colors *defaultColorSet();
         static void resetColors();
-        static QColor invert(QColor);
         static struct SizeSettings defaultSizes(int width, int height);
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background

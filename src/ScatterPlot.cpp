@@ -221,7 +221,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
     sym->setSize(6);
-    sym->setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
+    sym->setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     sym->setBrush(QBrush(Qt::NoBrush));
     QPen p;
     p.setColor(Qt::red);
@@ -392,7 +392,7 @@ ScatterPlot::showTime(ScatterSettings *settings, int offset, int secs)
         QwtSymbol *sym = new QwtSymbol;
         sym->setStyle(QwtSymbol::Rect);
         sym->setSize(6);
-        sym->setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
+        sym->setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         sym->setBrush(QBrush(Qt::NoBrush));
 
         QPen pen;

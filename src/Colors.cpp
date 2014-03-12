@@ -202,12 +202,6 @@ void GCColor::resetColors()
     copyArray(DefaultColorList, ColorList);
 }
 
-QColor
-GCColor::invert(QColor color)
-{
-    return QColor(255-color.red(), 255-color.green(), 255-color.blue());
-}
-
 void
 GCColor::readConfig()
 {
