@@ -102,6 +102,8 @@ class ModelWindow : public GcChartWindow
         void setBin(QString x) { binWidthLineEdit->setText(x); }
 
     public slots:
+
+        void configChanged();
         void rideSelected();
         void intervalSelected();
         void applyPreset(int);
