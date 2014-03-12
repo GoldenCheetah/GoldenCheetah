@@ -116,6 +116,9 @@ PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
 #ifdef GC_HAVE_LUCENE
     connect(context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 #endif
+
+    // set colors
+    configChanged();
 }
 
 PerformanceManagerWindow::~PerformanceManagerWindow()
@@ -143,6 +146,19 @@ void PerformanceManagerWindow::configChanged()
         replot();
     }
     PMpicker->setRubberBandPen(GColor(CPLOTSELECT));
+    setProperty("color", GColor(CPLOTBACKGROUND));
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+    setStyleSheet(QString("background-color: %1; color: %2; border: %1")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 }
 
 void PerformanceManagerWindow::metricChanged()
