@@ -40,6 +40,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
 {
     // resize all the arrays to zero
     wattsMeanMax.resize(0);
+    heatMeanMax.resize(0);
     hrMeanMax.resize(0);
     cadMeanMax.resize(0);
     nmMeanMax.resize(0);
@@ -128,6 +129,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
 {
     // resize all the arrays to zero
     wattsMeanMax.resize(0);
+    heatMeanMax.resize(0);
     hrMeanMax.resize(0);
     cadMeanMax.resize(0);
     nmMeanMax.resize(0);
@@ -1089,6 +1091,11 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
                : start(start), end(end), context(context), rideFileName(""), ride(0) 
 {
 
+    // remember parameters for getting heat
+    this->filter = filter;
+    this->files = files;
+    this->onhome = onhome;
+
     // Oh lets get from the cache if we can -- but not if filtered
     if (!filter && !context->isfiltered) {
 
@@ -1107,6 +1114,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     xPowerMeanMax.resize(0);
     npMeanMax.resize(0);
     wattsMeanMax.resize(0);
+    heatMeanMax.resize(0);
     hrMeanMax.resize(0);
     cadMeanMax.resize(0);
     nmMeanMax.resize(0);
@@ -1203,6 +1211,44 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
         context->athlete->cpxCache.append(new RideFileCache(this));
     }
 
+}
+
+//
+// Get heat mean max -- if an aggregated curve
+//
+QVector<float> &RideFileCache::heatMeanMaxArray()
+{
+    // not aggregated or already done it return the result
+    if (ride || heatMeanMax.count()) return heatMeanMax;
+
+    // make it big enough
+    heatMeanMax.resize(wattsMeanMaxDouble.size());
+
+    // ok, we need to iterate again and compute heat based upon
+    // how close to the absolute best we've got
+    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(context->athlete->home)) {
+
+        QDate rideDate = dateFromFileName(rideFileName);
+        if (((filter == true && files.contains(rideFileName)) || filter == false) &&
+            rideDate >= start && rideDate <= end) {
+
+            // skip globally filtered values
+            if (context->isfiltered && !context->filters.contains(rideFileName)) continue;
+            if (onhome && context->ishomefiltered && !context->homeFilters.contains(rideFileName)) continue;
+
+            // get its cached values (will refresh if needed...)
+            RideFileCache rideCache(context, context->athlete->home.absolutePath() + "/" + rideFileName);
+
+            for(int i=0; i<rideCache.wattsMeanMaxDouble.count() && i<wattsMeanMaxDouble.count(); i++) {
+
+                // is it within 10% of the best we have ?
+                if (rideCache.wattsMeanMaxDouble[i] >= (0.9f * wattsMeanMaxDouble[i]))
+                    heatMeanMax[i] = heatMeanMax[i] + 1;
+            }
+        }
+    }
+
+    return heatMeanMax;
 }
 
 //

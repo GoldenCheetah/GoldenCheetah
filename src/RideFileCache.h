@@ -169,6 +169,8 @@ class RideFileCache
         QVector<float> &wattsCPZoneArray() { return wattsCPTimeInZone; } // moderate, heavy and severe domains
         QVector<float> &hrZoneArray() { return hrTimeInZone; }
 
+        QVector<float> &heatMeanMaxArray();  // will compute if neccessary
+
         // explain the array binning / sampling
         double &distBinSize(RideFile::SeriesType); // return distribution bin size
         double &meanMaxBinSize(RideFile::SeriesType); // return distribution bin size
@@ -220,6 +222,11 @@ class RideFileCache
         QVector<float> vamMeanMax; // RideFile::vam
         QVector<float> wattsKgMeanMax; // watts/kg
         QVector<float> aPowerMeanMax; // RideFile::aPower
+
+        QVector<float> heatMeanMax; // The heat of training for aggregated power data
+        bool filter, onhome; // saving parameters re-used when aggregating heat
+        QStringList files;
+
 
         QVector<double> wattsMeanMaxDouble; // RideFile::watts
         QVector<double> hrMeanMaxDouble; // RideFile::hr

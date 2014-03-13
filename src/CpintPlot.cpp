@@ -772,6 +772,10 @@ CpintPlot::calculate(RideItem *rideItem)
     // get aggregates - incase not initialised from date change
     if (bests == NULL) bests = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode);
 
+    // heat ...
+    //! todo qDebug()<<"FTP heat="<<bests->heatMeanMaxArray()[3600];
+    //! todo qDebug()<<"3min heat="<<bests->heatMeanMaxArray()[180];
+
     //
     // PLOT MODEL CURVE (DERIVED)
     //
