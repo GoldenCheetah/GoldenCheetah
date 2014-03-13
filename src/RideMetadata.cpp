@@ -51,8 +51,6 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     // setup the tabs widget
     tabs = new QTabWidget(this);
     tabs->setMovable(true);
-    tabs->setPalette(palette);
-    tabs->setAutoFillBackground(false);
 #ifdef WIN32
     tabs->setStyleSheet("QTabWidget::pane { "
 		    " margin: 0px,0px,0px,0px;"
@@ -208,13 +206,17 @@ RideMetadata::configUpdate()
 
     palette = QPalette();
 
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
 
     // only change base if moved away from white plots
-    if (GColor(CPLOTBACKGROUND) != Qt::white) {
-        palette.setBrush(QPalette::Base, QBrush(GCColor::alternateColor(GColor(CPLOTBACKGROUND))));
-        palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    // which is a Mac thing
+#ifndef Q_OS_MAC
+    if (GColor(CPLOTBACKGROUND) != Qt::white)
+#endif
+    {
+        palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+        palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
     }
 
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -315,16 +317,9 @@ Form::clear()
 void
 Form::initialise()
 {
-    QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
-
-    setPalette(palette);
-    setAutoFillBackground(false);
-
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
+    setPalette(meta->palette);
     contents = new QWidget;
-    contents->setPalette(palette);
-    contents->setAutoFillBackground(false);
+    contents->setPalette(meta->palette);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(contents);
     hlayout = new QHBoxLayout;
