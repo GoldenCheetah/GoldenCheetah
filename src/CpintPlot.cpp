@@ -55,7 +55,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     isFiltered(false),
     shadeMode(2),
     shadeIntervals(true),
-    rangemode(rangemode)
+    rangemode(rangemode),
+    showHeat(false)
 {
     setAutoFillBackground(true);
 
@@ -100,6 +101,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     extendedCPCurve4 = NULL;
     extendedCPCurve5 = NULL;
     extendedCPCurve6 = NULL;
+    heatCurve = NULL;
 
     extendedCPCurve_WSecond = NULL;
     extendedCPCurve_WPrime = NULL;
@@ -155,6 +157,10 @@ CpintPlot::changeSeason(const QDate &start, const QDate &end)
     if (bests) {
         delete bests;
         bests = NULL;
+    }
+    if (heatCurve) {
+        delete heatCurve;
+        heatCurve = NULL;
     }
 }
 
@@ -258,6 +264,10 @@ CpintPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     if (allCurve) {
         delete allCurve;
         allCurve = NULL;
+    }
+    if (heatCurve) {
+        delete heatCurve;
+        heatCurve = NULL;
     }
 }
 
@@ -383,6 +393,11 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         CPCurve = NULL;
     }
 
+    if (heatCurve) {
+        delete heatCurve;
+        heatCurve = NULL;
+    }
+
     // if there's no cp, then there's nothing to do
     if (cp <= 0)
         return;
@@ -466,6 +481,28 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     CPCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
     CPCurve->attach(thisPlot);
 
+    // draw a heat curve
+    if (showHeat && rideSeries == RideFile::watts && bests && bests->heatMeanMaxArray().count()) {
+        // heat curve
+        heatCurve = new QwtPlotIntervalCurve("heat");
+
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) heatCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+        heatCurve->setBrush(QBrush(GColor(CCP).darker(200)));
+        heatCurve->setPen(QPen(Qt::NoPen));
+        heatCurve->setZ(-1);
+
+        // generate samples
+        QVector<QwtIntervalSample> heatSamples;
+
+        for (int i=0; i<bests->meanMaxArray(RideFile::watts).count() && i<bests->heatMeanMaxArray().count(); i++) {
+            QwtIntervalSample add(i/60.00f, bests->meanMaxArray(RideFile::watts)[i] - bests->heatMeanMaxArray()[i],
+                                            bests->meanMaxArray(RideFile::watts)[i] + bests->heatMeanMaxArray()[i]);
+            heatSamples << add;
+        }
+        heatCurve->setSamples(heatSamples);
+        heatCurve->attach(thisPlot);
+    }
 
     // Extended CP 4
     if (extendedCPCurve4) {
@@ -1062,6 +1099,12 @@ CpintPlot::setFilter(QStringList list)
     files = list;
     delete bests;
     bests = NULL;
+}
+
+void
+CpintPlot::setShowHeat(bool x)
+{
+    showHeat = x;
 }
 
 void

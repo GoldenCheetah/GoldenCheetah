@@ -69,6 +69,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
     Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
     Q_PROPERTY(int shading READ shading WRITE setShading USER true)
+    Q_PROPERTY(bool showHeat READ showHeat WRITE setShowHeat USER true)
     Q_PROPERTY(int shadeIntervals READ shadeIntervals WRITE setShadeIntervals USER true)
     Q_PROPERTY(int ridePlotMode READ ridePlotMode WRITE setRidePlotMode USER true)
     Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
@@ -176,6 +177,8 @@ class CriticalPowerWindow : public GcChartWindow
         int shadeIntervals() { return shadeIntervalsCheck->isChecked(); }
         void setShadeIntervals(int x) { return shadeIntervalsCheck->setChecked(x); }
 
+        bool showHeat() { return showHeatCheck->isChecked(); }
+        void setShowHeat(bool x) { return showHeatCheck->setChecked(x); }
 
     protected slots:
         void forceReplot();
@@ -188,6 +191,7 @@ class CriticalPowerWindow : public GcChartWindow
         void intervalsChanged();
         void seasonSelected(int season);
         void shadingSelected(int shading);
+        void showHeatChanged(int check);
         void shadeIntervalsChanged(int state);
         void setRidePlotStyle(int index);
         void setSeries(int index);
@@ -227,6 +231,7 @@ class CriticalPowerWindow : public GcChartWindow
         QComboBox *ridePlotStyleCombo;
         QComboBox *shadeCombo;
         QCheckBox *shadeIntervalsCheck;
+        QCheckBox *showHeatCheck;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;

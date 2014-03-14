@@ -127,6 +127,7 @@ class CpintPlot : public QwtPlot
         void plot_interval(CpintPlot *plot, QVector<double> vector, QColor plotColor);
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
+        void setShowHeat(bool x);
         void setShadeMode(int x);
         void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
@@ -144,6 +145,7 @@ class CpintPlot : public QwtPlot
         QString path;
         QwtPlotCurve *thisCurve;
         QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4, *extendedCPCurve5, *extendedCPCurve6;
+        QwtPlotIntervalCurve *heatCurve;
 
         QwtPlotIntervalCurve *extendedCPCurve_WSecond, *extendedCPCurve_WPrime, *extendedCPCurve_CP, *extendedCPCurve_WPrime_CP;
 
@@ -177,6 +179,7 @@ class CpintPlot : public QwtPlot
         int shadeMode;
         bool shadeIntervals;
         bool rangemode;
+        bool showHeat;
 
         int ridePlotStyle;
         void calculateCentile(RideItem *rideItem);
