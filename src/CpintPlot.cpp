@@ -497,7 +497,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
         for (int i=0; i<bests->meanMaxArray(RideFile::watts).count() && i<bests->heatMeanMaxArray().count(); i++) {
             QwtIntervalSample add(i/60.00f, bests->meanMaxArray(RideFile::watts)[i] - bests->heatMeanMaxArray()[i],
-                                            bests->meanMaxArray(RideFile::watts)[i] + bests->heatMeanMaxArray()[i]);
+                                            bests->meanMaxArray(RideFile::watts)[i]/* + bests->heatMeanMaxArray()[i]*/);
             heatSamples << add;
         }
         heatCurve->setSamples(heatSamples);
