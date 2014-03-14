@@ -30,7 +30,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
 
     setFixedHeight(23);
-    setContentsMargins(3,0,3,0);
+    setContentsMargins(0,0,0,0);
 
     // main layout
     QHBoxLayout *mlayout = new QHBoxLayout(this);
@@ -207,6 +207,8 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
         //     we should try and be a little more fluid / animate ...
         //     which will probably mean using QScrollArea::ScrollContentsBy
     }
+
+    return false;
 }
 
 void
