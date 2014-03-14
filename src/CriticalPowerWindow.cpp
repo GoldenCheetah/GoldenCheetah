@@ -184,6 +184,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    showHeatCheck = new QCheckBox(this);
+    showHeatCheck->setChecked(false); // default off
+    QLabel *heaties = new QLabel(tr("Show curve heat"));
+    cl->addRow(heaties, showHeatCheck);
+
     shadeIntervalsCheck = new QCheckBox(this);
     shadeIntervalsCheck->setChecked(true); // default on
     QLabel *shadies = new QLabel(tr("Shade Intervals"));
@@ -359,6 +364,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
+    connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -1161,6 +1167,16 @@ void
 CriticalPowerWindow::shadingSelected(int shading)
 {
     cpintPlot->setShadeMode(shading);
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpintPlot->calculate(currentRide);
+}
+
+void
+CriticalPowerWindow::showHeatChanged(int state)
+{
+    cpintPlot->setShowHeat(state);
+
+    // redraw
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
 }
