@@ -534,7 +534,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         QVector<QwtPoint3D> heatByDateSamples;
 
         for (int i=0; i<bests->meanMaxArray(rideSeries).count(); i++) {
-            QDate date = bests->meanMaxDates(RideFile::watts)[i];
+            QDate date = bests->meanMaxDates(rideSeries)[i];
             double heat = 1000*(bests->start.daysTo(bests->end)-date.daysTo(bests->end))/(bests->start.daysTo(bests->end));
 
             QwtPoint3D add(i/60.00f, bests->meanMaxArray(rideSeries)[i], heat);
