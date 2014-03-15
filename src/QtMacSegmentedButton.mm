@@ -97,7 +97,7 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
     setContentsMargins(0,0,0,0);
 
 #if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
-    setAttribute(Qt::WA_NativeWindow);
+    //setAttribute(Qt::WA_NativeWindow);
 #endif
     mNativeRef = [[[NSSegmentedControl alloc] init] autorelease];
     [mNativeRef setSegmentCount:aCount];

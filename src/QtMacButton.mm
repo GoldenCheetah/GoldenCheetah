@@ -55,7 +55,7 @@ static inline NSString* fromQString(const QString &string)
 // nice little trick from qocoa
 static inline void setupLayout(NSView *cocoaView, QWidget *parent)
 {
-    parent->setAttribute(Qt::WA_NativeWindow);
+    //parent->setAttribute(Qt::WA_NativeWindow);
     QVBoxLayout *layout = new QVBoxLayout(parent);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);

@@ -209,7 +209,7 @@ MediaHelper::isMedia(QString filename)
 QtMacMovieView::QtMacMovieView (QWidget *context) : QMacCocoaViewContainer (0, context)
 {
 #if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
-    setAttribute(Qt::WA_NativeWindow);
+    //setAttribute(Qt::WA_NativeWindow);
 #endif
 
     NSRect frame;
