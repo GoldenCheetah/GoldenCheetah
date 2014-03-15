@@ -1416,7 +1416,7 @@ AllPlot::refreshIntervalMarkers()
     }
     standard->d_mrk.clear();
     QRegExp wkoAuto("^(Peak *[0-9]*(s|min)|Entire workout|Find #[0-9]*) *\\([^)]*\\)$");
-    if (rideItem->ride()) {
+    if (rideItem && rideItem->ride()) {
         foreach(const RideFileInterval &interval, rideItem->ride()->intervals()) {
 
             bool wko = false;
@@ -1466,7 +1466,7 @@ AllPlot::refreshCalibrationMarkers()
     }
     standard->cal_mrk.clear();
 
-    if (rideItem->ride()) {
+    if (rideItem && rideItem->ride()) {
         foreach(const RideFileCalibration &calibration, rideItem->ride()->calibrations()) {
             QwtPlotMarker *mrk = new QwtPlotMarker;
             standard->cal_mrk.append(mrk);
