@@ -1,7 +1,6 @@
 #include "CpPlotCurve.h"
 #include "qwt_clipper.h"
 #include "qwt_color_map.h"
-#include "qwt_point_mapper.h"
 #include "qwt_scale_map.h"
 #include "qwt_painter.h"
 #include <qpainter.h>
@@ -11,8 +10,8 @@ class CpPlotCurve::PrivateData
 public:
     PrivateData():
         colorRange( 0.0, 1000.0 ),
-        penWidth(2.0),
-        paintAttributes( CpPlotCurve::ClipPoints )
+        penWidth(0.0),
+        paintAttributes( CpPlotCurve::ClipPoints | CpPlotCurve::FilterPoints )
     {
         colorMap = new QwtLinearColorMap();
     }
@@ -55,7 +54,7 @@ CpPlotCurve::init()
     d_data = new PrivateData;
     setData( new QwtPoint3DSeriesData() );
 
-    setZ( 20.0 );
+    setZ( 1000.0 );
 }
 
 int
@@ -135,7 +134,7 @@ void CpPlotCurve::setPenWidth(double penWidth)
 
     if ( d_data->penWidth != penWidth )
     {
-        d_data->penWidth = 10;//penWidth;
+        d_data->penWidth = penWidth;
 
         legendChanged();
         itemChanged();
@@ -177,10 +176,10 @@ CpPlotCurve::drawSeries( QPainter *painter,
     if ( from > to )
         return;
 
-    drawDots( painter, xMap, yMap, canvasRect, from, to );
+    //drawDots( painter, xMap, yMap, canvasRect, from, to );
 
     // Not working, to debug...
-    //drawLines( painter, xMap, yMap, canvasRect, from, to );
+    drawLines( painter, xMap, yMap, canvasRect, from, to );
 }
 
 /*!
@@ -265,6 +264,8 @@ CpPlotCurve::drawLines( QPainter *painter,
     if ( format == QwtColorMap::Indexed )
         d_data->colorTable = d_data->colorMap->colorTable( d_data->colorRange );
 
+    const bool noDuplicates = d_data->paintAttributes & CpPlotCurve::FilterPoints;
+
     const QwtSeriesData<QwtPoint3D> *series = data();
 
     for ( int i = from; i < to; i++ )
@@ -279,12 +280,13 @@ CpPlotCurve::drawLines( QPainter *painter,
             yi = qRound( yi );
         }
 
-        int y=i+1;
+        int y=i;
         double xi1 = xi;
         double yi1 = yi;
         QwtPoint3D nextSample;
 
         do {
+            y++;
             nextSample = series->sample( y );
 
             xi1 = xMap.transform( nextSample.x() );
@@ -295,55 +297,47 @@ CpPlotCurve::drawLines( QPainter *painter,
                 xi1 = qRound( xi1 );
                 yi1 = qRound( yi1 );
             }
-            y++;
-        } while (y < to && xi1 == xi &&  yi1 == yi );
 
+        } while (y < to && noDuplicates && xi1 == xi &&  yi1 == yi);
 
-        //qDebug() << "x" << xi << xi1;
-        //qDebug() << "y" << yi << yi1;
+        // Next point
+        i=y-1;
+
+        if (y>=to) {
+            continue ;
+        }
+        //qDebug() << "x" << 60*sample.x()  << 60*nextSample.x()  << "y" << sample.y()  << nextSample.y() ;
 
 
         if ( d_data->paintAttributes & CpPlotCurve::ClipPoints )
         {
-            if ( !canvasRect.contains( xi, yi ) )
+            if (!canvasRect.contains( xi1, yi1 ) )
                 continue;
         }
 
-        QwtScaleMap _xMap = QwtScaleMap(xMap);
-        _xMap.setPaintInterval(xi, xi1);
-        //_xMap.setPaintInterval(sample.x(), nextSample.x());
-        QwtScaleMap _yMap = QwtScaleMap(yMap);
-        _yMap.setPaintInterval(yi, yi1);
-        //_yMap.setPaintInterval(sample.y(), nextSample.y());
-
-         QRectF clipRect;
-         if ( true  )
-         {
-             qreal pw = qMax( qreal( 1.0 ), painter->pen().widthF());
-             clipRect = canvasRect.adjusted(-pw, -pw, pw, pw);
-         }
-
-         const bool noDuplicates = true; //d_data->paintAttributes & FilterPoints;
-
-         QwtPointMapper mapper;
-         mapper.setFlag( QwtPointMapper::RoundPoints, true  );
-         mapper.setFlag( QwtPointMapper::WeedOutPoints, true  );
-         mapper.setBoundingRect( canvasRect );
 
          QVector<QPointF> samples;
          samples.append(QPointF(xi, yi));
          samples.append(QPointF(xi1, yi1));
 
-
          QwtPointSeriesData *data = new QwtPointSeriesData(samples);
-         QPolygonF polyline = mapper.toPolygonF( _xMap, _yMap, data, 0, 1 );
 
+         // Increase width for recent poins
+         int width = d_data->penWidth;
+         if (sample.z()>250)
+             width ++;
+         if (sample.z()>500)
+             width ++;
+         if (sample.z()>750)
+             width ++;
+
+         // Choose color in the colorMap
          if ( format == QwtColorMap::RGB )
          {
              const QRgb rgb = d_data->colorMap->rgb(
                  d_data->colorRange, sample.z() );
 
-             painter->setPen( QPen( QColor::fromRgba( rgb ), d_data->penWidth ) );
+             painter->setPen( QPen( QColor::fromRgba( rgb ), width ) );
          }
          else
          {
@@ -351,24 +345,10 @@ CpPlotCurve::drawLines( QPainter *painter,
                  d_data->colorRange, sample.z() );
 
              painter->setPen( QPen( QColor::fromRgba( d_data->colorTable[index] ),
-                 d_data->penWidth ) );
+                 width ) );
          }
 
-         painter->setPen( QPen( Qt::green, 1 ) );
-         qDebug() << "draw " << data->sample(0).x() << data->sample(0).y() << data->sample(1).x() << data->sample(1).y() ;
-
-         if ( d_data->paintAttributes & true )
-         {
-             const QPolygonF clipped = QwtClipper::clipPolygonF(
-                 clipRect, polyline, false );
-
-             QwtPainter::drawPolyline( painter, clipped );
-         }
-         else
-         {
-             QwtPainter::drawPolyline( painter, polyline );
-         }
-
+         //qDebug() << "draw " << data->sample(0).x() << data->sample(0).y() << data->sample(1).x() << data->sample(1).y()  << "(" << sample.z() << ")" ;
+         QwtPainter::drawLine(painter, data->sample(0), data->sample(1) );
      }
-
  }
