@@ -544,7 +544,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
         heatCurveByDate->setPenWidth(1);
 
-        QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::lightGray, Qt::red);
+        QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::blue, Qt::red);
         heatCurveByDate->setColorMap(colorMap);
 
         // generate samples
@@ -814,6 +814,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             curve->setSamples(time_values.data(), energyBests.data(), n_values);
         else
             curve->setSamples(time_values.data(), power_values, n_values);
+
         curve->attach(thisPlot);
         allCurves.append(curve);
     }

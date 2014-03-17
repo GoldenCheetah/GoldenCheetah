@@ -258,6 +258,8 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
         }
     }
 
+
+    // Activity Extensions
     QDomElement extensions = doc.createElement("Extensions");
     lap.appendChild(extensions);
     QDomElement lx = doc.createElement("LX");
