@@ -1192,7 +1192,7 @@ RideFile::recalculateDerivedSeries()
         if (CP && dataPresent.watts) {
 
             // a * exp (b * exp (c * fraction of cp) ) 
-            aTISS += a * exp(b * exp(c * (double(p->watts) / double(CP))));
+            aTISS += recIntSecs_ * (a * exp(b * exp(c * (double(p->watts) / double(CP)))));
             p->atiss = aTISS;
         }
 

@@ -260,7 +260,7 @@ class aTISS : public RideMetric {
             foreach (RideFilePoint *p, r->dataPoints()) {
 
                 // a * exp (b * exp (c * fraction of cp) ) 
-                aTISS += a * exp(b * exp(c * (double(p->watts) / double(cp))));
+                aTISS += r->recIntSecs() * (a * exp(b * exp(c * (double(p->watts) / double(cp)))));
             }
         }
         setValue(aTISS);
