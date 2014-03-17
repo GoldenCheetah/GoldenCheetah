@@ -2886,7 +2886,6 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 {
                 ourCurve = new QwtPlotCurve(tr("Aerobic TISS"));
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-                ourCurve2->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
                 thereCurve = referencePlot->standard->atissCurve;
                 title = tr("Aerobic TISS");
                 }
