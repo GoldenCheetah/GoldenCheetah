@@ -2367,6 +2367,8 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
     // create a custom set of summary metric data!
     if (metricDetail.symbol.startsWith("skiba")) {
         scoreType = "skiba_bike_score";
+    } else if (metricDetail.symbol.startsWith("atiss")) {
+        scoreType = "atiss_score";
     } else if (metricDetail.symbol.startsWith("coggan")) {
         scoreType = "coggan_tss";
     } else if (metricDetail.symbol.startsWith("daniels")) {
@@ -2375,6 +2377,10 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
         scoreType = "trimp_points";
     } else if (metricDetail.symbol.startsWith("work")) {
         scoreType = "total_work";
+    } else if (metricDetail.symbol.startsWith("cp_")) {
+        scoreType = "skiba_cp_exp";
+    } else if (metricDetail.symbol.startsWith("wprime")) {
+        scoreType = "skiba_wprime_exp";
     } else if (metricDetail.symbol.startsWith("distance")) {
         scoreType = "total_distance";
     }
@@ -2411,6 +2417,12 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
             add.setForSymbol("skiba_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("skiba_sr", sc->getSRvalues()[i]);
             add.setForSymbol("skiba_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "atiss_score") {
+            add.setForSymbol("atiss_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("atiss_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("atiss_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("atiss_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("atiss_lr", sc->getLRvalues()[i]);
         } else if (scoreType == "coggan_tss") {
             add.setForSymbol("coggan_ctl", sc->getLTSvalues()[i]);
             add.setForSymbol("coggan_atl", sc->getSTSvalues()[i]);
@@ -2429,6 +2441,18 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
             add.setForSymbol("trimp_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("trimp_sr", sc->getSRvalues()[i]);
             add.setForSymbol("trimp_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "skiba_cp_exp") {
+            add.setForSymbol("cp_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("cp_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("cp_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("cp_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("cp_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "skiba_wprime_exp") {
+            add.setForSymbol("wprime_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("wprime_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("wprime_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("wprime_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("wprime_lr", sc->getLRvalues()[i]);
         } else if (scoreType == "total_work") {
             add.setForSymbol("work_lts", sc->getLTSvalues()[i]);
             add.setForSymbol("work_sts", sc->getSTSvalues()[i]);

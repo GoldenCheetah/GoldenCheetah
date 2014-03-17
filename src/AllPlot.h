@@ -296,6 +296,7 @@ class AllPlotObject : public QObject
     QVector<QwtPlotCurve*> tmpReferenceLines;
 
     QwtPlotCurve *wattsCurve;
+    QwtPlotCurve *atissCurve;
     QwtPlotCurve *npCurve;
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
@@ -319,6 +320,7 @@ class AllPlotObject : public QObject
     // source data
     QVector<double> hrArray;
     QVector<double> wattsArray;
+    QVector<double> atissArray;
     QVector<double> npArray;
     QVector<double> xpArray;
     QVector<double> apArray;
@@ -339,6 +341,7 @@ class AllPlotObject : public QObject
 
     // smoothed data
     QVector<double> smoothWatts;
+    QVector<double> smoothAT;
     QVector<double> smoothNP;
     QVector<double> smoothAP;
     QVector<double> smoothXP;
@@ -431,6 +434,7 @@ class AllPlot : public QwtPlot
         void setShowHrD(bool show);
         void setShowPower(int id);
         void setShowNP(bool show);
+        void setShowATISS(bool show);
         void setShowXP(bool show);
         void setShowAP(bool show);
         void setShowHr(bool show);
@@ -470,6 +474,7 @@ class AllPlot : public QwtPlot
         // controls
         bool shade_zones;
         int showPowerState;
+        bool showATISS;
         bool showNP;
         bool showXP;
         bool showAP;

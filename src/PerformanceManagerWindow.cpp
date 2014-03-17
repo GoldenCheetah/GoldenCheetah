@@ -52,12 +52,14 @@ PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
 
     metricCombo = new QComboBox(this);
     metricCombo->addItem(tr("Use TSS"), "coggan_tss");
+    metricCombo->addItem(tr("Use Aerobic TISS"), "atiss_score");
     metricCombo->addItem(tr("Use BikeScore"), "skiba_bike_score");
     metricCombo->addItem(tr("Use DanielsPoints"), "daniels_points");
     metricCombo->addItem(tr("Use TRIMP"), "trimp_points");
     metricCombo->addItem(tr("Use TRIMP 100"), "trimp_100_points");
     metricCombo->addItem(tr("Use Trimp Zonal"), "trimp_zonal_points");
     metricCombo->addItem(tr("Use Work (Kj)"), "total_work");
+    metricCombo->addItem(tr("Use W' Work (Kj)"), "skiba_wprime_exp");
     metricCombo->addItem(tr("Use Distance (km/mi)"), "total_distance");
     QString metricName =
         appsettings->value(this, GC_PERF_MAN_METRIC, "skiba_bike_score").toString();
