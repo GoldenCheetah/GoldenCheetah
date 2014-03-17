@@ -58,6 +58,7 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ _stackWidth WRITE setStackWidth USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
+    Q_PROPERTY(int showATISS READ isShowATISS WRITE setShowATISS USER true)
     Q_PROPERTY(int showNP READ isShowNP WRITE setShowNP USER true)
     Q_PROPERTY(int showXP READ isShowXP WRITE setShowXP USER true)
     Q_PROPERTY(int showAP READ isShowAP WRITE setShowAP USER true)
@@ -99,6 +100,7 @@ class AllPlotWindow : public GcChartWindow
         int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
+        int isShowATISS() const { return showATISS->checkState(); }
         int isShowNP() const { return showNP->checkState(); }
         int isShowXP() const { return showXP->checkState(); }
         int isShowAP() const { return showAP->checkState(); }
@@ -137,6 +139,7 @@ class AllPlotWindow : public GcChartWindow
         void setrSmoothingFromLineEdit();
         void setStackWidth(int x);
         void setShowNP(int state);
+        void setShowATISS(int state);
         void setShowXP(int state);
         void setShowAP(int state);
         void setShowSpeed(int state);
@@ -234,6 +237,7 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showFull;
         QCheckBox *paintBrush;
         QCheckBox *showAlt;
+        QCheckBox *showATISS;
         QCheckBox *showNP;
         QCheckBox *showXP;
         QCheckBox *showAP;

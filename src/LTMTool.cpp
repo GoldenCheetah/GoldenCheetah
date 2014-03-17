@@ -295,6 +295,82 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     skibaLTR.uunits = tr("Ramp");
     metrics.append(skibaLTR);
 
+    // SKIBA Aerobic TISS LTS
+    MetricDetail atissLTS;
+    atissLTS.type = METRIC_PM;
+    atissLTS.symbol = "atiss_lts";
+    atissLTS.metric = NULL; // not a factory metric
+    atissLTS.penColor = QColor(Qt::blue);
+    atissLTS.curveStyle = QwtPlotCurve::Lines;
+    atissLTS.symbolStyle = QwtSymbol::NoSymbol;
+    atissLTS.smooth = false;
+    atissLTS.trend = false;
+    atissLTS.topN = 1;
+    atissLTS.uname = atissLTS.name = tr("Aerobic TISS Long Term Stress");
+    atissLTS.units = "Stress";
+    atissLTS.uunits = tr("Stress");
+    metrics.append(atissLTS);
+
+    MetricDetail atissSTS;
+    atissSTS.type = METRIC_PM;
+    atissSTS.symbol = "atiss_sts";
+    atissSTS.metric = NULL; // not a factory metric
+    atissSTS.penColor = QColor(Qt::magenta);
+    atissSTS.curveStyle = QwtPlotCurve::Lines;
+    atissSTS.symbolStyle = QwtSymbol::NoSymbol;
+    atissSTS.smooth = false;
+    atissSTS.trend = false;
+    atissSTS.topN = 1;
+    atissSTS.uname = atissSTS.name = tr("Aerobic TISS Short Term Stress");
+    atissSTS.units = "Stress";
+    atissSTS.uunits = tr("Stress");
+    metrics.append(atissSTS);
+
+    MetricDetail atissSB;
+    atissSB.type = METRIC_PM;
+    atissSB.symbol = "atiss_sb";
+    atissSB.metric = NULL; // not a factory metric
+    atissSB.penColor = QColor(Qt::yellow);
+    atissSB.curveStyle = QwtPlotCurve::Steps;
+    atissSB.symbolStyle = QwtSymbol::NoSymbol;
+    atissSB.smooth = false;
+    atissSB.trend = false;
+    atissSB.topN = 1;
+    atissSB.uname = atissSB.name = tr("Aerobic TISS Stress Balance");
+    atissSB.units = "Stress Balance";
+    atissSB.uunits = tr("Stress Balance");
+    metrics.append(atissSB);
+
+    MetricDetail atissSTR;
+    atissSTR.type = METRIC_PM;
+    atissSTR.symbol = "atiss_sr";
+    atissSTR.metric = NULL; // not a factory metric
+    atissSTR.penColor = QColor(Qt::darkGreen);
+    atissSTR.curveStyle = QwtPlotCurve::Steps;
+    atissSTR.symbolStyle = QwtSymbol::NoSymbol;
+    atissSTR.smooth = false;
+    atissSTR.trend = false;
+    atissSTR.topN = 1;
+    atissSTR.uname = atissSTR.name = tr("Aerobic TISS STS Ramp");
+    atissSTR.units = "Ramp";
+    atissSTR.uunits = tr("Ramp");
+    metrics.append(atissSTR);
+
+    MetricDetail atissLTR;
+    atissLTR.type = METRIC_PM;
+    atissLTR.symbol = "atiss_lr";
+    atissLTR.metric = NULL; // not a factory metric
+    atissLTR.penColor = QColor(Qt::darkBlue);
+    atissLTR.curveStyle = QwtPlotCurve::Steps;
+    atissLTR.symbolStyle = QwtSymbol::NoSymbol;
+    atissLTR.smooth = false;
+    atissLTR.trend = false;
+    atissLTR.topN = 1;
+    atissLTR.uname = atissLTR.name = tr("Aerobic TISS LTS Ramp");
+    atissLTR.units = "Ramp";
+    atissLTR.uunits = tr("Ramp");
+    metrics.append(atissLTR);
+
     // DANIELS LTS
     MetricDetail danielsLTS;
     danielsLTS.type = METRIC_PM;
@@ -446,6 +522,158 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     workLTR.units = "Ramp";
     workLTR.uunits = tr("Ramp");
     metrics.append(workLTR);
+
+    // total wprime work
+    MetricDetail wPrimeWorkLTS;
+    wPrimeWorkLTS.type = METRIC_PM;
+    wPrimeWorkLTS.symbol = "wprime_lts";
+    wPrimeWorkLTS.metric = NULL; // not a factory metric
+    wPrimeWorkLTS.penColor = QColor(Qt::blue);
+    wPrimeWorkLTS.curveStyle = QwtPlotCurve::Lines;
+    wPrimeWorkLTS.symbolStyle = QwtSymbol::NoSymbol;
+    wPrimeWorkLTS.smooth = false;
+    wPrimeWorkLTS.trend = false;
+    wPrimeWorkLTS.topN = 1;
+    wPrimeWorkLTS.uname = wPrimeWorkLTS.name = tr("W' Work (Kj) Long Term Stress");
+    wPrimeWorkLTS.units = "Stress (Kj)";
+    wPrimeWorkLTS.uunits = tr("Stress (Kj)");
+    metrics.append(wPrimeWorkLTS);
+
+    MetricDetail wPrimeWorkSTS;
+    wPrimeWorkSTS.type = METRIC_PM;
+    wPrimeWorkSTS.symbol = "wprime_sts";
+    wPrimeWorkSTS.metric = NULL; // not a factory metric
+    wPrimeWorkSTS.penColor = QColor(Qt::magenta);
+    wPrimeWorkSTS.curveStyle = QwtPlotCurve::Lines;
+    wPrimeWorkSTS.symbolStyle = QwtSymbol::NoSymbol;
+    wPrimeWorkSTS.smooth = false;
+    wPrimeWorkSTS.trend = false;
+    wPrimeWorkSTS.topN = 1;
+    wPrimeWorkSTS.uname = wPrimeWorkSTS.name = tr("W' Work (Kj) Short Term Stress");
+    wPrimeWorkSTS.units = "Stress (Kj)";
+    wPrimeWorkSTS.uunits = tr("Stress (Kj)");
+    metrics.append(wPrimeWorkSTS);
+
+    MetricDetail wPrimeWorkSB;
+    wPrimeWorkSB.type = METRIC_PM;
+    wPrimeWorkSB.symbol = "wprime_sb";
+    wPrimeWorkSB.metric = NULL; // not a factory metric
+    wPrimeWorkSB.penColor = QColor(Qt::yellow);
+    wPrimeWorkSB.curveStyle = QwtPlotCurve::Steps;
+    wPrimeWorkSB.symbolStyle = QwtSymbol::NoSymbol;
+    wPrimeWorkSB.smooth = false;
+    wPrimeWorkSB.trend = false;
+    wPrimeWorkSB.topN = 1;
+    wPrimeWorkSB.uname = wPrimeWorkSB.name = tr("W' Work (Kj) Stress Balance");
+    wPrimeWorkSB.units = "Stress Balance";
+    wPrimeWorkSB.uunits = tr("Stress Balance");
+    metrics.append(wPrimeWorkSB);
+
+    MetricDetail wPrimeWorkSTR;
+    wPrimeWorkSTR.type = METRIC_PM;
+    wPrimeWorkSTR.symbol = "wprime_sr";
+    wPrimeWorkSTR.metric = NULL; // not a factory metric
+    wPrimeWorkSTR.penColor = QColor(Qt::darkGreen);
+    wPrimeWorkSTR.curveStyle = QwtPlotCurve::Steps;
+    wPrimeWorkSTR.symbolStyle = QwtSymbol::NoSymbol;
+    wPrimeWorkSTR.smooth = false;
+    wPrimeWorkSTR.trend = false;
+    wPrimeWorkSTR.topN = 1;
+    wPrimeWorkSTR.uname = wPrimeWorkSTR.name = tr("W' Work (Kj) STS Ramp");
+    wPrimeWorkSTR.units = "Ramp";
+    wPrimeWorkSTR.uunits = tr("Ramp");
+    metrics.append(wPrimeWorkSTR);
+
+    MetricDetail wPrimeWorkLTR;
+    wPrimeWorkLTR.type = METRIC_PM;
+    wPrimeWorkLTR.symbol = "wprime_lr";
+    wPrimeWorkLTR.metric = NULL; // not a factory metric
+    wPrimeWorkLTR.penColor = QColor(Qt::darkBlue);
+    wPrimeWorkLTR.curveStyle = QwtPlotCurve::Steps;
+    wPrimeWorkLTR.symbolStyle = QwtSymbol::NoSymbol;
+    wPrimeWorkLTR.smooth = false;
+    wPrimeWorkLTR.trend = false;
+    wPrimeWorkLTR.topN = 1;
+    wPrimeWorkLTR.uname = wPrimeWorkLTR.name = tr("W' Work (Kj) LTS Ramp");
+    wPrimeWorkLTR.units = "Ramp";
+    wPrimeWorkLTR.uunits = tr("Ramp");
+    metrics.append(wPrimeWorkLTR);
+
+    // total below CP work
+    MetricDetail cpWorkLTS;
+    cpWorkLTS.type = METRIC_PM;
+    cpWorkLTS.symbol = "cp_lts";
+    cpWorkLTS.metric = NULL; // not a factory metric
+    cpWorkLTS.penColor = QColor(Qt::blue);
+    cpWorkLTS.curveStyle = QwtPlotCurve::Lines;
+    cpWorkLTS.symbolStyle = QwtSymbol::NoSymbol;
+    cpWorkLTS.smooth = false;
+    cpWorkLTS.trend = false;
+    cpWorkLTS.topN = 1;
+    cpWorkLTS.uname = cpWorkLTS.name = tr("Below CP Work (Kj) Long Term Stress");
+    cpWorkLTS.units = "Stress (Kj)";
+    cpWorkLTS.uunits = tr("Stress (Kj)");
+    metrics.append(cpWorkLTS);
+
+    MetricDetail cpWorkSTS;
+    cpWorkSTS.type = METRIC_PM;
+    cpWorkSTS.symbol = "cp_sts";
+    cpWorkSTS.metric = NULL; // not a factory metric
+    cpWorkSTS.penColor = QColor(Qt::magenta);
+    cpWorkSTS.curveStyle = QwtPlotCurve::Lines;
+    cpWorkSTS.symbolStyle = QwtSymbol::NoSymbol;
+    cpWorkSTS.smooth = false;
+    cpWorkSTS.trend = false;
+    cpWorkSTS.topN = 1;
+    cpWorkSTS.uname = cpWorkSTS.name = tr("Below CP Work (Kj) Short Term Stress");
+    cpWorkSTS.units = "Stress (Kj)";
+    cpWorkSTS.uunits = tr("Stress (Kj)");
+    metrics.append(cpWorkSTS);
+
+    MetricDetail cpWorkSB;
+    cpWorkSB.type = METRIC_PM;
+    cpWorkSB.symbol = "cp_sb";
+    cpWorkSB.metric = NULL; // not a factory metric
+    cpWorkSB.penColor = QColor(Qt::yellow);
+    cpWorkSB.curveStyle = QwtPlotCurve::Steps;
+    cpWorkSB.symbolStyle = QwtSymbol::NoSymbol;
+    cpWorkSB.smooth = false;
+    cpWorkSB.trend = false;
+    cpWorkSB.topN = 1;
+    cpWorkSB.uname = cpWorkSB.name = tr("Below CP Work (Kj) Stress Balance");
+    cpWorkSB.units = "Stress Balance";
+    cpWorkSB.uunits = tr("Stress Balance");
+    metrics.append(cpWorkSB);
+
+    MetricDetail cpWorkSTR;
+    cpWorkSTR.type = METRIC_PM;
+    cpWorkSTR.symbol = "cp_sr";
+    cpWorkSTR.metric = NULL; // not a factory metric
+    cpWorkSTR.penColor = QColor(Qt::darkGreen);
+    cpWorkSTR.curveStyle = QwtPlotCurve::Steps;
+    cpWorkSTR.symbolStyle = QwtSymbol::NoSymbol;
+    cpWorkSTR.smooth = false;
+    cpWorkSTR.trend = false;
+    cpWorkSTR.topN = 1;
+    cpWorkSTR.uname = cpWorkSTR.name = tr("Below CP Work (Kj) STS Ramp");
+    cpWorkSTR.units = "Ramp";
+    cpWorkSTR.uunits = tr("Ramp");
+    metrics.append(cpWorkSTR);
+
+    MetricDetail cpWorkLTR;
+    cpWorkLTR.type = METRIC_PM;
+    cpWorkLTR.symbol = "cp_lr";
+    cpWorkLTR.metric = NULL; // not a factory metric
+    cpWorkLTR.penColor = QColor(Qt::darkBlue);
+    cpWorkLTR.curveStyle = QwtPlotCurve::Steps;
+    cpWorkLTR.symbolStyle = QwtSymbol::NoSymbol;
+    cpWorkLTR.smooth = false;
+    cpWorkLTR.trend = false;
+    cpWorkLTR.topN = 1;
+    cpWorkLTR.uname = cpWorkLTR.name = tr("Below CP Work (Kj) LTS Ramp");
+    cpWorkLTR.units = "Ramp";
+    cpWorkLTR.uunits = tr("Ramp");
+    metrics.append(cpWorkLTR);
 
     // total distance
     MetricDetail distanceLTS;

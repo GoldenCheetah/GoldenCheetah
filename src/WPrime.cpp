@@ -735,6 +735,45 @@ class WPrimeExp : public RideMetric {
     RideMetric *clone() const { return new WPrimeExp(*this); }
 };
 
+class CPExp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(CPExp);
+
+    public:
+
+    CPExp()
+    {
+        setSymbol("skiba_cp_exp");
+        setInternalName("Below CP Work");
+    }
+    void initialize() {
+        setName(tr("Below CP Work"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("kJ"));
+        setImperialUnits(tr("kJ"));
+        setPrecision(0);
+    }
+    void compute(const RideFile *r, const Zones *zones, int zonerange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        int cp = r->getTag("CP","0").toInt();
+        if (!cp && zones && zonerange >=0) cp = zones->getCP(zonerange);
+
+        double total = 0;
+        double secs = 0;
+        foreach(const RideFilePoint *point, r->dataPoints()) {
+            if (cp && point->watts <= cp) total += r->recIntSecs() * point->watts;
+            secs += r->recIntSecs();
+        }
+        setValue(total/1000.00f);
+        setCount(secs);
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new CPExp(*this); }
+};
+
 // add to catalogue
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
@@ -742,6 +781,7 @@ static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MaxMatch());
     RideMetricFactory::instance().addMetric(WPrimeTau());
     RideMetricFactory::instance().addMetric(WPrimeExp());
+    RideMetricFactory::instance().addMetric(CPExp());
     return true;
 }
 

@@ -61,14 +61,14 @@ struct RideFileDataPresent
     bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance, interval;
 
     // derived
-    bool np,xp,apower,wprime;
+    bool np,xp,apower,wprime,atiss;
 
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), lrbalance(false), interval(false),
-        np(false), xp(false), apower(false), wprime(false) {}
+        np(false), xp(false), apower(false), wprime(false), atiss(false) {}
 };
 
 struct RideFileInterval
@@ -116,8 +116,7 @@ class RideFile : public QObject // QObject to emit signals
         virtual ~RideFile();
 
         // Working with DATASERIES
-        enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd, alt, lon, lat, headwind, slope, temp, 
-                          interval, NP, xPower, vam, wattsKg, lrbalance, aPower, wprime, none };
+        enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd, alt, lon, lat, headwind, slope, temp, interval, NP, xPower, vam, wattsKg, lrbalance, aPower, wprime, aTISS, none };
         enum specialValues { noTemp = -255 };
 
         typedef enum seriestype SeriesType;
@@ -285,19 +284,24 @@ struct RideFilePoint
 
     // derived data (we calculate it)
     // xPower, normalised power, aPower
-    double xp, np, apower;
+    double xp, np, apower, atiss;
 
     // create blank point
-    RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
-        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(-255.0), lrbalance(0), hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(0), xp(0), np(0), apower(0) {}
+    RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), nm(0.0), 
+                      watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), 
+                      slope(0.0), temp(-255.0), lrbalance(0), hrd(0.0), cadd(0.0), 
+                      kphd(0.0), nmd(0.0), wattsd(0.0), interval(0), xp(0), np(0), 
+                      apower(0), atiss(0.0) {} 
 
     // create point supplying all values
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
                   double nm, double watts, double alt, double lon, double lat,
                   double headwind, double slope, double temp, double lrbalance, int interval) :
-        secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
-        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), slope(slope), temp(temp), lrbalance(lrbalance), 
-        hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(interval), xp(0), np(0), apower(0) {}
+
+        secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), watts(watts), alt(alt), lon(lon), 
+        lat(lat), headwind(headwind), slope(slope), temp(temp), lrbalance(lrbalance), 
+        hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(interval), 
+        xp(0), np(0), apower(0), atiss(0.0) {}
 
     // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;

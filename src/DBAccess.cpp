@@ -82,8 +82,10 @@
 // 61  15  Feb 2014 Mark Liversedge    Fixed W' Work (for recintsecs not 1s!).
 // 62  06  Mar 2014 Mark Liversedge    Fixed Fatigue Index to find peak then watch for decay, primarily useful in sprint intervals
 // 63  06  Mar 2014 Mark Liversedge    Added Pacing Index AP as %age of Max Power
+// 64  17  Mar 2014 Mark Liversedge    Added W' and CP work to PMC metrics
+// 65  17  Mar 2014 Mark Liversedge    Added Aerobic TISS prototype
 
-int DBSchemaVersion = 63;
+int DBSchemaVersion = 65;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
