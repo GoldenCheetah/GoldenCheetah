@@ -1038,8 +1038,8 @@ RideFile::recalculateDerivedSeries()
 
     // aTISS - Aerobic Training Impact Scoring System
     static const double a = 0.663788683661645f;
-    static const double b = -7.5095428451195;
-    static const double c = -0.86118031563782;
+    static const double b = -7.5095428451195f;
+    static const double c = -0.86118031563782f;
     static const double t = 2;
     int CP = 0;
     int WPRIME = 0;
@@ -1156,20 +1156,20 @@ RideFile::recalculateDerivedSeries()
 
             dataPresent.apower = true;
 
-            static const double a0  = -174.1448622;
-            static const double a1  = 1.0899959;
-            static const double a2  = -0.0015119;
-            static const double a3  = 7.2674E-07;
-            static const double E = 2.71828183;
+            static const double a0  = -174.1448622f;
+            static const double a1  = 1.0899959f;
+            static const double a2  = -0.0015119f;
+            static const double a3  = 7.2674E-07f;
+            static const double E = 2.71828183f;
 
             if (p->alt > 0) {
                 // pbar [mbar]= 0.76*EXP( -alt[m] / 7000 )*1000 
-                double pbar = 0.76 * pow(E, p->alt / 7000) * 1000;
+                double pbar = 0.76f * exp(p->alt / -7000.00f) * 1000.00f;
 
                 // %Vo2max= a0 + a1 * pbar + a2 * pbar ^2 + a3 * pbar ^3 (with pbar in mbar)
                 double vo2maxPCT = a0 + (a1 * pbar) + (a2 * pow(pbar,2)) + (a3 * pow(pbar,3)); 
 
-                p->apower = (p->watts / 100) * vo2maxPCT;
+                p->apower = double(p->watts / vo2maxPCT) * 100;
 
             } else {
 
