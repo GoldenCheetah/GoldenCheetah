@@ -84,6 +84,7 @@
 // 63  06  Mar 2014 Mark Liversedge    Added Pacing Index AP as %age of Max Power
 // 64  17  Mar 2014 Mark Liversedge    Added W' and CP work to PMC metrics
 // 65  17  Mar 2014 Mark Liversedge    Added Aerobic TISS prototype
+// 66  18  Mar 2014 Mark Liversedge    Updated aPower calculation
 
 int DBSchemaVersion = 65;
 
