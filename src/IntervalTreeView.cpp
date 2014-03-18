@@ -18,6 +18,8 @@
 
 #include "IntervalTreeView.h"
 #include "IntervalItem.h"
+#include "RideItem.h"
+#include "RideFile.h"
 #include "Context.h"
 
 
@@ -29,7 +31,22 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    setStyleSheet("QTreeView::item:hover { background: lightGray; }");
+    setMouseTracking(true);
     invisibleRootItem()->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+    connect(this, SIGNAL(itemEntered(QTreeWidgetItem*,int)), this, SLOT(mouseHover(QTreeWidgetItem*,int)));
+}
+
+void 
+IntervalTreeView::mouseHover(QTreeWidgetItem *item, int column)
+{
+    int index = invisibleRootItem()->indexOfChild(item);
+    if (index >=0 && context->rideItem() && context->rideItem()->ride() &&
+        context->rideItem()->ride()->intervals().count() > index) {
+
+        context->notifyIntervalHover(context->rideItem()->ride()->intervals()[index]);
+    }
 }
 
 void
