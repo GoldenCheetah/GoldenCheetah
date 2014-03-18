@@ -57,6 +57,7 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     shadeMode(2),
     shadeIntervals(true),
     rangemode(rangemode),
+    showPercent(false),
     showHeat(false),
     showHeatByDate(false)
 {
@@ -83,6 +84,14 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     setAxisTitle(yLeft, tr("Average Power (watts)"));
     setAxisMaxMinor(yLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
+
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    setAxisScaleDraw(yRight, sd);
+    setAxisTitle(yRight, tr("Percent of Best"));
+    setAxisMaxMinor(yRight, 0);
 
     //grid = new QwtPlotGrid();
     //grid->enableX(true);
@@ -123,6 +132,7 @@ CpintPlot::configChanged()
 
     axisWidget(QwtPlot::xBottom)->setPalette(palette);
     axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    axisWidget(QwtPlot::yRight)->setPalette(palette);
 
     setCanvasBackground(GColor(CPLOTBACKGROUND));
     //QPen gridPen(GColor(CPLOTGRID));
@@ -841,6 +851,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             ymax = 5 * ceil(power_values[0] / 5);
     }
     thisPlot->setAxisScale(thisPlot->yLeft, 0, ymax);
+    thisPlot->setAxisScale(thisPlot->yRight, 0, 100); // always 100
 }
 
 void
@@ -1064,6 +1075,9 @@ CpintPlot::calculate(RideItem *rideItem)
 
                 thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
                 thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                thisCurve->setYAxis(yLeft);
+                thisCurve->setBrush(QBrush(Qt::NoBrush));
+                setAxisVisible(yRight, false);
                 QPen black;
                 black.setColor(GColor(CRIDECP));
                 double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
@@ -1084,9 +1098,33 @@ CpintPlot::calculate(RideItem *rideItem)
 
                 } else {
 
-                    // normal
-                    thisCurve->setSamples(timeArray.data() + 1,
-                    current->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
+                    if (showPercent && bests) {
+
+                        thisCurve->setYAxis(yRight);
+                        //QColor p = GColor(CRIDECP);
+                        //p.setAlpha(64);
+                        //thisCurve->setBrush(QBrush(p));
+                        setAxisVisible(yRight, true);
+
+                        QVector<double> samples(timeArray.size());
+
+                        for(int i=0; i <samples.size() && i < current->meanMaxArray(rideSeries).size() &&
+                                     i <bests->meanMaxArray(rideSeries).size(); i++) {
+
+                            samples[i] = current->meanMaxArray(rideSeries)[i] /
+                                         bests->meanMaxArray(rideSeries)[i] * 100.00f;
+                        }
+                        thisCurve->setSamples(timeArray.data() + 1, samples.data() + 1, maxNonZero -1);
+
+                    } else {
+
+                        thisCurve->setYAxis(yLeft);
+                        setAxisVisible(yRight, false);
+
+                        // normal
+                        thisCurve->setSamples(timeArray.data() + 1,
+                        current->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
+                    }
                 }
             }
         }
@@ -1161,6 +1199,12 @@ void
 CpintPlot::setShowHeat(bool x)
 {
     showHeat = x;
+}
+
+void
+CpintPlot::setShowPercent(bool x)
+{
+    showPercent = x;
 }
 
 void

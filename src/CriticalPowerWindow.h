@@ -47,6 +47,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
+    Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
 
     // for retro compatibility
     Q_PROPERTY(QString season READ season WRITE setSeason USER true)
@@ -184,6 +185,9 @@ class CriticalPowerWindow : public GcChartWindow
         bool showHeatByDate() { return showHeatByDateCheck->isChecked(); }
         void setShowHeatByDate(bool x) { return showHeatByDateCheck->setChecked(x); }
 
+        bool showPercent() { return showPercentCheck->isChecked(); }
+        void setShowPercent(bool x) { return showPercentCheck->setChecked(x); }
+
     protected slots:
         void forceReplot();
         void newRideAdded(RideItem*);
@@ -197,6 +201,7 @@ class CriticalPowerWindow : public GcChartWindow
         void shadingSelected(int shading);
         void showHeatChanged(int check);
         void showHeatByDateChanged(int check);
+        void showPercentChanged(int check);
         void shadeIntervalsChanged(int state);
         void setRidePlotStyle(int index);
         void setSeries(int index);
@@ -238,6 +243,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *shadeIntervalsCheck;
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
+        QCheckBox *showPercentCheck;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;

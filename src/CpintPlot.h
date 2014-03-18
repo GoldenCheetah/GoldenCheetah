@@ -131,6 +131,7 @@ class CpintPlot : public QwtPlot
         void plot_interval(CpintPlot *plot, QVector<double> vector, QColor plotColor);
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
+        void setShowPercent(bool x);
         void setShowHeat(bool x);
         void setShowHeatByDate(bool x);
         void setShadeMode(int x);
@@ -187,6 +188,7 @@ class CpintPlot : public QwtPlot
         int shadeMode;
         bool shadeIntervals;
         bool rangemode;
+        bool showPercent;
         bool showHeat;
         bool showHeatByDate;
 
