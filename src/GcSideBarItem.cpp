@@ -314,7 +314,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     titleLayout->addStretch();
 
     if (mid) titleLayout->addWidget(mid);
-    titleLayout->addStretch();
+    //titleLayout->addStretch();
 
     if (right) titleLayout->addWidget(right);
     setCursor(Qt::ArrowCursor);

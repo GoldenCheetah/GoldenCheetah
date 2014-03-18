@@ -28,6 +28,9 @@
 #include "HomeWindow.h"
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
+#ifdef Q_OS_MAC
+#include "QtMacButton.h"
+#endif
 
 class Tab;
 class ViewSplitter;
@@ -148,15 +151,24 @@ public:
 
 protected:
     QSplitterHandle *createHandle() {
-        return new GcSplitterHandle(name, orientation, newclear(), NULL, newtoggle(), this);
+        return new GcSplitterHandle(name, orientation, NULL, newclear(), newtoggle(), this);
     }
     int handleWidth() { return 23; };
 
+#ifdef Q_OS_MAC
+    QtMacButton *newclear() {
+        if (clearbutton) delete clearbutton; // we only need one!
+        clearbutton = new QtMacButton("Clear", this);
+        clearbutton->setFixedWidth(60);
+        clearbutton->setFixedHeight(20);
+        clearbutton->setFocusPolicy(Qt::NoFocus);
+        connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
+        return clearbutton;
+    }
+#else
     QPushButton *newclear() {
         if (clearbutton) delete clearbutton; // we only need one!
         clearbutton = new QPushButton("Clear", this);
-        clearbutton->setCheckable(true);
-        clearbutton->setChecked(false);
         clearbutton->setFixedWidth(60);
         clearbutton->setFixedHeight(20);
         clearbutton->setFocusPolicy(Qt::NoFocus);
@@ -164,6 +176,20 @@ protected:
 
         return clearbutton;
     }
+#endif
+
+#ifdef Q_OS_MAC
+    QtMacButton *newtoggle() {
+        if (toggle) delete toggle; // we only need one!
+        toggle = new QtMacButton("OFF", this);
+        toggle->setFixedWidth(40);
+        toggle->setFixedHeight(20);
+        toggle->setFocusPolicy(Qt::NoFocus);
+        connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
+
+        return toggle;
+    }
+#else
     QPushButton *newtoggle() {
         if (toggle) delete toggle; // we only need one!
         toggle = new QPushButton("OFF", this);
@@ -176,6 +202,7 @@ protected:
 
         return toggle;
     }
+#endif
     virtual void dragEnterEvent(QDragEnterEvent *event) {
 
         // we handle intervals or seasons
@@ -261,7 +288,11 @@ private:
     QString name;
     TabView *tabView;
     bool showForDrag;
+#ifdef Q_OS_MAC
+    QtMacButton *toggle, *clearbutton;
+#else
     QPushButton *toggle, *clearbutton;
+#endif
 };
 
 #endif // _GC_TabView_h

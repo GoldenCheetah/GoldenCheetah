@@ -51,6 +51,7 @@ public:
     };
 
     explicit QtMacButton(QWidget *parent, BezelStyle bezelStyle = Rounded);
+    explicit QtMacButton(QString text, QWidget *parent);
 
 public slots:
     void setText(const QString &text);
