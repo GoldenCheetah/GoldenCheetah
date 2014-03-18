@@ -182,6 +182,7 @@ GcWindow::GcWindow()
     menuButton->setStyleSheet("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; }");
     //menuButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
     menuButton->setText(tr("More..."));
+    menuButton->setFocusPolicy(Qt::NoFocus);
     //menuButton->setArrowType(Qt::NoArrow);
     //menuButton->setPopupMode(QPushButton::InstantPopup);
 
@@ -215,6 +216,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     // make sure its underneath the toggle button
     menuButton = new QPushButton(this);
     menuButton->setStyleSheet("QPushButton::menu-indicator { image: none; } QPushButton { border: 0px; padding: 0px; }");
+    menuButton->setFocusPolicy(Qt::NoFocus);
     //menuButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
     menuButton->setText(tr("More..."));
     //menuButton->setArrowType(Qt::NoArrow);

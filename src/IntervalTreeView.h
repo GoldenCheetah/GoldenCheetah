@@ -36,13 +36,13 @@ class IntervalTreeView : public QTreeWidget
         QStringList mimeTypes () const;
         QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
 
+    private slots:
+        void mouseHover(QTreeWidgetItem *item, int column);
+
     protected:
         Context *context;
 
         void dropEvent(QDropEvent* event);
-
-
-
 
 };
 #endif // _GC_IntervalTreeView_h
