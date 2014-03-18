@@ -210,6 +210,24 @@ public:
 }
 @end
 
+QtMacButton::QtMacButton(QString text, QWidget *parent) : QWidget(parent)
+{
+    setContentsMargins(0,0,0,0);
+
+    NSButton *button = [[[NSButton alloc] init] autorelease];
+    qtw = new QtMacButtonWidget(this, button, QtMacButton::TexturedRounded);
+    setText(text);
+    QtMacButtonTarget *target = [[QtMacButtonTarget alloc] init];
+    target->qtw = qtw;
+
+    [button setShowsBorderOnlyWhileMouseInside:true ];
+    [button setFont:[NSFont fontWithName:@"Helvetica" size:12]];
+    [button setTarget:target];
+
+    [button setAction:@selector(clicked)];
+    setupLayout(button, this);
+}
+
 QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(parent), width(-1)
 {
     setContentsMargins(0,0,0,0);
