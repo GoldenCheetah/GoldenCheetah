@@ -39,6 +39,7 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
     setBottom(new ComparePane(context, this, ComparePane::interval));
 
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
+    connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
 }
 
 RideNavigator *AnalysisView::rideNavigator()
@@ -138,6 +139,7 @@ HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context
     connect(s, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
+    connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
 }
 
 HomeView::~HomeView()

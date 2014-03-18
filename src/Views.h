@@ -101,7 +101,6 @@ class HomeView : public TabView
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);
-
 };
 
 #endif // _GC_Views_h

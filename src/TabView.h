@@ -143,21 +143,34 @@ public:
         QSplitter(orientation, parent), orientation(orientation), name(name), tabView(parent), showForDrag(false) {
         setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
-        toggle=NULL;
+        clearbutton=toggle=NULL;
     }
 
 protected:
     QSplitterHandle *createHandle() {
-        return new GcSplitterHandle(name, orientation, NULL, NULL, newtoggle(), this);
+        return new GcSplitterHandle(name, orientation, newclear(), NULL, newtoggle(), this);
     }
     int handleWidth() { return 23; };
 
+    QPushButton *newclear() {
+        if (clearbutton) delete clearbutton; // we only need one!
+        clearbutton = new QPushButton("Clear", this);
+        clearbutton->setCheckable(true);
+        clearbutton->setChecked(false);
+        clearbutton->setFixedWidth(60);
+        clearbutton->setFixedHeight(20);
+        clearbutton->setFocusPolicy(Qt::NoFocus);
+        connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
+
+        return clearbutton;
+    }
     QPushButton *newtoggle() {
         if (toggle) delete toggle; // we only need one!
         toggle = new QPushButton("OFF", this);
         toggle->setCheckable(true);
         toggle->setChecked(false);
         toggle->setFixedWidth(40);
+        toggle->setFixedHeight(20);
         toggle->setFocusPolicy(Qt::NoFocus);
         connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
 
@@ -219,6 +232,7 @@ public:
 
 signals:
     void compareChanged(bool);
+    void compareClear();
 
 public slots:
     void toggled() {
@@ -237,12 +251,17 @@ public slots:
         // we started compare mode
         emit compareChanged(toggle->isChecked());
     }
+
+    void clearClicked() {
+        emit compareClear();
+    }
+
 private:
     Qt::Orientation orientation;
     QString name;
     TabView *tabView;
     bool showForDrag;
-    QPushButton *toggle;
+    QPushButton *toggle, *clearbutton;
 };
 
 #endif // _GC_TabView_h
