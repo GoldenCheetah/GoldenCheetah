@@ -184,6 +184,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    showPercentCheck = new QCheckBox(this);
+    showPercentCheck->setChecked(false); // default off
+    QLabel *percentify = new QLabel(tr("Show as percentage"));
+    cl->addRow(percentify, showPercentCheck);
+
     showHeatCheck = new QCheckBox(this);
     showHeatCheck->setChecked(false); // default off
     QLabel *heaties = new QLabel(tr("Show curve heat"));
@@ -371,6 +376,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
+    connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -1178,6 +1184,16 @@ CriticalPowerWindow::shadingSelected(int shading)
 }
 
 void
+CriticalPowerWindow::showPercentChanged(int state)
+{
+    cpintPlot->setShowPercent(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpintPlot->calculate(currentRide);
+}
+
+void
 CriticalPowerWindow::showHeatChanged(int state)
 {
     cpintPlot->setShowHeat(state);
@@ -1186,6 +1202,7 @@ CriticalPowerWindow::showHeatChanged(int state)
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
 }
+
 
 void
 CriticalPowerWindow::showHeatByDateChanged(int state)
