@@ -42,7 +42,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
-    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false)
+    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false), hoverCurve(NULL)
 {
     //
     // reveal controls widget
@@ -342,6 +342,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
         connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
+        connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));  
 
         // Compare
         connect(context, SIGNAL(compareIntervalsStateChanged(bool)), SLOT(forceReplot()));
@@ -649,6 +650,69 @@ CriticalPowerWindow::intervalSelected()
         }
     }
     cpintPlot->replot();
+}
+
+// user hovered over an interval
+void
+CriticalPowerWindow::intervalHover(RideFileInterval x)
+{
+    // ignore in compare mode
+    if (!amVisible() || context->isCompareIntervals) return;
+
+    // only one interval can be hovered at any one time
+    // so we always use the same curve to ensure we don't leave
+    // any nasty artefacts behind. And its always gray :)
+
+    // first lets see what interval this actually is?
+    IntervalItem *current=NULL;
+    int index = -1;
+
+    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
+        current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
+        if (current != NULL) {
+            // is this the one ?
+            if (x.start == current->start && x.stop == current->stop) {
+                index = i;
+                break;
+            }
+        }
+    }
+
+    if (index >=0) {
+
+        // lazy for now just reuse existing
+        if (intervalCurves[index] == NULL) {
+
+            // get the data setup
+            showIntervalCurve(current, index); // set it all up
+            hideIntervalCurve(index); // in case its shown at present
+        }
+
+        // wipe what we have
+        if (hoverCurve != NULL) {
+            hoverCurve->detach();
+            delete hoverCurve;
+            hoverCurve = NULL;
+        }
+
+        // clone the data
+        QVector<QPointF> array;
+        for (size_t i=0; i<intervalCurves[index]->data()->size(); i++) array << intervalCurves[index]->data()->sample(i);
+
+        QPen pen(Qt::white);
+        double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+        pen.setWidth(width);
+
+        // create the hover curve
+        hoverCurve = new QwtPlotCurve("Interval");
+        hoverCurve->setPen(pen);
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        hoverCurve->attach(cpintPlot);
+        hoverCurve->setYAxis(QwtPlot::yLeft);
+        hoverCurve->setSamples(array);
+        hoverCurve->setVisible(true);
+        cpintPlot->replot();
+    }
 }
 
 void

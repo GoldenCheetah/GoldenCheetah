@@ -197,6 +197,7 @@ class CriticalPowerWindow : public GcChartWindow
         void configChanged();
         void intervalSelected();
         void intervalsChanged();
+        void intervalHover(RideFileInterval);
         void seasonSelected(int season);
         void shadingSelected(int shading);
         void showHeatChanged(int check);
@@ -276,6 +277,7 @@ class CriticalPowerWindow : public GcChartWindow
 
         DateSettingsEdit *dateSetting;
         bool active; // when resetting parameters
+        QwtPlotCurve *hoverCurve;
 };
 
 #endif // _GC_CriticalPowerWindow_h
