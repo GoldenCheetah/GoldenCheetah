@@ -69,7 +69,7 @@ GcWindowRegistry::initialize()
 {
   static GcWindowRegistry GcWindowsInit[30] = {
     // name                     GcWinID
-    { VIEW_HOME|VIEW_DIARY, tr("Long Term Metrics"),GcWindowTypes::LTM },
+    { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
     { VIEW_HOME, tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
