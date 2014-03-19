@@ -59,7 +59,8 @@ CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool range
     rangemode(rangemode),
     showPercent(false),
     showHeat(false),
-    showHeatByDate(false)
+    showHeatByDate(false),
+    ridePlotStyle(0)
 {
     setAutoFillBackground(true);
 
