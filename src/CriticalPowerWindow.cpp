@@ -836,6 +836,13 @@ CriticalPowerWindow::rideSelected()
             }
         }
 
+        // clear the hover curve
+        if (hoverCurve) {
+            hoverCurve->detach();
+            delete hoverCurve;
+            hoverCurve = NULL;
+        }
+
         // clear, resize to interval count and set to null
         intervalCurves.clear();
         for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
