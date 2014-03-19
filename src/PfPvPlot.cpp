@@ -144,7 +144,7 @@ public:
 
 
 PfPvPlot::PfPvPlot(Context *context)
-    : rideItem (NULL), context(context), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
+    : rideItem (NULL), context(context), hover(NULL), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
@@ -218,7 +218,7 @@ PfPvPlot::configChanged()
     // frame with inverse of background
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
-    sym->setSize(6);
+    sym->setSize(4);
     sym->setPen(QPen(Qt::red));
     sym->setBrush(QBrush(Qt::red));
     curve->setSymbol(sym);
@@ -482,7 +482,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(6);
+            sym->setSize(4);
             sym->setPen(QPen(Qt::red));
             sym->setBrush(QBrush(Qt::red));
             curve->setSymbol(sym);
@@ -502,6 +502,55 @@ PfPvPlot::setData(RideItem *_rideItem)
     }
 
     replot();
+}
+
+void
+PfPvPlot::intervalHover(RideFileInterval x)
+{
+    if (!isVisible()) return;
+    if (context->isCompareIntervals) return;
+    if (!rideItem) return;
+    if (!rideItem->ride());
+
+    // zap the old one
+    if (hover) {
+        hover->detach();
+        delete hover;
+        hover = NULL;
+    }
+
+    // collect the data
+    QVector<double> aepfArray, cpvArray;
+    foreach(const RideFilePoint *p1, rideItem->ride()->dataPoints()) {
+
+        if (p1->secs < x.start || p1->secs > x.stop) continue;
+
+        if (p1->watts != 0 && p1->cad != 0) {
+            double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+            double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+            aepfArray << aepf;
+            cpvArray << cpv;
+        }
+    }
+
+    // any data ?
+    if (aepfArray.size()) {
+        QwtSymbol *sym = new QwtSymbol;
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(4);
+        sym->setPen(QPen(Qt::gray));
+        sym->setBrush(QBrush(Qt::gray));
+
+        hover = new QwtPlotCurve();
+        hover->setSymbol(sym);
+        hover->setStyle(QwtPlotCurve::Dots);
+        hover->setRenderHint(QwtPlotItem::RenderAntialiased);
+        hover->setSamples(cpvArray, aepfArray);
+        hover->attach(this);
+    }
+
+    replot(); // refresh
 }
 
 void
@@ -627,7 +676,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(6);
+                sym->setSize(4);
                 sym->setBrush(QBrush(Qt::NoBrush));
 
                 QPen pen;
@@ -1081,7 +1130,7 @@ PfPvPlot::showCompareIntervals()
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(6);
+            sym->setSize(4);
             sym->setBrush(QBrush(Qt::NoBrush));
 
             QPen pen;

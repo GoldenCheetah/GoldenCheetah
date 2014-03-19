@@ -21,6 +21,7 @@
 #include "Athlete.h"
 #include "PfPvPlot.h"
 #include "RideItem.h"
+#include "RideFile.h"
 #include "Settings.h"
 #include "Colors.h"
 #include <QtGui>
@@ -166,36 +167,25 @@ PfPvWindow::PfPvWindow(Context *context) :
     cl->addWidget(frameIntervalPfPvCheckBox);
     cl->addStretch();
 
-    connect(pfPvPlot, SIGNAL(changedCP(const QString&)),
-            qaCPValue, SLOT(setText(const QString&)) );
-    connect(pfPvPlot, SIGNAL(changedCAD(const QString&)),
-            qaCadValue, SLOT(setText(const QString&)) );
-    connect(pfPvPlot, SIGNAL(changedCL(const QString&)),
-            qaClValue, SLOT(setText(const QString&)) );
-    connect(qaCPValue, SIGNAL(editingFinished()),
-	    this, SLOT(setQaCPFromLineEdit()));
-    connect(qaCadValue, SIGNAL(editingFinished()),
-	    this, SLOT(setQaCADFromLineEdit()));
-    connect(qaClValue, SIGNAL(editingFinished()),
-	    this, SLOT(setQaCLFromLineEdit()));
-    connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
-            this, SLOT(setShadeZonesPfPvFromCheckBox()));
-    connect(rShade, SIGNAL(stateChanged(int)),
-            this, SLOT(setrShadeZonesPfPvFromCheckBox()));
-    connect(mergeIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
-                this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
-    connect(rMergeInterval, SIGNAL(stateChanged(int)),
-                this, SLOT(setrMergeIntervalsPfPvFromCheckBox()));
-    connect(frameIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
-                this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
-    connect(rFrameInterval, SIGNAL(stateChanged(int)),
-                this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
+    connect(pfPvPlot, SIGNAL(changedCP(const QString&)), qaCPValue, SLOT(setText(const QString&)) );
+    connect(pfPvPlot, SIGNAL(changedCAD(const QString&)), qaCadValue, SLOT(setText(const QString&)) );
+    connect(pfPvPlot, SIGNAL(changedCL(const QString&)), qaClValue, SLOT(setText(const QString&)) );
+    connect(qaCPValue, SIGNAL(editingFinished()), this, SLOT(setQaCPFromLineEdit()));
+    connect(qaCadValue, SIGNAL(editingFinished()), this, SLOT(setQaCADFromLineEdit()));
+    connect(qaClValue, SIGNAL(editingFinished()), this, SLOT(setQaCLFromLineEdit()));
+    connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setShadeZonesPfPvFromCheckBox()));
+    connect(rShade, SIGNAL(stateChanged(int)), this, SLOT(setrShadeZonesPfPvFromCheckBox()));
+    connect(mergeIntervalPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
+    connect(rMergeInterval, SIGNAL(stateChanged(int)), this, SLOT(setrMergeIntervalsPfPvFromCheckBox()));
+    connect(frameIntervalPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
+    connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
 
     // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
@@ -252,6 +242,12 @@ PfPvWindow::rideSelected()
 
     // update the QLabel widget with the CP value set in PfPvPlot::setData()
     qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+}
+
+void
+PfPvWindow::intervalHover(RideFileInterval x)
+{
+    pfPvPlot->intervalHover(x);
 }
 
 void
