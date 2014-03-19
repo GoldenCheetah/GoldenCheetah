@@ -678,7 +678,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         }
     }
 
-    if (index >=0) {
+    if (index >=0 && index <= intervalCurves.count()) {
 
         // lazy for now just reuse existing
         if (intervalCurves[index] == NULL) {
@@ -699,7 +699,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         QVector<QPointF> array;
         for (size_t i=0; i<intervalCurves[index]->data()->size(); i++) array << intervalCurves[index]->data()->sample(i);
 
-        QPen pen(Qt::white);
+        QPen pen(Qt::gray);
         double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
         pen.setWidth(width);
 
