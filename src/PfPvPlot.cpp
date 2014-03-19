@@ -421,6 +421,13 @@ PfPvPlot::setData(RideItem *_rideItem)
     }
     intervalCurves.clear();
 
+    // clear the hover curve
+    if (hover) {
+        hover->detach();
+        delete hover;
+        hover = NULL;
+    }
+
     rideItem = _rideItem;
     RideFile *ride = rideItem->ride();
 
