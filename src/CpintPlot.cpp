@@ -703,6 +703,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // lets work out how we are shading it
     switch(shadeMode) {
         case 0 : // not shading!!
+            shadingCP = 0;
             break;
 
         case 1 : // value for current date
@@ -928,6 +929,7 @@ CpintPlot::calculate(RideItem *rideItem)
             for (int i = 0; i < bests->meanMaxArray(rideSeries).size(); ++i) {
                 if (bests->meanMaxArray(rideSeries)[i] > 0) maxNonZero = i;
             }
+qDebug()<<"allplot point 1";
             plot_allCurve(this, maxNonZero, bests->meanMaxArray(rideSeries).constData() + 1, GColor(CCP), false);
         }
     } else {
@@ -1583,6 +1585,7 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 }
                 if (i>0) shadeMode = 0;
 
+qDebug()<<"allplot point 2";
                 plot_allCurve(this, maxNonZero, cache->meanMaxArray(rideSeries).constData() + 1, range.color, true);
 
                 foreach(double v, cache->meanMaxArray(rideSeries)) {
