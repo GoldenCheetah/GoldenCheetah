@@ -19,6 +19,7 @@
 #ifndef _GC_PfPvWindow_h
 #define _GC_PfPvWindow_h 1
 #include "GoldenCheetah.h"
+#include "RideFile.h"
 
 #include <QtGui>
 #include <QLineEdit>
@@ -90,6 +91,7 @@ class PfPvWindow : public GcChartWindow
 
         void rideSelected();
         void intervalSelected();
+        void intervalHover(RideFileInterval);
         void zonesChanged();
 
     protected slots:

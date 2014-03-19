@@ -20,13 +20,13 @@
 #ifndef _GC_QaPlot_h
 #define _GC_QaPlot_h 1
 #include "GoldenCheetah.h"
+#include "RideFile.h"
 
 #include <qwt_plot.h>
 #include <qwt_point_3d.h>
 #include <qwt_compat.h>
 
 // forward references
-class RideFile;
 class RideItem;
 struct RideFilePoint;
 class QwtPlotCurve;
@@ -76,6 +76,7 @@ class PfPvPlot : public QwtPlot
 
     public slots:
         void configChanged();
+        void intervalHover(RideFileInterval);
 
     signals:
         void changedCP( const QString& );
@@ -90,6 +91,7 @@ class PfPvPlot : public QwtPlot
 
         Context *context;
         QwtPlotCurve *curve;
+        QwtPlotCurve *hover;
         QList <QwtPlotCurve *> intervalCurves;
         QwtPlotCurve *cpCurve;
         QList <QwtPlotCurve *> zoneCurves;
