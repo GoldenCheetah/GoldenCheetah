@@ -678,7 +678,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         }
     }
 
-    if (index >=0 && index <= intervalCurves.count()) {
+    if (index >=0 && index < intervalCurves.count()) {
 
         // lazy for now just reuse existing
         if (intervalCurves[index] == NULL) {
@@ -707,10 +707,11 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         hoverCurve = new QwtPlotCurve("Interval");
         hoverCurve->setPen(pen);
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hoverCurve->attach(cpintPlot);
         hoverCurve->setYAxis(QwtPlot::yLeft);
         hoverCurve->setSamples(array);
         hoverCurve->setVisible(true);
+        hoverCurve->setZ(100);
+        hoverCurve->attach(cpintPlot);
         cpintPlot->replot();
     }
 }
