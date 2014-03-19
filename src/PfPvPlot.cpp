@@ -220,7 +220,7 @@ PfPvPlot::configChanged()
     sym->setStyle(QwtSymbol::Ellipse);
     sym->setSize(6);
     sym->setPen(QPen(Qt::red));
-    sym->setBrush(QBrush(Qt::NoBrush));
+    sym->setBrush(QBrush(Qt::red));
     curve->setSymbol(sym);
     curve->setStyle(QwtPlotCurve::Dots);
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -484,7 +484,7 @@ PfPvPlot::setData(RideItem *_rideItem)
             sym->setStyle(QwtSymbol::Ellipse);
             sym->setSize(6);
             sym->setPen(QPen(Qt::red));
-            sym->setBrush(QBrush(Qt::NoBrush));
+            sym->setBrush(QBrush(Qt::red));
             curve->setSymbol(sym);
             curve->setStyle(QwtPlotCurve::Dots);
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -633,6 +633,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 QPen pen;
                 pen.setColor(intervalColor);
                 sym->setPen(pen);
+                sym->setBrush(QBrush(intervalColor));
 
                 curve->setSymbol(sym);
                 curve->setStyle(QwtPlotCurve::Dots);
@@ -1086,6 +1087,7 @@ PfPvPlot::showCompareIntervals()
             QPen pen;
             pen.setColor(intervalColor);
             sym->setPen(pen);
+            sym->setBrush(QBrush(intervalColor));
 
             _curve->setSymbol(sym);
             _curve->setStyle(QwtPlotCurve::Dots);
