@@ -614,12 +614,21 @@ PfPvPlot::intervalHover(RideFileInterval x)
         }
     }
 
+    // which interval is it or how many ?
+    int count = 0;
+    int ours = 0;
+    foreach(RideFileInterval p, rideItem->ride()->intervals()) {
+        if (p.start == x.start && p.stop == x.stop) ours = count;
+        count++;
+    }
+
     // any data ?
     if (aepfArray.size()) {
         QwtSymbol *sym = new QwtSymbol;
         sym->setStyle(QwtSymbol::Ellipse);
         sym->setSize(4);
-        QColor color(Qt::gray);
+        QColor color;
+        color.setHsv(ours * 255/count, 255,255);
         color.setAlpha(128);
         sym->setPen(QPen(color));
         sym->setBrush(QBrush(color));
