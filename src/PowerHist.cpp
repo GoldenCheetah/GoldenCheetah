@@ -213,7 +213,8 @@ PowerHist::hideStandard(bool hide)
     curve->setVisible(!hide);
     curveSelected->setVisible(!hide);
 
-    if (!hide) {
+    // clear if we are showing standard (not comparing) or if the comparisons got cleared
+    if (!hide || (rangemode && context->compareDateRanges.count() == 0) || (!rangemode && context->compareIntervals.count() == 0) ) {
 
         // wipe the compare data 
         compareData.clear();
