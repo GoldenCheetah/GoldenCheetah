@@ -406,6 +406,75 @@ int PfPvPlot::intervalCount() const
 }
 
 void
+PfPvPlot::refreshIntervalMarkers()
+{
+    // zap what we got ...
+    foreach(QwtPlotMarker *is, intervalMarkers) {
+        is->detach();
+        delete is;
+    }
+    intervalMarkers.clear();
+
+    // do we have a ride with intervals to refresh ?
+    int count=0;
+    if (rideItem && rideItem->ride() && rideItem->ride()->dataPoints().count() && (count = rideItem->ride()->intervals().count())) {
+
+        // accumulating...
+        class accum { public: accum() : count(0), aepf(0), cpv(0) {}
+                      int count; double aepf; double cpv; };
+        QVector<accum> intervalAccumulator(count);
+
+        foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
+
+            if (p1->cad && p1->watts) {
+
+                // calculate the values
+                double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                // accumulate values for each interval here ....
+                for(int i=0; i < count; i++) {
+
+                    RideFileInterval v = rideItem->ride()->intervals()[i];
+
+                    // in our interval ?
+                    if (p1->secs >= v.start && p1->secs <= v.stop) {
+                        intervalAccumulator[i].aepf += aepf;
+                        intervalAccumulator[i].cpv += cpv;
+                        intervalAccumulator[i].count++;
+                    }
+                }
+            }
+        }
+
+        // ok, so now add markers for the average position for each interval
+        int index = 0;
+        foreach (accum a, intervalAccumulator) {
+
+            QColor color;
+            color.setHsv(index * 255/count, 255,255);
+            double cpv = a.cpv/double(a.count);
+            double aepf = a.aepf/double(a.count);
+
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Diamond);
+            sym->setSize(8);
+            sym->setPen(QPen(GColor(CPLOTMARKER)));
+            sym->setBrush(QBrush(color));
+
+            QwtPlotMarker *p = new QwtPlotMarker();
+            p->setValue(cpv, aepf);
+            p->setYAxis(yLeft);
+            p->setSymbol(sym);
+            p->attach(this);
+            intervalMarkers << p;
+
+            index++;
+        }
+    }
+}
+
+void
 PfPvPlot::setData(RideItem *_rideItem)
 {
     if (context->isCompareIntervals) return;
@@ -416,7 +485,7 @@ PfPvPlot::setData(RideItem *_rideItem)
        while (i.hasNext()) {
            QwtPlotCurve *curve = i.next();
            curve->detach();
-           //delete curve;
+           delete curve;
        }
     }
     intervalCurves.clear();
@@ -498,6 +567,10 @@ PfPvPlot::setData(RideItem *_rideItem)
 
             // now show the data (zone shading would already be visible)
             refreshZoneItems();
+
+            // averages for intervals
+            refreshIntervalMarkers();
+
             curve->setSymbol(sym);
             curve->setVisible(true);
         }
@@ -704,6 +777,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
             }
         }
     }
+    refreshIntervalMarkers();
     replot();
 }
 

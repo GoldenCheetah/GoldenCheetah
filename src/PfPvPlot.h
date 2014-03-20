@@ -46,6 +46,7 @@ class PfPvPlot : public QwtPlot
         void refreshZoneItems();
         void setData(RideItem *_rideItem);
         void showIntervals(RideItem *_rideItem);
+        void refreshIntervalMarkers();
 
         int getCP();
         void setCP(int cp);
@@ -93,6 +94,7 @@ class PfPvPlot : public QwtPlot
         QwtPlotCurve *curve;
         QwtPlotCurve *hover;
         QList <QwtPlotCurve *> intervalCurves;
+        QList <QwtPlotMarker *> intervalMarkers;
         QwtPlotCurve *cpCurve;
         QList <QwtPlotCurve *> zoneCurves;
         QList <PfPvPlotZoneLabel *> zoneLabels;
