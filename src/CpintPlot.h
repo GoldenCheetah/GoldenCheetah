@@ -151,7 +151,7 @@ class CpintPlot : public QwtPlot
         QString path;
         QwtPlotCurve *thisCurve;
         QwtPlotCurve *CPCurve, *extendedCPCurve2, *extendedCPCurve4, *extendedCPCurve5, *extendedCPCurve6;
-        QwtPlotIntervalCurve *heatCurve;
+        QwtPlotCurve *heatCurve;
         CpPlotCurve *heatCurveByDate;
 
         QwtPlotCurve *level14Curve5, *level15Curve5;
