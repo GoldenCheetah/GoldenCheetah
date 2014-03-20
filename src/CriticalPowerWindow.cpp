@@ -51,6 +51,18 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // layout reveal controls
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
+
+    rPercent = new QCheckBox(tr("Percentage of Best"));
+    rHeat = new QCheckBox("Show Heat");
+
+    QVBoxLayout *checks = new QVBoxLayout;
+    checks->addStretch();
+    checks->addWidget(rPercent);
+    checks->addWidget(rHeat);
+    checks->addStretch();
+
+    revealLayout->addStretch();
+    revealLayout->addLayout(checks);
     revealLayout->addStretch();
 
     setRevealLayout(revealLayout);
@@ -376,8 +388,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
+    connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(rPercent, SIGNAL(stateChanged(int)), this, SLOT(rPercentChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -1259,22 +1273,35 @@ void
 CriticalPowerWindow::showPercentChanged(int state)
 {
     cpintPlot->setShowPercent(state);
+    rPercent->setChecked(state);
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
+}
+
+void 
+CriticalPowerWindow::rPercentChanged(int check)
+{
+    showPercentCheck->setChecked(check);
 }
 
 void
 CriticalPowerWindow::showHeatChanged(int state)
 {
     cpintPlot->setShowHeat(state);
+    rHeat->setChecked(state);
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
     else cpintPlot->calculate(currentRide);
 }
 
+void 
+CriticalPowerWindow::rHeatChanged(int check)
+{
+    showHeatCheck->setChecked(check);
+}
 
 void
 CriticalPowerWindow::showHeatByDateChanged(int state)
