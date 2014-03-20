@@ -86,7 +86,7 @@ class CriticalPowerWindow : public GcChartWindow
         }
 
         // reveal
-        bool hasReveal() { return false; }
+        bool hasReveal() { return true; }
 
         void deleteCpiFile(QString filename);
 
@@ -218,6 +218,10 @@ class CriticalPowerWindow : public GcChartWindow
         void modelParametersChanged(); // we changed the intervals
         void modelChanged(); // we changed the model type 
 
+        // reveal controls changed
+        void rPercentChanged(int check);
+        void rHeatChanged(int check);
+
     private:
         void updateCpint(double minutes);
         void hideIntervalCurve(int index);
@@ -245,6 +249,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;
+        QCheckBox *rPercent, *rHeat;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;
