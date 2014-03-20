@@ -853,7 +853,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             ymax = 5 * ceil(power_values[0] / 5);
     }
     thisPlot->setAxisScale(thisPlot->yLeft, 0, ymax);
-    thisPlot->setAxisScale(thisPlot->yRight, 0, 100); // always 100
+
 }
 
 void
@@ -1118,6 +1118,10 @@ CpintPlot::calculate(RideItem *rideItem)
                                          bests->meanMaxArray(rideSeries)[i] * 100.00f;
                         }
                         thisCurve->setSamples(timeArray.data() + 1, samples.data() + 1, maxNonZero -1);
+
+                        int max = thisCurve->maxYValue();
+                        if (max < 100) max = 100;
+                        setAxisScale(yRight, 0, max); // always 100
 
                     } else {
 
