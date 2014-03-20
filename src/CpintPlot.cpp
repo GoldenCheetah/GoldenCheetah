@@ -509,8 +509,9 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
     // draw a heat curve
     if (showHeat && rideSeries == RideFile::watts && bests && bests->heatMeanMaxArray().count()) {
+
         // heat curve
-        heatCurve = new QwtPlotIntervalCurve("heat");
+        heatCurve = new QwtPlotCurve("heat");
 
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) heatCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
@@ -519,14 +520,18 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         heatCurve->setZ(-1);
 
         // generate samples
-        QVector<QwtIntervalSample> heatSamples;
+        QVector<double> heat;
+        QVector<double> time;
 
         for (int i=0; i<bests->meanMaxArray(RideFile::watts).count() && i<bests->heatMeanMaxArray().count(); i++) {
             QwtIntervalSample add(i/60.00f, bests->meanMaxArray(RideFile::watts)[i] - bests->heatMeanMaxArray()[i],
                                             bests->meanMaxArray(RideFile::watts)[i]/* + bests->heatMeanMaxArray()[i]*/);
-            heatSamples << add;
+            time << double(i)/60.00f;
+            heat << bests->heatMeanMaxArray()[i];
         }
-        heatCurve->setSamples(heatSamples);
+        heatCurve->setSamples(time, heat);
+        heatCurve->setYAxis(yRight);
+        setAxisScale(yRight, 0, 100); // always 100
         heatCurve->attach(thisPlot);
     }
 
