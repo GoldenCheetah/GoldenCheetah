@@ -65,6 +65,9 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
     QwtText returning(text);
     returning.setColor(GColor(CPLOTMARKER));
 
+    // trigger plot doing interval hover ...
+    pfPvPlot->mouseTrack(p.x(), p.y());
+
     return returning;
 }
 

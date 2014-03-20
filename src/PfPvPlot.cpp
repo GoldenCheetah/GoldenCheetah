@@ -405,6 +405,31 @@ int PfPvPlot::intervalCount() const
     return highlighted;
 }
 
+void 
+PfPvPlot::mouseTrack(double cad, double watts)
+{
+    if (watts <= 0 || cad <= 0) return;
+
+    double aepf = (watts * 60.0) / (cad * cl_ * 2.0 * PI);
+    double cpv = (cad * cl_ * 2.0 * PI) / 60.0;
+
+    if (rideItem && rideItem->ride() && rideItem->ride()->intervals().count() >= intervalMarkers.count()) {
+        // are we hovering "close" to an interval marker ?
+        int index = 0;
+        foreach (QwtPlotMarker *is, intervalMarkers) {
+
+            double x = is->xValue() - cpv;
+            double y = is->yValue() - aepf;
+
+            if ((x > -0.05f && x < 0.05f) && (y > -3 && y < 3)) {
+                context->notifyIntervalHover(rideItem->ride()->intervals()[index]);
+            }
+    
+            index++;
+        }
+    }
+}
+
 void
 PfPvPlot::refreshIntervalMarkers()
 {

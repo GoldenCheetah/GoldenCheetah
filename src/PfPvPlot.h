@@ -47,6 +47,7 @@ class PfPvPlot : public QwtPlot
         void setData(RideItem *_rideItem);
         void showIntervals(RideItem *_rideItem);
         void refreshIntervalMarkers();
+        void mouseTrack(double cpv, double aepf);
 
         int getCP();
         void setCP(int cp);
