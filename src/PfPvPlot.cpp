@@ -546,8 +546,10 @@ PfPvPlot::intervalHover(RideFileInterval x)
         QwtSymbol *sym = new QwtSymbol;
         sym->setStyle(QwtSymbol::Ellipse);
         sym->setSize(4);
-        sym->setPen(QPen(Qt::gray));
-        sym->setBrush(QBrush(Qt::gray));
+        QColor color(Qt::gray);
+        color.setAlpha(128);
+        sym->setPen(QPen(color));
+        sym->setBrush(QBrush(color));
 
         hover = new QwtPlotCurve();
         hover->setSymbol(sym);
@@ -689,6 +691,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 QPen pen;
                 pen.setColor(intervalColor);
                 sym->setPen(pen);
+                intervalColor.setAlpha(128);
                 sym->setBrush(QBrush(intervalColor));
 
                 curve->setSymbol(sym);
@@ -1143,6 +1146,7 @@ PfPvPlot::showCompareIntervals()
             QPen pen;
             pen.setColor(intervalColor);
             sym->setPen(pen);
+            intervalColor.setAlpha(128);
             sym->setBrush(QBrush(intervalColor));
 
             _curve->setSymbol(sym);
