@@ -230,7 +230,7 @@ void
 HomeWindow::rideSelected()
 {
     // we need to notify of null rides immediately
-    if (!myRideItem || amVisible()) {
+    if (!myRideItem || isVisible()) {
         for (int i=0; i < charts.count(); i++) {
 
             // show if its not a tab
@@ -250,7 +250,7 @@ HomeWindow::rideSelected()
 void
 HomeWindow::dateRangeChanged(DateRange dr)
 { Q_UNUSED( dr )
-    if (amVisible()) {
+    if (isVisible()) {
 
         for (int i=0; i < charts.count(); i++) {
 
@@ -720,7 +720,7 @@ HomeWindow::resizeEvent(QResizeEvent * /* e */)
 bool
 HomeWindow::eventFilter(QObject *object, QEvent *e)
 {
-    if (isHidden()) return false; // ignore when we aren't visible
+    if (!isVisible()) return false; // ignore when we aren't visible
 
     // mouse moved and tabbed -- should we show/hide chart popup controls?
     if (e->type() == QEvent::MouseMove && currentStyle == 0 && tabbed->currentIndex() >= 0) {
@@ -755,6 +755,8 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
             }
         }
     }
+
+    //qDebug()<<QTime::currentTime()<<name<<"filter event"<<object<<e->type();
 
     // we watch the mouse when
     // dropping charts, to update
