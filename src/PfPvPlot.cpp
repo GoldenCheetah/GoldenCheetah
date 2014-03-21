@@ -430,6 +430,9 @@ PfPvPlot::mouseTrack(double cad, double watts)
     }
 }
 
+// for accumulating averages when refreshing interval markers
+class accum { public: accum() : count(0), aepf(0), cpv(0) {} int count; double aepf; double cpv; };
+
 void
 PfPvPlot::refreshIntervalMarkers()
 {
@@ -445,8 +448,6 @@ PfPvPlot::refreshIntervalMarkers()
     if (rideItem && rideItem->ride() && rideItem->ride()->dataPoints().count() && (count = rideItem->ride()->intervals().count())) {
 
         // accumulating...
-        class accum { public: accum() : count(0), aepf(0), cpv(0) {}
-                      int count; double aepf; double cpv; };
         QVector<accum> intervalAccumulator(count);
 
         foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
