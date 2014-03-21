@@ -88,7 +88,7 @@ class CpintPlot : public QwtPlot
 
     public:
 
-        CpintPlot(Context *, QString path, const Zones *zones, bool rangemode);
+        CpintPlot(QWidget *parent, Context *, QString path, const Zones *zones, bool rangemode);
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }

@@ -135,7 +135,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     switch(id) {
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(context); break;
     case GcWindowTypes::AllPlot: returning = new AllPlotWindow(context); break;
-    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(context->athlete->home, context); break;
+    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(context->athlete->home, context, false); break;
     case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(context->athlete->home, context, true); break;
 #ifdef GC_HAVE_ICAL
     case GcWindowTypes::Diary: returning = new DiaryWindow(context); break;

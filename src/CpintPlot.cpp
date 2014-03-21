@@ -42,7 +42,8 @@
 
 #include <algorithm> // for std::lower_bound
 
-CpintPlot::CpintPlot(Context *context, QString p, const Zones *zones, bool rangemode) :
+CpintPlot::CpintPlot(QWidget *parent, Context *context, QString p, const Zones *zones, bool rangemode) :
+    QwtPlot(parent),
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
