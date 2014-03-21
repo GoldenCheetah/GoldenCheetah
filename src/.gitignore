@@ -23,6 +23,7 @@ qrc_RideWindow.cpp
 
 # logfiles
 vlc-log.txt
+antlog.bin
 
 # ignore lex/yacc generated files
 *_lex.cpp
@@ -42,3 +43,7 @@ tags
 
 #ignore patches
 *.patch
+
+#ignore qm
+*.qm
+
