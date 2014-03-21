@@ -331,33 +331,12 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 /*----------------------------------------------------------------------
  * Drag and resize tiles
  *--------------------------------------------------------------------*/
-
-bool
-GcWindow::eventFilter(QObject *, QEvent *e)
-{
-    if (!resizable()) return false;
-
-    // handle moving / resizing activity
-    if (dragState != None) {
-        switch (e->type()) {
-        case QEvent::MouseMove:
-            mouseMoveEvent((QMouseEvent*)e);
-            return false;
-            break;
-        case QEvent::MouseButtonRelease:
-            mouseReleaseEvent((QMouseEvent*)e);
-            return false;
-            break;
-        default:
-            break;
-        }
-    }
-    return false;
-}
-
 void
 GcWindow::mousePressEvent(QMouseEvent *e)
 {
+    // always propagate
+    e->ignore();
+
     if (!resizable() || e->button() == Qt::NoButton || isHidden()) {
         setDragState(None);
         return;
@@ -389,8 +368,11 @@ GcWindow::mousePressEvent(QMouseEvent *e)
 }
 
 void
-GcWindow::mouseReleaseEvent(QMouseEvent *)
+GcWindow::mouseReleaseEvent(QMouseEvent *e)
 {
+    // always propagate
+    e->ignore();
+
     // tell the owner!
     if (dragState == Move) {
         setProperty("gripped", false);
@@ -441,6 +423,9 @@ GcWindow::spotHotSpot(QMouseEvent *e)
 void
 GcWindow::mouseMoveEvent(QMouseEvent *e)
 {
+    // always propagate
+    e->ignore();
+
     if (!resizable()) return;
 
     if (dragState == None) {

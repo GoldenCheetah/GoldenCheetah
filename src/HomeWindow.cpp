@@ -756,7 +756,7 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
         }
     }
 
-    //qDebug()<<QTime::currentTime()<<name<<"filter event"<<object<<e->type();
+    //if (e->type() == 2) qDebug()<<QTime::currentTime()<<name<<"filter event"<<object<<e->type();
 
     // we watch the mouse when
     // dropping charts, to update

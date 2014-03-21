@@ -189,10 +189,10 @@ public:
     void paintEvent (QPaintEvent * event);
 
     // mouse actions -- resizing and dragging tiles
-    bool eventFilter(QObject *object, QEvent *e);
-    virtual void mousePressEvent(QMouseEvent *);
-    virtual void mouseReleaseEvent(QMouseEvent *);
-    virtual void mouseMoveEvent(QMouseEvent *);
+    //bool eventFilter(QObject *object, QEvent *e);
+    void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
     void enterEvent(QEvent *);
     void leaveEvent(QEvent *);
     void setDragState(DragState);
