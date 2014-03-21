@@ -821,13 +821,14 @@ GcChartWindow:: reveal()
 void GcChartWindow:: unreveal()
 {
     _unrevealAnim->start();
-    _unrevealTimer->setSingleShot(150);
-    //_unrevealTimer->start(150);
+    //_unrevealTimer->setSingleShot(150);
+    _unrevealTimer->start(150);
 }
 
 void GcChartWindow:: hideRevealControls()
 {
     _revealControls->hide();
+    _unrevealTimer->stop();
 }
 
 void GcChartWindow:: saveImage()
