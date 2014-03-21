@@ -78,7 +78,7 @@ class CriticalPowerWindow : public GcChartWindow
 
     public:
 
-        CriticalPowerWindow(const QDir &home, Context *context, bool range = false);
+        CriticalPowerWindow(const QDir &home, Context *context, bool range);
 
         // compare is supported
         bool isCompare() const {

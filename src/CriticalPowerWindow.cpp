@@ -52,8 +52,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
 
-    rPercent = new QCheckBox(tr("Percentage of Best"));
-    rHeat = new QCheckBox("Show Heat");
+    rPercent = new QCheckBox(this);
+    rPercent->setText(tr("Percentage of Best"));
+    rHeat = new QCheckBox(this);
+    rHeat->setText(tr("Show Heat"));
 
     QVBoxLayout *checks = new QVBoxLayout;
     checks->addStretch();
@@ -70,15 +72,14 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     //
     // main plot area
     //
-    QVBoxLayout *vlayout = new QVBoxLayout;
-    cpintPlot = new CpintPlot(context, home.path(), context->athlete->zones(), rangemode);
-    vlayout->addWidget(cpintPlot);
-
-    QGridLayout *mainLayout = new QGridLayout();
-    mainLayout->addLayout(vlayout, 0, 0);
+    QVBoxLayout *mainLayout = new QVBoxLayout();
     setChartLayout(mainLayout);
 
+    cpintPlot = new CpintPlot(this, context, home.path(), context->athlete->zones(), rangemode);
+    mainLayout->addWidget(cpintPlot);
 
+
+#if 0
     //
     // picker - on chart controls/display
     //
@@ -125,7 +126,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     }
     pcl->addRow(cpintAllLabel, cpintAllValue);
     pcl->addRow(cpintCPLabel, cpintCPValue);
-
+#endif
 
     //
     // Chart settings
@@ -133,7 +134,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     // controls widget and layout
     QTabWidget *settingsTabs = new QTabWidget(this);
-    mainLayout->addWidget(settingsTabs);
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
@@ -1019,7 +1019,7 @@ CriticalPowerWindow::updateCpint(double minutes)
           label = QString("%1 %2").arg(value).arg(units);
       else
           label = tr("no data");
-      cpintTodayValue->setText(label);
+          //XXXcpintTodayValue->setText(label);
     }
 
     // cp line
@@ -1057,6 +1057,7 @@ CriticalPowerWindow::updateCpint(double minutes)
 void
 CriticalPowerWindow::cpintTimeValueEntered()
 {
+  return; //XXX
   double minutes = str_to_interval(cpintTimeValue->text()) / 60.0;
   updateCpint(minutes);
 }
@@ -1064,6 +1065,7 @@ CriticalPowerWindow::cpintTimeValueEntered()
 void
 CriticalPowerWindow::pickerMoved(const QPoint &pos)
 {
+    return; //XXX
     double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
     cpintTimeValue->setText(interval_to_str(60.0*minutes));
     updateCpint(minutes);
