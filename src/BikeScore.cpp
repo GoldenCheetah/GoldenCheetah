@@ -315,6 +315,43 @@ class anTISS : public RideMetric {
     RideMetric *clone() const { return new anTISS(*this); }
 };
 
+class dTISS : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(dTISS)
+
+    public:
+
+    dTISS()
+    {
+        setSymbol("tiss_delta");
+        setInternalName("TISS Aerobicity");
+        setType(RideMetric::Average);
+    }
+    void initialize() {
+        setName(tr("TISS Aerobicity"));
+        setMetricUnits("Percent");
+        setImperialUnits("Percent");
+    }
+
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+	    const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+	    if (!zones || zoneRange < 0)
+	        return;
+
+        assert(deps.contains("atiss_score"));
+        assert(deps.contains("antiss_score"));
+        double atscore = dynamic_cast<aTISS*>(deps.value("atiss_score"))->value(true);
+        double antscore = dynamic_cast<anTISS*>(deps.value("antiss_score"))->value(true);
+
+        // we don't like nan results
+        if (atscore == 0.00 && antscore == 0.00) setValue(0.0);
+        else setValue((atscore/(atscore+antscore)) * 100.00f);
+    }
+
+    RideMetric *clone() const { return new dTISS(*this); }
+};
 class BikeScore : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(BikeScore)
     double score;
@@ -406,6 +443,10 @@ static bool addAllSix() {
     deps.append("skiba_xpower");
     deps.append("average_power");
     RideMetricFactory::instance().addMetric(VariabilityIndex(), &deps);
+    deps.clear();
+    deps.append("atiss_score");
+    deps.append("antiss_score");
+    RideMetricFactory::instance().addMetric(dTISS(), &deps);
     deps.clear();
     deps.append("skiba_xpower");
     deps.append("average_hr");
