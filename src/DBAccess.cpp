@@ -85,8 +85,9 @@
 // 64  17  Mar 2014 Mark Liversedge    Added W' and CP work to PMC metrics
 // 65  17  Mar 2014 Mark Liversedge    Added Aerobic TISS prototype
 // 66  18  Mar 2014 Mark Liversedge    Updated aPower calculation
+// 67  22  Mar 2014 Mark Liversedge    Added Anaerobic TISS prototype
 
-int DBSchemaVersion = 65;
+int DBSchemaVersion = 67;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

@@ -269,6 +269,52 @@ class aTISS : public RideMetric {
     RideMetric *clone() const { return new aTISS(*this); }
 };
 
+class anTISS : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(aTISS)
+
+    public:
+
+    anTISS()
+    {
+        setSymbol("antiss_score");
+        setInternalName("Anaerobic TISS");
+    }
+    void initialize() {
+        setName(tr("Anaerobic TISS"));
+        setMetricUnits("");
+        setImperialUnits("");
+    }
+
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+	    const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+	    if (!zones || zoneRange < 0)
+	        return;
+
+        // anTISS - Aerobic Training Impact Scoring System
+        static const double a = 0.238923886004611f;
+        static const double b = -12.2066385296127f;
+        static const double c = -1.73549567522521f;
+        double anTISS = 0.0f;
+
+        int cp = r->getTag("CP","0").toInt();
+        if (!cp) cp = zones->getCP(zoneRange);
+
+        if (cp && r->areDataPresent()->watts) {
+            foreach (RideFilePoint *p, r->dataPoints()) {
+
+                // a * exp (b * exp (c * fraction of cp) ) 
+                anTISS += r->recIntSecs() * (a * exp(b * exp(c * (double(p->watts) / double(cp)))));
+            }
+        }
+        setValue(anTISS);
+    }
+
+    RideMetric *clone() const { return new anTISS(*this); }
+};
+
 class BikeScore : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(BikeScore)
     double score;
@@ -348,6 +394,7 @@ class ResponseIndex : public RideMetric {
 
 static bool addAllSix() {
     RideMetricFactory::instance().addMetric(aTISS());
+    RideMetricFactory::instance().addMetric(anTISS());
     RideMetricFactory::instance().addMetric(CriticalPower());
     RideMetricFactory::instance().addMetric(XPower());
     QVector<QString> deps;

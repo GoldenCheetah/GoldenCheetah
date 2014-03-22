@@ -2367,6 +2367,8 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
     // create a custom set of summary metric data!
     if (metricDetail.symbol.startsWith("skiba")) {
         scoreType = "skiba_bike_score";
+    } else if (metricDetail.symbol.startsWith("antiss")) {
+        scoreType = "antiss_score";
     } else if (metricDetail.symbol.startsWith("atiss")) {
         scoreType = "atiss_score";
     } else if (metricDetail.symbol.startsWith("coggan")) {
@@ -2417,6 +2419,12 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
             add.setForSymbol("skiba_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("skiba_sr", sc->getSRvalues()[i]);
             add.setForSymbol("skiba_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "antiss_score") {
+            add.setForSymbol("antiss_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("antiss_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("antiss_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("antiss_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("antiss_lr", sc->getLRvalues()[i]);
         } else if (scoreType == "atiss_score") {
             add.setForSymbol("atiss_lts", sc->getLTSvalues()[i]);
             add.setForSymbol("atiss_sts", sc->getSTSvalues()[i]);
