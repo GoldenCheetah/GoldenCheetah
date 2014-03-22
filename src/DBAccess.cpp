@@ -86,8 +86,9 @@
 // 65  17  Mar 2014 Mark Liversedge    Added Aerobic TISS prototype
 // 66  18  Mar 2014 Mark Liversedge    Updated aPower calculation
 // 67  22  Mar 2014 Mark Liversedge    Added Anaerobic TISS prototype
+// 68  22  Mar 2014 Mark Liversedge    Added dTISS prototype
 
-int DBSchemaVersion = 67;
+int DBSchemaVersion = 68;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
