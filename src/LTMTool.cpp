@@ -371,6 +371,81 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     atissLTR.uunits = tr("Ramp");
     metrics.append(atissLTR);
 
+    // SKIBA Anerobic TISS LTS
+    MetricDetail antissLTS;
+    antissLTS.type = METRIC_PM;
+    antissLTS.symbol = "antiss_lts";
+    antissLTS.metric = NULL; // not a factory metric
+    antissLTS.penColor = QColor(Qt::blue);
+    antissLTS.curveStyle = QwtPlotCurve::Lines;
+    antissLTS.symbolStyle = QwtSymbol::NoSymbol;
+    antissLTS.smooth = false;
+    antissLTS.trend = false;
+    antissLTS.topN = 1;
+    antissLTS.uname = antissLTS.name = tr("Anaerobic TISS Long Term Stress");
+    antissLTS.units = "Stress";
+    antissLTS.uunits = tr("Stress");
+    metrics.append(antissLTS);
+
+    MetricDetail antissSTS;
+    antissSTS.type = METRIC_PM;
+    antissSTS.symbol = "antiss_sts";
+    antissSTS.metric = NULL; // not a factory metric
+    antissSTS.penColor = QColor(Qt::magenta);
+    antissSTS.curveStyle = QwtPlotCurve::Lines;
+    antissSTS.symbolStyle = QwtSymbol::NoSymbol;
+    antissSTS.smooth = false;
+    antissSTS.trend = false;
+    antissSTS.topN = 1;
+    antissSTS.uname = antissSTS.name = tr("Anaerobic TISS Short Term Stress");
+    antissSTS.units = "Stress";
+    antissSTS.uunits = tr("Stress");
+    metrics.append(antissSTS);
+
+    MetricDetail antissSB;
+    antissSB.type = METRIC_PM;
+    antissSB.symbol = "antiss_sb";
+    antissSB.metric = NULL; // not a factory metric
+    antissSB.penColor = QColor(Qt::yellow);
+    antissSB.curveStyle = QwtPlotCurve::Steps;
+    antissSB.symbolStyle = QwtSymbol::NoSymbol;
+    antissSB.smooth = false;
+    antissSB.trend = false;
+    antissSB.topN = 1;
+    antissSB.uname = antissSB.name = tr("Anaerobic TISS Stress Balance");
+    antissSB.units = "Stress Balance";
+    antissSB.uunits = tr("Stress Balance");
+    metrics.append(antissSB);
+
+    MetricDetail antissSTR;
+    antissSTR.type = METRIC_PM;
+    antissSTR.symbol = "antiss_sr";
+    antissSTR.metric = NULL; // not a factory metric
+    antissSTR.penColor = QColor(Qt::darkGreen);
+    antissSTR.curveStyle = QwtPlotCurve::Steps;
+    antissSTR.symbolStyle = QwtSymbol::NoSymbol;
+    antissSTR.smooth = false;
+    antissSTR.trend = false;
+    antissSTR.topN = 1;
+    antissSTR.uname = antissSTR.name = tr("Anaerobic TISS STS Ramp");
+    antissSTR.units = "Ramp";
+    antissSTR.uunits = tr("Ramp");
+    metrics.append(antissSTR);
+
+    MetricDetail antissLTR;
+    antissLTR.type = METRIC_PM;
+    antissLTR.symbol = "antiss_lr";
+    antissLTR.metric = NULL; // not a factory metric
+    antissLTR.penColor = QColor(Qt::darkBlue);
+    antissLTR.curveStyle = QwtPlotCurve::Steps;
+    antissLTR.symbolStyle = QwtSymbol::NoSymbol;
+    antissLTR.smooth = false;
+    antissLTR.trend = false;
+    antissLTR.topN = 1;
+    antissLTR.uname = antissLTR.name = tr("Anaerobic TISS LTS Ramp");
+    antissLTR.units = "Ramp";
+    antissLTR.uunits = tr("Ramp");
+    metrics.append(antissLTR);
     // DANIELS LTS
     MetricDetail danielsLTS;
     danielsLTS.type = METRIC_PM;

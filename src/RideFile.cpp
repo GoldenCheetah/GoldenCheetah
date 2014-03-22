@@ -668,6 +668,7 @@ RideFile::isDataPresent(SeriesType series)
         case watts : return dataPresent.watts; break;
         case aPower : return dataPresent.apower; break;
         case aTISS : return dataPresent.atiss; break;
+        case anTISS : return dataPresent.antiss; break;
         case alt : return dataPresent.alt; break;
         case lon : return dataPresent.lon; break;
         case lat : return dataPresent.lat; break;
@@ -733,6 +734,7 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::xPower : return xp; break;
         case RideFile::aPower : return apower; break;
         case RideFile::aTISS : return atiss; break;
+        case RideFile::anTISS : return antiss; break;
 
         default:
         case RideFile::none : break;
@@ -1041,9 +1043,15 @@ RideFile::recalculateDerivedSeries()
     static const double b = -7.5095428451195f;
     static const double c = -0.86118031563782f;
     static const double t = 2;
+    // anTISS
+    static const double an = 0.238923886004611f;
+    static const double bn = -12.2066385296127f;
+    static const double cn = -1.73549567522521f;
+
     int CP = 0;
     int WPRIME = 0;
     double aTISS = 0.0f;
+    double anTISS = 0.0f;
 
     // set WPrime and CP
     if (context->athlete->zones()) {
@@ -1188,12 +1196,14 @@ RideFile::recalculateDerivedSeries()
         APtotal += p->apower;
         APcount++;
 
-        // Aerobic TISS
+        // Anaerobic and Aerobic TISS
         if (CP && dataPresent.watts) {
 
             // a * exp (b * exp (c * fraction of cp) ) 
             aTISS += recIntSecs_ * (a * exp(b * exp(c * (double(p->watts) / double(CP)))));
+            anTISS += recIntSecs_ * (an * exp(bn * exp(cn * (double(p->watts) / double(CP)))));
             p->atiss = aTISS;
+            p->antiss = anTISS;
         }
 
         // last point

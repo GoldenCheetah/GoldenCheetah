@@ -117,6 +117,8 @@ void GCColor::setupColors()
         { tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
         { tr("W' Balance"), "CWBAL", Qt::red },
         { tr("Ride CP Curve"), "CRIDECP", Qt::black },
+        { tr("Aerobic TISS"), "CATISS", Qt::magenta },
+        { tr("Anaerobic TISS"), "CANTISS", Qt::cyan },
         { "", "", QColor(0,0,0) },
     };
 

@@ -196,6 +196,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showTorque->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showTorque);
 
+    showANTISS = new QCheckBox(tr("Anaerobic TISS"), this);
+    showANTISS->setCheckState(Qt::Unchecked);
+    cl2->addRow(new QLabel(""), showANTISS);
+
     showATISS = new QCheckBox(tr("Aerobic TISS"), this);
     showATISS->setCheckState(Qt::Unchecked);
     cl2->addRow(new QLabel(""), showATISS);
@@ -500,6 +504,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showHrD, SIGNAL(stateChanged(int)), this, SLOT(setShowHrD(int)));
     connect(showNP, SIGNAL(stateChanged(int)), this, SLOT(setShowNP(int)));
     connect(showATISS, SIGNAL(stateChanged(int)), this, SLOT(setShowATISS(int)));
+    connect(showANTISS, SIGNAL(stateChanged(int)), this, SLOT(setShowANTISS(int)));
     connect(showXP, SIGNAL(stateChanged(int)), this, SLOT(setShowXP(int)));
     connect(showAP, SIGNAL(stateChanged(int)), this, SLOT(setShowAP(int)));
     connect(showSpeed, SIGNAL(stateChanged(int)), this, SLOT(setShowSpeed(int)));
@@ -744,6 +749,7 @@ AllPlotWindow::compareChanged()
         if (showWind->isChecked()) wanted << RideFile::headwind;
         if (showNP->isChecked()) wanted << RideFile::NP;
         if (showATISS->isChecked()) wanted << RideFile::aTISS;
+        if (showANTISS->isChecked()) wanted << RideFile::anTISS;
         if (showXP->isChecked()) wanted << RideFile::xPower;
         if (showAP->isChecked()) wanted << RideFile::aPower;
         if (showW->isChecked()) wanted << RideFile::wprime;
@@ -1801,6 +1807,29 @@ AllPlotWindow::setShowNP(int value)
 }
 
 void
+AllPlotWindow::setShowANTISS(int value)
+{
+    showANTISS->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showANTISS->isEnabled()) ? true : false;
+
+    // recalc only does it if it needs to
+    if (value && current && current->ride()) current->ride()->recalculateDerivedSeries();
+
+    allPlot->setShowANTISS(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowANTISS(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
 AllPlotWindow::setShowATISS(int value)
 {
     showATISS->setChecked(value);
@@ -2518,6 +2547,7 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) addHeadwind=true; //serieslist << RideFile::headwind;
     if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::NP;
     if (showATISS->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::aTISS;
+    if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::anTISS;
     if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::xPower;
     if (showAP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::aPower;
     if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::wprime;
@@ -2697,6 +2727,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShowTorque((showTorque->isEnabled()) ? ( showTorque->checkState() == Qt::Checked ) : false );
         _allPlot->setShowW((showW->isEnabled()) ? ( showW->checkState() == Qt::Checked ) : false );
         _allPlot->setShowATISS((showATISS->isEnabled()) ? ( showATISS->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowANTISS((showANTISS->isEnabled()) ? ( showANTISS->checkState() == Qt::Checked ) : false );
         _allPlot->setShowGrid(showGrid->checkState() == Qt::Checked);
         _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setSmoothing(smoothSlider->value());

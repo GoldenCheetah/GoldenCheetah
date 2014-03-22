@@ -280,6 +280,10 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     wattsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     wattsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
 
+    antissCurve = new QwtPlotCurve(tr("anTISS"));
+    antissCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    antissCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+
     atissCurve = new QwtPlotCurve(tr("aTISS"));
     atissCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     atissCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
@@ -392,7 +396,7 @@ void
 AllPlotObject::setColor(QColor color)
 {
     QList<QwtPlotCurve*> worklist;
-    worklist << mCurve << wCurve << wattsCurve << atissCurve << npCurve << xpCurve << speedCurve << accelCurve
+    worklist << mCurve << wCurve << wattsCurve << atissCurve << antissCurve << npCurve << xpCurve << speedCurve << accelCurve
              << wattsDCurve << cadDCurve << nmDCurve << hrDCurve
              << apCurve << cadCurve << tempCurve << hrCurve << torqueCurve << balanceLCurve
              << balanceRCurve << altCurve;
@@ -431,6 +435,7 @@ AllPlotObject::~AllPlotObject()
     wCurve->detach(); delete wCurve;
     wattsCurve->detach(); delete wattsCurve;
     atissCurve->detach(); delete atissCurve;
+    antissCurve->detach(); delete antissCurve;
     npCurve->detach(); delete npCurve;
     xpCurve->detach(); delete xpCurve;
     apCurve->detach(); delete apCurve;
@@ -461,6 +466,7 @@ AllPlotObject::setVisible(bool show)
         wattsCurve->detach();
         npCurve->detach();
         atissCurve->detach();
+        antissCurve->detach();
         xpCurve->detach();
         apCurve->detach();
         hrCurve->detach();
@@ -498,6 +504,7 @@ AllPlotObject::setVisible(bool show)
         wattsCurve->attach(plot);
         npCurve->attach(plot);
         atissCurve->attach(plot);
+        antissCurve->attach(plot);
         xpCurve->attach(plot);
         apCurve->attach(plot);
         hrCurve->attach(plot);
@@ -534,6 +541,7 @@ AllPlotObject::hideUnwanted()
     if (plot->showPowerState>1) wattsCurve->detach();
     if (!plot->showNP) npCurve->detach();
     if (!plot->showATISS) atissCurve->detach();
+    if (!plot->showANTISS) antissCurve->detach();
     if (!plot->showXP) xpCurve->detach();
     if (!plot->showAP) apCurve->detach();
     if (!plot->showW) wCurve->detach();
@@ -560,6 +568,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     shade_zones(true),
     showPowerState(3),
     showATISS(false),
+    showANTISS(false),
     showNP(false),
     showXP(false),
     showAP(false),
@@ -673,6 +682,7 @@ AllPlot::configChanged()
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) {
         standard->wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->atissCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->antissCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->npCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->xpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->apCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -704,7 +714,12 @@ AllPlot::configChanged()
     QPen npPen = QPen(GColor(CNPOWER));
     npPen.setWidth(width);
     standard->npCurve->setPen(npPen);
-    standard->atissCurve->setPen(npPen);
+    QPen antissPen = QPen(GColor(CANTISS));
+    antissPen.setWidth(width);
+    standard->antissCurve->setPen(antissPen);
+    QPen atissPen = QPen(GColor(CATISS));
+    atissPen.setWidth(width);
+    standard->atissCurve->setPen(atissPen);
     QPen xpPen = QPen(GColor(CXPOWER));
     xpPen.setWidth(width);
     standard->xpCurve->setPen(xpPen);
@@ -786,10 +801,17 @@ AllPlot::configChanged()
         p.setAlpha(64);
         standard->wattsCurve->setBrush(QBrush(p));
 
+        p = standard->atissCurve->pen().color();
+        p.setAlpha(64);
+        standard->atissCurve->setBrush(QBrush(p));
+
+        p = standard->antissCurve->pen().color();
+        p.setAlpha(64);
+        standard->antissCurve->setBrush(QBrush(p));
+
         p = standard->npCurve->pen().color();
         p.setAlpha(64);
         standard->npCurve->setBrush(QBrush(p));
-        standard->atissCurve->setBrush(QBrush(p));
 
         p = standard->xpCurve->pen().color();
         p.setAlpha(64);
@@ -853,6 +875,7 @@ AllPlot::configChanged()
     } else {
         standard->wattsCurve->setBrush(Qt::NoBrush);
         standard->atissCurve->setBrush(Qt::NoBrush);
+        standard->antissCurve->setBrush(Qt::NoBrush);
         standard->npCurve->setBrush(Qt::NoBrush);
         standard->xpCurve->setBrush(Qt::NoBrush);
         standard->apCurve->setBrush(Qt::NoBrush);
@@ -934,8 +957,8 @@ AllPlot::configChanged()
     sd->enableComponent(QwtScaleDraw::Backbone, false);
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 3), sd);
-    pal.setColor(QPalette::WindowText, GColor(CNPOWER));
-    pal.setColor(QPalette::Text, GColor(CNPOWER));
+    pal.setColor(QPalette::WindowText, GColor(CATISS));
+    pal.setColor(QPalette::Text, GColor(CATISS));
     axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
 }
 
@@ -952,9 +975,9 @@ AllPlot::setHighlightIntervals(bool state)
 }
 
 struct DataPoint {
-    double time, hr, watts, atiss, np, ap, xp, speed, cad, alt, temp, wind, torque, lrbalance, kphd, wattsd, cadd, nmd, hrd;
-    DataPoint(double t, double h, double w, double at, double n, double l, double x, double s, double c, double a, double te, double wi, double tq, double lrb, double kphd, double wattsd, double cadd, double nmd, double hrd) :
-        time(t), hr(h), watts(w), atiss(at), np(n), ap(l), xp(x), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd) {}
+    double time, hr, watts, atiss, antiss, np, ap, xp, speed, cad, alt, temp, wind, torque, lrbalance, kphd, wattsd, cadd, nmd, hrd;
+    DataPoint(double t, double h, double w, double at, double an, double n, double l, double x, double s, double c, double a, double te, double wi, double tq, double lrb, double kphd, double wattsd, double cadd, double nmd, double hrd) :
+        time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), ap(l), xp(x), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -1018,8 +1041,9 @@ AllPlot::recalc(AllPlotObject *objects)
 
         objects->wCurve->setSamples(data,data);
         objects->mCurve->setSamples(data,data);
-        if (!objects->atissArray.empty())
-            objects->atissCurve->setSamples(data, data);
+        if (!objects->atissArray.empty()) objects->atissCurve->setSamples(data, data);
+        if (!objects->antissArray.empty()) objects->antissCurve->setSamples(data, data);
+
         if (!objects->npArray.empty())
             objects->npCurve->setSamples(data, data);
         if (!objects->xpArray.empty())
@@ -1064,6 +1088,7 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalWatts = 0.0;
         double totalNP = 0.0;
         double totalATISS = 0.0;
+        double totalANTISS = 0.0;
         double totalXP = 0.0;
         double totalAP = 0.0;
         double totalHr = 0.0;
@@ -1086,6 +1111,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothWatts.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         objects->smoothNP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         objects->smoothAT.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+        objects->smoothANT.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         objects->smoothXP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         objects->smoothAP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
         objects->smoothHr.resize(rideTimeSecs + 1);
@@ -1111,6 +1137,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothWatts[secs] = 0.0;
             objects->smoothNP[secs] = 0.0;
             objects->smoothAT[secs] = 0.0;
+            objects->smoothANT[secs] = 0.0;
             objects->smoothXP[secs] = 0.0;
             objects->smoothAP[secs] = 0.0;
             objects->smoothHr[secs]    = 0.0;
@@ -1139,6 +1166,7 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->hrArray.empty() ? objects->hrArray[i] : 0),
                              (!objects->wattsArray.empty() ? objects->wattsArray[i] : 0),
                              (!objects->atissArray.empty() ? objects->atissArray[i] : 0),
+                             (!objects->antissArray.empty() ? objects->antissArray[i] : 0),
                              (!objects->npArray.empty() ? objects->npArray[i] : 0),
                              (!objects->apArray.empty() ? objects->apArray[i] : 0),
                              (!objects->xpArray.empty() ? objects->xpArray[i] : 0),
@@ -1159,6 +1187,7 @@ AllPlot::recalc(AllPlotObject *objects)
 
                 if (!objects->npArray.empty()) totalNP += objects->npArray[i];
                 if (!objects->atissArray.empty()) totalATISS += objects->atissArray[i];
+                if (!objects->antissArray.empty()) totalANTISS += objects->antissArray[i];
 
                 if (!objects->xpArray.empty())
                     totalXP += objects->xpArray[i];
@@ -1204,6 +1233,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalWatts -= dp.watts;
                 totalNP -= dp.np;
                 totalATISS -= dp.atiss;
+                totalANTISS -= dp.antiss;
                 totalAP -= dp.ap;
                 totalXP -= dp.xp;
                 totalHr    -= dp.hr;
@@ -1227,6 +1257,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothWatts[secs] = 0.0;
                 objects->smoothNP[secs] = 0.0;
                 objects->smoothAT[secs] = 0.0;
+                objects->smoothANT[secs] = 0.0;
                 objects->smoothXP[secs] = 0.0;
                 objects->smoothAP[secs] = 0.0;
                 objects->smoothHr[secs]    = 0.0;
@@ -1249,6 +1280,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothWatts[secs]    = totalWatts / list.size();
                 objects->smoothNP[secs]    = totalNP / list.size();
                 objects->smoothAT[secs]    = totalATISS / list.size();
+                objects->smoothANT[secs]    = totalANTISS / list.size();
                 objects->smoothXP[secs]    = totalXP / list.size();
                 objects->smoothAP[secs]    = totalAP / list.size();
                 objects->smoothHr[secs]       = totalHr / list.size();
@@ -1288,6 +1320,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothWatts.resize(0);
         objects->smoothNP.resize(0);
         objects->smoothAT.resize(0);
+        objects->smoothANT.resize(0);
         objects->smoothXP.resize(0);
         objects->smoothAP.resize(0);
         objects->smoothHr.resize(0);
@@ -1312,6 +1345,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothWatts.append(dp->watts);
             objects->smoothNP.append(dp->np);
             objects->smoothAT.append(dp->atiss);
+            objects->smoothANT.append(dp->antiss);
             objects->smoothXP.append(dp->xp);
             objects->smoothAP.append(dp->apower);
             objects->smoothHr.append(dp->hr);
@@ -1365,6 +1399,10 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!objects->wattsArray.empty()) {
         objects->wattsCurve->setSamples(xaxis.data() + startingIndex, objects->smoothWatts.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->antissArray.empty()) {
+        objects->antissCurve->setSamples(xaxis.data() + startingIndex, objects->smoothANT.data() + startingIndex, totalPoints);
     }
 
     if (!objects->atissArray.empty()) {
@@ -1536,7 +1574,7 @@ AllPlot::refreshReferenceLines()
     if (context->isCompareIntervals) return;
 
     // only on power based charts
-    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS &&
+    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     foreach(QwtPlotCurve *referenceLine, standard->referenceLines) {
@@ -1561,7 +1599,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
     if (context->isCompareIntervals) return NULL;
 
     // only on power based charts
-    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS &&
+    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return NULL;
 
     QwtPlotCurve *referenceLine = NULL;
@@ -1620,10 +1658,11 @@ AllPlot::setYMax()
 {
 
     // set axis scales
-    if (showATISS && standard->atissCurve->isVisible() && rideItem && rideItem->ride()) {
+    if (((showATISS && standard->atissCurve->isVisible()) || (showANTISS && standard->antissCurve->isVisible()))
+         && rideItem && rideItem->ride()) {
 
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("Aerobic TISS"));
-        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),0,standard->atissCurve->maxYValue() * 1.05);
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("TISS"));
+        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),0, qMax(standard->atissCurve->maxYValue(), standard->atissCurve->maxYValue()) * 1.05);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
     }
 
@@ -1792,13 +1831,13 @@ AllPlot::setYMax()
 
     if (wantaxis) {
 
-        setAxisVisible(yLeft, standard->wattsCurve->isVisible() || standard->atissCurve->isVisible() || 
+        setAxisVisible(yLeft, standard->wattsCurve->isVisible() || standard->atissCurve->isVisible() || standard->antissCurve->isVisible() || 
                               standard->npCurve->isVisible() || standard->xpCurve->isVisible() || standard->apCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), standard->hrCurve->isVisible() || standard->cadCurve->isVisible());
         setAxisVisible(yRight, standard->speedCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
-        setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), standard->atissCurve->isVisible());
+        setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), standard->atissCurve->isVisible() || standard->antissCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false);
         setAxisVisible(xBottom, true);
 
@@ -1864,6 +1903,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothW = &plot->standard->smoothWatts[startidx];
     double *smoothN = &plot->standard->smoothNP[startidx];
     double *smoothAT = &plot->standard->smoothAT[startidx];
+    double *smoothANT = &plot->standard->smoothANT[startidx];
     double *smoothX = &plot->standard->smoothXP[startidx];
     double *smoothL = &plot->standard->smoothAP[startidx];
     double *smoothT = &plot->standard->smoothTime[startidx];
@@ -1929,6 +1969,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->mCurve->detach();
     standard->wattsCurve->detach();
     standard->atissCurve->detach();
+    standard->antissCurve->detach();
     standard->npCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
@@ -1949,6 +1990,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     standard->wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
     standard->atissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showATISS);
+    standard->antissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showANTISS);
     standard->npCurve->setVisible(rideItem->ride()->areDataPresent()->np && showNP);
     standard->xpCurve->setVisible(rideItem->ride()->areDataPresent()->xp && showXP);
     standard->apCurve->setVisible(rideItem->ride()->areDataPresent()->apower && showAP);
@@ -1975,6 +2017,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     standard->wattsCurve->setSamples(xaxis,smoothW,stopidx-startidx);
     standard->atissCurve->setSamples(xaxis,smoothAT,stopidx-startidx);
+    standard->antissCurve->setSamples(xaxis,smoothANT,stopidx-startidx);
     standard->npCurve->setSamples(xaxis,smoothN,stopidx-startidx);
     standard->xpCurve->setSamples(xaxis,smoothX,stopidx-startidx);
     standard->apCurve->setSamples(xaxis,smoothL,stopidx-startidx);
@@ -2026,6 +2069,17 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         sym->setSize(0);
     }
     standard->wattsCurve->setSymbol(sym);
+
+    sym = new QwtSymbol;
+    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(3);
+    } else {
+        sym->setStyle(QwtSymbol::NoSymbol);
+        sym->setSize(0);
+    }
+    standard->antissCurve->setSymbol(sym);
 
     sym = new QwtSymbol;
     sym->setPen(QPen(GColor(CPLOTMARKER)));
@@ -2230,6 +2284,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->standard->smoothWatts.empty()) {
         standard->wattsCurve->attach(this);
     }
+    if (!plot->standard->smoothANT.empty()) {
+        standard->antissCurve->attach(this);
+    }
     if (!plot->standard->smoothAT.empty()) {
         standard->atissCurve->attach(this);
     }
@@ -2313,6 +2370,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->mCurve->detach();
     standard->wattsCurve->detach();
     standard->atissCurve->detach();
+    standard->antissCurve->detach();
     standard->npCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
@@ -2335,6 +2393,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->mCurve->setVisible(false);
     standard->wattsCurve->setVisible(false);
     standard->atissCurve->setVisible(false);
+    standard->antissCurve->setVisible(false);
     standard->npCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
@@ -2476,6 +2535,14 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         ourCurve = standard->tempCurve;
         thereCurve = referencePlot->standard->tempCurve;
         title = tr("Temperature");
+        }
+        break;
+
+    case RideFile::anTISS:
+        {
+        ourCurve = standard->antissCurve;
+        thereCurve = referencePlot->standard->antissCurve;
+        title = tr("Anaerobic TISS");
         }
         break;
 
@@ -2677,6 +2744,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->mCurve->detach();
     standard->wattsCurve->detach();
     standard->atissCurve->detach();
+    standard->antissCurve->detach();
     standard->npCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
@@ -2699,6 +2767,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->mCurve->setVisible(false);
     standard->wattsCurve->setVisible(false);
     standard->atissCurve->setVisible(false);
+    standard->antissCurve->setVisible(false);
     standard->npCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
@@ -2879,6 +2948,15 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->tempCurve;
                 title = tr("Temperature");
+                }
+                break;
+
+            case RideFile::anTISS:
+                {
+                ourCurve = new QwtPlotCurve(tr("Anaerobic TISS"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->antissCurve;
+                title = tr("Anaerobic TISS");
                 }
                 break;
 
@@ -3117,6 +3195,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->mCurve->detach();
     standard->wattsCurve->detach();
     standard->atissCurve->detach();
+    standard->antissCurve->detach();
     standard->npCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
@@ -3141,6 +3220,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->mCurve->setVisible(false);
     standard->wattsCurve->setVisible(false);
     standard->atissCurve->setVisible(false);
+    standard->antissCurve->setVisible(false);
     standard->npCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
@@ -3173,6 +3253,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->wattsCurve->setSamples(xaxis.data(), object->smoothWatts.data(), totalPoints);
         standard->wattsCurve->attach(this);
         standard->wattsCurve->setVisible(true);
+    }
+
+    if (!object->antissArray.empty()) {
+        standard->antissCurve->setSamples(xaxis.data(), object->smoothANT.data(), totalPoints);
+        standard->antissCurve->attach(this);
+        standard->antissCurve->setVisible(true);
     }
 
     if (!object->atissArray.empty()) {
@@ -3290,6 +3376,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->wattsCurve->setVisible(referencePlot->showPowerState < 2);
     standard->npCurve->setVisible(referencePlot->showNP);
     standard->atissCurve->setVisible(referencePlot->showATISS);
+    standard->antissCurve->setVisible(referencePlot->showANTISS);
     standard->xpCurve->setVisible(referencePlot->showXP);
     standard->apCurve->setVisible(referencePlot->showAP);
     standard->hrCurve->setVisible(referencePlot->showHr);
@@ -3359,6 +3446,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         int npoints = ride->dataPoints().size();
         here->wattsArray.resize(dataPresent->watts ? npoints : 0);
         here->atissArray.resize(dataPresent->watts ? npoints : 0);
+        here->antissArray.resize(dataPresent->watts ? npoints : 0);
         here->npArray.resize(dataPresent->np ? npoints : 0);
         here->xpArray.resize(dataPresent->xp ? npoints : 0);
         here->apArray.resize(dataPresent->apower ? npoints : 0);
@@ -3383,6 +3471,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->mCurve->detach();
         here->wattsCurve->detach();
         here->atissCurve->detach();
+        here->antissCurve->detach();
         here->npCurve->detach();
         here->xpCurve->detach();
         here->apCurve->detach();
@@ -3404,6 +3493,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (!here->altArray.empty()) here->altCurve->attach(this);
         if (!here->wattsArray.empty()) here->wattsCurve->attach(this);
         if (!here->atissArray.empty()) here->atissCurve->attach(this);
+        if (!here->antissArray.empty()) here->antissCurve->attach(this);
         if (!here->npArray.empty()) here->npCurve->attach(this);
         if (!here->xpArray.empty()) here->xpCurve->attach(this);
         if (!here->apArray.empty()) here->apCurve->attach(this);
@@ -3434,6 +3524,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->mCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
         here->wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         here->atissCurve->setVisible(dataPresent->watts && showATISS);
+        here->antissCurve->setVisible(dataPresent->watts && showANTISS);
         here->npCurve->setVisible(dataPresent->np && showNP);
         here->xpCurve->setVisible(dataPresent->xp && showXP);
         here->apCurve->setVisible(dataPresent->apower && showAP);
@@ -3473,6 +3564,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             here->timeArray[arrayLength]  = secs + msecs/1000;
             if (!here->wattsArray.empty()) here->wattsArray[arrayLength] = max(0, point->watts);
             if (!here->atissArray.empty()) here->atissArray[arrayLength] = max(0, point->atiss);
+            if (!here->antissArray.empty()) here->antissArray[arrayLength] = max(0, point->antiss);
             if (!here->npArray.empty()) here->npArray[arrayLength] = max(0, point->np);
             if (!here->xpArray.empty()) here->xpArray[arrayLength] = max(0, point->xp);
             if (!here->apArray.empty()) here->apArray[arrayLength] = max(0, point->apower);
@@ -3531,6 +3623,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->mCurve->detach();
         here->wattsCurve->detach();
         here->atissCurve->detach();
+        here->antissCurve->detach();
         here->npCurve->detach();
         here->xpCurve->detach();
         here->apCurve->detach();
@@ -3603,6 +3696,19 @@ AllPlot::setShowNP(bool show)
 {
     showNP = show;
     standard->npCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowANTISS(bool show)
+{
+    showANTISS = show;
+    standard->antissCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
@@ -3866,6 +3972,7 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         standard->npCurve->setBrush(QBrush(p));
         standard->atissCurve->setBrush(QBrush(p));
+        standard->antissCurve->setBrush(QBrush(p));
 
         p = standard->xpCurve->pen().color();
         p.setAlpha(64);
@@ -3927,6 +4034,7 @@ AllPlot::setPaintBrush(int state)
         standard->wattsCurve->setBrush(Qt::NoBrush);
         standard->npCurve->setBrush(Qt::NoBrush);
         standard->atissCurve->setBrush(Qt::NoBrush);
+        standard->antissCurve->setBrush(Qt::NoBrush);
         standard->xpCurve->setBrush(Qt::NoBrush);
         standard->apCurve->setBrush(Qt::NoBrush);
         standard->hrCurve->setBrush(Qt::NoBrush);
@@ -4328,8 +4436,8 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 
     // if power is going on we worry about reference lines
     // otherwise not so much ..
-    if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts || scope == RideFile::aTISS ||
-        scope == RideFile::NP || scope == RideFile::aPower || scope == RideFile::xPower) {
+    if ((showPowerState<2 && scope == RideFile::none) || scope == RideFile::watts || scope == RideFile::aTISS || 
+        scope == RideFile::anTISS || scope == RideFile::NP || scope == RideFile::aPower || scope == RideFile::xPower) {
 
         int axis = -1;
         if (obj == axisWidget(QwtPlot::yLeft))
@@ -4426,7 +4534,7 @@ AllPlot::plotTmpReference(int axis, int x, int y)
     if (context->isCompareIntervals) return;
 
     // only on power based charts
-    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS &&
+    if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     if (x>0) {
