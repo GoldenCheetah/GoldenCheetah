@@ -1045,7 +1045,8 @@ RideFile::recalculateDerivedSeries()
     static const double t = 2;
     // anTISS
     static const double an = 0.238923886004611f;
-    static const double bn = -12.2066385296127f;
+    //static const double bn = -12.2066385296127f;
+    static const double bn = -61.849f;
     static const double cn = -1.73549567522521f;
 
     int CP = 0;
