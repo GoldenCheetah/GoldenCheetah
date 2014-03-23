@@ -87,8 +87,9 @@
 // 66  18  Mar 2014 Mark Liversedge    Updated aPower calculation
 // 67  22  Mar 2014 Mark Liversedge    Added Anaerobic TISS prototype
 // 68  22  Mar 2014 Mark Liversedge    Added dTISS prototype
+// 69  23  Mar 2014 Mark Liversedge    Updated Gompertz constansts for An-TISS sigmoid
 
-int DBSchemaVersion = 68;
+int DBSchemaVersion = 69;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
