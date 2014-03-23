@@ -295,7 +295,8 @@ class anTISS : public RideMetric {
 
         // anTISS - Aerobic Training Impact Scoring System
         static const double a = 0.238923886004611f;
-        static const double b = -12.2066385296127f;
+        //static const double b = -12.2066385296127f;
+        static const double b = -61.849f;
         static const double c = -1.73549567522521f;
         double anTISS = 0.0f;
 
