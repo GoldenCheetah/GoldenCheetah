@@ -19,7 +19,7 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "Colors.h"
-#include "CpintPlot.h"
+#include "CPPlot.h"
 #include <unistd.h>
 #include <QDebug>
 #include <qwt_series_data.h>
@@ -42,18 +42,12 @@
 
 #include <algorithm> // for std::lower_bound
 
-CpintPlot::CpintPlot(QWidget *parent, Context *context, QString p, const Zones *zones, bool rangemode) :
+CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) :
     QwtPlot(parent),
-    path(p),
-    thisCurve(NULL),
-    CPCurve(NULL),
-    allCurve(NULL),
-    curveTitle(NULL),
-    zones(zones),
-    rideSeries(RideFile::watts),
     context(context),
     current(NULL),
     bests(NULL),
+    rideSeries(RideFile::watts),
     isFiltered(false),
     shadeMode(2),
     shadeIntervals(true),
@@ -61,7 +55,11 @@ CpintPlot::CpintPlot(QWidget *parent, Context *context, QString p, const Zones *
     showPercent(false),
     showHeat(false),
     showHeatByDate(false),
-    ridePlotStyle(0)
+    ridePlotStyle(0),
+    rideCurve(NULL),
+    modelCurve(NULL),
+    bestsCurve(NULL),
+    curveTitle(NULL)
 {
     setAutoFillBackground(true);
 
@@ -111,20 +109,20 @@ CpintPlot::CpintPlot(QWidget *parent, Context *context, QString p, const Zones *
 
     ecp = new ExtendedCriticalPower(context);
 
-    extendedCPCurve4 = NULL;
-    extendedCPCurve5 = NULL;
-    extendedCPCurve6 = NULL;
+    extendedModelCurve4 = NULL;
+    extendedModelCurve5 = NULL;
+    extendedModelCurve6 = NULL;
     heatCurve = NULL;
     heatCurveByDate = NULL;
 
-    extendedCPCurve_WSecond = NULL;
-    extendedCPCurve_WPrime = NULL;
-    extendedCPCurve_CP = NULL;
-    extendedCPCurve_WPrime_CP = NULL;
+    extendedModelCurve_WSecond = NULL;
+    extendedModelCurve_WPrime = NULL;
+    extendedModelCurve_CP = NULL;
+    extendedModelCurve_WPrime_CP = NULL;
 }
 
 void
-CpintPlot::configChanged()
+CPPlot::configChanged()
 {
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
@@ -143,7 +141,7 @@ CpintPlot::configChanged()
 }
 
 void
-CpintPlot::setAxisTitle(int axis, QString label)
+CPPlot::setAxisTitle(int axis, QString label)
 {
     // setup the default fonts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
@@ -158,33 +156,17 @@ CpintPlot::setAxisTitle(int axis, QString label)
 }
 
 void
-CpintPlot::changeSeason(const QDate &start, const QDate &end)
+CPPlot::changeSeason(const QDate &start, const QDate &end)
 {
     // wipe out current - calculate will reinstate
     startDate = (start == QDate()) ? QDate(1900, 1, 1) : start;
     endDate = (end == QDate()) ? QDate(3000, 12, 31) : end;
 
-    if (CPCurve) {
-        delete CPCurve;
-        CPCurve = NULL;
-        clear_CP_Curves();
-    }
-    if (bests) {
-        delete bests;
-        bests = NULL;
-    }
-    if (heatCurve) {
-        delete heatCurve;
-        heatCurve = NULL;
-    }
-    if (heatCurveByDate) {
-        delete heatCurveByDate;
-        heatCurveByDate = NULL;
-    }
+    clearCurves();
 }
 
 void
-CpintPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
+CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 {
     rideSeries = CriticalPowerWindow::getRideSeries(criticalSeries);
     this->criticalSeries = criticalSeries;
@@ -277,21 +259,8 @@ CpintPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 
     }
 
-    delete CPCurve;
-    CPCurve = NULL;
-    clear_CP_Curves();
-    if (allCurve) {
-        delete allCurve;
-        allCurve = NULL;
-    }
-    if (heatCurve) {
-        delete heatCurve;
-        heatCurve = NULL;
-    }
-    if (heatCurveByDate) {
-        delete heatCurveByDate;
-        heatCurveByDate = NULL;
-    }
+    // zap the old curves
+    clearCurves();
 }
 
 // extract critical power parameters which match the given curve
@@ -301,7 +270,7 @@ CpintPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 // been discussed in the literature
 // it is assumed duration = index * seconds
 void
-CpintPlot::deriveCPParameters()
+CPPlot::deriveCPParameters()
 {
     // bounds on anaerobic interval in minutes
     const double t1 = anI1;
@@ -406,14 +375,14 @@ CpintPlot::deriveCPParameters()
 
 
 void
-CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently displaying
+CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently displaying
                          double cp,
                          double tau,
                          double t0)
 {
-    if (CPCurve) {
-        delete CPCurve;
-        CPCurve = NULL;
+    if (modelCurve) {
+        delete modelCurve;
+        modelCurve = NULL;
     }
 
     if (heatCurve) {
@@ -497,16 +466,16 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         curveTitle->setYValue(70);
     curveTitle->attach(thisPlot);
 
-    CPCurve = new QwtPlotCurve(curve_title);
+    modelCurve = new QwtPlotCurve(curve_title);
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
-        CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen pen(GColor(CCP));
     double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
     pen.setWidth(width);
     pen.setStyle(Qt::DashLine);
-    CPCurve->setPen(pen);
-    CPCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
-    CPCurve->attach(thisPlot);
+    modelCurve->setPen(pen);
+    modelCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
+    modelCurve->attach(thisPlot);
 
     // draw a heat curve
     if (showHeat && rideSeries == RideFile::watts && bests && bests->heatMeanMaxArray().count()) {
@@ -565,35 +534,35 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     }
 
     // Extended CP 4
-    if (extendedCPCurve4) {
-        delete extendedCPCurve4;
-        extendedCPCurve4 = NULL;
+    if (extendedModelCurve4) {
+        delete extendedModelCurve4;
+        extendedModelCurve4 = NULL;
     }
-    if (extendedCPCurve_WSecond) {
-        delete extendedCPCurve_WSecond;
-        extendedCPCurve_WSecond = NULL;
+    if (extendedModelCurve_WSecond) {
+        delete extendedModelCurve_WSecond;
+        extendedModelCurve_WSecond = NULL;
     }
-    if (extendedCPCurve_WPrime) {
-        delete extendedCPCurve_WPrime;
-        extendedCPCurve_WPrime = NULL;
+    if (extendedModelCurve_WPrime) {
+        delete extendedModelCurve_WPrime;
+        extendedModelCurve_WPrime = NULL;
     }
-    if (extendedCPCurve_CP) {
-        delete extendedCPCurve_CP;
-        extendedCPCurve_CP = NULL;
+    if (extendedModelCurve_CP) {
+        delete extendedModelCurve_CP;
+        extendedModelCurve_CP = NULL;
     }
-    if (extendedCPCurve_WPrime_CP) {
-        delete extendedCPCurve_WPrime_CP;
-        extendedCPCurve_WPrime_CP = NULL;
-    }
-
-    if (extendedCPCurve5) {
-        delete extendedCPCurve5;
-        extendedCPCurve5 = NULL;
+    if (extendedModelCurve_WPrime_CP) {
+        delete extendedModelCurve_WPrime_CP;
+        extendedModelCurve_WPrime_CP = NULL;
     }
 
-    if (extendedCPCurve6) {
-        delete extendedCPCurve6;
-        extendedCPCurve6 = NULL;
+    if (extendedModelCurve5) {
+        delete extendedModelCurve5;
+        extendedModelCurve5 = NULL;
+    }
+
+    if (extendedModelCurve6) {
+        delete extendedModelCurve6;
+        extendedModelCurve6 = NULL;
     }
 
 
@@ -603,15 +572,15 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
             delete curveTitle;
             curveTitle = NULL;
         }
-        //extendedCPCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
-        //extendedCPCurve4->attach(thisPlot);
+        //extendedModelCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
+        //extendedModelCurve4->attach(thisPlot);
 
-        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
-        extendedCPCurve_WSecond->attach(thisPlot);
-        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_4_3_WPrime(athleteModeleCP4);
-        extendedCPCurve_WPrime->attach(thisPlot);
-        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_4_3_CP(athleteModeleCP4);
-        extendedCPCurve_CP->attach(thisPlot);*/
+        /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
+        extendedModelCurve_WSecond->attach(thisPlot);
+        extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_4_3_WPrime(athleteModeleCP4);
+        extendedModelCurve_WPrime->attach(thisPlot);
+        extendedModelCurve_CP = ecp->getPlotCurveForExtendedCP_4_3_CP(athleteModeleCP4);
+        extendedModelCurve_CP->attach(thisPlot);*/
 
         /*extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
         extendedCurveTitle->attach(thisPlot);*/
@@ -627,27 +596,27 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
             levelCurve5->attach(thisPlot);
         }*/
 
-        extendedCPCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
-        extendedCPCurve5->attach(thisPlot);
+        extendedModelCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
+        extendedModelCurve5->attach(thisPlot);
 
 
 
-        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5, false);
-        extendedCPCurve_WSecond->attach(thisPlot);
-        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5, false);
-        extendedCPCurve_WPrime->attach(thisPlot);
-        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_5_3_CP(athleteModeleCP5, false);
-        extendedCPCurve_CP->attach(thisPlot);*/
+        /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5, false);
+        extendedModelCurve_WSecond->attach(thisPlot);
+        extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5, false);
+        extendedModelCurve_WPrime->attach(thisPlot);
+        extendedModelCurve_CP = ecp->getPlotCurveForExtendedCP_5_3_CP(athleteModeleCP5, false);
+        extendedModelCurve_CP->attach(thisPlot);*/
 
-        //extendedCPCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
-        //extendedCPCurve6->attach(thisPlot);
+        //extendedModelCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
+        //extendedModelCurve6->attach(thisPlot);
 
-        /*extendedCPCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, false);
-        extendedCPCurve_WSecond->attach(thisPlot);
-        extendedCPCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, false);
-        extendedCPCurve_WPrime->attach(thisPlot);
-        extendedCPCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, false);
-        extendedCPCurve_CP->attach(thisPlot);*/
+        /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, false);
+        extendedModelCurve_WSecond->attach(thisPlot);
+        extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, false);
+        extendedModelCurve_WPrime->attach(thisPlot);
+        extendedModelCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, false);
+        extendedModelCurve_CP->attach(thisPlot);*/
 
 
         curveTitle = ecp->getPlotMarkerForExtendedCP(athleteModeleCP5);
@@ -658,43 +627,59 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 }
 
 void
-CpintPlot::clear_CP_Curves()
+CPPlot::clearCurves()
 {
-    // unattach any existing shading curves and reset the list
-    if (allCurves.size()) {
-        foreach (QwtPlotCurve *curve, allCurves)
+    // bests ridefilecache
+    if (bests) {
+        delete bests;
+        bests = NULL;
+    }
+
+    // model curve
+    if (modelCurve) {
+        delete modelCurve;
+        modelCurve = NULL;
+    }
+
+    // ride curve
+    if (rideCurve) {
+        delete rideCurve;
+        rideCurve = NULL;
+    }
+
+    // rainbow curve
+    if (bestsCurves.size()) {
+        foreach (QwtPlotCurve *curve, bestsCurves)
             delete curve;
-        allCurves.clear();
+        bestsCurves.clear();
     }
 
-    if (thisCurve) {
-        delete thisCurve;
-        thisCurve = NULL;
-    }
-
-    // now delete any labels
+    // rainbow labels
     if (allZoneLabels.size()) {
         foreach (QwtPlotMarker *label, allZoneLabels)
             delete label;
         allZoneLabels.clear();
     }
 
-    if (CPCurve) {
-        delete CPCurve;
-        CPCurve = NULL;
+    // heat curves
+    if (heatCurve) {
+        delete heatCurve;
+        heatCurve = NULL;
+    }
+    if (heatCurveByDate) {
+        delete heatCurveByDate;
+        heatCurveByDate = NULL;
     }
 }
 
 // plot the all curve, with shading according to the shade mode
 void
-CpintPlot::plot_allCurve(CpintPlot *thisPlot,
+CPPlot::plotBestsCurve(CPPlot *thisPlot,
                          int n_values,
                          const double *power_values,
                          QColor plotColor,
                          bool forcePlotColor)
 {
-    //clear_CP_Curves();
-
     QVector<double> energyBests(n_values);
     QVector<double> time_values(n_values);
     // generate an array of time values
@@ -727,7 +712,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // generate zones from shading CP value
     if (shadingCP > 0) {
         QList <int> power_zone;
-        int n_zones = zones->lowsFromCP(&power_zone, (int) int(shadingCP));
+        int n_zones = context->athlete->zones()->lowsFromCP(&power_zone, (int) int(shadingCP));
         int high = n_values - 1;
         int zone = 0;
         while (zone < n_zones && high > 0) {
@@ -741,7 +726,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             }
 
             QColor color = zoneColor(zone, n_zones);
-            QString name = zones->getDefaultZoneName(zone);
+            QString name = context->athlete->zones()->getDefaultZoneName(zone);
             QwtPlotCurve *curve = new QwtPlotCurve(name);
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -771,7 +756,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                 curve->setSamples(time_values.data() + low,
                                power_values + low, high - low + 1);
             }
-            allCurves.append(curve);
+            bestsCurves.append(curve);
 
             if (shadeMode && (criticalSeries != CriticalPowerWindow::work || energyBests[high] > 100.0)) {
                 QwtText text(name);
@@ -816,7 +801,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             curve->setSamples(time_values.data(), power_values, n_values);
 
         curve->attach(thisPlot);
-        allCurves.append(curve);
+        bestsCurves.append(curve);
     }
 
 
@@ -864,9 +849,9 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 }
 
 void
-CpintPlot::calculate(RideItem *rideItem)
+CPPlot::calculate(RideItem *rideItem)
 {
-    clear_CP_Curves();
+    clearCurves();
 
     // Season Compare Mode
     if (rangemode && context->isCompareDateRanges) return calculateForDateRanges(context->compareDateRanges);
@@ -875,7 +860,7 @@ CpintPlot::calculate(RideItem *rideItem)
 
     QString fileName = rideItem->fileName;
     QDateTime dateTime = rideItem->dateTime;
-    QDir dir(path);
+    //QDir dir(path);
     QFileInfo file(fileName);
 
     // zap any existing ridefilecache then get new one
@@ -915,18 +900,18 @@ CpintPlot::calculate(RideItem *rideItem)
         if (rideSeries == RideFile::aPower || rideSeries == RideFile::NP || rideSeries == RideFile::xPower ||
             rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::none) {
 
-            if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
+            if (!modelCurve) plotModelCurve(this, cp, tau, t0);
             else {
                 // make sure color reflects latest config
                 QPen pen(GColor(CCP));
                 double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
                 pen.setWidth(width);
                 pen.setStyle(Qt::DashLine);
-                CPCurve->setPen(pen);
+                modelCurve->setPen(pen);
             }
 
-            if (model == 3 && CPCurve) CPCurve->setVisible(false);
-            else if (CPCurve) CPCurve->setVisible(true);
+            if (model == 3 && modelCurve) modelCurve->setVisible(false);
+            else if (modelCurve) modelCurve->setVisible(true);
         }
 
         //
@@ -938,16 +923,16 @@ CpintPlot::calculate(RideItem *rideItem)
                 if (bests->meanMaxArray(rideSeries)[i] > 0) maxNonZero = i;
             }
 
-            plot_allCurve(this, maxNonZero, bests->meanMaxArray(rideSeries).constData() + 1, GColor(CCP), false);
+            plotBestsCurve(this, maxNonZero, bests->meanMaxArray(rideSeries).constData() + 1, GColor(CCP), false);
         }
     } else {
 
         //
         // PLOT BESTS IN SERIES COLOR
         //
-        if (allCurve) {
-            delete allCurve;
-            allCurve = NULL;
+        if (bestsCurve) {
+            delete bestsCurve;
+            bestsCurve = NULL;
         }
         if (bests->meanMaxArray(rideSeries).size()) {
 
@@ -960,8 +945,8 @@ CpintPlot::calculate(RideItem *rideItem)
 
             if (maxNonZero > 1) {
 
-                allCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
-                allCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                bestsCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+                bestsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
                 QPen line;
                 QColor fill;
@@ -1046,7 +1031,7 @@ CpintPlot::calculate(RideItem *rideItem)
                 div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
                 setAxisScaleDiv(QwtPlot::xBottom, div);
 
-                allCurve->setPen(line);
+                bestsCurve->setPen(line);
                 fill.setAlpha(64);
                 // use a linear gradient
                 fill.setAlpha(64);
@@ -1055,9 +1040,9 @@ CpintPlot::calculate(RideItem *rideItem)
                 linearGradient.setColorAt(0.0, fill);
                 linearGradient.setColorAt(1.0, fill1);
                 linearGradient.setSpread(QGradient::PadSpread);
-                allCurve->setBrush(linearGradient);
-                allCurve->attach(this);
-                allCurve->setSamples(timeArray.data() + 1, bests->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
+                bestsCurve->setBrush(linearGradient);
+                bestsCurve->attach(this);
+                bestsCurve->setSamples(timeArray.data() + 1, bests->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
             }
         }
     }
@@ -1068,9 +1053,9 @@ CpintPlot::calculate(RideItem *rideItem)
         //
         // PLOT THIS RIDE CURVE
         //
-        if (thisCurve) {
-            delete thisCurve;
-            thisCurve = NULL;
+        if (rideCurve) {
+            delete rideCurve;
+            rideCurve = NULL;
         }
 
         if (!rangemode && current->meanMaxArray(rideSeries).size()) {
@@ -1083,17 +1068,17 @@ CpintPlot::calculate(RideItem *rideItem)
 
             if (maxNonZero > 1) {
 
-                thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
-                thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                thisCurve->setYAxis(yLeft);
-                thisCurve->setBrush(QBrush(Qt::NoBrush));
+                rideCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+                rideCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                rideCurve->setYAxis(yLeft);
+                rideCurve->setBrush(QBrush(Qt::NoBrush));
                 setAxisVisible(yRight, false);
                 QPen black;
                 black.setColor(GColor(CRIDECP));
                 double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
                 black.setWidth(width);
-                thisCurve->setPen(black);
-                thisCurve->attach(this);
+                rideCurve->setPen(black);
+                rideCurve->attach(this);
 
                 if (criticalSeries == CriticalPowerWindow::work) {
 
@@ -1104,16 +1089,16 @@ CpintPlot::calculate(RideItem *rideItem)
                         timeArray[i] *
                         current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
                     }
-                    thisCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
+                    rideCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
 
                 } else {
 
                     if (showPercent && bests) {
 
-                        thisCurve->setYAxis(yRight);
+                        rideCurve->setYAxis(yRight);
                         //QColor p = GColor(CRIDECP);
                         //p.setAlpha(64);
-                        //thisCurve->setBrush(QBrush(p));
+                        //rideCurve->setBrush(QBrush(p));
                         setAxisVisible(yRight, true);
 
                         QVector<double> samples(timeArray.size());
@@ -1124,19 +1109,19 @@ CpintPlot::calculate(RideItem *rideItem)
                             samples[i] = current->meanMaxArray(rideSeries)[i] /
                                          bests->meanMaxArray(rideSeries)[i] * 100.00f;
                         }
-                        thisCurve->setSamples(timeArray.data() + 1, samples.data() + 1, maxNonZero -1);
+                        rideCurve->setSamples(timeArray.data() + 1, samples.data() + 1, maxNonZero -1);
 
-                        int max = thisCurve->maxYValue();
+                        int max = rideCurve->maxYValue();
                         if (max < 100) max = 100;
                         setAxisScale(yRight, 0, max); // always 100
 
                     } else {
 
-                        thisCurve->setYAxis(yLeft);
+                        rideCurve->setYAxis(yLeft);
                         setAxisVisible(yRight, false);
 
                         // normal
-                        thisCurve->setSamples(timeArray.data() + 1,
+                        rideCurve->setSamples(timeArray.data() + 1,
                         current->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
                     }
                 }
@@ -1152,14 +1137,7 @@ CpintPlot::calculate(RideItem *rideItem)
 }
 
 void
-CpintPlot::showGrid(int )
-{
-    //grid->setVisible(state == Qt::Checked);
-    //replot();
-}
-
-void
-CpintPlot::pointHover(QwtPlotCurve *curve, int index)
+CPPlot::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0) {
 
@@ -1168,7 +1146,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
         QString text, dateStr;
 
         // add when to tooltip if its all curve
-        if (allCurves.contains(curve)) {
+        if (bestsCurves.contains(curve)) {
             int index = xvalue * 60;
             if (index >= 0 && bests && getBests().count() > index) {
                 QDate date = getBestDates()[index];
@@ -1192,7 +1170,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
 }
 
 void
-CpintPlot::clearFilter()
+CPPlot::clearFilter()
 {
     isFiltered = false;
     files.clear();
@@ -1201,7 +1179,7 @@ CpintPlot::clearFilter()
 }
 
 void
-CpintPlot::setFilter(QStringList list)
+CPPlot::setFilter(QStringList list)
 {
     isFiltered = true;
     files = list;
@@ -1210,39 +1188,39 @@ CpintPlot::setFilter(QStringList list)
 }
 
 void
-CpintPlot::setShowHeat(bool x)
+CPPlot::setShowHeat(bool x)
 {
     showHeat = x;
 }
 
 void
-CpintPlot::setShowPercent(bool x)
+CPPlot::setShowPercent(bool x)
 {
     showPercent = x;
 }
 
 void
-CpintPlot::setShowHeatByDate(bool x)
+CPPlot::setShowHeatByDate(bool x)
 {
     showHeatByDate = x;
 }
 
 
 void
-CpintPlot::setShadeMode(int x)
+CPPlot::setShadeMode(int x)
 {
     shadeMode = x;
 }
 
 void
-CpintPlot::setShadeIntervals(int x)
+CPPlot::setShadeIntervals(int x)
 {
     shadeIntervals = x;
 }
 
 // model parameters!
 void 
-CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model)
+CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model)
 {
     this->anI1 = double(anI1) / double(60.00f);
     this->anI2 = double(anI2) / double(60.00f);
@@ -1257,15 +1235,11 @@ CpintPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2
     this->model = model;
 
     // wipe away previous effort
-    if (CPCurve) {
-        delete CPCurve;
-        CPCurve = NULL;
-        clear_CP_Curves();
-    }
+    clearCurves();
 }
 
 void
-CpintPlot::refreshReferenceLines(RideItem *rideItem)
+CPPlot::refreshReferenceLines(RideItem *rideItem)
 {
     // we only do refs for a specific ride
     if (rangemode) return;
@@ -1304,13 +1278,13 @@ CpintPlot::refreshReferenceLines(RideItem *rideItem)
 }
 
 void
-CpintPlot::setRidePlotStyle(int index)
+CPPlot::setRidePlotStyle(int index)
 {
     ridePlotStyle = index;
 }
 
 void
-CpintPlot::calculateCentile(RideItem *rideItem)
+CPPlot::calculateCentile(RideItem *rideItem)
 {
     qDebug() << "calculateCentile";
     QTime elapsed;
@@ -1546,18 +1520,18 @@ CpintPlot::calculateCentile(RideItem *rideItem)
 
         if (maxNonZero > 1) {
 
-            QwtPlotCurve *thisCurve = new QwtPlotCurve(tr("%10 %").arg(i+1));
-            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            QwtPlotCurve *rideCurve = new QwtPlotCurve(tr("%10 %").arg(i+1));
+            rideCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(QColor(250-(i*20),0,00));
             pen.setStyle(Qt::DashLine); // Qt::SolidLine
             double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
             pen.setWidth(width);
-            thisCurve->setPen(pen);
-            thisCurve->attach(this);
+            rideCurve->setPen(pen);
+            rideCurve->attach(this);
 
 
-            thisCurve->setSamples(timeArray.data() + 1, ride_centiles[i].constData() + 1, maxNonZero - 1);
-            allCurves.append(thisCurve);
+            rideCurve->setSamples(timeArray.data() + 1, ride_centiles[i].constData() + 1, maxNonZero - 1);
+            bestsCurves.append(rideCurve);
         }
     }
 
@@ -1567,9 +1541,11 @@ CpintPlot::calculateCentile(RideItem *rideItem)
 }
 
 void
-CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
+CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 {
-    clear_CP_Curves();
+    // zap old curves
+    clearCurves();
+
     // If no range
     if (compareDateRanges.count() == 0) return;
 
@@ -1597,7 +1573,7 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 }
                 if (i>0) shadeMode = 0;
 
-                plot_allCurve(this, maxNonZero, cache->meanMaxArray(rideSeries).constData() + 1, range.color, true);
+                plotBestsCurve(this, maxNonZero, cache->meanMaxArray(rideSeries).constData() + 1, range.color, true);
 
                 foreach(double v, cache->meanMaxArray(rideSeries)) {
                     if (v > ymax) ymax = v;
@@ -1613,7 +1589,7 @@ CpintPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 }
 
 void
-CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
+CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 {
     if (rangemode) return;
 
@@ -1623,9 +1599,9 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
     }
 
     // Remove curve from current Ride
-    if (thisCurve) {
-        delete thisCurve;
-        thisCurve = NULL;
+    if (rideCurve) {
+        delete rideCurve;
+        rideCurve = NULL;
     }
 
 
@@ -1642,7 +1618,7 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
             if (interval.rideFileCache()->meanMaxArray(rideSeries).count() == 0) return;
 
             // create curve data arrays
-            plot_interval(this, interval.rideFileCache()->meanMaxArray(rideSeries), interval.color);
+            plotInterval(this, interval.rideFileCache()->meanMaxArray(rideSeries), interval.color);
         }
     }
 
@@ -1650,7 +1626,7 @@ CpintPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 }
 
 void
-CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<double> vector, QColor intervalColor)
+CPPlot::plotInterval(CPPlot *thisPlot, QVector<double> vector, QColor intervalColor)
 {
     QVector<double>x;
     QVector<double>y;
@@ -1679,5 +1655,5 @@ CpintPlot::plot_interval(CpintPlot *thisPlot, QVector<double> vector, QColor int
     // attach and register
     curve->attach(thisPlot);
 
-    allCurves.append(curve);
+    bestsCurves.append(curve);
 }
