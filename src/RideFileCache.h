@@ -296,7 +296,7 @@ class RideFileCache
         QVector<float> hrTimeInZone;      // time in zone in seconds
 };
 
-// Working structured inherited from CpintPlot.cpp
+// Working structured inherited from CPPlot.cpp
 // could probably be factored out and just use the
 // ridefile structures, but this keeps well tested
 // and stable legacy code intact

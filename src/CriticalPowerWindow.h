@@ -30,7 +30,7 @@
 #include <QFormLayout>
 #include <QCheckBox>
 
-class CpintPlot;
+class CPPlot;
 class QwtPlotCurve;
 class Context;
 class RideItem;
@@ -91,7 +91,6 @@ class CriticalPowerWindow : public GcChartWindow
         void deleteCpiFile(QString filename);
 
         // set/get properties
-        // ---------------------------------------------------
         int mode() const { return seriesCombo->currentIndex(); }
         void setMode(int x) { seriesCombo->setCurrentIndex(x); }
 
@@ -108,7 +107,7 @@ class CriticalPowerWindow : public GcChartWindow
         int ridePlotMode() const { return ridePlotStyleCombo->currentIndex(); }
         void setRidePlotMode(int x) { ridePlotStyleCombo->setCurrentIndex(x); }
 
-        // for retro compatibility
+        // for old settings config (<3.0) compatibility
         QString season() const { return cComboSeason->itemText(cComboSeason->currentIndex()); }
         void setSeason(QString x) { 
             int index = cComboSeason->findText(x);
@@ -234,7 +233,7 @@ class CriticalPowerWindow : public GcChartWindow
     protected:
 
         QDir home;
-        CpintPlot *cpintPlot;
+        CPPlot *cpPlot;
         Context *context;
         QLabel *cpintTimeValue;
         QLabel *cpintTodayValue;
@@ -286,4 +285,3 @@ class CriticalPowerWindow : public GcChartWindow
 };
 
 #endif // _GC_CriticalPowerWindow_h
-

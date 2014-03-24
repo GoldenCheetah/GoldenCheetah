@@ -288,7 +288,7 @@ HEADERS += \
         ConfigDialog.h \
         Context.h \
         CpPlotCurve.h \
-        CpintPlot.h \
+        CPPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
         DataProcessor.h \
@@ -482,7 +482,7 @@ SOURCES += \
         ConfigDialog.cpp \
         Context.cpp \
         CpPlotCurve.cpp \
-        CpintPlot.cpp \
+        CPPlot.cpp \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
         DanielsPoints.cpp \
