@@ -151,17 +151,17 @@ class CPPlot : public QwtPlot
         int ridePlotStyle;
 
         // Curves
-        QwtPlotCurve *rideCurve;
+        QList<QwtPlotCurve*> bestsCurves;
+        QwtPlotCurve *bestsCurve; // bests but not zoned
+        QwtPlotMarker *curveTitle;
         QwtPlotCurve *modelCurve, *extendedModelCurve2, *extendedModelCurve4, 
                      *extendedModelCurve5, *extendedModelCurve6;
         QwtPlotCurve *heatCurve;
         CpPlotCurve *heatCurveByDate;
-        QwtPlotCurve *level14Curve5, *level15Curve5;
         QwtPlotIntervalCurve *extendedModelCurve_WSecond, *extendedModelCurve_WPrime,
                              *extendedModelCurve_CP, *extendedModelCurve_WPrime_CP;
-        QList<QwtPlotCurve*> bestsCurves;
-        QwtPlotCurve *bestsCurve; // bests but not zoned
-        QwtPlotMarker *curveTitle;
+        QwtPlotCurve *level14Curve5, *level15Curve5;
+        QwtPlotCurve *rideCurve;
 
         // other plot objects
         QList<QwtPlotMarker*> referenceLines;

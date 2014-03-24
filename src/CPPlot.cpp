@@ -42,27 +42,19 @@
 
 #include <algorithm> // for std::lower_bound
 
-CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) :
-    QwtPlot(parent),
-    context(context),
-    current(NULL),
-    bests(NULL),
-    rideSeries(RideFile::watts),
-    isFiltered(false),
-    shadeMode(2),
-    shadeIntervals(true),
-    rangemode(rangemode),
-    showPercent(false),
-    showHeat(false),
-    showHeatByDate(false),
-    ridePlotStyle(0),
-    rideCurve(NULL),
-    modelCurve(NULL),
-    bestsCurve(NULL),
-    curveTitle(NULL)
+CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent),
+    // state
+    context(context), current(NULL), bests(NULL), rideSeries(RideFile::watts), isFiltered(false), shadeMode(2),
+    shadeIntervals(true), rangemode(rangemode), showPercent(false), showHeat(false), showHeatByDate(false),
+    ridePlotStyle(0), 
+    // curves
+    bestsCurve(NULL), curveTitle(NULL), modelCurve(NULL), 
+    extendedModelCurve2(NULL), extendedModelCurve4(NULL), extendedModelCurve5(NULL), extendedModelCurve6(NULL),
+    heatCurve(NULL), heatCurveByDate(NULL), extendedModelCurve_WSecond(NULL), extendedModelCurve_WPrime(NULL),
+    extendedModelCurve_CP(NULL), extendedModelCurve_WPrime_CP(NULL),
+    level14Curve5(NULL), level15Curve5(NULL), rideCurve(NULL)
 {
     setAutoFillBackground(true);
-
     setAxisTitle(xBottom, tr("Interval Length"));
 
     // Log scale on x-axis
@@ -71,11 +63,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) :
     setAxisScaleDraw(xBottom, ld);
     setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
 
-    //COMMENTED OUT AS CAUSED ISSUES WITH RESIZING
-    //QwtScaleDiv div( (double)0.017, (double)60 );
-    //div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-    //setAxisScaleDiv(QwtPlot::xBottom, div);
-
+    // left yAxis scale prettify
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
@@ -85,6 +73,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) :
     setAxisMaxMinor(yLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
 
+    // right yAxis scale prettify
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
@@ -93,32 +82,21 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) :
     setAxisTitle(yRight, tr("Percent of Best"));
     setAxisMaxMinor(yRight, 0);
 
-    //grid = new QwtPlotGrid();
-    //grid->enableX(true);
-    //grid->attach(this);
-
+    // zoom
     zoomer = new penTooltip(static_cast<QwtPlotCanvas*>(this->canvas()));
     zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
                             Qt::LeftButton, Qt::ShiftModifier);
 
+    // hover
     canvasPicker = new LTMCanvasPicker(this);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
-    configChanged(); // apply colors
-
+    // ecp model
     ecp = new ExtendedCriticalPower(context);
 
-    extendedModelCurve4 = NULL;
-    extendedModelCurve5 = NULL;
-    extendedModelCurve6 = NULL;
-    heatCurve = NULL;
-    heatCurveByDate = NULL;
-
-    extendedModelCurve_WSecond = NULL;
-    extendedModelCurve_WPrime = NULL;
-    extendedModelCurve_CP = NULL;
-    extendedModelCurve_WPrime_CP = NULL;
+    // now color everything we created
+    configChanged();
 }
 
 void
@@ -135,9 +113,6 @@ CPPlot::configChanged()
     axisWidget(QwtPlot::yRight)->setPalette(palette);
 
     setCanvasBackground(GColor(CPLOTBACKGROUND));
-    //QPen gridPen(GColor(CPLOTGRID));
-    //gridPen.setStyle(Qt::DotLine);
-    //grid->setPen(gridPen);
 }
 
 void
@@ -179,83 +154,83 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 
     switch (criticalSeries) {
 
-        case CriticalPowerWindow::work:
-            setAxisTitle(yLeft, tr("Total work (kJ)"));
-            setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-            setAxisTitle(xBottom, tr("Interval Length (minutes)"));
-            break;
+    case CriticalPowerWindow::work:
+        setAxisTitle(yLeft, tr("Total work (kJ)"));
+        setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+        setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+        break;
 
-        case CriticalPowerWindow::watts_inv_time:
-            setAxisTitle(yLeft, tr("Average Power (watts)"));
-            setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-            //setAxisScaleDraw(xBottom, new QwtScaleDraw);
-            ltsd->inv_time = true;
-            setAxisTitle(xBottom, tr("Interval Length (minutes)"));
-            break;
+    case CriticalPowerWindow::watts_inv_time:
+        setAxisTitle(yLeft, tr("Average Power (watts)"));
+        setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+        //setAxisScaleDraw(xBottom, new QwtScaleDraw);
+        ltsd->inv_time = true;
+        setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+        break;
 
-        case CriticalPowerWindow::cad:
-            setAxisTitle(yLeft, tr("Average Cadence (rpm)"));
-            break;
+    case CriticalPowerWindow::cad:
+        setAxisTitle(yLeft, tr("Average Cadence (rpm)"));
+        break;
 
-        case CriticalPowerWindow::hr:
-            setAxisTitle(yLeft, tr("Average Heartrate (bpm)"));
-            break;
+    case CriticalPowerWindow::hr:
+        setAxisTitle(yLeft, tr("Average Heartrate (bpm)"));
+        break;
 
-        case CriticalPowerWindow::wattsd:
-            setAxisTitle(yLeft, tr("Watts Delta (watts/s)"));
-            break;
+    case CriticalPowerWindow::wattsd:
+        setAxisTitle(yLeft, tr("Watts Delta (watts/s)"));
+        break;
 
-        case CriticalPowerWindow::cadd:
-            setAxisTitle(yLeft, tr("Cadence Delta (rpm/s)"));
-            break;
+    case CriticalPowerWindow::cadd:
+        setAxisTitle(yLeft, tr("Cadence Delta (rpm/s)"));
+        break;
 
-        case CriticalPowerWindow::nmd:
-            setAxisTitle(yLeft, tr("Torque Delta (nm/s)"));
-            break;
+    case CriticalPowerWindow::nmd:
+        setAxisTitle(yLeft, tr("Torque Delta (nm/s)"));
+        break;
 
-        case CriticalPowerWindow::hrd:
-            setAxisTitle(yLeft, tr("Heartrate Delta (bpm/s)"));
-            break;
+    case CriticalPowerWindow::hrd:
+        setAxisTitle(yLeft, tr("Heartrate Delta (bpm/s)"));
+        break;
 
-        case CriticalPowerWindow::kphd:
-            setAxisTitle(yLeft, tr("Acceleration (m/s/s)"));
-            break;
+    case CriticalPowerWindow::kphd:
+        setAxisTitle(yLeft, tr("Acceleration (m/s/s)"));
+        break;
 
-        case CriticalPowerWindow::kph:
-            setAxisTitle(yLeft, tr("Average Speed (kph)"));
-            break;
+    case CriticalPowerWindow::kph:
+        setAxisTitle(yLeft, tr("Average Speed (kph)"));
+        break;
 
-        case CriticalPowerWindow::nm:
-            setAxisTitle(yLeft, tr("Average Pedal Force (nm)"));
-            break;
+    case CriticalPowerWindow::nm:
+        setAxisTitle(yLeft, tr("Average Pedal Force (nm)"));
+        break;
 
-        case CriticalPowerWindow::NP:
-            setAxisTitle(yLeft, tr("Normalized Power (watts)"));
-            break;
+    case CriticalPowerWindow::NP:
+        setAxisTitle(yLeft, tr("Normalized Power (watts)"));
+        break;
 
-        case CriticalPowerWindow::aPower:
-            setAxisTitle(yLeft, tr("Altitude Power (watts)"));
-            break;
+    case CriticalPowerWindow::aPower:
+        setAxisTitle(yLeft, tr("Altitude Power (watts)"));
+        break;
 
-        case CriticalPowerWindow::xPower:
-            setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
-            break;
+    case CriticalPowerWindow::xPower:
+        setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
+        break;
 
-        case CriticalPowerWindow::wattsKg:
-            if (context->athlete->useMetricUnits)
-                setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
-            else
-                setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
-            break;
+    case CriticalPowerWindow::wattsKg:
+        if (context->athlete->useMetricUnits)
+            setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
+        else
+            setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
+        break;
 
-        case CriticalPowerWindow::vam:
-            setAxisTitle(yLeft, tr("VAM (meters per hour)"));
-            break;
+    case CriticalPowerWindow::vam:
+        setAxisTitle(yLeft, tr("VAM (meters per hour)"));
+        break;
 
-        default:
-        case CriticalPowerWindow::watts:
-            setAxisTitle(yLeft, tr("Average Power (watts)"));
-            break;
+    default:
+    case CriticalPowerWindow::watts:
+        setAxisTitle(yLeft, tr("Average Power (watts)"));
+        break;
 
     }
 
@@ -328,13 +303,13 @@ CPPlot::deriveCPParameters()
     // loop to convergence
     int iteration = 0;
     do {
+
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %d exceeded in cp model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+
+            // don't get stuck in an infinite loop
+            QMessageBox::warning(NULL, "Warning", 
+                                 QString("Maximum number of loops %d exceeded in cp model extraction").arg(max_loops),
+                                 QMessageBox::Ok, QMessageBox::NoButton);
             break;
         }
 
@@ -364,21 +339,15 @@ CPPlot::deriveCPParameters()
         }
 
         // update t0 if we're using that model
-        if (model == 2)
-            t0 = tau / (bests->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
+        if (model == 2) t0 = tau / (bests->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
 
-    } while ((fabs(tau - tau_prev) > tau_delta_max) ||
-             (fabs(t0 - t0_prev) > t0_delta_max)
-            );
+    } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 }
 
-
-
+// Plot the dashed line model curve according to the paramters
+// from the settings
 void
-CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently displaying
-                         double cp,
-                         double tau,
-                         double t0)
+CPPlot::plotModelCurve(CPPlot *thisPlot, double cp, double tau, double t0)
 {
     if (modelCurve) {
         delete modelCurve;
@@ -394,13 +363,8 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
         heatCurveByDate = NULL;
     }
 
-    // if there's no cp, then there's nothing to do
-    if (cp <= 0)
-        return;
-
-    // if no model, then there's nothing to do
-    if (model == 0)
-        return;
+    // if there's no cp or no model is wanted, then there's nothing to do
+    if (cp <= 0 || model == 0) return;
 
     // populate curve data with a CP curve
     const int curve_points = 100;
@@ -410,6 +374,7 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
     QVector<double> cp_curve_time(curve_points);
 
     for (int i = 0; i < curve_points; i ++) {
+
         double x = (double) i / (curve_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
 
@@ -425,21 +390,10 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
 
     // generate a plot
     QString curve_title;
-#if 0 //XXX ?
-    if (model == 2) {
-
-        curve_title.sprintf("CP=%.1f w; W'/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
-
-    } else {
-#endif
-
-        if (rideSeries == RideFile::wattsKg)
-            curve_title.sprintf("CP=%.2f w/kg; W'=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
-        else
-            curve_title.sprintf("CP=%.0f w; W'=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
-#if 0
-    }
-#endif
+    if (rideSeries == RideFile::wattsKg)
+        curve_title.sprintf("CP=%.2f w/kg; W'=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
+    else
+        curve_title.sprintf("CP=%.0f w; W'=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
 
     if (curveTitle) {
         delete curveTitle;
@@ -448,12 +402,8 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
     curveTitle = new QwtPlotMarker("");
     curveTitle->setXValue(5);
 
-    if (rideSeries == RideFile::watts ||
-        rideSeries == RideFile::aPower ||
-        rideSeries == RideFile::xPower ||
-        rideSeries == RideFile::NP ||
-        rideSeries == RideFile::wattsKg) {
-
+    if (rideSeries == RideFile::watts || rideSeries == RideFile::aPower || rideSeries == RideFile::xPower ||
+        rideSeries == RideFile::NP || rideSeries == RideFile::wattsKg) { 
 
         QwtText text(curve_title, QwtText::PlainText);
         text.setColor(GColor(CPLOTMARKER));
@@ -494,11 +444,13 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
         QVector<double> time;
 
         for (int i=0; i<bests->meanMaxArray(RideFile::watts).count() && i<bests->heatMeanMaxArray().count(); i++) {
+
             QwtIntervalSample add(i/60.00f, bests->meanMaxArray(RideFile::watts)[i] - bests->heatMeanMaxArray()[i],
-                                            bests->meanMaxArray(RideFile::watts)[i]/* + bests->heatMeanMaxArray()[i]*/);
+                                  bests->meanMaxArray(RideFile::watts)[i]/* + bests->heatMeanMaxArray()[i]*/);
             time << double(i)/60.00f;
             heat << bests->heatMeanMaxArray()[i];
         }
+
         heatCurve->setSamples(time, heat);
         heatCurve->setYAxis(yRight);
         setAxisScale(yRight, 0, 100); // always 100
@@ -509,10 +461,10 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
         // HeatCurveByDate
         heatCurveByDate = new CpPlotCurve("heat by date");
 
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) heatCurveByDate->setRenderHint(QwtPlotItem::RenderAntialiased);
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) 
+            heatCurveByDate->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         heatCurveByDate->setPenWidth(1);
-
         QwtLinearColorMap *colorMap = new QwtLinearColorMap(Qt::blue, Qt::red);
         heatCurveByDate->setColorMap(colorMap);
 
@@ -565,13 +517,13 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
         extendedModelCurve6 = NULL;
     }
 
-
-
     if (model == 3) {
+
         if (curveTitle) {
             delete curveTitle;
             curveTitle = NULL;
         }
+
         //extendedModelCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
         //extendedModelCurve4->attach(thisPlot);
 
@@ -599,8 +551,6 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
         extendedModelCurve5 = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
         extendedModelCurve5->attach(thisPlot);
 
-
-
         /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5, false);
         extendedModelCurve_WSecond->attach(thisPlot);
         extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5, false);
@@ -626,6 +576,7 @@ CPPlot::plotModelCurve(CPPlot *thisPlot,     // the plot we're currently display
     }
 }
 
+// wipe away all the curves
 void
 CPPlot::clearCurves()
 {
@@ -650,14 +601,14 @@ CPPlot::clearCurves()
     // rainbow curve
     if (bestsCurves.size()) {
         foreach (QwtPlotCurve *curve, bestsCurves)
-            delete curve;
+        delete curve;
         bestsCurves.clear();
     }
 
     // rainbow labels
     if (allZoneLabels.size()) {
         foreach (QwtPlotMarker *label, allZoneLabels)
-            delete label;
+        delete label;
         allZoneLabels.clear();
     }
 
@@ -672,14 +623,11 @@ CPPlot::clearCurves()
     }
 }
 
-// plot the all curve, with shading according to the shade mode
+// plot the bests curve which can be plain or a rainbow
 void
-CPPlot::plotBestsCurve(CPPlot *thisPlot,
-                         int n_values,
-                         const double *power_values,
-                         QColor plotColor,
-                         bool forcePlotColor)
+CPPlot::plotBestsCurve(CPPlot *thisPlot, int n_values, const double *power_values, QColor plotColor, bool forcePlotColor)
 {
+
     QVector<double> energyBests(n_values);
     QVector<double> time_values(n_values);
     // generate an array of time values
@@ -694,19 +642,19 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
 
     // lets work out how we are shading it
     switch(shadeMode) {
-        case 0 : // not shading!!
-            shadingCP = 0;
-            break;
+    case 0 : // not shading!!
+        shadingCP = 0;
+        break;
 
-        case 1 : // value for current date
-                 // or average for date range if a range
-            shadingCP = dateCP;
-            break;
+    case 1 : // value for current date
+        // or average for date range if a range
+        shadingCP = dateCP;
+        break;
 
-        default:
-        case 2 : // derived value
-            shadingCP = cp;
-            break;
+    default:
+    case 2 : // derived value
+        shadingCP = cp;
+        break;
     }
 
     // generate zones from shading CP value
@@ -732,7 +680,7 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(color.darker(200));
             if (forcePlotColor) // not default
-               pen.setColor(plotColor);
+                pen.setColor(plotColor);
             double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
             pen.setWidth(width);
             curve->setPen(pen);
@@ -751,29 +699,31 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
 
             if (criticalSeries == CriticalPowerWindow::work) { // this is Energy mode
                 curve->setSamples(time_values.data() + low,
-                               energyBests.data() + low, high - low + 1);
+                                  energyBests.data() + low, high - low + 1);
             } else {
                 curve->setSamples(time_values.data() + low,
-                               power_values + low, high - low + 1);
+                                  power_values + low, high - low + 1);
             }
             bestsCurves.append(curve);
 
             if (shadeMode && (criticalSeries != CriticalPowerWindow::work || energyBests[high] > 100.0)) {
+
                 QwtText text(name);
                 text.setFont(QFont("Helvetica", 20, QFont::Bold));
                 color.setAlpha(255);
                 text.setColor(color);
                 QwtPlotMarker *label_mark = new QwtPlotMarker();
+
                 // place the text in the geometric mean in time, at a decent power
                 double x, y;
                 if (criticalSeries == CriticalPowerWindow::work) {
                     x = (time_values[low] + time_values[high]) / 2;
                     y = (energyBests[low] + energyBests[high]) / 5;
-                }
-                else {
+                } else {
                     x = sqrt(time_values[low] * time_values[high]);
                     y = (power_values[low] + power_values[high]) / 5;
                 }
+
                 label_mark->setValue(x, y);
                 label_mark->setLabel(text);
                 label_mark->attach(thisPlot);
@@ -783,18 +733,19 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
             high = low;
             ++zone;
         }
-    }
-    // no zones available: just plot the curve without zones
-    else {
+    } else {
+
+        // no zones available: just plot the curve without zones
         QwtPlotCurve *curve = new QwtPlotCurve(tr("maximal power"));
         if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
         QPen pen((plotColor));
         pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
         curve->setPen(pen);
         QColor brush_color = GColor(CCP);
         brush_color.setAlpha(200);
-        //curve->setBrush(QBrush::None);   // brush fills below the line
+
         if (criticalSeries == CriticalPowerWindow::work)
             curve->setSamples(time_values.data(), energyBests.data(), n_values);
         else
@@ -804,7 +755,6 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
         bestsCurves.append(curve);
     }
 
-
     double xmin = 0.017;
     double xmax = time_values[n_values - 1];
 
@@ -813,12 +763,10 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
         // Energy mode is really only interesting in the range where energy is
         // linear in interval duration--up to about 1 hour.
         xmax = 60.0;
-    }
-    else if (criticalSeries == CriticalPowerWindow::watts_inv_time) {
+    } else if (criticalSeries == CriticalPowerWindow::watts_inv_time) {
         xmin = 0.001;
         xmax = 0.3;
-    }
-    else if (criticalSeries == CriticalPowerWindow::vam) {
+    } else if (criticalSeries == CriticalPowerWindow::vam) {
         xmin = 4.993;
     }
 
@@ -827,25 +775,20 @@ CPPlot::plotBestsCurve(CPPlot *thisPlot,
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
     else
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
-
     thisPlot->setAxisScaleDiv(QwtPlot::xBottom, div);
-
 
     double ymax;
     if (criticalSeries == CriticalPowerWindow::work) {
         int i = std::lower_bound(time_values.begin(), time_values.end(), 60.0) - time_values.begin();
         ymax = 10 * ceil(energyBests[i] / 10);
-    }
-    else if (criticalSeries == CriticalPowerWindow::watts_inv_time) {
+    } else if (criticalSeries == CriticalPowerWindow::watts_inv_time) {
         ymax = 10 * ceil(power_values[180] / 10);
-    }
-    else {
+    } else {
         ymax = 100 * ceil(power_values[0] / 100);
         if (ymax == 100)
             ymax = 5 * ceil(power_values[0] / 5);
     }
     thisPlot->setAxisScale(thisPlot->yLeft, 0, ymax);
-
 }
 
 void
@@ -898,7 +841,7 @@ CPPlot::calculate(RideItem *rideItem)
         // CP curve only relevant for Energy or Watts (?)
         //
         if (rideSeries == RideFile::aPower || rideSeries == RideFile::NP || rideSeries == RideFile::xPower ||
-            rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::none) {
+                rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::none) {
 
             if (!modelCurve) plotModelCurve(this, cp, tau, t0);
             else {
@@ -925,6 +868,7 @@ CPPlot::calculate(RideItem *rideItem)
 
             plotBestsCurve(this, maxNonZero, bests->meanMaxArray(rideSeries).constData() + 1, GColor(CCP), false);
         }
+
     } else {
 
         //
@@ -934,6 +878,7 @@ CPPlot::calculate(RideItem *rideItem)
             delete bestsCurve;
             bestsCurve = NULL;
         }
+
         if (bests->meanMaxArray(rideSeries).size()) {
 
             int maxNonZero = 0;
@@ -952,47 +897,47 @@ CPPlot::calculate(RideItem *rideItem)
                 QColor fill;
                 switch (rideSeries) {
 
-                    case RideFile::kphd:
-                        line.setColor(GColor(CACCELERATION).darker(200));
-                        fill = (GColor(CACCELERATION));
-                        break;
+                case RideFile::kphd:
+                    line.setColor(GColor(CACCELERATION).darker(200));
+                    fill = (GColor(CACCELERATION));
+                    break;
 
-                    case RideFile::kph:
-                        line.setColor(GColor(CSPEED).darker(200));
-                        fill = (GColor(CSPEED));
-                        break;
+                case RideFile::kph:
+                    line.setColor(GColor(CSPEED).darker(200));
+                    fill = (GColor(CSPEED));
+                    break;
 
-                    case RideFile::cad:
-                    case RideFile::cadd:
-                        line.setColor(GColor(CCADENCE).darker(200));
-                        fill = (GColor(CCADENCE));
-                        break;
+                case RideFile::cad:
+                case RideFile::cadd:
+                    line.setColor(GColor(CCADENCE).darker(200));
+                    fill = (GColor(CCADENCE));
+                    break;
 
-                    case RideFile::nm:
-                    case RideFile::nmd:
-                        line.setColor(GColor(CTORQUE).darker(200));
-                        fill = (GColor(CTORQUE));
-                        break;
+                case RideFile::nm:
+                case RideFile::nmd:
+                    line.setColor(GColor(CTORQUE).darker(200));
+                    fill = (GColor(CTORQUE));
+                    break;
 
-                    case RideFile::hr:
-                    case RideFile::hrd:
-                        line.setColor(GColor(CHEARTRATE).darker(200));
-                        fill = (GColor(CHEARTRATE));
-                        break;
+                case RideFile::hr:
+                case RideFile::hrd:
+                    line.setColor(GColor(CHEARTRATE).darker(200));
+                    fill = (GColor(CHEARTRATE));
+                    break;
 
-                    case RideFile::vam:
-                        line.setColor(GColor(CALTITUDE).darker(200));
-                        fill = (GColor(CALTITUDE));
-                        break;
+                case RideFile::vam:
+                    line.setColor(GColor(CALTITUDE).darker(200));
+                    fill = (GColor(CALTITUDE));
+                    break;
 
-                    default:
-                    case RideFile::watts: // won't ever get here
-                    case RideFile::wattsd:
-                    case RideFile::NP:
-                    case RideFile::xPower:
-                        line.setColor(GColor(CPOWER).darker(200));
-                        fill = (GColor(CPOWER));
-                        break;
+                default:
+                case RideFile::watts: // won't ever get here
+                case RideFile::wattsd:
+                case RideFile::NP:
+                case RideFile::xPower:
+                    line.setColor(GColor(CPOWER).darker(200));
+                    fill = (GColor(CPOWER));
+                    break;
                 }
 
                 // wow, QVector really doesn't have a max/min method!
@@ -1059,6 +1004,7 @@ CPPlot::calculate(RideItem *rideItem)
         }
 
         if (!rangemode && current->meanMaxArray(rideSeries).size()) {
+
             int maxNonZero = 0;
             QVector<double> timeArray(current->meanMaxArray(rideSeries).size());
             for (int i = 0; i < current->meanMaxArray(rideSeries).size(); ++i) {
@@ -1086,8 +1032,8 @@ CPPlot::calculate(RideItem *rideItem)
                     QVector<double> energyArray(current->meanMaxArray(RideFile::watts).size());
                     for (int i = 0; i <= maxNonZero; ++i) {
                         energyArray[i] =
-                        timeArray[i] *
-                        current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
+                            timeArray[i] *
+                            current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
                     }
                     rideCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
 
@@ -1104,7 +1050,7 @@ CPPlot::calculate(RideItem *rideItem)
                         QVector<double> samples(timeArray.size());
 
                         for(int i=0; i <samples.size() && i < current->meanMaxArray(rideSeries).size() &&
-                                     i <bests->meanMaxArray(rideSeries).size(); i++) {
+                                i <bests->meanMaxArray(rideSeries).size(); i++) {
 
                             samples[i] = current->meanMaxArray(rideSeries)[i] /
                                          bests->meanMaxArray(rideSeries)[i] * 100.00f;
@@ -1122,7 +1068,7 @@ CPPlot::calculate(RideItem *rideItem)
 
                         // normal
                         rideCurve->setSamples(timeArray.data() + 1,
-                        current->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
+                                              current->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
                     }
                 }
             }
@@ -1154,12 +1100,12 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             }
         }
 
-            // output the tooltip
+        // output the tooltip
         text = QString("%1\n%3 %4%5")
-            .arg(interval_to_str(60.0*xvalue))
-            .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-            .arg(RideFile::unitName(rideSeries, context))
-            .arg(dateStr);
+               .arg(interval_to_str(60.0*xvalue))
+               .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
+               .arg(RideFile::unitName(rideSeries, context))
+               .arg(dateStr);
 
         // set that text up
         zoomer->setText(text);
@@ -1219,7 +1165,7 @@ CPPlot::setShadeIntervals(int x)
 }
 
 // model parameters!
-void 
+void
 CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model)
 {
     this->anI1 = double(anI1) / double(60.00f);
@@ -1260,7 +1206,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
             foreach(const RideFilePoint *referencePoint, rideItem->ride()->referencePoints()) {
 
                 if (referencePoint->watts != 0) {
-                    QwtPlotMarker *referenceLine = new QwtPlotMarker;   
+                    QwtPlotMarker *referenceLine = new QwtPlotMarker;
                     QPen p;
                     p.setColor(GColor(CPLOTMARKER));
                     double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
@@ -1404,21 +1350,20 @@ CPPlot::calculateCentile(RideItem *rideItem)
         samplerate = rideItem->ride()->recIntSecs();
         for (int i=0; i<data.points.size(); i++)
             downsampled.append(data.points[i].value);
-        } else {
-            // moving to 5s samples is DECREASING the work...
-            samplerate = 5;
-            // we are downsampling to 5s
-            long five=5; // start at 1st 5s sample
-            double fivesum=0;
+    } else {
+        // moving to 5s samples is DECREASING the work...
+        samplerate = 5;
+        // we are downsampling to 5s
+        long five=5; // start at 1st 5s sample
+        double fivesum=0;
 
-            int fivecount=0;
+        int fivecount=0;
 
-            for (int i=0; i<data.points.size(); i++) {
-                if (data.points[i].secs <= five) {
-                    fivesum += data.points[i].value;
-                    fivecount++;
-                }
-                else {
+        for (int i=0; i<data.points.size(); i++) {
+            if (data.points[i].secs <= five) {
+                fivesum += data.points[i].value;
+                fivecount++;
+            } else {
                 downsampled.append(fivesum / fivecount);
                 fivecount = 1;
                 fivesum = data.points[i].value;
