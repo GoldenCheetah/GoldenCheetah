@@ -56,7 +56,7 @@ class CPPlot : public QwtPlot
         CPPlot(QWidget *parent, Context *, bool rangemode);
 
         // setters
-        void changeSeason(const QDate &start, const QDate &end);
+        void setDateRange(const QDate &start, const QDate &end);
         void setShowPercent(bool x);
         void setShowHeat(bool x);
         void setShowHeatByDate(bool x);
@@ -64,7 +64,7 @@ class CPPlot : public QwtPlot
         void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
-        void setRidePlotStyle(int index);
+        void setPlotType(int index);
         void setModel(int sanI1, int sanI2, int anI1, int anI2, 
                       int aeI1, int aeI2, int laeI1, int laeI2, int model);
 
@@ -93,24 +93,24 @@ class CPPlot : public QwtPlot
     private:
 
         // getters
-        QVector<double> getBests() { return bests->meanMaxArray(rideSeries); }
-        QVector<QDate> getBestDates() { return bests->meanMaxDates(rideSeries); }
+        QVector<double> getBests() { return bestsCache->meanMaxArray(rideSeries); }
+        QVector<QDate> getBestDates() { return bestsCache->meanMaxDates(rideSeries); }
         const QwtPlotCurve *getThisCurve() const { return rideCurve; }
         const QwtPlotCurve *getModelCurve() const { return modelCurve; }
 
         // calculate / data setting
-        void calculate(RideItem *rideItem);
+        void setRide(RideItem *rideItem);
         void calculateForDateRanges(QList<CompareDateRange> compareDateRanges);
         void calculateForIntervals(QList<CompareInterval> compareIntervals);
-        void calculateCentile(RideItem *rideItem);
         void deriveCPParameters();
         void deriveExtendedCPParameters();
 
         // plotters
-        void plotInterval(CPPlot *plot, QVector<double> vector, QColor plotColor);
-        void plotModelCurve(CPPlot *plot, double cp, double tau, double t0n);
-        void plotBestsCurve(CPPlot *plot, int n_values, const double *power_values,
-                            QColor plotColor, bool forcePlotColor);
+        void plotRide(RideItem *); // done :)
+        void plotBests(); // done :) (refresh issues)
+        void plotModel(); // done :) (refresh issues)
+        void plotCentile(RideItem *);
+        void plotInterval(QVector<double> vector, QColor plotColor);
 
         // utility
         void clearCurves();
@@ -133,7 +133,7 @@ class CPPlot : public QwtPlot
 
         // Data and State
         Context *context;
-        RideFileCache *current, *bests;
+        RideFileCache *rideCache, *bestsCache;
         int dateCP;
 
         // settings
@@ -148,16 +148,18 @@ class CPPlot : public QwtPlot
         bool showHeat;
         bool showHeatByDate;
         double shadingCP; // the CP value we use to draw the shade
-        int ridePlotStyle;
+        int plotType;
 
         // Curves
         QList<QwtPlotCurve*> bestsCurves;
-        QwtPlotCurve *bestsCurve; // bests but not zoned
+        QList<QwtPlotCurve*> centileCurves;
+        QList<QwtPlotCurve*> intervalCurves;
+
         QwtPlotMarker *curveTitle;
         QwtPlotCurve *modelCurve, *extendedModelCurve2, *extendedModelCurve4, 
                      *extendedModelCurve5, *extendedModelCurve6;
         QwtPlotCurve *heatCurve;
-        CpPlotCurve *heatCurveByDate;
+        CpPlotCurve *heatAgeCurve;
         QwtPlotIntervalCurve *extendedModelCurve_WSecond, *extendedModelCurve_WPrime,
                              *extendedModelCurve_CP, *extendedModelCurve_WPrime_CP;
         QwtPlotCurve *level14Curve5, *level15Curve5;

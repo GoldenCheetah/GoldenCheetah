@@ -203,7 +203,7 @@ class CriticalPowerWindow : public GcChartWindow
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
         void shadeIntervalsChanged(int state);
-        void setRidePlotStyle(int index);
+        void setPlotType(int index);
         void setSeries(int index);
         void resetSeasons();
         void filterChanged();

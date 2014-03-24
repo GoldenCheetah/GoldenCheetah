@@ -362,7 +362,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
-    connect(ridePlotStyleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setRidePlotStyle(int)));
+    connect(ridePlotStyleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlotType(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), cpPlot, SLOT(configChanged()));
 
@@ -544,7 +544,7 @@ CriticalPowerWindow::modelParametersChanged()
 
     // and apply
     if (amVisible() && myRideItem != NULL) {
-        cpPlot->calculate(myRideItem);
+        cpPlot->setRide(myRideItem);
     }
 }
 
@@ -560,7 +560,7 @@ CriticalPowerWindow::refreshRideSaved()
         date <= cpPlot->endDate) {
 
         // force a redraw next time visible
-        cpPlot->changeSeason(cpPlot->startDate, cpPlot->endDate);
+        cpPlot->setDateRange(cpPlot->startDate, cpPlot->endDate);
     }
 }
 
@@ -577,7 +577,7 @@ CriticalPowerWindow::forceReplot()
         Season season = seasons->seasons.at(cComboSeason->currentIndex());
 
         // Refresh aggregated curve (ride added/filter changed)
-        cpPlot->changeSeason(season.getStart(), season.getEnd());
+        cpPlot->setDateRange(season.getStart(), season.getEnd());
 
         // if visible make the changes visible
         // rideSelected is easiest way
@@ -873,7 +873,7 @@ CriticalPowerWindow::rideSelected()
         } else {
             cpPlot->setDateCP(0);
         }
-        cpPlot->calculate(currentRide);
+        cpPlot->setRide(currentRide);
 
         // apply latest colors
         picker->setRubberBandPen(GColor(CPLOTTRACKER));
@@ -894,7 +894,7 @@ CriticalPowerWindow::setSeries(int index)
         if (rangemode) {
 
             cpPlot->setSeries(static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt()));
-            cpPlot->calculate(currentRide);
+            cpPlot->setRide(currentRide);
 
         } else {
 
@@ -911,7 +911,7 @@ CriticalPowerWindow::setSeries(int index)
             for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
 
             cpPlot->setSeries(static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt()));
-            cpPlot->calculate(currentRide);
+            cpPlot->setRide(currentRide);
 
             // refresh intervals
             intervalSelected();
@@ -1037,7 +1037,7 @@ CriticalPowerWindow::updateCpint(double minutes)
     {
       QString label;
       int index = (int) ceil(minutes * 60);
-      if (index >= 0 && cpPlot->bests && cpPlot->getBests().count() > index) {
+      if (index >= 0 && cpPlot->bestsCache && cpPlot->getBests().count() > index) {
           QDate date = cpPlot->getBestDates()[index];
           double value = cpPlot->getBests()[index];
 
@@ -1243,8 +1243,8 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         cpPlot->setDateCP(dateCP);
     }
 
-    cpPlot->changeSeason(dateRange.from, dateRange.to);
-    cpPlot->calculate(currentRide);
+    cpPlot->setDateRange(dateRange.from, dateRange.to);
+    cpPlot->setRide(currentRide);
 
     stale = false;
 }
@@ -1254,13 +1254,13 @@ void CriticalPowerWindow::seasonSelected(int iSeason)
     if (iSeason >= seasons->seasons.count() || iSeason < 0) return;
     Season season = seasons->seasons.at(iSeason);
     //XXX BROKEM CODE IN 5.1 PORT // _dateRange = season.id();
-    cpPlot->changeSeason(season.getStart(), season.getEnd());
-    cpPlot->calculate(currentRide);
+    cpPlot->setDateRange(season.getStart(), season.getEnd());
+    cpPlot->setRide(currentRide);
 }
 
 void CriticalPowerWindow::filterChanged()
 {
-    cpPlot->calculate(currentRide);
+    cpPlot->setRide(currentRide);
 }
 
 void
@@ -1268,7 +1268,7 @@ CriticalPowerWindow::shadingSelected(int shading)
 {
     cpPlot->setShadeMode(shading);
     if (rangemode) dateRangeChanged(DateRange());
-    else cpPlot->calculate(currentRide);
+    else cpPlot->setRide(currentRide);
 }
 
 void
@@ -1279,7 +1279,7 @@ CriticalPowerWindow::showPercentChanged(int state)
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
-    else cpPlot->calculate(currentRide);
+    else cpPlot->setRide(currentRide);
 }
 
 void 
@@ -1296,7 +1296,7 @@ CriticalPowerWindow::showHeatChanged(int state)
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
-    else cpPlot->calculate(currentRide);
+    else cpPlot->setRide(currentRide);
 }
 
 void 
@@ -1312,7 +1312,7 @@ CriticalPowerWindow::showHeatByDateChanged(int state)
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
-    else cpPlot->calculate(currentRide);
+    else cpPlot->setRide(currentRide);
 }
 
 void
@@ -1333,12 +1333,12 @@ CriticalPowerWindow::shadeIntervalsChanged(int state)
         }
     }
     if (rangemode) dateRangeChanged(DateRange());
-    else cpPlot->calculate(currentRide);
+    else cpPlot->setRide(currentRide);
 }
 
 void
-CriticalPowerWindow::setRidePlotStyle(int index)
+CriticalPowerWindow::setPlotType(int index)
 {
-    cpPlot->setRidePlotStyle(index);
-    cpPlot->calculate(currentRide);
+    cpPlot->setPlotType(index);
+    cpPlot->setRide(currentRide);
 }
