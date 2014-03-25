@@ -1003,13 +1003,13 @@ CPPlot::setRide(RideItem *rideItem)
     }
     intervalCurves.clear();
 
+    // MAKE SURE BESTS IS UP TO DATE FIRST AS WE REFERENCE IT
+    // first make sure the bests cache is up to date as we may need it
+    // if plotting in percentage mode, so get data and plot it now
+    plotBests();
+
     // do we actually have something to plot?
     if (rideItem && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
-
-        // MAKE SURE BESTS IS UP TO DATE FIRST AS WE REFERENCE IT
-        // first make sure the bests cache is up to date as we may need it
-        // if plotting in percentage mode, so get data and plot it now
-        plotBests();
 
         // NOW PLOT OUR CURVE
         // We are a percent or plain curve
