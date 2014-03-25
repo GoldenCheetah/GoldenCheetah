@@ -886,7 +886,11 @@ CriticalPowerWindow::rideSelected()
             cpPlot->setDateCP(0);
         }
         cpPlot->setRide(currentRide);
-        setIsBlank(false);
+
+        if (currentRide->ride() && currentRide->ride()->dataPoints().count() == 0)
+            setIsBlank(true);
+        else
+            setIsBlank(false);
 
     } else if (!rangemode) {
 
