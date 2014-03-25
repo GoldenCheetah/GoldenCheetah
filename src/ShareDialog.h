@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QtGui>
 #include <QNetworkReply>
+#include <QNetworkCookie>
 #include <QSslError>
 #include "MainWindow.h"
 #include "RideItem.h"
@@ -181,6 +182,51 @@ private:
     QString uploadProgress;
 };
 
+// uploader to connect.garmin.com
+class GarminUploader : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    GarminUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
+
+    void upload();
+
+private slots:
+    void requestFlowExecutionKey();
+    void requestFlowExecutionKeyFinished(QNetworkReply *reply);
+
+    void requestLoginGarmin();
+    void requestLoginGarminFinished(QNetworkReply *reply);
+
+    void requestUploadGarmin();
+    void requestUploadGarminFinished(QNetworkReply *reply);
+
+    void okClicked();
+    void closeClicked();
+
+private:
+    Context *context;
+    ShareDialog *parent;
+    RideItem *ride;
+    QDialog *dialog;
+
+    QNetworkAccessManager networkMgr;
+
+    QUrl serverUrl;
+    QString flowExecutionKey;
+    QString ticket;
+
+    bool loggedIn, uploadSuccessful;
+    bool overwrite;
+
+    QString garminUploadId, garminActivityId;
+
+    QString uploadStatus;
+    QString uploadProgress;
+};
+
 class ShareDialog : public QDialog
 {
     Q_OBJECT
@@ -217,6 +263,7 @@ private:
      QCheckBox *rideWithGPSChk;
      QCheckBox *cyclingAnalyticsChk;
      QCheckBox *selfLoopsChk;
+     QCheckBox *garminChk;
 
      RideItem *ride;
 
@@ -224,6 +271,7 @@ private:
      RideWithGpsUploader *rideWithGpsUploader;
      CyclingAnalyticsUploader *cyclingAnalyticsUploader;
      SelfLoopsUploader *selfLoopsUploader;
+     GarminUploader *garminUploader;
 
      QString athleteId;
 };
