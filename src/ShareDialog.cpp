@@ -85,6 +85,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     rideWithGpsUploader = new RideWithGpsUploader(context, ride, this);
     cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
     selfLoopsUploader = new SelfLoopsUploader(context, ride, this);
+    garminUploader = new GarminUploader(context, ride, this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose which sites you wish to share on: "));
@@ -99,12 +100,14 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     cyclingAnalyticsChk->setEnabled(false);
 #endif
     selfLoopsChk = new QCheckBox(tr("Selfloops"));
+    //garminChk = new QCheckBox(tr("Garmin Connect"));
 
     QGridLayout *vbox1 = new QGridLayout();
     vbox1->addWidget(stravaChk,0,0);
     vbox1->addWidget(rideWithGPSChk,0,1);
     vbox1->addWidget(cyclingAnalyticsChk,0,2);
     vbox1->addWidget(selfLoopsChk,0,3);
+    vbox1->addWidget(garminChk,0,4);
 
 
     groupBox1->setLayout(vbox1);
@@ -180,7 +183,8 @@ ShareDialog::upload()
     show();
 
     if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() &&
-        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked()) {
+        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked() &&
+        !garminChk->isChecked()) {
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("No share site selected !"));
         aMsgBox.exec();
@@ -204,6 +208,9 @@ ShareDialog::upload()
     if (selfLoopsChk->isChecked()) {
         shareSiteCount ++;
     }
+    if (garminChk->isChecked()) {
+        shareSiteCount ++;
+    }
 
     if (stravaChk->isChecked()) {
         stravaUploader->upload();
@@ -216,6 +223,9 @@ ShareDialog::upload()
     }
     if (selfLoopsChk->isChecked()) {
         selfLoopsUploader->upload();
+    }
+    if (garminChk->isChecked()) {
+        garminUploader->upload();
     }
 }
 
@@ -1027,6 +1037,318 @@ SelfLoopsUploader::okClicked()
 
 void
 SelfLoopsUploader::closeClicked()
+{
+    dialog->reject();
+    return;
+}
+
+/******************/
+/* Garmin Connect */
+/******************/
+
+GarminUploader::GarminUploader(Context *context, RideItem *ride, ShareDialog *parent) :
+    context(context), ride(ride), parent(parent)
+{
+    garminUploadId = ride->ride()->getTag("Garmin Connect uploadId", "");
+    garminActivityId = ride->ride()->getTag("Garmin Connect activityId", "");
+}
+
+void
+GarminUploader::upload()
+{
+    // allready shared ?
+    if(garminActivityId.length()>0)
+    {
+        overwrite = false;
+
+        dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout;
+
+        QVBoxLayout *layoutLabel = new QVBoxLayout();
+        QLabel *label = new QLabel();
+        label->setText(tr("This Ride is marked as already on Garmin Connect. Are you sure you want to upload it?"));
+        layoutLabel->addWidget(label);
+
+        QPushButton *ok = new QPushButton(tr("OK"), dialog);
+        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
+        QHBoxLayout *buttons = new QHBoxLayout();
+        buttons->addStretch();
+        buttons->addWidget(cancel);
+        buttons->addWidget(ok);
+
+        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
+
+        layout->addLayout(layoutLabel);
+        layout->addLayout(buttons);
+
+        dialog->setLayout(layout);
+
+        if (!dialog->exec()) return;
+    }
+
+    requestFlowExecutionKey();
+    //requestUploadGarmin();
+
+    if(!uploadSuccessful)
+    {
+        parent->progressLabel->setText("Error uploading to Garmin Connect");
+    }
+    else
+    {
+        parent->progressLabel->setText(tr("Successfully uploaded to Garmin Connect"));
+    }
+}
+
+void
+GarminUploader::requestFlowExecutionKey()
+{
+    parent->progressLabel->setText(tr("Login to Garmin Connect..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+
+    QEventLoop eventLoop;
+
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestFlowExecutionKeyFinished(QNetworkReply*)));
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+
+    serverUrl = QUrl("https://sso.garmin.com/sso/login?service=http%3A%2F%2Fconnect.garmin.com%2Fpost-auth%2Flogin&webhost=olaxpw-connect07.garmin.com&source=http%3A%2F%2Fconnect.garmin.com%2Fde-DE%2Fsignin&redirectAfterAccountLoginUrl=http%3A%2F%2Fconnect.garmin.com%2Fpost-auth%2Flogin&redirectAfterAccountCreationUrl=http%3A%2F%2Fconnect.garmin.com%2Fpost-auth%2Flogin&gauthHost=https%3A%2F%2Fsso.garmin.com%2Fsso&locale=en&id=gauth-widget&cssUrl=https%3A%2F%2Fstatic.garmincdn.com%2Fcom.garmin.connect%2Fui%2Fsrc-css%2Fgauth-custom.css&clientId=GarminConnect&rememberMeShown=true&rememberMeChecked=false&createAccountShown=true&openCreateAccount=false&usernameShown=true&displayNameShown=false&consumeServiceTicket=false&initialFocus=true&embedWidget=false");
+
+    QNetworkRequest request = QNetworkRequest(serverUrl);
+
+    qDebug() << "url" << serverUrl;
+
+    networkMgr.get(request);
+
+    // holding pattern
+    eventLoop.exec();
+}
+
+void
+GarminUploader::requestFlowExecutionKeyFinished(QNetworkReply *reply)
+{
+    parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Login to Garmin Connect finished."));
+
+    QString response = reply->readAll();
+    //qDebug() << "response" << response;
+
+    int i = response.indexOf("[", response.indexOf("flowExecutionKey"))+1;
+    int j = response.indexOf("]", i);
+    flowExecutionKey = response.mid(i, j-i);
+    qDebug() << "flowExecutionKey" << flowExecutionKey;
+
+    QVariant v = reply->header(QNetworkRequest::SetCookieHeader);
+    serverUrl = QUrl( "https://sso.garmin.com/sso/login" );
+
+#if QT_VERSION > 0x050000
+    QUrlQuery params;
+#else
+    QUrl params = serverUrl;
+#endif
+
+    params.addQueryItem("service","http%3A%2F%2Fconnect.garmin.com%2Fpost-auth%2Flogin");
+    params.addQueryItem("clientId","GarminConnect");
+    params.addQueryItem("consumeServiceTicket","false");
+
+#if QT_VERSION > 0x050000
+    serverUrl.setQuery(params);
+#endif
+
+    qDebug() << "serverUrl" << serverUrl;
+
+    requestLoginGarmin();
+}
+
+void
+GarminUploader::requestLoginGarmin()
+{
+    qDebug() << "requestLoginGarmin()";
+
+    parent->progressLabel->setText(tr("Login to Garmin Connect..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+
+    QEventLoop eventLoop;
+
+    disconnect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestFlowExecutionKeyFinished(QNetworkReply*)));
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestLoginGarminFinished(QNetworkReply*)));
+
+
+    QNetworkRequest request = QNetworkRequest(serverUrl);
+    request.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/x-www-form-urlencoded"));
+
+    QByteArray data;
+#if QT_VERSION > 0x050000
+    QUrlQuery params;
+#else
+    QUrl params;
+#endif
+
+    params.addQueryItem("_eventId","submit");
+    params.addQueryItem("embed","true");
+
+    params.addQueryItem("lt",flowExecutionKey);
+    params.addQueryItem("username","grauser");
+    params.addQueryItem("password","_garmin55");
+
+#if QT_VERSION > 0x050000
+    //data.append(params.query(QUrl::FullyEncoded));
+    data=params.query(QUrl::FullyEncoded).toUtf8();
+#else
+    data=params.encodedQuery();
+#endif
+
+    networkMgr.post(request, data);
+
+    // holding pattern
+    eventLoop.exec();
+}
+
+void
+GarminUploader::requestLoginGarminFinished(QNetworkReply *reply)
+{
+    qDebug() << "requestLoginGarminFinished()";
+
+    parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Login to Garmin Connect finished."));
+
+    QString response = reply->readAll();
+    //qDebug() << "response2" << response;
+
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        qDebug() << "Error " << reply->error() ;
+    } else {
+        int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        qDebug() << "statusCode " << statusCode;
+
+        if(statusCode == 200) {
+            QScriptValue sc;
+            QScriptEngine se;
+
+            sc = se.evaluate("("+response+")");
+            QString response_url = sc.property("response_url").toString();
+            qDebug() << "response_url" << response_url;
+
+            int i = response.indexOf("?ticket=")+8;
+            int j = response.indexOf("'", i);
+            ticket = response.mid(i, j-i);
+            qDebug() << "ticket" << ticket;
+
+            requestUploadGarmin();
+        }
+        else if(statusCode == 302) { // or statusCode == 301
+            QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+            qDebug() << "redirectUrl " << redirectUrl;
+            //serverUrl = redirectUrl;
+            //requestLoginGarmin();
+        }
+    }
+
+}
+
+void
+GarminUploader::requestUploadGarmin()
+{
+    qDebug() << "requestUploadGarmin()";
+
+    parent->progressLabel->setText(tr("Upload ride to Garmin Connect..."));
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+
+    QEventLoop eventLoop;
+
+    disconnect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestLoginGarminFinished(QNetworkReply*)));
+    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadGarminFinished(QNetworkReply*)));
+
+    // #/proxy/upload-service-1.1/json/upload/.fit
+    // fit_file = FITIO.Dump(activity)
+    // files = {"data": ("tap-sync-" + str(os.getpid()) + "-" + activity.UID + ".fit", fit_file)}
+    // cookies = self._get_cookies(record=serviceRecord)
+    // self._rate_limit()
+    // res = requests.post("http://connect.garmin.com/proxy/upload-service-1.1/json/upload/.tcx", files=files, cookies=cookies)
+    // res = res.json()["detailedImportResult"]
+
+
+    QUrl url = QUrl( "http://connect.garmin.com/proxy/upload-service-1.1/json/upload/.tcx" );
+    QNetworkRequest request = QNetworkRequest(url);
+
+    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+
+    // The TCX file have to be gzipped
+    TcxFileReader reader;
+    QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
+
+
+    // MULTIPART *****************
+
+    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::MixedType);
+    multiPart->setBoundary(boundary.toLatin1());
+
+
+    QHttpPart filePart;
+    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"tcxfile\"; filename=\"myfile.tcx.\"; type=\"application/x-gzip\""));
+    filePart.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-gzip");
+    filePart.setBody(file);
+
+    multiPart->append(filePart);
+
+    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
+    multiPart->setParent(reply.data());
+
+    parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload ride... Sending to Garmin Connect"));
+
+    eventLoop.exec();
+}
+
+void
+GarminUploader::requestUploadGarminFinished(QNetworkReply *reply)
+{
+    qDebug() << "requestUploadGarminFinished()";
+
+    parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
+    parent->progressLabel->setText(tr("Upload to Garmin Connect finished."));
+
+    uploadSuccessful = false;
+
+    QString response = reply->readAll();
+    qDebug() << "response" << response;
+
+    QScriptValue sc;
+    QScriptEngine se;
+
+    sc = se.evaluate("("+response+")");
+    QString error = sc.property("error_code").toString();
+    QString uploadError = sc.property("message").toString();
+
+    if (error.length()>0 || reply->error() != QNetworkReply::NoError)
+    {
+        qDebug() << "Error " << reply->error() ;
+        qDebug() << "Error " << uploadError;
+        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Selfloops: ") + uploadError + "\n" );
+    }
+    else
+    {
+        garminActivityId = sc.property("activity_id").toString();
+
+        ride->ride()->setTag("Garmin Connect activityId", garminActivityId);
+        ride->setDirty(true);
+
+        qDebug() << "activity: " << garminActivityId;
+
+        parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+        uploadSuccessful = true;
+    }
+}
+
+void
+GarminUploader::okClicked()
+{
+    dialog->accept();
+    return;
+}
+
+void
+GarminUploader::closeClicked()
 {
     dialog->reject();
     return;
