@@ -275,7 +275,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     aeI1SpinBox->setMaximum(3600);
     aeI1SpinBox->setSingleStep(1.0);
     aeI1SpinBox->setAlignment(Qt::AlignRight);
-    aeI1SpinBox->setValue(1800); // 30 minutes
+    aeI1SpinBox->setValue(1200); // 30 minutes
 
     aeI2SpinBox = new QDoubleSpinBox(this);
     aeI2SpinBox->setDecimals(0);
@@ -283,7 +283,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     aeI2SpinBox->setMaximum(3600);
     aeI2SpinBox->setSingleStep(1.0);
     aeI2SpinBox->setAlignment(Qt::AlignRight);
-    aeI2SpinBox->setValue(3600); // 60 minutes
+    aeI2SpinBox->setValue(1800); // 60 minutes
 
     QHBoxLayout *aeLayout = new QHBoxLayout;
     aeLayout->addWidget(aeI1SpinBox);
@@ -463,9 +463,9 @@ CriticalPowerWindow::modelChanged()
 
             // Default values
             anI1SpinBox->setValue(180);
-            anI2SpinBox->setValue(360);
-            aeI1SpinBox->setValue(1800);
-            aeI2SpinBox->setValue(3600);
+            anI2SpinBox->setValue(300);
+            aeI1SpinBox->setValue(1200);
+            aeI2SpinBox->setValue(1800);
 
             break;
 
@@ -629,7 +629,6 @@ CriticalPowerWindow::intervalSelected()
                 delete p;
             }
         }
-
         return;
     }
 
@@ -651,13 +650,15 @@ CriticalPowerWindow::intervalSelected()
 
         // clear, resize to interval count and set to null
         intervalCurves.clear();
-        for (int i=0; i< context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
+        if (myRideItem && myRideItem->ride() && myRideItem->ride()->intervals().count())
+            for (int i=0; i< myRideItem->ride()->intervals().count(); i++)
+                intervalCurves << NULL;
     }
 
     // which itervals are selected?
     IntervalItem *current=NULL;
     for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
+        current = static_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
         if (current != NULL) {
             if (current->isSelected() == true) {
                 showIntervalCurve(current, i); // set it all up
@@ -675,6 +676,11 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
 {
     // ignore in compare mode
     if (!amVisible() || context->isCompareIntervals) return;
+
+    // do we need to fill with nulls ?
+    if (intervalCurves.count() == 0 && myRideItem && myRideItem->ride() && myRideItem->ride()->intervals().count())
+        for (int i=0; i< myRideItem->ride()->intervals().count(); i++)
+            intervalCurves << NULL;
 
     // only one interval can be hovered at any one time
     // so we always use the same curve to ensure we don't leave
@@ -701,6 +707,8 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         if (intervalCurves[index] == NULL) {
 
             // get the data setup
+            // but if there is no data for the ride series
+            // selected they will still be null
             showIntervalCurve(current, index); // set it all up
             hideIntervalCurve(index); // in case its shown at present
         }
@@ -711,6 +719,9 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
             delete hoverCurve;
             hoverCurve = NULL;
         }
+
+        // still NULL so they have no data
+        if (intervalCurves[index] == NULL) return;
 
         // clone the data
         QVector<QPointF> array;
@@ -832,7 +843,6 @@ CriticalPowerWindow::intervalsChanged()
 
     // clear, resize to interval count and set to null
     intervalCurves.clear();
-    for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
 
     if (!amVisible()) return;
 
@@ -853,16 +863,15 @@ CriticalPowerWindow::rideSelected()
             }
         }
 
+        // clear, resize to interval count and set to null
+        intervalCurves.clear();
+
         // clear the hover curve
         if (hoverCurve) {
             hoverCurve->detach();
             delete hoverCurve;
             hoverCurve = NULL;
         }
-
-        // clear, resize to interval count and set to null
-        intervalCurves.clear();
-        for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
     }
 
     if (!amVisible()) return;
@@ -877,11 +886,10 @@ CriticalPowerWindow::rideSelected()
             cpPlot->setDateCP(0);
         }
         cpPlot->setRide(currentRide);
-
-        // apply latest colors
-        picker->setRubberBandPen(GColor(CPLOTTRACKER));
         setIsBlank(false);
+
     } else if (!rangemode) {
+
         setIsBlank(true);
     }
 
@@ -1227,26 +1235,30 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         if (dateRange.to > today) dateRange.to = today;
 
     } else dateRange = myDateRange;
-    
-    if (dateRange.from == cfrom && dateRange.to == cto && !stale) return;
 
-    cfrom = dateRange.from;
-    cto = dateRange.to;
+    // only change date range if its actually changed! 
+    if (dateRange.from != cfrom || dateRange.to != cto || stale) {
 
-    // lets work out the average CP configure value
-    if (context->athlete->zones()) {
-        int fromZoneRange = context->athlete->zones()->whichRange(cfrom);
-        int toZoneRange = context->athlete->zones()->whichRange(cto);
+        cfrom = dateRange.from;
+        cto = dateRange.to;
 
-        int CPfrom = fromZoneRange >= 0 ? context->athlete->zones()->getCP(fromZoneRange) : 0;
-        int CPto = toZoneRange >= 0 ? context->athlete->zones()->getCP(toZoneRange) : CPfrom;
-        if (CPfrom == 0) CPfrom = CPto;
-        int dateCP = (CPfrom + CPto) / 2;
+        // lets work out the average CP configure value
+        if (context->athlete->zones()) {
+            int fromZoneRange = context->athlete->zones()->whichRange(cfrom);
+            int toZoneRange = context->athlete->zones()->whichRange(cto);
 
-        cpPlot->setDateCP(dateCP);
+            int CPfrom = fromZoneRange >= 0 ? context->athlete->zones()->getCP(fromZoneRange) : 0;
+            int CPto = toZoneRange >= 0 ? context->athlete->zones()->getCP(toZoneRange) : CPfrom;
+            if (CPfrom == 0) CPfrom = CPto;
+            int dateCP = (CPfrom + CPto) / 2;
+
+            cpPlot->setDateCP(dateCP);
+        }
+
+        cpPlot->setDateRange(dateRange.from, dateRange.to);
     }
 
-    cpPlot->setDateRange(dateRange.from, dateRange.to);
+    // always refresh though
     cpPlot->setRide(currentRide);
 
     stale = false;

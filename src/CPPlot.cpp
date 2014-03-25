@@ -23,6 +23,7 @@
 #include "Zones.h"
 #include "Colors.h"
 #include "CPPlot.h"
+
 #include <unistd.h>
 #include <QDebug>
 #include <qwt_series_data.h>
@@ -34,6 +35,8 @@
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
 #include <qwt_color_map.h>
+#include <algorithm> // for std::lower_bound
+
 #include "CriticalPowerWindow.h"
 #include "RideItem.h"
 #include "LogTimeScaleDraw.h"
@@ -43,19 +46,21 @@
 #include "LTMCanvasPicker.h"
 #include "TimeUtils.h"
 
-#include <algorithm> // for std::lower_bound
 
 CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent),
+
     // state
     context(context), rideCache(NULL), bestsCache(NULL), rideSeries(RideFile::watts), isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), showPercent(false), showHeat(false), showHeatByDate(false),
     plotType(0), 
+
     // curves
-    curveTitle(NULL), modelCurve(NULL), 
-    extendedModelCurve2(NULL), extendedModelCurve4(NULL), extendedModelCurve5(NULL), extendedModelCurve6(NULL),
+    rideCurve(NULL), modelCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL),
+    /*extendedModelCurve2(NULL), extendedModelCurve4(NULL), extendedModelCurve5(NULL), extendedModelCurve6(NULL),
     heatCurve(NULL), heatAgeCurve(NULL), extendedModelCurve_WSecond(NULL), extendedModelCurve_WPrime(NULL),
     extendedModelCurve_CP(NULL), extendedModelCurve_WPrime_CP(NULL),
-    level14Curve5(NULL), level15Curve5(NULL), rideCurve(NULL)
+    level14Curve5(NULL), level15Curve5(NULL), */ curveTitle(NULL)
+
 {
     setAutoFillBackground(true);
     setAxisTitle(xBottom, tr("Interval Length"));
@@ -102,6 +107,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     configChanged();
 }
 
+// set colours mostly
 void
 CPPlot::configChanged()
 {
@@ -118,6 +124,7 @@ CPPlot::configChanged()
     setCanvasBackground(GColor(CPLOTBACKGROUND));
 }
 
+// get the fonts and colors right for the axis scales
 void
 CPPlot::setAxisTitle(int axis, QString label)
 {
@@ -133,6 +140,7 @@ CPPlot::setAxisTitle(int axis, QString label)
     QwtPlot::setAxisTitle(axis, title);
 }
 
+// change the date range for the 'bests' curve
 void
 CPPlot::setDateRange(const QDate &start, const QDate &end)
 {
@@ -144,6 +152,7 @@ CPPlot::setDateRange(const QDate &start, const QDate &end)
     clearCurves(); // clears all bar the ride curve
 }
 
+// what series are we plotting ?
 void
 CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 {
@@ -360,7 +369,6 @@ CPPlot::deriveCPParameters()
 void
 CPPlot::plotModel()
 {
-
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
     if (model == 0 || rideSeries != RideFile::watts) {
@@ -502,7 +510,7 @@ CPPlot::plotModel()
                 curveTitle->setYValue(70);
                 curveTitle->attach(this);
 
-                // Extended CP 4
+                /*
                 if (extendedModelCurve4) {
                     delete extendedModelCurve4;
                     extendedModelCurve4 = NULL;
@@ -533,6 +541,7 @@ CPPlot::plotModel()
                     delete extendedModelCurve6;
                     extendedModelCurve6 = NULL;
                 }
+                */
 
                 //extendedModelCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
                 //extendedModelCurve4->attach(thisPlot);
@@ -945,6 +954,7 @@ CPPlot::plotBests()
     setAxisScale(yLeft, 0, ymax);
 }
 
+// plot the currently selected ride
 void
 CPPlot::plotRide(RideItem *rideItem)
 {
@@ -1037,6 +1047,7 @@ CPPlot::plotRide(RideItem *rideItem)
     rideCurve->attach(this);
 }
 
+// notified that the user selected a ride
 void
 CPPlot::setRide(RideItem *rideItem)
 {
@@ -1125,6 +1136,7 @@ CPPlot::setRide(RideItem *rideItem)
     replot();
 }
 
+// the picker hovered over a point on a curve
 void
 CPPlot::pointHover(QwtPlotCurve *curve, int index)
 {
@@ -1158,6 +1170,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
     zoomer->setText("");
 }
 
+// no filter 
 void
 CPPlot::clearFilter()
 {
@@ -1168,6 +1181,7 @@ CPPlot::clearFilter()
     clearCurves();
 }
 
+// set a filter
 void
 CPPlot::setFilter(QStringList list)
 {
@@ -1189,7 +1203,6 @@ void
 CPPlot::setShowPercent(bool x)
 {
     showPercent = x;
-    clearCurves();
 }
 
 void
@@ -1271,6 +1284,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
     }
 }
 
+// plot mean max, centile or none!
 void
 CPPlot::setPlotType(int index)
 {
@@ -1278,6 +1292,7 @@ CPPlot::setPlotType(int index)
     clearCurves();
 }
 
+// calculate and plot a centile plot
 void
 CPPlot::plotCentile(RideItem *rideItem)
 {
@@ -1592,12 +1607,17 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         context->athlete->allIntervalItems()->child(i)->setSelected(false);
     }
 
-    // Remove curve from current Ride
+    // Remove ride curve if present
     if (rideCurve) {
         delete rideCurve;
         rideCurve = NULL;
     }
-
+    // Remove current intervals
+    foreach(QwtPlotCurve *c, intervalCurves) {
+        c->detach();
+        delete c;
+    }
+    intervalCurves.clear();
 
     // If no intervals
     if (compareIntervals.count() == 0) return;
