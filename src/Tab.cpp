@@ -175,13 +175,6 @@ Tab::selectView(int index)
 void
 Tab::rideSelected(RideItem*)
 {
-    // update the ride property on all widgets
-    // to let them know they need to replot new
-    // selected ride
-    setRide(context->ride);
-
-    if (!context->ride) return;
-
     // stop SEGV in widgets watching for intervals being
     // selected whilst we are deleting them from the tree
     context->athlete->intervalWidget->blockSignals(true);
@@ -213,5 +206,11 @@ Tab::rideSelected(RideItem*)
     }
     // all done, so connected widgets can receive signals now
     context->athlete->intervalWidget->blockSignals(false);
+
+    // update the ride property on all widgets
+    // to let them know they need to replot new
+    // selected ride (now the tree is up to date)
+    setRide(context->ride);
+
 }
 

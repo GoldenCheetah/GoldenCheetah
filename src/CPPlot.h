@@ -158,20 +158,23 @@ class CPPlot : public QwtPlot
         QList<QwtPlotCurve*> centileCurves;
         QList<QwtPlotCurve*> intervalCurves;
 
-        QwtPlotMarker *curveTitle;
-        QwtPlotCurve *modelCurve, *extendedModelCurve2, *extendedModelCurve4, 
-                     *extendedModelCurve5, *extendedModelCurve6;
+        QwtPlotCurve *rideCurve;
+        QwtPlotCurve *modelCurve;
+
         QwtPlotCurve *heatCurve;
         CpPlotCurve *heatAgeCurve;
-        QwtPlotIntervalCurve *extendedModelCurve_WSecond, *extendedModelCurve_WPrime,
-                             *extendedModelCurve_CP, *extendedModelCurve_WPrime_CP;
-        QwtPlotCurve *level14Curve5, *level15Curve5;
-        QwtPlotCurve *rideCurve;
+
+        //Not sure if you need these Damien (?)
+        //QwtPlotCurve *extendedModelCurve2, *extendedModelCurve4, 
+        //             *extendedModelCurve5, *extendedModelCurve6;
+        //QwtPlotIntervalCurve *extendedModelCurve_WSecond, *extendedModelCurve_WPrime,
+        //                     *extendedModelCurve_CP, *extendedModelCurve_WPrime_CP;
+        //QwtPlotCurve *level14Curve5, *level15Curve5;
 
         // other plot objects
+        QwtPlotMarker *curveTitle;
         QList<QwtPlotMarker*> referenceLines;
         QList<QwtPlotMarker*> allZoneLabels;
-        QwtPlotGrid *grid;
 
         // tooltip / zooming
         LTMCanvasPicker *canvasPicker;
