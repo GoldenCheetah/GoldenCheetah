@@ -54,12 +54,8 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     shadeIntervals(true), rangemode(rangemode), showPercent(false), showHeat(false), showHeatByDate(false),
     plotType(0), 
 
-    // curves
-    rideCurve(NULL), modelCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL),
-    /*extendedModelCurve2(NULL), extendedModelCurve4(NULL), extendedModelCurve5(NULL), extendedModelCurve6(NULL),
-    heatCurve(NULL), heatAgeCurve(NULL), extendedModelCurve_WSecond(NULL), extendedModelCurve_WPrime(NULL),
-    extendedModelCurve_CP(NULL), extendedModelCurve_WPrime_CP(NULL),
-    level14Curve5(NULL), level15Curve5(NULL), */ curveTitle(NULL)
+    // curves and plot objects
+    rideCurve(NULL), modelCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), curveTitle(NULL)
 
 {
     setAutoFillBackground(true);
@@ -493,10 +489,8 @@ CPPlot::plotModel()
                 deriveCPParameters();
 
                 // calculate extended CP model from all-time best data
-                //athleteModeleCP2 = ecp->deriveExtendedCP_2_3_Parameters(bests, series, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-                athleteModeleCP4 = ecp->deriveExtendedCP_4_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-                athleteModeleCP5 = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-                athleteModeleCP6 = ecp->deriveExtendedCP_6_3_Parameters(true, bestsCache, rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+                Model_eCP athleteModeleCP5 = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache,
+                                                                rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
 
                 modelCurve = ecp->getPlotCurveForExtendedCP_5_3(athleteModeleCP5);
                 modelCurve->attach(this);
@@ -509,80 +503,6 @@ CPPlot::plotModel()
                 curveTitle->setXValue(5);
                 curveTitle->setYValue(70);
                 curveTitle->attach(this);
-
-                /*
-                if (extendedModelCurve4) {
-                    delete extendedModelCurve4;
-                    extendedModelCurve4 = NULL;
-                }
-                if (extendedModelCurve_WSecond) {
-                    delete extendedModelCurve_WSecond;
-                    extendedModelCurve_WSecond = NULL;
-                }
-                if (extendedModelCurve_WPrime) {
-                    delete extendedModelCurve_WPrime;
-                    extendedModelCurve_WPrime = NULL;
-                }
-                if (extendedModelCurve_CP) {
-                    delete extendedModelCurve_CP;
-                    extendedModelCurve_CP = NULL;
-                }
-                if (extendedModelCurve_WPrime_CP) {
-                    delete extendedModelCurve_WPrime_CP;
-                    extendedModelCurve_WPrime_CP = NULL;
-                }
-
-                if (extendedModelCurve5) {
-                    delete extendedModelCurve5;
-                    extendedModelCurve5 = NULL;
-                }
-
-                if (extendedModelCurve6) {
-                    delete extendedModelCurve6;
-                    extendedModelCurve6 = NULL;
-                }
-                */
-
-                //extendedModelCurve4 = ecp->getPlotCurveForExtendedCP_4_3(athleteModeleCP4);
-                //extendedModelCurve4->attach(thisPlot);
-
-                /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_4_3_P1(athleteModeleCP4);
-                extendedModelCurve_WSecond->attach(thisPlot);
-                extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_4_3_WPrime(athleteModeleCP4);
-                extendedModelCurve_WPrime->attach(thisPlot);
-                extendedModelCurve_CP = ecp->getPlotCurveForExtendedCP_4_3_CP(athleteModeleCP4);
-                extendedModelCurve_CP->attach(thisPlot);*/
-
-                /*extendedCurveTitle = ecp->getPlotMarkerForExtendedCP_4_3(athleteModeleCP4);
-                extendedCurveTitle->attach(thisPlot);*/
-
-                /*for (int level=15;level>0;level--) {
-                    double best5sec = context->ride->ride()->getWeight() * (23-(15-level)*1);
-                    double best1min = context->ride->ride()->getWeight() * (12-(15-level)*0.5);
-                    double best5min = context->ride->ride()->getWeight() * (8-(15-level)*0.33333);
-                    double best1hour = context->ride->ride()->getWeight() * (6.25-(15-level)*0.25);
-
-                    Model_eCP levelModeleCP5 = ecp->deriveExtendedCP_5_3_ParametersForBest(best5sec, best1min, best5min, best1hour);
-                    QwtPlotCurve *levelCurve5 = ecp->getPlotLevelForExtendedCP_5_3(levelModeleCP5);
-                    levelCurve5->attach(thisPlot);
-                }*/
-
-                /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_5_3_WSecond(athleteModeleCP5, false);
-                extendedModelCurve_WSecond->attach(thisPlot);
-                extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_5_3_WPrime(athleteModeleCP5, false);
-                extendedModelCurve_WPrime->attach(thisPlot);
-                extendedModelCurve_CP = ecp->getPlotCurveForExtendedCP_5_3_CP(athleteModeleCP5, false);
-                extendedModelCurve_CP->attach(thisPlot);*/
-
-                //extendedModelCurve6 = ecp->getPlotCurveForExtendedCP_6_3(athleteModeleCP6);
-                //extendedModelCurve6->attach(thisPlot);
-
-                /*extendedModelCurve_WSecond = ecp->getPlotCurveForExtendedCP_6_3_WSecond(athleteModeleCP6, false);
-                extendedModelCurve_WSecond->attach(thisPlot);
-                extendedModelCurve_WPrime = ecp->getPlotCurveForExtendedCP_6_3_WPrime(athleteModeleCP6, false);
-                extendedModelCurve_WPrime->attach(thisPlot);
-                extendedModelCurve_CP = ecp->getPlotCurveForExtendedCP_6_3_CP(athleteModeleCP6, false);
-                extendedModelCurve_CP->attach(thisPlot);*/
             }
             break;
         }
@@ -1552,18 +1472,23 @@ CPPlot::plotCentile(RideItem *rideItem)
 void
 CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 {
+    if (!rangemode) return;
+
     // zap old curves
     clearCurves();
+    foreach(QwtPlotCurve *c, intervalCurves) {
+        c->detach();
+        delete c;
+    }
+    intervalCurves.clear();
 
     // If no range
-    if (compareDateRanges.count() == 0) return;
-
-    int shadeModeOri = shadeMode;
-    int modelOri = model;
+    if (compareDateRanges.count() == 0) {
+        replot(); // show cleared plot
+        return;
+    }
 
     double ymax = 0;
-
-    model = 0; // no model in compareDateRanges
 
     // prepare aggregates
     for (int j = 0; j < compareDateRanges.size(); ++j) {
@@ -1575,14 +1500,8 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 
             if (cache->meanMaxArray(rideSeries).size()) {
 
-                int maxNonZero = 0;
-                int i=0;
-                for (; i < cache->meanMaxArray(rideSeries).size(); ++i) {
-                    if (cache->meanMaxArray(rideSeries)[i] > 0) maxNonZero = i;
-                }
-                if (i>0) shadeMode = 0;
-
-                //XXX !!! XXX plotBestsCurve(maxNonZero, cache->meanMaxArray(rideSeries).constData() + 1, range.color, true);
+                // plot using the interval way
+                plotCache(cache->meanMaxArray(rideSeries), range.color);
 
                 foreach(double v, cache->meanMaxArray(rideSeries)) {
                     if (v > ymax) ymax = v;
@@ -1591,9 +1510,6 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         }
     }
     setAxisScale(yLeft, 0, 1.1*ymax);
-    shadeMode = shadeModeOri;
-    model = modelOri;
-
     replot();
 }
 
@@ -1602,17 +1518,8 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 {
     if (rangemode) return;
 
-    // unselect current intervals
-    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        context->athlete->allIntervalItems()->child(i)->setSelected(false);
-    }
-
-    // Remove ride curve if present
-    if (rideCurve) {
-        delete rideCurve;
-        rideCurve = NULL;
-    }
-    // Remove current intervals
+    // Zap what we got
+    clearCurves();
     foreach(QwtPlotCurve *c, intervalCurves) {
         c->detach();
         delete c;
@@ -1620,7 +1527,10 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
     intervalCurves.clear();
 
     // If no intervals
-    if (compareIntervals.count() == 0) return;
+    if (compareIntervals.count() == 0) {
+        replot(); // show cleared plot
+        return;
+    }
 
     // prepare aggregates
     for (int i = 0; i < compareIntervals.size(); ++i) {
@@ -1632,7 +1542,7 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
             if (interval.rideFileCache()->meanMaxArray(rideSeries).count() == 0) return;
 
             // create curve data arrays
-            plotInterval(interval.rideFileCache()->meanMaxArray(rideSeries), interval.color);
+            plotCache(interval.rideFileCache()->meanMaxArray(rideSeries), interval.color);
         }
     }
 
@@ -1640,8 +1550,13 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 }
 
 void
-CPPlot::plotInterval(QVector<double> vector, QColor intervalColor)
+CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 {
+    // we don't shade if we're plotting in compare mode
+    bool wantShadeIntervals = false;
+    if ((rangemode && !context->isCompareDateRanges) || (!rangemode && !context->isCompareIntervals)) 
+        wantShadeIntervals = shadeIntervals;
+
     QVector<double>x;
     QVector<double>y;
     for (int i=1; i<vector.count(); i++) {
@@ -1661,7 +1576,7 @@ CPPlot::plotInterval(QVector<double> vector, QColor intervalColor)
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);
     QBrush brush = QBrush(intervalColor);
-    if (shadeIntervals) curve->setBrush(brush);
+    if (wantShadeIntervals) curve->setBrush(brush);
     else curve->setBrush(Qt::NoBrush);
     curve->setPen(pen);
     curve->setSamples(x.data(), y.data(), x.count()-1);

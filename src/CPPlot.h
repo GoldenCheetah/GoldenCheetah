@@ -106,18 +106,17 @@ class CPPlot : public QwtPlot
         void calculateForDateRanges(QList<CompareDateRange> compareDateRanges);
         void calculateForIntervals(QList<CompareInterval> compareIntervals);
         void deriveCPParameters();
-        void deriveExtendedCPParameters();
 
         // plotters
-        void plotRide(RideItem *); // done :)
-        void plotBests(); // done :) (refresh issues)
-        void plotModel(); // done :) (refresh issues)
+        void plotRide(RideItem *);
+        void plotBests();
+        void plotModel();
         void plotCentile(RideItem *);
-        void plotInterval(QVector<double> vector, QColor plotColor);
+        void plotCache(QVector<double> vector, QColor plotColor);
 
         // utility
         void clearCurves();
-        QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
+        //QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
         void setAxisTitle(int axis, QString label);
         void refreshReferenceLines(RideItem*);
 
@@ -125,13 +124,6 @@ class CPPlot : public QwtPlot
         int model;
         double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
         double cp, tau, t0; // CP model parameters
-
-        Model_eCP athleteModeleCP2;
-        Model_eCP athleteModeleCP4;
-        Model_eCP athleteModeleCP5;
-        Model_eCP athleteModeleCP6;
-        Model_eCP level14ModeleCP5;
-        Model_eCP level15ModeleCP5;
         ExtendedCriticalPower *ecp;
 
         // Data and State
@@ -163,13 +155,6 @@ class CPPlot : public QwtPlot
 
         QwtPlotCurve *heatCurve;
         CpPlotCurve *heatAgeCurve;
-
-        //Not sure if you need these Damien (?)
-        //QwtPlotCurve *extendedModelCurve2, *extendedModelCurve4, 
-        //             *extendedModelCurve5, *extendedModelCurve6;
-        //QwtPlotIntervalCurve *extendedModelCurve_WSecond, *extendedModelCurve_WPrime,
-        //                     *extendedModelCurve_CP, *extendedModelCurve_WPrime_CP;
-        //QwtPlotCurve *level14Curve5, *level15Curve5;
 
         // other plot objects
         QwtPlotMarker *curveTitle;
