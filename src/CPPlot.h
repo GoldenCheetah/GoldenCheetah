@@ -59,6 +59,7 @@ class CPPlot : public QwtPlot
         CPPlot(QWidget *parent, Context *, bool rangemode);
 
         // setters
+        void setRide(RideItem *rideItem);
         void setDateRange(const QDate &start, const QDate &end);
         void setShowPercent(bool x);
         void setShowHeat(bool x);
@@ -70,6 +71,18 @@ class CPPlot : public QwtPlot
         void setPlotType(int index);
         void setModel(int sanI1, int sanI2, int anI1, int anI2, 
                       int aeI1, int aeI2, int laeI1, int laeI2, int model);
+
+        // getters
+        QVector<double> getBests();
+        QVector<QDate> getBestDates();
+        const QwtPlotCurve *getThisCurve() const { return rideCurve; }
+        const QwtPlotCurve *getModelCurve() const { return modelCurve; }
+
+        // when rides saved/deleted/added CPWindow
+        // needs to know what range we have plotted
+        // to decide if it needs refreshing
+        QDate startDate;
+        QDate endDate;
 
     public slots:
 
@@ -83,26 +96,9 @@ class CPPlot : public QwtPlot
         void clearFilter();
         void setFilter(QStringList);
 
-    protected:
-
-        friend class ::CriticalPowerWindow;
-
-        // when rides saved/deleted/added CPWindow
-        // needs to know what range we have plotted
-        // to decide if it needs refreshing
-        QDate startDate;
-        QDate endDate;
-
     private:
 
-        // getters
-        QVector<double> getBests() { return bestsCache->meanMaxArray(rideSeries); }
-        QVector<QDate> getBestDates() { return bestsCache->meanMaxDates(rideSeries); }
-        const QwtPlotCurve *getThisCurve() const { return rideCurve; }
-        const QwtPlotCurve *getModelCurve() const { return modelCurve; }
-
         // calculate / data setting
-        void setRide(RideItem *rideItem);
         void calculateForDateRanges(QList<CompareDateRange> compareDateRanges);
         void calculateForIntervals(QList<CompareInterval> compareIntervals);
         void deriveCPParameters();

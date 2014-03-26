@@ -1052,7 +1052,7 @@ CriticalPowerWindow::updateCpint(double minutes)
     {
       QString label;
       int index = (int) ceil(minutes * 60);
-      if (index >= 0 && cpPlot->bestsCache && cpPlot->getBests().count() > index) {
+      if (index >= 0 && cpPlot->getBests().count() > index) {
           QDate date = cpPlot->getBestDates()[index];
           double value = cpPlot->getBests()[index];
 
