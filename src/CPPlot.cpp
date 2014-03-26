@@ -625,6 +625,22 @@ CPPlot::clearCurves()
     }
 }
 
+// get bests or an empty set if it is null
+QVector<double> 
+CPPlot::getBests() 
+{ 
+    if (bestsCache) return bestsCache->meanMaxArray(rideSeries); 
+    else return QVector<double>();
+}
+
+// get bests dates or an empty set if it is null
+QVector<QDate> 
+CPPlot::getBestDates() 
+{
+    if (bestsCache) return bestsCache->meanMaxDates(rideSeries);
+    else return QVector<QDate>();
+}
+
 // plot the bests curve and refresh the data if needed too
 void
 CPPlot::plotBests()
