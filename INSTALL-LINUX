@@ -399,3 +399,4 @@ CLUCENE_LIBS    = -lclucene
 $ make clean
 $ qmake
 $ make
+
