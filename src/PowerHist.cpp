@@ -1529,6 +1529,10 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 {
     source = Ride;
 
+    // hide hover curve just in case its there
+    // from previous ride
+    curveHover->hide();
+
     // we set with this data already
     if (force == false && _rideItem == LASTrideItem && source == LASTsource) return;
 
