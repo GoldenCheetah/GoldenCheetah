@@ -288,6 +288,8 @@ GCColor::css()
                    "h1 { color: %1; background-color: %2; } "
                    "h2 { color: %1; background-color: %2; } "
                    "h3 { color: %1; background-color: %2; } "
+                   "h4 { color: %1; background-color: %2; } "
+                   "b { color: %1; background-color: %2; } "
                    "</style> ").arg(GColor(CPLOTMARKER).name())
                                .arg(bgColor.name())
                                .arg(fgColor.name());
