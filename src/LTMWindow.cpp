@@ -852,11 +852,11 @@ LTMWindow::refreshDataTable()
     // now set to new (avoids a weird crash)
     QString summary;
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    //QColor fgColor = GCColor::invertColor(bgColor);
     QColor altColor = GCColor::alternateColor(bgColor);
 
-    summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
-                                                                                        .arg(fgColor.name());
+    summary = GCColor::css();
+    summary += "<center>";
 
     // device summary for ride summary, otherwise how many activities?
     summary += "<p><h3>" + settings.title + tr(" grouped by ");

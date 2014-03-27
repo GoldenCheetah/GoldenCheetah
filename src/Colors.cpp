@@ -275,3 +275,20 @@ ColorEngine::colorFor(QString text)
     }
     return color;
 }
+
+QString
+GCColor::css()
+{
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+    //QColor altColor = GCColor::alternateColor(bgColor); // not yet ?
+
+    return QString("<style> "
+                   "body { color: %3; background-color: %2; }"
+                   "h1 { color: %1; background-color: %2; } "
+                   "h2 { color: %1; background-color: %2; } "
+                   "h3 { color: %1; background-color: %2; } "
+                   "</style> ").arg(GColor(CPLOTMARKER).name())
+                               .arg(bgColor.name())
+                               .arg(fgColor.name());
+}
