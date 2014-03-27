@@ -297,6 +297,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+        connect(context, SIGNAL(intervalHover(RideFileInterval)), powerHist, SLOT(intervalHover(RideFileInterval)));
 
         // comparing things
         connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
