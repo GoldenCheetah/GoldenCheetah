@@ -58,8 +58,8 @@ MetricAggregator::~MetricAggregator()
  *                         the ride file no longer exists
  *----------------------------------------------------------------------*/
 
-// used to store timestamp and fingerprint used in database
-struct status { unsigned long timestamp, fingerprint; };
+// used to store timestamp, file crc and schema fingerprint used in database
+struct status { unsigned long timestamp, crc, fingerprint; };
 
 // Refresh not up to date metrics
 void MetricAggregator::refreshMetrics()
@@ -101,12 +101,13 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // get a Hash map of statistic records and timestamps
     QSqlQuery query(dbaccess->connection());
     QHash <QString, status> dbStatus;
-    bool rc = query.exec("SELECT filename, timestamp, fingerprint FROM metrics ORDER BY ride_date;");
+    bool rc = query.exec("SELECT filename, crc, timestamp, fingerprint FROM metrics ORDER BY ride_date;");
     while (rc && query.next()) {
         status add;
         QString filename = query.value(0).toString();
-        add.timestamp = query.value(1).toInt();
-        add.fingerprint = query.value(2).toInt();
+        add.crc = query.value(1).toInt();
+        add.timestamp = query.value(2).toInt();
+        add.fingerprint = query.value(3).toInt();
         dbStatus.insert(filename, add);
     }
 
@@ -151,6 +152,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // if it s missing or out of date then update it!
         status current = dbStatus.value(name);
         unsigned long dbTimeStamp = current.timestamp;
+        unsigned long crc = current.crc;
         unsigned long fingerprint = current.fingerprint;
 
         RideFile *ride = NULL;
@@ -185,20 +187,28 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
             (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
             QStringList errors;
 
-            // log
-            out << "Opening ride: " << name << "\r\n";
+            // ooh we have one to update -- lets check the CRC in case
+            // its actually unchanged since last time and the timestamps
+            // have been mucked up by dropbox / file copying / backups etc
+            QString fullPath =  QString(context->athlete->home.absolutePath()) + "/" + name;
+            if (crc == 0 || crc != DBAccess::computeFileCRC(fullPath)) {
 
-            // read file and process it if we didn't already...
-            if (ride == NULL) ride = RideFileFactory::instance().openRideFile(context, file, errors);
+                // log
+                out << "Opening ride: " << name << "\r\n";
 
-            out << "File open completed: " << name << "\r\n";
+                // read file and process it if we didn't already...
+                if (ride == NULL) ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
-            if (ride != NULL) {
+                out << "File open completed: " << name << "\r\n";
 
-                out << "Getting weight: " << name << "\r\n";
-                ride->getWeight();
-                out << "Updating statistics: " << name << "\r\n";
-                importRide(context->athlete->home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
+                if (ride != NULL) {
+
+                    out << "Getting weight: " << name << "\r\n";
+                    ride->getWeight();
+                    out << "Updating statistics: " << name << "\r\n";
+                    importRide(context->athlete->home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
+
+                }
 
             }
         }
@@ -207,6 +217,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // if ride wasn't opened it will do it itself
         // we only want to check so passing check=true
         // because we don't actually want the results now
+        // it will also check the file CRC as well as timestamps
         RideFileCache updater(context, context->athlete->home.absolutePath() + "/" + name, ride, true);
 
         // free memory - if needed

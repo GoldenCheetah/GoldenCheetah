@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 15;
+static const unsigned int RideFileCacheVersion = 16;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -57,6 +57,7 @@ static const unsigned int RideFileCacheVersion = 15;
 // 12       21-Feb-14    Added Acceleration (speed)
 // 12       22-Feb-14    Acceleration precision way too high!
 // 13-15    24-Feb-14    Add hr, cad, watts, nm Δ data series
+// 13-15    24-Feb-14    Add crc to the header
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -71,6 +72,7 @@ static const unsigned int RideFileCacheVersion = 15;
 struct RideFileCacheHeader {
 
     unsigned int version;
+    unsigned int crc;
 
     unsigned int wattsMeanMaxCount,
                  hrMeanMaxCount,
@@ -127,6 +129,7 @@ class RideFileCache
         enum cachetype { meanmax, distribution, none };
         typedef enum cachetype CacheType;
         QDate start, end;
+        unsigned int crc;
 
         // Construct from a ridefile or its filename
         // will reference cache if it exists, and create it
