@@ -136,6 +136,10 @@ class PowerHist : public QwtPlot
         // set data from a ride
         void setData(RideItem *_rideItem, bool force=false);
 
+        // used to set and bin ride data
+        void setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zones, RideFileInterval hover);
+        void binData(HistData &standard, QVector<double>&, QVector<double>&, QVector<double>&, QVector<double>&);
+
         // set data from the compare intervals -or- dateranges
         void setDataFromCompare(); // cache
         void setDataFromCompare(QString totalMetric, QString distMetric); // metric
@@ -167,6 +171,7 @@ class PowerHist : public QwtPlot
 
         // react to plot signals
         void pointHover(QwtPlotCurve *curve, int index);
+        void intervalHover(RideFileInterval);
 
         // get told to refresh
         void recalc(bool force=false); // normal mode recalc
@@ -215,7 +220,7 @@ class PowerHist : public QwtPlot
         LTMCanvasPicker *canvasPicker;
 
         // curves when NOT in compare mode
-        QwtPlotCurve *curve, *curveSelected;
+        QwtPlotCurve *curve, *curveSelected, *curveHover;
 
         // curves when ARE in compare mode
         QList<QwtPlotCurve*> compareCurves;
