@@ -53,6 +53,7 @@ class DBAccess
 
         // get schema version
         int getDBVersion();
+        static unsigned int computeFileCRC(QString); 
         QList<FieldDefinition> &getMetadataFields() { return mfieldDefinitions; }
 
         // create and drop connections

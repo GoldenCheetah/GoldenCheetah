@@ -76,8 +76,8 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     QFileInfo cacheFileInfo(cacheFileName);
 
     // is it up-to-date?
-    if (cacheFileInfo.exists() && rideFileInfo.lastModified() <= cacheFileInfo.lastModified() &&
-        cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
+    if (cacheFileInfo.exists() && cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
+
         // we have a file, it is more recent than the ride file
         // but is it the latest version?
         RideFileCacheHeader head;
@@ -89,12 +89,17 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
             inFile.readRawData((char *) &head, sizeof(head));
             cacheFile.close();
 
-            // is it as recent as we are?
-            if (head.version == RideFileCacheVersion) {
+            // its more recent -or- the crc is the same
+            if (rideFileInfo.lastModified() <= cacheFileInfo.lastModified() ||
+                head.crc == DBAccess::computeFileCRC(rideFileName)) {
+ 
+                // it is the same ?
+                if (head.version == RideFileCacheVersion) {
 
-                // WE'RE GOOD
-                if (check == false) readCache(); // if check is false we aren't just checking
-                return;
+                    // WE'RE GOOD
+                    if (check == false) readCache(); // if check is false we aren't just checking
+                    return;
+                }
             }
         }
     }
@@ -428,6 +433,9 @@ void
 RideFileCache::refreshCache()
 {
     static bool writeerror=false;
+
+    // set head crc
+    crc = DBAccess::computeFileCRC(rideFileName);
 
     // update cache!
     QFile cacheFile(cacheFileName);
@@ -1261,6 +1269,7 @@ RideFileCache::serialize(QDataStream *out)
 
     // write header
     head.version = RideFileCacheVersion;
+    head.crc = crc;
     head.CP = CP;
     head.LTHR = LTHR;
 

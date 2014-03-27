@@ -88,6 +88,7 @@
 // 67  22  Mar 2014 Mark Liversedge    Added Anaerobic TISS prototype
 // 68  22  Mar 2014 Mark Liversedge    Added dTISS prototype
 // 69  23  Mar 2014 Mark Liversedge    Updated Gompertz constansts for An-TISS sigmoid
+// 70  27  Mar 2014 Mark Liversedge    Add file CRC to refresh only if contents change (not just timestamps)
 
 int DBSchemaVersion = 69;
 
@@ -136,8 +137,8 @@ DBAccess::initDatabase(QDir home)
     }
 }
 
-static int
-computeFileCRC(QString filename)
+unsigned int
+DBAccess::computeFileCRC(QString filename)
 {
     QFile file(filename);
     QFileInfo fileinfo(file);
@@ -180,6 +181,7 @@ bool DBAccess::createMetricsTable()
         QString createMetricTable = "create table metrics (filename varchar primary key,"
                                     "identifier varchar,"
                                     "timestamp integer,"
+                                    "crc integer,"
                                     "ride_date date,"
                                     "color varchar,"
                                     "fingerprint integer";
@@ -421,7 +423,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     }
 
     // construct an insert statement
-    QString insertStatement = "insert into metrics ( filename, identifier, timestamp, ride_date, color, fingerprint ";
+    QString insertStatement = "insert into metrics ( filename, identifier, crc, timestamp, ride_date, color, fingerprint ";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -439,7 +441,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
         }
     }
 
-    insertStatement += " ) values (?,?,?,?,?,?"; // filename, identifier, timestamp, ride_date, color, fingerprint
+    insertStatement += " ) values (?,?,?,?,?,?,?"; // filename, identifier, crc, timestamp, ride_date, color, fingerprint
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
@@ -451,9 +453,11 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
 
 	query.prepare(insertStatement);
 
-    // filename, timestamp, ride date
+    // filename, crc, timestamp, ride date
+    QString fullPath =  QString(context->athlete->home.absolutePath()) + "/" + summaryMetrics->getFileName();
 	query.addBindValue(summaryMetrics->getFileName());
 	query.addBindValue(summaryMetrics->getId());
+	query.addBindValue((int)computeFileCRC(fullPath));
 	query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
     query.addBindValue(color.name());
