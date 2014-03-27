@@ -71,6 +71,7 @@ class GCColor : public QObject
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
+        static QString css();
 
     public slots:
         void readConfig();

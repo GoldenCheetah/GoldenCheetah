@@ -297,8 +297,8 @@ RideSummaryWindow::htmlSummary() const
     }
 
     // set those colors
-    summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
-                                                                                        .arg(fgColor.name());
+    summary = GCColor::css();
+    summary += "<center>";
 
     // device summary for ride summary, otherwise how many activities?
     if (ridesummary) summary += ("<p><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3><p>");
@@ -1015,8 +1015,9 @@ RideSummaryWindow::htmlCompareSummary() const
         }
 
         // LETS FORMAT THE HTML
-        summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
-                                                                                        .arg(fgColor.name());
+        summary = GCColor::css();
+        summary += "<center>";
+
         //
         // TOTALS, AVERAGES, MAX, METRICS
         //
@@ -1281,8 +1282,8 @@ RideSummaryWindow::htmlCompareSummary() const
     } else { // DATE RANGE COMPARE
 
         // LETS FORMAT THE HTML
-        summary = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>").arg(bgColor.name())
-                                                                                        .arg(fgColor.name());
+        summary = GCColor::css();
+        summary += "<center>";
 
         // get metric details here ...
         RideMetricFactory &factory = RideMetricFactory::instance();
