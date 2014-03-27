@@ -198,7 +198,7 @@ PowerHist::configChanged()
     curveSelected->setBrush(ivlbrush);   // fill below the line
 
     // hover curve
-    QPen hvl(QColor(Qt::darkGray));
+    QPen hvl(Qt::darkGray);
     hvl.setWidth(width);
     curveHover->setPen(hvl);
     QColor hvlbrush = QColor(Qt::darkGray);
