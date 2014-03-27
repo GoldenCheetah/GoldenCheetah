@@ -987,6 +987,9 @@ CPPlot::plotRide(RideItem *rideItem)
 void
 CPPlot::setRide(RideItem *rideItem)
 {
+    // null ride ?
+    if (!rideItem) return;
+
     // Season Compare Mode -- so nothing for us to do
     if (rangemode && context->isCompareDateRanges) return calculateForDateRanges(context->compareDateRanges);
 
