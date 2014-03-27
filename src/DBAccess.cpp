@@ -90,7 +90,7 @@
 // 69  23  Mar 2014 Mark Liversedge    Updated Gompertz constansts for An-TISS sigmoid
 // 70  27  Mar 2014 Mark Liversedge    Add file CRC to refresh only if contents change (not just timestamps)
 
-int DBSchemaVersion = 69;
+int DBSchemaVersion = 70;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
