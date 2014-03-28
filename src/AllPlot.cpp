@@ -1034,6 +1034,10 @@ AllPlot::recalc(AllPlotObject *objects)
     if (objects->timeArray.empty())
         return;
 
+    // skip null rides
+    if (!rideItem || !rideItem->ride()) return;
+
+
     int rideTimeSecs = (int) ceil(objects->timeArray[objects->timeArray.count()-1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;

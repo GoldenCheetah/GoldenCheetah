@@ -28,6 +28,8 @@
 #include <QFormLayout>
 
 #include "SummaryMetrics.h"
+#include "RideFileCache.h"
+#include "ExtendedCriticalPower.h"
 
 #ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
@@ -107,7 +109,7 @@ class RideSummaryWindow : public GcChartWindow
 
     protected:
 
-        QString htmlSummary() const;        // summary of a ride or a date range
+        QString htmlSummary();        // summary of a ride or a date range
         QString htmlCompareSummary() const; // comparing intervals or seasons
 
         Context *context;
@@ -128,6 +130,10 @@ class RideSummaryWindow : public GcChartWindow
 #endif
         QStringList filters; // empty when no lucene
         bool filtered; // are we using a filter?
+
+        RideFileCache *bestsCache;
+        ExtendedCriticalPower *ecp;
+        Model_eCP cpModel;
 };
 
 #endif // _GC_RideSummaryWindow_h
