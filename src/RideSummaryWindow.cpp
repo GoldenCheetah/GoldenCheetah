@@ -311,7 +311,7 @@ RideSummaryWindow::htmlSummary()
     if (ridesummary) summary += ("<p><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3><p>");
 
     // All the metrics we will display
-    static const QStringList columnNames = QStringList() << tr("Totals") << tr("Averages") << tr("Maximums") << tr("Metrics*");
+    static const QStringList columnNames = QStringList() << tr("Totals") << tr("Averages") << tr("Maximums") << tr("Metrics");
     static const QStringList totalColumn = QStringList()
         << "workout_time"
         << "time_riding"
@@ -556,11 +556,6 @@ RideSummaryWindow::htmlSummary()
                 .arg("W' (kJ)")
                 .arg(cpModel.etau * cpModel.ecp * 60.0f / 1000.0, 0, 'f', 1);
 
-        // Pmax;
-        summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-                .arg("P-max (watts)")
-                .arg(int(cpModel.pMax));
-
         // CP;
         summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
                 .arg("CP (watts)")
@@ -570,6 +565,11 @@ RideSummaryWindow::htmlSummary()
         summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
                 .arg("FTP / MMP60 (watts)")
                 .arg(int(cpModel.mmp60));
+
+        // Pmax;
+        summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
+                .arg("P-max (watts)")
+                .arg(int(cpModel.pMax));
 
         summary += "</table></td>";
     }
@@ -942,7 +942,7 @@ RideSummaryWindow::htmlSummary()
     summary += tr("<br>BikeScore is a trademark of Dr. Philip "
         "Friere Skiba, PhysFarm Training Systems LLC");
 
-    summary += tr("<br>TSS, NP and IF are trademarks of Peaksware LLC</center>");
+    summary += tr("<br>FTP, TSS, NP and IF are trademarks of Peaksware LLC</center>");
     return summary;
 }
 
@@ -1605,7 +1605,7 @@ RideSummaryWindow::htmlCompareSummary() const
     summary += tr("<br>BikeScore is a trademark of Dr. Philip "
         "Friere Skiba, PhysFarm Training Systems LLC");
 
-    summary += tr("<br>TSS, NP and IF are trademarks of Peaksware LLC</center>");
+    summary += tr("<br>FTP, TSS, NP and IF are trademarks of Peaksware LLC</center>");
     return summary;
 }
 
