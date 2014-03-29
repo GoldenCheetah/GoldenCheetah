@@ -224,14 +224,14 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showBalance->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showBalance);
 
-    showPower = new QComboBox();
+    showPower = new QComboBox(this);
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
     showPower->addItem(tr("No Power"));
     cl3->addRow(new QLabel(tr("Shading")), showPower);
     showPower->setCurrentIndex(0);
 
-    comboDistance = new QComboBox();
+    comboDistance = new QComboBox(this);
     comboDistance->addItem(tr("Time"));
     comboDistance->addItem(tr("Distance"));
     cl3->addRow(new QLabel(tr("X Axis")), comboDistance);
@@ -240,7 +240,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     smoothLineEdit = new QLineEdit(this);
     smoothLineEdit->setFixedWidth(40);
 
-    smoothSlider = new QSlider(Qt::Horizontal);
+    smoothSlider = new QSlider(Qt::Horizontal, this);
     smoothSlider->setTickPosition(QSlider::TicksBelow);
     smoothSlider->setTickInterval(10);
     smoothSlider->setMinimum(1);
@@ -334,12 +334,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackPlotLayout = new QVBoxLayout();
     stackPlotLayout->setSpacing(0);
     stackPlotLayout->setContentsMargins(0,0,0,0);
-    stackWidget = new QWidget();
+
+    stackWidget = new QWidget(this);
     stackWidget->setAutoFillBackground(false);
     stackWidget->setLayout(stackPlotLayout);
     stackWidget->setPalette(palette);
 
-    stackFrame = new QScrollArea();
+    stackFrame = new QScrollArea(this);
     stackFrame->hide();
     stackFrame->setAutoFillBackground(false);
     stackFrame->setWidgetResizable(true);
@@ -354,12 +355,12 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     seriesstackPlotLayout = new QVBoxLayout();
     seriesstackPlotLayout->setSpacing(0);
     seriesstackPlotLayout->setContentsMargins(0,0,0,0);
-    seriesstackWidget = new QWidget();
-    seriesstackWidget->setAutoFillBackground(false);
+    seriesstackWidget = new QWidget(this);
+    seriesstackWidget->setAutoFillBackground(true);
     seriesstackWidget->setLayout(seriesstackPlotLayout);
     seriesstackWidget->setPalette(palette);
 
-    seriesstackFrame = new QScrollArea();
+    seriesstackFrame = new QScrollArea(this);
     seriesstackFrame->hide();
     seriesstackFrame->setAutoFillBackground(false);
     seriesstackFrame->setWidgetResizable(true);
@@ -374,12 +375,12 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     comparePlotLayout = new QVBoxLayout();
     comparePlotLayout->setSpacing(0);
     comparePlotLayout->setContentsMargins(0,0,0,0);
-    comparePlotWidget = new QWidget();
+    comparePlotWidget = new QWidget(this);
     comparePlotWidget->setAutoFillBackground(false);
     comparePlotWidget->setLayout(comparePlotLayout);
     comparePlotWidget->setPalette(palette);
 
-    comparePlotFrame = new QScrollArea();
+    comparePlotFrame = new QScrollArea(this);
     comparePlotFrame->hide();
     comparePlotFrame->setAutoFillBackground(false);
     comparePlotFrame->setWidgetResizable(true);
@@ -396,13 +397,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlotLayout = new QVBoxLayout;
     allPlotLayout->setSpacing(0);
     allPlotLayout->setContentsMargins(0,0,0,0);
-    allPlotFrame = new QScrollArea();
+    allPlotFrame = new QScrollArea(this);
     allPlotFrame->setFrameStyle(QFrame::NoFrame);
     allPlotFrame->setAutoFillBackground(false);
     allPlotFrame->setContentsMargins(0,0,0,0);
     allPlotFrame->setPalette(palette);
 
-    spanSlider = new QxtSpanSlider(Qt::Horizontal);
+    spanSlider = new QxtSpanSlider(Qt::Horizontal, this);
     spanSlider->setFocusPolicy(Qt::NoFocus);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     spanSlider->setLowerValue(0);
@@ -411,14 +412,14 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     QFont small;
     small.setPointSize(6);
 
-    scrollLeft = new QPushButton("<");
+    scrollLeft = new QPushButton("<", this);
     scrollLeft->setFont(small);
     scrollLeft->setAutoRepeat(true);
     scrollLeft->setFixedHeight(16);
     scrollLeft->setFixedWidth(16);
     scrollLeft->setContentsMargins(0,0,0,0);
 
-    scrollRight = new QPushButton(">");
+    scrollRight = new QPushButton(">", this);
     scrollRight->setFont(small);
     scrollRight->setAutoRepeat(true);
     scrollRight->setFixedHeight(16);
@@ -540,7 +541,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
-    connect(context, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
@@ -560,7 +560,69 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 void
 AllPlotWindow::configChanged()
 {
+    setUpdatesEnabled(false);
+
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+
+    // Container widgets should not paint
+    // since they tend to use naff defaults and
+    // 'complicate' or 'make busy' the general
+    // look and feel
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    setPalette(palette); // propagates to children
+
+    // set palettes
+    allStack->setPalette(palette);
+    allPlotStack->setPalette(palette);
+    allPlotFrame->setPalette(palette);
+    comparePlotFrame->setPalette(palette);
+    comparePlotWidget->setPalette(palette);
+    seriesstackFrame->setPalette(palette);
+    seriesstackWidget->setPalette(palette);
+    stackFrame->setPalette(palette);
+    stackWidget->setPalette(palette);
+    stackZoomSlider->setPalette(palette);
+    scrollLeft->setPalette(palette);
+    scrollRight->setPalette(palette);
+
+
+    fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    fullPlot->setPalette(palette);
+    fullPlot->configChanged();
+    fullPlot->update();
+
+    // allPlot of course
+    allPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    allPlot->setPalette(palette);
+    allPlot->configChanged();
+    allPlot->update();
+
+    // and then the stacked plot
+    foreach (AllPlot *plot, allPlots) {
+        plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+        plot->setPalette(palette);
+        plot->configChanged();
+        plot->update();
+    }
+
+    // and then the series plots
+    foreach (AllPlot *plot, seriesPlots) {
+        plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+        plot->setPalette(palette);
+        plot->configChanged();
+        plot->update();
+    }
+
+    // and then the compaer plots
+    foreach (AllPlot *plot, allComparePlots) {
+        plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+        plot->setPalette(palette);
+        plot->configChanged();
+        plot->update();
+    }
+
+    setUpdatesEnabled(true);
 
     // we're going to replot, but only if we're active
     // and all the other guff
@@ -569,16 +631,6 @@ AllPlotWindow::configChanged()
         stale = true;
         return;
     }
-
-    // Container widgets should not paint
-    // since they tend to use naff defaults and
-    // 'complicate' or 'make busy' the general
-    // look and feel
-    QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
-    allPlotFrame->setPalette(palette);
-    stackFrame->widget()->setPalette(palette);
-    fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
 
     // ignore if null, or manual / empty
     if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) return;
@@ -589,6 +641,7 @@ AllPlotWindow::configChanged()
         compareChanged();
 
     } else {
+
         // ok replot with the new config!
         redrawFullPlot();
         redrawAllPlot();
@@ -2593,11 +2646,12 @@ AllPlotWindow::setupSeriesStackPlots()
     resizeSeriesPlots(); // << checks if updates enabled and doesn't reenable
 
     // set new widgets
-    QWidget *stackWidget = new QWidget;
-    stackWidget->setPalette(palette);
-    stackWidget->setAutoFillBackground(true);
-    stackWidget->setLayout(newLayout);
-    seriesstackFrame->setWidget(stackWidget);
+    QPalette old = seriesstackWidget->palette();
+    seriesstackWidget = new QWidget(this);
+    seriesstackWidget->setPalette(old);
+    seriesstackWidget->setAutoFillBackground(false);
+    seriesstackWidget->setLayout(newLayout);
+    seriesstackFrame->setWidget(seriesstackWidget);
 
     // lets remember the layout
     seriesstackPlotLayout = newLayout;
@@ -2744,9 +2798,10 @@ AllPlotWindow::setupStackPlots()
     stackFrame->setUpdatesEnabled(false);
 
     // set new widgets
-    QWidget *stackWidget = new QWidget;
-    stackWidget->setPalette(palette);
-    stackWidget->setAutoFillBackground(true);
+    QPalette old = stackWidget->palette();
+    stackWidget = new QWidget(this);
+    stackWidget->setPalette(old);
+    stackWidget->setAutoFillBackground(false);
     stackWidget->setLayout(newLayout);
     stackFrame->setWidget(stackWidget);
 
