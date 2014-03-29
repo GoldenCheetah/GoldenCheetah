@@ -636,7 +636,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 2), sd);
-    QPalette pal;
+
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, QColor(Qt::gray));
     pal.setColor(QPalette::Text, QColor(Qt::gray));
     axisWidget(QwtAxisId(QwtAxis::yLeft, 2))->setPalette(pal);
@@ -894,7 +896,9 @@ AllPlot::configChanged()
         //standard->balanceRCurve->setBrush(Qt::NoBrush);
     }
 
-    QPalette pal;
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    setPalette(pal);
 
     // tick draw
     TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
@@ -960,6 +964,8 @@ AllPlot::configChanged()
     pal.setColor(QPalette::WindowText, GColor(CATISS));
     pal.setColor(QPalette::Text, GColor(CATISS));
     axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
+
+    curveColors->saveState();
 }
 
 void 
@@ -2350,6 +2356,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     //if (this->legend()) this->legend()->show();
     //replot();
 
+    // set all the colors ?
+    configChanged();
+
     // remember the curves and colors
     isolation = false;
     curveColors->saveState();
@@ -2702,7 +2711,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
         // title and colour
         setAxisTitle(yLeft, title);
-        QPalette pal;
+        QPalette pal = palette();
         if (thereCurve) {
             pal.setColor(QPalette::WindowText, thereCurve->pen().color());
             pal.setColor(QPalette::Text, thereCurve->pen().color());
