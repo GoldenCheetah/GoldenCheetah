@@ -385,7 +385,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
 
     // setup that standard->grid
     grid = new QwtPlotGrid();
-    grid->enableX(true);
+    grid->enableX(false); // not needed
     grid->enableY(true);
     grid->attach(plot);
 
@@ -793,7 +793,7 @@ AllPlot::configChanged()
     standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
     QPen gridPen(GColor(CPLOTGRID));
-    gridPen.setStyle(Qt::DotLine);
+    //gridPen.setStyle(Qt::DotLine); // solid line is nicer
     standard->grid->setPen(gridPen);
 
     // curve brushes
