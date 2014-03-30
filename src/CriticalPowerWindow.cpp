@@ -199,6 +199,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
+    showGridCheck = new QCheckBox(this);
+    showGridCheck->setChecked(true); // default on
+    QLabel *gridify = new QLabel(tr("Show grid"));
+    cl->addRow(gridify, showGridCheck);
+
     showPercentCheck = new QCheckBox(this);
     showPercentCheck->setChecked(false); // default off
     QLabel *percentify = new QLabel(tr("Show as percentage"));
@@ -344,6 +349,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     picker->setStateMachine(new QwtPickerDragPointMachine);
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
+    grid = new QwtPlotGrid();
+    grid->enableX(true); // not needed
+    grid->enableY(true);
+    grid->attach(cpPlot);
+
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
 
     if (rangemode) {
@@ -394,6 +404,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showGridCheck, SIGNAL(stateChanged(int)), this, SLOT(showGridChanged(int)));
     connect(rPercent, SIGNAL(stateChanged(int)), this, SLOT(rPercentChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
@@ -408,6 +419,10 @@ void
 CriticalPowerWindow::configChanged()
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
+
+    QPen gridPen(GColor(CPLOTGRID));
+    grid->setPen(gridPen);
+
     rideSelected();
 }
 
@@ -1288,6 +1303,15 @@ CriticalPowerWindow::shadingSelected(int shading)
     cpPlot->setShadeMode(shading);
     if (rangemode) dateRangeChanged(DateRange());
     else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::showGridChanged(int state)
+{
+    // redraw
+    if (state) grid->setVisible(true);
+    else grid->setVisible(false);
+    cpPlot->replot();
 }
 
 void

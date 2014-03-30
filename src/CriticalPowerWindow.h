@@ -32,6 +32,7 @@
 #include <QtGui>
 #include <QFormLayout>
 #include <QCheckBox>
+#include <qwt_plot_grid.h>
 
 class CPPlot;
 class QwtPlotCurve;
@@ -51,6 +52,7 @@ class CriticalPowerWindow : public GcChartWindow
 #endif
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
     Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent USER true)
+    Q_PROPERTY(bool showGrid READ showGrid WRITE setShowGrid USER true)
 
     // for retro compatibility
     Q_PROPERTY(QString season READ season WRITE setSeason USER true)
@@ -187,6 +189,9 @@ class CriticalPowerWindow : public GcChartWindow
         bool showHeatByDate() { return showHeatByDateCheck->isChecked(); }
         void setShowHeatByDate(bool x) { return showHeatByDateCheck->setChecked(x); }
 
+        bool showGrid() { return showGridCheck->isChecked(); }
+        void setShowGrid(bool x) { return showGridCheck->setChecked(x); }
+
         bool showPercent() { return showPercentCheck->isChecked(); }
         void setShowPercent(bool x) { return showPercentCheck->setChecked(x); }
 
@@ -205,6 +210,7 @@ class CriticalPowerWindow : public GcChartWindow
         void showHeatChanged(int check);
         void showHeatByDateChanged(int check);
         void showPercentChanged(int check);
+        void showGridChanged(int check);
         void shadeIntervalsChanged(int state);
         void setPlotType(int index);
         void setSeries(int index);
@@ -251,8 +257,10 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;
         QCheckBox *showPercentCheck;
+        QCheckBox *showGridCheck;
         QCheckBox *rPercent, *rHeat;
         QwtPlotPicker *picker;
+        QwtPlotGrid *grid;
         void addSeries();
         Seasons *seasons;
         QList<Season> seasonsList;
