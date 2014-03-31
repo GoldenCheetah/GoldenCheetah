@@ -154,7 +154,9 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
     setAutoDelete(false); // no don't delete on detach !
     curve = NULL;
+    hover = NULL;
     grid = NULL;
+    ride = NULL;
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAxisMaxMinor(xBottom, 0);
@@ -171,6 +173,11 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+
+    // lets watch the mouse move...
+    new mouseTracker(this);
+
     configChanged(); // use latest colors etc
 }
 
@@ -183,9 +190,22 @@ void ScatterPlot::setData (ScatterSettings *settings)
     // create a null data plot
     if (settings == NULL || settings->ride == NULL || settings->ride->ride() == NULL ||
         settings->x == 0 || settings->y == 0 ) {
+        ride = NULL;
         return;
+    } else {
+        ride = settings->ride;
     }
 
+    // clear the hover curve
+    if (hover) {
+        hover->detach();
+        delete hover;
+        hover = NULL;
+    }
+
+    // what are the settings
+    xseries = settings->x;
+    yseries = settings->y;
 
     // if its not setup or no settings exist default to 175mm cranks
     if (cranklength == 0.0) cranklength = 0.175;
@@ -356,8 +376,165 @@ void ScatterPlot::setData (ScatterSettings *settings)
         curve = NULL;
     }
 
+    // and those interval markers
+    refreshIntervalMarkers(settings);
 
     replot();
+}
+
+
+void ScatterPlot::mouseMoved()
+{
+    if (!isVisible()) return;
+
+    if (ride && ride->ride() && ride->ride()->intervals().count() >= intervalMarkers.count()) {
+
+        // where is the mouse ?
+        QPoint pos = QCursor::pos();
+
+        // are we hovering "close" to an interval marker ?
+        int index = 0;
+        foreach (QwtPlotMarker *is, intervalMarkers) {
+
+            QPoint mpos = canvas()->mapToGlobal(QPoint(transform(xBottom, is->value().x()), transform(yLeft, is->value().y())));
+
+            int dx = mpos.x() - pos.x();
+            int dy = mpos.y() - pos.y();
+
+            if ((dx > -6 && dx < 6) && (dy > -6 && dy < 6))
+                context->notifyIntervalHover(ride->ride()->intervals()[index]);
+
+            index++;
+        }
+    }
+    return;
+}
+
+void
+ScatterPlot::intervalHover(RideFileInterval ri)
+{
+    if (!isVisible()) return;
+    if (context->isCompareIntervals) return;
+    if (!ride) return;
+    if (!ride->ride()) return;
+
+    // zap the old one
+    if (hover) {
+        hover->detach();
+        delete hover;
+        hover = NULL;
+    }
+
+    // collect the data
+    QVector<double> xArray, yArray;
+    foreach(const RideFilePoint *p1, ride->ride()->dataPoints()) {
+
+        double y = pointType(p1, xseries, useMetricUnits, cranklength);
+        double x = pointType(p1, yseries, useMetricUnits, cranklength);
+
+        if (p1->secs < ri.start || p1->secs > ri.stop) continue;
+
+        xArray << x;
+        yArray << y;
+    }
+
+    // which interval is it or how many ?
+    int count = 0;
+    int ours = 0;
+    foreach(RideFileInterval p, ride->ride()->intervals()) {
+        if (p.start == ri.start && p.stop == ri.stop) ours = count;
+        count++;
+    }
+
+    // any data ?
+    if (xArray.size()) {
+        QwtSymbol *sym = new QwtSymbol;
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(4);
+        QColor color;
+        color.setHsv(ours * 255/count, 255,255);
+        color.setAlpha(128);
+        sym->setPen(QPen(color));
+        sym->setBrush(QBrush(color));
+
+        hover = new QwtPlotCurve();
+        hover->setSymbol(sym);
+        hover->setStyle(QwtPlotCurve::Dots);
+        hover->setRenderHint(QwtPlotItem::RenderAntialiased);
+        hover->setSamples(yArray, xArray);
+        hover->attach(this);
+    }
+
+    replot(); // refresh
+}
+
+// for accumulating averages when refreshing interval markers
+class saccum { public: saccum() : count(0), x(0), y(0) {} int count; double x; double y; };
+
+void
+ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
+{
+    // zap what we got ...
+    foreach(QwtPlotMarker *is, intervalMarkers) {
+        is->detach();
+        delete is;
+    }
+    intervalMarkers.clear();
+
+    // do we have a ride with intervals to refresh ?
+    int count=0;
+
+    if (settings->ride && settings->ride->ride() && settings->ride->ride()->dataPoints().count() && (count = settings->ride->ride()->intervals().count())) {
+
+    // accumulating...
+    QVector<saccum> intervalAccumulator(count);
+
+
+        foreach (RideFilePoint *point, settings->ride->ride()->dataPoints()) {
+
+            double x = pointType(point, settings->x, useMetricUnits, cranklength);
+            double y = pointType(point, settings->y, useMetricUnits, cranklength);
+
+            // accumulate values for each interval here ....
+            for(int i=0; i < count; i++) {
+
+                RideFileInterval v = settings->ride->ride()->intervals()[i];
+
+                // in our interval ?
+                if (point->secs >= v.start && point->secs <= v.stop) {
+                    intervalAccumulator[i].x += x;
+                    intervalAccumulator[i].y += y;
+                    intervalAccumulator[i].count++;
+                }
+            }
+        }
+
+        // ok, so now add markers for the average position for each interval
+        int index = 0;
+        foreach (saccum a, intervalAccumulator) {
+
+            QColor color;
+            color.setHsv(index * 255/count, 255,255);
+            double x = a.x/double(a.count);
+            double y = a.y/double(a.count);
+
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Diamond);
+            sym->setSize(8);
+            sym->setPen(QPen(GColor(CPLOTMARKER)));
+            sym->setBrush(QBrush(color));
+
+            QwtPlotMarker *p = new QwtPlotMarker();
+            p->setValue(x, y);
+            p->setYAxis(yLeft);
+            p->setZ(100);
+            p->setSymbol(sym);
+            p->attach(this);
+            intervalMarkers << p;
+
+            index++;
+        }
+    }
 }
 
 void

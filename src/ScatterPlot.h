@@ -27,12 +27,15 @@
 #include "Context.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
+#include "RideFile.h"
 #include "Units.h"
 #include "math.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_marker.h>
+#include <qwt_plot_picker.h>
 #include <qwt_symbol.h>
 
 #define MODEL_NONE          0
@@ -65,10 +68,13 @@ class ScatterPlot : public QwtPlot
     public:
         ScatterPlot(Context *);
         void setData(ScatterSettings *);
+        void refreshIntervalMarkers(ScatterSettings *);
         void showTime(ScatterSettings *, int offset, int secs);
         void setAxisTitle(int axis, QString label);
 
     public slots:
+        void intervalHover(RideFileInterval);
+        void mouseMoved();
         void configChanged();
 
     protected:
@@ -85,11 +91,38 @@ class ScatterPlot : public QwtPlot
         QVector<double> y;
 
         QList <QwtPlotCurve *> intervalCurves; // each curve on plot
+        QList <QwtPlotMarker *> intervalMarkers; // each curve on plot
 
         QwtPlotCurve *curve;
+        QwtPlotCurve *hover;
         QwtPlotGrid *grid;
 
     private:
         static QString describeType(int type, bool longer, bool useMetricUnits);
+
+        // save the settings
+        RideItem *ride; // what we plotting?
+        int xseries,yseries;  // which channels to use
+};
+
+// qwt breaks QWidget::mouseMoveEvent, so we have to use their dogshit
+// quite whats wrong with the QT event handling is beyond me.
+class mouseTracker: public QwtPlotPicker
+{
+public:
+
+    mouseTracker(ScatterPlot *me) : QwtPlotPicker(me->canvas()), me(me) {
+        setTrackerMode(AlwaysOn);
+    }
+
+protected:
+
+    virtual QwtText trackerText(const QPoint &pos ) const {
+        me->mouseMoved();
+        return QwtText("");
+    }
+
+private:
+    ScatterPlot *me;
 };
 #endif // _GC_ScatterPlot_h
