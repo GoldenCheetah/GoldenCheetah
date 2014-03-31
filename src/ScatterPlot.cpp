@@ -224,8 +224,6 @@ void ScatterPlot::setData (ScatterSettings *settings)
 	    delete curve;
     }
 
-    QPen gridPen(GColor(CPLOTGRID));
-    gridPen.setStyle(Qt::DotLine);
 
     if (grid) {
         grid->detach();
@@ -233,10 +231,13 @@ void ScatterPlot::setData (ScatterSettings *settings)
     }
 
     if (settings->gridlines) {
+
+        QPen gridPen(GColor(CPLOTGRID));
         grid = new QwtPlotGrid();
         grid->setPen(gridPen);
         grid->enableX(true);
         grid->enableY(true);
+        grid->setZ(-10);
         grid->attach(this);
     } else {
         grid = NULL;
