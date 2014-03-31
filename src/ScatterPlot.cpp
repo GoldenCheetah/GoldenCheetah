@@ -153,7 +153,7 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
 ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
     setAutoDelete(false); // no don't delete on detach !
-    all = NULL;
+    curve = NULL;
     grid = NULL;
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
@@ -218,31 +218,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
         }
     }
 
-    QwtSymbol *sym = new QwtSymbol;
-    sym->setStyle(QwtSymbol::Ellipse);
-    sym->setSize(6);
-    sym->setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    sym->setBrush(QBrush(Qt::NoBrush));
-    QPen p;
-    p.setColor(Qt::red);
-    sym->setPen(p);
-
     // wipe away existing
-	if (all) {
-        all->detach();
-	    //delete all;
-    }
-
-    // setup the framing curve
-    if (settings->frame) {
-        all = new QwtPlotCurve();
-        all->setSymbol(sym);
-        all->setStyle(QwtPlotCurve::Dots);
-        all->setRenderHint(QwtPlotItem::RenderAntialiased);
-	    all->setSamples(x.constData(), y.constData(), points);
-        all->attach(this);
-    } else {
-        all = NULL;
+	if (curve) {
+        curve->detach();
+	    delete curve;
     }
 
     QPen gridPen(GColor(CPLOTGRID));
@@ -250,7 +229,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     if (grid) {
         grid->detach();
-        //delete grid;
+        delete grid;
     }
 
     if (settings->gridlines) {
@@ -280,9 +259,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
     if (intervalCurves.size()) {
        QListIterator<QwtPlotCurve *> i(intervalCurves);
        while (i.hasNext()) {
-           QwtPlotCurve *curve = i.next();
-           curve->detach();
-           //delete curve;
+           QwtPlotCurve *ic = i.next();
+           ic->detach();
+           delete ic;
        }
     }
     intervalCurves.clear();
@@ -334,23 +313,48 @@ void ScatterPlot::setData (ScatterSettings *settings)
             order.next();
             int idx = order.value();
 
-            QPen pen;
             QColor intervalColor;
             intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
-            pen.setColor(intervalColor);
-            sym->setPen(pen);
 
-            QwtPlotCurve *curve = new QwtPlotCurve();
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(4);
+            sym->setBrush(QBrush(intervalColor));
+            sym->setPen(QPen(intervalColor));
 
-            curve->setSymbol(sym);
-            curve->setStyle(QwtPlotCurve::Dots);
-            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            curve->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
-            curve->attach(this);
+            QwtPlotCurve *ic = new QwtPlotCurve();
 
-            intervalCurves.append(curve);
+            ic->setSymbol(sym);
+            ic->setStyle(QwtPlotCurve::Dots);
+            ic->setRenderHint(QwtPlotItem::RenderAntialiased);
+            ic->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
+            ic->attach(this);
+
+            intervalCurves.append(ic);
         }
     }
+
+    // setup the framing curve
+    if (intervals.count() == 0 || settings->frame) {
+
+        QwtSymbol *sym = new QwtSymbol;
+        sym->setStyle(QwtSymbol::Ellipse);
+        sym->setSize(4);
+        sym->setPen(QPen(Qt::red));
+        sym->setBrush(QBrush(Qt::red));
+
+        curve = new QwtPlotCurve();
+        curve->setSymbol(sym);
+        curve->setStyle(QwtPlotCurve::Dots);
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+	    curve->setSamples(x.constData(), y.constData(), points);
+        curve->setZ(-1);
+        curve->attach(this);
+
+    } else {
+        curve = NULL;
+    }
+
 
     replot();
 }
@@ -368,6 +372,8 @@ ScatterPlot::configChanged()
 
     axisWidget(QwtPlot::xBottom)->setPalette(palette);
     axisWidget(QwtPlot::yLeft)->setPalette(palette);
+
+    replot();
 }
 
 void
