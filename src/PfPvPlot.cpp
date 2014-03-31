@@ -616,7 +616,7 @@ PfPvPlot::intervalHover(RideFileInterval x)
     if (!isVisible()) return;
     if (context->isCompareIntervals) return;
     if (!rideItem) return;
-    if (!rideItem->ride());
+    if (!rideItem->ride()) return;
 
     // zap the old one
     if (hover) {
