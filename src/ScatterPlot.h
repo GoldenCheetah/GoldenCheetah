@@ -86,7 +86,7 @@ class ScatterPlot : public QwtPlot
 
         QList <QwtPlotCurve *> intervalCurves; // each curve on plot
 
-        QwtPlotCurve *all;
+        QwtPlotCurve *curve;
         QwtPlotGrid *grid;
 
     private:
