@@ -32,6 +32,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_marker.h>
+#include <qwt_symbol.h>
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
 #include <qwt_color_map.h>
@@ -526,7 +527,7 @@ CPPlot::plotModel()
         QVector<double> heat;
         QVector<double> time;
 
-        for (int i=0; i<bestsCache->meanMaxArray(RideFile::watts).count() && i<bestsCache->heatMeanMaxArray().count(); i++) {
+        for (int i=1; i<bestsCache->meanMaxArray(RideFile::watts).count() && i<bestsCache->heatMeanMaxArray().count(); i++) {
 
             QwtIntervalSample add(i/60.00f, bestsCache->meanMaxArray(RideFile::watts)[i] - bestsCache->heatMeanMaxArray()[i],
                                   bestsCache->meanMaxArray(RideFile::watts)[i]/* + bestsCache->heatMeanMaxArray()[i]*/);
@@ -743,7 +744,7 @@ CPPlot::plotBests()
         default:
         case RideFile::watts:
             line.setColor(GColor(CCP));
-            fill = (GColor(CPOWER));
+            fill = (GColor(CCP));
             break;
         case RideFile::wattsd:
         case RideFile::NP:
@@ -752,8 +753,23 @@ CPPlot::plotBests()
             fill = (GColor(CPOWER));
             break;
         }
+
+        // when plotting power bests AND a model we draw bests as dots
+        // but only if in 'plain' mode .. not doing a rainbow curve.
+        if (rideSeries == RideFile::watts && model) {
+
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(4);
+            sym->setBrush(QBrush(fill));
+            sym->setPen(QPen(fill));
+            curve->setSymbol(sym);
+            curve->setStyle(QwtPlotCurve::Dots);
+        }
+
         fill.setAlpha(64);
         line.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
+
         curve->setPen(line);
         if (rideSeries == RideFile::watts)
             curve->setBrush(Qt::NoBrush);
@@ -860,7 +876,7 @@ CPPlot::plotBests()
     // X-AXIS
 
     // now sort the axis for the bests curve
-    double xmin = 0.017;
+    double xmin = 1.0f/60.0f - 0.001f;
     double xmax = time[maxNonZero - 1];
 
     // truncate at an hour for energy mode
