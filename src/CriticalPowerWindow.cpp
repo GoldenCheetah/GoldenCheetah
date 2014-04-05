@@ -352,6 +352,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     grid = new QwtPlotGrid();
     grid->enableX(true); // not needed
     grid->enableY(true);
+    grid->setZ(-20);
     grid->attach(cpPlot);
 
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
