@@ -19,9 +19,8 @@
 #include "Context.h"
 #include "Athlete.h"
 
-Context::Context(MainWindow *mainWindow)
+Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
 {
-    this->mainWindow = mainWindow;
     ride = NULL;
     workout = NULL;
     isfiltered = ishomefiltered = false;
