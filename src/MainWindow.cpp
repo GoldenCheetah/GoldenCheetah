@@ -145,7 +145,7 @@ MainWindow::MainWindow(const QDir &home)
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
 #ifndef Q_OS_MAC
-    fullScreen = new QTFullScreen(context);
+    fullScreen = new QTFullScreen(this);
 #endif
 
     // if no workout directory is configured, default to the

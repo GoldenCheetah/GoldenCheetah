@@ -17,34 +17,26 @@
 */
 
 #include "QTFullScreen.h"
-#include "Context.h"
 #include "MainWindow.h"
 
-QTFullScreen::QTFullScreen(Context *context) : QObject(context->mainWindow), context(context), isFull(false)
+QTFullScreen::QTFullScreen(MainWindow* mainWindow) : QObject(mainWindow), mainWindow(mainWindow), isFull(false)
 {
     // watch for ESC key being hit when in full screen
-    context->mainWindow->installEventFilter(this);
+    mainWindow->installEventFilter(this);
 }
 
 bool
 QTFullScreen::eventFilter(QObject *obj, QEvent *event)
 {
-    if (obj != context->mainWindow) return false;
-
-    // F11 toggle full screen
-    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent *>(event)->key() == Qt::Key_F11) {
-        toggle();
-    }
-
-    // ESC cancels fullscreen
-    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent *>(event)->key() == Qt::Key_Escape) {
-
-        // if in full screen then toggle, otherwise do nothing
-        if (isFull) {
-            context->mainWindow->showNormal();
+    if (obj == mainWindow && event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        // F11 toggle full screen
+        if (keyEvent->key() == Qt::Key_F11) {
+            toggle();
+        } else if (keyEvent->key() == Qt::Key_Escape && isFull) {
+            mainWindow->showNormal();
             isFull = false;
         }
-        return false;
     }
     return false; // always pass thru, just in case
 }
@@ -54,9 +46,9 @@ void
 QTFullScreen::toggle()
 {
     if (isFull) {
-        context->mainWindow->showNormal();
+        mainWindow->showNormal();
     } else {
-        context->mainWindow->showFullScreen();
+        mainWindow->showFullScreen();
     }
     isFull = !isFull;
 }
