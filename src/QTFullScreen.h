@@ -20,18 +20,17 @@
 #ifndef _GC_QTFullScreen_h
 #define _GC_QTFullScreen_h 1
 
-#include "GoldenCheetah.h"
-
 // QT stuff etc
 #include <QtGui>
 
+class MainWindow;
 class QTFullScreen : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     public:
 
-        QTFullScreen(Context *context);
+        QTFullScreen(MainWindow* mainWindow);
 
         // found in the supplied directory
         void toggle();
@@ -40,7 +39,7 @@ class QTFullScreen : public QObject
         bool eventFilter(QObject *obj, QEvent *event);
 
     private:
-        Context *context;
+        MainWindow* const mainWindow;
         bool isFull;
 };
 

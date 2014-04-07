@@ -56,7 +56,7 @@ class Context : public QObject
         DateRange currentDateRange() { return dr_; }
 
         // current selections
-        MainWindow *mainWindow;
+        MainWindow * const mainWindow;
         Tab *tab;
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
