@@ -98,6 +98,8 @@ class CPPlot : public QwtPlot
 
     private:
 
+        QWidget *parent;
+
         // calculate / data setting
         void calculateForDateRanges(QList<CompareDateRange> compareDateRanges);
         void calculateForIntervals(QList<CompareInterval> compareIntervals);
@@ -153,7 +155,6 @@ class CPPlot : public QwtPlot
         CpPlotCurve *heatAgeCurve;
 
         // other plot objects
-        QwtPlotMarker *curveTitle;
         QList<QwtPlotMarker*> referenceLines;
         QList<QwtPlotMarker*> allZoneLabels;
 

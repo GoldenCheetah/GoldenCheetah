@@ -18,6 +18,7 @@
 
 #include "GoldenCheetah.h"
 #include "MainWindow.h"
+#include "GcOverlayWidget.h"
 #include "Context.h"
 #include "Colors.h"
 #include "Settings.h"
@@ -734,6 +735,8 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context)
     _defaultBlankLayout->addWidget(blankLabel);
     _defaultBlankLayout->addStretch();
     _blank->setLayout(_defaultBlankLayout);
+
+    overlayWidget = NULL;
 }
 
 void
@@ -814,6 +817,20 @@ void GcChartWindow:: hideRevealControls()
 {
     _revealControls->hide();
     _unrevealTimer->stop();
+}
+
+
+void 
+GcChartWindow::addHelper(QString name, QWidget *widget)
+{
+    if (!overlayWidget) {
+        overlayWidget = new GcOverlayWidget(context, _mainWidget);
+    }
+
+    //overlayWidget->move(100, 100); // temporary!
+    //overlayWidget->setFixedSize(300, 300); // temporary!
+    overlayWidget->addWidget(name, widget);
+    overlayWidget->show();
 }
 
 void GcChartWindow:: saveImage()

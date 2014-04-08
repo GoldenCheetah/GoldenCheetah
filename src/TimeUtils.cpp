@@ -57,7 +57,7 @@ double str_to_interval(QString s)
 QString interval_to_str(double secs) 
 {
     if (secs < 60.0)
-        return QString("%1s").arg(secs, 0, 'f', 2, QLatin1Char('0'));
+        return QString("%1s").arg(secs, 0, 'f', 0, QLatin1Char('0'));
     QString result;
     unsigned rounded = static_cast<unsigned>(round(secs));
     bool needs_colon = false;
@@ -69,13 +69,15 @@ QString interval_to_str(double secs)
     if (needs_colon || rounded >= 60) {
         if (needs_colon)
             result += " ";
-        result += QString("%1m").arg(rounded / 60, 2, 10, QLatin1Char('0'));
+        //result += QString("%1m").arg(rounded / 60, 2, 10, QLatin1Char('0'));
+        result += QString("%1m").arg(rounded / 60, 2, 10);
         rounded %= 60;
         needs_colon = true;
     }
     if (needs_colon)
         result += " ";
-    result += QString("%1s").arg(rounded, 2, 10, QLatin1Char('0'));
+    //result += QString("%1s").arg(rounded, 2, 10, QLatin1Char('0'));
+    result += QString("%1s").arg(rounded, 2, 10);
     return result;
 }
 
