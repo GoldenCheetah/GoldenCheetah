@@ -198,8 +198,6 @@ class CriticalPowerWindow : public GcChartWindow
     protected slots:
         void forceReplot();
         void newRideAdded(RideItem*);
-        void cpintTimeValueEntered();
-        void pickerMoved(const QPoint &pos);
         void rideSelected();
         void configChanged();
         void intervalSelected();
@@ -241,6 +239,10 @@ class CriticalPowerWindow : public GcChartWindow
 
     protected:
 
+        friend class ::CPPlot;
+
+        bool event(QEvent *event);
+
         QDir home;
         CPPlot *cpPlot;
         Context *context;
@@ -261,6 +263,15 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *rPercent, *rHeat;
         QwtPlotPicker *picker;
         QwtPlotGrid *grid;
+
+        // model helper widget
+        QWidget *helper;
+        QLabel *titleBlank, *titleValue, *titleRank;
+        QLabel *wprimeTitle, *wprimeValue, *wprimeRank;
+        QLabel *cpTitle, *cpValue, *cpRank;
+        QLabel *ftpTitle, *ftpValue, *ftpRank;
+        QLabel *pmaxTitle, *pmaxValue, *pmaxRank;
+
         void addSeries();
         Seasons *seasons;
         QList<Season> seasonsList;
@@ -293,6 +304,8 @@ class CriticalPowerWindow : public GcChartWindow
         DateSettingsEdit *dateSetting;
         bool active; // when resetting parameters
         QwtPlotCurve *hoverCurve;
+
+        bool firstShow;
 };
 
 #endif // _GC_CriticalPowerWindow_h

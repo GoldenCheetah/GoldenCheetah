@@ -44,6 +44,7 @@ class Context;
 #include "TimeUtils.h"
 
 class RideItem;
+class GcOverlayWidget;
 
 
 class GcWindow : public QFrame
@@ -235,18 +236,22 @@ private:
     void reveal();
     void unreveal();
 
+    // overlay widget
+    GcOverlayWidget *overlayWidget;
+    bool wantOverlay;
+
 public:
     GcChartWindow(Context *context);
 
     QWidget *mainWidget() { return _mainWidget; }
+    GcOverlayWidget *helperWidget() { return overlayWidget; }
 
     void setChartLayout(QLayout *layout);
     void setRevealLayout(QLayout *layout);
     void setBlankLayout(QLayout *layout);
-
     void setIsBlank(bool value);
-
     void setControls(QWidget *x);
+    void addHelper(QString name, QWidget *widget); // add to the overlay widget
 
 public slots:
     void hideRevealControls();

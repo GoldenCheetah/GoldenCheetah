@@ -30,6 +30,7 @@
 #include "RideItem.h"
 #include "TimeUtils.h"
 #include "IntervalItem.h"
+#include "GcOverlayWidget.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -45,7 +46,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
-    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false), hoverCurve(NULL)
+    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false), hoverCurve(NULL), firstShow(true)
 {
     //
     // reveal controls widget
@@ -343,19 +344,90 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     // point 2 + 3 -or- point 1 + 2 in a 2 point model
 
-    picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::VLineRubberBand,
-                               QwtPicker::AlwaysOff, cpPlot->canvas());
-    picker->setStateMachine(new QwtPickerDragPointMachine);
-    picker->setRubberBandPen(GColor(CPLOTTRACKER));
-
     grid = new QwtPlotGrid();
     grid->enableX(true); // not needed
     grid->enableY(true);
     grid->setZ(-20);
     grid->attach(cpPlot);
 
-    connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
+    // the model helper -- showing model parameters etc
+    helper = new QWidget(this);
+    helper->setAutoFillBackground(true);
+
+    QGridLayout *gridLayout = new QGridLayout(helper);
+    gridLayout->setColumnStretch(0, 40);
+    gridLayout->setColumnStretch(1, 30);
+    gridLayout->setColumnStretch(2, 20);
+
+    // create the labels
+    titleBlank = new QLabel(tr(""), this);
+    titleValue = new QLabel(tr("Value"), this);
+    titleRank = new QLabel(tr("Rank"), this);
+    wprimeTitle = new QLabel(tr("W'"), this);
+    wprimeValue = new QLabel(tr("0 kJ"), this);
+    wprimeRank = new QLabel(tr("0.0"), this);
+    cpTitle = new QLabel(tr("CP"), this);
+    cpValue = new QLabel(tr("0 w"), this);
+    cpRank = new QLabel(tr("0.0"), this);
+    pmaxTitle = new QLabel(tr("Pmax"), this);
+    pmaxValue = new QLabel(tr("0 w"), this);
+    pmaxRank = new QLabel(tr("0.0"), this);
+    ftpTitle = new QLabel(tr("FTP"), this);
+    ftpValue = new QLabel(tr("0 w"), this);
+    ftpRank = new QLabel(tr("0.0"), this);
+
+    // autofill
+    titleBlank->setAutoFillBackground(true);
+    titleValue->setAutoFillBackground(true);
+    titleRank->setAutoFillBackground(true);
+    wprimeTitle->setAutoFillBackground(true);
+    wprimeValue->setAutoFillBackground(true);
+    wprimeRank->setAutoFillBackground(true);
+    cpTitle->setAutoFillBackground(true);
+    cpValue->setAutoFillBackground(true);
+    cpRank->setAutoFillBackground(true);
+    pmaxTitle->setAutoFillBackground(true);
+    pmaxValue->setAutoFillBackground(true);
+    pmaxRank->setAutoFillBackground(true);
+    ftpTitle->setAutoFillBackground(true);
+    ftpValue->setAutoFillBackground(true);
+    ftpRank->setAutoFillBackground(true);
+
+    // align all centered
+    titleBlank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    titleValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    titleRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    wprimeTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    wprimeValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    wprimeRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    cpTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    cpValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    cpRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    pmaxTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    pmaxValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    pmaxRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ftpTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    ftpValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ftpRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+    // add to grid
+    gridLayout->addWidget(titleBlank, 0, 0);
+    gridLayout->addWidget(titleValue, 0, 1);
+    gridLayout->addWidget(titleRank, 0, 2);
+    gridLayout->addWidget(wprimeTitle, 1, 0);
+    gridLayout->addWidget(wprimeValue, 1, 1);
+    gridLayout->addWidget(wprimeRank, 1, 2);
+    gridLayout->addWidget(cpTitle, 2, 0);
+    gridLayout->addWidget(cpValue, 2, 1);
+    gridLayout->addWidget(cpRank, 2, 2);
+    gridLayout->addWidget(pmaxTitle, 3, 0);
+    gridLayout->addWidget(pmaxValue, 3, 1);
+    gridLayout->addWidget(pmaxRank, 3, 2);
+    gridLayout->addWidget(ftpTitle, 4, 0);
+    gridLayout->addWidget(ftpValue, 4, 1);
+    gridLayout->addWidget(ftpRank, 4, 2);
+
+    addHelper(QString("Model"), helper);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
@@ -421,6 +493,54 @@ CriticalPowerWindow::configChanged()
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 
+    // tinted palette for headings etc
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
+
+    // inverted palette for data etc
+    QPalette whitepalette;
+    whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+
+    QFont font;
+    font.setPointSize(16); // reasonably big
+    titleBlank->setFont(font);
+    titleValue->setFont(font);
+    titleRank->setFont(font);
+    wprimeTitle->setFont(font);
+    wprimeValue->setFont(font);
+    wprimeRank->setFont(font);
+    cpTitle->setFont(font);
+    cpValue->setFont(font);
+    cpRank->setFont(font);
+    pmaxTitle->setFont(font);
+    pmaxValue->setFont(font);
+    pmaxRank->setFont(font);
+    ftpTitle->setFont(font);
+    ftpValue->setFont(font);
+    ftpRank->setFont(font);
+
+    helper->setPalette(palette);
+    titleBlank->setPalette(palette);
+    titleValue->setPalette(palette);
+    titleRank->setPalette(palette);
+    wprimeTitle->setPalette(palette);
+    wprimeValue->setPalette(whitepalette);
+    wprimeRank->setPalette(whitepalette);
+    cpTitle->setPalette(palette);
+    cpValue->setPalette(whitepalette);
+    cpRank->setPalette(whitepalette);
+    pmaxTitle->setPalette(palette);
+    pmaxValue->setPalette(whitepalette);
+    pmaxRank->setPalette(whitepalette);
+    ftpTitle->setPalette(palette);
+    ftpValue->setPalette(whitepalette);
+    ftpRank->setPalette(whitepalette);
+
     QPen gridPen(GColor(CPLOTGRID));
     grid->setPen(gridPen);
 
@@ -456,7 +576,6 @@ CriticalPowerWindow::modelChanged()
             laeI2SpinBox->hide();
 
             // No default values !
-
             break;
 
     case 1 : // 2 param model
@@ -482,7 +601,6 @@ CriticalPowerWindow::modelChanged()
             anI2SpinBox->setValue(300);
             aeI1SpinBox->setValue(1200);
             aeI2SpinBox->setValue(1800);
-
             break;
 
     case 2 : // 3 param model
@@ -549,6 +667,13 @@ void
 CriticalPowerWindow::modelParametersChanged()
 {
     if (active == true) return;
+
+    // need a helper any more ?
+    if (seriesCombo->currentIndex() >= 0) {
+        CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+        if (series == watts && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        else helperWidget()->hide();
+    }
 
     // tell the plot
     cpPlot->setModel(sanI1SpinBox->value(),
@@ -894,6 +1019,7 @@ CriticalPowerWindow::rideSelected()
     currentRide = myRideItem;
 
     if (currentRide) {
+
         if (context->athlete->zones()) {
             int zoneRange = context->athlete->zones()->whichRange(currentRide->dateTime.date());
             int CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
@@ -917,14 +1043,32 @@ CriticalPowerWindow::rideSelected()
     intervalSelected();
 }
 
+bool
+CriticalPowerWindow::event(QEvent *event)
+{
+    // nasty nasty nasty hack to move widgets as soon as the widget geometry
+    // is set properly by the layout system, by default the width is 100 and 
+    // we wait for it to be set properly then put our helper widget on the RHS
+    if (event->type() == QEvent::Resize && geometry().width() != 100 && firstShow) {
+        firstShow = false;
+        helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+    }
+    return QWidget::event(event);
+}
+
 void
 CriticalPowerWindow::setSeries(int index)
 {
     if (index >= 0) {
 
+        // need a helper any more ?
+        CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt());
+        if (series == watts && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        else helperWidget()->hide();
+
         if (rangemode) {
 
-            cpPlot->setSeries(static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt()));
+            cpPlot->setSeries(series);
             cpPlot->setRide(currentRide);
 
         } else {
@@ -941,7 +1085,7 @@ CriticalPowerWindow::setSeries(int index)
             intervalCurves.clear();
             for (int i=0; i<= context->athlete->allIntervalItems()->childCount(); i++) intervalCurves << NULL;
 
-            cpPlot->setSeries(static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt()));
+            cpPlot->setSeries(series);
             cpPlot->setRide(currentRide);
 
             // refresh intervals
@@ -1083,23 +1227,6 @@ CriticalPowerWindow::updateCpint(double minutes)
       }
       cpintAllValue->setText(label);
     }
-}
-
-void
-CriticalPowerWindow::cpintTimeValueEntered()
-{
-  return; //XXX
-  double minutes = str_to_interval(cpintTimeValue->text()) / 60.0;
-  updateCpint(minutes);
-}
-
-void
-CriticalPowerWindow::pickerMoved(const QPoint &pos)
-{
-    return; //XXX
-    double minutes = cpPlot->invTransform(QwtPlot::xBottom, pos.x());
-    cpintTimeValue->setText(interval_to_str(60.0*minutes));
-    updateCpint(minutes);
 }
 
 QString

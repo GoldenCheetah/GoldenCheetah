@@ -311,6 +311,7 @@ HEADERS += \
         FitRideFile.h \
         GcCalendarModel.h \
         GcCrashDialog.h \
+        GcOverlayWidget.h \
         GcPane.h \
         GcRideFile.h \
         GcScopeBar.h \
@@ -509,6 +510,7 @@ SOURCES += \
         FixTorque.cpp \
         FixHRSpikes.cpp \
         GcCrashDialog.cpp \
+        GcOverlayWidget.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
         GcScopeBar.cpp \
