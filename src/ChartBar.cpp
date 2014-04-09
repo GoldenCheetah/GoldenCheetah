@@ -89,6 +89,22 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     mlayout->addWidget(right);
     connect(right, SIGNAL(clicked()), this, SLOT(scrollRight()));
 
+    // spacer to make the menuButton on the right
+    QLabel *spacer = new QLabel("", this);
+    spacer->setAutoFillBackground(false);
+    spacer->setFixedHeight(20);
+    spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    mlayout->addWidget(spacer);
+
+    menuButton = new QToolButton(this);
+    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    menuButton->setAutoFillBackground(false);
+    menuButton->setFixedSize(20,20);
+    menuButton->setIcon(iconFromPNG(":images/sidebar/extra.png"));
+    menuButton->setIconSize(QSize(10,10));
+    menuButton->setFocusPolicy(Qt::NoFocus);
+    mlayout->addWidget(menuButton);
+    //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
 
     buttonFont.setPointSize(10);
     buttonFont.setWeight(QFont::Black);
