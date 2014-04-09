@@ -73,6 +73,7 @@ private:
 
     ButtonBar *buttonBar;
     QToolButton *left, *right; // scrollers, hidden if menu fits
+    QToolButton *menuButton;
     QScrollArea *scrollArea;
     QHBoxLayout *layout;
 
