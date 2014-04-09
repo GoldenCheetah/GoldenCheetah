@@ -831,6 +831,12 @@ MainWindow::setChartMenu()
 void
 MainWindow::setSubChartMenu()
 {
+    setChartMenu(subChartMenu);
+}
+
+void
+MainWindow::setChartMenu(QMenu *menu)
+{
     unsigned int mask=0;
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
@@ -843,12 +849,12 @@ MainWindow::setSubChartMenu()
         case 3 : mask = VIEW_TRAIN; break;
     }
 
-    subChartMenu->clear();
+    menu->clear();
     if (!mask) return;
 
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask) 
-            subChartMenu->addAction(GcWindows[i].name);
+            menu->addAction(GcWindows[i].name);
     }
 }
 

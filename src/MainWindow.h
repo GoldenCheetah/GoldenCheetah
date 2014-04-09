@@ -120,6 +120,7 @@ class MainWindow : public QMainWindow
 
         void setChartMenu();
         void setSubChartMenu();
+        void setChartMenu(QMenu *);
         void addChart(QAction*);
 
         void showOptions();
