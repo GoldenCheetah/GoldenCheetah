@@ -20,6 +20,7 @@
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 
+// creates an icon in the apple style of gray emboss
 QIcon iconFromPNG(QString filename, bool emboss)
 {
     QImage pngImage;
@@ -46,6 +47,12 @@ QIcon iconFromPNG(QString filename, bool emboss)
     return icon;
 }
 
+//
+// GcSplitter -- The sidebar is largely comprised of this which contains a splitter (GcSubSplitter)
+//               and a control (GcSplitterControl) at the bottom with icons to show/hide items.
+//               The GcSplitter contains 2 or more such items (GcSplitterItem) and each of those will
+//               have a special handle (GcSplitterHandle).
+//
 GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(parent)
 {
 
@@ -163,6 +170,11 @@ GcSplitter::insertWidget(int index, QWidget *widget)
     splitter->insertWidget(index, widget);
 }
 
+//
+// GcSubSplitter -- the actual QSplitter widget but needs to have a handle at the top even if there is
+//                  only one item shown, hence making it a special widget
+//
+
 GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent, bool plainstyle) : QSplitter(orientation, parent), control(control), gcSplitter (parent), plainstyle(plainstyle)
 {
     _insertedWidget = NULL;
@@ -230,6 +242,11 @@ GcSubSplitter::createHandle()
 
     return QSplitter::createHandle();
 }
+
+//
+// GcSplitterHandle -- the handle shown at the top of a sidebar item with a title and a menu button
+//                     the user drags this to resize the sidebar contents up and down.
+//
 
 GcSplitterHandle::GcSplitterHandle(QString title, Qt::Orientation orientation, QSplitter *parent, bool metal) : QSplitterHandle(orientation, parent), _title(title), metal(metal)
 {
@@ -387,6 +404,10 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     painter.restore();
 }
 
+//
+// GcSplitterControl - the icon bar at the bottom of the left sidebar
+//
+
 GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
@@ -452,6 +473,10 @@ GcSplitterControl::selectAction()
     /*this->setBaseSize(width(), parentWidget()->height());
     this->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);*/
 }
+
+//
+// GcSplitterItem -- the selectable content in the sidebar; has a name, an icon and a widget to show
+//
 
 GcSplitterItem::GcSplitterItem(QString title, QIcon icon, QWidget *parent) : QWidget(parent), title(title), icon(icon)
 {
