@@ -808,7 +808,7 @@ CPPlot::plotBests()
 
             // use a linear gradient
             if (shadeMode && shadingCP) { // 0 value means no shading please - and only if proper value for shadingCP
-                color.setAlpha(64);
+                color.setAlpha(128);
                 QColor color1 = color.darker();
                 QLinearGradient linearGradient(0, 0, 0, height());
                 linearGradient.setColorAt(0.0, color);
