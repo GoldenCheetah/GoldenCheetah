@@ -160,6 +160,8 @@ WPrime::setRide(RideFile *input)
     for (int i=0; i<last; i++) {
 
         int value = smoothed.value(i);
+        if (value < 0) value = 0; // don't go negative now
+
         inputArray[i] = value > CP ? value-CP : 0;
 
         if (value < CP) {
@@ -210,6 +212,8 @@ WPrime::setRide(RideFile *input)
         if (value > maxY) maxY = value;
         if (value < minY) minY = value;
     }
+    if (minY < -30000) minY = 0; // the data is definitely out of bounds!
+                                 // so lets not excacerbate the problem - truncate
 
     //qDebug()<<"compute W'bal curve took"<<time.elapsed();
 
