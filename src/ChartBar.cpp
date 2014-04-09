@@ -131,6 +131,14 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
 
+    barMenu = new QMenu("Add");
+    chartMenu = barMenu->addMenu(tr("Add Chart"));
+
+    // menu
+    connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));
+    connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
+    connect(chartMenu, SIGNAL(triggered(QAction*)), context->mainWindow, SLOT(addChart(QAction*)));
+
     // trap resize / mouse events
     installEventFilter(this);
 }
@@ -163,6 +171,19 @@ ChartBar::addWidget(QString title)
 
     // tidy up scrollers etc
     tidy();
+}
+
+void
+ChartBar::setChartMenu()
+{
+    context->mainWindow->setChartMenu(chartMenu);
+}
+
+void
+ChartBar::menuPopup()
+{
+    // set the point for the menu and call below
+    barMenu->exec(this->mapToGlobal(QPoint(menuButton->pos().x(), menuButton->pos().y()+20)));
 }
 
 void
