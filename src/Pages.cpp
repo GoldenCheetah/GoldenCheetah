@@ -610,7 +610,7 @@ void CredentialsPage::authoriseTwitter()
     t_key = NULL;
     t_secret = NULL;
 
-    const char *request_token_uri = "http://api.twitter.com/oauth/request_token";
+    const char *request_token_uri = "https://api.twitter.com/oauth/request_token";
 
     char *req_url = NULL;
     char *postarg = NULL;
@@ -623,7 +623,7 @@ void CredentialsPage::authoriseTwitter()
     token = QString(rv[1]);
     t_key  =strdup(&(rv[1][12]));
     t_secret =strdup(&(rv[2][19]));
-    url = QString("http://api.twitter.com/oauth/authorize?");
+    url = QString("https://api.twitter.com/oauth/authorize?");
     url.append(token);
     QDesktopServices::openUrl(QUrl(url));
     if(rv) free(rv);
@@ -637,7 +637,7 @@ void CredentialsPage::saveTwitter()
     char *req_url;
     char **rv = NULL;
     char *postarg = NULL;
-    QString url = QString("http://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
+    QString url = QString("https://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
 
     QString strPin = twitterPIN->text();
     if(strPin.size() == 0)
@@ -685,6 +685,8 @@ void CredentialsPage::authoriseCyclingAnalytics()
 void
 CredentialsPage::saveClicked()
 {
+    saveTwitter();
+
     appsettings->setCValue(context->athlete->cyclist, GC_GCURL, gcURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GCUSER, gcUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GCPASS, gcPass->text());
