@@ -72,6 +72,8 @@ private:
     bool requestToken;
     bool requestAuth;
 
+    char *t_key, *t_secret;
+
 };
 
 #endif // OAUTHDIALOG_H

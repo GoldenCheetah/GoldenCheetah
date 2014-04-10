@@ -38,19 +38,49 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr = QString("https://www.strava.com/oauth/authorize?");
         urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
         urlstr.append("scope=view_private,write&");
+        urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
+        urlstr.append("response_type=code&");
+        urlstr.append("approval_prompt=force");
     }
     else if (site == TWITTER) {
-        urlstr = QString("http://api.twitter.com/oauth/request_token?");
-        // TODO
+#ifdef GC_HAVE_LIBOAUTH
+        int rc;
+        char **rv = NULL;
+        QString token;
+        QString url = QString();
+        t_key = NULL;
+        t_secret = NULL;
+
+        const char *request_token_uri = "https://api.twitter.com/oauth/request_token";
+
+        char *req_url = NULL;
+        char *postarg = NULL;
+        char *reply   = NULL;
+        req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
+        reply = oauth_http_get(req_url,postarg);
+
+        rc = oauth_split_url_parameters(reply, &rv);
+        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+        token = QString(rv[1]);
+        t_key  =strdup(&(rv[1][12]));
+        t_secret =strdup(&(rv[2][19]));
+        urlstr = QString("https://api.twitter.com/oauth/authorize?");
+        urlstr.append(token);
+        //QDesktopServices::openUrl(QUrl(url));
+        if(rv) free(rv);
+
+        //urlstr.append("&oauth_callback=http%3A%2F%2Fwww.goldencheetah.org%2F");
+        requestToken = true;
+#endif
     }
     else if (site == CYCLING_ANALYTICS) {
         urlstr = QString("https://www.cyclinganalytics.com/api/auth?");
         urlstr.append("client_id=").append(GC_CYCLINGANALYTICS_CLIENT_ID).append("&");
         urlstr.append("scope=modify_rides&");
+        urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
+        urlstr.append("response_type=code&");
+        urlstr.append("approval_prompt=force");
     }
-    urlstr.append("redirect_uri=http://www.goldencheetah.org/&");  
-    urlstr.append("response_type=code&");
-    urlstr.append("approval_prompt=force");
 
 
     url = QUrl(urlstr);
@@ -95,8 +125,7 @@ OAuthDialog::urlChanged(const QUrl &url)
             params.addQueryItem("redirect_uri", "http://www.goldencheetah.org/");
         }
         else if (site == TWITTER) {
-            urlstr = QString("http://api.twitter.com/oauth/token?");
-            // TODO
+
         }
         else if (site == CYCLING_ANALYTICS) {
             urlstr = QString("https://www.cyclinganalytics.com/api/token?");
@@ -127,17 +156,56 @@ void
 OAuthDialog::loadFinished()
 {
     if (requestToken) {
+        //qDebug()<< view->page()->mainFrame()->toHtml();
+
         int at = view->page()->mainFrame()->toHtml().indexOf("\"access_token\":");
+        if (at==-1)
+            at = view->page()->mainFrame()->toHtml().indexOf("<code>");
         if (at>-1) {
-            int i = view->page()->mainFrame()->toHtml().indexOf("\"", at+15);
-            int j = view->page()->mainFrame()->toHtml().indexOf("\"", i+1);
+            int i = -1;
+            int j = -1;
+
+            if (site == TWITTER) {
+                i = at+5;
+                j = view->page()->mainFrame()->toHtml().indexOf("</code>", i+1);
+            }
+            else  {
+                view->page()->mainFrame()->toHtml().indexOf("\"", at+15);
+                view->page()->mainFrame()->toHtml().indexOf("\"", i+1);
+            }
             if (i>-1 && j>-1) {
                 QString access_token = view->page()->mainFrame()->toHtml().mid(i+1,j-i-1);
                 if (site == STRAVA) {
                     appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
                 }
                 else if (site == TWITTER) {
-                    // TODO
+                    //qDebug() << "access_token" << access_token;
+#ifdef GC_HAVE_LIBOAUTH
+                    char *reply;
+                    char *req_url;
+                    char **rv = NULL;
+                    char *postarg = NULL;
+                    QString url = QString("https://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
+
+                    url.append(access_token);
+
+                    req_url = oauth_sign_url2(url.toLatin1(), NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, t_key, t_secret);
+                    reply = oauth_http_get(req_url,postarg);
+
+                    int rc = oauth_split_url_parameters(reply, &rv);
+
+                    if(rc ==4)
+                    {
+                        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+
+                        const char *oauth_token = strdup(&(rv[0][12]));
+                        const char *oauth_secret = strdup(&(rv[1][19]));
+
+                        //Save Twitter oauth_token and oauth_secret;
+                        appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_TOKEN, oauth_token);
+                        appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_SECRET, oauth_secret);
+                    }
+#endif
                 }
                 else if (site == CYCLING_ANALYTICS) {
                     appsettings->setCValue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, access_token);
