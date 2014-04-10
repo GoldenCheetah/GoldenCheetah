@@ -97,8 +97,8 @@ void
 TwitterDialog::tweetCurrentRide()
 {
 
-    QString strToken = appsettings->value(this, GC_TWITTER_TOKEN).toString();
-    QString strSecret = appsettings->value(this, GC_TWITTER_SECRET).toString();
+    QString strToken = appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_TOKEN).toString();
+    QString strSecret = appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_SECRET).toString();
 
     QString s_token = QString(strToken);
     QString s_secret = QString(strSecret);
