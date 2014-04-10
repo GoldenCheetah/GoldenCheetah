@@ -484,6 +484,17 @@ CPPlot::plotModel()
                 cpw->cpValue->setText(QString("%1 w").arg(int (model.ecp)));
                 cpw->ftpValue->setText(QString("%1 w").arg(model.mmp60));
                 cpw->pmaxValue->setText(QString("%1 w").arg(model.pMax));
+                
+                // Add levels for pmax and ftp
+                // TODO use weight from date ?
+
+                // Reference 22.5W/kg -> untrained 8W/kg
+                int _pMaxLevel = 15 * (model.pMax / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+
+                // Reference 6.25W/kg -> untrained 2.5W/kg
+                int _ftpLevel = 15 * (model.mmp60 / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
             }
             break;
         }
