@@ -507,7 +507,7 @@ CriticalPowerWindow::configChanged()
     whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
 
     QFont font;
-    font.setPointSize(16); // reasonably big
+    font.setPointSize(12); // reasonably big
     titleBlank->setFont(font);
     titleValue->setFont(font);
     titleRank->setFont(font);
