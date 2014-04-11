@@ -162,7 +162,7 @@ class CredentialsPage : public QScrollArea
         //QPushButton *stravaTest;
         //QLineEdit *stravaUser;
         //QLineEdit *stravaPass;
-        QPushButton *stravaAuthorise, *stravaAuthorised;
+        QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
         QLineEdit *stravaPIN;
         char *s_id, *s_secret;
 
