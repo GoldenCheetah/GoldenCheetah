@@ -189,7 +189,8 @@ struct Bin2FileReaderState
         else
             lng = lng/10000000.0;
 
-        rideFile->appendPoint(*secs, cad, hr, km, kph, nm, watts, alt, lng, lat, 0.0, 0, temp, lrbal, interval);
+        // 0.0 values at end are for garmin vector torque efficiency/pedal smoothness which are not available
+        rideFile->appendPoint(*secs, cad, hr, km, kph, nm, watts, alt, lng, lat, 0.0, 0, temp, lrbal, 0.0, 0.0, 0.0, 0.0, interval);
         (*secs)++;
     }
 

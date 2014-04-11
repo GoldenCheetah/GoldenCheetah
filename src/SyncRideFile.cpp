@@ -131,7 +131,8 @@ struct SyncFileReaderState
 
         km += intSecs * kph / 3600.0;
         rideFile->setRecIntSecs(intSecs);
-        rideFile->appendPoint(*secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temp, 0.0, interval);
+        rideFile->appendPoint(*secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temp, 0.0, 
+                              0.0, 0.0, 0.0, 0.0, interval);
 
         *secs = *secs + intSecs;
 

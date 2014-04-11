@@ -100,7 +100,7 @@ FitlogParser::startElement( const QString&, const QString&,
         // now add
         rideFile->appendPoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,
                               point.watts,point.alt,point.lon,point.lat, point.headwind,
-                              0.0, RideFile::noTemp, 0.0, point.interval);
+                              0.0, RideFile::noTemp, 0.0, 0.0, 0.0, 0.0, 0.0, point.interval);
     }
     return true;
 }

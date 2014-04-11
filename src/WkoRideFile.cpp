@@ -486,9 +486,10 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
             // Now output this sample if it is not a null record
             if (!isnull) {
-                    // !! needs to be modified to support the new alt patch
                     results->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, lon, lat, wind, slope, temp, 0.0, 0);
+                            kph, nm, watts, alt, lon, lat, wind, slope, temp, 0.0, 
+                            0.0,0.0,0.0,0.0, // vector pedal torque eff and smoothness not supported in WKO (?)
+                            0);
             }
 
             // increment time - even for null records (perhaps especially for null

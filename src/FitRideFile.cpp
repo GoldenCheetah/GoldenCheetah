@@ -531,8 +531,12 @@ struct FitFileReaderState
             double deltaLon = lng - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
             double deltaHeadwind = headwind - prevPoint->headwind;
-            double deltaSlope = headwind - prevPoint->slope;
+            double deltaSlope = slope - prevPoint->slope;
             double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
+            double deltaLeftTE = leftTorqueEff - prevPoint->lte;
+            double deltaRightTE = rightTorqueEff - prevPoint->rte;
+            double deltaLeftPS = leftPedalSmooth - prevPoint->lps;
+            double deltaRightPS = rightPedalSmooth - prevPoint->rps;
 
             // only smooth for less than 30 minutes
             // we don't want to crash / stall on bad
@@ -556,6 +560,10 @@ struct FitFileReaderState
                         prevPoint->slope + (deltaSlope * weight),
                         temperature,
                         prevPoint->lrbalance + (deltaLeftRightBalance * weight),
+                        prevPoint->lte + (deltaLeftTE * weight),
+                        prevPoint->rte + (deltaRightTE * weight),
+                        prevPoint->lps + (deltaLeftPS * weight),
+                        prevPoint->rps + (deltaRightPS * weight),
                         interval);
                 }
                 prevPoint = rideFile->dataPoints().back();
@@ -563,7 +571,8 @@ struct FitFileReaderState
         }
 
         if (km < 0.00001f) km = last_distance;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature, lrbalance, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature,
+                     lrbalance, leftTorqueEff, rightTorqueEff, leftPedalSmooth, rightPedalSmooth, interval);
         last_time = time;
         last_distance = km;
     }

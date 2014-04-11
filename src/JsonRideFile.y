@@ -111,7 +111,7 @@ static QString unprotect(const QString string)
 %token TAGS INTERVALS NAME START STOP
 %token CALIBRATIONS VALUE
 %token REFERENCES
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE LTE RTE LPS RPS
 
 %start document
 %%
@@ -236,6 +236,8 @@ sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, 
                                                     JsonPoint.lon, JsonPoint.lat,
                                                     JsonPoint.headwind,
                                                     JsonPoint.slope, JsonPoint.temp, JsonPoint.lrbalance,
+                                                    JsonPoint.lte, JsonPoint.rte,
+                                                    JsonPoint.lps, JsonPoint.rps,
                                                     JsonPoint.interval);
                                           JsonPoint = RideFilePoint();
                                         }
@@ -255,6 +257,10 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | SLOPE ':' number              { JsonPoint.slope = JsonNumber; }
         | TEMP ':' number               { JsonPoint.temp = JsonNumber; }
         | LRBALANCE ':' number          { JsonPoint.lrbalance = JsonNumber; }
+        | LTE ':' number          { JsonPoint.lte = JsonNumber; }
+        | RTE ':' number          { JsonPoint.rte = JsonNumber; }
+        | LPS ':' number          { JsonPoint.lps = JsonNumber; }
+        | RPS ':' number          { JsonPoint.rps = JsonNumber; }
         ;
 
 /*
@@ -499,6 +505,10 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             if (ride->areDataPresent()->slope) out << ", \"SLOPE\":" << QString("%1").arg(p->slope);
             if (ride->areDataPresent()->temp && p->temp != RideFile::noTemp) out << ", \"TEMP\":" << QString("%1").arg(p->temp);
             if (ride->areDataPresent()->lrbalance) out << ", \"LRBALANCE\":" << QString("%1").arg(p->lrbalance);
+            if (ride->areDataPresent()->lte) out << ", \"LTE\":" << QString("%1").arg(p->lte);
+            if (ride->areDataPresent()->rte) out << ", \"RTE\":" << QString("%1").arg(p->rte);
+            if (ride->areDataPresent()->lps) out << ", \"LPS\":" << QString("%1").arg(p->lps);
+            if (ride->areDataPresent()->rps) out << ", \"RPS\":" << QString("%1").arg(p->rps);
 
             // sample points in here!
             out << " }";
