@@ -97,7 +97,8 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
     for (int i = start; i <= end; ++i) {
         const RideFilePoint *p = ride->dataPoints()[i];
         f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 0);
+                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 
+                      p->lte, p->rte, p->lps, p->rps, 0);
 
         // derived data
         RideFilePoint *l = f.dataPoints().last();
@@ -169,7 +170,8 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
     for (int i = start; i <= end; ++i) {
         const RideFilePoint *p = ride->dataPoints()[i];
         f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 0);
+                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 
+                      p->lte, p->rte, p->lps, p->rps, 0);
 
         // derived data
         RideFilePoint *l = f.dataPoints().last();

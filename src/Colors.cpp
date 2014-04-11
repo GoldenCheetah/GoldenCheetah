@@ -119,6 +119,10 @@ void GCColor::setupColors()
         { tr("Ride CP Curve"), "CRIDECP", Qt::red },
         { tr("Aerobic TISS"), "CATISS", Qt::magenta },
         { tr("Anaerobic TISS"), "CANTISS", Qt::cyan },
+        { tr("Left Torque Effectiveness"), "CLTE", Qt::cyan },
+        { tr("Right Torque Effectiveness"), "CRTE", Qt::magenta },
+        { tr("Left Pedal Smoothness"), "CLPS", Qt::cyan },
+        { tr("Right Pedal Smoothness"), "CRPS", Qt::magenta },
         { "", "", QColor(0,0,0) },
     };
 

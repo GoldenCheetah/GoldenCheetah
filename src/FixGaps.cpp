@@ -190,6 +190,10 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double slopedelta = (point->slope - last->slope) / (double) count;
                 double temperaturedelta = (point->temp - last->temp) / (double) count;
                 double lrbalancedelta = (point->lrbalance - last->lrbalance) / (double) count;
+                double ltedelta = (point->lte - last->lte) / (double) count;
+                double rtedelta = (point->rte - last->rte) / (double) count;
+                double lpsdelta = (point->lps - last->lps) / (double) count;
+                double rpsdelta = (point->rps - last->rps) / (double) count;
 
                 // add the points
                 for(int i=0; i<count; i++) {
@@ -207,6 +211,10 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->slope + ((i+1)*slopedelta),
                                                            last->temp + ((i+1)*temperaturedelta),
                                                            last->lrbalance + ((i+1)*lrbalancedelta),
+                                                           last->lte + ((i+1)*ltedelta),
+                                                           last->rte + ((i+1)*rtedelta),
+                                                           last->lps + ((i+1)*lpsdelta),
+                                                           last->rps + ((i+1)*rpsdelta),
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }
@@ -236,6 +244,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0,
                                                            0,
+                                                           0.0, 0.0, 0.0, 0.0, //pedal torque / smoothness
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }

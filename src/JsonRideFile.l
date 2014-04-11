@@ -69,6 +69,10 @@
 \"SLOPE\"           return SLOPE;
 \"TEMP\"            return TEMP;
 \"LRBALANCE\"       return LRBALANCE;
+\"LTE\"       return LTE;
+\"RTE\"       return RTE;
+\"LPS\"       return LPS;
+\"RPS\"       return RPS;
 [-+]?[0-9]+            return JS_INTEGER;
 [-+]?[0-9]+e-[0-9]+    return JS_FLOAT;
 [-+]?[0-9]+\.[-+e0-9]*  return JS_FLOAT;

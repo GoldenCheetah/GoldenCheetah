@@ -776,7 +776,8 @@ SplitConfirm::createRideFile(long start, long stop)
         returning->appendPoint(p->secs - offset, // start from zero!
                                p->cad, p->hr, p->km - distanceoffset, p->kph,
                                p->nm, p->watts, p->alt, p->lon, p->lat,
-                               p->headwind, p->slope, p->temp, p->lrbalance, p->interval);
+                               p->headwind, p->slope, p->temp, p->lrbalance, p->lte, p->rte, p->lps, p->rps,
+                               p->interval);
     }
 
     // lets keep intervals that start in our section truncating them
