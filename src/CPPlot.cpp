@@ -941,7 +941,8 @@ CPPlot::plotRide(RideItem *rideItem)
         for (int i = 0; i <= maxNonZero; ++i) {
             energyArray[i] = timeArray[i] * rideCache->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
         }
-        rideCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
+        rideCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1, 
+                              maxNonZero > 0 ? maxNonZero-1 : 0);
 
     } else {
 
@@ -961,7 +962,8 @@ CPPlot::plotRide(RideItem *rideItem)
                 samples[i] = rideCache->meanMaxArray(rideSeries)[i] /
                              bestsCache->meanMaxArray(rideSeries)[i] * 100.00f;
             }
-            rideCurve->setSamples(timeArray.data() + 1, samples.data() + 1, maxNonZero -1);
+            rideCurve->setSamples(timeArray.data() + 1, samples.data() + 1, 
+                                  maxNonZero > 0 ? maxNonZero-1 : 0);
 
             // did we get over 100% .. because if so
             // we need to set the maxY on the RHS to reflect that
@@ -974,7 +976,8 @@ CPPlot::plotRide(RideItem *rideItem)
 
             // JUST A NORMAL CURVE
             rideCurve->setYAxis(yLeft);
-            rideCurve->setSamples(timeArray.data() + 1, rideCache->meanMaxArray(rideSeries).constData() + 1, maxNonZero - 1);
+            rideCurve->setSamples(timeArray.data() + 1, rideCache->meanMaxArray(rideSeries).constData() + 1, 
+                                  maxNonZero > 0 ? maxNonZero-1 : 0);
         }
     }
 
