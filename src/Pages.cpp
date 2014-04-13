@@ -615,9 +615,11 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 void CredentialsPage::authoriseTwitter()
 {
+#ifdef GC_HAVE_LIBOAUTH
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
+#endif
     /*
 #ifdef GC_HAVE_LIBOAUTH
     int rc;
