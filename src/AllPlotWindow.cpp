@@ -149,8 +149,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showGrid->setCheckState(Qt::Checked);
     cl1->addRow(new QLabel(""), showGrid);
     cl1->addRow(new QLabel(""), new QLabel(""));
-    cl1->addRow(new QLabel("Delta Series"), new QLabel(""));
 
+    showAccel = new QCheckBox(tr("Acceleration"), this);
+    showAccel->setCheckState(Qt::Checked);
+    cl1->addRow(new QLabel("Delta Series"), showAccel);
     showPowerD = new QCheckBox(QString(tr("Power %1").arg(deltaChar)), this);
     showPowerD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showPowerD);
@@ -164,6 +166,20 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showHrD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showHrD);
 
+    cl1->addRow(new QLabel(""), new QLabel(""));
+
+    showBalance = new QCheckBox(tr("Balance"), this);
+    showBalance->setCheckState(Qt::Checked);
+    cl1->addRow(new QLabel("Left/Right"), showBalance);
+
+    showTE = new QCheckBox(tr("Torque Effectiveness"));
+    showTE->setCheckState(Qt::Unchecked);
+    cl1->addRow(new QLabel(""), showTE);
+
+    showPS = new QCheckBox(tr("Smoothness"), this);
+    showPS->setCheckState(Qt::Unchecked);
+    cl1->addRow(new QLabel(""), showPS);
+
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(tr("Data series")), showHr);
@@ -171,10 +187,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showSpeed = new QCheckBox(tr("Speed"), this);
     showSpeed->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showSpeed);
-
-    showAccel = new QCheckBox(tr("Acceleration"), this);
-    showAccel->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showAccel);
 
     showCad = new QCheckBox(tr("Cadence"), this);
     showCad->setCheckState(Qt::Checked);
@@ -196,9 +208,11 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showTorque->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showTorque);
 
+    cl2->addRow(new QLabel(""), new QLabel(""));
+
     showANTISS = new QCheckBox(tr("Anaerobic TISS"), this);
     showANTISS->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(""), showANTISS);
+    cl2->addRow(new QLabel("Metrics"), showANTISS);
 
     showATISS = new QCheckBox(tr("Aerobic TISS"), this);
     showATISS->setCheckState(Qt::Unchecked);
@@ -219,10 +233,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showW = new QCheckBox(tr("W' balance"), this);
     showW->setCheckState(Qt::Unchecked);
     cl2->addRow(new QLabel(""), showW);
-
-    showBalance = new QCheckBox(tr("Power balance"), this);
-    showBalance->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showBalance);
 
     showPower = new QComboBox(this);
     showPower->addItem(tr("Power + shade"));
@@ -515,6 +525,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showWind, SIGNAL(stateChanged(int)), this, SLOT(setShowWind(int)));
     connect(showW, SIGNAL(stateChanged(int)), this, SLOT(setShowW(int)));
     connect(showBalance, SIGNAL(stateChanged(int)), this, SLOT(setShowBalance(int)));
+    connect(showPS, SIGNAL(stateChanged(int)), this, SLOT(setShowPS(int)));
+    connect(showTE, SIGNAL(stateChanged(int)), this, SLOT(setShowTE(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -652,8 +664,6 @@ AllPlotWindow::configChanged()
 void
 AllPlotWindow::compareChanged()
 {
-//XXXXX
-
     if (!amVisible()) {
         compareStale = true;
         return;
@@ -2222,6 +2232,48 @@ AllPlotWindow::setShowBalance(int value)
 }
 
 void
+AllPlotWindow::setShowPS(int value)
+{
+    showPS->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showPS->isEnabled()) ? true : false;
+
+    allPlot->setShowPS(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowPS(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+
+}
+
+void
+AllPlotWindow::setShowTE(int value)
+{
+    showTE->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showTE->isEnabled()) ? true : false;
+
+    allPlot->setShowTE(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowTE(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+
+}
+
+void
 AllPlotWindow::setShowFull(int value)
 {
     rFull->setChecked(value);
@@ -2605,6 +2657,8 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showAP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::aPower;
     if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::wprime;
     if (showBalance->isChecked() && rideItem->ride()->areDataPresent()->lrbalance) serieslist << RideFile::lrbalance;
+    if (showTE->isChecked() && rideItem->ride()->areDataPresent()->lte) serieslist << RideFile::lte << RideFile::rte;
+    if (showPS->isChecked() && rideItem->ride()->areDataPresent()->lps) serieslist << RideFile::lps << RideFile::rps;
 
     bool first = true;
     foreach(RideFile::SeriesType x, serieslist) {

@@ -75,6 +75,8 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showHrD READ isShowHrD WRITE setShowHrD USER true)
     Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
     Q_PROPERTY(int showBalance READ isShowBalance WRITE setShowBalance USER true)
+    Q_PROPERTY(int showTE READ isShowTE WRITE setShowTE USER true)
+    Q_PROPERTY(int showPS READ isShowPS WRITE setShowPS USER true)
     Q_PROPERTY(int showTemp READ isShowTemp WRITE setShowTemp USER true)
     Q_PROPERTY(int showW READ isShowW WRITE setShowW USER true)
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
@@ -117,6 +119,8 @@ class AllPlotWindow : public GcChartWindow
         int isShowCadD() const { return showCadD->checkState(); }
         int isShowTorqueD() const { return showTorqueD->checkState(); }
         int isShowHrD() const { return showHrD->checkState(); }
+        int isShowTE() const { return showTE->checkState(); }
+        int isShowPS() const { return showPS->checkState(); }
         int isShowBalance() const { return showBalance->checkState(); }
         int isShowTemp() const { return showTemp->checkState(); }
         int isShowW() const { return showW->checkState(); }
@@ -159,6 +163,8 @@ class AllPlotWindow : public GcChartWindow
         void setShowTorqueD(int state);
         void setShowHrD(int state);
         void setShowBalance(int state);
+        void setShowPS(int state);
+        void setShowTE(int state);
         void setShowW(int state);
         void setShowGrid(int state);
         void setPaintBrush(int state);
@@ -258,6 +264,8 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showTemp;
         QCheckBox *showWind;
         QCheckBox *showBalance;
+        QCheckBox *showTE;
+        QCheckBox *showPS;
         QCheckBox *showW;
         QComboBox *comboDistance;
         QSlider *smoothSlider;

@@ -317,6 +317,10 @@ class AllPlotObject : public QObject
     QwtPlotCurve *balanceRCurve;
     QwtPlotCurve *wCurve;
     QwtPlotCurve *mCurve;
+    QwtPlotCurve *lteCurve;
+    QwtPlotCurve *rteCurve;
+    QwtPlotCurve *lpsCurve;
+    QwtPlotCurve *rpsCurve;
 
     // source data
     QVector<double> hrArray;
@@ -340,6 +344,10 @@ class AllPlotObject : public QObject
     QVector<double> windArray;
     QVector<double> torqueArray;
     QVector<double> balanceArray;
+    QVector<double> lteArray;
+    QVector<double> rteArray;
+    QVector<double> lpsArray;
+    QVector<double> rpsArray;
 
     // smoothed data
     QVector<double> smoothWatts;
@@ -364,6 +372,10 @@ class AllPlotObject : public QObject
     QVector<double> smoothTorque;
     QVector<double> smoothBalanceL;
     QVector<double> smoothBalanceR;
+    QVector<double> smoothLTE;
+    QVector<double> smoothRTE;
+    QVector<double> smoothLPS;
+    QVector<double> smoothRPS;
     QVector<QwtIntervalSample> smoothRelSpeed;
 
     // highlighting intervals
@@ -450,6 +462,8 @@ class AllPlot : public QwtPlot
         void setShowW(bool show);
         void setShowTorque(bool show);
         void setShowBalance(bool show);
+        void setShowTE(bool show);
+        void setShowPS(bool show);
         void setShowGrid(bool show);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -497,6 +511,8 @@ class AllPlot : public QwtPlot
         bool showW;
         bool showTorque;
         bool showBalance;
+        bool showTE;
+        bool showPS;
 
         // plot objects
         AllPlotObject *standard;
