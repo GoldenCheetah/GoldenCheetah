@@ -1103,7 +1103,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 
         // show percent ?
-        if (curve == rideCurve && showPercent && rideSeries == RideFile::watts) units = QString("%");
+        if (curve == rideCurve && showPercent) units = QString("%");
         else units = RideFile::unitName(rideSeries, context);
 
         // output the tooltip

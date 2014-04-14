@@ -1714,10 +1714,10 @@ AllPlot::refreshCalibrationMarkers()
             mrk->attach(this);
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashLine));
+            mrk->setLinePen(QPen(Qt::gray, 0, Qt::DashLine));
             QwtText text(wanttext ? ("\n\n"+calibration.name) : "");
             text.setFont(QFont("Helvetica", 9, QFont::Bold));
-            text.setColor(GColor(CPLOTMARKER));
+            text.setColor(Qt::gray);
             if (!bydist)
                 mrk->setValue(calibration.start / 60.0, 0.0);
             else
