@@ -16,7 +16,7 @@ ENHANCEMENTS
 1. General
 i    Open Athletes in Tabs
 ii   Redesign Tabbed mode with a ChartBar
-iii  Better support for themes, new look
+iii  Better support for color customisation, new look
 iv   Interactivity (axes, interval hover)
 v    Autofilter in Trends view
 vi   Specify athlete library location
@@ -28,6 +28,7 @@ ix   Multiple pages of charts [unimplemented yet]
 i    Fixed up Tacx Fortius Support
 ii   Joule GPS firmware support
 iii  FIT ride file support
+iv   Pedal Smoothness / Torque Effectiveness support
 
 3. Metrics
 i    Plot best x power etc
@@ -37,6 +38,7 @@ iv   aPower
 v    Polarised Zones
 vi   Pacing Index / Fatigue Index
 vii  W' work
+viii Average Pedal Smoothness / Torque Efficiency
 
 4. LTM Chart
 i   LTM settings cleaned up
