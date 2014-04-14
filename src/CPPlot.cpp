@@ -1091,6 +1091,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         double xvalue = curve->sample(index).x();
         double yvalue = curve->sample(index).y();
         QString text, dateStr;
+        QString units;
 
         // add when to tooltip if its all curve
         if (bestsCurves.contains(curve)) {
@@ -1101,11 +1102,15 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             }
         }
 
+        // show percent ?
+        if (curve == rideCurve && showPercent && rideSeries == RideFile::watts) units = QString("%");
+        else units = RideFile::unitName(rideSeries, context);
+
         // output the tooltip
         text = QString("%1\n%3 %4%5")
                .arg(interval_to_str(60.0*xvalue))
                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-               .arg(RideFile::unitName(rideSeries, context))
+               .arg(units)
                .arg(dateStr);
 
         // set that text up
