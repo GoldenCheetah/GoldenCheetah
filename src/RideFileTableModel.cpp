@@ -125,6 +125,22 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Left/Right Balance");
             headingsType << RideFile::lrbalance;
         }
+        if (series == RideFile::lte || ride->areDataPresent()->lte) {
+            headings_ << tr("Left TE");
+            headingsType << RideFile::lte;
+        }
+        if (series == RideFile::rte || ride->areDataPresent()->rte) {
+            headings_ << tr("Right TE");
+            headingsType << RideFile::rte;
+        }
+        if (series == RideFile::lps || ride->areDataPresent()->lps) {
+            headings_ << tr("Left PS");
+            headingsType << RideFile::lps;
+        }
+        if (series == RideFile::rps || ride->areDataPresent()->rps) {
+            headings_ << tr("Right PS");
+            headingsType << RideFile::rps;
+        }
         if (series == RideFile::interval || ride->areDataPresent()->interval) {
             headings_ << tr("Interval");
             headingsType << RideFile::interval;

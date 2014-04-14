@@ -208,6 +208,11 @@ RideEditor::whatColumns()
          << tr("Headwind")
          << tr("Slope")
          << tr("Temperature")
+         << tr("Left/Right Balance")
+         << tr("Left TE")
+         << tr("Right TE")
+         << tr("Left PS")
+         << tr("Right PS")
          << tr("Interval");
 
     return what;
@@ -793,7 +798,11 @@ RideEditor::insColumn(QString name)
     if (name == tr("Heartrate")) series = RideFile::hr;
     if (name == tr("Slope")) series = RideFile::slope;
     if (name == tr("Temperature")) series = RideFile::temp;
-
+    if (name == tr("Left/Right Balance")) series = RideFile::lrbalance;
+    if (name == tr("Left TE")) series = RideFile::lte;
+    if (name == tr("Right TE")) series = RideFile::rte;
+    if (name == tr("Left PS")) series = RideFile::lps;
+    if (name == tr("Right PS")) series = RideFile::rps;
 
     model->insertColumn(series);
 }
