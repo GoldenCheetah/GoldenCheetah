@@ -1085,3 +1085,205 @@ static bool addMaxPowerVariance()
 static bool maxPowerVarianceAdded = addMaxPowerVariance();
 
 //////////////////////////////////////////////////////////////////////////////
+
+class AvgLTE : public RideMetric {
+
+    Q_DECLARE_TR_FUNCTIONS(AvgLTE)
+
+    public:
+
+    AvgLTE()
+    {
+        setSymbol("average_lte");
+        setInternalName("Average Left Torque Effectiveness");
+    }
+    void initialize() {
+        setName(tr("Average Left Torque Effectiveness"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setType(RideMetric::Average);
+        setPrecision(1);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->areDataPresent()->lte) {
+
+            double total = 0.0f;
+            double secs = 0.0f;
+
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                secs += ride->recIntSecs();
+                total += point->lte;
+            }
+
+            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            else setValue(0.0);
+
+        } else {
+
+            setValue(0.0);
+        }
+    }
+
+    RideMetric *clone() const { return new AvgLTE(*this); }
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+class AvgRTE : public RideMetric {
+
+    Q_DECLARE_TR_FUNCTIONS(AvgRTE)
+
+    public:
+
+    AvgRTE()
+    {
+        setSymbol("average_rte");
+        setInternalName("Average Right Torque Effectiveness");
+    }
+    void initialize() {
+        setName(tr("Average Right Torque Effectiveness"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setType(RideMetric::Average);
+        setPrecision(1);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->areDataPresent()->rte) {
+
+            double total = 0.0f;
+            double secs = 0.0f;
+
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                secs += ride->recIntSecs();
+                total += point->rte;
+            }
+
+            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            else setValue(0.0);
+
+        } else {
+
+            setValue(0.0);
+        }
+    }
+
+    RideMetric *clone() const { return new AvgRTE(*this); }
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+class AvgLPS : public RideMetric {
+
+    Q_DECLARE_TR_FUNCTIONS(AvgLPS)
+
+    public:
+
+    AvgLPS()
+    {
+        setSymbol("average_lps");
+        setInternalName("Average Left Pedal Smoothness");
+    }
+    void initialize() {
+        setName(tr("Average Left Pedal Smoothness"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setType(RideMetric::Average);
+        setPrecision(1);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->areDataPresent()->lps) {
+
+            double total = 0.0f;
+            double secs = 0.0f;
+
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                secs += ride->recIntSecs();
+                total += point->lps;
+            }
+
+            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            else setValue(0.0);
+
+        } else {
+
+            setValue(0.0);
+        }
+    }
+
+    RideMetric *clone() const { return new AvgLPS(*this); }
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+class AvgRPS : public RideMetric {
+
+    Q_DECLARE_TR_FUNCTIONS(AvgRPS)
+
+    public:
+
+    AvgRPS()
+    {
+        setSymbol("average_rps");
+        setInternalName("Average Right Pedal Smoothness");
+    }
+    void initialize() {
+        setName(tr("Average Right Pedal Smoothness"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setType(RideMetric::Average);
+        setPrecision(1);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        if (ride->areDataPresent()->rps) {
+
+            double total = 0.0f;
+            double secs = 0.0f;
+
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                secs += ride->recIntSecs();
+                total += point->rps;
+            }
+
+            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            else setValue(0.0);
+
+        } else {
+
+            setValue(0.0);
+        }
+    }
+
+    RideMetric *clone() const { return new AvgRPS(*this); }
+};
+
+static bool addLeftRight()
+{
+    QVector<QString> deps;
+    RideMetricFactory::instance().addMetric(AvgLTE(), &deps);
+    RideMetricFactory::instance().addMetric(AvgRTE(), &deps);
+    RideMetricFactory::instance().addMetric(AvgLPS(), &deps);
+    RideMetricFactory::instance().addMetric(AvgRPS(), &deps);
+    return true;
+}
+static bool leftRightAdded = addLeftRight();
+//////////////////////////////////////////////////////////////////////////////
