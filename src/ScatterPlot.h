@@ -54,6 +54,12 @@
 #define MODEL_POWERZONE     13
 #define MODEL_CPV           14
 #define MODEL_AEPF          15
+#define MODEL_HEADWIND      16
+#define MODEL_SLOPE         17
+#define MODEL_TEMP          18
+#define MODEL_LRBALANCE     19
+#define MODEL_TE            20
+#define MODEL_PS            21
 
 // the data provider for the plot
 class ScatterSettings;
@@ -69,7 +75,6 @@ class ScatterPlot : public QwtPlot
         ScatterPlot(Context *);
         void setData(ScatterSettings *);
         void refreshIntervalMarkers(ScatterSettings *);
-        void showTime(ScatterSettings *, int offset, int secs);
         void setAxisTitle(int axis, QString label);
 
     public slots:
@@ -84,18 +89,14 @@ class ScatterPlot : public QwtPlot
         bool useMetricUnits;
         double cranklength;
 
-        double minX, maxX;
-        double minY, maxY;
-
-        QVector<double> x;
-        QVector<double> y;
-
         QList <QwtPlotCurve *> intervalCurves; // each curve on plot
         QList <QwtPlotMarker *> intervalMarkers; // each curve on plot
 
-        QwtPlotCurve *curve;
-        QwtPlotCurve *hover;
+        QwtPlotCurve *curve, *curve2; // when we are plotting l/r curve=left curve2=right
+        QwtPlotCurve *hover, *hover2; // similarly for hover
         QwtPlotGrid *grid;
+
+        int curves; // 1 per interval/ride but set to 2 when we have an L/R to plot
 
     private:
         static QString describeType(int type, bool longer, bool useMetricUnits);

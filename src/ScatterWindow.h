@@ -64,7 +64,6 @@ class ScatterWindow : public GcChartWindow
     Q_PROPERTY(bool ignore READ isIgnore WRITE set_Ignore USER true)
     Q_PROPERTY(bool grid READ isGrid WRITE set_Grid USER true)
     Q_PROPERTY(bool frame READ isFrame WRITE set_Frame USER true)
-    Q_PROPERTY(int time READ time WRITE set_Time USER true)
 
     public:
 
@@ -84,8 +83,6 @@ class ScatterWindow : public GcChartWindow
         void set_Ignore(bool x) { ignore->setChecked(x); }
         bool isFrame() const { return frame->isChecked(); }
         void set_Frame(bool x) { frame->setChecked(x); }
-        int time() const { return timeSlider->value(); }
-        void set_Time(int x) { timeSlider->setValue(x); }
 
     public slots:
         void rideSelected();
@@ -102,7 +99,6 @@ class ScatterWindow : public GcChartWindow
         void setIgnore();
         void setrFrame();
         void setrIgnore();
-        void setTime(int);
 
     protected:
 
@@ -131,8 +127,6 @@ class ScatterWindow : public GcChartWindow
         QCheckBox   *ignore,
                     *grid,
                     *frame;
-
-        QSlider *timeSlider;
 
         RideItem *current;
 

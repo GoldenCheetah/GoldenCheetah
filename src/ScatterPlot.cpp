@@ -41,8 +41,9 @@
 
 #define PI M_PI
 
+// side 0=left, 1=right, usually 0
 static double
-pointType(const RideFilePoint *point, int type, bool useMetricUnits, double cranklength)
+pointType(const RideFilePoint *point, int type, int side, bool useMetricUnits, double cranklength)
 {
     // return the point value for the given type
     switch(type) {
@@ -82,6 +83,13 @@ pointType(const RideFilePoint *point, int type, bool useMetricUnits, double cran
         // logic needed and I'm just lookup table!
         case MODEL_XYTIME : return 1;
         case MODEL_POWERZONE : return point->watts;
+        case MODEL_HEADWIND : return point->headwind;
+        case MODEL_SLOPE : return point->slope;
+        case MODEL_TEMP : return point->temp;
+
+        case MODEL_LRBALANCE : return !side ? point->lrbalance : (100 - point->lrbalance);
+        case MODEL_TE : return side ? point->rte : point->lte;
+        case MODEL_PS : return side ? point->rps : point->lps;
     }
     return 0; // ? unknown channel ?
 }
@@ -125,6 +133,12 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
             // logic needed and I'm just lookup table!
             case MODEL_XYTIME : return (tr("Time at X/Y (%)"));
             case MODEL_POWERZONE : return (tr("Power Zone"));
+            case MODEL_HEADWIND : return (tr("Headwind (kph)"));
+            case MODEL_SLOPE : return (tr("Slope (gradient)"));
+            case MODEL_TEMP : return (tr("Temperature (C)"));
+            case MODEL_LRBALANCE : return (tr("L/R Balance"));
+            case MODEL_TE : return (tr("Torque Efficiency"));
+            case MODEL_PS : return (tr("Pedal Smoothness"));
         }
         return (tr("Unknown"));; // ? unknown channel ?
     } else {
@@ -145,6 +159,12 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
             case MODEL_POWERZONE : return (tr("Zone"));
             case MODEL_CPV : return (tr("CPV"));
             case MODEL_AEPF : return (tr("AEPF"));
+            case MODEL_HEADWIND : return (tr("Headwind"));
+            case MODEL_SLOPE : return (tr("Slope"));
+            case MODEL_TEMP : return (tr("Temp"));
+            case MODEL_LRBALANCE : return (tr("Balance"));
+            case MODEL_TE : return (tr("TE"));
+            case MODEL_PS : return (tr("PS"));
         }
         return (tr("None")); // ? unknown channel ?
     }
@@ -154,7 +174,9 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
 {
     setAutoDelete(false); // no don't delete on detach !
     curve = NULL;
+    curve2 = NULL;
     hover = NULL;
+    hover2 = NULL;
     grid = NULL;
     ride = NULL;
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
@@ -183,8 +205,6 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
 
 void ScatterPlot::setData (ScatterSettings *settings)
 {
-    // get application settings
-    cranklength = appsettings->value(this, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
 
     // if there are no settings or incomplete settings
     // create a null data plot
@@ -202,49 +222,189 @@ void ScatterPlot::setData (ScatterSettings *settings)
         delete hover;
         hover = NULL;
     }
+    // wipe away existing curves -- we decide what to do below
+	if (curve) {
+        curve->detach();
+	    delete curve;
+        curve = NULL;
+    }
+	if (curve2) {
+        curve2->detach();
+	    delete curve2;
+        curve2 = NULL;
+    }
+    // clear out any interval curves
+    foreach(QwtPlotCurve *c, intervalCurves) {
+        c->detach();
+        delete c;
+    }
+    intervalCurves.clear();
+
+    // count the currently selected intervals
+    QVector<int> intervals;
+    QMap<int,int> displaySequence;
+
+    for (int child=0; child<context->athlete->allIntervalItems()->childCount(); child++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(child));
+        if ((current != NULL) && current->isSelected()) {
+            intervals.append(child);
+            displaySequence.insert(current->displaySequence, intervals.count()-1);
+        }
+    }
 
     // what are the settings
     xseries = settings->x;
     yseries = settings->y;
 
-    // if its not setup or no settings exist default to 175mm cranks
-    if (cranklength == 0.0) cranklength = 0.175;
+    // for setting boundaries of axis
+    double minX, maxX;
+    double minY, maxY;
+    maxY = maxX = -65535;
+    minY = minX = 65535;
 
-    //
-    // Create Main Plot dataset - used to frame intervals
-    //
-    int points=0;
+    // get application settings
+    cranklength = appsettings->value(this, GC_CRANKLENGTH, 175.00).toDouble() / 1000.0;
 
-    x.clear();
-    y.clear();
-    x.resize(settings->ride->ride()->dataPoints().count());
-    y.resize(settings->ride->ride()->dataPoints().count());
+    // how many curves do we need ?
+    if (xseries == MODEL_LRBALANCE || xseries == MODEL_TE || xseries == MODEL_PS ||
+        yseries == MODEL_LRBALANCE || yseries == MODEL_TE || yseries == MODEL_PS) {
 
-    double maxY = maxX = -65535;
-    double minY = minX = 65535;
+        // left and right side needed for each ride/interval
+        curves = 2;
+    } else {
 
-    foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
+        // just one curve per ride/interval
+        curves = 1;
+    }
 
-        double xv = x[points] = pointType(point, settings->x, context->athlete->useMetricUnits, cranklength);
-        double yv = y[points] = pointType(point, settings->y, context->athlete->useMetricUnits, cranklength);
+    for (int side = 0; side < curves; side++) {
 
-        // skip zeroes?
-        if (!(settings->ignore && (x[points] == 0 || y[points] == 0))) {
+        //
+        // GET ALL DATA AND MIN / MAX
+        //
+        int points=0;
+        QVector<double> x;
+        QVector<double> y;
+
+        foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
+
+            double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+            double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+
+            // skip zeroes?
+            if (settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
+
+            // add it 
+            x <<xv;
+            y <<yv;
             points++;
+
             if (yv > maxY) maxY = yv;
             if (yv < minY) minY = yv;
             if (xv > maxX) maxX = xv;
             if (xv < minX) minX = xv;
         }
+
+        //
+        // CREATE INTERVAL CURVES (and use framing data from above if needed)
+        //
+        if (intervals.count() > 0) {
+
+            // interval data in here
+            QVector<QVector<double> > xvals(intervals.count()); // array of curve x arrays
+            QVector<QVector<double> > yvals(intervals.count()); // array of curve x arrays
+            QVector<int> points(intervals.count());             // points in eac curve
+
+            // extract interval data
+            foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
+
+                double x = pointType(point, settings->x, side, useMetricUnits, cranklength);
+                double y = pointType(point, settings->y, side, useMetricUnits, cranklength);
+
+                if (!(settings->ignore && (x == 0 && y ==0))) {
+
+                    // which interval is it in?
+                    for (int idx=0; idx<intervals.count(); idx++) {
+
+                        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(intervals[idx]));
+
+                        if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
+                            xvals[idx].append(x);
+                            yvals[idx].append(y);
+                            points[idx]++;
+                        }
+                    }
+                }
+            }
+
+            // now we have the interval data lets create the curves
+            QMapIterator<int, int> order(displaySequence);
+            while (order.hasNext()) {
+                order.next();
+                int idx = order.value();
+
+                QColor intervalColor;
+                intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
+                // left / right are darker lighter
+                if (side) intervalColor = intervalColor.lighter(50);
+
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(4);
+                sym->setBrush(QBrush(intervalColor));
+                sym->setPen(QPen(intervalColor));
+
+                QwtPlotCurve *ic = new QwtPlotCurve();
+
+                ic->setSymbol(sym);
+                ic->setStyle(QwtPlotCurve::Dots);
+                ic->setRenderHint(QwtPlotItem::RenderAntialiased);
+                ic->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
+                ic->attach(this);
+
+                intervalCurves.append(ic);
+            }
+        }
+
+        // setup the framing curve
+        if (intervals.count() == 0 || settings->frame) {
+
+            if (side) {
+
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(4);
+                sym->setPen(QPen(Qt::cyan));
+                sym->setBrush(QBrush(Qt::cyan));
+
+                curve2 = new QwtPlotCurve();
+                curve2->setSymbol(sym);
+                curve2->setStyle(QwtPlotCurve::Dots);
+                curve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+	            curve2->setSamples(x.constData(), y.constData(), points);
+                curve2->setZ(-1);
+                curve2->attach(this);
+
+            } else {
+
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(4);
+                sym->setPen(QPen(Qt::red));
+                sym->setBrush(QBrush(Qt::red));
+
+                curve = new QwtPlotCurve();
+                curve->setSymbol(sym);
+                curve->setStyle(QwtPlotCurve::Dots);
+                curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+	            curve->setSamples(x.constData(), y.constData(), points);
+                curve->setZ(-1);
+                curve->attach(this);
+            }
+        }
     }
 
-    // wipe away existing
-	if (curve) {
-        curve->detach();
-	    delete curve;
-    }
-
-
+    // redraw grid 
     if (grid) {
         grid->detach();
         delete grid;
@@ -263,118 +423,16 @@ void ScatterPlot::setData (ScatterSettings *settings)
         grid = NULL;
     }
 
+    // axis titles
     setAxisTitle(yLeft, describeType(settings->y, true, useMetricUnits));
     setAxisTitle(xBottom, describeType(settings->x, true, useMetricUnits));
 
-    // truncate PfPv values to make easier to read
+    // axis scale
     if (settings->y == MODEL_AEPF) setAxisScale(yLeft, 0, 600);
     else setAxisScale(yLeft, minY, maxY);
     if (settings->x == MODEL_CPV) setAxisScale(xBottom, 0, 3);
     else setAxisScale(xBottom, minX, maxX);
 
-    //
-    // Create Interval Plot dataset - used to frame intervals
-    //
-
-    // clear out any interval curves which are presently defined
-    if (intervalCurves.size()) {
-       QListIterator<QwtPlotCurve *> i(intervalCurves);
-       while (i.hasNext()) {
-           QwtPlotCurve *ic = i.next();
-           ic->detach();
-           delete ic;
-       }
-    }
-    intervalCurves.clear();
-
-    // which ones are highlighted then?
-    QVector<int> intervals;
-    QMap<int,int> displaySequence;
-
-    for (int child=0; child<context->athlete->allIntervalItems()->childCount(); child++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(child));
-        if ((current != NULL) && current->isSelected()) {
-            intervals.append(child);
-            displaySequence.insert(current->displaySequence, intervals.count()-1);
-        }
-    }
-
-    if (intervals.count() > 0) {
-
-        // interval data in here
-        QVector<QVector<double> > xvals(intervals.count()); // array of curve x arrays
-        QVector<QVector<double> > yvals(intervals.count()); // array of curve x arrays
-        QVector<int> points(intervals.count());             // points in eac curve
-
-        // extract interval data
-        foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
-
-            double x = pointType(point, settings->x, useMetricUnits, cranklength);
-            double y = pointType(point, settings->y, useMetricUnits, cranklength);
-
-            if (!(settings->ignore && (x == 0 && y ==0))) {
-
-                // which interval is it in?
-                for (int idx=0; idx<intervals.count(); idx++) {
-
-                    IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(intervals[idx]));
-
-                    if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
-                        xvals[idx].append(x);
-                        yvals[idx].append(y);
-                        points[idx]++;
-                    }
-                }
-            }
-        }
-
-        // now we have the interval data lets create the curves
-        QMapIterator<int, int> order(displaySequence);
-        while (order.hasNext()) {
-            order.next();
-            int idx = order.value();
-
-            QColor intervalColor;
-            intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
-
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(4);
-            sym->setBrush(QBrush(intervalColor));
-            sym->setPen(QPen(intervalColor));
-
-            QwtPlotCurve *ic = new QwtPlotCurve();
-
-            ic->setSymbol(sym);
-            ic->setStyle(QwtPlotCurve::Dots);
-            ic->setRenderHint(QwtPlotItem::RenderAntialiased);
-            ic->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
-            ic->attach(this);
-
-            intervalCurves.append(ic);
-        }
-    }
-
-    // setup the framing curve
-    if (intervals.count() == 0 || settings->frame) {
-
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(QwtSymbol::Ellipse);
-        sym->setSize(4);
-        sym->setPen(QPen(Qt::red));
-        sym->setBrush(QBrush(Qt::red));
-
-        curve = new QwtPlotCurve();
-        curve->setSymbol(sym);
-        curve->setStyle(QwtPlotCurve::Dots);
-        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-	    curve->setSamples(x.constData(), y.constData(), points);
-        curve->setZ(-1);
-        curve->attach(this);
-
-    } else {
-        curve = NULL;
-    }
 
     // and those interval markers
     refreshIntervalMarkers(settings);
@@ -424,45 +482,78 @@ ScatterPlot::intervalHover(RideFileInterval ri)
         delete hover;
         hover = NULL;
     }
-
-    // collect the data
-    QVector<double> xArray, yArray;
-    foreach(const RideFilePoint *p1, ride->ride()->dataPoints()) {
-
-        double y = pointType(p1, xseries, useMetricUnits, cranklength);
-        double x = pointType(p1, yseries, useMetricUnits, cranklength);
-
-        if (p1->secs < ri.start || p1->secs > ri.stop) continue;
-
-        xArray << x;
-        yArray << y;
+    if (hover2) {
+        hover2->detach();
+        delete hover2;
+        hover2 = NULL;
     }
 
-    // which interval is it or how many ?
-    int count = 0;
-    int ours = 0;
-    foreach(RideFileInterval p, ride->ride()->intervals()) {
-        if (p.start == ri.start && p.stop == ri.stop) ours = count;
-        count++;
+    // how many curves do we need ?
+    if (xseries == MODEL_LRBALANCE || xseries == MODEL_TE || xseries == MODEL_PS ||
+        yseries == MODEL_LRBALANCE || yseries == MODEL_TE || yseries == MODEL_PS) {
+
+        // left and right side needed for each ride/interval
+        curves = 2;
+    } else {
+
+        // just one curve per ride/interval
+        curves = 1;
     }
 
-    // any data ?
-    if (xArray.size()) {
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(QwtSymbol::Ellipse);
-        sym->setSize(4);
-        QColor color;
-        color.setHsv(ours * 255/count, 255,255);
-        color.setAlpha(128);
-        sym->setPen(QPen(color));
-        sym->setBrush(QBrush(color));
+    for (int side = 0; side < curves; side++) {
 
-        hover = new QwtPlotCurve();
-        hover->setSymbol(sym);
-        hover->setStyle(QwtPlotCurve::Dots);
-        hover->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hover->setSamples(yArray, xArray);
-        hover->attach(this);
+        // collect the data
+        QVector<double> xArray, yArray;
+        foreach(const RideFilePoint *p1, ride->ride()->dataPoints()) {
+
+            double y = pointType(p1, xseries, side, useMetricUnits, cranklength);
+            double x = pointType(p1, yseries, side, useMetricUnits, cranklength);
+
+            if (p1->secs < ri.start || p1->secs > ri.stop) continue;
+
+            xArray << x;
+            yArray << y;
+        }
+
+        // which interval is it or how many ?
+        int count = 0;
+        int ours = 0;
+        foreach(RideFileInterval p, ride->ride()->intervals()) {
+            if (p.start == ri.start && p.stop == ri.stop) ours = count;
+            count++;
+        }
+
+        // any data ?
+        if (xArray.size()) {
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::Ellipse);
+            sym->setSize(4);
+            QColor color;
+            color.setHsv(ours * 255/count, 255,255);
+            color.setAlpha(128);
+
+            // lighter for rhs
+            if (side) color = color.lighter(50);
+
+            sym->setPen(QPen(color));
+            sym->setBrush(QBrush(color));
+   
+            if (side) { 
+                hover2 = new QwtPlotCurve();
+                hover2->setSymbol(sym);
+                hover2->setStyle(QwtPlotCurve::Dots);
+                hover2->setRenderHint(QwtPlotItem::RenderAntialiased);
+                hover2->setSamples(yArray, xArray);
+                hover2->attach(this);
+            } else {
+                hover = new QwtPlotCurve();
+                hover->setSymbol(sym);
+                hover->setStyle(QwtPlotCurve::Dots);
+                hover->setRenderHint(QwtPlotItem::RenderAntialiased);
+                hover->setSamples(yArray, xArray);
+                hover->attach(this);
+            }
+        }
     }
 
     replot(); // refresh
@@ -486,14 +577,19 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
     if (settings->ride && settings->ride->ride() && settings->ride->ride()->dataPoints().count() && (count = settings->ride->ride()->intervals().count())) {
 
-    // accumulating...
-    QVector<saccum> intervalAccumulator(count);
-
+        // accumulating...
+        QVector<saccum> intervalAccumulator(count);
 
         foreach (RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-            double x = pointType(point, settings->x, useMetricUnits, cranklength);
-            double y = pointType(point, settings->y, useMetricUnits, cranklength);
+            double x0 = pointType(point, settings->x, 0, useMetricUnits, cranklength);
+            double y0 = pointType(point, settings->y, 0, useMetricUnits, cranklength);
+            double x1 = pointType(point, settings->x, 1, useMetricUnits, cranklength);
+            double y1 = pointType(point, settings->y, 1, useMetricUnits, cranklength);
+
+            // average of left and right (even if both the same)
+            double x = (x0 + x1) / 2.00f;
+            double y = (y0 + y1) / 2.00f;
 
             // accumulate values for each interval here ....
             for(int i=0; i < count; i++) {
@@ -552,47 +648,6 @@ ScatterPlot::configChanged()
     axisWidget(QwtPlot::yLeft)->setPalette(palette);
 
     replot();
-}
-
-void
-ScatterPlot::showTime(ScatterSettings *settings, int offset, int secs)
-{
-    static QwtPlotCurve *time = NULL;
-
-    int begin = offset-secs;
-    if (begin<0) begin = 0;
-
-    if (time == NULL) {
-        time = new QwtPlotCurve();
-        time->attach(this);
-        replot();
-    }
-
-    // offset into data points...
-    if (settings && settings->ride && settings->ride->ride()) {
-        int startidx = settings->ride->ride()->timeIndex(begin);
-        int stopidx = settings->ride->ride()->timeIndex(offset);
-
-        QwtSymbol *sym = new QwtSymbol;
-        sym->setStyle(QwtSymbol::Rect);
-        sym->setSize(6);
-        sym->setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-        sym->setBrush(QBrush(Qt::NoBrush));
-
-        QPen pen;
-        pen.setColor(Qt::red);
-        sym->setPen(pen);
-
-        time->setSymbol(sym);
-        time->setStyle(QwtPlotCurve::Dots);
-        time->setRenderHint(QwtPlotItem::RenderAntialiased);
-        time->setSamples(x.constData()+startidx, y.constData()+startidx, stopidx-startidx);
-
-        // make it on top
-        time->detach();
-        time->attach(this);
-        replot(); // ouch really expensive if lots on the plot...
-    }
 }
 
 void
