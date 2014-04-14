@@ -38,6 +38,12 @@ ScatterWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("CPV"), MODEL_CPV);
     box->addItem(tr("Time"), MODEL_TIME);
     box->addItem(tr("Distance"), MODEL_DISTANCE);
+    box->addItem(tr("Headwind"), MODEL_HEADWIND);
+    box->addItem(tr("Slope"), MODEL_SLOPE);
+    box->addItem(tr("Temperature"), MODEL_TEMP);
+    box->addItem(tr("L/R Balance"), MODEL_LRBALANCE);
+    box->addItem(tr("L/R Torque Effectiveness"), MODEL_TE);
+    box->addItem(tr("L/R Pedal Smoothness"), MODEL_PS);
     //box->addItem(tr("Interval"), MODEL_INTERVAL); //supported differently for now
     //box->addItem(tr("Latitude"), MODEL_LAT); //weird values make the plot ugly
     //box->addItem(tr("Longitude"), MODEL_LONG); //weird values make the plot ugly
@@ -57,6 +63,12 @@ ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
     list.append(tr("CPV"));
     list.append(tr("Time"));
     list.append(tr("Distance"));
+    list.append(tr("Headwind"));
+    list.append(tr("Slope"));
+    list.append(tr("Temperature"));
+    list.append(tr("L/R Balance"));
+    list.append(tr("L/R Torque Effectiveness"));
+    list.append(tr("L/R Pedal Smoothness"));
     box->setStrings(list);
 }
 
@@ -122,17 +134,6 @@ ScatterWindow::ScatterWindow(Context *context, const QDir &home) :
     rySelector->setValue(2);
     cl->addRow(yLabel, ySelector);
 
-    timeLabel = new QLabel(tr("00:00:00"), this);
-    timeSlider = new QSlider(Qt::Horizontal);
-    timeSlider->setTickPosition(QSlider::TicksBelow);
-    timeSlider->setTickInterval(1);
-    timeSlider->setMinimum(0);
-    timeSlider->setTickInterval(5);
-    timeSlider->setMaximum(100);
-    timeSlider->setValue(0);
-    timeSlider->setTracking(true);
-    cl->addRow(timeLabel, timeSlider);
-
     // selectors
     ignore = new QCheckBox(tr("Ignore Zero"));
     ignore->setChecked(true);
@@ -155,7 +156,6 @@ ScatterWindow::ScatterWindow(Context *context, const QDir &home) :
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
     connect(rxSelector, SIGNAL(valueChanged(int)), this, SLOT(rxSelectorChanged(int)));
     connect(rySelector, SIGNAL(valueChanged(int)), this, SLOT(rySelectorChanged(int)));
-    connect(timeSlider, SIGNAL(valueChanged(int)), this, SLOT(setTime(int)));
     connect(grid, SIGNAL(stateChanged(int)), this, SLOT(setGrid()));
     //connect(legend, SIGNAL(stateChanged(int)), this, SLOT(setLegend()));
     connect(frame, SIGNAL(stateChanged(int)), this, SLOT(setFrame()));
@@ -198,13 +198,6 @@ ScatterWindow::rideSelected()
         setIsBlank(false);
 
     current = ride;
-
-    timeSlider->setMinimum(0);
-
-    if (ride->ride()->dataPoints().count()) timeSlider->setMaximum(ride->ride()->dataPoints().last()->secs);
-    else timeSlider->setMaximum(100);
-
-    timeSlider->setTickInterval(timeSlider->maximum()/20);
     setData();
 }
 
@@ -253,17 +246,6 @@ ScatterWindow::intervalSelected()
     if (!amVisible())
         return;
     setData();
-}
-
-void
-ScatterWindow::setTime(int value)
-{
-   QChar zero = QLatin1Char ( '0' );
-   QString time = QString("%1:%2:%3").arg(value/3600,2,10,zero)
-                                          .arg(value%3600/60,2,10,zero)
-                                          .arg(value%60,2,10,zero);
-    timeLabel->setText(time);
-    scatterPlot->showTime(&settings, value, 30);
 }
 
 void

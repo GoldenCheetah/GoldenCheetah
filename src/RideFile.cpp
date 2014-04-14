@@ -458,6 +458,8 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         if (result->areDataPresent()->lat ||
             result->areDataPresent()->lon ) flags += 'G'; // GPS
         else flags += '-';
+        if (result->areDataPresent()->slope) flags += 'L'; // Slope
+        else flags += '-';
         if (result->areDataPresent()->headwind) flags += 'W'; // Windspeed
         else flags += '-';
         if (result->areDataPresent()->temp) flags += 'E'; // Temperature
