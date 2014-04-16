@@ -144,6 +144,9 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
 void
 ComparePane::configChanged()
 {
+    // via standard style sheet
+    table->setStyleSheet(GCColor::stylesheet());
+
     // refresh table...
     refreshTable();
 }

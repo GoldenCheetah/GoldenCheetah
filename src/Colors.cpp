@@ -320,5 +320,7 @@ GCColor::stylesheet()
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
     return QString("QTreeView { color: %2; background: %1; }"
+                   "QTableWidget { color: %2; background: %1; }"
+                   "QTableWidget::item:hover { color: black; background: lightGray; }"
                    "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
 }
