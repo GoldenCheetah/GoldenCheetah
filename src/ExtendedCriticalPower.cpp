@@ -149,12 +149,7 @@ ExtendedCriticalPower::deriveExtendedCP_2_3_Parameters(RideFileCache *bests, Rid
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp2 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
             break;
         }
 
@@ -402,12 +397,7 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCac
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp5 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp5 model";
             break;
         }
 
@@ -575,12 +565,7 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_ParametersForBest(double best5s, dou
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp2 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
             break;
         }
 
@@ -968,12 +953,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp5 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
             break;
         }
 
@@ -1139,12 +1119,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_ParametersForBest(double best5s, dou
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp5 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
             break;
         }
 
@@ -1493,12 +1468,7 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp5 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
             break;
         }
 
@@ -1918,12 +1888,7 @@ ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCa
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Maximum number of loops %1 exceeded in ecp5 model"
-                        "extraction").arg(max_loops),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops exceeded in ecp2 model";
             break;
         }
 
