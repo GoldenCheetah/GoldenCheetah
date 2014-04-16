@@ -432,7 +432,7 @@ AllPlotObject::setColor(QColor color)
 
         // lighten up for the next guy
         color = color.darker(110);
-        alpha -= 10;
+        if (alpha > 10) alpha -= 10;
     }
 
     // has to be different...
