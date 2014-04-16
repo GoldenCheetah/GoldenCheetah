@@ -961,8 +961,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         QPen isColor = painter->pen();
         QFont isFont = painter->font();
         painter->setPen(rpen);
-        painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth,myOption.rect.y());
-        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height());
+        painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth-1,myOption.rect.y());
+        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth-1,myOption.rect.y()+myOption.rect.height());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
 
         // indent first column and draw all in plotmarker color
