@@ -485,6 +485,11 @@ void
 TrainSidebar::configChanged()
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+    mediaTree->setStyleSheet(GCColor::stylesheet());
+#endif
+    workoutTree->setStyleSheet(GCColor::stylesheet());
+    deviceTree->setStyleSheet(GCColor::stylesheet());
 
     // DEVICES
 
