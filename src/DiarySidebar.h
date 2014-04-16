@@ -189,6 +189,7 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
 
         QComboBox *summarySelect;
         QWebView *summary;
+        QWidget *summaryWidget;
         QDate from, to;
 };
 #endif // _GC_DiarySidebar_h

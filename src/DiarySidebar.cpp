@@ -63,12 +63,14 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     calendarItem->addWidget(cal);
 
     // summary widget
-    QWidget *sum = new QWidget(this);
-    sum->setPalette(pal);
-    sum->setContentsMargins(0,0,0,0);
-    QVBoxLayout *slayout = new QVBoxLayout(sum);
+    summaryWidget = new QWidget(this);
+    summaryWidget->setContentsMargins(0,0,0,0);
+    summaryWidget->setObjectName("summaryWidget");
+    summaryWidget->setAutoFillBackground(true);
+    QVBoxLayout *slayout = new QVBoxLayout(summaryWidget);
     slayout->setSpacing(0);
-    summaryItem->addWidget(sum);
+    slayout->setContentsMargins(0,0,0,0);
+    summaryItem->addWidget(summaryWidget);
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);
@@ -123,11 +125,18 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
 void
 DiarySidebar::refresh()
 {
+    // GCColor stylesheet is too generic, we ONLY want to style the container
+    // and NOT its children. This is why stylesheets on widgets is a stoopid idea
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+    summaryWidget->setStyleSheet(QString("QWidget#summaryWidget { color: %1; background: %2 }")
+                                .arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
+
     if (!isHidden()) {
         multiCalendar->refresh();
         setSummary();
-        repaint();
     }
+    repaint();
 }
 
 void
@@ -299,8 +308,9 @@ DiarySidebar::setSummary()
                               "<head>"
                               "<title></title>"
                               "</head>"
+                              "%1"
                               "<body>"
-                              "<center>");
+                              "<center>").arg(GCColor::css());
 
         for (int i=0; i<4; i++) { //taken out maximums -- too much info -- looks ugly
 
