@@ -489,6 +489,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                     results->appendPoint((double)rtime/1000, cad, hr, km,
                             kph, nm, watts, alt, lon, lat, wind, slope, temp, 0.0, 
                             0.0,0.0,0.0,0.0, // vector pedal torque eff and smoothness not supported in WKO (?)
+                            0.0,0.0,
                             0);
             }
 

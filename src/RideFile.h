@@ -59,7 +59,7 @@ struct RideFileDataPresent
 {
     // basic (te = torqueeffectiveness, ps = pedal smoothness)
     bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
-    bool lrbalance, lte, rte, lps, rps, interval;
+    bool lrbalance, lte, rte, lps, rps, smo2, thb, interval;
 
     // derived
     bool np,xp,apower,wprime,atiss,antiss;
@@ -122,7 +122,7 @@ class RideFile : public QObject // QObject to emit signals
         enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd,
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
                           vam, wattsKg, lrbalance, lte, rte, lps, rps, 
-                          aPower, wprime, aTISS, anTISS, none };
+                          aPower, wprime, aTISS, anTISS, smO2, tHb, none };
 
         enum specialValues { noTemp = -255 };
 
@@ -149,6 +149,7 @@ class RideFile : public QObject // QObject to emit signals
                          double lon, double lat, double headwind, double slope,
                          double temperature, double lrbalance,
                          double lte, double rte, double lps, double rps,
+                         double smo2, double thb,
                          int interval);
 
         void appendPoint(const RideFilePoint &);
@@ -289,6 +290,7 @@ struct RideFilePoint
     // recorded data
     double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
     double lrbalance, lte, rte, lps, rps;
+    double smo2, thb;
     double hrd, cadd, kphd, nmd, wattsd; // acceleration in watts/s km/s
     int interval;
 
@@ -300,19 +302,23 @@ struct RideFilePoint
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), nm(0.0), 
                       watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), 
                       slope(0.0), temp(-255.0), lrbalance(0), lte(0.0), rte(0.0),
-                      lps(0.0), rps(0.0), hrd(0.0), cadd(0.0), 
-                      kphd(0.0), nmd(0.0), wattsd(0.0), interval(0), xp(0), np(0), 
+                      lps(0.0), rps(0.0),
+                      smo2(0.0), thb(0.0),
+                      hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0),
+                      interval(0), xp(0), np(0),
                       apower(0), atiss(0.0), antiss(0.0) {} 
 
     // create point supplying all values
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
                   double nm, double watts, double alt, double lon, double lat,
                   double headwind, double slope, double temp, double lrbalance, 
-                  double lte, double rte, double lps, double rps, int interval) :
+                  double lte, double rte, double lps, double rps,
+                  double smo2, double thb, int interval) :
 
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), watts(watts), alt(alt), lon(lon), 
         lat(lat), headwind(headwind), slope(slope), temp(temp),
         lrbalance(lrbalance), lte(lte), rte(rte), lps(lps), rps(rps),
+        smo2(smo2), thb(thb),
         hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(interval), 
         xp(0), np(0), apower(0), atiss(0.0), antiss(0.0) {}
 

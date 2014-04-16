@@ -919,7 +919,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
        if ((p->secs+f.recIntSecs()) >= current->start && p->secs <= (current->stop+f.recIntSecs())) {
            f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                        p->watts, p->alt, p->lon, p->lat, p->headwind,
-                       p->slope, p->temp, p->lrbalance, p->lte, p->rte, p->lps, p->rps, 0);
+                       p->slope, p->temp, p->lrbalance, p->lte, p->rte, p->lps, p->rps, p->smo2, p->thb, 0);
        }
     }
     // for xpower and acceleration et al
