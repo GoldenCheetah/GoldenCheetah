@@ -48,19 +48,15 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
     summaryItem = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
-    QPalette pal;
-    pal.setColor(QPalette::Window, Qt::white);
-    setPalette(pal);
-
     // cal widget
-    QWidget *cal = new QWidget(this);
-    cal->setPalette(pal);
-    cal->setContentsMargins(0,0,0,0);
-    cal->setStyleSheet("QLabel { color: gray; }");
-    layout = new QVBoxLayout(cal);
+    calWidget = new QWidget(this);
+    calWidget->setObjectName("calWidget");
+    calWidget->setContentsMargins(0,0,0,0);
+    calWidget->setAutoFillBackground(true);
+    layout = new QVBoxLayout(calWidget);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    calendarItem->addWidget(cal);
+    calendarItem->addWidget(calWidget);
 
     // summary widget
     summaryWidget = new QWidget(this);
@@ -75,10 +71,6 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);
     splitter->prepare(context->athlete->cyclist, "diary");
-
-    black.setColor(QPalette::WindowText, Qt::gray);
-    white.setColor(QPalette::WindowText, Qt::white);
-    grey.setColor(QPalette::WindowText, Qt::gray);
 
     multiCalendar = new GcMultiCalendar(context);
     layout->addWidget(multiCalendar);
@@ -116,22 +108,30 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     // refresh on these events...
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // set up for current selections
-    refresh();
+    configChanged();
 }
 
 void
-DiarySidebar::refresh()
+DiarySidebar::configChanged()
 {
     // GCColor stylesheet is too generic, we ONLY want to style the container
     // and NOT its children. This is why stylesheets on widgets is a stoopid idea
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
-    summaryWidget->setStyleSheet(QString("QWidget#summaryWidget { color: %1; background: %2 }")
+    summaryWidget->setStyleSheet(QString("QWidget#summaryWidget { color: %1; background: %2; }")
                                 .arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
 
+    // now apply
+    refresh();
+
+}
+
+void
+DiarySidebar::refresh()
+{
     if (!isHidden()) {
         multiCalendar->refresh();
         setSummary();
@@ -173,8 +173,9 @@ GcLabel::paintEvent(QPaintEvent *)
     if (bg) {
 
         // setup a painter and the area to paint
-        if (!underMouse()) painter.fillRect(all, bgColor);
-        else {
+        if (!underMouse()) {
+            painter.fillRect(all, bgColor);
+        } else {
             if (filtered) painter.fillRect(all, GColor(CCALCURRENT));
             else painter.fillRect(all, Qt::lightGray);
         }
@@ -199,7 +200,7 @@ GcLabel::paintEvent(QPaintEvent *)
         }
 
         if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
-        else painter.setPen(QColor(0,0,0,170));
+        else painter.setPen(palette().color(QPalette::WindowText));
 
         painter.drawText(norm, alignment(), text());
 
@@ -408,18 +409,14 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
 {
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
+    setObjectName("miniCalendar");
 
     month = year = 0;
     _ride = NULL;
 
-    setStyleSheet("QLabel { color: gray; }");
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-
-    black.setColor(QPalette::WindowText, Qt::gray);
-    white.setColor(QPalette::WindowText, Qt::white);
-    grey.setColor(QPalette::WindowText, Qt::gray);
 
     // get the model
     fieldDefinitions = context->athlete->rideMetadata()->getFields();
@@ -440,7 +437,6 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     if (master) {
         left = new GcLabel("<",this);
         left->setAutoFillBackground(false);
-        left->setPalette(white);
         left->setFont(font);
         left->setAlignment(Qt::AlignLeft);
         line->addWidget(left);
@@ -449,7 +445,6 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
 
     monthName = new GcLabel("January 2012", this);
     monthName->setAutoFillBackground(false);
-    monthName->setPalette(white);
     monthName->setFont(font);
     monthName->setAlignment(Qt::AlignCenter);
     line->addWidget(monthName);
@@ -457,22 +452,22 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     if (master) {
         right = new GcLabel(">", this);
         right->setAutoFillBackground(false);
-        right->setPalette(white);
         right->setFont(font);
         right->setAlignment(Qt::AlignRight);
         line->addWidget(right);
         connect (right, SIGNAL(clicked()), this, SLOT(next()));
     }
 
-    QWidget *month = new QWidget(this);
-    month->setContentsMargins(0,0,0,0);
-    month->setFixedWidth(180);
-    month->setFixedHeight(180);
-    QGridLayout *dayLayout = new QGridLayout(month);
+    monthWidget = new QWidget(this);
+    monthWidget->setContentsMargins(0,0,0,0);
+    monthWidget->setFixedWidth(180);
+    monthWidget->setFixedHeight(180);
+    monthWidget->setAutoFillBackground(true);
+    QGridLayout *dayLayout = new QGridLayout(monthWidget);
     dayLayout->setSpacing(1);
     dayLayout->setContentsMargins(0,0,0,0);
     dayLayout->addLayout(line, 0,0,1,7);
-    layout->addWidget(month, Qt::AlignCenter);
+    layout->addWidget(monthWidget, Qt::AlignCenter);
 
     font.setWeight(QFont::Normal);
 
@@ -485,64 +480,64 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     GcLabel *day = new GcLabel("Mon", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 0);
+    dayNames[0] = day;
 
     // Tue
     day = new GcLabel("Tue", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 1);
+    dayNames[1] = day;
 
     // Wed
     day = new GcLabel("Wed", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 2);
+    dayNames[2] = day;
 
     // Thu
     day = new GcLabel("Thu", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 3);
+    dayNames[3] = day;
 
     // Fri
     day = new GcLabel("Fri", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 4);
+    dayNames[4] = day;
 
     // Sat
     day = new GcLabel("Sat", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 5);
+    dayNames[5] = day;
 
     // Sun
     day = new GcLabel("Sun", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
-    day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
     dayLayout->addWidget(day, 1, 6);
+    dayNames[6] = day;
 
     signalMapper = new QSignalMapper(this);
 #ifdef WIN32
@@ -557,8 +552,6 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
             GcLabel *d = new GcLabel(QString("%1").arg((row-2)*7+col), this);
             d->setFont(font);
             d->setAutoFillBackground(false);
-            d->setPalette(grey);
-            d->setStyleSheet("color: gray;");
             d->setAlignment(Qt::AlignCenter);
             d->setXOff(0);
             d->setYOff(0);
@@ -581,7 +574,39 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     // day clicked
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
 
-    // set up for current selections
+    // set up for current selections - and watch for future changes
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    configChanged();
+}
+
+void
+GcMiniCalendar::configChanged()
+{
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+    //XXX setStyleSheet(QString("color: %1; background: %2;").arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
+    tint.setColor(QPalette::Window, bgColor);
+    tint.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    white.setColor(QPalette::WindowText, fgColor);
+    white.setColor(QPalette::Window, bgColor);
+    grey.setColor(QPalette::WindowText, fgColor);
+    grey.setColor(QPalette::Window, bgColor);
+
+    monthWidget->setPalette(white);
+    setPalette(white);
+
+    // only the top one has cursors
+    if (master) {
+        left->setPalette(white);
+        right->setPalette(white);
+    }
+
+    monthName->setPalette(tint);
+    for (int i=0; i<7; i++) dayNames[i]->setPalette(tint);
+
+    foreach(GcLabel*label, dayLabels) {
+        label->setPalette(white);
+    }
     refresh();
 }
 
@@ -789,7 +814,7 @@ GcMiniCalendar::setDate(int _month, int _year)
                 QList<QColor> colors = p.data(Qt::BackgroundRole).value<QList<QColor> >();
                 if (colors.count()) {
                     d->setBg(true);
-                    d->setPalette(black);
+                    d->setPalette(grey);
                     d->setBgColor(colors.at(0)); // use first always
                 } else {
                     d->setBg(false);
@@ -816,6 +841,9 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setContentsMargins(0,0,0,0);
+    setObjectName("multiCalendar");
+    setAutoFillBackground(true);
+
     _ride = NULL;
 
     setFrameStyle(QFrame::NoFrame);
@@ -823,10 +851,6 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
     layout = new GcWindowLayout(this, 0, 4, 0);
     layout->setSpacing(0);
     layout->setContentsMargins(10,10,0,0);
-
-    QPalette pal;
-    pal.setColor(QPalette::Window, Qt::white);
-    setPalette(pal);
 
     GcMiniCalendar *mini = new GcMiniCalendar(context, true);
     calendars.append(mini);
@@ -838,6 +862,26 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 
     connect(mini, SIGNAL(dateChanged(int,int)), this, SLOT(dateChanged(int,int)));
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+    connect (context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    configChanged();
+}
+
+void
+GcMultiCalendar::configChanged()
+{
+    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor fgColor = GCColor::invertColor(bgColor);
+
+    QPalette pal;
+    pal.setColor(QPalette::Window, bgColor);
+    pal.setColor(QPalette::WindowText, fgColor);
+
+    viewport()->setPalette(pal);
+    setPalette(pal);
+
+    viewport()->repaint();
+    repaint();
 }
 
 void
