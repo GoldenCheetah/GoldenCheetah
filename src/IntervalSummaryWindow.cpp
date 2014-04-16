@@ -25,6 +25,7 @@
 #include "IntervalSummaryWindow.h"
 #include "Settings.h"
 #include "TimeUtils.h"
+#include "Colors.h"
 
 IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context)
 {
@@ -37,6 +38,8 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
 #endif
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+
+    setHtml(GCColor::css() + "<body></body>");
 }
 
 IntervalSummaryWindow::~IntervalSummaryWindow() {
@@ -47,7 +50,8 @@ void IntervalSummaryWindow::intervalSelected()
     // if no ride available don't bother
     if (context->currentRideItem() == NULL || context->currentRide() == NULL) return;
 
-	QString html;
+	QString html = GCColor::css();
+    html += "<body>";
     if (context->athlete->allIntervalItems() != NULL) {
         for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
             IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
@@ -58,9 +62,11 @@ void IntervalSummaryWindow::intervalSelected()
             }
         }
     }
-    if (html.length() == 0)
-    	html = "<i>" + tr("select an interval for summary info") + "</i>";
+    if (html == GCColor::css()+"<body>") {
+    	html += "<i>" + tr("select an interval for summary info") + "</i>";
+    }
 
+    html += "</body>";
 	setHtml(html);
 	return;
 }
@@ -74,12 +80,15 @@ IntervalSummaryWindow::intervalHover(RideFileInterval x)
     // we already have summries!
     if (context->athlete->intervalWidget->selectedItems().count()) return;
 
-    QString html;
+    QString html = GCColor::css();
+    html += "<body>";
+
     if (x == RideFileInterval()) {
-    	html = "<i>" + tr("select an interval for summary info") + "</i>";
+    	html += "<i>" + tr("select an interval for summary info") + "</i>";
     } else {
         calcInterval(x, html);
     }
+    html += "</body>";
     setHtml(html);
     return;
 }

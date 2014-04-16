@@ -111,6 +111,8 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     connect(context->athlete->intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showIntervalMenu(const QPoint &)));
 
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+
+    configChanged();
 }
 
 void
@@ -132,6 +134,16 @@ AnalysisSidebar::close()
 void
 AnalysisSidebar::configChanged()
 {
+    //rideNavigator->setPalette(GCColor::palette());
+    //calendarWidget->setPalette(GCColor::palette());
+    //intervalSummaryWindow->setPalette(GCColor::palette());
+    //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
+
+    // interval tree
+    context->athlete->intervalWidget->setPalette(GCColor::palette());
+    context->athlete->intervalWidget->setStyleSheet(GCColor::stylesheet());
+
+    repaint();
 }
 
 void
