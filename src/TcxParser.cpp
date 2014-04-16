@@ -157,7 +157,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             // first point
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
                                   power, alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0.0, 
-                                  0.0,0.0,0.0,0.0,lap);
+                                  0.0,0.0,0.0,0.0,0.0,0.0,lap);
 
         } else {
 
@@ -181,7 +181,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                 // no smart recording, or delta exceeds HW treshold, just insert the data
                 rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power,
                                       alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0.0, 
-                                      0.0,0.0,0.0,0.0,lap);
+                                      0.0,0.0,0.0,0.0,0.0,0.0,lap);
 
             } else {
 
@@ -211,6 +211,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           RideFile::noTemp,
                                           0.0,
                                           0.0,0.0,0.0,0.0,
+                                          0.0,0.0,
                                           lap);
                 }
                 prevPoint = rideFile->dataPoints().back();

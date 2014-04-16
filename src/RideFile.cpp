@@ -121,6 +121,8 @@ RideFile::seriesName(SeriesType series)
     case RideFile::vam: return QString(tr("VAM"));
     case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
     case RideFile::wprime: return QString(tr("W' balance"));
+    case RideFile::smO2: return QString(tr("SmO2"));
+    case RideFile::tHb: return QString(tr("THb"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -154,6 +156,8 @@ RideFile::colorFor(SeriesType series)
     case RideFile::interval: return QColor(Qt::white);
     case RideFile::wattsKg: return GColor(CPOWER);
     case RideFile::wprime: return GColor(CWBAL);
+    case RideFile::smO2: return GColor(CWBAL);
+    case RideFile::tHb: return GColor(CSPEED);
     case RideFile::secs:
     case RideFile::km:
     case RideFile::vam:
@@ -201,6 +205,8 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::vam: return QString(tr("meters per hour"));
     case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/lb"));
     case RideFile::wprime: return QString(useMetricUnits ? tr("joules") : tr("joules"));
+    case RideFile::smO2: return QString(tr("%"));
+    case RideFile::tHb: return QString(tr("g/dL"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -528,6 +534,10 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->rps = point->rps;
     if (minPoint->lrbalance == 0 || point->lrbalance<minPoint->lrbalance)
        minPoint->lrbalance = point->lrbalance;
+    if (minPoint->smo2 == 0 || point->smo2<minPoint->smo2)
+       minPoint->smo2 = point->smo2;
+    if (minPoint->thb == 0 || point->thb<minPoint->thb)
+       minPoint->thb = point->thb;
 }
 
 void RideFile::updateMax(RideFilePoint* point)
@@ -569,6 +579,10 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->rps = point->rps;
     if (point->lrbalance>maxPoint->lrbalance)
        maxPoint->lrbalance = point->lrbalance;
+    if (point->smo2>maxPoint->smo2)
+       maxPoint->smo2 = point->smo2;
+    if (point->thb>maxPoint->thb)
+       maxPoint->thb = point->thb;
 }
 
 void RideFile::updateAvg(RideFilePoint* point)
@@ -592,6 +606,8 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->lps += point->lps;
     totalPoint->rps += point->rps;
     totalPoint->lrbalance += point->lrbalance;
+    totalPoint->smo2 += point->smo2;
+    totalPoint->thb += point->thb;
 
     ++totalCount;
 
@@ -614,6 +630,8 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rte = totalPoint->rte/totalCount;
     avgPoint->lps = totalPoint->lps/totalCount;
     avgPoint->rps = totalPoint->rps/totalCount;
+    avgPoint->smo2 = totalPoint->smo2/totalCount;
+    avgPoint->thb = totalPoint->thb/totalCount;
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
@@ -621,6 +639,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double lon, double lat, double headwind,
                            double slope, double temp, double lrbalance, 
                            double lte, double rte, double lps, double rps,
+                           double smo2, double thb,
                            int interval)
 {
     // negative values are not good, make them zero
@@ -637,6 +656,8 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!isfinite(rps) || rps<0) rps=0;
     if (!isfinite(lte) || lte<0) lte=0;
     if (!isfinite(rte) || rte<0) rte=0;
+    if (!isfinite(smo2) || smo2<0) smo2=0;
+    if (!isfinite(thb) || thb<0) thb=0;
 
     // truncate alt out of bounds -- ? should do for all, but uncomfortable about
     //                                 setting an absolute max. At least We know the highest
@@ -645,6 +666,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 
     RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, 
                                              headwind, slope, temp, lrbalance, lte, rte, lps, rps,
+                                             smo2, thb,
                                              interval);
     dataPoints_.append(point);
 
@@ -666,6 +688,8 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.rte      |= (rte != 0);
     dataPresent.lps      |= (lps != 0);
     dataPresent.rps      |= (rps != 0);
+    dataPresent.smo2     |= (smo2 != 0);
+    dataPresent.thb      |= (thb != 0);
     dataPresent.interval |= (interval != 0);
 
     updateMin(point);
@@ -679,6 +703,7 @@ void RideFile::appendPoint(const RideFilePoint &point)
                                          point.nm,point.watts,point.alt,point.lon,point.lat,
                                          point.headwind, point.slope, point.temp, point.lrbalance,
                                          point.lte, point.rte, point.lps, point.rps,
+                                         point.smo2, point.thb,
                                          point.interval));
 }
 
@@ -704,6 +729,8 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case rte : dataPresent.rte = value; break;
         case lps : dataPresent.lps = value; break;
         case rps : dataPresent.rps = value; break;
+        case smO2 : dataPresent.smo2 = value; break;
+        case tHb : dataPresent.thb = value; break;
         case interval : dataPresent.interval = value; break;
         case wprime : dataPresent.wprime = value; break;
         default:
@@ -736,6 +763,8 @@ RideFile::isDataPresent(SeriesType series)
         case rps : return dataPresent.rps; break;
         case lte : return dataPresent.lte; break;
         case rte : return dataPresent.rte; break;
+        case smO2 : return dataPresent.smo2; break;
+        case tHb : return dataPresent.thb; break;
         case interval : return dataPresent.interval; break;
         default:
         case none : return false; break;
@@ -764,6 +793,8 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case rte : dataPoints_[index]->rte = value; break;
         case lps : dataPoints_[index]->lps = value; break;
         case rps : dataPoints_[index]->rps = value; break;
+        case smO2 : dataPoints_[index]->smo2 = value; break;
+        case tHb : dataPoints_[index]->thb = value; break;
         case interval : dataPoints_[index]->interval = value; break;
         default:
         case none : break;
@@ -797,6 +828,8 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::rte : return rte; break;
         case RideFile::lps : return lps; break;
         case RideFile::rps : return rps; break;
+        case RideFile::tHb : return thb; break;
+        case RideFile::smO2 : return smo2; break;
         case RideFile::interval : return interval; break;
         case RideFile::NP : return np; break;
         case RideFile::xPower : return xp; break;
@@ -879,6 +912,8 @@ RideFile::decimalsFor(SeriesType series)
         case rps :
         case lte :
         case rte : return 0; break;
+        case smO2 : return 0; break;
+        case tHb : return 2; break;
         case wprime : return 0; break;
         case none : break;
     }
@@ -914,6 +949,8 @@ RideFile::maximumFor(SeriesType series)
         case lte :
         case rte :
         case lrbalance : return 100; break;
+        case smO2 : return 100; break;
+        case tHb : return 20; break;
         case wprime : return 99999; break;
         case none : break;
     }
@@ -949,6 +986,8 @@ RideFile::minimumFor(SeriesType series)
         case lps :
         case rps :
         case lrbalance : return 0; break;
+        case smO2 : return 0; break;
+        case tHb : return 0; break;
         case wprime : return 0; break;
         case none : break;
     }
@@ -1041,7 +1080,7 @@ RideFile::getWeight()
 void RideFile::appendReference(const RideFilePoint &point)
 {
     referencePoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,point.watts,point.alt,point.lon,point.lat,
-                                         point.headwind, point.slope, point.temp, point.lrbalance, point.lte, point.rte, point.lps, point.rps, point.interval));
+                                         point.headwind, point.slope, point.temp, point.lrbalance, point.lte, point.rte, point.lps, point.rps, point.smo2, point.thb, point.interval));
 }
 
 void RideFile::removeReference(int index)

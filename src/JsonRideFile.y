@@ -111,7 +111,7 @@ static QString unprotect(const QString string)
 %token TAGS INTERVALS NAME START STOP
 %token CALIBRATIONS VALUE
 %token REFERENCES
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE LTE RTE LPS RPS
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE LTE RTE LPS RPS THB SMO2
 
 %start document
 %%
@@ -238,6 +238,7 @@ sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, 
                                                     JsonPoint.slope, JsonPoint.temp, JsonPoint.lrbalance,
                                                     JsonPoint.lte, JsonPoint.rte,
                                                     JsonPoint.lps, JsonPoint.rps,
+                                                    JsonPoint.smo2, JsonPoint.thb,
                                                     JsonPoint.interval);
                                           JsonPoint = RideFilePoint();
                                         }
@@ -261,6 +262,8 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | RTE ':' number          { JsonPoint.rte = JsonNumber; }
         | LPS ':' number          { JsonPoint.lps = JsonNumber; }
         | RPS ':' number          { JsonPoint.rps = JsonNumber; }
+        | SMO2 ':' number         { JsonPoint.rps = JsonNumber; }
+        | THB ':' number          { JsonPoint.rps = JsonNumber; }
         ;
 
 /*
@@ -509,6 +512,8 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             if (ride->areDataPresent()->rte) out << ", \"RTE\":" << QString("%1").arg(p->rte);
             if (ride->areDataPresent()->lps) out << ", \"LPS\":" << QString("%1").arg(p->lps);
             if (ride->areDataPresent()->rps) out << ", \"RPS\":" << QString("%1").arg(p->rps);
+            if (ride->areDataPresent()->smo2) out << ", \"SMO2\":" << QString("%1").arg(p->smo2);
+            if (ride->areDataPresent()->thb) out << ", \"THB\":" << QString("%1").arg(p->thb);
 
             // sample points in here!
             out << " }";

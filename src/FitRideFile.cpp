@@ -387,6 +387,8 @@ struct FitFileReaderState
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
         double kph = 0, temperature = RideFile::noTemp, watts = 0, slope = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
+        double smO2, tHb = 0;
+
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -537,6 +539,8 @@ struct FitFileReaderState
             double deltaRightTE = rightTorqueEff - prevPoint->rte;
             double deltaLeftPS = leftPedalSmooth - prevPoint->lps;
             double deltaRightPS = rightPedalSmooth - prevPoint->rps;
+            double deltaSmO2 = smO2 - prevPoint->smo2;
+            double deltaTHb = tHb - prevPoint->thb;
 
             // only smooth for less than 30 minutes
             // we don't want to crash / stall on bad
@@ -564,6 +568,8 @@ struct FitFileReaderState
                         prevPoint->rte + (deltaRightTE * weight),
                         prevPoint->lps + (deltaLeftPS * weight),
                         prevPoint->rps + (deltaRightPS * weight),
+                        prevPoint->smo2 + (deltaSmO2 * weight),
+                        prevPoint->thb + (deltaTHb * weight),
                         interval);
                 }
                 prevPoint = rideFile->dataPoints().back();
@@ -572,7 +578,8 @@ struct FitFileReaderState
 
         if (km < 0.00001f) km = last_distance;
         rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature,
-                     lrbalance, leftTorqueEff, rightTorqueEff, leftPedalSmooth, rightPedalSmooth, interval);
+                     lrbalance, leftTorqueEff, rightTorqueEff, leftPedalSmooth, rightPedalSmooth,
+                     smO2, tHb, interval);
         last_time = time;
         last_distance = km;
     }

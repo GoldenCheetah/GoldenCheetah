@@ -149,7 +149,7 @@ SlfParser::endElement( const QString&, const QString&, const QString& qName)
                 distance *= KM_PER_MILE;
                 alt *= FEET_PER_METER;
             }
-            rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power, alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0.0, 0.0, 0.0, 0.0, 0.0, lap);
+            rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power, alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, lap);
             secs += samplingRate;
         }
     }

@@ -239,6 +239,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                                 (double) hr, km, speed, 0.0, watts,
                                 altitude, 0, 0, 0.0, 0.0, RideFile::noTemp, 0.0,
                                 0.0, 0.0, 0.0, 0.0, // pedal torque eff / pedal smoothness
+                                0.0, 0.0,
                                 0);
         }
         // while loop since an interval in the .3dp file might
@@ -292,6 +293,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                                 RideFile::noTemp, // temp
                                 0.0,
                                 0.0, 0.0, 0.0, 0.0, // pedal torque effectiveness / pedal smoothness
+                                0.0, 0.0, // smO2 / tHb
                                 0);
 
           // reset averaging sums

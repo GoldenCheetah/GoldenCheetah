@@ -194,6 +194,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double rtedelta = (point->rte - last->rte) / (double) count;
                 double lpsdelta = (point->lps - last->lps) / (double) count;
                 double rpsdelta = (point->rps - last->rps) / (double) count;
+                double smo2delta = (point->smo2 - last->smo2) / (double) count;
+                double thbdelta = (point->thb - last->thb) / (double) count;
 
                 // add the points
                 for(int i=0; i<count; i++) {
@@ -215,6 +217,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->rte + ((i+1)*rtedelta),
                                                            last->lps + ((i+1)*lpsdelta),
                                                            last->rps + ((i+1)*rpsdelta),
+                                                           last->smo2 + ((i+1)*smo2delta),
+                                                           last->thb + ((i+1)*thbdelta),
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }
@@ -245,6 +249,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0,
                                                            0.0, 0.0, 0.0, 0.0, //pedal torque / smoothness
+                                                           0.0, 0.0, // smO2 / thb
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }
