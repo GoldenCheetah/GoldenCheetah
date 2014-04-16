@@ -192,11 +192,19 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
 
+    // setup colors
+    configChanged();
 }
 
 void
 LTMSidebar::configChanged()
 {
+    seasonsWidget->setStyleSheet(GCColor::stylesheet());
+    eventsWidget->setStyleSheet(GCColor::stylesheet());
+#ifdef GC_HAVE_LUCENE
+    filtersWidget->setStyleSheet(GCColor::stylesheet());
+#endif
+
     setAutoFilterMenu();
 
     // set or reset the autofilter widgets
@@ -1069,12 +1077,13 @@ LTMSidebar::setSummary(DateRange dateRange)
         // foreach of the metrics get an aggregated value
         // header of summary
         summaryText = QString("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2//EN\">"
+                              "%1"
                               "<html>"
                               "<head>"
                               "<title></title>"
                               "</head>"
                               "<body>"
-                              "<center>");
+                              "<center>").arg(GCColor::css());
 
         for (int i=0; i<4; i++) {
 
