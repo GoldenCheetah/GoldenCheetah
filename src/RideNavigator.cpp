@@ -949,7 +949,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if (columnName != "*") {
 
         myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
-        painter->fillRect(myOption.rect, background);
+        QRectF bigger(myOption.rect.x(), myOption.rect.y(), myOption.rect.width()+1, myOption.rect.height()+1);
+        painter->fillRect(bigger, background);
 
         // clear first
         drawDisplay(painter, myOption, myOption.rect, ""); //added
