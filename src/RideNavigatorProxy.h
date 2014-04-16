@@ -283,7 +283,7 @@ public:
                 returning = string;
 
 
-            } else if (role == Qt::BackgroundRole) {
+            } else if (role == Qt::ForegroundRole || role == Qt::BackgroundRole) {
 
 
                 if (colorColumn != -1 && proxyIndex.internalPointer()) {
@@ -293,12 +293,12 @@ public:
                     // hideous code, sorry
                     int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
                     if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
-                        colorstring="#ffffff";
+                        colorstring= GColor(CPLOTMARKER).name();
                     else colorstring = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), colorColumn)).toString();
 
                     returning = QColor(colorstring);
                 } else {
-                    returning = QColor("#ffffff");
+                    returning = GColor(CPLOTMARKER).name();
                 }
 
             } else if (role == (Qt::UserRole+1)) {

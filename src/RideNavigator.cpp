@@ -18,6 +18,7 @@
 
 #include "Athlete.h"
 #include "Context.h"
+#include "Colors.h"
 #include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
@@ -884,6 +885,13 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     const RideMetric *m;
     QString value;
 
+    // are we a selected cell ? need to paint acordingly
+    bool selected = false;
+    if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
+        if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
+            selected = true;
+    }
+
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
         // format as a metric
 
@@ -935,7 +943,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     // normal render
     QString calendarText = rideNavigator->tableView->model()->data(index, Qt::UserRole).toString();
-    QBrush background = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>();
+    QColor userColor = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>().color();
+    QBrush background = QBrush(GColor(CPLOTBACKGROUND)); //XXX
 
     if (columnName != "*") {
 
@@ -948,20 +957,36 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         // draw border of each cell
         QPen rpen;
         rpen.setWidth(1);
-        rpen.setColor(Qt::lightGray);
+        rpen.setColor(GColor(CPLOTGRID));
+        QPen isColor = painter->pen();
+        QFont isFont = painter->font();
         painter->setPen(rpen);
         painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth,myOption.rect.y());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
 
-        // indent first column and draw all in bold
+        // indent first column and draw all in plotmarker color
         myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
         myOption.font.setWeight(QFont::Bold);
+
+        QFont boldened = painter->font();
+        boldened.setWeight(QFont::Bold);
+        painter->setFont(boldened);
+        if (!selected) {
+            // not selected, so invert ride plot color
+            painter->setPen(userColor);
+        }
+
         QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
         if (myOption.rect.x() == 0) {
+            // first line ?
             QRect indented(myOption.rect.x()+5, myOption.rect.y()+1, myOption.rect.width()-5, myOption.rect.height());
-            drawDisplay(painter, myOption, indented, value); //added
-        } else drawDisplay(painter, myOption, normal, value); //added
+            painter->drawText(indented, value); //added
+        } else {
+            painter->drawText(normal, value); //added
+        }
+        painter->setPen(isColor);
+        painter->setFont(isFont);
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
@@ -971,13 +996,17 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
             myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
-            painter->fillRect(myOption.rect, background);
+            //myOption.palette.setColor(QPalette::WindowText, userColor); //XXX
+            painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND)); //XXX
             drawDisplay(painter, myOption, myOption.rect, "");
             myOption.rect.setX(10); // wider notes display
             myOption.rect.setWidth(pwidth-20);// wider notes display
             painter->setFont(myOption.font);
             QPen isColor = painter->pen();
-            if (isColor.color() == Qt::black) painter->setPen(Qt::darkGray);
+            if (!selected) {
+                // not selected, so invert ride plot color
+                painter->setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+            }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
         }
@@ -989,9 +1018,13 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setX(0);
             myOption.rect.setHeight(rideNavigator->fontHeight + 2);
             myOption.rect.setWidth(rideNavigator->pwidth);
-            painter->fillRect(myOption.rect, GColor(CRIDEGROUP));
+            painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND));
         }
-        drawDisplay(painter, myOption, myOption.rect, value);
+        QPen isColor = painter->pen();
+        painter->setPen(QPen(Qt::green));
+        myOption.palette.setColor(QPalette::WindowText, QColor(Qt::green)); //XXX
+        painter->drawText(myOption.rect, value);
+        painter->setPen(isColor);
     }
 }
 
