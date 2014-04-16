@@ -87,6 +87,8 @@ class GcMiniCalendar : public QWidget
 
     public slots:
 
+        void configChanged();
+
         void setRide(RideItem *ride);
         void refresh(); 
 
@@ -114,12 +116,13 @@ class GcMiniCalendar : public QWidget
 
         QSignalMapper *signalMapper; // for mapping dayLabels "clicked"
 
-        QPalette black, grey, white;
+        QPalette tint, grey, white;
         QList<FieldDefinition> fieldDefinitions;
         GcCalendarModel *calendarModel;
         bool master;
 
         QStringList filters;
+        QWidget *monthWidget;
 };
 
 class GcMultiCalendar : public QScrollArea
@@ -139,7 +142,7 @@ class GcMultiCalendar : public QScrollArea
         void setFilter(QStringList filter);
         void clearFilter();
         void showEvent(QShowEvent*);
-
+        void configChanged();
 
     private:
         GcWindowLayout *layout;
@@ -167,6 +170,7 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
         void refresh(); 
         void setSummary(); // set the summary at the bottom
 
+        void configChanged();
         void filterChanged() { multiCalendar->filterChanged(); }
 
     signals:
@@ -180,9 +184,10 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
         QVBoxLayout *layout;
         QGridLayout *dayLayout; // contains the day names and days
 
+        QWidget *calWidget;
         GcMultiCalendar *multiCalendar;
 
-        QPalette black, grey, white;
+        //QPalette black, grey, white;
         GcSplitter *splitter; // calendar vs summary
         GcSplitterItem *calendarItem,
                        *summaryItem;
