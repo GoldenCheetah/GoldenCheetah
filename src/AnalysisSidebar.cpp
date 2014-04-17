@@ -134,10 +134,12 @@ AnalysisSidebar::close()
 void
 AnalysisSidebar::configChanged()
 {
-    //rideNavigator->setPalette(GCColor::palette());
     //calendarWidget->setPalette(GCColor::palette());
     //intervalSummaryWindow->setPalette(GCColor::palette());
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
+
+    rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
+    rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
     // interval tree
     context->athlete->intervalWidget->setPalette(GCColor::palette());
