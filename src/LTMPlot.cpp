@@ -434,7 +434,7 @@ LTMPlot::setData(LTMSettings *set)
                 QBrush brush = QBrush(brushColor);
                 current->setBrush(brush);
             } else {
-                brushColor.setAlpha(64); // now side by side, less transparency required
+                brushColor.setAlpha(200); // now side by side, less transparency required
                 QColor brushColor1 = brushColor.darker();
 
                 QLinearGradient linearGradient(0, 0, 0, height());
@@ -849,7 +849,7 @@ LTMPlot::setData(LTMSettings *set)
             
             // fill the bars
             QColor brushColor = metricDetail.penColor;
-            brushColor.setAlpha(64); // now side by side, less transparency required
+            brushColor.setAlpha(200); // now side by side, less transparency required
             QColor brushColor1 = metricDetail.penColor.darker();
             QLinearGradient linearGradient(0, 0, 0, height());
             linearGradient.setColorAt(0.0, brushColor1);
@@ -922,7 +922,7 @@ LTMPlot::setData(LTMSettings *set)
             // fill below the line
             if (metricDetail.fillCurve) {
                 QColor fillColor = metricDetail.penColor;
-                fillColor.setAlpha(60);
+                fillColor.setAlpha(100);
                 current->setBrush(fillColor);
             }
 
@@ -1435,7 +1435,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     QBrush brush = QBrush(brushColor);
                     current->setBrush(brush);
                 } else {
-                    brushColor.setAlpha(64); // now side by side, less transparency required
+                    brushColor.setAlpha(200); // now side by side, less transparency required
                     QColor brushColor1 = brushColor.darker();
     
                     QLinearGradient linearGradient(0, 0, 0, height());
@@ -1842,7 +1842,7 @@ LTMPlot::setCompareData(LTMSettings *set)
             
                 // fill the bars
                 QColor brushColor = cd.color;
-                brushColor.setAlpha(64); // now side by side, less transparency required
+                brushColor.setAlpha(200); // now side by side, less transparency required
                 QColor brushColor1 = cd.color.darker();
                 QLinearGradient linearGradient(0, 0, 0, height());
                 linearGradient.setColorAt(0.0, brushColor1);
@@ -1915,7 +1915,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 // fill below the line
                 if (metricDetail.fillCurve) {
                     QColor fillColor = cd.color;
-                    fillColor.setAlpha(60);
+                    fillColor.setAlpha(100);
                     current->setBrush(fillColor);
                 }
 
