@@ -532,6 +532,8 @@ RideSummaryWindow::htmlSummary()
         summary += "</table></td>";
     }
 
+//XXX TOO SLOW -- NEED TO THINK ABOUT DOING THIS IN BACKGROUND
+#if 0
     // now add in the model parameters if we are not in ridesummary mode...
     // if we're summarising a range we need to get the model parameters refreshed
     if (!ridesummary && bestsCache == NULL) {
@@ -573,6 +575,7 @@ RideSummaryWindow::htmlSummary()
 
         summary += "</table></td>";
     }
+#endif
 
     summary += "</tr></table>";
 
