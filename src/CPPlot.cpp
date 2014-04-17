@@ -889,7 +889,20 @@ CPPlot::plotBests()
         ymax = 100 * ceil(values[0] / 100);
         if (ymax == 100) ymax = 5 * ceil(values[0] / 5);
     }
-    setAxisScale(yLeft, 0, ymax);
+
+    // adjust if for power
+    if (rideSeries == RideFile::watts) {
+
+        // set ymax to nearest 100 if power
+        int max = ymax * 1.1f;
+        max = ((max/100) + 1) * 100;
+
+        setAxisScale(yLeft, 0, max);
+    } else {
+
+        // or just add 10% headroom
+        setAxisScale(yLeft, 0, 1.1*ymax);
+    }
 }
 
 // plot the currently selected ride
@@ -1540,7 +1553,19 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
             }
         }
     }
-    setAxisScale(yLeft, 0, 1.1*ymax);
+
+    if (rideSeries == RideFile::watts) {
+
+        // set ymax to nearest 100 if power
+        int max = ymax * 1.1f;
+        max = ((max/100) + 1) * 100;
+
+        setAxisScale(yLeft, 0, max);
+    } else {
+
+        // or just add 10% headroom
+        setAxisScale(yLeft, 0, 1.1*ymax);
+    }
     replot();
 }
 
