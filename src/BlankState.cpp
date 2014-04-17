@@ -32,6 +32,8 @@ BlankStatePage::BlankStatePage(Context *context) : context(context), canShow_(tr
     mainLayout->addLayout(homeLayout);
     homeLayout->setAlignment(Qt::AlignCenter);
     homeLayout->addSpacing(20); // left margin
+    setAutoFillBackground(true);
+    setProperty("color", QColor(Qt::white));
     setProperty("nomenu", true);
 
     // left part
