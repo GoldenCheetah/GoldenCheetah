@@ -587,7 +587,8 @@ class SearchFilter : public QSortFilterProxyModel
         // find the filename column
         fileIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
-            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename") {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename"
+                || model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == tr("File")) {
                 fileIndex = i;
             }
         }
