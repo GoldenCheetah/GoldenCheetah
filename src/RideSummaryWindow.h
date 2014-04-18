@@ -134,6 +134,8 @@ class RideSummaryWindow : public GcChartWindow
         RideFileCache *bestsCache;
         ExtendedCriticalPower *ecp;
         Model_eCP cpModel;
+
+        bool force; // to force a replot
 };
 
 #endif // _GC_RideSummaryWindow_h
