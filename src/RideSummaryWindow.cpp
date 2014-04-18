@@ -33,7 +33,7 @@
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
-     GcChartWindow(context), context(context), ridesummary(ridesummary), useCustom(false), useToToday(false), filtered(false), bestsCache(NULL)
+     GcChartWindow(context), context(context), ridesummary(ridesummary), useCustom(false), useToToday(false), filtered(false), bestsCache(NULL), force(false)
 {
     setRideItem(NULL);
 
@@ -116,6 +116,9 @@ void
 RideSummaryWindow::configChanged()
 {
     setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+    force = true;
+    refresh();
+    force = false;
 }
 
 #ifdef GC_HAVE_LUCENE
@@ -182,7 +185,7 @@ RideSummaryWindow::metadataChanged()
 void
 RideSummaryWindow::refresh()
 {
-    if (!amVisible()) return; // only if you can see me!
+    if (!force && !amVisible()) return; // only if you can see me!
 
     if (isCompare()) { // COMPARE MODE
 
