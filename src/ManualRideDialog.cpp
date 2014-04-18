@@ -140,7 +140,8 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 
     QLabel *timeLabel = new QLabel(tr("Start time:"), this);
     timeEdit = new QTimeEdit(this);
-    timeEdit->setDisplayFormat("hh:mm:ss");
+    QString timeFormat = QString(tr("hh:mm:ss %1")).arg(context->athlete->useMetricUnits ? "" : "AP");
+    timeEdit->setDisplayFormat(timeFormat);
     timeEdit->setTime(QTime::currentTime().addSecs(-4 * 3600)); // 4 hours ago by default
 
     // ride duration
@@ -152,8 +153,8 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     QString distanceString = QString(tr("Distance (%1):")).arg(context->athlete->useMetricUnits ? "km" : "miles");
     QLabel *distanceLabel = new QLabel(distanceString, this);
     distance = new QDoubleSpinBox(this);
-    distance->setSingleStep(10.0);
-    distance->setDecimals(0);
+    distance->setSingleStep(1.0);
+    distance->setDecimals(2);
     distance->setMinimum(0);
     distance->setMaximum(999);
 
@@ -410,7 +411,11 @@ ManualRideDialog::okClicked()
     // basic data
     if (distance->value()) {
         QMap<QString,QString> override;
-        override.insert("value", QString("%1").arg(distance->value()));
+        if (!context->athlete->useMetricUnits) {
+            override.insert("value", QString("%1").arg(distance->value() * KM_PER_MILE));
+        }else{
+            override.insert("value", QString("%1").arg(distance->value()));
+        }
         rideFile->metricOverrides.insert("total_distance", override);
     }
 
