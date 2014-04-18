@@ -140,8 +140,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 
     QLabel *timeLabel = new QLabel(tr("Start time:"), this);
     timeEdit = new QTimeEdit(this);
-    QString timeFormat = QString(tr("hh:mm:ss %1")).arg(context->athlete->useMetricUnits ? "" : "AP");
-    timeEdit->setDisplayFormat(timeFormat);
+    timeEdit->setDisplayFormat("hh:mm:ss");
     timeEdit->setTime(QTime::currentTime().addSecs(-4 * 3600)); // 4 hours ago by default
 
     // ride duration
