@@ -680,6 +680,14 @@ AllPlotWindow::compareChanged()
     // new ones ..
     if (context->isCompareIntervals) {
 
+        // first, lets init fullPlot, just in case its never
+        // been set (ie, switched to us before ever plotting a ride
+        if (myRideItem) fullPlot->setDataFromRide(myRideItem);
+
+        // and even if the current ride is blank, we're not
+        // going to be blank !!
+        setIsBlank(false);
+
         //
         // SETUP FULLPLOT FOR COMPARE MODE
         // 
