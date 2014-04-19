@@ -258,12 +258,12 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | SLOPE ':' number              { JsonPoint.slope = JsonNumber; }
         | TEMP ':' number               { JsonPoint.temp = JsonNumber; }
         | LRBALANCE ':' number          { JsonPoint.lrbalance = JsonNumber; }
-        | LTE ':' number          { JsonPoint.lte = JsonNumber; }
-        | RTE ':' number          { JsonPoint.rte = JsonNumber; }
-        | LPS ':' number          { JsonPoint.lps = JsonNumber; }
-        | RPS ':' number          { JsonPoint.rps = JsonNumber; }
-        | SMO2 ':' number         { JsonPoint.rps = JsonNumber; }
-        | THB ':' number          { JsonPoint.rps = JsonNumber; }
+        | LTE ':' number                { JsonPoint.lte = JsonNumber; }
+        | RTE ':' number                { JsonPoint.rte = JsonNumber; }
+        | LPS ':' number                { JsonPoint.lps = JsonNumber; }
+        | RPS ':' number                { JsonPoint.rps = JsonNumber; }
+        | SMO2 ':' number               { JsonPoint.smo2 = JsonNumber; }
+        | THB ':' number                { JsonPoint.thb = JsonNumber; }
         ;
 
 /*

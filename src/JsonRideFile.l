@@ -66,6 +66,8 @@
 \"LAT\"             return LAT;
 \"LON\"             return LON;
 \"HEADWIND\"        return HEADWIND;
+\"SMO2\"            return SMO2;
+\"THB\"             return THB;
 \"SLOPE\"           return SLOPE;
 \"TEMP\"            return TEMP;
 \"LRBALANCE\"       return LRBALANCE;
