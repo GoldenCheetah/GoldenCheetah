@@ -213,6 +213,8 @@ RideEditor::whatColumns()
          << tr("Right TE")
          << tr("Left PS")
          << tr("Right PS")
+         << tr("SmO2")
+         << tr("tHb")
          << tr("Interval");
 
     return what;
@@ -803,6 +805,8 @@ RideEditor::insColumn(QString name)
     if (name == tr("Right TE")) series = RideFile::rte;
     if (name == tr("Left PS")) series = RideFile::lps;
     if (name == tr("Right PS")) series = RideFile::rps;
+    if (name == tr("SmO2")) series = RideFile::smO2;
+    if (name == tr("tHb")) series = RideFile::tHb;
 
     model->insertColumn(series);
 }
@@ -2173,6 +2177,8 @@ PasteSpecialDialog::okClicked()
                 if (headings[col] == tr("Headwind")) newrow.headwind = value;
                 if (headings[col] == tr("Slope")) newrow.slope = value;
                 if (headings[col] == tr("Temperature")) newrow.temp = value;
+                if (headings[col] == tr("SmO2")) newrow.smo2 = value;
+                if (headings[col] == tr("tHb")) newrow.thb = value;
                 if (headings[col] == tr("Interval")) newrow.interval = value;
             }
 

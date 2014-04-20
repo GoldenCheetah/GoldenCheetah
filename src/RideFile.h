@@ -69,7 +69,7 @@ struct RideFileDataPresent
         secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
-        lrbalance(false), lte(false), rte(false), lps(false), rps(false), interval(false),
+        lrbalance(false), lte(false), rte(false), lps(false), rps(false), smo2(false), thb(false), interval(false),
         np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false) {}
 
 };
