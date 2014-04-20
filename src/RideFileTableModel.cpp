@@ -141,6 +141,14 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Right PS");
             headingsType << RideFile::rps;
         }
+        if (series == RideFile::smO2 || ride->areDataPresent()->smo2) {
+            headings_ << tr("SmO2");
+            headingsType << RideFile::smO2;
+        }
+        if (series == RideFile::tHb || ride->areDataPresent()->thb) {
+            headings_ << tr("tHb");
+            headingsType << RideFile::tHb;
+        }
         if (series == RideFile::interval || ride->areDataPresent()->interval) {
             headings_ << tr("Interval");
             headingsType << RideFile::interval;
