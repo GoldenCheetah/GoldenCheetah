@@ -356,6 +356,10 @@ void RideNavigator::setWidth(int x)
     else
         delegate->setWidth(pwidth=x);
 
+    // make the scrollbars go away
+    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
     active = false;
 }
 
