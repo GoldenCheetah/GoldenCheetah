@@ -899,7 +899,7 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
 
         // we add a bin on the end since the last "incomplete" bin
         // will be dropped otherwise
-        int count = int(ceil((arrayLength - 1) / (binw)))+1;
+        int count = qMax(0, int(ceil((arrayLength - 1) / (binw)))+1);
 
         // allocate space for data, plus beginning and ending point
         x.resize(count+2);
