@@ -82,56 +82,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     cpPlot = new CPPlot(this, context, rangemode);
     mainLayout->addWidget(cpPlot);
 
-
-#if 0
-    //
-    // picker - on chart controls/display
-    //
-
-    // picker widget
-    QWidget *pickerControls = new QWidget(this);
-    mainLayout->addWidget(pickerControls, 0, 0, Qt::AlignTop | Qt::AlignRight);
-    pickerControls->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-
-    // picker layout
-    QVBoxLayout *pickerLayout = new QVBoxLayout(pickerControls);
-    QFormLayout *pcl = new QFormLayout;
-    pickerLayout->addLayout(pcl);
-    pickerLayout->addStretch(); // get labels at top right
-
-    // picker details
-    QLabel *cpintTimeLabel = new QLabel(tr("Duration:"), this);
-    cpintTimeValue = new QLabel("0 s");
-    QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
-    cpintTodayValue = new QLabel(tr("no data"));
-    QLabel *cpintAllLabel = new QLabel(tr("Best:"), this);
-    cpintAllValue = new QLabel(tr("no data"));
-    QLabel *cpintCPLabel = new QLabel(tr("CP Curve:"), this);
-    cpintCPValue = new QLabel(tr("no data"));
-
-    // chart overlayed values in smaller font
-    QFont font = cpintTimeValue->font();
-    font.setPointSize(font.pointSize()-2);
-    cpintTodayValue->setFont(font);
-    cpintAllValue->setFont(font);
-    cpintCPValue->setFont(font);
-    cpintTimeValue->setFont(font);
-    cpintTimeLabel->setFont(font);
-    cpintTodayLabel->setFont(font);
-    cpintAllLabel->setFont(font);
-    cpintCPLabel->setFont(font);
-
-    pcl->addRow(cpintTimeLabel, cpintTimeValue);
-    if (rangemode) {
-        cpintTodayLabel->hide();
-        cpintTodayValue->hide();
-    } else {
-        pcl->addRow(cpintTodayLabel, cpintTodayValue);
-    }
-    pcl->addRow(cpintAllLabel, cpintAllValue);
-    pcl->addRow(cpintCPLabel, cpintCPValue);
-#endif
-
     //
     // Chart settings
     //
@@ -427,7 +377,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     gridLayout->addWidget(ftpValue, 4, 1);
     gridLayout->addWidget(ftpRank, 4, 2);
 
-    addHelper(QString("Model"), helper);
+    addHelper(QString("CP Model"), helper);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));

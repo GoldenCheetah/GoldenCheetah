@@ -41,6 +41,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     setMinimumSize(200,200);
     setFocus();
     mode = none;
+    initial = true;
 
     // main layout
     QVBoxLayout *mlayout = new QVBoxLayout(this);
@@ -84,11 +85,9 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     titleLayout->addWidget(right);
     connect(right, SIGNAL(clicked()), this, SLOT(scrollRight()));
 
-    widgets = new QStackedWidget(this);
-    widgets->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mlayout->addWidget(widgets);
-
-    currentIndex_ = -1;
+    stack = new QStackedWidget(this);
+    stack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mlayout->addWidget(stack);
 
     // linear gradients
 #ifdef Q_OS_MAC
@@ -124,82 +123,69 @@ GcOverlayWidget::addWidget(QString title, QWidget *widget)
     widget->releaseMouse();
     widget->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
-    titleLabel->setText(title);
-    widgets->addWidget(widget);
-    widgets->setCurrentIndex(0);
-}
+    // add to list
+    items << GcOverlayWidgetItem(title, widget);
+    stack->addWidget(widget);
 
-void
-GcOverlayWidget::setText(int index, QString text)
-{
-    // XXX
-}
+    // but don't select it 
+    // unless its the first one
+    if (items.count() == 1) setCurrentIndex(0);
 
-#if 0
-bool 
-GcOverlayWidget::eventFilter(QObject *object, QEvent *e)
-{
-    // show/hide scrollers on resize event
-    if (object == this && e->type() == QEvent::Resize) {
-
-        // we do NOT move the position, we just show/hide
-        // the left and right scrollers
-        tidy();
-    }
-
-    // showing us - tidy up
-    if (object == this && e->type() == QEvent::Show) {
-        tidy();
-    }
-
-    // enter/leave we can track approximate mouse position and decide 
-    // if we want to 'autoscroll'
-    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
-        tidy(); // tidy up anyway
-
-        // XXX for later, perhaps when drag/dropping
-        //     we should try and be a little more fluid / animate ...
-        //     which will probably mean using QScrollArea::ScrollContentsBy
-    }
-
-    return false;
-}
-#endif
-
-void
-GcOverlayWidget::scrollRight()
-{
-    //XXX
-}
-
-void
-GcOverlayWidget::scrollLeft()
-{
-    //XXX
-}
-
-void
-GcOverlayWidget::clear()
-{
-    //XXX
-}
-
-void
-GcOverlayWidget::removeWidget(int index)
-{
-    //XXX
+    // set cursors visible/hidden if needed
+    setCursors();
 }
 
 void
 GcOverlayWidget::setCurrentIndex(int index)
 {
-    //XXX
+    if (initial || index != stack->currentIndex()) {
+        titleLabel->setText(items.at(index).name);
+        stack->setCurrentIndex(index);
+
+        // tell everyone we changed
+        emit currentIndexChanged(index);
+
+        initial = false;
+    }
 }
 
-
-GcOverlayWidget::~GcOverlayWidget()
+int
+GcOverlayWidget::currentIndex() const
 {
+    return stack->currentIndex();
 }
+
+void
+GcOverlayWidget::setCursors()
+{
+    if (items.count() > 1) {
+
+        left->show();
+        right->show();
+
+    } else {
+
+        left->hide();
+        right->hide();
+    }
+}
+
+void
+GcOverlayWidget::scrollRight()
+{
+    int rightIndex = stack->currentIndex() + 1;
+    if (stack->count() > rightIndex) setCurrentIndex(rightIndex);
+    else setCurrentIndex(0);
+}
+
+void
+GcOverlayWidget::scrollLeft()
+{
+    if (stack->currentIndex() > 0) setCurrentIndex(stack->currentIndex() -1);
+    else setCurrentIndex(stack->count() -1);
+}
+
+GcOverlayWidget::~GcOverlayWidget() {}
 
 void
 GcOverlayWidget::paintEvent (QPaintEvent *event)
@@ -239,7 +225,7 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     painter.restore();
 }
 
-void GcOverlayWidget::focusInEvent(QFocusEvent *e) 
+void GcOverlayWidget::focusInEvent(QFocusEvent *) 
 {
     m_infocus = true;
     parentWidget()->installEventFilter(this);
@@ -247,7 +233,7 @@ void GcOverlayWidget::focusInEvent(QFocusEvent *e)
     emit inFocus(true);
 }
  
-void GcOverlayWidget::focusOutEvent(QFocusEvent *e) 
+void GcOverlayWidget::focusOutEvent(QFocusEvent *) 
 {
     if (!m_isEditing) return;
     if (m_showMenu) return;
