@@ -323,9 +323,7 @@ CPPlot::deriveCPParameters()
         if (iteration ++ > max_loops) {
 
             // don't get stuck in an infinite loop
-            QMessageBox::warning(NULL, "Warning", 
-                                 QString("Maximum number of loops %d exceeded in cp model extraction").arg(max_loops),
-                                 QMessageBox::Ok, QMessageBox::NoButton);
+            qDebug()<<"Maximum number of loops in model extraction in CPPlot.";
             break;
         }
 
