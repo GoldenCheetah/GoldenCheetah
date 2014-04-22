@@ -42,6 +42,15 @@ class GcScopeButton;
 #endif
 class GcLabel;
 
+class GcOverlayWidgetItem
+{
+    public:
+        GcOverlayWidgetItem(QString name, QWidget *widget) : name(name), widget(widget) {}
+
+        QString name;
+        QWidget *widget;
+};
+
 class GcOverlayWidget : public QWidget
 {
     Q_OBJECT
@@ -53,9 +62,10 @@ public:
 
     // add remove children
     void addWidget(QString title, QWidget *widget);
-    void setText(int index, QString title);
-    void removeWidget(int);
-    void clear();
+    int currentIndex() const;
+
+    // set arrow widgets if needed
+    void setCursors();
 
     // reused by button bar
     QLinearGradient active, inactive;
@@ -109,10 +119,9 @@ private:
 
     QToolButton *left, *right; // scrollers, hidden if menu fits
     GcLabel *titleLabel;
-    QStackedWidget *widgets; // where the widget gets put
+    QStackedWidget *stack; // where the widget gets put
 
-    QList<QString> titles;
-
-    int currentIndex_;
+    QList<GcOverlayWidgetItem> items;
+    bool initial;
 };
 #endif
