@@ -118,10 +118,11 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
 void
 GcOverlayWidget::addWidget(QString title, QWidget *widget)
 {
-    // we want this one
-    widget->setParent(this);
-    widget->releaseMouse();
-    widget->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    //We don't stop the widget from processing local mouse
+    //events since it may well be interactive in future.
+    //widget->setParent(this);
+    //widget->releaseMouse();
+    //widget->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     // add to list
     items << GcOverlayWidgetItem(title, widget);
