@@ -90,8 +90,9 @@
 // 69  23  Mar 2014 Mark Liversedge    Updated Gompertz constansts for An-TISS sigmoid
 // 70  27  Mar 2014 Mark Liversedge    Add file CRC to refresh only if contents change (not just timestamps)
 // 71  14  Apr 2014 Mark Liversedge    Added average lef/right vector metrics (Pedal Smoothness / Torque Effectiveness)
+// 72  24  Apr 2014 Mark Liversedge    Andy Froncioni's faster algorithm for W' bal
 
-int DBSchemaVersion = 71;
+int DBSchemaVersion = 72;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
