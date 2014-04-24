@@ -2,6 +2,7 @@ Makefile
 
 # old skool
 .svn
+*.pri
 
 # osx noise
 .DS_Store
