@@ -185,33 +185,22 @@ WPrime::setRide(RideFile *input)
     values.resize(last+1);
     xvalues.resize(last+1);
 
-    QVector<double> myvalues(last+1);
-
-    int stop = last / 2;
-
-    WPrimeIntegrator a(inputArray, 0, stop, TAU);
-    WPrimeIntegrator b(inputArray, stop+1, last, TAU);
-
-    a.start();
-    b.start();
-
-    a.wait();
-    b.wait();
-
-    // sum values
+    double W = WPRIME;
     for (int t=0; t<=last; t++) {
-        values[t] = a.output[t] + b.output[t];
+
+        if(smoothed.value(t) < CP) {
+            W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
+        } else {
+            W  = W + (CP-smoothed.value(t));
+        }
+
+        if (W > maxY) maxY = W;
+        if (W < minY) minY = W;
+
+        values[t] = W;
         xvalues[t] = double(t) / 60.00f;
     }
 
-    // now subtract WPRIME and work out minimum etc
-    for(int t=0; t <= last; t++) {
-        double value = WPRIME - values[t];
-        values[t] = value;
-
-        if (value > maxY) maxY = value;
-        if (value < minY) minY = value;
-    }
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
                                  // so lets not excacerbate the problem - truncate
 
@@ -357,33 +346,24 @@ WPrime::setErg(ErgFile *input)
     values.resize(last+1);
     xvalues.resize(last+1);
 
-    QVector<double> myvalues(last+1);
-
-    int stop = last / 2;
-
-    WPrimeIntegrator a(inputArray, 0, stop, TAU);
-    WPrimeIntegrator b(inputArray, stop+1, last, TAU);
-
-    a.start();
-    b.start();
-
-    a.wait();
-    b.wait();
-
-    // sum values
+    double W = WPRIME;
     for (int t=0; t<=last; t++) {
-        values[t] = a.output[t] + b.output[t];
-        xvalues[t] = t * 1000;
+
+        if(smoothed.value(t) < CP) {
+            W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
+        } else {
+            W  = W + (CP-smoothed.value(t));
+        }
+
+        if (W > maxY) maxY = W;
+        if (W < minY) minY = W;
+
+        values[t] = W;
+        xvalues[t] = double(t) / 60.00f;
     }
 
-    // now subtract WPRIME and work out minimum etc
-    for(int t=0; t <= last; t++) {
-        double value = WPRIME - values[t];
-        values[t] = value;
-
-        if (value > maxY) maxY = value;
-        if (value < minY) minY = value;
-    }
+    if (minY < -30000) minY = 0; // the data is definitely out of bounds!
+                                 // so lets not excacerbate the problem - truncate
 
     // STEP 3: FIND MATCHES
 
