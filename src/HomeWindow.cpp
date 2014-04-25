@@ -434,7 +434,8 @@ HomeWindow::appendChart(GcWinID id)
     }
 
     // now wipe it
-    delete f;
+    f->hide();
+    f->deleteLater();
 
     // before we return lets turn the cursor off
     chartCursor = -2;
