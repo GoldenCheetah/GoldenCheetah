@@ -352,8 +352,8 @@ CPPlot::deriveCPParameters()
                 tau = taun;
         }
 
-        // update t0 if we're using that model
-        if (model == 2) t0 = tau / (bestsCache->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
+        // estimate t0
+        t0 = tau / (bestsCache->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 }
@@ -493,6 +493,108 @@ CPPlot::plotModel()
                 // Reference 6.25W/kg -> untrained 2.5W/kg
                 int _ftpLevel = 15 * (model.mmp60 / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
                 cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+            }
+            break;
+
+            case 4:
+            {
+                cp  = tau = t0  = 0;
+                deriveCPParameters();
+
+                // ooopsie no model for us!
+                if (cp == 0 && tau == 0 && t0 == 0) return;
+
+                // the Veloclinic model has the following formulation
+                //
+                // p(t) = pc1 + pc2
+                //        Power at time t is the sum of;
+                //        pc1 - the power from component 1 (fast twitch pools)
+                //        pc2 - the power from component 2 (slow twitch motor units)
+                //
+                // The inputs are derived from the CP2-20 model and 3 constants:
+                //
+                //      Pmax - as derived from the CP2-20 model (via t0)
+                //      w1   - W' as derived from the CP2-20 model 
+                //      p1   - pmax - cp as derived from the CP2-20 model
+                //      p2   - cp as derived from the CP2-20 model
+                //      tau1 - W'1 / p1
+                //      tau2 = 15,000
+                //      w2  -  A slow twitch W' derived from p2 * tau2
+                //      alpha - 0.1 
+                //      beta
+                //
+                // Fast twitch component is:
+                //      pc1(t) = W'1 / t * (1-exp(-t/tau1)) * ((1-exp(-t/10)) ^ (1/alpha))
+                // 
+                // Slow twitch component has three formulations:
+                //      a) pc2(t) = p2 * tau2 * (1-exp(-t/tau2))
+                //      b) pc2(t) = p2 / (1 + t/tau2)
+                //      c) pc2(t) = p2 / (1 + t/5400) ^ (1/beta)
+                //
+                // Currently deciding which of the three formulations to use
+                // as the base for GoldenCheetah (we have enough models already !)
+                //
+                // to keep things simple we just use formulation (a) for now.
+                double pmax = cp * (double(1.00f)+tau /(((double(1)/double(60))+t0)));
+                double w1 = cp*tau*60;
+                double p1 = pmax - cp;
+                double p2 = cp;
+                double tau1 = w1 / p1;
+                double tau2 = 15000;
+                double alpha = 0.1;
+
+                //double w2 = p2 * tau2;
+                //qDebug()<<"model parameters: pmax="<<pmax<<"w1="<<w1<<"p1="<<p1
+                //            <<"p2="<<p2<<"tau1="<<tau1<<"tau2="<<tau2<<"alpha="<<alpha;
+
+                // populate curve data with a CP curve of 100 points resolution
+                const int points = 3600 * 5; // 5 hours is enough
+                QVector<double> cp_curve_power(points);
+                QVector<double> cp_curve_time(points);
+
+                for (int i = 0; i < points; i ++) {
+
+                    double t = i+1;
+
+                    if (criticalSeries == CriticalPowerWindow::work) {//this is ENERGY same as other models
+                        cp_curve_power[i] = (cp * t + cp * tau) * 60.0 / 1000.0;
+
+                    } else {
+
+                        // two component model
+                        double pc1 = w1 / t * (1.00f - exp(-t/tau1)) * pow(1-exp(-t/10), alpha); // ^ (1/alpha) missing XXX
+                        double pc2 = p2 * tau2 / t * (1-exp(-t/tau2));
+
+                        // p(t) as a sum of both component powers
+                        cp_curve_power[i] = pc1 + pc2;
+                    }
+
+                    // set time
+                    if (criticalSeries == CriticalPowerWindow::watts_inv_time) t = 1.0 / t;
+                    cp_curve_time[i] = t / 60.00f;
+                }
+
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::aPower || rideSeries == RideFile::xPower ||
+                    rideSeries == RideFile::NP || rideSeries == RideFile::wattsKg) { 
+
+                    // set parent labels for model values
+                    CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
+                    cpw->wprimeValue->setText(QString("%1 kJ").arg(cp*tau * 60 / 1000.0, 0, 'f', 1));
+                    cpw->cpValue->setText(QString("%1 w").arg(int(cp)));
+                    cpw->ftpValue->setText("n/a");
+                    cpw->pmaxValue->setText(QString("%1 w").arg(int(pmax)));
+                }
+
+                modelCurve = new QwtPlotCurve("Model");
+                if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+                    modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                QPen pen(GColor(CCP));
+                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                pen.setWidth(width);
+                pen.setStyle(Qt::DashLine);
+                modelCurve->setPen(pen);
+                modelCurve->setSamples(cp_curve_time, cp_curve_power);
+                modelCurve->attach(this);
             }
             break;
         }
