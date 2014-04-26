@@ -98,7 +98,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     QWidget *modelWidget = new QWidget(this);
     modelWidget->setContentsMargins(0,0,0,0);
-    settingsTabs->addTab(modelWidget, tr("Model"));
+    settingsTabs->addTab(modelWidget, tr("CP Model"));
 
     QFormLayout *mcl = new QFormLayout(modelWidget);;
     mcl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -189,7 +189,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     modelCombo->addItem("None");
     modelCombo->addItem("2 parameter");
     modelCombo->addItem("3 parameter");
-    modelCombo->addItem("ExtendedCP");
+    modelCombo->addItem("Extended CP");
+    modelCombo->addItem("Multicomponent");
     modelCombo->setCurrentIndex(1);
 
     mcl->addRow(new QLabel(tr("CP Model")), modelCombo);
@@ -528,7 +529,8 @@ CriticalPowerWindow::modelChanged()
             // No default values !
             break;
 
-    case 1 : // 2 param model
+    case 4 : // Veloclinic Model uses 2 parameter classic
+    case 1 : // Classic 2 param model 2-20 default (per literature)
 
             intervalLabel->show();
             secondsLabel->show();
@@ -546,14 +548,14 @@ CriticalPowerWindow::modelChanged()
             laeI1SpinBox->hide();
             laeI2SpinBox->hide();
 
-            // Default values
-            anI1SpinBox->setValue(180);
-            anI2SpinBox->setValue(300);
-            aeI1SpinBox->setValue(1200);
-            aeI2SpinBox->setValue(1800);
+            // Default values: class 2-20 model
+            anI1SpinBox->setValue(100);
+            anI2SpinBox->setValue(120);
+            aeI1SpinBox->setValue(1000);
+            aeI2SpinBox->setValue(1200);
             break;
 
-    case 2 : // 3 param model
+    case 2 : // 3 param model: 3-30 model
 
             intervalLabel->show();
             secondsLabel->show();
