@@ -842,7 +842,11 @@ void GcChartWindow:: saveImage()
    {
        QPixmap picture;
        menuButton->hide();
+#if QT_VERSION > 0x050000
+       picture = grab(geometry());
+#else
        picture = QPixmap::grabWidget (this);
+#endif
 
        picture.save(fileName);
    }
