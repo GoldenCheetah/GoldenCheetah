@@ -100,7 +100,8 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     cyclingAnalyticsChk->setEnabled(false);
 #endif
     selfLoopsChk = new QCheckBox(tr("Selfloops"));
-    //garminChk = new QCheckBox(tr("Garmin Connect"));
+    garminChk = new QCheckBox(tr("Garmin Connect"));
+    garminChk->setVisible(false);
 
     QGridLayout *vbox1 = new QGridLayout();
     vbox1->addWidget(stravaChk,0,0);

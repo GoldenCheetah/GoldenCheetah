@@ -257,7 +257,14 @@ struct Bin2FileReaderState
             int device_type = read_bytes(1, bytes_read, sum);
             if (device_type < 255)  {
                 QString text = read_text(20, bytes_read, sum);
-                while(text.endsWith( QChar(0) )) text.chop(1);
+
+                for(int i=0; i < text.length(); i++)
+                {
+                    if (text.at(i) == QChar(0))
+                        text = text.left(i);
+                }
+
+                //while (text.endsWith( QChar(0) )) text.chop(1);
 
                 read_bytes(1, bytes_read, sum); // flag
                 uint16_t id = read_bytes(2, bytes_read, sum);
