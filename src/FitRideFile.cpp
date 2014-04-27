@@ -387,7 +387,7 @@ struct FitFileReaderState
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
         double kph = 0, temperature = RideFile::noTemp, watts = 0, slope = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
-        double smO2, tHb = 0;
+        double smO2 = 0, tHb = 0;
 
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;

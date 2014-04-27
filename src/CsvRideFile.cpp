@@ -87,6 +87,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         //  Modified the regExp string to allow for 2-digit version numbers - 23 Mar 2009, thm
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     bool iBike = false;
+
+
+    QRegExp moxyCSV("FW Part Number:", Qt::CaseInsensitive);
+    bool moxy = false;
+
     int recInterval = 1;
 
     if (!file.open(QFile::ReadOnly)) {
@@ -114,6 +119,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
         for (int li = 0; li < lines.size(); ++li) {
             QString line = lines[li];
+
+            if (line.length()==0) {
+                continue;
+            }
 
             if (lineno == 1) {
                 if (ergomoCSV.indexIn(line) != -1) {
@@ -163,6 +172,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      ++lineno;
                      continue;
                  }
+                 else if(moxyCSV.indexIn(line) != -1) {
+                     moxy = true;
+                     rideFile->setDeviceType("Moxy");
+                     rideFile->setFileFormat("Moxy CSV (csv)");
+                     unitsHeader = 4;
+                     recInterval = 2;
+                     ++lineno;
+                     continue;
+                }
                  // default
                  rideFile->setDeviceType("PowerTap");
                  rideFile->setFileFormat("PowerTap CSV (csv)");
@@ -199,7 +217,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
             }
-            if (lineno == unitsHeader) {
+            if (lineno == unitsHeader && !moxy) {
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
                 else if (englishUnits.indexIn(line) != -1)
@@ -216,17 +234,18 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     tempType = degF;
             }
             else if (lineno > unitsHeader) {
-                double minutes=0,nm,kph,watts,km,cad,alt,hr,dfpm, seconds=0.0;
+                double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
                 double temp=RideFile::noTemp;
                 double slope=0.0;
                 bool ok;
                 double lat = 0.0, lon = 0.0;
                 double headwind = 0.0;
+                double smo2 = 0.0, thb = 0.0;
                 int interval=0;
                 int pause=0;
                 quint64 ms;
 
-                if (!ergomo && !iBike && !motoActv) {
+                if (!ergomo && !iBike && !motoActv && !moxy) {
                      minutes = line.section(',', 0, 0).toDouble();
                      nm = line.section(',', 1, 1).toDouble();
                      kph = line.section(',', 2, 2).toDouble();
@@ -291,6 +310,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         alt *= METERS_PER_FOOT;
                         headwind *= KM_PER_MILE;
                     }
+                }
+                else if (moxy)  {
+                    minutes = (recInterval * lineno - unitsHeader)/60.0;
+                    smo2 = line.section(',', 2, 2).remove("\"").toDouble();
+                    thb = line.section(',', 4, 4).remove("\"").toDouble();
                 }
                else if(motoActv) {
                     /* MotoActv saves it all as kind of SI (m, ms, m/s, NM etc)
@@ -378,7 +402,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
-                                          0.0, 0.0, interval);
+                                          smo2, thb, interval);
             }
             ++lineno;
         }
