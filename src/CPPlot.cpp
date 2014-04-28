@@ -413,6 +413,9 @@ CPPlot::plotModel()
                 // ooopsie no model for us!
                 if (cp == 0 && tau == 0 && t0 == 0) return;
 
+                // clear t0 if doing a classic 2 point curve
+                if (model == 1) t0 = 0;
+
                 // populate curve data with a CP curve
                 const int curve_points = 100;
                 double tmin = model == 2 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
