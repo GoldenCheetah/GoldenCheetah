@@ -749,9 +749,8 @@ LTMPlot::setData(LTMSettings *set)
             // lets setup a curve with this data then!
             QString topName;
             if (counter > 1)
-                topName = QString(tr("%1 Best %2"))
-                          .arg(metricDetail.uname)
-                          .arg(counter); // starts from zero
+                topName = QString(tr("%1 Best"))
+                          .arg(metricDetail.uname);
             else
                 topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
@@ -759,7 +758,7 @@ LTMPlot::setData(LTMSettings *set)
                                 .arg(metricDetail.type == METRIC_BEST ? 
                                      metricDetail.bestSymbol : metricDetail.symbol);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
-            curves.insert(topSymbol, top);
+            curves.insert(topName, top);
 
             top->setRenderHint(QwtPlotItem::RenderAntialiased);
             top->setStyle(QwtPlotCurve::Dots);
@@ -1119,16 +1118,24 @@ LTMPlot::setData(LTMSettings *set)
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
     }
 
-    // show legend?
-    if (settings->legend == false) {
-        this->legend()->hide();
-        QHashIterator<QString, QwtPlotCurve*> c(curves);
-        while (c.hasNext()) {
-            c.next();
-            c.value()->setItemAttribute(QwtPlotItem::Legend, false);
-        }
-        updateLegend();
+    QHashIterator<QString, QwtPlotCurve*> p(curves);
+    while (p.hasNext()) {
+        p.next();
+
+        // always hide bollocksy curves
+        if (p.key().endsWith(tr("trend")) || p.key().endsWith(tr("Outliers")) || p.key().endsWith(tr("Best")))
+            p.value()->setItemAttribute(QwtPlotItem::Legend, false);
+        else
+            p.value()->setItemAttribute(QwtPlotItem::Legend, settings->legend);
     }
+
+    // show legend?
+    if (settings->legend == false) this->legend()->hide();
+    else this->legend()->show();
+
+
+    // now refresh
+    updateLegend();
 
     // markers
     if (settings->groupBy != LTM_TOD)
@@ -1619,8 +1626,6 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setSamples(xtrend,ytrend, 2);
 
                     trend->attach(this);
-                    curves.insert(trendSymbol, trend);
-
                 }
 
                 // quadratic lsm regression
@@ -1661,7 +1666,6 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setSamples(xtrend.data(),ytrend.data(), xtrend.count());
 
                     trend->attach(this);
-                    curves.insert(trendName, trend);
                 }
             }
 
