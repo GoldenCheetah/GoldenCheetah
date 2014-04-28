@@ -321,7 +321,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     QLabel *twurlLabel = new QLabel(tr("Website"));
     QLabel *twauthLabel = new QLabel(tr("Authorise"));
-    QLabel *twpinLabel = new QLabel(tr("PIN"));
 
     QLabel *str = new QLabel(tr("Strava"));
     str->setFont(current);
@@ -411,9 +410,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     twitterURL = new QLineEdit(this);
     twitterURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TWURL, "http://www.twitter.com").toString());
     twitterAuthorise = new QPushButton("Authorise", this);
-    twitterPIN = new QLineEdit(this);
-    twitterPIN->setText("");
-
     QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
 
     twitterAuthorised = new QPushButton(this);
@@ -561,7 +557,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         grid->addWidget(twitterAuthorised, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
     else
         twitterAuthorised->hide(); // if no token no show
-    //grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->addWidget(stravaAuthorise, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
     if (appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "")!="")
@@ -650,40 +645,6 @@ void CredentialsPage::authoriseTwitter()
     */
 }
 
-void CredentialsPage::saveTwitter()
-{
-#ifdef GC_HAVE_LIBOAUTH
-    char *reply;
-    char *req_url;
-    char **rv = NULL;
-    char *postarg = NULL;
-    QString url = QString("https://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
-
-    QString strPin = twitterPIN->text();
-    if(strPin.size() == 0)
-        return;
-
-    url.append(strPin);
-
-    req_url = oauth_sign_url2(url.toLatin1(), NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, t_key, t_secret);
-    reply = oauth_http_get(req_url,postarg);
-
-    int rc = oauth_split_url_parameters(reply, &rv);
-
-    if(rc ==4)
-    {
-        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
-
-        const char *oauth_token = strdup(&(rv[0][12]));
-        const char *oauth_secret = strdup(&(rv[1][19]));
-
-        //Save Twitter oauth_token and oauth_secret;
-        appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_TOKEN, oauth_token);
-        appsettings->setCValue(context->athlete->cyclist, GC_TWITTER_SECRET, oauth_secret);
-    }
-#endif
-}
-
 void CredentialsPage::authoriseStrava()
 {
 #ifdef GC_HAVE_LIBOAUTH
@@ -705,8 +666,6 @@ void CredentialsPage::authoriseCyclingAnalytics()
 void
 CredentialsPage::saveClicked()
 {
-    // don't need anymore : saveTwitter();
-
     appsettings->setCValue(context->athlete->cyclist, GC_GCURL, gcURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GCUSER, gcUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_GCPASS, gcPass->text());
