@@ -352,8 +352,8 @@ CPPlot::deriveCPParameters()
                 tau = taun;
         }
 
-        // estimate t0
-        t0 = tau / (bestsCache->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
+        // estimate t0 - but only for veloclinic/3parm cp
+        if (model == 2 || model == 4) t0 = tau / (bestsCache->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
 }
@@ -412,9 +412,6 @@ CPPlot::plotModel()
 
                 // ooopsie no model for us!
                 if (cp == 0 && tau == 0 && t0 == 0) return;
-
-                // clear t0 if doing a classic 2 point curve
-                if (model == 1) t0 = 0;
 
                 // populate curve data with a CP curve
                 const int curve_points = 100;
