@@ -466,61 +466,21 @@ WPrime::PCP()
 int 
 WPrime::minForCP(int cp)
 {
-    QTime time; // for profiling performance of the code
-    time.start();
-
-    // input array contains the actual W' expenditure
-    // and will also contain non-zero values
-    double tau;
-    double totalBelowCP=0;
-    double countBelowCP=0;
-    QVector<int> inputArray(last+1);
-    for (int i=0; i<last; i++) {
-
-        int value = smoothed.value(i);
-        inputArray[i] = value > cp ? value-cp : 0;
-
-        if (value < cp) {
-            totalBelowCP += value;
-            countBelowCP++;
-        }
-    }
-
-    if (countBelowCP > 0)
-        tau = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
-    else
-        tau = 546.00f * pow(E,-0.01*(CP)) + 316.00f;
-
-    tau = int(tau); // round it down
-
-
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
 
     // lets run forward from 0s to end of ride
     int min = WPRIME;
-    QVector<double> myvalues(last+1);
+    double W = WPRIME;
+    for (int t=0; t<=last; t++) {
 
-    int stop = last / 2;
+        if(smoothed.value(t) < cp) {
+            W  = W + (cp-smoothed.value(t))*(WPRIME-W)/WPRIME;
+        } else {
+            W  = W + (cp-smoothed.value(t));
+        }
 
-    WPrimeIntegrator a(inputArray, 0, stop, tau);
-    WPrimeIntegrator b(inputArray, stop+1, last, tau);
-
-    a.start();
-    b.start();
-
-    a.wait();
-    b.wait();
-
-    // sum values
-    for (int t=0; t<=last; t++) 
-        myvalues[t] = a.output[t] + b.output[t];
-
-    // now subtract WPRIME and work out minimum etc
-    for(int t=0; t <= last; t++) {
-        double value = WPRIME - myvalues[t];
-        if (value < min) min = value;
+        if (W < min) min = W;
     }
-    //qDebug()<<"compute time="<<time.elapsed();
     return min;
 }
 
@@ -534,31 +494,6 @@ WPrime::maxMatch()
     return max;
 }
 
-// decay and integrate -- split into threads for
-// best performance
-WPrimeIntegrator::WPrimeIntegrator(QVector<int> &source, int begin, int end, double TAU) :
-    source(source), begin(begin), end(end), TAU(TAU)
-{
-    output.resize(source.size());
-}
-
-void
-WPrimeIntegrator::run()
-{
-    // run from start to stop adding decay to end
-    for (int t=begin; t<end; t++) {
-
-        if (source[t] <= 0) continue;
-
-        for (int i=0; i < WPrimeDecayPeriod && t+i < source.size(); i++) {
-
-            double value = source[t] * pow(E, -(double(i)/TAU));
- 
-            // integrate
-            output[t+i] += value;
-        }
-    }
-}
 
 //
 // Associated Metrics
