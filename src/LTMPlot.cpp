@@ -814,8 +814,7 @@ LTMPlot::setData(LTMSettings *set)
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
-                            labelString = QString("%1").arg(value * (context->athlete->useMetricUnits ? 1 : m->conversion())
-                                        + (context->athlete->useMetricUnits ? 0 : m->conversionSum()), 0, 'f', precision);
+                            labelString = QString("%1").arg(value, 0, 'f', precision);
 
                         } else {
                             // no precision
