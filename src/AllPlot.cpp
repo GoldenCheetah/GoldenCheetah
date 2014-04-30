@@ -278,7 +278,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
 
     wattsCurve = new QwtPlotCurve(tr("Power"));
     wattsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    wattsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    wattsCurve->setYAxis(QwtAxis::yLeft);
 
     antissCurve = new QwtPlotCurve(tr("anTISS"));
     antissCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
@@ -290,15 +290,15 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
 
     npCurve = new QwtPlotCurve(tr("NP"));
     npCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    npCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    npCurve->setYAxis(QwtAxis::yLeft);
 
     xpCurve = new QwtPlotCurve(tr("xPower"));
     xpCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    xpCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    xpCurve->setYAxis(QwtAxis::yLeft);
 
     apCurve = new QwtPlotCurve(tr("aPower"));
     apCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    apCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    apCurve->setYAxis(QwtAxis::yLeft);
 
     hrCurve = new QwtPlotCurve(tr("Heart Rate"));
     hrCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
@@ -1821,22 +1821,14 @@ AllPlot::setYMax()
     // etc are ignored because the axis is not visible
     if (wantaxis) {
 
-        setAxisVisible(yLeft, standard->wattsCurve->isVisible() || 
-                              standard->atissCurve->isVisible() || 
-                              standard->antissCurve->isVisible() || 
-                              standard->npCurve->isVisible() || 
-                              standard->xpCurve->isVisible() || 
-                              standard->apCurve->isVisible());
-
-        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), standard->hrCurve->isVisible() || standard->cadCurve->isVisible());
+        setAxisVisible(yLeft, showPowerState<2 || showNP || showXP || showAP);
+        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), showHr || showCad);
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false);
-        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 3), standard->balanceLCurve->isVisible() ||
-                                                     standard->lteCurve->isVisible() ||
-                                                     standard->lpsCurve->isVisible());
-        setAxisVisible(yRight, standard->speedCurve->isVisible());
-        setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible());
-        setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
-        setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), standard->atissCurve->isVisible() || standard->antissCurve->isVisible());
+        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 3), showBalance || showTE || showPS);
+        setAxisVisible(yRight, showSpeed); 
+        setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), showAlt);
+        setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), showW);
+        setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), showATISS || showANTISS);
         setAxisVisible(xBottom, true);
 
     } else {
@@ -1853,25 +1845,23 @@ AllPlot::setYMax()
 
     }
     // set axis scales
-    if (((showATISS && standard->atissCurve->isVisible()) || (showANTISS && standard->antissCurve->isVisible()))
-         && rideItem && rideItem->ride()) {
+    if (showATISS || showANTISS && rideItem && rideItem->ride()) {
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("TISS"));
         setAxisScale(QwtAxisId(QwtAxis::yRight, 3),0, qMax(standard->atissCurve->maxYValue(), standard->atissCurve->maxYValue()) * 1.05);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
     }
 
-    if (showW && standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
+    if (showW && rideItem && rideItem->ride()) {
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (j)"));
         setAxisScale(QwtAxisId(QwtAxis::yRight, 2),rideItem->ride()->wprimeData()->minY-1000,rideItem->ride()->wprimeData()->maxY+1000);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
 
-    if (standard->wattsCurve->isVisible()) {
+    if (showPowerState < 2) {
         double maxY = (referencePlot == NULL) ? (1.05 * standard->wattsCurve->maxYValue()) :
                                              (1.05 * referencePlot->standard->wattsCurve->maxYValue());
-
         int axisHeight = qRound( plotLayout()->canvasRect().height() );
         QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
         int labelWidth = labelWidthMetric.width( (maxY > 1000) ? " 8,888 " : " 888 " );
@@ -1888,31 +1878,31 @@ AllPlot::setYMax()
 
         setAxisTitle(yLeft, tr("Watts"));
         setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
+        axisWidget(yLeft)->update();
         //setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
 
-    if (standard->hrCurve->isVisible() || standard->cadCurve->isVisible() || 
-       (!context->athlete->useMetricUnits && standard->tempCurve->isVisible())) {
+    if (showHr || showCad || (!context->athlete->useMetricUnits && showTemp)) {
 
         double ymin = 0;
         double ymax = 0;
 
         QStringList labels;
-        if (standard->hrCurve->isVisible()) {
+        if (showHr) {
             labels << tr("BPM");
             if (referencePlot == NULL)
                 ymax = standard->hrCurve->maxYValue();
             else
                 ymax = referencePlot->standard->hrCurve->maxYValue();
         }
-        if (standard->cadCurve->isVisible()) {
+        if (showCad) {
             labels << tr("RPM");
             if (referencePlot == NULL)
                 ymax = qMax(ymax, standard->cadCurve->maxYValue());
             else
                 ymax = qMax(ymax, referencePlot->standard->cadCurve->maxYValue());
         }
-        if (standard->tempCurve->isVisible() && !context->athlete->useMetricUnits) {
+        if (showTemp && !context->athlete->useMetricUnits) {
 
             labels << QString::fromUtf8("°F");
 
@@ -1946,7 +1936,7 @@ AllPlot::setYMax()
         //setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
 
-    if (standard->balanceLCurve->isVisible() || standard->lteCurve->isVisible() || standard->lpsCurve->isVisible()) {
+    if (showBalance || showTE || showPS) {
 
         // 0 - 100 percent
         setAxisTitle(QwtAxisId(QwtAxis::yLeft, 3), tr("Percent"));
@@ -1957,13 +1947,13 @@ AllPlot::setYMax()
         standard->balanceRCurve->setBaseline(50);
     }
 
-    if (standard->speedCurve->isVisible() || (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || standard->torqueCurve->isVisible()) {
+    if (showSpeed || (context->athlete->useMetricUnits && showTemp) || showTorque) {
         double ymin = -10;
         double ymax = 0;
 
         QStringList labels;
 
-        if (standard->speedCurve->isVisible()) {
+        if (showSpeed) {
             labels << (context->athlete->useMetricUnits ? tr("KPH") : tr("MPH"));
 
             if (referencePlot == NULL)
@@ -1971,7 +1961,7 @@ AllPlot::setYMax()
             else
                 ymax = referencePlot->standard->speedCurve->maxYValue();
         }
-        if (standard->tempCurve->isVisible() && context->athlete->useMetricUnits) {
+        if (showTemp && context->athlete->useMetricUnits) {
 
             labels << QString::fromUtf8("°C");
 
@@ -1984,7 +1974,7 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, referencePlot->standard->tempCurve->maxYValue());
             }
         }
-        if (standard->torqueCurve->isVisible()) {
+        if (showTorque) {
             labels << (context->athlete->useMetricUnits ? tr("Nm") : tr("ftLb"));
 
             if (referencePlot == NULL)
@@ -1996,7 +1986,7 @@ AllPlot::setYMax()
         setAxisScale(yRight, ymin, 1.05 * ymax);
         //setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
-    if (standard->altCurve->isVisible()) {
+    if (showAlt) {
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 1), context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin,ymax;
 
@@ -2365,8 +2355,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     refreshCalibrationMarkers();
     refreshZoneLabels();
 
-    //if (this->legend()) this->legend()->show();
-    //replot();
+    // refresh
+    replot();
 
     // set all the colors ?
     configChanged();
