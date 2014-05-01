@@ -131,11 +131,11 @@ bool
     {
         hr = buffer.toDouble(); // on suunto ambit export file, there are sometimes double values
     }
-    else if (qName == "gpxdata:temp")
+    else if (qName == "gpxdata:temp" || (qName == "gpxtpx:atemp"))
     {
         temp = buffer.toDouble();
     }
-    else if (qName == "gpxdata:cadence")
+    else if ((qName == "gpxdata:cadence") || (qName == "gpxtpx:cad"))
     {
         cad = buffer.toDouble();
     }
