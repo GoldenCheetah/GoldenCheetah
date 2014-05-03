@@ -412,13 +412,13 @@ class ColorsPage : public QWidget
         void saveClicked();
 
     public slots:
-        void resetClicked();
+        void applyThemeClicked();
+        void tabChanged();
 
     private:
 
         // General stuff
         QCheckBox *antiAliased;
-        QCheckBox *shadeZones;
         QDoubleSpinBox *lineWidth;
 
         // Fonts
@@ -426,20 +426,22 @@ class ColorsPage : public QWidget
                       *titles,
                       *chartmarkers,
                       *chartlabels,
-                      *calendar,
-                      *popup;
+                      *calendar;
 
         QComboBox *defaultSize,
                   *titlesSize,
                   *chartmarkersSize,
                   *chartlabelsSize,
-                  *calendarSize,
-                  *popupSize;
+                  *calendarSize;
+
+        // tabbed view between colors and themes
+        QTabWidget *colorTab;
 
         // Colors
         QTreeWidget *colors;
+        QTreeWidget *themes;
         const Colors *colorSet;
-        QPushButton *reset;
+        QPushButton *applyTheme;
 };
 
 class FieldsPage : public QWidget

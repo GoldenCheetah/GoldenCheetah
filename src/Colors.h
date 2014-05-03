@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QString>
 #include <QColor>
+#include <QLabel>
 
 class Context;
 
@@ -38,8 +39,7 @@ struct SizeSettings {
         titleFont,
         markerFont,
         labelFont,
-        calendarFont,
-        popupFont;
+        calendarFont;
 
     // screen dimension
     int width,
@@ -47,12 +47,46 @@ struct SizeSettings {
 };
 
 extern SizeSettings defaultAppearance[];
+
 class Colors
 {
 public:
         QString name,
                 setting;
         QColor  color;
+};
+
+class ColorTheme
+{
+    public:
+        ColorTheme(QString name, QList<QColor>colors) : name(name), colors(colors) {}
+
+        // all public
+        QString name;
+        QList<QColor> colors;
+};
+
+class Themes
+{
+
+    Q_DECLARE_TR_FUNCTIONS(Themes);
+
+    public:
+        Themes(); // will init the array of themes
+
+        QList<ColorTheme> themes;
+};
+
+class ColorLabel : public QLabel
+{
+    Q_OBJECT
+
+    public:
+        ColorLabel(ColorTheme theme) : theme(theme) {}
+
+        void paintEvent(QPaintEvent *);
+
+        ColorTheme theme;
 };
 
 class GCColor : public QObject
@@ -71,6 +105,7 @@ class GCColor : public QObject
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
+        static Themes &themes(); 
 
         // for styling things with current preferences
         static QString css();

@@ -180,13 +180,11 @@
 #define GC_FONT_CHARTMARKERS      "font/chartmarkers"
 #define GC_FONT_CHARTLABELS       "font/chartlabels"
 #define GC_FONT_CALENDAR          "font/calendar"
-#define GC_FONT_POPUP             "font/popup"
 #define GC_FONT_DEFAULT_SIZE      "font/defaultsize"
 #define GC_FONT_TITLES_SIZE       "font/titlessize"
 #define GC_FONT_CHARTMARKERS_SIZE "font/chartmarkerssize"
 #define GC_FONT_CHARTLABELS_SIZE  "font/chartlabelssize"
 #define GC_FONT_CALENDAR_SIZE     "font/calendarsize"
-#define GC_FONT_POPUP_SIZE        "font/popup"
 
 // TreeMap selection
 #define GC_TM_FIRST               "tm/first"

@@ -25,6 +25,9 @@
 #include <QDir>
 #include "Settings.h"
 
+// the standard themes, a global object
+static Themes allThemes;
+
 // Number of confugurable metric colors + 1 for sentinel value
 static Colors ColorList[CNUMOFCFGCOLORS+1], DefaultColorList[CNUMOFCFGCOLORS+1];
 
@@ -139,18 +142,18 @@ void GCColor::setupColors()
 struct SizeSettings defaultAppearance[] ={
 
     // small screens include netbooks and old vga 800x600, 1024x768
-    { 1024, 768,  8,8,6,6,6,6,    800, 600 },
+    { 1024, 768,  8,8,6,6,6,    800, 600 },
 
     // medium screen size includes typical 16:9 pc formats and TV screens
-    { 1280, 800,  8,8,6,6,6,6,    800, 600},
+    { 1280, 800,  8,8,6,6,6,    800, 600},
 
     // high resolution screens 
-    { 1650, 1080,  10,10,8,8,8,8,   1024,650 },
+    { 1650, 1080,  10,10,8,8,8,   1024,650 },
 
     // very big panels, incl. e.g.  mac 27"
-    { 9999, 9999,  10,10,8,8,8,8,   1280,700 },
+    { 9999, 9999,  10,10,8,8,8,   1280,700 },
 
-    { 0,0,0,0,0,0,0,0,0,0 },
+    { 0,0,0,0,0,0,0,0,0 },
 };
 
 struct SizeSettings
@@ -241,6 +244,12 @@ GCColor::getColor(int colornum)
     return ColorList[colornum].color;
 }
 
+Themes &
+GCColor::themes()
+{
+    return allThemes;
+}
+
 ColorEngine::ColorEngine(Context* context) : QObject(context), defaultColor(QColor(Qt::white)), context(context)
 {
     configUpdate();
@@ -323,4 +332,103 @@ GCColor::stylesheet()
                    "QTableWidget { color: %2; background: %1; }"
                    "QTableWidget::item:hover { color: black; background: lightGray; }"
                    "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
+}
+
+//
+// Themes
+//
+
+Themes::Themes()
+{
+    // initialise the array of themes, lets just start with a compiled in list
+    QList<QColor> colors;
+    ColorTheme add("", QList<QColor>());
+
+    //
+    // Add all the standard themes
+    //
+    add.name = tr("Default"); // New v3.1 default colors
+    colors << QColor(52,52,52) << QColor(Qt::white) << QColor(Qt::cyan) << QColor(Qt::blue) << QColor(Qt::red);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    // now some popular combos from Kueler
+    add.name = tr("Neutral Blue");
+    colors << QColor(25,52,65) << QColor(252,255,245) << QColor(209,219,189) << QColor(145,170,157) << QColor(62,96,188);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    add.name = tr("Firenze");
+    colors << QColor(255,240,165) << QColor(Qt::darkGray) << QColor(70,137,102) << QColor(182,73,38) << QColor(142,40,0);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    add.name = tr("Mustang");
+    colors << QColor(0,0,0) << QColor(255,255,255) << QColor(255,152,0) << QColor(38,50,72) << QColor(126,138,162);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    add.name = tr("Japanese Garden");
+    colors << QColor(56,37,19) << QColor(216,202,168) << QColor(92,131,47) << QColor(54,57,66) << QColor(40,73,7);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    add.name = tr("Zen and Tea");
+    colors << QColor(246,255,224) << QColor(149,171,99) << QColor(16,34,43) << QColor(226,240,214) << QColor(189,214,132);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    add.name = tr("Mono (dark)"); // New v3.1 default colors
+    colors << QColor(Qt::black) << QColor(Qt::white) << QColor(Qt::white) << QColor(Qt::white) << QColor(Qt::white);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    add.name = tr("Mono (light)"); // New v3.1 default colors
+    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::black) << QColor(Qt::black) << QColor(Qt::black);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    // we can add more later ....
+    add.name = tr("Classic"); // Old GoldenCheetah colors
+    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::darkGray) << QColor(Qt::blue) << QColor(Qt::red);
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+}
+
+//
+// ColorLabel - just paints a swatch of the first 5 colors
+//
+void
+ColorLabel::paintEvent(QPaintEvent *)
+{
+
+    QPainter painter(this);
+    painter.save();
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
+
+    // grr. some want a rect others want a rectf
+    QRectF allF(0,0,width(),height());
+    QRect all(0,0,width(),height());
+
+    const double x = width() / 5; 
+    const double y = height();
+
+    // now do all the color blocks
+    for (int i=0; i<5; i++) {
+
+        QRectF block (i*x,0,x,y);
+        painter.fillRect(block, theme.colors[i]);
+    }
+
+    painter.restore();
 }
