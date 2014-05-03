@@ -44,6 +44,7 @@
 #include "Zones.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#include <QFileDialog>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
     GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false), hoverCurve(NULL), firstShow(true)
@@ -102,6 +103,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
 
     QFormLayout *mcl = new QFormLayout(modelWidget);;
     mcl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+
+    // add additional menu items before setting
+    // controls since the menu is SET from setControls
+    QAction *exportData = new QAction(tr("Export Chart Data..."), this);
+    addAction(exportData);
 
     setControls(settingsTabs);
 
@@ -410,6 +416,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(ridePlotStyleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlotType(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged()), cpPlot, SLOT(configChanged()));
+    connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
 
     // model updated?
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
@@ -1514,4 +1521,17 @@ CriticalPowerWindow::setPlotType(int index)
 {
     cpPlot->setPlotType(index);
     cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::exportData()
+{
+    QString fileName = title()+".csv";
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Best Data as CSV"),  QString(), title()+".csv (*.csv)");
+
+    if (!fileName.isEmpty()) {
+
+        // open and write bests data to the csv file
+        cpPlot->exportBests(fileName);
+    }
 }

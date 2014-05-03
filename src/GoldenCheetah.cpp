@@ -48,6 +48,18 @@ void GcWindow::setControls(QWidget *x)
     if (x != NULL) {
         menu->clear();
         menu->addAction(tr("All Chart Settings"), this, SIGNAL(showControls()));
+
+        // add any other actions
+        if (actions.count()) {
+            if (actions.count() > 1) menu->addSeparator();
+
+            foreach(QAction *act, actions) {
+                menu->addAction(act->text(), act, SIGNAL(triggered()));
+            }
+
+            if (actions.count() > 1) menu->addSeparator();
+        }
+
         menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
     }
 }
@@ -177,6 +189,7 @@ GcWindow::GcWindow()
     setMouseTracking(true);
     setProperty("color", GColor(CPLOTBACKGROUND));
     setProperty("nomenu", false);
+    menu = NULL;
 
     // make sure its underneath the toggle button
     menuButton = new QPushButton(this);
@@ -192,7 +205,7 @@ GcWindow::GcWindow()
     menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
     menuButton->hide();
 
-    menuButton->move(00,0);
+    menuButton->move(0,0);
 }
 
 GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
@@ -213,6 +226,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setMouseTracking(true);
     setProperty("color", GColor(CPLOTBACKGROUND));
     setProperty("nomenu", false);
+    menu = NULL;
 
     // make sure its underneath the toggle button
     menuButton = new QPushButton(this);
@@ -227,7 +241,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     menuButton->setMenu(menu);
     menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
 
-    menuButton->hide();
+    //menuButton->hide();
     menuButton->move(0,0);
 }
 
@@ -786,7 +800,17 @@ GcChartWindow::setControls(QWidget *x)
     if (x != NULL) {
         menu->clear();
         menu->addAction(tr("All Chart Settings"), this, SIGNAL(showControls()));
-        menu->addAction(tr("Export as PNG"), this, SLOT(saveImage()));
+        menu->addAction(tr("Export Chart Image..."), this, SLOT(saveImage()));
+        // add any other actions
+        if (actions.count()) {
+            if (actions.count() > 1) menu->addSeparator();
+
+            foreach(QAction *act, actions) {
+                menu->addAction(act->text(), act, SIGNAL(triggered()));
+            }
+
+            if (actions.count() > 1) menu->addSeparator();
+        }
         menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
     }
 }
@@ -836,18 +860,17 @@ GcChartWindow::addHelper(QString name, QWidget *widget)
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this,"Save PNG ",  QString(), title()+".png (*.png)");
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  QString(), title()+".png (*.png)");
 
-   if ( !fileName.isEmpty() )
-   {
-       QPixmap picture;
-       menuButton->hide();
+    if (!fileName.isEmpty()) {
+
+        QPixmap picture;
+        menuButton->hide();
 #if QT_VERSION > 0x050000
-       picture = grab(geometry());
+        picture = grab(geometry());
 #else
-       picture = QPixmap::grabWidget (this);
+        picture = QPixmap::grabWidget (this);
 #endif
-
-       picture.save(fileName);
-   }
+        picture.save(fileName);
+    }
 }

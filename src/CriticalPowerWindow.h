@@ -232,6 +232,9 @@ class CriticalPowerWindow : public GcChartWindow
         void rPercentChanged(int check);
         void rHeatChanged(int check);
 
+        // menu option
+        void exportData();
+
     private:
         void updateCpint(double minutes);
         void hideIntervalCurve(int index);

@@ -84,6 +84,9 @@ class CPPlot : public QwtPlot
         QDate startDate;
         QDate endDate;
 
+        // saving the data
+        void exportBests(QString filename);
+
     public slots:
 
         // colors/appearance changed
