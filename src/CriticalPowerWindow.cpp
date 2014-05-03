@@ -295,7 +295,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     mcl->addRow(new QLabel(""), new QLabel(""));
     velo1 = new QRadioButton(tr("Exponential"));
     velo1->setChecked(true);
-    mcl->addRow(new QLabel(tr("Variant")), velo1);
+    mcl->addRow(vlabel = new QLabel(tr("Variant")), velo1);
     velo2 = new QRadioButton(tr("Linear feedback"));
     mcl->addRow(new QLabel(""), velo2);
     velo3 = new QRadioButton(tr("Regeneration"));
@@ -521,6 +521,7 @@ CriticalPowerWindow::modelChanged()
 
     // hide veloclinic's variation for everyone
     // it will get shown for model 4 below
+    vlabel->hide();
     velo1->hide();
     velo2->hide();
     velo3->hide();
@@ -549,6 +550,7 @@ CriticalPowerWindow::modelChanged()
 
     case 4 : // Veloclinic Model uses 2 parameter classic but 
              // also lets you select a variation ..
+            vlabel->show();
             velo1->show();
             velo2->show();
             velo3->show();
