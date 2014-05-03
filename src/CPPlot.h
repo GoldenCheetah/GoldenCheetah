@@ -70,7 +70,7 @@ class CPPlot : public QwtPlot
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
         void setPlotType(int index);
         void setModel(int sanI1, int sanI2, int anI1, int anI2, 
-                      int aeI1, int aeI2, int laeI1, int laeI2, int model);
+                      int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant);
 
         // getters
         QVector<double> getBests();
@@ -119,7 +119,7 @@ class CPPlot : public QwtPlot
         void refreshReferenceLines(RideItem*);
 
         // Models and Extended Models
-        int model;
+        int model, modelVariant;
         double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
         double cp, tau, t0; // CP model parameters
         ExtendedCriticalPower *ecp;
