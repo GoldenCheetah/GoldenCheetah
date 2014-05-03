@@ -134,6 +134,9 @@ public:
     //void _setInstanceName(QString x); // GOBJECTS can set their instance name, but not be GcWindows
     //QString instanceName() const;
 
+    // must call this before set controls
+    void addAction(QAction *act) { actions << act; }
+
     void virtual setControls(QWidget *x);
     QWidget *controls() const;
 
@@ -204,6 +207,7 @@ public:
     QPushButton *settingsButton, *closeButton;
     QPushButton *menuButton;
     QMenu *menu;
+    QList<QAction*>actions;
 };
 
 class GcChartWindow : public GcWindow
