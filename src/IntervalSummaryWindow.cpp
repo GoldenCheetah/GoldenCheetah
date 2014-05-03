@@ -38,6 +38,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
 #endif
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
+    connect(context, SIGNAL(configChanged()), this, SLOT(intervalSelected()));
 
     setHtml(GCColor::css() + "<body></body>");
 }
@@ -47,8 +48,14 @@ IntervalSummaryWindow::~IntervalSummaryWindow() {
 
 void IntervalSummaryWindow::intervalSelected()
 {
-    // if no ride available don't bother
-    if (context->currentRideItem() == NULL || context->currentRide() == NULL) return;
+    // if no ride available don't bother - just reset for color changes
+    if (context->currentRideItem() == NULL || context->currentRide() == NULL) {
+        // no ride just update the colors
+	    QString html = GCColor::css();
+        html += "<body></body>";
+	    setHtml(html);
+	    return;
+    }
 
 	QString html = GCColor::css();
     html += "<body>";
