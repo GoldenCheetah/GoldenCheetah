@@ -256,6 +256,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpintCPValue;
         QComboBox *seriesCombo;
         QComboBox *modelCombo;
+        QLabel *vlabel;
         QRadioButton *velo1, *velo2, *velo3; // for selecting veloclinic formulation
         QComboBox *cComboSeason;
         QComboBox *ridePlotStyleCombo;
