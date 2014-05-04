@@ -310,7 +310,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
                 ((qint64) end.toTime_t()) * 1000 + end.time().msec();
             qint64 startms =
                 ((qint64) start.toTime_t()) * 1000 + start.time().msec();
-            double diff_secs = (startms - endms) / 1000.0;
+            double diff_secs = (startms - endms + recintms) / 1000.0;
             if (diff_secs < result->recIntSecs()) {
                 errorStrings << QString("ERROR: time goes backwards by %1 s"
                                         " on trans " "to block %2"
