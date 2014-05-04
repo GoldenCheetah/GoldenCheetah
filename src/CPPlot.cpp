@@ -517,7 +517,7 @@ CPPlot::plotModel()
                 //      tau1 - W'1 / p1
                 //      tau2 - 15,000
                 //      w2   -  A slow twitch W' derived from p2 * tau2
-                //      alpha- 0.1
+                //      alpha- 0.1 thru -0.1, we default to zero
                 //      beta - 1.0
                 //
                 // Fast twitch component is:
@@ -544,7 +544,7 @@ CPPlot::plotModel()
                 double p2 = cp;
                 double tau1 = w1 / p1;
                 const double tau2 = 15000;
-                const double alpha = 0.1;
+                const double alpha = 0.0f;
                 const double beta = 1.0;
 
                 //double w2 = p2 * tau2;
