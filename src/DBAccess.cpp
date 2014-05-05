@@ -775,6 +775,7 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
 
     // execute the select statement
     QSqlQuery query(selectStatement, db->database(sessionid));
+    query.prepare(selectStatement);
     query.bindValue(":start", start.date());
     query.bindValue(":end", end.date());
     query.exec();
