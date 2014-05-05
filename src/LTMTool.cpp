@@ -1012,7 +1012,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
             MetricDetail measure;
             measure.type = METRIC_MEASURE;
             QString underscored = field.name;
-            measure.symbol = field.name; // we don't bother with '_' for measures
+            measure.symbol = QString("%1_m").arg(field.name); // we don't bother with '_' for measures
             measure.metric = NULL; // not a factory metric
             measure.penColor = QColor(Qt::blue);
             measure.curveStyle = QwtPlotCurve::Lines;

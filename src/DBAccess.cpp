@@ -788,11 +788,12 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
         // the values
         int i=2;
         foreach(FieldDefinition field, mfieldDefinitions) {
+            QString symbol = QString("%1_m").arg(field.name);
             if (field.type == 3 || field.type == 4) {
-                add.setText(field.name, query.value(i).toString());
+                add.setText(symbol, query.value(i).toString());
                 i++;
             } else if (field.type < 3 || field.type == 7) {
-                add.setText(field.name, query.value(i).toString());
+                add.setText(symbol, query.value(i).toString());
                 i++;
             }
         }
