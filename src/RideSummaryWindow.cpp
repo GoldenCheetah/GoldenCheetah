@@ -798,8 +798,14 @@ RideSummaryWindow::htmlSummary()
                     QString s("<td align=\"center\">%1</td>");
                     if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
                         summary += s.arg(time_to_string(m->value(useMetricUnits)));
-                    else
+                    else if (m->internalName() == "Pace") { // pace is mm:ss
+
+                        double pace  = m->value(useMetricUnits);
+                        summary += s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
+
+                    } else {
                         summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision());
+                    }
                 }
                 summary += "</tr>";
             }
