@@ -1388,13 +1388,21 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     penColor = metricDetail->penColor;
     setButtonIcon(penColor);
 
-    QLabel *topN = new QLabel(tr("Highlight Best"));
+    QLabel *topN = new QLabel(tr("Highlight Highest"));
     showBest = new QDoubleSpinBox(this);
     showBest->setDecimals(0);
     showBest->setMinimum(0);
     showBest->setMaximum(999);
     showBest->setSingleStep(1.0);
     showBest->setValue(metricDetail->topN);
+
+    QLabel *bottomN = new QLabel(tr("Highlight Lowest"));
+    showLowest = new QDoubleSpinBox(this);
+    showLowest->setDecimals(0);
+    showLowest->setMinimum(0);
+    showLowest->setMaximum(999);
+    showLowest->setSingleStep(1.0);
+    showLowest->setValue(metricDetail->lowestN);
 
     QLabel *outN = new QLabel(tr("Highlight Outliers"));
     showOut = new QDoubleSpinBox(this);
@@ -1451,10 +1459,12 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(fillCurve, 9,1);
     grid->addWidget(topN, 3,2);
     grid->addWidget(showBest, 3,3);
-    grid->addWidget(outN, 4,2);
-    grid->addWidget(showOut, 4,3);
-    grid->addWidget(baseline, 5, 2);
-    grid->addWidget(baseLine, 5,3);
+    grid->addWidget(bottomN, 4,2);
+    grid->addWidget(showLowest, 4,3);
+    grid->addWidget(outN, 5,2);
+    grid->addWidget(showOut, 5,3);
+    grid->addWidget(baseline, 6, 2);
+    grid->addWidget(baseLine, 6,3);
     grid->addWidget(trendType, 7,2);
     grid->addWidget(curveSmooth, 8,2);
     grid->addWidget(labels, 9,2);
@@ -1641,6 +1651,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->smooth = curveSmooth->isChecked();
     metricDetail->trend = curveTrend->isChecked();
     metricDetail->topN = showBest->value();
+    metricDetail->lowestN = showLowest->value();
     metricDetail->topOut = showOut->value();
     metricDetail->baseline = baseLine->value();
     metricDetail->curveStyle = styleMap[curveStyle->currentIndex()];

@@ -193,6 +193,7 @@ class EditMetricDetailDialog : public QDialog
         QCheckBox *fillCurve;
         QCheckBox *labels;
         QDoubleSpinBox *showBest,
+                       *showLowest,
                        *showOut,
                        *baseLine;
         QCheckBox *curveSmooth,
