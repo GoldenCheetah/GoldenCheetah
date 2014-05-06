@@ -152,8 +152,8 @@ ScatterWindow::ScatterWindow(Context *context, const QDir &home) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
-    connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
-    connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
+    connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(xSelectorChanged(int)));
+    connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(ySelectorChanged(int)));
     connect(rxSelector, SIGNAL(valueChanged(int)), this, SLOT(rxSelectorChanged(int)));
     connect(rySelector, SIGNAL(valueChanged(int)), this, SLOT(rySelectorChanged(int)));
     connect(grid, SIGNAL(stateChanged(int)), this, SLOT(setGrid()));
@@ -249,9 +249,23 @@ ScatterWindow::intervalSelected()
 }
 
 void
+ScatterWindow::xSelectorChanged(int value)
+{
+    rxSelector->setValue(value);
+    setData();
+}
+
+void
 ScatterWindow::rxSelectorChanged(int value)
 {
     xSelector->setCurrentIndex(value);
+    setData();
+}
+
+void
+ScatterWindow::ySelectorChanged(int value)
+{
+    rySelector->setValue(value);
     setData();
 }
 

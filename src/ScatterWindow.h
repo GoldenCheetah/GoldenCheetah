@@ -89,6 +89,8 @@ class ScatterWindow : public GcChartWindow
         void intervalSelected();
         void setData();
 
+        void xSelectorChanged(int);
+        void ySelectorChanged(int);
         void rxSelectorChanged(int);
         void rySelectorChanged(int);
         void configChanged();
