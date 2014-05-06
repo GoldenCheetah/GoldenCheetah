@@ -136,6 +136,8 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
         double value = rideMetrics.getForSymbol(name);
         double count = rideMetrics.getForSymbol("workout_time"); // for averaging
 
+        // don't include zero values
+        if (value == 0.0f) continue;
         
         // check values are bounded, just in case
         if (isnan(value) || isinf(value)) value = 0;
