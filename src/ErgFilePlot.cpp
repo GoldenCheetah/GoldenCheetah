@@ -397,7 +397,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
 
         // and the values ... but avoid sharing!
-        wbalCurvePredict->setSamples(calculator.xdata(), calculator.ydata());
+        wbalCurvePredict->setSamples(calculator.xdata(false), calculator.ydata());
 
     } else {
 

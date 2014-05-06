@@ -1542,8 +1542,8 @@ AllPlot::recalc(AllPlotObject *objects)
 
     //W' curve set to whatever data we have
     if (rideItem && rideItem->ride() && objects->wCurve->isVisible()) {
-        objects->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata().count());
-        objects->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata().count());
+        objects->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata(bydist).data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata(bydist).count());
+        objects->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata(bydist).data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata(bydist).count());
     }
 
     if (!objects->wattsArray.empty()) {
@@ -2212,8 +2212,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
     if (showW) {
-        standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata().count());
-        standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata().count());
+        standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata(bydist).data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata(bydist).count());
+        standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata(bydist).data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata(bydist).count());
     }
     standard->wattsCurve->setSamples(xaxis,smoothW,stopidx-startidx);
     standard->atissCurve->setSamples(xaxis,smoothAT,stopidx-startidx);
@@ -2287,7 +2287,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->standard->smoothAltitude.empty()) {
         standard->altCurve->attach(this);
     }
-    if (showW && rideItem->ride()->wprimeData()->xdata().count()) {
+    if (showW && rideItem->ride()->wprimeData()->xdata(bydist).count()) {
         standard->wCurve->attach(this);
         standard->mCurve->attach(this);
     }
