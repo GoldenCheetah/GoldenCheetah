@@ -420,7 +420,7 @@ next_line: {}
         if (ranges[nr].zones.size()) {
 
             // check that the first zone starts with zero
-            ranges[nr].zones[0].lo = 0;
+            // ranges[nr].zones[0].lo = 0; // there is no reason we should enforce this
 
             // resolve zone end powers
             for (int nz = 0; nz < ranges[nr].zones.size(); nz++) {
