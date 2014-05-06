@@ -9,6 +9,7 @@ TEMPLATE = app
 TARGET = GoldenCheetah
 !isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
 DEPENDPATH += .
+QMAKE_INFO_PLIST = ./mac/Info.plist.app
 
 ## qwt and libz
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
