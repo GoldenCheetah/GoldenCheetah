@@ -51,10 +51,10 @@ class WPrime {
 
         // W' 1second time series from 0
         QVector<double> &ydata() { return values; }
-        QVector<double> &xdata() { return xvalues; }
+        QVector<double> &xdata(bool bydist) { return bydist ? xdvalues : xvalues; }
 
         QVector<double> &mydata() { return mvalues; }
-        QVector<double> &mxdata() { return mxvalues; }
+        QVector<double> &mxdata(bool bydist) { return bydist ? mxdvalues : mxvalues; }
 
         double maxMatch();
         double minY, maxY;
@@ -74,11 +74,13 @@ class WPrime {
         RideFile *rideFile;          // the ride file we worked on
         QVector<double> values;      // W' time series in 1s intervals
         QVector<double> xvalues;      // W' time series in 1s intervals
+        QVector<double> xdvalues;      // W' distance
     
         QVector<double> mvalues;      // W' time series in 1s intervals
         QVector<double> mxvalues;      // W' time series in 1s intervals
+        QVector<double> mxdvalues;      // W' distance
 
-        QwtSpline smoothed;
+        QwtSpline smoothed, distance;
         int last;
 };
 

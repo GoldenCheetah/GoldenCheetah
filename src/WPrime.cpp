@@ -49,6 +49,7 @@
 
 
 #include "WPrime.h"
+#include "Units.h" // for MILES_PER_KM
 
 const double WprimeMultConst = 1.0;
 const int WPrimeDecayPeriod = 3600; // 1 hour, tried infinite but costly and limited value
@@ -76,6 +77,7 @@ WPrime::setRide(RideFile *input)
     // reset from previous
     values.resize(0); // the memory is kept for next time so this is efficient
     xvalues.resize(0);
+    xdvalues.resize(0);
 
     EXP = PCP_ = CP = WPRIME = TAU=0;
 
@@ -87,6 +89,7 @@ WPrime::setRide(RideFile *input)
     // STEP 1: CONVERT POWER DATA TO A 1 SECOND TIME SERIES
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
+    QVector<QPointF> pointsd;
 
     last=0;
     double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
@@ -107,12 +110,16 @@ WPrime::setRide(RideFile *input)
             if (lp)
                 for(int t=lp->secs+input->recIntSecs();
                     (t + input->recIntSecs()) < p->secs;
-                    t += input->recIntSecs())
+                    t += input->recIntSecs()) {
                     points << QPointF(t-offset, 0);
+                    pointsd << QPointF(t-offset, 0);
+                }
 
             // lets not go backwards -- or two sampls at the same time
-            if ((lp && p->secs > lp->secs) || !lp)
+            if ((lp && p->secs > lp->secs) || !lp) {
                 points << QPointF(p->secs - offset, p->watts);
+                pointsd << QPointF(p->secs - offset, input->context->athlete->useMetricUnits ? p->km : p->km * MILES_PER_KM);
+            }
 
             // update state
             last = p->secs - offset;
@@ -130,11 +137,14 @@ WPrime::setRide(RideFile *input)
                 first = false;
             }
             points << QPointF(p->secs - offset, p->watts);
+            pointsd << QPointF(p->secs - offset, input->context->athlete->useMetricUnits ? p->km : p->km * MILES_PER_KM);
             last = p->secs - offset;
         }
     }
 
     // Create a spline
+    distance.setSplineType(QwtSpline::Natural);
+    distance.setPoints(QPolygonF(pointsd));
     smoothed.setSplineType(QwtSpline::Natural);
     smoothed.setPoints(QPolygonF(points));
 
@@ -184,6 +194,7 @@ WPrime::setRide(RideFile *input)
     maxY = WPRIME;
     values.resize(last+1);
     xvalues.resize(last+1);
+    xdvalues.resize(last+1);
 
     double W = WPRIME;
     for (int t=0; t<=last; t++) {
@@ -199,6 +210,7 @@ WPrime::setRide(RideFile *input)
 
         values[t] = W;
         xvalues[t] = double(t) / 60.00f;
+        xdvalues[t] = distance.value(t);
     }
 
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
@@ -238,6 +250,7 @@ WPrime::setRide(RideFile *input)
     matches.clear();
     mvalues.clear();
     mxvalues.clear();
+    mxdvalues.clear();
     for(int i=0; i<last; i++) {
 
         Match match;
@@ -278,8 +291,10 @@ WPrime::setRide(RideFile *input)
         if (match.cost >= 2000) { //XXX need to agree how to define a match -- or even if we want to...
             mvalues << values[match.start];
             mxvalues << xvalues[match.start];
+            mxdvalues << xdvalues[match.start];
             mvalues << values[match.stop];
             mxvalues << xvalues[match.stop];
+            mxdvalues << xdvalues[match.stop];
         }
     }
 }
