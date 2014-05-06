@@ -718,8 +718,8 @@ LTMPlot::setData(LTMSettings *set)
             out->attach(this);
         }
 
-        // highlight top N values
-        if (metricDetail.topN > 0) {
+        // highlight lowest / top N values
+        if (metricDetail.lowestN > 0 || metricDetail.topN > 0) {
 
             QMap<double, int> sortedList;
 
@@ -729,11 +729,11 @@ LTMPlot::setData(LTMSettings *set)
 
             // copy the top N values
             QVector<double> hxdata, hydata;
-            hxdata.resize(metricDetail.topN);
-            hydata.resize(metricDetail.topN);
+            hxdata.resize(metricDetail.topN + metricDetail.lowestN);
+            hydata.resize(metricDetail.topN + metricDetail.lowestN);
 
             // QMap orders the list so start at the top and work
-            // backwards
+            // backwards for topN
             QMapIterator<double, int> i(sortedList);
             i.toBack();
             int counter = 0;
@@ -742,6 +742,16 @@ LTMPlot::setData(LTMSettings *set)
                 if (ydata[i.value()]) {
                     hxdata[counter] = xdata[i.value()] + middle;
                     hydata[counter] = ydata[i.value()];
+                    counter++;
+                }
+            }
+            i.toFront();
+            counter = 0; // and forwards for bottomN
+            while (i.hasNext() && counter < metricDetail.lowestN) {
+                i.next();
+                if (ydata[i.value()]) {
+                    hxdata[metricDetail.topN + counter] = xdata[i.value()] + middle;
+                    hydata[metricDetail.topN + counter] = ydata[i.value()];
                     counter++;
                 }
             }
@@ -1722,7 +1732,7 @@ LTMPlot::setCompareData(LTMSettings *set)
             }
 
             // highlight top N values
-            if (metricDetail.topN > 0) {
+            if (metricDetail.lowestN > 0 || metricDetail.topN > 0) {
 
                 QMap<double, int> sortedList;
 
@@ -1732,11 +1742,11 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                 // copy the top N values
                 QVector<double> hxdata, hydata;
-                hxdata.resize(metricDetail.topN);
-                hydata.resize(metricDetail.topN);
+                hxdata.resize(metricDetail.topN + metricDetail.lowestN);
+                hydata.resize(metricDetail.topN + metricDetail.lowestN);
 
                 // QMap orders the list so start at the top and work
-                // backwards
+                // backwards for topN
                 QMapIterator<double, int> i(sortedList);
                 i.toBack();
                 int counter = 0;
@@ -1745,6 +1755,16 @@ LTMPlot::setCompareData(LTMSettings *set)
                     if (ydata[i.value()]) {
                         hxdata[counter] = xdata[i.value()] + middle;
                         hydata[counter] = ydata[i.value()];
+                        counter++;
+                    }
+                }
+                i.toFront();
+                counter = 0; // and backwards for bottomN
+                while (i.hasNext() && counter < metricDetail.lowestN) {
+                    i.next();
+                    if (ydata[i.value()]) {
+                        hxdata[metricDetail.topN + counter] = xdata[i.value()] + middle;
+                        hydata[metricDetail.topN + counter] = ydata[i.value()];
                         counter++;
                     }
                 }
