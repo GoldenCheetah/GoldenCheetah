@@ -175,14 +175,14 @@ struct Bin2FileReaderState
         else if (alt > 0x7FFF) // Negative
             alt = (alt-0xFFFF);
 
-        if ((long)lat == (long)0x80000000) //0x80000000 = invalid
+        if (lat == 0x80000000) //0x80000000 = invalid
             lat = 0;
         else if (lat > 0x7FFFFFFF) // Negative
             lat = (lat-0xFFFFFFFF)/10000000.0;
         else
             lat = lat/10000000.0;
 
-        if ((long)lng == (long)0x80000000) //0x80000000 = invalid
+        if (lng == 0x80000000) //0x80000000 = invalid
             lng = 0;
         else if (lng > 0x7FFFFFFF) // Negative
             lng = (lng-0xFFFFFFFF)/10000000.0;
