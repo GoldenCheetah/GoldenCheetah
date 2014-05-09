@@ -129,6 +129,16 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     }
 }
 
+// get the date from the ride file name
+static QDate dateFromFileName(const QString filename) {
+    QRegExp rx("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\..*$");
+    if (rx.exactMatch(filename)) {
+        QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(), rx.cap(3).toInt());
+        if (date.isValid()) return date;
+    }
+    return QDate(); // nil date
+}
+
 // returns offset from end of head
 static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
 {
@@ -221,6 +231,41 @@ static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType serie
     }
 
     return 0;
+}
+
+QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QDate from, QDate to)
+{
+    QVector<float> returning;
+    bool first = true;
+
+    // look at all the rides
+    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(context->athlete->home)) {
+        QDate rideDate = dateFromFileName(rideFileName);
+
+        if (rideDate < from || rideDate > to) continue; // not one we want
+
+        // get the power data
+        if (first == true) {
+
+            // first time through the whole thing is going to be best
+            returning =  meanMaxPowerFor(context, context->athlete->home.absolutePath() + "/" + rideFileName);
+            first = false;
+
+        } else {
+
+            // next time through we should only pick out better times
+            QVector<float> ridebest = meanMaxPowerFor(context, context->athlete->home.absolutePath() + "/" + rideFileName);
+
+            // do we need to increase the returning array?
+            if (returning.size() < ridebest.size()) returning.resize(ridebest.size());
+
+            // now update where its a better number
+            for (int i=0; i<ridebest.size(); i++)
+                if (ridebest[i] > returning[i]) returning[i] = ridebest[i];
+        }
+    }
+
+    return returning;
 }
 
 QVector<float> RideFileCache::meanMaxPowerFor(Context *, QString fileName)
@@ -1208,14 +1253,6 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 //
 // AGGREGATE FOR A GIVEN DATE RANGE
 //
-static QDate dateFromFileName(const QString filename) {
-    QRegExp rx("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\..*$");
-    if (rx.exactMatch(filename)) {
-        QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(), rx.cap(3).toInt());
-        if (date.isValid()) return date;
-    }
-    return QDate(); // nil date
-}
 
 // select and update bests
 static void meanMaxAggregate(QVector<double> &into, QVector<double> &other, QVector<QDate>&dates, QDate rideDate)

@@ -24,6 +24,7 @@
 #include <QMap>
 #include "RideFile.h"
 #include <QDir>
+#include <QProgressDialog>
 #include "Zones.h"
 #include "HrZones.h"
 #include "RideMetric.h"
@@ -45,6 +46,8 @@ class MetricAggregator : public QObject
 
         void refreshMetrics();
         void refreshMetrics(QDateTime forceAfterThisDate);
+        void refreshCPModelMetrics(QProgressDialog *); // metrics derived from model
+
         void getFirstLast(QDate &, QDate &);
         DBAccess *db() { return dbaccess; }
         SummaryMetrics getAllMetricsFor(QString filename); // for a single ride
