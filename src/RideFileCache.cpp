@@ -129,6 +129,150 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     }
 }
 
+// returns offset from end of head
+static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
+{
+    long offset = 0;
+
+    switch (series) {
+    case RideFile::aPower : offset += head.wattsKgMeanMaxCount * sizeof(float);
+    case RideFile::wattsKg : offset += head.vamMeanMaxCount * sizeof(float);
+    case RideFile::vam : offset += head.npMeanMaxCount * sizeof(float);
+    case RideFile::NP : offset += head.xPowerMeanMaxCount * sizeof(float);
+    case RideFile::xPower : offset += head.kphMeanMaxCount * sizeof(float);
+    case RideFile::hrd : offset += head.hrdMeanMaxCount * sizeof(float);
+    case RideFile::nmd : offset += head.nmdMeanMaxCount * sizeof(float);
+    case RideFile::cadd : offset += head.caddMeanMaxCount * sizeof(float);
+    case RideFile::wattsd : offset += head.wattsdMeanMaxCount * sizeof(float);
+    case RideFile::kphd : offset += head.kphdMeanMaxCount * sizeof(float);
+    case RideFile::kph : offset += head.nmMeanMaxCount * sizeof(float);
+    case RideFile::nm : offset += head.cadMeanMaxCount * sizeof(float);
+    case RideFile::cad : offset += head.hrMeanMaxCount * sizeof(float);
+    case RideFile::hr : offset += head.wattsMeanMaxCount * sizeof(float);
+    case RideFile::watts : offset += 0;
+    default:
+        break;
+    }
+
+    return offset;
+}
+
+//offset to tiz table
+static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
+{
+    long offset = 0;
+
+    // skip past the mean max arrays
+    offset += head.aPowerMeanMaxCount * sizeof(float);
+    offset += head.wattsKgMeanMaxCount * sizeof(float);
+    offset += head.vamMeanMaxCount * sizeof(float);
+    offset += head.npMeanMaxCount * sizeof(float);
+    offset += head.xPowerMeanMaxCount * sizeof(float);
+    offset += head.hrdMeanMaxCount * sizeof(float);
+    offset += head.nmdMeanMaxCount * sizeof(float);
+    offset += head.caddMeanMaxCount * sizeof(float);
+    offset += head.wattsdMeanMaxCount * sizeof(float);
+    offset += head.kphdMeanMaxCount * sizeof(float);
+    offset += head.kphMeanMaxCount * sizeof(float);
+    offset += head.nmMeanMaxCount * sizeof(float);
+    offset += head.cadMeanMaxCount * sizeof(float);
+    offset += head.hrMeanMaxCount * sizeof(float);
+    offset += head.wattsMeanMaxCount * sizeof(float);
+
+    // skip past the distribution arrays
+    offset += head.wattsDistCount * sizeof(float);
+    offset += head.hrDistCount * sizeof(float);
+    offset += head.cadDistCount * sizeof(float);
+    offset += head.nmDistrCount * sizeof(float);
+    offset += head.kphDistCount * sizeof(float);
+    offset += head.xPowerDistCount * sizeof(float);
+    offset += head.npDistCount * sizeof(float);
+    offset += head.wattsKgDistCount * sizeof(float);
+    offset += head.aPowerDistCount * sizeof(float);
+
+    // Watts then HR
+    if (series == RideFile::hr) offset += 10 * sizeof(float);
+
+    return offset;
+}
+
+
+// returns offset from end of head
+static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
+{
+    switch (series) {
+    case RideFile::aPower : return head.aPowerMeanMaxCount;
+    case RideFile::wattsKg : return head.wattsKgMeanMaxCount;
+    case RideFile::vam : return head.vamMeanMaxCount;
+    case RideFile::NP : return head.npMeanMaxCount;
+    case RideFile::xPower :  return head.xPowerMeanMaxCount;
+    case RideFile::kph :  return head.kphMeanMaxCount;
+    case RideFile::kphd :  return head.kphdMeanMaxCount;
+    case RideFile::wattsd :  return head.wattsdMeanMaxCount;
+    case RideFile::cadd :  return head.caddMeanMaxCount;
+    case RideFile::nmd :  return head.nmdMeanMaxCount;
+    case RideFile::hrd :  return head.hrdMeanMaxCount;
+    case RideFile::nm :  return head.nmMeanMaxCount;
+    case RideFile::cad :  return head.cadMeanMaxCount;
+    case RideFile::hr :  return head.hrMeanMaxCount;
+    case RideFile::watts :  return head.wattsMeanMaxCount;
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+QVector<float> RideFileCache::meanMaxPowerFor(Context *, QString fileName)
+{
+    QTime start;
+    start.start();
+
+    QVector<float> returning;
+
+    // Get info for ride file and cache file
+    QFileInfo rideFileInfo(fileName);
+    QString cacheFilename = rideFileInfo.path() + "/" + rideFileInfo.baseName() + ".cpx";
+    QFileInfo cacheFileInfo(cacheFilename);
+
+    // is it up-to-date?
+    if (cacheFileInfo.exists() && cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
+
+        // we have a file, it is more recent than the ride file
+        // but is it the latest version?
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFilename);
+        if (cacheFile.open(QIODevice::ReadOnly) == true) {
+
+            // read the header
+            QDataStream inFile(&cacheFile);
+            inFile.readRawData((char *) &head, sizeof(head));
+
+            // check its an up to date format and contains power
+            if (head.version == RideFileCacheVersion && head.wattsMeanMaxCount > 0) {
+
+                    // WE'RE GOOD
+                // get the values and place into the summarymetric map
+                long offset = offsetForMeanMax(head, RideFile::watts) + sizeof(head);
+                cacheFile.seek(qint64(offset));
+
+                returning.resize(head.wattsMeanMaxCount);
+                inFile.readRawData((char*)returning.constData(), head.wattsMeanMaxCount * sizeof(float));
+
+                //qDebug()<<"retrieved:"<<head.wattsMeanMaxCount<<"in:"<<start.elapsed()<<"ms";
+            }
+
+            // we're done reading
+            cacheFile.close();
+        }
+    }
+
+    // profiling the code
+    // will be empty if no up to date cache
+    return returning;
+
+}
+
 RideFileCache::RideFileCache(RideFile *ride) :
                context(ride->context), rideFileName(""), ride(ride)
 {
@@ -229,6 +373,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::lrbalance : return 1; break;
         case RideFile::wprime :  return 0; break;
         case RideFile::none : break;
+        default : return 2;
     }
     return 2; // default
 }
@@ -1447,99 +1592,6 @@ void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, Rid
     return;
 }
 
-// returns offset from end of head
-static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
-{
-    long offset = 0;
-
-    switch (series) {
-    case RideFile::aPower : offset += head.wattsKgMeanMaxCount * sizeof(float);
-    case RideFile::wattsKg : offset += head.vamMeanMaxCount * sizeof(float);
-    case RideFile::vam : offset += head.npMeanMaxCount * sizeof(float);
-    case RideFile::NP : offset += head.xPowerMeanMaxCount * sizeof(float);
-    case RideFile::xPower : offset += head.kphMeanMaxCount * sizeof(float);
-    case RideFile::hrd : offset += head.hrdMeanMaxCount * sizeof(float);
-    case RideFile::nmd : offset += head.nmdMeanMaxCount * sizeof(float);
-    case RideFile::cadd : offset += head.caddMeanMaxCount * sizeof(float);
-    case RideFile::wattsd : offset += head.wattsdMeanMaxCount * sizeof(float);
-    case RideFile::kphd : offset += head.kphdMeanMaxCount * sizeof(float);
-    case RideFile::kph : offset += head.nmMeanMaxCount * sizeof(float);
-    case RideFile::nm : offset += head.cadMeanMaxCount * sizeof(float);
-    case RideFile::cad : offset += head.hrMeanMaxCount * sizeof(float);
-    case RideFile::hr : offset += head.wattsMeanMaxCount * sizeof(float);
-    case RideFile::watts : offset += 0;
-    default:
-        break;
-    }
-
-    return offset;
-}
-
-//offset to tiz table
-static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
-{
-    long offset = 0;
-
-    // skip past the mean max arrays
-    offset += head.aPowerMeanMaxCount * sizeof(float);
-    offset += head.wattsKgMeanMaxCount * sizeof(float);
-    offset += head.vamMeanMaxCount * sizeof(float);
-    offset += head.npMeanMaxCount * sizeof(float);
-    offset += head.xPowerMeanMaxCount * sizeof(float);
-    offset += head.hrdMeanMaxCount * sizeof(float);
-    offset += head.nmdMeanMaxCount * sizeof(float);
-    offset += head.caddMeanMaxCount * sizeof(float);
-    offset += head.wattsdMeanMaxCount * sizeof(float);
-    offset += head.kphdMeanMaxCount * sizeof(float);
-    offset += head.kphMeanMaxCount * sizeof(float);
-    offset += head.nmMeanMaxCount * sizeof(float);
-    offset += head.cadMeanMaxCount * sizeof(float);
-    offset += head.hrMeanMaxCount * sizeof(float);
-    offset += head.wattsMeanMaxCount * sizeof(float);
-
-    // skip past the distribution arrays
-    offset += head.wattsDistCount * sizeof(float);
-    offset += head.hrDistCount * sizeof(float);
-    offset += head.cadDistCount * sizeof(float);
-    offset += head.nmDistrCount * sizeof(float);
-    offset += head.kphDistCount * sizeof(float);
-    offset += head.xPowerDistCount * sizeof(float);
-    offset += head.npDistCount * sizeof(float);
-    offset += head.wattsKgDistCount * sizeof(float);
-    offset += head.aPowerDistCount * sizeof(float);
-
-    // Watts then HR
-    if (series == RideFile::hr) offset += 10 * sizeof(float);
-
-    return offset;
-}
-
-
-// returns offset from end of head
-static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
-{
-    switch (series) {
-    case RideFile::aPower : return head.aPowerMeanMaxCount;
-    case RideFile::wattsKg : return head.wattsKgMeanMaxCount;
-    case RideFile::vam : return head.vamMeanMaxCount;
-    case RideFile::NP : return head.npMeanMaxCount;
-    case RideFile::xPower :  return head.xPowerMeanMaxCount;
-    case RideFile::kph :  return head.kphMeanMaxCount;
-    case RideFile::kphd :  return head.kphdMeanMaxCount;
-    case RideFile::wattsd :  return head.wattsdMeanMaxCount;
-    case RideFile::cadd :  return head.caddMeanMaxCount;
-    case RideFile::nmd :  return head.nmdMeanMaxCount;
-    case RideFile::hrd :  return head.hrdMeanMaxCount;
-    case RideFile::nm :  return head.nmMeanMaxCount;
-    case RideFile::cad :  return head.cadMeanMaxCount;
-    case RideFile::hr :  return head.hrMeanMaxCount;
-    case RideFile::watts :  return head.wattsMeanMaxCount;
-    default:
-        break;
-    }
-
-    return 0;
-}
 double 
 RideFileCache::best(Context *context, QString filename, RideFile::SeriesType series, int duration)
 {
