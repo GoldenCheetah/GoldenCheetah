@@ -103,8 +103,12 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     else if (qName == "Speed" || qName == "ns3:Speed") { speed = buffer.toDouble() * 3.6; }
     else if (qName == "Value") { hr = buffer.toDouble(); }
     else if (qName == "Cadence") { cadence = buffer.toDouble(); }
-    else if (qName == "AltitudeMeters") { alt = buffer.toDouble(); }
-    else if (qName == "LongitudeDegrees") {
+    else if (qName == "AltitudeMeters") {
+        // on Suunto TCX files there are lots of 0 values between valid ones, skip these
+        if (buffer.toDouble() != 0) {
+            alt = buffer.toDouble();
+        }
+    } else if (qName == "LongitudeDegrees") {
 
         char *p; 
         setlocale(LC_NUMERIC,"C"); // strtod is locale dependent!
