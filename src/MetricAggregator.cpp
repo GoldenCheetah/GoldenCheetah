@@ -136,6 +136,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QProgressDialog *bar = NULL;
 
     int processed=0;
+    int updates=0; // how many actually changed ?
     QApplication::processEvents(); // get that dialog up!
 
     // log of progress
@@ -209,7 +210,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                     importRide(context->athlete->home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
 
                 }
-
+                updates++;
             }
         }
 
@@ -232,8 +233,6 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         }
     }
 
-    // now zap the progress bar
-    if (bar) delete bar;
 
     // end LUW -- now syncs DB
     out << "COMMIT: " << QDateTime::currentDateTime().toString() + "\r\n";
@@ -246,6 +245,12 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 #endif
 #endif
     context->athlete->isclean = true;
+
+    // now refresh cp model -- if any files actually changed
+    if (updates) refreshCPModelMetrics(bar);
+
+    // now zap the progress bar
+    if (bar) delete bar;
 
     // stop logging
     out << "SIGNAL DATA CHANGED: " << QDateTime::currentDateTime().toString() + "\r\n";
@@ -450,4 +455,105 @@ MetricAggregator::getRideMetrics(QString filename)
         return empty;
     }
     return dbaccess->getRideMetrics(filename);
+}
+
+void
+MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
+{
+return; // checkpoint commit -- do nothing for now
+
+    // this needs to be done once all the other metrics
+    // Calculate a *monthly* estimate of CP, W' etc using
+    // bests data from the previous 3 months
+
+    // we do this by aggregating power data into bests
+    // for each month, and having a rolling set of 3 aggregates
+    // then aggregating those up into a rolling 3 month 'bests'
+    // which we feed to the models to get the estimates for that
+    // point in time based upon the available data
+    QDate from, to;
+
+    // what dates have any power data ?
+    QSqlQuery query(dbaccess->connection());
+    bool rc = query.exec("SELECT ride_date FROM metrics WHERE ZData LIKE '%P%' ORDER BY ride_date;");
+    bool first = true;
+    while (rc && query.next()) {
+        if (first) {
+            from = query.value(0).toDate();
+            first = false;
+        } else {
+            to = query.value(0).toDate();
+        }
+    }
+
+    // if we don't have 2 rides or more then skip this!
+    if (to == QDate()) return;
+
+    // run through each month with a rolling bests
+    int year = from.year();
+    int month = from.month();
+    int lastYear = to.year();
+    int lastMonth = to.month();
+    int count = 0;
+
+    // if we have a progress dialog lets update the bar to show
+    // progress for the model parameters
+    if (bar) {
+        bar->setLabelText(QString(tr("Derive Model Parameters")));
+        bar->setMinimum(0);
+        bar->setMaximum((lastYear*12 + lastMonth) - (year*12 + month));
+        bar->setValue(0);
+    }
+
+    QList< QVector<float> > months;
+
+    // loop through
+    while (year < lastYear || (year == lastYear && month <= lastMonth)) {
+
+        QDate firstOfMonth = QDate(year, month, 01);
+        QDate lastOfMonth = firstOfMonth.addMonths(1).addDays(-1);
+
+        // months is a rolling 3 months sets of bests
+        months << RideFileCache::meanMaxPowerFor(context, firstOfMonth, lastOfMonth);
+        if (months.count() > 3) months.removeFirst();
+
+        // create a rolling merge of all those months
+        QVector<float> rollingBests = months[0];
+
+        switch(months.count()) {
+            case 1 : // first time through we are done!
+                break;
+
+            case 2 : // second time through just apply month(1)
+                {
+                    if (months[1].size() > rollingBests.size()) rollingBests.resize(months[1].size());
+                    for (int i=0; i<months[1].size(); i++)
+                        if (months[1][i] > rollingBests[i]) rollingBests[i] = months[1][i];
+                }
+                break;
+
+            case 3 : // third time through resize to largest and compare to 1 and 2
+                {
+                    if (months[1].size() > rollingBests.size()) rollingBests.resize(months[1].size());
+                    if (months[2].size() > rollingBests.size()) rollingBests.resize(months[2].size());
+                    for (int i=0; i<months[1].size(); i++) if (months[1][i] > rollingBests[i]) rollingBests[i] = months[1][i];
+                    for (int i=0; i<months[2].size(); i++) if (months[2][i] > rollingBests[i]) rollingBests[i] = months[2][i];
+                }
+        }
+        
+        // we now have the data
+        //qDebug()<<months.count()<<"month n="<<count<<"from"<<firstOfMonth<<"thru"<<lastOfMonth<<rollingBests.count();
+
+        // move onto the next month
+        count++;
+        if (month == 12) {
+            year ++;
+            month = 1;
+        } else {
+            month ++;
+        }
+
+        // show some progress
+        if (bar) bar->setValue(count);
+    }
 }
