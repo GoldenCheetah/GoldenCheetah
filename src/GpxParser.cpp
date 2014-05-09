@@ -139,7 +139,7 @@ bool
     {
         cad = buffer.toDouble();
     }
-    else if (qName == "gpxdata:bikepower") // hopefully suunto adds bikepower data to gpx export file, as it is on saved moveslink log_.xml
+    else if (qName == "gpxdata:power") // from suunto ambit export file
     {
         watts = buffer.toDouble();
     }
