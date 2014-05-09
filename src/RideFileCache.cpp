@@ -251,11 +251,12 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *, QString fileName)
             // check its an up to date format and contains power
             if (head.version == RideFileCacheVersion && head.wattsMeanMaxCount > 0) {
 
-                    // WE'RE GOOD
-                // get the values and place into the summarymetric map
+                // seek to start of meanmax array in the cache
                 long offset = offsetForMeanMax(head, RideFile::watts) + sizeof(head);
                 cacheFile.seek(qint64(offset));
 
+                // read from cache and put straight into QVector memory
+                // a little naughty but seems to work ok
                 returning.resize(head.wattsMeanMaxCount);
                 inFile.readRawData((char*)returning.constData(), head.wattsMeanMaxCount * sizeof(float));
 
@@ -267,7 +268,6 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *, QString fileName)
         }
     }
 
-    // profiling the code
     // will be empty if no up to date cache
     return returning;
 
