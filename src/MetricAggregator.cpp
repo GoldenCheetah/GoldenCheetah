@@ -223,6 +223,9 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // free memory - if needed
         if (ride) delete ride;
 
+        // for model run...
+        // RideFileCache::meanMaxPowerFor(context, context->athlete->home.absolutePath() + "/" + name);
+
         if (bar && bar->wasCanceled()) {
             out << "METRIC REFRESH CANCELLED\r\n";
             break;
