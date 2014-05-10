@@ -890,6 +890,9 @@ LTMWindow::refreshDataTable()
 
     foreach (MetricDetail metricDetail, settings.metrics) {
 
+        // ignore estimates for now XXX just to stop it crashing
+        if (metricDetail.type == METRIC_ESTIMATE) continue;
+
         QList<SummaryMetrics> *data = NULL; // source data (metrics, bests etc)
         GroupedData a; // aggregated data
 
@@ -1012,18 +1015,18 @@ LTMWindow::refreshDataTable()
         aggregates << a;
     }
 
-    // fill in the remainder if data doesn't extend to
-    // the period we are summarising
-    for (int n=0; n < aggregates[0].x.count(); n++) {
-        aggregates[0].x[n] = n;
-    }
-
     //
     // STEP 2: PREPARE HTML TABLE FROM AGGREGATED DATA
     //         But note there will be no data if there are no curves of if there
     //         is no date range selected of no data anyway!
     //
     if (aggregates.count()) {
+
+        // fill in the remainder if data doesn't extend to
+        // the period we are summarising
+        for (int n=0; n < aggregates[0].x.count(); n++) {
+            aggregates[0].x[n] = n;
+        }
 
         // formatting ...
         LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
