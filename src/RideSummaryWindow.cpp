@@ -283,7 +283,7 @@ RideSummaryWindow::htmlSummary()
 {
     QString summary("");
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    //QColor fgColor = GCColor::invertColor(bgColor);
     QColor altColor = GCColor::alternateColor(bgColor);
 
     RideItem *rideItem = myRideItem;
@@ -964,7 +964,7 @@ RideSummaryWindow::htmlCompareSummary() const
     QString summary;
 
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    //QColor fgColor = GCColor::invertColor(bgColor);
     QColor altColor = GCColor::alternateColor(bgColor);
 
     // SETUP ALL THE METRICS WE WILL SHOW

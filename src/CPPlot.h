@@ -25,6 +25,7 @@
 
 #include "CriticalPowerWindow.h"
 #include "RideFileCache.h"
+#include "PDModel.h"
 #include "ExtendedCriticalPower.h"
 #include "CpPlotCurve.h"
 #include "PowerHist.h" // for penTooltip

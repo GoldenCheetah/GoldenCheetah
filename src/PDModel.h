@@ -1,0 +1,215 @@
+/*
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include <QObject>
+#include <QString>
+
+#include "Context.h"
+
+// series data from a function
+#include <qwt_series_data.h>
+#include <qwt_point_data.h>
+
+#ifndef _GC_PDModel_h
+#define _GC_PDModel_h 1
+
+// A Power-Duration Model base class
+//
+// 1. setData is used to provide 'bests' power data in 1s intervals
+//
+// 2. PDModels can be used as a data provider to a QwtPlotCurve 
+//    since (QwtPlotCurve::setData(*QwtSyntheticPointData)
+//    the data is returned via double y(double x) const which
+//    the sub-classes must implement
+//
+// 3. By default the model is set-up to provide 5 hours of points in 1s intervals
+//    so x will be 0,1,2,3 .. 18,000. To change this the setInterval() and setSize()
+//    members of QwtSyntheticPointData can be called by derived classes.
+//
+// 4. The model will also be used to derive W', CP, FTP etc and any subclass
+//    should declare what capabilities it has via bool hasWPrime et al
+//    since this controls which model parameters it can extract
+//
+// 5. The setData functions setup the data for all models and store it
+//    in a local QVector. It will issue a signal dataChanged() when this
+//    happens, and the subclasses can then choose to call a base method
+//    deriveCPparameters() to extract the basic parameters and cherry-pick
+//    the best points to use.
+//
+// 6. The setIntervals method can be used to setup the intervals the
+//    base derviceCPparameters will use
+
+#define PDMODEL_MAXT 18000 // maximum value for t we will provide p(t) for
+#define PDMODEL_INTERVAL 1 // intervals used in seconds; 0t, 1t, 2t .. 18000t
+
+class PDModel : public QObject, public QwtSyntheticPointData
+{
+    Q_OBJECT
+
+    public:
+
+        PDModel(Context *context);
+
+        // set data using doubles or float always
+        void setData(QVector<double> meanMaxPower);
+        void setData(QVector<float> meanMaxPower);
+
+        // set the intervals to search for bests
+        void setIntervals(double sanI1, double sanI2, double anI1, double anI2,
+                          double aeI1, double aeI2, double laeI1, double laeI2);
+
+        // provide data to a QwtPlotCurve
+        double y(double /* t */) const { return 0; }
+
+        // what capabilities do you have ?
+        // sticking with 4 key measures for now
+        bool hasWPrime() { return false; }  // can estimate W'
+        bool hasCP()     { return false; }  // can estimate W'
+        bool hasFTP()    { return false; }  // can estimate W'
+        bool hasPMax()   { return false; }  // can estimate W'
+
+        int WPrime()     { return 0; }      // return estimated W'
+        int CP()         { return 0; }      // return CP
+        int FTP()        { return 0; }      // return FTP
+        int PMax()       { return 0; }      // return PMax
+
+        QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
+
+    protected:
+
+        // using data from setData() and intervals from setIntervals()
+        // this is the old function from CPPlot to extract the best points
+        // in the data series to calculate cp, tau and t0.
+        void deriveCPParameters(bool three=false); 
+
+    signals:
+
+        // new data arrived
+        void dataChanged();
+
+        // we changed intervals
+        void intervalsChanged();
+
+    protected:
+
+        Context *context;
+
+        // intervals to search for best points
+        double sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2;
+
+        // standard CP derived values - set when deriveCPParameters is called
+        double cp, tau, t0; // CP model parameters
+
+        // mean max power data set by setData
+        QVector<double> data;
+};
+
+// 2 parameter model
+class CP2Model : public PDModel
+{
+    Q_OBJECT
+
+    public:
+        CP2Model(Context *context);
+
+        // synthetic data for a curve
+        double y(double t) const;
+
+        bool hasWPrime() { return true; }  // can estimate W'
+        bool hasCP()     { return true; }  // can estimate W'
+        bool hasFTP()    { return false; }  // can estimate W'
+        bool hasPMax()   { return false; }  // can estimate W'
+
+        // 2 parameter model can calculate these
+        int WPrime();
+        int CP();
+
+    public slots:
+
+        void onDataChanged();      // catch data changes
+        void onIntervalsChanged(); //catch interval changes
+};
+
+// 3 parameter model
+class CP3Model : public PDModel
+{
+    Q_OBJECT
+
+    public:
+        CP3Model(Context *context);
+
+        // synthetic data for a curve
+        double y(double t) const;
+
+        bool hasWPrime() { return true; }  // can estimate W'
+        bool hasCP()     { return true; }  // can CP
+        bool hasFTP()    { return false; }  // can estimate FTP
+        bool hasPMax()   { return true; }  // can estimate p-Max
+
+        // 2 parameter model can calculate these
+        int WPrime();
+        int CP();
+        int PMax();
+
+    public slots:
+
+        void onDataChanged();      // catch data changes
+        void onIntervalsChanged(); //catch interval changes
+};
+
+// multicomponent model
+class MultiModel : public PDModel
+{
+    Q_OBJECT
+
+    public:
+        MultiModel(Context *context);
+        void setVariant(int); // which variant to use
+
+        // synthetic data for a curve
+        double y(double t) const;
+
+        bool hasWPrime() { return true; }  // can estimate W'
+        bool hasCP()     { return true; }  // can CP
+        bool hasFTP()    { return true; }  // can estimate FTP
+        bool hasPMax()   { return true; }  // can estimate p-Max
+
+        // 2 parameter model can calculate these
+        int WPrime();
+        int CP();
+        int FTP();
+        int PMax();
+
+        // veloclinic has multiple additional parameters
+        int variant;
+        double w1, p1, p2, tau1, tau2, alpha, beta;
+
+    public slots:
+
+        void onDataChanged();      // catch data changes
+        void onIntervalsChanged(); //catch interval changes
+};
+
+
+// extended model
+class ExtendedModel : public PDModel
+{
+};
+
+#endif 

@@ -136,7 +136,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QProgressDialog *bar = NULL;
 
     int processed=0;
-    int updates=0; // how many actually changed ?
+    int updates=1; //XXX // how many actually changed ?
     QApplication::processEvents(); // get that dialog up!
 
     // log of progress
@@ -460,8 +460,6 @@ MetricAggregator::getRideMetrics(QString filename)
 void
 MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
 {
-return; // checkpoint commit -- do nothing for now
-
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
     // bests data from the previous 3 months
@@ -507,6 +505,10 @@ return; // checkpoint commit -- do nothing for now
 
     QList< QVector<float> > months;
 
+    CP2Model p2model(context);
+    CP3Model p3model(context);
+    MultiModel multimodel(context);
+
     // loop through
     while (year < lastYear || (year == lastYear && month <= lastMonth)) {
 
@@ -540,9 +542,21 @@ return; // checkpoint commit -- do nothing for now
                     for (int i=0; i<months[2].size(); i++) if (months[2][i] > rollingBests[i]) rollingBests[i] = months[2][i];
                 }
         }
-        
-        // we now have the data
-        //qDebug()<<months.count()<<"month n="<<count<<"from"<<firstOfMonth<<"thru"<<lastOfMonth<<rollingBests.count();
+
+        // got some data lets rock
+        if (rollingBests.size()) {
+
+            // we now have the data
+            p2model.setData(rollingBests);
+            p3model.setData(rollingBests);
+            multimodel.setData(rollingBests);
+
+            qDebug()<<months.count()<<"month n="<<count<<"from"<<firstOfMonth<<"thru"<<lastOfMonth <<rollingBests.count();
+            qDebug()<<"2p W'="<< p2model.WPrime() <<"2p CP="<< p2model.CP();
+            qDebug()<<"3p W'="<< p3model.WPrime() <<"3p CP="<< p3model.CP() <<"3p pMax="<<p3model.PMax();
+            qDebug()<<"velo W'="<< multimodel.WPrime() <<"velo CP="<< multimodel.CP() <<"velo pMax="<<multimodel.PMax();
+            qDebug()<<"---------------";
+        }
 
         // move onto the next month
         count++;

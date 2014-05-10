@@ -32,6 +32,7 @@
 #include "Context.h"
 #include "DBAccess.h"
 #include "Colors.h"
+#include "PDModel.h"
 
 class MetricAggregator : public QObject
 {
