@@ -24,6 +24,7 @@
 #include "Season.h"
 #include "RideMetric.h"
 #include "LTMSettings.h"
+#include "PDModel.h"
 
 #ifdef GC_HAVE_LUCENE
 #include "SearchFilterBox.h"
@@ -166,14 +167,18 @@ class EditMetricDetailDialog : public QDialog
 
         void typeChanged();
         void bestName();
+        void estimateName();
+
+        void modelChanged();
+        void estimateChanged();
 
     private:
         Context *context;
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest;
-        QWidget *bestWidget;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate;
+        QWidget *bestWidget, *estimateWidget;
         QStackedWidget *typeStack;
 
         // bests
@@ -185,6 +190,11 @@ class EditMetricDetailDialog : public QDialog
         QTreeWidget *metricTree;
         QLineEdit *userName,
                   *userUnits;
+
+        // estimates
+        QList<PDModel*>models;
+        QComboBox *modelSelect;     // select 2p, 3p, multi etc
+        QComboBox *estimateSelect;  // select w', cp, ftp, pmax .. whichever is suported by model
 
         QComboBox *curveStyle,
                   *curveSymbol;

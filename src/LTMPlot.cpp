@@ -2282,6 +2282,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
         data = &PMCdata;
     } else if (metricDetail.type == METRIC_BEST) {
         data = settings->bests;
+    } else if (metricDetail.type == METRIC_ESTIMATE) {
+        // XXX to be coded up !
+        return;
     }
 
     n=-1;

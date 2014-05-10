@@ -46,8 +46,8 @@ class RideItem;
 class IntervalItem;
 class IntervalTreeView;
 class QSqlTableModel;
+class PDEstimate;
 
-class Context;
 class Context;
 
 class Athlete : public QObject
@@ -73,6 +73,7 @@ class Athlete : public QObject
         QSqlTableModel *sqlModel;
         RideMetadata *rideMetadata_;
         Seasons *seasons;
+        QList<PDEstimate> PDEstimates;
         QList<RideFileCache*> cpxCache;
 
         // athlete's calendar
