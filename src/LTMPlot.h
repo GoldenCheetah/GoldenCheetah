@@ -107,6 +107,7 @@ class LTMPlot : public QwtPlot
 
         int groupForDate(QDate , int);
         void createCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createEstimateData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
         void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
         void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a
         QwtAxisId chooseYAxis(QString);
