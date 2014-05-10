@@ -57,6 +57,9 @@ release-notes_2.1.0.html: release-notes_2.1.0.content genpage.pl
 release-notes_3.0.0.html: release-notes_3.0.0.content genpage.pl
 	./genpage.pl "Release Notes 3.0.0" $< > $@
 
+release-notes_3.0.1.html: release-notes_3.0.1.content genpage.pl
+	./genpage.pl "Release Notes 3.0.1" $< > $@
+
 faq.html: faq.content genpage.pl
 	./genpage.pl "Frequently Asked Questions" $< > $@
 
