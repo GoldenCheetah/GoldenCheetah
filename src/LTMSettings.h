@@ -54,13 +54,21 @@ class RideMetric;
 #define METRIC_META      3
 #define METRIC_MEASURE   4
 #define METRIC_BEST      5
+#define METRIC_ESTIMATE  6
+
+// type of estimate
+#define ESTIMATE_WPRIME  0
+#define ESTIMATE_CP      1
+#define ESTIMATE_FTP     2
+#define ESTIMATE_PMAX    3
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), stack(false), name(""), metric(NULL), smooth(false), trend(false), topN(0), lowestN(0),
-                     topOut(0), baseline(0.0), curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
+    MetricDetail() : type(METRIC_DB), stack(false), model(""), name(""), metric(NULL), smooth(false), trend(false), 
+                     topN(0), lowestN(0), topOut(0), baseline(0.0), 
+                     curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false) {}
 
@@ -68,6 +76,9 @@ class MetricDetail {
 
     int type;
     bool stack; // should this be stacked?
+
+    QString model; // short code for model selected
+    int estimate; // 0-4 for W', CP, FTP, PMAX
 
     // for METRICS
     QString symbol;

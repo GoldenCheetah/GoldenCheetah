@@ -74,22 +74,22 @@ class PDModel : public QObject, public QwtSyntheticPointData
                           double aeI1, double aeI2, double laeI1, double laeI2);
 
         // provide data to a QwtPlotCurve
-        double y(double /* t */) const { return 0; }
+        virtual double y(double /* t */) const { return 0; }
 
         // what capabilities do you have ?
         // sticking with 4 key measures for now
-        bool hasWPrime() { return false; }  // can estimate W'
-        bool hasCP()     { return false; }  // can estimate W'
-        bool hasFTP()    { return false; }  // can estimate W'
-        bool hasPMax()   { return false; }  // can estimate W'
+        virtual bool hasWPrime() { return false; }  // can estimate W'
+        virtual bool hasCP()     { return false; }  // can estimate W'
+        virtual bool hasFTP()    { return false; }  // can estimate W'
+        virtual bool hasPMax()   { return false; }  // can estimate W'
 
-        int WPrime()     { return 0; }      // return estimated W'
-        int CP()         { return 0; }      // return CP
-        int FTP()        { return 0; }      // return FTP
-        int PMax()       { return 0; }      // return PMax
+        virtual int WPrime()     { return 0; }      // return estimated W'
+        virtual int CP()         { return 0; }      // return CP
+        virtual int FTP()        { return 0; }      // return FTP
+        virtual int PMax()       { return 0; }      // return PMax
 
-        QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
-        QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
+        virtual QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
+        virtual QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
 
     protected:
 
@@ -120,6 +120,20 @@ class PDModel : public QObject, public QwtSyntheticPointData
         QVector<double> data;
 };
 
+// estimates are recorded 
+class PDEstimate
+{
+    public:
+        PDEstimate() : WPrime(0), CP(0), FTP(0), PMax(0) {}
+
+        QDate from, to;
+        QString model;
+        int WPrime,
+            CP,
+            FTP,
+            PMax;
+};
+
 // 2 parameter model
 class CP2Model : public PDModel
 {
@@ -139,6 +153,9 @@ class CP2Model : public PDModel
         // 2 parameter model can calculate these
         int WPrime();
         int CP();
+
+        QString name()   { return "Classic 2 Parameter"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "2 Parm"; }        // short name used in metric names e.g. 2P model
 
     public slots:
 
@@ -166,6 +183,9 @@ class CP3Model : public PDModel
         int WPrime();
         int CP();
         int PMax();
+
+        QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
 
     public slots:
 
@@ -195,6 +215,9 @@ class MultiModel : public PDModel
         int CP();
         int FTP();
         int PMax();
+
+        QString name()   { return "Veloclinic Multicomponent"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "Velo"; }        // short name used in metric names e.g. 2P model
 
         // veloclinic has multiple additional parameters
         int variant;

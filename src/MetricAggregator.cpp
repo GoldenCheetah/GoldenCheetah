@@ -136,7 +136,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QProgressDialog *bar = NULL;
 
     int processed=0;
-    int updates=1; //XXX // how many actually changed ?
+    int updates=0;
     QApplication::processEvents(); // get that dialog up!
 
     // log of progress
@@ -246,8 +246,9 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 #endif
     context->athlete->isclean = true;
 
-    // now refresh cp model -- if any files actually changed
-    if (updates) refreshCPModelMetrics(bar);
+    // now refresh cp model -- if any files actually changed or we haven't set 
+    //                         up from initial load (i.e. no cache read/write)
+    if (updates || context->athlete->PDEstimates.count() == 0) refreshCPModelMetrics(bar);
 
     // now zap the progress bar
     if (bar) delete bar;
@@ -464,6 +465,9 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
     // Calculate a *monthly* estimate of CP, W' etc using
     // bests data from the previous 3 months
 
+    // clear any previous calculations
+    context->athlete->PDEstimates.clear(); 
+
     // we do this by aggregating power data into bests
     // for each month, and having a rolling set of 3 aggregates
     // then aggregating those up into a rolling 3 month 'bests'
@@ -505,9 +509,15 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
 
     QList< QVector<float> > months;
 
+    // set up the models we support
     CP2Model p2model(context);
     CP3Model p3model(context);
     MultiModel multimodel(context);
+
+    QList <PDModel *> models;
+    models << &p2model;
+    models << &p3model;
+    models << &multimodel;
 
     // loop through
     while (year < lastYear || (year == lastYear && month <= lastMonth)) {
@@ -547,15 +557,24 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
         if (rollingBests.size()) {
 
             // we now have the data
-            p2model.setData(rollingBests);
-            p3model.setData(rollingBests);
-            multimodel.setData(rollingBests);
+            foreach (PDModel *model, models) {
 
-            qDebug()<<months.count()<<"month n="<<count<<"from"<<firstOfMonth<<"thru"<<lastOfMonth <<rollingBests.count();
-            qDebug()<<"2p W'="<< p2model.WPrime() <<"2p CP="<< p2model.CP();
-            qDebug()<<"3p W'="<< p3model.WPrime() <<"3p CP="<< p3model.CP() <<"3p pMax="<<p3model.PMax();
-            qDebug()<<"velo W'="<< multimodel.WPrime() <<"velo CP="<< multimodel.CP() <<"velo pMax="<<multimodel.PMax();
-            qDebug()<<"---------------";
+                // set the data
+                model->setData(rollingBests);
+
+                PDEstimate add;
+                add.from = firstOfMonth;
+                add.to = lastOfMonth;
+                add.model = model->code();
+                add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
+                add.CP = model->hasCP() ? model->CP() : 0;
+                add.PMax = model->hasPMax() ? model->PMax() : 0;
+                add.FTP = model->hasFTP() ? model->FTP() : 0;
+
+                context->athlete->PDEstimates << add;
+
+                //qDebug()<<model->code()<< "W'="<< model->WPrime() <<"3p CP="<< model->CP() <<"3p pMax="<<model->PMax();
+            }
         }
 
         // move onto the next month
