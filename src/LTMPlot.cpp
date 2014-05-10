@@ -2432,17 +2432,19 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
         }
 
-        int currentDay = groupForDate(from, settings->groupBy);
-        x[n] = currentDay - firstDay;
-        y[n] = value;
-        n++;
-
-        int nextDay = groupForDate(to, settings->groupBy);
-        while (nextDay > currentDay) { // i.e. not the same day
-            x[n] = 1 + currentDay - firstDay;
+        if (n <= maxdays) {
+            int currentDay = groupForDate(from, settings->groupBy);
+            x[n] = currentDay - firstDay;
             y[n] = value;
             n++;
-            currentDay++;
+
+            int nextDay = groupForDate(to, settings->groupBy);
+            while (n <= maxdays && nextDay > currentDay) { // i.e. not the same day
+                x[n] = 1 + currentDay - firstDay;
+                y[n] = value;
+                n++;
+                currentDay++;
+            }
         }
     }
 
