@@ -209,7 +209,7 @@ public:
         return returning;
     }
 
-    QMimeData *mimeData (const QModelIndexList &indexes) const {
+    QMimeData *mimeData (const QModelIndexList & /*indexes*/) const {
 
         QMimeData *returning = new QMimeData;
 

@@ -360,6 +360,7 @@ HEADERS += \
         NewCyclistDialog.h \
         NullController.h \
         Pages.h \
+        PDModel.h \
         PerfPlot.h \
         PerformanceManagerWindow.h \
         PfPvPlot.h \
@@ -559,6 +560,7 @@ SOURCES += \
         NewCyclistDialog.cpp \
         NullController.cpp \
         Pages.cpp \
+        PDModel.cpp \
         PeakPower.cpp \
         PerfPlot.cpp \
         PerformanceManagerWindow.cpp \
