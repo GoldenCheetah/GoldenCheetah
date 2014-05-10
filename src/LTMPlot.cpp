@@ -2283,7 +2283,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     } else if (metricDetail.type == METRIC_BEST) {
         data = settings->bests;
     } else if (metricDetail.type == METRIC_ESTIMATE) {
-        // XXX to be coded up !
+        createEstimateData(context, settings, metricDetail, x,y,n);
         return;
     }
 
@@ -2380,6 +2380,74 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
             lastDay = currentDay;
         }
     }
+}
+
+void
+LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
+                                              QVector<double>&x,QVector<double>&y,int&n)
+{
+    // resize the curve array to maximum possible size (even if we don't need it)
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    n = 0;
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // what is the first date
+    int firstDay = groupForDate(settings->start.date(), settings->groupBy);
+
+    // loop through all the estimate data
+    foreach(PDEstimate est, context->athlete->PDEstimates) {
+
+        // skip entries for other models
+        if (est.model != metricDetail.model) continue;
+
+        // skip if no in our time period
+        if (est.to < settings->start.date() || est.from > settings->end.date()) continue;
+
+        // get dat for first and last
+        QDate from = est.from < settings->start.date() ? settings->start.date() : est.from;
+        QDate to = est.to > settings->end.date() ? settings->end.date() : est.to;
+
+        // what value to plot ?
+        double value=0;
+
+        switch(metricDetail.estimate) {
+        case ESTIMATE_WPRIME :
+            value = est.WPrime;
+            break;
+
+        case ESTIMATE_CP :
+            value = est.CP;
+            break;
+
+        case ESTIMATE_FTP :
+            value = est.FTP;
+            break;
+
+        case ESTIMATE_PMAX :
+            value = est.PMax;
+            break;
+
+        }
+
+        int currentDay = groupForDate(from, settings->groupBy);
+        x[n] = currentDay - firstDay;
+        y[n] = value;
+        n++;
+
+        int nextDay = groupForDate(to, settings->groupBy);
+        while (nextDay > currentDay) { // i.e. not the same day
+            x[n] = 1 + currentDay - firstDay;
+            y[n] = value;
+            n++;
+            currentDay++;
+        }
+    }
+
+    // always seems to be one too many ...
+    if (n>0)n--;
 }
 
 void

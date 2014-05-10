@@ -1250,7 +1250,7 @@ EditMetricDetailDialog::modelChanged()
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(3)->setEnabled(models[currentIndex]->hasPMax());
 
     // switch to other estimate if wanted estimate is not selected
-    if (!qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(ce)->isEnabled())
+    if (ce < 0 || !qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(ce)->isEnabled())
         estimateSelect->setCurrentIndex(0);
 
     estimateName();
@@ -1279,6 +1279,7 @@ EditMetricDetailDialog::estimateName()
     // now the model
     name += " (" + models[modelSelect->currentIndex()]->code() + ")";
     userName->setText(name);
+    metricDetail->symbol = name.replace(" ", "_");
 }
 
 /*----------------------------------------------------------------------
