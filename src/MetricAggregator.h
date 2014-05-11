@@ -47,7 +47,7 @@ class MetricAggregator : public QObject
 
         void refreshMetrics();
         void refreshMetrics(QDateTime forceAfterThisDate);
-        void refreshCPModelMetrics(QProgressDialog *); // metrics derived from model
+        void refreshCPModelMetrics(); // metrics derived from model
 
         void getFirstLast(QDate &, QDate &);
         DBAccess *db() { return dbaccess; }

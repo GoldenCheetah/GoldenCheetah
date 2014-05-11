@@ -2386,6 +2386,10 @@ void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n)
 {
+
+    // lets refresh the model data if we don't have any
+    if (context->athlete->PDEstimates.count() == 0) context->athlete->metricDB->refreshCPModelMetrics(); 
+
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
                     - groupForDate(settings->start.date(), settings->groupBy);
