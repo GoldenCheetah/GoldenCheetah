@@ -85,6 +85,7 @@
 #define GC_BLANK_DIARY    "blank/diary"
 #define GC_LINEWIDTH      "linewidth"
 #define GC_ANTIALIAS      "antialias"
+#define GC_RIDEBG         "rideBG"
 #define GC_DROPSHADOW     "dropshadow"
 #define GC_SHADEZONES     "shadezones"
 #define GC_PROXYTYPE      "proxy/type"

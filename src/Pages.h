@@ -374,6 +374,7 @@ class KeywordsPage : public QWidget
     public:
         KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>);
         void getDefinitions(QList<KeywordDefinition>&);
+        QCheckBox *rideBG;
 
     public slots:
         void addClicked();
