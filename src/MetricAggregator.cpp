@@ -249,9 +249,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 #endif
     context->athlete->isclean = true;
 
-    // now refresh cp model -- if any files actually changed or we haven't set 
-    //                         up from initial load (i.e. no cache read/write)
-    if (updates || context->athlete->PDEstimates.count() == 0) refreshCPModelMetrics(bar);
+    // clear out the estimates if something changed!
+    if (updates) context->athlete->PDEstimates.clear();
 
     // now zap the progress bar
     if (bar) delete bar;
@@ -462,7 +461,7 @@ MetricAggregator::getRideMetrics(QString filename)
 }
 
 void
-MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
+MetricAggregator::refreshCPModelMetrics()
 {
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
@@ -509,12 +508,13 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
 
     // if we have a progress dialog lets update the bar to show
     // progress for the model parameters
-    if (bar) {
-        bar->setLabelText(QString(tr("Derive Model Parameters")));
-        bar->setMinimum(0);
-        bar->setMaximum((lastYear*12 + lastMonth) - (year*12 + month));
-        bar->setValue(0);
-    }
+    QProgressDialog *bar = new QProgressDialog(tr("Update Model Estimates"), tr("Abort"), 0, (lastYear*12 + lastMonth) - (year*12 + month));
+    bar->setWindowFlags(bar->windowFlags() | Qt::FramelessWindowHint);
+    bar->setWindowModality(Qt::WindowModal);
+    bar->setMinimumDuration(0);
+    bar->setValue(0);
+    bar->show(); // lets hide until elapsed time is > 6 seconds
+    QApplication::processEvents();
 
     QList< QVector<float> > months;
 
@@ -598,6 +598,7 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
         }
 
         // show some progress
-        if (bar) bar->setValue(count);
+        bar->setValue(count);
     }
+    delete bar;
 }
