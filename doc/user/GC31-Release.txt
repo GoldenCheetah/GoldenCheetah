@@ -8,6 +8,10 @@ MAJOR NEW FEATURES
    * Compare Athletes, Seasons, Rides, Intervals
    * Easy and intuitive user interface
 
+2. Power Duration Models
+   * Multiple PD models available
+   * Track changes in W', CP, P-Max, FTP over time
+
 2. Merge Activities
 3. Share Dialog
 
@@ -16,22 +20,22 @@ ENHANCEMENTS
 1. General
 i    Open Athletes in Tabs
 ii   Redesign Tabbed mode with a ChartBar
-iii  Better support for color customisation, new look
-iv   Interactivity (axes, interval hover)
+iii  Themes and better support for color customisation
+iv   Improved Interactivity (axes, interval hover)
 v    Autofilter in Trends view
 vi   Specify athlete library location
 vii  Improved Dropbox support (CRC)
 viii Find intervals via matches, hills etc
-ix   Multiple pages of charts [unimplemented yet]
 
 2. Device
 i    Fixed up Tacx Fortius Support
-ii   Joule GPS firmware support
-iii  FIT ride file support
+ii   Joule GPS updates
+iii  FIT ride file updates 
 iv   Pedal Smoothness / Torque Effectiveness support
+v    Moxy support
 
 3. Metrics
-i    Plot best x power etc
+i    Plot best x power etc, Plot W', CP et al
 ii   W'bal implemented with metrics
 iii  TISS implemented
 iv   aPower
@@ -56,6 +60,7 @@ v   Plot as percentge of best
 vi  Plot centiles
 v   Ranking
 vi  Plot intervals
+vii Export Data
 
 6. Ride Chart
 i   Plot lots of derived series; NP, W'bal, xPower, Delta etc etc
@@ -69,12 +74,11 @@ i   Athlete Bests
 ii  Model derived estimates (CP, FTP etc)
 
 8. Foundational
-i   Use JSON for storing all rides [unimplemented yet]
-ii  QT 5 support
-iii QWT 6.1 support
-iv  MainWindow/Context/Athlete refactored
-v   CP refactored (for models and intervals)
-vi  AllPlot refactored (for compare)
+i   QT 5 support
+ii  QWT 6.1 support
+iii MainWindow/Context/Athlete refactored
+iv  CP refactored (for models and intervals)
+v   AllPlot refactored (for compare)
 
 BUG FIXES
 i   Over 600 commits since 3.0 including many bug fixes
