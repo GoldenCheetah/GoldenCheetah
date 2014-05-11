@@ -444,3 +444,273 @@ void MultiModel::onIntervalsChanged()
 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 }
+
+//
+// Extended CP Model
+//
+ExtendedModel::ExtendedModel(Context *context) :
+    PDModel(context)
+{
+    // set default intervals to search Extended CP
+    sanI1=20;
+    sanI2=90;
+    anI1=120;
+    anI2=300;
+    aeI1=600;
+    aeI2=3000;
+    laeI1=4000;
+    laeI2=30000;
+
+    connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
+    connect (this, SIGNAL(intervalsChanged()), this, SLOT(onIntervalsChanged()));
+}
+
+// P(t) - return y for t in Extended model
+double
+ExtendedModel::y(double t) const
+{
+    return paa*(1.20-0.20*exp(-1*double(t)))*exp(paa_dec*(double(t))) + ecp * (1-exp(tau_del*double(t))) * (1-exp(ecp_del*double(t))) * (1+ecp_dec*exp(ecp_dec_del/double(t))) * ( 1 + etau/(double(t)));
+}
+
+// 2 parameter model can calculate these
+int
+ExtendedModel::WPrime()
+{
+    // kjoules
+    return (ecp * etau * 60);
+}
+
+int
+ExtendedModel::CP()
+{
+    return ecp;
+}
+
+int
+ExtendedModel::PMax()
+{
+    // casting to double across to ensure we don't lose precision
+    // but basically its the max value of the curve at time t of 1s
+    // which is cp * 1 + tau / ((t/60) + t0)
+    return paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * ( 1 + etau/(1/60.0));
+}
+
+int
+ExtendedModel::FTP()
+{
+    // casting to double across to ensure we don't lose precision
+    // but basically its the max value of the curve at time t of 1s
+    // which is cp * 1 + tau / ((t/60) + t0)
+    return paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp * (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) * (1+ecp_dec*exp(ecp_dec_del/60.0)) * ( 1 + etau/(60.0));
+}
+
+
+// could have just connected signal to slot
+// but might want to be more sophisticated in future
+void
+ExtendedModel::onDataChanged()
+{
+    // calc tau etc and make sure the interval is
+    // set corretly - i.e. 'domain of validity'
+    deriveExtCPParameters();
+    setInterval(QwtInterval(etau, PDMODEL_MAXT));
+
+}
+
+void
+ExtendedModel::onIntervalsChanged()
+{
+    deriveExtCPParameters();
+    setInterval(QwtInterval(etau, PDMODEL_MAXT));
+}
+
+void
+ExtendedModel::deriveExtCPParameters()
+{
+    // bounds on anaerobic interval in minutes
+    const double t1 = sanI1;
+    const double t2 = sanI2;
+
+    // bounds on anaerobic interval in minutes
+    const double t3 = anI1;
+    const double t4 = anI2;
+
+    // bounds on aerobic interval in minutes
+    const double t5 = aeI1;
+    const double t6 = aeI2;
+
+    // bounds on long aerobic interval in minutes
+    const double t7 = laeI1;
+    const double t8 = laeI2;
+
+    // bounds of these time valus in the data
+    int i1, i2, i3, i4, i5, i6, i7, i8;
+
+    // find the indexes associated with the bounds
+    // the first point must be at least the minimum for the anaerobic interval, or quit
+    for (i1 = 0; i1 < 60 * t1; i1++)
+        if (i1 + 1 > data.size())
+            return;
+    // the second point is the maximum point suitable for anaerobicly dominated efforts.
+    for (i2 = i1; i2 + 1 <= 60 * t2; i2++)
+        if (i2 + 1 >= data.size())
+            return;
+
+    // the third point is the beginning of the minimum duration for aerobic efforts
+    for (i3 = i2; i3 < 60 * t3; i3++)
+        if (i3 + 1 >= data.size())
+            return;
+    for (i4 = i3; i4 + 1 <= 60 * t4; i4++)
+        if (i4 + 1 >= data.size())
+            break;
+
+    // the fifth point is the beginning of the minimum duration for aerobic efforts
+    for (i5 = i4; i5 < 60 * t5; i5++)
+        if (i5 + 1 >= data.size())
+            return;
+    for (i6 = i5; i6 + 1 <= 60 * t6; i6++)
+        if (i6 + 1 >= data.size())
+            break;
+
+    // the first point must be at least the minimum for the anaerobic interval, or quit
+    for (i7 = i6; i7 < 60 * t7; i7++)
+        if (i7 + 1 >= data.size())
+            return;
+    // the second point is the maximum point suitable for anaerobicly dominated efforts.
+    for (i8 = i7; i8 + 1 <= 60 * t8; i8++)
+        if (i8 + 1 >= data.size())
+            break;
+
+
+
+    // initial estimate
+    if (paa == 0) paa = 300;
+
+    if (etau == 0) etau = 1;
+
+    if (ecp == 0) ecp = 300;
+
+    if (paa_dec == 0) paa_dec = -2;
+
+    if (ecp_del == 0) ecp_del = -0.9;
+
+    if (tau_del == 0) tau_del = -4.8;
+
+    if (ecp_dec == 0) ecp_dec = -1;
+
+    if (ecp_dec_del == 0) ecp_dec_del = -180;
+
+
+    // lower bound
+    const double paa_min = 100;
+    const double etau_min = 0.5;
+    const double paa_dec_max = -0.25;
+    const double paa_dec_min = -3;
+    const double ecp_dec_min = -5;
+
+    // convergence delta
+    const double etau_delta_max = 1e-4;
+    const double paa_delta_max = 1e-2;
+    const double paa_dec_delta_max = 1e-4;
+    const double ecp_del_delta_max = 1e-4;
+    const double ecp_dec_delta_max  = 1e-8;
+
+    // previous loop values
+    double etau_prev;
+    double paa_prev;
+    double paa_dec_prev;
+    double ecp_del_prev;
+    double ecp_dec_prev;
+
+    // maximum number of loops
+    const int max_loops = 100;
+
+    // loop to convergence
+    int iteration = 0;
+    do {
+
+        // bounds check, don't go on for ever
+        if (iteration++ > max_loops) break;
+
+        // record the previous version of tau, for convergence
+        etau_prev = etau;
+        paa_prev = paa;
+        paa_dec_prev = paa_dec;
+        ecp_del_prev = ecp_del;
+        ecp_dec_prev = ecp_dec;
+
+        // estimate cp, given tau
+        int i;
+        ecp = 0;
+        for (i = i5; i <= i6; i++) {
+            double ecpn = (data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) / ( 1 + etau/(i/60.0));
+
+            if (ecp < ecpn)
+                ecp = ecpn;
+        }
+
+
+        // if cp = 0; no valid data; give up
+        if (ecp == 0.0)
+            return;
+
+        // estimate etau, given ecp
+        etau = etau_min;
+        for (i = i3; i <= i4; i++) {
+            double etaun = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) - 1) * (i/60.0);
+
+            if (etau < etaun)
+                etau = etaun;
+        }
+
+        // estimate paa_dec
+        paa_dec = paa_dec_min;
+        for (i = i1; i <= i2; i++) {
+            double paa_decn = log((data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0)) ) / paa / (1.20-0.20*exp(-1*(i/60.0))) ) / (i/60.0);
+
+            if (paa_dec < paa_decn && paa_decn < paa_dec_max) {
+                paa_dec = paa_decn;
+            }
+        }
+
+        paa = paa_min;
+        double _avg_paa = 0.0;
+        int count=1;
+        for (i = 2; i <= 8; i++) {
+            double paan = (data[i] - ecp * (1-exp(tau_del*i/60.0)) * (1-exp(ecp_del*i/60.0)) * (1+ecp_dec*exp(ecp_dec_del/(i/60.0))) * ( 1 + etau/(i/60.0))) / exp(paa_dec*(i/60.0)) / (1.20-0.20*exp(-1*(i/60.0)));
+            _avg_paa = (double)((count-1)*_avg_paa+paan)/count;
+
+            if (paa < paan)
+                paa = paan;
+            count++;
+        }
+        if (_avg_paa<0.95*paa) {
+            paa = _avg_paa;
+        }
+
+
+        ecp_dec = ecp_dec_min;
+        for (i = i7; i <= i8; i=i+120) {
+            double ecp_decn = ((data[i] - paa * (1.20-0.20*exp(-1*(i/60.0))) * exp(paa_dec*(i/60.0))) / ecp / (1-exp(tau_del*i/60.0)) / (1-exp(ecp_del*i/60.0)) / ( 1 + etau/(i/60.0)) -1 ) / exp(ecp_dec_del/(i / 60.0));
+
+            if (ecp_decn > 0) ecp_decn = 0;
+
+            if (ecp_dec < ecp_decn)
+                ecp_dec = ecp_decn;
+        }
+
+
+    } while ((fabs(etau - etau_prev) > etau_delta_max) ||
+             (fabs(paa - paa_prev) > paa_delta_max)  ||
+             (fabs(paa_dec - paa_dec_prev) > paa_dec_delta_max)  ||
+             (fabs(ecp_del - ecp_del_prev) > ecp_del_delta_max)  ||
+             (fabs(ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
+            );
+
+    int pMax = paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * ( 1 + etau/(1/60.0));
+    int mmp60 = paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp * (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) * (1+ecp_dec*exp(ecp_dec_del/60.0)) * ( 1 + etau/(60.0));
+
+    qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec" << ecp_dec << "ecp_dec_del" << ecp_dec_del;
+    qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
+
+}
