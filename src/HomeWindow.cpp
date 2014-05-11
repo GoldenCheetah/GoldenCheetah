@@ -195,7 +195,7 @@ HomeWindow::selected()
     if (loaded == false) {
         restoreState();
         loaded = true;
-        if (!currentStyle) tabSelected(0);
+        if (!currentStyle && charts.count()) tabSelected(0);
     }
 
     resizeEvent(NULL); // force a relayout
