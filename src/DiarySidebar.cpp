@@ -815,7 +815,8 @@ GcMiniCalendar::setDate(int _month, int _year)
                 if (colors.count()) {
                     d->setBg(true);
                     d->setPalette(grey);
-                    d->setBgColor(colors.at(0)); // use first always
+                    if (colors.at(0) == QColor(1,1,1)) d->setBgColor(GColor(CPLOTMARKER)); // default
+                    else d->setBgColor(colors.at(0)); // use first always
                 } else {
                     d->setBg(false);
                     d->setPalette(white);

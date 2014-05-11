@@ -264,7 +264,7 @@ void ColorEngine::configUpdate()
     // setup the keyword/color combinations from config settings
     foreach (KeywordDefinition keyword, context->athlete->rideMetadata()->getKeywords()) {
         if (keyword.name == "Default")
-            defaultColor = keyword.color;
+            defaultColor = keyword.color; // we actually ignore this now
         else {
             workoutCodes[keyword.name] = keyword.color;
 
@@ -279,7 +279,7 @@ void ColorEngine::configUpdate()
 QColor
 ColorEngine::colorFor(QString text)
 {
-    QColor color = defaultColor;
+    QColor color = QColor(1,1,1,1); // the default color has an alpha of 1, not possible otherwise
 
     foreach(QString code, workoutCodes.keys()) {
         if (text.contains(code, Qt::CaseInsensitive)) {

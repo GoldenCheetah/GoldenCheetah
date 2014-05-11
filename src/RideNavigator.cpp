@@ -948,6 +948,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     // normal render
     QString calendarText = rideNavigator->tableView->model()->data(index, Qt::UserRole).toString();
     QColor userColor = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>().color();
+    if (userColor == QColor(1,1,1)) userColor = GColor(CPLOTMARKER);
     QBrush background = QBrush(GColor(CPLOTBACKGROUND)); //XXX
 
     if (columnName != "*") {

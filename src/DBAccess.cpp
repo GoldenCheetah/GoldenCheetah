@@ -91,8 +91,9 @@
 // 70  27  Mar 2014 Mark Liversedge    Add file CRC to refresh only if contents change (not just timestamps)
 // 71  14  Apr 2014 Mark Liversedge    Added average lef/right vector metrics (Pedal Smoothness / Torque Effectiveness)
 // 72  24  Apr 2014 Mark Liversedge    Andy Froncioni's faster algorithm for W' bal
+// 73  11  May 2014 Mark Liversedge    Default color of 1,1,1 now uses CPLOTMARKER for ride color, change version to force rebuild
 
-int DBSchemaVersion = 72;
+int DBSchemaVersion = 73;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
