@@ -251,7 +251,9 @@ public:
                     if (context->rideItem() && sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == context->rideItem()->dateTime) {
                         colors << GColor(CCALCURRENT); // its the current ride!
                     } else {
-                        colors << QColor(sourceModel()->data(index(i, colorIndex, QModelIndex())).toString());
+                        QColor user = QColor(sourceModel()->data(index(i, colorIndex, QModelIndex())).toString());
+                        if (user == QColor(1,1,1)) colors << GColor(CPLOTMARKER);
+                        else colors << user;
                     }
                 }
             }
