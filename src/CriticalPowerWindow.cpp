@@ -721,6 +721,20 @@ void
 CriticalPowerWindow::forceReplot()
 {
     stale = true; // we must become stale
+
+    if ((rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals)) {
+
+        // hide in compare mode
+        helperWidget()->hide();
+
+    } else {
+
+        // show helper if we're showing power
+        CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+        if (series == watts && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        else helperWidget()->hide();
+    }
+
     if (rangemode) {
 
         // force replot...
