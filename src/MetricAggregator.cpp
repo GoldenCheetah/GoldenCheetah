@@ -485,7 +485,7 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
     while (rc && query.next()) {
         if (first) {
             from = query.value(0).toDate();
-            first = false;
+            if (from.year() >= 1990) first = false; // ignore daft dates
         } else {
             to = query.value(0).toDate();
         }
@@ -500,6 +500,12 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
     int lastYear = to.year();
     int lastMonth = to.month();
     int count = 0;
+
+    // lets make sure we don't run wild when there is bad
+    // ride dates etc -- ignore data before 1990 and after 
+    // next year. This is belt and braces really
+    if (year < 1990) year = 1990;
+    if (lastYear > QDate::currentDate().year()+1) lastYear = QDate::currentDate().year()+1;
 
     // if we have a progress dialog lets update the bar to show
     // progress for the model parameters
