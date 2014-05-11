@@ -168,6 +168,9 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
             bar->setWindowModality(Qt::WindowModal);
             bar->setMinimumDuration(0);
             bar->show(); // lets hide until elapsed time is > 6 seconds
+
+            // lets make sure it goes to the center!
+            QApplication::processEvents();
         }
 
         // update the dialog always after 6 seconds
