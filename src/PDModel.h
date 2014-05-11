@@ -233,6 +233,38 @@ class MultiModel : public PDModel
 // extended model
 class ExtendedModel : public PDModel
 {
+    Q_OBJECT
+
+    public:
+        ExtendedModel(Context *context);
+
+        // synthetic data for a curve
+        double y(double t) const;
+
+        bool hasWPrime() { return true; }  // can estimate W'
+        bool hasCP()     { return true; }  // can CP
+        bool hasFTP()    { return true; }  // can estimate FTP
+        bool hasPMax()   { return true; }  // can estimate p-Max
+
+        // 4 parameter model can calculate these
+        int WPrime();
+        int CP();
+        int FTP();
+        int PMax();
+
+        QString name()   { return "Extended CP"; }  // model name e.g. CP 2 parameter model
+        QString code()   { return "Ext"; }        // short name used in metric names e.g. 2P model
+
+        // Extended has multiple additional parameters
+        double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del;
+
+    public slots:
+
+        void onDataChanged();      // catch data changes
+        void onIntervalsChanged(); //catch interval changes
+
+    private:
+        void deriveExtCPParameters();
 };
 
 #endif 
