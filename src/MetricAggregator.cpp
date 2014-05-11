@@ -516,11 +516,13 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
     CP2Model p2model(context);
     CP3Model p3model(context);
     MultiModel multimodel(context);
+    ExtendedModel extmodel(context);
 
     QList <PDModel *> models;
     models << &p2model;
     models << &p3model;
     models << &multimodel;
+    models << &extmodel;
 
     // loop through
     while (year < lastYear || (year == lastYear && month <= lastMonth)) {
@@ -547,7 +549,7 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
                 }
                 break;
 
-            case 3 : // third time through resize to largest and compare to 1 and 2
+            case 3 : // third time through resize to largest and compare to 1 and 2 XXX not used as limits to 2 month window
                 {
                     if (months[1].size() > rollingBests.size()) rollingBests.resize(months[1].size());
                     if (months[2].size() > rollingBests.size()) rollingBests.resize(months[2].size());

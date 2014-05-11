@@ -1368,6 +1368,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     models << new CP2Model(context);
     models << new CP3Model(context);
     models << new MultiModel(context);
+    models << new ExtendedModel(context);
     foreach(PDModel *model, models) {
         modelSelect->addItem(model->name(), model->code());
     }
