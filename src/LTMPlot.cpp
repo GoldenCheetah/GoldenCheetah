@@ -2432,7 +2432,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
         }
 
-        if (n <= maxdays) {
+        if (n <= maxdays && value > 0) {
             int currentDay = groupForDate(from, settings->groupBy);
             x[n] = currentDay - firstDay;
             y[n] = value;
