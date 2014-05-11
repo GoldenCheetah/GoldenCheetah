@@ -530,7 +530,7 @@ MetricAggregator::refreshCPModelMetrics(QProgressDialog *bar)
 
         // months is a rolling 3 months sets of bests
         months << RideFileCache::meanMaxPowerFor(context, firstOfMonth, lastOfMonth);
-        if (months.count() > 3) months.removeFirst();
+        if (months.count() > 2) months.removeFirst();
 
         // create a rolling merge of all those months
         QVector<float> rollingBests = months[0];
