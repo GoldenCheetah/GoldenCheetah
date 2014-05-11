@@ -548,58 +548,50 @@ ExtendedModel::deriveExtCPParameters()
 
     // find the indexes associated with the bounds
     // the first point must be at least the minimum for the anaerobic interval, or quit
-    for (i1 = 0; i1 < 60 * t1; i1++)
+    for (i1 = 0; i1 < t1; i1++)
         if (i1 + 1 > data.size())
             return;
     // the second point is the maximum point suitable for anaerobicly dominated efforts.
-    for (i2 = i1; i2 + 1 <= 60 * t2; i2++)
+    for (i2 = i1; i2 + 1 <= t2; i2++)
         if (i2 + 1 >= data.size())
             return;
 
     // the third point is the beginning of the minimum duration for aerobic efforts
-    for (i3 = i2; i3 < 60 * t3; i3++)
+    for (i3 = i2; i3 < t3; i3++)
         if (i3 + 1 >= data.size())
             return;
-    for (i4 = i3; i4 + 1 <= 60 * t4; i4++)
+    for (i4 = i3; i4 + 1 <= t4; i4++)
         if (i4 + 1 >= data.size())
             break;
 
     // the fifth point is the beginning of the minimum duration for aerobic efforts
-    for (i5 = i4; i5 < 60 * t5; i5++)
+    for (i5 = i4; i5 < t5; i5++)
         if (i5 + 1 >= data.size())
             return;
-    for (i6 = i5; i6 + 1 <= 60 * t6; i6++)
+    for (i6 = i5; i6 + 1 <= t6; i6++)
         if (i6 + 1 >= data.size())
             break;
 
     // the first point must be at least the minimum for the anaerobic interval, or quit
-    for (i7 = i6; i7 < 60 * t7; i7++)
+    for (i7 = i6; i7 < t7; i7++)
         if (i7 + 1 >= data.size())
             return;
     // the second point is the maximum point suitable for anaerobicly dominated efforts.
-    for (i8 = i7; i8 + 1 <= 60 * t8; i8++)
+    for (i8 = i7; i8 + 1 <= t8; i8++)
         if (i8 + 1 >= data.size())
             break;
 
 
 
     // initial estimate
-    if (paa == 0) paa = 300;
-
-    if (etau == 0) etau = 1;
-
-    if (ecp == 0) ecp = 300;
-
-    if (paa_dec == 0) paa_dec = -2;
-
-    if (ecp_del == 0) ecp_del = -0.9;
-
-    if (tau_del == 0) tau_del = -4.8;
-
-    if (ecp_dec == 0) ecp_dec = -1;
-
-    if (ecp_dec_del == 0) ecp_dec_del = -180;
-
+    paa = 300;
+    etau = 1;
+    ecp = 300;
+    paa_dec = -2;
+    ecp_del = -0.9;
+    tau_del = -4.8;
+    ecp_dec = -1;
+    ecp_dec_del = -180;
 
     // lower bound
     const double paa_min = 100;
@@ -710,7 +702,6 @@ ExtendedModel::deriveExtCPParameters()
     int pMax = paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * ( 1 + etau/(1/60.0));
     int mmp60 = paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp * (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) * (1+ecp_dec*exp(ecp_dec_del/60.0)) * ( 1 + etau/(60.0));
 
-    qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec" << ecp_dec << "ecp_dec_del" << ecp_dec_del;
-    qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
-
+    //qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec" << ecp_dec << "ecp_dec_del" << ecp_dec_del;
+    //qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
 }
