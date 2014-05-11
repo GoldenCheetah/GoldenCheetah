@@ -2013,6 +2013,9 @@ MetadataPage::saveClicked()
     fieldsPage->getDefinitions(fieldDefinitions);
     keywordsPage->getDefinitions(keywordDefinitions);
 
+    // save settings
+    appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
+
     // write to metadata.xml
     RideMetadata::serialize(context->athlete->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
 
@@ -2049,6 +2052,10 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     field->addWidget(fieldChooser);
     field->addStretch();
     mainLayout->addLayout(field);
+
+    rideBG = new QCheckBox(tr("Use for Background"));
+    rideBG->setChecked(appsettings->value(this, GC_RIDEBG, false).toBool());
+    field->addWidget(rideBG);
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
