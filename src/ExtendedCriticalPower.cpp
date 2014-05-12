@@ -1216,7 +1216,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(Model_eCP model)
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model, bool)
 {
     const int extendedCurve2_points = 1000;
 
@@ -1631,7 +1631,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(Model_eCP model)
 }
 
 QwtPlotIntervalCurve*
-ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP model, bool stacked)
+ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP model, bool)
 {
     const int extendedCurve2_points = 1000;
 

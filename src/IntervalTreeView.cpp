@@ -39,7 +39,7 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 }
 
 void 
-IntervalTreeView::mouseHover(QTreeWidgetItem *item, int column)
+IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
 {
     int index = invisibleRootItem()->indexOfChild(item);
     if (index >=0 && context->rideItem() && context->rideItem()->ride() &&

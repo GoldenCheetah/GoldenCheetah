@@ -118,7 +118,7 @@ public:
 
 protected:
 
-    virtual QwtText trackerText(const QPoint &pos ) const {
+    virtual QwtText trackerText(const QPoint &) const {
         me->mouseMoved();
         return QwtText("");
     }

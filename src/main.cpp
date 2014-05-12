@@ -37,7 +37,7 @@ void nostderr(QString dir)
     QFile *fp = new QFile(QString("%1/goldencheetah.log").arg(dir));
     if (fp->open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
         close(2);
-        dup(fp->handle());
+        if(dup(fp->handle()) == -1) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
     } else {
         fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
     }

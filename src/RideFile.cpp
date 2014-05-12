@@ -44,8 +44,8 @@ const QChar deltaChar(0x0394);
 
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown"), data(NULL), weight_(0),
-            totalCount(0), dstale(true), wprime_(NULL), wstale(true)
+            deviceType_("unknown"), data(NULL), wprime_(NULL), 
+            wstale(true), weight_(0), totalCount(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -55,7 +55,9 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
     totalPoint = new RideFilePoint();
 }
 
-RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0), totalCount(0), dstale(true), wprime_(NULL), wstale(true)
+RideFile::RideFile() : 
+    recIntSecs_(0.0), deviceType_("unknown"), data(NULL), wprime_(NULL), 
+    wstale(true), weight_(0), totalCount(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -915,6 +917,7 @@ RideFile::decimalsFor(SeriesType series)
         case smO2 : return 0; break;
         case tHb : return 2; break;
         case wprime : return 0; break;
+        default:
         case none : break;
     }
     return 2; // default
@@ -952,6 +955,7 @@ RideFile::maximumFor(SeriesType series)
         case smO2 : return 100; break;
         case tHb : return 20; break;
         case wprime : return 99999; break;
+        default :
         case none : break;
     }
     return 9999; // default
@@ -989,6 +993,7 @@ RideFile::minimumFor(SeriesType series)
         case smO2 : return 0; break;
         case tHb : return 0; break;
         case wprime : return 0; break;
+        default :
         case none : break;
     }
     return 0; // default
@@ -1161,7 +1166,7 @@ RideFile::recalculateDerivedSeries()
     static const double a = 0.663788683661645f;
     static const double b = -7.5095428451195f;
     static const double c = -0.86118031563782f;
-    static const double t = 2;
+    //static const double t = 2;
     // anTISS
     static const double an = 0.238923886004611f;
     //static const double bn = -12.2066385296127f;
@@ -1169,7 +1174,7 @@ RideFile::recalculateDerivedSeries()
     static const double cn = -1.73549567522521f;
 
     int CP = 0;
-    int WPRIME = 0;
+    //int WPRIME = 0;
     double aTISS = 0.0f;
     double anTISS = 0.0f;
 
@@ -1177,7 +1182,7 @@ RideFile::recalculateDerivedSeries()
     if (context->athlete->zones()) {
         int zoneRange = context->athlete->zones()->whichRange(startTime().date());
         CP = zoneRange >= 0 ? context->athlete->zones()->getCP(zoneRange) : 0;
-        WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
+        //WPRIME = zoneRange >= 0 ? context->athlete->zones()->getWprime(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = getTag("CP","0").toInt();
@@ -1288,7 +1293,7 @@ RideFile::recalculateDerivedSeries()
             static const double a1  = 1.0899959f;
             static const double a2  = -0.0015119f;
             static const double a3  = 7.2674E-07f;
-            static const double E = 2.71828183f;
+            //static const double E = 2.71828183f;
 
             if (p->alt > 0) {
                 // pbar [mbar]= 0.76*EXP( -alt[m] / 7000 )*1000 

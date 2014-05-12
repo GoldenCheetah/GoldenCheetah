@@ -93,7 +93,7 @@ struct DataPoint {
     double time, hr, alt, watts;
     int inter;
     DataPoint(double t, double h, double w, double a, int i) :
-             time(t), hr(h), watts(w), alt(a), inter(i) {}
+             time(t), hr(h), alt(a), watts(w), inter(i) {}
 };
 
 void

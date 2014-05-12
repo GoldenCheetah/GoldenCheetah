@@ -564,11 +564,11 @@ MergeSync::diffForSeries(QVector<DataPoint*> a1, QVector<DataPoint*> a2, int sta
         }
     }
 
-    result.alt = (totalAlt>0&variabilityAlt>samplesLength/4?diffAlt/totalAlt:1.0);
-    result.kph = (totalKph>0?diffKph/totalKph:1.0);
-    result.cad = (totalCad>0?diffCad/totalCad:1.0);
-    result.watts = (totalWatts>0?diffWatts/totalWatts:1.0);
-    result.hr = (totalHr>0?diffHr/totalHr:1.0);
+    result.alt = (totalAlt>0 && variabilityAlt>samplesLength/4) ? diffAlt/totalAlt : 1.0;
+    result.kph = totalKph>0 ? diffKph/totalKph : 1.0;
+    result.cad = totalCad>0 ? diffCad/totalCad : 1.0;
+    result.watts = totalWatts>0 ? diffWatts/totalWatts : 1.0;
+    result.hr = totalHr>0 ? diffHr/totalHr : 1.0;
 
     //fprintf(stderr, "   pt alt:%f kph:%f cad:%f watts:%f hr:%f \n", result.alt, result.kph, result.cad, result.watts, result.hr);
     return result;
