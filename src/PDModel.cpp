@@ -699,9 +699,25 @@ ExtendedModel::deriveExtCPParameters()
              (fabs(ecp_dec - ecp_dec_prev) > ecp_dec_delta_max)
             );
 
-    int pMax = paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * ( 1 + etau/(1/60.0));
-    int mmp60 = paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp * (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) * (1+ecp_dec*exp(ecp_dec_del/60.0)) * ( 1 + etau/(60.0));
+    // What did we get ...
+    // To help debug this below we output the derived values
+    // commented out for release, its quite a mouthful !
 
-    //qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec" << ecp_dec << "ecp_dec_del" << ecp_dec_del;
-    //qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
+#if 0
+    int pMax = paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * 
+               (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * 
+               (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * 
+               (1+etau/(1/60.0));
+
+    int mmp60 = paa*(1.20-0.20*exp(-1*60.0))*exp(paa_dec*(60.0)) + ecp * 
+               (1-exp(tau_del*(60.0))) * (1-exp(ecp_del*60.0)) * 
+               (1+ecp_dec*exp(ecp_dec_del/60.0)) * 
+               (1+etau/(60.0));
+
+    qDebug() <<"eCP(5.3) " << "paa" << paa  << "ecp" << ecp << "etau" << etau 
+             << "paa_dec" << paa_dec << "ecp_del" << ecp_del << "ecp_dec" 
+             << ecp_dec << "ecp_dec_del" << ecp_dec_del;
+
+    qDebug() <<"eCP(5.3) " << "pmax" << pMax << "mmp60" << mmp60;
+#endif
 }
