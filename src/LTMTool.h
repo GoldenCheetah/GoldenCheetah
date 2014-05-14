@@ -195,6 +195,8 @@ class EditMetricDetailDialog : public QDialog
         QList<PDModel*>models;
         QComboBox *modelSelect;     // select 2p, 3p, multi etc
         QComboBox *estimateSelect;  // select w', cp, ftp, pmax .. whichever is suported by model
+        QDoubleSpinBox *estimateDuration;
+        QComboBox *estimateDurationUnits;
 
         QComboBox *curveStyle,
                   *curveSymbol;

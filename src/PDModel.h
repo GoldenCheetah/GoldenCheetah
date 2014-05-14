@@ -88,6 +88,9 @@ class PDModel : public QObject, public QwtSyntheticPointData
         virtual int FTP()        { return 0; }      // return FTP
         virtual int PMax()       { return 0; }      // return PMax
 
+        virtual void saveParameters(QList<double>&here) = 0;
+        virtual void loadParameters(QList<double>&here) = 0;
+
         virtual QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
         virtual QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
 
@@ -132,6 +135,10 @@ class PDEstimate
             CP,
             FTP,
             PMax;
+
+        QList<double> parameters; // parameters are stored/retrieved from here
+                                  // so we can run the model using pre-computed
+                                  // parameters
 };
 
 // 2 parameter model
@@ -156,6 +163,9 @@ class CP2Model : public PDModel
 
         QString name()   { return "Classic 2 Parameter"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "2 Parm"; }        // short name used in metric names e.g. 2P model
+
+        void saveParameters(QList<double>&here);
+        void loadParameters(QList<double>&here);
 
     public slots:
 
@@ -186,6 +196,9 @@ class CP3Model : public PDModel
 
         QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
+
+        void saveParameters(QList<double>&here);
+        void loadParameters(QList<double>&here);
 
     public slots:
 
@@ -223,6 +236,9 @@ class MultiModel : public PDModel
         int variant;
         double w1, p1, p2, tau1, tau2, alpha, beta;
 
+        void saveParameters(QList<double>&here);
+        void loadParameters(QList<double>&here);
+
     public slots:
 
         void onDataChanged();      // catch data changes
@@ -257,6 +273,9 @@ class ExtendedModel : public PDModel
 
         // Extended has multiple additional parameters
         double paa, paa_dec, ecp, etau, ecp_del, tau_del, ecp_dec, ecp_dec_del;
+
+        void saveParameters(QList<double>&here);
+        void loadParameters(QList<double>&here);
 
     public slots:
 

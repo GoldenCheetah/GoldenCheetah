@@ -1248,6 +1248,7 @@ EditMetricDetailDialog::modelChanged()
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(1)->setEnabled(models[currentIndex]->hasCP());
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(2)->setEnabled(models[currentIndex]->hasFTP());
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(3)->setEnabled(models[currentIndex]->hasPMax());
+    qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(4)->setEnabled(true);
 
     // switch to other estimate if wanted estimate is not selected
     if (ce < 0 || !qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(ce)->isEnabled())
@@ -1265,6 +1266,17 @@ EditMetricDetailDialog::estimateChanged()
 void
 EditMetricDetailDialog::estimateName()
 {
+    if (chooseEstimate->isChecked() == false) return; // only if we have estimate selected
+
+    // do we need to see the best duration ?
+    if (estimateSelect->currentIndex() == 4) {
+        estimateDuration->show();
+        estimateDurationUnits->show();
+    } else {
+        estimateDuration->hide();
+        estimateDurationUnits->hide();
+    }
+
     // set the estimate name from model and estimate type
     QString name;
 
@@ -1274,6 +1286,12 @@ EditMetricDetailDialog::estimateName()
         case 1 : name = "CP"; break;
         case 2 : name = "FTP"; break;
         case 3 : name = "p-Max"; break;
+        case 4 : 
+            {
+                name = QString("Estimate %1 %2 Power").arg(estimateDuration->value())
+                                                  .arg(estimateDurationUnits->currentText());
+            }
+            break;
     }
 
     // now the model
@@ -1377,6 +1395,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estimateSelect->addItem("CP");
     estimateSelect->addItem("FTP");
     estimateSelect->addItem("p-Max");
+    estimateSelect->addItem("Best Power");
 
     int n=0;
     modelSelect->setCurrentIndex(0); // default to 2parm model
@@ -1386,9 +1405,31 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     }
     estimateSelect->setCurrentIndex(metricDetail->estimate);
 
+    estimateDuration = new QDoubleSpinBox(this);
+    estimateDuration->setDecimals(0);
+    estimateDuration->setMinimum(0);
+    estimateDuration->setMaximum(999);
+    estimateDuration->setSingleStep(1.0);
+    estimateDuration->setValue(metricDetail->estimateDuration); // default to 60 minutes
+
+    estimateDurationUnits = new QComboBox(this);
+    estimateDurationUnits->addItem(tr("seconds"));
+    estimateDurationUnits->addItem(tr("minutes"));
+    estimateDurationUnits->addItem(tr("hours"));
+    switch(metricDetail->estimateDuration_units) {
+        case 1 : estimateDurationUnits->setCurrentIndex(0); break;
+        case 60 : estimateDurationUnits->setCurrentIndex(1); break;
+        default :
+        case 3600 : estimateDurationUnits->setCurrentIndex(2); break;
+    }
+    QHBoxLayout *estbestLayout = new QHBoxLayout();
+    estbestLayout->addWidget(estimateDuration);
+    estbestLayout->addWidget(estimateDurationUnits);
+
     estimateLayout->addStretch();
     estimateLayout->addWidget(modelSelect);
     estimateLayout->addWidget(estimateSelect);
+    estimateLayout->addLayout(estbestLayout);
     estimateLayout->addStretch();
 
     // metric selection tree
@@ -1584,6 +1625,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     connect(chooseEstimate, SIGNAL(toggled(bool)), this, SLOT(typeChanged()));
     connect(modelSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
     connect(estimateSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(estimateChanged()));
+    connect(estimateDuration, SIGNAL(valueChanged(double)), this, SLOT(estimateName()));
+    connect(estimateDurationUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(estimateName()));
 
     // when stuff changes rebuild name
     connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(bestName()));
@@ -1745,8 +1788,15 @@ EditMetricDetailDialog::applyClicked()
     if (chooseBest->isChecked()) metricDetail->type = 5; // is a best
     else if (chooseEstimate->isChecked()) metricDetail->type = 6; // estimate
 
-    metricDetail->duration = duration->value();
+    metricDetail->estimateDuration = estimateDuration->value();
+    switch (estimateDurationUnits->currentIndex()) {
+        case 0 : metricDetail->estimateDuration_units = 1; break;
+        case 1 : metricDetail->estimateDuration_units = 60; break;
+        case 2 :
+        default: metricDetail->estimateDuration_units = 3600; break;
+    }
 
+    metricDetail->duration = duration->value();
     switch (durationUnits->currentIndex()) {
         case 0 : metricDetail->duration_units = 1; break;
         case 1 : metricDetail->duration_units = 60; break;

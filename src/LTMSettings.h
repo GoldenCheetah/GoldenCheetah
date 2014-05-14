@@ -61,6 +61,7 @@ class RideMetric;
 #define ESTIMATE_CP      1
 #define ESTIMATE_FTP     2
 #define ESTIMATE_PMAX    3
+#define ESTIMATE_BEST    4
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {
@@ -79,6 +80,8 @@ class MetricDetail {
 
     QString model; // short code for model selected
     int estimate; // 0-4 for W', CP, FTP, PMAX
+    int estimateDuration;       // n x units below for seconds
+    int estimateDuration_units; // 1=secs, 60=mins, 3600=hours
 
     // for METRICS
     QString symbol;
