@@ -68,6 +68,7 @@ class LTMPlot : public QwtPlot
 
         LTMPlotBackground *bg;
         QList <LTMPlotZoneLabel *> zoneLabels;
+        QList <PDModel*>models;
 
         LTMWindow *parent;
         double minY[10], maxY[10], maxX;      // for all possible 10 curves

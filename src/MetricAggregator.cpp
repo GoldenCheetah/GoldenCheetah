@@ -574,6 +574,7 @@ MetricAggregator::refreshCPModelMetrics()
                 model->setData(rollingBests);
 
                 PDEstimate add;
+                model->saveParameters(add.parameters); // save the computed parms
                 add.from = firstOfMonth;
                 add.to = lastOfMonth;
                 add.model = model->code();

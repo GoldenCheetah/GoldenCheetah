@@ -142,7 +142,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(9); // version 9
+    out<<int(10); // version 9
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         out<<metric.type;
@@ -178,6 +178,8 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.lowestN;
         out<<metric.model;
         out<<metric.estimate;
+        out<<metric.estimateDuration;
+        out<<metric.estimateDuration_units;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -279,6 +281,10 @@ while(counter-- && !in.atEnd()) {
         } else {
             m.model = "";
             m.estimate = 0;
+        }
+        if (version >= 10) {
+            in >> m.estimateDuration;
+            in >> m.estimateDuration_units;
         }
         // get a metric pointer (if it exists)
         m.metric = factory.rideMetric(m.symbol);

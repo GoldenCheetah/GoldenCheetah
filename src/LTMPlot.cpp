@@ -53,6 +53,12 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) :
     setAutoReplot(false);
     setAutoFillBackground(true);
 
+    // set up the models we support
+    models << new CP2Model(context);
+    models << new CP3Model(context);
+    models << new MultiModel(context);
+    models << new ExtendedModel(context);
+
     // setup my axes
     // for now we limit to 4 on left and 4 on right
     setAxesCount(QwtAxis::yLeft, 4);
@@ -2386,7 +2392,6 @@ void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n)
 {
-
     // lets refresh the model data if we don't have any
     if (context->athlete->PDEstimates.count() == 0) context->athlete->metricDB->refreshCPModelMetrics(); 
 
@@ -2434,6 +2439,24 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
             value = est.PMax;
             break;
 
+        case ESTIMATE_BEST :
+            {
+                value = 0;
+
+                // we need to find the model 
+                foreach(PDModel *model, models) {
+
+                    // not the one we want
+                    if (model->code() != metricDetail.model) continue;
+
+                    // set the paramters previously derived
+                    model->loadParameters(est.parameters);
+
+                    // get the model estimate for our duration
+                    value = model->y(metricDetail.estimateDuration * metricDetail.estimateDuration_units);
+                }
+            }
+            break;
         }
 
         if (n <= maxdays && value > 0) {
