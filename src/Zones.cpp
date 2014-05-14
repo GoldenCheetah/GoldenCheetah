@@ -240,8 +240,10 @@ bool Zones::read(QFile &file)
         if (wprimerx.indexIn(line, 0) != -1) {
             if (!in_range)
                 qDebug()<<"ignoring errant W'= in power.zones";
-            else
+            else {
                 wprime = wprimerx.cap(1).toInt();
+                if (wprime < 1000) wprime *= 1000; // JOULES not kJ
+            }
         }
 
         // check for zone definition

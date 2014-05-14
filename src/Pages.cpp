@@ -2905,7 +2905,9 @@ CPPage::addClicked()
     add->setText(1, QString("%1").arg(cpEdit->value()));
 
     // W'
-    add->setText(2, QString("%1").arg(wEdit->value()));
+    int wp = wEdit->value();
+    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
+    add->setText(2, QString("%1").arg(wp));
 
 }
 
