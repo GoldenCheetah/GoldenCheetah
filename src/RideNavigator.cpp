@@ -1003,6 +1003,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
+            QRect high(myOption.rect.x()+myOption.rect.width() - 5, myOption.rect.y(), 5, 50);
+
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
@@ -1022,6 +1024,10 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
+
+            if (!selected && !rideBG && high.x()+10 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+                painter->fillRect(high, userColor);
+            }
         }
 
     } else {
