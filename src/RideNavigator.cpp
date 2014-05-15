@@ -1025,7 +1025,11 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
 
+#if (defined (Q_OS_MAC) && (QT_VERSION >= 0x050000)) // on QT5 the scrollbars have no width
             if (!selected && !rideBG && high.x()+10 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+#else
+            if (!selected && !rideBG && high.x()+30 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+#endif
                 painter->fillRect(high, userColor);
             }
         }
