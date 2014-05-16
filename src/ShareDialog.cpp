@@ -284,7 +284,7 @@ StravaUploader::upload()
 
     if(!uploadSuccessful)
     {
-        parent->progressLabel->setText("Error uploading to Strava");
+        parent->progressLabel->setText(tr("Error uploading to Strava"));
     }
     else
     {
@@ -752,7 +752,7 @@ CyclingAnalyticsUploader::upload()
 
     if(!uploadSuccessful)
     {
-        parent->progressLabel->setText("Error uploading to CyclingAnalytics");
+        parent->progressLabel->setText(tr("Error uploading to CyclingAnalytics"));
     }
     else
     {
@@ -916,7 +916,7 @@ SelfLoopsUploader::upload()
 
     if(!uploadSuccessful)
     {
-        parent->progressLabel->setText("Error uploading to Selfloops");
+        parent->progressLabel->setText(tr("Error uploading to Selfloops"));
     }
     else
     {
@@ -1093,7 +1093,7 @@ GarminUploader::upload()
 
     if(!uploadSuccessful)
     {
-        parent->progressLabel->setText("Error uploading to Garmin Connect");
+        parent->progressLabel->setText(tr("Error uploading to Garmin Connect"));
     }
     else
     {
@@ -1325,7 +1325,7 @@ GarminUploader::requestUploadGarminFinished(QNetworkReply *reply)
     {
         qDebug() << "Error " << reply->error() ;
         qDebug() << "Error " << uploadError;
-        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Selfloops: ") + uploadError + "\n" );
+        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Garmin Connect: ") + uploadError + "\n" );
     }
     else
     {
