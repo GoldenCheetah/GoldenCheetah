@@ -672,7 +672,7 @@ CPPlot::plotModel()
         // generate samples
         QVector<QwtPoint3D> heatByDateSamples;
 
-        for (int i=0; i<bestsCache->meanMaxArray(rideSeries).count(); i++) {
+        for (int i=1; i<bestsCache->meanMaxArray(rideSeries).count(); i++) {
             QDate date = bestsCache->meanMaxDates(rideSeries)[i];
             double heat = 1000*(bestsCache->start.daysTo(bestsCache->end)-date.daysTo(bestsCache->end))/(bestsCache->start.daysTo(bestsCache->end));
 
