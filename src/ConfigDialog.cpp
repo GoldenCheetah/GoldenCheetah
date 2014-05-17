@@ -189,11 +189,11 @@ void ConfigDialog::saveClicked()
         // are you sure you want to change the location of the athlete library?
         // if so we will restart, if not I'll revert to current directory
         QMessageBox msgBox;
-        msgBox.setText("You changed the location of the athlete library");
-        msgBox.setInformativeText("This is where all new athletes and their ride files "
+        msgBox.setText(tr("You changed the location of the athlete library"));
+        msgBox.setInformativeText(tr("This is where all new athletes and their ride files "
                                   "will now be stored.\n\nCurrent athlete data will no longer be "
                                   "available and GoldenCheetah will need to restart for the change to take effect."
-                                  "\n\nDo you want to apply and restart GoldenCheetah?");
+                                  "\n\nDo you want to apply and restart GoldenCheetah?"));
 
         // we want our own buttons...
         msgBox.addButton(tr("No, Keep current"), QMessageBox::RejectRole);
