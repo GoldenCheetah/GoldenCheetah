@@ -65,8 +65,8 @@ void GCColor::setupColors()
         { tr("Altitude Power"), "CAPOWER", Qt::magenta },
         { tr("Critical Power"), "COLORCP", Qt::cyan },
         { tr("Cadence"), "COLORCADENCE", QColor(0,204,204) },
-        { tr("Altitude"), "COLORALTITUTDE", QColor(124,91,31) },
-        { tr("Altitude Shading"), "COLORALTITUDESHADE", QColor(124,91,31) },
+        { tr("Altitude"), "COLORALTITUTDE", QColor(Qt::darkGray) },
+        { tr("Altitude Shading"), "COLORALTITUDESHADE", QColor(Qt::gray) },
         { tr("Wind Speed"), "COLORWINDSPEED", Qt::darkGreen },
         { tr("Torque"), "COLORTORQUE", Qt::magenta },
         { tr("Load"), "COLORLOAD", Qt::yellow },
@@ -409,6 +409,15 @@ Themes::Themes()
     colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::black) << QColor(Qt::black) << QColor(Qt::black);
     //            HR              Speed                Power                 Cadence             Torque
     colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::black) << QColor(0,204,204) << QColor(Qt::magenta) ;
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    // we can add more later ....
+    add.name = tr("Schoberer"); // Old GoldenCheetah colors // ** LIGHT **
+    colors << QColor(Qt::white) << QColor(Qt::darkGray) << QColor(Qt::black) << QColor(Qt::green) << QColor(Qt::red);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::magenta) << QColor(Qt::green) << QColor(Qt::blue) << QColor(Qt::darkGreen) ;
     add.colors = colors;
     themes << add;
     colors.clear();
