@@ -1352,6 +1352,26 @@ ColorsPage::applyThemeClicked()
                 color = theme.colors[4];
                 break;
 
+            case CHEARTRATE:
+                color = theme.colors[5];
+                break;
+
+            case CSPEED:
+                color = theme.colors[6];
+                break;
+
+            case CPOWER:
+                color = theme.colors[7];
+                break;
+
+            case CCADENCE:
+                color = theme.colors[8];
+                break;
+
+            case CTORQUE:
+                color = theme.colors[9];
+                break;
+
                 default:
                     color = colorSet[i].color;
             }
