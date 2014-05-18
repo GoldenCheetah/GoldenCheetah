@@ -194,8 +194,12 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
             // ooh we have one to update -- lets check the CRC in case
             // its actually unchanged since last time and the timestamps
             // have been mucked up by dropbox / file copying / backups etc
+
+            // but still update if we're doing this because settings changed not the ride!
             QString fullPath =  QString(context->athlete->home.absolutePath()) + "/" + name;
-            if (crc == 0 || crc != DBAccess::computeFileCRC(fullPath)) {
+            if ((crc == 0 || crc != DBAccess::computeFileCRC(fullPath)) ||
+                zoneFingerPrint != fingerprint ||
+                (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
 
                 // log
                 out << "Opening ride: " << name << "\r\n";

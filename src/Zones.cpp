@@ -918,9 +918,7 @@ Zones::getFingerprint() const
         x += ranges[i].cp;
 
         // W'
-        //!! will not affect metrics so not part of the
-        //!! fingerprint calculation
-        //x += ranges[i].wprime;
+        x += ranges[i].wprime;
 
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
