@@ -136,6 +136,7 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     contributors.append("Jaime Jofre");
     contributors.append("Jamie Kimberley");
     contributors.append("Jim Ley");
+    contributors.append("Jörn Rischmüller");
     contributors.append("John Ehrlinger");
     contributors.append("Jon Escombe");
     contributors.append("Josef Gebel");
@@ -149,10 +150,12 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     contributors.append("Marc Boudreau");
     contributors.append("Mark Liversedge");
     contributors.append("Mark Rages");
+    contributors.append("Michael Puchowicz");
     contributors.append("Mitsukuni Sato");
     contributors.append("Ned Harding");
     contributors.append("Okano Takayoshi");
     contributors.append("Patrick McNerthney");
+    contributors.append("Dr Phil Skiba");
     contributors.append("Rainer Clasen");
     contributors.append("Robb Romans");
     contributors.append("Robert Carlsen");
