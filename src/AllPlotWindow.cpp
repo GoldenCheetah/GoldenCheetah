@@ -53,10 +53,14 @@
 // tooltip
 #include "LTMWindow.h"
 
+// overlay helper
+#include "GcOverlayWidget.h"
+#include "IntervalSummaryWindow.h"
+
 static const int stackZoomWidth[8] = { 5, 10, 15, 20, 30, 45, 60, 120 };
 
 AllPlotWindow::AllPlotWindow(Context *context) :
-    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false), compareStale(true)
+    GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false), compareStale(true), firstShow(true)
 {
     QWidget *c = new QWidget;
     QVBoxLayout *clv = new QVBoxLayout(c);
@@ -94,6 +98,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     rStack = new QCheckBox(tr("Stacked"));
     rBySeries = new QCheckBox(tr("by series"));
     rFull = new QCheckBox(tr("Fullplot"));
+    rHelp = new QCheckBox(tr("Overlay"));
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -104,10 +109,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     r->addWidget(rSmoothSlider);
     QVBoxLayout *v = new QVBoxLayout;
     QHBoxLayout *s = new QHBoxLayout;
+    QHBoxLayout *t = new QHBoxLayout;
     s->addWidget(rStack);
     s->addWidget(rBySeries);
     v->addLayout(s);
-    v->addWidget(rFull);
+    t->addWidget(rFull);
+    t->addWidget(rHelp);
+    v->addLayout(t);
     r->addSpacing(20);
     r->addLayout(v);
     r->addStretch();
@@ -140,6 +148,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull = new QCheckBox(tr("Full plot"), this);
     showFull->setCheckState(Qt::Checked);
     cl1->addRow(new QLabel(""), showFull);
+
+    showHelp = new QCheckBox(tr("Show Overlay"), this);
+    showHelp->setCheckState(Qt::Unchecked);
+    cl1->addRow(new QLabel(""), showHelp);
 
     paintBrush = new QCheckBox(tr("Fill Curves"), this);
     paintBrush->setCheckState(Qt::Unchecked);
@@ -496,6 +508,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     vlayout->addWidget(stackFrame);
     vlayout->setSpacing(1);
 
+    // put a helper on the screen for mouse over intervals...
+    addHelper(tr("Intervals"), new IntervalSummaryWindow(context));
+
     //mainLayout->addLayout(vlayout,0,0);
     //mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
     //mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
@@ -528,11 +543,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showTE, SIGNAL(stateChanged(int)), this, SLOT(setShowTE(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
+    connect(showHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(showBySeries, SIGNAL(stateChanged(int)), this, SLOT(showBySeriesChanged(int)));
     connect(rBySeries, SIGNAL(stateChanged(int)), this, SLOT(showBySeriesChanged(int)));
     connect(rFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
+    connect(rHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(paintBrush, SIGNAL(stateChanged(int)), this, SLOT(setPaintBrush(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
@@ -660,6 +677,23 @@ AllPlotWindow::configChanged()
         redrawAllPlot();
         redrawStackPlot();
     }
+}
+
+bool
+AllPlotWindow::event(QEvent *event)
+{
+    // nasty nasty nasty hack to move widgets as soon as the widget geometry
+    // is set properly by the layout system, by default the width is 100 and 
+    // we wait for it to be set properly then put our helper widget on the RHS
+    if (event->type() == QEvent::Resize && geometry().width() != 100 && firstShow) {
+        firstShow = false;
+        helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+        helperWidget()->raise();
+
+        if (isShowHelp()) helperWidget()->show();
+        else helperWidget()->hide();
+    }
+    return QWidget::event(event);
 }
 
 void
@@ -2280,6 +2314,15 @@ AllPlotWindow::setShowTE(int value)
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 
+}
+
+void
+AllPlotWindow::setShowHelp(int value)
+{
+    rHelp->setChecked(value);
+    showHelp->setChecked(value);
+    if (showHelp->isChecked()) helperWidget()->show();
+    else helperWidget()->hide();
 }
 
 void

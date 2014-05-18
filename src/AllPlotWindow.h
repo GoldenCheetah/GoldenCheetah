@@ -58,6 +58,7 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ _stackWidth WRITE setStackWidth USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
+    Q_PROPERTY(int showHelp READ isShowHelp WRITE setShowHelp USER true)
     Q_PROPERTY(int showATISS READ isShowATISS WRITE setShowATISS USER true)
     Q_PROPERTY(int showANTISS READ isShowANTISS WRITE setShowANTISS USER true)
     Q_PROPERTY(int showNP READ isShowNP WRITE setShowNP USER true)
@@ -103,6 +104,7 @@ class AllPlotWindow : public GcChartWindow
         int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
+        int isShowHelp() const { return showHelp->checkState(); }
         int isShowATISS() const { return showATISS->checkState(); }
         int isShowANTISS() const { return showANTISS->checkState(); }
         int isShowNP() const { return showNP->checkState(); }
@@ -169,6 +171,7 @@ class AllPlotWindow : public GcChartWindow
         void setShowGrid(int state);
         void setPaintBrush(int state);
         void setShowFull(int state);
+        void setShowHelp(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
         void setStacked(int value);
@@ -197,6 +200,7 @@ class AllPlotWindow : public GcChartWindow
         friend class AllPlot;
 
         void setAllPlotWidgets(RideItem *rideItem);
+        bool event(QEvent *event);
 
         // cached state
         RideItem *current;
@@ -244,6 +248,7 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showBySeries;
         QCheckBox *showGrid;
         QCheckBox *showFull;
+        QCheckBox *showHelp;
         QCheckBox *paintBrush;
         QCheckBox *showAlt;
         QCheckBox *showATISS;
@@ -277,7 +282,7 @@ class AllPlotWindow : public GcChartWindow
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
-        QCheckBox *rStack, *rBySeries, *rFull;
+        QCheckBox *rStack, *rBySeries, *rFull, *rHelp;
         QStackedWidget *allPlotStack;
 
         // comparing 
@@ -301,6 +306,7 @@ class AllPlotWindow : public GcChartWindow
         bool setupStack;       // we optimise this out, its costly
         bool setupSeriesStack; // we optimise this out, its costly
         bool compareStale;     // compare init one off setup
+        bool firstShow;
 
     private slots:
 
