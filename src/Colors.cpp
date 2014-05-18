@@ -347,58 +347,77 @@ Themes::Themes()
     //
     // Add all the standard themes
     //
-    add.name = tr("Default"); // New v3.1 default colors
+    add.name = tr("Default"); // New v3.1 default colors // ** DARK **
     colors << QColor(52,52,52) << QColor(Qt::white) << QColor(Qt::cyan) << QColor(Qt::blue) << QColor(Qt::red);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
+
 
     // now some popular combos from Kueler
-    add.name = tr("Neutral Blue");
+    add.name = tr("Neutral Blue"); // ** DARK **
     colors << QColor(25,52,65) << QColor(252,255,245) << QColor(209,219,189) << QColor(145,170,157) << QColor(62,96,188);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
-    add.name = tr("Firenze");
+    add.name = tr("Firenze"); // ** LIGHT **
     colors << QColor(255,240,165) << QColor(Qt::darkGray) << QColor(70,137,102) << QColor(182,73,38) << QColor(142,40,0);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(85,90,127) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
-    add.name = tr("Mustang");
+    add.name = tr("Mustang"); // ** DARK **
     colors << QColor(0,0,0) << QColor(255,255,255) << QColor(255,152,0) << QColor(38,50,72) << QColor(126,138,162);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
-    add.name = tr("Japanese Garden");
+    add.name = tr("Japanese Garden"); // ** DARK **
     colors << QColor(56,37,19) << QColor(216,202,168) << QColor(92,131,47) << QColor(54,57,66) << QColor(40,73,7);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
-    add.name = tr("Zen and Tea");
+    add.name = tr("Zen and Tea"); // ** DARK **
     colors << QColor(246,255,224) << QColor(149,171,99) << QColor(16,34,43) << QColor(226,240,214) << QColor(189,214,132);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
-    add.name = tr("Mono (dark)"); // New v3.1 default colors
+    add.name = tr("Mono (dark)"); // New v3.1 default colors // ** DARK **
     colors << QColor(Qt::black) << QColor(Qt::white) << QColor(Qt::white) << QColor(Qt::white) << QColor(Qt::white);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
-    add.name = tr("Mono (light)"); // New v3.1 default colors
+    add.name = tr("Mono (light)"); // New v3.1 default colors // ** LIGHT **
     colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::black) << QColor(Qt::black) << QColor(Qt::black);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::black) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
 
     // we can add more later ....
-    add.name = tr("Classic"); // Old GoldenCheetah colors
-    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::darkGray) << QColor(Qt::blue) << QColor(Qt::red);
+    add.name = tr("Classic"); // Old GoldenCheetah colors // ** LIGHT **
+    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::darkRed) << QColor(Qt::blue) << QColor(Qt::red);
+    //            HR              Speed                Power                 Cadence             Torque
+    colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::blue) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
     themes << add;
     colors.clear();
