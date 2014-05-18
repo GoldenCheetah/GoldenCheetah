@@ -149,7 +149,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull->setCheckState(Qt::Checked);
     cl1->addRow(new QLabel(""), showFull);
 
-    showHelp = new QCheckBox(tr("Show Overlay"), this);
+    showHelp = new QCheckBox(tr("Overlay"), this);
     showHelp->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showHelp);
 
