@@ -330,16 +330,16 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     titleRank = new QLabel(tr("Rank"), this);
     wprimeTitle = new QLabel(tr("W'"), this);
     wprimeValue = new QLabel(tr("0 kJ"), this);
-    wprimeRank = new QLabel(tr("0.0"), this);
+    wprimeRank = new QLabel(tr("n/a"), this);
     cpTitle = new QLabel(tr("CP"), this);
     cpValue = new QLabel(tr("0 w"), this);
-    cpRank = new QLabel(tr("0.0"), this);
+    cpRank = new QLabel(tr("n/a"), this);
     pmaxTitle = new QLabel(tr("Pmax"), this);
     pmaxValue = new QLabel(tr("0 w"), this);
-    pmaxRank = new QLabel(tr("0.0"), this);
+    pmaxRank = new QLabel(tr("n/a"), this);
     ftpTitle = new QLabel(tr("FTP"), this);
     ftpValue = new QLabel(tr("0 w"), this);
-    ftpRank = new QLabel(tr("0.0"), this);
+    ftpRank = new QLabel(tr("n/a"), this);
 
     // autofill
     titleBlank->setAutoFillBackground(true);

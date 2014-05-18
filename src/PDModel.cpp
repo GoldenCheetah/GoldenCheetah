@@ -23,9 +23,10 @@ PDModel::PDModel(Context *context) :
     QwtSyntheticPointData(PDMODEL_MAXT),
     context(context),
     sanI1(0), sanI2(0), anI1(0), anI2(0), aeI1(0), aeI2(0), laeI1(0), laeI2(0),
-    cp(0), tau(0), t0(0)
+    cp(0), tau(0), t0(0), minutes(false)
 {
     setInterval(QwtInterval(1, PDMODEL_MAXT));
+    setSize(PDMODEL_MAXT);
 }
 
 // set data using doubles always
@@ -37,6 +38,26 @@ PDModel::setData(QVector<double> meanMaxPower)
     data = meanMaxPower;
     emit dataChanged();
 }
+
+void
+PDModel::setMinutes(bool x)
+{
+    minutes = x;
+    if (minutes) {
+        setInterval(QwtInterval(1.00f / 60.00f, double(PDMODEL_MAXT)/ 60.00f));
+        setSize(PDMODEL_MAXT);
+    }
+}
+
+double PDModel::x(unsigned int index) const
+{
+    // don't start at zero !
+    index += 1;
+
+    if (minutes) return (double(index)/60.00f);
+    else return index;
+}
+
 
 // set data using floats, we convert
 void
@@ -181,6 +202,9 @@ CP2Model::CP2Model(Context *context) :
 double 
 CP2Model::y(double t) const
 {
+    // adjust to seconds
+    if (minutes) t *= 60.00f;
+
     // classic model - W' / t + CP
     return (cp * tau * 60) / t + cp;
 }
@@ -236,6 +260,9 @@ CP3Model::CP3Model(Context *context) :
 double 
 CP3Model::y(double t) const
 {
+    // adjust to seconds
+    if (minutes) t *= 60.00f;
+
     // classic model - W' / t + CP
     return cp * (double(1.00f)+tau /(((double(t)/double(60))+t0)));
 }
@@ -339,8 +366,11 @@ MultiModel::setVariant(int variant)
 double 
 MultiModel::y(double t) const
 {
+    // adjust to seconds
+    if (minutes) t *= 60.00f;
+
     // two component model
-    double pc1 = w1 / t * (1.00f - exp(-t/tau1)) * pow(1-exp(-t/10), alpha);
+    double pc1 = w1 / t * (1.00f - exp(-t/tau1)) * pow(1-exp(-t/10.00f), alpha);
 
     // which variant for pc2 ?
     double pc2 = 0.0f;
@@ -362,13 +392,13 @@ MultiModel::y(double t) const
 
         }
 
-    return pc1 + pc2;
+    return (pc1 + pc2);
 }
 
 int
 MultiModel::FTP()
 {
-    if (data.size()) return y(3600);
+    if (data.size()) return y(minutes ? 60 : 3600);
     return 0;
 }
 
@@ -384,7 +414,7 @@ MultiModel::WPrime()
 int
 MultiModel::CP()
 {
-    if (data.size()) return y(3600);
+    if (data.size()) return y(minutes ? 60 : 3600);
     return 0;
 }
 
@@ -418,7 +448,7 @@ void MultiModel::onDataChanged()
     // now account for model -- this is rather problematic
     // since the formula uses cp/w' as derived via CP220 but
     // the resulting W' is higher.
-    w1 = (cp + (cp-CP())) * tau * 60;
+    //w1 = (cp + (cp-CP())) * tau * 60;
 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 }
@@ -469,7 +499,7 @@ ExtendedModel::ExtendedModel(Context *context) :
 double
 ExtendedModel::y(double t) const
 {
-    t /= 60.00f;
+    if (!minutes) t /= 60.00f;
     return paa*(1.20-0.20*exp(-1*double(t)))*exp(paa_dec*(double(t))) + ecp * (1-exp(tau_del*double(t))) * (1-exp(ecp_del*double(t))) * (1+ecp_dec*exp(ecp_dec_del/double(t))) * ( 1 + etau/(double(t)));
 }
 

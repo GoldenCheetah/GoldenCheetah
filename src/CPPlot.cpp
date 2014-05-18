@@ -59,7 +59,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     plotType(0),
 
     // curves and plot objects
-    rideCurve(NULL), modelCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL)
+    rideCurve(NULL), modelCurve(NULL), heatCurve(NULL), heatAgeCurve(NULL), pdModel(NULL)
 
 {
     setAutoFillBackground(true);
@@ -99,9 +99,6 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     canvasPicker = new LTMCanvasPicker(this);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
-
-    // ecp model
-    ecp = new ExtendedCriticalPower(context);
 
     // now color everything we created
     configChanged();
@@ -251,116 +248,6 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     clearCurves();
 }
 
-// extract critical power parameters which match the given curve
-// model: maximal power = cp (1 + tau / [t + t0]), where t is the
-// duration of the effort, and t, cp and tau are model parameters
-// the basic critical power model is t0 = 0, but non-zero has
-// been discussed in the literature
-// it is assumed duration = index * seconds
-void
-CPPlot::deriveCPParameters()
-{
-    // no bests we can't do it
-    if (bestsCache == NULL) {
-        cp = tau = t0 = 0;
-        return;
-    }
-
-    // bounds on anaerobic interval in minutes
-    const double t1 = anI1;
-    const double t2 = anI2;
-
-    // bounds on aerobic interval in minutes
-    const double t3 = aeI1;
-    const double t4 = aeI2;
-
-    // bounds of these time valus in the data
-    int i1, i2, i3, i4;
-
-    // find the indexes associated with the bounds
-    // the first point must be at least the minimum for the anaerobic interval, or quit
-    for (i1 = 0; i1 < 60 * t1; i1++)
-        if (i1 + 1 >= bestsCache->meanMaxArray(rideSeries).size())
-            return;
-    // the second point is the maximum point suitable for anaerobicly dominated efforts.
-    for (i2 = i1; i2 + 1 <= 60 * t2; i2++)
-        if (i2 + 1 >= bestsCache->meanMaxArray(rideSeries).size())
-            return;
-    // the third point is the beginning of the minimum duration for aerobic efforts
-    for (i3 = i2; i3 < 60 * t3; i3++)
-        if (i3 + 1 >= bestsCache->meanMaxArray(rideSeries).size())
-            return;
-    for (i4 = i3; i4 + 1 <= 60 * t4; i4++)
-        if (i4 + 1 >= bestsCache->meanMaxArray(rideSeries).size())
-            break;
-
-    // initial estimate of tau
-    if (tau == 0)
-        tau = 1;
-
-    // initial estimate of cp (if not already available)
-    if (cp == 0)
-        cp = 300;
-
-    // initial estimate of t0: start small to maximize sensitivity to data
-    t0 = 0;
-
-    // lower bound on tau
-    const double tau_min = 0.5;
-
-    // convergence delta for tau
-    const double tau_delta_max = 1e-4;
-    const double t0_delta_max  = 1e-4;
-
-    // previous loop value of tau and t0
-    double tau_prev;
-    double t0_prev;
-
-    // maximum number of loops
-    const int max_loops = 100;
-
-    // loop to convergence
-    int iteration = 0;
-    do {
-
-        if (iteration ++ > max_loops) {
-
-            // don't get stuck in an infinite loop
-            qDebug()<<"Maximum number of loops in model extraction in CPPlot.";
-            break;
-        }
-
-        // record the previous version of tau, for convergence
-        tau_prev = tau;
-        t0_prev  = t0;
-
-        // estimate cp, given tau
-        int i;
-        cp = 0;
-        for (i = i3; i <= i4; i++) {
-            double cpn = bestsCache->meanMaxArray(rideSeries)[i] / (1 + tau / (t0 + i / 60.0));
-            if (cp < cpn)
-                cp = cpn;
-        }
-
-        // if cp = 0; no valid data; give up
-        if (cp == 0.0)
-            return;
-
-        // estimate tau, given cp
-        tau = tau_min;
-        for (i = i1; i <= i2; i++) {
-            double taun = (bestsCache->meanMaxArray(rideSeries)[i] / cp - 1) * (i / 60.0 + t0) - t0;
-            if (tau < taun)
-                tau = taun;
-        }
-
-        // estimate t0 - but only for veloclinic/3parm cp
-        if (model == 2 || model == 4) t0 = tau / (bestsCache->meanMaxArray(rideSeries)[1] / cp - 1) - 1 / 60.0;
-
-    } while ((fabs(tau - tau_prev) > tau_delta_max) || (fabs(t0 - t0_prev) > t0_delta_max));
-}
-
 // Plot the dashed line model curve according to the paramters
 // and will also plot the heat on the curve or below since it is
 // related to the model
@@ -401,225 +288,83 @@ CPPlot::plotModel()
     // if you want something you need to wipe the old one first
     if (!modelCurve) {
 
+        // new model please
         switch (model) {
 
         case 0 : // no model - do nothing
-            {
-            }
+            pdModel = NULL;
             break;
-
         case 1 : // 2 param
-        case 2 : // 3 param
-            {
-                deriveCPParameters();
-
-                // ooopsie no model for us!
-                if (cp == 0 && tau == 0 && t0 == 0) return;
-
-                // populate curve data with a CP curve
-                const int curve_points = 100;
-                double tmin = model == 2 ? 1.00/60.00 : tau; // we want to see the entire curve for 3 model
-                double tmax = 180.0;
-                QVector<double> cp_curve_power(curve_points);
-                QVector<double> cp_curve_time(curve_points);
-
-                for (int i = 0; i < curve_points; i ++) {
-
-                    double x = (double) i / (curve_points - 1);
-                    double t = pow(tmax, x) * pow(tmin, 1-x);
-
-                    if (criticalSeries == CriticalPowerWindow::work) //this is ENERGY
-                        cp_curve_power[i] = (cp * t + cp * tau) * 60.0 / 1000.0;
-                    else
-                        cp_curve_power[i] = cp * (1 + tau / (t + t0));
-
-                    if (criticalSeries == CriticalPowerWindow::watts_inv_time)
-                        t = 1.0 / t;
-                    cp_curve_time[i] = t;
-                }
-
-                if (rideSeries == RideFile::watts || rideSeries == RideFile::aPower || rideSeries == RideFile::xPower ||
-                    rideSeries == RideFile::NP || rideSeries == RideFile::wattsKg) {
-
-                    // set parent labels for model values
-                    CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
-                    cpw->wprimeValue->setText(QString("%1 kJ").arg(cp*tau * 60 / 1000.0, 0, 'f', 1));
-                    cpw->cpValue->setText(QString("%1 w").arg(int(cp)));
-                    cpw->ftpValue->setText("n/a");
-                    if (model == 1) {
-                        cpw->pmaxValue->setText("n/a");
-                    } else {
-                        cpw->pmaxValue->setText(QString("%1 w").arg(int(cp_curve_power[0])));
-                    }
-                }
-
-                modelCurve = new QwtPlotCurve("Model");
-                if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
-                    modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                QPen pen(GColor(CCP));
-                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
-                pen.setWidth(width);
-                pen.setStyle(Qt::DashLine);
-                modelCurve->setPen(pen);
-                modelCurve->setSamples(cp_curve_time.data(), cp_curve_power.data(), curve_points);
-                modelCurve->attach(this);
-
-            }
+            pdModel = new CP2Model(context);
             break;
+        case 2 : // 3 param
+            pdModel = new CP3Model(context);
+            break;
+        case 3 : // extended model
+            pdModel = new ExtendedModel(context);
+            break;
+        case 4 : // multimodel
+            pdModel = new MultiModel(context);
+            break;
+        }
 
-        case 3: // Damien Grauser's Extended CP model
-            {
-                cp  = tau = t0  = 0;
-                deriveCPParameters();
+        if (pdModel) {
 
-                // calculate extended CP model from all-time best data
-                Model_eCP model = ecp->deriveExtendedCP_5_3_Parameters(true, bestsCache,
-                                                                rideSeries, sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+            // set the model and load data
+            pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+            pdModel->setMinutes(true); // we're minutes here ...
+            pdModel->setData(bestsCache->meanMaxArray(rideSeries));
 
-                modelCurve = ecp->getPlotCurveForExtendedCP_5_3(model);
-                modelCurve->attach(this);
+            // create curve
+            modelCurve = new QwtPlotCurve("Model");
+            if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+                modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-                // set parent labels for model values
-                CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
-                cpw->wprimeValue->setText(QString("%1 kJ").arg(model.etau*model.ecp* 60.0f / 1000.0f, 0, 'f', 1));
-                cpw->cpValue->setText(QString("%1 w").arg(int (model.ecp)));
-                cpw->ftpValue->setText(QString("%1 w").arg(model.mmp60));
-                cpw->pmaxValue->setText(QString("%1 w").arg(model.pMax));
+            // set the point data
+            modelCurve->setData(pdModel);
 
-                // Add levels for pmax and ftp
-                // TODO use weight from date ?
+            // curve cosmetics
+            QPen pen(GColor(CCP));
+            double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+            pen.setWidth(width);
+            pen.setStyle(Qt::DashLine);
+            modelCurve->setPen(pen);
+            modelCurve->attach(this);
 
-                // Reference 22.5W/kg -> untrained 8W/kg
-                int _pMaxLevel = 15 * (model.pMax / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
-                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+            // update the model paramters display
+            CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
+
+            //WPrime
+            if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString("%1 kJ").arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
+            else cpw->wprimeValue->setText("n/a");
+
+            //CP
+            cpw->cpValue->setText(QString("%1 w").arg(pdModel->CP()));
+
+            //FTP and FTP ranking
+            if (pdModel->hasFTP()) {
+                cpw->ftpValue->setText(QString("%1 w").arg(pdModel->FTP()));
 
                 // Reference 6.25W/kg -> untrained 2.5W/kg
-                int _ftpLevel = 15 * (model.mmp60 / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
                 cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+
+            } else {
+                cpw->ftpValue->setText("n/a");
+                cpw->ftpRank->setText("n/a");
             }
-            break;
 
-            case 4:
-            {
-                // the Michael Puchowicz (aka @Veloclinic) model has the following formulation
-                //
-                // p(t) = pc1 + pc2
-                //        Power at time t is the sum of;
-                //        pc1 - the power from component 1 (fast twitch pools)
-                //        pc2 - the power from component 2 (slow twitch motor units)
-                //
-                // The inputs are derived from the CP2-20 model and 3 constants:
-                //
-                //      Pmax - as derived from the CP2-20 model (via t0)
-                //      w1   - W' as derived from the CP2-20 model
-                //      p1   - pmax - cp as derived from the CP2-20 model
-                //      p2   - cp as derived from the CP2-20 model
-                //      tau1 - W'1 / p1
-                //      tau2 - 15,000
-                //      w2   -  A slow twitch W' derived from p2 * tau2
-                //      alpha- 0.1 thru -0.1, we default to zero
-                //      beta - 1.0
-                //
-                // Fast twitch component is:
-                //      pc1(t) = W'1 / t * (1-exp(-t/tau1)) * ((1-exp(-t/10)) ^ (1/alpha))
-                //
-                // Slow twitch component has three formulations:
-                //      sprint capped linear)          pc2(t) = p2 * tau2 * (1-exp(-t/tau2))
-                //      sprint capped regeneration)    pc2(t) = p2 / (1 + t/tau2)
-                //      sprint capped exponential)     pc2(t) = p2 / (1 + t/5400) ^ (1/beta)
-                //
-                // Currently deciding which of the three formulations to use
-                // as the base for GoldenCheetah (we have enough models already !)
-                //
-                // to keep things simple we just use formulation (a) for now.
-                cp  = tau = t0  = 0;
-                deriveCPParameters();
+            // P-MAX and P-MAX ranking
+            if (pdModel->hasPMax()) {
+                cpw->pmaxValue->setText(QString("%1 w").arg(pdModel->PMax()));
 
-                // ooopsie no model for us!
-                if (cp == 0 && tau == 0 && t0 == 0) return;
-
-                double pmax = cp * (double(1.00f)+tau /(((double(1)/double(60))+t0)));
-                double w1 = cp*tau*60;
-                double p1 = pmax - cp;
-                double p2 = cp;
-                double tau1 = w1 / p1;
-                const double tau2 = 15000;
-                const double alpha = 0.0f;
-                const double beta = 1.0;
-
-                //double w2 = p2 * tau2;
-                //qDebug()<<"model parameters: pmax="<<pmax<<"w1="<<w1<<"p1="<<p1
-                //            <<"p2="<<p2<<"tau1="<<tau1<<"tau2="<<tau2<<"alpha="<<alpha;
-
-                // populate curve data with a CP curve of 100 points resolution
-                const int points = 3600 * 10; // 10 hours is enough
-                QVector<double> cp_curve_power(points);
-                QVector<double> cp_curve_time(points);
-
-                for (int i = 0; i < points; i ++) {
-
-                    double t = i+1;
-
-                    if (criticalSeries == CriticalPowerWindow::work) {//this is ENERGY same as other models
-                        cp_curve_power[i] = (cp * t + cp * tau) * 60.0 / 1000.0;
-
-                    } else {
-
-                        // two component model
-                        double pc1 = w1 / t * (1.00f - exp(-t/tau1)) * pow(1-exp(-t/10), alpha);
-
-                        // which variant for pc2 ?
-                        double pc2 = 0.0f;
-                        switch (modelVariant) {
-
-                            default:
-                            case 0 : // exponential top and bottom
-                                pc2 = p2 * tau2 / t * (1-exp(-t/tau2));
-                                break;
-
-                            case 1 : // linear feedback
-                                pc2 = p2 / (1+t/tau2);
-                                break;
-
-                            case 2 : // regeneration
-                                pc2 = pow(p2 / (1+t/5400),1/beta);
-                                //pc2 = p2 / pow((1+t/5400),(1/beta));
-                                break;
-
-                        }
-
-                        // p(t) as a sum of both component powers
-                        cp_curve_power[i] = pc1 + pc2;
-                    }
-
-                    // set time
-                    if (criticalSeries == CriticalPowerWindow::watts_inv_time) t = 1.0 / t;
-                    cp_curve_time[i] = t / 60.00f;
-                }
-
-                if (rideSeries == RideFile::watts || rideSeries == RideFile::aPower || rideSeries == RideFile::xPower ||
-                    rideSeries == RideFile::NP || rideSeries == RideFile::wattsKg) {
-
-                    // set parent labels for model values
-                    CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
-                    cpw->wprimeValue->setText(QString("%1 kJ").arg(cp*tau * 60 / 1000.0, 0, 'f', 1));
-                    cpw->cpValue->setText(QString("%1 w").arg(int(cp)));
-                    cpw->ftpValue->setText("n/a");
-                    cpw->pmaxValue->setText(QString("%1 w").arg(int(pmax)));
-                }
-
-                modelCurve = new QwtPlotCurve("Model");
-                if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
-                    modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                QPen pen(GColor(CCP));
-                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
-                pen.setWidth(width);
-                pen.setStyle(Qt::DashLine);
-                modelCurve->setPen(pen);
-                modelCurve->setSamples(cp_curve_time, cp_curve_power);
-                modelCurve->attach(this);
+                // Reference 22.5W/kg -> untrained 8W/kg
+                int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+            } else  {
+                cpw->pmaxValue->setText("n/a");
+                cpw->pmaxRank->setText("n/a");
             }
-            break;
         }
     }
 
@@ -685,7 +430,6 @@ CPPlot::plotModel()
         heatAgeCurve->attach(this);
 
     }
-
 }
 
 // wipe away all the curves
@@ -762,7 +506,6 @@ CPPlot::plotBests()
     // do we need to get the cache ?
     if (bestsCache == NULL) {
         bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode);
-        deriveCPParameters(); // refresh cp, tau and t0
     }
 
     // how much we got ?
@@ -782,11 +525,8 @@ CPPlot::plotBests()
     // we can only do shading of the bests curve
     // when we have power and the user wants it to
     // be a rainbow curve. Otherwise its gonna be plain
-    int shadingCP = 0; // default to no shading
-    if (rideSeries == RideFile::watts) {
-        if (shadeMode == 1) shadingCP = dateCP; // by cp set by the user for this "bests" date range
-        if (shadeMode == 2) shadingCP = cp;     // by cp derived from this "bests" date range
-    }
+    int shadingCP = 0; 
+    if (rideSeries == RideFile::watts && shadeMode) shadingCP = dateCP;
 
     // lets setup a time array to the size we want to plot the bests curve
     // and do work at the same time since its used in a few places below
@@ -1351,18 +1091,19 @@ CPPlot::setShadeIntervals(int x)
 void
 CPPlot::setModel(int sanI1, int sanI2, int anI1, int anI2, int aeI1, int aeI2, int laeI1, int laeI2, int model, int variant)
 {
-    this->anI1 = double(anI1) / double(60.00f);
-    this->anI2 = double(anI2) / double(60.00f);
-    this->aeI1 = double(aeI1) / double(60.00f);
-    this->aeI2 = double(aeI2) / double(60.00f);
+    this->anI1 = double(anI1);
+    this->anI2 = double(anI2);
+    this->aeI1 = double(aeI1);
+    this->aeI2 = double(aeI2);
 
-    this->sanI1 = double(sanI1) / double(60.00f);
-    this->sanI2 = double(sanI2) / double(60.00f);
-    this->laeI1 = double(laeI1) / double(60.00f);
-    this->laeI2 = double(laeI2) / double(60.00f);
+    this->sanI1 = double(sanI1);
+    this->sanI2 = double(sanI2);
+    this->laeI1 = double(laeI1);
+    this->laeI2 = double(laeI2);
 
     this->model = model;
     this->modelVariant = variant;
+
     clearCurves();
 }
 

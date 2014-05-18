@@ -69,11 +69,14 @@ class PDModel : public QObject, public QwtSyntheticPointData
         void setData(QVector<double> meanMaxPower);
         void setData(QVector<float> meanMaxPower);
 
+        void setMinutes(bool); // use minutes in y()
+
         // set the intervals to search for bests
         void setIntervals(double sanI1, double sanI2, double anI1, double anI2,
                           double aeI1, double aeI2, double laeI1, double laeI2);
 
         // provide data to a QwtPlotCurve
+        double x(unsigned int index) const; 
         virtual double y(double /* t */) const { return 0; }
 
         // what capabilities do you have ?
@@ -121,6 +124,8 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         // mean max power data set by setData
         QVector<double> data;
+
+        bool minutes;
 };
 
 // estimates are recorded 
