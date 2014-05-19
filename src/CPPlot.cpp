@@ -256,7 +256,7 @@ CPPlot::plotModel()
 {
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
-    if (model == 0 || rideSeries != RideFile::watts) {
+    if (model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg)) {
         if (modelCurve) {
             modelCurve->detach();
             delete modelCurve;
@@ -280,7 +280,7 @@ CPPlot::plotModel()
     }
 
     // we don't want a model
-    if (rideSeries != RideFile::watts) return;
+    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts) return;
 
     // we don't have any bests yet?
     if (bestsCache == NULL) return;
@@ -334,36 +334,75 @@ CPPlot::plotModel()
             // update the model paramters display
             CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
 
-            //WPrime
-            if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString("%1 kJ").arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
-            else cpw->wprimeValue->setText("n/a");
+            // update the helper widget -- either as watts or w/kg
 
-            //CP
-            cpw->cpValue->setText(QString("%1 w").arg(pdModel->CP()));
+            if (rideSeries == RideFile::watts) {
 
-            //FTP and FTP ranking
-            if (pdModel->hasFTP()) {
-                cpw->ftpValue->setText(QString("%1 w").arg(pdModel->FTP()));
+                //WPrime
+                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString("%1 kJ").arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
+                else cpw->wprimeValue->setText("n/a");
 
-                // Reference 6.25W/kg -> untrained 2.5W/kg
-                int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
-                cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+                //CP
+                cpw->cpValue->setText(QString("%1 w").arg(pdModel->CP(), 0, 'f', 0));
+
+                //FTP and FTP ranking
+                if (pdModel->hasFTP()) {
+                    cpw->ftpValue->setText(QString("%1 w").arg(pdModel->FTP(), 0, 'f', 0));
+
+                    // Reference 6.25W/kg -> untrained 2.5W/kg
+                    int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                    cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+
+                } else {
+                    cpw->ftpValue->setText("n/a");
+                    cpw->ftpRank->setText("n/a");
+                }
+
+                // P-MAX and P-MAX ranking
+                if (pdModel->hasPMax()) {
+                    cpw->pmaxValue->setText(QString("%1 w").arg(pdModel->PMax(), 0, 'f', 0));
+
+                    // Reference 22.5W/kg -> untrained 8W/kg
+                    int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                    cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                } else  {
+                    cpw->pmaxValue->setText("n/a");
+                    cpw->pmaxRank->setText("n/a");
+                }
 
             } else {
-                cpw->ftpValue->setText("n/a");
-                cpw->ftpRank->setText("n/a");
-            }
 
-            // P-MAX and P-MAX ranking
-            if (pdModel->hasPMax()) {
-                cpw->pmaxValue->setText(QString("%1 w").arg(pdModel->PMax()));
+                //WPrime
+                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString("%1 kJ/kg").arg(pdModel->WPrime() / 1000.0, 0, 'f', 2));
+                else cpw->wprimeValue->setText("n/a");
 
-                // Reference 22.5W/kg -> untrained 8W/kg
-                int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
-                cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
-            } else  {
-                cpw->pmaxValue->setText("n/a");
-                cpw->pmaxRank->setText("n/a");
+                //CP
+                cpw->cpValue->setText(QString("%1 w/kg").arg(pdModel->CP(), 0, 'f', 2));
+
+                //FTP and FTP ranking
+                if (pdModel->hasFTP()) {
+                    cpw->ftpValue->setText(QString("%1 w/kg").arg(pdModel->FTP(), 0, 'f', 2));
+
+                    // Reference 6.25W/kg -> untrained 2.5W/kg
+                    int _ftpLevel = 15 * (pdModel->FTP() - 2.5) / (6.25-2.5) ;
+                    cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+
+                } else {
+                    cpw->ftpValue->setText("n/a");
+                    cpw->ftpRank->setText("n/a");
+                }
+
+                // P-MAX and P-MAX ranking
+                if (pdModel->hasPMax()) {
+                    cpw->pmaxValue->setText(QString("%1 w/kg").arg(pdModel->PMax(), 0, 'f', 2));
+
+                    // Reference 22.5W/kg -> untrained 8W/kg
+                    int _pMaxLevel = 15 * (pdModel->PMax() - 8) / (23-8) ;
+                    cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                } else  {
+                    cpw->pmaxValue->setText("n/a");
+                    cpw->pmaxRank->setText("n/a");
+                }
             }
         }
     }
@@ -605,7 +644,7 @@ CPPlot::plotBests()
 
         // when plotting power bests AND a model we draw bests as dots
         // but only if in 'plain' mode .. not doing a rainbow curve.
-        if (rideSeries == RideFile::watts && model) {
+        if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && model) {
 
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Ellipse);
@@ -620,7 +659,7 @@ CPPlot::plotBests()
         line.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
 
         curve->setPen(line);
-        if (rideSeries == RideFile::watts)
+        if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
             curve->setBrush(Qt::NoBrush);
         else
             curve->setBrush(QBrush(fill));
@@ -764,7 +803,7 @@ CPPlot::plotBests()
     } else {
 
         // or just add 10% headroom
-        setAxisScale(yLeft, 0, 1.1*ymax);
+        setAxisScale(yLeft, 0, 1.1*values[0]);
     }
 }
 
