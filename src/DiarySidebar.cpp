@@ -393,9 +393,9 @@ DiarySidebar::setSummary()
     QString name;
 
     if (summarySelect->currentIndex() == 0)
-        name = tr("Day of ") + from.toString("dddd MMMM d");
+        name = tr("Day of ") + from.toString(tr("dddd MMMM d"));
     else if (summarySelect->currentIndex() == 1)
-        name = QString(tr("Week Commencing %1")).arg(from.toString("dddd MMMM d"));
+        name = QString(tr("Week Commencing %1")).arg(from.toString(tr("dddd MMMM d")));
     else if (summarySelect->currentIndex() == 2)
         name = from.toString(tr("MMMM yyyy"));
 
@@ -779,7 +779,7 @@ GcMiniCalendar::setDate(int _month, int _year)
 
     // don't refresh the model if we're already showing this month
     if (month != _month || year != _year) calendarModel->setMonth(_month, _year);
-    monthName->setText(QDate(_year,_month,01).toString("MMMM yyyy"));
+    monthName->setText(QDate(_year,_month,01).toString(tr("MMMM yyyy")));
 
     // update state
     month = _month;

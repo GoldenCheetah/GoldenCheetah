@@ -123,10 +123,10 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
 
     wheelSizeCombo = new QComboBox();
-    wheelSizeCombo->addItem("Road/Cross (700C/622)"); // 2100mm
-    wheelSizeCombo->addItem("Tri/TT (650C)"); // 1960mm
-    wheelSizeCombo->addItem("Mountain (26\")"); // 1985mm
-    wheelSizeCombo->addItem("BMX (20\")"); // 1750mm
+    wheelSizeCombo->addItem(tr("Road/Cross (700C/622)")); // 2100mm
+    wheelSizeCombo->addItem(tr("Tri/TT (650C)")); // 1960mm
+    wheelSizeCombo->addItem(tr("Mountain (26\")")); // 1985mm
+    wheelSizeCombo->addItem(tr("BMX (20\")")); // 1750mm
 
     switch (wheelSize) {
     default:
@@ -150,7 +150,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     // by default, set the threshold to 25 seconds
     if (garminHWMark.isNull() || garminHWMark.toInt() == 0) garminHWMark.setValue(25);
-    QLabel *garminHWLabel = new QLabel(tr("Threshold (secs):"));
+    QLabel *garminHWLabel = new QLabel(tr("Smart Recoding Threshold (secs):"));
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
@@ -207,7 +207,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteDirectory = new QLineEdit;
     athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
     athleteBrowseButton = new QPushButton(tr("Browse"));
-    athleteBrowseButton->setFixedWidth(70);
+    athleteBrowseButton->setFixedWidth(120);
 
     configLayout->addWidget(athleteLabel, 12,0, Qt::AlignRight);
     configLayout->addWidget(athleteDirectory, 12,1);
@@ -223,7 +223,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     workoutDirectory = new QLineEdit;
     workoutDirectory->setText(workoutDir.toString());
     workoutBrowseButton = new QPushButton(tr("Browse"));
-    workoutBrowseButton->setFixedWidth(70);
+    workoutBrowseButton->setFixedWidth(120);
 
     configLayout->addWidget(workoutLabel, 14,0, Qt::AlignRight);
     configLayout->addWidget(workoutDirectory, 14,1);
@@ -278,7 +278,7 @@ GeneralPage::browseWorkoutDir()
 {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
                             "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    workoutDirectory->setText(dir);
+    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 void
@@ -286,7 +286,7 @@ GeneralPage::browseAthleteDir()
 {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Athlete Library"),
                             "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    athleteDirectory->setText(dir);
+    if (dir != "") athleteDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 //
@@ -409,7 +409,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     twitterURL = new QLineEdit(this);
     twitterURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TWURL, "http://www.twitter.com").toString());
-    twitterAuthorise = new QPushButton("Authorise", this);
+    twitterAuthorise = new QPushButton(tr("Authorise"), this);
     QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
 
     twitterAuthorised = new QPushButton(this);
@@ -419,7 +419,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     twitterAuthorised->setFixedHeight(16);
     twitterAuthorised->setFixedWidth(16);
 
-    stravaAuthorise = new QPushButton("Authorise", this);
+    stravaAuthorise = new QPushButton(tr("Authorise"), this);
 
 #ifndef GC_STRAVA_CLIENT_SECRET
     stravaAuthorise->setEnabled(false);
@@ -432,7 +432,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     stravaAuthorised->setFixedHeight(16);
     stravaAuthorised->setFixedWidth(16);
 
-    cyclingAnalyticsAuthorise = new QPushButton("Authorise", this);
+    cyclingAnalyticsAuthorise = new QPushButton(tr("Authorise"), this);
 #ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
     cyclingAnalyticsAuthorise->setEnabled(false);
 #endif
@@ -1132,7 +1132,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     colors->headerItem()->setText(0, tr("Color"));
     colors->headerItem()->setText(1, tr("Select"));
     colors->setColumnCount(2);
-    colors->setColumnWidth(0,310);
+    colors->setColumnWidth(0,350);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true);
@@ -2091,8 +2091,8 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
 #endif
@@ -2305,8 +2305,8 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
 #endif
@@ -2440,9 +2440,9 @@ FieldsPage::addClicked()
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
     // field
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; fields->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(1, text);
 
@@ -2610,9 +2610,10 @@ SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
 #ifndef Q_OS_MAC
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
 #endif
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
     actionButtons->addStretch();
@@ -2690,16 +2691,16 @@ SchemePage::addClicked()
     scheme->setItemWidget(add, 2, loedit);
 
     // Short
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(0, text);
 
     // long
-    text = "New";
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+    text = tr("New");
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(1, text);
 }
@@ -2775,8 +2776,8 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
 #endif
     defaultButton = new QPushButton(tr("Def"));
     defaultButton->hide();
@@ -2787,8 +2788,8 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     addZoneButton->setFixedSize(20,20);
     deleteZoneButton->setFixedSize(20,20);
 #else
-    addZoneButton->setText("Add");
-    deleteZoneButton->setText("Delete");
+    addZoneButton->setText(tr("Add"));
+    deleteZoneButton->setText(tr("Delete"));
 #endif
 
     QHBoxLayout *zoneButtons = new QHBoxLayout;
@@ -2854,7 +2855,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
                                         QFont::Normal : QFont::Black);
 
         // date
-        add->setText(0, zonePage->zones.getStartDate(i).toString("MMM d, yyyy"));
+        add->setText(0, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
         add->setFont(0, font);
 
         // CP
@@ -2904,7 +2905,7 @@ CPPage::addClicked()
     int cp = cpEdit->value();
     if( cp <= 0 ){
         QMessageBox err;
-        err.setText("CP must be > 0");
+        err.setText(tr("CP must be > 0"));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
@@ -2919,7 +2920,7 @@ CPPage::addClicked()
     ranges->invisibleRootItem()->insertChild(index, add);
 
     // date
-    add->setText(0, dateEdit->date().toString("MMM d, yyyy"));
+    add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // CP
     add->setText(1, QString("%1").arg(cpEdit->value()));
@@ -3054,16 +3055,16 @@ CPPage::addZoneClicked()
     connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
 
     // Short
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(0, text);
 
     // long
-    text = "New";
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+    text = tr("New");
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(1, text);
     active = false;
@@ -3183,8 +3184,8 @@ HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
@@ -3251,7 +3252,7 @@ HrSchemePage::addClicked()
     // are we at maximum already?
     if (scheme->invisibleRootItem()->childCount() == 10) {
         QMessageBox err;
-        err.setText("Maximum of 10 zones reached.");
+        err.setText(tr("Maximum of 10 zones reached."));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
@@ -3284,16 +3285,16 @@ HrSchemePage::addClicked()
     scheme->setItemWidget(add, 3, trimpedit);
 
     // Short
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(0, text);
 
     // long
-    text = "New";
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+    text = tr("New");
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(1, text);
 }
@@ -3362,8 +3363,8 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
 #endif
     defaultButton = new QPushButton(tr("Def"));
     defaultButton->hide();
@@ -3374,8 +3375,8 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     addZoneButton->setFixedSize(20,20);
     deleteZoneButton->setFixedSize(20,20);
 #else
-    addZoneButton->setText("Add");
-    deleteZoneButton->setText("Delete");
+    addZoneButton->setText(tr("Add"));
+    deleteZoneButton->setText(tr("Delete"));
 #endif
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
@@ -3454,7 +3455,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
                        QFont::Normal : QFont::Black);
 
         // date
-        add->setText(0, zonePage->zones.getStartDate(i).toString("MMM d, yyyy"));
+        add->setText(0, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
         add->setFont(0, font);
 
         // LT
@@ -3517,7 +3518,7 @@ LTPage::addClicked()
     ranges->invisibleRootItem()->insertChild(index, add);
 
     // date
-    add->setText(0, dateEdit->date().toString("MMM d, yyyy"));
+    add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
     // LT
     add->setText(1, QString("%1").arg(ltEdit->value()));
@@ -3636,7 +3637,7 @@ LTPage::addZoneClicked()
     // are we at maximum already?
     if (zones->invisibleRootItem()->childCount() == 10) {
         QMessageBox err;
-        err.setText("Maximum of 10 zones reached.");
+        err.setText(tr("Maximum of 10 zones reached."));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
@@ -3671,16 +3672,16 @@ LTPage::addZoneClicked()
     connect(trimpedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
 
     // Short
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(0, text);
 
     // long
-    text = "New";
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+    text = tr("New");
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(1, text);
     active = false;
@@ -3777,8 +3778,8 @@ MeasuresPage::MeasuresPage(Context *context) : context(context)
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
 #endif
@@ -3904,9 +3905,9 @@ MeasuresPage::addClicked()
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
     // field
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; fields->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(1, text);
 
@@ -3985,10 +3986,10 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
     toEdit->setCalendarPopup(true);
 
     // set form
-    editLayout->addRow(new QLabel("Name"), nameEdit);
-    editLayout->addRow(new QLabel("Type"), typeEdit);
-    editLayout->addRow(new QLabel("From"), fromEdit);
-    editLayout->addRow(new QLabel("To"), toEdit);
+    editLayout->addRow(new QLabel(tr("Name")), nameEdit);
+    editLayout->addRow(new QLabel(tr("Type")), typeEdit);
+    editLayout->addRow(new QLabel(tr("From")), fromEdit);
+    editLayout->addRow(new QLabel(tr("To")), toEdit);
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
@@ -4002,8 +4003,8 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
 #else
-    addButton->setText("Add");
-    deleteButton->setText("Delete");
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
 #endif
@@ -4051,9 +4052,9 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
         // type
         add->setText(1, Season::types[static_cast<int>(season.type)]);
         // from
-        add->setText(2, season.start.toString("ddd MMM d, yyyy"));
+        add->setText(2, season.start.toString(tr("ddd MMM d, yyyy")));
         // to
-        add->setText(3, season.end.toString("ddd MMM d, yyyy"));
+        add->setText(3, season.end.toString(tr("ddd MMM d, yyyy")));
         // guid -- hidden
         add->setText(4, season._id.toString());
 
@@ -4144,9 +4145,9 @@ SeasonsPage::addClicked()
     // type
     add->setText(1, Season::types[typeEdit->currentIndex()]);
     // from
-    add->setText(2, fromEdit->date().toString("ddd MMM d, yyyy"));
+    add->setText(2, fromEdit->date().toString(tr("ddd MMM d, yyyy")));
     // to
-    add->setText(3, toEdit->date().toString("ddd MMM d, yyyy"));
+    add->setText(3, toEdit->date().toString(tr("ddd MMM d, yyyy")));
     // guid -- hidden
     add->setText(4, (id=QUuid::createUuid().toString()));
 

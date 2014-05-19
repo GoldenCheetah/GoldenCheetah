@@ -48,7 +48,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     head->setMovable(false); // oops!
 
     QFont defaultFont;
-    setFixedSize(53 * defaultFont.pointSize(),580);
+    setFixedSize(60 * defaultFont.pointSize(),580);   //Change for 53 to 60 - To be decided if also Size for Q_OS_MAC need change
 #endif
 
     // icons
