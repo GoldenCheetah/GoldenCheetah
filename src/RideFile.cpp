@@ -1064,7 +1064,7 @@ RideFile::getWeight()
     int i = measures.count()-1;
     if (i) {
         while (i>=0) {
-            if ((weight_ = measures[i].getText("Weight", "0.0").toDouble()) > 0) {
+            if ((weight_ = measures[i].getText("Weight_m", "0.0").toDouble()) > 0) {
                return weight_;
             }
             i--;
