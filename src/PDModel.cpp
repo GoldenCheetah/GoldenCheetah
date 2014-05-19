@@ -210,14 +210,14 @@ CP2Model::y(double t) const
 }
 
 // 2 parameter model can calculate these
-int 
+double 
 CP2Model::WPrime()
 {
     // kjoules
     return (cp * tau * 60);
 }
 
-int
+double
 CP2Model::CP()
 {
     return cp;
@@ -268,20 +268,20 @@ CP3Model::y(double t) const
 }
 
 // 2 parameter model can calculate these
-int 
+double 
 CP3Model::WPrime()
 {
     // kjoules
     return (cp * tau * 60);
 }
 
-int
+double
 CP3Model::CP()
 {
     return cp;
 }
 
-int
+double
 CP3Model::PMax()
 {
     // casting to double across to ensure we don't lose precision
@@ -395,7 +395,7 @@ MultiModel::y(double t) const
     return (pc1 + pc2);
 }
 
-int
+double
 MultiModel::FTP()
 {
     if (data.size()) return y(minutes ? 60 : 3600);
@@ -403,7 +403,7 @@ MultiModel::FTP()
 }
 
 // 2 parameter model can calculate these
-int 
+double 
 MultiModel::WPrime()
 {
     // kjoules -- add in difference between CP60 from
@@ -411,14 +411,14 @@ MultiModel::WPrime()
     return w1;
 }
 
-int
+double
 MultiModel::CP()
 {
     if (data.size()) return y(minutes ? 60 : 3600);
     return 0;
 }
 
-int
+double
 MultiModel::PMax()
 {
     // casting to double across to ensure we don't lose precision
@@ -504,20 +504,20 @@ ExtendedModel::y(double t) const
 }
 
 // 2 parameter model can calculate these
-int
+double
 ExtendedModel::WPrime()
 {
     // kjoules
     return (ecp * etau * 60);
 }
 
-int
+double
 ExtendedModel::CP()
 {
     return ecp;
 }
 
-int
+double
 ExtendedModel::PMax()
 {
     // casting to double across to ensure we don't lose precision
@@ -526,7 +526,7 @@ ExtendedModel::PMax()
     return paa*(1.20-0.20*exp(-1*(1/60.0)))*exp(paa_dec*(1/60.0)) + ecp * (1-exp(tau_del*(1/60.0))) * (1-exp(ecp_del*(1/60.0))) * (1+ecp_dec*exp(ecp_dec_del/(1/60.0))) * ( 1 + etau/(1/60.0));
 }
 
-int
+double
 ExtendedModel::FTP()
 {
     // casting to double across to ensure we don't lose precision

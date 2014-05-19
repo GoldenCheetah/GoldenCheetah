@@ -86,10 +86,10 @@ class PDModel : public QObject, public QwtSyntheticPointData
         virtual bool hasFTP()    { return false; }  // can estimate W'
         virtual bool hasPMax()   { return false; }  // can estimate W'
 
-        virtual int WPrime()     { return 0; }      // return estimated W'
-        virtual int CP()         { return 0; }      // return CP
-        virtual int FTP()        { return 0; }      // return FTP
-        virtual int PMax()       { return 0; }      // return PMax
+        virtual double WPrime()     { return 0; }      // return estimated W'
+        virtual double CP()         { return 0; }      // return CP
+        virtual double FTP()        { return 0; }      // return FTP
+        virtual double PMax()       { return 0; }      // return PMax
 
         virtual void saveParameters(QList<double>&here) = 0;
         virtual void loadParameters(QList<double>&here) = 0;
@@ -163,8 +163,8 @@ class CP2Model : public PDModel
         bool hasPMax()   { return false; }  // can estimate W'
 
         // 2 parameter model can calculate these
-        int WPrime();
-        int CP();
+        double WPrime();
+        double CP();
 
         QString name()   { return "Classic 2 Parameter"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "2 Parm"; }        // short name used in metric names e.g. 2P model
@@ -195,9 +195,9 @@ class CP3Model : public PDModel
         bool hasPMax()   { return true; }  // can estimate p-Max
 
         // 2 parameter model can calculate these
-        int WPrime();
-        int CP();
-        int PMax();
+        double WPrime();
+        double CP();
+        double PMax();
 
         QString name()   { return "Morton 3 Parameter"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "3 Parm"; }        // short name used in metric names e.g. 2P model
@@ -229,10 +229,10 @@ class MultiModel : public PDModel
         bool hasPMax()   { return true; }  // can estimate p-Max
 
         // 2 parameter model can calculate these
-        int WPrime();
-        int CP();
-        int FTP();
-        int PMax();
+        double WPrime();
+        double CP();
+        double FTP();
+        double PMax();
 
         QString name()   { return "Veloclinic Multicomponent"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "Velo"; }        // short name used in metric names e.g. 2P model
@@ -268,10 +268,10 @@ class ExtendedModel : public PDModel
         bool hasPMax()   { return true; }  // can estimate p-Max
 
         // 4 parameter model can calculate these
-        int WPrime();
-        int CP();
-        int FTP();
-        int PMax();
+        double WPrime();
+        double CP();
+        double FTP();
+        double PMax();
 
         QString name()   { return "Extended CP"; }  // model name e.g. CP 2 parameter model
         QString code()   { return "Ext"; }        // short name used in metric names e.g. 2P model

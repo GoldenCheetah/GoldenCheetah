@@ -679,7 +679,7 @@ CriticalPowerWindow::modelParametersChanged()
     // need a helper any more ?
     if (seriesCombo->currentIndex() >= 0) {
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
-        if (series == watts && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
     }
 
@@ -731,7 +731,7 @@ CriticalPowerWindow::forceReplot()
 
         // show helper if we're showing power
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
-        if (series == watts && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
     }
 
@@ -1086,7 +1086,7 @@ CriticalPowerWindow::setSeries(int index)
 
         // need a helper any more ?
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt());
-        if (series == watts && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
 
         if (rangemode) {
