@@ -8,9 +8,10 @@ MAJOR NEW FEATURES
    * Compare Athletes, Seasons, Rides, Intervals
    * Easy and intuitive user interface
 
-2. Power Duration Models
-   * Multiple PD models available
-   * Track changes in W', CP, P-Max, FTP over time
+2. Additional Power Duration Models
+   * Multiple PD models now available
+   * Track changes in model estimates for W', CP, P-Max, FTP over time
+   * Track changes in model estimates for any duration over time
 
 2. Merge Activities
 3. Share Dialog
@@ -81,6 +82,6 @@ iv  CP refactored (for models and intervals)
 v   AllPlot refactored (for compare)
 
 BUG FIXES
-i   Over 600 commits since 3.0 including many bug fixes
+i   Over 900 commits since 3.0 including many bug fixes
 ii  Eradicating assert reduces crashes
 iii Crash dialog/restart to menu
