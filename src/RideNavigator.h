@@ -174,6 +174,7 @@ class RideNavigator : public GcWindow
 
         // font metrics for display etc
         int fontHeight;
+        QColor reverseColor; // used by delegate when 'use for color' set
 
         // search filter
         SearchFilter *searchFilter;

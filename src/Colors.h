@@ -126,13 +126,13 @@ class ColorEngine : public QObject
         ColorEngine(Context *);
 
         QColor colorFor(QString);
+        QColor defaultColor, reverseColor;
 
     public slots:
         void configUpdate();
 
     private:
         QMap<QString, QColor> workoutCodes;
-        QColor defaultColor;
         Context *context;
 };
 

@@ -261,10 +261,15 @@ void ColorEngine::configUpdate()
     // clear existing
     workoutCodes.clear();
 
+    // reverse
+    reverseColor = GColor(CPLOTBACKGROUND);
+
     // setup the keyword/color combinations from config settings
     foreach (KeywordDefinition keyword, context->athlete->rideMetadata()->getKeywords()) {
         if (keyword.name == "Default")
             defaultColor = keyword.color; // we actually ignore this now
+        else if (keyword.name == "Reverse")
+            reverseColor = keyword.color;  // to set the foreground when use as background is set
         else {
             workoutCodes[keyword.name] = keyword.color;
 
