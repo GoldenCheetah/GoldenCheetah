@@ -39,6 +39,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     currentColumn = -1;
     _groupBy = -1;
     fontHeight = QFontMetrics(QFont()).height();
+    ColorEngine ce(context);
+    reverseColor = ce.reverseColor;
 
     init = false;
 
@@ -138,7 +140,9 @@ RideNavigator::~RideNavigator()
 void
 RideNavigator::refresh()
 {
+    ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();
+    reverseColor = ce.reverseColor;
 
     context->athlete->sqlModel->select();
     while (context->athlete->sqlModel->canFetchMore(QModelIndex()))
@@ -955,8 +959,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         rideBG = false; // default so don't swap round...
         userColor = GColor(CPLOTMARKER);
     }
-    QBrush background = QBrush(GColor(CPLOTBACKGROUND)); //XXX
-    QColor backgroundColor = GColor(CPLOTBACKGROUND);
+    QBrush background = QBrush(GColor(CPLOTBACKGROUND));
 
     if (columnName != "*") {
 
@@ -987,7 +990,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->setFont(boldened);
         if (!selected) {
             // not selected, so invert ride plot color
-            painter->setPen(rideBG ? backgroundColor : userColor);
+            painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
         }
 
         QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
@@ -1020,7 +1023,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             QPen isColor = painter->pen();
             if (!selected) {
                 // not selected, so invert ride plot color
-                painter->setPen(rideBG ? backgroundColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+                painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
             }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
