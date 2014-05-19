@@ -379,7 +379,7 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Mustang"); // ** DARK **
-    colors << QColor(0,0,0) << QColor(255,255,255) << QColor(255,152,0) << QColor(38,50,72) << QColor(126,138,162);
+    colors << QColor(0,0,0) << QColor(255,255,255) << QColor(255,152,0) << QColor(Qt::white) << QColor(126,138,162);
     //            HR              Speed                Power                 Cadence             Torque
     colors << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::yellow) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
