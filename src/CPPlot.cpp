@@ -494,9 +494,8 @@ CPPlot::clearCurves()
     }
 
     // rainbow curve
-    if (bestsCurves.size()) {
-        foreach (QwtPlotCurve *curve, bestsCurves)
-        delete curve;
+    if (bestsCurves.count()) {
+        foreach (QwtPlotCurve *curve, bestsCurves) delete curve;
         bestsCurves.clear();
     }
 
@@ -1043,9 +1042,12 @@ CPPlot::exportBests(QString filename)
 
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return; // couldn't open file
 
+    // do we want to export the model estimate too ?
+    bool model = (pdModel && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts));
+
     // open stream and write header
     QTextStream stream(&f);
-    stream << "seconds, value, date" << endl;
+    stream << "seconds, value," << (model ? " model, date" : " date") << endl;
 
     // output a row for each second
     foreach(QwtPlotCurve *bestsCurve, bestsCurves) {
@@ -1054,14 +1056,17 @@ CPPlot::exportBests(QString filename)
         for (size_t i=0; i<bestsCurve->data()->size(); i++) {
             double xvalue = bestsCurve->sample(i).x();
             double yvalue = bestsCurve->sample(i).y();
+            double modelvalue = model ? pdModel->y(xvalue) : 0;
 
-            int index = xvalue * 60;
+            int index = xvalue * 60.00f;
             QDate date;
             if (index >= 0 && bestsCache && getBests().count() > index) {
                 date = getBestDates()[index];
             }
 
-            stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString() << endl;
+            // values
+            if (model) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString() << endl;
+            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString() << endl;
         }
     }
 
