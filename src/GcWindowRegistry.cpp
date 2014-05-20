@@ -39,7 +39,6 @@
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #endif
-#include "PerformanceManagerWindow.h"
 #include "PfPvWindow.h"
 #include "HrPwWindow.h"
 #include "RideEditor.h"
@@ -70,7 +69,6 @@ GcWindowRegistry::initialize()
   static GcWindowRegistry GcWindowsInit[30] = {
     // name                     GcWinID
     { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
-    { VIEW_HOME, tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
     { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
@@ -145,13 +143,13 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
     case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
+    case GcWindowTypes::PerformanceManager: // retired now returns an LTM
     case GcWindowTypes::LTM: returning = new LTMWindow(context); break;
 #ifdef GC_HAVE_QWTPLOT3D
     case GcWindowTypes::Model: returning = new ModelWindow(context, context->athlete->home); break;
 #else
     case GcWindowTypes::Model: returning = new GcWindow(); break;
 #endif
-    case GcWindowTypes::PerformanceManager: returning = new PerformanceManagerWindow(context); break;
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
     case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;
