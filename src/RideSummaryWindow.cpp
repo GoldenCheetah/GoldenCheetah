@@ -331,6 +331,7 @@ RideSummaryWindow::htmlSummary()
         << "elevation_gain";
 
     QStringList averageColumn = QStringList() // not const as modified below..
+        << "athlete_weight"
         << "average_speed"
         << "average_power"
         << "average_hr"
@@ -986,6 +987,7 @@ RideSummaryWindow::htmlCompareSummary() const
         << "elevation_gain";
 
     QStringList averageColumn = QStringList() // not const as modified below..
+        << "athlete_weight"
         << "average_speed"
         << "average_power"
         << "average_hr"

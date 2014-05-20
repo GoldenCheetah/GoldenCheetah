@@ -182,6 +182,40 @@ class TotalDistance : public RideMetric {
 static bool totalDistanceAdded =
     RideMetricFactory::instance().addMetric(TotalDistance());
 
+class AthleteWeight : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AthleteWeight)
+    double kg;
+
+    public:
+
+    AthleteWeight() : kg(0.0)
+    {
+        setSymbol("athlete_weight");
+        setInternalName("Athlete Weight");
+    }
+    void initialize() {
+        setName(tr("Athlete Weight"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("kg"));
+        setImperialUnits(tr("lbs"));
+        setPrecision(2);
+        setConversion(LB_PER_KG);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        setValue(const_cast<RideFile*>(ride)->getWeight());
+    }
+
+    RideMetric *clone() const { return new AthleteWeight(*this); }
+};
+
+static bool athleteWeightAdded =
+    RideMetricFactory::instance().addMetric(AthleteWeight());
+
+//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 
