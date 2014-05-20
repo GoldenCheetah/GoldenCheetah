@@ -115,6 +115,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // Constructor / Destructor
         RideFile();
+        RideFile(RideFile*);
         RideFile(const QDateTime &startTime, double recIntSecs);
         virtual ~RideFile();
 

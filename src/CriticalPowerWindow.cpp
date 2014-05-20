@@ -934,7 +934,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     // ack, we need to create the curve for this interval
 
     // make a ridefile
-    RideFile f;
+    RideFile f(myRideItem->ride());
     f.context = context; // hack, until we refactor athlete and mainwindow
     f.setRecIntSecs(myRideItem->ride()->recIntSecs());
    
