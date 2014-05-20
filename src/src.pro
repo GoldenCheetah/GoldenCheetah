@@ -361,8 +361,6 @@ HEADERS += \
         NullController.h \
         Pages.h \
         PDModel.h \
-        PerfPlot.h \
-        PerformanceManagerWindow.h \
         PfPvPlot.h \
         PfPvWindow.h \
         PolarRideFile.h \
@@ -562,8 +560,6 @@ SOURCES += \
         Pages.cpp \
         PDModel.cpp \
         PeakPower.cpp \
-        PerfPlot.cpp \
-        PerformanceManagerWindow.cpp \
         PfPvPlot.cpp \
         PfPvWindow.cpp \
         PolarRideFile.cpp \
