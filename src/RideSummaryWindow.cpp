@@ -748,7 +748,6 @@ RideSummaryWindow::htmlSummary()
             bool even = false;
             foreach (RideFileInterval interval, ride->intervals()) {
                 RideFile f(ride);
-                f.context = context; // hack, until we refactor athlete and mainwindow
                 for (int i = ride->intervalBegin(interval); i>= 0 &&i < ride->dataPoints().size(); ++i) {
                     const RideFilePoint *p = ride->dataPoints()[i];
                     if (p->secs > interval.stop)

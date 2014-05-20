@@ -935,8 +935,6 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
 
     // make a ridefile
     RideFile f(myRideItem->ride());
-    f.context = context; // hack, until we refactor athlete and mainwindow
-    f.setRecIntSecs(myRideItem->ride()->recIntSecs());
    
     foreach(RideFilePoint *p, myRideItem->ride()->dataPoints()) { 
        if ((p->secs+f.recIntSecs()) >= current->start && p->secs <= (current->stop+f.recIntSecs())) {

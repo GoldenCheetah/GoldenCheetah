@@ -107,7 +107,6 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
     bool metricUnits = context->athlete->useMetricUnits;
 
     RideFile f(const_cast<RideFile*>(ride));
-    f.context = context;
     int start = ride->timeIndex(interval->start);
     int end = ride->timeIndex(interval->stop);
     for (int i = start; i <= end; ++i) {
@@ -180,7 +179,6 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
     bool metricUnits = context->athlete->useMetricUnits;
 
     RideFile f(const_cast<RideFile*>(ride));
-    f.context = context;
     int start = ride->timeIndex(interval.start);
     int end = ride->timeIndex(interval.stop);
     for (int i = start; i <= end; ++i) {

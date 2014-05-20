@@ -64,6 +64,7 @@ RideFile::RideFile(RideFile *p) :
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
+    context = p->context;
 
     command = new RideFileCommand(this);
     minPoint = new RideFilePoint();
