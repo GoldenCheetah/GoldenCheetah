@@ -39,7 +39,7 @@ class AverageWPK : public RideMetric {
         setType(RideMetric::Average);
         setMetricUnits(tr("wpk"));
         setImperialUnits(tr("wpk"));
-        setPrecision(1);
+        setPrecision(2);
     }
 
     void compute(const RideFile *ride, const Zones *, int,
@@ -75,7 +75,7 @@ class PeakWPK : public RideMetric {
         setType(RideMetric::Peak);
         setMetricUnits(tr("wpk"));
         setImperialUnits(tr("wpk"));
-        setPrecision(1);
+        setPrecision(2);
     }
     void setSecs(double secs) { this->secs=secs; }
     void compute(const RideFile *ride, const Zones *, int,
