@@ -57,22 +57,21 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     allMeasures = parser->readings().count();
     QDateTime olderDate;
 
+    // get list of what we have
+    QList<SummaryMetrics> list = context->athlete->metricDB->getAllMeasuresFor(QDateTime(QDate(1900,01,01), QTime(0,0,0)),QDateTime::currentDateTime());
+
+    // start  a transaction
+    context->athlete->metricDB->db()->connection().transaction();
 
     foreach (WithingsReading x, parser->readings()) {
-        QList<SummaryMetrics> list = context->athlete->metricDB->getAllMeasuresFor(x.when,x.when);
-        bool presentOrEmpty = false;
-        for (int i=0;i<list.size();i++) {
-            SummaryMetrics sm = list.at(i);
-            if (((x.weightkg == 0) || (sm.getText("Weight", "").length()>0))  &&
-                ((x.sizemeter == 0) || (sm.getText("Height", "").length()>0))   &&
-                ((x.leankg>0) || (sm.getText("Lean Mass", "").length()>0))  &&
-                ((x.fatkg>0) || (sm.getText("Fat Mass", "").length()>0))  &&
-                ((x.fatpercent>0) || (sm.getText("Fat Ratio", "").length()>0))) {
-                presentOrEmpty = true;
-            }
+
+        // do we have it already ?
+        bool have = false;
+        foreach(SummaryMetrics m, list) {
+            if (m.getDateTime().date() == x.when.date()) have = true;
         }
 
-        if (!presentOrEmpty) {
+        if (!have) {
             newMeasures ++;
             SummaryMetrics add;
             add.setDateTime(x.when);
@@ -84,15 +83,17 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
 
             context->athlete->metricDB->importMeasure(&add);
 
-            if (olderDate.isNull() || x.when<olderDate)
-                olderDate = x.when;
+            if (olderDate.isNull() || x.when.date() <olderDate.date()) olderDate = x.when;
         }
     }
+
+    // commit the transaction
+    context->athlete->metricDB->db()->connection().transaction();
 
     QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
     QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
 
-    if (!olderDate.isNull()) {
+    if (newMeasures) {
         context->athlete->isclean = false;
         context->athlete->metricDB->refreshMetrics(olderDate);
     }
