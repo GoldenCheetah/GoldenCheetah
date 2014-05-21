@@ -54,8 +54,10 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     model(0), modelVariant(0),
 
     // state
-    context(context), rideCache(NULL), bestsCache(NULL), rideSeries(RideFile::watts), isFiltered(false), shadeMode(2),
-    shadeIntervals(true), rangemode(rangemode), showPercent(false), showHeat(false), showHeatByDate(false),
+    context(context), rideCache(NULL), bestsCache(NULL), rideSeries(RideFile::watts), 
+    isFiltered(false), shadeMode(2),
+    shadeIntervals(true), rangemode(rangemode), 
+    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false),
     plotType(0),
 
     // curves and plot objects
@@ -327,7 +329,7 @@ CPPlot::plotModel()
             QPen pen(GColor(CCP));
             double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
             pen.setWidth(width);
-            pen.setStyle(Qt::DashLine);
+            if (showBest) pen.setStyle(Qt::DashLine);
             modelCurve->setPen(pen);
             modelCurve->attach(this);
 
@@ -575,6 +577,7 @@ CPPlot::plotBests()
         work[t] = values[t] * t / 1000; // kJ not Joules
     }
 
+    if (showBest) {
     if (shadingCP == 0) {
 
         // PLAIN CURVE
@@ -757,6 +760,7 @@ CPPlot::plotBests()
             high = low;
             ++zone;
         }
+    }
     }
 
 
@@ -998,7 +1002,7 @@ CPPlot::setRide(RideItem *rideItem)
 void
 CPPlot::pointHover(QwtPlotCurve *curve, int index)
 {
-    if (curve == modelCurve) return; // ignore model curve hover
+    if (showBest && curve == modelCurve) return; // ignore model curve hover
 
     if (index >= 0) {
 
@@ -1100,6 +1104,13 @@ void
 CPPlot::setShowHeat(bool x)
 {
     showHeat = x;
+    clearCurves();
+}
+
+void
+CPPlot::setShowBest(bool x)
+{
+    showBest = x;
     clearCurves();
 }
 
