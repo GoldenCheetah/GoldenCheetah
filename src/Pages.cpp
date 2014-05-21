@@ -3161,7 +3161,7 @@ HrZonePage::HrZonePage(Context *context) : context(context)
     ltPage = new LTPage(this);
 
     tabs = new QTabWidget(this);
-    tabs->addTab(ltPage, tr("Lactic Threshold"));
+    tabs->addTab(ltPage, tr("Lactate Threshold"));
     tabs->addTab(schemePage, tr("Default"));
 
     layout->addWidget(tabs);
@@ -3393,7 +3393,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
 
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
-    QLabel *ltLabel = new QLabel(tr("Lactic Threshold"));
+    QLabel *ltLabel = new QLabel(tr("Lactate Threshold"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
 
@@ -3433,7 +3433,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
 
     ranges = new QTreeWidget;
     ranges->headerItem()->setText(0, tr("From Date"));
-    ranges->headerItem()->setText(1, tr("Lactic Threshold"));
+    ranges->headerItem()->setText(1, tr("Lactate Threshold"));
     ranges->headerItem()->setText(2, tr("Rest HR"));
     ranges->headerItem()->setText(3, tr("Max HR"));
     ranges->setColumnCount(4);
