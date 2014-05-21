@@ -74,6 +74,10 @@ void HrZones::initializeZoneParameters()
 // read zone file, allowing for zones with or without end dates
 bool HrZones::read(QFile &file)
 {
+
+    //
+    // GET SET
+    //
     defaults_from_user = false;
     scheme.zone_default.clear();
     scheme.zone_default_is_pct.clear();
@@ -143,188 +147,207 @@ bool HrZones::read(QFile &file)
     // true if zone defaults are found in the file (then we need to write them)
     bool zones_are_defaults = false;
 
-    while (! fileStream.atEnd() ) {
+    //
+    // READ IN hr.zones FILE
+    //
+
+    // loop through line by line
+    while (!fileStream.atEnd()) {
+
+        // starting from line 1
         ++lineno;
-    QString line = fileStream.readLine();
+
+        // get a line in
+        QString line = fileStream.readLine();
         int pos = commentrx.indexIn(line, 0);
-        if (pos != -1)
-            line = line.left(pos);
-        if (blankrx.indexIn(line, 0) == 0)
-        goto next_line;
 
-    // check for default zone range definition (may be followed by hr zone definitions)
-    if (zonedefaultsx.indexIn(line, 0) != -1) {
-        zones_are_defaults = true;
+        // strip comments
+        if (pos != -1) line = line.left(pos);
 
-        // defaults are allowed only at the beginning of the file
-        if (ranges.size()) {
-        err = "HR Zone defaults must be specified at head of hr.zones file";
-        return false;
+        // its a blank line (we check after comments stripped)
+        if (blankrx.indexIn(line, 0) == 0) goto next_line; // who wrote this? bleck.
+
+        // check for default zone range definition (may be followed by hr zone definitions)
+        if (zonedefaultsx.indexIn(line, 0) != -1) {
+            zones_are_defaults = true;
+
+            // defaults are allowed only at the beginning of the file
+            if (ranges.size()) {
+                err = "HR Zone defaults must be specified at head of hr.zones file";
+                return false;
+            }
+
+            // only one set of defaults is allowed
+            if (scheme.nzones_default) {
+                err = "Only one set of zone defaults may be specified in hr.zones file";
+                return false;
+            }
+
+            // ok move on to get defaults setup
+            goto next_line;
         }
 
-        // only one set of defaults is allowed
-        if (scheme.nzones_default) {
-        err = "Only one set of zone defaults may be specified in hr.zones file";
-        return false;
-        }
-
-        goto next_line;
-    }
-
-    // check for range specification (may be followed by zone definitions)
+        // check for range specification (may be followed by zone definitions)
         for (int r=0; r<2; r++) {
-                if (rangerx[r].indexIn(line, 0) != -1) {
 
-                        if (in_range) {
+            if (rangerx[r].indexIn(line, 0) != -1) {
 
-                                // if zones are empty, then generate them
-                                HrZoneRange range(begin, end, lt, restHr, maxHr);
-                                range.zones = zoneInfos;
+                if (in_range) {
 
-                                if (range.zones.empty()) {
-                                        if (range.lt > 0) setHrZonesFromLT(range);
-                                        else {
-                                                err = tr("line %1: read new range without reading "
-                                                "any zones for previous one").arg(lineno);
-                                                file.close();
-                                                return false;
-                                        }
-                                } else {
-                                        qSort(range.zones);
-                                }
-                                ranges.append(range);
-                        }
+                    // if zones are empty, then generate them
+                    HrZoneRange range(begin, end, lt, restHr, maxHr);
+                    range.zones = zoneInfos;
 
-                        in_range = true;
-                        zones_are_defaults = false;
-                        zoneInfos.clear();
-
-                        // process the beginning date
-                        if (rangerx[r].cap(1) == "BEGIN")
-                                begin = date_zero;
+                    if (range.zones.empty()) {
+                        if (range.lt > 0) setHrZonesFromLT(range);
                         else {
-                                begin = QDate(rangerx[r].cap(2).toInt(),
-                                rangerx[r].cap(3).toInt(),
-                                rangerx[r].cap(4).toInt());
+                            err = tr("line %1: read new range without reading "
+                                    "any zones for previous one").arg(lineno);
+                            file.close();
+                            return false;
                         }
-
-                        // process an end date, if any, else it is null
-                        if (rangerx[r].cap(5) == "END") end = date_infinity;
-                        else if (rangerx[r].cap(6).toInt() || rangerx[r].cap(7).toInt() ||
-                                 rangerx[r].cap(8).toInt()) {
-
-                                end = QDate(rangerx[r].cap(6).toInt(),
-                                rangerx[r].cap(7).toInt(),
-                                rangerx[r].cap(8).toInt());
-
-                        } else {
-                                end = QDate();
-                        }
-
-                        // set up the range, capturing LT if it's specified
-                        // range = new ZoneRange(begin, end);
-                        int nLT = (r ? 11 : 7);
-                        if (rangerx[r].captureCount() >= (nLT)) lt = rangerx[r].cap(nLT).toInt();
-                        else lt = 0;
-
-                        int nRestHr = (r ? 14 : 10);
-                        if (rangerx[r].captureCount() >= (nRestHr)) restHr = rangerx[r].cap(nRestHr).toInt();
-                        else restHr = 0;
-
-                        int nMaxHr = (r ? 17 : 13);
-                        if (rangerx[r].captureCount() >= (nRestHr)) maxHr = rangerx[r].cap(nMaxHr).toInt();
-                        else maxHr = 0;
-
-                        // bleck
-                        goto next_line;
+                    } else {
+                        qSort(range.zones);
+                    }
+                    ranges.append(range);
                 }
+
+                in_range = true;
+                zones_are_defaults = false;
+                zoneInfos.clear();
+
+                // process the beginning date
+                if (rangerx[r].cap(1) == "BEGIN")
+                    begin = date_zero;
+                else {
+                    begin = QDate(rangerx[r].cap(2).toInt(),
+                    rangerx[r].cap(3).toInt(),
+                    rangerx[r].cap(4).toInt());
+                }
+
+                // process an end date, if any, else it is null
+                if (rangerx[r].cap(5) == "END") end = date_infinity;
+                else if (rangerx[r].cap(6).toInt() || rangerx[r].cap(7).toInt() || rangerx[r].cap(8).toInt()) {
+
+                    end = QDate(rangerx[r].cap(6).toInt(),
+                    rangerx[r].cap(7).toInt(),
+                    rangerx[r].cap(8).toInt());
+
+                } else {
+                    end = QDate();
+                }
+
+                // set up the range, capturing LT if it's specified
+                // range = new ZoneRange(begin, end);
+                int nLT = (r ? 11 : 7);
+                if (rangerx[r].captureCount() >= (nLT)) lt = rangerx[r].cap(nLT).toInt();
+                else lt = 0;
+
+                int nRestHr = (r ? 14 : 10);
+                if (rangerx[r].captureCount() >= (nRestHr)) restHr = rangerx[r].cap(nRestHr).toInt();
+                else restHr = 0;
+
+                int nMaxHr = (r ? 17 : 13);
+                if (rangerx[r].captureCount() >= (nRestHr)) maxHr = rangerx[r].cap(nMaxHr).toInt();
+                else maxHr = 0;
+
+                // bleck
+                goto next_line;
+            }
         }
 
         // check for zone definition
         if (zonerx.indexIn(line, 0) != -1) {
-           if (! (in_range || zones_are_defaults)) {
-              err = tr("line %1: read zone without "
-                "preceding date range").arg(lineno);
-              file.close();
-              return false;
-           }
 
-           int lo = zonerx.cap(3).toInt();
-           double trimp = zonerx.cap(5).toDouble();
+            if (! (in_range || zones_are_defaults)) {
+                err = tr("line %1: read zone without preceding date range").arg(lineno);
+                file.close();
+                return false;
+            }
 
-           // allow for zone specified as % of LT
-           bool lo_is_pct = false;
-           if (zonerx.cap(4) == "%") {
-           if (zones_are_defaults) lo_is_pct = true;
-           else if (lt > 0) lo = int(lo * lt / 100);
-           else {
-              err = tr("attempt to set zone based on % of "
-                       "LT without setting LT in line number %1.\n").
-              arg(lineno);
-              file.close();
-              return false;
-           }
+            int lo = zonerx.cap(3).toInt();
+            double trimp = zonerx.cap(5).toDouble();
+
+            // allow for zone specified as % of LT
+            bool lo_is_pct = false;
+            if (zonerx.cap(4) == "%") {
+                if (zones_are_defaults) lo_is_pct = true;
+                else if (lt > 0) lo = int(lo * lt / 100);
+                else {
+                    err = tr("attempt to set zone based on % of LT without setting LT in line number %1.\n").
+                    arg(lineno);
+                    file.close();
+                    return false;
+                }
+            }
+
+            int hi = -1; // signal an undefined number
+            double tr =  zonerx.cap(5).toDouble();
+
+            if (zones_are_defaults) {
+                scheme.nzones_default ++;
+                scheme.zone_default_is_pct.append(lo_is_pct);
+                scheme.zone_default.append(lo);
+                scheme.zone_default_name.append(zonerx.cap(1));
+                scheme.zone_default_desc.append(zonerx.cap(2));
+                scheme.zone_default_trimp.append(trimp);
+                defaults_from_user = true;
+
+            } else {
+
+                HrZoneInfo zone(zonerx.cap(1), zonerx.cap(2), lo, hi, tr);
+                zoneInfos.append(zone);
+            }
         }
 
-        int hi = -1; // signal an undefined number
-        double tr =  zonerx.cap(5).toDouble();
-
-        if (zones_are_defaults) {
-           scheme.nzones_default ++;
-           scheme.zone_default_is_pct.append(lo_is_pct);
-           scheme.zone_default.append(lo);
-           scheme.zone_default_name.append(zonerx.cap(1));
-           scheme.zone_default_desc.append(zonerx.cap(2));
-           scheme.zone_default_trimp.append(trimp);
-           defaults_from_user = true;
-        }
-        else {
-           HrZoneInfo zone(zonerx.cap(1), zonerx.cap(2), lo, hi, tr);
-           zoneInfos.append(zone);
-        }
+        next_line: ;
     }
-    next_line: {}
-    }
 
+    // did we drop out mid way through ?
     if (in_range) {
         HrZoneRange range(begin, end, lt, restHr, maxHr);
         range.zones = zoneInfos;
         if (range.zones.empty()) {
             if (range.lt > 0)
-            setHrZonesFromLT(range);
-        else {
+                setHrZonesFromLT(range);
+            else {
                 err = tr("file ended without reading any zones for last range");
                 file.close();
                 return false;
-        }
-        }
-    else {
-        qSort(range.zones);
-    }
+            }
+        } else {
 
+            qSort(range.zones);
+        }
         ranges.append(range);
     }
+
+    // reading done
     file.close();
 
     // sort the ranges
     qSort(ranges);
+
+    //
+    // POST-PROCESS / FIX-UP ZONES
+    //
 
     // set the default zones if not in file
     if (!scheme.nzones_default)  {
 
         // do we have a zone which is explicitly set?
         for (int i=0; i<ranges.count(); i++) {
-                if (ranges[i].hrZonesSetFromLT == false) {
-                        // set the defaults using this one!
-                        scheme.nzones_default = ranges[i].zones.count();
-                        for (int j=0; j<scheme.nzones_default; j++) {
-                                scheme.zone_default.append(((double)ranges[i].zones[j].lo / (double)ranges[i].lt) * 100.00);
-                                scheme.zone_default_is_pct.append(true);
-                                scheme.zone_default_name.append(ranges[i].zones[j].name);
-                                scheme.zone_default_desc.append(ranges[i].zones[j].desc);
-                                scheme.zone_default_trimp.append(ranges[i].zones[j].trimp);
-                        }
+            if (ranges[i].hrZonesSetFromLT == false) {
+                // set the defaults using this one!
+                scheme.nzones_default = ranges[i].zones.count();
+                for (int j=0; j<scheme.nzones_default; j++) {
+                    scheme.zone_default.append(((double)ranges[i].zones[j].lo / (double)ranges[i].lt) * 100.00);
+                    scheme.zone_default_is_pct.append(true);
+                    scheme.zone_default_name.append(ranges[i].zones[j].name);
+                    scheme.zone_default_desc.append(ranges[i].zones[j].desc);
+                    scheme.zone_default_trimp.append(ranges[i].zones[j].trimp);
                 }
+            }
         }
 
         // still not set then reset to defaults as usual
@@ -333,76 +356,58 @@ bool HrZones::read(QFile &file)
 
     // resolve undefined endpoints in ranges and zones
     for (int nr = 0; nr < ranges.size(); nr ++) {
-    // clean up gaps or overlaps in zone ranges
-    if (ranges[nr].end.isNull())
-        ranges[nr].end =
-        (nr < ranges.size() - 1) ?
-        ranges[nr + 1].begin :
-        date_infinity;
-    else if ((nr < ranges.size() - 1) &&
-         (ranges[nr + 1].begin != ranges[nr].end)) {
 
-        append_to_warning(tr("Setting end date of range %1 "
-                 "to start date of range %2.\n").
-                  arg(nr + 1).
-                  arg(nr + 2)
-                  );
+        // clean up gaps or overlaps in zone ranges
+        if (ranges[nr].end.isNull()) {
 
-        ranges[nr].end = ranges[nr + 1].begin;
-    }
-    else if ((nr == ranges.size() - 1) &&
-         (ranges[nr].end < QDate::currentDate())) {
+            ranges[nr].end = (nr < ranges.size() - 1) ?  ranges[nr + 1].begin : date_infinity;
 
-        append_to_warning(tr("Extending final range %1 to infinite "
-                 "to include present date.\n").arg(nr + 1));
+         } else if ((nr < ranges.size() - 1) && (ranges[nr + 1].begin != ranges[nr].end)) {
 
-        ranges[nr].end = date_infinity;
-    }
+            append_to_warning(tr("Setting end date of range %1 to start date of range %2.\n").arg(nr + 1).arg(nr + 2));
+            ranges[nr].end = ranges[nr + 1].begin;
+
+        } else if ((nr == ranges.size() - 1) && (ranges[nr].end < QDate::currentDate())) {
+
+
+            append_to_warning(tr("Extending final range %1 to infinite to include present date.\n").arg(nr + 1));
+            ranges[nr].end = date_infinity;
+        }
 
         if (ranges[nr].lt <= 0) {
-            err = tr("LT must be greater than zero in zone "
-                     "range %1 of hr.zones").arg(nr + 1);
+            err = tr("LT must be greater than zero in zone range %1 of hr.zones").arg(nr + 1);
             return false;
         }
 
-    if (ranges[nr].zones.size()) {
+        if (ranges[nr].zones.size()) {
 
-        // check that the first zone starts with zero
-        // ranges[nr].zones[0].lo = 0; // there is no reason we should enforce this, so removing it.
+            // check that the first zone starts with zero
+            // ranges[nr].zones[0].lo = 0; // there is no reason we should enforce this, so removing it.
 
-        // resolve zone end powers
-        for (int nz = 0; nz < ranges[nr].zones.size(); nz ++) {
-        if (ranges[nr].zones[nz].hi == -1)
-            ranges[nr].zones[nz].hi =
-            (nz < ranges[nr].zones.size() - 1) ?
-            ranges[nr].zones[nz + 1].lo :
-            INT_MAX;
-        else if ((nz < ranges[nr].zones.size() - 1) &&
-             (ranges[nr].zones[nz].hi != ranges[nr].zones[nz + 1].lo)) {
-            if (abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4) {
-            append_to_warning(tr("Range %1: matching top of zone %2 "
-                         "(%3) to bottom of zone %4 (%5).\n").
-                      arg(nr + 1).
-                      arg(ranges[nr].zones[nz].name).
-                      arg(ranges[nr].zones[nz].hi).
-                      arg(ranges[nr].zones[nz + 1].name).
-                      arg(ranges[nr].zones[nz + 1].lo)
-                      );
+            // resolve zone end powers
+            for (int nz = 0; nz < ranges[nr].zones.size(); nz ++) {
+                if (ranges[nr].zones[nz].hi == -1) 
+                    ranges[nr].zones[nz].hi = (nz < ranges[nr].zones.size() - 1) ?  
+                                                ranges[nr].zones[nz + 1].lo : INT_MAX;
+
+                else if ((nz < ranges[nr].zones.size() - 1) && (ranges[nr].zones[nz].hi != ranges[nr].zones[nz + 1].lo)) {
+
+                    if (abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4) {
+
+                        append_to_warning(tr("Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).\n")
+                              .arg(nr+1).arg(ranges[nr].zones[nz].name).arg(ranges[nr].zones[nz].hi)
+                              .arg(ranges[nr].zones[nz + 1].name) .arg(ranges[nr].zones[nz + 1].lo));
                     }
-            ranges[nr].zones[nz].hi = ranges[nr].zones[nz + 1].lo;
+                    ranges[nr].zones[nz].hi = ranges[nr].zones[nz + 1].lo;
 
-        } else if ((nz == ranges[nr].zones.size() - 1) &&
-             (ranges[nr].zones[nz].hi < INT_MAX)) {
+                } else if ((nz == ranges[nr].zones.size() - 1) && (ranges[nr].zones[nz].hi < INT_MAX)) {
 
-            append_to_warning(tr("Range %1: setting top of zone %2 from %3 to MAX.\n").
-                      arg(nr + 1).
-                      arg(ranges[nr].zones[nz].name).
-                      arg(ranges[nr].zones[nz].hi)
-                      );
-            ranges[nr].zones[nz].hi = INT_MAX;
-        }
+                    append_to_warning(tr("Range %1: setting top of zone %2 from %3 to MAX.\n")
+                                     .arg(nr + 1).arg(ranges[nr].zones[nz].name).arg(ranges[nr].zones[nz].hi));
+                    ranges[nr].zones[nz].hi = INT_MAX;
+                }
             }
-    }
+        }
     }
 
     // mark zones as modified so pages which depend on zones can be updated

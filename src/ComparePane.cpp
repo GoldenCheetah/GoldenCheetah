@@ -656,7 +656,7 @@ ComparePane::dropEvent(QDropEvent *event)
             // construct a ridefile for the interval
 
             // RideFile *data;
-            add.data = new RideFile(ride->startTime(), ride->recIntSecs());
+            add.data = new RideFile(ride);
             add.data->context = context;
 
             // manage offsets
