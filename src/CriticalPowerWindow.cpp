@@ -161,6 +161,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     QLabel *gridify = new QLabel(tr("Show grid"));
     cl->addRow(gridify, showGridCheck);
 
+    showBestCheck = new QCheckBox(this);
+    showBestCheck->setChecked(true); // default off
+    QLabel *bestify = new QLabel(tr("Show Bests"));
+    cl->addRow(bestify, showBestCheck);
+
     showPercentCheck = new QCheckBox(this);
     showPercentCheck->setChecked(false); // default off
     QLabel *percentify = new QLabel(tr("Show as percentage"));
@@ -446,6 +451,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
     connect(showGridCheck, SIGNAL(stateChanged(int)), this, SLOT(showGridChanged(int)));
     connect(rPercent, SIGNAL(stateChanged(int)), this, SLOT(rPercentChanged(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -1461,6 +1467,16 @@ CriticalPowerWindow::showGridChanged(int state)
     if (state) grid->setVisible(true);
     else grid->setVisible(false);
     cpPlot->replot();
+}
+
+void
+CriticalPowerWindow::showBestChanged(int state)
+{
+    cpPlot->setShowBest(state);
+
+    // redraw
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
 }
 
 void
