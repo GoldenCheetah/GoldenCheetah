@@ -115,6 +115,7 @@ class CPPlot : public QwtPlot
         void plotRide(RideItem *);
         void plotBests();
         void plotModel();
+        void plotModel(QVector<double> vector, QColor plotColor); // for compare date range models
         void plotCentile(RideItem *);
         void plotCache(QVector<double> vector, QColor plotColor);
 

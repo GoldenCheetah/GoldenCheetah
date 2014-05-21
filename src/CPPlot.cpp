@@ -473,6 +473,62 @@ CPPlot::plotModel()
     }
 }
 
+// in compare mode we can plot models and compare them...
+void 
+CPPlot::plotModel(QVector<double> vector, QColor plotColor)
+{
+    // first lets clear any curves we shouldn't be displaying
+    // no model curve if not power !
+    if (!context->isCompareDateRanges || model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg)) {
+        return;
+    }
+
+    // we don't want a model
+    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts) return;
+
+    PDModel *pdmodel; // synthetic data provider for curve
+
+    // new model please
+    switch (model) {
+
+    case 1 : // 2 param
+            pdmodel = new CP2Model(context);
+            break;
+        case 2 : // 3 param
+            pdmodel = new CP3Model(context);
+            break;
+        case 3 : // extended model
+            pdmodel = new ExtendedModel(context);
+            break;
+        case 4 : // multimodel
+            pdmodel = new MultiModel(context);
+            break;
+    }
+
+    // set the model and load data
+    pdmodel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+    pdmodel->setMinutes(true); // we're minutes here ...
+    pdmodel->setData(vector);
+
+    // create curve
+    QwtPlotCurve *curve = new QwtPlotCurve("Model");
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    // set the point data
+    curve->setData(pdmodel);
+
+    // curve cosmetics
+    QPen pen(plotColor);
+    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    pen.setWidth(width);
+    if (showBest) pen.setStyle(Qt::DashLine);
+    curve->setPen(pen);
+    curve->attach(this);
+
+    intervalCurves.append(curve);
+}
+
 // wipe away all the curves
 void
 CPPlot::clearCurves()
@@ -1478,6 +1534,8 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         delete c;
     }
     intervalCurves.clear();
+    // don't need to zap old models as they
+    // are deleted with the curve !
 
     // If no range
     if (compareDateRanges.count() == 0) {
@@ -1497,8 +1555,12 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
 
             if (cache->meanMaxArray(rideSeries).size()) {
 
-                // plot using the interval way
-                plotCache(cache->meanMaxArray(rideSeries), range.color);
+                // plot the bests if we want them
+                if (showBest) plotCache(cache->meanMaxArray(rideSeries), range.color);
+
+                // and plot a model too -- its neat to compare them...
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
+                    plotModel(cache->meanMaxArray(rideSeries), range.color);
 
                 foreach(double v, cache->meanMaxArray(rideSeries)) {
                     if (v > ymax) ymax = v;
