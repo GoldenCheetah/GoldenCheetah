@@ -1006,7 +1006,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - 5, myOption.rect.y(), 5, (rideNavigator->fontHeight+2) * 3);
+            QRect high(myOption.rect.x()+myOption.rect.width() - 7, myOption.rect.y(), 7, (rideNavigator->fontHeight+2) * 3);
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
@@ -1029,9 +1029,9 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->setPen(isColor);
 
 #if (defined (Q_OS_MAC) && (QT_VERSION >= 0x050000)) // on QT5 the scrollbars have no width
-            if (!selected && !rideBG && high.x()+10 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+            if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
 #else
-            if (!selected && !rideBG && high.x()+30 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+            if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
 #endif
                 painter->fillRect(high, userColor);
             }

@@ -725,7 +725,7 @@ CPPlot::plotBests()
         if (criticalSeries == CriticalPowerWindow::work)
             curve->setSamples(time, work);
         else
-            curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero);
+            curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
 
         curve->attach(this);
         bestsCurves.append(curve);
