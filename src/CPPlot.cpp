@@ -57,7 +57,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     context(context), rideCache(NULL), bestsCache(NULL), rideSeries(RideFile::watts), 
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false),
+    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false),
     plotType(0),
 
     // curves and plot objects
@@ -475,7 +475,7 @@ CPPlot::plotModel()
 
 // in compare mode we can plot models and compare them...
 void 
-CPPlot::plotModel(QVector<double> vector, QColor plotColor)
+CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
 {
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
@@ -1177,6 +1177,12 @@ CPPlot::setShowPercent(bool x)
 }
 
 void
+CPPlot::setShowDelta(bool x)
+{
+    showDelta = x;
+}
+
+void
 CPPlot::setShowHeatByDate(bool x)
 {
     showHeatByDate = x;
@@ -1544,6 +1550,46 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
     }
 
     double ymax = 0;
+    double ymin = 0;
+
+    // when delta mode is invoked we compare to a baseline curve
+    QVector<double> baseline;
+    PDModel *baselineModel = NULL;
+
+    if (showDelta && compareDateRanges.count()) {
+
+        // set the baseline data
+        CompareDateRange range = compareDateRanges.at(0);
+        baseline = range.rideFileCache()->meanMaxArray(rideSeries);
+
+        if (model && rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg) {
+
+            // get a model
+            switch (model) {
+            case 1 : // 2 param
+                baselineModel = new CP2Model(context);
+                break;
+            case 2 : // 3 param
+                baselineModel = new CP3Model(context);
+                break;
+            case 3 : // extended model
+                baselineModel = new ExtendedModel(context);
+                break;
+            case 4 : // multimodel
+                baselineModel = new MultiModel(context);
+                break;
+            }
+
+            // feed the data into the model
+            if (baselineModel) {
+
+                // set the model and load data
+                baselineModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+                baselineModel->setMinutes(true); // we're minutes here ...
+                baselineModel->setData(baseline);
+            }
+        }
+    }
 
     // prepare aggregates
     for (int j = 0; j < compareDateRanges.size(); ++j) {
@@ -1551,16 +1597,47 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         CompareDateRange range = compareDateRanges.at(j);
 
         if (range.isChecked())  {
+
             RideFileCache *cache = range.rideFileCache();
 
-            if (cache->meanMaxArray(rideSeries).size()) {
+            // create a delta array
+            if (showDelta && cache) {
+
+                int n=0;
+                QVector<double> deltaArray = cache->meanMaxArray(rideSeries);
+
+                // make a delta to baseline
+                for (n=1; n < deltaArray.size() && n < baseline.size(); n++) {
+                    // stop when we get to zero!
+                    if (deltaArray[n] > 0 && baseline[n] > 0)
+                        deltaArray[n] = deltaArray[n] - baseline[n];
+                    else
+                        break;
+                }
+                deltaArray.resize(n-1);
+
+                // now plot using the delta series and NOT the cache
+                if (showBest) plotCache(deltaArray, range.color);
+
+                // and plot a model too -- its neat to compare them...
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg) {
+                    plotModel(cache->meanMaxArray(rideSeries), range.color, baselineModel);
+                }
+
+                foreach(double v, deltaArray) {
+                    if (v > ymax) ymax = v;
+                    if (v < ymin) ymin = v;
+                }
+            }
+
+            if (!showDelta && cache->meanMaxArray(rideSeries).size()) {
 
                 // plot the bests if we want them
                 if (showBest) plotCache(cache->meanMaxArray(rideSeries), range.color);
 
                 // and plot a model too -- its neat to compare them...
                 if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
-                    plotModel(cache->meanMaxArray(rideSeries), range.color);
+                    plotModel(cache->meanMaxArray(rideSeries), range.color, NULL);
 
                 foreach(double v, cache->meanMaxArray(rideSeries)) {
                     if (v > ymax) ymax = v;
@@ -1575,11 +1652,11 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         int max = ymax * 1.1f;
         max = ((max/100) + 1) * 100;
 
-        setAxisScale(yLeft, 0, max);
+        setAxisScale(yLeft, ymin, max);
     } else {
 
         // or just add 10% headroom
-        setAxisScale(yLeft, 0, 1.1*ymax);
+        setAxisScale(yLeft, ymin *1.1, 1.1*ymax);
     }
     replot();
 }
@@ -1628,12 +1705,15 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
     if ((rangemode && !context->isCompareDateRanges) || (!rangemode && !context->isCompareIntervals))
         wantShadeIntervals = shadeIntervals;
 
+    int maxNonZero=0;
     QVector<double>x;
     QVector<double>y;
     for (int i=1; i<vector.count(); i++) {
         x << double(i)/60.00f;
         y << vector[i];
+        if (vector[i] < 0 || vector[i] > 0) maxNonZero = i;
     }
+    if (maxNonZero == 0) maxNonZero = y.size();
 
     // create a curve!
     QwtPlotCurve *curve = new QwtPlotCurve();
@@ -1650,7 +1730,7 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
     if (wantShadeIntervals) curve->setBrush(brush);
     else curve->setBrush(Qt::NoBrush);
     curve->setPen(pen);
-    curve->setSamples(x.data(), y.data(), x.count()-1);
+    curve->setSamples(x.data(), y.data(), maxNonZero-1);
 
     // attach and register
     curve->attach(this);
