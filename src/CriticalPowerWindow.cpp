@@ -738,12 +738,9 @@ CriticalPowerWindow::forceReplot()
         // hide in compare mode
         helperWidget()->hide();
 
-        // only in range mode!
-        if (context->isCompareDateRanges) {
-            rPercent->hide();
-            rHeat->hide();
-            rDelta->show();
-        }
+        rPercent->hide();
+        rHeat->hide();
+        rDelta->show();
 
     } else {
 
@@ -1533,11 +1530,11 @@ CriticalPowerWindow::rHeatChanged(int check)
 void
 CriticalPowerWindow::rDeltaChanged(int check)
 {
-    if (!rangemode || !context->isCompareDateRanges) return;
     cpPlot->setShowDelta(check);
 
     // redraw
-    dateRangeChanged(DateRange());
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpPlot->setRide(currentRide);
 }
 
 void
