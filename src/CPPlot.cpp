@@ -486,23 +486,23 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
     // we don't want a model
     if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts) return;
 
-    PDModel *pdmodel; // synthetic data provider for curve
+    PDModel *pdmodel = NULL; // synthetic data provider for curve
 
     // new model please
     switch (model) {
 
     case 1 : // 2 param
-            pdmodel = new CP2Model(context);
-            break;
-        case 2 : // 3 param
-            pdmodel = new CP3Model(context);
-            break;
-        case 3 : // extended model
-            pdmodel = new ExtendedModel(context);
-            break;
-        case 4 : // multimodel
-            pdmodel = new MultiModel(context);
-            break;
+        pdmodel = new CP2Model(context);
+        break;
+    case 2 : // 3 param
+        pdmodel = new CP3Model(context);
+        break;
+    case 3 : // extended model
+        pdmodel = new ExtendedModel(context);
+        break;
+    case 4 : // multimodel
+        pdmodel = new MultiModel(context);
+        break;
     }
 
     // set the model and load data
@@ -1562,7 +1562,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         CompareDateRange range = compareDateRanges.at(0);
         baseline = range.rideFileCache()->meanMaxArray(rideSeries);
 
-        if (model && rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg) {
+        if (model && (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)) {
 
             // get a model
             switch (model) {
@@ -1680,6 +1680,18 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         return;
     }
 
+    // set baseline if we're plotting deltas
+    QVector<double> baseline;
+    if (showDelta && compareIntervals.count()) {
+
+        // set the baseline data
+        CompareInterval range = compareIntervals.at(0);
+        baseline = range.rideFileCache()->meanMaxArray(rideSeries);
+    }
+
+    double ymax = 0;
+    double ymin = 0;
+
     // prepare aggregates
     for (int i = 0; i < compareIntervals.size(); ++i) {
         CompareInterval interval = compareIntervals.at(i);
@@ -1689,11 +1701,55 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
             // no data ?
             if (interval.rideFileCache()->meanMaxArray(rideSeries).count() == 0) return;
 
-            // create curve data arrays
-            plotCache(interval.rideFileCache()->meanMaxArray(rideSeries), interval.color);
+            // create a delta array
+            if (showDelta) {
+
+                int n=0;
+                QVector<double> deltaArray = interval.rideFileCache()->meanMaxArray(rideSeries);
+
+                // make a delta to baseline
+                for (n=1; n < deltaArray.size() && n < baseline.size(); n++) {
+                    // stop when we get to zero!
+                    if (deltaArray[n] > 0 && baseline[n] > 0)
+                        deltaArray[n] = deltaArray[n] - baseline[n];
+                    else
+                        break;
+                }
+                deltaArray.resize(n-1);
+
+                // now plot using the delta series and NOT the cache
+                plotCache(deltaArray, interval.color);
+
+                foreach(double v, deltaArray) {
+                    if (v > ymax) ymax = v;
+                    if (v < ymin) ymin = v;
+                }
+
+            } else {
+
+                // create curve data arrays
+                plotCache(interval.rideFileCache()->meanMaxArray(rideSeries), interval.color);
+
+                // whats ymax ?
+                foreach(double v, interval.rideFileCache()->meanMaxArray(rideSeries)) {
+                    if (v > ymax) ymax = v;
+                }
+            }
         }
     }
 
+    if (rideSeries == RideFile::watts) {
+
+        // set ymax to nearest 100 if power
+        int max = ymax * 1.1f;
+        max = ((max/100) + 1) * 100;
+
+        setAxisScale(yLeft, ymin, max);
+    } else {
+
+        // or just add 10% headroom
+        setAxisScale(yLeft, ymin *1.1, 1.1*ymax);
+    }
     replot();
 }
 
