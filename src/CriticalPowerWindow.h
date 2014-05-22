@@ -236,6 +236,7 @@ class CriticalPowerWindow : public GcChartWindow
         // reveal controls changed
         void rPercentChanged(int check);
         void rHeatChanged(int check);
+        void rDeltaChanged(int check);
 
         // menu option
         void exportData();
@@ -275,7 +276,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showPercentCheck;
         QCheckBox *showBestCheck;
         QCheckBox *showGridCheck;
-        QCheckBox *rPercent, *rHeat;
+        QCheckBox *rPercent, *rHeat, *rDelta;
         QwtPlotPicker *picker;
         QwtPlotGrid *grid;
 

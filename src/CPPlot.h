@@ -68,6 +68,7 @@ class CPPlot : public QwtPlot
         void setShowBest(bool x);
         void setShowHeat(bool x);
         void setShowHeatByDate(bool x);
+        void setShowDelta(bool x);
         void setShadeMode(int x);
         void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
@@ -115,7 +116,7 @@ class CPPlot : public QwtPlot
         void plotRide(RideItem *);
         void plotBests();
         void plotModel();
-        void plotModel(QVector<double> vector, QColor plotColor); // for compare date range models
+        void plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline); // for compare date range models
         void plotCentile(RideItem *);
         void plotCache(QVector<double> vector, QColor plotColor);
 
@@ -146,6 +147,7 @@ class CPPlot : public QwtPlot
         bool showPercent;
         bool showHeat;
         bool showHeatByDate;
+        bool showDelta; // only in compare mode
         double shadingCP; // the CP value we use to draw the shade
         int plotType;
 

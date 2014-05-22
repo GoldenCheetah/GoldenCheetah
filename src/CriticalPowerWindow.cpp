@@ -61,11 +61,15 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     rPercent->setText(tr("Percentage of Best"));
     rHeat = new QCheckBox(this);
     rHeat->setText(tr("Show Heat"));
+    rDelta = new QCheckBox(this);
+    rDelta->setText(tr("Delta compare"));
+    rDelta->hide();
 
     QVBoxLayout *checks = new QVBoxLayout;
     checks->addStretch();
     checks->addWidget(rPercent);
     checks->addWidget(rHeat);
+    checks->addWidget(rDelta);
     checks->addStretch();
 
     revealLayout->addStretch();
@@ -449,6 +453,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
+    connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged(int)));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
@@ -733,12 +738,24 @@ CriticalPowerWindow::forceReplot()
         // hide in compare mode
         helperWidget()->hide();
 
+        // only in range mode!
+        if (context->isCompareDateRanges) {
+            rPercent->hide();
+            rHeat->hide();
+            rDelta->show();
+        }
+
     } else {
 
         // show helper if we're showing power
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
+
+        // these are allowed outside of compare mode
+        rPercent->show();
+        rHeat->show();
+        rDelta->hide();
     }
 
     if (rangemode) {
@@ -1511,6 +1528,16 @@ void
 CriticalPowerWindow::rHeatChanged(int check)
 {
     showHeatCheck->setChecked(check);
+}
+
+void
+CriticalPowerWindow::rDeltaChanged(int check)
+{
+    if (!rangemode || !context->isCompareDateRanges) return;
+    cpPlot->setShowDelta(check);
+
+    // redraw
+    dateRangeChanged(DateRange());
 }
 
 void
