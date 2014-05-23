@@ -473,6 +473,23 @@ CPPlot::plotModel()
     }
 }
 
+// our model for combining a model for delta mode
+class DeltaModel : public QwtSyntheticPointData
+{
+    public:
+
+        double x(unsigned int index) const { return baseline->x(index); }
+        double y(double t)  const { return us->y(t) - baseline->y(t); }
+
+        // use the same interval and size as the baseline model
+        DeltaModel(PDModel *us, PDModel *baseline) : QwtSyntheticPointData(baseline->size()), us(us), baseline(baseline) {
+            setInterval(baseline->interval());
+        }
+
+    private:
+        PDModel *us, *baseline;
+};
+
 // in compare mode we can plot models and compare them...
 void 
 CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
@@ -515,8 +532,16 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    // set the point data
-    curve->setData(pdmodel);
+    if (baseline) {
+
+        // doing a delta model
+        curve->setData(new DeltaModel(pdmodel, baseline));
+
+    } else {
+
+        // set the point data
+        curve->setData(pdmodel);
+    }
 
     // curve cosmetics
     QPen pen(plotColor);
