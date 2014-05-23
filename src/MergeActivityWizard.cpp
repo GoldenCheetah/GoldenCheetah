@@ -63,8 +63,8 @@ MergeWelcome::MergeWelcome(MergeActivityWizard *parent) : QWizardPage(parent), w
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel("This wizard will help you to merge 2 different files\n"
-                               "from the same ride into a single file.");
+    QLabel *label = new QLabel(tr("This wizard will help you to merge 2 different files\n"
+                               "from the same ride into a single file."));
     label->setWordWrap(true);
 
     layout->addWidget(label);
@@ -85,7 +85,7 @@ MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum,QSizePolicy::Expanding );
     layout->addItem( spacer );
 
-    QLabel *label = new QLabel("Select the file to merge to this ride.");
+    QLabel *label = new QLabel(tr("Select the file to merge to this ride."));
     label->setWordWrap(true);
 
     layout->addWidget(label);
@@ -114,10 +114,10 @@ MergeUpload::importFile()
     suffixList.replaceInStrings(QRegExp("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
-    allFormats << QString("All Supported Formats (%1)").arg(suffixList.join(" "));
+    allFormats << QString(tr("All Supported Formats (%1)")).arg(suffixList.join(" "));
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
-    allFormats << "All files (*.*)";
+    allFormats << tr("All files (*.*)");
     fileNames = QFileDialog::getOpenFileNames(
         this, tr("Import from File"), lastDir,
         allFormats.join(";;"));
@@ -155,7 +155,7 @@ MergeUpload::importFile(QList<QString> files)
             // did it parse ok?
             if (ride) {
                 //wizard->addRideFile(ride);
-                labelSuccess->setText("File uploaded");
+                labelSuccess->setText(tr("File uploaded"));
                 ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString("MMM d, yyyy - hh:mm:ss"));
 
                 wizard->ride2 = ride;
@@ -467,9 +467,9 @@ MergeSync::bestDelay()
             seriesName = tr("alt");
         else if (bestSeries==4)
             seriesName = tr("hr");
-        warning->setText(QString("Delay on matching %1 series.").arg(seriesName));
+        warning->setText(QString(tr("Delay on matching %1 series.")).arg(seriesName));
     } else
-        warning->setText(QString("Unable to match datas"));
+        warning->setText(QString(tr("Unable to match datas")));
     return result;
 }
 
@@ -583,7 +583,7 @@ MergeParameters::MergeParameters(MergeActivityWizard *parent) : QWizardPage(pare
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel("No parameters at this time.\n");
+    QLabel *label = new QLabel(tr("No parameters at this time.\n"));
     label->setWordWrap(true);
 
     layout->addWidget(label);

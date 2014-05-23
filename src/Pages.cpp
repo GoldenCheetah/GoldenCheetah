@@ -842,8 +842,8 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     deviceList = new QTableView(this);
 #ifdef Q_OS_MAC
-    addButton->setText("Add");
-    delButton->setText("Delete");
+    addButton->setText(tr("Add");
+    delButton->setText(tr("Delete"));
     deviceList->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #else
     addButton->setFixedSize(20,20);
