@@ -307,6 +307,7 @@ CPPlot::plotModel()
             break;
         case 4 : // multimodel
             pdModel = new MultiModel(context);
+            pdModel->setVariant(modelVariant);
             break;
         }
 
@@ -519,6 +520,7 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
         break;
     case 4 : // multimodel
         pdmodel = new MultiModel(context);
+        pdmodel->setVariant(modelVariant);
         break;
     }
 
@@ -1602,6 +1604,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 break;
             case 4 : // multimodel
                 baselineModel = new MultiModel(context);
+                baselineModel->setVariant(modelVariant);
                 break;
             }
 
@@ -1671,13 +1674,14 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         }
     }
 
-    if (rideSeries == RideFile::watts) {
+    if (!showDelta && rideSeries == RideFile::watts) {
 
         // set ymax to nearest 100 if power
         int max = ymax * 1.1f;
         max = ((max/100) + 1) * 100;
 
-        setAxisScale(yLeft, ymin, max);
+        setAxisScale(yLeft, 0, max);
+
     } else {
 
         // or just add 10% headroom

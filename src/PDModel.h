@@ -65,6 +65,10 @@ class PDModel : public QObject, public QwtSyntheticPointData
 
         PDModel(Context *context);
 
+        // set which variant of the model to use (if the model
+        // supports such a thing it needs to reimplement)
+        virtual void setVariant(int) {}
+
         // set data using doubles or float always
         void setData(QVector<double> meanMaxPower);
         void setData(QVector<float> meanMaxPower);
