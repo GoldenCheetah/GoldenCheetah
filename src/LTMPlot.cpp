@@ -2173,6 +2173,9 @@ LTMPlot::setCompareData(LTMSettings *set)
     // now refresh
     updateLegend();
 
+    // update colours etc for plot chrome
+    configUpdate();
+
     // plot
     replot();
 

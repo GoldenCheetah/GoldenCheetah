@@ -488,7 +488,7 @@ ExtendedModel::ExtendedModel(Context *context) :
     anI2=300;
     aeI1=600;
     aeI2=3000;
-    laeI1=4000;
+    laeI1=3600;
     laeI2=30000;
 
     connect (this, SIGNAL(dataChanged()), this, SLOT(onDataChanged()));
