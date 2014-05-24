@@ -129,6 +129,9 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
 
     // we accept drag and drop operations
     setAcceptDrops(true);
+
+    // lets go
+    refresh();
 }
 
 RideNavigator::~RideNavigator()
@@ -149,6 +152,16 @@ RideNavigator::refresh()
         context->athlete->sqlModel->fetchMore(QModelIndex());
 
     active=false;
+
+    // hide ride list scroll bar ?
+#ifndef Q_OS_MAC
+    if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
+        tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    else
+        tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+#endif
+
+    setWidth(geometry().width());
     rideTreeSelectionChanged();
 }
 
@@ -362,7 +375,6 @@ void RideNavigator::setWidth(int x)
 
     // make the scrollbars go away
     tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     active = false;
 }
