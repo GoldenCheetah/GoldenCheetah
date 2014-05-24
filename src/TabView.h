@@ -109,6 +109,7 @@ class TabView : public QWidget
 
         //void mediaSelected(QString filename);
         //void ergSelected(ErgFile *erg);
+        void configChanged();
 
     protected:
 
