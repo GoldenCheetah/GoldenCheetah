@@ -159,6 +159,7 @@ class RideNavigator : public GcWindow
 
     private:
         bool active;
+        bool mainwindow;
         bool init;
         int currentColumn;
         int pwidth;
