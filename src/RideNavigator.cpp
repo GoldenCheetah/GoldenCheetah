@@ -159,38 +159,8 @@ RideNavigator::refresh()
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        else {
+        else 
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
-            // style that sucker
-            tableView->setStyleSheet(
-            QString::fromUtf8("QScrollBar:vertical {"
-                            "    border: 0px;"
-                            "    background:%1;"
-                            "    width:10px;    "
-                            "    margin: 0px 0px 0px 0px;"
-                            "}"
-                            "QScrollBar::handle:vertical {"
-                            "    background: darkGray; "
-                            "    min-height: 0px;"
-                            ""
-                            "}"
-                            "QScrollBar::add-line:vertical {"
-                            "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                            "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
-                            "    height: px;"
-                            "    subcontrol-position: bottom;"
-                            "    subcontrol-origin: margin;"
-                            "}"
-                            "QScrollBar::sub-line:vertical {"
-                            "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                            "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
-                            "    height: 0px;"
-                            "    subcontrol-position: top;"
-                            "    subcontrol-origin: margin;"
-                            "}"
-                            "").arg(GColor(CPLOTBACKGROUND).name()));
-        }
     }
 #endif
 
