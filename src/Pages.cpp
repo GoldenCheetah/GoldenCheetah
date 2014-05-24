@@ -1146,6 +1146,9 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QLabel *rideScrollLabel = new QLabel(tr("Ride Scrollbar"));
     rideScroll = new QCheckBox;
     rideScroll->setChecked(appsettings->value(this, GC_RIDESCROLL, true).toBool());
+    QLabel *rideHeadLabel = new QLabel(tr("Ride Headings"));
+    rideHead = new QCheckBox;
+    rideHead->setChecked(appsettings->value(this, GC_RIDEHEAD, true).toBool());
 #endif
     lineWidth = new QDoubleSpinBox;
     lineWidth->setMaximum(5);
@@ -1234,6 +1237,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #ifndef Q_OS_MAC
     grid->addWidget(rideScrollLabel, 2,3);
     grid->addWidget(rideScroll, 2,4);
+    grid->addWidget(rideHeadLabel, 3,3);
+    grid->addWidget(rideHead, 3,4);
 #endif
 
     grid->addWidget(markerLabel, 2,0);
@@ -1402,6 +1407,7 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_ANTIALIAS, antiAliased->isChecked());
 #ifndef Q_OS_MAC
     appsettings->setValue(GC_RIDESCROLL, rideScroll->isChecked());
+    appsettings->setValue(GC_RIDEHEAD, rideHead->isChecked());
 #endif
 
     // run down and get the current colors and save

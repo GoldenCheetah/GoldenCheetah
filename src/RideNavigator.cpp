@@ -161,6 +161,10 @@ RideNavigator::refresh()
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         else 
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        if (appsettings->value(this, GC_RIDEHEAD, true).toBool() == false)
+            tableView->header()->hide();
+        else 
+            tableView->header()->show();
     }
 #endif
 
