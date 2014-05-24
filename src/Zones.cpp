@@ -82,6 +82,7 @@ bool Zones::read(QFile &file)
     warning = QString();
     int warning_lines = 0;
     const int max_warning_lines = 100;
+    int defaultwprime = 20000; // default to 20kJ
 
     // macro to append lines to the warning
     #define append_to_warning(s) \
@@ -168,7 +169,7 @@ bool Zones::read(QFile &file)
                 if (in_range) {
 
                     // if zones are empty, then generate them
-                    ZoneRange range(begin, end, cp, wprime);
+                    ZoneRange range(begin, end, cp, wprime ? wprime : defaultwprime);
                     range.zones = zoneInfos;
 
                     if (range.zones.empty()) {
@@ -242,7 +243,15 @@ bool Zones::read(QFile &file)
                 qDebug()<<"ignoring errant W'= in power.zones";
             else {
                 wprime = wprimerx.cap(1).toInt();
-                if (wprime < 1000) wprime *= 1000; // JOULES not kJ
+
+                // ok its stored, so if it is in kJ upscale
+                // if it is zero as never set, then use default
+                if (wprime) {
+                    if (wprime < 1000) wprime *= 1000; // JOULES not kJ
+                    defaultwprime = wprime;
+                } else {
+                    wprime = defaultwprime;
+                }
             }
         }
 
@@ -333,7 +342,7 @@ next_line: {}
 
     if (in_range) {
 
-        ZoneRange range(begin, end, cp, wprime);
+        ZoneRange range(begin, end, cp, wprime ? wprime : defaultwprime);
         range.zones = zoneInfos;
 
         if (range.zones.empty()) {
