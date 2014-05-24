@@ -87,6 +87,7 @@
 #define GC_ANTIALIAS      "antialias"
 #define GC_RIDEBG         "rideBG"
 #define GC_RIDESCROLL     "rideScroll"
+#define GC_RIDEHEAD       "rideHead"
 #define GC_DROPSHADOW     "dropshadow"
 #define GC_SHADEZONES     "shadezones"
 #define GC_PROXYTYPE      "proxy/type"

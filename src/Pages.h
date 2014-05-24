@@ -422,6 +422,7 @@ class ColorsPage : public QWidget
         QCheckBox *antiAliased;
 #ifndef Q_OS_MAC // they do scrollbars nicely
         QCheckBox *rideScroll;
+        QCheckBox *rideHead;
 #endif
         QDoubleSpinBox *lineWidth;
 
