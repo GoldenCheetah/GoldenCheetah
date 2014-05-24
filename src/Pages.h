@@ -420,6 +420,9 @@ class ColorsPage : public QWidget
 
         // General stuff
         QCheckBox *antiAliased;
+#ifndef Q_OS_MAC // they do scrollbars nicely
+        QCheckBox *rideScroll;
+#endif
         QDoubleSpinBox *lineWidth;
 
         // Fonts

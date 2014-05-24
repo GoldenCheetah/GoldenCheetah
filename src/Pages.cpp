@@ -1142,6 +1142,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QLabel *antiAliasLabel = new QLabel(tr("Antialias"));
     antiAliased = new QCheckBox;
     antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, false).toBool());
+#ifndef Q_OS_MAC
+    QLabel *rideScrollLabel = new QLabel(tr("Ride Scrollbar"));
+    rideScroll = new QCheckBox;
+    rideScroll->setChecked(appsettings->value(this, GC_RIDESCROLL, true).toBool());
+#endif
     lineWidth = new QDoubleSpinBox;
     lineWidth->setMaximum(5);
     lineWidth->setMinimum(0.5);
@@ -1226,6 +1231,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(lineWidth, 0,4);
     grid->addWidget(antiAliasLabel, 1,3);
     grid->addWidget(antiAliased, 1,4);
+#ifndef Q_OS_MAC
+    grid->addWidget(rideScrollLabel, 2,3);
+    grid->addWidget(rideScroll, 2,4);
+#endif
 
     grid->addWidget(markerLabel, 2,0);
     grid->addWidget(chartLabel, 3,0);
@@ -1391,6 +1400,9 @@ ColorsPage::saveClicked()
 {
     appsettings->setValue(GC_LINEWIDTH, lineWidth->value());
     appsettings->setValue(GC_ANTIALIAS, antiAliased->isChecked());
+#ifndef Q_OS_MAC
+    appsettings->setValue(GC_RIDESCROLL, rideScroll->isChecked());
+#endif
 
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
