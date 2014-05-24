@@ -2912,7 +2912,9 @@ CPPage::addClicked()
     }
 
     //int index = ranges->invisibleRootItem()->childCount();
-    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), wEdit->value());
+    int wp = wEdit->value() ? wEdit->value() : 20000;
+    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
+    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value(), wp);
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -2926,8 +2928,6 @@ CPPage::addClicked()
     add->setText(1, QString("%1").arg(cpEdit->value()));
 
     // W'
-    int wp = wEdit->value();
-    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
     add->setText(2, QString("%1").arg(wp));
 
 }
