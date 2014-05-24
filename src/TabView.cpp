@@ -115,7 +115,7 @@ TabView::setSidebar(QWidget *sidebar)
 void
 TabView::configChanged()
 {
-#ifndef Q_OS_MAC
+#ifdef Q_OS_LINUX
     // style that sucker
     if (sidebar_) {
         sidebar_->setStyleSheet(
