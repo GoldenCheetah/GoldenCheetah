@@ -29,6 +29,8 @@
 #include <QScrollBar>
 #include <QtGui>
 #include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 // seasons support
 #include "Season.h"
@@ -79,7 +81,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     dateRangeTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    QStyle *cde = QStyleFactory::create("plastique");
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
     dateRangeTree->verticalScrollBar()->setStyle(cde);
 #endif
     seasonsWidget->addWidget(dateRangeTree);
@@ -107,7 +109,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     eventTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    cde = QStyleFactory::create("plastique");
+    cde = QStyleFactory::create(OS_STYLE);
     eventTree->verticalScrollBar()->setStyle(cde);
 #endif
     eventsWidget->addWidget(eventTree);
@@ -140,7 +142,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    cde = QStyleFactory::create("plastique");
+    cde = QStyleFactory::create(OS_STYLE);
     filterTree->verticalScrollBar()->setStyle(cde);
 #endif
     // we cast the filter tree and this because we use the same constructor XXX fix this!!!
@@ -556,7 +558,7 @@ LTMSidebar::autoFilterChanged()
             tree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-            QStyle *cde = QStyleFactory::create("plastique");
+            QStyle *cde = QStyleFactory::create(OS_STYLE);
             tree->verticalScrollBar()->setStyle(cde);
 #endif
             item->addWidget(tree);

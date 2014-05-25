@@ -21,7 +21,10 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "Context.h"
+#include "Settings.h"
 #include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 
 IntervalTreeView::IntervalTreeView(Context *context) : context(context)
@@ -33,7 +36,7 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    QStyle *cde = QStyleFactory::create("plastique");
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
     verticalScrollBar()->setStyle(cde);
 #endif
     setStyleSheet("QTreeView::item:hover { background: lightGray; }");
