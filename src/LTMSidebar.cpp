@@ -707,7 +707,7 @@ void
 LTMSidebar::autoFilterRefresh()
 {
     // the data has changed so refresh the trees
-    for (int i=0; i<filterSplitter->count(); i++) {
+    for (int i=1; i<filterSplitter->count(); i++) {
 
         GcSplitterItem *item = static_cast<GcSplitterItem*>(filterSplitter->widget(i));
         QTreeWidget *tree = static_cast<QTreeWidget*>(item->content);
