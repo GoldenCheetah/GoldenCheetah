@@ -26,6 +26,9 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Colors.h"
+#include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context)
 {
@@ -33,7 +36,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
     setReadOnly(true);
     setFrameStyle(QFrame::NoFrame);
 #ifdef Q_OS_WIN
-    QStyle *cde = QStyleFactory::create("plastique");
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
     verticalScrollBar()->setStyle(cde);
 #endif
 
