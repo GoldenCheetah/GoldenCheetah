@@ -168,7 +168,15 @@ RideNavigator::configChanged()
             tableView->header()->hide();
         else 
             tableView->header()->show();
+
+        tableView->header()->setStyleSheet(
+        QString("QHeaderView { background-color: %1; color: %2; }"
+                "QHeaderView::section { background-color: %1; color: %2; "
+                " border: 0px ; }")
+                .arg(GColor(CPLOTBACKGROUND).name())
+                .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     }
+
 #endif
 
     refresh();
