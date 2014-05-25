@@ -1537,7 +1537,10 @@ CPPlot::plotCentile(RideItem *rideItem)
 
             QwtPlotCurve *rideCurve = new QwtPlotCurve(tr("%10 %").arg(i+1));
             rideCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            QPen pen(QColor(250-(i*20),0,00));
+
+            // red hue to cp curve color
+            QColor std = GColor(CRIDECP);
+            QPen pen(QColor(250-(i*20),std.green(),std.blue()));
             pen.setStyle(Qt::DashLine); // Qt::SolidLine
             double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
             pen.setWidth(width);
