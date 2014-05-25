@@ -27,6 +27,9 @@
 #include <QtGui>
 #include <QString>
 #include <QTreeView>
+#include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(context), active(false), _groupBy(-1)
 {
@@ -88,7 +91,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->header()->setFocusPolicy(Qt::NoFocus);
 #ifdef Q_OS_WIN
     if (mainwindow) {
-        QStyle *cde = QStyleFactory::create("plastique");
+        QStyle *cde = QStyleFactory::create(OS_STYLE);
         tableView->verticalScrollBar()->setStyle(cde);
     }
 #endif
