@@ -89,6 +89,8 @@ class RideNavigator : public GcWindow
         void customContextMenuRequested(const QPoint &);
 
     public slots:
+
+        void configChanged();
         void refresh();
 
         void showEvent(QShowEvent *event);
