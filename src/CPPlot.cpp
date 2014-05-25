@@ -661,189 +661,189 @@ CPPlot::plotBests()
     }
 
     if (showBest) {
-    if (shadingCP == 0) {
+        if (shadingCP == 0) {
 
-        // PLAIN CURVE
+            // PLAIN CURVE
 
-        // if we're plotting work we need to adjust from
-        // power to work from the bests cache, before we
-        // set the curve samples.
-        //
+            // if we're plotting work we need to adjust from
+            // power to work from the bests cache, before we
+            // set the curve samples.
+            //
 
-        // no zones wanted
-        QwtPlotCurve *curve = new QwtPlotCurve(tr("Bests"));
+            // no zones wanted
+            QwtPlotCurve *curve = new QwtPlotCurve(tr("Bests"));
 
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
-            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-
-        // lets make it the right colour for the date series
-        QPen line;
-        QColor fill;
-        switch (rideSeries) {
-
-        case RideFile::kphd:
-            line.setColor(GColor(CACCELERATION).darker(200));
-            fill = (GColor(CACCELERATION));
-            break;
-
-        case RideFile::kph:
-            line.setColor(GColor(CSPEED).darker(200));
-            fill = (GColor(CSPEED));
-            break;
-
-        case RideFile::cad:
-        case RideFile::cadd:
-            line.setColor(GColor(CCADENCE).darker(200));
-            fill = (GColor(CCADENCE));
-            break;
-
-        case RideFile::nm:
-        case RideFile::nmd:
-            line.setColor(GColor(CTORQUE).darker(200));
-            fill = (GColor(CTORQUE));
-            break;
-
-        case RideFile::hr:
-        case RideFile::hrd:
-            line.setColor(GColor(CHEARTRATE).darker(200));
-            fill = (GColor(CHEARTRATE));
-            break;
-
-        case RideFile::vam:
-            line.setColor(GColor(CALTITUDE).darker(200));
-            fill = (GColor(CALTITUDE));
-            break;
-
-        default:
-        case RideFile::watts:
-            line.setColor(GColor(CCP));
-            fill = (GColor(CCP));
-            break;
-        case RideFile::wattsd:
-        case RideFile::NP:
-        case RideFile::xPower:
-            line.setColor(GColor(CPOWER).darker(200));
-            fill = (GColor(CPOWER));
-            break;
-        }
-
-        // when plotting power bests AND a model we draw bests as dots
-        // but only if in 'plain' mode .. not doing a rainbow curve.
-        if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && model) {
-
-            QwtSymbol *sym = new QwtSymbol;
-            sym->setStyle(QwtSymbol::Ellipse);
-            sym->setSize(4);
-            sym->setBrush(QBrush(fill));
-            sym->setPen(QPen(fill));
-            curve->setSymbol(sym);
-            curve->setStyle(QwtPlotCurve::Dots);
-        }
-
-        fill.setAlpha(64);
-        line.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
-
-        curve->setPen(line);
-        if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
-            curve->setBrush(Qt::NoBrush);
-        else
-            curve->setBrush(QBrush(fill));
-
-        if (criticalSeries == CriticalPowerWindow::work)
-            curve->setSamples(time, work);
-        else
-            curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
-
-        curve->attach(this);
-        bestsCurves.append(curve);
-
-    } else {
-
-        //
-        // RAINBOW CURVE We are plotting power AND the user wants a rainbow
-        //
-
-        // set zones from shading CP
-        QList <int> power_zone;
-        int n_zones = context->athlete->zones()->lowsFromCP(&power_zone, (int) int(shadingCP));
-
-        // now run through each zone and create a curve
-        int high = maxNonZero - 1;
-        int zone = 0;
-        while (zone < n_zones && high > 0) {
-
-            // create the curve
-            QwtPlotCurve *curve = new QwtPlotCurve("");
-            bestsCurves.append(curve);
-            curve->attach(this);
-
-            // get range for the curve
-            int low = high - 1;
-            int nextZone = zone + 1;
-            if (nextZone >= power_zone.size())
-                low = 0;
-            else {
-                while ((low > 0) && (values[low] < power_zone[nextZone]))
-                    --low;
-            }
-
-            // set samples
-            if (criticalSeries == CriticalPowerWindow::work) { // this is Energy mode
-                curve->setSamples(time.data() + low, work.data() + low, high - low + 1);
-            } else {
-                curve->setSamples(time.data() + low, values + low, high - low + 1);
-            }
-
-            // set the pen color and line width etc
-            QColor color = zoneColor(zone, n_zones);
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            QPen pen(color.darker(200));
-            pen.setColor(GColor(CCP)); //XXX color ?
-            double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
-            pen.setWidth(width);
-            curve->setPen(pen);
 
-            // use a linear gradient
-            if (shadeMode && shadingCP) { // 0 value means no shading please - and only if proper value for shadingCP
-                color.setAlpha(128);
-                QColor color1 = color.darker();
-                QLinearGradient linearGradient(0, 0, 0, height());
-                linearGradient.setColorAt(0.0, color);
-                linearGradient.setColorAt(1.0, color1);
-                linearGradient.setSpread(QGradient::PadSpread);
-                curve->setBrush(linearGradient);   // fill below the line
+            // lets make it the right colour for the date series
+            QPen line;
+            QColor fill;
+            switch (rideSeries) {
+
+            case RideFile::kphd:
+                line.setColor(GColor(CACCELERATION).darker(200));
+                fill = (GColor(CACCELERATION));
+                break;
+
+            case RideFile::kph:
+                line.setColor(GColor(CSPEED).darker(200));
+                fill = (GColor(CSPEED));
+                break;
+
+            case RideFile::cad:
+            case RideFile::cadd:
+                line.setColor(GColor(CCADENCE).darker(200));
+                fill = (GColor(CCADENCE));
+                break;
+
+            case RideFile::nm:
+            case RideFile::nmd:
+                line.setColor(GColor(CTORQUE).darker(200));
+                fill = (GColor(CTORQUE));
+                break;
+
+            case RideFile::hr:
+            case RideFile::hrd:
+                line.setColor(GColor(CHEARTRATE).darker(200));
+                fill = (GColor(CHEARTRATE));
+                break;
+
+            case RideFile::vam:
+                line.setColor(GColor(CALTITUDE).darker(200));
+                fill = (GColor(CALTITUDE));
+                break;
+
+            default:
+            case RideFile::watts:
+                line.setColor(GColor(CCP));
+                fill = (GColor(CCP));
+                break;
+            case RideFile::wattsd:
+            case RideFile::NP:
+            case RideFile::xPower:
+                line.setColor(GColor(CPOWER).darker(200));
+                fill = (GColor(CPOWER));
+                break;
             }
 
-            // now the labels
-            if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
+            // when plotting power bests AND a model we draw bests as dots
+            // but only if in 'plain' mode .. not doing a rainbow curve.
+            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && model) {
 
-                QwtText text(context->athlete->zones()->getDefaultZoneName(zone));
-                text.setFont(QFont("Helvetica", 20, QFont::Bold));
-                color.setAlpha(255);
-                text.setColor(color);
-                QwtPlotMarker *label_mark = new QwtPlotMarker();
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Ellipse);
+                sym->setSize(4);
+                sym->setBrush(QBrush(fill));
+                sym->setPen(QPen(fill));
+                curve->setSymbol(sym);
+                curve->setStyle(QwtPlotCurve::Dots);
+            }
 
-                // place the text in the geometric mean in time, at a decent power
-                double x, y;
-                if (criticalSeries == CriticalPowerWindow::work) {
-                    x = (time[low] + time[high]) / 2;
-                    y = (work[low] + work[high]) / 5;
-                } else {
-                    x = sqrt(time[low] * time[high]);
-                    y = (values[low] + values[high]) / 5;
+            fill.setAlpha(64);
+            line.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
+
+            curve->setPen(line);
+            if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
+                curve->setBrush(Qt::NoBrush);
+            else
+                curve->setBrush(QBrush(fill));
+
+            if (criticalSeries == CriticalPowerWindow::work)
+                curve->setSamples(time, work);
+            else
+                curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
+
+            curve->attach(this);
+            bestsCurves.append(curve);
+
+        } else {
+
+            //
+            // RAINBOW CURVE We are plotting power AND the user wants a rainbow
+            //
+
+            // set zones from shading CP
+            QList <int> power_zone;
+            int n_zones = context->athlete->zones()->lowsFromCP(&power_zone, (int) int(shadingCP));
+
+            // now run through each zone and create a curve
+            int high = maxNonZero - 1;
+            int zone = 0;
+            while (zone < n_zones && high > 0) {
+
+                // create the curve
+                QwtPlotCurve *curve = new QwtPlotCurve("");
+                bestsCurves.append(curve);
+                curve->attach(this);
+
+                // get range for the curve
+                int low = high - 1;
+                int nextZone = zone + 1;
+                if (nextZone >= power_zone.size())
+                    low = 0;
+                else {
+                    while ((low > 0) && (values[low] < power_zone[nextZone]))
+                        --low;
                 }
 
-                label_mark->setValue(x, y);
-                label_mark->setLabel(text);
-                label_mark->attach(this);
-                allZoneLabels.append(label_mark);
-            }
+                // set samples
+                if (criticalSeries == CriticalPowerWindow::work) { // this is Energy mode
+                    curve->setSamples(time.data() + low, work.data() + low, high - low + 1);
+                } else {
+                    curve->setSamples(time.data() + low, values + low, high - low + 1);
+                }
 
-            high = low;
-            ++zone;
+                // set the pen color and line width etc
+                QColor color = zoneColor(zone, n_zones);
+                if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+                    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                QPen pen(color.darker(200));
+                pen.setColor(GColor(CCP)); //XXX color ?
+                double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+                pen.setWidth(width);
+                curve->setPen(pen);
+
+                // use a linear gradient
+                if (shadeMode && shadingCP) { // 0 value means no shading please - and only if proper value for shadingCP
+                    color.setAlpha(128);
+                    QColor color1 = color.darker();
+                    QLinearGradient linearGradient(0, 0, 0, height());
+                    linearGradient.setColorAt(0.0, color);
+                    linearGradient.setColorAt(1.0, color1);
+                    linearGradient.setSpread(QGradient::PadSpread);
+                    curve->setBrush(linearGradient);   // fill below the line
+                }
+
+                // now the labels
+                if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
+
+                    QwtText text(context->athlete->zones()->getDefaultZoneName(zone));
+                    text.setFont(QFont("Helvetica", 20, QFont::Bold));
+                    color.setAlpha(255);
+                    text.setColor(color);
+                    QwtPlotMarker *label_mark = new QwtPlotMarker();
+
+                    // place the text in the geometric mean in time, at a decent power
+                    double x, y;
+                    if (criticalSeries == CriticalPowerWindow::work) {
+                        x = (time[low] + time[high]) / 2;
+                        y = (work[low] + work[high]) / 5;
+                    } else {
+                        x = sqrt(time[low] * time[high]);
+                        y = (values[low] + values[high]) / 5;
+                    }
+
+                    label_mark->setValue(x, y);
+                    label_mark->setLabel(text);
+                    label_mark->attach(this);
+                    allZoneLabels.append(label_mark);
+                }
+    
+                high = low;
+                ++zone;
+            }
         }
-    }
     }
 
 
@@ -1619,6 +1619,9 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         }
     }
 
+    double xmin = 1.0f/60.0f - 0.001f;
+    double xmax = 0;
+
     // prepare aggregates
     for (int j = 0; j < compareDateRanges.size(); ++j) {
 
@@ -1656,6 +1659,11 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                     if (v > ymax) ymax = v;
                     if (v < ymin) ymin = v;
                 }
+
+                // keep track of longest point
+                int imax = cache->meanMaxArray(rideSeries).count()/60.00f;
+                if (cache && imax > xmax) xmax = imax;
+
             }
 
             if (!showDelta && cache->meanMaxArray(rideSeries).size()) {
@@ -1674,6 +1682,27 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         }
     }
 
+    // X-AXIS
+
+    // if max xvalue not set then default to 6 hours
+    if (xmax == 0) xmax = 6 * 60;
+
+    // truncate at an hour for energy mode
+    if (criticalSeries == CriticalPowerWindow::work) xmax = 60.0;
+
+    // not interested in short durations for vam
+    if (criticalSeries == CriticalPowerWindow::vam) xmin = 4.993;
+
+    // now set the scale
+    QwtScaleDiv div((double)xmin, (double)xmax);
+    if (criticalSeries == CriticalPowerWindow::work)
+        div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
+    else
+        div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
+    setAxisScaleDiv(QwtPlot::xBottom, div);
+
+    // Y-AXIS
+
     if (!showDelta && rideSeries == RideFile::watts) {
 
         // set ymax to nearest 100 if power
@@ -1687,6 +1716,8 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         // or just add 10% headroom
         setAxisScale(yLeft, ymin *1.1, 1.1*ymax);
     }
+
+    // phew
     replot();
 }
 
