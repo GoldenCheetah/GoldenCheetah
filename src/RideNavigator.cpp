@@ -104,7 +104,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
-    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
@@ -132,7 +132,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     setAcceptDrops(true);
 
     // lets go
-    refresh();
+    configChanged();
 }
 
 RideNavigator::~RideNavigator()
@@ -142,17 +142,11 @@ RideNavigator::~RideNavigator()
 }
 
 void
-RideNavigator::refresh()
+RideNavigator::configChanged()
 {
     ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();
     reverseColor = ce.reverseColor;
-
-    context->athlete->sqlModel->select();
-    while (context->athlete->sqlModel->canFetchMore(QModelIndex()))
-        context->athlete->sqlModel->fetchMore(QModelIndex());
-
-    active=false;
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
@@ -167,6 +161,18 @@ RideNavigator::refresh()
             tableView->header()->show();
     }
 #endif
+
+    refresh();
+}
+
+void
+RideNavigator::refresh()
+{
+    context->athlete->sqlModel->select();
+    while (context->athlete->sqlModel->canFetchMore(QModelIndex()))
+        context->athlete->sqlModel->fetchMore(QModelIndex());
+
+    active=false;
 
     setWidth(geometry().width());
     rideTreeSelectionChanged();
