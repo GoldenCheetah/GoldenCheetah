@@ -29,9 +29,13 @@
 
 IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context)
 {
-	setWindowTitle(tr("Interval Summary"));
-	setReadOnly(true);
+    setWindowTitle(tr("Interval Summary"));
+    setReadOnly(true);
     setFrameStyle(QFrame::NoFrame);
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create("plastique");
+    verticalScrollBar()->setStyle(cde);
+#endif
 
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
