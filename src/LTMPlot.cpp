@@ -288,7 +288,7 @@ LTMPlot::setData(LTMSettings *set)
         setAxisVisible(QwtAxis::xTop, false);
 
         // remove the shading if it exists
-        refreshZoneLabels(-1);
+        refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
 
         // remove the old markers
         refreshMarkers(settings, settings->start.date(), settings->end.date(), settings->groupBy, GColor(CPLOTMARKER));
