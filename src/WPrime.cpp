@@ -658,7 +658,7 @@ class WPrimeExp : public RideMetric {
         double total = 0;
         double secs = 0;
         foreach(const RideFilePoint *point, r->dataPoints()) {
-            if (cp && point->watts > cp) total += r->recIntSecs() * point->watts;
+            if (cp && point->watts > cp) total += r->recIntSecs() * (point->watts - cp);
             secs += r->recIntSecs();
         }
         setValue(total/1000.00f);
