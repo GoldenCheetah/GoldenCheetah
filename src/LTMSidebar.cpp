@@ -489,6 +489,8 @@ void
 LTMSidebar::setAutoFilterMenu()
 {
 #ifdef GC_HAVE_LUCENE
+    active = true;
+
     QStringList on = appsettings->cvalue(context->athlete->cyclist, GC_LTM_AUTOFILTERS, tr("Workout Code|Sport")).toString().split("|");
     autoFilterMenu->clear();
     autoFilterState.clear();
@@ -501,18 +503,26 @@ LTMSidebar::setAutoFilterMenu()
             action->setCheckable(true);
 
             if (on.contains(field.name)) action->setChecked(true);
+            else action->setChecked(false);
+
             connect(action, SIGNAL(triggered()), this, SLOT(autoFilterChanged()));
+
+            // remove from tree if its already there
+            GcSplitterItem *item = filterSplitter->removeItem(action->text());
+            if (item) delete item; // will be removed from splitter too
 
             autoFilterMenu->addAction(action);
             autoFilterState << false;
         }
     }
+    active = false;
 #endif
 }
 
 void 
 LTMSidebar::autoFilterChanged()
 {
+    if (active) return;
 
     QString on;
 
@@ -564,6 +574,7 @@ LTMSidebar::autoFilterChanged()
                 }
             }
             connect(tree,SIGNAL(itemSelectionChanged()), this, SLOT(autoFilterSelectionChanged()));
+
         }
 
         // deactivate
@@ -696,7 +707,7 @@ void
 LTMSidebar::autoFilterRefresh()
 {
     // the data has changed so refresh the trees
-    for (int i=1; i<filterSplitter->count(); i++) {
+    for (int i=0; i<filterSplitter->count(); i++) {
 
         GcSplitterItem *item = static_cast<GcSplitterItem*>(filterSplitter->widget(i));
         QTreeWidget *tree = static_cast<QTreeWidget*>(item->content);
