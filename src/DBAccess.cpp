@@ -93,8 +93,9 @@
 // 72  24  Apr 2014 Mark Liversedge    Andy Froncioni's faster algorithm for W' bal
 // 73  11  May 2014 Mark Liversedge    Default color of 1,1,1 now uses CPLOTMARKER for ride color, change version to force rebuild
 // 74  20  May 2014 Mark Liversedge    Added Athlete Weight
+// 75  25  May 2014 Mark Liversedge    W' work calculation changed to only include energy above CP
 
-int DBSchemaVersion = 74;
+int DBSchemaVersion = 75;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
