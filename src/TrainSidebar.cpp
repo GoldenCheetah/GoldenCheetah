@@ -29,6 +29,8 @@
 #include <QtGui>
 #include <QRegExp>
 #include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -107,7 +109,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    QStyle *cde = QStyleFactory::create("plastique");
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
     mediaTree->verticalScrollBar()->setStyle(cde);
 #endif
 #endif
@@ -125,7 +127,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     deviceTree->expandItem(deviceTree->invisibleRootItem());
     deviceTree->setContextMenuPolicy(Qt::CustomContextMenu);
 #ifdef Q_OS_WIN
-    QStyle *xde = QStyleFactory::create("plastique");
+    QStyle *xde = QStyleFactory::create(OS_STYLE);
     deviceTree->verticalScrollBar()->setStyle(xde);
 #endif
 
@@ -163,7 +165,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 #ifdef Q_OS_WIN
-    xde = QStyleFactory::create("plastique");
+    xde = QStyleFactory::create(OS_STYLE);
     workoutTree->verticalScrollBar()->setStyle(xde);
 #endif
 
