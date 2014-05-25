@@ -1355,7 +1355,7 @@ ColorsPage::applyThemeClicked()
                             // we make it barely distinguishable from background
                 {
                     QColor bg = theme.colors[0];
-                    if(bg == QColor(Qt::black)) color = bg.lighter(110);
+                    if(bg == QColor(Qt::black)) color = QColor(30,30,30);
                     else color = bg.darker(110);
                 }
                 break;
