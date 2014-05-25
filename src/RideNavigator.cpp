@@ -999,6 +999,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth-1,myOption.rect.y());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth-1,myOption.rect.y()+myOption.rect.height());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
+        painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
 
         // indent first column and draw all in plotmarker color
         myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
@@ -1053,6 +1054,17 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
 #endif
                 painter->fillRect(high, userColor);
+            } else {
+
+                // border
+                QPen rpen;
+                rpen.setWidth(1);
+                rpen.setColor(GColor(CPLOTGRID));
+                QPen isColor = painter->pen();
+                QFont isFont = painter->font();
+                painter->setPen(rpen);
+                painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
+                painter->setPen(isColor);
             }
         }
 
