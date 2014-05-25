@@ -86,6 +86,12 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(0);
     tableView->header()->setFocusPolicy(Qt::NoFocus);
+#ifdef Q_OS_WIN
+    if (mainwindow) {
+        QStyle *cde = QStyleFactory::create("plastique");
+        tableView->verticalScrollBar()->setStyle(cde);
+    }
+#endif
 #ifdef Q_OS_MAC
     tableView->header()->setSortIndicatorShown(false); // blue looks nasty
     tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);

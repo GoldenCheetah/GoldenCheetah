@@ -28,6 +28,7 @@
 #include <QWebFrame>
 #include <QScrollBar>
 #include <QtGui>
+#include <QStyle>
 
 // seasons support
 #include "Season.h"
@@ -77,6 +78,10 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #ifdef Q_OS_MAC
     dateRangeTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create("plastique");
+    dateRangeTree->verticalScrollBar()->setStyle(cde);
+#endif
     seasonsWidget->addWidget(dateRangeTree);
 
     // events
@@ -100,6 +105,10 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     eventTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 #ifdef Q_OS_MAC
     eventTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create("plastique");
+    eventTree->verticalScrollBar()->setStyle(cde);
 #endif
     eventsWidget->addWidget(eventTree);
 
@@ -129,6 +138,10 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     filterTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 #ifdef Q_OS_MAC
     filterTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create("plastique");
+    filterTree->verticalScrollBar()->setStyle(cde);
 #endif
     // we cast the filter tree and this because we use the same constructor XXX fix this!!!
     filterSplitter = new GcSubSplitter(Qt::Vertical, (GcSplitterControl*)filterTree, (GcSplitter*)this, true);
@@ -529,6 +542,10 @@ LTMSidebar::autoFilterChanged()
             tree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 #ifdef Q_OS_MAC
             tree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+#ifdef Q_OS_WIN
+            QStyle *cde = QStyleFactory::create("plastique");
+            tree->verticalScrollBar()->setStyle(cde);
 #endif
             item->addWidget(tree);
             filterSplitter->addWidget(item);
