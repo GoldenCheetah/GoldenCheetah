@@ -23,6 +23,7 @@
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
+#include "TabView.h"
 
 #include <QtGui>
 #include <QString>
@@ -175,6 +176,7 @@ RideNavigator::configChanged()
                 " border: 0px ; }")
                 .arg(GColor(CPLOTBACKGROUND).name())
                 .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+        tableView->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
     }
 
 #endif
