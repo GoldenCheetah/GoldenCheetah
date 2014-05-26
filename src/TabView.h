@@ -112,6 +112,8 @@ class TabView : public QWidget
         //void ergSelected(ErgFile *erg);
         void configChanged();
 
+        void resizeEvent(QResizeEvent*);
+
     protected:
 
         Context *context;
@@ -126,6 +128,7 @@ class TabView : public QWidget
         bool _tiled;
         bool _selected;
         int lastHeight; // last height of splitter, default to 100...
+        int sidewidth; // width of sidebar
 
         QStackedWidget *stack;
         QSplitter *splitter;
