@@ -241,7 +241,7 @@ extern int OperatingSystem;
 #define OSX     3
 #define OPENBSD 4
 
-#if QT_VER > 0x050000
+#if QT_VERSION > 0x050000
 #define OS_STYLE "Fusion"
 #else
 #define OS_STYLE "Plastique"
