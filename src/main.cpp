@@ -150,7 +150,7 @@ main(int argc, char *argv[])
     // set defaultfont
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
-    font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 12).toInt());
+    font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
     application->setFont(font); // set default font
 
 
