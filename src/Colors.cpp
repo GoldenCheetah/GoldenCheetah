@@ -308,9 +308,13 @@ GCColor::css()
                    "h3 { color: %1; background-color: %2; } "
                    "h4 { color: %1; background-color: %2; } "
                    "b { color: %1; background-color: %2; } "
-                   //"html { overflow: auto }"
+#ifdef Q_OS_MAC
+                   "::-webkit-scrollbar-thumb { border-radius: 3px; background: rgba(0,0,0,0.5); } "
+                   "::-webkit-scrollbar { width: 7px; background: %2; } "
+#else
                    "::-webkit-scrollbar-thumb { background: darkGray; } "
                    "::-webkit-scrollbar { width: 5px; background: %2; } "
+#endif
                    "</style> ").arg(GColor(CPLOTMARKER).name())
                                .arg(bgColor.name())
                                .arg(fgColor.name());
