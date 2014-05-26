@@ -91,10 +91,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->header()->setMinimumSectionSize(0);
     tableView->header()->setFocusPolicy(Qt::NoFocus);
 #ifdef Q_OS_WIN
-    if (mainwindow) {
-        QStyle *cde = QStyleFactory::create(OS_STYLE);
-        tableView->verticalScrollBar()->setStyle(cde);
-    }
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
+    tableView->verticalScrollBar()->setStyle(cde);
 #endif
 #ifdef Q_OS_MAC
     tableView->header()->setSortIndicatorShown(false); // blue looks nasty
@@ -160,6 +158,7 @@ RideNavigator::configChanged()
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
+    tableView->setStyleSheet(TabView::ourStyleSheet());
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -170,7 +169,6 @@ RideNavigator::configChanged()
         else 
             tableView->header()->show();
 
-        tableView->setStyleSheet(TabView::ourStyleSheet());
         tableView->header()->setStyleSheet(
         QString("QHeaderView { background-color: %1; color: %2; }"
                 "QHeaderView::section { background-color: %1; color: %2; "
