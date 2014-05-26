@@ -112,39 +112,46 @@ TabView::setSidebar(QWidget *sidebar)
     configChanged();
 }
 
+QString
+TabView::ourStyleSheet()
+{
+    return QString::fromUtf8("QScrollBar { background-color: %1; }"
+           "QTextEdit { background: %1; }"
+           "QScrollBar:vertical {"
+           "    border: 0px solid darkGray; "
+           "    background:%1;"
+           "    width: 8px;    "
+           "    margin: 2px 2px 2px 2px;"
+           "}"
+           "QScrollBar::handle:vertical {"
+           "    background: darkGray; "
+           "    min-height: 0px;"
+           ""
+           "}"
+           "QScrollBar::add-line:vertical {"
+           "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
+           "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
+           "    height: px;"
+           "    subcontrol-position: bottom;"
+           "    subcontrol-origin: margin;"
+           "}"
+           "QScrollBar::sub-line:vertical {"
+           "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
+           "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
+           "    height: 0px;"
+           "    subcontrol-position: top;"
+           "    subcontrol-origin: margin;"
+           "}"
+           "").arg(GColor(CPLOTBACKGROUND).name());
+}
+
 void
 TabView::configChanged()
 {
 #if (defined Q_OS_LINUX) || (defined Q_OS_WIN)
     // style that sucker
     if (sidebar_) {
-        sidebar_->setStyleSheet(
-        QString::fromUtf8("QScrollBar:vertical {"
-                      "    border: 0px solid darkGray; "
-                      "    background:%1;"
-                      "    width: 8px;    "
-                      "    margin: 0px 0px 0px 0px;"
-                      "}"
-                      "QScrollBar::handle:vertical {"
-                      "    background: darkGray; "
-                      "    min-height: 0px;"
-                      ""
-                      "}"
-                      "QScrollBar::add-line:vertical {"
-                      "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                      "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
-                      "    height: px;"
-                      "    subcontrol-position: bottom;"
-                      "    subcontrol-origin: margin;"
-                      "}"
-                      "QScrollBar::sub-line:vertical {"
-                      "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                      "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
-                      "    height: 0px;"
-                      "    subcontrol-position: top;"
-                      "    subcontrol-origin: margin;"
-                      "}"
-                      "").arg(GColor(CPLOTBACKGROUND).name()));
+        sidebar_->setStyleSheet(ourStyleSheet());
     }
 #endif
 }

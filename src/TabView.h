@@ -62,6 +62,7 @@ class TabView : public QWidget
         QWidget *bottom() { return bottom_; }
 
         // sidebar
+        static QString ourStyleSheet();
         void setSidebarEnabled(bool x) { _sidebar=x; sidebarChanged(); }
         bool sidebarEnabled() const { return _sidebar; }
 
