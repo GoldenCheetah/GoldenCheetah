@@ -20,6 +20,7 @@
 #include "LTMTool.h"
 #include "LTMPlot.h"
 #include "LTMSettings.h"
+#include "TabView.h"
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -34,6 +35,8 @@
 #include <QDebug>
 #include <QWebView>
 #include <QWebFrame>
+#include <QStyle>
+#include <QStyleFactory>
 
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
@@ -61,6 +64,10 @@ LTMWindow::LTMWindow(Context *context) :
     plotsLayout->setContentsMargins(0,0,0,0);
 
     plotArea = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
+    plotArea->setStyle(cde);
+#endif
     plotArea->setAutoFillBackground(false);
     plotArea->setWidgetResizable(true);
     plotArea->setWidget(plotsWidget);
@@ -87,6 +94,10 @@ LTMWindow::LTMWindow(Context *context) :
     compareplotsLayout->setContentsMargins(0,0,0,0);
 
     compareplotArea = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create(OS_STYLE);
+    compareplotArea->setStyle(cde);
+#endif
     compareplotArea->setAutoFillBackground(false);
     compareplotArea->setWidgetResizable(true);
     compareplotArea->setWidget(compareplotsWidget);
@@ -190,12 +201,24 @@ LTMWindow::LTMWindow(Context *context) :
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    configChanged();
 }
 
 LTMWindow::~LTMWindow()
 {
     delete popup;
+}
+
+void
+LTMWindow::configChanged()
+{
+#ifndef Q_OS_MAC
+    plotArea->setStyleSheet(TabView::ourStyleSheet());
+    compareplotArea->setStyleSheet(TabView::ourStyleSheet());
+#endif
+    refresh();
 }
 
 void
