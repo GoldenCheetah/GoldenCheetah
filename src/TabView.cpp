@@ -32,7 +32,7 @@
 
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
-    _sidebar(true), _tiled(false), _selected(false), lastHeight(130),
+    _sidebar(true), _tiled(false), _selected(false), lastHeight(130), sidewidth(0),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
 {
@@ -94,13 +94,36 @@ TabView::splitterMoved(int pos,int)
     // show / hide sidebar as dragged..
     if ((pos == 0  && sidebarEnabled())) setSidebarEnabled(false);
 
-    //XXX ? analysisSidebar should handle resizeEvents better, we shouldn't have
-    //      to babysit it when the sidebar sizes change
-    //analysisSidebar->setWidth(pos);
+    // remember the size the user selected
+    sidewidth = splitter->sizes()[0];
 
     // we now have splitter settings for each view
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     appsettings->setCValue(context->athlete->cyclist, setting, splitter->saveState());
+}
+
+void
+TabView::resizeEvent(QResizeEvent *)
+{
+    if (sidewidth == 0) {
+        sidewidth = splitter->sizes()[0];
+    } else {
+
+        // splitter sizes will have changed, so lets get the new
+        // total width and set the handle back to where it was
+        QList<int> csizes = splitter->sizes();
+        if (csizes.count() != 2) return; //don't have two widgets!
+
+        // total will have changed
+        int tot = csizes[0] + csizes[1];
+        if (tot < sidewidth) return; // requested size too big!
+
+        // set left back to where it was before!
+        csizes[0] = sidewidth;
+        csizes[1] = tot-sidewidth;
+        splitter->setSizes(csizes);
+        sidewidth = splitter->sizes()[0];
+    }
 }
 
 void
