@@ -463,7 +463,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
-    modelParametersChanged();
+    // set widgets and model parameters
+    modelChanged();
 
     configChanged(); // get colors set
 }
