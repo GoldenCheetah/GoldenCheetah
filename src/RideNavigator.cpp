@@ -1103,8 +1103,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND));
         }
         QPen isColor = painter->pen();
-        painter->setPen(QPen(Qt::green));
-        myOption.palette.setColor(QPalette::WindowText, QColor(Qt::green)); //XXX
+        painter->setPen(QPen(GColor(CPLOTMARKER)));
+        myOption.palette.setColor(QPalette::WindowText, QColor(GColor(CPLOTMARKER))); //XXX
         painter->drawText(myOption.rect, value);
         painter->setPen(isColor);
     }
