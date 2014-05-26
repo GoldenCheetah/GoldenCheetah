@@ -1211,17 +1211,17 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     calendar->setCurrentFont(font);
 
 #ifdef Q_OS_MAC
-    defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 12).toInt() -7) / 2);
-    titlesSize->setCurrentIndex((appsettings->value(this, GC_FONT_TITLES_SIZE, 12).toInt() -7) / 2);
-    chartmarkersSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTMARKERS_SIZE, 12).toInt() -7) / 2);
-    chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 12).toInt() -7) / 2);
-    calendarSize->setCurrentIndex((appsettings->value(this, GC_FONT_CALENDAR_SIZE, 12).toInt() -7) / 2);
+    defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 10).toInt() -7) / 2);
+    titlesSize->setCurrentIndex((appsettings->value(this, GC_FONT_TITLES_SIZE, 10).toInt() -7) / 2);
+    chartmarkersSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTMARKERS_SIZE, 8).toInt() -7) / 2);
+    chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 8).toInt() -7) / 2);
+    calendarSize->setCurrentIndex((appsettings->value(this, GC_FONT_CALENDAR_SIZE, 8).toInt() -7) / 2);
 #else
-    defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 12).toInt() -6) / 2);
-    titlesSize->setCurrentIndex((appsettings->value(this, GC_FONT_TITLES_SIZE, 12).toInt() -6) / 2);
-    chartmarkersSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTMARKERS_SIZE, 12).toInt() -6) / 2);
-    chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 12).toInt() -6) / 2);
-    calendarSize->setCurrentIndex((appsettings->value(this, GC_FONT_CALENDAR_SIZE, 12).toInt() -6) / 2);
+    defaultSize->setCurrentIndex((appsettings->value(this, GC_FONT_DEFAULT_SIZE, 10).toInt() -6) / 2);
+    titlesSize->setCurrentIndex((appsettings->value(this, GC_FONT_TITLES_SIZE, 10).toInt() -6) / 2);
+    chartmarkersSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTMARKERS_SIZE, 8).toInt() -6) / 2);
+    chartlabelsSize->setCurrentIndex((appsettings->value(this, GC_FONT_CHARTLABELS_SIZE, 8).toInt() -6) / 2);
+    calendarSize->setCurrentIndex((appsettings->value(this, GC_FONT_CALENDAR_SIZE, 8).toInt() -6) / 2);
 #endif
 
     QGridLayout *grid = new QGridLayout;
