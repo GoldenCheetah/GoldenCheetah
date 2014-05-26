@@ -26,13 +26,14 @@
 #include "GcWindowRegistry.h"
 #include "TrainDB.h"
 #include "MetricAggregator.h"
+#include "RideNavigator.h"
 #include "MainWindow.h"
 
 #include "Settings.h"
 
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
-    _sidebar(true), _tiled(false), _selected(false), lastHeight(130), sidewidth(0),
+    _sidebar(true), _tiled(false), _selected(false), lastHeight(130), sidewidth(0), active(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
 {
@@ -100,30 +101,43 @@ TabView::splitterMoved(int pos,int)
     // we now have splitter settings for each view
     QString setting = QString("%1/%2").arg(GC_SETTINGS_SPLITTER_SIZES).arg(type);
     appsettings->setCValue(context->athlete->cyclist, setting, splitter->saveState());
+
+    // if user moved us then tell ride navigator if
+    // we are the analysis view
+    // all a bit of a hack to stop the column widths from
+    // being adjusted as the splitter gets resized and reset
+    if (type == VIEW_ANALYSIS && active == false)
+        context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
 }
 
 void
 TabView::resizeEvent(QResizeEvent *)
 {
-    if (sidewidth == 0) {
+    active = true; // we're mucking about, so ignore in splitterMoved ...
+
+    if (sidewidth < 200) {
         sidewidth = splitter->sizes()[0];
     } else {
 
         // splitter sizes will have changed, so lets get the new
         // total width and set the handle back to where it was
         QList<int> csizes = splitter->sizes();
-        if (csizes.count() != 2) return; //don't have two widgets!
+        if (csizes.count() == 2) {
 
-        // total will have changed
-        int tot = csizes[0] + csizes[1];
-        if (tot < sidewidth) return; // requested size too big!
+            // total will have changed
+            int tot = csizes[0] + csizes[1];
+            if (tot >= sidewidth) {
 
-        // set left back to where it was before!
-        csizes[0] = sidewidth;
-        csizes[1] = tot-sidewidth;
-        splitter->setSizes(csizes);
-        sidewidth = splitter->sizes()[0];
+                // set left back to where it was before!
+                csizes[0] = sidewidth;
+                csizes[1] = tot-sidewidth;
+                splitter->setSizes(csizes);
+                sidewidth = splitter->sizes()[0];
+            }
+        }
     }
+
+    active = false;
 }
 
 void

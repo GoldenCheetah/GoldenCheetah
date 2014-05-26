@@ -129,6 +129,7 @@ class TabView : public QWidget
         bool _selected;
         int lastHeight; // last height of splitter, default to 100...
         int sidewidth; // width of sidebar
+        bool active;
 
         QStackedWidget *stack;
         QSplitter *splitter;

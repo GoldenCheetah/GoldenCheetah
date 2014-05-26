@@ -200,6 +200,10 @@ RideNavigator::refresh()
 void
 RideNavigator::resizeEvent(QResizeEvent*)
 {
+    // ignore if main window .. we get told to resize
+    // by the splitter mover
+    if (mainwindow) return;
+
     setWidth(geometry().width());
 }
 
