@@ -211,6 +211,8 @@ class LTMWindow : public GcChartWindow
         void useStandardRange();
         void useThruToday();
 
+        void configChanged();
+
     private:
         // passed from Context *
         DateRange plotted;
