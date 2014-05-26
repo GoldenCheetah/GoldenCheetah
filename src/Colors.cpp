@@ -313,7 +313,7 @@ GCColor::css()
                    "::-webkit-scrollbar { width: 7px; background: %2; } "
 #else
                    "::-webkit-scrollbar-thumb { background: darkGray; } "
-                   "::-webkit-scrollbar { width: 5px; background: %2; } "
+                   "::-webkit-scrollbar { width: 4px; background: %2; } "
 #endif
                    "</style> ").arg(GColor(CPLOTMARKER).name())
                                .arg(bgColor.name())

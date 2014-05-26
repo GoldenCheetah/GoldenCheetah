@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "TabView.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
 #include "RideFile.h"
@@ -49,6 +50,7 @@
 #include <qxtspanslider.h>
 #include <QStyleFactory>
 #include <QStyle>
+#include <QScrollBar>
 
 // tooltip
 #include "LTMWindow.h"
@@ -363,6 +365,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackWidget->setPalette(palette);
 
     stackFrame = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
+    stackFrame->setStyle(cde);
+#endif
     stackFrame->hide();
     stackFrame->setAutoFillBackground(false);
     stackFrame->setWidgetResizable(true);
@@ -383,6 +389,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     seriesstackWidget->setPalette(palette);
 
     seriesstackFrame = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create(OS_STYLE);
+    seriesstackFrame->setStyle(cde);
+#endif
     seriesstackFrame->hide();
     seriesstackFrame->setAutoFillBackground(false);
     seriesstackFrame->setWidgetResizable(true);
@@ -403,6 +413,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     comparePlotWidget->setPalette(palette);
 
     comparePlotFrame = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create(OS_STYLE);
+    comparePlotWidget->setStyle(cde);
+#endif
     comparePlotFrame->hide();
     comparePlotFrame->setAutoFillBackground(false);
     comparePlotFrame->setWidgetResizable(true);
@@ -420,6 +434,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlotLayout->setSpacing(0);
     allPlotLayout->setContentsMargins(0,0,0,0);
     allPlotFrame = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create(OS_STYLE);
+    allPlotFrame->setStyle(cde);
+#endif
     allPlotFrame->setFrameStyle(QFrame::NoFrame);
     allPlotFrame->setAutoFillBackground(false);
     allPlotFrame->setContentsMargins(0,0,0,0);
@@ -616,6 +634,13 @@ AllPlotWindow::configChanged()
     scrollLeft->setPalette(palette);
     scrollRight->setPalette(palette);
 
+    // set style sheets
+#ifndef Q_OS_MAC
+    allPlotFrame->setStyleSheet(TabView::ourStyleSheet());
+    comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
+    seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
+    stackFrame->setStyleSheet(TabView::ourStyleSheet());
+#endif
 
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     fullPlot->setPalette(palette);
