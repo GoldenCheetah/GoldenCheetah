@@ -728,6 +728,7 @@ AllPlotWindow::compareChanged()
         int maxKM=0, maxSECS=0;
 
         fullPlot->standard->setVisible(false);
+        if (fullPlot->smooth < 1) fullPlot->smooth = 1;
         foreach(CompareInterval ci, context->compareIntervals) {
 
             AllPlotObject *po = new AllPlotObject(fullPlot);
@@ -2430,11 +2431,13 @@ AllPlotWindow::setSmoothing(int value)
     //if (!current) return;
     smoothSlider->setValue(value);
 
-    // recalculate etc
-    fullPlot->setSmoothing(value);
-
     // Compare has LOTS of rides to smooth...
     if (context->isCompareIntervals) {
+
+        // no zero smoothin when comparing -- we need the
+        // arrays to be intitialised for all series
+        if (value < 1) value = 1;
+        fullPlot->setSmoothing(value);
 
         setUpdatesEnabled(false);
 
@@ -2458,6 +2461,9 @@ AllPlotWindow::setSmoothing(int value)
         setUpdatesEnabled(true);
 
     } else {
+
+        // recalculate etc
+        fullPlot->setSmoothing(value);
 
         // redraw
         redrawFullPlot();
