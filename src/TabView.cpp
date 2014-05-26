@@ -154,6 +154,7 @@ TabView::ourStyleSheet()
 {
     return QString::fromUtf8("QScrollBar { background-color: %1; }"
            "QTextEdit { background: %1; }"
+           "QTreeView { background: %1; }"
            "QScrollBar:vertical {"
            "    border: 0px solid darkGray; "
            "    background:%1;"

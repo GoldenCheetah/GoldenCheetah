@@ -170,13 +170,13 @@ RideNavigator::configChanged()
         else 
             tableView->header()->show();
 
+        tableView->setStyleSheet(TabView::ourStyleSheet());
         tableView->header()->setStyleSheet(
         QString("QHeaderView { background-color: %1; color: %2; }"
                 "QHeaderView::section { background-color: %1; color: %2; "
                 " border: 0px ; }")
                 .arg(GColor(CPLOTBACKGROUND).name())
                 .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-        tableView->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
     }
 
 #endif
