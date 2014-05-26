@@ -37,9 +37,9 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
     // delete when done
     setAttribute(Qt::WA_DeleteOnClose);
 
-    // Minimum 600x500 for when selecting intervals
+    // Minimum 750x500 for when selecting intervals / and room for translation
     setMinimumHeight(500);
-    setMinimumWidth(600);
+    setMinimumWidth(750);
 
     // title
     setWindowTitle(tr("Split Ride"));
@@ -65,11 +65,11 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
     intervals->headerItem()->setText(6, tr("Interval Name"));
     intervals->setColumnCount(7);
     intervals->setColumnWidth(0,30);
-    intervals->setColumnWidth(1,80);
+    intervals->setColumnWidth(1,90);
     intervals->setColumnWidth(2,30);
-    intervals->setColumnWidth(3,80);
+    intervals->setColumnWidth(3,90);
     intervals->setColumnWidth(4,80);
-    intervals->setColumnWidth(5,80);
+    intervals->setColumnWidth(5,100);
     intervals->setSelectionMode(QAbstractItemView::NoSelection);
     intervals->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     intervals->setUniformRowHeights(true);
@@ -83,11 +83,11 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
     files->headerItem()->setText(4, tr("Distance"));
     files->headerItem()->setText(5, tr("Action"));
     files->setColumnCount(6);
-    files->setColumnWidth(0, 190); // filename
-    files->setColumnWidth(1, 95); // date
-    files->setColumnWidth(2, 90); // time
-    files->setColumnWidth(3, 75); // duration
-    files->setColumnWidth(4, 75); // distance
+    files->setColumnWidth(0, 220); // filename
+    files->setColumnWidth(1, 110); // date
+    files->setColumnWidth(2, 80); // time
+    files->setColumnWidth(3, 80); // duration
+    files->setColumnWidth(4, 90); // distance
     files->setSelectionMode(QAbstractItemView::SingleSelection);
     files->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     files->setUniformRowHeights(true);
