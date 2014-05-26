@@ -618,6 +618,14 @@ AllPlotWindow::configChanged()
     palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     setPalette(palette); // propagates to children
 
+    // set style sheets
+#ifndef Q_OS_MAC
+    allPlotFrame->setStyleSheet(TabView::ourStyleSheet());
+    comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
+    seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
+    stackFrame->setStyleSheet(TabView::ourStyleSheet());
+#endif
+
     // set palettes
     allStack->setPalette(palette);
     allPlotStack->setPalette(palette);
@@ -634,13 +642,6 @@ AllPlotWindow::configChanged()
     scrollLeft->setPalette(palette);
     scrollRight->setPalette(palette);
 
-    // set style sheets
-#ifndef Q_OS_MAC
-    allPlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
-    stackFrame->setStyleSheet(TabView::ourStyleSheet());
-#endif
 
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     fullPlot->setPalette(palette);
