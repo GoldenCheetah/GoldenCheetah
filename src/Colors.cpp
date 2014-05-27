@@ -309,8 +309,9 @@ GCColor::css()
                    "h4 { color: %1; background-color: %2; } "
                    "b { color: %1; background-color: %2; } "
 #ifdef Q_OS_MAC
-                   "::-webkit-scrollbar-thumb { border-radius: 3px; background: rgba(0,0,0,0.5); } "
-                   "::-webkit-scrollbar { width: 7px; background: %2; } "
+                   "::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.5);  "
+                   "-webkit-box-shadow: inset 0 0 1px rgba(255,255,255,0.6); }"
+                   "::-webkit-scrollbar { width: 9; background: %2; } "
 #else
                    "::-webkit-scrollbar-thumb { background: darkGray; } "
                    "::-webkit-scrollbar { width: 4px; background: %2; } "
