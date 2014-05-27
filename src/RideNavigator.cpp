@@ -1026,7 +1026,10 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth-1,myOption.rect.y());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth-1,myOption.rect.y()+myOption.rect.height());
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
+
+#ifndef Q_OS_MAC
         painter->drawLine(rideNavigator->pwidth-1, myOption.rect.y(), rideNavigator->pwidth-1, myOption.rect.y()+myOption.rect.height());
+#endif // not needed on mac due to scrollbar overlays
 
         // indent first column and draw all in plotmarker color
         myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
