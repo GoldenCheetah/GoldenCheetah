@@ -2,6 +2,20 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="it">
 <context>
+    <name>AAvgPower</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="467"/>
+        <source>Average aPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="468"/>
+        <location filename="../BasicRideMetrics.cpp" line="469"/>
+        <source>watts</source>
+        <translation type="unfinished">watt</translation>
+    </message>
+</context>
+<context>
     <name>AboutDialog</name>
     <message>
         <location filename="../AboutDialog.cpp" line="25"/>
@@ -32,20 +46,24 @@
 <context>
     <name>AboutPage</name>
     <message>
-        <location filename="../AboutDialog.cpp" line="62"/>
         <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
-        <translation>center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Software per l&apos;Analisi in Potenza&lt;br&gt;per Linux, Mac, e Windows&lt;p&gt;GoldenCheetah e&apos; sottoposto alla&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Il codice sorgente puo&apos; essere ottenuto da&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;I files delle Ativita&apos;  e altri dati sono momerizzati in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks usati con permessi&lt;br&gt;TSS, NP, IF per cortesia da&lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower cortesia di &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+        <translation type="obsolete">center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Software per l&apos;Analisi in Potenza&lt;br&gt;per Linux, Mac, e Windows&lt;p&gt;GoldenCheetah e&apos; sottoposto alla&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Il codice sorgente puo&apos; essere ottenuto da&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;I files delle Ativita&apos;  e altri dati sono momerizzati in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks usati con permessi&lt;br&gt;TSS, NP, IF per cortesia da&lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower cortesia di &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
+    </message>
+    <message>
+        <location filename="../AboutDialog.cpp" line="62"/>
+        <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>AbsWattagePage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="273"/>
+        <location filename="../WorkoutWizard.cpp" line="278"/>
         <source>Minutes</source>
         <translation>Minuti</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="274"/>
+        <location filename="../WorkoutWizard.cpp" line="279"/>
         <source>Wattage</source>
         <translation>Wattage</translation>
     </message>
@@ -230,47 +248,132 @@
         <translation>Potenza - Tacx Flow (8)</translation>
     </message>
     <message>
+        <location filename="../AddDeviceWizard.cpp" line="1118"/>
+        <source>Power - Tacx Blue Twist (1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../AddDeviceWizard.cpp" line="1119"/>
+        <source>Power - Tacx Blue Twist (3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1120"/>
+        <source>Power - Tacx Blue Twist (5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1121"/>
+        <source>Power - Tacx Blue Twist (7)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1122"/>
+        <source>Power - Tacx Blue Motion (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1123"/>
+        <source>Power - Tacx Blue Motion (4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1124"/>
+        <source>Power - Tacx Blue Motion (6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1125"/>
+        <source>Power - Tacx Blue Motion (8)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1126"/>
+        <source>Power - Tacx Blue Motion (10)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1127"/>
+        <source>Power - Elite Supercrono Powermag (1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1128"/>
+        <source>Power - Elite Supercrono Powermag (2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1129"/>
+        <source>Power - Elite Supercrono Powermag (3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1130"/>
+        <source>Power - Elite Supercrono Powermag (4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1131"/>
+        <source>Power - Elite Supercrono Powermag (5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1132"/>
+        <source>Power - Elite Supercrono Powermag (6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1133"/>
+        <source>Power - Elite Supercrono Powermag (7)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1134"/>
+        <source>Power - Elite Supercrono Powermag (8)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddDeviceWizard.cpp" line="1136"/>
         <source>Road/Cross (700C/622)</source>
         <translation>Strada/Cross (700C/622)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1120"/>
+        <location filename="../AddDeviceWizard.cpp" line="1137"/>
         <source>Tri/TT (650C)</source>
         <translation>Tri/TT (650C)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1121"/>
+        <location filename="../AddDeviceWizard.cpp" line="1138"/>
         <source>Mountain (26&quot;)</source>
         <translation>MTB (26&quot;)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1122"/>
+        <location filename="../AddDeviceWizard.cpp" line="1139"/>
         <source>BMX (20&quot;)</source>
         <translation>BMX (20&quot;)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1127"/>
+        <location filename="../AddDeviceWizard.cpp" line="1144"/>
         <source>Selected by default</source>
         <translation>Selezionato da default</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1134"/>
+        <location filename="../AddDeviceWizard.cpp" line="1151"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1135"/>
+        <location filename="../AddDeviceWizard.cpp" line="1152"/>
         <source>Heartrate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1136"/>
+        <location filename="../AddDeviceWizard.cpp" line="1153"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1137"/>
+        <location filename="../AddDeviceWizard.cpp" line="1154"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
@@ -337,107 +440,146 @@ Se scegli di copiarlo nella libreria il file sara&apos; copiato nella libreria G
 <context>
     <name>AddIntervalDialog</name>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="31"/>
         <source>Add Intervals</source>
-        <translation>Aggiungi Intervalli</translation>
+        <translation type="obsolete">Aggiungi Intervalli</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="36"/>
+        <location filename="../AddIntervalDialog.cpp" line="44"/>
         <source>Method: </source>
         <translation>Metodo: </translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="39"/>
         <source>First</source>
-        <translation>Primo</translation>
+        <translation type="obsolete">Primo</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="43"/>
+        <location filename="../AddIntervalDialog.cpp" line="52"/>
         <source>Peak Power</source>
         <translation>Potenza di picco</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="52"/>
+        <location filename="../AddIntervalDialog.cpp" line="75"/>
         <source>Type: </source>
         <translation>Tipo: </translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="55"/>
+        <location filename="../AddIntervalDialog.cpp" line="78"/>
         <source>Standard</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="59"/>
+        <location filename="../AddIntervalDialog.cpp" line="82"/>
         <source>Custom</source>
         <translation>Custom</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="69"/>
         <source>Interval length: </source>
-        <translation>Lunghezza intervallo:</translation>
+        <translation type="obsolete">Lunghezza intervallo:</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="72"/>
+        <location filename="../AddIntervalDialog.cpp" line="36"/>
+        <source>Find Intervals</source>
+        <translation type="unfinished">Trova intervalli</translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="57"/>
+        <source>Ascent (elevation)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="62"/>
+        <source>W&apos; (Energy)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="67"/>
+        <source>Time / Distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="94"/>
+        <source>Length: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="97"/>
         <source>By time</source>
         <translation>Per tempo</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="76"/>
+        <location filename="../AddIntervalDialog.cpp" line="101"/>
         <source>By distance</source>
         <translation>Per distanza</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="85"/>
+        <location filename="../AddIntervalDialog.cpp" line="111"/>
         <source>Time: </source>
         <translation>Ora: </translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="117"/>
+        <location filename="../AddIntervalDialog.cpp" line="143"/>
         <source>Distance: </source>
         <translation>Distanza: </translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="141"/>
+        <location filename="../AddIntervalDialog.cpp" line="167"/>
         <source>How many to find: </source>
         <translation>Quanti cercarne: </translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="160"/>
+        <location filename="../AddIntervalDialog.cpp" line="182"/>
+        <source>Minimum W&apos; Cost: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="200"/>
+        <source>Minimum Ascent: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="218"/>
+        <source>&amp;Find</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AddIntervalDialog.cpp" line="223"/>
         <source>Results:</source>
         <translation>Risultati:</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="175"/>
+        <location filename="../AddIntervalDialog.cpp" line="240"/>
+        <source>&amp;Add to Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Create Intervals</source>
-        <translation>&amp;Creare Intervalli</translation>
+        <translation type="obsolete">&amp;Creare Intervalli</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="177"/>
         <source>&amp;Done</source>
-        <translation>&amp;Fatto</translation>
+        <translation type="obsolete">&amp;Fatto</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="179"/>
         <source>&amp;Add to Intervals</source>
-        <translation>&amp;Aggiungi agli intervalli</translation>
+        <translation type="obsolete">&amp;Aggiungi agli intervalli</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="308"/>
+        <location filename="../AddIntervalDialog.cpp" line="421"/>
         <source>Select Ride</source>
         <translation>Seleziona attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="308"/>
+        <location filename="../AddIntervalDialog.cpp" line="421"/>
         <source>No ride selected!</source>
         <translation>Nessuna attivita&apos; selezionata!</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="322"/>
+        <location filename="../AddIntervalDialog.cpp" line="449"/>
         <source>Bad Interval Length</source>
         <translation>Lunghezza Intervallo Errata</translation>
     </message>
     <message>
-        <location filename="../AddIntervalDialog.cpp" line="323"/>
+        <location filename="../AddIntervalDialog.cpp" line="449"/>
         <source>Interval length must be greater than zero!</source>
         <translation>La lunghezza dell&apos;intervallo deve essere maggiore di zero!</translation>
     </message>
@@ -658,13 +800,13 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AerobicDecoupling</name>
     <message>
-        <location filename="../AerobicDecoupling.cpp" line="52"/>
+        <location filename="../AerobicDecoupling.cpp" line="53"/>
         <source>Aerobic Decoupling</source>
         <translation>Disaccopiamento Aerobico</translation>
     </message>
     <message>
-        <location filename="../AerobicDecoupling.cpp" line="54"/>
         <location filename="../AerobicDecoupling.cpp" line="55"/>
+        <location filename="../AerobicDecoupling.cpp" line="56"/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -736,62 +878,62 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AerolabWindow</name>
     <message>
-        <location filename="../AerolabWindow.cpp" line="49"/>
+        <location filename="../AerolabWindow.cpp" line="48"/>
         <source>Crr</source>
         <translation>Crr</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="72"/>
+        <location filename="../AerolabWindow.cpp" line="71"/>
         <source>CdA</source>
         <translation>CdA</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="95"/>
+        <location filename="../AerolabWindow.cpp" line="94"/>
         <source>Eta</source>
         <translation>Eta</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="128"/>
+        <location filename="../AerolabWindow.cpp" line="127"/>
         <source>Total Mass (kg)</source>
         <translation>Massa totale (kg)</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="151"/>
+        <location filename="../AerolabWindow.cpp" line="150"/>
         <source>Rho (kg/m^3)</source>
         <translation>Rho (kg/m^3)</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="174"/>
+        <location filename="../AerolabWindow.cpp" line="173"/>
         <source>Eoffset (m)</source>
         <translation>Eoffset (m)</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="196"/>
+        <location filename="../AerolabWindow.cpp" line="195"/>
         <source>eoffset auto</source>
         <translation>eoffset automatico</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="200"/>
+        <location filename="../AerolabWindow.cpp" line="199"/>
         <source>Constant altitude (velodrome,...)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="208"/>
+        <location filename="../AerolabWindow.cpp" line="207"/>
         <source>X Axis Shows Time</source>
         <translation>Tempo su asse X</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="209"/>
+        <location filename="../AerolabWindow.cpp" line="208"/>
         <source>X Axis Shows Distance</source>
         <translation>Distanza su asse X</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="213"/>
+        <location filename="../AerolabWindow.cpp" line="212"/>
         <source>&amp;Estimate CdA and Crr</source>
         <translation>&amp;Stima CdA e Crr</translation>
     </message>
     <message>
-        <location filename="../AerolabWindow.cpp" line="508"/>
+        <location filename="../AerolabWindow.cpp" line="520"/>
         <source>Estimate CdA and Crr</source>
         <translation>Stima Cda e Crr</translation>
     </message>
@@ -799,139 +941,432 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AllPlot</name>
     <message>
-        <location filename="../AllPlot.cpp" line="263"/>
+        <location filename="../AllPlot.cpp" line="2531"/>
+        <location filename="../AllPlot.cpp" line="2978"/>
+        <location filename="../AllPlot.cpp" line="2981"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="266"/>
+        <location filename="../AllPlot.cpp" line="2902"/>
         <source>Heart Rate</source>
         <translation>Frequenza cardiaca</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="269"/>
+        <location filename="../AllPlot.cpp" line="2515"/>
+        <location filename="../AllPlot.cpp" line="2956"/>
+        <location filename="../AllPlot.cpp" line="2963"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="272"/>
+        <location filename="../AllPlot.cpp" line="1950"/>
+        <source>Percent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2455"/>
+        <location filename="../AllPlot.cpp" line="2893"/>
+        <location filename="../AllPlot.cpp" line="2896"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="275"/>
+        <location filename="../AllPlot.cpp" line="2463"/>
+        <location filename="../AllPlot.cpp" line="2905"/>
+        <source>Heartrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2471"/>
+        <location filename="../AllPlot.cpp" line="2911"/>
+        <location filename="../AllPlot.cpp" line="2914"/>
+        <source>Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2479"/>
+        <location filename="../AllPlot.cpp" line="2920"/>
+        <location filename="../AllPlot.cpp" line="2923"/>
+        <source>Power Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2487"/>
+        <location filename="../AllPlot.cpp" line="2929"/>
+        <location filename="../AllPlot.cpp" line="2932"/>
+        <source>Cadence Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2495"/>
+        <location filename="../AllPlot.cpp" line="2938"/>
+        <location filename="../AllPlot.cpp" line="2941"/>
+        <source>Torque Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2503"/>
+        <location filename="../AllPlot.cpp" line="2947"/>
+        <location filename="../AllPlot.cpp" line="2950"/>
+        <source>Heartrate Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2541"/>
+        <location filename="../AllPlot.cpp" line="2996"/>
+        <source>W&apos;bal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2549"/>
+        <location filename="../AllPlot.cpp" line="3002"/>
+        <location filename="../AllPlot.cpp" line="3006"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="279"/>
+        <location filename="../AllPlot.cpp" line="2557"/>
+        <location filename="../AllPlot.cpp" line="3012"/>
+        <location filename="../AllPlot.cpp" line="3014"/>
+        <source>Headwind</source>
+        <translation type="unfinished">Vento Contrario</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2565"/>
+        <location filename="../AllPlot.cpp" line="3020"/>
+        <location filename="../AllPlot.cpp" line="3023"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="285"/>
         <source>Wind</source>
-        <translation>Vento</translation>
+        <translation type="obsolete">Vento</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="288"/>
+        <location filename="../AllPlot.cpp" line="2523"/>
+        <location filename="../AllPlot.cpp" line="2969"/>
+        <location filename="../AllPlot.cpp" line="2972"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="291"/>
+        <location filename="../AllPlot.cpp" line="2573"/>
+        <location filename="../AllPlot.cpp" line="3029"/>
+        <location filename="../AllPlot.cpp" line="3032"/>
+        <source>Anaerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2581"/>
+        <location filename="../AllPlot.cpp" line="3038"/>
+        <location filename="../AllPlot.cpp" line="3041"/>
+        <source>Aerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2589"/>
+        <location filename="../AllPlot.cpp" line="3047"/>
+        <location filename="../AllPlot.cpp" line="3050"/>
+        <source>NP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2597"/>
+        <location filename="../AllPlot.cpp" line="3056"/>
+        <location filename="../AllPlot.cpp" line="3059"/>
+        <source>xPower</source>
+        <translation type="unfinished">xPower</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2605"/>
+        <location filename="../AllPlot.cpp" line="3065"/>
+        <location filename="../AllPlot.cpp" line="3068"/>
+        <source>Left Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2613"/>
+        <location filename="../AllPlot.cpp" line="3074"/>
+        <location filename="../AllPlot.cpp" line="3077"/>
+        <source>Right Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2621"/>
+        <location filename="../AllPlot.cpp" line="3083"/>
+        <location filename="../AllPlot.cpp" line="3086"/>
+        <source>Left Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2629"/>
+        <location filename="../AllPlot.cpp" line="3092"/>
+        <location filename="../AllPlot.cpp" line="3095"/>
+        <source>Right Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2639"/>
+        <location filename="../AllPlot.cpp" line="3107"/>
+        <source>L/R Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2647"/>
+        <location filename="../AllPlot.cpp" line="3113"/>
+        <location filename="../AllPlot.cpp" line="3116"/>
+        <source>aPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="2989"/>
+        <source>Matches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="3101"/>
         <source>Left Balance</source>
         <translation>Bilancia a Sinistra</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="294"/>
+        <location filename="../AllPlot.cpp" line="3103"/>
         <source>Right Balance</source>
         <translation>Bilancia a Destra</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="297"/>
-        <location filename="../AllPlot.cpp" line="973"/>
+        <location filename="../AllPlot.cpp" line="4527"/>
+        <location filename="../AllPlot.cpp" line="4587"/>
+        <source>Peak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="1866"/>
+        <location filename="../AllPlot.cpp" line="2987"/>
         <source>W&apos; Balance (j)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="927"/>
+        <location filename="../AllPlot.cpp" line="1679"/>
+        <location filename="../AllPlot.cpp" line="1685"/>
+        <location filename="../AllPlot.cpp" line="4528"/>
+        <location filename="../AllPlot.cpp" line="4588"/>
+        <source>Match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="1775"/>
         <source>Power Ref</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="937"/>
+        <location filename="../AllPlot.cpp" line="1785"/>
         <source>Heart Rate Ref</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="947"/>
+        <location filename="../AllPlot.cpp" line="1795"/>
         <source>Cadence Ref</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="997"/>
+        <location filename="../AllPlot.cpp" line="1859"/>
+        <source>TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="1889"/>
         <source>Watts</source>
         <translation>Watt</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1008"/>
+        <location filename="../AllPlot.cpp" line="1902"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1015"/>
+        <location filename="../AllPlot.cpp" line="1909"/>
         <source>RPM</source>
         <translation>RPM</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1035"/>
         <source>% left</source>
-        <translation>% Sinistra</translation>
+        <translation type="obsolete">% Sinistra</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1072"/>
+        <location filename="../AllPlot.cpp" line="1965"/>
         <source>KPH</source>
         <translation>Km/h</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1072"/>
+        <location filename="../AllPlot.cpp" line="1965"/>
         <source>MPH</source>
         <translation>Miglia/h</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1093"/>
+        <location filename="../AllPlot.cpp" line="1986"/>
         <source>Nm</source>
         <translation>Nm</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1093"/>
+        <location filename="../AllPlot.cpp" line="1986"/>
         <source>ftLb</source>
         <translation>ftLb</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1106"/>
+        <location filename="../AllPlot.cpp" line="1998"/>
         <source>Meters</source>
         <translation>Metri</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1106"/>
+        <location filename="../AllPlot.cpp" line="1998"/>
         <source>Feet</source>
         <translation>Piedi</translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1150"/>
         <source>Distance </source>
-        <translation>Distanza </translation>
+        <translation type="obsolete">Distanza </translation>
     </message>
     <message>
-        <location filename="../AllPlot.cpp" line="1152"/>
         <source>Time (Hours:Minutes)</source>
-        <translation>Tempo (Ore:Minuti)</translation>
+        <translation type="obsolete">Tempo (Ore:Minuti)</translation>
     </message>
     <message>
         <source>Time (minutes)</source>
         <translation type="obsolete">Tempo (minuti)</translation>
+    </message>
+</context>
+<context>
+    <name>AllPlotObject</name>
+    <message>
+        <location filename="../AllPlot.cpp" line="279"/>
+        <source>Power</source>
+        <translation type="unfinished">Potenza</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="283"/>
+        <source>anTISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="287"/>
+        <source>aTISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="291"/>
+        <source>NP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="295"/>
+        <source>xPower</source>
+        <translation type="unfinished">xPower</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="299"/>
+        <source>aPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="303"/>
+        <source>Heart Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="307"/>
+        <source>Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="311"/>
+        <source>Power Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="315"/>
+        <source>Cadence Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="319"/>
+        <source>Torque Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="323"/>
+        <source>Heartrate Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="327"/>
+        <source>Speed</source>
+        <translation type="unfinished">Velocità</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="331"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Cadenza</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="335"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Altitudine</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="341"/>
+        <source>Temperature</source>
+        <translation type="unfinished">Temperatura</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="348"/>
+        <source>Wind</source>
+        <translation type="unfinished">Vento</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="351"/>
+        <source>Torque</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="355"/>
+        <source>Left Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="359"/>
+        <source>Right Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="363"/>
+        <source>Left Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="367"/>
+        <source>Right Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="371"/>
+        <source>Left Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="375"/>
+        <source>Right Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="379"/>
+        <source>W&apos; Balance (j)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="383"/>
+        <source>Matches</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -941,128 +1376,221 @@ Clicca Successivo per Continuare</translation>
         <translation type="obsolete">Mostra:</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="85"/>
-        <location filename="../AllPlotWindow.cpp" line="199"/>
+        <location filename="../AllPlotWindow.cpp" line="92"/>
+        <location filename="../AllPlotWindow.cpp" line="263"/>
         <source>Smooth</source>
         <translation>Approssima</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="93"/>
+        <location filename="../AllPlotWindow.cpp" line="100"/>
         <source>Stacked</source>
         <translation>Visuale grafici sovrapposta</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="94"/>
+        <location filename="../AllPlotWindow.cpp" line="101"/>
+        <source>by series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="102"/>
         <source>Fullplot</source>
         <translation>Disegno Intero</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="116"/>
         <source>Show</source>
-        <translation>Mostra</translation>
+        <translation type="obsolete">Mostra</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="118"/>
         <source>Stacked view</source>
-        <translation>Visuale grafici sovrapposta</translation>
+        <translation type="obsolete">Visuale grafici sovrapposta</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="139"/>
+        <location filename="../AllPlotWindow.cpp" line="103"/>
+        <location filename="../AllPlotWindow.cpp" line="154"/>
+        <source>Overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="131"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="133"/>
+        <source>Stack</source>
+        <translation type="unfinished">Pila</translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="137"/>
+        <source>By Series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="150"/>
         <source>Full plot</source>
         <translation>Grafico completo</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="143"/>
+        <location filename="../AllPlotWindow.cpp" line="158"/>
         <source>Fill Curves</source>
         <translation>Riempi le curve</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="147"/>
+        <location filename="../AllPlotWindow.cpp" line="162"/>
         <source>Grid</source>
         <translation>Griglia</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="151"/>
+        <location filename="../AllPlotWindow.cpp" line="167"/>
+        <source>Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="170"/>
+        <source>Power %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="173"/>
+        <source>Cadence %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="176"/>
+        <source>Torque %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="179"/>
+        <source>Heartrate %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="185"/>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="189"/>
+        <source>Torque Effectiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="193"/>
+        <source>Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="197"/>
         <source>Heart Rate</source>
         <translation>Frequanza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="153"/>
+        <location filename="../AllPlotWindow.cpp" line="199"/>
         <source>Data series</source>
         <translation>Serie di Dati</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="155"/>
+        <location filename="../AllPlotWindow.cpp" line="201"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="159"/>
+        <location filename="../AllPlotWindow.cpp" line="205"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="163"/>
+        <location filename="../AllPlotWindow.cpp" line="209"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="167"/>
+        <location filename="../AllPlotWindow.cpp" line="213"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="171"/>
+        <location filename="../AllPlotWindow.cpp" line="217"/>
         <source>Headwind</source>
         <translation>Vento Contrario</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="175"/>
+        <location filename="../AllPlotWindow.cpp" line="221"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="179"/>
+        <location filename="../AllPlotWindow.cpp" line="227"/>
+        <source>Anaerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="231"/>
+        <source>Aerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="235"/>
+        <source>Normalized Power</source>
+        <translation type="unfinished">Potenza Normalizzata</translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="239"/>
+        <source>Skiba xPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="243"/>
+        <source>Altitude Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="247"/>
         <source>W&apos; balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="183"/>
-        <source>Power balance</source>
-        <translation>Bilancio di Potenza</translation>
+        <location filename="../AllPlotWindow.cpp" line="530"/>
+        <source>Intervals</source>
+        <translation type="unfinished">Intervalli</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="188"/>
+        <source>Power balance</source>
+        <translation type="obsolete">Bilancio di Potenza</translation>
+    </message>
+    <message>
+        <location filename="../AllPlotWindow.cpp" line="252"/>
         <source>Power + shade</source>
         <translation>Potenza + sfondo</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="189"/>
+        <location filename="../AllPlotWindow.cpp" line="253"/>
         <source>Power - shade</source>
         <translation>Potenza - sfondo</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="190"/>
+        <location filename="../AllPlotWindow.cpp" line="254"/>
         <source>No Power</source>
         <translation>Senza Potenza</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="191"/>
+        <location filename="../AllPlotWindow.cpp" line="255"/>
         <source>Shading</source>
         <translation>Ombreggia</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="195"/>
+        <location filename="../AllPlotWindow.cpp" line="259"/>
         <source>Time</source>
         <translation>Tempo</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="196"/>
+        <location filename="../AllPlotWindow.cpp" line="260"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../AllPlotWindow.cpp" line="197"/>
+        <location filename="../AllPlotWindow.cpp" line="261"/>
         <source>X Axis</source>
         <translation>Asse X</translation>
     </message>
@@ -1087,9 +1615,8 @@ Clicca Successivo per Continuare</translation>
         <translation type="unfinished">Calendario</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="75"/>
         <source>Activities</source>
-        <translation type="unfinished">Attivita&apos;</translation>
+        <translation type="obsolete">Attivita&apos;</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="76"/>
@@ -1099,140 +1626,187 @@ Clicca Successivo per Continuare</translation>
     </message>
     <message>
         <location filename="../AnalysisSidebar.cpp" line="94"/>
-        <location filename="../AnalysisSidebar.cpp" line="311"/>
+        <location filename="../AnalysisSidebar.cpp" line="328"/>
         <source>Intervals</source>
         <translation type="unfinished">Intervalli</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="174"/>
         <source>All Activities</source>
-        <translation type="unfinished">Tutte le Attivita&apos;</translation>
+        <translation type="obsolete">Tutte le Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="178"/>
+        <location filename="../AnalysisSidebar.cpp" line="192"/>
         <source>Save Changes</source>
         <translation type="unfinished">Salva Modifiche</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="181"/>
+        <location filename="../AnalysisSidebar.cpp" line="195"/>
         <source>Revert to Saved version</source>
         <translation type="unfinished">Ripristina alla Versione Salvata</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="184"/>
         <source>Delete Activity</source>
-        <translation type="unfinished">Cancella Attivita&apos;</translation>
+        <translation type="obsolete">Cancella Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="187"/>
         <source>Split Activity</source>
-        <translation type="unfinished">Dividi Attivita&apos;</translation>
+        <translation type="obsolete">Dividi Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="198"/>
         <source>Upload Activity to Calendar</source>
-        <translation type="unfinished">Upload Attivita&apos; in Calendario</translation>
+        <translation type="obsolete">Upload Attivita&apos; in Calendario</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="205"/>
+        <location filename="../AnalysisSidebar.cpp" line="222"/>
         <source>Show Column Chooser</source>
         <translation type="unfinished">Mostra Scegli Colonne</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="212"/>
+        <location filename="../AnalysisSidebar.cpp" line="229"/>
         <source>Do Not Show In Groups</source>
         <translation type="unfinished">Non Mostrare in Gruppi</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="218"/>
+        <location filename="../AnalysisSidebar.cpp" line="235"/>
         <source>Group By</source>
         <translation type="unfinished">Raggruppa per</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="239"/>
+        <location filename="../AnalysisSidebar.cpp" line="256"/>
         <source>Expand All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="244"/>
+        <location filename="../AnalysisSidebar.cpp" line="261"/>
         <source>Collapse All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="260"/>
         <source>Find Peak Intervals</source>
-        <translation type="unfinished">Trova Intervalli di Picco</translation>
+        <translation type="obsolete">Trova Intervalli di Picco</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="261"/>
-        <location filename="../AnalysisSidebar.cpp" line="350"/>
-        <location filename="../AnalysisSidebar.cpp" line="352"/>
         <source>Find Best Intervals</source>
-        <translation type="unfinished">Trova i Migliori Intervalli</translation>
+        <translation type="obsolete">Trova i Migliori Intervalli</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="269"/>
+        <location filename="../AnalysisSidebar.cpp" line="75"/>
+        <source>Rides</source>
+        <translation type="unfinished">Attivita&apos;</translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="188"/>
+        <source>All Rides</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="198"/>
+        <source>Delete Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="201"/>
+        <source>Split Ride</source>
+        <translation type="unfinished">Dividi allenamento</translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="212"/>
+        <source>Upload Ride to Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="216"/>
+        <location filename="../AnalysisSidebar.cpp" line="277"/>
+        <source>Find Intervals...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="283"/>
         <source>Sort Intervals</source>
         <translation type="unfinished">Ordina Intervalli</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="281"/>
-        <location filename="../AnalysisSidebar.cpp" line="318"/>
+        <location filename="../AnalysisSidebar.cpp" line="291"/>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="298"/>
+        <location filename="../AnalysisSidebar.cpp" line="336"/>
         <source>Zoom to interval</source>
         <translation type="unfinished">Zoom dell&apos;intervallo</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="282"/>
-        <location filename="../AnalysisSidebar.cpp" line="316"/>
+        <location filename="../AnalysisSidebar.cpp" line="299"/>
+        <location filename="../AnalysisSidebar.cpp" line="333"/>
         <source>Edit interval</source>
         <translation type="unfinished">Modifica intervalli</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="283"/>
-        <location filename="../AnalysisSidebar.cpp" line="317"/>
+        <location filename="../AnalysisSidebar.cpp" line="300"/>
+        <location filename="../AnalysisSidebar.cpp" line="334"/>
         <source>Delete interval</source>
         <translation type="unfinished">Cancella Intervallo</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="295"/>
+        <location filename="../AnalysisSidebar.cpp" line="312"/>
         <source>Rename selected intervals</source>
         <translation type="unfinished">Rinomina intervalli selezionati</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="297"/>
+        <location filename="../AnalysisSidebar.cpp" line="314"/>
         <source>Delete selected intervals</source>
         <translation type="unfinished">Cancella intervalli selezionati</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="319"/>
+        <location filename="../AnalysisSidebar.cpp" line="335"/>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="337"/>
         <source>Bring to Front</source>
         <translation type="unfinished">Porta di Fronte</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="320"/>
+        <location filename="../AnalysisSidebar.cpp" line="338"/>
         <source>Send to back</source>
         <translation type="unfinished">Invia indietro</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="350"/>
-        <location filename="../AnalysisSidebar.cpp" line="403"/>
+        <location filename="../AnalysisSidebar.cpp" line="370"/>
+        <location filename="../AnalysisSidebar.cpp" line="372"/>
+        <source>Find Intervals</source>
+        <translation type="unfinished">Trova intervalli</translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="370"/>
+        <location filename="../AnalysisSidebar.cpp" line="423"/>
+        <source>No ride selected</source>
+        <translation type="unfinished">Nessun elemento selezionato</translation>
+    </message>
+    <message>
+        <location filename="../AnalysisSidebar.cpp" line="372"/>
+        <location filename="../AnalysisSidebar.cpp" line="425"/>
+        <source>Current ride contains no data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>No activity selected</source>
-        <translation type="unfinished">Nessuna attivita&apos; selezionata</translation>
+        <translation type="obsolete">Nessuna attivita&apos; selezionata</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="352"/>
-        <location filename="../AnalysisSidebar.cpp" line="405"/>
         <source>Current activity contains no data</source>
-        <translation type="unfinished">L&apos;attivita&apos; corrente non contiene dati</translation>
+        <translation type="obsolete">L&apos;attivita&apos; corrente non contiene dati</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="364"/>
+        <location filename="../AnalysisSidebar.cpp" line="384"/>
         <source> (%1 watts)</source>
         <translation type="unfinished"> (%1 watt)</translation>
     </message>
     <message>
-        <location filename="../AnalysisSidebar.cpp" line="403"/>
-        <location filename="../AnalysisSidebar.cpp" line="405"/>
+        <location filename="../AnalysisSidebar.cpp" line="423"/>
+        <location filename="../AnalysisSidebar.cpp" line="425"/>
         <source>Find Power Peaks</source>
         <translation type="unfinished">Trova Picchi di Potenza</translation>
     </message>
@@ -1240,48 +1814,48 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AnomalyDialog</name>
     <message>
-        <location filename="../RideEditor.cpp" line="348"/>
+        <location filename="../RideEditor.cpp" line="380"/>
         <source>Invalid recording gap</source>
         <translation>Gap registrato non valido</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="354"/>
+        <location filename="../RideEditor.cpp" line="386"/>
         <source>Distance goes backwards.</source>
         <translation>Distanza va decrescendo.</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="362"/>
+        <location filename="../RideEditor.cpp" line="394"/>
         <source>Suspiciously high cadence</source>
         <translation>Alto valore di Cadenza sospetto</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="366"/>
+        <location filename="../RideEditor.cpp" line="398"/>
         <source>Suspiciously high heartrate</source>
         <translation>Alto valore di FC sospetto</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="370"/>
+        <location filename="../RideEditor.cpp" line="402"/>
         <source>Suspiciously high speed</source>
         <translation>Alto valore di Velocita&apos; sospetto</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="374"/>
-        <location filename="../RideEditor.cpp" line="378"/>
+        <location filename="../RideEditor.cpp" line="406"/>
+        <location filename="../RideEditor.cpp" line="410"/>
         <source>Out of bounds value</source>
         <translation>Valore fuoriscala</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="382"/>
+        <location filename="../RideEditor.cpp" line="414"/>
         <source>Non-zero torque but zero cadence</source>
         <translation>Coppia non nulla, ma cadenza nulla</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="389"/>
+        <location filename="../RideEditor.cpp" line="421"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="409"/>
+        <location filename="../RideEditor.cpp" line="441"/>
         <source>Data spike candidate</source>
         <translation>Spikes Dati candidati</translation>
     </message>
@@ -1298,25 +1872,25 @@ Clicca Successivo per Continuare</translation>
     <name>Athlete</name>
     <message>
         <location filename="../Athlete.cpp" line="84"/>
-        <location filename="../MainWindow.cpp" line="1347"/>
+        <location filename="../MainWindow.cpp" line="1831"/>
         <source>Zones File Error</source>
         <translation type="unfinished">Errore nel file delle zone</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="87"/>
-        <location filename="../MainWindow.cpp" line="1351"/>
+        <location filename="../MainWindow.cpp" line="1835"/>
         <source>Reading Zones File</source>
         <translation type="unfinished">Sto leggendo il file delle zone FC</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="95"/>
-        <location filename="../MainWindow.cpp" line="1358"/>
+        <location filename="../MainWindow.cpp" line="1842"/>
         <source>HR Zones File Error</source>
         <translation type="unfinished">Errore nel File Zone FC</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="98"/>
-        <location filename="../MainWindow.cpp" line="1362"/>
+        <location filename="../MainWindow.cpp" line="1846"/>
         <source>Reading HR Zones File</source>
         <translation type="unfinished">Leggo il File Zone FC</translation>
     </message>
@@ -1331,7 +1905,7 @@ Clicca Successivo per Continuare</translation>
         <translation type="unfinished">Intervalli</translation>
     </message>
     <message>
-        <location filename="../Athlete.cpp" line="351"/>
+        <location filename="../Athlete.cpp" line="352"/>
         <source>Can&apos;t rename %1 to %2</source>
         <translation type="unfinished">Non posso rinominare %1 in %2</translation>
     </message>
@@ -1339,17 +1913,17 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AthleteConfig</name>
     <message>
-        <location filename="../ConfigDialog.cpp" line="211"/>
+        <location filename="../ConfigDialog.cpp" line="269"/>
         <source>About</source>
         <translation>Riguardo</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="212"/>
+        <location filename="../ConfigDialog.cpp" line="270"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="213"/>
+        <location filename="../ConfigDialog.cpp" line="271"/>
         <source>Heartrate</source>
         <translation>Frequenza cardiaca</translation>
     </message>
@@ -1359,6 +1933,24 @@ Clicca Successivo per Continuare</translation>
     <message>
         <source>Athletes</source>
         <translation type="obsolete">Atleta</translation>
+    </message>
+</context>
+<context>
+    <name>AthleteWeight</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="197"/>
+        <source>Athlete Weight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="199"/>
+        <source>kg</source>
+        <translation type="unfinished">kg</translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="200"/>
+        <source>lbs</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1378,13 +1970,13 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AvgCadence</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="513"/>
+        <location filename="../BasicRideMetrics.cpp" line="587"/>
         <source>Average Cadence</source>
         <translation>Cadenza Media</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="514"/>
-        <location filename="../BasicRideMetrics.cpp" line="515"/>
+        <location filename="../BasicRideMetrics.cpp" line="588"/>
+        <location filename="../BasicRideMetrics.cpp" line="589"/>
         <source>rpm</source>
         <translation>rpm</translation>
     </message>
@@ -1392,45 +1984,101 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AvgHeartRate</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="473"/>
+        <location filename="../BasicRideMetrics.cpp" line="547"/>
         <source>Average Heart Rate</source>
         <translation>FC media</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="474"/>
-        <location filename="../BasicRideMetrics.cpp" line="475"/>
+        <location filename="../BasicRideMetrics.cpp" line="548"/>
+        <location filename="../BasicRideMetrics.cpp" line="549"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
 </context>
 <context>
+    <name>AvgLPS</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1231"/>
+        <source>Average Left Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1232"/>
+        <location filename="../BasicRideMetrics.cpp" line="1233"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
+    <name>AvgLTE</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1135"/>
+        <source>Average Left Torque Effectiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1136"/>
+        <location filename="../BasicRideMetrics.cpp" line="1137"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
     <name>AvgPower</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="393"/>
+        <location filename="../BasicRideMetrics.cpp" line="427"/>
         <source>Average Power</source>
         <translation>Potenza Media</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="394"/>
-        <location filename="../BasicRideMetrics.cpp" line="395"/>
+        <location filename="../BasicRideMetrics.cpp" line="428"/>
+        <location filename="../BasicRideMetrics.cpp" line="429"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
 </context>
 <context>
+    <name>AvgRPS</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1279"/>
+        <source>Average Right Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1280"/>
+        <location filename="../BasicRideMetrics.cpp" line="1281"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
+    <name>AvgRTE</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1183"/>
+        <source>Average Right Torque Effectiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="1184"/>
+        <location filename="../BasicRideMetrics.cpp" line="1185"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
     <name>AvgSpeed</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="287"/>
+        <location filename="../BasicRideMetrics.cpp" line="321"/>
         <source>Average Speed</source>
         <translation>Velocità Media</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="288"/>
+        <location filename="../BasicRideMetrics.cpp" line="322"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="289"/>
+        <location filename="../BasicRideMetrics.cpp" line="323"/>
         <source>mph</source>
         <translation>Miglia/h</translation>
     </message>
@@ -1438,17 +2086,17 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>AvgTemp</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="553"/>
+        <location filename="../BasicRideMetrics.cpp" line="627"/>
         <source>Average Temp</source>
         <translation>Temperatura Media</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="554"/>
+        <location filename="../BasicRideMetrics.cpp" line="628"/>
         <source>C</source>
         <translation>C</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="555"/>
+        <location filename="../BasicRideMetrics.cpp" line="629"/>
         <source>F</source>
         <translation>F</translation>
     </message>
@@ -1456,9 +2104,13 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>BatchExportDialog</name>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="29"/>
         <source>Activity Batch Export</source>
-        <translation>Attivita&apos; Esporta gruppo</translation>
+        <translation type="obsolete">Attivita&apos; Esporta gruppo</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="29"/>
+        <source>Ride Batch Export</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="40"/>
@@ -1492,8 +2144,8 @@ Clicca Successivo per Continuare</translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="76"/>
-        <location filename="../BatchExportDialog.cpp" line="108"/>
-        <location filename="../BatchExportDialog.cpp" line="157"/>
+        <location filename="../BatchExportDialog.cpp" line="114"/>
+        <location filename="../BatchExportDialog.cpp" line="163"/>
         <source>Export</source>
         <translation>Esporta</translation>
     </message>
@@ -1503,89 +2155,93 @@ Clicca Successivo per Continuare</translation>
         <translation>Esporta come</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="87"/>
+        <location filename="../BatchExportDialog.cpp" line="88"/>
         <source>Browse</source>
         <translation>Sfoglia</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="88"/>
+        <location filename="../BatchExportDialog.cpp" line="89"/>
         <source>Export to</source>
         <translation>Esporta in</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="90"/>
+        <location filename="../BatchExportDialog.cpp" line="96"/>
         <source>check/uncheck all</source>
         <translation>segna/non segna tutti</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="106"/>
+        <location filename="../BatchExportDialog.cpp" line="112"/>
         <source>Overwrite existing files</source>
         <translation>Sovrascrivi file esistenti</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="107"/>
+        <location filename="../BatchExportDialog.cpp" line="113"/>
         <source>Cancel</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="132"/>
+        <location filename="../BatchExportDialog.cpp" line="138"/>
         <source>Select Target Directory</source>
         <translation>Seleziona Directory di Destinazione</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="161"/>
+        <location filename="../BatchExportDialog.cpp" line="167"/>
         <source>Exporting...</source>
         <translation>Sto exportando...</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="164"/>
-        <location filename="../BatchExportDialog.cpp" line="169"/>
+        <location filename="../BatchExportDialog.cpp" line="170"/>
+        <location filename="../BatchExportDialog.cpp" line="177"/>
         <source>Abort</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="166"/>
-        <source>%1 activities exported, %2 failed or skipped.</source>
-        <translation>%1 attivita&apos; esportate, %2 fallito o saltato.</translation>
+        <location filename="../BatchExportDialog.cpp" line="174"/>
+        <source>%1 rides exported, %2 failed or skipped.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="167"/>
-        <location filename="../BatchExportDialog.cpp" line="171"/>
+        <source>%1 activities exported, %2 failed or skipped.</source>
+        <translation type="obsolete">%1 attivita&apos; esportate, %2 fallito o saltato.</translation>
+    </message>
+    <message>
+        <location filename="../BatchExportDialog.cpp" line="175"/>
+        <location filename="../BatchExportDialog.cpp" line="179"/>
         <source>Finish</source>
         <translation>Finito</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="209"/>
+        <location filename="../BatchExportDialog.cpp" line="217"/>
         <source>Exists - not exported</source>
         <translation>Gia Esistente, non esportato</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="217"/>
+        <location filename="../BatchExportDialog.cpp" line="225"/>
         <source>Removing...</source>
         <translation>In Rimozione...</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="222"/>
+        <location filename="../BatchExportDialog.cpp" line="230"/>
         <source>Reading...</source>
         <translation>In lettura...</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="234"/>
+        <location filename="../BatchExportDialog.cpp" line="242"/>
         <source>Writing...</source>
         <translation>In scrittura...</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="240"/>
+        <location filename="../BatchExportDialog.cpp" line="248"/>
         <source>Exported</source>
         <translation>Esportato</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="243"/>
+        <location filename="../BatchExportDialog.cpp" line="251"/>
         <source>Write failed</source>
         <translation>Scrittura fallita</translation>
     </message>
     <message>
-        <location filename="../BatchExportDialog.cpp" line="251"/>
+        <location filename="../BatchExportDialog.cpp" line="259"/>
         <source>Read error</source>
         <translation>Errore in lettura</translation>
     </message>
@@ -1644,9 +2300,44 @@ Clicca Successivo per Continuare</translation>
     </message>
 </context>
 <context>
+    <name>BestsMetricsPage</name>
+    <message>
+        <location filename="../Pages.cpp" line="1648"/>
+        <source>Available Metrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1653"/>
+        <source>Selected Metrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1669"/>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1670"/>
+        <source>Down</source>
+        <translation type="unfinished">Sotto</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1718"/>
+        <location filename="../Pages.cpp" line="1728"/>
+        <source>&amp;#8482;</source>
+        <translation type="unfinished">&amp;#8482;</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1718"/>
+        <location filename="../Pages.cpp" line="1728"/>
+        <source> (TM)</source>
+        <translation type="unfinished">.(TM)</translation>
+    </message>
+</context>
+<context>
     <name>BikeScore</name>
     <message>
-        <location filename="../BikeScore.cpp" line="196"/>
+        <location filename="../BikeScore.cpp" line="368"/>
         <source>BikeScore&amp;#8482;</source>
         <translation>BikeScore&amp;#8482;</translation>
     </message>
@@ -1654,12 +2345,12 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>BingMap</name>
     <message>
-        <location filename="../BingMap.cpp" line="72"/>
+        <location filename="../BingMap.cpp" line="82"/>
         <source>Route</source>
         <translation>Itinerario</translation>
     </message>
     <message>
-        <location filename="../BingMap.cpp" line="112"/>
+        <location filename="../BingMap.cpp" line="125"/>
         <source>No GPS Data Present</source>
         <translation>Nessun dato GPS presente</translation>
     </message>
@@ -1667,34 +2358,38 @@ Clicca Successivo per Continuare</translation>
 <context>
     <name>BlankStateAnalysisPage</name>
     <message>
-        <location filename="../BlankState.cpp" line="142"/>
         <source>Analysis</source>
-        <translation>Analisi</translation>
+        <translation type="obsolete">Analisi</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="143"/>
+        <location filename="../BlankState.cpp" line="144"/>
+        <source>Rides</source>
+        <translation type="unfinished">Attivita&apos;</translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="145"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
         <translation>Nessun Attivita&apos;?
 Aggiungi una nuova attivita&apos;.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="149"/>
+        <location filename="../BlankState.cpp" line="151"/>
         <source>Import files from your disk or usb device</source>
         <translation>Importa file dal tuo hard Disk o dispositivo usb</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="150"/>
+        <location filename="../BlankState.cpp" line="152"/>
         <source>Import data</source>
         <translation>Importa dati</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="156"/>
+        <location filename="../BlankState.cpp" line="158"/>
         <source>Download from serial device.</source>
         <translation>Scarica da dispositivo seriale.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="157"/>
+        <location filename="../BlankState.cpp" line="159"/>
         <source>Download from device</source>
         <translation>Scarica da dispositivo</translation>
     </message>
@@ -1702,34 +2397,34 @@ Aggiungi una nuova attivita&apos;.</translation>
 <context>
     <name>BlankStateDiaryPage</name>
     <message>
-        <location filename="../BlankState.cpp" line="200"/>
+        <location filename="../BlankState.cpp" line="202"/>
         <source>Diary</source>
         <translation>Diario</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="201"/>
+        <location filename="../BlankState.cpp" line="203"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
         <translation>Nessun Attivita&apos;?
 Aggiungi una nuova attivita&apos;.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="207"/>
+        <location filename="../BlankState.cpp" line="209"/>
         <source>Import files from your disk or usb device</source>
         <translation>Importa file dal tuo hard Disk o dispositivo usb</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="208"/>
+        <location filename="../BlankState.cpp" line="210"/>
         <source>Import data</source>
         <translation>Importa dati</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="214"/>
+        <location filename="../BlankState.cpp" line="216"/>
         <source>Download from serial device.</source>
         <translation>Scarica da dispositivo seriale.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="215"/>
+        <location filename="../BlankState.cpp" line="217"/>
         <source>Download from device</source>
         <translation>Scarica da dispositivo</translation>
     </message>
@@ -1737,34 +2432,38 @@ Aggiungi una nuova attivita&apos;.</translation>
 <context>
     <name>BlankStateHomePage</name>
     <message>
-        <location filename="../BlankState.cpp" line="171"/>
         <source>Home</source>
-        <translation>Principale</translation>
+        <translation type="obsolete">Principale</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="172"/>
+        <location filename="../BlankState.cpp" line="173"/>
+        <source>Trends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BlankState.cpp" line="174"/>
         <source>No ride ?
 Let&apos;s start with some data.</source>
         <translation>Nessun Attivita&apos;?
 Aggiungi una nuova attivita&apos;.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="178"/>
+        <location filename="../BlankState.cpp" line="180"/>
         <source>Import files from your disk or usb device</source>
         <translation>Importa file dal tuo hard Disk o dispositivo usb</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="179"/>
+        <location filename="../BlankState.cpp" line="181"/>
         <source>Import data</source>
         <translation>Importa dati</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="185"/>
+        <location filename="../BlankState.cpp" line="187"/>
         <source>Download from serial device.</source>
         <translation>Scarica da dispositivo seriale.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="186"/>
+        <location filename="../BlankState.cpp" line="188"/>
         <source>Download from device</source>
         <translation>Scarica da dispositivo</translation>
     </message>
@@ -1772,12 +2471,12 @@ Aggiungi una nuova attivita&apos;.</translation>
 <context>
     <name>BlankStatePage</name>
     <message>
-        <location filename="../BlankState.cpp" line="76"/>
+        <location filename="../BlankState.cpp" line="78"/>
         <source>Don&apos;t show this next time.</source>
         <translation>Non mostrare la prossima volta.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="78"/>
+        <location filename="../BlankState.cpp" line="80"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
@@ -1785,46 +2484,60 @@ Aggiungi una nuova attivita&apos;.</translation>
 <context>
     <name>BlankStateTrainPage</name>
     <message>
-        <location filename="../BlankState.cpp" line="229"/>
+        <location filename="../BlankState.cpp" line="231"/>
         <source>Train</source>
         <translation>Palestra</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="230"/>
+        <location filename="../BlankState.cpp" line="232"/>
         <source>No devices or workouts ?
 Let&apos;s get you setup.</source>
         <translation>Nessun dispositivo o allenamento?
 Iniziamo la configurazione.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="238"/>
+        <location filename="../BlankState.cpp" line="240"/>
         <source>Find and add training devices.</source>
         <translation>Cerca e connetti dispositivi.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="239"/>
+        <location filename="../BlankState.cpp" line="241"/>
         <source>Add device</source>
         <translation>Aggiungi Dispositivo</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="246"/>
+        <location filename="../BlankState.cpp" line="248"/>
         <source>Find and Import your videos and workouts.</source>
         <translation>Cerca e importa i video e allenamenti.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="247"/>
+        <location filename="../BlankState.cpp" line="249"/>
         <source>Scan hard drives</source>
         <translation>Scansiona Hard drives</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="253"/>
+        <location filename="../BlankState.cpp" line="255"/>
         <source>Download workout files from the Erg DB.</source>
         <translation>Scarica Allenamenti da Erg DB.</translation>
     </message>
     <message>
-        <location filename="../BlankState.cpp" line="254"/>
+        <location filename="../BlankState.cpp" line="256"/>
         <source>Download workouts</source>
         <translation>Scarica allenamenti</translation>
+    </message>
+</context>
+<context>
+    <name>CPExp</name>
+    <message>
+        <location filename="../WPrime.cpp" line="683"/>
+        <source>Below CP Work</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="685"/>
+        <location filename="../WPrime.cpp" line="686"/>
+        <source>kJ</source>
+        <translation type="unfinished">kJ</translation>
     </message>
 </context>
 <context>
@@ -1850,54 +2563,211 @@ Iniziamo la configurazione.</translation>
         <translation type="obsolete">Cancella Zona</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2469"/>
-        <location filename="../Pages.cpp" line="2478"/>
+        <location filename="../Pages.cpp" line="2791"/>
+        <location filename="../Pages.cpp" line="2803"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2470"/>
-        <location filename="../Pages.cpp" line="2479"/>
+        <location filename="../Pages.cpp" line="2792"/>
+        <location filename="../Pages.cpp" line="2804"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2475"/>
+        <location filename="../Pages.cpp" line="2797"/>
+        <location filename="../Pages.cpp" line="2809"/>
+        <source>Add</source>
+        <translation type="unfinished">Aggiungi</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2798"/>
+        <location filename="../Pages.cpp" line="2810"/>
+        <source>Delete</source>
+        <translation type="unfinished">Cancella</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2800"/>
         <source>Def</source>
         <translation>Def</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2492"/>
-        <location filename="../Pages.cpp" line="2526"/>
+        <location filename="../Pages.cpp" line="2820"/>
+        <location filename="../Pages.cpp" line="2854"/>
         <source>From Date</source>
         <translation>Da (data)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2493"/>
-        <location filename="../Pages.cpp" line="2527"/>
+        <location filename="../Pages.cpp" line="2821"/>
+        <location filename="../Pages.cpp" line="2855"/>
         <source>Critical Power</source>
         <translation>Potenza Critica (CP)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2494"/>
-        <location filename="../Pages.cpp" line="2528"/>
+        <location filename="../Pages.cpp" line="2822"/>
+        <location filename="../Pages.cpp" line="2856"/>
         <source>W&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2562"/>
+        <location filename="../Pages.cpp" line="2876"/>
+        <location filename="../Pages.cpp" line="2943"/>
+        <source>MMM d, yyyy</source>
+        <translation type="unfinished">MMM d, yyyy</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2890"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2563"/>
+        <location filename="../Pages.cpp" line="2891"/>
         <source>Long</source>
         <translation>Lungo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2564"/>
+        <location filename="../Pages.cpp" line="2892"/>
         <source>From Watts</source>
         <translation>Da watt</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2926"/>
+        <source>CP must be &gt; 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3076"/>
+        <location filename="../Pages.cpp" line="3083"/>
+        <source>New</source>
+        <translation type="unfinished">Nuovo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3078"/>
+        <location filename="../Pages.cpp" line="3085"/>
+        <source>New (%1)</source>
+        <translation type="unfinished">Nuovo (%1)</translation>
+    </message>
+</context>
+<context>
+    <name>CPPlot</name>
+    <message>
+        <location filename="../CPPlot.cpp" line="68"/>
+        <location filename="../CPPlot.cpp" line="165"/>
+        <source>Interval Length</source>
+        <translation type="unfinished">Lunghezza dell&apos;intervallo</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="82"/>
+        <location filename="../CPPlot.cpp" line="176"/>
+        <location filename="../CPPlot.cpp" line="244"/>
+        <source>Average Power (watts)</source>
+        <translation type="unfinished">Potenza Media (watt)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="92"/>
+        <source>Percent of Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="170"/>
+        <source>Total work (kJ)</source>
+        <translation type="unfinished">Lavoro totale (kJ)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="172"/>
+        <location filename="../CPPlot.cpp" line="180"/>
+        <source>Interval Length (minutes)</source>
+        <translation type="unfinished">Lunghezza dell&apos;intervallo (minuti)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="184"/>
+        <source>Average Cadence (rpm)</source>
+        <translation type="unfinished">Cadenza media (rpm)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="188"/>
+        <source>Average Heartrate (bpm)</source>
+        <translation type="unfinished">Frequenza cardiaca media (bpm)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="192"/>
+        <source>Watts Delta (watts/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="196"/>
+        <source>Cadence Delta (rpm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="200"/>
+        <source>Torque Delta (nm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="204"/>
+        <source>Heartrate Delta (bpm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="208"/>
+        <source>Acceleration (m/s/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="212"/>
+        <source>Average Speed (kph)</source>
+        <translation type="unfinished">Velocita&apos; media(km/h)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="216"/>
+        <source>Average Pedal Force (nm)</source>
+        <translation type="unfinished">Forza sul Pedale Media (Nm)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="220"/>
+        <source>Normalized Power (watts)</source>
+        <translation type="unfinished">Potenza Normalizzata (Watt)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="224"/>
+        <source>Altitude Power (watts)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="228"/>
+        <source>Skiba xPower (watts)</source>
+        <translation type="unfinished">Skiba xPower (watts)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="233"/>
+        <source>Watts per kilo (watts/kg)</source>
+        <translation type="unfinished">Watt per kilo (watts/kg)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="235"/>
+        <source>Watts per lb (watts/lb)</source>
+        <translation type="unfinished">Watt per lb (watt/lb)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="239"/>
+        <source>VAM (meters per hour)</source>
+        <translation type="unfinished">VAM (metri per ora)</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="674"/>
+        <source>Bests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="923"/>
+        <source>ddd MMM d, yyyy h:mm AP</source>
+        <translation type="unfinished">ddd MMM d, yyyy h:mm AP</translation>
+    </message>
+    <message>
+        <location filename="../CPPlot.cpp" line="1538"/>
+        <source>%10 %</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1939,6 +2809,14 @@ Iniziamo la configurazione.</translation>
         <location filename="../CalendarDownload.cpp" line="75"/>
         <source>Remote Calendar not available, reverting to cached workouts.</source>
         <translation>Calendario Remoto non disponibile, ritorno agli allenamenti in memoria.</translation>
+    </message>
+</context>
+<context>
+    <name>ChartBar</name>
+    <message>
+        <location filename="../ChartBar.cpp" line="135"/>
+        <source>Add Chart</source>
+        <translation type="unfinished">Aggiungi Tabella</translation>
     </message>
 </context>
 <context>
@@ -2004,22 +2882,22 @@ Iniziamo la configurazione.</translation>
         <translation type="obsolete">Seleziona Atleta</translation>
     </message>
     <message>
-        <location filename="../ChooseCyclistDialog.cpp" line="29"/>
+        <location filename="../ChooseCyclistDialog.cpp" line="28"/>
         <source>Choose an Athlete</source>
         <translation>Seleziona-Atleta</translation>
     </message>
     <message>
-        <location filename="../ChooseCyclistDialog.cpp" line="47"/>
+        <location filename="../ChooseCyclistDialog.cpp" line="51"/>
         <source>&amp;New...</source>
         <translation>&amp;Nuovo...</translation>
     </message>
     <message>
-        <location filename="../ChooseCyclistDialog.cpp" line="48"/>
+        <location filename="../ChooseCyclistDialog.cpp" line="52"/>
         <source>&amp;Open</source>
         <translation>&amp;Apri</translation>
     </message>
     <message>
-        <location filename="../ChooseCyclistDialog.cpp" line="49"/>
+        <location filename="../ChooseCyclistDialog.cpp" line="53"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
@@ -2051,120 +2929,180 @@ Iniziamo la configurazione.</translation>
 <context>
     <name>ColorsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1112"/>
+        <location filename="../Pages.cpp" line="1132"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1113"/>
+        <location filename="../Pages.cpp" line="1133"/>
         <source>Select</source>
         <translation>Seleziona</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1133"/>
+        <location filename="../Pages.cpp" line="1160"/>
         <source>Line Width</source>
         <translation>Spessore Linea</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1134"/>
+        <location filename="../Pages.cpp" line="1142"/>
         <source>Antialias</source>
         <translation>Antialias</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1135"/>
         <source>Shade Zones</source>
-        <translation>Ombreggiatura Zone</translation>
+        <translation type="obsolete">Ombreggiatura Zone</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1137"/>
+        <location filename="../Pages.cpp" line="1121"/>
+        <source>Swatch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1122"/>
+        <source>Name</source>
+        <translation type="unfinished">Nome</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1146"/>
+        <source>Ride Scrollbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1149"/>
+        <source>Ride Headings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1161"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1138"/>
+        <location filename="../Pages.cpp" line="1162"/>
         <source>Title</source>
         <translation>Titolo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1139"/>
+        <location filename="../Pages.cpp" line="1163"/>
         <source>Chart Markers</source>
         <translation>Marcatori grafico</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1140"/>
+        <location filename="../Pages.cpp" line="1164"/>
         <source>Chart Labels</source>
         <translation>Etichette Grafico</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1141"/>
+        <location filename="../Pages.cpp" line="1165"/>
         <source>Calendar Text</source>
         <translation>Calendario Testo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1142"/>
+        <location filename="../Pages.cpp" line="1271"/>
+        <source>Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1272"/>
+        <source>Colors</source>
+        <translation type="unfinished">Colori</translation>
+    </message>
+    <message>
         <source>Popup Text</source>
-        <translation>Popup Testo</translation>
+        <translation type="obsolete">Popup Testo</translation>
     </message>
 </context>
 <context>
     <name>ColumnChooser</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="997"/>
+        <location filename="../RideNavigator.cpp" line="1118"/>
         <source>Column Chooser</source>
         <translation>Scegli Colonne</translation>
     </message>
 </context>
 <context>
+    <name>ComparePane</name>
+    <message>
+        <location filename="../ComparePane.cpp" line="278"/>
+        <source>seconds</source>
+        <translation type="unfinished">secondi</translation>
+    </message>
+</context>
+<context>
     <name>ConfigDialog</name>
     <message>
-        <location filename="../ConfigDialog.cpp" line="66"/>
+        <location filename="../ConfigDialog.cpp" line="78"/>
         <source>General</source>
         <translation>Generale</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="74"/>
+        <location filename="../ConfigDialog.cpp" line="86"/>
         <source>Passwords</source>
         <translation>Passwords</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="78"/>
+        <location filename="../ConfigDialog.cpp" line="90"/>
         <source>Appearance</source>
         <translation>Apparenza</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="82"/>
+        <location filename="../ConfigDialog.cpp" line="94"/>
         <source>Data Fields</source>
         <translation>Campi Dati</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="86"/>
+        <location filename="../ConfigDialog.cpp" line="98"/>
         <source>Metrics</source>
         <translation>Metriche</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="90"/>
+        <location filename="../ConfigDialog.cpp" line="102"/>
         <source>Train Devices</source>
         <translation>Dispositivi Train</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="119"/>
+        <location filename="../ConfigDialog.cpp" line="138"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="120"/>
+        <location filename="../ConfigDialog.cpp" line="139"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="39"/>
-        <location filename="../ConfigDialog.cpp" line="145"/>
+        <location filename="../ConfigDialog.cpp" line="205"/>
+        <source>You changed the location of the athlete library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="206"/>
+        <source>This is where all new athletes and their ride files will now be stored.
+
+Current athlete data will no longer be available and GoldenCheetah will need to restart for the change to take effect.
+
+Do you want to apply and restart GoldenCheetah?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="212"/>
+        <source>No, Keep current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="213"/>
+        <source>Yes, Apply and Restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="41"/>
+        <location filename="../ConfigDialog.cpp" line="164"/>
         <source>Preferences</source>
         <translation>Preferenze</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="43"/>
-        <location filename="../ConfigDialog.cpp" line="147"/>
+        <location filename="../ConfigDialog.cpp" line="47"/>
+        <location filename="../ConfigDialog.cpp" line="166"/>
         <source>Options</source>
         <translation>Opzioni</translation>
     </message>
@@ -2173,7 +3111,7 @@ Iniziamo la configurazione.</translation>
         <translation type="obsolete">Impostazioni</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="70"/>
+        <location filename="../ConfigDialog.cpp" line="82"/>
         <source>Athlete</source>
         <translation>Atleta</translation>
     </message>
@@ -2320,76 +3258,60 @@ Iniziamo la configurazione.</translation>
 <context>
     <name>CpintPlot</name>
     <message>
-        <location filename="../CpintPlot.cpp" line="70"/>
-        <location filename="../CpintPlot.cpp" line="191"/>
         <source>Average Power (watts)</source>
-        <translation>Potenza Media (watt)</translation>
+        <translation type="obsolete">Potenza Media (watt)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="60"/>
-        <location filename="../CpintPlot.cpp" line="143"/>
         <source>Interval Length</source>
-        <translation>Lunghezza dell&apos;intervallo</translation>
+        <translation type="obsolete">Lunghezza dell&apos;intervallo</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="148"/>
         <source>Total work (kJ)</source>
-        <translation>Lavoro totale (kJ)</translation>
+        <translation type="obsolete">Lavoro totale (kJ)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="151"/>
         <source>Interval Length (minutes)</source>
-        <translation>Lunghezza dell&apos;intervallo (minuti)</translation>
+        <translation type="obsolete">Lunghezza dell&apos;intervallo (minuti)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="155"/>
         <source>Average Cadence (rpm)</source>
-        <translation>Cadenza media (rpm)</translation>
+        <translation type="obsolete">Cadenza media (rpm)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="159"/>
         <source>Average Heartrate (bpm)</source>
-        <translation>Frequenza cardiaca media (bpm)</translation>
+        <translation type="obsolete">Frequenza cardiaca media (bpm)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="163"/>
         <source>Average Speed (kph)</source>
-        <translation>Velocita&apos; media(km/h)</translation>
+        <translation type="obsolete">Velocita&apos; media(km/h)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="167"/>
         <source>Average Pedal Force (nm)</source>
-        <translation>Forza sul Pedale Media (Nm)</translation>
+        <translation type="obsolete">Forza sul Pedale Media (Nm)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="171"/>
         <source>Normalized Power (watts)</source>
-        <translation>Potenza Normalizzata (Watt)</translation>
+        <translation type="obsolete">Potenza Normalizzata (Watt)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="175"/>
         <source>Skiba xPower (watts)</source>
-        <translation>Skiba xPower (watts)</translation>
+        <translation type="obsolete">Skiba xPower (watts)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="180"/>
         <source>Watts per kilo (watts/kg)</source>
-        <translation>Watt per kilo (watts/kg)</translation>
+        <translation type="obsolete">Watt per kilo (watts/kg)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="182"/>
         <source>Watts per lb (watts/lb)</source>
-        <translation>Watt per lb (watt/lb)</translation>
+        <translation type="obsolete">Watt per lb (watt/lb)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="186"/>
         <source>VAM (meters per hour)</source>
-        <translation>VAM (metri per ora)</translation>
+        <translation type="obsolete">VAM (metri per ora)</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="500"/>
         <source>maximal power</source>
-        <translation>potenza massimale</translation>
+        <translation type="obsolete">potenza massimale</translation>
     </message>
     <message>
         <source>Abort</source>
@@ -2404,151 +3326,151 @@ Iniziamo la configurazione.</translation>
         <translation type="obsolete">Unificando tutti i file</translation>
     </message>
     <message>
-        <location filename="../CpintPlot.cpp" line="611"/>
-        <location filename="../CpintPlot.cpp" line="723"/>
         <source>ddd MMM d, yyyy h:mm AP</source>
-        <translation>ddd MMM d, yyyy h:mm AP</translation>
+        <translation type="obsolete">ddd MMM d, yyyy h:mm AP</translation>
     </message>
 </context>
 <context>
     <name>CredentialsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="276"/>
+        <location filename="../Pages.cpp" line="302"/>
         <source>Golden Cheetah Racing</source>
         <translation>Golden Cheetah Racing</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="281"/>
-        <location filename="../Pages.cpp" line="288"/>
-        <location filename="../Pages.cpp" line="296"/>
-        <location filename="../Pages.cpp" line="332"/>
-        <location filename="../Pages.cpp" line="339"/>
+        <location filename="../Pages.cpp" line="307"/>
+        <location filename="../Pages.cpp" line="314"/>
+        <location filename="../Pages.cpp" line="322"/>
+        <location filename="../Pages.cpp" line="357"/>
+        <location filename="../Pages.cpp" line="364"/>
         <source>Website</source>
         <translation>Website</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="282"/>
-        <location filename="../Pages.cpp" line="289"/>
-        <location filename="../Pages.cpp" line="314"/>
-        <location filename="../Pages.cpp" line="320"/>
-        <location filename="../Pages.cpp" line="326"/>
+        <location filename="../Pages.cpp" line="308"/>
+        <location filename="../Pages.cpp" line="315"/>
+        <location filename="../Pages.cpp" line="339"/>
+        <location filename="../Pages.cpp" line="345"/>
+        <location filename="../Pages.cpp" line="351"/>
         <source>Username</source>
         <translation>Nome Utente</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="283"/>
-        <location filename="../Pages.cpp" line="290"/>
-        <location filename="../Pages.cpp" line="315"/>
-        <location filename="../Pages.cpp" line="321"/>
-        <location filename="../Pages.cpp" line="327"/>
-        <location filename="../Pages.cpp" line="341"/>
+        <location filename="../Pages.cpp" line="309"/>
+        <location filename="../Pages.cpp" line="316"/>
+        <location filename="../Pages.cpp" line="340"/>
+        <location filename="../Pages.cpp" line="346"/>
+        <location filename="../Pages.cpp" line="352"/>
+        <location filename="../Pages.cpp" line="366"/>
         <source>Password</source>
         <translation>Password</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="285"/>
+        <location filename="../Pages.cpp" line="311"/>
         <source>TrainingPeaks</source>
         <translation>TrainingPeak</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="291"/>
+        <location filename="../Pages.cpp" line="317"/>
         <source>Account Type</source>
         <translation>Tipo di Account</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="293"/>
+        <location filename="../Pages.cpp" line="319"/>
         <source>Twitter</source>
         <translation>Twitter</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="297"/>
-        <location filename="../Pages.cpp" line="305"/>
-        <location filename="../Pages.cpp" line="309"/>
+        <location filename="../Pages.cpp" line="323"/>
+        <location filename="../Pages.cpp" line="330"/>
+        <location filename="../Pages.cpp" line="334"/>
+        <location filename="../Pages.cpp" line="412"/>
+        <location filename="../Pages.cpp" line="422"/>
+        <location filename="../Pages.cpp" line="435"/>
         <source>Authorise</source>
         <translation>Autorizza</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="298"/>
         <source>PIN</source>
-        <translation>PIN</translation>
+        <translation type="obsolete">PIN</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="300"/>
+        <location filename="../Pages.cpp" line="325"/>
         <source>Strava</source>
         <translation>Strava</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="307"/>
+        <location filename="../Pages.cpp" line="332"/>
         <source>Cycling Analytics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="311"/>
+        <location filename="../Pages.cpp" line="336"/>
         <source>RideWithGPS</source>
         <translation>RideWithGPS</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="317"/>
+        <location filename="../Pages.cpp" line="342"/>
         <source>Trainingstagebuch</source>
         <translation>Trainingstagebuch</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="323"/>
+        <location filename="../Pages.cpp" line="348"/>
         <source>Selfloops</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="329"/>
+        <location filename="../Pages.cpp" line="354"/>
         <source>Withings Wifi Scales</source>
         <translation>Bilance Withings Wifi</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="333"/>
+        <location filename="../Pages.cpp" line="358"/>
         <source>User Id</source>
         <translation>Utente id</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="334"/>
+        <location filename="../Pages.cpp" line="359"/>
         <source>Public Key</source>
         <translation>Chiave Pubblica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="336"/>
+        <location filename="../Pages.cpp" line="361"/>
         <source>Zeo Sleep Data</source>
         <translation>Dati Zeo Sleep</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="340"/>
+        <location filename="../Pages.cpp" line="365"/>
         <source>User</source>
         <translation>Utente</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="344"/>
+        <location filename="../Pages.cpp" line="369"/>
         <source>Web Calendar</source>
         <translation>Calendario Web</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="346"/>
+        <location filename="../Pages.cpp" line="371"/>
         <source>Webcal URL</source>
         <translation>Calendario Web url</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="348"/>
+        <location filename="../Pages.cpp" line="373"/>
         <source>CalDAV Calendar</source>
         <translation>CalDAV Calendario</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="350"/>
+        <location filename="../Pages.cpp" line="375"/>
         <source>CalDAV URL</source>
         <translation>CalDAV URL</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="351"/>
+        <location filename="../Pages.cpp" line="376"/>
         <source>CalDAV User Id</source>
         <translation>CalDAV Nome Utente</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="352"/>
+        <location filename="../Pages.cpp" line="377"/>
         <source>CalDAV Password</source>
         <translation>CalDAV Password</translation>
     </message>
@@ -2556,15 +3478,17 @@ Iniziamo la configurazione.</translation>
 <context>
     <name>CriticalPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="65"/>
         <source>60 min Peak Power</source>
-        <translation>60 min Picco di Potenza</translation>
+        <translation type="obsolete">60 min Picco di Potenza</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="66"/>
-        <location filename="../PeakPower.cpp" line="67"/>
         <source>watts</source>
-        <translation>watt</translation>
+        <translation type="obsolete">watt</translation>
+    </message>
+    <message>
+        <location filename="../BikeScore.cpp" line="195"/>
+        <source>Critical Power</source>
+        <translation type="unfinished">Potenza Critica (CP)</translation>
     </message>
 </context>
 <context>
@@ -2574,79 +3498,352 @@ Iniziamo la configurazione.</translation>
         <translation type="obsolete">Durata dell&apos;intervallo:</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="86"/>
         <source>Duration:</source>
-        <translation>Durata:</translation>
+        <translation type="obsolete">Durata:</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="88"/>
         <source>Today:</source>
-        <translation>Oggi:</translation>
+        <translation type="obsolete">Oggi:</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="89"/>
-        <location filename="../CriticalPowerWindow.cpp" line="91"/>
-        <location filename="../CriticalPowerWindow.cpp" line="93"/>
-        <location filename="../CriticalPowerWindow.cpp" line="377"/>
-        <location filename="../CriticalPowerWindow.cpp" line="388"/>
-        <location filename="../CriticalPowerWindow.cpp" line="407"/>
+        <location filename="../CriticalPowerWindow.cpp" line="1238"/>
+        <location filename="../CriticalPowerWindow.cpp" line="1249"/>
+        <location filename="../CriticalPowerWindow.cpp" line="1268"/>
         <source>no data</source>
         <translation>no dati</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="90"/>
         <source>Best:</source>
-        <translation>Migliore:</translation>
+        <translation type="obsolete">Migliore:</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="92"/>
         <source>CP Curve:</source>
-        <translation>Curva CP:</translation>
+        <translation type="obsolete">Curva CP:</translation>
     </message>
     <message>
         <source>&amp;Save CP value</source>
         <translation type="obsolete">&amp;Salva valore CP</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="134"/>
+        <location filename="../CriticalPowerWindow.cpp" line="61"/>
+        <source>Percentage of Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="63"/>
+        <source>Show Heat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="65"/>
+        <source>Delta compare</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="99"/>
+        <source>Basic</source>
+        <translation type="unfinished">Base</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="106"/>
+        <location filename="../CriticalPowerWindow.cpp" line="211"/>
+        <source>CP Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="113"/>
+        <source>Export Chart Data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="125"/>
         <source>Filter</source>
         <translation>Filtro</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="146"/>
-        <location filename="../CriticalPowerWindow.cpp" line="147"/>
+        <location filename="../CriticalPowerWindow.cpp" line="137"/>
+        <location filename="../CriticalPowerWindow.cpp" line="138"/>
         <source>Date range</source>
         <translation>Intervallo Date</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="161"/>
+        <location filename="../CriticalPowerWindow.cpp" line="152"/>
         <source>Data series</source>
         <translation>Serie di Dati</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="165"/>
+        <location filename="../CriticalPowerWindow.cpp" line="156"/>
         <source>None</source>
         <translation>Nessuno</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="166"/>
+        <location filename="../CriticalPowerWindow.cpp" line="157"/>
         <source>Using CP</source>
         <translation>Sto Usando PC</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="167"/>
+        <location filename="../CriticalPowerWindow.cpp" line="158"/>
         <source>Using derived CP</source>
         <translation>Sto usando PC derivata</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="168"/>
+        <location filename="../CriticalPowerWindow.cpp" line="159"/>
         <source>Power Shading</source>
         <translation>Ombreggia Potenza</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="443"/>
+        <location filename="../CriticalPowerWindow.cpp" line="165"/>
+        <source>Show grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="170"/>
+        <source>Show Bests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="175"/>
+        <source>Show as percentage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="180"/>
+        <source>Show curve heat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="185"/>
+        <source>Show curve heat by date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="190"/>
+        <source>Shade Intervals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="194"/>
+        <source>Ride Mean Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="195"/>
+        <source>Ride Centile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="196"/>
+        <source>No Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="199"/>
+        <source>Current Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="213"/>
+        <source> </source>
+        <translation type="unfinished"> </translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="214"/>
+        <source>Search Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="215"/>
+        <source>(seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="218"/>
+        <source>Anaerobic</source>
+        <translation type="unfinished">Anaerobico</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="241"/>
+        <source>Aerobic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="280"/>
+        <source>Short anaerobic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="303"/>
+        <source>Long aerobic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="311"/>
+        <source>Exponential</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="313"/>
+        <source>Variant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="314"/>
+        <source>Linear feedback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="316"/>
+        <source>Regeneration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="338"/>
+        <source>Value</source>
+        <translation type="unfinished">Valore</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="339"/>
+        <source>Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="340"/>
+        <source>W&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="341"/>
+        <source>0 kJ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="342"/>
+        <location filename="../CriticalPowerWindow.cpp" line="345"/>
+        <location filename="../CriticalPowerWindow.cpp" line="348"/>
+        <location filename="../CriticalPowerWindow.cpp" line="351"/>
+        <source>n/a</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="343"/>
+        <source>CP</source>
+        <translation type="unfinished">PC</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="344"/>
+        <location filename="../CriticalPowerWindow.cpp" line="347"/>
+        <location filename="../CriticalPowerWindow.cpp" line="350"/>
+        <source>0 w</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="346"/>
+        <source>Pmax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="349"/>
+        <source>FTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1278"/>
+        <source>Power</source>
+        <translation type="unfinished">Potenza</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1279"/>
+        <source>Watts per Kilogram</source>
+        <translation type="unfinished">Watts Per kg</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1280"/>
+        <source>xPower</source>
+        <translation type="unfinished">xPower</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1281"/>
+        <source>Normalized Power</source>
+        <translation type="unfinished">Potenza Normalizzata</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1282"/>
+        <source>Heartrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1283"/>
+        <source>Speed</source>
+        <translation type="unfinished">Velocità</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1284"/>
+        <source>Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1285"/>
+        <source>Power %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1286"/>
+        <source>Cadence %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1287"/>
+        <source>Torque %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1288"/>
+        <source>Heartrate %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1289"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Cadenza</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1290"/>
+        <source>Torque</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1291"/>
+        <source>VAM</source>
+        <translation type="unfinished">VAM</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1292"/>
+        <source>aPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1293"/>
+        <source>Work</source>
+        <translation type="unfinished">Lavoro</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1294"/>
+        <source>Power by inv of time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1296"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Sconosciuto</translation>
+    </message>
+    <message>
+        <location filename="../CriticalPowerWindow.cpp" line="1583"/>
+        <source>Save Best Data as CSV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Energy</source>
-        <translation>Energia:</translation>
+        <translation type="obsolete">Energia:</translation>
     </message>
     <message>
         <source>Y Axis Shows Power</source>
@@ -2665,12 +3862,12 @@ Iniziamo la configurazione.</translation>
         <translation type="obsolete">Le zone non sono state modificate.</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="404"/>
+        <location filename="../CriticalPowerWindow.cpp" line="1265"/>
         <source>no date</source>
         <translation>no data</translation>
     </message>
     <message>
-        <location filename="../CriticalPowerWindow.cpp" line="404"/>
+        <location filename="../CriticalPowerWindow.cpp" line="1265"/>
         <source>MM/dd/yyyy</source>
         <translation>MM/dd/yyyy</translation>
     </message>
@@ -2682,47 +3879,52 @@ Iniziamo la configurazione.</translation>
 <context>
     <name>CyclingAnalyticsUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="705"/>
+        <location filename="../ShareDialog.cpp" line="715"/>
         <source>Cannot login to CyclingAnalytics. Check permission</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="720"/>
+        <location filename="../ShareDialog.cpp" line="730"/>
         <source>This Ride is marked as already on CyclingAnalytics. Are you sure you want to upload it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="723"/>
+        <location filename="../ShareDialog.cpp" line="733"/>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="724"/>
+        <location filename="../ShareDialog.cpp" line="734"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="749"/>
+        <location filename="../ShareDialog.cpp" line="755"/>
+        <source>Error uploading to CyclingAnalytics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="759"/>
         <source>Successfully uploaded to CyclingAnalytics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="756"/>
+        <location filename="../ShareDialog.cpp" line="766"/>
         <source>Upload ride to CyclingAnalytics...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="805"/>
+        <location filename="../ShareDialog.cpp" line="815"/>
         <source>Upload ride... Sending to CyclingAnalytics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="814"/>
+        <location filename="../ShareDialog.cpp" line="824"/>
         <source>Upload to CyclingAnalytics finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="833"/>
+        <location filename="../ShareDialog.cpp" line="843"/>
         <source> Error from CyclingAnalytics: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2765,12 +3967,12 @@ Iniziamo la configurazione.</translation>
 <context>
     <name>DBAccess</name>
     <message>
-        <location filename="../DBAccess.cpp" line="106"/>
+        <location filename="../DBAccess.cpp" line="132"/>
         <source>Cannot open database</source>
         <translation>Non può aprire il database</translation>
     </message>
     <message>
-        <location filename="../DBAccess.cpp" line="107"/>
+        <location filename="../DBAccess.cpp" line="133"/>
         <source>Unable to establish a database connection.
 This feature requires SQLite support. Please read the Qt SQL driver documentation for information how to build it.
 
@@ -2830,82 +4032,82 @@ Click Cancel to exit.</source>
 <context>
     <name>DateSettingsEdit</name>
     <message>
-        <location filename="../TimeUtils.cpp" line="139"/>
+        <location filename="../TimeUtils.cpp" line="141"/>
         <source>Current selection</source>
         <translation>Selezione Corrente</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="147"/>
+        <location filename="../TimeUtils.cpp" line="149"/>
         <source>Current selection thru today</source>
         <translation>Selezione Corrente fino ad oggi</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="155"/>
+        <location filename="../TimeUtils.cpp" line="157"/>
         <source>From</source>
         <translation>Da</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="163"/>
+        <location filename="../TimeUtils.cpp" line="165"/>
         <source>to today</source>
         <translation>fino a oggi</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="167"/>
+        <location filename="../TimeUtils.cpp" line="169"/>
         <source>Between</source>
         <translation>Tra</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="175"/>
+        <location filename="../TimeUtils.cpp" line="177"/>
         <source>and</source>
         <translation>e</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="180"/>
+        <location filename="../TimeUtils.cpp" line="182"/>
         <source>Last</source>
         <translation>Ultimo</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="190"/>
+        <location filename="../TimeUtils.cpp" line="192"/>
         <source>days</source>
         <translation>giorni</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="191"/>
+        <location filename="../TimeUtils.cpp" line="193"/>
         <source>weeks</source>
         <translation>settimane</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="192"/>
+        <location filename="../TimeUtils.cpp" line="194"/>
         <source>months</source>
         <translation>mesi</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="193"/>
+        <location filename="../TimeUtils.cpp" line="195"/>
         <source>years</source>
         <translation>anni</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="202"/>
+        <location filename="../TimeUtils.cpp" line="204"/>
         <source>This</source>
         <translation>Questo</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="206"/>
+        <location filename="../TimeUtils.cpp" line="208"/>
         <source>week</source>
         <translation>settimana</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="207"/>
+        <location filename="../TimeUtils.cpp" line="209"/>
         <source>month</source>
         <translation>mese</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="208"/>
+        <location filename="../TimeUtils.cpp" line="210"/>
         <source>year</source>
         <translation>anno</translation>
     </message>
     <message>
-        <location filename="../TimeUtils.cpp" line="219"/>
+        <location filename="../TimeUtils.cpp" line="221"/>
         <source>prior</source>
         <translation>prima</translation>
     </message>
@@ -2995,24 +4197,26 @@ Click Cancel to exit.</source>
         <translation type="obsolete">Profilo Unità</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="845"/>
         <source>Add</source>
-        <translation type="obsolete">Aggiungi</translation>
+        <translation type="unfinished">Aggiungi</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="846"/>
         <source>Delete</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="unfinished">Cancella</translation>
     </message>
     <message>
         <source>Pair</source>
         <translation type="obsolete">Accoppia</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="833"/>
+        <location filename="../Pages.cpp" line="840"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="834"/>
+        <location filename="../Pages.cpp" line="841"/>
         <source>-</source>
         <translation>-</translation>
     </message>
@@ -3054,12 +4258,12 @@ Click Cancel to exit.</source>
 <context>
     <name>DialWindow</name>
     <message>
-        <location filename="../DialWindow.cpp" line="43"/>
+        <location filename="../DialWindow.cpp" line="42"/>
         <source>Data Series</source>
         <translation>Serie dei Dati</translation>
     </message>
     <message>
-        <location filename="../DialWindow.cpp" line="52"/>
+        <location filename="../DialWindow.cpp" line="51"/>
         <source>Smooth (secs)</source>
         <translation>Approssima (sec)</translation>
     </message>
@@ -3077,62 +4281,68 @@ Click Cancel to exit.</source>
         <translation type="unfinished">Sommario</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="89"/>
+        <location filename="../DiarySidebar.cpp" line="83"/>
         <source>Day Summary</source>
         <translation type="unfinished">Sommario Giornaliero</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="90"/>
+        <location filename="../DiarySidebar.cpp" line="84"/>
         <source>Weekly Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="91"/>
+        <location filename="../DiarySidebar.cpp" line="85"/>
         <source>Monthly Summary</source>
         <translation type="unfinished">Sommario Mensile</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="312"/>
+        <location filename="../DiarySidebar.cpp" line="323"/>
         <source>Totals</source>
         <translation type="unfinished">Totale</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="317"/>
+        <location filename="../DiarySidebar.cpp" line="328"/>
         <source>Averages</source>
         <translation type="unfinished">Medie</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="322"/>
+        <location filename="../DiarySidebar.cpp" line="333"/>
         <source>Maximums</source>
         <translation type="unfinished">Massimi</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="327"/>
+        <location filename="../DiarySidebar.cpp" line="338"/>
         <source>Metrics</source>
         <translation type="unfinished">Metriche</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="349"/>
+        <location filename="../DiarySidebar.cpp" line="360"/>
         <source>^(Average|Max) </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="353"/>
+        <location filename="../DiarySidebar.cpp" line="364"/>
         <source>seconds</source>
         <translation type="unfinished">secondi</translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="385"/>
+        <location filename="../DiarySidebar.cpp" line="396"/>
         <source>Day of </source>
         <translation type="unfinished">Giorno di </translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="387"/>
+        <location filename="../DiarySidebar.cpp" line="396"/>
+        <location filename="../DiarySidebar.cpp" line="398"/>
+        <source>dddd MMMM d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="398"/>
         <source>Week Commencing %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DiarySidebar.cpp" line="389"/>
+        <location filename="../DiarySidebar.cpp" line="400"/>
         <source>MMMM yyyy</source>
         <translation type="unfinished">mese-anno</translation>
     </message>
@@ -3341,6 +4551,14 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     </message>
 </context>
 <context>
+    <name>EOA</name>
+    <message>
+        <location filename="../BasicRideMetrics.cpp" line="953"/>
+        <source>Effect of Altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EditChartDialog</name>
     <message>
         <location filename="../LTMSettings.cpp" line="37"/>
@@ -3383,12 +4601,12 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
         <translation type="obsolete">Impostazioni</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1025"/>
+        <location filename="../LTMTool.cpp" line="1477"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1026"/>
+        <location filename="../LTMTool.cpp" line="1478"/>
         <source>Axis Label / Units</source>
         <translation>Etichetta assi / Unita&apos;</translation>
     </message>
@@ -3397,167 +4615,204 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
         <translation type="obsolete">Curve</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="919"/>
+        <location filename="../LTMTool.cpp" line="1309"/>
         <source>Curve Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="924"/>
+        <location filename="../LTMTool.cpp" line="1314"/>
         <source>Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="926"/>
+        <location filename="../LTMTool.cpp" line="1316"/>
         <source>Best</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="943"/>
+        <location filename="../LTMTool.cpp" line="1318"/>
+        <source>Estimate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1336"/>
+        <location filename="../LTMTool.cpp" line="1416"/>
         <source>seconds</source>
         <translation type="unfinished">secondi</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="944"/>
+        <location filename="../LTMTool.cpp" line="1337"/>
+        <location filename="../LTMTool.cpp" line="1417"/>
         <source>minutes</source>
         <translation type="unfinished">minuti</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="945"/>
+        <location filename="../LTMTool.cpp" line="1338"/>
+        <location filename="../LTMTool.cpp" line="1418"/>
         <source>hours</source>
         <translation type="unfinished">ore</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="981"/>
+        <location filename="../LTMTool.cpp" line="1375"/>
         <source>Peak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1032"/>
+        <location filename="../LTMTool.cpp" line="1484"/>
         <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1034"/>
+        <location filename="../LTMTool.cpp" line="1486"/>
         <source>Bar</source>
         <translation>Barre</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1035"/>
+        <location filename="../LTMTool.cpp" line="1487"/>
         <source>Line</source>
         <translation>Linea</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1036"/>
+        <location filename="../LTMTool.cpp" line="1488"/>
         <source>Sticks</source>
         <translation>Stecche</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1037"/>
+        <location filename="../LTMTool.cpp" line="1489"/>
         <source>Dots</source>
         <translation>Punti</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1040"/>
+        <location filename="../LTMTool.cpp" line="1492"/>
         <source>Stack</source>
         <translation>Pila</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1045"/>
+        <location filename="../LTMTool.cpp" line="1497"/>
         <source>Symbol</source>
         <translation>Simbolo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1047"/>
+        <location filename="../LTMTool.cpp" line="1499"/>
         <source>None</source>
         <translation>Nessuno</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1048"/>
+        <location filename="../LTMTool.cpp" line="1500"/>
         <source>Circle</source>
         <translation>Cerchio</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1049"/>
+        <location filename="../LTMTool.cpp" line="1501"/>
         <source>Square</source>
         <translation>Quadrato</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1050"/>
+        <location filename="../LTMTool.cpp" line="1502"/>
         <source>Diamond</source>
         <translation>Diamante</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1051"/>
+        <location filename="../LTMTool.cpp" line="1503"/>
         <source>Triangle</source>
         <translation>Triangolo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1052"/>
+        <location filename="../LTMTool.cpp" line="1504"/>
         <source>Cross</source>
         <translation>Croce</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1053"/>
+        <location filename="../LTMTool.cpp" line="1505"/>
         <source>Hexagon</source>
         <translation>Esagono</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1054"/>
+        <location filename="../LTMTool.cpp" line="1506"/>
         <source>Star</source>
         <translation>Stella</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1057"/>
+        <location filename="../LTMTool.cpp" line="1509"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1060"/>
+        <location filename="../LTMTool.cpp" line="1512"/>
         <source>Fill curve</source>
         <translation>Riempi curve</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1068"/>
-        <source>Highlight Best</source>
-        <translation>Evidenzia Migliore</translation>
+        <location filename="../LTMTool.cpp" line="1516"/>
+        <source>Data labels</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1076"/>
+        <location filename="../LTMTool.cpp" line="1523"/>
+        <source>Highlight Highest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1531"/>
+        <source>Highlight Lowest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlight Best</source>
+        <translation type="obsolete">Evidenzia Migliore</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1539"/>
         <source>Highlight Outliers</source>
         <translation>Evidenzia Outliers</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1084"/>
+        <location filename="../LTMTool.cpp" line="1547"/>
         <source>Baseline</source>
         <translation>Normale</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1092"/>
+        <location filename="../LTMTool.cpp" line="1555"/>
         <source>Smooth Curve</source>
         <translation>Approssima Curva</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1095"/>
+        <location filename="../LTMTool.cpp" line="1558"/>
         <source>Trend Line</source>
         <translation>Linea del Trend</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1135"/>
+        <location filename="../LTMTool.cpp" line="1564"/>
+        <source>No trend Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1565"/>
+        <source>Linear Trend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1566"/>
+        <source>Quadratic Trend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1609"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1136"/>
+        <location filename="../LTMTool.cpp" line="1610"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1193"/>
+        <location filename="../LTMTool.cpp" line="1684"/>
         <source>Peak %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1360"/>
+        <location filename="../LTMTool.cpp" line="1865"/>
         <source>Choose Metric Color</source>
         <translation>Scegli Colore Metriche</translation>
     </message>
@@ -3565,32 +4820,36 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
 <context>
     <name>EditNamedSearches</name>
     <message>
-        <location filename="../NamedSearch.cpp" line="188"/>
         <source>Manage Favourites</source>
-        <translation>Gestisci Favoriti</translation>
+        <translation type="obsolete">Gestisci Favoriti</translation>
     </message>
     <message>
-        <location filename="../NamedSearch.cpp" line="203"/>
+        <location filename="../NamedSearch.cpp" line="201"/>
+        <source>Manage Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NamedSearch.cpp" line="216"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../NamedSearch.cpp" line="209"/>
+        <location filename="../NamedSearch.cpp" line="222"/>
         <source>Filter</source>
         <translation>Filtro</translation>
     </message>
     <message>
-        <location filename="../NamedSearch.cpp" line="218"/>
+        <location filename="../NamedSearch.cpp" line="231"/>
         <source>Add</source>
         <translation>Aggiungi</translation>
     </message>
     <message>
-        <location filename="../NamedSearch.cpp" line="220"/>
+        <location filename="../NamedSearch.cpp" line="233"/>
         <source>Update</source>
         <translation>Aggiorna</translation>
     </message>
     <message>
-        <location filename="../NamedSearch.cpp" line="250"/>
+        <location filename="../NamedSearch.cpp" line="263"/>
         <source>Delete</source>
         <translation>Cancella</translation>
     </message>
@@ -3598,42 +4857,47 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
 <context>
     <name>EditSeasonDialog</name>
     <message>
-        <location filename="../Season.cpp" line="92"/>
+        <location filename="../Season.cpp" line="95"/>
         <source>Edit Date Range</source>
         <translation>Modifica Intervallo Date</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="97"/>
+        <location filename="../Season.cpp" line="100"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="98"/>
+        <location filename="../Season.cpp" line="101"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="99"/>
+        <location filename="../Season.cpp" line="102"/>
         <source>From</source>
         <translation>Da</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="100"/>
+        <location filename="../Season.cpp" line="103"/>
         <source>To</source>
         <translation>a</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="101"/>
+        <location filename="../Season.cpp" line="104"/>
         <source>Starting LTS</source>
         <translation>LTS iniziale</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="143"/>
+        <location filename="../Season.cpp" line="105"/>
+        <source>Lowest SB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="157"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="144"/>
+        <location filename="../Season.cpp" line="158"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
@@ -3641,27 +4905,27 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
 <context>
     <name>EditSeasonEventDialog</name>
     <message>
-        <location filename="../Season.cpp" line="177"/>
+        <location filename="../Season.cpp" line="192"/>
         <source>Edit Event</source>
         <translation>Modifica Evento</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="182"/>
+        <location filename="../Season.cpp" line="197"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="183"/>
+        <location filename="../Season.cpp" line="198"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="201"/>
+        <location filename="../Season.cpp" line="216"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="202"/>
+        <location filename="../Season.cpp" line="217"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
@@ -3677,17 +4941,17 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
 <context>
     <name>ElevationGain</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="201"/>
+        <location filename="../BasicRideMetrics.cpp" line="235"/>
         <source>Elevation Gain</source>
         <translation>Ascesa</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="203"/>
+        <location filename="../BasicRideMetrics.cpp" line="237"/>
         <source>meters</source>
         <translation>metri</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="204"/>
+        <location filename="../BasicRideMetrics.cpp" line="238"/>
         <source>feet</source>
         <translation>piedi</translation>
     </message>
@@ -3731,6 +4995,28 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     </message>
 </context>
 <context>
+    <name>ErgFilePlot</name>
+    <message>
+        <location filename="../ErgFilePlot.cpp" line="395"/>
+        <source>W&apos; Balance (j)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FatigueIndex</name>
+    <message>
+        <location filename="../PeakPower.cpp" line="37"/>
+        <source>Fatigue Index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="38"/>
+        <location filename="../PeakPower.cpp" line="40"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
     <name>FieldsPage</name>
     <message>
         <source>Move up</source>
@@ -3749,149 +5035,165 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
         <translation type="obsolete">Rinomina</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="2327"/>
         <source>Delete</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2009"/>
+        <location filename="../Pages.cpp" line="2328"/>
         <source>Up</source>
         <translation>Sopra</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2010"/>
+        <location filename="../Pages.cpp" line="2329"/>
         <source>Down</source>
         <translation>Sotto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1997"/>
+        <location filename="../Pages.cpp" line="2314"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1760"/>
+        <location filename="../Pages.cpp" line="2071"/>
         <source>Text</source>
         <translation>Testo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1761"/>
+        <location filename="../Pages.cpp" line="2072"/>
         <source>Textbox</source>
         <translation>Box di Testo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1762"/>
+        <location filename="../Pages.cpp" line="2073"/>
         <source>ShortText</source>
         <translation>Testo corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1763"/>
+        <location filename="../Pages.cpp" line="2074"/>
         <source>Integer</source>
         <translation>Intero</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1764"/>
+        <location filename="../Pages.cpp" line="2075"/>
         <source>Double</source>
         <translation>Double</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1765"/>
+        <location filename="../Pages.cpp" line="2076"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1766"/>
+        <location filename="../Pages.cpp" line="2077"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1767"/>
+        <location filename="../Pages.cpp" line="2078"/>
         <source>Checkbox</source>
         <translation>Checkbox</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1998"/>
+        <location filename="../Pages.cpp" line="2315"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2021"/>
+        <location filename="../Pages.cpp" line="2326"/>
+        <source>Add</source>
+        <translation type="unfinished">Aggiungi</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2340"/>
         <source>Screen Tab</source>
         <translation>Tab schermo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2022"/>
+        <location filename="../Pages.cpp" line="2341"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2023"/>
+        <location filename="../Pages.cpp" line="2342"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2024"/>
+        <location filename="../Pages.cpp" line="2343"/>
         <source>Values</source>
         <translation>Valori</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2025"/>
+        <location filename="../Pages.cpp" line="2344"/>
         <source>Diary</source>
         <translation>Diario</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2461"/>
+        <source>New</source>
+        <translation type="unfinished">Nuovo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2463"/>
+        <source>New (%1)</source>
+        <translation type="unfinished">Nuovo (%1)</translation>
     </message>
 </context>
 <context>
     <name>FindDialog</name>
     <message>
-        <location filename="../RideEditor.cpp" line="1584"/>
+        <location filename="../RideEditor.cpp" line="1620"/>
         <source>Find values</source>
         <translation>Trova valori</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1586"/>
+        <location filename="../RideEditor.cpp" line="1622"/>
         <source>Between</source>
         <translation>Tra</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1587"/>
+        <location filename="../RideEditor.cpp" line="1623"/>
         <source>Not Between</source>
         <translation>No tra</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1588"/>
+        <location filename="../RideEditor.cpp" line="1624"/>
         <source>Greater Than</source>
         <translation>Maggiore di</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1589"/>
+        <location filename="../RideEditor.cpp" line="1625"/>
         <source>Less Than</source>
         <translation>Minore di</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1590"/>
+        <location filename="../RideEditor.cpp" line="1626"/>
         <source>Equal To</source>
         <translation>Uguale a</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1591"/>
+        <location filename="../RideEditor.cpp" line="1627"/>
         <source>Not Equal To</source>
         <translation>Non uguale a</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1593"/>
+        <location filename="../RideEditor.cpp" line="1629"/>
         <source>and</source>
         <translation>e</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1609"/>
+        <location filename="../RideEditor.cpp" line="1645"/>
         <source>Clear</source>
         <translation>Pulisci</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1867"/>
+        <location filename="../RideEditor.cpp" line="1903"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1608"/>
+        <location filename="../RideEditor.cpp" line="1644"/>
         <source>Find</source>
         <translation>Trova</translation>
     </message>
@@ -4052,17 +5354,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>FormField</name>
     <message>
-        <location filename="../RideMetadata.cpp" line="420"/>
+        <location filename="../RideMetadata.cpp" line="429"/>
         <source> (kg)</source>
         <translation>.(kg)</translation>
     </message>
     <message>
-        <location filename="../RideMetadata.cpp" line="420"/>
+        <location filename="../RideMetadata.cpp" line="429"/>
         <source> (lbs)</source>
         <translation>.(lbs)</translation>
     </message>
     <message>
-        <location filename="../RideMetadata.cpp" line="576"/>
+        <location filename="../RideMetadata.cpp" line="588"/>
         <source>You entered &apos;%1&apos; which is not an expected value.</source>
         <translation>Hai inserito &apos;%1&apos; che non e&apos; un valore atteso.</translation>
     </message>
@@ -4070,354 +5372,483 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GCColor</name>
     <message>
-        <location filename="../Colors.cpp" line="43"/>
+        <location filename="../Colors.cpp" line="46"/>
         <source>Plot Background</source>
         <translation>Disegna Sfondo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="44"/>
+        <location filename="../Colors.cpp" line="47"/>
         <source>Ride Plot Background</source>
         <translation>Disegna Allenamento Sfondo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="45"/>
+        <location filename="../Colors.cpp" line="48"/>
+        <source>Train Plot Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="49"/>
         <source>Plot Symbols</source>
         <translation>Disegna Simboli</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="46"/>
+        <location filename="../Colors.cpp" line="50"/>
         <source>Ride Plot X Axis</source>
         <translation>Asse X Grafico Ride</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="47"/>
+        <location filename="../Colors.cpp" line="51"/>
         <source>Ride Plot Y Axis</source>
         <translation>Asse Y Grafico Ride</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="48"/>
+        <location filename="../Colors.cpp" line="52"/>
         <source>Plot Thumbnail Background</source>
         <translation>Disegna Icona Sfondo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="49"/>
+        <location filename="../Colors.cpp" line="53"/>
         <source>Plot Title</source>
         <translation>Disegna Titolo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="50"/>
+        <location filename="../Colors.cpp" line="54"/>
         <source>Plot Selection Pen</source>
         <translation>Disegna Seleziona Penna</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="51"/>
+        <location filename="../Colors.cpp" line="55"/>
         <source>Plot TrackerPen</source>
         <translation>Disegna TrackerPen</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="52"/>
+        <location filename="../Colors.cpp" line="56"/>
         <source>Plot Markers</source>
         <translation>Disegna Marcatori</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="53"/>
+        <location filename="../Colors.cpp" line="57"/>
         <source>Plot Grid</source>
         <translation>Disegna Griglia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="54"/>
+        <location filename="../Colors.cpp" line="58"/>
         <source>Interval Highlighter</source>
         <translation>Evidenziator Intervalli</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="55"/>
+        <location filename="../Colors.cpp" line="59"/>
         <source>Heart Rate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="56"/>
+        <location filename="../Colors.cpp" line="60"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="57"/>
+        <location filename="../Colors.cpp" line="61"/>
+        <source>Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="62"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="58"/>
+        <location filename="../Colors.cpp" line="63"/>
+        <source>Normalised Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="64"/>
+        <source>Skiba xPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="65"/>
+        <source>Altitude Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="66"/>
         <source>Critical Power</source>
         <translation>Potenza Critica (CP)</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="59"/>
+        <location filename="../Colors.cpp" line="67"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="60"/>
+        <location filename="../Colors.cpp" line="68"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="61"/>
+        <location filename="../Colors.cpp" line="69"/>
         <source>Altitude Shading</source>
         <translation>Altitudine Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="62"/>
+        <location filename="../Colors.cpp" line="70"/>
         <source>Wind Speed</source>
         <translation>Velocita&apos; vento</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="63"/>
+        <location filename="../Colors.cpp" line="71"/>
         <source>Torque</source>
         <translation>Coppia torcente</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="64"/>
+        <location filename="../Colors.cpp" line="72"/>
         <source>Load</source>
         <translation>Carica</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="65"/>
+        <location filename="../Colors.cpp" line="73"/>
         <source>TSS</source>
         <translation>TSS</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="66"/>
+        <location filename="../Colors.cpp" line="74"/>
         <source>Short Term Stress</source>
         <translation>Stress Breve Termine</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="67"/>
+        <location filename="../Colors.cpp" line="75"/>
         <source>Long Term Stress</source>
         <translation>Stress Lungo Termine</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="68"/>
+        <location filename="../Colors.cpp" line="76"/>
         <source>Stress Balance</source>
         <translation>Stress Balancio</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="69"/>
+        <location filename="../Colors.cpp" line="77"/>
         <source>Daily Stress</source>
         <translation>Stress Giornaliero</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="70"/>
+        <location filename="../Colors.cpp" line="78"/>
         <source>Bike Score</source>
         <translation>BikeScore</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="71"/>
+        <location filename="../Colors.cpp" line="79"/>
         <source>Calendar Text</source>
         <translation>Calendario Testo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="72"/>
+        <location filename="../Colors.cpp" line="80"/>
         <source>Power Zone 1 Shading</source>
         <translation>Potenza Zona 1 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="73"/>
+        <location filename="../Colors.cpp" line="81"/>
         <source>Power Zone 2 Shading</source>
         <translation>Potenza Zona 2 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="74"/>
+        <location filename="../Colors.cpp" line="82"/>
         <source>Power Zone 3 Shading</source>
         <translation>Potenza Zona 3 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="75"/>
+        <location filename="../Colors.cpp" line="83"/>
         <source>Power Zone 4 Shading</source>
         <translation>Potenza Zona 4 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="76"/>
+        <location filename="../Colors.cpp" line="84"/>
         <source>Power Zone 5 Shading</source>
         <translation>Potenza Zona 5 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="77"/>
+        <location filename="../Colors.cpp" line="85"/>
         <source>Power Zone 6 Shading</source>
         <translation>Potenza Zona 6 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="78"/>
+        <location filename="../Colors.cpp" line="86"/>
         <source>Power Zone 7 Shading</source>
         <translation>Potenza Zona 7 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="79"/>
+        <location filename="../Colors.cpp" line="87"/>
         <source>Power Zone 8 Shading</source>
         <translation>Potenza Zona 8 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="80"/>
+        <location filename="../Colors.cpp" line="88"/>
         <source>Power Zone 9 Shading</source>
         <translation>Potenza Zona 9 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="81"/>
+        <location filename="../Colors.cpp" line="89"/>
         <source>Power Zone 10 Shading</source>
         <translation>Potenza Zona 10 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="82"/>
+        <location filename="../Colors.cpp" line="90"/>
         <source>HR Zone 1 Shading</source>
         <translation>FC Zona 1 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="83"/>
+        <location filename="../Colors.cpp" line="91"/>
         <source>HR Zone 2 Shading</source>
         <translation>FC Zona 2 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="84"/>
+        <location filename="../Colors.cpp" line="92"/>
         <source>HR Zone 3 Shading</source>
         <translation>FC Zona 3 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="85"/>
+        <location filename="../Colors.cpp" line="93"/>
         <source>HR Zone 4 Shading</source>
         <translation>FC Zona 4 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="86"/>
+        <location filename="../Colors.cpp" line="94"/>
         <source>HR Zone 5 Shading</source>
         <translation>FC Zona 5 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="87"/>
+        <location filename="../Colors.cpp" line="95"/>
         <source>HR Zone 6 Shading</source>
         <translation>FC Zona 6 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="88"/>
+        <location filename="../Colors.cpp" line="96"/>
         <source>HR Zone 7 Shading</source>
         <translation>FC Zona 7 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="89"/>
+        <location filename="../Colors.cpp" line="97"/>
         <source>HR Zone 8 Shading</source>
         <translation>FC Zona 8 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="90"/>
+        <location filename="../Colors.cpp" line="98"/>
         <source>HR Zone 9 Shading</source>
         <translation>FC Zona 9 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="91"/>
+        <location filename="../Colors.cpp" line="99"/>
         <source>HR Zone 10 Shading</source>
         <translation>FC Zona 10 Ombreggia</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="92"/>
+        <location filename="../Colors.cpp" line="100"/>
         <source>Aerolab VE</source>
         <translation>Aerolab VE</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="93"/>
+        <location filename="../Colors.cpp" line="101"/>
         <source>Aerolab Elevation</source>
         <translation>Aerolab Ascesa</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="94"/>
+        <location filename="../Colors.cpp" line="102"/>
         <source>Calendar background</source>
         <translation>Calendario Sfondo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="95"/>
+        <location filename="../Colors.cpp" line="103"/>
         <source>Calendar heading</source>
         <translation>Calendario Intestazione</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="96"/>
+        <location filename="../Colors.cpp" line="104"/>
         <source>Calendar Current Selection</source>
         <translation>Calendario Selezione Corrente</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="97"/>
+        <location filename="../Colors.cpp" line="105"/>
         <source>Calendar Actual Workout</source>
         <translation>Calendario Allenamento Attuale</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="98"/>
+        <location filename="../Colors.cpp" line="106"/>
         <source>Calendar Planned Workout</source>
         <translation>Calendario Allenamento Pianificato</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="99"/>
+        <location filename="../Colors.cpp" line="107"/>
         <source>Calendar Today</source>
         <translation>Caledario Oggi</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="100"/>
+        <location filename="../Colors.cpp" line="108"/>
         <source>Pop Up Windows Background</source>
         <translation>Finestra Pop up Sfondo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="101"/>
+        <location filename="../Colors.cpp" line="109"/>
         <source>Pop Up Windows Foreground</source>
         <translation>Finestra Pop up Foreground</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="102"/>
+        <location filename="../Colors.cpp" line="110"/>
         <source>Chart Bar Unselected</source>
         <translation>Barra Tabella Non selezionata</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="103"/>
+        <location filename="../Colors.cpp" line="111"/>
         <source>Chart Bar Selected</source>
         <translation>Barra Tabella Selezionata</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="104"/>
+        <location filename="../Colors.cpp" line="112"/>
         <source>ToolBar Background</source>
         <translation>Barra degli Strumenti Sfondo</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="105"/>
-        <source>Activity History Group</source>
-        <translation>Storia delle attivita&apos; Gruppo</translation>
+        <location filename="../Colors.cpp" line="113"/>
+        <source>Ride History Group</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="106"/>
+        <location filename="../Colors.cpp" line="121"/>
+        <source>W&apos; Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="122"/>
+        <source>Ride CP Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="123"/>
+        <source>Aerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="124"/>
+        <source>Anaerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="125"/>
+        <source>Left Torque Effectiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="126"/>
+        <source>Right Torque Effectiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="127"/>
+        <source>Left Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="128"/>
+        <source>Right Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity History Group</source>
+        <translation type="obsolete">Storia delle attivita&apos; Gruppo</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="114"/>
         <source>SpinScan Left</source>
         <translation>SpinScan Sinistra</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="107"/>
+        <location filename="../Colors.cpp" line="115"/>
         <source>SpinScan Right</source>
         <translation>SpinScan Destra</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="108"/>
+        <location filename="../Colors.cpp" line="116"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="109"/>
+        <location filename="../Colors.cpp" line="117"/>
         <source>Default Dial Color</source>
         <translation>Colore quadrante di default</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="110"/>
+        <location filename="../Colors.cpp" line="118"/>
         <source>Alternate Power</source>
         <translation>Potenza Alternativa</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="111"/>
+        <location filename="../Colors.cpp" line="119"/>
         <source>Left Balance</source>
         <translation>Bilancio Sinistra</translation>
     </message>
     <message>
-        <location filename="../Colors.cpp" line="112"/>
+        <location filename="../Colors.cpp" line="120"/>
         <source>Right Balance</source>
         <translation>Bilancio Destro</translation>
+    </message>
+</context>
+<context>
+    <name>GarminUploader</name>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1070"/>
+        <source>This Ride is marked as already on Garmin Connect. Are you sure you want to upload it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1073"/>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1074"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1096"/>
+        <source>Error uploading to Garmin Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1100"/>
+        <source>Successfully uploaded to Garmin Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1107"/>
+        <location filename="../ShareDialog.cpp" line="1168"/>
+        <source>Login to Garmin Connect...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1131"/>
+        <location filename="../ShareDialog.cpp" line="1213"/>
+        <source>Login to Garmin Connect finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1255"/>
+        <source>Upload ride to Garmin Connect...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1299"/>
+        <source>Upload ride... Sending to Garmin Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1310"/>
+        <source>Upload to Garmin Connect finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="1328"/>
+        <source> Error from Garmin Connect: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4482,22 +5913,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcCalendarModel</name>
     <message>
-        <location filename="../GcCalendarModel.h" line="106"/>
+        <location filename="../GcCalendarModel.h" line="112"/>
         <source>Duration</source>
         <translation>Durata</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="107"/>
+        <location filename="../GcCalendarModel.h" line="113"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="108"/>
+        <location filename="../GcCalendarModel.h" line="114"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../GcCalendarModel.h" line="109"/>
+        <location filename="../GcCalendarModel.h" line="115"/>
         <source>Calendar Text</source>
         <translation>Calendario Testo</translation>
     </message>
@@ -4505,9 +5936,29 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcChartWindow</name>
     <message>
-        <location filename="../GoldenCheetah.cpp" line="722"/>
+        <location filename="../GoldenCheetah.cpp" line="740"/>
         <source>No data available</source>
         <translation>Nessun dato disponibile</translation>
+    </message>
+    <message>
+        <location filename="../GoldenCheetah.cpp" line="802"/>
+        <source>All Chart Settings</source>
+        <translation type="unfinished">Impostazioni Tutti Grafici</translation>
+    </message>
+    <message>
+        <location filename="../GoldenCheetah.cpp" line="803"/>
+        <source>Export Chart Image...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GoldenCheetah.cpp" line="814"/>
+        <source>Close</source>
+        <translation type="unfinished">Chiudi</translation>
+    </message>
+    <message>
+        <location filename="../GoldenCheetah.cpp" line="863"/>
+        <source>Save Chart Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4533,24 +5984,36 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>Chiudi</translation>
     </message>
     <message>
-        <location filename="../GcCrashDialog.cpp" line="231"/>
+        <location filename="../GcCrashDialog.cpp" line="223"/>
         <source>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;OS: %6&lt;br&gt;</source>
         <translation>&lt;p&gt;Compilato il: %1 %2&lt;br&gt;id Compilazione: %3&lt;br&gt;Versione: %4&lt;br&gt;DB Schema: %5&lt;br&gt;SO: %6&lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../GcCrashDialog.cpp" line="249"/>
-        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LION SUPPORT&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LION SUPPORT&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
+        <location filename="../GcCrashDialog.cpp" line="241"/>
+        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcCrashDialog.cpp" line="364"/>
+        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LION SUPPORT&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
+        <translation type="obsolete">&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Wahoo API&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LION SUPPORT&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
+    </message>
+    <message>
+        <location filename="../GcCrashDialog.cpp" line="350"/>
         <source>Save Diagnostics</source>
         <translation>Salva Diagnostiche</translation>
     </message>
     <message>
-        <location filename="../GcCrashDialog.cpp" line="364"/>
+        <location filename="../GcCrashDialog.cpp" line="350"/>
         <source>Text File (*.txt)</source>
         <translation>File di Testo (*.txt)</translation>
+    </message>
+</context>
+<context>
+    <name>GcMiniCalendar</name>
+    <message>
+        <location filename="../DiarySidebar.cpp" line="782"/>
+        <source>MMMM yyyy</source>
+        <translation type="unfinished">mese-anno</translation>
     </message>
 </context>
 <context>
@@ -4561,26 +6024,34 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>Cerca/Filtro:</translation>
     </message>
     <message>
-        <location filename="../GcScopeBar.cpp" line="77"/>
-        <location filename="../GcScopeBar.cpp" line="105"/>
-        <source>Home</source>
-        <translation>Principale</translation>
+        <location filename="../GcScopeBar.cpp" line="71"/>
+        <location filename="../GcScopeBar.cpp" line="97"/>
+        <source>Trends</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcScopeBar.cpp" line="82"/>
-        <location filename="../GcScopeBar.cpp" line="115"/>
+        <location filename="../GcScopeBar.cpp" line="81"/>
+        <location filename="../GcScopeBar.cpp" line="100"/>
+        <source>Rides</source>
+        <translation type="unfinished">Attivita&apos;</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="obsolete">Principale</translation>
+    </message>
+    <message>
+        <location filename="../GcScopeBar.cpp" line="76"/>
+        <location filename="../GcScopeBar.cpp" line="107"/>
         <source>Diary</source>
         <translation>Diario</translation>
     </message>
     <message>
-        <location filename="../GcScopeBar.cpp" line="87"/>
-        <location filename="../GcScopeBar.cpp" line="108"/>
         <source>Analysis</source>
-        <translation>Analisi</translation>
+        <translation type="obsolete">Analisi</translation>
     </message>
     <message>
-        <location filename="../GcScopeBar.cpp" line="93"/>
-        <location filename="../GcScopeBar.cpp" line="111"/>
+        <location filename="../GcScopeBar.cpp" line="87"/>
+        <location filename="../GcScopeBar.cpp" line="103"/>
         <source>Train</source>
         <translation>Palestra</translation>
     </message>
@@ -4592,32 +6063,38 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">Tabella Impostazioni</translation>
     </message>
     <message>
-        <location filename="../GoldenCheetah.cpp" line="43"/>
+        <location filename="../GoldenCheetah.cpp" line="50"/>
         <source>All Chart Settings</source>
         <translation>Impostazioni Tutti Grafici</translation>
     </message>
     <message>
-        <location filename="../GoldenCheetah.cpp" line="44"/>
-        <location filename="../GoldenCheetah.cpp" line="181"/>
-        <location filename="../GoldenCheetah.cpp" line="218"/>
+        <location filename="../GoldenCheetah.cpp" line="63"/>
+        <location filename="../GoldenCheetah.cpp" line="205"/>
+        <location filename="../GoldenCheetah.cpp" line="242"/>
         <source>Close</source>
         <translation>Chiudi</translation>
+    </message>
+    <message>
+        <location filename="../GoldenCheetah.cpp" line="198"/>
+        <location filename="../GoldenCheetah.cpp" line="236"/>
+        <source>More...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>GcWindowDialog</name>
     <message>
-        <location filename="../HomeWindow.cpp" line="1017"/>
+        <location filename="../HomeWindow.cpp" line="1037"/>
         <source>Chart Setup</source>
         <translation>Setup Tabella</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1054"/>
+        <location filename="../HomeWindow.cpp" line="1074"/>
         <source>Cancel</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1055"/>
+        <location filename="../HomeWindow.cpp" line="1075"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -4625,147 +6102,154 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcWindowRegistry</name>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="72"/>
         <source>Long Term Metrics</source>
-        <translation>Metriche di Lungo Termine</translation>
+        <translation type="obsolete">Metriche di Lungo Termine</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="73"/>
         <source>Performance Manager</source>
-        <translation>Amministartore Prestazioni</translation>
+        <translation type="obsolete">Amministartore Prestazioni</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="74"/>
+        <location filename="../GcWindowRegistry.cpp" line="72"/>
         <source>Collection TreeMap</source>
         <translation>Collezione Mappe</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="76"/>
+        <location filename="../GcWindowRegistry.cpp" line="74"/>
         <source>Critical Mean Maximal</source>
         <translation>Critico Media Massimo</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="77"/>
         <source>Activity Summary</source>
-        <translation>Sommario Attivita&apos;</translation>
+        <translation type="obsolete">Sommario Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="78"/>
+        <location filename="../GcWindowRegistry.cpp" line="71"/>
+        <source>Metric Trends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="75"/>
+        <source>Ride Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="76"/>
         <source>Details</source>
         <translation>Dettagli</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="79"/>
+        <location filename="../GcWindowRegistry.cpp" line="77"/>
         <source>Summary and Details</source>
         <translation>Sommario e Dettagli</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="80"/>
+        <location filename="../GcWindowRegistry.cpp" line="78"/>
         <source>Editor</source>
         <translation>Editor</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="81"/>
+        <location filename="../GcWindowRegistry.cpp" line="79"/>
         <source>Performance</source>
         <translation>Prestazioni</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="82"/>
+        <location filename="../GcWindowRegistry.cpp" line="80"/>
         <source>Critical Mean Maximals</source>
         <translation>Critico Medio Massimo</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="83"/>
+        <location filename="../GcWindowRegistry.cpp" line="81"/>
         <source>Histogram</source>
         <translation>Istogramma</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="84"/>
+        <location filename="../GcWindowRegistry.cpp" line="82"/>
         <source>Distribution</source>
         <translation>Distribuzione</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="85"/>
+        <location filename="../GcWindowRegistry.cpp" line="83"/>
         <source>Pedal Force vs Velocity</source>
         <translation>Forza Pedalata vs Velocita&apos;</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="86"/>
+        <location filename="../GcWindowRegistry.cpp" line="84"/>
         <source>Heartrate vs Power</source>
         <translation>Frequenza cardiaca vs Potenza</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="87"/>
+        <location filename="../GcWindowRegistry.cpp" line="85"/>
         <source>Google Map</source>
         <translation>Google Map</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="88"/>
+        <location filename="../GcWindowRegistry.cpp" line="86"/>
         <source>Bing Map</source>
         <translation>Bing Map</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="89"/>
+        <location filename="../GcWindowRegistry.cpp" line="87"/>
         <source>2d Plot</source>
         <translation>Grafico 2d</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="90"/>
+        <location filename="../GcWindowRegistry.cpp" line="88"/>
         <source>3d Plot</source>
         <translation>Grafico 3d</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="91"/>
+        <location filename="../GcWindowRegistry.cpp" line="89"/>
         <source>Aerolab Chung Analysis</source>
         <translation>Aerolab Chung Analisi</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="92"/>
+        <location filename="../GcWindowRegistry.cpp" line="90"/>
         <source>Calendar</source>
         <translation>Calendario</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="93"/>
+        <location filename="../GcWindowRegistry.cpp" line="91"/>
         <source>Navigator</source>
         <translation>Navigatore</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="94"/>
+        <location filename="../GcWindowRegistry.cpp" line="92"/>
         <source>Summary</source>
         <translation>Sommario</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="95"/>
+        <location filename="../GcWindowRegistry.cpp" line="93"/>
         <source>Telemetry</source>
         <translation>Telemetria</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="96"/>
+        <location filename="../GcWindowRegistry.cpp" line="94"/>
         <source>Workout</source>
         <translation>Allenamento</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="97"/>
+        <location filename="../GcWindowRegistry.cpp" line="95"/>
         <source>Realtime</source>
         <translation>Tempo Reale</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="98"/>
+        <location filename="../GcWindowRegistry.cpp" line="96"/>
         <source>Pedal Stroke</source>
         <translation>Forza sul Pedale</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="99"/>
+        <location filename="../GcWindowRegistry.cpp" line="97"/>
         <source>Map</source>
         <translation>Mappa</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="100"/>
+        <location filename="../GcWindowRegistry.cpp" line="98"/>
         <source>StreetView</source>
         <translation>StreetView</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="101"/>
+        <location filename="../GcWindowRegistry.cpp" line="99"/>
         <source>Video Player</source>
         <translation>Player Video</translation>
     </message>
@@ -4780,79 +6264,103 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GeneralPage</name>
     <message>
-        <location filename="../Pages.cpp" line="55"/>
+        <location filename="../Pages.cpp" line="56"/>
         <source>Language:</source>
         <translation>Lingua:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="57"/>
+        <location filename="../Pages.cpp" line="58"/>
         <source>English</source>
         <translation>Inglese</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="58"/>
+        <location filename="../Pages.cpp" line="59"/>
         <source>French</source>
         <translation>Francese</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="59"/>
+        <location filename="../Pages.cpp" line="60"/>
         <source>Japanese</source>
         <translation>Giapponese</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="60"/>
+        <location filename="../Pages.cpp" line="61"/>
         <source>Portugese (Brazil)</source>
         <translation>Portoghese</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="61"/>
+        <location filename="../Pages.cpp" line="62"/>
         <source>Italian</source>
         <translation>Italiano</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="62"/>
+        <location filename="../Pages.cpp" line="63"/>
         <source>German</source>
         <translation>Tedesco</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="63"/>
+        <location filename="../Pages.cpp" line="64"/>
         <source>Russian</source>
         <translation>Russo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="64"/>
+        <location filename="../Pages.cpp" line="65"/>
         <source>Czech</source>
         <translation>Republica Ceca</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="65"/>
+        <location filename="../Pages.cpp" line="66"/>
         <source>Spanish</source>
         <translation>Spagnolo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="66"/>
+        <location filename="../Pages.cpp" line="67"/>
         <source>Portugese</source>
         <translation>Portoghese</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="89"/>
+        <location filename="../Pages.cpp" line="90"/>
         <source>Crank Length:</source>
         <translation>Lunghezza pedivella:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="121"/>
+        <location filename="../Pages.cpp" line="122"/>
         <source>Wheelsize:</source>
         <translation>Circonferenza ruota:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="146"/>
+        <location filename="../Pages.cpp" line="126"/>
+        <source>Road/Cross (700C/622)</source>
+        <translation type="unfinished">Strada/Cross (700C/622)</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="127"/>
+        <source>Tri/TT (650C)</source>
+        <translation type="unfinished">Tri/TT (650C)</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="128"/>
+        <source>Mountain (26&quot;)</source>
+        <translation type="unfinished">MTB (26&quot;)</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="129"/>
+        <source>BMX (20&quot;)</source>
+        <translation type="unfinished">BMX (20&quot;)</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="147"/>
         <source>Use Garmin Smart Recording</source>
         <translation>Usa Garming Smart Recording</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="152"/>
+        <location filename="../Pages.cpp" line="287"/>
+        <source>Select Athlete Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Threshold (secs):</source>
-        <translation>Soglia (secondi):</translation>
+        <translation type="obsolete">Soglia (secondi):</translation>
     </message>
     <message>
         <source>time</source>
@@ -4863,67 +6371,78 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">distanza</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="165"/>
+        <location filename="../Pages.cpp" line="166"/>
         <source>Elevation hysteresis (meters):</source>
         <translation>Isteresi Elevazione (metri):</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="176"/>
+        <location filename="../Pages.cpp" line="177"/>
         <source>STS average (days):</source>
         <translation>STS media (giorni):</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="177"/>
+        <location filename="../Pages.cpp" line="178"/>
         <source>LTS average (days):</source>
         <translation>LTS media (giorni):</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="192"/>
+        <location filename="../Pages.cpp" line="193"/>
         <source>PMC Stress Balance Today</source>
         <translation>PMC Stress Bilancio Oggi</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="205"/>
+        <location filename="../Pages.cpp" line="222"/>
         <source>Workout Library:</source>
         <translation>Libreria Allenamenti:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="208"/>
+        <location filename="../Pages.cpp" line="209"/>
+        <location filename="../Pages.cpp" line="225"/>
         <source>Browse</source>
         <translation>Sfoglia</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="250"/>
+        <location filename="../Pages.cpp" line="153"/>
+        <source>Smart Recoding Threshold (secs):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="206"/>
+        <source>Athlete Library:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="268"/>
         <source>Short Term Stress</source>
         <translation>Stress Breve Periodo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="251"/>
+        <location filename="../Pages.cpp" line="269"/>
         <source>STS</source>
         <translation>STS</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="252"/>
+        <location filename="../Pages.cpp" line="270"/>
         <source>Long Term Stress</source>
         <translation>Stress Lungo Periodo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="253"/>
+        <location filename="../Pages.cpp" line="271"/>
         <source>LTS</source>
         <translation>LTS</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="254"/>
+        <location filename="../Pages.cpp" line="272"/>
         <source>Stress Balance</source>
         <translation>Stress Bilancio</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="255"/>
+        <location filename="../Pages.cpp" line="273"/>
         <source>SB</source>
         <translation>SB</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="261"/>
+        <location filename="../Pages.cpp" line="279"/>
         <source>Select Workout Library</source>
         <translation>Seleziona Libreria Allenamenti</translation>
     </message>
@@ -4931,12 +6450,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GoogleMapControl</name>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="88"/>
+        <location filename="../GoogleMapControl.cpp" line="95"/>
         <source>Route</source>
         <translation>Itinerario</translation>
     </message>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="128"/>
+        <location filename="../GoogleMapControl.cpp" line="138"/>
         <source>No GPS Data Present</source>
         <translation>Nessun dato GPS presente</translation>
     </message>
@@ -4960,7 +6479,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>Gradient</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="879"/>
+        <location filename="../BasicRideMetrics.cpp" line="993"/>
         <source>Gradient</source>
         <translation>Gradiente</translation>
     </message>
@@ -4968,7 +6487,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GradientPage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="530"/>
+        <location filename="../WorkoutWizard.cpp" line="535"/>
         <source>Grade</source>
         <translation>Grado</translation>
     </message>
@@ -4976,298 +6495,320 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GroupByModel</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="613"/>
-        <location filename="../RideNavigator.cpp" line="624"/>
-        <location filename="../RideNavigator.cpp" line="638"/>
-        <location filename="../RideNavigator.cpp" line="660"/>
-        <location filename="../RideNavigator.cpp" line="702"/>
+        <location filename="../RideNavigator.cpp" line="672"/>
+        <location filename="../RideNavigator.cpp" line="683"/>
+        <location filename="../RideNavigator.cpp" line="697"/>
+        <location filename="../RideNavigator.cpp" line="719"/>
+        <location filename="../RideNavigator.cpp" line="761"/>
         <source>Zero or not present</source>
         <translation>Zero o non presente</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="614"/>
+        <location filename="../RideNavigator.cpp" line="673"/>
         <source>Low Stress</source>
         <translation>Stress Minimo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="615"/>
+        <location filename="../RideNavigator.cpp" line="674"/>
         <source>Medium Stress</source>
         <translation>Stress Medio</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="616"/>
+        <location filename="../RideNavigator.cpp" line="675"/>
         <source>High Stress</source>
         <translation>Stress Massimo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="617"/>
+        <location filename="../RideNavigator.cpp" line="676"/>
         <source>Very High Stress</source>
         <translation>Stress Molto Elevato</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="625"/>
+        <location filename="../RideNavigator.cpp" line="684"/>
         <source>Active Recovery</source>
         <translation>Recupero Attivo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="626"/>
+        <location filename="../RideNavigator.cpp" line="685"/>
         <source>Endurance</source>
         <translation>Endurance</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="627"/>
+        <location filename="../RideNavigator.cpp" line="686"/>
         <source>Tempo</source>
         <translation>Tempo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="628"/>
+        <location filename="../RideNavigator.cpp" line="687"/>
         <source>Threshold</source>
         <translation>Soglia</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="629"/>
+        <location filename="../RideNavigator.cpp" line="688"/>
         <source>VO2Max</source>
         <translation>VO2Max</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="630"/>
+        <location filename="../RideNavigator.cpp" line="689"/>
         <source>Anaerobic Capacity</source>
         <translation>Capacita&apos; Anaerobica</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="631"/>
+        <location filename="../RideNavigator.cpp" line="690"/>
         <source>Maximal</source>
         <translation>Massimale</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="639"/>
+        <location filename="../RideNavigator.cpp" line="698"/>
         <source>Isopower</source>
         <translation>Potenza costante</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="640"/>
+        <location filename="../RideNavigator.cpp" line="699"/>
         <source>Steady</source>
         <translation>Costante</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="641"/>
+        <location filename="../RideNavigator.cpp" line="700"/>
         <source>Variable</source>
         <translation>Variabile</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="642"/>
+        <location filename="../RideNavigator.cpp" line="701"/>
         <source>Highly Variable</source>
         <translation>Molto Variabile</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="649"/>
+        <location filename="../RideNavigator.cpp" line="708"/>
         <source>Less than an hour</source>
         <translation>Meno di un&apos;ora</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="650"/>
+        <location filename="../RideNavigator.cpp" line="709"/>
         <source>Less than 90 minutes</source>
         <translation>Meno di 90 minuti</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="651"/>
+        <location filename="../RideNavigator.cpp" line="710"/>
         <source>Less than 3 hours</source>
         <translation>Meno di 3 ore</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="652"/>
+        <location filename="../RideNavigator.cpp" line="711"/>
         <source>Less than 5 hours</source>
         <translation>Meno di 5 ore</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="653"/>
+        <location filename="../RideNavigator.cpp" line="712"/>
         <source>More than 5 hours</source>
         <translation>Piu&apos; di 5 ore</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="661"/>
+        <location filename="../RideNavigator.cpp" line="720"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="662"/>
+        <location filename="../RideNavigator.cpp" line="721"/>
         <source>Medium</source>
         <translation>Medio</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="663"/>
+        <location filename="../RideNavigator.cpp" line="722"/>
         <source>Long</source>
         <translation>Lungo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="664"/>
+        <location filename="../RideNavigator.cpp" line="723"/>
         <source>Very Long</source>
         <translation>Molto Lungo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="693"/>
+        <location filename="../RideNavigator.cpp" line="752"/>
         <source>Undefined</source>
         <translation>Non identificato</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="703"/>
+        <location filename="../RideNavigator.cpp" line="762"/>
         <source>Best 10</source>
         <translation>Migliori 10</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="704"/>
+        <location filename="../RideNavigator.cpp" line="763"/>
         <source>Quartile 1:  0% -  25%</source>
         <translation>Quartile 1:  0% -  25%</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="705"/>
+        <location filename="../RideNavigator.cpp" line="764"/>
         <source>Quartile 2: 25% -  50%</source>
         <translation>Quartile 2:  25% -  50%</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="706"/>
+        <location filename="../RideNavigator.cpp" line="765"/>
         <source>Quartile 3: 50% -  75%</source>
         <translation>Quartile 3:  50% -  75%</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="707"/>
+        <location filename="../RideNavigator.cpp" line="766"/>
         <source>Quartile 4: 75% - 100%</source>
         <translation>Quartile 4:  75% -  100%</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="711"/>
+        <location filename="../RideNavigator.cpp" line="770"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="719"/>
+        <location filename="../RideNavigator.cpp" line="778"/>
         <source>This week</source>
         <translation>Questa settimana</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="722"/>
+        <location filename="../RideNavigator.cpp" line="781"/>
         <source>This month</source>
         <translation>Questo Mese</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="725"/>
+        <location filename="../RideNavigator.cpp" line="784"/>
         <source>Last month</source>
         <translation>Ultimo mese</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="727"/>
+        <location filename="../RideNavigator.cpp" line="786"/>
         <source>yyyy-MM (MMMM)</source>
         <translation>yyy MM (MMMM)</translation>
     </message>
     <message>
-        <location filename="../RideNavigatorProxy.h" line="302"/>
         <source>%1: %2 (%3 activities)</source>
-        <translation>%1: %2 (%3 attivita&apos;)</translation>
+        <translation type="obsolete">%1: %2 (%3 attivita&apos;)</translation>
     </message>
     <message>
-        <location filename="../RideNavigatorProxy.h" line="308"/>
         <source>%1 activities</source>
-        <translation>%1 attivita&apos;</translation>
+        <translation type="obsolete">%1 attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../RideNavigatorProxy.h" line="398"/>
         <source>All Activities</source>
-        <translation>Tutte le Attivita&apos;</translation>
+        <translation type="obsolete">Tutte le Attivita&apos;</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="231"/>
+        <source>Entire Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="349"/>
+        <source>%1: %2 (%3 rides)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="355"/>
+        <source>%1 rides</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="445"/>
+        <source>All Rides</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>HistogramWindow</name>
     <message>
-        <location filename="../HistogramWindow.cpp" line="237"/>
+        <location filename="../HistogramWindow.cpp" line="239"/>
         <source>Bin width</source>
         <translation>Larghezza contenitore</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="220"/>
+        <location filename="../HistogramWindow.cpp" line="218"/>
         <source>Log Y</source>
         <translation>Log Y</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="216"/>
+        <location filename="../HistogramWindow.cpp" line="214"/>
         <source>Show</source>
         <translation>Mostra</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="224"/>
+        <location filename="../HistogramWindow.cpp" line="222"/>
         <source>With zeros</source>
         <translation>Con zeri</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="66"/>
-        <location filename="../HistogramWindow.cpp" line="228"/>
+        <location filename="../HistogramWindow.cpp" line="64"/>
+        <location filename="../HistogramWindow.cpp" line="226"/>
         <source>Shade zones</source>
         <translation>Ombreggia Zone</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="58"/>
+        <location filename="../HistogramWindow.cpp" line="56"/>
         <source>Bin Width</source>
         <translation>Larghezza contenitore</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="67"/>
-        <location filename="../HistogramWindow.cpp" line="232"/>
+        <location filename="../HistogramWindow.cpp" line="65"/>
+        <location filename="../HistogramWindow.cpp" line="230"/>
         <source>Show in zones</source>
         <translation>Mostra in zone</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="100"/>
+        <location filename="../HistogramWindow.cpp" line="98"/>
         <source>Filter</source>
         <translation>Filtro</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="110"/>
+        <location filename="../HistogramWindow.cpp" line="108"/>
         <source>Date Range</source>
         <translation>Intervallo Date</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="114"/>
+        <location filename="../HistogramWindow.cpp" line="112"/>
         <source>Ride Data Samples</source>
         <translation>Dati Attivita&apos; Esempi</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="115"/>
+        <location filename="../HistogramWindow.cpp" line="113"/>
         <source>Ride Metrics</source>
         <translation>Attivita&apos; Metriche</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="121"/>
+        <location filename="../HistogramWindow.cpp" line="119"/>
         <source>Plot</source>
         <translation>Disegna</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="131"/>
+        <location filename="../HistogramWindow.cpp" line="129"/>
         <source>Data Series</source>
         <translation>Serie dei Dati</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="187"/>
+        <location filename="../HistogramWindow.cpp" line="185"/>
         <source>Total (x-axis)</source>
         <translation>Totale (asse x)</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="191"/>
+        <location filename="../HistogramWindow.cpp" line="189"/>
         <source>Distribution (y-axis)</source>
         <translation>Distribuzione (asse y)</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="202"/>
+        <location filename="../HistogramWindow.cpp" line="200"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="213"/>
+        <location filename="../HistogramWindow.cpp" line="211"/>
         <source>Absolute Time</source>
         <translation>Tempo Assoluto</translation>
     </message>
     <message>
-        <location filename="../HistogramWindow.cpp" line="214"/>
+        <location filename="../HistogramWindow.cpp" line="212"/>
         <source>Percentage Time</source>
         <translation>Percentuale di tempo</translation>
+    </message>
+    <message>
+        <location filename="../HistogramWindow.cpp" line="234"/>
+        <source>Use polarised zones</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Watts</source>
@@ -5313,142 +6854,146 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">Aggiungi Tabella...</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="598"/>
+        <location filename="../HomeWindow.cpp" line="612"/>
         <source>Are you sure you want to remove the chart?</source>
         <translation>Sei sicuro di voler cancellare la tabella?</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="599"/>
+        <location filename="../HomeWindow.cpp" line="613"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1317"/>
         <source>Activity Log</source>
-        <translation>Log delle Attivita&apos;</translation>
+        <translation type="obsolete">Log delle Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1318"/>
+        <location filename="../HomeWindow.cpp" line="1340"/>
+        <source>Ride Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1341"/>
         <source>Aerobic Power</source>
         <translation>Potenza Aerobica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1319"/>
+        <location filename="../HomeWindow.cpp" line="1342"/>
         <source>Anaerobic Power</source>
         <translation>Potenza Anaerobica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1320"/>
+        <location filename="../HomeWindow.cpp" line="1343"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1321"/>
+        <location filename="../HomeWindow.cpp" line="1344"/>
         <source>Calendar</source>
         <translation>Calendario</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1322"/>
+        <location filename="../HomeWindow.cpp" line="1345"/>
         <source>CP</source>
         <translation>PC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1323"/>
+        <location filename="../HomeWindow.cpp" line="1346"/>
         <source>Details</source>
         <translation>Dettagli</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1324"/>
+        <location filename="../HomeWindow.cpp" line="1347"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1325"/>
+        <location filename="../HomeWindow.cpp" line="1348"/>
         <source>Edit</source>
         <translation>Modifica</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1326"/>
+        <location filename="../HomeWindow.cpp" line="1349"/>
         <source>Elapsed Time</source>
         <translation>Tempo Trascorso</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1327"/>
+        <location filename="../HomeWindow.cpp" line="1350"/>
         <source>Heartrate</source>
         <translation>Frequenza cardiaca</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1328"/>
+        <location filename="../HomeWindow.cpp" line="1351"/>
         <source>Lap</source>
         <translation>Giro</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1329"/>
+        <location filename="../HomeWindow.cpp" line="1352"/>
         <source>Map</source>
         <translation>Mappa</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1330"/>
+        <location filename="../HomeWindow.cpp" line="1353"/>
         <source>Performance</source>
         <translation>Prestazioni</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1331"/>
+        <location filename="../HomeWindow.cpp" line="1354"/>
         <source>PMC</source>
         <translation>PMC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1332"/>
+        <location filename="../HomeWindow.cpp" line="1355"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1333"/>
+        <location filename="../HomeWindow.cpp" line="1356"/>
         <source>QA</source>
         <translation>QA</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1334"/>
+        <location filename="../HomeWindow.cpp" line="1357"/>
         <source>Ride</source>
         <translation>Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1335"/>
+        <location filename="../HomeWindow.cpp" line="1358"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1336"/>
+        <location filename="../HomeWindow.cpp" line="1359"/>
         <source>Summary</source>
         <translation>Sommario</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1337"/>
+        <location filename="../HomeWindow.cpp" line="1360"/>
         <source>Target Power</source>
         <translation>Potenza Target</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1338"/>
+        <location filename="../HomeWindow.cpp" line="1361"/>
         <source>Time and Distance</source>
         <translation>Orario e Distanza</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1339"/>
+        <location filename="../HomeWindow.cpp" line="1362"/>
         <source>Time In Zone</source>
         <translation>Tempo in Zona</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1340"/>
+        <location filename="../HomeWindow.cpp" line="1363"/>
         <source>Training Mix</source>
         <translation>Training Misto</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1341"/>
+        <location filename="../HomeWindow.cpp" line="1364"/>
         <source>W/kg</source>
         <translation>W/kg</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1342"/>
+        <location filename="../HomeWindow.cpp" line="1365"/>
         <source>Workout</source>
         <translation>Allenamento</translation>
     </message>
@@ -5456,12 +7001,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrPwPlot</name>
     <message>
-        <location filename="../HrPwPlot.cpp" line="327"/>
+        <location filename="../HrPwPlot.cpp" line="348"/>
         <source>Heart Rate(BPM)</source>
         <translation>Frequenza Cardiaca(BPM)</translation>
     </message>
     <message>
-        <location filename="../HrPwPlot.cpp" line="434"/>
+        <location filename="../HrPwPlot.cpp" line="455"/>
         <source>Power (Watts)</source>
         <translation>Potenza (Watt)</translation>
     </message>
@@ -5469,33 +7014,33 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrPwWindow</name>
     <message>
-        <location filename="../HrPwWindow.cpp" line="129"/>
+        <location filename="../HrPwWindow.cpp" line="128"/>
         <source>HR delay</source>
         <translation>FC Ritardo</translation>
     </message>
     <message>
-        <location filename="../HrPwWindow.cpp" line="55"/>
-        <location filename="../HrPwWindow.cpp" line="144"/>
+        <location filename="../HrPwWindow.cpp" line="54"/>
+        <location filename="../HrPwWindow.cpp" line="143"/>
         <source>Smooth</source>
         <translation>Approssima</translation>
     </message>
     <message>
-        <location filename="../HrPwWindow.cpp" line="44"/>
+        <location filename="../HrPwWindow.cpp" line="43"/>
         <source>HR Delay</source>
         <translation>FC Ritardo</translation>
     </message>
     <message>
-        <location filename="../HrPwWindow.cpp" line="161"/>
+        <location filename="../HrPwWindow.cpp" line="160"/>
         <source>Join points</source>
         <translation>Unisci Punti</translation>
     </message>
     <message>
-        <location filename="../HrPwWindow.cpp" line="167"/>
+        <location filename="../HrPwWindow.cpp" line="166"/>
         <source>Shade Zones</source>
         <translation>Ombreggia Zone</translation>
     </message>
     <message>
-        <location filename="../HrPwWindow.cpp" line="173"/>
+        <location filename="../HrPwWindow.cpp" line="172"/>
         <source>Show Full Plot</source>
         <translation>Grafico completo</translation>
     </message>
@@ -5503,47 +7048,66 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrSchemePage</name>
     <message>
+        <location filename="../Pages.cpp" line="3205"/>
         <source>Add</source>
-        <translation type="obsolete">Aggiungi</translation>
+        <translation type="unfinished">Aggiungi</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation type="obsolete">Rinomina</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="3206"/>
         <source>Delete</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2869"/>
+        <location filename="../Pages.cpp" line="3199"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2870"/>
+        <location filename="../Pages.cpp" line="3200"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2882"/>
+        <location filename="../Pages.cpp" line="3215"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2883"/>
+        <location filename="../Pages.cpp" line="3216"/>
         <source>Long</source>
         <translation>Lungo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2884"/>
+        <location filename="../Pages.cpp" line="3217"/>
         <source>Percent of LT</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation>Percentuale di LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2885"/>
+        <location filename="../Pages.cpp" line="3218"/>
         <source>Trimp k</source>
         <translation>Trimp k</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3273"/>
+        <source>Maximum of 10 zones reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3306"/>
+        <location filename="../Pages.cpp" line="3313"/>
+        <source>New</source>
+        <translation type="unfinished">Nuovo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3308"/>
+        <location filename="../Pages.cpp" line="3315"/>
+        <source>New (%1)</source>
+        <translation type="unfinished">Nuovo (%1)</translation>
     </message>
 </context>
 <context>
@@ -5617,12 +7181,16 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">Zone di default</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2852"/>
         <source>Lactic Threshold</source>
-        <translation>Soglia lattica</translation>
+        <translation type="obsolete">Soglia lattica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2853"/>
+        <location filename="../Pages.cpp" line="3182"/>
+        <source>Lactate Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3183"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
@@ -5694,77 +7262,77 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZones</name>
     <message>
-        <location filename="../HrZones.cpp" line="187"/>
+        <location filename="../HrZones.cpp" line="204"/>
         <source>line %1: read new range without reading any zones for previous one</source>
         <translation>linea %1: letto nuovo intervallo senza aver letto nessuna zona dal precedente</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="246"/>
+        <location filename="../HrZones.cpp" line="263"/>
         <source>line %1: read zone without preceding date range</source>
         <translation>linea %1: letta zona senza l&apos;intervallo date</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="261"/>
+        <location filename="../HrZones.cpp" line="277"/>
         <source>attempt to set zone based on % of LT without setting LT in line number %1.
 </source>
         <translation>tentativo di impostare le zone basato su % della FC senza impostare LT nella linea numero %1.</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="296"/>
+        <location filename="../HrZones.cpp" line="314"/>
         <source>file ended without reading any zones for last range</source>
         <translation>Il file finisce senza aver letto alcuna zona per l&apos;ultimo intervallo</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="345"/>
+        <location filename="../HrZones.cpp" line="367"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
         <translation>Imposto la data finale dell&apos;intervalle %1 alla data d&apos;inizio dell&apos;intervallo %2.</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="356"/>
+        <location filename="../HrZones.cpp" line="373"/>
         <source>Extending final range %1 to infinite to include present date.
 </source>
         <translation>Estendo l&apos;intervallo finale %1 a infinito per includere la data attuale.</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="363"/>
+        <location filename="../HrZones.cpp" line="378"/>
         <source>LT must be greater than zero in zone range %1 of hr.zones</source>
         <translation>LT deve essere maggiore di zero nell&apos;intervallo zona %1 delle FC zone</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="382"/>
+        <location filename="../HrZones.cpp" line="397"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
         <translation>L&apos;intervallo %1: accoppia il top di zona %2 (%3) fino all&apos;estremo inferiore di zona %4 (%5).</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="396"/>
+        <location filename="../HrZones.cpp" line="405"/>
         <source>Range %1: setting top of zone %2 from %3 to MAX.
 </source>
         <translation>L&apos;intervallo %1 impostato al top di zona %2 da %3 fino al MAX.</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="611"/>
+        <location filename="../HrZones.cpp" line="617"/>
         <source>Threshold (bpm): %1</source>
         <translation>Soglia (bmp): %1</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="619"/>
+        <location filename="../HrZones.cpp" line="625"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Min (bpm)&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="620"/>
+        <location filename="../HrZones.cpp" line="626"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Max (bpm)&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="622"/>
+        <location filename="../HrZones.cpp" line="628"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="617"/>
+        <location filename="../HrZones.cpp" line="623"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Zona&lt;/td&gt;</translation>
     </message>
@@ -5794,12 +7362,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>VO2Max</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="618"/>
+        <location filename="../HrZones.cpp" line="624"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Descrizione&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="621"/>
+        <location filename="../HrZones.cpp" line="627"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Orario&lt;/td&gt;</translation>
     </message>
@@ -6287,12 +7855,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>ImportPage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="632"/>
+        <location filename="../WorkoutWizard.cpp" line="637"/>
         <source>Ride Smoothing Parameters</source>
         <translation>Parametri di interpolazione</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="638"/>
+        <location filename="../WorkoutWizard.cpp" line="643"/>
         <source>Maximum supported grade is 8</source>
         <translation>Il grado massimo sopportato e&apos; 8</translation>
     </message>
@@ -6308,34 +7876,34 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>IntervalMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1340"/>
+        <location filename="../Pages.cpp" line="1455"/>
         <source>Available Metrics</source>
         <translation>Campi selezionabili</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1345"/>
+        <location filename="../Pages.cpp" line="1460"/>
         <source>Selected Metrics</source>
         <translation>Campi selezionati</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1361"/>
+        <location filename="../Pages.cpp" line="1476"/>
         <source>Up</source>
         <translation>Sopra</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1362"/>
+        <location filename="../Pages.cpp" line="1477"/>
         <source>Down</source>
         <translation>Sotto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1410"/>
-        <location filename="../Pages.cpp" line="1420"/>
+        <location filename="../Pages.cpp" line="1525"/>
+        <location filename="../Pages.cpp" line="1535"/>
         <source>&amp;#8482;</source>
         <translation>&amp;#8482;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1410"/>
-        <location filename="../Pages.cpp" line="1420"/>
+        <location filename="../Pages.cpp" line="1525"/>
+        <location filename="../Pages.cpp" line="1535"/>
         <source> (TM)</source>
         <translation>.(TM)</translation>
     </message>
@@ -6343,23 +7911,27 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>IntervalSummaryWindow</name>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="30"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="35"/>
         <source>Interval Summary</source>
         <translation>Sommario Intervalli</translation>
     </message>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="60"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="80"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="101"/>
         <source>select an interval for summary info</source>
         <translation>Seleziona un intervallo per le informazioni del sommario</translation>
     </message>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="83"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="133"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="205"/>
         <source>empty interval</source>
         <translation>Intervallo vuoto</translation>
     </message>
     <message>
-        <location filename="../IntervalSummaryWindow.cpp" line="111"/>
-        <location filename="../IntervalSummaryWindow.cpp" line="120"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="161"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="170"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="233"/>
+        <location filename="../IntervalSummaryWindow.cpp" line="242"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
@@ -6373,9 +7945,13 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>ERRORE: apertura fallita: </translation>
     </message>
     <message>
-        <location filename="../JouleDevice.cpp" line="138"/>
         <source>Joule %1 indentified</source>
-        <translation>Joule %1 identificato</translation>
+        <translation type="obsolete">Joule %1 identificato</translation>
+    </message>
+    <message>
+        <location filename="../JouleDevice.cpp" line="138"/>
+        <source>Joule %1 identified</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="145"/>
@@ -6424,8 +8000,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="386"/>
+        <source>%1 detailed rides</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%1 detailled rides</source>
-        <translation>%1 attivita&apos; dettagliate</translation>
+        <translation type="obsolete">%1 attivita&apos; dettagliate</translation>
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="394"/>
@@ -6502,8 +8082,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="607"/>
+        <source>, read only %1 bytes instead of: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>, read only %1 bytes insteed of: %2</source>
-        <translation>, leggi solo %1 bytes invece di: %2</translation>
+        <translation type="obsolete">, leggi solo %1 bytes invece di: %2</translation>
     </message>
     <message>
         <location filename="../JouleDevice.cpp" line="621"/>
@@ -6514,53 +8098,68 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1778"/>
+        <location filename="../Pages.cpp" line="2089"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1797"/>
+        <location filename="../Pages.cpp" line="2096"/>
+        <source>Use for Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2112"/>
+        <source>Add</source>
+        <translation type="unfinished">Aggiungi</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2113"/>
+        <source>Delete</source>
+        <translation type="unfinished">Cancella</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2114"/>
         <source>Up</source>
         <translation>Sopra</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1798"/>
+        <location filename="../Pages.cpp" line="2115"/>
         <source>Down</source>
         <translation>Sotto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1810"/>
+        <location filename="../Pages.cpp" line="2127"/>
         <source>Keyword</source>
         <translation>Tastiera</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1811"/>
+        <location filename="../Pages.cpp" line="2128"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1812"/>
+        <location filename="../Pages.cpp" line="2129"/>
         <source>Related Notes Words</source>
         <translation>Note Relative Parole</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1941"/>
-        <location filename="../Pages.cpp" line="1947"/>
+        <location filename="../Pages.cpp" line="2258"/>
+        <location filename="../Pages.cpp" line="2264"/>
         <source>New</source>
         <translation>Nuovo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1949"/>
+        <location filename="../Pages.cpp" line="2266"/>
         <source>New (%1)</source>
         <translation>Nuovo (%1)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1785"/>
+        <location filename="../Pages.cpp" line="2100"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1786"/>
+        <location filename="../Pages.cpp" line="2101"/>
         <source>-</source>
         <translation>-</translation>
     </message>
@@ -6572,67 +8171,128 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>LTMPlot</name>
     <message>
-        <location filename="../LTMPlot.cpp" line="55"/>
-        <location filename="../LTMPlot.cpp" line="131"/>
+        <location filename="../LTMPlot.cpp" line="99"/>
+        <location filename="../LTMPlot.cpp" line="230"/>
+        <location filename="../LTMPlot.cpp" line="1308"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="133"/>
+        <location filename="../LTMPlot.cpp" line="232"/>
+        <location filename="../LTMPlot.cpp" line="1293"/>
         <source>Time of Day</source>
         <translation>Orario del Giorno</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="461"/>
+        <location filename="../LTMPlot.cpp" line="596"/>
+        <location filename="../LTMPlot.cpp" line="632"/>
         <source>%1 trend</source>
         <translation>%1 trend</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="513"/>
+        <location filename="../LTMPlot.cpp" line="691"/>
         <source>%1 Top %2 Outliers</source>
         <translation>%1 Top %2 Outliers</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="517"/>
+        <location filename="../LTMPlot.cpp" line="695"/>
         <source>%1 Outlier</source>
         <translation>%1 Esterni</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="575"/>
         <source>%1 Best %2</source>
-        <translation>%1 Migliore %2</translation>
+        <translation type="obsolete">%1 Migliore %2</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="579"/>
+        <location filename="../LTMPlot.cpp" line="768"/>
+        <source>%1 Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="771"/>
         <source>Best %1</source>
         <translation>Migliore %1</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="764"/>
+        <location filename="../LTMPlot.cpp" line="1130"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="813"/>
-        <location filename="../LTMPlot.cpp" line="905"/>
-        <location filename="../LTMPlot.cpp" line="1052"/>
-        <location filename="../LTMPlot.cpp" line="1136"/>
+        <location filename="../LTMPlot.cpp" line="1141"/>
+        <location filename="../LTMPlot.cpp" line="2167"/>
+        <source>trend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1141"/>
+        <location filename="../LTMPlot.cpp" line="2167"/>
+        <source>Outliers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1141"/>
+        <location filename="../LTMPlot.cpp" line="2167"/>
+        <source>Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1296"/>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1299"/>
+        <source>Week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1302"/>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1305"/>
+        <source>Year</source>
+        <translation type="unfinished">Anno</translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1613"/>
+        <location filename="../LTMPlot.cpp" line="1648"/>
+        <source>%1 %2 trend</source>
+        <translation type="unfinished">%1 trend {1 %2 ?}</translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1706"/>
+        <source>%1 %2 Outliers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="1779"/>
+        <source>%1 %2 Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="2239"/>
+        <location filename="../LTMPlot.cpp" line="2335"/>
+        <location filename="../LTMPlot.cpp" line="2625"/>
+        <location filename="../LTMPlot.cpp" line="2708"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="820"/>
-        <location filename="../LTMPlot.cpp" line="930"/>
+        <location filename="../LTMPlot.cpp" line="2246"/>
+        <location filename="../LTMPlot.cpp" line="2361"/>
         <source>Ramp</source>
         <translation>Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1052"/>
+        <location filename="../LTMPlot.cpp" line="2625"/>
         <source>hours</source>
         <translation>ore</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1104"/>
+        <location filename="../LTMPlot.cpp" line="2675"/>
         <source>Week Commencing %1</source>
         <translation>Inizio Settimana il %1</translation>
     </message>
@@ -6640,106 +8300,133 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>LTMSidebar</name>
     <message>
-        <location filename="../LTMSidebar.cpp" line="50"/>
-        <location filename="../LTMSidebar.cpp" line="59"/>
+        <location filename="../LTMSidebar.cpp" line="63"/>
+        <location filename="../LTMSidebar.cpp" line="72"/>
         <source>Date Ranges</source>
         <translation>Date Intervallo</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="73"/>
-        <location filename="../LTMSidebar.cpp" line="82"/>
+        <location filename="../LTMSidebar.cpp" line="90"/>
+        <location filename="../LTMSidebar.cpp" line="98"/>
         <source>Events</source>
         <translation>Eventi</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="261"/>
-        <location filename="../LTMSidebar.cpp" line="274"/>
-        <location filename="../LTMSidebar.cpp" line="305"/>
+        <location filename="../LTMSidebar.cpp" line="340"/>
+        <location filename="../LTMSidebar.cpp" line="353"/>
+        <location filename="../LTMSidebar.cpp" line="384"/>
         <source>Add season</source>
         <translation>Aggiungi Stagione</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="275"/>
-        <location filename="../LTMSidebar.cpp" line="310"/>
+        <location filename="../LTMSidebar.cpp" line="354"/>
+        <location filename="../LTMSidebar.cpp" line="389"/>
         <source>Edit season</source>
         <translation>Modifica Stagione</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="276"/>
-        <location filename="../LTMSidebar.cpp" line="311"/>
+        <location filename="../LTMSidebar.cpp" line="355"/>
+        <location filename="../LTMSidebar.cpp" line="390"/>
         <source>Delete season</source>
         <translation>Cancella Stagione</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="345"/>
-        <location filename="../LTMSidebar.cpp" line="387"/>
+        <location filename="../LTMSidebar.cpp" line="424"/>
+        <location filename="../LTMSidebar.cpp" line="466"/>
         <source>Edit details</source>
         <translation>Modifica Dettagli</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="277"/>
-        <location filename="../LTMSidebar.cpp" line="312"/>
-        <location filename="../LTMSidebar.cpp" line="501"/>
-        <location filename="../LTMSidebar.cpp" line="508"/>
+        <location filename="../LTMSidebar.cpp" line="356"/>
+        <location filename="../LTMSidebar.cpp" line="391"/>
+        <location filename="../LTMSidebar.cpp" line="971"/>
+        <location filename="../LTMSidebar.cpp" line="978"/>
         <source>Add Event</source>
         <translation>Aggiungi Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="51"/>
-        <location filename="../LTMSidebar.cpp" line="74"/>
+        <location filename="../LTMSidebar.cpp" line="64"/>
+        <location filename="../LTMSidebar.cpp" line="91"/>
+        <location filename="../LTMSidebar.cpp" line="120"/>
         <source>Menu</source>
         <translation>Menu&apos;</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="106"/>
+        <location filename="../LTMSidebar.cpp" line="119"/>
+        <location filename="../LTMSidebar.cpp" line="128"/>
+        <source>Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="157"/>
+        <source>Autofilter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="167"/>
         <source>Summary</source>
         <translation>Sommario</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="346"/>
-        <location filename="../LTMSidebar.cpp" line="388"/>
+        <location filename="../LTMSidebar.cpp" line="425"/>
+        <location filename="../LTMSidebar.cpp" line="467"/>
         <source>Delete event</source>
         <translation>Cancella Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="356"/>
-        <location filename="../LTMSidebar.cpp" line="381"/>
+        <location filename="../LTMSidebar.cpp" line="435"/>
+        <location filename="../LTMSidebar.cpp" line="460"/>
         <source>Add event</source>
         <translation>Aggiungi Evento</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="501"/>
-        <location filename="../LTMSidebar.cpp" line="508"/>
+        <location filename="../LTMSidebar.cpp" line="496"/>
+        <source>Workout Code|Sport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="832"/>
+        <source>Manage Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="838"/>
+        <source>Delete Filter%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="971"/>
+        <location filename="../LTMSidebar.cpp" line="978"/>
         <source>You can only add events to user defined seasons. Please select a season you have created before adding an event.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="656"/>
+        <location filename="../LTMSidebar.cpp" line="1127"/>
         <source>Totals</source>
         <translation>Totale</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="661"/>
+        <location filename="../LTMSidebar.cpp" line="1132"/>
         <source>Averages</source>
         <translation>Medie</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="666"/>
+        <location filename="../LTMSidebar.cpp" line="1137"/>
         <source>Maximums</source>
         <translation>Massimi</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="671"/>
+        <location filename="../LTMSidebar.cpp" line="1142"/>
         <source>Metrics</source>
         <translation>Metriche</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="692"/>
+        <location filename="../LTMSidebar.cpp" line="1163"/>
         <source>^(Average|Max) </source>
         <translation>^(Media|Massimo)</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="696"/>
+        <location filename="../LTMSidebar.cpp" line="1167"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
@@ -6747,62 +8434,62 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>LTMTool</name>
     <message>
-        <location filename="../LTMTool.cpp" line="62"/>
+        <location filename="../LTMTool.cpp" line="65"/>
         <source>Filter</source>
         <translation>Filtro</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="78"/>
+        <location filename="../LTMTool.cpp" line="81"/>
         <source>Chart</source>
         <translation>Tabella</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="85"/>
+        <location filename="../LTMTool.cpp" line="88"/>
         <source>Date range</source>
         <translation>Intervallo Date</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="89"/>
+        <location filename="../LTMTool.cpp" line="92"/>
         <source>Days</source>
         <translation>Giorni</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="90"/>
+        <location filename="../LTMTool.cpp" line="93"/>
         <source>Weeks</source>
         <translation>Settimane</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="91"/>
+        <location filename="../LTMTool.cpp" line="94"/>
         <source>Months</source>
         <translation>Mesi</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="92"/>
+        <location filename="../LTMTool.cpp" line="95"/>
         <source>Years</source>
         <translation>Anni</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="93"/>
+        <location filename="../LTMTool.cpp" line="96"/>
         <source>Time Of Day</source>
         <translation>Orario del Giorno</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="95"/>
+        <location filename="../LTMTool.cpp" line="98"/>
         <source>Group by</source>
         <translation>Raggruppa per</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="98"/>
+        <location filename="../LTMTool.cpp" line="109"/>
         <source>Shade Zones</source>
         <translation>Ombreggia Zone</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="101"/>
+        <location filename="../LTMTool.cpp" line="112"/>
         <source>Show Legend</source>
         <translation>Mostra Legenda</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="104"/>
+        <location filename="../LTMTool.cpp" line="115"/>
         <source>Show Events</source>
         <translation>Mostra eventi</translation>
     </message>
@@ -6815,265 +8502,400 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">Gestisci</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="787"/>
+        <location filename="../LTMTool.cpp" line="1109"/>
         <source>Metric</source>
         <translation>Metriche</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="217"/>
+        <location filename="../LTMTool.cpp" line="236"/>
         <source>Skiba Long Term Stress</source>
         <translation>Skiba Stress di Lungo Periodo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="111"/>
+        <location filename="../LTMTool.cpp" line="101"/>
+        <source>Data Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="105"/>
+        <source>Show Stack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="130"/>
         <source>Import...</source>
         <translation type="unfinished">Importa...</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="112"/>
+        <location filename="../LTMTool.cpp" line="131"/>
         <source>Export...</source>
         <translation type="unfinished">Esporta...</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="113"/>
+        <location filename="../LTMTool.cpp" line="132"/>
         <source>Move up</source>
         <translation type="unfinished">Muovi sopra</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="114"/>
+        <location filename="../LTMTool.cpp" line="133"/>
         <source>Move down</source>
         <translation type="unfinished">Muovi sotto</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="115"/>
+        <location filename="../LTMTool.cpp" line="134"/>
         <source>Rename</source>
         <translation type="unfinished">Rinomina</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="116"/>
+        <location filename="../LTMTool.cpp" line="135"/>
         <source>Delete</source>
         <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="117"/>
+        <location filename="../LTMTool.cpp" line="136"/>
         <source>Add Current</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="149"/>
+        <location filename="../LTMTool.cpp" line="168"/>
         <source>Apply</source>
         <translation type="unfinished">Applica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="219"/>
-        <location filename="../LTMTool.cpp" line="234"/>
-        <location filename="../LTMTool.cpp" line="295"/>
-        <location filename="../LTMTool.cpp" line="310"/>
-        <location filename="../LTMTool.cpp" line="598"/>
-        <location filename="../LTMTool.cpp" line="613"/>
+        <location filename="../LTMTool.cpp" line="238"/>
+        <location filename="../LTMTool.cpp" line="253"/>
+        <location filename="../LTMTool.cpp" line="314"/>
+        <location filename="../LTMTool.cpp" line="329"/>
+        <location filename="../LTMTool.cpp" line="390"/>
+        <location filename="../LTMTool.cpp" line="405"/>
+        <location filename="../LTMTool.cpp" line="465"/>
+        <location filename="../LTMTool.cpp" line="480"/>
+        <location filename="../LTMTool.cpp" line="920"/>
+        <location filename="../LTMTool.cpp" line="935"/>
         <source>Stress</source>
         <translation>Stress</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="232"/>
+        <location filename="../LTMTool.cpp" line="251"/>
         <source>Skiba Short Term Stress</source>
         <translation>Skiba Stress Breve termine</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="247"/>
+        <location filename="../LTMTool.cpp" line="266"/>
         <source>Skiba Stress Balance</source>
         <translation>Skiba Bilancio Stress</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="249"/>
-        <location filename="../LTMTool.cpp" line="325"/>
-        <location filename="../LTMTool.cpp" line="401"/>
-        <location filename="../LTMTool.cpp" line="477"/>
-        <location filename="../LTMTool.cpp" line="628"/>
+        <location filename="../LTMTool.cpp" line="268"/>
+        <location filename="../LTMTool.cpp" line="344"/>
+        <location filename="../LTMTool.cpp" line="420"/>
+        <location filename="../LTMTool.cpp" line="495"/>
+        <location filename="../LTMTool.cpp" line="571"/>
+        <location filename="../LTMTool.cpp" line="647"/>
+        <location filename="../LTMTool.cpp" line="723"/>
+        <location filename="../LTMTool.cpp" line="799"/>
+        <location filename="../LTMTool.cpp" line="950"/>
         <source>Stress Balance</source>
         <translation>Bilancio Stress</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="262"/>
+        <location filename="../LTMTool.cpp" line="281"/>
         <source>Skiba STS Ramp</source>
         <translation>Skiba STS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="264"/>
-        <location filename="../LTMTool.cpp" line="279"/>
-        <location filename="../LTMTool.cpp" line="340"/>
-        <location filename="../LTMTool.cpp" line="355"/>
-        <location filename="../LTMTool.cpp" line="416"/>
-        <location filename="../LTMTool.cpp" line="431"/>
-        <location filename="../LTMTool.cpp" line="492"/>
-        <location filename="../LTMTool.cpp" line="507"/>
-        <location filename="../LTMTool.cpp" line="568"/>
-        <location filename="../LTMTool.cpp" line="583"/>
-        <location filename="../LTMTool.cpp" line="643"/>
-        <location filename="../LTMTool.cpp" line="658"/>
+        <location filename="../LTMTool.cpp" line="283"/>
+        <location filename="../LTMTool.cpp" line="298"/>
+        <location filename="../LTMTool.cpp" line="359"/>
+        <location filename="../LTMTool.cpp" line="374"/>
+        <location filename="../LTMTool.cpp" line="435"/>
+        <location filename="../LTMTool.cpp" line="450"/>
+        <location filename="../LTMTool.cpp" line="510"/>
+        <location filename="../LTMTool.cpp" line="525"/>
+        <location filename="../LTMTool.cpp" line="586"/>
+        <location filename="../LTMTool.cpp" line="601"/>
+        <location filename="../LTMTool.cpp" line="662"/>
+        <location filename="../LTMTool.cpp" line="677"/>
+        <location filename="../LTMTool.cpp" line="738"/>
+        <location filename="../LTMTool.cpp" line="753"/>
+        <location filename="../LTMTool.cpp" line="814"/>
+        <location filename="../LTMTool.cpp" line="829"/>
+        <location filename="../LTMTool.cpp" line="890"/>
+        <location filename="../LTMTool.cpp" line="905"/>
+        <location filename="../LTMTool.cpp" line="965"/>
+        <location filename="../LTMTool.cpp" line="980"/>
         <source>Ramp</source>
         <translation>Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="277"/>
+        <location filename="../LTMTool.cpp" line="296"/>
         <source>Skiba LTS Ramp</source>
         <translation>Skiba LTS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="293"/>
+        <location filename="../LTMTool.cpp" line="312"/>
+        <source>Aerobic TISS Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="327"/>
+        <source>Aerobic TISS Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="342"/>
+        <source>Aerobic TISS Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="357"/>
+        <source>Aerobic TISS STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="372"/>
+        <source>Aerobic TISS LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="388"/>
+        <source>Anaerobic TISS Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="403"/>
+        <source>Anaerobic TISS Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="418"/>
+        <source>Anaerobic TISS Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="433"/>
+        <source>Anaerobic TISS STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="448"/>
+        <source>Anaerobic TISS LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="463"/>
         <source>Daniels Long Term Stress</source>
         <translation>Daniels Stress Lungo Termine</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="308"/>
+        <location filename="../LTMTool.cpp" line="478"/>
         <source>Daniels Short Term Stress</source>
         <translation>Daniels Stress di breve periodo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="323"/>
+        <location filename="../LTMTool.cpp" line="493"/>
         <source>Daniels Stress Balance</source>
         <translation>Daniels Bilancio Stress</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="338"/>
+        <location filename="../LTMTool.cpp" line="508"/>
         <source>Daniels STS Ramp</source>
         <translation>Daniels Rampa STS</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="353"/>
+        <location filename="../LTMTool.cpp" line="523"/>
         <source>Daniels LTS Ramp</source>
         <translation>Daniels LTS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="369"/>
+        <location filename="../LTMTool.cpp" line="539"/>
         <source>Work (Kj) Long Term Stress</source>
         <translation>Lavoro (Kj) Stress di Lungo Periodo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="371"/>
-        <location filename="../LTMTool.cpp" line="386"/>
+        <location filename="../LTMTool.cpp" line="541"/>
+        <location filename="../LTMTool.cpp" line="556"/>
+        <location filename="../LTMTool.cpp" line="617"/>
+        <location filename="../LTMTool.cpp" line="632"/>
+        <location filename="../LTMTool.cpp" line="693"/>
+        <location filename="../LTMTool.cpp" line="708"/>
         <source>Stress (Kj)</source>
         <translation>Stress (Kj)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="384"/>
+        <location filename="../LTMTool.cpp" line="554"/>
         <source>Work (Kj) Short Term Stress</source>
         <translation>Lavoro (Kj) Stress di Breve Periodo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="399"/>
+        <location filename="../LTMTool.cpp" line="569"/>
         <source>Work (Kj) Stress Balance</source>
         <translation>Lavoro (Kj) Stress Bilancio</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="414"/>
+        <location filename="../LTMTool.cpp" line="584"/>
         <source>Work (Kj) STS Ramp</source>
         <translation>Lavoro (Kj) Rampa STS</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="429"/>
+        <location filename="../LTMTool.cpp" line="599"/>
         <source>Work (Kj) LTS Ramp</source>
         <translation>Lavoro (Kj) Rampa LTS</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="445"/>
+        <location filename="../LTMTool.cpp" line="615"/>
+        <source>W&apos; Work (Kj) Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="630"/>
+        <source>W&apos; Work (Kj) Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="645"/>
+        <source>W&apos; Work (Kj) Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="660"/>
+        <source>W&apos; Work (Kj) STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="675"/>
+        <source>W&apos; Work (Kj) LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="691"/>
+        <source>Below CP Work (Kj) Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="706"/>
+        <source>Below CP Work (Kj) Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="721"/>
+        <source>Below CP Work (Kj) Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="736"/>
+        <source>Below CP Work (Kj) STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="751"/>
+        <source>Below CP Work (Kj) LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="767"/>
         <source>Distance (km|mi) Long Term Stress</source>
         <translation>Distanza (km|mi) Stress di Lungo Termine</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="447"/>
-        <location filename="../LTMTool.cpp" line="462"/>
+        <location filename="../LTMTool.cpp" line="769"/>
+        <location filename="../LTMTool.cpp" line="784"/>
         <source>Stress (km|mi)</source>
         <translation>Stress (km|mi)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="460"/>
+        <location filename="../LTMTool.cpp" line="782"/>
         <source>Distance (km|mi) Short Term Stress</source>
         <translation>Distanza (km|mi) Stress di Breve Termine</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="475"/>
+        <location filename="../LTMTool.cpp" line="797"/>
         <source>Distance (km|mi) Stress Balance</source>
         <translation>Distanza (km|mi) Stress Bilancio</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="490"/>
+        <location filename="../LTMTool.cpp" line="812"/>
         <source>Distance (km|mi) STS Ramp</source>
         <translation>Distanza (km|mi) STS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="505"/>
+        <location filename="../LTMTool.cpp" line="827"/>
         <source>Distance (km|mi) LTS Ramp</source>
         <translation>Distanza (km|mi) LTS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="521"/>
+        <location filename="../LTMTool.cpp" line="843"/>
         <source>Coggan Chronic Training Load</source>
         <translation>Coggan Chronic Training Load (CTL)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="536"/>
+        <location filename="../LTMTool.cpp" line="858"/>
         <source>Coggan Acute Training Load</source>
         <translation>Coggan Carico Allenamento Acuto (ATL)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="551"/>
+        <location filename="../LTMTool.cpp" line="873"/>
         <source>Coggan Training Stress Balance</source>
         <translation>Coggan Bilancio Strees Allenamento</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="566"/>
+        <location filename="../LTMTool.cpp" line="888"/>
         <source>Coggan STS Ramp</source>
         <translation>Coggan STS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="581"/>
+        <location filename="../LTMTool.cpp" line="903"/>
         <source>Coggan LTS Ramp</source>
         <translation>Coggan LTS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="597"/>
+        <location filename="../LTMTool.cpp" line="919"/>
         <source>TRIMP Long Term Stress</source>
         <translation>TRMP Stress di Lungo Termine</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="611"/>
+        <location filename="../LTMTool.cpp" line="933"/>
         <source>TRIMP Short Term Stress</source>
         <translation>TRIMP Stress di Breve Periodo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="626"/>
+        <location filename="../LTMTool.cpp" line="948"/>
         <source>TRIMP Stress Balance</source>
         <translation>TRIMP Stress Bilancio</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="641"/>
+        <location filename="../LTMTool.cpp" line="963"/>
         <source>TRIMP STS Ramp</source>
         <translation>TRMP STS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="656"/>
+        <location filename="../LTMTool.cpp" line="978"/>
         <source>TRIMP LTS Ramp</source>
         <translation>TRIMP LTS Rampa</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="737"/>
+        <location filename="../LTMTool.cpp" line="1059"/>
         <source>Edit</source>
         <translation type="unfinished">Modifica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="758"/>
+        <location filename="../LTMTool.cpp" line="1080"/>
         <source>Basic</source>
         <translation>Base</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="759"/>
+        <location filename="../LTMTool.cpp" line="1081"/>
         <source>Preset</source>
         <translation>Pre Impostazioni</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1499"/>
-        <location filename="../LTMTool.cpp" line="1541"/>
+        <location filename="../LTMTool.cpp" line="1113"/>
+        <source>Estimate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2004"/>
+        <location filename="../LTMTool.cpp" line="2046"/>
         <source>Chart File (*.xml)</source>
         <translation type="unfinished">File Grafico (*.xml)</translation>
     </message>
@@ -7098,162 +8920,162 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="obsolete">Scegli Colore Metriche</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1410"/>
+        <location filename="../LTMTool.cpp" line="1915"/>
         <source>PMC</source>
         <translation>PMC</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1411"/>
+        <location filename="../LTMTool.cpp" line="1916"/>
         <source>Track Weight</source>
         <translation>Traccia Peso</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1412"/>
+        <location filename="../LTMTool.cpp" line="1917"/>
         <source>Time In Power Zone (Stacked)</source>
         <translation>Tempo in Zona di Potenza (Pila)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1413"/>
+        <location filename="../LTMTool.cpp" line="1918"/>
         <source>Time In Power Zone (Bar)</source>
         <translation>Tempo in Zona di Potenza (Barre)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1414"/>
+        <location filename="../LTMTool.cpp" line="1919"/>
         <source>Time In HR Zone</source>
         <translation>Tempo in FC Zona</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1415"/>
+        <location filename="../LTMTool.cpp" line="1920"/>
         <source>Power Distribution</source>
         <translation>Distribuzione di Potenza</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1416"/>
+        <location filename="../LTMTool.cpp" line="1921"/>
         <source>KPI Tracker</source>
         <translation>KPI Tracciatore</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1418"/>
+        <location filename="../LTMTool.cpp" line="1923"/>
         <source>Aerobic Power</source>
         <translation>Potenza Aerobica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1419"/>
+        <location filename="../LTMTool.cpp" line="1924"/>
         <source>Aerobic WPK</source>
         <translation>Aerobico WPK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1420"/>
+        <location filename="../LTMTool.cpp" line="1925"/>
         <source>Power Variance</source>
         <translation>Potenza Varianza</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1421"/>
+        <location filename="../LTMTool.cpp" line="1926"/>
         <source>Power Profile</source>
         <translation>Potenza Profilo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1422"/>
+        <location filename="../LTMTool.cpp" line="1927"/>
         <source>Anaerobic Power</source>
         <translation>Potenza Anaerobica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1434"/>
+        <location filename="../LTMTool.cpp" line="1939"/>
         <source>Device Reliability</source>
         <translation>Dispositivo Affidabilita&apos;</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1435"/>
+        <location filename="../LTMTool.cpp" line="1940"/>
         <source>Withings Weight</source>
         <translation>Peso dispositivi Withings</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1436"/>
+        <location filename="../LTMTool.cpp" line="1941"/>
         <source>Stress and Distance</source>
         <translation>Stress e Distanza</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1437"/>
+        <location filename="../LTMTool.cpp" line="1942"/>
         <source>Calories vs Duration</source>
         <translation>Calorie vs Durata</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1417"/>
+        <location filename="../LTMTool.cpp" line="1922"/>
         <source>Critical Power Trend</source>
         <translation>Potenza Critica Trend</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="760"/>
+        <location filename="../LTMTool.cpp" line="1082"/>
         <source>Curves</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="777"/>
+        <location filename="../LTMTool.cpp" line="1099"/>
         <source>Type</source>
         <translation type="unfinished">Tipo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="777"/>
+        <location filename="../LTMTool.cpp" line="1099"/>
         <source>Details</source>
         <translation type="unfinished">Dettagli</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="789"/>
+        <location filename="../LTMTool.cpp" line="1111"/>
         <source>Peak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1423"/>
+        <location filename="../LTMTool.cpp" line="1928"/>
         <source>Anaerobic WPK</source>
         <translation>Anaerobico WPK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1424"/>
+        <location filename="../LTMTool.cpp" line="1929"/>
         <source>Power &amp; Speed Trend</source>
         <translation>Potenza &amp; Velocita&apos; Trend</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1425"/>
+        <location filename="../LTMTool.cpp" line="1930"/>
         <source>Cardiovascular Response</source>
         <translation>Risposta Cardiovascolare</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1427"/>
+        <location filename="../LTMTool.cpp" line="1932"/>
         <source>Training Mix</source>
         <translation>Allenamento Misto</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1426"/>
+        <location filename="../LTMTool.cpp" line="1931"/>
         <source>Tempo &amp; Threshold Time</source>
         <translation>Tempo &amp; Soglia Tempo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1428"/>
+        <location filename="../LTMTool.cpp" line="1933"/>
         <source>Time &amp; Distance</source>
         <translation>Tempo &amp; Distanza</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1430"/>
+        <location filename="../LTMTool.cpp" line="1935"/>
         <source>Daniels Power</source>
         <translation>Potenza Daniels</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1429"/>
+        <location filename="../LTMTool.cpp" line="1934"/>
         <source>Skiba Power</source>
         <translation>Potenza Skiba</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1431"/>
+        <location filename="../LTMTool.cpp" line="1936"/>
         <source>PM Ramp &amp; Peak</source>
         <translation>PM Rampa &amp; Picco</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1432"/>
+        <location filename="../LTMTool.cpp" line="1937"/>
         <source>Skiba PM</source>
         <translation>Skiba PM</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1433"/>
+        <location filename="../LTMTool.cpp" line="1938"/>
         <source>Daniels PM</source>
         <translation>Daniels PM</translation>
     </message>
@@ -7261,106 +9083,199 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>LTMWindow</name>
     <message>
-        <location filename="../LTMWindow.cpp" line="63"/>
+        <location filename="../LTMWindow.cpp" line="127"/>
         <source>Weeks</source>
         <translation>Settimane</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="65"/>
+        <location filename="../LTMWindow.cpp" line="129"/>
         <source>Years</source>
         <translation>Anni</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="58"/>
+        <location filename="../LTMWindow.cpp" line="122"/>
         <source>Group by</source>
         <translation>Raggruppa per</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="62"/>
+        <location filename="../LTMWindow.cpp" line="126"/>
         <source>Days</source>
         <translation>Giorni</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="64"/>
+        <location filename="../LTMWindow.cpp" line="128"/>
         <source>Months</source>
         <translation>Mesi</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="66"/>
+        <location filename="../LTMWindow.cpp" line="130"/>
         <source>Time Of Day</source>
         <translation>Orario del Giorno</translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="71"/>
-        <source>Shade zones</source>
-        <translation>Ombreggia zone</translation>
+        <location filename="../LTMWindow.cpp" line="135"/>
+        <source>Data Table</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMWindow.cpp" line="72"/>
+        <location filename="../LTMWindow.cpp" line="136"/>
+        <source>Stacked</source>
+        <translation type="unfinished">Visuale grafici sovrapposta</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="885"/>
+        <source> grouped by </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="889"/>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="892"/>
+        <source>week</source>
+        <translation type="unfinished">settimana</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="895"/>
+        <source>month</source>
+        <translation type="unfinished">mese</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="898"/>
+        <source>year</source>
+        <translation type="unfinished">anno</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="901"/>
+        <source>time of day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="979"/>
+        <location filename="../LTMWindow.cpp" line="1080"/>
+        <source>seconds</source>
+        <translation type="unfinished">secondi</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="1005"/>
+        <source>Ramp</source>
+        <translation type="unfinished">Rampa</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="1080"/>
+        <source>hours</source>
+        <translation type="unfinished">ore</translation>
+    </message>
+    <message>
+        <source>Shade zones</source>
+        <translation type="obsolete">Ombreggia zone</translation>
+    </message>
+    <message>
         <source>Show events</source>
-        <translation>Mostra eventi</translation>
+        <translation type="obsolete">Mostra eventi</translation>
     </message>
 </context>
 <context>
     <name>LTPage</name>
     <message>
-        <location filename="../Pages.cpp" line="3045"/>
-        <location filename="../Pages.cpp" line="3054"/>
+        <location filename="../Pages.cpp" line="3378"/>
+        <location filename="../Pages.cpp" line="3390"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3046"/>
-        <location filename="../Pages.cpp" line="3055"/>
+        <location filename="../Pages.cpp" line="3379"/>
+        <location filename="../Pages.cpp" line="3391"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3051"/>
+        <location filename="../Pages.cpp" line="3384"/>
+        <location filename="../Pages.cpp" line="3396"/>
+        <source>Add</source>
+        <translation type="unfinished">Aggiungi</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3385"/>
+        <location filename="../Pages.cpp" line="3397"/>
+        <source>Delete</source>
+        <translation type="unfinished">Cancella</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3387"/>
         <source>Def</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3074"/>
-        <location filename="../Pages.cpp" line="3114"/>
+        <location filename="../Pages.cpp" line="3413"/>
+        <location filename="../Pages.cpp" line="3453"/>
         <source>From Date</source>
         <translation>Dalla Data</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3075"/>
-        <location filename="../Pages.cpp" line="3115"/>
-        <source>Lactic Threshold</source>
-        <translation>Soglia lattica</translation>
+        <location filename="../Pages.cpp" line="3414"/>
+        <location filename="../Pages.cpp" line="3454"/>
+        <source>Lactate Threshold</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3092"/>
-        <location filename="../Pages.cpp" line="3116"/>
+        <location filename="../Pages.cpp" line="3658"/>
+        <source>Maximum of 10 zones reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3693"/>
+        <location filename="../Pages.cpp" line="3700"/>
+        <source>New</source>
+        <translation type="unfinished">Nuovo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3695"/>
+        <location filename="../Pages.cpp" line="3702"/>
+        <source>New (%1)</source>
+        <translation type="unfinished">Nuovo (%1)</translation>
+    </message>
+    <message>
+        <source>Lactic Threshold</source>
+        <translation type="obsolete">Soglia lattica</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3431"/>
+        <location filename="../Pages.cpp" line="3455"/>
         <source>Rest HR</source>
         <translation>FC a Riposo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3093"/>
-        <location filename="../Pages.cpp" line="3117"/>
+        <location filename="../Pages.cpp" line="3432"/>
+        <location filename="../Pages.cpp" line="3456"/>
         <source>Max HR</source>
         <translation>FC Massima</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3154"/>
+        <location filename="../Pages.cpp" line="3476"/>
+        <location filename="../Pages.cpp" line="3539"/>
+        <source>MMM d, yyyy</source>
+        <translation type="unfinished">MMM d, yyyy</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3493"/>
         <source>Short</source>
         <translation>Breve</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3155"/>
+        <location filename="../Pages.cpp" line="3494"/>
         <source>Long</source>
         <translation>Lungo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3156"/>
+        <location filename="../Pages.cpp" line="3495"/>
         <source>From BPM</source>
         <translation>Da BPM</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3157"/>
+        <location filename="../Pages.cpp" line="3496"/>
         <source>Trimp k</source>
         <translation>Trimp k</translation>
     </message>
@@ -7567,8 +9482,12 @@ on and that its display says, &quot;PC Link&quot;</source>
     </message>
     <message>
         <location filename="../MacroDevice.cpp" line="399"/>
+        <source>, read only %1 bytes instead of: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>, read only %1 bytes insteed of: %2</source>
-        <translation>, leggi solo %1 bytes invece di: %2</translation>
+        <translation type="obsolete">, leggi solo %1 bytes invece di: %2</translation>
     </message>
 </context>
 <context>
@@ -7602,37 +9521,35 @@ Salta il file...</translation>
         <translation type="obsolete">&amp;Ciclista</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="461"/>
         <source>&amp;New...</source>
-        <translation>&amp;Nuovo...</translation>
+        <translation type="obsolete">&amp;Nuovo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="461"/>
+        <location filename="../MainWindow.cpp" line="1548"/>
+        <location filename="../MainWindow.cpp" line="1584"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="462"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Apri...</translation>
+        <translation type="obsolete">&amp;Apri...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="462"/>
         <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
+        <translation type="obsolete">Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="464"/>
+        <location filename="../MainWindow.cpp" line="576"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="495"/>
+        <location filename="../MainWindow.cpp" line="608"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="467"/>
+        <location filename="../MainWindow.cpp" line="580"/>
         <source>&amp;Download from device...</source>
         <translation>&amp;Download da dispositivo...</translation>
     </message>
@@ -7657,53 +9574,49 @@ Salta il file...</translation>
         <translation type="obsolete">Attivita&apos; Manuale</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="569"/>
         <source>Home</source>
-        <translation>Principale</translation>
+        <translation type="obsolete">Principale</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="572"/>
+        <location filename="../MainWindow.cpp" line="689"/>
         <source>Diary</source>
         <translation>Diario</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="568"/>
         <source>Analysis</source>
-        <translation>Analisi</translation>
+        <translation type="obsolete">Analisi</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="570"/>
+        <location filename="../MainWindow.cpp" line="687"/>
         <source>Train</source>
         <translation>Palestra</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="420"/>
-        <location filename="../MainWindow.cpp" line="575"/>
+        <location filename="../MainWindow.cpp" line="221"/>
+        <location filename="../MainWindow.cpp" line="692"/>
         <source>Add Chart</source>
         <translation>Aggiungi Tabella</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="328"/>
+        <location filename="../MainWindow.cpp" line="404"/>
         <source>Download from Device</source>
         <translation>Scarica da dispositivo</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="337"/>
         <source>Create Manual Activity</source>
-        <translation>Inserimento Attivita&apos; Manuale</translation>
+        <translation type="obsolete">Inserimento Attivita&apos; Manuale</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="346"/>
+        <location filename="../MainWindow.cpp" line="431"/>
         <source>Toggle Sidebar</source>
         <translation>Mostra Barra Laterale a Sinistra</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="359"/>
         <source>Find Intervals</source>
-        <translation>Trova intervalli</translation>
+        <translation type="obsolete">Trova intervalli</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="372"/>
+        <location filename="../MainWindow.cpp" line="457"/>
         <source>Tiled View</source>
         <translation>Vista Tabulata</translation>
     </message>
@@ -7724,72 +9637,69 @@ Salta il file...</translation>
         <translation type="obsolete">Menu&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="460"/>
+        <location filename="../MainWindow.cpp" line="560"/>
         <source>&amp;Athlete</source>
         <translation>&amp;Atleta</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="463"/>
         <source>&amp;Close Window</source>
-        <translation>&amp;Chiudi Finestra</translation>
+        <translation type="obsolete">&amp;Chiudi Finestra</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="463"/>
         <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
+        <translation type="obsolete">Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="464"/>
+        <location filename="../MainWindow.cpp" line="576"/>
         <source>&amp;Quit All Windows</source>
         <translation>&amp;Chiudi tutte le Finestre</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="466"/>
+        <location filename="../MainWindow.cpp" line="579"/>
         <source>A&amp;ctivity</source>
         <translation>A&amp;ttivita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="467"/>
+        <location filename="../MainWindow.cpp" line="580"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="469"/>
         <source>&amp;Manual activity entry...</source>
-        <translation>Inserimento &amp;Manuale Attivita&apos;...</translation>
+        <translation type="obsolete">Inserimento &amp;Manuale Attivita&apos;...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="471"/>
+        <location filename="../MainWindow.cpp" line="584"/>
         <source>&amp;Export...</source>
         <translation>&amp;Esporta...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="472"/>
+        <location filename="../MainWindow.cpp" line="585"/>
         <source>&amp;Batch export...</source>
         <translation>Esporta &amp;Automatico...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="473"/>
+        <location filename="../MainWindow.cpp" line="586"/>
         <source>Export Metrics as CSV...</source>
         <translation>Esporta Metriche come CSV...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="476"/>
+        <location filename="../MainWindow.cpp" line="589"/>
         <source>&amp;Upload to TrainingPeaks</source>
         <translation>&amp;Upload in TrainingPeaks</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="476"/>
+        <location filename="../MainWindow.cpp" line="589"/>
         <source>Ctrl+U</source>
         <translation>Ctrl+U</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="477"/>
+        <location filename="../MainWindow.cpp" line="590"/>
         <source>Down&amp;load from TrainingPeaks...</source>
         <translation>Down&amp;load da TrainingPeaks...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="477"/>
+        <location filename="../MainWindow.cpp" line="590"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
@@ -7806,44 +9716,40 @@ Salta il file...</translation>
         <translation type="obsolete">Upload in RideWithGPS...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="490"/>
+        <location filename="../MainWindow.cpp" line="603"/>
         <source>Upload to Trainingstagebuch...</source>
         <translation>Upload in Trainingstagebuch...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="495"/>
         <source>&amp;Save activity</source>
-        <translation>&amp;Salva Attivita&apos;</translation>
+        <translation type="obsolete">&amp;Salva Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="496"/>
         <source>D&amp;elete activity...</source>
-        <translation>Canc&amp;ella Attivita&apos;...</translation>
+        <translation type="obsolete">Canc&amp;ella Attivita&apos;...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="497"/>
         <source>Split &amp;activity...</source>
-        <translation>Dividi &amp;attivita&apos;...</translation>
+        <translation type="obsolete">Dividi &amp;attivita&apos;...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="504"/>
+        <location filename="../MainWindow.cpp" line="618"/>
         <source>Air Density (Rho) Estimator...</source>
         <translation>Densita&apos; dell&apos;Aria (Rho) Stimatore...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="507"/>
+        <location filename="../MainWindow.cpp" line="621"/>
         <source>Get &amp;Withings Data...</source>
         <translation>Ottieni Dati &amp;Withings...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="509"/>
+        <location filename="../MainWindow.cpp" line="623"/>
         <source>Get &amp;Zeo Data...</source>
         <translation>Ottieni &amp; Dati &amp;Zeo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="519"/>
         <source>Upload Activity to Calendar</source>
-        <translation>Upload Attivita&apos; in Calendario</translation>
+        <translation type="obsolete">Upload Attivita&apos; in Calendario</translation>
     </message>
     <message>
         <source>Import Calendar...</source>
@@ -7854,38 +9760,34 @@ Salta il file...</translation>
         <translation type="obsolete">Esporta Calendario...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="522"/>
+        <location filename="../MainWindow.cpp" line="636"/>
         <source>Refresh Calendar</source>
         <translation>Aggiorna Calendario</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="525"/>
+        <location filename="../MainWindow.cpp" line="639"/>
         <source>Find intervals...</source>
         <translation>Trova Intervalli...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1001"/>
         <source>Select Activity</source>
-        <translation>Seleziona Attivita&apos;</translation>
+        <translation type="obsolete">Seleziona Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1001"/>
-        <location filename="../MainWindow.cpp" line="1110"/>
         <source>No activity selected!</source>
-        <translation>Nessuna Attivita&apos; Selezionata!</translation>
+        <translation type="obsolete">Nessuna Attivita&apos; Selezionata!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1012"/>
         <source>Export Activity</source>
-        <translation>Esporta Attivita&apos;</translation>
+        <translation type="obsolete">Esporta Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1025"/>
+        <location filename="../MainWindow.cpp" line="1236"/>
         <source>Export Failed</source>
         <translation>Esporta Fallita</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1026"/>
+        <location filename="../MainWindow.cpp" line="1237"/>
         <source>Failed to export ride, please check permissions</source>
         <translation>Fallito di esportare attivita&apos;, per favore controlla i permessi</translation>
     </message>
@@ -7899,128 +9801,287 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Nome File Attivita&apos; Non Valido</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="471"/>
+        <location filename="../MainWindow.cpp" line="584"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="468"/>
+        <location filename="../MainWindow.cpp" line="581"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="472"/>
+        <location filename="../MainWindow.cpp" line="585"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="468"/>
+        <location filename="../MainWindow.cpp" line="581"/>
         <source>&amp;Import from file...</source>
         <translation>&amp;Importa da file...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="469"/>
+        <location filename="../MainWindow.cpp" line="413"/>
+        <source>Create Manual Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="422"/>
+        <source>Toggle Compare Pane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="444"/>
+        <source>Find Intervals...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="445"/>
+        <source>Split Ride...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="446"/>
+        <location filename="../MainWindow.cpp" line="1321"/>
+        <source>Delete Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="562"/>
+        <source>Open &amp;Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="563"/>
+        <source>Open &amp;Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="574"/>
+        <source>Close Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="575"/>
+        <source>&amp;Close Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="582"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="485"/>
+        <location filename="../MainWindow.cpp" line="582"/>
+        <source>&amp;Manual ride entry...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="594"/>
+        <source>Tweet Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="598"/>
         <source>Share (Strava, RideWithGPS, CyclingAnalytics)...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="498"/>
-        <source>Merge activities...</source>
+        <location filename="../MainWindow.cpp" line="694"/>
+        <source>Tabbed not Tiled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="501"/>
+        <location filename="../MainWindow.cpp" line="1212"/>
+        <source>Select Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1212"/>
+        <location filename="../MainWindow.cpp" line="1321"/>
+        <source>No ride selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1223"/>
+        <source>Export Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1274"/>
+        <source>No Ride To Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1298"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
+        <location filename="../MainWindow.cpp" line="1310"/>
+        <location filename="../MainWindow.cpp" line="1312"/>
+        <source>Split Ride</source>
+        <translation type="unfinished">Dividi allenamento</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1298"/>
+        <location filename="../MainWindow.cpp" line="1310"/>
+        <source>No ride selected</source>
+        <translation type="unfinished">Nessun elemento selezionato</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1300"/>
+        <source>Current ride contains no data to split</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1312"/>
+        <source>Current ride contains no data to merge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1326"/>
+        <source>Are you sure you want to delete the ride:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1548"/>
+        <location filename="../MainWindow.cpp" line="1584"/>
+        <source>&amp;New Athlete...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="615"/>
         <source>&amp;Tools</source>
         <translation>S&amp;trumenti</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="502"/>
+        <location filename="../MainWindow.cpp" line="616"/>
         <source>&amp;Options...</source>
         <translation>&amp;Opzioni...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="503"/>
         <source>Critical Power Estimator...</source>
-        <translation>Stimatore Potenza Critica...</translation>
+        <translation type="obsolete">Stimatore Potenza Critica...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="512"/>
+        <location filename="../MainWindow.cpp" line="626"/>
         <source>Create a new workout...</source>
         <translation>Crea un nuovo allenamento...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="513"/>
+        <location filename="../MainWindow.cpp" line="627"/>
         <source>Download workouts from ErgDB...</source>
         <translation>Download Allenamento da ErgDB...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="514"/>
+        <location filename="../MainWindow.cpp" line="628"/>
         <source>Import workouts or videos...</source>
         <translation>Importa allenamento o video...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="515"/>
+        <location filename="../MainWindow.cpp" line="629"/>
         <source>Scan disk for videos and workouts...</source>
         <translation>Scansiona disco per video e allenamenti...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="549"/>
+        <location filename="../MainWindow.cpp" line="633"/>
+        <source>Upload Ride to Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="664"/>
         <source>&amp;View</source>
         <translation>&amp;Vista</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="551"/>
+        <location filename="../MainWindow.cpp" line="666"/>
         <source>Toggle Full Screen</source>
         <translation>Cambia Schermo Intero</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="553"/>
+        <location filename="../MainWindow.cpp" line="668"/>
         <source>Show Left Sidebar</source>
         <translation>Mostra Barra Laterale a Sinistra</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="557"/>
+        <location filename="../MainWindow.cpp" line="671"/>
+        <source>Show Compare Pane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="675"/>
         <source>Show Toolbar</source>
         <translation>Mostra Barra Strumenti</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="371"/>
-        <location filename="../MainWindow.cpp" line="562"/>
+        <location filename="../MainWindow.cpp" line="456"/>
         <source>Tabbed View</source>
         <translation>Vista Tabulata</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="576"/>
+        <location filename="../MainWindow.cpp" line="608"/>
+        <source>&amp;Save ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="609"/>
+        <source>D&amp;elete ride...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="610"/>
+        <source>Split &amp;ride...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="611"/>
+        <source>Merge rides...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="617"/>
+        <source>CP and W&apos; Estimator...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="679"/>
+        <source>Show Athlete Tabs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="685"/>
+        <source>Rides</source>
+        <translation type="unfinished">Attivita&apos;</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="686"/>
+        <source>Trends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="693"/>
         <source>Reset Layout</source>
         <translation>Reset Struttura Pagina</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="578"/>
         <source>&amp;Window</source>
-        <translation>&amp;Finestra</translation>
+        <translation type="obsolete">&amp;Finestra</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="585"/>
+        <location filename="../MainWindow.cpp" line="704"/>
         <source>&amp;Help</source>
         <translation>&amp;Aiuto</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="586"/>
+        <location filename="../MainWindow.cpp" line="705"/>
         <source>&amp;User Guide</source>
         <translation>&amp;Guida Utente</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="587"/>
+        <location filename="../MainWindow.cpp" line="706"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>&amp;Logga il bug o richiedi funzionalita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="589"/>
+        <location filename="../MainWindow.cpp" line="708"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>Rigu&amp;ardo GoldenCheetah</translation>
     </message>
@@ -8033,24 +10094,16 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Ripristina alla Versione Salvata</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="361"/>
-        <location filename="../MainWindow.cpp" line="1110"/>
         <source>Delete Activity</source>
-        <translation>Cancella Attivita&apos;</translation>
+        <translation type="obsolete">Cancella Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="360"/>
-        <location filename="../MainWindow.cpp" line="1087"/>
-        <location filename="../MainWindow.cpp" line="1089"/>
-        <location filename="../MainWindow.cpp" line="1099"/>
-        <location filename="../MainWindow.cpp" line="1101"/>
         <source>Split Activity</source>
-        <translation>Dividi Attivita&apos;</translation>
+        <translation type="obsolete">Dividi Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="481"/>
         <source>Tweet Activity</source>
-        <translation>Tweet Attivita&apos;</translation>
+        <translation type="obsolete">Tweet Attivita&apos;</translation>
     </message>
     <message>
         <source>Show Column Chooser</source>
@@ -8089,54 +10142,44 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Non posso rinominare %1 in %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1047"/>
-        <location filename="../MainWindow.cpp" line="1255"/>
+        <location filename="../MainWindow.cpp" line="1258"/>
+        <location filename="../MainWindow.cpp" line="1739"/>
         <source>Import from File</source>
         <translation>Importa da File</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1063"/>
         <source>No Activity To Save</source>
-        <translation>Nessuna Attivita&apos; da Salvare</translation>
+        <translation type="obsolete">Nessuna Attivita&apos; da Salvare</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1064"/>
+        <location filename="../MainWindow.cpp" line="1275"/>
         <source>There is no currently selected ride to save.</source>
         <translation>Non c&apos;e&apos; nessuna attivita&apos; selezionata da salvare.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1087"/>
-        <location filename="../MainWindow.cpp" line="1099"/>
         <source>No activity selected</source>
-        <translation>Nessuna attivita&apos; selezionata</translation>
+        <translation type="obsolete">Nessuna attivita&apos; selezionata</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1089"/>
         <source>Current activity contains no data to split</source>
-        <translation>L&apos;attivita&apos; corrente non contiene dati da dividere</translation>
+        <translation type="obsolete">L&apos;attivita&apos; corrente non contiene dati da dividere</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1101"/>
-        <source>Current activity contains no data to merge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1115"/>
         <source>Are you sure you want to delete the activity:</source>
-        <translation>Sei sicuro di voler cancellare l&apos;attivita&apos;:</translation>
+        <translation type="obsolete">Sei sicuro di voler cancellare l&apos;attivita&apos;:</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1179"/>
+        <location filename="../MainWindow.cpp" line="1663"/>
         <source>Export Metrics</source>
         <translation>Esporta Metriche</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1179"/>
+        <location filename="../MainWindow.cpp" line="1663"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Valori separati da virgola (*.csv)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1285"/>
+        <location filename="../MainWindow.cpp" line="1769"/>
         <source>Workout Directory Invalid</source>
         <translation>Directory Allenamenti non valida</translation>
     </message>
@@ -8181,12 +10224,12 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">PC salavata</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1117"/>
+        <location filename="../MainWindow.cpp" line="1328"/>
         <source>Delete</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="171"/>
+        <location filename="../SaveDialogs.cpp" line="172"/>
         <source>Changes on </source>
         <translation>Cambiato in </translation>
     </message>
@@ -8237,9 +10280,13 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">km</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="120"/>
         <source>Manual Activity Entry</source>
-        <translation>Inserimento Attivita&apos; Manuale</translation>
+        <translation type="obsolete">Inserimento Attivita&apos; Manuale</translation>
+    </message>
+    <message>
+        <location filename="../ManualRideDialog.cpp" line="120"/>
+        <source>Manual Ride Entry</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="137"/>
@@ -8347,14 +10394,18 @@ Athlete CP set to %3 watts</source>
         <translation>Metriche</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="502"/>
+        <location filename="../ManualRideDialog.cpp" line="506"/>
         <source>Unable to save</source>
         <translation>Impossibile salvare</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="503"/>
+        <location filename="../ManualRideDialog.cpp" line="507"/>
+        <source>There is already an ride with the same start time or you do not have permissions to save a file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
-        <translation>Esiste gia&apos; un&apos;attivita&apos; con la stessa ora di partenza o non hai i permessi di salvare il file.</translation>
+        <translation type="obsolete">Esiste gia&apos; un&apos;attivita&apos; con la stessa ora di partenza o non hai i permessi di salvare il file.</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="250"/>
@@ -8378,13 +10429,13 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MaxCadence</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="711"/>
+        <location filename="../BasicRideMetrics.cpp" line="785"/>
         <source>Max Cadence</source>
         <translation>Cadenza Massima</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="712"/>
-        <location filename="../BasicRideMetrics.cpp" line="713"/>
+        <location filename="../BasicRideMetrics.cpp" line="786"/>
+        <location filename="../BasicRideMetrics.cpp" line="787"/>
         <source>rpm</source>
         <translation>rpm</translation>
     </message>
@@ -8392,27 +10443,41 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MaxHr</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="632"/>
+        <location filename="../BasicRideMetrics.cpp" line="706"/>
         <source>Max Heartrate</source>
         <translation>Max FC</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="633"/>
-        <location filename="../BasicRideMetrics.cpp" line="634"/>
+        <location filename="../BasicRideMetrics.cpp" line="707"/>
+        <location filename="../BasicRideMetrics.cpp" line="708"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
 </context>
 <context>
+    <name>MaxMatch</name>
+    <message>
+        <location filename="../WPrime.cpp" line="586"/>
+        <source>Maximum W&apos;bal Match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="588"/>
+        <location filename="../WPrime.cpp" line="589"/>
+        <source>kJ</source>
+        <translation type="unfinished">kJ</translation>
+    </message>
+</context>
+<context>
     <name>MaxPower</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="599"/>
+        <location filename="../BasicRideMetrics.cpp" line="673"/>
         <source>Max Power</source>
         <translation>Potenza Massima</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="600"/>
-        <location filename="../BasicRideMetrics.cpp" line="601"/>
+        <location filename="../BasicRideMetrics.cpp" line="674"/>
+        <location filename="../BasicRideMetrics.cpp" line="675"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -8420,7 +10485,7 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MaxPowerVariance</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="977"/>
+        <location filename="../BasicRideMetrics.cpp" line="1091"/>
         <source>Max Power Variance</source>
         <translation>Varianza Potenza Massima</translation>
     </message>
@@ -8428,17 +10493,17 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MaxSpeed</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="665"/>
+        <location filename="../BasicRideMetrics.cpp" line="739"/>
         <source>Max Speed</source>
         <translation>Velocita&apos; Massima</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="666"/>
+        <location filename="../BasicRideMetrics.cpp" line="740"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="667"/>
+        <location filename="../BasicRideMetrics.cpp" line="741"/>
         <source>mph</source>
         <translation>mph</translation>
     </message>
@@ -8446,25 +10511,39 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MaxTemp</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="752"/>
+        <location filename="../BasicRideMetrics.cpp" line="826"/>
         <source>Max Temp</source>
         <translation>Temperature Massima</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="753"/>
+        <location filename="../BasicRideMetrics.cpp" line="827"/>
         <source>C</source>
         <translation>C</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="754"/>
+        <location filename="../BasicRideMetrics.cpp" line="828"/>
         <source>F</source>
         <translation>F</translation>
     </message>
 </context>
 <context>
+    <name>MaxWPrime</name>
+    <message>
+        <location filename="../WPrime.cpp" line="557"/>
+        <source>Max W&apos; Expended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="559"/>
+        <location filename="../WPrime.cpp" line="560"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
     <name>MeanPowerVariance</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="925"/>
+        <location filename="../BasicRideMetrics.cpp" line="1039"/>
         <source>Average Power Variance</source>
         <translation>Varianza Potenza Media</translation>
     </message>
@@ -8488,43 +10567,59 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Rinomina</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="3800"/>
         <source>Delete</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3460"/>
+        <location filename="../Pages.cpp" line="3801"/>
         <source>Up</source>
         <translation>Su</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3461"/>
+        <location filename="../Pages.cpp" line="3802"/>
         <source>Down</source>
         <translation>Sotto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3448"/>
+        <location filename="../Pages.cpp" line="3787"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3449"/>
+        <location filename="../Pages.cpp" line="3788"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3473"/>
+        <location filename="../Pages.cpp" line="3799"/>
+        <source>Add</source>
+        <translation type="unfinished">Aggiungi</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3814"/>
         <source>Screen Tab</source>
         <translation>Tab Schermo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3474"/>
+        <location filename="../Pages.cpp" line="3815"/>
         <source>Measure</source>
         <translation>Misura</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3475"/>
+        <location filename="../Pages.cpp" line="3816"/>
         <source>Type</source>
         <translation>Tipo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3926"/>
+        <source>New</source>
+        <translation type="unfinished">Nuovo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3928"/>
+        <source>New (%1)</source>
+        <translation type="unfinished">Nuovo (%1)</translation>
     </message>
 </context>
 <context>
@@ -8538,12 +10633,12 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MergeConfirm</name>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="820"/>
+        <location filename="../MergeActivityWizard.cpp" line="822"/>
         <source>Confirm</source>
         <translation type="unfinished">Conferma</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="821"/>
+        <location filename="../MergeActivityWizard.cpp" line="823"/>
         <source>Proceed with merge</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8551,102 +10646,108 @@ Athlete CP set to %3 watts</source>
 <context>
     <name>MergeParameters</name>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="578"/>
+        <location filename="../MergeActivityWizard.cpp" line="580"/>
         <source>Merge Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="579"/>
+        <location filename="../MergeActivityWizard.cpp" line="581"/>
         <source>Configure how file are synchronised</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="586"/>
+        <source>No parameters at this time.
+</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MergeSelect</name>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="605"/>
+        <location filename="../MergeActivityWizard.cpp" line="607"/>
         <source>Select</source>
         <translation type="unfinished">Seleziona</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="606"/>
+        <location filename="../MergeActivityWizard.cpp" line="608"/>
         <source>Select series for merged file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="619"/>
-        <location filename="../MergeActivityWizard.cpp" line="651"/>
+        <location filename="../MergeActivityWizard.cpp" line="621"/>
+        <location filename="../MergeActivityWizard.cpp" line="653"/>
         <source>Power</source>
         <translation type="unfinished">Potenza</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="623"/>
-        <location filename="../MergeActivityWizard.cpp" line="655"/>
+        <location filename="../MergeActivityWizard.cpp" line="625"/>
+        <location filename="../MergeActivityWizard.cpp" line="657"/>
         <source>AltPower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="627"/>
-        <location filename="../MergeActivityWizard.cpp" line="659"/>
+        <location filename="../MergeActivityWizard.cpp" line="629"/>
+        <location filename="../MergeActivityWizard.cpp" line="661"/>
         <source>Heart Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="631"/>
-        <location filename="../MergeActivityWizard.cpp" line="663"/>
+        <location filename="../MergeActivityWizard.cpp" line="633"/>
+        <location filename="../MergeActivityWizard.cpp" line="665"/>
         <source>Speed</source>
         <translation type="unfinished">Velocità</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="635"/>
-        <location filename="../MergeActivityWizard.cpp" line="667"/>
+        <location filename="../MergeActivityWizard.cpp" line="637"/>
+        <location filename="../MergeActivityWizard.cpp" line="669"/>
         <source>Cadence</source>
         <translation type="unfinished">Cadenza</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="639"/>
-        <location filename="../MergeActivityWizard.cpp" line="671"/>
+        <location filename="../MergeActivityWizard.cpp" line="641"/>
+        <location filename="../MergeActivityWizard.cpp" line="673"/>
         <source>Altitude</source>
         <translation type="unfinished">Altitudine</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="643"/>
-        <location filename="../MergeActivityWizard.cpp" line="675"/>
+        <location filename="../MergeActivityWizard.cpp" line="645"/>
+        <location filename="../MergeActivityWizard.cpp" line="677"/>
         <source>GPS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="683"/>
+        <location filename="../MergeActivityWizard.cpp" line="685"/>
         <source>No Power</source>
         <translation type="unfinished">Senza Potenza</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="687"/>
+        <location filename="../MergeActivityWizard.cpp" line="689"/>
         <source>No Alt Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="691"/>
+        <location filename="../MergeActivityWizard.cpp" line="693"/>
         <source>No Heart Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="695"/>
+        <location filename="../MergeActivityWizard.cpp" line="697"/>
         <source>No Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="699"/>
+        <location filename="../MergeActivityWizard.cpp" line="701"/>
         <source>No Cadence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="703"/>
+        <location filename="../MergeActivityWizard.cpp" line="705"/>
         <source>No Altitude</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="707"/>
+        <location filename="../MergeActivityWizard.cpp" line="709"/>
         <source>No GPS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8660,7 +10761,7 @@ Athlete CP set to %3 watts</source>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="177"/>
-        <source>Start of activities</source>
+        <source>Start of rides</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8674,28 +10775,38 @@ Athlete CP set to %3 watts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="459"/>
+        <location filename="../MergeActivityWizard.cpp" line="461"/>
         <source>watts</source>
         <translation type="unfinished">watt</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="461"/>
+        <location filename="../MergeActivityWizard.cpp" line="463"/>
         <source>cad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="463"/>
+        <location filename="../MergeActivityWizard.cpp" line="465"/>
         <source>kph</source>
         <translation type="unfinished">km/h</translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="465"/>
+        <location filename="../MergeActivityWizard.cpp" line="467"/>
         <source>alt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MergeActivityWizard.cpp" line="467"/>
+        <location filename="../MergeActivityWizard.cpp" line="469"/>
         <source>hr</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="470"/>
+        <source>Delay on matching %1 series.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="472"/>
+        <source>Unable to match datas</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8713,7 +10824,22 @@ Athlete CP set to %3 watts</source>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="83"/>
-        <source>Current activity</source>
+        <source>Current ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="88"/>
+        <source>Select the file to merge to this ride.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="158"/>
+        <source>File uploaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="159"/>
+        <source>Second ride</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8722,14 +10848,19 @@ Athlete CP set to %3 watts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../MergeActivityWizard.cpp" line="117"/>
+        <source>All Supported Formats (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="120"/>
+        <source>All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../MergeActivityWizard.cpp" line="122"/>
         <source>Import from File</source>
         <translation type="unfinished">Importa da File</translation>
-    </message>
-    <message>
-        <location filename="../MergeActivityWizard.cpp" line="159"/>
-        <source>Second activity</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="165"/>
@@ -8741,7 +10872,7 @@ Athlete CP set to %3 watts</source>
     <name>MergeWelcome</name>
     <message>
         <location filename="../MergeActivityWizard.cpp" line="60"/>
-        <source>Merge Activity</source>
+        <source>Merge Ride</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8749,21 +10880,27 @@ Athlete CP set to %3 watts</source>
         <source>Lets get started</source>
         <translation type="unfinished">Iniziamo</translation>
     </message>
+    <message>
+        <location filename="../MergeActivityWizard.cpp" line="66"/>
+        <source>This wizard will help you to merge 2 different files
+from the same ride into a single file.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1730"/>
+        <location filename="../Pages.cpp" line="2038"/>
         <source>Fields</source>
         <translation>Campi</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1731"/>
+        <location filename="../Pages.cpp" line="2039"/>
         <source>Notes Keywords</source>
         <translation>Note Parole Chiave</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1732"/>
+        <location filename="../Pages.cpp" line="2040"/>
         <source>Processing</source>
         <translation>In elaborazione</translation>
     </message>
@@ -8775,23 +10912,43 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Ricaricando il database dei campi</translation>
     </message>
     <message>
-        <location filename="../MetricAggregator.cpp" line="134"/>
         <source>Refreshing Ride Statistics...
 Started</source>
-        <translation>Sto Aggiornando la Statistica delle attivita&apos;...
+        <translation type="obsolete">Sto Aggiornando la Statistica delle attivita&apos;...
 In execuzione</translation>
     </message>
     <message>
-        <location filename="../MetricAggregator.cpp" line="163"/>
+        <location filename="../MetricAggregator.cpp" line="135"/>
+        <source>Updating Statistics
+Started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MetricAggregator.cpp" line="166"/>
+        <location filename="../MetricAggregator.cpp" line="516"/>
         <source>Abort</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../MetricAggregator.cpp" line="176"/>
+        <location filename="../MetricAggregator.cpp" line="183"/>
+        <source>%1
+
+Update Statistics
+Elapsed: %2
+
+%3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MetricAggregator.cpp" line="516"/>
+        <source>Update Model Estimates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Refreshing Ride Statistics...
 Elapsed: %1
 %2</source>
-        <translation>Sto Aggiornando la Statistica delle attivita&apos;...
+        <translation type="obsolete">Sto Aggiornando la Statistica delle attivita&apos;...
 Tempo Trascorso: %1
 %2</translation>
     </message>
@@ -8799,14 +10956,33 @@ Tempo Trascorso: %1
 <context>
     <name>MetricConfig</name>
     <message>
-        <location filename="../ConfigDialog.cpp" line="290"/>
+        <location filename="../ConfigDialog.cpp" line="349"/>
+        <source>Bests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="350"/>
         <source>Summary</source>
         <translation>Sommario</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="291"/>
+        <location filename="../ConfigDialog.cpp" line="351"/>
         <source>Intervals</source>
         <translation>Intervalli</translation>
+    </message>
+</context>
+<context>
+    <name>MinWPrime</name>
+    <message>
+        <location filename="../WPrime.cpp" line="528"/>
+        <source>Minimum W&apos; bal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../WPrime.cpp" line="530"/>
+        <location filename="../WPrime.cpp" line="531"/>
+        <source>kJ</source>
+        <translation type="unfinished">kJ</translation>
     </message>
 </context>
 <context>
@@ -8995,173 +11171,173 @@ Tempo Trascorso: %1
 <context>
     <name>ModelWindow</name>
     <message>
-        <location filename="../ModelWindow.cpp" line="34"/>
+        <location filename="../ModelWindow.cpp" line="35"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="35"/>
+        <location filename="../ModelWindow.cpp" line="36"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="36"/>
+        <location filename="../ModelWindow.cpp" line="37"/>
         <source>Heartrate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="37"/>
+        <location filename="../ModelWindow.cpp" line="38"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="38"/>
+        <location filename="../ModelWindow.cpp" line="39"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="39"/>
+        <location filename="../ModelWindow.cpp" line="40"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="40"/>
+        <location filename="../ModelWindow.cpp" line="41"/>
         <source>AEPF</source>
         <translation>AEPF</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="41"/>
+        <location filename="../ModelWindow.cpp" line="42"/>
         <source>CPV</source>
         <translation>CPV</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="42"/>
+        <location filename="../ModelWindow.cpp" line="43"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="43"/>
+        <location filename="../ModelWindow.cpp" line="44"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="44"/>
+        <location filename="../ModelWindow.cpp" line="45"/>
         <source>Latitude</source>
         <translation>Latitudine</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="45"/>
+        <location filename="../ModelWindow.cpp" line="46"/>
         <source>Longitude</source>
         <translation>Longitudine</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="58"/>
+        <location filename="../ModelWindow.cpp" line="57"/>
         <source>No data or bin size too large.</source>
         <translation>Nessun Dato o file bin troppo grande.</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="75"/>
+        <location filename="../ModelWindow.cpp" line="74"/>
         <source>Analyse</source>
         <translation>Analisi</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="82"/>
+        <location filename="../ModelWindow.cpp" line="81"/>
         <source>X-Axis:</source>
         <translation>Asse X:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="88"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Y-Axis:</source>
         <translation>Asse Y:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="94"/>
+        <location filename="../ModelWindow.cpp" line="93"/>
         <source>Z-Axis:</source>
         <translation>Asse Z:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="101"/>
+        <location filename="../ModelWindow.cpp" line="100"/>
         <source>Color:</source>
         <translation>Colore:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="109"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Bin Width:</source>
         <translation>Larghezza contenitore:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="334"/>
+        <location filename="../ModelWindow.cpp" line="343"/>
         <source>User Defined</source>
         <translation>Utente Definito</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="335"/>
+        <location filename="../ModelWindow.cpp" line="344"/>
         <source>Natural Cadence Selection</source>
         <translation>Selezione Cadenza Naturale</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="336"/>
+        <location filename="../ModelWindow.cpp" line="345"/>
         <source>Route Visualisation</source>
         <translation>Visualizzazione Percorso</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="337"/>
+        <location filename="../ModelWindow.cpp" line="346"/>
         <source>Power Fatigue</source>
         <translation>Potenza Fatica</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="338"/>
+        <location filename="../ModelWindow.cpp" line="347"/>
         <source>Impact of Altitude</source>
         <translation>Impatto dell&apos;Altitudine</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="97"/>
-        <location filename="../ModelWindow.cpp" line="105"/>
+        <location filename="../ModelWindow.cpp" line="96"/>
+        <location filename="../ModelWindow.cpp" line="104"/>
         <source>Time at X&amp;Y</source>
         <translation>Orario a X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="104"/>
+        <location filename="../ModelWindow.cpp" line="103"/>
         <source>Power Zone</source>
         <translation>Zona di Potenza</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="125"/>
+        <location filename="../ModelWindow.cpp" line="124"/>
         <source>Bar</source>
         <translation>Barre</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="126"/>
+        <location filename="../ModelWindow.cpp" line="125"/>
         <source>Grid</source>
         <translation>Griglia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="127"/>
+        <location filename="../ModelWindow.cpp" line="126"/>
         <source>Surface</source>
         <translation>Superficie</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="128"/>
+        <location filename="../ModelWindow.cpp" line="127"/>
         <source>Dots</source>
         <translation>Punti</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="132"/>
+        <location filename="../ModelWindow.cpp" line="131"/>
         <source>Ignore Zero</source>
         <translation>Ignora Zero</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="136"/>
+        <location filename="../ModelWindow.cpp" line="135"/>
         <source>Show Grid</source>
         <translation>Mostra Griglia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="140"/>
+        <location filename="../ModelWindow.cpp" line="139"/>
         <source>Frame Intervals</source>
         <translation>Incornicia Intervalli</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="144"/>
+        <location filename="../ModelWindow.cpp" line="143"/>
         <source>Legend</source>
         <translation>Legenda</translation>
     </message>
@@ -9177,7 +11353,7 @@ Tempo Trascorso: %1
 <context>
     <name>MultiDeviceDialog</name>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1527"/>
+        <location filename="../TrainSidebar.cpp" line="1551"/>
         <source>Multiple Device Configuration</source>
         <translation>Configurazione Disposistivi Multipli</translation>
     </message>
@@ -9185,32 +11361,32 @@ Tempo Trascorso: %1
 <context>
     <name>NavigatorCellDelegate</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="895"/>
+        <location filename="../RideNavigator.cpp" line="964"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="910"/>
+        <location filename="../RideNavigator.cpp" line="979"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="912"/>
+        <location filename="../RideNavigator.cpp" line="981"/>
         <source>MMM d, yyyy</source>
         <translation>MMM d, yyyy</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="913"/>
+        <location filename="../RideNavigator.cpp" line="982"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="916"/>
+        <location filename="../RideNavigator.cpp" line="985"/>
         <source>Last updated</source>
         <translation>Ultimo aggiornato</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="919"/>
+        <location filename="../RideNavigator.cpp" line="988"/>
         <source>ddd MMM d, yyyy h:mm AP</source>
         <translation>ddd MMM d, yyyy h:mm AP</translation>
     </message>
@@ -9352,13 +11528,13 @@ Tempo Trascorso: %1
 <context>
     <name>NinetyFivePercentHeartRate</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="801"/>
+        <location filename="../BasicRideMetrics.cpp" line="875"/>
         <source>95% Heartrate</source>
         <translation>95% FC</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="802"/>
-        <location filename="../BasicRideMetrics.cpp" line="803"/>
+        <location filename="../BasicRideMetrics.cpp" line="876"/>
+        <location filename="../BasicRideMetrics.cpp" line="877"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9366,13 +11542,13 @@ Tempo Trascorso: %1
 <context>
     <name>NonZeroPower</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="433"/>
+        <location filename="../BasicRideMetrics.cpp" line="507"/>
         <source>Nonzero Average Power</source>
         <translation>Potenza Media Non nulla</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="434"/>
-        <location filename="../BasicRideMetrics.cpp" line="435"/>
+        <location filename="../BasicRideMetrics.cpp" line="508"/>
+        <location filename="../BasicRideMetrics.cpp" line="509"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9380,7 +11556,7 @@ Tempo Trascorso: %1
 <context>
     <name>OAuthDialog</name>
     <message>
-        <location filename="../OAuthDialog.cpp" line="31"/>
+        <location filename="../OAuthDialog.cpp" line="29"/>
         <source>OAuth</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9388,189 +11564,213 @@ Tempo Trascorso: %1
 <context>
     <name>Pace</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="344"/>
+        <location filename="../BasicRideMetrics.cpp" line="378"/>
         <source>Pace</source>
         <translation>Ritmo</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="346"/>
+        <location filename="../BasicRideMetrics.cpp" line="380"/>
         <source>min/km</source>
         <translation>min/km</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="347"/>
+        <location filename="../BasicRideMetrics.cpp" line="381"/>
         <source>min/mile</source>
         <translation>min/miglio</translation>
     </message>
 </context>
 <context>
+    <name>PacingIndex</name>
+    <message>
+        <location filename="../PeakPower.cpp" line="86"/>
+        <source>Pacing Index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="87"/>
+        <location filename="../PeakPower.cpp" line="89"/>
+        <source>%</source>
+        <translation type="unfinished">%</translation>
+    </message>
+</context>
+<context>
     <name>PasteSpecialDialog</name>
     <message>
-        <location filename="../RideEditor.cpp" line="1921"/>
+        <location filename="../RideEditor.cpp" line="1957"/>
         <source>Paste mode</source>
         <translation>Modo Incolla</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1922"/>
+        <location filename="../RideEditor.cpp" line="1958"/>
         <source>Separator options</source>
         <translation>Opzioni Separatore</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1923"/>
+        <location filename="../RideEditor.cpp" line="1959"/>
         <source>Columns</source>
         <translation>Colonne</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1925"/>
+        <location filename="../RideEditor.cpp" line="1961"/>
         <source>Append</source>
         <translation>Appendi</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1926"/>
+        <location filename="../RideEditor.cpp" line="1962"/>
         <source>Overwrite</source>
         <translation>Sovrascrivi</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1935"/>
+        <location filename="../RideEditor.cpp" line="1971"/>
         <source>First line has headings</source>
         <translation>la prima riga ha l&apos;intestazione</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1936"/>
+        <location filename="../RideEditor.cpp" line="1972"/>
         <source>Tab</source>
         <translation>Tabulazione</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1938"/>
+        <location filename="../RideEditor.cpp" line="1974"/>
         <source>Comma</source>
         <translation>Virgola</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1939"/>
+        <location filename="../RideEditor.cpp" line="1975"/>
         <source>Semi-colon</source>
         <translation>Punto e virgola</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1940"/>
+        <location filename="../RideEditor.cpp" line="1976"/>
         <source>Space</source>
         <translation>Spazio</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1941"/>
+        <location filename="../RideEditor.cpp" line="1977"/>
         <source>Other</source>
         <translation>Altro</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1977"/>
+        <location filename="../RideEditor.cpp" line="2013"/>
         <source>Column Type</source>
         <translation>Tipo Colonna</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1993"/>
+        <location filename="../RideEditor.cpp" line="2029"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1994"/>
+        <location filename="../RideEditor.cpp" line="2030"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2123"/>
-        <location filename="../RideEditor.cpp" line="2212"/>
+        <location filename="../RideEditor.cpp" line="2159"/>
+        <location filename="../RideEditor.cpp" line="2250"/>
         <source>Ignore</source>
         <translation>Ignora</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2126"/>
-        <location filename="../RideEditor.cpp" line="2131"/>
+        <location filename="../RideEditor.cpp" line="2162"/>
+        <location filename="../RideEditor.cpp" line="2167"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2127"/>
-        <location filename="../RideEditor.cpp" line="2132"/>
+        <location filename="../RideEditor.cpp" line="2163"/>
+        <location filename="../RideEditor.cpp" line="2168"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2133"/>
+        <location filename="../RideEditor.cpp" line="2169"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2134"/>
+        <location filename="../RideEditor.cpp" line="2170"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2135"/>
+        <location filename="../RideEditor.cpp" line="2171"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2136"/>
+        <location filename="../RideEditor.cpp" line="2172"/>
         <source>Heartrate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2137"/>
+        <location filename="../RideEditor.cpp" line="2173"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2138"/>
+        <location filename="../RideEditor.cpp" line="2174"/>
         <source>Latitude</source>
         <translation>Latitudine</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2139"/>
+        <location filename="../RideEditor.cpp" line="2175"/>
         <source>Longitude</source>
         <translation>Longitudine</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2140"/>
+        <location filename="../RideEditor.cpp" line="2176"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2141"/>
+        <location filename="../RideEditor.cpp" line="2177"/>
         <source>Headwind</source>
         <translation>Vento Contrario</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2142"/>
+        <location filename="../RideEditor.cpp" line="2178"/>
         <source>Slope</source>
         <translation>Pendenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2143"/>
+        <location filename="../RideEditor.cpp" line="2179"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2144"/>
+        <location filename="../RideEditor.cpp" line="2180"/>
+        <source>SmO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="2181"/>
+        <source>tHb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="2182"/>
         <source>Interval</source>
         <translation>Intervallo</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2178"/>
+        <location filename="../RideEditor.cpp" line="2216"/>
         <source>Paste error</source>
         <translation>Errore incolla</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2179"/>
+        <location filename="../RideEditor.cpp" line="2217"/>
         <source>Please select target cell or cells to paste values into.</source>
         <translation>Per favore seleziona la cella/e di destinazione per incollare i valori.</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2260"/>
+        <location filename="../RideEditor.cpp" line="2298"/>
         <source>Copy/Paste Mismatch</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation>Copia/Incolla discepanze</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="2261"/>
+        <location filename="../RideEditor.cpp" line="2299"/>
         <source>The selected range and available data have different sizes, some data may be lost.
 
 Do you want to continue?</source>
@@ -9589,13 +11789,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower10m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="269"/>
+        <location filename="../PeakPower.cpp" line="361"/>
         <source>10 min Peak Power</source>
         <translation>10 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="270"/>
-        <location filename="../PeakPower.cpp" line="271"/>
+        <location filename="../PeakPower.cpp" line="362"/>
+        <location filename="../PeakPower.cpp" line="363"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9603,13 +11803,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower10s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="116"/>
+        <location filename="../PeakPower.cpp" line="208"/>
         <source>10 sec Peak Power</source>
         <translation>10 sec Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="117"/>
-        <location filename="../PeakPower.cpp" line="118"/>
+        <location filename="../PeakPower.cpp" line="209"/>
+        <location filename="../PeakPower.cpp" line="210"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9617,13 +11817,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower15s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="133"/>
+        <location filename="../PeakPower.cpp" line="225"/>
         <source>15 sec Peak Power</source>
         <translation>15 sec Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="134"/>
-        <location filename="../PeakPower.cpp" line="135"/>
+        <location filename="../PeakPower.cpp" line="226"/>
+        <location filename="../PeakPower.cpp" line="227"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9631,13 +11831,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower1m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="184"/>
+        <location filename="../PeakPower.cpp" line="276"/>
         <source>1 min Peak Power</source>
         <translation>1 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="185"/>
-        <location filename="../PeakPower.cpp" line="186"/>
+        <location filename="../PeakPower.cpp" line="277"/>
+        <location filename="../PeakPower.cpp" line="278"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9645,13 +11845,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower1s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="82"/>
+        <location filename="../PeakPower.cpp" line="174"/>
         <source>1 sec Peak Power</source>
         <translation>1 sec Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="83"/>
-        <location filename="../PeakPower.cpp" line="84"/>
+        <location filename="../PeakPower.cpp" line="175"/>
+        <location filename="../PeakPower.cpp" line="176"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9659,13 +11859,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower20m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="286"/>
+        <location filename="../PeakPower.cpp" line="378"/>
         <source>20 min Peak Power</source>
         <translation>20 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="287"/>
-        <location filename="../PeakPower.cpp" line="288"/>
+        <location filename="../PeakPower.cpp" line="379"/>
+        <location filename="../PeakPower.cpp" line="380"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9673,13 +11873,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower20s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="150"/>
+        <location filename="../PeakPower.cpp" line="242"/>
         <source>20 sec Peak Power</source>
         <translation>20 sec Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="151"/>
-        <location filename="../PeakPower.cpp" line="152"/>
+        <location filename="../PeakPower.cpp" line="243"/>
+        <location filename="../PeakPower.cpp" line="244"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9687,13 +11887,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower2m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="201"/>
+        <location filename="../PeakPower.cpp" line="293"/>
         <source>2 min Peak Power</source>
         <translation>2 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="202"/>
-        <location filename="../PeakPower.cpp" line="203"/>
+        <location filename="../PeakPower.cpp" line="294"/>
+        <location filename="../PeakPower.cpp" line="295"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9701,13 +11901,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower30m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="303"/>
+        <location filename="../PeakPower.cpp" line="395"/>
         <source>30 min Peak Power</source>
         <translation>30 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="304"/>
-        <location filename="../PeakPower.cpp" line="305"/>
+        <location filename="../PeakPower.cpp" line="396"/>
+        <location filename="../PeakPower.cpp" line="397"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9715,13 +11915,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower30s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="167"/>
+        <location filename="../PeakPower.cpp" line="259"/>
         <source>30 sec Peak Power</source>
         <translation>30 sec Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="168"/>
-        <location filename="../PeakPower.cpp" line="169"/>
+        <location filename="../PeakPower.cpp" line="260"/>
+        <location filename="../PeakPower.cpp" line="261"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9729,13 +11929,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower3m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="218"/>
+        <location filename="../PeakPower.cpp" line="310"/>
         <source>3 min Peak Power</source>
         <translation>3 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="219"/>
-        <location filename="../PeakPower.cpp" line="220"/>
+        <location filename="../PeakPower.cpp" line="311"/>
+        <location filename="../PeakPower.cpp" line="312"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9743,13 +11943,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower5m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="235"/>
+        <location filename="../PeakPower.cpp" line="327"/>
         <source>5 min Peak Power</source>
         <translation>5 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="236"/>
-        <location filename="../PeakPower.cpp" line="237"/>
+        <location filename="../PeakPower.cpp" line="328"/>
+        <location filename="../PeakPower.cpp" line="329"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9757,27 +11957,41 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower5s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="99"/>
+        <location filename="../PeakPower.cpp" line="191"/>
         <source>5 sec Peak Power</source>
         <translation>5 sec Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="100"/>
-        <location filename="../PeakPower.cpp" line="101"/>
+        <location filename="../PeakPower.cpp" line="192"/>
+        <location filename="../PeakPower.cpp" line="193"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
 </context>
 <context>
+    <name>PeakPower60m</name>
+    <message>
+        <location filename="../PeakPower.cpp" line="157"/>
+        <source>60 min Peak Power</source>
+        <translation type="unfinished">60 min Picco di Potenza</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="158"/>
+        <location filename="../PeakPower.cpp" line="159"/>
+        <source>watts</source>
+        <translation type="unfinished">watt</translation>
+    </message>
+</context>
+<context>
     <name>PeakPower8m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="252"/>
+        <location filename="../PeakPower.cpp" line="344"/>
         <source>8 min Peak Power</source>
         <translation>8 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="253"/>
-        <location filename="../PeakPower.cpp" line="254"/>
+        <location filename="../PeakPower.cpp" line="345"/>
+        <location filename="../PeakPower.cpp" line="346"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9785,13 +11999,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPower90m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="320"/>
+        <location filename="../PeakPower.cpp" line="412"/>
         <source>90 min Peak Power</source>
         <translation>90 min Potenza di Picco</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="321"/>
-        <location filename="../PeakPower.cpp" line="322"/>
+        <location filename="../PeakPower.cpp" line="413"/>
+        <location filename="../PeakPower.cpp" line="414"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
@@ -9799,13 +12013,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPowerHr10m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="414"/>
+        <location filename="../PeakPower.cpp" line="506"/>
         <source>10 min Peak Power HR</source>
         <translation>10 min Potenza di Picco FC</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="415"/>
-        <location filename="../PeakPower.cpp" line="416"/>
+        <location filename="../PeakPower.cpp" line="507"/>
+        <location filename="../PeakPower.cpp" line="508"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9813,13 +12027,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPowerHr1m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="378"/>
+        <location filename="../PeakPower.cpp" line="470"/>
         <source>1 min Peak Power HR</source>
         <translation>1 min Potenza di Picco FC</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="379"/>
-        <location filename="../PeakPower.cpp" line="380"/>
+        <location filename="../PeakPower.cpp" line="471"/>
+        <location filename="../PeakPower.cpp" line="472"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9827,13 +12041,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPowerHr20m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="432"/>
+        <location filename="../PeakPower.cpp" line="524"/>
         <source>20 min Peak Power HR</source>
         <translation>20 min Potenza di Picco FC</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="433"/>
-        <location filename="../PeakPower.cpp" line="434"/>
+        <location filename="../PeakPower.cpp" line="525"/>
+        <location filename="../PeakPower.cpp" line="526"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9841,13 +12055,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPowerHr30m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="450"/>
+        <location filename="../PeakPower.cpp" line="542"/>
         <source>30 min Peak Power HR</source>
         <translation>30 min Potenza di Picco FC</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="451"/>
-        <location filename="../PeakPower.cpp" line="452"/>
+        <location filename="../PeakPower.cpp" line="543"/>
+        <location filename="../PeakPower.cpp" line="544"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9855,13 +12069,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPowerHr5m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="396"/>
+        <location filename="../PeakPower.cpp" line="488"/>
         <source>5 min Peak Power HR</source>
         <translation>5 min Potenza di Picco FC</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="397"/>
-        <location filename="../PeakPower.cpp" line="398"/>
+        <location filename="../PeakPower.cpp" line="489"/>
+        <location filename="../PeakPower.cpp" line="490"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9869,13 +12083,13 @@ Vuoi continuare?</translation>
 <context>
     <name>PeakPowerHr60m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="469"/>
+        <location filename="../PeakPower.cpp" line="561"/>
         <source>60 min Peak Power HR</source>
         <translation>60 min Potenza di Picco FC</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="470"/>
-        <location filename="../PeakPower.cpp" line="471"/>
+        <location filename="../PeakPower.cpp" line="562"/>
+        <location filename="../PeakPower.cpp" line="563"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
@@ -9980,110 +12194,53 @@ Vuoi continuare?</translation>
 <context>
     <name>PerfPlot</name>
     <message>
-        <location filename="../PerfPlot.cpp" line="68"/>
         <source>Exponentially Weighted Average Stress</source>
-        <translation>Stress Pesato Medio Esponenziale</translation>
+        <translation type="obsolete">Stress Pesato Medio Esponenziale</translation>
     </message>
     <message>
-        <location filename="../PerfPlot.cpp" line="69"/>
         <source>Time (days)</source>
-        <translation>Tempo (giorni)</translation>
+        <translation type="obsolete">Tempo (giorni)</translation>
     </message>
     <message>
-        <location filename="../PerfPlot.cpp" line="70"/>
         <source>Daily Stress</source>
-        <translation>Stress Giornaliero</translation>
-    </message>
-    <message>
-        <location filename="../PerfPlot.cpp" line="146"/>
-        <source>Daily</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerfPlot.cpp" line="166"/>
-        <source>Short Term Stress</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerfPlot.cpp" line="180"/>
-        <source>Long Term Stress</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerfPlot.cpp" line="194"/>
-        <source>Stress Balance</source>
-        <translation></translation>
+        <translation type="obsolete">Stress Giornaliero</translation>
     </message>
 </context>
 <context>
     <name>PerformanceManagerWindow</name>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="49"/>
-        <source>Day:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="50"/>
         <source>no data</source>
-        <translation>no dati</translation>
+        <translation type="obsolete">no dati</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="55"/>
         <source>Use TSS</source>
-        <translation>Usa TSS</translation>
+        <translation type="obsolete">Usa TSS</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="56"/>
-        <source>Use BikeScore</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="57"/>
-        <source>Use DanielsPoints</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="58"/>
-        <source>Use TRIMP</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="59"/>
         <source>Use TRIMP 100</source>
-        <translation>Usa TRIMP 100</translation>
+        <translation type="obsolete">Usa TRIMP 100</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="60"/>
         <source>Use Trimp Zonal</source>
-        <translation>Usa Trimp per Zona</translation>
+        <translation type="obsolete">Usa Trimp per Zona</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="61"/>
         <source>Use Work (Kj)</source>
-        <translation>Usa Lavoro (Kj)</translation>
+        <translation type="obsolete">Usa Lavoro (Kj)</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="62"/>
         <source>Use Distance (km/mi)</source>
-        <translation>Usa Distanza (km/mi)</translation>
+        <translation type="obsolete">Usa Distanza (km/mi)</translation>
     </message>
     <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="83"/>
         <source>to</source>
-        <translation>a</translation>
-    </message>
-    <message>
-        <location filename="../PerformanceManagerWindow.cpp" line="275"/>
-        <location filename="../PerformanceManagerWindow.cpp" line="305"/>
-        <location filename="../PerformanceManagerWindow.cpp" line="307"/>
-        <source>MMM d yyyy</source>
-        <translation></translation>
+        <translation type="obsolete">a</translation>
     </message>
 </context>
 <context>
     <name>PfPvDoubleClickPicker</name>
     <message>
-        <location filename="../PfPvWindow.cpp" line="62"/>
+        <location filename="../PfPvWindow.cpp" line="63"/>
         <source>%1 rpm, %2 watts</source>
         <translation>%1 rpm, %2 watt</translation>
     </message>
@@ -10095,12 +12252,12 @@ Vuoi continuare?</translation>
         <translation type="obsolete">no cadenza</translation>
     </message>
     <message>
-        <location filename="../PfPvPlot.cpp" line="128"/>
+        <location filename="../PfPvPlot.cpp" line="152"/>
         <source>Average Effective Pedal Force (N)</source>
         <translation>Forza Media Effettiva Pedalata (N)</translation>
     </message>
     <message>
-        <location filename="../PfPvPlot.cpp" line="130"/>
+        <location filename="../PfPvPlot.cpp" line="154"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
         <translation>Velocita&apos; Circonferenziale Pedalata (m/s)</translation>
     </message>
@@ -10108,35 +12265,35 @@ Vuoi continuare?</translation>
 <context>
     <name>PfPvWindow</name>
     <message>
-        <location filename="../PfPvWindow.cpp" line="134"/>
+        <location filename="../PfPvWindow.cpp" line="140"/>
         <source>Watts:</source>
         <translation>Watt:</translation>
     </message>
     <message>
-        <location filename="../PfPvWindow.cpp" line="139"/>
+        <location filename="../PfPvWindow.cpp" line="145"/>
         <source>RPM:</source>
         <translation>RPM:</translation>
     </message>
     <message>
-        <location filename="../PfPvWindow.cpp" line="144"/>
+        <location filename="../PfPvWindow.cpp" line="150"/>
         <source>Crank Length (m):</source>
         <translation>Lunghezza Pedivella (m):</translation>
     </message>
     <message>
-        <location filename="../PfPvWindow.cpp" line="84"/>
-        <location filename="../PfPvWindow.cpp" line="149"/>
+        <location filename="../PfPvWindow.cpp" line="89"/>
+        <location filename="../PfPvWindow.cpp" line="155"/>
         <source>Shade zones</source>
         <translation>Ombreggia Zone</translation>
     </message>
     <message>
-        <location filename="../PfPvWindow.cpp" line="90"/>
-        <location filename="../PfPvWindow.cpp" line="157"/>
+        <location filename="../PfPvWindow.cpp" line="95"/>
+        <location filename="../PfPvWindow.cpp" line="163"/>
         <source>Merge intervals</source>
         <translation>Unisci intervalli</translation>
     </message>
     <message>
-        <location filename="../PfPvWindow.cpp" line="94"/>
-        <location filename="../PfPvWindow.cpp" line="162"/>
+        <location filename="../PfPvWindow.cpp" line="99"/>
+        <location filename="../PfPvWindow.cpp" line="168"/>
         <source>Frame intervals</source>
         <translation>Incornicia intervalli</translation>
     </message>
@@ -10144,123 +12301,136 @@ Vuoi continuare?</translation>
 <context>
     <name>PowerHist</name>
     <message>
-        <location filename="../PowerHist.cpp" line="80"/>
-        <location filename="../PowerHist.cpp" line="1043"/>
+        <location filename="../PowerHist.cpp" line="83"/>
+        <location filename="../PowerHist.cpp" line="1882"/>
         <source>Time (minutes)</source>
         <translation>Tempo (minuti)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="80"/>
-        <location filename="../PowerHist.cpp" line="1043"/>
+        <location filename="../PowerHist.cpp" line="83"/>
+        <location filename="../PowerHist.cpp" line="1882"/>
         <source>Time (percent)</source>
         <translation>Tempo (percentuale)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1013"/>
+        <location filename="../PowerHist.cpp" line="1511"/>
+        <source>%1 of Ride (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PowerHist.cpp" line="1513"/>
+        <source>%1 of Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PowerHist.cpp" line="1848"/>
         <source>Power (watts)</source>
         <translation>Potenza (watt)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1012"/>
-        <location filename="../PowerHist.cpp" line="1017"/>
+        <location filename="../PowerHist.cpp" line="1847"/>
+        <location filename="../PowerHist.cpp" line="1852"/>
         <source>Power zone</source>
         <translation>Zone Potenza</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1023"/>
+        <location filename="../PowerHist.cpp" line="1858"/>
         <source>Heartrate (bpm)</source>
         <translation>Frequenza Cardiaca (bpm)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1022"/>
+        <location filename="../PowerHist.cpp" line="1857"/>
         <source>Heartrate zone</source>
         <translation>Frequenza cardiaca (Zone)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="662"/>
-        <location filename="../PowerHist.cpp" line="702"/>
-        <location filename="../PowerHist.cpp" line="717"/>
-        <location filename="../PowerHist.cpp" line="739"/>
-        <location filename="../PowerHist.cpp" line="741"/>
+        <location filename="../PowerHist.cpp" line="1424"/>
+        <location filename="../PowerHist.cpp" line="1464"/>
+        <location filename="../PowerHist.cpp" line="1479"/>
+        <location filename="../PowerHist.cpp" line="1501"/>
+        <location filename="../PowerHist.cpp" line="1503"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="744"/>
+        <location filename="../PowerHist.cpp" line="1506"/>
         <source>Total %1 (%2)</source>
         <translation>Totale %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="746"/>
+        <location filename="../PowerHist.cpp" line="1508"/>
         <source>Total %1</source>
         <translation>Totale %1</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="749"/>
         <source>%1 of Activity (%2)</source>
-        <translation>%1 delle Attivita&apos; (%2)</translation>
+        <translation type="obsolete">%1 delle Attivita&apos; (%2)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="751"/>
         <source>%1 of Activity</source>
-        <translation>%1 delle Attivita&apos;</translation>
+        <translation type="obsolete">%1 delle Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1018"/>
+        <location filename="../PowerHist.cpp" line="1853"/>
         <source>Power (watts/kg)</source>
         <translation>Potenza (watt/kg)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1027"/>
+        <location filename="../PowerHist.cpp" line="1862"/>
+        <source>aPower (watts)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PowerHist.cpp" line="1866"/>
         <source>Cadence (rpm)</source>
         <translation>Cadenza (rpm)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1031"/>
+        <location filename="../PowerHist.cpp" line="1870"/>
         <source>Speed (%1)</source>
         <translation>Velocita&apos; (%1)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1031"/>
+        <location filename="../PowerHist.cpp" line="1870"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1031"/>
+        <location filename="../PowerHist.cpp" line="1870"/>
         <source>mph</source>
         <translation>mi/h</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1035"/>
+        <location filename="../PowerHist.cpp" line="1874"/>
         <source>Torque (%1)</source>
         <translation>Coppia (%1)</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1035"/>
+        <location filename="../PowerHist.cpp" line="1874"/>
         <source>N-m</source>
         <translation>N-m</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1035"/>
+        <location filename="../PowerHist.cpp" line="1874"/>
         <source>ft-lbf</source>
         <translation>feet-lbf</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1039"/>
+        <location filename="../PowerHist.cpp" line="1878"/>
         <source>Unknown data series</source>
         <translation>Serie dati sconosciuta</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="739"/>
-        <location filename="../PowerHist.cpp" line="741"/>
-        <location filename="../PowerHist.cpp" line="1104"/>
-        <location filename="../PowerHist.cpp" line="1118"/>
+        <location filename="../PowerHist.cpp" line="1501"/>
+        <location filename="../PowerHist.cpp" line="1503"/>
+        <location filename="../PowerHist.cpp" line="1943"/>
+        <location filename="../PowerHist.cpp" line="1957"/>
         <source>minutes</source>
         <translation>minuti</translation>
     </message>
     <message>
-        <location filename="../PowerHist.cpp" line="1104"/>
-        <location filename="../PowerHist.cpp" line="1118"/>
+        <location filename="../PowerHist.cpp" line="1943"/>
+        <location filename="../PowerHist.cpp" line="1957"/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -10400,27 +12570,27 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2210"/>
+        <location filename="../Pages.cpp" line="2529"/>
         <source>Processor</source>
         <translation>Processore</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2211"/>
+        <location filename="../Pages.cpp" line="2530"/>
         <source>Apply</source>
         <translation>Applica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2212"/>
+        <location filename="../Pages.cpp" line="2531"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2236"/>
+        <location filename="../Pages.cpp" line="2555"/>
         <source>Manual</source>
         <translation>Manuale</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2237"/>
+        <location filename="../Pages.cpp" line="2556"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
@@ -10428,25 +12598,25 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../PwxRideFile.cpp" line="340"/>
+        <location filename="../PwxRideFile.cpp" line="342"/>
         <location filename="../TcxRideFile.cpp" line="71"/>
         <source>Biking</source>
         <translation>Bici</translation>
     </message>
     <message>
-        <location filename="../PwxRideFile.cpp" line="340"/>
+        <location filename="../PwxRideFile.cpp" line="342"/>
         <location filename="../TcxRideFile.cpp" line="71"/>
         <source>Cycling</source>
         <translation>Ciclismo</translation>
     </message>
     <message>
-        <location filename="../PwxRideFile.cpp" line="340"/>
+        <location filename="../PwxRideFile.cpp" line="342"/>
         <location filename="../TcxRideFile.cpp" line="71"/>
         <source>Cycle</source>
         <translation>Ciclo</translation>
     </message>
     <message>
-        <location filename="../PwxRideFile.cpp" line="340"/>
+        <location filename="../PwxRideFile.cpp" line="342"/>
         <location filename="../TcxRideFile.cpp" line="71"/>
         <source>Bike</source>
         <translation>Bici</translation>
@@ -10632,66 +12802,104 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RealtimePlotWindow</name>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="35"/>
+        <location filename="../RealtimePlotWindow.cpp" line="34"/>
         <source>Show</source>
         <translation>Mostra</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="38"/>
+        <location filename="../RealtimePlotWindow.cpp" line="37"/>
         <source>Heart Rate</source>
         <translation>Frequenza cardiaca</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="42"/>
+        <location filename="../RealtimePlotWindow.cpp" line="41"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="46"/>
+        <location filename="../RealtimePlotWindow.cpp" line="45"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="50"/>
+        <location filename="../RealtimePlotWindow.cpp" line="49"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="54"/>
+        <location filename="../RealtimePlotWindow.cpp" line="53"/>
         <source>Alternate Power</source>
         <translation>Potenza Alternativa</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="58"/>
+        <location filename="../RealtimePlotWindow.cpp" line="57"/>
         <source>30s Power</source>
         <translation>30sec Potenza</translation>
     </message>
     <message>
-        <location filename="../RealtimePlotWindow.cpp" line="62"/>
+        <location filename="../RealtimePlotWindow.cpp" line="61"/>
         <source>Smoothing (5Hz Samples)</source>
         <translation>Arrotondamento (5Hz Campioni)</translation>
     </message>
 </context>
 <context>
+    <name>ReferenceLineDialog</name>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="29"/>
+        <source>References</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="36"/>
+        <source>Reference:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="39"/>
+        <source>Watts</source>
+        <translation type="unfinished">Watt</translation>
+    </message>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="45"/>
+        <source> + </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="154"/>
+        <source>Series</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="154"/>
+        <source>Value</source>
+        <translation type="unfinished">Valore</translation>
+    </message>
+    <message>
+        <location filename="../ReferenceLineDialog.cpp" line="162"/>
+        <source>Power</source>
+        <translation type="unfinished">Potenza</translation>
+    </message>
+</context>
+<context>
     <name>RelWattagePage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="400"/>
-        <location filename="../WorkoutWizard.cpp" line="409"/>
+        <location filename="../WorkoutWizard.cpp" line="405"/>
+        <location filename="../WorkoutWizard.cpp" line="414"/>
         <source>% of FTP</source>
         <translation>% del FTP</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="401"/>
+        <location filename="../WorkoutWizard.cpp" line="406"/>
         <source>Time (minutes)</source>
         <translation>Tempo (minuti)</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="408"/>
+        <location filename="../WorkoutWizard.cpp" line="413"/>
         <source>Minutes</source>
         <translation>Minuti</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="410"/>
+        <location filename="../WorkoutWizard.cpp" line="415"/>
         <source>Wattage</source>
         <translation>Wattage</translation>
     </message>
@@ -10725,7 +12933,7 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>ResponseIndex</name>
     <message>
-        <location filename="../BikeScore.cpp" line="237"/>
+        <location filename="../BikeScore.cpp" line="409"/>
         <source>Response Index</source>
         <translation>Indice Risposta</translation>
     </message>
@@ -10756,9 +12964,9 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideDelegate</name>
     <message>
-        <location filename="../RideImportWizard.cpp" line="969"/>
-        <location filename="../RideImportWizard.cpp" line="1006"/>
-        <location filename="../RideImportWizard.cpp" line="1022"/>
+        <location filename="../RideImportWizard.cpp" line="972"/>
+        <location filename="../RideImportWizard.cpp" line="1009"/>
+        <location filename="../RideImportWizard.cpp" line="1025"/>
         <source>dd MMM yyyy</source>
         <translation>dd MMM yyyy</translation>
     </message>
@@ -10766,192 +12974,234 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideEditor</name>
     <message>
-        <location filename="../RideEditor.cpp" line="88"/>
+        <location filename="../RideEditor.cpp" line="86"/>
         <source>Save</source>
         <translation>Salva</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="98"/>
-        <location filename="../RideEditor.cpp" line="523"/>
+        <location filename="../RideEditor.cpp" line="96"/>
+        <location filename="../RideEditor.cpp" line="555"/>
         <source>Undo</source>
         <translation>Indietro</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="103"/>
-        <location filename="../RideEditor.cpp" line="529"/>
+        <location filename="../RideEditor.cpp" line="101"/>
+        <location filename="../RideEditor.cpp" line="561"/>
         <source>Redo</source>
         <translation>Ri imposta</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="110"/>
+        <location filename="../RideEditor.cpp" line="108"/>
         <source>Find</source>
         <translation>Trova</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="115"/>
+        <location filename="../RideEditor.cpp" line="113"/>
         <source>Anomalies</source>
         <translation>Anomalie</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="173"/>
-        <location filename="../RideEditor.cpp" line="757"/>
+        <location filename="../RideEditor.cpp" line="198"/>
+        <location filename="../RideEditor.cpp" line="789"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="174"/>
-        <location filename="../RideEditor.cpp" line="758"/>
+        <location filename="../RideEditor.cpp" line="199"/>
+        <location filename="../RideEditor.cpp" line="790"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="175"/>
-        <location filename="../RideEditor.cpp" line="759"/>
+        <location filename="../RideEditor.cpp" line="200"/>
+        <location filename="../RideEditor.cpp" line="791"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="176"/>
-        <location filename="../RideEditor.cpp" line="768"/>
+        <location filename="../RideEditor.cpp" line="201"/>
+        <location filename="../RideEditor.cpp" line="800"/>
         <source>Heartrate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="177"/>
-        <location filename="../RideEditor.cpp" line="760"/>
+        <location filename="../RideEditor.cpp" line="202"/>
+        <location filename="../RideEditor.cpp" line="792"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="178"/>
-        <location filename="../RideEditor.cpp" line="761"/>
+        <location filename="../RideEditor.cpp" line="203"/>
+        <location filename="../RideEditor.cpp" line="793"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="179"/>
-        <location filename="../RideEditor.cpp" line="762"/>
+        <location filename="../RideEditor.cpp" line="204"/>
+        <location filename="../RideEditor.cpp" line="794"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="180"/>
-        <location filename="../RideEditor.cpp" line="765"/>
+        <location filename="../RideEditor.cpp" line="205"/>
+        <location filename="../RideEditor.cpp" line="797"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="181"/>
-        <location filename="../RideEditor.cpp" line="763"/>
+        <location filename="../RideEditor.cpp" line="206"/>
+        <location filename="../RideEditor.cpp" line="795"/>
         <source>Latitude</source>
         <translation>Latitudine</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="182"/>
-        <location filename="../RideEditor.cpp" line="764"/>
+        <location filename="../RideEditor.cpp" line="207"/>
+        <location filename="../RideEditor.cpp" line="796"/>
         <source>Longitude</source>
         <translation>Longitudine</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="183"/>
-        <location filename="../RideEditor.cpp" line="766"/>
+        <location filename="../RideEditor.cpp" line="208"/>
+        <location filename="../RideEditor.cpp" line="798"/>
         <source>Headwind</source>
         <translatorcomment>これなにがいいだろう</translatorcomment>
         <translation>Vento Contrario</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="184"/>
-        <location filename="../RideEditor.cpp" line="769"/>
+        <location filename="../RideEditor.cpp" line="209"/>
+        <location filename="../RideEditor.cpp" line="801"/>
         <source>Slope</source>
         <translation>Pendenza</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="185"/>
-        <location filename="../RideEditor.cpp" line="770"/>
+        <location filename="../RideEditor.cpp" line="210"/>
+        <location filename="../RideEditor.cpp" line="802"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="186"/>
-        <location filename="../RideEditor.cpp" line="767"/>
+        <location filename="../RideEditor.cpp" line="211"/>
+        <location filename="../RideEditor.cpp" line="803"/>
+        <source>Left/Right Balance</source>
+        <translation type="unfinished">Bilancio Sinistro/Destro</translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="212"/>
+        <location filename="../RideEditor.cpp" line="804"/>
+        <source>Left TE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="213"/>
+        <location filename="../RideEditor.cpp" line="805"/>
+        <source>Right TE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="214"/>
+        <location filename="../RideEditor.cpp" line="806"/>
+        <source>Left PS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="215"/>
+        <location filename="../RideEditor.cpp" line="807"/>
+        <source>Right PS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="216"/>
+        <location filename="../RideEditor.cpp" line="808"/>
+        <source>SmO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="217"/>
+        <location filename="../RideEditor.cpp" line="809"/>
+        <source>tHb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideEditor.cpp" line="218"/>
+        <location filename="../RideEditor.cpp" line="799"/>
         <source>Interval</source>
         <translation>Intervallo</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="537"/>
+        <location filename="../RideEditor.cpp" line="569"/>
         <source>Cut</source>
         <translation>Taglia</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="543"/>
+        <location filename="../RideEditor.cpp" line="575"/>
         <source>Copy</source>
         <translation>Copia</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="549"/>
+        <location filename="../RideEditor.cpp" line="581"/>
         <source>Paste</source>
         <translation>Incolla</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="555"/>
+        <location filename="../RideEditor.cpp" line="587"/>
         <source>Paste Special...</source>
         <translation>Incolla Speciale...</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="560"/>
+        <location filename="../RideEditor.cpp" line="592"/>
         <source>Clear Contents</source>
         <translation>Cancella Contenuto</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="583"/>
+        <location filename="../RideEditor.cpp" line="615"/>
         <source>Smooth Anomaly</source>
         <translation>Approssima Anomalia</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="628"/>
+        <location filename="../RideEditor.cpp" line="660"/>
         <source>Delete Row</source>
         <translation>Cancella Riga</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="633"/>
+        <location filename="../RideEditor.cpp" line="665"/>
         <source>Insert Row</source>
         <translation>Inserisci Riga</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="640"/>
+        <location filename="../RideEditor.cpp" line="672"/>
         <source>Remove Column</source>
         <translation>Rmuovi Colonna</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="645"/>
+        <location filename="../RideEditor.cpp" line="677"/>
         <source>Add Column</source>
         <translation>Aggiungi Colonna</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="796"/>
-        <location filename="../RideEditor.cpp" line="811"/>
-        <location filename="../RideEditor.cpp" line="820"/>
-        <location filename="../RideEditor.cpp" line="829"/>
+        <location filename="../RideEditor.cpp" line="834"/>
+        <location filename="../RideEditor.cpp" line="849"/>
+        <location filename="../RideEditor.cpp" line="858"/>
+        <location filename="../RideEditor.cpp" line="867"/>
         <source>Paste error</source>
         <translation>Incolla errore</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="797"/>
+        <location filename="../RideEditor.cpp" line="835"/>
         <source>Please select target cell or cells to paste values into.</source>
         <translation>Per favore seleziona la o le celle di destinazione per copiare valori.</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="812"/>
+        <location filename="../RideEditor.cpp" line="850"/>
         <source>Copy buffer and selected area are diffferent sizes.</source>
         <translation>Buffer copiato e aree selezionate sono di dimensioni diverse.</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="821"/>
+        <location filename="../RideEditor.cpp" line="859"/>
         <source>Copy buffer has more columns than available.</source>
         <translation>Buffer di copia ha piu&apos; colonne delle disponibili.</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="830"/>
+        <location filename="../RideEditor.cpp" line="868"/>
         <source>Copy buffer has more rows than available.</source>
         <translation>Buffer di copia ha piu&apos; righe delle disponibili.</translation>
     </message>
@@ -10959,208 +13209,328 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideFile</name>
     <message>
-        <location filename="../RideFile.cpp" line="77"/>
+        <location filename="../RideFile.cpp" line="114"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="78"/>
+        <location filename="../RideFile.cpp" line="115"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="79"/>
+        <location filename="../RideFile.cpp" line="116"/>
         <source>Heartrate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="80"/>
+        <location filename="../RideFile.cpp" line="117"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="81"/>
+        <location filename="../RideFile.cpp" line="118"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="82"/>
+        <location filename="../RideFile.cpp" line="119"/>
+        <source>Acceleration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="120"/>
+        <source>Power %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="121"/>
+        <source>Cadence %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="122"/>
+        <source>Torque %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="123"/>
+        <source>Heartrate %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="124"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="83"/>
+        <location filename="../RideFile.cpp" line="125"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="84"/>
+        <location filename="../RideFile.cpp" line="126"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="85"/>
+        <location filename="../RideFile.cpp" line="127"/>
+        <source>aPower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="128"/>
+        <source>aTISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="129"/>
         <source>Normalized Power</source>
         <translation>Potenza Normalizzata</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="86"/>
+        <location filename="../RideFile.cpp" line="130"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="87"/>
+        <location filename="../RideFile.cpp" line="131"/>
         <source>Longitude</source>
         <translation>Longitudine</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="88"/>
+        <location filename="../RideFile.cpp" line="132"/>
         <source>Latitude</source>
         <translation>Latitudine</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="89"/>
+        <location filename="../RideFile.cpp" line="133"/>
         <source>Headwind</source>
         <translation>Vento Contrario</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="90"/>
+        <location filename="../RideFile.cpp" line="134"/>
         <source>Slope</source>
         <translation>Pendenza</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="91"/>
+        <location filename="../RideFile.cpp" line="135"/>
         <source>Temperature</source>
         <translation>Temperatura</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="92"/>
+        <location filename="../RideFile.cpp" line="136"/>
         <source>Left/Right Balance</source>
         <translation>Bilancio Sinistro/Destro</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="93"/>
-        <location filename="../RideFile.cpp" line="122"/>
+        <location filename="../RideFile.cpp" line="137"/>
+        <source>Left Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="138"/>
+        <source>Right Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="139"/>
+        <source>Left Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="140"/>
+        <source>Righ Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="141"/>
+        <location filename="../RideFile.cpp" line="225"/>
         <source>Interval</source>
         <translation>Intervallo</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="94"/>
+        <location filename="../RideFile.cpp" line="142"/>
         <source>VAM</source>
         <translation>VAM</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="95"/>
+        <location filename="../RideFile.cpp" line="143"/>
         <source>Watts per Kilogram</source>
         <translation>Watts Per kg</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="96"/>
-        <location filename="../RideFile.cpp" line="125"/>
+        <location filename="../RideFile.cpp" line="144"/>
+        <source>W&apos; balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="145"/>
+        <source>SmO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="146"/>
+        <source>THb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="147"/>
+        <location filename="../RideFile.cpp" line="231"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="106"/>
+        <location filename="../RideFile.cpp" line="198"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="107"/>
+        <location filename="../RideFile.cpp" line="199"/>
         <source>rpm</source>
         <translation>rpm</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="108"/>
+        <location filename="../RideFile.cpp" line="200"/>
+        <source>rpm/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="201"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="109"/>
+        <location filename="../RideFile.cpp" line="202"/>
+        <source>bpm/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="203"/>
         <source>km</source>
         <translation>km</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="109"/>
+        <location filename="../RideFile.cpp" line="203"/>
         <source>miles</source>
         <translation>miglia</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="110"/>
-        <location filename="../RideFile.cpp" line="118"/>
+        <location filename="../RideFile.cpp" line="204"/>
+        <location filename="../RideFile.cpp" line="217"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="110"/>
+        <location filename="../RideFile.cpp" line="204"/>
         <source>mph</source>
         <translation>mph</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="111"/>
+        <location filename="../RideFile.cpp" line="205"/>
+        <source>m/s/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="206"/>
         <source>N</source>
         <translation>N</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="112"/>
-        <location filename="../RideFile.cpp" line="113"/>
-        <location filename="../RideFile.cpp" line="114"/>
+        <location filename="../RideFile.cpp" line="207"/>
+        <source>N/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="208"/>
+        <location filename="../RideFile.cpp" line="210"/>
+        <location filename="../RideFile.cpp" line="211"/>
+        <location filename="../RideFile.cpp" line="213"/>
         <source>watts</source>
         <translation>watt</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="115"/>
+        <location filename="../RideFile.cpp" line="209"/>
+        <source>watts/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="212"/>
+        <source>TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="214"/>
         <source>metres</source>
         <translation>Metri</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="115"/>
+        <location filename="../RideFile.cpp" line="214"/>
         <source>feet</source>
         <translation>piedi</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="116"/>
+        <location filename="../RideFile.cpp" line="215"/>
         <source>lon</source>
         <translation>lon</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="117"/>
+        <location filename="../RideFile.cpp" line="216"/>
         <source>lat</source>
         <translation>lat</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="119"/>
-        <location filename="../RideFile.cpp" line="121"/>
+        <location filename="../RideFile.cpp" line="218"/>
+        <location filename="../RideFile.cpp" line="220"/>
+        <location filename="../RideFile.cpp" line="221"/>
+        <location filename="../RideFile.cpp" line="222"/>
+        <location filename="../RideFile.cpp" line="223"/>
+        <location filename="../RideFile.cpp" line="224"/>
+        <location filename="../RideFile.cpp" line="229"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="120"/>
+        <location filename="../RideFile.cpp" line="219"/>
         <source>Â°C</source>
         <translation>Â°C</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="123"/>
+        <location filename="../RideFile.cpp" line="226"/>
         <source>meters per hour</source>
         <translation>metri per ora</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="124"/>
+        <location filename="../RideFile.cpp" line="227"/>
         <source>watts/kg</source>
         <translation>watt/kg</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="124"/>
+        <location filename="../RideFile.cpp" line="227"/>
         <source>watts/lb</source>
         <translation>watt/lb</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="870"/>
-        <source>Invalid Activity File Name</source>
-        <translation type="unfinished">Nome File Attivita&apos; Non Valido</translation>
+        <location filename="../RideFile.cpp" line="228"/>
+        <source>joules</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="871"/>
+        <location filename="../RideFile.cpp" line="230"/>
+        <source>g/dL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="1128"/>
+        <source>Invalid Ride File Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Activity File Name</source>
+        <translation type="obsolete">Nome File Attivita&apos; Non Valido</translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="1129"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -11243,6 +13613,36 @@ Salta il file...</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="129"/>
+        <source>Left TE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="133"/>
+        <source>Right TE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="137"/>
+        <source>Left PS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="141"/>
+        <source>Right PS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="145"/>
+        <source>SmO2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="149"/>
+        <source>tHb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideFileTableModel.cpp" line="153"/>
         <source>Interval</source>
         <translation>Intervallo</translation>
     </message>
@@ -11382,7 +13782,7 @@ Salta il file...</translation>
         <location filename="../RideImportWizard.cpp" line="510"/>
         <location filename="../RideImportWizard.cpp" line="721"/>
         <location filename="../RideImportWizard.cpp" line="760"/>
-        <location filename="../RideImportWizard.cpp" line="892"/>
+        <location filename="../RideImportWizard.cpp" line="895"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
@@ -11467,56 +13867,56 @@ Salta il file...</translation>
         <translation>Salvando...</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="838"/>
+        <location filename="../RideImportWizard.cpp" line="839"/>
         <source>Error - Source is Target</source>
         <translation>Errore - La sorgente e&apos; la destinazione</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="849"/>
+        <location filename="../RideImportWizard.cpp" line="850"/>
         <source>Overwriting file...</source>
         <translation>Sto Sovrascrivendo il file...</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="851"/>
+        <location filename="../RideImportWizard.cpp" line="852"/>
         <source>/</source>
         <translation>/</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="851"/>
+        <location filename="../RideImportWizard.cpp" line="852"/>
         <source>.tmp</source>
         <translation>.tmp</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="825"/>
-        <location filename="../RideImportWizard.cpp" line="858"/>
+        <location filename="../RideImportWizard.cpp" line="859"/>
         <source>File Overwritten</source>
         <translation>File sovrascritto</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="861"/>
-        <location filename="../RideImportWizard.cpp" line="863"/>
+        <location filename="../RideImportWizard.cpp" line="862"/>
+        <location filename="../RideImportWizard.cpp" line="864"/>
         <source>Error - overwrite failed</source>
         <translation>Errore - sovrascrittura non riuscita</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="794"/>
-        <location filename="../RideImportWizard.cpp" line="866"/>
+        <location filename="../RideImportWizard.cpp" line="867"/>
         <source>Error - File exists</source>
         <translation>Errore - file già esistente</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="869"/>
+        <location filename="../RideImportWizard.cpp" line="870"/>
         <source>Saving file...</source>
         <translation>Salvando il file...</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="827"/>
-        <location filename="../RideImportWizard.cpp" line="872"/>
+        <location filename="../RideImportWizard.cpp" line="873"/>
         <source>File Saved</source>
         <translation>File salvato</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="880"/>
+        <location filename="../RideImportWizard.cpp" line="883"/>
         <source>Error - copy failed</source>
         <translation>Errorre - copia non riuscita</translation>
     </message>
@@ -11533,13 +13933,13 @@ Salta il file...</translation>
         <translation type="obsolete">Completato</translation>
     </message>
     <message>
-        <location filename="../RideImportWizard.cpp" line="897"/>
+        <location filename="../RideImportWizard.cpp" line="900"/>
         <source>Import Complete. %1 of %2 successful.</source>
         <translation>Importa Completato. %1 di %2 con successo.</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="708"/>
-        <location filename="../RideImportWizard.cpp" line="902"/>
+        <location filename="../RideImportWizard.cpp" line="905"/>
         <source>Finish</source>
         <translation>Finito</translation>
     </message>
@@ -11547,57 +13947,57 @@ Salta il file...</translation>
 <context>
     <name>RideNavigator</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="33"/>
+        <location filename="../RideNavigator.cpp" line="39"/>
         <source>*|Workout Code|TSS|Date|</source>
         <translation>*|Codice Allenamento|TSS|Data|</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="168"/>
-        <location filename="../RideNavigator.cpp" line="169"/>
+        <location filename="../RideNavigator.cpp" line="222"/>
+        <location filename="../RideNavigator.cpp" line="223"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="170"/>
-        <location filename="../RideNavigator.cpp" line="171"/>
+        <location filename="../RideNavigator.cpp" line="224"/>
+        <location filename="../RideNavigator.cpp" line="225"/>
         <source>Last updated</source>
         <translation>Ultimo aggiornato</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="172"/>
-        <location filename="../RideNavigator.cpp" line="173"/>
+        <location filename="../RideNavigator.cpp" line="226"/>
+        <location filename="../RideNavigator.cpp" line="227"/>
         <source>Date</source>
         <translation>Data</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="174"/>
-        <location filename="../RideNavigator.cpp" line="175"/>
+        <location filename="../RideNavigator.cpp" line="228"/>
+        <location filename="../RideNavigator.cpp" line="229"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="176"/>
-        <location filename="../RideNavigator.cpp" line="177"/>
+        <location filename="../RideNavigator.cpp" line="230"/>
+        <location filename="../RideNavigator.cpp" line="231"/>
         <source>Config Checksum</source>
         <translation>Configura Checksum</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="527"/>
+        <location filename="../RideNavigator.cpp" line="586"/>
         <source>Remove Column</source>
         <translation>Rimuovi Colonna</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="533"/>
+        <location filename="../RideNavigator.cpp" line="592"/>
         <source>Column Chooser</source>
         <translation>Scegli Colonne</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="538"/>
+        <location filename="../RideNavigator.cpp" line="597"/>
         <source>Do Not Show in Groups</source>
         <translation>Non Mostrare in Gruppi</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="538"/>
+        <location filename="../RideNavigator.cpp" line="597"/>
         <source>Show In Groups</source>
         <translation>Mostra in Gruppi</translation>
     </message>
@@ -11605,117 +14005,180 @@ Salta il file...</translation>
 <context>
     <name>RideSummaryWindow</name>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="199"/>
+        <location filename="../RideSummaryWindow.cpp" line="301"/>
         <source>&lt;p&gt;Couldn&apos;t read file &quot;</source>
         <translation>&lt;p&gt;Non posso legger il file &quot;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="168"/>
+        <location filename="../RideSummaryWindow.cpp" line="265"/>
         <source>dddd MMMM d, yyyy, h:mm AP</source>
         <translation>dddd MMMM d, yyyy, h:mm AP</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="62"/>
+        <location filename="../RideSummaryWindow.cpp" line="61"/>
         <source>Filter</source>
         <translation>Filtro</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="66"/>
+        <location filename="../RideSummaryWindow.cpp" line="65"/>
         <source>Date range</source>
         <translation>Intervallo Date</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="211"/>
+        <location filename="../RideSummaryWindow.cpp" line="314"/>
         <source>Device Type: </source>
         <translation>Tipo di Dispositivo: </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="562"/>
-        <location filename="../RideSummaryWindow.cpp" line="568"/>
         <source> activity</source>
-        <translation> attivita&apos;</translation>
+        <translation type="obsolete"> attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="562"/>
-        <location filename="../RideSummaryWindow.cpp" line="568"/>
         <source> activities</source>
-        <translation> attivita&apos;</translation>
+        <translation type="obsolete"> attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="214"/>
+        <location filename="../RideSummaryWindow.cpp" line="317"/>
+        <location filename="../RideSummaryWindow.cpp" line="973"/>
         <source>Totals</source>
         <translation>Totale</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="214"/>
+        <location filename="../RideSummaryWindow.cpp" line="317"/>
+        <location filename="../RideSummaryWindow.cpp" line="973"/>
         <source>Averages</source>
         <translation>Medie</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="214"/>
+        <location filename="../RideSummaryWindow.cpp" line="317"/>
+        <location filename="../RideSummaryWindow.cpp" line="973"/>
         <source>Maximums</source>
         <translation>Massimi</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="214"/>
+        <location filename="../RideSummaryWindow.cpp" line="957"/>
+        <location filename="../RideSummaryWindow.cpp" line="1621"/>
+        <source>&lt;br&gt;FTP, TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="973"/>
         <source>Metrics*</source>
         <translation>Metriche</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="340"/>
+        <location filename="../RideSummaryWindow.cpp" line="451"/>
+        <location filename="../RideSummaryWindow.cpp" line="1125"/>
+        <location filename="../RideSummaryWindow.cpp" line="1398"/>
         <source>^(Average|Max) </source>
         <translation>^(Media|Massimo)</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="343"/>
-        <location filename="../RideSummaryWindow.cpp" line="494"/>
-        <location filename="../RideSummaryWindow.cpp" line="516"/>
-        <location filename="../RideSummaryWindow.cpp" line="600"/>
-        <location filename="../RideSummaryWindow.cpp" line="608"/>
+        <location filename="../RideSummaryWindow.cpp" line="219"/>
+        <location filename="../RideSummaryWindow.cpp" line="247"/>
+        <source>Compare</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="256"/>
+        <source>Summary</source>
+        <translation type="unfinished">Sommario</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="317"/>
+        <source>Metrics</source>
+        <translation type="unfinished">Metriche</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="454"/>
+        <location filename="../RideSummaryWindow.cpp" line="779"/>
+        <location filename="../RideSummaryWindow.cpp" line="799"/>
+        <location filename="../RideSummaryWindow.cpp" line="890"/>
+        <location filename="../RideSummaryWindow.cpp" line="898"/>
+        <location filename="../RideSummaryWindow.cpp" line="1163"/>
+        <location filename="../RideSummaryWindow.cpp" line="1183"/>
+        <location filename="../RideSummaryWindow.cpp" line="1431"/>
+        <location filename="../RideSummaryWindow.cpp" line="1451"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="412"/>
+        <location filename="../RideSummaryWindow.cpp" line="558"/>
+        <source>Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="590"/>
+        <source>&lt;h3&gt;Athlete Bests&lt;/h3&gt;
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="626"/>
+        <source>d MMM yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="679"/>
+        <location filename="../RideSummaryWindow.cpp" line="1214"/>
+        <location filename="../RideSummaryWindow.cpp" line="1482"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zone di Potenza&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="447"/>
+        <location filename="../RideSummaryWindow.cpp" line="727"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Zone Frequenza Cardiaca&lt;/h3&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="577"/>
+        <location filename="../RideSummaryWindow.cpp" line="852"/>
+        <location filename="../RideSummaryWindow.cpp" line="858"/>
+        <source> ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="852"/>
+        <location filename="../RideSummaryWindow.cpp" line="858"/>
+        <source> rides</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="867"/>
         <source>&lt;td align=&quot;center&quot;&gt;Date&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Data&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="594"/>
+        <location filename="../RideSummaryWindow.cpp" line="884"/>
         <source>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="665"/>
+        <location filename="../RideSummaryWindow.cpp" line="954"/>
+        <location filename="../RideSummaryWindow.cpp" line="1618"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
         <translation>&lt;br&gt;BikeScore e&apos; un marchio registrato da Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="668"/>
+        <location filename="../RideSummaryWindow.cpp" line="1286"/>
+        <location filename="../RideSummaryWindow.cpp" line="1554"/>
+        <source>&lt;h3&gt;Heartrate Zones&lt;/h3&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
-        <translation>&lt;br&gt;TSS, NP e IF sono marchi registrati da Peaksware LLC&lt;/center&gt;</translation>
+        <translation type="obsolete">&lt;br&gt;TSS, NP e IF sono marchi registrati da Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
         <source>^Average </source>
         <translation type="obsolete">^Media </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="465"/>
+        <location filename="../RideSummaryWindow.cpp" line="745"/>
         <source>Intervals</source>
         <translation>Intervalli</translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="655"/>
+        <location filename="../RideSummaryWindow.cpp" line="944"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Errore nel leggere il file:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
@@ -11762,47 +14225,47 @@ Salta il file...</translation>
 <context>
     <name>RideWithGpsUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="509"/>
+        <location filename="../ShareDialog.cpp" line="519"/>
         <source>This Ride is marked as already on RideWithGPS. Are you sure you want to upload it?</source>
         <translation type="unfinished">Questa Attivita&apos; e&apos; marcata come gia&apos; presente su RideWithGPS. Sei sicuro di volerla aggiungerla?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="512"/>
+        <location filename="../ShareDialog.cpp" line="522"/>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="513"/>
+        <location filename="../ShareDialog.cpp" line="523"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="534"/>
+        <location filename="../ShareDialog.cpp" line="544"/>
         <source>Error uploading to RideWithGPS</source>
         <translation type="unfinished">Errore upload in RideWithGPS</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="538"/>
+        <location filename="../ShareDialog.cpp" line="548"/>
         <source>Successfully uploaded to RideWithGPS</source>
         <translation type="unfinished">Upload con successo in RideWithGPS</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="545"/>
+        <location filename="../ShareDialog.cpp" line="555"/>
         <source>Upload ride...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="633"/>
+        <location filename="../ShareDialog.cpp" line="643"/>
         <source>Upload ride... Sending to RideWithGPS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="643"/>
+        <location filename="../ShareDialog.cpp" line="653"/>
         <source>Upload to RideWithGPS finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="661"/>
+        <location filename="../ShareDialog.cpp" line="671"/>
         <source> Error from RideWithGPS: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -11810,12 +14273,12 @@ Salta il file...</translation>
 <context>
     <name>RiderPage</name>
     <message>
-        <location filename="../Pages.cpp" line="699"/>
+        <location filename="../Pages.cpp" line="706"/>
         <source>Nickname</source>
         <translation>Soprannome</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="700"/>
+        <location filename="../Pages.cpp" line="707"/>
         <source>Date of Birth</source>
         <translation>Data di nascita</translation>
     </message>
@@ -11824,66 +14287,66 @@ Salta il file...</translation>
         <translation type="obsolete">Sesso</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="701"/>
+        <location filename="../Pages.cpp" line="708"/>
         <source>Sex</source>
         <translation>Sesso</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="702"/>
+        <location filename="../Pages.cpp" line="709"/>
         <source>Unit</source>
         <translation>Unita&apos;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="703"/>
+        <location filename="../Pages.cpp" line="710"/>
         <source>Bio</source>
         <translation>Bio</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="705"/>
-        <location filename="../Pages.cpp" line="795"/>
-        <location filename="../Pages.cpp" line="800"/>
+        <location filename="../Pages.cpp" line="712"/>
+        <location filename="../Pages.cpp" line="802"/>
+        <location filename="../Pages.cpp" line="807"/>
         <source>Weight (%1)</source>
         <translation>Peso (%1)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="705"/>
-        <location filename="../Pages.cpp" line="795"/>
+        <location filename="../Pages.cpp" line="712"/>
+        <location filename="../Pages.cpp" line="802"/>
         <source>kg</source>
         <translation>kg</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="705"/>
-        <location filename="../Pages.cpp" line="800"/>
+        <location filename="../Pages.cpp" line="712"/>
+        <location filename="../Pages.cpp" line="807"/>
         <source>lb</source>
         <translation>libbre</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="715"/>
+        <location filename="../Pages.cpp" line="722"/>
         <source>Male</source>
         <translation>Uomo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="716"/>
+        <location filename="../Pages.cpp" line="723"/>
         <source>Female</source>
         <translation>Donna</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="724"/>
+        <location filename="../Pages.cpp" line="731"/>
         <source>Metric</source>
         <translation>Metrico</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="725"/>
+        <location filename="../Pages.cpp" line="732"/>
         <source>Imperial</source>
         <translation>Imperiale</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="781"/>
+        <location filename="../Pages.cpp" line="788"/>
         <source>Choose Picture</source>
         <translation>Seleziona foto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="782"/>
+        <location filename="../Pages.cpp" line="789"/>
         <source>Images (*.png *.jpg *.bmp</source>
         <translation>Immagini (*.png *.jpg *.bmp</translation>
     </message>
@@ -11891,7 +14354,7 @@ Salta il file...</translation>
 <context>
     <name>SaveOnExitDialogWidget</name>
     <message>
-        <location filename="../SaveDialogs.cpp" line="268"/>
+        <location filename="../SaveDialogs.cpp" line="269"/>
         <source>WARNING
 
 You have made changes to some rides which
@@ -11901,22 +14364,22 @@ have not been saved. They are listed below.</source>
 Hai fatto dei cambiamenti ad alcune attivita&apos; che non sono state salvate. Sono elencate di seguito.</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="299"/>
+        <location filename="../SaveDialogs.cpp" line="300"/>
         <source>&amp;Save and Exit</source>
         <translation>&amp;Salva e esci</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="301"/>
+        <location filename="../SaveDialogs.cpp" line="302"/>
         <source>&amp;Discard and Exit</source>
         <translation>&amp;Annulla ed Esci</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="303"/>
+        <location filename="../SaveDialogs.cpp" line="304"/>
         <source>&amp;Cancel Exit</source>
         <translation>&amp;Annulla l&apos;uscita</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="308"/>
+        <location filename="../SaveDialogs.cpp" line="309"/>
         <source>Always check for unsaved changes on exit</source>
         <translation>Controlla sempre cambiamenti non salvati all&apos;uscita</translation>
     </message>
@@ -11924,7 +14387,7 @@ Hai fatto dei cambiamenti ad alcune attivita&apos; che non sono state salvate. S
 <context>
     <name>SaveSingleDialogWidget</name>
     <message>
-        <location filename="../SaveDialogs.cpp" line="206"/>
+        <location filename="../SaveDialogs.cpp" line="207"/>
         <source>WARNING
 
 You have made changes to </source>
@@ -11933,12 +14396,12 @@ You have made changes to </source>
 Hai applicato delle modifiche a </translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="202"/>
+        <location filename="../SaveDialogs.cpp" line="203"/>
         <source>Save and Conversion</source>
         <translation>Salva e Conversione</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="206"/>
+        <location filename="../SaveDialogs.cpp" line="207"/>
         <source> If you want to save
 them, we need to convert the ride to GoldenCheetah&apos;s
 native format. Should we do so?
@@ -11946,22 +14409,22 @@ native format. Should we do so?
         <translation> Se vuoi salvarle, e&apos; necessario convertire le attivita&apos; nel formato nativo di GoldenCheetah. Vuoi convertirle?</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="211"/>
+        <location filename="../SaveDialogs.cpp" line="212"/>
         <source>&amp;Save and Convert</source>
         <translation>&amp;Salva e converti</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="213"/>
+        <location filename="../SaveDialogs.cpp" line="214"/>
         <source>&amp;Discard Changes</source>
         <translation>&amp;Annulla modifiche</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="215"/>
+        <location filename="../SaveDialogs.cpp" line="216"/>
         <source>&amp;Cancel Save</source>
         <translation>&amp;Annulla il salvataggio</translation>
     </message>
     <message>
-        <location filename="../SaveDialogs.cpp" line="220"/>
+        <location filename="../SaveDialogs.cpp" line="221"/>
         <source>Always warn me about file conversions</source>
         <translation>Avvisami sempre riguardo conversione file</translation>
     </message>
@@ -11969,177 +14432,237 @@ native format. Should we do so?
 <context>
     <name>ScatterPlot</name>
     <message>
-        <location filename="../ScatterPlot.cpp" line="94"/>
+        <location filename="../ScatterPlot.cpp" line="103"/>
         <source>Power (watts)</source>
         <translation>Potenza (watt)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="95"/>
+        <location filename="../ScatterPlot.cpp" line="104"/>
         <source>Cadence (rpm)</source>
         <translation>Cadenza (rpm)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="96"/>
+        <location filename="../ScatterPlot.cpp" line="105"/>
         <source>Heartrate (bpm)</source>
         <translation>Frequenza Cardiaca (bpm)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="99"/>
+        <location filename="../ScatterPlot.cpp" line="108"/>
         <source>Speed (kph)</source>
         <translation>Velocita&apos; (km/h)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="101"/>
+        <location filename="../ScatterPlot.cpp" line="110"/>
         <source>Speed (mph)</source>
         <translation>Velocita&apos; (km/h)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="105"/>
+        <location filename="../ScatterPlot.cpp" line="114"/>
         <source>Altitude (meters)</source>
         <translation>Altitudine (metri)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="107"/>
+        <location filename="../ScatterPlot.cpp" line="116"/>
         <source>Altitude (feet)</source>
         <translation>Altitudine (piedi)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="109"/>
+        <location filename="../ScatterPlot.cpp" line="118"/>
         <source>Torque (N)</source>
         <translation>Coppia (N)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="110"/>
+        <location filename="../ScatterPlot.cpp" line="119"/>
         <source>Elapsed Time (secs)</source>
         <translation>Tempo Trascorso (sec)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="113"/>
+        <location filename="../ScatterPlot.cpp" line="122"/>
         <source>Elapsed Distance (km)</source>
         <translation>Distanza Percorsa (km)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="115"/>
+        <location filename="../ScatterPlot.cpp" line="124"/>
         <source>Elapsed Distance (mi)</source>
         <translation>Distanza Percorsa (miglia)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="117"/>
+        <location filename="../ScatterPlot.cpp" line="126"/>
         <source>Interval Number</source>
         <translation>Numero intervalli</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="118"/>
+        <location filename="../ScatterPlot.cpp" line="127"/>
         <source>Latitude (degree offset)</source>
         <translation>Latitudine (offset gradi)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="119"/>
+        <location filename="../ScatterPlot.cpp" line="128"/>
         <source>Longitude (degree offset)</source>
         <translation>Longitudine (offset gradi)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="120"/>
+        <location filename="../ScatterPlot.cpp" line="129"/>
         <source>Circumferential Pedal Velocity (cm/s)</source>
         <translation>Velocita&apos; Circonferenzaziale Padalata (cm/s)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="121"/>
+        <location filename="../ScatterPlot.cpp" line="130"/>
         <source>Average Effective Pedal Force (N)</source>
         <translation>Forza Media Effettiva Pedalata (N)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="125"/>
+        <location filename="../ScatterPlot.cpp" line="134"/>
         <source>Time at X/Y (%)</source>
         <translation>Tempo a X/Y (%)</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="126"/>
+        <location filename="../ScatterPlot.cpp" line="135"/>
         <source>Power Zone</source>
         <translation>Zona di Potenza</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="128"/>
+        <location filename="../ScatterPlot.cpp" line="136"/>
+        <source>Headwind (kph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="137"/>
+        <source>Slope (gradient)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="138"/>
+        <source>Temperature (C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="139"/>
+        <source>L/R Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="140"/>
+        <source>Torque Efficiency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="141"/>
+        <source>Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="143"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="132"/>
+        <location filename="../ScatterPlot.cpp" line="147"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="133"/>
+        <location filename="../ScatterPlot.cpp" line="148"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="134"/>
+        <location filename="../ScatterPlot.cpp" line="149"/>
         <source>Heartrate</source>
         <translation>Frequenza Cardiaca</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="135"/>
+        <location filename="../ScatterPlot.cpp" line="150"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="136"/>
+        <location filename="../ScatterPlot.cpp" line="151"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="137"/>
+        <location filename="../ScatterPlot.cpp" line="152"/>
         <source>Pedal Force</source>
         <translation>Forza Pedalata</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="138"/>
+        <location filename="../ScatterPlot.cpp" line="153"/>
         <source>Time</source>
         <translation>Orario</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="139"/>
+        <location filename="../ScatterPlot.cpp" line="154"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="140"/>
+        <location filename="../ScatterPlot.cpp" line="155"/>
         <source>Interval</source>
         <translation>Intervallo</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="141"/>
+        <location filename="../ScatterPlot.cpp" line="156"/>
         <source>Latitude</source>
         <translation>Latitudine</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="142"/>
+        <location filename="../ScatterPlot.cpp" line="157"/>
         <source>Longitude</source>
         <translation>Longitudine</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="143"/>
+        <location filename="../ScatterPlot.cpp" line="158"/>
         <source>Time at X/Y</source>
         <translation>Tempo a X/Y</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="144"/>
+        <location filename="../ScatterPlot.cpp" line="159"/>
         <source>Zone</source>
         <translation>Zona</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="145"/>
+        <location filename="../ScatterPlot.cpp" line="160"/>
         <source>CPV</source>
         <translation>CPV</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="146"/>
+        <location filename="../ScatterPlot.cpp" line="161"/>
         <source>AEPF</source>
         <translation>AEPF</translation>
     </message>
     <message>
-        <location filename="../ScatterPlot.cpp" line="148"/>
+        <location filename="../ScatterPlot.cpp" line="162"/>
+        <source>Headwind</source>
+        <translation type="unfinished">Vento Contrario</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="163"/>
+        <source>Slope</source>
+        <translation type="unfinished">Pendenza</translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="164"/>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="165"/>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="166"/>
+        <source>TE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="167"/>
+        <source>PS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterPlot.cpp" line="169"/>
         <source>None</source>
         <translation>Nessuno</translation>
     </message>
@@ -12147,89 +14670,124 @@ native format. Should we do so?
 <context>
     <name>ScatterWindow</name>
     <message>
-        <location filename="../ScatterWindow.cpp" line="30"/>
-        <location filename="../ScatterWindow.cpp" line="49"/>
+        <location filename="../ScatterWindow.cpp" line="31"/>
+        <location filename="../ScatterWindow.cpp" line="56"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="31"/>
-        <location filename="../ScatterWindow.cpp" line="50"/>
+        <location filename="../ScatterWindow.cpp" line="32"/>
+        <location filename="../ScatterWindow.cpp" line="57"/>
         <source>Cadence</source>
         <translation>Cadenza</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="32"/>
-        <location filename="../ScatterWindow.cpp" line="51"/>
+        <location filename="../ScatterWindow.cpp" line="33"/>
+        <location filename="../ScatterWindow.cpp" line="58"/>
         <source>Heartrate</source>
         <translation>Frequenza cardiaca</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="33"/>
-        <location filename="../ScatterWindow.cpp" line="52"/>
+        <location filename="../ScatterWindow.cpp" line="34"/>
+        <location filename="../ScatterWindow.cpp" line="59"/>
         <source>Speed</source>
         <translation>Velocità</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="34"/>
-        <location filename="../ScatterWindow.cpp" line="53"/>
+        <location filename="../ScatterWindow.cpp" line="35"/>
+        <location filename="../ScatterWindow.cpp" line="60"/>
         <source>Altitude</source>
         <translation>Altitudine</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="35"/>
-        <location filename="../ScatterWindow.cpp" line="54"/>
+        <location filename="../ScatterWindow.cpp" line="36"/>
+        <location filename="../ScatterWindow.cpp" line="61"/>
         <source>Torque</source>
         <translation>Coppia</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="36"/>
-        <location filename="../ScatterWindow.cpp" line="55"/>
+        <location filename="../ScatterWindow.cpp" line="37"/>
+        <location filename="../ScatterWindow.cpp" line="62"/>
         <source>AEPF</source>
         <translation>AEPF</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="37"/>
-        <location filename="../ScatterWindow.cpp" line="56"/>
+        <location filename="../ScatterWindow.cpp" line="38"/>
+        <location filename="../ScatterWindow.cpp" line="63"/>
         <source>CPV</source>
         <translation>CPV</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="38"/>
-        <location filename="../ScatterWindow.cpp" line="57"/>
+        <location filename="../ScatterWindow.cpp" line="39"/>
+        <location filename="../ScatterWindow.cpp" line="64"/>
         <source>Time</source>
         <translation>Tempo</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="39"/>
-        <location filename="../ScatterWindow.cpp" line="58"/>
+        <location filename="../ScatterWindow.cpp" line="40"/>
+        <location filename="../ScatterWindow.cpp" line="65"/>
         <source>Distance</source>
         <translation>Distanza</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="72"/>
-        <location filename="../ScatterWindow.cpp" line="112"/>
+        <location filename="../ScatterWindow.cpp" line="41"/>
+        <location filename="../ScatterWindow.cpp" line="66"/>
+        <source>Headwind</source>
+        <translation type="unfinished">Vento Contrario</translation>
+    </message>
+    <message>
+        <location filename="../ScatterWindow.cpp" line="42"/>
+        <location filename="../ScatterWindow.cpp" line="67"/>
+        <source>Slope</source>
+        <translation type="unfinished">Pendenza</translation>
+    </message>
+    <message>
+        <location filename="../ScatterWindow.cpp" line="43"/>
+        <location filename="../ScatterWindow.cpp" line="68"/>
+        <source>Temperature</source>
+        <translation type="unfinished">Temperatura</translation>
+    </message>
+    <message>
+        <location filename="../ScatterWindow.cpp" line="44"/>
+        <location filename="../ScatterWindow.cpp" line="69"/>
+        <source>L/R Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterWindow.cpp" line="45"/>
+        <location filename="../ScatterWindow.cpp" line="70"/>
+        <source>L/R Torque Effectiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterWindow.cpp" line="46"/>
+        <location filename="../ScatterWindow.cpp" line="71"/>
+        <source>L/R Pedal Smoothness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ScatterWindow.cpp" line="83"/>
+        <location filename="../ScatterWindow.cpp" line="123"/>
         <source>X-Axis:</source>
         <translation>Asse X:</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="76"/>
-        <location filename="../ScatterWindow.cpp" line="119"/>
+        <location filename="../ScatterWindow.cpp" line="87"/>
+        <location filename="../ScatterWindow.cpp" line="130"/>
         <source>Y-Axis:</source>
         <translation>Asse Y:</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="83"/>
+        <location filename="../ScatterWindow.cpp" line="94"/>
         <source>Frame intervals</source>
         <translation>Incornicia intervalli</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="126"/>
         <source>00:00:00</source>
-        <translation>00:00:00</translation>
+        <translation type="obsolete">00:00:00</translation>
     </message>
     <message>
-        <location filename="../ScatterWindow.cpp" line="80"/>
+        <location filename="../ScatterWindow.cpp" line="91"/>
         <location filename="../ScatterWindow.cpp" line="138"/>
         <source>Ignore Zero</source>
         <translation>Ignora Zero</translation>
@@ -12248,71 +14806,93 @@ native format. Should we do so?
 <context>
     <name>SchemePage</name>
     <message>
+        <location filename="../Pages.cpp" line="2632"/>
         <source>Add</source>
-        <translation type="obsolete">Aggiungi</translation>
+        <translation type="unfinished">Aggiungi</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation type="obsolete">Rinomina</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="2633"/>
         <source>Delete</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2307"/>
+        <location filename="../Pages.cpp" line="2626"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2308"/>
+        <location filename="../Pages.cpp" line="2627"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2320"/>
+        <location filename="../Pages.cpp" line="2642"/>
         <source>Short</source>
         <translation>Corto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2321"/>
+        <location filename="../Pages.cpp" line="2643"/>
         <source>Long</source>
         <translation>Lungo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2322"/>
+        <location filename="../Pages.cpp" line="2644"/>
         <source>Percent of CP</source>
         <translation>Percentuale di PC</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2712"/>
+        <location filename="../Pages.cpp" line="2719"/>
+        <source>New</source>
+        <translation type="unfinished">Nuovo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2714"/>
+        <location filename="../Pages.cpp" line="2721"/>
+        <source>New (%1)</source>
+        <translation type="unfinished">Nuovo (%1)</translation>
     </message>
 </context>
 <context>
     <name>SearchBox</name>
     <message>
-        <location filename="../SearchBox.cpp" line="95"/>
-        <location filename="../SearchBox.cpp" line="146"/>
+        <location filename="../SearchBox.cpp" line="96"/>
+        <location filename="../SearchBox.cpp" line="147"/>
         <source>Search...</source>
         <translation>Cerca...</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="136"/>
+        <location filename="../SearchBox.cpp" line="137"/>
         <source>Filter...</source>
         <translation>Filtro...</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="191"/>
-        <location filename="../SearchBox.cpp" line="206"/>
-        <source>Add to Favourites</source>
-        <translation>Aggiungi a Favoriti</translation>
-    </message>
-    <message>
-        <location filename="../SearchBox.cpp" line="198"/>
+        <location filename="../SearchBox.cpp" line="192"/>
         <location filename="../SearchBox.cpp" line="207"/>
-        <source>Manage Favourites</source>
-        <translation>Gestisci Favoriti</translation>
+        <source>Add to Named Filters</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="200"/>
-        <location filename="../SearchBox.cpp" line="213"/>
+        <location filename="../SearchBox.cpp" line="199"/>
+        <location filename="../SearchBox.cpp" line="208"/>
+        <source>Manage Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Favourites</source>
+        <translation type="obsolete">Aggiungi a Favoriti</translation>
+    </message>
+    <message>
+        <source>Manage Favourites</source>
+        <translation type="obsolete">Gestisci Favoriti</translation>
+    </message>
+    <message>
+        <location filename="../SearchBox.cpp" line="201"/>
+        <location filename="../SearchBox.cpp" line="214"/>
         <source>Column Chooser</source>
         <translation>Scegli Colonne</translation>
     </message>
@@ -12321,70 +14901,78 @@ native format. Should we do so?
         <translation type="obsolete">Aggiungi Favoriti</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="285"/>
+        <location filename="../SearchBox.cpp" line="281"/>
         <source>Add new search</source>
         <translation>Aggiungi nuova ricerca</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="286"/>
+        <location filename="../SearchBox.cpp" line="282"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
 </context>
 <context>
+    <name>SearchFilter</name>
+    <message>
+        <location filename="../RideNavigatorProxy.h" line="591"/>
+        <source>File</source>
+        <translation type="unfinished">File</translation>
+    </message>
+</context>
+<context>
     <name>Seasons</name>
     <message>
-        <location filename="../Season.cpp" line="247"/>
+        <location filename="../Season.cpp" line="262"/>
         <source>All Dates</source>
         <translation>Tutte le Date</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="254"/>
+        <location filename="../Season.cpp" line="269"/>
         <source>This Year</source>
         <translation>Quest&apos;anno</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="261"/>
+        <location filename="../Season.cpp" line="276"/>
         <source>This Month</source>
         <translation>Questo Mese</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="268"/>
+        <location filename="../Season.cpp" line="283"/>
         <source>This Week</source>
         <translation>Questa Settimana</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="279"/>
+        <location filename="../Season.cpp" line="294"/>
         <source>Last 7 days</source>
         <translation>Ultimi 7 giorni</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="286"/>
+        <location filename="../Season.cpp" line="301"/>
         <source>Last 14 days</source>
         <translation>Ultimi 14 giorni</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="293"/>
+        <location filename="../Season.cpp" line="308"/>
         <source>Last 21 days</source>
         <translation>Ultimi 21 giorni</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="300"/>
+        <location filename="../Season.cpp" line="315"/>
         <source>Last 28 days</source>
         <translation>Ultimi 28 giorni</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="307"/>
+        <location filename="../Season.cpp" line="322"/>
         <source>Last 3 months</source>
         <translation>Ultimi 3 mesi</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="314"/>
+        <location filename="../Season.cpp" line="329"/>
         <source>Last 6 months</source>
         <translation>Ultimi 6 mesi</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="321"/>
+        <location filename="../Season.cpp" line="336"/>
         <source>Last 12 months</source>
         <translation>Ultimi 12 mesi</translation>
     </message>
@@ -12400,50 +14988,64 @@ native format. Should we do so?
         <translation type="obsolete">Muovi sotto</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="4024"/>
         <source>Add</source>
-        <translation type="obsolete">Aggiungi</translation>
+        <translation type="unfinished">Aggiungi</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="4025"/>
         <source>Delete</source>
-        <translation type="obsolete">Cancella</translation>
+        <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3683"/>
+        <location filename="../Pages.cpp" line="4026"/>
         <source>Up</source>
         <translation>Su</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3684"/>
+        <location filename="../Pages.cpp" line="4027"/>
         <source>Down</source>
         <translation>Sotto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3671"/>
+        <location filename="../Pages.cpp" line="4073"/>
+        <location filename="../Pages.cpp" line="4075"/>
+        <location filename="../Pages.cpp" line="4166"/>
+        <location filename="../Pages.cpp" line="4168"/>
+        <source>ddd MMM d, yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="4012"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3672"/>
+        <location filename="../Pages.cpp" line="4013"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3695"/>
+        <location filename="../Pages.cpp" line="4007"/>
+        <location filename="../Pages.cpp" line="4038"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3696"/>
+        <location filename="../Pages.cpp" line="4008"/>
+        <location filename="../Pages.cpp" line="4039"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3697"/>
+        <location filename="../Pages.cpp" line="4009"/>
+        <location filename="../Pages.cpp" line="4040"/>
         <source>From</source>
         <translation>Da</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3698"/>
+        <location filename="../Pages.cpp" line="4010"/>
+        <location filename="../Pages.cpp" line="4041"/>
         <source>To</source>
         <translation>a</translation>
     </message>
@@ -12451,42 +15053,47 @@ native format. Should we do so?
 <context>
     <name>SelfLoopsUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="884"/>
+        <location filename="../ShareDialog.cpp" line="894"/>
         <source>This Ride is marked as already on Selfloops. Are you sure you want to upload it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="887"/>
+        <location filename="../ShareDialog.cpp" line="897"/>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="888"/>
+        <location filename="../ShareDialog.cpp" line="898"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="913"/>
+        <location filename="../ShareDialog.cpp" line="919"/>
+        <source>Error uploading to Selfloops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="923"/>
         <source>Successfully uploaded to Selfloops</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="932"/>
+        <location filename="../ShareDialog.cpp" line="942"/>
         <source>Upload ride to Selfloops...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="979"/>
+        <location filename="../ShareDialog.cpp" line="989"/>
         <source>Upload ride... Sending to Selfloops</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="988"/>
+        <location filename="../ShareDialog.cpp" line="998"/>
         <source>Upload to Selfloops finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1006"/>
+        <location filename="../ShareDialog.cpp" line="1016"/>
         <source> Error from Selfloops: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -12544,47 +15151,56 @@ native format. Should we do so?
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="114"/>
+        <location filename="../ShareDialog.cpp" line="103"/>
+        <source>Garmin Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="117"/>
         <source>Choose a name for your ride: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="124"/>
-        <source>Choose which channels you wish to send: </source>
-        <translation type="unfinished">Scegli quale canali vuoi inviare: </translation>
+        <location filename="../ShareDialog.cpp" line="127"/>
+        <source>Choose which data series you wish to send: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="127"/>
+        <source>Choose which channels you wish to send: </source>
+        <translation type="obsolete">Scegli quale canali vuoi inviare: </translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="130"/>
         <source>Altitude</source>
         <translation type="unfinished">Altitudine</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="128"/>
+        <location filename="../ShareDialog.cpp" line="131"/>
         <source>Power</source>
         <translation type="unfinished">Potenza</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="129"/>
+        <location filename="../ShareDialog.cpp" line="132"/>
         <source>Cadence</source>
         <translation type="unfinished">Cadenza</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="130"/>
+        <location filename="../ShareDialog.cpp" line="133"/>
         <source>Heartrate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="164"/>
+        <location filename="../ShareDialog.cpp" line="167"/>
         <source>&amp;Upload Ride</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="166"/>
+        <location filename="../ShareDialog.cpp" line="169"/>
         <source>&amp;Close</source>
         <translation type="unfinished">&amp;Chiudi</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="186"/>
+        <location filename="../ShareDialog.cpp" line="190"/>
         <source>No share site selected !</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12781,9 +15397,13 @@ native format. Should we do so?
 <context>
     <name>SplitActivityWizard</name>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="45"/>
         <source>Split Activity</source>
-        <translation>Dividi Attivita&apos;</translation>
+        <translation type="obsolete">Dividi Attivita&apos;</translation>
+    </message>
+    <message>
+        <location filename="../SplitActivityWizard.cpp" line="45"/>
+        <source>Split Ride</source>
+        <translation type="unfinished">Dividi allenamento</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="60"/>
@@ -12835,8 +15455,18 @@ native format. Should we do so?
     <message>
         <location filename="../SplitActivityWizard.cpp" line="157"/>
         <location filename="../SplitActivityWizard.cpp" line="176"/>
+        <source>Ride Segment #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SplitActivityWizard.cpp" line="223"/>
+        <location filename="../SplitActivityWizard.cpp" line="244"/>
+        <source>Entire Ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Activity Segment #%1</source>
-        <translation>Segmento Attivita&apos; #%1</translation>
+        <translation type="obsolete">Segmento Attivita&apos; #%1</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="197"/>
@@ -12845,10 +15475,8 @@ native format. Should we do so?
         <translation>Gap in registrazione #%1</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="223"/>
-        <location filename="../SplitActivityWizard.cpp" line="244"/>
         <source>Entire Activity</source>
-        <translation>Attivita&apos; intera</translation>
+        <translation type="obsolete">Attivita&apos; intera</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="243"/>
@@ -12883,17 +15511,21 @@ native format. Should we do so?
     <message>
         <location filename="../SplitActivityWizard.cpp" line="660"/>
         <location filename="../SplitActivityWizard.cpp" line="664"/>
-        <location filename="../SplitActivityWizard.cpp" line="801"/>
+        <location filename="../SplitActivityWizard.cpp" line="803"/>
         <source>Confirm</source>
         <translation>Conferma</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="661"/>
         <source>Split Activity cannot be undone</source>
-        <translation>Lo Split della&apos;Attivita&apos; non puo&apos; essere eseguito</translation>
+        <translation type="obsolete">Lo Split della&apos;Attivita&apos; non puo&apos; essere eseguito</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="802"/>
+        <location filename="../SplitActivityWizard.cpp" line="661"/>
+        <source>Split ride cannot be undone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SplitActivityWizard.cpp" line="804"/>
         <source>%1 file(s) will be created.
 
 Are you sure you wish to proceed?</source>
@@ -12902,24 +15534,28 @@ Are you sure you wish to proceed?</source>
 Sei sicuro di voler procedere?</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="812"/>
+        <location filename="../SplitActivityWizard.cpp" line="814"/>
         <source>Removed</source>
         <translation>Rimosso</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="826"/>
+        <location filename="../SplitActivityWizard.cpp" line="828"/>
         <source>Saved</source>
         <translation>Salvato</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="832"/>
+        <location filename="../SplitActivityWizard.cpp" line="834"/>
         <source>Completed</source>
         <translation>Completato</translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="833"/>
+        <location filename="../SplitActivityWizard.cpp" line="835"/>
+        <source>Split Ride Completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Split Activity Completed</source>
-        <translation>Dividi Attivita&apos; Completata</translation>
+        <translation type="obsolete">Dividi Attivita&apos; Completata</translation>
     </message>
 </context>
 <context>
@@ -12931,26 +15567,42 @@ Sei sicuro di voler procedere?</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="474"/>
-        <source>Do you want to keep the original activity?</source>
-        <translation>Vuoi mantenere l&apos;attivita&apos; originale?</translation>
+        <source>Do you want to keep the original ride?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="479"/>
+        <source>If you want to keep the current ride then you should ensure you have clicked on the &quot;Keep original ride&quot; check box below.
+
+If you do not choose to keep the original ride it will be backed up before removing it from the ride history.
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SplitActivityWizard.cpp" line="487"/>
+        <source>Keep original ride</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to keep the original activity?</source>
+        <translation type="obsolete">Vuoi mantenere l&apos;attivita&apos; originale?</translation>
+    </message>
+    <message>
         <source>If you want to keep the current activity then you should ensure you have clicked on the &quot;Keep original activity&quot; check box below.
 
 If you do not choose to keep the original activity it will be backed up before removing it from the activity history.
 
 </source>
-        <translation>Se vuoi mantenere k&apos;attivita&apos; corrente devi assicurarti di aver cliccato su &quot;Mantieni attivita&apos; originale&quot; nella casella sottostante.
+        <translation type="obsolete">Se vuoi mantenere k&apos;attivita&apos; corrente devi assicurarti di aver cliccato su &quot;Mantieni attivita&apos; originale&quot; nella casella sottostante.
 
 Se scegli di non mantenere l&apos;attivita&apos; originale,di quest&apos;ultima verra&apos; fatta una copia di back up prima di essere rimossa dal database.
 
 </translation>
     </message>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="487"/>
         <source>Keep original activity</source>
-        <translation>Mantieni Attivita&apos; Originale</translation>
+        <translation type="obsolete">Mantieni Attivita&apos; Originale</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="573"/>
@@ -12972,6 +15624,16 @@ Se scegli di non mantenere l&apos;attivita&apos; originale,di quest&apos;ultima 
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="515"/>
+        <source>This wizard will find segments of ride to save by looking for gaps in recording. 
+
+You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
+
+In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>This wizard will find segments of activity to save by looking for gaps in recording. 
 
 You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
@@ -12979,7 +15641,7 @@ You can define the minimum length, in time, a gap in recording should be in orde
 In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
 
 </source>
-        <translation>Questo wizard trovera&apos; segmenti di attivita&apos; da salvare cercando i gap in registrazione.
+        <translation type="obsolete">Questo wizard trovera&apos; segmenti di attivita&apos; da salvare cercando i gap in registrazione.
 
 Puoi definire la lunghezza minima, tempo trascorso, un gap in registrazione deve essere tale da marcare la fine di un segmento e l&apos;inizio di un altro.
 
@@ -13030,16 +15692,24 @@ In aggiunta, puoi settare un segmento di dimensione minima. Qualsiasi segmento m
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="586"/>
+        <source>Ride will be split between marker points selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Activity will be split between marker points selected</source>
-        <translation>L&apos;Attivita&apos; sara&apos; divisa tra i marcatori selezionati</translation>
+        <translation type="obsolete">L&apos;Attivita&apos; sara&apos; divisa tra i marcatori selezionati</translation>
     </message>
 </context>
 <context>
     <name>SplitWelcome</name>
     <message>
-        <location filename="../SplitActivityWizard.cpp" line="448"/>
         <source>Split Activity</source>
-        <translation>Dividi Attivita&apos;</translation>
+        <translation type="obsolete">Dividi Attivita&apos;</translation>
+    </message>
+    <message>
+        <location filename="../SplitActivityWizard.cpp" line="448"/>
+        <source>Split Ride</source>
+        <translation type="unfinished">Dividi allenamento</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="449"/>
@@ -13048,12 +15718,20 @@ In aggiunta, puoi settare un segmento di dimensione minima. Qualsiasi segmento m
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="454"/>
+        <source>This wizard will help you split the current ride into multiple rides
+
+The wizard will identify segments of uninterrupted ride and allow you to select which ones to save as new rides. You will also be able to select any currently defined intervals too.
+
+If the newly created ride clashes with an existing ride (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing rides.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>This wizard will help you split the current activity into multiple activities
 
 The wizard will identify segments of uninterrupted activity and allow you to select which ones to save as new activities. You will also be able to select any currently defined intervals too.
 
 If the newly created activity clashes with an existing activity (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing activities.</source>
-        <translation>Questo wizard ti aiutera&apos; a dividere l&apos;attivita&apos; corrente in piu&apos; attivita&apos; piu&apos; piccole.
+        <translation type="obsolete">Questo wizard ti aiutera&apos; a dividere l&apos;attivita&apos; corrente in piu&apos; attivita&apos; piu&apos; piccole.
 
 Il wizard identifichera&apos; segmenti di attivita&apos; ininterrotta and ti permettera&apos; di selezionare il segmento come nuova attivita&apos;.Sarai in grado di selezionarequalsiasi intervallo definito.
 
@@ -13478,53 +16156,58 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
 <context>
     <name>StravaUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="237"/>
+        <location filename="../ShareDialog.cpp" line="247"/>
         <source>Cannot login to Strava. Check permission</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="252"/>
+        <location filename="../ShareDialog.cpp" line="262"/>
         <source>This Ride is marked as already on Strava. Are you sure you want to upload it?</source>
         <translation type="unfinished">Quest&apos;attivita&apos; e&apos;marcata come gia&apos; esistente su Strava. Sei sicuro di volerla aggiungerla?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="255"/>
+        <location filename="../ShareDialog.cpp" line="265"/>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="256"/>
+        <location filename="../ShareDialog.cpp" line="266"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="282"/>
+        <location filename="../ShareDialog.cpp" line="287"/>
+        <source>Error uploading to Strava</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="292"/>
         <source>Successfully uploaded to Strava
 </source>
         <translation type="unfinished">Caricata su Strava con successo</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="291"/>
+        <location filename="../ShareDialog.cpp" line="301"/>
         <source>Upload ride to Strava...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="368"/>
+        <location filename="../ShareDialog.cpp" line="378"/>
         <source>Upload ride... Sending to Strava</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="377"/>
+        <location filename="../ShareDialog.cpp" line="387"/>
         <source>Upload to Strava finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="396"/>
+        <location filename="../ShareDialog.cpp" line="406"/>
         <source> Error from Strava: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="416"/>
+        <location filename="../ShareDialog.cpp" line="426"/>
         <source>Ride processing...</source>
         <translation type="unfinished">Attivita&apos; in elaborazione...</translation>
     </message>
@@ -13533,7 +16216,7 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
     <name>SummaryMetrics</name>
     <message>
         <location filename="../SummaryMetrics.cpp" line="92"/>
-        <location filename="../SummaryMetrics.cpp" line="184"/>
+        <location filename="../SummaryMetrics.cpp" line="186"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
@@ -13541,34 +16224,34 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
 <context>
     <name>SummaryMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1533"/>
+        <location filename="../Pages.cpp" line="1841"/>
         <source>Available Metrics</source>
         <translation>Metriche Disponibili</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1538"/>
+        <location filename="../Pages.cpp" line="1846"/>
         <source>Selected Metrics</source>
         <translation>Metriche Selezionate</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1554"/>
+        <location filename="../Pages.cpp" line="1862"/>
         <source>Up</source>
         <translation>Sopra</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1555"/>
+        <location filename="../Pages.cpp" line="1863"/>
         <source>Down</source>
         <translation>Sotto</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1599"/>
-        <location filename="../Pages.cpp" line="1609"/>
+        <location filename="../Pages.cpp" line="1907"/>
+        <location filename="../Pages.cpp" line="1917"/>
         <source>&amp;#8482;</source>
         <translation>&amp;#8482;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1599"/>
-        <location filename="../Pages.cpp" line="1609"/>
+        <location filename="../Pages.cpp" line="1907"/>
+        <location filename="../Pages.cpp" line="1917"/>
         <source> (TM)</source>
         <translation>.(TM)</translation>
     </message>
@@ -13576,9 +16259,17 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
 <context>
     <name>SummaryWindow</name>
     <message>
-        <location filename="../SummaryWindow.cpp" line="51"/>
+        <location filename="../SummaryWindow.cpp" line="50"/>
         <source>dddd MMMM d, yyyy, h:mm AP</source>
         <translation>dddd MMMM d, yyyy, h:mm AP</translation>
+    </message>
+</context>
+<context>
+    <name>TPAthlete</name>
+    <message>
+        <location filename="../TPDownload.cpp" line="70"/>
+        <source>Error:</source>
+        <translation type="unfinished">Errore:</translation>
     </message>
 </context>
 <context>
@@ -13590,159 +16281,159 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
         <translation>Scarica da TrainingPeaks.com</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="53"/>
+        <location filename="../TPDownloadDialog.cpp" line="57"/>
         <source>You must be a premium member to download from TrainingPeaks. Please check your cyclist configurations are correct on the Passwords tab.</source>
         <translation>Devi essere un utente premium per scaricare da TrainingPeaks. Controlla che la configurazione del tuo profilo sia corretta sulla casella della Password.</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="65"/>
-        <location filename="../TPDownloadDialog.cpp" line="111"/>
-        <location filename="../TPDownloadDialog.cpp" line="321"/>
-        <location filename="../TPDownloadDialog.cpp" line="418"/>
+        <location filename="../TPDownloadDialog.cpp" line="70"/>
+        <location filename="../TPDownloadDialog.cpp" line="116"/>
+        <location filename="../TPDownloadDialog.cpp" line="326"/>
+        <location filename="../TPDownloadDialog.cpp" line="423"/>
         <source>Download</source>
         <translation>Download</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="66"/>
-        <location filename="../TPDownloadDialog.cpp" line="325"/>
-        <location filename="../TPDownloadDialog.cpp" line="498"/>
+        <location filename="../TPDownloadDialog.cpp" line="71"/>
+        <location filename="../TPDownloadDialog.cpp" line="330"/>
+        <location filename="../TPDownloadDialog.cpp" line="503"/>
         <source>Upload</source>
         <translation>Upload</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="67"/>
-        <location filename="../TPDownloadDialog.cpp" line="329"/>
+        <location filename="../TPDownloadDialog.cpp" line="72"/>
+        <location filename="../TPDownloadDialog.cpp" line="334"/>
         <source>Synchronize</source>
         <translation>Sincronizza</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="98"/>
+        <location filename="../TPDownloadDialog.cpp" line="103"/>
         <source>From:</source>
         <translation>Da:</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="99"/>
+        <location filename="../TPDownloadDialog.cpp" line="104"/>
         <source>To:</source>
         <translation>a:</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="109"/>
+        <location filename="../TPDownloadDialog.cpp" line="114"/>
         <source>Refresh Ride List</source>
         <translation>Aggiorna Lista Attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="110"/>
+        <location filename="../TPDownloadDialog.cpp" line="115"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="113"/>
-        <location filename="../TPDownloadDialog.cpp" line="143"/>
-        <location filename="../TPDownloadDialog.cpp" line="173"/>
+        <location filename="../TPDownloadDialog.cpp" line="118"/>
+        <location filename="../TPDownloadDialog.cpp" line="148"/>
+        <location filename="../TPDownloadDialog.cpp" line="178"/>
         <source>Select all</source>
         <translation>Seleziona tutti</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="176"/>
+        <location filename="../TPDownloadDialog.cpp" line="181"/>
         <source>Keep all do not delete any rides</source>
         <translation>Mantieni tutti non cancellare nessun attivita&apos;</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="177"/>
+        <location filename="../TPDownloadDialog.cpp" line="182"/>
         <source>Keep TP.com but delete Local</source>
         <translation>Mantieni TP.com ma cancella i file locali</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="178"/>
+        <location filename="../TPDownloadDialog.cpp" line="183"/>
         <source>Keep Local but delete TP.com</source>
         <translation>Mantieni il file locale ma cancella su TP.com</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="216"/>
+        <location filename="../TPDownloadDialog.cpp" line="221"/>
         <source>Overwrite existing files</source>
         <translation>Sovrascrivi file esistenti</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="267"/>
+        <location filename="../TPDownloadDialog.cpp" line="272"/>
         <source>Downloading ride list...</source>
         <translation>Download Lista Allenamenti...</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="654"/>
+        <location filename="../TPDownloadDialog.cpp" line="659"/>
         <source>Processed %1 of %2</source>
         <translation>Elaborati %1 di %2</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="656"/>
-        <location filename="../TPDownloadDialog.cpp" line="728"/>
+        <location filename="../TPDownloadDialog.cpp" line="661"/>
+        <location filename="../TPDownloadDialog.cpp" line="733"/>
         <source>Downloading</source>
         <translation>Sto scaricando</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="665"/>
-        <location filename="../TPDownloadDialog.cpp" line="819"/>
+        <location filename="../TPDownloadDialog.cpp" line="670"/>
+        <location filename="../TPDownloadDialog.cpp" line="824"/>
         <source>Uploading</source>
         <translation>Sto caricando</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="694"/>
+        <location filename="../TPDownloadDialog.cpp" line="699"/>
         <source>Sync complete</source>
         <translation>Sincronizzazione completa</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="706"/>
+        <location filename="../TPDownloadDialog.cpp" line="711"/>
         <source>Processed %1 of %2 successfully</source>
         <translation>Elaborati %1 di %2 con successo</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="720"/>
-        <location filename="../TPDownloadDialog.cpp" line="811"/>
+        <location filename="../TPDownloadDialog.cpp" line="725"/>
+        <location filename="../TPDownloadDialog.cpp" line="816"/>
         <source>File exists</source>
         <translation>File esistente</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="730"/>
+        <location filename="../TPDownloadDialog.cpp" line="735"/>
         <source>Downloaded %1 of %2</source>
         <translation>Scaricati %1 di %2</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="746"/>
+        <location filename="../TPDownloadDialog.cpp" line="751"/>
         <source>Downloads complete</source>
         <translation>Download completo</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="757"/>
+        <location filename="../TPDownloadDialog.cpp" line="762"/>
         <source>Downloaded %1 of %2 successfully</source>
         <translation>Scaricati %1 di %2 con successo</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="769"/>
-        <location filename="../TPDownloadDialog.cpp" line="868"/>
+        <location filename="../TPDownloadDialog.cpp" line="774"/>
+        <location filename="../TPDownloadDialog.cpp" line="873"/>
         <source>Aborted</source>
         <translation>Annullato</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="784"/>
+        <location filename="../TPDownloadDialog.cpp" line="789"/>
         <source>Saved</source>
         <translation>Salvato</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="821"/>
+        <location filename="../TPDownloadDialog.cpp" line="826"/>
         <source>Uploaded %1 of %2</source>
         <translation>Caricati %1 di %2</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="845"/>
+        <location filename="../TPDownloadDialog.cpp" line="850"/>
         <source>Uploads complete</source>
         <translation>Upload completo</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="856"/>
+        <location filename="../TPDownloadDialog.cpp" line="861"/>
         <source>Uploaded %1 of %2 successfully</source>
         <translation>Caricati %1 di %2 con successo</translation>
     </message>
     <message>
-        <location filename="../TPDownloadDialog.cpp" line="876"/>
+        <location filename="../TPDownloadDialog.cpp" line="881"/>
         <source>Upload successful</source>
         <translation>Upload con successo</translation>
     </message>
@@ -13818,6 +16509,72 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
     </message>
 </context>
 <context>
+    <name>TabView</name>
+    <message>
+        <location filename="../TabView.cpp" line="63"/>
+        <source>Compare Rides and Intervals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../TabView.cpp" line="64"/>
+        <source>Compare Date Ranges</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Themes</name>
+    <message>
+        <location filename="../Colors.cpp" line="363"/>
+        <source>Default</source>
+        <translation type="unfinished">Default</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="373"/>
+        <source>Neutral Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="381"/>
+        <source>Firenze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="389"/>
+        <source>Mustang</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="397"/>
+        <source>Japanese Garden</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="405"/>
+        <source>Zen and Tea</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="413"/>
+        <source>Mono (dark)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="421"/>
+        <source>Mono (light)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="430"/>
+        <source>Schoberer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="439"/>
+        <source>Classic</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimeRiding</name>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="107"/>
@@ -13853,12 +16610,17 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
         <translation>Il tuo miglior intervallo lungo (15-60 min):</translation>
     </message>
     <message>
-        <location filename="../ToolsDialog.cpp" line="79"/>
+        <location filename="../ToolsDialog.cpp" line="80"/>
         <source>Your critical power:</source>
         <translation>La tua potenza critica (CP):</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="90"/>
+        <source>Your W&apos;:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ToolsDialog.cpp" line="102"/>
         <source>Estimate CP</source>
         <translation>Stima CP</translation>
     </message>
@@ -13867,7 +16629,7 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
         <translation type="obsolete">Calcolo CP</translation>
     </message>
     <message>
-        <location filename="../ToolsDialog.cpp" line="94"/>
+        <location filename="../ToolsDialog.cpp" line="106"/>
         <source>Done</source>
         <translation>Fatto</translation>
     </message>
@@ -13972,13 +16734,13 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
 <context>
     <name>TotalWork</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="252"/>
+        <location filename="../BasicRideMetrics.cpp" line="286"/>
         <source>Work</source>
         <translation>Lavoro</translation>
     </message>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="253"/>
-        <location filename="../BasicRideMetrics.cpp" line="254"/>
+        <location filename="../BasicRideMetrics.cpp" line="287"/>
+        <location filename="../BasicRideMetrics.cpp" line="288"/>
         <source>kJ</source>
         <translation>kJ</translation>
     </message>
@@ -13986,12 +16748,12 @@ Se la nuova attivita&apos; concorre con un&apos;attivita&apos; pre-esistente (st
 <context>
     <name>TrainDB</name>
     <message>
-        <location filename="../TrainDB.cpp" line="60"/>
+        <location filename="../TrainDB.cpp" line="64"/>
         <source>Cannot open database</source>
         <translation>Non può aprire il database</translation>
     </message>
     <message>
-        <location filename="../TrainDB.cpp" line="61"/>
+        <location filename="../TrainDB.cpp" line="65"/>
         <source>Unable to establish a database connection.
 This feature requires SQLite support. Please read the Qt SQL driver documentation for information how to build it.
 
@@ -14002,12 +16764,12 @@ Questa funzione richiede il support di SQLite. Leggi i documenti Qt SQL driver p
 Clicca Cancella per uscire.</translation>
     </message>
     <message>
-        <location filename="../TrainDB.cpp" line="168"/>
+        <location filename="../TrainDB.cpp" line="172"/>
         <source> Manual Erg Mode</source>
         <translation> Modo Manuale Erg</translation>
     </message>
     <message>
-        <location filename="../TrainDB.cpp" line="172"/>
+        <location filename="../TrainDB.cpp" line="176"/>
         <source> Manual Slope Mode</source>
         <translation> Modo Manuale Slope</translation>
     </message>
@@ -14015,120 +16777,120 @@ Clicca Cancella per uscire.</translation>
 <context>
     <name>TrainSidebar</name>
     <message>
-        <location filename="../TrainSidebar.cpp" line="285"/>
+        <location filename="../TrainSidebar.cpp" line="304"/>
         <source>Save workout data</source>
         <translation type="unfinished">Salva dati allenamento</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="291"/>
+        <location filename="../TrainSidebar.cpp" line="310"/>
         <source>Devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="294"/>
-        <location filename="../TrainSidebar.cpp" line="299"/>
-        <location filename="../TrainSidebar.cpp" line="312"/>
+        <location filename="../TrainSidebar.cpp" line="313"/>
+        <location filename="../TrainSidebar.cpp" line="318"/>
+        <location filename="../TrainSidebar.cpp" line="331"/>
         <source>Menu</source>
         <translation type="unfinished">Menu&apos;</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="298"/>
+        <location filename="../TrainSidebar.cpp" line="317"/>
         <source>Workouts</source>
         <translation type="unfinished">Allenamenti</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="311"/>
+        <location filename="../TrainSidebar.cpp" line="330"/>
         <source>Media</source>
         <translation type="unfinished">Multimedia</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="420"/>
+        <location filename="../TrainSidebar.cpp" line="439"/>
         <source>Import Workout from File</source>
         <translation type="unfinished">Importa Allenamento da file</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="421"/>
+        <location filename="../TrainSidebar.cpp" line="440"/>
         <source>Get Workouts from ErgDB</source>
         <translation type="unfinished">Ottieni gli allenamenti da ErgDB</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="422"/>
+        <location filename="../TrainSidebar.cpp" line="441"/>
         <source>Create Workout via Wizard</source>
         <translation type="unfinished">Crea un allenamento via Wizard</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="423"/>
+        <location filename="../TrainSidebar.cpp" line="442"/>
         <source>Scan for Workouts</source>
         <translation type="unfinished">Scansiona per nuovi allenamenti</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="435"/>
+        <location filename="../TrainSidebar.cpp" line="454"/>
         <source>Delete selected workout</source>
         <translation type="unfinished">Cancella allenamenti selezionati</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="456"/>
+        <location filename="../TrainSidebar.cpp" line="475"/>
         <source>Import Video from File</source>
         <translation type="unfinished">Importa Video da file</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="457"/>
+        <location filename="../TrainSidebar.cpp" line="476"/>
         <source>Scan for Videos</source>
         <translation type="unfinished">Scansiona per Video</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="470"/>
+        <location filename="../TrainSidebar.cpp" line="489"/>
         <source>Delete selected video</source>
         <translation type="unfinished">Cancella video selezionati</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="676"/>
+        <location filename="../TrainSidebar.cpp" line="700"/>
         <source>Are you sure you want to delete this video?</source>
         <translation type="unfinished">Sei sicuro di voler cancellare i video?</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="678"/>
-        <location filename="../TrainSidebar.cpp" line="711"/>
-        <location filename="../TrainSidebar.cpp" line="1662"/>
+        <location filename="../TrainSidebar.cpp" line="702"/>
+        <location filename="../TrainSidebar.cpp" line="735"/>
+        <location filename="../TrainSidebar.cpp" line="1686"/>
         <source>Delete</source>
         <translation type="unfinished">Cancella</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="709"/>
+        <location filename="../TrainSidebar.cpp" line="733"/>
         <source>Are you sure you want to delete this workout?</source>
         <translation type="unfinished">Sei sicuro di voler cancellare questo allenamento?</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1190"/>
+        <location filename="../TrainSidebar.cpp" line="1214"/>
         <source>No Devices Configured</source>
         <translation type="unfinished">Nessun Dispositivo Configurato</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1308"/>
+        <location filename="../TrainSidebar.cpp" line="1332"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
         <translation type="unfinished">Calibrazione in corso...
 Premi F3 sul Controller quando finito.</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1309"/>
+        <location filename="../TrainSidebar.cpp" line="1333"/>
         <source>Done</source>
         <translation type="unfinished">Fatto</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1614"/>
-        <location filename="../TrainSidebar.cpp" line="1632"/>
+        <location filename="../TrainSidebar.cpp" line="1638"/>
+        <location filename="../TrainSidebar.cpp" line="1656"/>
         <source>Add Device</source>
         <translation type="unfinished">Aggiungi Dispositivo</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1619"/>
-        <location filename="../TrainSidebar.cpp" line="1637"/>
+        <location filename="../TrainSidebar.cpp" line="1643"/>
+        <location filename="../TrainSidebar.cpp" line="1661"/>
         <source>Delete Device</source>
         <translation type="unfinished">Cancella Dispositivo</translation>
     </message>
     <message>
-        <location filename="../TrainSidebar.cpp" line="1660"/>
+        <location filename="../TrainSidebar.cpp" line="1684"/>
         <source>Are you sure you want to delete this device?</source>
         <translation type="unfinished">Sei sicuro di voler cancellare questo dispositivo?</translation>
     </message>
@@ -14252,7 +17014,7 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>TreeMapWindow</name>
     <message>
-        <location filename="../TreeMapWindow.cpp" line="102"/>
+        <location filename="../TreeMapWindow.cpp" line="100"/>
         <source>Metric</source>
         <translation>Metrico</translation>
     </message>
@@ -14270,90 +17032,90 @@ Premi F3 sul Controller quando finito.</translation>
         <translation>ottenendo le Impostazioni...</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="161"/>
+        <location filename="../TtbDialog.cpp" line="171"/>
         <source>getting new Session...</source>
         <translation>ottenento nuova Sessione...</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="187"/>
+        <location filename="../TtbDialog.cpp" line="208"/>
         <source>preparing upload ...</source>
         <translation>prepara l&apos;upload ...</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="210"/>
+        <location filename="../TtbDialog.cpp" line="231"/>
         <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
         <translation>file temporaneo troppo grande per l&apos;upload: %1 &gt; %1 bytes</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="213"/>
-        <location filename="../TtbDialog.cpp" line="262"/>
-        <location filename="../TtbDialog.cpp" line="273"/>
-        <location filename="../TtbDialog.cpp" line="339"/>
-        <location filename="../TtbDialog.cpp" line="346"/>
-        <location filename="../TtbDialog.cpp" line="395"/>
-        <location filename="../TtbDialog.cpp" line="402"/>
-        <location filename="../TtbDialog.cpp" line="410"/>
+        <location filename="../TtbDialog.cpp" line="234"/>
+        <location filename="../TtbDialog.cpp" line="294"/>
+        <location filename="../TtbDialog.cpp" line="305"/>
+        <location filename="../TtbDialog.cpp" line="371"/>
+        <location filename="../TtbDialog.cpp" line="378"/>
+        <location filename="../TtbDialog.cpp" line="427"/>
+        <location filename="../TtbDialog.cpp" line="434"/>
         <location filename="../TtbDialog.cpp" line="442"/>
+        <location filename="../TtbDialog.cpp" line="474"/>
         <source>&amp;Close</source>
         <translation>&amp;Chiudi</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="227"/>
+        <location filename="../TtbDialog.cpp" line="248"/>
         <source>uploading ...</source>
         <translation>uploading ...</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="260"/>
+        <location filename="../TtbDialog.cpp" line="292"/>
         <source>request failed: </source>
         <translation>Richiesta fallita: </translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="270"/>
+        <location filename="../TtbDialog.cpp" line="302"/>
         <source>request failed, Server response: %1 %2</source>
         <translation>richiesta fallita, Risposta Server: %1 %2</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="337"/>
+        <location filename="../TtbDialog.cpp" line="369"/>
         <source>failed to parse Settings response: </source>
         <translation>fallito il tentativo di parsing Configurazione:</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="344"/>
+        <location filename="../TtbDialog.cpp" line="376"/>
         <source>failed to get settings: </source>
         <translation>fallito il tentativo di ottenere la Configurazione:</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="393"/>
+        <location filename="../TtbDialog.cpp" line="425"/>
         <source>failed to parse Session response: </source>
         <translation>fallito il tentativo di parsing Configurazione:</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="400"/>
+        <location filename="../TtbDialog.cpp" line="432"/>
         <source>failed to get new session: </source>
         <translation>fallito il tentativo di ottenere una nuova Sessione:</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="409"/>
+        <location filename="../TtbDialog.cpp" line="441"/>
         <source>got empty session</source>
         <translation>ottenuta sessione vuota</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="451"/>
+        <location filename="../TtbDialog.cpp" line="483"/>
         <source>failed to parse upload response: </source>
         <translation>fallito il tentativo di parsing risposta upload:</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="457"/>
+        <location filename="../TtbDialog.cpp" line="489"/>
         <source>failed to upload file: </source>
         <translation>fallito il tentativo di upload file:</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="465"/>
+        <location filename="../TtbDialog.cpp" line="497"/>
         <source>got empty exercise</source>
         <translation>esercizio vuoto</translation>
     </message>
     <message>
-        <location filename="../TtbDialog.cpp" line="469"/>
+        <location filename="../TtbDialog.cpp" line="501"/>
         <source>successfully uploaded as %1</source>
         <translation>Caricato con successo come %1</translation>
     </message>
@@ -14361,187 +17123,187 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>TwitterDialog</name>
     <message>
-        <location filename="../TwitterDialog.cpp" line="32"/>
+        <location filename="../TwitterDialog.cpp" line="31"/>
         <source>Tweet Your Ride</source>
         <translation>Tweetta il tuo allenamento</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="35"/>
+        <location filename="../TwitterDialog.cpp" line="34"/>
         <source>Choose which metrics you wish to tweet: </source>
         <translation>Seleziona campo da inviare con twitter:</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="37"/>
+        <location filename="../TwitterDialog.cpp" line="36"/>
         <source>Workout Time</source>
         <translation>Orarioi Allenamento</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="38"/>
+        <location filename="../TwitterDialog.cpp" line="37"/>
         <source>Time Riding</source>
         <translation>Durata Effettiva</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="39"/>
+        <location filename="../TwitterDialog.cpp" line="38"/>
         <source>Total Distance</source>
         <translation>Distanza totale</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="40"/>
+        <location filename="../TwitterDialog.cpp" line="39"/>
         <source>Elevation Gain</source>
         <translation>Ascesa</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="41"/>
+        <location filename="../TwitterDialog.cpp" line="40"/>
         <source>Total Work (kJ)</source>
         <translation>Lavoro totale (kJ)</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="42"/>
+        <location filename="../TwitterDialog.cpp" line="41"/>
         <source>Average Speed</source>
         <translation>Velocità media</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="43"/>
+        <location filename="../TwitterDialog.cpp" line="42"/>
         <source>Average Power</source>
         <translation>Potenza media</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="44"/>
+        <location filename="../TwitterDialog.cpp" line="43"/>
         <source>Average Heart Rate</source>
         <translation>FC media</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="45"/>
+        <location filename="../TwitterDialog.cpp" line="44"/>
         <source>Average Cadence</source>
         <translation>Cadenza media</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="46"/>
+        <location filename="../TwitterDialog.cpp" line="45"/>
         <source>Max Power</source>
         <translation>Max Potenza</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="47"/>
+        <location filename="../TwitterDialog.cpp" line="46"/>
         <source>Max Heart Rate</source>
         <translation>Max FC</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="64"/>
+        <location filename="../TwitterDialog.cpp" line="63"/>
         <source>Twitter Message:</source>
         <translation>Messaggio Twitter :</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="68"/>
+        <location filename="../TwitterDialog.cpp" line="67"/>
         <source>Message Length: </source>
         <translation>Lunghezza messaggio: </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="73"/>
+        <location filename="../TwitterDialog.cpp" line="72"/>
         <source>&amp;Tweet Ride</source>
         <translation>&amp;Tweet allenamento</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="75"/>
+        <location filename="../TwitterDialog.cpp" line="74"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="109"/>
+        <location filename="../TwitterDialog.cpp" line="108"/>
         <source>Golden Cheetah-&gt;Preferences</source>
         <translation>Golden Cheetah-&gt;Preferenze</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="111"/>
+        <location filename="../TwitterDialog.cpp" line="110"/>
         <source>Tools-&gt;Options</source>
         <translation>Strumenti-&gt;Opzioni</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="113"/>
+        <location filename="../TwitterDialog.cpp" line="112"/>
         <source>Error fetching OAuth credentials.  Please make sure to complete the twitter authorization procedure found under %1.</source>
         <translation>Errore nell&apos;acquisire le credenziali OAuth.  Per favore accertati di aver completato l&apos;autorizzazione di twitter in %1.</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="114"/>
+        <location filename="../TwitterDialog.cpp" line="113"/>
         <source>OAuth Error</source>
         <translation>Errore OAuth </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="129"/>
+        <location filename="../TwitterDialog.cpp" line="128"/>
         <source>Tweet Length Error</source>
         <translation>Errore lunghezza msg</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="129"/>
+        <location filename="../TwitterDialog.cpp" line="128"/>
         <source>Tweet must be 140 characters or fewer.</source>
         <translation>Il msg deve avere meno di 140 caratteri.</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="142"/>
+        <location filename="../TwitterDialog.cpp" line="141"/>
         <source>Error Posting Tweet</source>
         <translation>Errore inviando Tweet</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="142"/>
+        <location filename="../TwitterDialog.cpp" line="141"/>
         <source>There was an error connecting to Twitter.  Check your network connection and try again.</source>
         <translation>C&apos;era un errore nel connetter Twitter.  Controlla la connessione ad internet e prova di nuovo.</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="157"/>
+        <location filename="../TwitterDialog.cpp" line="156"/>
         <source>seconds</source>
         <translation>secondi</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="177"/>
+        <location filename="../TwitterDialog.cpp" line="176"/>
         <source>Duration: %1 </source>
         <translation>Durata: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="182"/>
+        <location filename="../TwitterDialog.cpp" line="181"/>
         <source>Time Riding: %1 </source>
         <translation>Durata Effettivo %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="187"/>
+        <location filename="../TwitterDialog.cpp" line="186"/>
         <source>Distance: %1 </source>
         <translation>Distanza: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="192"/>
+        <location filename="../TwitterDialog.cpp" line="191"/>
         <source>Climbing: %1 </source>
         <translation>Scalata: %1</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="197"/>
+        <location filename="../TwitterDialog.cpp" line="196"/>
         <source>Work: %1 </source>
         <translation>Lavoro: %1</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="202"/>
+        <location filename="../TwitterDialog.cpp" line="201"/>
         <source>Avg Speed: %1 </source>
         <translation>Velocita&apos; media: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="207"/>
+        <location filename="../TwitterDialog.cpp" line="206"/>
         <source>Avg Power: %1 </source>
         <translation>Potenza Media: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="212"/>
+        <location filename="../TwitterDialog.cpp" line="211"/>
         <source>Avg HR: %1 </source>
         <translation>FC media: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="217"/>
+        <location filename="../TwitterDialog.cpp" line="216"/>
         <source>Avg Cadence: %1 </source>
         <translation>Cadenza media: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="222"/>
+        <location filename="../TwitterDialog.cpp" line="221"/>
         <source>Max Power: %1 </source>
         <translation>Potenza Massima: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="227"/>
+        <location filename="../TwitterDialog.cpp" line="226"/>
         <source>Max HR: %1 </source>
         <translation>FC Massima: %1 </translation>
     </message>
@@ -14586,8 +17348,8 @@ Premi F3 sul Controller quando finito.</translation>
         <translation type="obsolete">rpm</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="243"/>
-        <location filename="../TwitterDialog.cpp" line="251"/>
+        <location filename="../TwitterDialog.cpp" line="242"/>
+        <location filename="../TwitterDialog.cpp" line="250"/>
         <source>Message Length: %1</source>
         <translation>Lunghezza Messaggio: %1</translation>
     </message>
@@ -14606,7 +17368,7 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>VAM</name>
     <message>
-        <location filename="../BasicRideMetrics.cpp" line="839"/>
+        <location filename="../BasicRideMetrics.cpp" line="913"/>
         <source>VAM</source>
         <translation>VAM</translation>
     </message>
@@ -14712,16 +17474,24 @@ Premi F3 sul Controller quando finito.</translation>
     </message>
 </context>
 <context>
-    <name>WPrimeMin</name>
+    <name>WPrimeExp</name>
     <message>
-        <location filename="../WPrime.cpp" line="178"/>
-        <source>Minimum W&apos;</source>
+        <location filename="../WPrime.cpp" line="644"/>
+        <source>W&apos; Work</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../WPrime.cpp" line="180"/>
-        <location filename="../WPrime.cpp" line="181"/>
-        <source>Kj</source>
+        <location filename="../WPrime.cpp" line="646"/>
+        <location filename="../WPrime.cpp" line="647"/>
+        <source>kJ</source>
+        <translation type="unfinished">kJ</translation>
+    </message>
+</context>
+<context>
+    <name>WPrimeTau</name>
+    <message>
+        <location filename="../WPrime.cpp" line="615"/>
+        <source>W&apos;bal TAU</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14740,12 +17510,12 @@ Premi F3 sul Controller quando finito.</translation>
     <name>WithingsDownload</name>
     <message>
         <location filename="../WithingsDownload.cpp" line="42"/>
-        <location filename="../WithingsDownload.cpp" line="93"/>
+        <location filename="../WithingsDownload.cpp" line="94"/>
         <source>Withings Data Download</source>
         <translation>Download Dati Withings</translation>
     </message>
     <message>
-        <location filename="../WithingsDownload.cpp" line="92"/>
+        <location filename="../WithingsDownload.cpp" line="93"/>
         <source>%1 new on %2 measurements received.</source>
         <translation>%1 nuovo su %2 misure ricevute.</translation>
     </message>
@@ -14753,38 +17523,38 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>WorkoutEditorBase</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="84"/>
+        <location filename="../WorkoutWizard.cpp" line="88"/>
         <source>Delete</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="85"/>
+        <location filename="../WorkoutWizard.cpp" line="89"/>
         <source>Delete the highlighted row</source>
         <translation>Cancella le righe selezionate</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="89"/>
+        <location filename="../WorkoutWizard.cpp" line="93"/>
         <source>Add</source>
         <translation>Aggiungi</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="90"/>
+        <location filename="../WorkoutWizard.cpp" line="94"/>
         <source>Add row at end</source>
         <translation>Aggiungi riga alla fine</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="94"/>
+        <location filename="../WorkoutWizard.cpp" line="98"/>
         <source>Insert</source>
         <translation>Inserisci</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="95"/>
-        <location filename="../WorkoutWizard.cpp" line="100"/>
+        <location filename="../WorkoutWizard.cpp" line="99"/>
+        <location filename="../WorkoutWizard.cpp" line="104"/>
         <source>Add a Lap below the highlighted row</source>
         <translation>Aggiungi Giro sotto the riga selezionata</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="99"/>
+        <location filename="../WorkoutWizard.cpp" line="103"/>
         <source>Lap</source>
         <translation>Giro</translation>
     </message>
@@ -14820,7 +17590,7 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>WorkoutMetricsSummary</name>
     <message>
-        <location filename="../WorkoutWizard.h" line="205"/>
+        <location filename="../WorkoutWizard.h" line="210"/>
         <source>Workout Metrics</source>
         <translation>Metriche Allenamento</translation>
     </message>
@@ -14842,27 +17612,27 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>WorkoutTypePage</name>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="220"/>
+        <location filename="../WorkoutWizard.cpp" line="225"/>
         <source>Workout Creator</source>
         <translation>Progetta Allenamenti</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="221"/>
+        <location filename="../WorkoutWizard.cpp" line="226"/>
         <source>Select the workout type to be created</source>
         <translation>Seleziona il tipo d&apos;allenamento da creare</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="223"/>
+        <location filename="../WorkoutWizard.cpp" line="228"/>
         <source>Absolute Wattage</source>
         <translation>Wattage Assoluto</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="225"/>
+        <location filename="../WorkoutWizard.cpp" line="230"/>
         <source>% FTP Wattage</source>
         <translation>% FTP Wattage</translation>
     </message>
     <message>
-        <location filename="../WorkoutWizard.cpp" line="226"/>
+        <location filename="../WorkoutWizard.cpp" line="231"/>
         <source>Gradient</source>
         <translation>Gradiente</translation>
     </message>
@@ -14979,12 +17749,12 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2290"/>
+        <location filename="../Pages.cpp" line="2609"/>
         <source>Critical Power</source>
         <translation>Potenza Critica (CP)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2291"/>
+        <location filename="../Pages.cpp" line="2610"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
@@ -15072,78 +17842,78 @@ Premi F3 sul Controller quando finito.</translation>
 <context>
     <name>Zones</name>
     <message>
-        <location filename="../Zones.cpp" line="178"/>
+        <location filename="../Zones.cpp" line="183"/>
         <source>line %1: read new range without reading any zones for previous one</source>
         <translation>linea %1: letto nuovo intervallo senza aver letto nessuna zona dal precedente</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="238"/>
+        <location filename="../Zones.cpp" line="263"/>
         <source>line %1: read zone without preceding date range</source>
         <translation>linea %1: letta zona senza aver processato l&apos;intervallo date</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="252"/>
-        <location filename="../Zones.cpp" line="274"/>
+        <location filename="../Zones.cpp" line="285"/>
+        <location filename="../Zones.cpp" line="315"/>
         <source>attempt to set zone based on % of CP without setting CP in line number %1.
 </source>
         <translation>tentativo di impostare le zone basato su % della PC senza aver impostato PC nella linea numero %1.</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="306"/>
+        <location filename="../Zones.cpp" line="356"/>
         <source>file ended without reading any zones for last range</source>
         <translation>il file e&apos; concluso senza aver letto nessuna zona per l&apos;ultimo intevallo</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="354"/>
+        <location filename="../Zones.cpp" line="409"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
         <translation>Impostazione data finale intervallo %1 alla data d&apos;inizio intervallo %2.</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="365"/>
+        <location filename="../Zones.cpp" line="419"/>
         <source>Extending final range %1 to infinite to include present date.
 </source>
         <translation>Estensione intervallo finale %1 a infinito per includere la data attuale.</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="372"/>
+        <location filename="../Zones.cpp" line="426"/>
         <source>CP must be greater than zero in zone range %1 of power.zones</source>
         <translation>PC deve essere maggiore di zero nell&apos;intervallo zona %1 delle zone di potenza</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="391"/>
+        <location filename="../Zones.cpp" line="449"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
         <translation>L&apos;intervallo %1: accoppia il top di zona %2 (%3) fino all&apos;estremo inferiore di zona %4 (%5).</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="405"/>
+        <location filename="../Zones.cpp" line="463"/>
         <source>Range %1: setting top of zone %2 from %3 to MAX.
 </source>
         <translation>L&apos;intervallo %1 impostato al top di zona %2 da %3 fino al MAX.</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="594"/>
+        <location filename="../Zones.cpp" line="673"/>
         <source>Critical Power (watts): %1</source>
         <translation>Potenza Critica (watt): %1</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="602"/>
+        <location filename="../Zones.cpp" line="681"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Min (watt)&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="603"/>
+        <location filename="../Zones.cpp" line="682"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Max (watt)&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="605"/>
+        <location filename="../Zones.cpp" line="684"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="600"/>
+        <location filename="../Zones.cpp" line="679"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Zona&lt;/td&gt;</translation>
     </message>
@@ -15183,40 +17953,61 @@ Premi F3 sul Controller quando finito.</translation>
         <translation>Neuromuscolare</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="601"/>
+        <location filename="../Zones.cpp" line="680"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Descrizione&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="604"/>
+        <location filename="../Zones.cpp" line="683"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;Orario&lt;/td&gt;</translation>
     </message>
 </context>
 <context>
+    <name>aTISS</name>
+    <message>
+        <location filename="../BikeScore.cpp" line="237"/>
+        <source>Aerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BikeScore.cpp" line="283"/>
+        <source>Anaerobic TISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>dTISS</name>
+    <message>
+        <location filename="../BikeScore.cpp" line="331"/>
+        <source>TISS Aerobicity</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>deviceModel</name>
     <message>
-        <location filename="../Pages.cpp" line="971"/>
+        <location filename="../Pages.cpp" line="980"/>
         <source>Device Name</source>
         <translation>Nome Dispositivo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="973"/>
+        <location filename="../Pages.cpp" line="982"/>
         <source>Device Type</source>
         <translation>Tipo di dispositivo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="975"/>
+        <location filename="../Pages.cpp" line="984"/>
         <source>Port Spec</source>
         <translation>Specifica porta</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="977"/>
+        <location filename="../Pages.cpp" line="986"/>
         <source>Profile</source>
         <translation>Profilo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="979"/>
+        <location filename="../Pages.cpp" line="988"/>
         <source>Virtual</source>
         <translation>Virtuale</translation>
     </message>
