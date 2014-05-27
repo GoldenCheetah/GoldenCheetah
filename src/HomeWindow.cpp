@@ -19,6 +19,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Tab.h"
+#include "TabView.h"
 #include "HomeWindow.h"
 #include "LTMTool.h"
 #include "LTMSettings.h"
@@ -26,6 +27,9 @@
 #include "ChartBar.h"
 
 #include <QGraphicsDropShadowEffect>
+#include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 static const int tileMargin = 20;
 static const int tileSpacing = 10;
@@ -106,6 +110,10 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     tileGrid->setSpacing(0);
 
     tileArea = new QScrollArea(this);
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
+    tileArea->setStyle(cde);
+#endif
     tileArea->setAutoFillBackground(false);
     tileArea->setPalette(palette);
     tileArea->setWidgetResizable(true);
@@ -184,7 +192,10 @@ HomeWindow::addChartFromMenu(QAction*action)
 void
 HomeWindow::configChanged()
 {
-    // get config
+    // update scroll bar
+//#ifndef Q_OS_MAC
+    tileArea->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+//#endif
 }
 
 void
