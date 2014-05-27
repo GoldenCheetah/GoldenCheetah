@@ -82,6 +82,8 @@ class MainWindow : public QMainWindow
 
     public slots:
 
+        bool eventFilter(QObject*,QEvent*);
+
         // GUI
 #ifndef Q_OS_MAC
         void toggleFullScreen();

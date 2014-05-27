@@ -229,7 +229,7 @@ MainWindow::MainWindow(const QDir &home)
     /*----------------------------------------------------------------------
      *  Mac Toolbar
      *--------------------------------------------------------------------*/
-#ifdef Q_OS_MAC 
+#ifdef Q_OS_MAC
 #if QT_VERSION > 0x50000
 #if QT_VERSION >= 0x50201
     setUnifiedTitleAndToolBarOnMac(true);
@@ -243,10 +243,10 @@ MainWindow::MainWindow(const QDir &home)
     // make it the same 'light' colour as the other widgets do.
 #if QT_VERSION < 0x50201
     head->setStyleSheet(" QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #C6C6C6, stop: 1 #A5A5A5 ); } "
-                        " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } "); 
+                        " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } ");
 #else
     head->setStyleSheet(" QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
-                        " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } "); 
+                        " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } ");
 #endif
 
     // widgets
@@ -364,7 +364,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
 #endif
 
-#endif 
+#endif
 
     /*----------------------------------------------------------------------
      *  Windows and Linux Toolbar
@@ -529,7 +529,7 @@ MainWindow::MainWindow(const QDir &home)
     QVBoxLayout *mainLayout = new QVBoxLayout(central);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
-#ifndef Q_OS_MAC // nonmac toolbar on main view -- its not 
+#ifndef Q_OS_MAC // nonmac toolbar on main view -- its not
                  // unified with the title bar.
     mainLayout->addWidget(head);
 #endif
@@ -563,7 +563,7 @@ MainWindow::MainWindow(const QDir &home)
     openTabMenu = fileMenu->addMenu(tr("Open &Tab"));
     connect(openWindowMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenWindowMenu()));
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
-    
+
     windowMapper = new QSignalMapper(this); // maps each option
     connect(windowMapper, SIGNAL(mapped(const QString &)), this, SLOT(openWindow(const QString &)));
 
@@ -722,6 +722,8 @@ MainWindow::MainWindow(const QDir &home)
 
     //grab focus
     currentTab->setFocus();
+
+    installEventFilter(this);
 }
 
 /*----------------------------------------------------------------------
@@ -817,12 +819,12 @@ MainWindow::setChartMenu()
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
     }
-    
+
     chartMenu->clear();
     if (!mask) return;
 
     for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance & mask) 
+        if (GcWindows[i].relevance & mask)
             chartMenu->addAction(GcWindows[i].name);
     }
 }
@@ -852,7 +854,7 @@ MainWindow::setChartMenu(QMenu *menu)
     if (!mask) return;
 
     for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance & mask) 
+        if (GcWindows[i].relevance & mask)
             menu->addAction(GcWindows[i].name);
     }
 }
@@ -863,11 +865,11 @@ MainWindow::setActivityMenu()
     // enable/disable upload if already uploaded
     if (currentTab->context->ride && currentTab->context->ride->ride()) {
 
-        
+
         QString activityId = currentTab->context->ride->ride()->getTag("TtbExercise", "");
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
-        
+
     } else {
         ttbAction->setEnabled(false);
     }
@@ -910,6 +912,15 @@ MainWindow::toggleFullScreen()
     else qDebug()<<"no fullscreen support compiled in.";
 }
 #endif
+
+bool
+MainWindow::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == this) {
+        if (e->type() == QEvent::WindowStateChange) resizeEvent(NULL); // see below
+    }
+    return false;
+}
 
 void
 MainWindow::resizeEvent(QResizeEvent*)
@@ -988,8 +999,8 @@ MainWindow::closeAll()
 {
     QList<MainWindow *> windows = mainwindows; // get a copy, since it is updated as closed
 
-    foreach(MainWindow *window, windows) 
-        if (window != this) 
+    foreach(MainWindow *window, windows)
+        if (window != this)
             window->closeWindow();
 
     // now close us down!
@@ -1114,7 +1125,7 @@ MainWindow::setToolButtons()
         break;
     case 2:
         index = 1; // diary
-        break; 
+        break;
     }
 #else
     switch (index) {
@@ -1586,7 +1597,7 @@ MainWindow::saveState(Context *context)
 #ifdef GC_HAVE_LUCENE
     context->searchText = searchBox->text();
 #endif
-    context->viewIndex = scopebar->selected();  
+    context->viewIndex = scopebar->selected();
     context->style = styleAction->isChecked();
     context->viewIndex = scopebar->selected();
 }
@@ -1727,7 +1738,7 @@ MainWindow::importWorkout()
     allFormats << "All files (*.*)";
     QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Import from File"), lastDir, allFormats.join(";;"));
 
-    // lets process them 
+    // lets process them
     if (!fileNames.isEmpty()) {
 
         // save away last place we looked
@@ -1755,7 +1766,7 @@ MainWindow::downloadErgDB()
         ErgDBDownloadDialog *d = new ErgDBDownloadDialog(currentTab->context);
         d->exec();
     } else{
-        QMessageBox::critical(this, tr("Workout Directory Invalid"), 
+        QMessageBox::critical(this, tr("Workout Directory Invalid"),
         "The workout directory is not configured, or the directory"
         " selected no longer exists.\n\n"
         "Please check your preference settings.");
