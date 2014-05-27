@@ -311,6 +311,8 @@ TabView::sidebarChanged()
 
     if (sidebarEnabled()) {
 
+        setUpdatesEnabled(false);
+
         sidebar_->show();
 
         // Restore sizes
@@ -332,6 +334,15 @@ TabView::sidebarChanged()
             sizes.append(width()-size);
             splitter->setSizes(sizes);
         }
+
+        // if user moved us then tell ride navigator if
+        // we are the analysis view
+        // all a bit of a hack to stop the column widths from
+        // being adjusted as the splitter gets resized and reset
+        if (type == VIEW_ANALYSIS && active == false)
+            context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
+
+        setUpdatesEnabled(true);
 
     } else sidebar_->hide();
 }
