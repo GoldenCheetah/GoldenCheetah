@@ -147,7 +147,9 @@ struct Bin2FileReaderState
         if (lrbal == 0xFF)
             lrbal = 0;
         else if ((lrbal & 0x200) == 0x200)
-            lrbal = 100-lrbal;
+            lrbal = 100-(lrbal & 0x3F);
+        else
+            lrbal = lrbal & 0x3F;
 
         if (cad == 0xFF)
             cad = 0;
