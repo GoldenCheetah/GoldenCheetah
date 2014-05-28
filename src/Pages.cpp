@@ -3195,6 +3195,7 @@ HrZonePage::saveClicked()
 HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(5);
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
@@ -3374,6 +3375,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     active = false;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(5);
 
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
