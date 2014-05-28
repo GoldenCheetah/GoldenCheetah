@@ -39,7 +39,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
 
 #ifdef Q_OS_MAC
     QToolBar *head = addToolBar(tr("Preferences"));
-    setFixedSize(600,540);
+    setMinimumSize(600,540);
     setUnifiedTitleAndToolBarOnMac(true);
     head->setFloatable(false);
     head->setMovable(false);
@@ -48,7 +48,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
     head->setMovable(false); // oops!
 
     QFont defaultFont;
-    setFixedSize(60 * defaultFont.pointSize(),580);   //Change for 53 to 60 - To be decided if also Size for Q_OS_MAC need change
+    setMinimumSize(60 * defaultFont.pointSize(),580);   //Change for 53 to 60 - To be decided if also Size for Q_OS_MAC need change
 #endif
 
     // center
