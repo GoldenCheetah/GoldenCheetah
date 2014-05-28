@@ -302,7 +302,11 @@ GCColor::css()
     //QColor altColor = GCColor::alternateColor(bgColor); // not yet ?
 
     return QString("<style> "
-                   "body { color: %3; background-color: %2; }"
+                   "html { overflow: auto; }"
+                   "body { position: absolute; "
+                   "       top: 5px; left: 5px; bottom: 5px; right: 5px; padding: 0px; "
+                   "       overflow-y: hidden; overflow-x: hidden; color: %3; background-color: %2; }"
+                   "body:hover { overflow-y: scroll; }"
                    "h1 { color: %1; background-color: %2; } "
                    "h2 { color: %1; background-color: %2; } "
                    "h3 { color: %1; background-color: %2; } "
