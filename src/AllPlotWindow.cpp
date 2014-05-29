@@ -145,7 +145,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackZoomSlider->setMaximum(7);
     stackZoomSlider->setTickInterval(1);
     stackZoomSlider->setValue(3);
-    cl1->addRow(new QLabel("Stack Zoom"), stackZoomSlider); 
+    cl1->addRow(new QLabel(tr("Stack Zoom")), stackZoomSlider);
 
     showFull = new QCheckBox(tr("Full plot"), this);
     showFull->setCheckState(Qt::Checked);
@@ -166,7 +166,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     showAccel = new QCheckBox(tr("Acceleration"), this);
     showAccel->setCheckState(Qt::Checked);
-    cl1->addRow(new QLabel("Delta Series"), showAccel);
+    cl1->addRow(new QLabel(tr("Delta Series")), showAccel);
     showPowerD = new QCheckBox(QString(tr("Power %1").arg(deltaChar)), this);
     showPowerD->setCheckState(Qt::Unchecked);
     cl1->addRow(new QLabel(""), showPowerD);
@@ -184,7 +184,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     showBalance = new QCheckBox(tr("Balance"), this);
     showBalance->setCheckState(Qt::Checked);
-    cl1->addRow(new QLabel("Left/Right"), showBalance);
+    cl1->addRow(new QLabel(tr("Left/Right")), showBalance);
 
     showTE = new QCheckBox(tr("Torque Effectiveness"));
     showTE->setCheckState(Qt::Unchecked);
@@ -226,7 +226,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     showANTISS = new QCheckBox(tr("Anaerobic TISS"), this);
     showANTISS->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel("Metrics"), showANTISS);
+    cl2->addRow(new QLabel(tr("Metrics")), showANTISS);
 
     showATISS = new QCheckBox(tr("Aerobic TISS"), this);
     showATISS->setCheckState(Qt::Unchecked);
