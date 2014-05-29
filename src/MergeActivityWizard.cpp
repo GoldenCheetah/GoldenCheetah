@@ -80,7 +80,7 @@ MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *ride1Label = new QLabel(tr("Current ride")+" "+parent->ride1->dateTime.toString("MMM d, yyyy - hh:mm:ss"));
+    QLabel *ride1Label = new QLabel(tr("Current ride")+" "+parent->ride1->dateTime.toString(tr("MMM d, yyyy - hh:mm:ss")));
     layout->addWidget(ride1Label);
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum,QSizePolicy::Expanding );
     layout->addItem( spacer );
@@ -156,7 +156,7 @@ MergeUpload::importFile(QList<QString> files)
             if (ride) {
                 //wizard->addRideFile(ride);
                 labelSuccess->setText(tr("File uploaded"));
-                ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString("MMM d, yyyy - hh:mm:ss"));
+                ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString(tr("MMM d, yyyy - hh:mm:ss")));
 
                 wizard->ride2 = ride;
             }

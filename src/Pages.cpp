@@ -1154,7 +1154,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     lineWidth->setMaximum(5);
     lineWidth->setMinimum(0.5);
     lineWidth->setSingleStep(0.5);
-    applyTheme = new QPushButton("Apply Theme");
+    applyTheme = new QPushButton(tr("Apply Theme"));
     lineWidth->setValue(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
 
     QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
