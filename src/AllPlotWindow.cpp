@@ -527,7 +527,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     vlayout->setSpacing(1);
 
     // put a helper on the screen for mouse over intervals...
-    addHelper(tr("Intervals"), new IntervalSummaryWindow(context));
+    overlayIntervals = new IntervalSummaryWindow(context);
+    addHelper(tr("Intervals"), overlayIntervals);
 
     //mainLayout->addLayout(vlayout,0,0);
     //mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
@@ -624,6 +625,7 @@ AllPlotWindow::configChanged()
     comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
     seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
     stackFrame->setStyleSheet(TabView::ourStyleSheet());
+    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
 #endif
 
     // set palettes
