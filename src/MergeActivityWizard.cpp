@@ -72,7 +72,7 @@ MergeWelcome::MergeWelcome(MergeActivityWizard *parent) : QWizardPage(parent), w
 }
 
 // Upload
-MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent), ridesLoaded(false)
 {
     setTitle(tr("Upload"));
     setSubTitle(tr("Select file to merge"));
@@ -132,8 +132,6 @@ MergeUpload::importFile()
 void
 MergeUpload::importFile(QList<QString> files)
 {
-
-
     // get fullpath name for processing
     QFileInfo filename = QFileInfo(files[0]).absoluteFilePath();
 
@@ -159,7 +157,7 @@ MergeUpload::importFile(QList<QString> files)
                 ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString(tr("MMM d, yyyy - hh:mm:ss")));
 
                 wizard->ride2 = ride;
-                ride2Loaded = TRUE;
+                ridesLoaded = true;
                 emit completeChanged();
             }
 
@@ -174,7 +172,7 @@ MergeUpload::importFile(QList<QString> files)
 
 bool MergeUpload::isComplete() const
 {
-  return ride2Loaded;
+  return ridesLoaded;
 }
 
 
