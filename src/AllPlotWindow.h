@@ -36,6 +36,7 @@ class QwtPlotMarker;
 class QwtArrowButton;
 class RideItem;
 class IntervalItem;
+class IntervalSummaryWindow;
 class QxtSpanSlider;
 class QxtGroupBox;
 class WPrime;
@@ -284,6 +285,7 @@ class AllPlotWindow : public GcChartWindow
         QLineEdit *rSmoothEdit;
         QCheckBox *rStack, *rBySeries, *rFull, *rHelp;
         QStackedWidget *allPlotStack;
+        IntervalSummaryWindow *overlayIntervals;
 
         // comparing 
         QList<AllPlotObject*> compareIntervalCurves; // one per compareInterval
