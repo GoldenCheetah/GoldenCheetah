@@ -147,7 +147,6 @@ class MergeUpload : public QWizardPage
         QPushButton *uploadButton;
         QLabel      *labelSuccess, *ride2Label;
         bool isComplete() const;
-        bool ridesLoaded;
 
     private slots:
         void importFile();

@@ -33,6 +33,7 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
 
     // current ride
     ride1 = const_cast<RideItem*>(context->currentRideItem());
+    ride2 = NULL;
 
     // 5 step process, although Conflict may be skipped
     mergeWelcome = new MergeWelcome(this);
@@ -72,7 +73,7 @@ MergeWelcome::MergeWelcome(MergeActivityWizard *parent) : QWizardPage(parent), w
 }
 
 // Upload
-MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent), ridesLoaded(false)
+MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Upload"));
     setSubTitle(tr("Select file to merge"));
@@ -157,7 +158,6 @@ MergeUpload::importFile(QList<QString> files)
                 ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString(tr("MMM d, yyyy - hh:mm:ss")));
 
                 wizard->ride2 = ride;
-                ridesLoaded = true;
                 emit completeChanged();
             }
 
@@ -172,7 +172,7 @@ MergeUpload::importFile(QList<QString> files)
 
 bool MergeUpload::isComplete() const
 {
-  return ridesLoaded;
+  return (wizard->ride2 != NULL);
 }
 
 
