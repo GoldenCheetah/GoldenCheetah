@@ -31,6 +31,8 @@
 #include <QXmlDefaultHandler>
 #include <QtGui>
 #include <QLineEdit>
+#include <QStyle>
+#include <QStyleFactory>
 
 // shorthand when looking up our ride via  Q_PROPERTY
 #define ourRideItem meta->property("ride").value<RideItem*>()
@@ -56,6 +58,12 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
 		    " margin: 0px,0px,0px,0px;"
 		    " border: 0px;"
 		    " border-top: 0px; }");
+#endif
+
+    // better styling on Linux with fusion controls
+#if (defined Q_OS_LINUX) && (QT_VERSION >= 0x050000)
+    QStyle *fusion = QStyleFactory::create("fusion");
+    setStyle(fusion);
 #endif
     mainLayout->addWidget(tabs);
 
