@@ -16012,17 +16012,22 @@ You can define the minimum length, in time, a gap in recording should be in orde
 In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Cet assistant va trouver des segments de sortie à sauver en cherchant les pauses dans l&apos;enregistrement. 
+
+Vous pouvez définir la longueur minimum d&apos;une pause dans l&apos;enregistrement pour considérer qu&apos;elle sépare la fin d&apos;une sortie et le début de la suivante.
+
+De plus vous pouvez définir la taille minimum d&apos;une sortie. Tous segment plus petit que cette limite sera ignoré.
+</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="527"/>
         <source>Minimum Gap (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pause minimum (minutes)</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="528"/>
         <source>Minimum Segment Size (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Longueur minimum (minutes)</translation>
     </message>
 </context>
 <context>
@@ -16054,7 +16059,7 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
     <message>
         <location filename="../SplitActivityWizard.cpp" line="586"/>
         <source>Ride will be split between marker points selected</source>
-        <translation type="unfinished"></translation>
+        <translation>La sortie sera divisée entre les points sélectionnés</translation>
     </message>
     <message>
         <source>Activity will be split between marker points selected</source>
@@ -16070,7 +16075,7 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
     <message>
         <location filename="../SplitActivityWizard.cpp" line="448"/>
         <source>Split Ride</source>
-        <translation type="unfinished"></translation>
+        <translation>Diviser une sortie</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="449"/>
@@ -16084,7 +16089,11 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
 The wizard will identify segments of uninterrupted ride and allow you to select which ones to save as new rides. You will also be able to select any currently defined intervals too.
 
 If the newly created ride clashes with an existing ride (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing rides.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cet assistant vous aide à diviser la sortie sélectionnée en plusieurs sorties
+
+Cet assistant va indentifier des segments ininterrompus et vous permet de sélectionner lesquels sauver comme nouvelle sortie. Vous pouvez également utiliser les intervalles définis.
+
+Si la nouvelle sortie correspond a une sortie existante (même date et heure) l&apos;heure de début sera décalé de quelques secondes pour éviter d&apos;écraser la sortie existante.</translation>
     </message>
 </context>
 <context>
@@ -16092,7 +16101,7 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../SrmDevice.cpp" line="87"/>
         <source>Failed to create temporary file </source>
-        <translation type="unfinished">Impossible de créer le fichier temporaire </translation>
+        <translation>Impossible de créer le fichier temporaire </translation>
     </message>
     <message>
         <location filename="../SrmDevice.cpp" line="129"/>
@@ -16451,58 +16460,58 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../ShareDialog.cpp" line="247"/>
         <source>Cannot login to Strava. Check permission</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de s&apos;identifier dans Strava. Vérifier vos données</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="262"/>
         <source>This Ride is marked as already on Strava. Are you sure you want to upload it?</source>
-        <translation type="unfinished">Cette activité est marquée comme déjà envoyée vers Strava. Voulez-vous l&apos;envoyer à nouveau?</translation>
+        <translation>Cette activité est marquée comme déjà envoyée vers Strava. Voulez-vous l&apos;envoyer à nouveau?</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="265"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="266"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="287"/>
         <source>Error uploading to Strava</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur impossible de télécharger sur Strava</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="292"/>
         <source>Successfully uploaded to Strava
 </source>
-        <translation type="unfinished">Envoyé vers Strava avec succès</translation>
+        <translation>Envoyé vers Strava avec succès</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="301"/>
         <source>Upload ride to Strava...</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement sur Strava...</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="378"/>
         <source>Upload ride... Sending to Strava</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargment... Envoi vers Strava</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="387"/>
         <source>Upload to Strava finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement sur Strava terminé.</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="406"/>
         <source> Error from Strava: </source>
-        <translation type="unfinished"></translation>
+        <translation> Erreur de Strava: </translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="426"/>
         <source>Ride processing...</source>
-        <translation type="unfinished">Traitement de l&apos;activité...</translation>
+        <translation>Traitement de l&apos;activité...</translation>
     </message>
 </context>
 <context>
@@ -16562,7 +16571,7 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../TPDownload.cpp" line="70"/>
         <source>Error:</source>
-        <translation type="unfinished">Erreur:</translation>
+        <translation>Erreur:</translation>
     </message>
 </context>
 <context>
@@ -16806,12 +16815,12 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../TabView.cpp" line="63"/>
         <source>Compare Rides and Intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Comparer les sorties et les intervalles</translation>
     </message>
     <message>
         <location filename="../TabView.cpp" line="64"/>
         <source>Compare Date Ranges</source>
-        <translation type="unfinished"></translation>
+        <translation>Comparer des périodes</translation>
     </message>
 </context>
 <context>
@@ -16819,52 +16828,52 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../Colors.cpp" line="363"/>
         <source>Default</source>
-        <translation type="unfinished">Défaut</translation>
+        <translation>Défaut</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="373"/>
         <source>Neutral Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>Bleu neutre</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="381"/>
         <source>Firenze</source>
-        <translation type="unfinished"></translation>
+        <translation>Firenze</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="389"/>
         <source>Mustang</source>
-        <translation type="unfinished"></translation>
+        <translation>Mustang</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="397"/>
         <source>Japanese Garden</source>
-        <translation type="unfinished"></translation>
+        <translation>Jardin japonais</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="405"/>
         <source>Zen and Tea</source>
-        <translation type="unfinished"></translation>
+        <translation>Zen et thé</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="413"/>
         <source>Mono (dark)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mono (foncé)</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="421"/>
         <source>Mono (light)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mono (léger)</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="430"/>
         <source>Schoberer</source>
-        <translation type="unfinished"></translation>
+        <translation>Schoberer</translation>
     </message>
     <message>
         <location filename="../Colors.cpp" line="439"/>
         <source>Classic</source>
-        <translation type="unfinished"></translation>
+        <translation>Classique</translation>
     </message>
 </context>
 <context>
@@ -16890,7 +16899,7 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../ToolsDialog.cpp" line="62"/>
         <source>Critical Power Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimation de la Puissance Critique (CP)</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="69"/>
@@ -16910,12 +16919,12 @@ If the newly created ride clashes with an existing ride (same date and time) the
     <message>
         <location filename="../ToolsDialog.cpp" line="90"/>
         <source>Your W&apos;:</source>
-        <translation type="unfinished"></translation>
+        <translation>Votre W&apos;:</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="102"/>
         <source>Estimate CP</source>
-        <translation type="unfinished"></translation>
+        <translation>CP estimé</translation>
     </message>
     <message>
         <source>Calculate CP</source>
@@ -17697,7 +17706,7 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../WPrime.cpp" line="615"/>
         <source>W&apos;bal TAU</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;bal TAU</translation>
     </message>
 </context>
 <context>
