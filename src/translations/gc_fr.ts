@@ -6899,72 +6899,72 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../HomeWindow.cpp" line="1342"/>
         <source>Anaerobic Power</source>
-        <translation type="unfinished">Puissance anaérobique</translation>
+        <translation>Puissance anaérobique</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1343"/>
         <source>Cadence</source>
-        <translation type="unfinished">Cadence</translation>
+        <translation>Cadence</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1344"/>
         <source>Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Calendrier</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1345"/>
         <source>CP</source>
-        <translation type="unfinished"></translation>
+        <translation>CP</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1346"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Détails</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1347"/>
         <source>Distance</source>
-        <translation type="unfinished">Distance</translation>
+        <translation>Distance</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1348"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Editer</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1349"/>
         <source>Elapsed Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps écoulé</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1350"/>
         <source>Heartrate</source>
-        <translation type="unfinished">Fréquence cardiaque</translation>
+        <translation>Fréquence cardiaque</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1351"/>
         <source>Lap</source>
-        <translation type="unfinished">Interval</translation>
+        <translation>Tour</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1352"/>
         <source>Map</source>
-        <translation type="unfinished">Carte</translation>
+        <translation>Carte</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1353"/>
         <source>Performance</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1354"/>
         <source>PMC</source>
-        <translation type="unfinished">PMC</translation>
+        <translation>PMC</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1355"/>
         <source>Power</source>
-        <translation type="unfinished">Puissance</translation>
+        <translation>Puissance</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1356"/>
@@ -14469,7 +14469,7 @@ Fichier ignoré...</translation>
         <location filename="../RideSummaryWindow.cpp" line="317"/>
         <location filename="../RideSummaryWindow.cpp" line="973"/>
         <source>Totals</source>
-        <translation>Totals</translation>
+        <translation type="unfinished">Totaux</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="317"/>
