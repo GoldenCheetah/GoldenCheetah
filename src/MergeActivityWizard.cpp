@@ -159,6 +159,8 @@ MergeUpload::importFile(QList<QString> files)
                 ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString(tr("MMM d, yyyy - hh:mm:ss")));
 
                 wizard->ride2 = ride;
+                ride2Loaded = TRUE;
+                emit completeChanged();
             }
 
         } else {
@@ -168,6 +170,13 @@ MergeUpload::importFile(QList<QString> files)
 
     }
 }
+
+
+bool MergeUpload::isComplete() const
+{
+  return ride2Loaded;
+}
+
 
 
 // Synchronise start of files
