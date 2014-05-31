@@ -937,6 +937,11 @@ LTMSidebar::editRange()
     if (dateRangeTree->selectedItems().count() != 1) return;
 
     int index = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+
+    if (seasons->seasons[index].getType() == Season::temporary) {
+        QMessageBox::warning(this, tr("Edit Season"), tr("You can only edit user defined seasons. Please select a season you have created for editing."));
+        return; // must be a user season
+    }
     EditSeasonDialog dialog(context, &seasons->seasons[index]);
 
     if (dialog.exec()) {
@@ -958,6 +963,11 @@ LTMSidebar::deleteRange()
 {
     if (dateRangeTree->selectedItems().count() != 1) return;
     int index = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+
+    if (seasons->seasons[index].getType() == Season::temporary) {
+        QMessageBox::warning(this, tr("Delete Season"), tr("You can only delete user defined seasons. Please select a season you have created for deletion."));
+        return; // must be a user season
+    }
 
     // now delete!
     delete allDateRanges->takeChild(index);

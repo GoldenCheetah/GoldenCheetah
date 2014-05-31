@@ -108,9 +108,9 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     nameEdit->setText(season->getName());
 
     typeEdit = new QComboBox;
-    typeEdit->addItem("Season", Season::season);
-    typeEdit->addItem("Cycle", Season::cycle);
-    typeEdit->addItem("Adhoc", Season::adhoc);
+    typeEdit->addItem(tr("Season"), Season::season);
+    typeEdit->addItem(tr("Cycle"), Season::cycle);
+    typeEdit->addItem(tr("Adhoc"), Season::adhoc);
     typeEdit->setCurrentIndex(typeEdit->findData(season->getType()));
 
     fromEdit = new QDateEdit(this);
