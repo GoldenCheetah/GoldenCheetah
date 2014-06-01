@@ -350,8 +350,12 @@ GcScopeButton::paintEvent(QPaintEvent *)
     }
 
     // now paint the text
-    painter.setPen((underMouse() || checked) ? QColor(50,50,50) : Qt::white);
-    painter.drawText(off, text, Qt::AlignVCenter | Qt::AlignCenter);
+    // don't do all that offset nonsense for flat style
+    bool flat = (appsettings->value(this, GC_CHROME, "Mac").toString() == "Flat");
+    if (!flat) {
+        painter.setPen((underMouse() || checked) ? QColor(50,50,50) : Qt::white);
+        painter.drawText(off, text, Qt::AlignVCenter | Qt::AlignCenter);
+    }
     painter.setPen((underMouse() || checked) ? QColor(240,240,240) : QColor(30,30,30,200));
     painter.drawText(body, text, Qt::AlignVCenter | Qt::AlignCenter);
     painter.restore();

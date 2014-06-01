@@ -426,6 +426,9 @@ class ColorsPage : public QWidget
 #endif
         QDoubleSpinBox *lineWidth;
 
+        // theme
+        QComboBox *chromeCombo;
+
         // Fonts
         QFontComboBox *def,
                       *titles,

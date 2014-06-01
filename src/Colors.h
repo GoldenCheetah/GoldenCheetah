@@ -108,6 +108,7 @@ class GCColor : public QObject
         static Themes &themes(); 
 
         // for styling things with current preferences
+        static bool isFlat();
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
         static QString css();
         static QPalette palette();

@@ -351,6 +351,12 @@ GCColor::stylesheet()
                    "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
 }
 
+bool
+GCColor::isFlat()
+{
+    return (appsettings->value(NULL, GC_CHROME, "Mac").toString() == "Flat");
+}
+
 // setup a linearGradient for the metallic backgrounds used on things like
 // the toolbar, sidebar handles and so on
 QLinearGradient
@@ -358,37 +364,53 @@ GCColor::linearGradient(int size, bool active, bool alternate)
 {
     QLinearGradient returning;
 
-    int shade, inshade;
-    if (!alternate) {
-#ifdef Q_OS_MAC
-        shade = 178;
-        inshade = 225;
-#else
-        shade = 200;
-        inshade = 250;
-#endif
-    } else {
-#ifdef Q_OS_MAC
-        inshade = 225;
-        shade = 210;
-#else
-        inshade = 250;
-        shade = 225;
-#endif
-    }
+    QString chrome = appsettings->value(NULL, GC_CHROME, "Mac").toString();
 
-    if (active) {
-        returning = QLinearGradient(0, 0, 0, size);
-        returning.setColorAt(0.0, QColor(shade,shade,shade, 100));
-        returning.setColorAt(0.5, QColor(shade,shade,shade, 180));
-        returning.setColorAt(1.0, QColor(shade,shade,shade, 255));
-        returning.setSpread(QGradient::PadSpread);
+    if (chrome == "Mac") {
+        int shade, inshade;
+        if (!alternate) {
+#ifdef Q_OS_MAC
+            shade = 178;
+            inshade = 225;
+#else
+            shade = 200;
+            inshade = 250;
+#endif
+        } else {
+#ifdef Q_OS_MAC
+            inshade = 225;
+            shade = 210;
+#else
+            inshade = 250;
+            shade = 225;
+#endif
+        }
+
+        // metallic
+        if (active) {
+            returning = QLinearGradient(0, 0, 0, size);
+            returning.setColorAt(0.0, QColor(shade,shade,shade, 100));
+            returning.setColorAt(0.5, QColor(shade,shade,shade, 180));
+            returning.setColorAt(1.0, QColor(shade,shade,shade, 255));
+            returning.setSpread(QGradient::PadSpread);
+        } else {
+            returning = QLinearGradient(0, 0, 0, size);
+            returning.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
+            returning.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
+            returning.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
+            returning.setSpread(QGradient::PadSpread);
+        }
+
     } else {
+
+        // flat is just white for now, fix in part 3
+        QColor color = QColor(255, 255, 255);
+
+        // just blocks of color
         returning = QLinearGradient(0, 0, 0, size);
-        returning.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-        returning.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-        returning.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-        returning.setSpread(QGradient::PadSpread);
+        returning.setColorAt(0.0, color);
+        returning.setColorAt(1.0, color);
+
     }
 
     return returning; 

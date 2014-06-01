@@ -67,9 +67,6 @@ public:
     // set arrow widgets if needed
     void setCursors();
 
-    // reused by button bar
-    QLinearGradient active, inactive;
-
 public slots:
 
     // events
