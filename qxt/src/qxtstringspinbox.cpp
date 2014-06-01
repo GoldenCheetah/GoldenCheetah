@@ -1,4 +1,7 @@
 #include "qxtstringspinbox.h"
+#include <QStyle>
+#include <QStyleFactory>
+
 /****************************************************************************
 ** Copyright (c) 2006 - 2011, the LibQxt project.
 ** See the Qxt AUTHORS file for a list of authors and copyright holders.
@@ -72,6 +75,9 @@ int QxtStringSpinBoxPrivate::startsWith(const QString& start, QString& string) c
  */
 QxtStringSpinBox::QxtStringSpinBox(QWidget* pParent) : QSpinBox(pParent)
 {
+#if (!defined Q_OS_MAC) && (QT_VERSION >= 0x050000)
+    setStyle(QStyleFactory::create("fusion"));
+#endif
     setRange(0, 0);
 }
 
