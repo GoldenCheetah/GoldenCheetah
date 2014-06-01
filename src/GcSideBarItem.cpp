@@ -282,34 +282,8 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     titleLabel = new GcLabel(title, this);
     titleLabel->setXOff(0);
 
-    int shade, inshade;
-    if (metal) {
-#ifdef Q_OS_MAC
-        shade = 178;
-        inshade = 225;
-#else
-        shade = 200;
-        inshade = 250;
-#endif
-    } else {
-#ifdef Q_OS_MAC
-        inshade = 225;
-        shade = 210;
-#else
-        inshade = 250;
-        shade = 225;
-#endif
-    }
-    active = QLinearGradient(0, 0, 0, metal ? 23 :18);
-    active.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    active.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    active.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    active.setSpread(QGradient::PadSpread);
-    inactive = QLinearGradient(0, 0, 0, metal ? 23 :18);
-    inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-    inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-    inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-    inactive.setSpread(QGradient::PadSpread);
+    active = GCColor::linearGradient(metal ? 23 : 18, true, !metal);
+    inactive = GCColor::linearGradient(metal ? 23 : 18, false, !metal);
 
     QFont font;
 #ifdef Q_OS_MAC
@@ -416,23 +390,8 @@ GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
 
-#ifdef Q_OS_MAC
-    int shade = 178;
-    int inshade = 225;
-#else
-    int shade = 200;
-    int inshade = 250;
-#endif
-    active = QLinearGradient(0, 0, 0, 20);
-    active.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    active.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    active.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    active.setSpread(QGradient::PadSpread);
-    inactive = QLinearGradient(0, 0, 0, 20);
-    inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-    inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-    inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-    inactive.setSpread(QGradient::PadSpread);
+    active = GCColor::linearGradient(20, true);
+    inactive = GCColor::linearGradient(20, false);
 
     QWidget *spacer = new QWidget(this);
     spacer->setAutoFillBackground(false);

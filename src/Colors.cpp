@@ -351,6 +351,49 @@ GCColor::stylesheet()
                    "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
 }
 
+// setup a linearGradient for the metallic backgrounds used on things like
+// the toolbar, sidebar handles and so on
+QLinearGradient
+GCColor::linearGradient(int size, bool active, bool alternate)
+{
+    QLinearGradient returning;
+
+    int shade, inshade;
+    if (!alternate) {
+#ifdef Q_OS_MAC
+        shade = 178;
+        inshade = 225;
+#else
+        shade = 200;
+        inshade = 250;
+#endif
+    } else {
+#ifdef Q_OS_MAC
+        inshade = 225;
+        shade = 210;
+#else
+        inshade = 250;
+        shade = 225;
+#endif
+    }
+
+    if (active) {
+        returning = QLinearGradient(0, 0, 0, size);
+        returning.setColorAt(0.0, QColor(shade,shade,shade, 100));
+        returning.setColorAt(0.5, QColor(shade,shade,shade, 180));
+        returning.setColorAt(1.0, QColor(shade,shade,shade, 255));
+        returning.setSpread(QGradient::PadSpread);
+    } else {
+        returning = QLinearGradient(0, 0, 0, size);
+        returning.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
+        returning.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
+        returning.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
+        returning.setSpread(QGradient::PadSpread);
+    }
+
+    return returning; 
+}
+
 //
 // Themes
 //
