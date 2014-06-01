@@ -713,13 +713,22 @@ AllPlotWindow::event(QEvent *event)
     // nasty nasty nasty hack to move widgets as soon as the widget geometry
     // is set properly by the layout system, by default the width is 100 and 
     // we wait for it to be set properly then put our helper widget on the RHS
-    if (event->type() == QEvent::Resize && geometry().width() != 100 && firstShow) {
-        firstShow = false;
-        helperWidget()->move(mainWidget()->geometry().width()-275, 50);
-        helperWidget()->raise();
+    if (event->type() == QEvent::Resize && geometry().width() != 100) {
 
-        if (isShowHelp()) helperWidget()->show();
-        else helperWidget()->hide();
+        // put somewhere nice on first show
+        if (firstShow) {
+            firstShow = false;
+            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+            helperWidget()->raise();
+
+            if (isShowHelp()) helperWidget()->show();
+            else helperWidget()->hide();
+        }
+
+        // if off the screen move on screen
+        if (helperWidget()->geometry().x() > geometry().width()) {
+            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+        }
     }
     return QWidget::event(event);
 }
