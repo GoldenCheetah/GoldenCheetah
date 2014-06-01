@@ -33,7 +33,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
 
-    setContentsMargins(0,0,0,0);
+    setContentsMargins(4,4,4,4);
     setAutoFillBackground(false);
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
@@ -186,10 +186,11 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
 
     painter.save();
     QRect all(0,0,width(),height());
+    QRect boundary(0,0,width()-1,height()-1);
 
-    // fill with a linear gradient
-    painter.setPen(Qt::NoPen);
-    painter.fillRect(all, QColor(Qt::gray));
+    painter.fillRect(all, GColor(CPLOTBACKGROUND));
+    painter.setPen(QPen(Qt::darkGray));
+    painter.drawRect(boundary);
 
     // linear gradients
     QLinearGradient active = GCColor::linearGradient(23, true); 
@@ -296,7 +297,7 @@ void GcOverlayWidget::keyPressEvent(QKeyEvent *e)
  
 void GcOverlayWidget::setCursorShape(const QPoint &e_pos) 
 {
-    const int diff = 3;
+    const int diff = 6;
     if (
             //Left-Bottom
             ((e_pos.y() > y() + height() - diff) &&          //Bottom
