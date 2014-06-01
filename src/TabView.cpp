@@ -205,6 +205,8 @@ TabView::ourStyleSheet()
            "    subcontrol-position: top;"
            "    subcontrol-origin: margin;"
            "}"
+           "QTableWidget::item:hover { color: black; background: lightGray; }"
+           "QTreeView::item:hover { color: black; background: lightGray; }"
            "").arg(GColor(CPLOTBACKGROUND).name());
 }
 
