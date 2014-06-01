@@ -33,7 +33,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
 
-    setContentsMargins(4,4,4,4);
+    setContentsMargins(4,0,4,4);
     setAutoFillBackground(false);
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
