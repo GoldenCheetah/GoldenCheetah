@@ -174,16 +174,7 @@ GcScopeBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
-#ifdef Q_OS_MAC
-    int shade = isActiveWindow() ? 178 : 225;
-#else
-    int shade = isActiveWindow() ? 200 : 250;
-#endif
-    QLinearGradient linearGradient(0, 0, 0, 23);
-    linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    linearGradient.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    linearGradient.setSpread(QGradient::PadSpread);
+    QLinearGradient linearGradient = GCColor::linearGradient(23, isActiveWindow());
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, linearGradient);
 

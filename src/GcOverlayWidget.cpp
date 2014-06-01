@@ -90,23 +90,8 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     mlayout->addWidget(stack);
 
     // linear gradients
-#ifdef Q_OS_MAC
-    int shade = 178;
-    int inshade = 225;
-#else
-    int shade = 200;
-    int inshade = 250;
-#endif
-    active = QLinearGradient(0, 0, 0, true ? 23 :18);
-    active.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    active.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    active.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    active.setSpread(QGradient::PadSpread);
-    inactive = QLinearGradient(0, 0, 0, true ? 23 :18);
-    inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-    inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-    inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-    inactive.setSpread(QGradient::PadSpread);
+    active = GCColor::linearGradient(23, true); 
+    inactive = GCColor::linearGradient(23, false); 
 
     // trap resize / mouse events
     m_infocus = true;

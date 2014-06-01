@@ -110,23 +110,8 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     buttonFont.setWeight(QFont::Black);
 
     // linear gradients
-#ifdef Q_OS_MAC
-    int shade = 178;
-    int inshade = 225;
-#else
-    int shade = 200;
-    int inshade = 250;
-#endif
-    active = QLinearGradient(0, 0, 0, true ? 23 :18);
-    active.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    active.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    active.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    active.setSpread(QGradient::PadSpread);
-    inactive = QLinearGradient(0, 0, 0, true ? 23 :18);
-    inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-    inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-    inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-    inactive.setSpread(QGradient::PadSpread);
+    active = GCColor::linearGradient(23, true); 
+    inactive = GCColor::linearGradient(23, false); 
 
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));

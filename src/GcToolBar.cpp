@@ -17,6 +17,7 @@
  */
 
 #include "GcToolBar.h"
+#include "Colors.h"
 
 GcToolBar::GcToolBar(QWidget *parent) : QWidget(parent)
 {
@@ -61,12 +62,7 @@ GcToolBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
-    int shade = isActiveWindow() ? 200 : 250;
-    QLinearGradient linearGradient(0, 0, 0, height());
-    linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    linearGradient.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    linearGradient.setSpread(QGradient::PadSpread);
+    QLinearGradient linearGradient = GCColor::linearGradient(23, isActiveWindow());
     
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, linearGradient);
