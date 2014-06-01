@@ -223,3 +223,7 @@ macx {
 #to get on your trainer and ride then uncomment below
 #DEFINES += GC_WANT_ROBOT
 
+#if you have a version of mingw that properly provides
+#the Dwmapi.h header then uncomment this line
+#GC_HAVE_DWM
+

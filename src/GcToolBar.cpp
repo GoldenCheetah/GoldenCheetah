@@ -67,12 +67,12 @@ GcToolBar::paintBackground(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, linearGradient);
 
-    // paint the botton lines
-    QPen black(QColor(100,100,100));
-    painter.setPen(black);
-    painter.drawLine(0,height()-1, width()-1, height()-1);
-
     if (!GCColor::isFlat()) {
+        // paint the botton lines
+        QPen black(QColor(100,100,100));
+        painter.setPen(black);
+        painter.drawLine(0,height()-1, width()-1, height()-1);
+
 #ifndef Q_OS_WIN32 // never on windows.
         QPen gray(QColor(230,230,230));
         painter.setPen(gray);
