@@ -941,8 +941,13 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const
 {
+
     // paint background for user defined color ?
     bool rideBG = appsettings->value(this,GC_RIDEBG,false).toBool();
+
+    // state of item
+    bool hover = option.state & QStyle::State_MouseOver;
+    bool selected = option.state & QStyle::State_Selected;
 
     // format the cell depending upon what it is...
     QString columnName = rideNavigator->tableView->model()->headerData(index.column(), Qt::Horizontal).toString();
@@ -950,11 +955,11 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     QString value;
 
     // are we a selected cell ? need to paint acordingly
-    bool selected = false;
-    if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
-        if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
-            selected = true;
-    }
+    //bool selected = false;
+    //if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
+        //if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
+            //selected = true;
+    //}
 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
         // format as a metric
@@ -1018,7 +1023,9 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
         QRectF bigger(myOption.rect.x(), myOption.rect.y(), myOption.rect.width()+1, myOption.rect.height()+1);
-        painter->fillRect(bigger, rideBG ? userColor : background);
+
+        if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray));
+        else painter->fillRect(bigger, rideBG ? userColor : background);
 
         // clear first
         drawDisplay(painter, myOption, myOption.rect, ""); //added
@@ -1044,7 +1051,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->setFont(boldened);
         if (!selected) {
             // not selected, so invert ride plot color
-            painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
+            if (hover) painter->setPen(QColor(Qt::black));
+            else painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
         }
 
         QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
@@ -1068,8 +1076,10 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
             myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
-            //myOption.palette.setColor(QPalette::WindowText, userColor); //XXX
-            painter->fillRect(myOption.rect, rideBG ? userColor : GColor(CPLOTBACKGROUND)); //XXX
+
+            if (hover) painter->fillRect(myOption.rect, QColor(Qt::lightGray)); 
+            else painter->fillRect(myOption.rect, rideBG ? userColor : GColor(CPLOTBACKGROUND));
+
             drawDisplay(painter, myOption, myOption.rect, "");
             myOption.rect.setX(10); // wider notes display
             myOption.rect.setWidth(pwidth-20);// wider notes display
@@ -1077,7 +1087,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             QPen isColor = painter->pen();
             if (!selected) {
                 // not selected, so invert ride plot color
-                painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+                if (hover) painter->setPen(QPen(Qt::black));
+                else painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
             }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
