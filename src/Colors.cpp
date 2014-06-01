@@ -25,6 +25,13 @@
 #include <QDir>
 #include "Settings.h"
 
+#ifdef Q_OS_WIN
+#include "Windows.h"
+#ifdef GC_HAVE_DWM
+#include "Dwmapi.h"
+#endif
+#endif
+
 // the standard themes, a global object
 static Themes allThemes;
 
@@ -126,6 +133,11 @@ void GCColor::setupColors()
         { tr("Right Torque Effectiveness"), "CRTE", Qt::magenta },
         { tr("Left Pedal Smoothness"), "CLPS", Qt::cyan },
         { tr("Right Pedal Smoothness"), "CRPS", Qt::magenta },
+#ifdef GC_HAVE_DWM
+        { tr("Toolbar and Sidebar"), "CCHROME", QColor(1,1,1) },
+#else
+        { tr("Toolbar and Sidebar"), "CCHROME", QColor(197,197,197) },
+#endif
         { "", "", QColor(0,0,0) },
     };
 
@@ -403,8 +415,28 @@ GCColor::linearGradient(int size, bool active, bool alternate)
 
     } else {
 
-        // flat is just white for now, fix in part 3
-        QColor color = QColor(255, 255, 255);
+        QColor color = GColor(CCHROME);
+
+//
+// The DWM api is how the MS windows color settings should be accessed
+//
+#ifdef GC_HAVE_DWM
+
+        if (color == QColor(1,1,1)) { // use system default, user hasn't changed
+
+            // use Windows API
+            DWORD wincolor = 0;
+            BOOL opaque = FALSE;
+
+            HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
+            if (SUCCEEDED(hr)) {
+                BYTE red = GetRValue(wincolor)
+                BYTE green = GetGValue(wincolor);
+                BYTE blue = GetBValue(wincolor);
+                color = QColor::fromRgb(red,green,blue,255);
+            } 
+        }
+#endif
 
         // just blocks of color
         returning = QLinearGradient(0, 0, 0, size);

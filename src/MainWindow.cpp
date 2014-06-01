@@ -551,8 +551,8 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
-    menuBar()->setStyleSheet("QMenuBar { background: rgba(225,225,225); }"
-		    	     "QMenuBar::item { background: rgba(225,225,225); }");
+    menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
+		    	     "QMenuBar::item { color: black; background: %1; }").arg(GColor(CCHROME).name()));
     menuBar()->setContentsMargins(0,0,0,0);
 #endif
 
@@ -724,6 +724,9 @@ MainWindow::MainWindow(const QDir &home)
     currentTab->setFocus();
 
     installEventFilter(this);
+
+    // catch config changes
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 }
 
 /*----------------------------------------------------------------------
@@ -1815,9 +1818,22 @@ MainWindow::downloadTP()
  *--------------------------------------------------------------------*/
 
 void
+MainWindow::configChanged()
+{
+#ifdef WIN32
+    menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
+		    	     "QMenuBar::item { color: black; background: %1; }").arg(GColor(CCHROME).name()));
+#endif
+#ifndef Q_OS_MAC
+    head->repaint();
+#endif
+
+}
+
+void
 Context::notifyConfigChanged()
 {
-    // now tell everyone else
+    // .. then tell everyone else
     configChanged();
 }
 

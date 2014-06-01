@@ -191,6 +191,8 @@ class MainWindow : public QMainWindow
         void saveState(Context *);
         void restoreState(Context *);
 
+        void configChanged();
+
     private:
 
         GcScopeBar *scopebar;
