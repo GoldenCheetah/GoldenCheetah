@@ -24,9 +24,13 @@
 #include "Context.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "TabView.h"
 
 #include <QtGui>
 #include <QString>
+#include <QStyle>
+#include <QStyleFactory>
+#include <QScrollBar>
 
 // for strtod
 #include <stdlib.h>
@@ -119,6 +123,11 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
 
     // set up the table
     table = new QTableView();
+#ifdef Q_OS_WIN
+    QStyle *cde = QStyleFactory::create(OS_STYLE);
+    table->verticalScrollBar()->setStyle(cde);
+    table->horizontalScrollBar()->setStyle(cde);
+#endif
     table->setItemDelegate(new CellDelegate(this));
     table->verticalHeader()->setDefaultSectionSize(20);
     table->setModel(model);
@@ -127,9 +136,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     table->installEventFilter(this);
 
     // prettify (and make anomalies more visible)
-    QPen gridStyle;
-    gridStyle.setColor(Qt::lightGray);
-    table->setGridStyle(Qt::DotLine);
+    table->setGridStyle(Qt::NoPen);
 
     connect(table, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(cellMenu(const QPoint&)));
 
@@ -182,6 +189,10 @@ RideEditor::configChanged()
     table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+#ifndef Q_OS_MAC
+    table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+#endif
     toolbar->setStyleSheet(QString("background: %1; border: 0px;").arg(GColor(CPLOTBACKGROUND).name()));
 }
 
