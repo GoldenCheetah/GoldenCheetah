@@ -89,10 +89,6 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     stack->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mlayout->addWidget(stack);
 
-    // linear gradients
-    active = GCColor::linearGradient(23, true); 
-    inactive = GCColor::linearGradient(23, false); 
-
     // trap resize / mouse events
     m_infocus = true;
     m_showMenu = false;
@@ -194,6 +190,10 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::gray));
+
+    // linear gradients
+    QLinearGradient active = GCColor::linearGradient(23, true); 
+    QLinearGradient inactive = GCColor::linearGradient(23, false); 
 
     // title
     QRect title(0,0,width(),23);

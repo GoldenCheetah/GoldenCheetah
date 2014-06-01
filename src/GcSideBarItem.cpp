@@ -28,8 +28,11 @@ QIcon iconFromPNG(QString filename, bool emboss)
 
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
     gray8.setColor(0, QColor(80,80,80, 170).rgb());
+
+    if (GCColor::isFlat()) return QIcon(QPixmap::fromImage(gray8));
+
+    QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
     white8.setColor(0, QColor(255,255,255, 255).rgb());
 
     // now convert to a format we can paint with!
@@ -43,8 +46,7 @@ QIcon iconFromPNG(QString filename, bool emboss)
     else painter.drawImage(0,0, gray);
     painter.end();
 
-    QIcon icon(QPixmap::fromImage(white));
-    return icon;
+    return QIcon(QPixmap::fromImage(white));
 }
 
 //
@@ -282,9 +284,6 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     titleLabel = new GcLabel(title, this);
     titleLabel->setXOff(0);
 
-    active = GCColor::linearGradient(metal ? 23 : 18, true, !metal);
-    inactive = GCColor::linearGradient(metal ? 23 : 18, false, !metal);
-
     QFont font;
 #ifdef Q_OS_MAC
     titleLabel->setFixedHeight(16);
@@ -365,15 +364,21 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
+
+    QLinearGradient active = GCColor::linearGradient(metal ? 23 : 18, true, !metal);
+    QLinearGradient inactive = GCColor::linearGradient(metal ? 23 : 18, false, !metal);
+
     painter.fillRect(all, isActiveWindow() ? active : inactive);
 
-    QPen black(QColor(100,100,100,200));
-    painter.setPen(black);
-    painter.drawLine(0,height()-1, width()-1, height()-1);
+    if (!GCColor::isFlat()) {
+        QPen black(QColor(100,100,100,200));
+        painter.setPen(black);
+        painter.drawLine(0,height()-1, width()-1, height()-1);
 
-    QPen gray(QColor(230,230,230));
-    painter.setPen(gray);
-    painter.drawLine(0,0, width()-1, 0);
+        QPen gray(QColor(230,230,230));
+        painter.setPen(gray);
+        painter.drawLine(0,0, width()-1, 0);
+    }
 
     painter.restore();
 }
@@ -389,9 +394,6 @@ GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
     setIconSize(QSize(14,14));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
-
-    active = GCColor::linearGradient(20, true);
-    inactive = GCColor::linearGradient(20, false);
 
     QWidget *spacer = new QWidget(this);
     spacer->setAutoFillBackground(false);
@@ -415,13 +417,18 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     // setup a painter and the area to paint
     QPainter painter(this);
 
+    QLinearGradient active = GCColor::linearGradient(20, true);
+    QLinearGradient inactive = GCColor::linearGradient(20, false);
+
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, isActiveWindow() ? active : inactive);
-    QPen gray(QColor(230,230,230));
-    painter.setPen(gray);
-    painter.drawLine(0,0, width()-1, 0);
 
+    if (!GCColor::isFlat()) {
+        QPen gray(QColor(230,230,230));
+        painter.setPen(gray);
+        painter.drawLine(0,0, width()-1, 0);
+    }
 }
 
 void

@@ -46,8 +46,6 @@ public:
     ChartBar(Context *context);
     ~ChartBar();
 
-    // reused by button bar
-    QLinearGradient active, inactive;
 
 public slots:
 

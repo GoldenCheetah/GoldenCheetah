@@ -85,6 +85,7 @@
 #define GC_BLANK_DIARY    "blank/diary"
 #define GC_LINEWIDTH      "linewidth"
 #define GC_ANTIALIAS      "antialias"
+#define GC_CHROME         "chrome" // mac or flat only so far
 #define GC_RIDEBG         "rideBG"
 #define GC_RIDESCROLL     "rideScroll"
 #define GC_RIDEHEAD       "rideHead"

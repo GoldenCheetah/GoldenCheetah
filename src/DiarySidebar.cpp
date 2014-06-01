@@ -191,7 +191,7 @@ GcLabel::paintEvent(QPaintEvent *)
     if (text() != "<" && text() != ">") {
         painter.setFont(this->font());
 
-        if (xoff || yoff) {
+        if (!GCColor::isFlat() && (xoff || yoff)) {
 
             // draw text in white behind...
             QRectF off(xoff,yoff,width(),height());

@@ -124,7 +124,6 @@ private:
 
     QString _title;
     int fullHeight;
-    QLinearGradient active, inactive;
     bool metal;
 };
 
@@ -141,7 +140,6 @@ protected:
 
 private:
     void paintBackground(QPaintEvent *);
-    QLinearGradient active, inactive;
 
 };
 
