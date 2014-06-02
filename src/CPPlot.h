@@ -68,7 +68,7 @@ class CPPlot : public QwtPlot
         void setShowBest(bool x);
         void setShowHeat(bool x);
         void setShowHeatByDate(bool x);
-        void setShowDelta(bool x);
+        void setShowDelta(bool delta, bool percent);
         void setShadeMode(int x);
         void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
@@ -148,6 +148,7 @@ class CPPlot : public QwtPlot
         bool showHeat;
         bool showHeatByDate;
         bool showDelta; // only in compare mode
+        bool showDeltaPercent; // only in compare mode
         double shadingCP; // the CP value we use to draw the shade
         int plotType;
 
