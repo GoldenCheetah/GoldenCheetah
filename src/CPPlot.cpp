@@ -1134,7 +1134,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 
         // show percent ?
-        if (curve == rideCurve && showPercent) units = QString("%");
+        if ((((rangemode && context->isCompareDateRanges)
+            || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
+            || (curve == rideCurve && showPercent)) units = QString("%");
         else units = RideFile::unitName(rideSeries, context);
 
         // output the tooltip
