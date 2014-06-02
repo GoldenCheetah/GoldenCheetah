@@ -57,7 +57,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     context(context), rideCache(NULL), bestsCache(NULL), rideSeries(RideFile::watts), 
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false),
+    showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
 
     // curves and plot objects
@@ -158,94 +158,124 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     rideSeries = CriticalPowerWindow::getRideSeries(criticalSeries);
     this->criticalSeries = criticalSeries;
 
-    // Log scale for all bar Energy
-    setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
-    LogTimeScaleDraw *ltsd = new LogTimeScaleDraw;
-    setAxisScaleDraw(xBottom, ltsd);
-    setAxisTitle(xBottom, tr("Interval Length"));
+    // we need to set the y axis label to reflect delta
+    // comparisons too, or even percent, if that is chosen.
+    // first, are we in compare mode ?
+    QString prefix = "";
+    QString series = "";
+    QString units = "";
+    QString postfix = "";
+    if ((rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals)) {
+        if (showDelta) {
+            prefix = "Delta ";
+            if (showDeltaPercent) {
+                postfix = "percent";
+            }
+        }
+    }
 
     switch (criticalSeries) {
 
     case CriticalPowerWindow::work:
-        setAxisTitle(yLeft, tr("Total work (kJ)"));
-        setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-        setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+        series = tr("Total work");
+        units = tr("kJ");
+        //setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+        //setAxisTitle(xBottom, tr("Interval Length (minutes)"));
         break;
 
     case CriticalPowerWindow::watts_inv_time:
-        setAxisTitle(yLeft, tr("Average Power (watts)"));
-        setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+        series = tr("Power");
+        units = tr("watts");
+        //setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
         //setAxisScaleDraw(xBottom, new QwtScaleDraw);
-        ltsd->inv_time = true;
-        setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+        //ltsd->inv_time = true;
+        //setAxisTitle(xBottom, tr("Interval Length (minutes)"));
         break;
 
     case CriticalPowerWindow::cad:
-        setAxisTitle(yLeft, tr("Average Cadence (rpm)"));
+        series = tr("Cadence");
+        units = tr("rpm");
         break;
 
     case CriticalPowerWindow::hr:
-        setAxisTitle(yLeft, tr("Average Heartrate (bpm)"));
+        series = tr("Heartrate");
+        units = tr("bpm");
         break;
 
     case CriticalPowerWindow::wattsd:
-        setAxisTitle(yLeft, tr("Watts Delta (watts/s)"));
+        series = tr("Watts delta");
+        units = tr("watts/s");
         break;
 
     case CriticalPowerWindow::cadd:
-        setAxisTitle(yLeft, tr("Cadence Delta (rpm/s)"));
+        series = tr("Cadence delta");
+        units = tr("rpm/s");
         break;
 
     case CriticalPowerWindow::nmd:
-        setAxisTitle(yLeft, tr("Torque Delta (nm/s)"));
+        series = tr("Torque delta");
+        units = tr("nm/s");
         break;
 
     case CriticalPowerWindow::hrd:
-        setAxisTitle(yLeft, tr("Heartrate Delta (bpm/s)"));
+        series = tr("Heartrate delta");
+        units = tr("bpm/s");
         break;
 
     case CriticalPowerWindow::kphd:
-        setAxisTitle(yLeft, tr("Acceleration (m/s/s)"));
+        series = tr("Acceleration");
+        units = tr("m/s/s");
         break;
 
     case CriticalPowerWindow::kph:
-        setAxisTitle(yLeft, tr("Average Speed (kph)"));
+        series = tr("Speed");
+        units = tr("kph");
         break;
 
     case CriticalPowerWindow::nm:
-        setAxisTitle(yLeft, tr("Average Pedal Force (nm)"));
+        series = tr("Pedal Force");
+        units = tr("nm");
         break;
 
     case CriticalPowerWindow::NP:
-        setAxisTitle(yLeft, tr("Normalized Power (watts)"));
+        series = tr("Normalised Power");
+        units = tr("watts");
         break;
 
     case CriticalPowerWindow::aPower:
-        setAxisTitle(yLeft, tr("Altitude Power (watts)"));
+        series = tr("Altitude Power");
+        units = tr("watts");
         break;
 
     case CriticalPowerWindow::xPower:
-        setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
+        series = tr("xPower");
+        units = tr("watts");
         break;
 
     case CriticalPowerWindow::wattsKg:
-        if (context->athlete->useMetricUnits)
-            setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
-        else
-            setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
+        if (context->athlete->useMetricUnits) {
+            series = tr("Watts per kilogram");
+            units = tr("w/kg");
+        } else {
+            series = tr("Watts per lb");
+            units = tr("w/lb");
+        }
         break;
 
     case CriticalPowerWindow::vam:
-        setAxisTitle(yLeft, tr("VAM (meters per hour)"));
+        series = tr("VAM");
+        units = tr("m/hour");
         break;
 
     default:
     case CriticalPowerWindow::watts:
-        setAxisTitle(yLeft, tr("Average Power (watts)"));
+        series = tr("Power");
+        units = tr("watts");
         break;
 
     }
 
+    setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
     // zap the old curves
     clearCurves();
 }
@@ -1204,9 +1234,11 @@ CPPlot::setShowPercent(bool x)
 }
 
 void
-CPPlot::setShowDelta(bool x)
+CPPlot::setShowDelta(bool delta, bool percent)
 {
-    showDelta = x;
+    showDelta = delta;
+    showDeltaPercent = percent;
+    setSeries(this->criticalSeries); // y-axis
 }
 
 void
@@ -1643,9 +1675,12 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 // make a delta to baseline
                 for (n=1; n < deltaArray.size() && n < baseline.size(); n++) {
                     // stop when we get to zero!
-                    if (deltaArray[n] > 0 && baseline[n] > 0)
-                        deltaArray[n] = deltaArray[n] - baseline[n];
-                    else
+                    if (deltaArray[n] > 0 && baseline[n] > 0) {
+
+                        if (showDeltaPercent) deltaArray[n] = 100.00f * (double(deltaArray[n]) - double(baseline[n])) / double(baseline[n]); // delta percentage
+                        else deltaArray[n] = deltaArray[n] - baseline[n];
+
+                    } else
                         break;
                 }
                 deltaArray.resize(n-1);
@@ -1774,7 +1809,8 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
                 for (n=1; n < deltaArray.size() && n < baseline.size(); n++) {
                     // stop when we get to zero!
                     if (deltaArray[n] > 0 && baseline[n] > 0)
-                        deltaArray[n] = deltaArray[n] - baseline[n];
+                        if (showDeltaPercent) deltaArray[n] = 100.00f * (double(deltaArray[n]) - double(baseline[n])) / double(baseline[n]); // delta percentage
+                        else deltaArray[n] = deltaArray[n] - baseline[n];
                     else
                         break;
                 }
@@ -1801,13 +1837,14 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         }
     }
 
-    if (rideSeries == RideFile::watts) {
+    if (!showDelta && rideSeries == RideFile::watts) {
 
         // set ymax to nearest 100 if power
         int max = ymax * 1.1f;
         max = ((max/100) + 1) * 100;
 
         setAxisScale(yLeft, ymin, max);
+
     } else {
 
         // or just add 10% headroom

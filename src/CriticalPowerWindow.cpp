@@ -64,12 +64,16 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     rDelta = new QCheckBox(this);
     rDelta->setText(tr("Delta compare"));
     rDelta->hide();
+    rDeltaPercent = new QCheckBox(this);
+    rDeltaPercent->setText(tr("as percentage"));
+    rDeltaPercent->hide();
 
     QVBoxLayout *checks = new QVBoxLayout;
     checks->addStretch();
     checks->addWidget(rPercent);
     checks->addWidget(rHeat);
     checks->addWidget(rDelta);
+    checks->addWidget(rDeltaPercent);
     checks->addStretch();
 
     revealLayout->addStretch();
@@ -453,7 +457,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
-    connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged(int)));
+    connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
+    connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
@@ -742,6 +747,7 @@ CriticalPowerWindow::forceReplot()
         rPercent->hide();
         rHeat->hide();
         rDelta->show();
+        rDeltaPercent->show();
 
     } else {
 
@@ -754,6 +760,7 @@ CriticalPowerWindow::forceReplot()
         rPercent->show();
         rHeat->show();
         rDelta->hide();
+        rDeltaPercent->hide();
     }
 
     if (rangemode) {
@@ -1538,9 +1545,9 @@ CriticalPowerWindow::rHeatChanged(int check)
 }
 
 void
-CriticalPowerWindow::rDeltaChanged(int check)
+CriticalPowerWindow::rDeltaChanged()
 {
-    cpPlot->setShowDelta(check);
+    cpPlot->setShowDelta(rDelta->isChecked(), rDeltaPercent->isChecked());
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
