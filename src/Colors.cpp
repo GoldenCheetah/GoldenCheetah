@@ -136,7 +136,11 @@ void GCColor::setupColors()
 #ifdef GC_HAVE_DWM
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(1,1,1) },
 #else
+#ifdef Q_OS_MAC
+        { tr("Toolbar and Sidebar"), "CCHROME", QColor(213,213,213) },
+#else
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(197,197,197) },
+#endif
 #endif
         { "", "", QColor(0,0,0) },
     };
