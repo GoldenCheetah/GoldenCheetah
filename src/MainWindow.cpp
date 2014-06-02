@@ -239,16 +239,6 @@ MainWindow::MainWindow(const QDir &home)
     head->setFloatable(false);
     head->setMovable(false);
 
-    // make the normal toolbar in QT5 have same colors as the tabs and when inactive
-    // make it the same 'light' colour as the other widgets do.
-#if QT_VERSION < 0x50201
-    head->setStyleSheet(" QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #C6C6C6, stop: 1 #A5A5A5 ); } "
-                        " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } ");
-#else
-    head->setStyleSheet(" QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
-                        " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } ");
-#endif
-
     // widgets
     QWidget *macAnalButtons = new QWidget(this);
     macAnalButtons->setContentsMargins(20,5,20,0);
@@ -727,6 +717,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // catch config changes
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    configChanged();
 }
 
 /*----------------------------------------------------------------------
@@ -773,7 +764,7 @@ MainWindow::showTabbar(bool want)
     setDocumentMode(true);
     tabbar->setDocumentMode(true);
 #if QT_VERSION >= 0x50201
-    blackline->hide();
+    if (!GCColor::isFlat()) blackline->hide();
 #endif
 #endif
         tabbar->show();
@@ -783,7 +774,7 @@ MainWindow::showTabbar(bool want)
     setDocumentMode(false);
     tabbar->setDocumentMode(false);
 #if QT_VERSION >= 0x50201
-    blackline->show();
+    if (!GCColor::isFlat()) blackline->show();
 #endif
 #endif
         tabbar->hide();
@@ -1820,13 +1811,40 @@ MainWindow::downloadTP()
 void
 MainWindow::configChanged()
 {
+
+// Windows
 #ifdef WIN32
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
 		    	     "QMenuBar::item { color: black; background: %1; }").arg(GColor(CCHROME).name()));
 #endif
-#ifndef Q_OS_MAC
-    head->repaint();
+
+// Mac
+#ifdef Q_OS_MAC
+    if (GCColor::isFlat()) {
+
+        // flat mode
+        head->setStyleSheet(QString(" QToolBar:active { border: 0px; background-color: %1; } "
+                            " QToolBar:!active { border: 0px; background-color: %1; }").arg(GColor(CCHROME).name()));
+        blackline->hide();
+
+    } else {
+
+        // black line back, but only if we aren't showing the tabbar
+        if (!showhideTabbar->isChecked()) blackline->show();
+
+        // metallic mode
+#if QT_VERSION < 0x50201
+        head->setStyleSheet(" QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #C6C6C6, stop: 1 #A5A5A5 ); } "
+                            " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } ");
+#else
+        head->setStyleSheet(" QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
+                            " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } ");
+    }
 #endif
+#endif
+
+    head->updateGeometry();
+    repaint();
 
 }
 
