@@ -181,6 +181,20 @@
 #CLUCENE_INCLUDE = /usr/include/CLucene
 #CLUCENE_LIBS    = -lclucene-core
 
+#** Windows users NOTE ***
+# If you want support WINDOWS DWMAPI.H for Menu Color settings to be derived from Windows (!! this works only for Windows !!)
+# you need to have a version of "mingw" which provide both "dwmapi.h" and "dwmapi.lib"   http://sourceforge.net/projects/freeassociation/
+# Set path to the root of the "dwmapi" files
+# If they are installed in C:\Qt\Tools\mingw482_32\i686-w64-mingw32 then set
+# DWM_INSTALL    = C:\Qt\Tools\mingw482_32\i686-w64-mingw32
+# This will automatically set:
+# DWM_INCLUDE = $${DWM_INSTALL}/include
+# DWM_LIBS    = $${DWM_INSTALL}/lib/libdwmapi.a
+# You may override the INCLUDE and LIB files if you like/need to.
+#DWM_INSTALL   = 
+#DWM_INCLUDE   =
+#DWM_LIBS      =
+
 
 # *** Mac users NOTE ***
 # On MAC you don't need libvlc since we use the
@@ -201,6 +215,8 @@
 # separately. 
 LIBZ_INCLUDE =
 LIBZ_LIBS    = -lz
+
+
 
 macx {
     # Uncomment this line to build with OS X Tiger support on a Leopard system:
@@ -223,7 +239,5 @@ macx {
 #to get on your trainer and ride then uncomment below
 #DEFINES += GC_WANT_ROBOT
 
-#if you have a version of mingw that properly provides
-#the Dwmapi.h header then uncomment this line
-#GC_HAVE_DWM
+
 

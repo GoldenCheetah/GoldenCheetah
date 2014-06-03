@@ -162,6 +162,19 @@ CONFIG(debug, debug|release) {
     LEXSOURCES  += DataFilter.l
 }
 
+# Window specific feature for dwmapi support (use Windows Colors for Menues)
+!isEmpty( DWM_INSTALL )
+{
+    isEmpty( DWM_INCLUDE ) { DWM_INCLUDE = $${DWM_INSTALL}/include }
+    isEmpty( DWM_LIBS )    { DWM_LIBS    = $${DWM_INSTALL}/lib/libdwmapi.a }
+
+    INCLUDEPATH += $${DWM_INCLUDE}
+    LIBS        += $${DWM_LIBS}
+    DEFINES     += GC_HAVE_DWM
+    HEADERS     += dwmapi.h
+}
+
+
 # Mac specific build for
 # Segmented mac style button
 # Video playback using Quicktime Framework
