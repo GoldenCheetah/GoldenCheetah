@@ -556,7 +556,7 @@ AddIntervalDialog::createClicked()
                     } else duration = QString("%1min").arg(mins);
             
                 }
-                add.name = QString("Match %1 (%2kJ)").arg(duration)
+                add.name = QString(tr("Match %1 (%2kJ)")).arg(duration)
                                                         .arg(match.cost/1000.00, 0, 'f', 1);
                 results << add;
             }
@@ -721,17 +721,17 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
 void
 AddIntervalDialog::findPeakPowerStandard(const RideFile *ride, QList<AddedInterval> &results)
 {
-    findBests(true, ride, 5, 1, results, "Peak 5s");
-    findBests(true, ride, 10, 1, results, "Peak 10s");
-    findBests(true, ride, 20, 1, results, "Peak 20s");
-    findBests(true, ride, 30, 1, results, "Peak 30s");
-    findBests(true, ride, 60, 1, results, "Peak 1min");
-    findBests(true, ride, 120, 1, results, "Peak 2min");
-    findBests(true, ride, 300, 1, results, "Peak 5min");
-    findBests(true, ride, 600, 1, results, "Peak 10min");
-    findBests(true, ride, 1200, 1, results, "Peak 20min");
-    findBests(true, ride, 1800, 1, results, "Peak 30min");
-    findBests(true, ride, 3600, 1, results, "Peak 60min");
+    findBests(true, ride, 5, 1, results, tr("Peak 5s"));
+    findBests(true, ride, 10, 1, results, tr("Peak 10s"));
+    findBests(true, ride, 20, 1, results, tr("Peak 20s"));
+    findBests(true, ride, 30, 1, results, tr("Peak 30s"));
+    findBests(true, ride, 60, 1, results, tr("Peak 1min"));
+    findBests(true, ride, 120, 1, results, tr("Peak 2min"));
+    findBests(true, ride, 300, 1, results, tr("Peak 5min"));
+    findBests(true, ride, 600, 1, results, tr("Peak 10min"));
+    findBests(true, ride, 1200, 1, results, tr("Peak 20min"));
+    findBests(true, ride, 1800, 1, results, tr("Peak 30min"));
+    findBests(true, ride, 3600, 1, results, tr("Peak 60min"));
 }
 
 void
