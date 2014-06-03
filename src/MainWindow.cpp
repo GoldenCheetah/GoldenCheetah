@@ -1822,25 +1822,19 @@ MainWindow::configChanged()
 #ifdef Q_OS_MAC
     if (GCColor::isFlat()) {
 
+#if (QT_VERSION >= 0x50201)
         // flat mode
         head->setStyleSheet(QString(" QToolBar:active { border: 0px; background-color: %1; } "
                             " QToolBar:!active { border: 0px; background-color: %1; }").arg(GColor(CCHROME).name()));
-#if (QT_VERSION >= 0x50201)
         blackline->hide();
 #endif
 
     } else {
 
-#if (QT_VERSION >= 0x50201)
+        // metallic mode
+#if QT_VERSION >= 0x50201
         // black line back, but only if we aren't showing the tabbar
         if (!showhideTabbar->isChecked()) blackline->show();
-#endif
-
-        // metallic mode
-#if QT_VERSION < 0x50201
-        head->setStyleSheet(" QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #C6C6C6, stop: 1 #A5A5A5 ); } "
-                            " QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #D6D6D6 ); } ");
-#else
         head->setStyleSheet(" QToolBar:!active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #F0F0F0, stop: 1 #E8E8E8 ); } "
                             " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } ");
 #endif
