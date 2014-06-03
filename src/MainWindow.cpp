@@ -1825,12 +1825,16 @@ MainWindow::configChanged()
         // flat mode
         head->setStyleSheet(QString(" QToolBar:active { border: 0px; background-color: %1; } "
                             " QToolBar:!active { border: 0px; background-color: %1; }").arg(GColor(CCHROME).name()));
+#if (QT_VERSION >= 0x50201)
         blackline->hide();
+#endif
 
     } else {
 
+#if (QT_VERSION >= 0x50201)
         // black line back, but only if we aren't showing the tabbar
         if (!showhideTabbar->isChecked()) blackline->show();
+#endif
 
         // metallic mode
 #if QT_VERSION < 0x50201
