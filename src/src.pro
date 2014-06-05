@@ -21,7 +21,7 @@ LIBS += -lm $${LIBZ_LIBS}
 #            5.2.0 or higher
 #
 ## common modules
-QT += xml sql network script svg
+QT += xml sql network script svg concurrent
 
 lessThan(QT_MAJOR_VERSION, 5) {
 

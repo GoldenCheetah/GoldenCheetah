@@ -26,6 +26,7 @@
 #include <QWebView>
 #include <QWebFrame>
 #include <QFormLayout>
+#include <QtConcurrent>
 
 #include "SummaryMetrics.h"
 #include "RideFileCache.h"
@@ -83,6 +84,8 @@ class RideSummaryWindow : public GcChartWindow
         bool isCompare() const { return ((ridesummary && context->isCompareIntervals)
                                       || (!ridesummary && context->isCompareDateRanges)); }
 
+        void getPDEstimates();
+
     protected slots:
 
         void refresh();
@@ -106,6 +109,10 @@ class RideSummaryWindow : public GcChartWindow
 
         // config changed
         void configChanged();
+
+    signals:
+
+        void doRefresh();
 
     protected:
 
@@ -134,6 +141,8 @@ class RideSummaryWindow : public GcChartWindow
         RideFileCache *bestsCache;
         ExtendedCriticalPower *ecp;
         Model_eCP cpModel;
+
+        QString WPrimeString, CPString, FTPString, PMaxString;
 
         bool force; // to force a replot
 };
