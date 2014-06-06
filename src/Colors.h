@@ -102,6 +102,7 @@ class GCColor : public QObject
         static const Colors *defaultColorSet();
         static void resetColors();
         static struct SizeSettings defaultSizes(int width, int height);
+        static double luminance(QColor color); // return the relative luminance
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
