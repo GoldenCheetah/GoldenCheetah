@@ -193,14 +193,20 @@ GCColor::GCColor(Context *context) : QObject(context)
     connect(context, SIGNAL(configChanged()), this, SLOT(readConfig()));
 }
 
+// returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
+double GCColor::luminance(QColor color)
+{
+    QColor cRGB = color.convertTo(QColor::Rgb);
+
+    // based upon http://en.wikipedia.org/wiki/Luminance_(relative)
+    return (0.2126f * double(cRGB.red()))  + 
+           (0.7152f * double(cRGB.green())) +
+           (0.0722f * double(cRGB.blue()));
+}
+
 QColor GCColor::invertColor(QColor bgColor)
 {
-    QColor cRGB = bgColor.convertTo(QColor::Rgb);
-    // lets work it out..
-    int r = cRGB.red() < 128 ? 255 : 0;
-    int g = cRGB.green() < 128 ? 255 : 0;
-    int b = cRGB.blue() < 128 ? 255 : 0;
-    return QColor(r,g,b);
+    return GCColor::luminance(bgColor) < 127 ? QColor(Qt::white) : QColor(Qt::black);
 }
 
 QColor GCColor::alternateColor(QColor bgColor)
