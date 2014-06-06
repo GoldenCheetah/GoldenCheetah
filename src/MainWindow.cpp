@@ -975,6 +975,11 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // save global mainwindow settings
         appsettings->setValue(GC_TABBAR, showhideTabbar->isChecked());
+
+        // wait for threads.. max of 10 seconds before just exiting anyway
+        for (int i=0; i<10 && QThreadPool::globalInstance()->activeThreadCount(); i++) {
+            QThread::sleep(1);
+        }
     }
 }
 
