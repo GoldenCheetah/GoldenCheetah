@@ -484,13 +484,6 @@ MainWindow::MainWindow(const QDir &home)
     tabbar->setTabsClosable(true);
 #ifdef Q_OS_MAC
     tabbar->setDocumentMode(true);
-#else
-    QPalette tabbarPalette;
-    tabbar->setAutoFillBackground(true);
-    tabbar->setShape(QTabBar::RoundedSouth);
-    tabbar->setDrawBase(false);
-    tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
-    tabbar->setPalette(tabbarPalette);
 #endif
 
     tabStack = new QStackedWidget(this);
@@ -1845,6 +1838,19 @@ MainWindow::configChanged()
                             " QToolBar:active { border: 0px; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #D9D9D9, stop: 1 #B5B5B5 ); } ");
 #endif
     }
+#endif
+
+#ifndef Q_OS_MAC
+    QPalette tabbarPalette;
+    tabbar->setAutoFillBackground(true);
+    tabbar->setShape(QTabBar::RoundedSouth);
+    tabbar->setDrawBase(false);
+
+    if (GCColor::isFlat())
+        tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
+    else
+        tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    tabbar->setPalette(tabbarPalette);
 #endif
 
     head->updateGeometry();
