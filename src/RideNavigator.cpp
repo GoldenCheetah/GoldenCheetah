@@ -573,7 +573,6 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
 void
 RideNavigator::borderMenu(const QPoint &pos)
 {
-qDebug()<<"right clicked at"<<pos;
     // Which column did we right click on?
     //
     // if not in the border then do nothing, this
