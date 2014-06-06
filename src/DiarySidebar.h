@@ -43,9 +43,11 @@ class GcLabel : public QLabel
     int xoff, yoff;
     bool bg, selected, filtered; // bg = highlighted, selected = user selected too
     bool highlighted;            // highlighed uses highlighter color overlay when painting
+    QColor bgColor; 
+    bool isChrome;
 
 public:
-    GcLabel(const QString & text, QWidget * parent = 0) : QLabel(text, parent), xoff(0), yoff(0), bg(false), selected(false), filtered(false), highlighted(false), bgColor(Qt::lightGray) {}
+    GcLabel(const QString & text, QWidget * parent = 0) : QLabel(text, parent), xoff(0), yoff(0), bg(false), selected(false), filtered(false), highlighted(false), bgColor(Qt::lightGray), isChrome(false) {}
     ~GcLabel(){}
  
 signals:
@@ -54,6 +56,7 @@ signals:
 public slots:
     void setYOff(int x) { yoff = x; }
     void setXOff(int x) { xoff = x; }
+    void setChrome(bool x) { isChrome = x; }
     void setBg(bool x) { bg = x; }
     bool getBg() { return bg; }
     void setBgColor(QColor bg) { bgColor = bg; }
@@ -67,7 +70,6 @@ protected:
         emit clicked();
     }
     void paintEvent(QPaintEvent *);
-    QColor bgColor; 
 };
 
 class GcMiniCalendar : public QWidget

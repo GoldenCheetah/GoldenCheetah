@@ -283,6 +283,7 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
 
     titleLabel = new GcLabel(title, this);
     titleLabel->setXOff(0);
+    titleLabel->setChrome(true);
 
     QFont font;
 #ifdef Q_OS_MAC
