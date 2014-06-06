@@ -6,7 +6,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="467"/>
         <source>Average aPower</source>
-        <translation>APuissance moyenne</translation>
+        <translation>aPuissance moyenne</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="468"/>
@@ -93,7 +93,8 @@
         <source>We will now add a new device with the configuration shown below. Please take a moment to review and then click Finish to add the device and complete this wizard, or press the Back button to make amendments.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Nous allons ajouter un nouvel périphérique avec la configuration ci-dessous. Veuillez prendre un moment pour vérifier les paramètre et cliquer Terminer pour ajouter ce périphérique ou bien Retour pour faire quelques modifications.
+</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1077"/>
@@ -108,12 +109,12 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1079"/>
         <source>Profile</source>
-        <translation type="unfinished">Profile</translation>
+        <translation>Profile</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1088"/>
         <source>Virtual</source>
-        <translation type="unfinished">Virtuel</translation>
+        <translation>Virtuel</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1089"/>
@@ -123,257 +124,257 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1093"/>
         <source>None</source>
-        <translation type="unfinished">--</translation>
+        <translation>--</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1094"/>
         <source>Power - Kurt Kinetic Cyclone</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Kurt Kinetic Cyclone</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1095"/>
         <source>Power - Kurt Kinetic Road Machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Kurt Kinetic Road Machine</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1096"/>
         <source>Power - Cyclops Fluid 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Cyclops Fluid 2</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1097"/>
         <source>Power - BT Advanced Training System</source>
-        <translation type="unfinished"></translation>
+        <translation>uissance - BT Advanced Training System</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1098"/>
         <source>Power - LeMond Revolution</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - LeMond Revolution</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1099"/>
         <source>Power - 1UP USA Trainer</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - 1UP USA Trainer</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1100"/>
         <source>Power - Minoura V100 Trainer (H)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Minoura V100 Trainer (H)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1101"/>
         <source>Power - Minoura V100 Trainer (5)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Minoura V100 Trainer (5)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1102"/>
         <source>Power - Minoura V100 Trainer (4)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Minoura V100 Trainer (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1103"/>
         <source>Power - Minoura V100 Trainer (3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Minoura V100 Trainer (3)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1104"/>
         <source>Power - Minoura V100 Trainer (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Minoura V100 Trainer (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1105"/>
         <source>Power - Minoura V100 Trainer (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance- Minoura V100 Trainer (1)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1106"/>
         <source>Power - Minoura V100 Trainer (L)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Minoura V100 Trainer (L)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1107"/>
         <source>Power - Saris Powerbeam Pro</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Saris Powerbeam Pro</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1108"/>
         <source>Power - Tacx Satori (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Satori (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1109"/>
         <source>Power - Tacx Satori (4)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Satori (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1110"/>
         <source>Power - Tacx Satori (6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Satori (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1111"/>
         <source>Power - Tacx Satori (8)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance- Tacx Satori (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1112"/>
         <source>Power - Tacx Satori (10)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Satori (10)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1113"/>
         <source>Power - Tacx Flow (0)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Flow (0)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1114"/>
         <source>Power - Tacx Flow (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Flow (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1115"/>
         <source>Power - Tacx Flow (4)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Flow (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1116"/>
         <source>Power - Tacx Flow (6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Flow (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1117"/>
         <source>Power - Tacx Flow (8)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Flow (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1118"/>
         <source>Power - Tacx Blue Twist (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Twist (1)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1119"/>
         <source>Power - Tacx Blue Twist (3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Twist (3)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1120"/>
         <source>Power - Tacx Blue Twist (5)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Twist (5)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1121"/>
         <source>Power - Tacx Blue Twist (7)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Twist (7)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1122"/>
         <source>Power - Tacx Blue Motion (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Motion (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1123"/>
         <source>Power - Tacx Blue Motion (4)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Motion (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1124"/>
         <source>Power - Tacx Blue Motion (6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Motion (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1125"/>
         <source>Power - Tacx Blue Motion (8)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Motion (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1126"/>
         <source>Power - Tacx Blue Motion (10)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Tacx Blue Motion (10)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1127"/>
         <source>Power - Elite Supercrono Powermag (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (1)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1128"/>
         <source>Power - Elite Supercrono Powermag (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1129"/>
         <source>Power - Elite Supercrono Powermag (3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (3)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1130"/>
         <source>Power - Elite Supercrono Powermag (4)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1131"/>
         <source>Power - Elite Supercrono Powermag (5)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (5)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1132"/>
         <source>Power - Elite Supercrono Powermag (6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1133"/>
         <source>Power - Elite Supercrono Powermag (7)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (7)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1134"/>
         <source>Power - Elite Supercrono Powermag (8)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance - Elite Supercrono Powermag (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1136"/>
         <source>Road/Cross (700C/622)</source>
-        <translation type="unfinished"></translation>
+        <translation>Route (700C/622)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1137"/>
         <source>Tri/TT (650C)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tri/CLM (650C)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1138"/>
         <source>Mountain (26&quot;)</source>
-        <translation type="unfinished"></translation>
+        <translation>VTT (26&quot;)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1139"/>
         <source>BMX (20&quot;)</source>
-        <translation type="unfinished"></translation>
+        <translation>BMX (20&quot;)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1144"/>
         <source>Selected by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionné par défaut</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1151"/>
         <source>Power</source>
-        <translation type="unfinished">Puissance</translation>
+        <translation>Puissance</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1152"/>
         <source>Heartrate</source>
-        <translation type="unfinished">Fréquence cardiaque</translation>
+        <translation>Fréquence cardiaque</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1153"/>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1154"/>
         <source>Cadence</source>
-        <translation type="unfinished">Cadence</translation>
+        <translation>Cadence</translation>
     </message>
 </context>
 <context>
@@ -391,12 +392,12 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="493"/>
         <source>Browse</source>
-        <translation type="unfinished">Parcourir</translation>
+        <translation>Parcourir</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="494"/>
         <source>Copy to Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier dans la bibliothèque</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="499"/>
@@ -1231,7 +1232,7 @@ Press Next to Continue
     <message>
         <location filename="../AllPlot.cpp" line="279"/>
         <source>Power</source>
-        <translation type="unfinished">Puissance</translation>
+        <translation>Puissance</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="283"/>
@@ -1251,22 +1252,22 @@ Press Next to Continue
     <message>
         <location filename="../AllPlot.cpp" line="295"/>
         <source>xPower</source>
-        <translation type="unfinished">xPower</translation>
+        <translation>xPower</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="299"/>
         <source>aPower</source>
-        <translation type="unfinished"></translation>
+        <translation>aPower</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="303"/>
         <source>Heart Rate</source>
-        <translation type="unfinished">Fréquence cardiaque</translation>
+        <translation>Fréquence cardiaque</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="307"/>
         <source>Acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>Accélération</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="311"/>
@@ -1920,7 +1921,7 @@ Press Next to Continue
     <message>
         <location filename="../BasicRideMetrics.cpp" line="200"/>
         <source>lbs</source>
-        <translation type="unfinished"></translation>
+        <translation>lbs</translation>
     </message>
 </context>
 <context>
@@ -1970,13 +1971,13 @@ Press Next to Continue
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1231"/>
         <source>Average Left Pedal Smoothness</source>
-        <translation type="unfinished"></translation>
+        <translation>Lissage moyen du pédalage gauche</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1232"/>
         <location filename="../BasicRideMetrics.cpp" line="1233"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -1984,13 +1985,13 @@ Press Next to Continue
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1135"/>
         <source>Average Left Torque Effectiveness</source>
-        <translation type="unfinished"></translation>
+        <translation>Efficacité moyenne du pédalage gauche</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1136"/>
         <location filename="../BasicRideMetrics.cpp" line="1137"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -2012,13 +2013,13 @@ Press Next to Continue
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1279"/>
         <source>Average Right Pedal Smoothness</source>
-        <translation type="unfinished"></translation>
+        <translation>Lissage moyen du pédalage droite</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1280"/>
         <location filename="../BasicRideMetrics.cpp" line="1281"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -2026,13 +2027,13 @@ Press Next to Continue
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1183"/>
         <source>Average Right Torque Effectiveness</source>
-        <translation type="unfinished"></translation>
+        <translation>Efficacité moyenne du pédalage droite</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="1184"/>
         <location filename="../BasicRideMetrics.cpp" line="1185"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -18227,12 +18228,12 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../BikeScore.cpp" line="237"/>
         <source>Aerobic TISS</source>
-        <translation type="unfinished"></translation>
+        <translation>Aérobique TISS</translation>
     </message>
     <message>
         <location filename="../BikeScore.cpp" line="283"/>
         <source>Anaerobic TISS</source>
-        <translation type="unfinished"></translation>
+        <translation>Anaérobique TISS</translation>
     </message>
 </context>
 <context>
