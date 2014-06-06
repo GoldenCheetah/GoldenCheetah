@@ -570,7 +570,7 @@ RideSummaryWindow::htmlSummary()
 
     // FTP/MMP60;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg("FTP / MMP60 (watts)")
+            .arg("FTP (watts)")
             .arg(FTPString);
 
     // Pmax;
