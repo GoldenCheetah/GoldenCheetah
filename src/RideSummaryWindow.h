@@ -26,7 +26,9 @@
 #include <QWebView>
 #include <QWebFrame>
 #include <QFormLayout>
+#if QT_VERSION >= 0x050000
 #include <QtConcurrent>
+#endif
 
 #include "SummaryMetrics.h"
 #include "RideFileCache.h"

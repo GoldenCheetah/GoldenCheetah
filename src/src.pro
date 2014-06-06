@@ -21,7 +21,7 @@ LIBS += -lm $${LIBZ_LIBS}
 #            5.2.0 or higher
 #
 ## common modules
-QT += xml sql network script svg concurrent
+QT += xml sql network script svg
 
 lessThan(QT_MAJOR_VERSION, 5) {
 
@@ -31,7 +31,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 } else {
 
     ## QT5 specific modules
-    QT += webkitwidgets widgets
+    QT += webkitwidgets widgets concurrent
     macx {
         QT += macextras
     } else {
