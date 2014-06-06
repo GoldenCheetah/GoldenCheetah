@@ -107,11 +107,10 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
         connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
-        // concurrent callback to refresh
-        connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
-
     }
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
+
     setChartLayout(vlayout);
     configChanged(); // set colors
 }
@@ -540,51 +539,46 @@ RideSummaryWindow::htmlSummary()
         summary += "</table></td>";
     }
 
-    // now add in the model parameters if we are not in ridesummary mode...
-    // if we're summarising a range we need to get the model parameters refreshed
-    if (!ridesummary && bestsCache == NULL) {
+    // get the PDEStimates for this athlete
+    if (context->athlete->PDEstimates.count() == 0) {
 
-        // get the PDEStimates for this athlete
-        if (context->athlete->PDEstimates.count() == 0) {
+        // ugh .. refresh in background
+        WPrimeString = CPString = FTPString = PMaxString = "-";
+        QFuture<void> future = QtConcurrent::run(this, &RideSummaryWindow::getPDEstimates);
 
-            // ugh .. refresh in background
-            WPrimeString = CPString = FTPString = PMaxString = "-";
-            QFuture<void> future = QtConcurrent::run(this, &RideSummaryWindow::getPDEstimates);
+    } else {
 
-        } else {
-
-            // set from cached values
-            getPDEstimates();
-        }
-
-        // lets get a table going
-        summary += "<td align=\"center\" valign=\"top\" width=\"%1%%\"><table>"
-            "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
-        summary = summary.arg(90 / columnNames.count()+1);
-        summary = summary.arg(tr("Model"));
-
-        // W;
-        summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-                .arg("W' (kJ)")
-                .arg(WPrimeString);
-
-        // CP;
-        summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-                .arg("CP (watts)")
-                .arg(CPString);
-
-        // FTP/MMP60;
-        summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-                .arg("FTP / MMP60 (watts)")
-                .arg(FTPString);
-
-        // Pmax;
-        summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-                .arg("P-max (watts)")
-                .arg(PMaxString);
-
-        summary += "</table></td>";
+        // set from cached values
+        getPDEstimates();
     }
+
+    // lets get a table going
+    summary += "<td align=\"center\" valign=\"top\" width=\"%1%%\"><table>"
+        "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
+    summary = summary.arg(90 / columnNames.count()+1);
+    summary = summary.arg(tr("Model"));
+
+    // W;
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
+            .arg("W' (kJ)")
+            .arg(WPrimeString);
+
+    // CP;
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
+            .arg("CP (watts)")
+            .arg(CPString);
+
+    // FTP/MMP60;
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
+            .arg("FTP / MMP60 (watts)")
+            .arg(FTPString);
+
+    // Pmax;
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
+            .arg("P-max (watts)")
+            .arg(PMaxString);
+
+    summary += "</table></td>";
 
     summary += "</tr></table>";
 
@@ -982,24 +976,30 @@ RideSummaryWindow::getPDEstimates()
     foreach(PDEstimate est, context->athlete->PDEstimates) {
 
         // We only use the extended model for now
-        if (est.model != "Ext" || est.from > myDateRange.to || est.to < myDateRange.from) continue;
+        if (est.model != "Ext" ) continue;
 
-        // it definitely was during our period
-        if ((est.from >= myDateRange.from && est.from <= myDateRange.to) || (est.to >= myDateRange.from && est.to <= myDateRange.to) ||
-            (est.from <= myDateRange.from && est.to >= myDateRange.to)) {
+        // summarising a season or date range
+        if (!ridesummary && (est.from > myDateRange.to || est.to < myDateRange.from)) continue;
 
-            // set low
-            if (!lowWPrime || est.WPrime < lowWPrime) lowWPrime = est.WPrime;
-            if (!lowCP || est.CP < lowCP) lowCP = est.CP;
-            if (!lowFTP || est.FTP < lowFTP) lowFTP = est.FTP;
-            if (!lowPMax || est.PMax < lowPMax) lowPMax = est.PMax;
+        // it definitely wasnt during our period
+        if (!ridesummary && !((est.from >= myDateRange.from && est.from <= myDateRange.to) || (est.to >= myDateRange.from && est.to <= myDateRange.to) ||
+            (est.from <= myDateRange.from && est.to >= myDateRange.to))) continue;
 
-            // set high
-            if (!highWPrime || est.WPrime > highWPrime) highWPrime = est.WPrime;
-            if (!highCP || est.CP > highCP) highCP = est.CP;
-            if (!highFTP || est.FTP > highFTP) highFTP = est.FTP;
-            if (!highPMax || est.PMax > highPMax) highPMax = est.PMax;
-        }
+
+        // summarising a ride
+        if (ridesummary && (!myRideItem || (myRideItem->dateTime.date() < est.from || myRideItem->dateTime.date() > est.to))) continue;
+
+        // set low
+        if (!lowWPrime || est.WPrime < lowWPrime) lowWPrime = est.WPrime;
+        if (!lowCP || est.CP < lowCP) lowCP = est.CP;
+        if (!lowFTP || est.FTP < lowFTP) lowFTP = est.FTP;
+        if (!lowPMax || est.PMax < lowPMax) lowPMax = est.PMax;
+
+        // set high
+        if (!highWPrime || est.WPrime > highWPrime) highWPrime = est.WPrime;
+        if (!highCP || est.CP > highCP) highCP = est.CP;
+        if (!highFTP || est.FTP > highFTP) highFTP = est.FTP;
+        if (!highPMax || est.PMax > highPMax) highPMax = est.PMax;
     }
 
     // ok, so lets set the string to either
