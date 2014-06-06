@@ -351,12 +351,26 @@ GcScopeButton::paintEvent(QPaintEvent *)
 
     // now paint the text
     // don't do all that offset nonsense for flat style
-    bool flat = (appsettings->value(this, GC_CHROME, "Mac").toString() == "Flat");
-    if (!flat) {
+    // set fg checked and unchecked colors
+    QColor checkedCol(240,240,240), uncheckedCol(30,30,30,200);
+    if (!GCColor::isFlat()) {
+
+        // metal style
         painter.setPen((underMouse() || checked) ? QColor(50,50,50) : Qt::white);
         painter.drawText(off, text, Qt::AlignVCenter | Qt::AlignCenter);
+
+    } else {
+
+        // adjust colors if flat and dark
+        if (GCColor::luminance(GColor(CCHROME)) < 127) {
+            // dark background so checked is white and unchecked is light gray
+            checkedCol = QColor(Qt::white);
+            uncheckedCol = QColor(Qt::lightGray);
+        }
     }
-    painter.setPen((underMouse() || checked) ? QColor(240,240,240) : QColor(30,30,30,200));
+
+    // draw the text
+    painter.setPen((underMouse() || checked) ? checkedCol : uncheckedCol);
     painter.drawText(body, text, Qt::AlignVCenter | Qt::AlignCenter);
     painter.restore();
 }
