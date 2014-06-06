@@ -501,7 +501,8 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
     {
         case QEvent::ContextMenu:
         {
-            borderMenu(((QMouseEvent *)e)->pos());
+            //borderMenu(((QMouseEvent *)e)->pos());
+            borderMenu(mapFromGlobal(QCursor::pos()));
             return true; // I'll take that thanks
             break;
         }
@@ -572,6 +573,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
 void
 RideNavigator::borderMenu(const QPoint &pos)
 {
+qDebug()<<"right clicked at"<<pos;
     // Which column did we right click on?
     //
     // if not in the border then do nothing, this
