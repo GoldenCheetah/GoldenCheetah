@@ -202,7 +202,7 @@ GcLabel::paintEvent(QPaintEvent *)
         if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
         else {
 
-            if (GCColor::isFlat()) {
+            if (isChrome && GCColor::isFlat()) {
 
                 if (GCColor::luminance(GColor(CCHROME)) < 127)
                     painter.setPen(QColor(Qt::white));
