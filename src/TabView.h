@@ -164,8 +164,8 @@ protected:
 #ifdef Q_OS_MAC
     QtMacButton *newclear() {
         if (clearbutton) delete clearbutton; // we only need one!
-        clearbutton = new QtMacButton("Clear", this);
-        clearbutton->setFixedWidth(60);
+        clearbutton = new QtMacButton(tr("Clear"), this);
+//      clearbutton->setFixedWidth(60); // no fixed length to allow translation
         clearbutton->setFixedHeight(20);
         clearbutton->setFocusPolicy(Qt::NoFocus);
         connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
@@ -174,8 +174,8 @@ protected:
 #else
     QPushButton *newclear() {
         if (clearbutton) delete clearbutton; // we only need one!
-        clearbutton = new QPushButton("Clear", this);
-        clearbutton->setFixedWidth(60);
+        clearbutton = new QPushButton(tr("Clear"), this);
+//      clearbutton->setFixedWidth(60); // no fixed length to allow translation
         clearbutton->setFixedHeight(20);
         clearbutton->setFocusPolicy(Qt::NoFocus);
         connect(clearbutton, SIGNAL(clicked()), this, SLOT(clearClicked()));
@@ -187,8 +187,8 @@ protected:
 #ifdef Q_OS_MAC
     QtMacButton *newtoggle() {
         if (toggle) delete toggle; // we only need one!
-        toggle = new QtMacButton("OFF", this);
-        toggle->setFixedWidth(40);
+        toggle = new QtMacButton(tr("OFF"), this);
+//      toggle->setFixedWidth(40);    // no fixed length to allow translation
         toggle->setFixedHeight(20);
         toggle->setFocusPolicy(Qt::NoFocus);
         connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
@@ -198,10 +198,10 @@ protected:
 #else
     QPushButton *newtoggle() {
         if (toggle) delete toggle; // we only need one!
-        toggle = new QPushButton("OFF", this);
+        toggle = new QPushButton(tr("OFF"), this);
         toggle->setCheckable(true);
         toggle->setChecked(false);
-        toggle->setFixedWidth(40);
+//      toggle->setFixedWidth(40);   // no fixed length to allow translation
         toggle->setFixedHeight(20);
         toggle->setFocusPolicy(Qt::NoFocus);
         connect(toggle, SIGNAL(clicked()), this, SLOT(toggled()));
@@ -274,12 +274,12 @@ public slots:
             font.setWeight(QFont::Bold);
             toggle->setFont(font);
             toggle->setStyleSheet("color: red");
-            toggle->setText("ON");
+            toggle->setText(tr("ON"));
         } else {
             font.setWeight(QFont::Normal);
             toggle->setFont(font);
             toggle->setStyleSheet("");
-            toggle->setText("OFF");
+            toggle->setText(tr("OFF"));
         }
         // we started compare mode
         emit compareChanged(toggle->isChecked());
