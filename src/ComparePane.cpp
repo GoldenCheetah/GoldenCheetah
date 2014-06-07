@@ -65,8 +65,8 @@ class CTableWidgetItem : public QTableWidgetItem
             switch(column()) {
 
                 case 2 : return text() < other.text(); // athlete
-                case 3 : return QDate::fromString(text(), "dd, MMM yyyy") <
-                                QDate::fromString(other.text(), "dd, MMM yyyy"); // date
+                case 3 : return QDate::fromString(text(), QObject::tr("dd, MMM yyyy")) <
+                                QDate::fromString(other.text(), QObject::tr("dd, MMM yyyy")); // date
                 case 4 : // date or time depending on which view
                          if (text().contains(":")) {
 
@@ -75,8 +75,8 @@ class CTableWidgetItem : public QTableWidgetItem
 
                          } else {
 
-                            return QDate::fromString(text(), "dd, MMM yyyy") <
-                                   QDate::fromString(other.text(), "dd, MMM yyyy"); // date
+                            return QDate::fromString(text(), QObject::tr("dd, MMM yyyy")) <
+                                   QDate::fromString(other.text(), QObject::tr("dd, MMM yyyy")); // date
 
                          }
                 case 5 : return QTime::fromString(text(), "hh:mm") < // Duration
@@ -174,9 +174,9 @@ ComparePane::refreshTable()
         QStringList list;
         list << "" // checkbox
             << "" // color
-            << "Athlete"
-            << "Date"
-            << "Time";
+            << tr("Athlete")
+            << tr("Date")
+            << tr("Time");
 
         QStringList worklist; // metrics to compute
         RideMetricFactory &factory = RideMetricFactory::instance();
@@ -188,7 +188,9 @@ ComparePane::refreshTable()
             if (m) {
                 worklist << metric;
                 QString units;
-                if (m->units(context->athlete->useMetricUnits) != "seconds") units = m->units(context->athlete->useMetricUnits);
+                // check for both original and translated
+                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
+                    units = m->units(context->athlete->useMetricUnits);
                 if (units != "") list << QString("%1 (%2)").arg(m->name()).arg(units);
                 else list << QString("%1").arg(m->name());
             }
@@ -248,7 +250,7 @@ ComparePane::refreshTable()
 
             // date
             t = new CTableWidgetItem;
-            t->setText(x.data->startTime().date().toString("dd MMM, yyyy"));
+            t->setText(x.data->startTime().date().toString(tr("dd MMM, yyyy")));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 3, t);
 
@@ -341,9 +343,9 @@ ComparePane::refreshTable()
         QStringList list;
         list << "" // checkbox
             << "" // color
-            << "Athlete"
-            << "From"
-            << "To";
+            << tr("Athlete")
+            << tr("From")
+            << tr("To");
 
         QStringList worklist; // metrics to compute
         RideMetricFactory &factory = RideMetricFactory::instance();
@@ -355,13 +357,14 @@ ComparePane::refreshTable()
             if (m) {
                 worklist << metric;
                 QString units;
-                if (m->units(context->athlete->useMetricUnits) != "seconds") units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
+                    units = m->units(context->athlete->useMetricUnits);
                 if (units != "") list << QString("%1 (%2)").arg(m->name()).arg(units);
                 else list << QString("%1").arg(m->name());
             }
         }
 
-        list << "Date Range";
+        list << tr("Date Range");
 
         table->setColumnCount(list.count()+1);
         table->horizontalHeader()->setSectionHidden(list.count(), true);
@@ -402,13 +405,13 @@ ComparePane::refreshTable()
 
             // date from
             t = new CTableWidgetItem;
-            t->setText(x.start.toString("dd MMM, yyyy"));
+            t->setText(x.start.toString(tr("dd MMM, yyyy")));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 3, t);
 
             // date to
             t = new CTableWidgetItem;
-            t->setText(x.end.toString("dd MMM, yyyy"));
+            t->setText(x.end.toString(tr("dd MMM, yyyy")));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             table->setItem(counter, 4, t);
 

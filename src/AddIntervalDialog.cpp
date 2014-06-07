@@ -113,14 +113,14 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     hrsSpinBox = new QDoubleSpinBox(this);
     hrsSpinBox->setDecimals(0);
     hrsSpinBox->setMinimum(0.0);
-    hrsSpinBox->setSuffix(" hrs");
+    hrsSpinBox->setSuffix(tr(" hrs"));
     hrsSpinBox->setSingleStep(1.0);
     hrsSpinBox->setAlignment(Qt::AlignRight);
     intervalTimeLayout->addWidget(hrsSpinBox);
     minsSpinBox = new QDoubleSpinBox(this);
     minsSpinBox->setDecimals(0);
     minsSpinBox->setRange(0.0, 59.0);
-    minsSpinBox->setSuffix(" mins");
+    minsSpinBox->setSuffix(tr(" mins"));
     minsSpinBox->setSingleStep(1.0);
     minsSpinBox->setWrapping(true);
     minsSpinBox->setAlignment(Qt::AlignRight);
@@ -129,7 +129,7 @@ AddIntervalDialog::AddIntervalDialog(Context *context) :
     secsSpinBox = new QDoubleSpinBox(this);
     secsSpinBox->setDecimals(0);
     secsSpinBox->setRange(0.0, 59.0);
-    secsSpinBox->setSuffix(" secs");
+    secsSpinBox->setSuffix(tr(" secs"));
     secsSpinBox->setSingleStep(1.0);
     secsSpinBox->setWrapping(true);
     secsSpinBox->setAlignment(Qt::AlignRight);
@@ -521,7 +521,7 @@ AddIntervalDialog::createClicked()
                 struct AddedInterval add;
                 add.start = ride->dataPoints()[peaks[i].x()]->secs;
                 add.stop = ride->dataPoints()[peaks[i+1].x()]->secs;
-                add.name = QString("Climb #%1 (%2m)").arg(counter)
+                add.name = QString(tr("Climb #%1 (%2m)")).arg(counter)
                                                         .arg(ascent);
                 results << add;
 
@@ -786,7 +786,7 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
         if (!overlaps) {
             QString name = prefix;
             if (prefix == "") {
-                name = "Best %2%3 #%1";
+                name = tr("Best %2%3 #%1");
                 name = name.arg(_results.count()+1);
                 if (typeTime)  {
                     // best n mins
