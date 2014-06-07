@@ -26,7 +26,7 @@
 #include "Settings.h"
 
 #ifdef Q_OS_WIN
-#include "Windows.h"
+#include <windows.h>
 #ifdef GC_HAVE_DWM
 #include "Dwmapi.h"
 #endif
