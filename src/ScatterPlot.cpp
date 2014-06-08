@@ -43,7 +43,7 @@
 
 // side 0=left, 1=right, usually 0
 static double
-pointType(const RideFilePoint *point, int type, int side, bool useMetricUnits, double cranklength)
+pointType(const RideFilePoint *point, int type, int side, bool metric, double cranklength)
 {
     // return the point value for the given type
     switch(type) {
@@ -52,13 +52,13 @@ pointType(const RideFilePoint *point, int type, int side, bool useMetricUnits, d
         case MODEL_CADENCE : return point->cad;
         case MODEL_HEARTRATE : return point->hr;
         case MODEL_SPEED :
-            if (useMetricUnits == true){
+            if (metric == true){
                 return point->kph;
             }else {
                 return point->kph * MILES_PER_KM;
             }
         case MODEL_ALT :
-            if (useMetricUnits == true){
+            if (metric == true){
                 return point->alt;
             }else {
                 return point->alt * FEET_PER_METER;
@@ -66,7 +66,7 @@ pointType(const RideFilePoint *point, int type, int side, bool useMetricUnits, d
         case MODEL_TORQUE : return point->nm;
         case MODEL_TIME : return point->secs;
         case MODEL_DISTANCE :
-            if (useMetricUnits == true){
+            if (metric == true){
                 return point->km;
             }else {
                 return point->km * MILES_PER_KM;
@@ -94,7 +94,7 @@ pointType(const RideFilePoint *point, int type, int side, bool useMetricUnits, d
     return 0; // ? unknown channel ?
 }
 
-QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
+QString ScatterPlot::describeType(int type, bool longer, bool metric)
 {
     // return the point value for the given type
     if (longer == true) {
@@ -104,13 +104,13 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
             case MODEL_CADENCE : return (tr("Cadence (rpm)"));
             case MODEL_HEARTRATE : return (tr("Heartrate (bpm)"));
             case MODEL_SPEED :
-                if (useMetricUnits == true){
+                if (metric == true){
                      return (tr("Speed (kph)"));
                 }else {
                      return (tr("Speed (mph)"));
                 }
             case MODEL_ALT :
-                  if (useMetricUnits == true){
+                  if (metric == true){
                       return (tr("Altitude (meters)"));
                   }else {
                       return (tr("Altitude (feet)"));
@@ -118,7 +118,7 @@ QString ScatterPlot::describeType(int type, bool longer, bool useMetricUnits)
             case MODEL_TORQUE : return (tr("Torque (N)"));
             case MODEL_TIME : return (tr("Elapsed Time (secs)"));
             case MODEL_DISTANCE :
-                if (useMetricUnits == true){
+                if (metric == true){
                     return (tr("Elapsed Distance (km)"));
                 }else {
                     return (tr("Elapsed Distance (mi)"));
@@ -318,8 +318,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
             // extract interval data
             foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-                double x = pointType(point, settings->x, side, useMetricUnits, cranklength);
-                double y = pointType(point, settings->y, side, useMetricUnits, cranklength);
+                double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
 
                 if (!(settings->ignore && (x == 0 && y ==0))) {
 
@@ -424,8 +424,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
     }
 
     // axis titles
-    setAxisTitle(yLeft, describeType(settings->y, true, useMetricUnits));
-    setAxisTitle(xBottom, describeType(settings->x, true, useMetricUnits));
+    setAxisTitle(yLeft, describeType(settings->y, true, context->athlete->useMetricUnits));
+    setAxisTitle(xBottom, describeType(settings->x, true, context->athlete->useMetricUnits));
 
     // axis scale
     if (settings->y == MODEL_AEPF) setAxisScale(yLeft, 0, 600);
@@ -506,8 +506,8 @@ ScatterPlot::intervalHover(RideFileInterval ri)
         QVector<double> xArray, yArray;
         foreach(const RideFilePoint *p1, ride->ride()->dataPoints()) {
 
-            double y = pointType(p1, xseries, side, useMetricUnits, cranklength);
-            double x = pointType(p1, yseries, side, useMetricUnits, cranklength);
+            double y = pointType(p1, xseries, side, context->athlete->useMetricUnits, cranklength);
+            double x = pointType(p1, yseries, side, context->athlete->useMetricUnits, cranklength);
 
             if (p1->secs < ri.start || p1->secs > ri.stop) continue;
 
@@ -582,10 +582,10 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
         foreach (RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-            double x0 = pointType(point, settings->x, 0, useMetricUnits, cranklength);
-            double y0 = pointType(point, settings->y, 0, useMetricUnits, cranklength);
-            double x1 = pointType(point, settings->x, 1, useMetricUnits, cranklength);
-            double y1 = pointType(point, settings->y, 1, useMetricUnits, cranklength);
+            double x0 = pointType(point, settings->x, 0, context->athlete->useMetricUnits, cranklength);
+            double y0 = pointType(point, settings->y, 0, context->athlete->useMetricUnits, cranklength);
+            double x1 = pointType(point, settings->x, 1, context->athlete->useMetricUnits, cranklength);
+            double y1 = pointType(point, settings->y, 1, context->athlete->useMetricUnits, cranklength);
 
             // average of left and right (even if both the same)
             double x = (x0 + x1) / 2.00f;
