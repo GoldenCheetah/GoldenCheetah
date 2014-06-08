@@ -863,7 +863,7 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    multiCheck = new QCheckBox("Allow multiple devices in Train View", this);
+    multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
     multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
 
     mainLayout->addWidget(deviceList);

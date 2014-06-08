@@ -377,7 +377,7 @@ struct FitFileReaderState
         }
 
         if (rideFile->dataPoints().count()) // no samples means no laps..
-            rideFile->addInterval(this_start_time - start_time, time - start_time, QString("%1").arg(interval));
+            rideFile->addInterval(this_start_time - start_time, time - start_time, QString(QObject::tr("Lap %1")).arg(interval));
     }
 
     void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<fit_value_t> values) {
