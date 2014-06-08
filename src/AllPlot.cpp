@@ -1184,8 +1184,11 @@ AllPlot::recalc(AllPlotObject *objects)
         return;
     }
 
+    // if recintsecs is longer than the smoothing there is no point in even trying
+    int applysmooth = smooth < rideItem->ride()->recIntSecs() ? rideItem->ride()->recIntSecs() : smooth;
+    
     // we should only smooth the curves if objects->smoothed rate is greater than sample rate
-    if (smooth > 0) {
+    if (applysmooth > 0) {
 
         double totalWatts = 0.0;
         double totalNP = 0.0;
@@ -1242,7 +1245,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothLPS.resize(rideTimeSecs + 1);
         objects->smoothRPS.resize(rideTimeSecs + 1);
 
-        for (int secs = 0; ((secs < smooth)
+        for (int secs = 0; ((secs < applysmooth)
                             && (secs < rideTimeSecs)); ++secs) {
             objects->smoothWatts[secs] = 0.0;
             objects->smoothNP[secs] = 0.0;
@@ -1274,7 +1277,7 @@ AllPlot::recalc(AllPlotObject *objects)
         }
 
         int i = 0;
-        for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
+        for (int secs = applysmooth; secs <= rideTimeSecs; ++secs) {
             while ((i < objects->timeArray.count()) && (objects->timeArray[i] <= secs)) {
                 DataPoint dp(objects->timeArray[i],
                              (!objects->hrArray.empty() ? objects->hrArray[i] : 0),
@@ -1356,7 +1359,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 list.append(dp);
                 ++i;
             }
-            while (!list.empty() && (list.front().time < secs - smooth)) {
+            while (!list.empty() && (list.front().time < secs - applysmooth)) {
                 DataPoint &dp = list.front();
                 totalWatts -= dp.watts;
                 totalNP -= dp.np;
