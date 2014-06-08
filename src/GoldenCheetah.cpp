@@ -668,7 +668,7 @@ GcWindow::_closeWindow()
     emit closeWindow(this);
 }
 
-GcChartWindow::GcChartWindow(Context *context) : GcWindow(context) 
+GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(context)
 {
     //
     // Default layout
