@@ -497,14 +497,16 @@ LTMSidebar::setAutoFilterMenu()
     autoFilterMenu->clear();
     autoFilterState.clear();
 
+    // Convert field names for Internal to Display (to work with the translated values)
+    SpecialFields sp;
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
 
         if (field.tab != "" && (field.type == 0 || field.type == 2)) { // we only do text or shorttext fields
 
-            QAction *action = new QAction(field.name, this);
+            QAction *action = new QAction(sp.displayName(field.name), this);
             action->setCheckable(true);
 
-            if (on.contains(field.name)) action->setChecked(true);
+            if (on.contains(sp.displayName(field.name))) action->setChecked(true);
             else action->setChecked(false);
 
             connect(action, SIGNAL(triggered()), this, SLOT(autoFilterChanged()));
@@ -564,11 +566,13 @@ LTMSidebar::autoFilterChanged()
             item->addWidget(tree);
             filterSplitter->addWidget(item);
 
+            // Convert field names for Internal to Display (to work with the translated values)
+            SpecialFields sp;
             // update the values available in the tree
             foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-                if (field.name == action->text()) {
+                if (sp.displayName(field.name) == action->text()) {
                     foreach (QString value, context->athlete->metricDB->db()->getDistinctValues(field)) {
-                        if (value == "") value = "(blank)";
+                        if (value == "") value = tr("(blank)");
                         QTreeWidgetItem *add = new QTreeWidgetItem(tree->invisibleRootItem(), 0);
 
                         // No Drag/Drop for autofilters
@@ -718,14 +722,17 @@ LTMSidebar::autoFilterRefresh()
 
         qDeleteAll(tree->invisibleRootItem()->takeChildren());
 
-        // what is the field?
-        QString fieldname = item->splitterHandle->title();
+        // translate fields back from Display Name to internal Name !
+        SpecialFields sp;
 
-            // update the values available in the tree
+        // what is the field?
+        QString fieldname = sp.internalName(item->splitterHandle->title());
+
+        // update the values available in the tree
         foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (field.name == fieldname) {
                 foreach (QString value, context->athlete->metricDB->db()->getDistinctValues(field)) {
-                    if (value == "") value = "(blank)";
+                    if (value == "") value = tr("(blank)");
                     QTreeWidgetItem *add = new QTreeWidgetItem(tree->invisibleRootItem(), 0);
 
                     // No Drag/Drop for autofilters
@@ -763,12 +770,15 @@ LTMSidebar::autoFilterSelectionChanged()
                 foreach(SummaryMetrics x, allRides) matched << x.getFileName();
             }
 
+            // translate fields back from Display Name to internal Name !
+            SpecialFields sp;
+
             // what is the field?
-            QString fieldname = item->splitterHandle->title();
+            QString fieldname = sp.internalName(item->splitterHandle->title());
 
             // what values are highlighted
             QStringList values;
-            foreach (QTreeWidgetItem *wi, tree->selectedItems()) values << wi->text(0);
+            foreach (QTreeWidgetItem *wi, tree->selectedItems()) values << sp.internalName(wi->text(0));
 
             // get a set of filenames that match
             QSet<QString> matches;
@@ -776,7 +786,7 @@ LTMSidebar::autoFilterSelectionChanged()
 
                 // we use XXX___XXX___XXX because it is not likely to exist
                 QString value = x.getText(fieldname, "XXX___XXX___XXX");
-                if (value == "") value = "(blank)"; // match blanks!
+                if (value == "") value = tr("(blank)"); // match blanks!
 
                 if (values.contains(value)) matches << x.getFileName();
             }
