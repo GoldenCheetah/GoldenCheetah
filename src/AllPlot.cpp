@@ -4462,7 +4462,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         if (bydist) {
             xstring = QString("%1").arg(xvalue);
         } else {
-            QTime t = QTime().addSecs(xvalue*60.00);
+            QTime t = QTime(0,0,0).addSecs(xvalue*60.00);
             xstring = t.toString("hh:mm:ss");
         }
 
