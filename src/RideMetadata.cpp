@@ -496,7 +496,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
             units = meta->sp.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
 
-            if (units == "seconds") {
+            if (units == "seconds" || units == tr("seconds")) {
                 // we need to use a TimeEdit instead
                 delete widget;
                 widget = new QTimeEdit(this);
