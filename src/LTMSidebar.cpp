@@ -898,13 +898,6 @@ LTMSidebar::dateRangeChanged(QTreeWidgetItem*item, int)
 void
 LTMSidebar::dateRangeMoved(QTreeWidgetItem*item, int oldposition, int newposition)
 {
-    // no drop in the temporary seasons
-    if (newposition>allDateRanges->childCount()-12) {
-        newposition = allDateRanges->childCount()-12;
-        allDateRanges->removeChild(item);
-        allDateRanges->insertChild(newposition, item);
-    }
-
     // report the move in the seasons
     seasons->seasons.move(oldposition, newposition);
 
