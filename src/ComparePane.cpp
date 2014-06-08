@@ -196,7 +196,7 @@ ComparePane::refreshTable()
             }
         }
 
-        list << "Interval";
+        list << tr("Interval");
 
         table->setColumnCount(list.count()+1);
         table->horizontalHeader()->setSectionHidden(list.count(), true);

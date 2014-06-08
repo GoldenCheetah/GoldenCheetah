@@ -1421,7 +1421,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (isnan(v) || isinf(v)) v = 0;
 
         // seconds to minutes
-        if (m->units(context->athlete->useMetricUnits) == tr("seconds")) v /= 60;
+        if (m->units(context->athlete->useMetricUnits) == "seconds" ||
+            m->units(context->athlete->useMetricUnits) == tr("seconds")) v /= 60;
 
         // apply multiplier
         v *= multiplier;
@@ -1461,7 +1462,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         if (isnan(v) || isinf(v)) v = 0;
 
         // seconds to minutes
-        if (m->units(context->athlete->useMetricUnits) == tr("seconds")) v /= 60;
+        if (m->units(context->athlete->useMetricUnits) == "seconds" ||
+            m->units(context->athlete->useMetricUnits) == tr("seconds")) v /= 60;
 
         // apply multiplier
         v *= multiplier;
@@ -1476,7 +1478,8 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         double t = x.getForSymbol(totalMetric, context->athlete->useMetricUnits);
 
         // totalise in minutes
-        if (tm->units(context->athlete->useMetricUnits) == tr("seconds")) t /= 60;
+        if (tm->units(context->athlete->useMetricUnits) == "seconds" ||
+            tm->units(context->athlete->useMetricUnits) == tr("seconds")) t /= 60;
 
         // sum up
         data->metricArray[(int)(v)-min] += t;
@@ -1498,9 +1501,9 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
 
     // and the plot itself
     QString yunits = tm->units(context->athlete->useMetricUnits);
-    if (yunits == tr("seconds")) yunits = tr("minutes");
+    if (yunits == "seconds" || yunits == tr("seconds")) yunits = tr("minutes");
     QString xunits = m->units(context->athlete->useMetricUnits);
-    if (xunits == tr("seconds")) xunits = tr("minutes");
+    if (xunits == "seconds" || xunits == tr("seconds")) xunits = tr("minutes");
 
     if (tm->units(context->athlete->useMetricUnits) != "")
         setAxisTitle(yLeft, QString(tr("Total %1 (%2)")).arg(tm->name()).arg(yunits));

@@ -208,14 +208,14 @@ RideSummaryWindow::refresh()
             // comparing intervals
             if (checkcount == 2) {
 
-                setSubTitle(QString("%2 on %1  vs  %4 on %3")
-                            .arg(context->compareIntervals.at(0).data->startTime().toString("dd MMM yy"))
+                setSubTitle(QString(tr("%2 on %1  vs  %4 on %3"))
+                            .arg(context->compareIntervals.at(0).data->startTime().toString(tr("dd MMM yy")))
                             .arg(context->compareIntervals.at(0).name)
-                            .arg(context->compareIntervals.at(versus).data->startTime().toString("dd MMM yy"))
+                            .arg(context->compareIntervals.at(versus).data->startTime().toString(tr("dd MMM yy")))
                             .arg(context->compareIntervals.at(versus).name));
             } else if (context->compareIntervals.count() > 2) {
-                setSubTitle(QString("%2 on %1  vs  %3 others")
-                            .arg(context->compareIntervals.at(0).data->startTime().toString("dd MMM yy"))
+                setSubTitle(QString(tr("%2 on %1  vs  %3 others"))
+                            .arg(context->compareIntervals.at(0).data->startTime().toString(tr("dd MMM yy")))
                             .arg(context->compareIntervals.at(0).name)
                             .arg(checkcount-1));
             } else {
@@ -238,12 +238,12 @@ RideSummaryWindow::refresh()
             // comparing seasons
             if (checkcount == 2) {
 
-                setSubTitle(QString("%1  vs  %2")
+                setSubTitle(QString(tr("%1  vs  %2"))
                             .arg(context->compareDateRanges.at(0).name)
                             .arg(context->compareDateRanges.at(versus).name));
 
             } else if (checkcount > 2) {
-                setSubTitle(QString("%1  vs  %2 others")
+                setSubTitle(QString(tr("%1  vs  %2 others"))
                             .arg(context->compareDateRanges.at(0).name)
                             .arg(checkcount-1));
             } else {
@@ -270,9 +270,9 @@ RideSummaryWindow::refresh()
 
             if (myDateRange.name != "") setSubTitle(myDateRange.name);
             else {
-            setSubTitle(myDateRange.from.toString("dddd MMMM d yyyy") +
+            setSubTitle(myDateRange.from.toString(tr("dddd MMMM d yyyy")) +
                         " - " +
-                        myDateRange.to.toString("dddd MMMM d yyyy"));
+                        myDateRange.to.toString(tr("dddd MMMM d yyyy")));
             }
         }
         rideSummary->page()->mainFrame()->setHtml(htmlSummary());
@@ -886,7 +886,7 @@ RideSummaryWindow::htmlSummary()
             const RideMetric *m = factory.rideMetric(symbol);
 
             QString units = m->units(useMetricUnits);
-            if (units == tr("seconds")) units = "";
+            if (units == "seconds" || units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
         for (j = 0; j< metricCols; ++j) {
@@ -894,7 +894,7 @@ RideSummaryWindow::htmlSummary()
             const RideMetric *m = factory.rideMetric(symbol);
 
             QString units = m->units(useMetricUnits);
-            if (units == tr("seconds")) units = "";
+            if (units == "seconds" || units == tr("seconds")) units = "";
             summary += QString("<td align=\"center\">%1</td>").arg(units);
         }
         summary += "</tr>";
@@ -1186,7 +1186,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 const RideMetric *m = factory.rideMetric(symbol);
 
                 QString name, units;
-                if (m->units(context->athlete->useMetricUnits) != "seconds") units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
+                        units = m->units(context->athlete->useMetricUnits);
                 if (units != "") name = QString("%1 (%2)").arg(m->name()).arg(units);
                 else name = QString("%1").arg(m->name());
 
@@ -1459,7 +1460,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 const RideMetric *m = factory.rideMetric(symbol);
 
                 QString name, units;
-                if (m->units(context->athlete->useMetricUnits) != "seconds") units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
+                    units = m->units(context->athlete->useMetricUnits);
                 if (units != "") name = QString("%1 (%2)").arg(m->name()).arg(units);
                 else name = QString("%1").arg(m->name());
 
