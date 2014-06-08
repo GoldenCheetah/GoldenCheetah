@@ -908,7 +908,8 @@ RideNavigator::dropEvent(QDropEvent *event)
 {
     QString name = event->mimeData()->data("application/x-columnchooser");
     // fugly, but it works for BikeScore with the (TM) in it...
-    if (name == "BikeScore?") name = QTextEdit("BikeScore&#8482;").toPlainText();
+    // when MIME object is UTF-8 and not Latin-1 - this seems not to be required any more
+    //    if (name == "BikeScore?") name = QTextEdit("BikeScore&#8482;").toPlainText();
     tableView->setColumnHidden(logicalHeadings.indexOf(name), false);
     tableView->setColumnWidth(logicalHeadings.indexOf(name), 50);
     tableView->header()->moveSection(tableView->header()->visualIndex(logicalHeadings.indexOf(name)), 1);
@@ -1181,7 +1182,9 @@ ColumnChooser::buttonClicked(QString name)
     // setup the drag data
     QMimeData *mimeData = new QMimeData;
     QByteArray empty;
-    mimeData->setData("application/x-columnchooser", name.toLatin1());
+//    mimeData->setData("application/x-columnchooser", name.toLatin1());
+//  Use UTF-8 in Mime Date to cover also special characters
+    mimeData->setData("application/x-columnchooser", name.toUtf8());
 
     // create a drag event
     QDrag *drag = new QDrag(this);
