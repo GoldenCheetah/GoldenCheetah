@@ -468,6 +468,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
+    // set date range for bests and model
+    if (!rangemode) seasonSelected(cComboSeason->currentIndex());
+
     // set widgets and model parameters
     modelChanged();
 
@@ -530,6 +533,7 @@ CriticalPowerWindow::configChanged()
     QPen gridPen(GColor(CPLOTGRID));
     grid->setPen(gridPen);
 
+    // set ride
     rideSelected();
 }
 
