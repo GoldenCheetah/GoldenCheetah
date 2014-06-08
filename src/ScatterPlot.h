@@ -86,7 +86,6 @@ class ScatterPlot : public QwtPlot
 
         // passed from Context *
         Context *context;
-        bool useMetricUnits;
         double cranklength;
 
         QList <QwtPlotCurve *> intervalCurves; // each curve on plot
@@ -99,7 +98,7 @@ class ScatterPlot : public QwtPlot
         int curves; // 1 per interval/ride but set to 2 when we have an L/R to plot
 
     private:
-        static QString describeType(int type, bool longer, bool useMetricUnits);
+        static QString describeType(int type, bool longer, bool metric);
 
         // save the settings
         RideItem *ride; // what we plotting?
