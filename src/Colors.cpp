@@ -370,6 +370,10 @@ GCColor::stylesheet()
     QColor fgColor = GCColor::invertColor(bgColor);
     return QString("QTreeView { color: %2; background: %1; }"
                    "QTableWidget { color: %2; background: %1; }"
+#ifndef Q_OS_MAC
+                   "QHeaderView { background-color: %1; color: %2; }"
+                   "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"
+#endif
                    "QTableWidget::item:hover { color: black; background: lightGray; }"
                    "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
 }
