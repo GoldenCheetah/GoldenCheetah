@@ -403,19 +403,27 @@ SeasonTreeView::SeasonTreeView(Context *context) : context(context)
 void
 SeasonTreeView::dropEvent(QDropEvent* event)
 {
-    // item and original position
-    QTreeWidgetItem *item = currentItem();
-    int idx1 = invisibleRootItem()->indexOfChild(item);
-    int idx2 = indexAt(event->pos()).row();
-
+    // get the list of the items that are about to be dropped
+    QTreeWidgetItem* item = selectedItems()[0];
+ 
+    // row we started on
+    int idx1 = indexFromItem(item).row();
+ 
     // don't move temp 'system generated' date ranges!
     if (context->athlete->seasons->seasons[idx1].type != Season::temporary) {
 
-        // finalise drop event
+        // the default implementation takes care of the actual move inside the tree
         QTreeWidget::dropEvent(event);
-
-        // emit the itemMoved signal
+ 
+        // moved to !
+        int idx2 = indexFromItem(item).row();
+ 
+        // notify subscribers in some useful way
         Q_EMIT itemMoved(item, idx1, idx2);
+
+    } else {
+
+        event->ignore();
     }
 }
 
