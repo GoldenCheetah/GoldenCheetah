@@ -1077,7 +1077,7 @@ LTMWindow::refreshDataTable()
             summary += "<td align=\"center\" valign=\"top\">"
                        "<b>%1</b></td>";
             QString units = settings.metrics[i].uunits;
-            if (units == tr("seconds")) units = tr("hours");
+            if (units == "seconds" || units == tr("seconds")) units = tr("hours");
             if (units == settings.metrics[i].uname) units = "";
             summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
         }
@@ -1114,7 +1114,7 @@ LTMWindow::refreshDataTable()
 
                     // handle precision of 1 for seconds converted to hours
                     int precision = m->precision();
-                    if (settings.metrics[j].uunits == "seconds") precision=1;
+                    if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision=1;
 
                     // we have a metric so lets be precise ...
                     QString v = QString("%1").arg(aggregates[j].y[i] * (context->athlete->useMetricUnits ? 1 : m->conversion())
