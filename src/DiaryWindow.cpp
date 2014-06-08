@@ -21,6 +21,7 @@
 #include "RideMetadata.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "TabView.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
     GcWindow(context), context(context), active(false)
@@ -89,6 +90,9 @@ DiaryWindow::DiaryWindow(Context *context) :
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
+
+    // get colors sorted
+    configChanged();
 }
 
 void
@@ -96,6 +100,34 @@ DiaryWindow::configChanged()
 {
     // get config
     fieldDefinitions = context->athlete->rideMetadata()->getFields();
+
+    // change colors to reflect preferences
+    setProperty("color", GColor(CPLOTBACKGROUND));
+
+    QPalette palette;
+    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    setPalette(palette);
+    monthlyView->setPalette(palette);
+    monthlyView->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    monthlyView->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    monthlyView->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+                    .arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+#ifndef Q_OS_MAC
+    monthlyView->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    monthlyView->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+#endif
+    title->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
+                                                              .arg(GColor(CPLOTMARKER).name()));
 }
 
 void
