@@ -1624,7 +1624,7 @@ AllPlotWindow::plotPickerMoved(const QPoint &pos)
     // we don't do selection in compare mode
     if (isCompare()) return;
 
-    QString name = QString("Selection #%1 ").arg(selection);
+    QString name = QString(tr("Selection #%1 ")).arg(selection);
 
     // which picker and plot send this signal?
     QwtPlotPicker* pick = qobject_cast<QwtPlotPicker *>(sender());
