@@ -1186,6 +1186,9 @@ AllPlot::recalc(AllPlotObject *objects)
 
     // if recintsecs is longer than the smoothing there is no point in even trying
     int applysmooth = smooth < rideItem->ride()->recIntSecs() ? 0 : smooth;
+
+    // compare mode breaks
+    if (context->isCompareIntervals && applysmooth == 0) applysmooth = 1;
     
     // we should only smooth the curves if objects->smoothed rate is greater than sample rate
     if (applysmooth > 0) {
