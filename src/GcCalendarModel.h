@@ -306,16 +306,16 @@ public:
             if (date(proxyIndex) == QDate::currentDate())
                 return GColor(CCALTODAY);
             if (date(proxyIndex).month() == month)
-                return GColor(CCALCELL);
+                return GColor(CPLOTBACKGROUND);
             else
-                return GColor(CCALHEAD);
+                return GColor(CPLOTBACKGROUND).darker(200);
             break;
 
         case HeaderColorRole: // what color for the cell heading
             if (date(proxyIndex).month() == month)
-                return GColor(CCALHEAD);
+                return GColor(CPLOTBACKGROUND);
             else
-                return GColor(CCALHEAD).darker(200);
+                return GColor(CPLOTBACKGROUND).darker(200);
             break;
 
         case FilenamesRole:
@@ -485,6 +485,7 @@ class GcCalendarDelegate : public QItemDelegate
         // date...
         QString datestring = index.data(GcCalendarModel::DateStringRole).toString();
         QTextOption textOption(Qt::AlignRight);
+        painter->setPen(GCColor::invertColor(hg));
         painter->drawText(hd, datestring, textOption);
 
         // text
