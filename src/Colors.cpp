@@ -139,7 +139,7 @@ void GCColor::setupColors()
 #ifdef Q_OS_MAC
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(213,213,213) },
 #else
-        { tr("Toolbar and Sidebar"), "CCHROME", QColor(197,197,197) },
+        { tr("Toolbar and Sidebar"), "CCHROME", QColor(108,108,108) },
 #endif
 #endif
         { "", "", QColor(0,0,0) },
