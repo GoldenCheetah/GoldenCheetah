@@ -543,6 +543,7 @@ RideSummaryWindow::htmlSummary()
     if (context->athlete->PDEstimates.count() == 0) {
 
         // ugh .. refresh in background
+        WPrimeStringWPK = CPStringWPK = FTPStringWPK = PMaxStringWPK = 
         WPrimeString = CPString = FTPString = PMaxString = "-";
         QFuture<void> future = QtConcurrent::run(this, &RideSummaryWindow::getPDEstimates);
 
@@ -552,34 +553,52 @@ RideSummaryWindow::htmlSummary()
         getPDEstimates();
     }
 
+    // MODEL 
     // lets get a table going
     summary += "<td align=\"center\" valign=\"top\" width=\"%1%%\"><table>"
         "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
+
     summary = summary.arg(90 / columnNames.count()+1);
     summary = summary.arg(tr("Model"));
 
     // W;
-    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg("W' (kJ)")
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 kJ</td></tr>")
+            .arg("W'")
             .arg(WPrimeString);
+    summary += QString("<tr><td></td><td align=\"right\">%1 J/kg</td></tr>")
+            .arg(WPrimeStringWPK);
+
+    // spacer
+    summary += "<tr style=\"height: 3px;\"></tr>";
 
     // CP;
-    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg("CP (watts)")
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 watts</td></tr>")
+            .arg("CP")
             .arg(CPString);
+    summary += QString("<tr><td></td><td align=\"right\">%1 w/kg</td></tr>")
+            .arg(CPStringWPK);
 
+    // spacer
+    summary += "<tr style=\"height: 3px;\"></tr>";
+
+#if 0 // clutters it up and adds almost nothing
     // FTP/MMP60;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
             .arg("FTP (watts)")
             .arg(FTPString);
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
+            .arg("FTP (w/kg)")
+            .arg(FTPStringWPK);
+#endif
 
     // Pmax;
-    summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg("P-max (watts)")
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 watts</td></tr>")
+            .arg("P-max")
             .arg(PMaxString);
+    summary += QString("<tr><td></td><td align=\"right\">%1 w/kg</td></tr>")
+            .arg(PMaxStringWPK);
 
     summary += "</table></td>";
-
     summary += "</tr></table>";
 
     //
@@ -961,69 +980,89 @@ void
 RideSummaryWindow::getPDEstimates()
 {
     bool ping = false;
-    double lowWPrime=0, highWPrime=0,
-           lowCP=0, highCP=0,
-           lowFTP=0, highFTP=0,
-           lowPMax=0, highPMax=0;
-
     // refresh if needed
     if (context->athlete->PDEstimates.count() == 0) {
         ping = true;
         context->athlete->metricDB->refreshCPModelMetrics(true); //true = bg ...
     }
 
-    // loop through and get ...
-    foreach(PDEstimate est, context->athlete->PDEstimates) {
+    for (int i=0; i<2; i++) {
 
-        // ignore wpk for now
-        if (est.wpk == true) continue;
+        // two times, once to get wpk versions
+        // second time to get normal
+        bool wpk = (i==0);
 
-        // We only use the extended model for now
-        if (est.model != "Ext" ) continue;
+        double lowWPrime=0, highWPrime=0,
+               lowCP=0, highCP=0,
+               lowFTP=0, highFTP=0,
+               lowPMax=0, highPMax=0;
 
-        // summarising a season or date range
-        if (!ridesummary && (est.from > myDateRange.to || est.to < myDateRange.from)) continue;
+        // loop through and get ...
+        foreach(PDEstimate est, context->athlete->PDEstimates) {
 
-        // it definitely wasnt during our period
-        if (!ridesummary && !((est.from >= myDateRange.from && est.from <= myDateRange.to) || (est.to >= myDateRange.from && est.to <= myDateRange.to) ||
-            (est.from <= myDateRange.from && est.to >= myDateRange.to))) continue;
+            // filter is set above
+            if (est.wpk != wpk) continue;
 
+            // We only use the extended model for now
+            if (est.model != "Ext" ) continue;
 
-        // summarising a ride
-        if (ridesummary && (!myRideItem || (myRideItem->dateTime.date() < est.from || myRideItem->dateTime.date() > est.to))) continue;
+            // summarising a season or date range
+            if (!ridesummary && (est.from > myDateRange.to || est.to < myDateRange.from)) continue;
 
-        // set low
-        if (!lowWPrime || est.WPrime < lowWPrime) lowWPrime = est.WPrime;
-        if (!lowCP || est.CP < lowCP) lowCP = est.CP;
-        if (!lowFTP || est.FTP < lowFTP) lowFTP = est.FTP;
-        if (!lowPMax || est.PMax < lowPMax) lowPMax = est.PMax;
+            // it definitely wasnt during our period
+            if (!ridesummary && !((est.from >= myDateRange.from && est.from <= myDateRange.to) || (est.to >= myDateRange.from && est.to <= myDateRange.to) ||
+                (est.from <= myDateRange.from && est.to >= myDateRange.to))) continue;
 
-        // set high
-        if (!highWPrime || est.WPrime > highWPrime) highWPrime = est.WPrime;
-        if (!highCP || est.CP > highCP) highCP = est.CP;
-        if (!highFTP || est.FTP > highFTP) highFTP = est.FTP;
-        if (!highPMax || est.PMax > highPMax) highPMax = est.PMax;
+    
+            // summarising a ride
+            if (ridesummary && (!myRideItem || (myRideItem->dateTime.date() < est.from || myRideItem->dateTime.date() > est.to))) continue;
+
+            // set low
+            if (!lowWPrime || est.WPrime < lowWPrime) lowWPrime = est.WPrime;
+            if (!lowCP || est.CP < lowCP) lowCP = est.CP;
+            if (!lowFTP || est.FTP < lowFTP) lowFTP = est.FTP;
+            if (!lowPMax || est.PMax < lowPMax) lowPMax = est.PMax;
+
+            // set high
+            if (!highWPrime || est.WPrime > highWPrime) highWPrime = est.WPrime;
+            if (!highCP || est.CP > highCP) highCP = est.CP;
+            if (!highFTP || est.FTP > highFTP) highFTP = est.FTP;
+            if (!highPMax || est.PMax > highPMax) highPMax = est.PMax;
+        }
+
+        // ok, so lets set the string to either
+        // N/A => when its not available
+        // low - high => when its a range
+        // val => when low = high
+        double divisor = wpk ? 1.0f : 1000.00f;
+
+        if (!lowWPrime && !highWPrime) WPrimeString = "N/A";
+        else if (lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/divisor, 0, 'f', 1).arg(highWPrime/divisor, 0, 'f', 1);
+        else WPrimeString = QString("%1").arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
+
+        if (!lowCP && !highCP) CPString = "N/A";
+        else if (lowCP != highCP) CPString = QString ("%1 - %2").arg(lowCP, 0, 'f', wpk ? 2 : 0)
+                                                                .arg(highCP, 0, 'f', wpk ? 2 : 0);
+        else CPString = QString("%1").arg(highCP, 0, 'f', wpk ? 2 : 0);
+
+        if (!lowFTP && !highFTP) FTPString = "N/A";
+        else if (lowFTP != highFTP) FTPString = QString ("%1 - %2").arg(lowFTP, 0, 'f', wpk ? 2 : 0)
+                                                                   .arg(highFTP, 0, 'f', wpk ? 2 : 0);
+        else FTPString = QString("%1").arg(highFTP, 0, 'f', wpk ? 2 : 0);
+
+        if (!lowPMax && !highPMax) PMaxString = "N/A";
+        else if (lowPMax != highPMax) PMaxString = QString ("%1 - %2").arg(lowPMax, 0, 'f', wpk ? 2 : 0)
+                                                                      .arg(highPMax, 0, 'f', wpk ? 2 : 0);
+        else PMaxString = QString("%1").arg(highPMax, 0, 'f', wpk ? 2 : 0);
+
+        // actually we just set the wPK versions:
+        if (wpk) {
+            WPrimeStringWPK = WPrimeString;
+            CPStringWPK = CPString;
+            FTPStringWPK = FTPString;
+            PMaxStringWPK = PMaxString;
+        }
     }
-
-    // ok, so lets set the string to either
-    // N/A => when its not available
-    // low - high => when its a range
-    // val => when low = high
-    if (!lowWPrime && !highWPrime) WPrimeString = "N/A";
-    else if (lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/1000, 0, 'f', 1).arg(highWPrime/1000, 0, 'f', 1);
-    else WPrimeString = QString("%1").arg(highWPrime/1000, 0, 'f', 1);
-
-    if (!lowCP && !highCP) CPString = "N/A";
-    else if (lowCP != highCP) CPString = QString ("%1 - %2").arg(lowCP).arg(highCP);
-    else CPString = QString("%1").arg(highCP);
-
-    if (!lowFTP && !highFTP) FTPString = "N/A";
-    else if (lowFTP != highFTP) FTPString = QString ("%1 - %2").arg(lowFTP).arg(highFTP);
-    else FTPString = QString("%1").arg(highFTP);
-
-    if (!lowPMax && !highPMax) PMaxString = "N/A";
-    else if (lowPMax != highPMax) PMaxString = QString ("%1 - %2").arg(lowPMax).arg(highPMax);
-    else PMaxString = QString("%1").arg(highPMax);
 
     // now refresh !
     if (ping) emit doRefresh();
