@@ -34,13 +34,16 @@
 // 3030 - V3.0 SP1 RELEASE (December 2013)
 // 3032 - V3.0 SP2 RELEASE (March 2014)
 // 3040 - V3.1 DEVELOPMENT
+// 3050 - V3.1 RC1
 
 #define VERSION3_BUILD 3010 // released
 #define VERSION3_SP1   3030 // released
 #define VERSION3_SP2   3032 // released
 
-#define VERSION_LATEST 3040
-#define VERSION_STRING "V3.1 (dev)"
+// these three will change until we release
+#define VERSION31_BUILD 3050
+#define VERSION_LATEST 3050
+#define VERSION_STRING "V3.1 (RC1)"
 
 class GcUpgrade
 {
