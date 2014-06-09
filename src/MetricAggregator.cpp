@@ -540,7 +540,6 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
     models << &multimodel;
     models << &extmodel;
 
-    QVector<float> wpk; // for getting the wpk values
 
     // loop through
     while (year < lastYear || (year == lastYear && month <= lastMonth)) {
@@ -549,8 +548,10 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
         QDate lastOfMonth = firstOfMonth.addMonths(1).addDays(-1);
 
         // months is a rolling 3 months sets of bests
+        QVector<float> wpk; // for getting the wpk values
         months << RideFileCache::meanMaxPowerFor(context, wpk, firstOfMonth, lastOfMonth);
         monthsKG << wpk;
+
         if (months.count() > 2) {
             months.removeFirst();
             monthsKG.removeFirst();
@@ -599,7 +600,7 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
         if (rollingBests.size()) {
 
             // we now have the data
-            foreach (PDModel *model, models) {
+            foreach(PDModel *model, models) {
 
                 PDEstimate add;
 
@@ -617,6 +618,8 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
                 add.FTP = model->hasFTP() ? model->FTP() : 0;
                 context->athlete->PDEstimates << add;
 
+                //qDebug()<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
+
                 // set the wpk data
                 model->setData(rollingBestsKG);
                 model->saveParameters(add.parameters); // save the computed parms
@@ -631,7 +634,7 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
                 add.FTP = model->hasFTP() ? model->FTP() : 0;
                 context->athlete->PDEstimates << add;
 
-                //qDebug()<<model->code()<< "W'="<< model->WPrime() <<"3p CP="<< model->CP() <<"3p pMax="<<model->PMax();
+                //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
             }
         }
 

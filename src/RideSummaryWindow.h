@@ -145,6 +145,7 @@ class RideSummaryWindow : public GcChartWindow
         Model_eCP cpModel;
 
         QString WPrimeString, CPString, FTPString, PMaxString;
+        QString WPrimeStringWPK, CPStringWPK, FTPStringWPK, PMaxStringWPK;
 
         bool force; // to force a replot
 };

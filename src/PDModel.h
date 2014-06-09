@@ -140,7 +140,7 @@ class PDEstimate
 
         QDate from, to;
         QString model;
-        int WPrime,
+        double WPrime,
             CP,
             FTP,
             PMax;

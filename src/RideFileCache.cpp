@@ -236,6 +236,7 @@ static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType serie
 QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to)
 {
     QVector<float> returning;
+    QVector<float> returningwpk;
     bool first = true;
 
     // look at all the rides
@@ -248,13 +249,15 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
         if (first == true) {
 
             // first time through the whole thing is going to be best
-            returning =  meanMaxPowerFor(context, wpk, context->athlete->home.absolutePath() + "/" + rideFileName);
+            returning =  meanMaxPowerFor(context, returningwpk, context->athlete->home.absolutePath() + "/" + rideFileName);
             first = false;
 
         } else {
 
+            QVector<float> thiswpk;
+
             // next time through we should only pick out better times
-            QVector<float> ridebest = meanMaxPowerFor(context, wpk, context->athlete->home.absolutePath() + "/" + rideFileName);
+            QVector<float> ridebest = meanMaxPowerFor(context, thiswpk, context->athlete->home.absolutePath() + "/" + rideFileName);
 
             // do we need to increase the returning array?
             if (returning.size() < ridebest.size()) returning.resize(ridebest.size());
@@ -262,9 +265,18 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
             // now update where its a better number
             for (int i=0; i<ridebest.size(); i++)
                 if (ridebest[i] > returning[i]) returning[i] = ridebest[i];
+
+            // do we need to increase the returning array?
+            if (returningwpk.size() < thiswpk.size()) returningwpk.resize(thiswpk.size());
+
+            // now update where its a better number
+            for (int i=0; i<thiswpk.size(); i++)
+                if (thiswpk[i] > returningwpk[i]) returningwpk[i] =thiswpk[i];
         }
     }
 
+    // set aggregated wpk
+    wpk = returningwpk;
     return returning;
 }
 
@@ -305,9 +317,12 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *, QVector<float>&wpk, QSt
                 returning.resize(head.wattsMeanMaxCount);
                 inFile.readRawData((char*)returning.constData(), head.wattsMeanMaxCount * sizeof(float));
 
-                wpk.resize(head.wattsMeanMaxCount);
-                inFile.readRawData((char*)wpk.constData(), head.wattsKgMeanMaxCount * sizeof(float));
+                offset = offsetForMeanMax(head, RideFile::wattsKg) + sizeof(head);
+                cacheFile.seek(qint64(offset));
 
+                wpk.resize(head.wattsKgMeanMaxCount);
+                inFile.readRawData((char*)wpk.constData(), head.wattsKgMeanMaxCount * sizeof(float));
+                for(int i=0; i<wpk.size(); i++) wpk[i] = wpk[i] / 100.00f;
 
                 //qDebug()<<"retrieved:"<<head.wattsMeanMaxCount<<"in:"<<start.elapsed()<<"ms";
             }
