@@ -1311,11 +1311,11 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // choose the type
-    chooseMetric = new QRadioButton(tr("Metric"));
+    chooseMetric = new QRadioButton(tr("Metric"), this);
     chooseMetric->setChecked(metricDetail->type != 5 && metricDetail->type != 6);
-    chooseBest = new QRadioButton(tr("Best"));
+    chooseBest = new QRadioButton(tr("Best"), this);
     chooseBest->setChecked(metricDetail->type == 5);
-    chooseEstimate = new QRadioButton(tr("Estimate"));
+    chooseEstimate = new QRadioButton(tr("Estimate"), this);
     chooseEstimate->setChecked(metricDetail->type == 6);
     QVBoxLayout *radioButtons = new QVBoxLayout;
     radioButtons->addStretch();
@@ -1426,10 +1426,23 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estbestLayout->addWidget(estimateDuration);
     estbestLayout->addWidget(estimateDurationUnits);
 
+    // estimate as absolute or watts per kilo ?
+    abs = new QRadioButton(tr("Absolute"), this);
+    wpk = new QRadioButton(tr("Per Kilogram"), this);
+    wpk->setChecked(metricDetail->wpk);
+    abs->setChecked(!metricDetail->wpk);
+
+    QHBoxLayout *estwpk = new QHBoxLayout;
+    estwpk->addStretch();
+    estwpk->addWidget(abs);
+    estwpk->addWidget(wpk);
+    estwpk->addStretch();
+
     estimateLayout->addStretch();
     estimateLayout->addWidget(modelSelect);
     estimateLayout->addWidget(estimateSelect);
     estimateLayout->addLayout(estbestLayout);
+    estimateLayout->addLayout(estwpk);
     estimateLayout->addStretch();
 
     // metric selection tree
@@ -1803,6 +1816,7 @@ EditMetricDetailDialog::applyClicked()
         case 2 :
         default: metricDetail->duration_units = 3600; break;
     }
+    metricDetail->wpk = wpk->isChecked();
     metricDetail->series = seriesList.at(dataSeries->currentIndex());
     metricDetail->model = models[modelSelect->currentIndex()]->code();
     metricDetail->estimate = estimateSelect->currentIndex(); // 0 - 3

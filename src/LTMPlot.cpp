@@ -834,7 +834,7 @@ LTMPlot::setData(LTMSettings *set)
 
                         } else {
                             // no precision
-                            labelString = (QString("%1").arg(value, 0, 'f', 0));
+                            labelString = (QString("%1").arg(value, 0, 'f', 1));
                         }
 
 
@@ -996,7 +996,7 @@ LTMPlot::setData(LTMSettings *set)
 
                     } else {
                         // no precision
-                        labelString = (QString("%1").arg(value, 0, 'f', 0));
+                        labelString = (QString("%1").arg(value, 0, 'f', 1));
                     }
 
 
@@ -1842,7 +1842,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     
                             } else {
                                 // no precision
-                                labelString = (QString("%1").arg(value, 0, 'f', 0));
+                                labelString = (QString("%1").arg(value, 0, 'f', 1));
                             }
 
 
@@ -2004,7 +2004,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                         } else {
                             // no precision
-                            labelString = (QString("%1").arg(value, 0, 'f', 0));
+                            labelString = (QString("%1").arg(value, 0, 'f', 1));
                         }
 
 
@@ -2413,7 +2413,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     foreach(PDEstimate est, context->athlete->PDEstimates) {
 
         // wpk skip for now
-        if (est.wpk == true) continue;
+        if (est.wpk != metricDetail.wpk) continue;
 
         // skip entries for other models
         if (est.model != metricDetail.model) continue;
