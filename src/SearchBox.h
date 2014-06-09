@@ -56,18 +56,20 @@ private slots:
     void toggleMode();
     void clearClicked();
 
-     // drop column headings from column chooser
-     void dragEnterEvent(QDragEnterEvent *event);
-     void dropEvent(QDropEvent *event);
+    // drop column headings from column chooser
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 
-     // highlight errors etc
-     void setBad(QStringList errors);
-     void setGood();
+    // highlight errors etc
+    void setBad(QStringList errors);
+    void setGood();
 
-     // run etc
-     void runMenu(QAction*);
-     void setMenu();
-     void addNamed();
+    // run etc
+    void runMenu(QAction*);
+    void setMenu();
+    void addNamed();
+
+    void configChanged();
 
 signals:
     // text search mode
