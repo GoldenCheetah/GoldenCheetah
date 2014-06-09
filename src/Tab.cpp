@@ -212,5 +212,7 @@ Tab::rideSelected(RideItem*)
     // selected ride (now the tree is up to date)
     setRide(context->ride);
 
+    // notify that the intervals have been cleared too
+    context->notifyIntervalsChanged();
 }
 
