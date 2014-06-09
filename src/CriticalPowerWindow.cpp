@@ -205,11 +205,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     // model config
     // 2 or 3 point model ?
     modelCombo= new QComboBox(this);
-    modelCombo->addItem("None");
-    modelCombo->addItem("2 parameter");
-    modelCombo->addItem("3 parameter");
-    modelCombo->addItem("Extended CP");
-    modelCombo->addItem("Multicomponent");
+    modelCombo->addItem(tr("None"));
+    modelCombo->addItem(tr("2 parameter"));
+    modelCombo->addItem(tr("3 parameter"));
+    modelCombo->addItem(tr("Extended CP"));
+    modelCombo->addItem(tr("Multicomponent"));
     modelCombo->setCurrentIndex(1);
 
     mcl->addRow(new QLabel(tr("CP Model")), modelCombo);
