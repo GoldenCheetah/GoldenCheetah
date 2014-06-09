@@ -137,7 +137,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // a lookup at execution time
             QString lookup = df->lookupMap.value(*(leaf->lvalue.n), "");
             if (lookup == "") {
-                DataFiltererrors << QString("%1 is unknown").arg(*(leaf->lvalue.n));
+                DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(*(leaf->lvalue.n));
             }
         }
         break;
@@ -150,10 +150,10 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QString symbol = *(leaf->series->lvalue.n); 
 
             if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) 
-                DataFiltererrors << QString("invalid data series for best(): %1").arg(symbol);
+                DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
 
             if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) 
-                DataFiltererrors << QString("invalid data series for tiz(): %1").arg(symbol);
+                DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
 
             // now set the series type
             leaf->seriesType = nameToSeries(symbol);
@@ -167,13 +167,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             bool lhsType = Leaf::isNumber(df, leaf->lvalue.l);
             bool rhsType = Leaf::isNumber(df, leaf->rvalue.l);
             if (lhsType != rhsType) {
-                DataFiltererrors << QString("comparing strings with numbers");
+                DataFiltererrors << QString(QObject::tr("comparing strings with numbers"));
             }
 
             // what about using string operations on a lhs/rhs that
             // are numeric?
             if ((lhsType || rhsType) && leaf->op >= MATCHES && leaf->op <= CONTAINS) {
-                DataFiltererrors << "using a string operations with a number";
+                DataFiltererrors << QObject::tr("using a string operations with a number");
             }
 
             validateFilter(df, leaf->lvalue.l);
@@ -222,7 +222,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
 
         // no errors just failed to finish
-        if (!treeRoot) DataFiltererrors << "malformed expression.";
+        if (!treeRoot) DataFiltererrors << tr("malformed expression.");
 
         // Bzzzt, malformed
         emit parseBad(DataFiltererrors);
@@ -269,12 +269,16 @@ void DataFilter::configUpdate()
     lookupMap.clear();
     lookupType.clear();
 
-    // create lookup map from 'friendly name' to name used in smmaryMetrics
+    // create lookup map from 'friendly name' to INTERNAL-name used in summaryMetrics
     // to enable a quick lookup && the lookup for the field type (number, text)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         QString symbol = factory.metricName(i);
-        QString name = factory.rideMetric(symbol)->name();
+        QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
+
+        //special Treatment for BikeScore
+        if (name.startsWith("BikeScore")) name = "BikeScore&#8482;";
+
         lookupMap.insert(name.replace(" ","_"), symbol);
         lookupType.insert(name.replace(" ","_"), true);
     }
@@ -283,10 +287,16 @@ void DataFilter::configUpdate()
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             QString underscored = field.name;
             if (!context->specialFields.isMetric(underscored)) {
+
+                // translate to internal name if name has non Latin1 characters
+                underscored = context->specialFields.internalName(underscored);
+                field.name = context->specialFields.internalName((field.name));
+
                 lookupMap.insert(underscored.replace(" ","_"), field.name);
                 lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
             }
     }
+
 }
 
 double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
