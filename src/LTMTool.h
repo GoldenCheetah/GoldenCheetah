@@ -197,6 +197,7 @@ class EditMetricDetailDialog : public QDialog
         QComboBox *estimateSelect;  // select w', cp, ftp, pmax .. whichever is suported by model
         QDoubleSpinBox *estimateDuration;
         QComboBox *estimateDurationUnits;
+        QRadioButton *abs, *wpk;
 
         QComboBox *curveStyle,
                   *curveSymbol;
