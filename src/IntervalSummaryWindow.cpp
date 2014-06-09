@@ -43,6 +43,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
     connect(context, SIGNAL(configChanged()), this, SLOT(intervalSelected()));
@@ -56,7 +57,8 @@ IntervalSummaryWindow::~IntervalSummaryWindow() {
 void IntervalSummaryWindow::intervalSelected()
 {
     // if no ride available don't bother - just reset for color changes
-    if (context->currentRideItem() == NULL || context->currentRide() == NULL) {
+    if (context->athlete->intervalTreeWidget()->selectedItems().count() == 0 || 
+        context->currentRideItem() == NULL || context->currentRide() == NULL) {
         // no ride just update the colors
 	    QString html = GCColor::css();
         html += "<body></body>";
