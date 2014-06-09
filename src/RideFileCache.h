@@ -145,9 +145,9 @@ class RideFileCache
         // across a date range. This is used to provide aggregated data.
         RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList(), bool onhome = true);
 
-        // Just get mean max values for power for a ride
-        static QVector<float> meanMaxPowerFor(Context *context, QDate from, QDate to);
-        static QVector<float> meanMaxPowerFor(Context *context, QString filename);
+        // Just get mean max values for power & wpk for a ride
+        static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to);
+        static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QString filename);
 
         // not actually a copy constructor -- but we call it IN the constructor.
         RideFileCache(RideFileCache *other) { *this = *other; }

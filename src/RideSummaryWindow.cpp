@@ -975,6 +975,9 @@ RideSummaryWindow::getPDEstimates()
     // loop through and get ...
     foreach(PDEstimate est, context->athlete->PDEstimates) {
 
+        // ignore wpk for now
+        if (est.wpk == true) continue;
+
         // We only use the extended model for now
         if (est.model != "Ext" ) continue;
 

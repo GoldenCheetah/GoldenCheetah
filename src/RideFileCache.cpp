@@ -233,7 +233,7 @@ static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType serie
     return 0;
 }
 
-QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QDate from, QDate to)
+QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to)
 {
     QVector<float> returning;
     bool first = true;
@@ -248,13 +248,13 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QDate from, QDat
         if (first == true) {
 
             // first time through the whole thing is going to be best
-            returning =  meanMaxPowerFor(context, context->athlete->home.absolutePath() + "/" + rideFileName);
+            returning =  meanMaxPowerFor(context, wpk, context->athlete->home.absolutePath() + "/" + rideFileName);
             first = false;
 
         } else {
 
             // next time through we should only pick out better times
-            QVector<float> ridebest = meanMaxPowerFor(context, context->athlete->home.absolutePath() + "/" + rideFileName);
+            QVector<float> ridebest = meanMaxPowerFor(context, wpk, context->athlete->home.absolutePath() + "/" + rideFileName);
 
             // do we need to increase the returning array?
             if (returning.size() < ridebest.size()) returning.resize(ridebest.size());
@@ -268,7 +268,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QDate from, QDat
     return returning;
 }
 
-QVector<float> RideFileCache::meanMaxPowerFor(Context *, QString fileName)
+QVector<float> RideFileCache::meanMaxPowerFor(Context *, QVector<float>&wpk, QString fileName)
 {
     QTime start;
     start.start();
@@ -304,6 +304,10 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *, QString fileName)
                 // a little naughty but seems to work ok
                 returning.resize(head.wattsMeanMaxCount);
                 inFile.readRawData((char*)returning.constData(), head.wattsMeanMaxCount * sizeof(float));
+
+                wpk.resize(head.wattsMeanMaxCount);
+                inFile.readRawData((char*)wpk.constData(), head.wattsKgMeanMaxCount * sizeof(float));
+
 
                 //qDebug()<<"retrieved:"<<head.wattsMeanMaxCount<<"in:"<<start.elapsed()<<"ms";
             }
