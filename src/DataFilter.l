@@ -61,7 +61,11 @@
 
 "TRIMP(100)_Points"                         return SYMBOL; /* special case */
 "Left/Right_Balance"                        return SYMBOL; /* special case */
-"Minimum_W'_bal"                        return SYMBOL; /* special case */
+"Minimum_W'bal"                             return SYMBOL; /* special case */
+"Maximum_W'bal_Match"                       return SYMBOL; /* special case */
+"Max_W'_Expended"                           return SYMBOL; /* special case */
+"W'_Work"                                   return SYMBOL; /* special case */
+"W'bal_TAU"                                 return SYMBOL; /* special case */
 [a-zA-Z0-9][a-zA-Z0-9_%™]+                  return SYMBOL; /* symbols can start with 0-9 */
 
 
