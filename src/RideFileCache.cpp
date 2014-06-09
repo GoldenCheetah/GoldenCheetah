@@ -145,8 +145,7 @@ static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType seri
     long offset = 0;
 
     switch (series) {
-    case RideFile::aPower : offset += head.wattsKgMeanMaxCount * sizeof(float);
-    case RideFile::wattsKg : offset += head.vamMeanMaxCount * sizeof(float);
+    case RideFile::aPower : offset += head.vamMeanMaxCount * sizeof(float);
     case RideFile::vam : offset += head.npMeanMaxCount * sizeof(float);
     case RideFile::NP : offset += head.xPowerMeanMaxCount * sizeof(float);
     case RideFile::xPower : offset += head.kphMeanMaxCount * sizeof(float);
@@ -158,7 +157,8 @@ static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType seri
     case RideFile::kph : offset += head.nmMeanMaxCount * sizeof(float);
     case RideFile::nm : offset += head.cadMeanMaxCount * sizeof(float);
     case RideFile::cad : offset += head.hrMeanMaxCount * sizeof(float);
-    case RideFile::hr : offset += head.wattsMeanMaxCount * sizeof(float);
+    case RideFile::hr : offset += head.wattsKgMeanMaxCount * sizeof(float);
+    case RideFile::wattsKg : offset += head.wattsMeanMaxCount * sizeof(float);
     case RideFile::watts : offset += 0;
     default:
         break;
@@ -174,7 +174,6 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
 
     // skip past the mean max arrays
     offset += head.aPowerMeanMaxCount * sizeof(float);
-    offset += head.wattsKgMeanMaxCount * sizeof(float);
     offset += head.vamMeanMaxCount * sizeof(float);
     offset += head.npMeanMaxCount * sizeof(float);
     offset += head.xPowerMeanMaxCount * sizeof(float);
@@ -187,6 +186,7 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
     offset += head.nmMeanMaxCount * sizeof(float);
     offset += head.cadMeanMaxCount * sizeof(float);
     offset += head.hrMeanMaxCount * sizeof(float);
+    offset += head.wattsKgMeanMaxCount * sizeof(float);
     offset += head.wattsMeanMaxCount * sizeof(float);
 
     // skip past the distribution arrays
@@ -1484,6 +1484,7 @@ RideFileCache::serialize(QDataStream *out)
 
     // write meanmax
     out->writeRawData((const char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
+    out->writeRawData((const char *) wattsKgMeanMax.data(), sizeof(float) * wattsKgMeanMax.size());
     out->writeRawData((const char *) hrMeanMax.data(), sizeof(float) * hrMeanMax.size());
     out->writeRawData((const char *) cadMeanMax.data(), sizeof(float) * cadMeanMax.size());
     out->writeRawData((const char *) nmMeanMax.data(), sizeof(float) * nmMeanMax.size());
@@ -1496,7 +1497,6 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
     out->writeRawData((const char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
     out->writeRawData((const char *) vamMeanMax.data(), sizeof(float) * vamMeanMax.size());
-    out->writeRawData((const char *) wattsKgMeanMax.data(), sizeof(float) * wattsKgMeanMax.size());
     out->writeRawData((const char *) aPowerMeanMax.data(), sizeof(float) * aPowerMeanMax.size());
 
     // write dist
@@ -1556,6 +1556,7 @@ RideFileCache::readCache()
 
         // read in the arrays
         inFile.readRawData((char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
+        inFile.readRawData((char *) wattsKgMeanMax.data(), sizeof(float) * wattsKgMeanMax.size());
         inFile.readRawData((char *) hrMeanMax.data(), sizeof(float) * hrMeanMax.size());
         inFile.readRawData((char *) cadMeanMax.data(), sizeof(float) * cadMeanMax.size());
         inFile.readRawData((char *) nmMeanMax.data(), sizeof(float) * nmMeanMax.size());
@@ -1568,7 +1569,6 @@ RideFileCache::readCache()
         inFile.readRawData((char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
         inFile.readRawData((char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
         inFile.readRawData((char *) vamMeanMax.data(), sizeof(float) * vamMeanMax.size());
-        inFile.readRawData((char *) wattsKgMeanMax.data(), sizeof(float) * wattsKgMeanMax.size());
         inFile.readRawData((char *) aPowerMeanMax.data(), sizeof(float) * aPowerMeanMax.size());
 
 
