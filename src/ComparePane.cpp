@@ -155,11 +155,14 @@ ComparePane::configChanged()
 void
 ComparePane::refreshTable()
 {
+    blockSignals(true); // don't stop me now...
+
     if (mode_ == interval) { // INTERVALS
 
         // STEP ONE : SET THE TABLE HEADINGS
 
         // clear current contents
+        table->clearSelection();
         table->clear();
         table->setRowCount(0);
 
@@ -310,7 +313,11 @@ ComparePane::refreshTable()
             counter++;
         }
 
+        table->setRowCount(counter);
+        table->setVisible(false);
         table->resizeColumnsToContents(); // set columns to fit
+        table->setVisible(true);
+
 #if QT_VERSION > 0x050000 // fix the first two if we can
         for (int i=0; i<list.count(); i++) {
             if (i < 2) {
@@ -450,7 +457,10 @@ ComparePane::refreshTable()
             counter++;
         }
 
+        table->setRowCount(counter);
+        table->setVisible(false);
         table->resizeColumnsToContents(); // set columns to fit
+        table->setVisible(true);
 #if QT_VERSION > 0x050000 // fix the first two if we can
         for (int i=0; i<list.count(); i++) {
             if (i < 2) {
@@ -464,6 +474,7 @@ ComparePane::refreshTable()
 #endif
         table->horizontalHeader()->setStretchLastSection(true);
     }
+    blockSignals(false);
 }
 
 void
