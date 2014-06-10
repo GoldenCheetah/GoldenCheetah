@@ -1043,7 +1043,7 @@ RideSummaryWindow::getPDEstimates()
         double divisor = wpk ? 1.0f : 1000.00f;
 
         if (!lowWPrime && !highWPrime) WPrimeString = "N/A";
-        else if (lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/divisor, 0, 'f', 1).arg(highWPrime/divisor, 0, 'f', 1);
+        else if (lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/divisor, 0, 'f',  wpk ? 0 : 1).arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
         else WPrimeString = QString("%1").arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
 
         if (!lowCP && !highCP) CPString = "N/A";
