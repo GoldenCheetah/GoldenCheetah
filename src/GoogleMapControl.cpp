@@ -109,6 +109,11 @@ void GoogleMapControl::loadRide()
 
 void GoogleMapControl::updateFrame()
 {
+    // deleting the web bridge seems to be the only way to
+    // reset state between it and the webpage.
+    delete webBridge;
+    webBridge = new WebBridge(context, this);
+
     view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
 }
 
