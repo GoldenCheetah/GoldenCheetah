@@ -59,6 +59,7 @@ class RideSummaryWindow : public GcChartWindow
 
         // two modes - summarise ride or summarise date range
         RideSummaryWindow(Context *context, bool ridesummary = true);
+        ~RideSummaryWindow();
 
         // properties
         int useSelected() { return dateSetting->mode(); }
@@ -148,6 +149,8 @@ class RideSummaryWindow : public GcChartWindow
         QString WPrimeStringWPK, CPStringWPK, FTPStringWPK, PMaxStringWPK;
 
         bool force; // to force a replot
+
+        QFuture<void> future; // used by QtConcurrent
 };
 
 #endif // _GC_RideSummaryWindow_h
