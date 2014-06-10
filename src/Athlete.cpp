@@ -204,7 +204,7 @@ Athlete::~Athlete()
 {
     // save those preset charts
     LTMSettings reader;
-    //XXX reader.writeChartXML(home, presets); // don't write it until we fix the code
+    reader.writeChartXML(home, presets); // don't write it until we fix the code
                                                // all the changes to LTM settings and chart config
                                                // have not been reflected in the charts.xml file
 
