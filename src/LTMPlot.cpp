@@ -2300,6 +2300,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
     bool wantZero = metricDetail.curveStyle == QwtPlotCurve::Steps;
+
     foreach (SummaryMetrics rideMetrics, *data) { 
 
         // filter out unwanted rides but not for PMC type metrics

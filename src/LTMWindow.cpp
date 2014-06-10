@@ -787,6 +787,7 @@ LTMWindow::applyClicked()
         // now get back the local chart setup
         settings.ltmTool = ltmTool;
         settings.data = &results;
+        settings.bests = &bestsresults;
         settings.measures = &measures;
         settings.groupBy = groupBy;
         settings.legend = legend;
