@@ -31,12 +31,12 @@ GcUpgrade::upgrade(const QDir &home)
     // for athlete directories from prior to Version 3
     // and can essentially be used as a template for all major release
     // upgrades as it delets old stuff and sets clean
-    if (!last || last < VERSION31_BUILD) {
+    if (!last || last < VERSION3_BUILD) {
 
         // For now we always do the same thing
         // when we have some maturity with versions we may
         // choose to do different things
-        if (last < VERSION31_BUILD) {
+        if (last < VERSION3_BUILD) {
 
             // 1. Delete old files
             QStringList oldfiles;
