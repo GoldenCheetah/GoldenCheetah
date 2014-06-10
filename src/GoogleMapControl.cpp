@@ -113,6 +113,8 @@ void GoogleMapControl::updateFrame()
     // reset state between it and the webpage.
     delete webBridge;
     webBridge = new WebBridge(context, this);
+    connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
+    connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
 
     view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
 }
@@ -484,16 +486,12 @@ GoogleMapControl::createMarkers()
             "   var marker = new google.maps.Marker({ title: '%3', animation: google.maps.Animation.DROP, position: latlng });"
             "   marker.setMap(map);"
             "   markerList.push(marker);" // keep track of those suckers
-#if 0
             "   google.maps.event.addListener(marker, 'click', function(event) { webBridge.toggleInterval(%4); });"
-#endif
             "}")
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
                                     .arg(x.name)
-#if 0
                                     .arg(interval)
-#endif
                                     ;
         view->page()->mainFrame()->evaluateJavaScript(code);
         interval++;
@@ -637,7 +635,7 @@ WebBridge::drawOverlays()
 void
 WebBridge::toggleInterval(int x)
 {
-return;
     IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(x));
     if (current) current->setSelected(!current->isSelected());
+    return;
 }
