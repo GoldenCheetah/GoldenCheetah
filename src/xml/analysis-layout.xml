@@ -259,13 +259,6 @@
 		<property name="bin" type="double" value="1" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="13" name="" title="Edit" >
-		<property name="title" type="QString" value="Edit" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2.27273" />
-		<property name="resizable" type="bool" value="0" />
-	</chart>
 	<chart id="15" name="" title="Scatter" >
 		<property name="title" type="QString" value="Scatter" />
 		<property name="subtitle" type="QString" value="" />
@@ -277,5 +270,12 @@
 		<property name="ignore" type="bool" value="1" />
 		<property name="grid" type="bool" value="1" />
 		<property name="frame" type="bool" value="0" />
+	</chart>
+	<chart id="13" name="" title="Edit" >
+		<property name="title" type="QString" value="Edit" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.27273" />
+		<property name="resizable" type="bool" value="0" />
 	</chart>
 </layout>
