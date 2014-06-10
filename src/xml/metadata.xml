@@ -1,12 +1,20 @@
 <metadata>
 <colorfield>"Workout Code"</colorfield>	<keywords>
 		<keyword>
-			<keywordname>"Race"</keywordname>
-			<keywordcolor red="255" green="44" blue="68"></keywordcolor>
+			<keywordname>"Reverse"</keywordname>
+			<keywordcolor red="70" green="70" blue="70"></keywordcolor>
 		</keyword>
 		<keyword>
-			<keywordname>"Default"</keywordname>
-			<keywordcolor red="255" green="255" blue="255"></keywordcolor>
+			<keywordname>"Hills"</keywordname>
+			<keywordcolor red="85" green="170" blue="0"></keywordcolor>
+		</keyword>
+		<keyword>
+			<keywordname>"FTP"</keywordname>
+			<keywordcolor red="170" green="170" blue="0"></keywordcolor>
+		</keyword>
+		<keyword>
+			<keywordname>"Race"</keywordname>
+			<keywordcolor red="0" green="0" blue="255"></keywordcolor>
 		</keyword>
 	</keywords>
 	<fields>
@@ -40,6 +48,13 @@
 		</field>
 		<field>
 			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Weight"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Route"</fieldname>
 			<fieldtype>2</fieldtype>
 			<fieldvalues>""</fieldvalues>
@@ -56,13 +71,6 @@
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Objective"</fieldname>
 			<fieldtype>1</fieldtype>
-			<fieldvalues>""</fieldvalues>
-			<fielddiary>0</fielddiary>
-		</field>
-		<field>
-			<fieldtab>""</fieldtab>
-			<fieldname>"Weight"</fieldname>
-			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
 			<fielddiary>0</fielddiary>
 		</field>
@@ -159,6 +167,13 @@
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"TSS"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
 			<fieldname>"BikeScore&amp;#8482;"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
@@ -181,6 +196,13 @@
 		<field>
 			<fieldtab>"Metric"</fieldtab>
 			<fieldname>"Daniels EqP"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"CP"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
 			<fielddiary>0</fielddiary>
