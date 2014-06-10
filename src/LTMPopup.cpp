@@ -42,7 +42,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     QFont titleFont;
     titleFont.setPointSize(14);
     titleFont.setBold(true);
-    title = new QLabel("No Ride Selected");
+    title = new QLabel(tr("No Ride Selected"));
     title->setFont(titleFont);
     title->setFixedHeight(30);
     mainLayout->addWidget(title);
@@ -118,11 +118,12 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
     rides->setColumnCount(2);
 
     // when
-    QTableWidgetItem *h = new QTableWidgetItem("Date & Time", QTableWidgetItem::Type);
+    QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
 
-    // value
-    h = new QTableWidgetItem(metric->name(), QTableWidgetItem::Type);
+    // value & special Treatment for (TM)
+    h = new QTableWidgetItem(metric->name().replace("&#8482;", " (TM)"), QTableWidgetItem::Type);
+
     rides->setHorizontalHeaderItem(1,h);
 
     // now add rows to the table for each entry
@@ -134,7 +135,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         selected << x;
 
         // date/time
-        QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString("ddd, dd MMM yy hh:mmA"));
+        QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         rides->setRowCount(count+1);
         rides->setItem(count, 0, t);
@@ -201,23 +202,23 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
     QString _title;
     switch (settings.groupBy) {
         case LTM_DAY:
-            _title = start.toString("dddd, d MMMM yyyy");
+            _title = start.toString(tr("dddd, d MMMM yyyy"));
             break;
         case LTM_MONTH:
-            _title = start.toString("MMMM yyyy");
+            _title = start.toString(tr("MMMM yyyy"));
             break;
         case LTM_YEAR:
             _title = start.toString("yyyy");
             break;
         case LTM_WEEK:
-            _title = QString("%1 to %2")
-                    .arg(start.toString("dd MMMM yyyy"))
-                    .arg(end.toString("dd MMMM yyyy"));
+            _title = QString(tr("%1 to %2"))
+                    .arg(start.toString(tr("dd MMMM yyyy")))
+                    .arg(end.toString(tr("dd MMMM yyyy")));
             break;
         case LTM_TOD:
-            _title = QString("%1 to %2")
-                    .arg(settings.start.date().toString("dd MMMM yy"))
-                    .arg(settings.end.date().toString("dd MMMM yy"));
+            _title = QString(tr("%1 to %2"))
+                    .arg(settings.start.date().toString(tr("dd MMMM yy")))
+                    .arg(settings.end.date().toString(tr("dd MMMM yy")));
             break;
     }
 
@@ -228,7 +229,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
 
     // set headings
     rides->setColumnCount(settings.metrics.count()+1);
-    QTableWidgetItem *h = new QTableWidgetItem("Date & Time", QTableWidgetItem::Type);
+    QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
     int column = 1;
     foreach(MetricDetail d, settings.metrics) {
@@ -244,7 +245,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
             selected << x;
 
             // date/time
-            QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString("ddd, dd MMM yy hh:mmA"));
+            QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
             rides->setRowCount(count+1);
             rides->setItem(count, 0, t);
@@ -289,7 +290,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
             metrics->show();
             notes->show();
         }
-        _title += QString(" (%1 rides)").arg(count);
+        _title += QString(tr(" (%1 rides)")).arg(count);
     } else {
         rides->hide();
         metrics->show();

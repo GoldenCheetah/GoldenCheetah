@@ -365,7 +365,7 @@ class BikeScore : public RideMetric {
         setInternalName("BikeScore&#8482;");
     }
     void initialize() {
-        setName(tr("BikeScore&#8482;"));
+        setName("BikeScore&#8482;");  // Don't translate as many places have special coding for the "TM" sign
         setMetricUnits("");
         setImperialUnits("");
     }
