@@ -42,6 +42,7 @@
 #endif
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
+#include "LTMSettings.h"
 
 #include "GcUpgrade.h" // upgrade wizard
 #include "GcCrashDialog.h" // recovering from a crash?
@@ -97,6 +98,11 @@ Athlete::Athlete(Context *context, const QDir &home)
         } else if (! hrzones_->warningString().isEmpty())
             QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
     }
+
+    // read athlete's charts.xml and translate etc
+    LTMSettings reader;
+    reader.readChartXML(context->athlete->home, presets);
+    translateDefaultCharts(presets);
 
     // Metadata
     rideMetadata_ = new RideMetadata(context,true);
@@ -398,4 +404,45 @@ Athlete::checkCPX(RideItem*ride)
             newList.append(p);
     }
     cpxCache = newList;
+}
+
+void
+Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
+{
+    // Map default (english) chart name to external (Localized) name
+    // New default charts need to be added to this list to be translated
+    QMap<QString, QString> chartNameMap;
+	chartNameMap.insert("PMC", tr("PMC"));
+	chartNameMap.insert("Track Weight", tr("Track Weight"));
+	chartNameMap.insert("Time In Power Zone (Stacked)", tr("Time In Power Zone (Stacked)"));
+	chartNameMap.insert("Time In Power Zone (Bar)", tr("Time In Power Zone (Bar)"));
+	chartNameMap.insert("Time In HR Zone", tr("Time In HR Zone"));
+	chartNameMap.insert("Power Distribution", tr("Power Distribution"));
+	chartNameMap.insert("KPI Tracker", tr("KPI Tracker"));
+	chartNameMap.insert("Critical Power Trend", tr("Critical Power Trend"));
+	chartNameMap.insert("Aerobic Power", tr("Aerobic Power"));
+	chartNameMap.insert("Aerobic WPK", tr("Aerobic WPK"));
+	chartNameMap.insert("Power Variance", tr("Power Variance"));
+	chartNameMap.insert("Power Profile", tr("Power Profile"));
+	chartNameMap.insert("Anaerobic Power", tr("Anaerobic Power"));
+	chartNameMap.insert("Anaerobic WPK", tr("Anaerobic WPK"));
+	chartNameMap.insert("Power & Speed Trend", tr("Power & Speed Trend"));
+	chartNameMap.insert("Cardiovascular Response", tr("Cardiovascular Response"));
+	chartNameMap.insert("Tempo & Threshold Time", tr("Tempo & Threshold Time"));
+	chartNameMap.insert("Training Mix", tr("Training Mix"));
+	chartNameMap.insert("Time & Distance", tr("Time & Distance"));
+	chartNameMap.insert("Skiba Power", tr("Skiba Power"));
+	chartNameMap.insert("Daniels Power", tr("Daniels Power"));
+	chartNameMap.insert("PM Ramp & Peak", tr("PM Ramp & Peak"));
+	chartNameMap.insert("Skiba PM", tr("Skiba PM"));
+	chartNameMap.insert("Daniels PM", tr("Daniels PM"));
+	chartNameMap.insert("Device Reliability", tr("Device Reliability"));
+	chartNameMap.insert("Withings Weight", tr("Withings Weight"));
+	chartNameMap.insert("Stress and Distance", tr("Stress and Distance"));
+	chartNameMap.insert("Calories vs Duration", tr("Calories vs Duration"));
+
+    for(int i=0; i<charts.count(); i++) {
+        // Replace chart name for localized version, default to english name
+        charts[i].name = chartNameMap.value(charts[i].name, charts[i].name);
+    }
 }

@@ -94,6 +94,7 @@ EditChartDialog::cancelClicked()
 void
 LTMSettings::writeChartXML(QDir home, QList<LTMSettings> charts)
 {
+qDebug()<<"write chart.xml !";
     LTMChartParser::serialize(QString(home.path() + "/charts.xml"), charts);
 }
 

@@ -66,11 +66,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 #endif
 
-    // read charts.xml and translate etc
-    LTMSettings reader;
-    reader.readChartXML(context->athlete->home, presets);
-    translateDefaultCharts(presets);
-
     // Basic Controls
     QWidget *basic = new QWidget(this);
     basic->setContentsMargins(0,0,0,0);
@@ -157,13 +152,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     charts->setIndentation(0);
-    foreach(LTMSettings chart, presets) {
-        QTreeWidgetItem *add;
-        add = new QTreeWidgetItem(charts->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
-        add->setText(0, chart.name);
-    }
-    charts->setCurrentItem(charts->invisibleRootItem()->child(0));
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp
     QHBoxLayout *buttons = new QHBoxLayout;
@@ -1085,6 +1073,26 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     connect(dateSetting, SIGNAL(useStandardRange()), this, SIGNAL(useStandardRange()));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SIGNAL(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SIGNAL(useThruToday()));
+
+    // watch for changes to the preset charts
+    connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
+
+    // but setup for the first time
+    presetsChanged();
+}
+
+void
+LTMTool::presetsChanged()
+{
+    // rebuild the preset chart list as the presets have changed
+    charts->clear();
+    foreach(LTMSettings chart, context->athlete->presets) {
+        QTreeWidgetItem *add;
+        add = new QTreeWidgetItem(charts->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setText(0, chart.name);
+    }
+    charts->setCurrentItem(charts->invisibleRootItem()->child(0));
 }
 
 void
@@ -1221,10 +1229,10 @@ void
 LTMTool::addCurrent()
 {
     // give the chart a name
-    if (settings->name == "") settings->name = QString("Chart %1").arg(presets.count()+1);
+    if (settings->name == "") settings->name = QString("Chart %1").arg(context->athlete->presets.count()+1);
 
     // add the current chart to the presets with a name using the chart title
-    presets.append(*settings);
+    context->athlete->presets.append(*settings);
 
     // add to the list
     QTreeWidgetItem *add;
@@ -1232,7 +1240,7 @@ LTMTool::addCurrent()
     add->setFlags(add->flags() | Qt::ItemIsEditable);
     add->setText(0, settings->name);
 
-    // save charts.xml
+    context->notifyPresetsChanged();
 }
 
 // set the estimateSelection based upon what is available
@@ -1920,46 +1928,6 @@ LTMTool::setFilter(QStringList files)
         emit filterChanged();
 }
 
-void
-LTMTool::translateDefaultCharts(QList<LTMSettings>&charts)
-{
-    // Map default (english) chart name to external (Localized) name
-    // New default charts need to be added to this list to be translated
-    QMap<QString, QString> chartNameMap;
-	chartNameMap.insert("PMC", tr("PMC"));
-	chartNameMap.insert("Track Weight", tr("Track Weight"));
-	chartNameMap.insert("Time In Power Zone (Stacked)", tr("Time In Power Zone (Stacked)"));
-	chartNameMap.insert("Time In Power Zone (Bar)", tr("Time In Power Zone (Bar)"));
-	chartNameMap.insert("Time In HR Zone", tr("Time In HR Zone"));
-	chartNameMap.insert("Power Distribution", tr("Power Distribution"));
-	chartNameMap.insert("KPI Tracker", tr("KPI Tracker"));
-	chartNameMap.insert("Critical Power Trend", tr("Critical Power Trend"));
-	chartNameMap.insert("Aerobic Power", tr("Aerobic Power"));
-	chartNameMap.insert("Aerobic WPK", tr("Aerobic WPK"));
-	chartNameMap.insert("Power Variance", tr("Power Variance"));
-	chartNameMap.insert("Power Profile", tr("Power Profile"));
-	chartNameMap.insert("Anaerobic Power", tr("Anaerobic Power"));
-	chartNameMap.insert("Anaerobic WPK", tr("Anaerobic WPK"));
-	chartNameMap.insert("Power & Speed Trend", tr("Power & Speed Trend"));
-	chartNameMap.insert("Cardiovascular Response", tr("Cardiovascular Response"));
-	chartNameMap.insert("Tempo & Threshold Time", tr("Tempo & Threshold Time"));
-	chartNameMap.insert("Training Mix", tr("Training Mix"));
-	chartNameMap.insert("Time & Distance", tr("Time & Distance"));
-	chartNameMap.insert("Skiba Power", tr("Skiba Power"));
-	chartNameMap.insert("Daniels Power", tr("Daniels Power"));
-	chartNameMap.insert("PM Ramp & Peak", tr("PM Ramp & Peak"));
-	chartNameMap.insert("Skiba PM", tr("Skiba PM"));
-	chartNameMap.insert("Daniels PM", tr("Daniels PM"));
-	chartNameMap.insert("Device Reliability", tr("Device Reliability"));
-	chartNameMap.insert("Withings Weight", tr("Withings Weight"));
-	chartNameMap.insert("Stress and Distance", tr("Stress and Distance"));
-	chartNameMap.insert("Calories vs Duration", tr("Calories vs Duration"));
-
-    for(int i=0; i<charts.count(); i++) {
-        // Replace chart name for localized version, default to english name
-        charts[i].name = chartNameMap.value(charts[i].name, charts[i].name);
-    }
-}
 
 // metricDetails gives access to the metric details catalog by symbol
 MetricDetail*
@@ -2002,13 +1970,18 @@ LTMTool::translateMetrics(Context *context, LTMSettings *settings) // settings o
     delete ltmTool;
 }
 
-//void
-//LTMTool::okClicked()
-//{
-    //// take the edited versions of the name first
-    //for(int i=0; i<charts->invisibleRootItem()->childCount(); i++)
-        //(presets)[i].name = charts->invisibleRootItem()->child(i)->text(0);
-//}
+#if 0 // need a way of knowing controls have closed ...
+void
+LTMTool::okClicked()
+{
+    // take the edited versions of the name first
+    for(int i=0; i<charts->invisibleRootItem()->childCount(); i++)
+        (context->athlete->presets)[i].name = charts->invisibleRootItem()->child(i)->text(0);
+
+    // let everyone know once we're done
+    context->notifyPresetsChanged();
+}
+#endif
 
 void
 LTMTool::importClicked()
@@ -2037,7 +2010,7 @@ LTMTool::importClicked()
             imported = handler.getSettings();
 
             // now append to the QList and QTreeWidget
-            presets += imported;
+            context->athlete->presets += imported;
             foreach (LTMSettings chart, imported) {
                 QTreeWidgetItem *add;
                 add = new QTreeWidgetItem(charts->invisibleRootItem());
@@ -2073,7 +2046,7 @@ LTMTool::exportClicked()
             if (msgBox.exec() != QMessageBox::Ok)
                 return;
         }
-        LTMChartParser::serialize(filenames[0], presets);
+        LTMChartParser::serialize(filenames[0], context->athlete->presets);
     }
 }
 
@@ -2088,9 +2061,10 @@ LTMTool::upClicked()
         QTreeWidgetItem *moved;
         charts->invisibleRootItem()->insertChild(index-1, moved=charts->invisibleRootItem()->takeChild(index));
         charts->setCurrentItem(moved);
-        LTMSettings save = (presets)[index];
-        presets.removeAt(index);
-        presets.insert(index-1, save);
+        LTMSettings save = (context->athlete->presets)[index];
+        context->athlete->presets.removeAt(index);
+        context->athlete->presets.insert(index-1, save);
+
     }
 }
 
@@ -2105,9 +2079,9 @@ LTMTool::downClicked()
         QTreeWidgetItem *moved;
         charts->invisibleRootItem()->insertChild(index+1, moved=charts->invisibleRootItem()->takeChild(index));
         charts->setCurrentItem(moved);
-        LTMSettings save = (presets)[index];
-        presets.removeAt(index);
-        presets.insert(index+1, save);
+        LTMSettings save = (context->athlete->presets)[index];
+        context->athlete->presets.removeAt(index);
+        context->athlete->presets.insert(index+1, save);
     }
 }
 
@@ -2115,7 +2089,9 @@ void
 LTMTool::renameClicked()
 {
     // which one is selected?
-    if (charts->currentItem()) charts->editItem(charts->currentItem(), 0);
+    if (charts->currentItem()) {
+        charts->editItem(charts->currentItem(), 0);
+    }
 }
 
 void
@@ -2130,7 +2106,7 @@ LTMTool::deleteClicked()
         int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
 
         // zap!
-        presets.removeAt(index);
+        context->athlete->presets.removeAt(index);
         delete charts->invisibleRootItem()->takeChild(index);
     }
 }
