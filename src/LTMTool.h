@@ -112,7 +112,8 @@ class LTMTool : public QWidget
         void presetsChanged();
         void exportClicked();
         void importClicked();
-        //void okClicked(); // !!! need to address this
+        void editingStarted();
+        void editingFinished();
         void upClicked();
         void downClicked();
         void renameClicked();
@@ -130,6 +131,7 @@ class LTMTool : public QWidget
         bool active; // ignore season changed signals since we triggered them
 
         bool _amFiltered; // is a filter appling?
+        bool editing;
         QStringList filenames; // filters
 
         QTabWidget *tabs;

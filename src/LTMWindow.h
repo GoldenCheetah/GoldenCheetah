@@ -201,7 +201,6 @@ class LTMWindow : public GcChartWindow
         void showStackClicked(int);
         void zoomSliderChanged();
         void showLegendClicked(int);
-        void saveClicked();
         void applyClicked();
         void refresh();
         void pointClicked(QwtPlotCurve*, int);

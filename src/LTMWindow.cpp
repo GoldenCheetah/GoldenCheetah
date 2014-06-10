@@ -179,7 +179,6 @@ LTMWindow::LTMWindow(Context *context) :
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(rGroupBy, SIGNAL(valueChanged(int)), this, SLOT(rGroupBySelected(int)));
-    //!!! connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
     connect(ltmTool->applyButton, SIGNAL(clicked(bool)), this, SLOT(applyClicked(void)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showData, SIGNAL(stateChanged(int)), this, SLOT(showDataClicked(int)));
@@ -799,18 +798,6 @@ LTMWindow::applyClicked()
 
         ltmTool->applySettings();
         refresh();
-    }
-}
-
-void
-LTMWindow::saveClicked()
-{
-    EditChartDialog editor(context, &settings, context->athlete->presets);
-    if (editor.exec()) {
-        context->athlete->presets.append(settings);
-        settings.writeChartXML(context->athlete->home, context->athlete->presets);
-        //ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
-        //ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
 }
 
