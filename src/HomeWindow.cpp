@@ -441,7 +441,7 @@ HomeWindow::appendChart(GcWinID id)
     // returns null if cancelled or closed
     if (newone) {
         addChart(newone);
-        //newone->show() //Crash on QT5
+        newone->show(); //Crash on QT5
     }
 
     // now wipe it
