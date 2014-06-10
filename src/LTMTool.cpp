@@ -41,7 +41,7 @@
 // PDModel estimate support
 #include "PDModel.h"
 
-LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false)
+LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mainWindow), settings(settings), context(context), active(false), _amFiltered(false), editing(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
@@ -169,6 +169,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
     connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
+    connect(charts, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(editingFinished()));
+    connect(charts, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(editingStarted()));
 
     tabs = new QTabWidget(this);
 
@@ -1234,12 +1236,8 @@ LTMTool::addCurrent()
     // add the current chart to the presets with a name using the chart title
     context->athlete->presets.append(*settings);
 
-    // add to the list
-    QTreeWidgetItem *add;
-    add = new QTreeWidgetItem(charts->invisibleRootItem());
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-    add->setText(0, settings->name);
-
+    // tree will now be refreshed
+    editing = false;
     context->notifyPresetsChanged();
 }
 
@@ -1970,18 +1968,25 @@ LTMTool::translateMetrics(Context *context, LTMSettings *settings) // settings o
     delete ltmTool;
 }
 
-#if 0 // need a way of knowing controls have closed ...
 void
-LTMTool::okClicked()
+LTMTool::editingStarted()
 {
+    editing = true; // also set from renameClicked
+}
+
+void
+LTMTool::editingFinished()
+{
+    if (!editing) return;
+
     // take the edited versions of the name first
     for(int i=0; i<charts->invisibleRootItem()->childCount(); i++)
         (context->athlete->presets)[i].name = charts->invisibleRootItem()->child(i)->text(0);
 
     // let everyone know once we're done
+    editing = false;
     context->notifyPresetsChanged();
 }
-#endif
 
 void
 LTMTool::importClicked()
@@ -2011,12 +2016,10 @@ LTMTool::importClicked()
 
             // now append to the QList and QTreeWidget
             context->athlete->presets += imported;
-            foreach (LTMSettings chart, imported) {
-                QTreeWidgetItem *add;
-                add = new QTreeWidgetItem(charts->invisibleRootItem());
-                add->setFlags(add->flags() | Qt::ItemIsEditable);
-                add->setText(0, chart.name);
-            }
+
+            // notify we changed and tree updates
+            editing = false;
+            context->notifyPresetsChanged();
 
         } else {
             // oops non existant - does this ever happen?
@@ -2058,13 +2061,16 @@ LTMTool::upClicked()
         if (index == 0) return; // its at the top already
 
         // movin on up!
-        QTreeWidgetItem *moved;
-        charts->invisibleRootItem()->insertChild(index-1, moved=charts->invisibleRootItem()->takeChild(index));
-        charts->setCurrentItem(moved);
         LTMSettings save = (context->athlete->presets)[index];
         context->athlete->presets.removeAt(index);
         context->athlete->presets.insert(index-1, save);
 
+        // notify we changed
+        editing = false;
+        context->notifyPresetsChanged();
+
+        // reselect
+        charts->setCurrentItem(charts->invisibleRootItem()->child(index-1));
     }
 }
 
@@ -2076,12 +2082,16 @@ LTMTool::downClicked()
         if (index == (charts->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
 
         // movin on up!
-        QTreeWidgetItem *moved;
-        charts->invisibleRootItem()->insertChild(index+1, moved=charts->invisibleRootItem()->takeChild(index));
-        charts->setCurrentItem(moved);
         LTMSettings save = (context->athlete->presets)[index];
         context->athlete->presets.removeAt(index);
         context->athlete->presets.insert(index+1, save);
+
+        // notify we changed
+        editing = false;
+        context->notifyPresetsChanged();
+
+        // reselect
+        charts->setCurrentItem(charts->invisibleRootItem()->child(index+1));
     }
 }
 
@@ -2090,6 +2100,7 @@ LTMTool::renameClicked()
 {
     // which one is selected?
     if (charts->currentItem()) {
+        editing = true;
         charts->editItem(charts->currentItem(), 0);
     }
 }
@@ -2103,10 +2114,14 @@ LTMTool::deleteClicked()
         return;
 
     } else if (charts->currentItem()) {
+
         int index = charts->invisibleRootItem()->indexOfChild(charts->currentItem());
 
         // zap!
         context->athlete->presets.removeAt(index);
-        delete charts->invisibleRootItem()->takeChild(index);
+
+        // notify we changed
+        editing = false;
+        context->notifyPresetsChanged();
     }
 }
