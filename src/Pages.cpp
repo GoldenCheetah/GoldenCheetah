@@ -1544,7 +1544,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QString name = m->name();
-        name.replace(tr("&#8482;"), tr(" (TM)"));
+        name.replace("&#8482;", " (TM)"); //Don't allow translation
         QListWidgetItem *item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
@@ -1554,7 +1554,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QString name = m->name();
-        name.replace(tr("&#8482;"), tr(" (TM)"));
+        name.replace("&#8482;", " (TM)");  //Don't allow translation
         QListWidgetItem *item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
@@ -1737,7 +1737,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QString name = m->name();
-        name.replace(tr("&#8482;"), tr(" (TM)"));
+        name.replace("&#8482;", " (TM)");  // Dont' allow Translation
         QListWidgetItem *item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
@@ -1747,7 +1747,7 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QString name = m->name();
-        name.replace(tr("&#8482;"), tr(" (TM)"));
+        name.replace("&#8482;", " (TM)");  // Don't allow translation
         QListWidgetItem *item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
@@ -1926,7 +1926,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QString name = m->name();
-        name.replace(tr("&#8482;"), tr(" (TM)"));
+        name.replace("&#8482;", " (TM)"); // Don't allow translation
         QListWidgetItem *item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
@@ -1936,7 +1936,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
         QString name = m->name();
-        name.replace(tr("&#8482;"), tr(" (TM)"));
+        name.replace("&#8482;", " (TM)"); // Don't allow translation
         QListWidgetItem *item = new QListWidgetItem(name);
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
