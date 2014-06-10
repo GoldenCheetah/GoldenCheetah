@@ -257,8 +257,38 @@ GCColor::readConfig()
 
             }
         }
+//
+// The DWM api is how the MS windows color settings should be accessed
+//
+// Comment to be removed after fixing:
+// -> When doing the access in the method "linear Gradient" it's to late for setting the mainMenu in MainWindow.CPP (therefore moved here)
+// -> Windows (7) delivers "alpha" channel information, which is not working in the MainMenu - that's why things get very dark and text is nearly unreadable (if in black)
+// -> Manual Change works (and overwrite) - Change Manual back to (1,1,1) pulls the Windows DWM color again
+// -> The color provided by DWM is stored in the Registry - so next time the Window will come up with the same color as before, even if the Windows Setting have changed
+// -> GC does not follow changes in the Window Color when open (and when closed, only if (1,1,1) has be set before closing
+
+#ifdef GC_HAVE_DWM
+        if (ColorList[i].setting == "CCHROME" && ColorList[i].color == QColor(1,1,1)) { // use system default, user hasn't changed
+
+             // use Windows API
+             DWORD wincolor = 0;
+             BOOL opaque = FALSE;
+
+             HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
+             if (SUCCEEDED(hr)) {
+             // This API delivers the colors in 0xAARRGGBB and not in 0x00BBGGRR format - therefore the Get Functions
+             // have to be used differently to what they look like
+             BYTE red = GetBValue(wincolor);
+             BYTE green = GetGValue(wincolor);
+             BYTE blue = GetRValue(wincolor);
+             // BYTE a = (LOBYTE((wincolor)>>24)); /this would get the Alpha Channel, but it would not be stored and is not working across all menus, so inactive
+             ColorList[i].color = QColor::fromRgb(red,green,blue,255);
+             }
+           }
+#endif
     }
 }
+
 
 QColor
 GCColor::getColor(int colornum)
@@ -431,27 +461,6 @@ GCColor::linearGradient(int size, bool active, bool alternate)
     } else {
 
         QColor color = GColor(CCHROME);
-
-//
-// The DWM api is how the MS windows color settings should be accessed
-//
-#ifdef GC_HAVE_DWM
-
-        if (color == QColor(1,1,1)) { // use system default, user hasn't changed
-
-            // use Windows API
-            DWORD wincolor = 0;
-            BOOL opaque = FALSE;
-
-            HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
-            if (SUCCEEDED(hr)) {
-                BYTE red = GetRValue(wincolor)
-                BYTE green = GetGValue(wincolor);
-                BYTE blue = GetBValue(wincolor);
-                color = QColor::fromRgb(red,green,blue,255);
-            } 
-        }
-#endif
 
         // just blocks of color
         returning = QLinearGradient(0, 0, 0, size);
