@@ -115,6 +115,12 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     configChanged(); // set colors
 }
 
+RideSummaryWindow::~RideSummaryWindow()
+{
+    // wait for background thread if needed
+    future.waitForFinished();
+}
+
 void
 RideSummaryWindow::configChanged()
 {
@@ -545,7 +551,7 @@ RideSummaryWindow::htmlSummary()
         // ugh .. refresh in background
         WPrimeStringWPK = CPStringWPK = FTPStringWPK = PMaxStringWPK = 
         WPrimeString = CPString = FTPString = PMaxString = "-";
-        QFuture<void> future = QtConcurrent::run(this, &RideSummaryWindow::getPDEstimates);
+        future = QtConcurrent::run(this, &RideSummaryWindow::getPDEstimates);
 
     } else {
 
