@@ -23,103 +23,10 @@
 #include <QDate>
 #include <QDebug>
 
-// local helper functions to convert Qwt enums to ints and back
-static int curveToInt(QwtPlotCurve::CurveStyle x)
-{
-    switch (x) {
-    case QwtPlotCurve::NoCurve : return 0;
-    case QwtPlotCurve::Lines : return 1;
-    case QwtPlotCurve::Sticks : return 2;
-    case QwtPlotCurve::Steps : return 3;
-    case QwtPlotCurve::Dots : return 4;
-    default : return 100;
-    }
-}
-static QwtPlotCurve::CurveStyle intToCurve(int x)
-{
-    switch (x) {
-    default:
-    case 0 : return QwtPlotCurve::NoCurve;
-    case 1 : return QwtPlotCurve::Lines;
-    case 2 : return QwtPlotCurve::Sticks;
-    case 3 : return QwtPlotCurve::Steps;
-    case 4 : return QwtPlotCurve::Dots;
-    case 100: return QwtPlotCurve::UserCurve;
-    }
-}
-static int symbolToInt(QwtSymbol::Style x)
-{
-    switch (x) {
-    default:
-    case QwtSymbol::NoSymbol: return -1;
-    case QwtSymbol::Ellipse: return 0;
-    case QwtSymbol::Rect: return 1;
-    case QwtSymbol::Diamond: return 2;
-    case QwtSymbol::Triangle: return 3;
-    case QwtSymbol::DTriangle: return 4;
-    case QwtSymbol::UTriangle: return 5;
-    case QwtSymbol::LTriangle: return 6;
-    case QwtSymbol::RTriangle: return 7;
-    case QwtSymbol::Cross: return 8;
-    case QwtSymbol::XCross: return 9;
-    case QwtSymbol::HLine: return 10;
-    case QwtSymbol::VLine: return 11;
-    case QwtSymbol::Star1: return 12;
-    case QwtSymbol::Star2: return 13;
-    case QwtSymbol::Hexagon: return 14;
-    // nomore in qwt6 -> case QwtSymbol::StyleCnt: return 15;
-
-    }
-}
-static QwtSymbol::Style intToSymbol(int x)
-{
-    switch (x) {
-    default:
-    case -1: return QwtSymbol::NoSymbol;
-    case 0 : return QwtSymbol::Ellipse;
-    case 1 : return QwtSymbol::Rect;
-    case 2 : return QwtSymbol::Diamond;
-    case 3 : return QwtSymbol::Triangle;
-    case 4 : return QwtSymbol::DTriangle;
-    case 5 : return QwtSymbol::UTriangle;
-    case 6 : return QwtSymbol::LTriangle;
-    case 7 : return QwtSymbol::RTriangle;
-    case 8 : return QwtSymbol::Cross;
-    case 9 : return QwtSymbol::XCross;
-    case 10 : return QwtSymbol::HLine;
-    case 11 : return QwtSymbol::VLine;
-    case 12 : return QwtSymbol::Star1;
-    case 13 : return QwtSymbol::Star2;
-    case 14 : return QwtSymbol::Hexagon;
-    // nomore in qwt6 ->  case 15 : return QwtSymbol::StyleCnt;
-
-    }
-}
 bool LTMChartParser::startDocument()
 {
     buffer.clear();
     return true;
-}
-
-static QString unprotect(QString buffer)
-{
-    // get local TM character code
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
-    // remove quotes
-    QString t = buffer.trimmed();
-    QString s = t.mid(1,t.length()-2);
-
-    // replace html (TM) with local TM character
-    s.replace( "&#8482;", tm );
-
-    // html special chars are automatically handled
-    // other special characters will not work
-    // cross-platform but will work locally, so not a biggie
-    // i.e. if thedefault charts.xml has a special character
-    // in it it should be added here
-    return s;
 }
 
 // to see the format of the charts.xml file, look at the serialize()
@@ -129,66 +36,22 @@ bool LTMChartParser::endElement( const QString&, const QString&, const QString &
     //
     // Single Attribute elements
     //
-    if(qName == "chartname") setting.name = unprotect(buffer);
-    else if(qName == "metricname") metric.symbol = buffer.trimmed();
-    else if(qName == "metricdesc") metric.name = unprotect(buffer);
-    else if(qName == "metricuname") metric.uname = unprotect(buffer);
-    else if(qName == "metricuunits") metric.uunits = unprotect(buffer);
-    else if(qName == "metricbaseline") metric.baseline = buffer.trimmed().toDouble();
-    else if(qName == "metricsmooth") metric.smooth = buffer.trimmed().toInt();
-    else if(qName == "metrictrend") metric.trend = buffer.trimmed().toInt();
-    else if(qName == "metrictype") metric.type = buffer.trimmed().toInt();
-    else if(qName == "metrictopn") metric.topN = buffer.trimmed().toInt();
-    else if(qName == "metricoutn") metric.topOut = buffer.trimmed().toInt();
-    else if(qName == "metriccurve") metric.curveStyle = intToCurve(buffer.trimmed().toInt());
-    else if(qName == "metricsymbol") metric.symbolStyle = intToSymbol(buffer.trimmed().toInt());
-    else if(qName == "metricstack") metric.stack = intToSymbol(buffer.trimmed().toInt());
-    else if(qName == "metricpencolor") {
-            // the r,g,b values are in red="xx",green="xx" and blue="xx" attributes
-            // of this element and captured in startelement below
-            metric.penColor = QColor(red,green,blue);
-    }
-    else if(qName == "metricpenalpha") metric.penAlpha = buffer.trimmed().toInt();
-    else if(qName == "metricpenwidth") metric.penWidth = buffer.trimmed().toInt();
-    else if(qName == "metricpenstyle") metric.penStyle = buffer.trimmed().toInt();
-    else if(qName == "metricbrushcolor") {
-            // the r,g,b values are in red="xx",green="xx" and blue="xx" attributes
-            // of this element and captured in startelement below
-            metric.brushColor = QColor(red,green,blue);
+    if(qName == "chart") {
+        QString string = buffer.mid(1,buffer.length()-2);
 
-    } else if(qName == "metricbrushalpha") metric.penAlpha = buffer.trimmed().toInt();
-
-    //
-    // Complex Elements
-    //
-    else if(qName == "metric") // <metric></metric> block
-        setting.metrics.append(metric);
-    else if (qName == "LTM-chart") // <LTM-chart></LTM-chart> block
-        settings.append(setting);
-    else if (qName == "charts") { // <charts></charts> block top-level
-    } // do nothing for now
+        QByteArray base64(string.toLatin1());
+        QByteArray unmarshall = QByteArray::fromBase64(base64);
+        QDataStream s(&unmarshall, QIODevice::ReadOnly);
+        LTMSettings x;
+        s >> x;
+        settings << x;
+    } 
     return true;
 }
 
-bool LTMChartParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
+bool LTMChartParser::startElement( const QString&, const QString&, const QString &, const QXmlAttributes &)
 {
     buffer.clear();
-    if(name == "charts")
-        ; // do nothing for now
-    else if (name == "LTM-chart")
-        setting = LTMSettings();
-    else if (name == "metric")
-        metric = MetricDetail();
-    else if (name == "metricpencolor" || name == "metricbrushcolor") {
-
-        // red="x" green="x" blue="x" attributes for pen/brush color
-        for(int i=0; i<attrs.count(); i++) {
-            if (attrs.qName(i) == "red") red=attrs.value(i).toInt();
-            if (attrs.qName(i) == "green") green=attrs.value(i).toInt();
-            if (attrs.qName(i) == "blue") blue=attrs.value(i).toInt();
-        }
-    }
-
     return true;
 }
 
@@ -231,6 +94,10 @@ static QString xmlprotect(QString string)
 //
 // Write out the charts.xml file
 //
+// Most of the heavy lifting is done by the LTMSettings
+// << and >> operators. We just put them into the character
+// data for a chart.
+//
 void
 LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
 {
@@ -246,49 +113,14 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
 
     // write out to file
     foreach (LTMSettings chart, charts) {
+
+        out <<"\t<chart name=\"" << xmlprotect(chart.name) <<"\">\"";
         // chart name
-        out<<QString("\t<LTM-chart>\n\t\t<chartname>\"%1\"</chartname>\n").arg(xmlprotect(chart.name));
-
-        // all the metrics
-        foreach (MetricDetail metric, chart.metrics) {
-            out<<QString("\t\t<metric>\n");
-            out<<QString("\t\t\t<metricdesc>\"%1\"</metricdesc>\n").arg(xmlprotect(metric.name));
-            out<<QString("\t\t\t<metricname>%1</metricname>\n").arg(metric.symbol);
-            out<<QString("\t\t\t<metricuname>\"%1\"</metricuname>\n").arg(xmlprotect(metric.uname));
-            out<<QString("\t\t\t<metricuunits>\"%1\"</metricuunits>\n").arg(xmlprotect(metric.uunits));
-            out<<QString("\t\t\t<metrictype>\"%1\"</metrictype>\n").arg(metric.type);
-
-            // SMOOTH, TREND, TOPN
-            out<<QString("\t\t\t<metricsmooth>%1</metricsmooth>\n").arg(metric.smooth);
-            out<<QString("\t\t\t<metrictrend>%1</metrictrend>\n").arg(metric.trend);
-            out<<QString("\t\t\t<metrictopn>%1</metrictopn>\n").arg(metric.topN);
-            out<<QString("\t\t\t<metricoutn>%1</metricoutn>\n").arg(metric.topOut);
-            out<<QString("\t\t\t<metricbaseline>%1</metricbaseline>\n").arg(metric.baseline);
-
-            // CURVE, SYMBOL
-            out<<QString("\t\t\t<metriccurve>%1</metriccurve>\n").arg(curveToInt(metric.curveStyle));
-            out<<QString("\t\t\t<metricsymbol>%1</metricsymbol>\n").arg(symbolToInt(metric.symbolStyle));
-            out<<QString("\t\t\t<metricstack>%1</metricstack>\n").arg(metric.stack ? 1 : 0);
-
-            // PEN
-            out<<QString("\t\t\t<metricpencolor red=\"%1\" green=\"%3\" blue=\"%4\"></metricpencolor>\n")
-                        .arg(metric.penColor.red())
-                        .arg(metric.penColor.green())
-                        .arg(metric.penColor.blue());
-            out<<QString("\t\t\t<metricpenalpha>%1</metricpenalpha>\n").arg(metric.penAlpha);
-            out<<QString("\t\t\t<metricpenwidth>%1</metricpenwidth>\n").arg(metric.penWidth);
-            out<<QString("\t\t\t<metricpenstyle>%1</metricpenstyle>\n").arg(metric.penStyle);
-
-            // BRUSH
-            out<<QString("\t\t\t<metricbrushcolor red=\"%1\" green=\"%3\" blue=\"%4\"></metricbrushcolor>\n")
-                        .arg(metric.brushColor.red())
-                        .arg(metric.brushColor.green())
-                        .arg(metric.brushColor.blue());
-            out<<QString("\t\t\t<metricbrushalpha>%1</metricbrushalpha>\n").arg(metric.brushAlpha);
-
-            out<<QString("\t\t</metric>\n");
-        }
-        out<<QString("\t</LTM-chart>\n");
+        QByteArray marshall;
+        QDataStream s(&marshall, QIODevice::WriteOnly);
+        s << chart;
+        out<<marshall.toBase64();
+        out<<"\"</chart>\n";
     }
 
     // end document
