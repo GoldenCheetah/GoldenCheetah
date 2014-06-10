@@ -47,6 +47,7 @@ class IntervalItem;
 class IntervalTreeView;
 class QSqlTableModel;
 class PDEstimate;
+class LTMSettings;
 
 class Context;
 
@@ -87,6 +88,10 @@ class Athlete : public QObject
 
         // ride metadata definitions
         RideMetadata *rideMetadata() { return rideMetadata_; }
+
+        // preset charts
+        QList<LTMSettings> presets;
+        void translateDefaultCharts(QList<LTMSettings>&charts);
 
         // indexes / filters
 #ifdef GC_HAVE_LUCENE

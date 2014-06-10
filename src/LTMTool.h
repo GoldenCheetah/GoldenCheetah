@@ -78,9 +78,6 @@ class LTMTool : public QWidget
         SearchFilterBox *searchBox;
 #endif
 
-        // preset charts
-        QList<LTMSettings> presets;
-
         // basic tab: accessed by LTMWindow hence public
         QComboBox *groupBy;
         QCheckBox *shadeZones;
@@ -112,8 +109,10 @@ class LTMTool : public QWidget
         void clearFilter();
         void setFilter(QStringList);
 
+        void presetsChanged();
         void exportClicked();
         void importClicked();
+        //void okClicked(); // !!! need to address this
         void upClicked();
         void downClicked();
         void renameClicked();
@@ -123,7 +122,6 @@ class LTMTool : public QWidget
     private:
 
         // Helper function for default charts translation
-        void translateDefaultCharts(QList<LTMSettings>&charts);
         QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
         QwtSymbol::Style symbolStyle(RideMetric::MetricType);
 

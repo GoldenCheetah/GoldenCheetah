@@ -783,7 +783,7 @@ LTMWindow::applyClicked()
         QDateTime end = settings.end;
 
         // apply preset
-        settings = ltmTool->presets[selected];
+        settings = context->athlete->presets[selected];
 
         // now get back the local chart setup
         settings.ltmTool = ltmTool;
@@ -805,10 +805,10 @@ LTMWindow::applyClicked()
 void
 LTMWindow::saveClicked()
 {
-    EditChartDialog editor(context, &settings, ltmTool->presets);
+    EditChartDialog editor(context, &settings, context->athlete->presets);
     if (editor.exec()) {
-        ltmTool->presets.append(settings);
-        settings.writeChartXML(context->athlete->home, ltmTool->presets);
+        context->athlete->presets.append(settings);
+        settings.writeChartXML(context->athlete->home, context->athlete->presets);
         //ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
         //ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
