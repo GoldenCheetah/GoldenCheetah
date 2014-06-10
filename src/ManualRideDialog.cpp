@@ -218,7 +218,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     else byDistance->setChecked(true);
 
     // Derived metrics
-    QLabel *BSLabel = new QLabel(tr("BikeScore: "), this);
+    QLabel *BSLabel = new QLabel("BikeScore (TM): ", this);
     BS = new QDoubleSpinBox(this);
     BS->setSingleStep(1.0);
     BS->setDecimals(0);

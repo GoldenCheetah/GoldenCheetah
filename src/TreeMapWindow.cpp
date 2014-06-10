@@ -81,9 +81,9 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     field2 = new QComboBox(this);
     addTextFields(field2);
 
-    cl->addRow(new QLabel("First"), field1);
-    cl->addRow(new QLabel("Second"), field2);
-    cl->addRow(new QLabel(tr(""))); // spacing
+    cl->addRow(new QLabel(tr("First")), field1);
+    cl->addRow(new QLabel(tr("Second")), field2);
+    cl->addRow(new QLabel("")); // spacing
 
     // metric selector .. just ride metrics
     metricTree = new QTreeWidget;
@@ -112,18 +112,21 @@ TreeMapWindow::TreeMapWindow(Context *context) :
         // everywhere. Just remember - in the factory "name" refers to symbol and
         // if you want the user friendly metric description you get it via the metric
         QString title = factory.rideMetric(factory.metricName(i))->name();
+        title.replace("&#8482;", " (TM)");
         add->setText(0, title); // long name
         add->setText(1, factory.metricName(i)); // symbol (hidden)
 
+        // sort by title
+        add->sortChildren(0, Qt::DescendingOrder);
         // by default use workout_time
         if (factory.metricName(i) == "workout_time") allMetrics->child(i)->setSelected(true);
     }
     metricTree->expandItem(allMetrics);
-    cl->addRow(new QLabel("Metric"), metricTree);
+    cl->addRow(new QLabel(tr("Metric")), metricTree);
     dateSetting = new DateSettingsEdit(this);
-    cl->addRow(new QLabel(tr(""))); // spacing
-    cl->addRow(new QLabel("Date range"), dateSetting);
-    cl->addRow(new QLabel(tr(""))); // spacing
+    cl->addRow(new QLabel("")); // spacing
+    cl->addRow(new QLabel(tr("Date range")), dateSetting);
+    cl->addRow(new QLabel("")); // spacing
 
     // chart settings changed
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
@@ -265,8 +268,8 @@ TreeMapWindow::cellClicked(QString f1, QString f2)
     // create a list of activities in this cell
     int count = 0;
     foreach(SummaryMetrics x, results) {
-        if (x.getText(settings.field1, "(unknown)") == f1 &&
-            x.getText(settings.field2, "(unknown)") == f2) {
+        if (x.getText(settings.field1, tr("(unknown)")) == f1 &&
+            x.getText(settings.field2, tr("(unknown)")) == f2) {
             cell.append(x);
             count++;
         }
@@ -275,7 +278,7 @@ TreeMapWindow::cellClicked(QString f1, QString f2)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *metric = factory.rideMetric(settings.symbol);
 
-    ltmPopup->setData(cell, metric, QString("%1 ride%2").arg(count).arg(count == 1 ? "" : "s"));
+    ltmPopup->setData(cell, metric, QString(tr("%1 ride%2")).arg(count).arg(count == 1 ? "" : tr("s")));
     popup->show();
 
 }
@@ -283,7 +286,7 @@ TreeMapWindow::cellClicked(QString f1, QString f2)
 void
 TreeMapWindow::addTextFields(QComboBox *combo)
 {
-    combo->addItem("None");
+    combo->addItem(tr("None"));
     foreach (FieldDefinition x, fieldDefinitions) {
         if (x.type < 4) combo->addItem(x.name);
     }

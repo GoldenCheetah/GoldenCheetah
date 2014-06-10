@@ -256,7 +256,7 @@ QString RealtimeData::seriesName(DataSeries series)
     case TSS: return tr("TSS");
         break;
 
-    case BikeScore: return tr("BikeScore");
+    case BikeScore: return "BikeScore (TM)";
         break;
 
     case Joules: return tr("kJoules");
