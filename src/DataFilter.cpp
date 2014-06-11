@@ -276,9 +276,6 @@ void DataFilter::configUpdate()
         QString symbol = factory.metricName(i);
         QString name = context->specialFields.internalName(factory.rideMetric(symbol)->name());
 
-        //special Treatment for BikeScore
-        if (name.startsWith("BikeScore")) name = "BikeScore&#8482;";
-
         lookupMap.insert(name.replace(" ","_"), symbol);
         lookupType.insert(name.replace(" ","_"), true);
     }
