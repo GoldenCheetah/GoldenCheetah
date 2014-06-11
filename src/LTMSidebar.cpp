@@ -234,6 +234,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
+    connect(chartTree,SIGNAL(itemSelectionChanged()), this, SLOT(presetTreeWidgetSelectionChanged()));
 
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
@@ -254,6 +255,19 @@ LTMSidebar::presetsChanged()
         add->setText(0, chart.name);
     }
     chartTree->setCurrentItem(chartTree->invisibleRootItem()->child(0));
+}
+
+void
+LTMSidebar::presetTreeWidgetSelectionChanged()
+{
+    if (!chartTree->selectedItems().isEmpty()) {
+        QTreeWidgetItem *which = chartTree->selectedItems().first();
+        if (which != allDateRanges) {
+            int index = allCharts->indexOfChild(which);
+            if (index >=0 && index < context->athlete->presets.count())
+                context->notifyPresetSelected(index);
+        }
+    }
 }
 
 void

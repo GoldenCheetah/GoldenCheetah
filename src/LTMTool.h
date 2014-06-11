@@ -80,6 +80,7 @@ class LTMTool : public QWidget
 
         // basic tab: accessed by LTMWindow hence public
         QComboBox *groupBy;
+        QCheckBox *usePreset;
         QCheckBox *shadeZones;
         QCheckBox *showLegend;
         QCheckBox *showData;
@@ -109,7 +110,9 @@ class LTMTool : public QWidget
         void clearFilter();
         void setFilter(QStringList);
 
-        void presetsChanged();
+        void presetsChanged();   // presets changed in the athlete class
+        void usePresetChanged(); // we changed the checkbox
+
         void exportClicked();
         void importClicked();
         void editingStarted();
