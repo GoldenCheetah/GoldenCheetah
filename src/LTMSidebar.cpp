@@ -114,13 +114,42 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #endif
     eventsWidget->addWidget(eventTree);
 
+    // charts
+    chartsWidget = new GcSplitterItem(tr("Charts"), iconFromPNG(":images/sidebar/charts.png"), this);
+    QAction *moreChartAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    chartsWidget->addAction(moreChartAct);
+    //XXXconnect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
+
+    chartTree = new QTreeWidget;
+    chartTree->setFrameStyle(QFrame::NoFrame);
+    allCharts = chartTree->invisibleRootItem();
+    allCharts->setText(0, tr("Events"));
+    chartTree->setColumnCount(1);
+    chartTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    chartTree->header()->hide();
+    chartTree->setIndentation(5);
+    chartTree->expandItem(allCharts);
+    chartTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    chartTree->horizontalScrollBar()->setDisabled(true);
+    chartTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef Q_OS_MAC
+    chartTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+#ifdef Q_OS_WIN
+    cde = QStyleFactory::create(OS_STYLE);
+    chartTree->verticalScrollBar()->setStyle(cde);
+#endif
+    chartsWidget->addWidget(chartTree);
+
+    // setup for first time
+    presetsChanged();
+
     // filters
 #ifdef GC_HAVE_LUCENE
     filtersWidget = new GcSplitterItem(tr("Filters"), iconFromPNG(":images/toolbar/filter3.png"), this);
     QAction *moreFilterAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     filtersWidget->addAction(moreFilterAct);
     connect(moreFilterAct, SIGNAL(triggered(void)), this, SLOT(filterPopup(void)));
-
 
     filterTree = new QTreeWidget;
     filterTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -163,6 +192,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #ifdef GC_HAVE_LUCENE
     splitter->addWidget(filtersWidget);
 #endif
+    splitter->addWidget(chartsWidget); // for charts that 'use sidebar chart' charts ! (confusing or what?!)
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
@@ -203,6 +233,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
+    connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
 
     // let everyone know what date range we are starting with
     dateRangeTreeWidgetSelectionChanged();
@@ -212,10 +243,25 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 }
 
 void
+LTMSidebar::presetsChanged()
+{
+    // rebuild the preset chart list as the presets have changed
+    chartTree->clear();
+    foreach(LTMSettings chart, context->athlete->presets) {
+        QTreeWidgetItem *add;
+        add = new QTreeWidgetItem(chartTree->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setText(0, chart.name);
+    }
+    chartTree->setCurrentItem(chartTree->invisibleRootItem()->child(0));
+}
+
+void
 LTMSidebar::configChanged()
 {
     seasonsWidget->setStyleSheet(GCColor::stylesheet());
     eventsWidget->setStyleSheet(GCColor::stylesheet());
+    chartsWidget->setStyleSheet(GCColor::stylesheet());
 #ifdef GC_HAVE_LUCENE
     filtersWidget->setStyleSheet(GCColor::stylesheet());
 #endif
