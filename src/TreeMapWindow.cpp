@@ -111,9 +111,8 @@ TreeMapWindow::TreeMapWindow(Context *context) :
         // I know it is confusing, but changing it will mean changing it absolutely
         // everywhere. Just remember - in the factory "name" refers to symbol and
         // if you want the user friendly metric description you get it via the metric
-        QString title = factory.rideMetric(factory.metricName(i))->name();
-        title.replace("&#8482;", " (TM)");
-        add->setText(0, title); // long name
+        QTextEdit title(factory.rideMetric(factory.metricName(i))->name()); // to handle HTML
+        add->setText(0, title.toPlainText()); // long name
         add->setText(1, factory.metricName(i)); // symbol (hidden)
 
         // sort by title
