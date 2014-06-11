@@ -292,9 +292,10 @@ SearchBox::dropEvent(QDropEvent *event)
 {
     QString name = event->mimeData()->data("application/x-columnchooser");
     // fugly, but it works for BikeScore with the (TM) in it... so...
-    // independent of Latin1 or UTF-8 coming from "Column Chooser" the "TM" is not recognized by the parser,
-    // when stripping it of, all works fine (Parser add's it internally to find the right metrics)
+    // independent of Latin1 or UTF-8 coming from "Column Chooser" the "TM" special sign is not recognized by the parser,
+    // so strip the "TM" off for this case (only)
     if (name.startsWith("BikeScore")) name = QString("BikeScore");
+
     //  Always use the "internalNames" in Filter expressions
     SpecialFields sp;
     name = sp.internalName(name);

@@ -82,7 +82,7 @@ void GCColor::setupColors()
         { tr("Long Term Stress"), "COLORLTS", Qt::green },
         { tr("Stress Balance"), "COLORSB", Qt::black },
         { tr("Daily Stress"), "COLORDAILYSTRESS", Qt::red },
-        { tr("Bike Score"), "COLORBIKESCORE", Qt::gray },
+        { "Bike Score (TM)", "COLORBIKESCORE", Qt::gray },
         { tr("Calendar Text"), "COLORCALENDARTEXT", Qt::black },
         { tr("Power Zone 1 Shading"), "COLORZONE1", QColor(255,0,255) },
         { tr("Power Zone 2 Shading"), "COLORZONE2", QColor(42,0,255) },
