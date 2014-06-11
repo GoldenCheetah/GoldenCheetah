@@ -89,10 +89,7 @@ class LTMWindow : public GcChartWindow
     Q_OBJECT
     G_OBJECT
 
-    Q_PROPERTY(int chart READ chart WRITE setChart USER true) // adding/deleting charts will cause this index to fail
-                                                              // not a big issue since the preset is APPLIED when it is
-                                                              // selected. We don't really need to remember what was used
-                                                              // but it may be helpful to some users
+    Q_PROPERTY(bool preset READ preset WRITE setPreset USER true)
     Q_PROPERTY(int bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool data READ data WRITE setData USER true)
@@ -145,10 +142,8 @@ class LTMWindow : public GcChartWindow
         int stackW() const { return ltmTool->stackSlider->value(); }
         void setStackW(int x) { ltmTool->stackSlider->setValue(x); }
 
-        // preset selection kind of pointless...
-        int chart() const { return 0; }
-        void setChart(int) { }
-
+        bool preset() const { return ltmTool->usePreset->isChecked(); }
+        void setPreset(bool x) { ltmTool->usePreset->setChecked(x); }
 
         int useSelected() { return ltmTool->dateSetting->mode(); }
         void setUseSelected(int x) { ltmTool->dateSetting->setMode(x); }
@@ -184,6 +179,7 @@ class LTMWindow : public GcChartWindow
 
     public slots:
         void rideSelected();        // notification to refresh
+        void presetSelected(int index); // when a preset is selected in the sidebar
 
         void refreshPlot();         // normal mode
         void refreshCompare();      // compare mode

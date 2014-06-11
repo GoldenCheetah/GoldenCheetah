@@ -1055,12 +1055,17 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     deleteCustomButton = new QPushButton("- ");
     connect(deleteCustomButton, SIGNAL(clicked()), this, SLOT(deleteMetric()));
 
+    usePreset = new QCheckBox(tr("Use sidebar chart settings"));
+    usePreset->setChecked(false);
+
 #ifndef Q_OS_MAC
     addCustomButton->setFixedSize(20,20);
     deleteCustomButton->setFixedSize(20,20);
 #endif
     QHBoxLayout *customButtons = new QHBoxLayout;
     customButtons->setSpacing(2);
+    customButtons->addWidget(usePreset);
+    customButtons->addStretch();
     customButtons->addWidget(editCustomButton);
     customButtons->addStretch();
     customButtons->addWidget(addCustomButton);
@@ -1078,9 +1083,22 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     // watch for changes to the preset charts
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
+    connect(usePreset, SIGNAL(stateChanged(int)), this, SLOT(usePresetChanged()));
 
+    // set the show/hide for preset selection
+    usePresetChanged();
+    
     // but setup for the first time
     presetsChanged();
+}
+
+void
+LTMTool::usePresetChanged()
+{
+    customTable->setEnabled(!usePreset->isChecked());
+    editCustomButton->setEnabled(!usePreset->isChecked());
+    addCustomButton->setEnabled(!usePreset->isChecked());
+    deleteCustomButton->setEnabled(!usePreset->isChecked());
 }
 
 void

@@ -201,6 +201,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
     configChanged();
 }
@@ -244,6 +245,42 @@ LTMWindow::compareChanged()
 
 void
 LTMWindow::rideSelected() { } // deprecated
+
+void
+LTMWindow::presetSelected(int index)
+{
+    // apply a preset if we are configured to do that...
+    if (ltmTool->usePreset->isChecked()) {
+
+        // save chart setup
+        int groupBy = settings.groupBy;
+        bool legend = settings.legend;
+        bool events = settings.events;
+        bool stack = settings.stack;
+        bool shadeZones = settings.shadeZones;
+        QDateTime start = settings.start;
+        QDateTime end = settings.end;
+
+        // apply preset
+        settings = context->athlete->presets[index];
+
+        // now get back the local chart setup
+        settings.ltmTool = ltmTool;
+        settings.data = &results;
+        settings.bests = &bestsresults;
+        settings.measures = &measures;
+        settings.groupBy = groupBy;
+        settings.legend = legend;
+        settings.events = events;
+        settings.stack = stack;
+        settings.shadeZones = shadeZones;
+        settings.start = start;
+        settings.end = end;
+
+        ltmTool->applySettings();
+        refresh();
+    }
+}
 
 void
 LTMWindow::refreshPlot()
