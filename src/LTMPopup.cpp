@@ -121,8 +121,9 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
     QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
 
-    // value & special Treatment for (TM)
-    h = new QTableWidgetItem(metric->name().replace("&#8482;", " (TM)"), QTableWidgetItem::Type);
+    // value & process html encoding of(TM)
+    QTextEdit name(metric->name());
+    h = new QTableWidgetItem(name.toPlainText(), QTableWidgetItem::Type);
 
     rides->setHorizontalHeaderItem(1,h);
 

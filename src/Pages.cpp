@@ -1543,9 +1543,8 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
         if (selectedMetrics.contains(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QString name = m->name();
-        name.replace("&#8482;", " (TM)"); //Don't allow translation
-        QListWidgetItem *item = new QListWidgetItem(name);
+        QTextEdit name(m->name()); // process html encoding of(TM)
+        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
     }
@@ -1553,9 +1552,8 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
         if (!factory.haveMetric(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QString name = m->name();
-        name.replace("&#8482;", " (TM)");  //Don't allow translation
-        QListWidgetItem *item = new QListWidgetItem(name);
+        QTextEdit name(m->name());  // process html encoding of(TM)
+        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
     }
@@ -1736,9 +1734,8 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
         if (selectedMetrics.contains(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QString name = m->name();
-        name.replace("&#8482;", " (TM)");  // Dont' allow Translation
-        QListWidgetItem *item = new QListWidgetItem(name);
+        QTextEdit name(m->name()); //  process html encoding of(TM)
+        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
     }
@@ -1746,9 +1743,8 @@ BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
         if (!factory.haveMetric(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QString name = m->name();
-        name.replace("&#8482;", " (TM)");  // Don't allow translation
-        QListWidgetItem *item = new QListWidgetItem(name);
+        QTextEdit name(m->name()); //  process html encoding of(TM)
+        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
     }
@@ -1925,9 +1921,8 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
         if (selectedMetrics.contains(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QString name = m->name();
-        name.replace("&#8482;", " (TM)"); // Don't allow translation
-        QListWidgetItem *item = new QListWidgetItem(name);
+        QTextEdit name(m->name()); //  process html encoding of(TM)
+        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
         item->setData(Qt::UserRole, symbol);
         availList->addItem(item);
     }
@@ -1935,9 +1930,8 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
         if (!factory.haveMetric(symbol))
             continue;
         QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QString name = m->name();
-        name.replace("&#8482;", " (TM)"); // Don't allow translation
-        QListWidgetItem *item = new QListWidgetItem(name);
+        QTextEdit name(m->name()); //  process html encoding of(TM)
+        QListWidgetItem *item = new QListWidgetItem(name.toPlainText());
         item->setData(Qt::UserRole, symbol);
         selectedList->addItem(item);
     }

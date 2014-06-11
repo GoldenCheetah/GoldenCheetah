@@ -195,8 +195,9 @@ ComparePane::refreshTable()
                 // check for both original and translated
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                     units = m->units(context->athlete->useMetricUnits);
-                if (units != "") list << QString("%1 (%2)").arg(m->name()).arg(units);
-                else list << QString("%1").arg(m->name());
+                QTextEdit name(m->name()); // process html encoding of(TM)
+                if (units != "") list << QString("%1 (%2)").arg(name.toPlainText()).arg(units);
+                else list << QString("%1").arg(name.toPlainText());
             }
         }
 
@@ -367,8 +368,9 @@ ComparePane::refreshTable()
                 QString units;
                 if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
                     units = m->units(context->athlete->useMetricUnits);
-                if (units != "") list << QString("%1 (%2)").arg(m->name()).arg(units);
-                else list << QString("%1").arg(m->name());
+                QTextEdit name(m->name()); // process html encoding of(TM)
+                if (units != "") list << QString("%1 (%2)").arg(name.toPlainText()).arg(units);
+                else list << QString("%1").arg(name.toPlainText());
             }
         }
 
