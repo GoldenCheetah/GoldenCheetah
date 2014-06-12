@@ -89,7 +89,7 @@ KickrController::getRealtimeData(RealtimeData &rtData)
     if(!myKickr->isRunning())
     {
         QMessageBox msgBox;
-        msgBox.setText("Cannot Connect to Kickr");
+        msgBox.setText(tr("Cannot Connect to Kickr"));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);

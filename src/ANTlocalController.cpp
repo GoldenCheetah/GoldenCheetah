@@ -104,7 +104,7 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
     if(!myANTlocal->isRunning())
     {
         QMessageBox msgBox;
-        msgBox.setText("Cannot open ANT+ device");
+        msgBox.setText(tr("Cannot open ANT+ device"));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);

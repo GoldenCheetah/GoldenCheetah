@@ -372,69 +372,76 @@ CPPlot::plotModel()
             if (rideSeries == RideFile::watts) {
 
                 //WPrime
-                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString("%1 kJ").arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
-                else cpw->wprimeValue->setText("n/a");
+                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
+                else cpw->wprimeValue->setText(tr("n/a"));
 
                 //CP
-                cpw->cpValue->setText(QString("%1 w").arg(pdModel->CP(), 0, 'f', 0));
+                cpw->cpValue->setText(QString(tr("%1 w")).arg(pdModel->CP(), 0, 'f', 0));
 
                 //FTP and FTP ranking
                 if (pdModel->hasFTP()) {
-                    cpw->ftpValue->setText(QString("%1 w").arg(pdModel->FTP(), 0, 'f', 0));
+                    cpw->ftpValue->setText(QString(tr("%1 w")).arg(pdModel->FTP(), 0, 'f', 0));
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
-                    int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
-                    cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
-
+                    if (appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() > 0.0) {
+                       int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                       cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+                    } else {
+                        cpw->ftpRank->setText(QString(tr("No Athlet Weight")));
+                    }
                 } else {
-                    cpw->ftpValue->setText("n/a");
-                    cpw->ftpRank->setText("n/a");
+                    cpw->ftpValue->setText(tr("n/a"));
+                    cpw->ftpRank->setText(tr("n/a"));
                 }
 
                 // P-MAX and P-MAX ranking
                 if (pdModel->hasPMax()) {
-                    cpw->pmaxValue->setText(QString("%1 w").arg(pdModel->PMax(), 0, 'f', 0));
+                    cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
 
                     // Reference 22.5W/kg -> untrained 8W/kg
-                    int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
-                    cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                    if (appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() > 0.0) {
+                      int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                      cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                    } else {
+                      cpw->pmaxRank->setText(QString(tr("No Athlet Weight")));
+                    }
                 } else  {
-                    cpw->pmaxValue->setText("n/a");
-                    cpw->pmaxRank->setText("n/a");
+                    cpw->pmaxValue->setText(tr("n/a"));
+                    cpw->pmaxRank->setText(tr("n/a"));
                 }
 
             } else {
 
                 //WPrime
-                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString("%1 kJ/kg").arg(pdModel->WPrime() / 1000.0, 0, 'f', 2));
-                else cpw->wprimeValue->setText("n/a");
+                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ/kg")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 2));
+                else cpw->wprimeValue->setText(tr("n/a"));
 
                 //CP
-                cpw->cpValue->setText(QString("%1 w/kg").arg(pdModel->CP(), 0, 'f', 2));
+                cpw->cpValue->setText(QString(tr("%1 w/kg")).arg(pdModel->CP(), 0, 'f', 2));
 
                 //FTP and FTP ranking
                 if (pdModel->hasFTP()) {
-                    cpw->ftpValue->setText(QString("%1 w/kg").arg(pdModel->FTP(), 0, 'f', 2));
+                    cpw->ftpValue->setText(QString(tr("%1 w/kg")).arg(pdModel->FTP(), 0, 'f', 2));
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
                     int _ftpLevel = 15 * (pdModel->FTP() - 2.5) / (6.25-2.5) ;
                     cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
 
                 } else {
-                    cpw->ftpValue->setText("n/a");
-                    cpw->ftpRank->setText("n/a");
+                    cpw->ftpValue->setText(tr("n/a"));
+                    cpw->ftpRank->setText(tr("n/a"));
                 }
 
                 // P-MAX and P-MAX ranking
                 if (pdModel->hasPMax()) {
-                    cpw->pmaxValue->setText(QString("%1 w/kg").arg(pdModel->PMax(), 0, 'f', 2));
+                    cpw->pmaxValue->setText(QString(tr("%1 w/kg")).arg(pdModel->PMax(), 0, 'f', 2));
 
                     // Reference 22.5W/kg -> untrained 8W/kg
                     int _pMaxLevel = 15 * (pdModel->PMax() - 8) / (23-8) ;
                     cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
                 } else  {
-                    cpw->pmaxValue->setText("n/a");
-                    cpw->pmaxRank->setText("n/a");
+                    cpw->pmaxValue->setText(tr("n/a"));
+                    cpw->pmaxRank->setText(tr("n/a"));
                 }
             }
         }
