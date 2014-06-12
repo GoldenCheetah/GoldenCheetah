@@ -534,8 +534,9 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
+    QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
-		    	     "QMenuBar::item { color: black; background: %1; }").arg(GColor(CCHROME).name()));
+                             "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
     menuBar()->setContentsMargins(0,0,0,0);
 #endif
 
@@ -1813,8 +1814,9 @@ MainWindow::configChanged()
 
 // Windows
 #ifdef WIN32
+    QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
-		    	     "QMenuBar::item { color: black; background: %1; }").arg(GColor(CCHROME).name()));
+                             "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
 #endif
 
 // Mac
