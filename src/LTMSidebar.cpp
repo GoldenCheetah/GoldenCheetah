@@ -116,8 +116,10 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 
     // charts
     chartsWidget = new GcSplitterItem(tr("Charts"), iconFromPNG(":images/sidebar/charts.png"), this);
-    QAction *moreChartAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
-    chartsWidget->addAction(moreChartAct);
+
+    //XXX Chart Widget Actions Pending
+    //XXXQAction *moreChartAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    //XXXchartsWidget->addAction(moreChartAct);
     //XXXconnect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
 
     chartTree = new QTreeWidget;
