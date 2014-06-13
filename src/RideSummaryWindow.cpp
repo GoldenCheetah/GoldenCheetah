@@ -579,7 +579,7 @@ RideSummaryWindow::htmlSummary()
 
     // W;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 kJ</td></tr>")
-            .arg("W'")
+            .arg(tr("W'"))
             .arg(WPrimeString);
     summary += QString("<tr><td></td><td align=\"right\">%1 J/kg</td></tr>")
             .arg(WPrimeStringWPK);
@@ -589,7 +589,7 @@ RideSummaryWindow::htmlSummary()
 
     // CP;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 watts</td></tr>")
-            .arg("CP")
+            .arg(tr("CP"))
             .arg(CPString);
     summary += QString("<tr><td></td><td align=\"right\">%1 w/kg</td></tr>")
             .arg(CPStringWPK);
@@ -600,16 +600,16 @@ RideSummaryWindow::htmlSummary()
 #if 0 // clutters it up and adds almost nothing
     // FTP/MMP60;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg("FTP (watts)")
+            .arg(tr("FTP (watts)"))
             .arg(FTPString);
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2</td></tr>")
-            .arg("FTP (w/kg)")
+            .arg(tr("FTP (w/kg)"))
             .arg(FTPStringWPK);
 #endif
 
     // Pmax;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 watts</td></tr>")
-            .arg("P-max")
+            .arg(tr("P-max"))
             .arg(PMaxString);
     summary += QString("<tr><td></td><td align=\"right\">%1 w/kg</td></tr>")
             .arg(PMaxStringWPK);
@@ -1052,21 +1052,21 @@ RideSummaryWindow::getPDEstimates()
         // val => when low = high
         double divisor = wpk ? 1.0f : 1000.00f;
 
-        if (!lowWPrime && !highWPrime) WPrimeString = "N/A";
+        if (!lowWPrime && !highWPrime) WPrimeString = tr("N/A");
         else if (lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/divisor, 0, 'f',  wpk ? 0 : 1).arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
         else WPrimeString = QString("%1").arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
 
-        if (!lowCP && !highCP) CPString = "N/A";
+        if (!lowCP && !highCP) CPString = tr("N/A");
         else if (lowCP != highCP) CPString = QString ("%1 - %2").arg(lowCP, 0, 'f', wpk ? 2 : 0)
                                                                 .arg(highCP, 0, 'f', wpk ? 2 : 0);
         else CPString = QString("%1").arg(highCP, 0, 'f', wpk ? 2 : 0);
 
-        if (!lowFTP && !highFTP) FTPString = "N/A";
+        if (!lowFTP && !highFTP) FTPString = tr("N/A");
         else if (lowFTP != highFTP) FTPString = QString ("%1 - %2").arg(lowFTP, 0, 'f', wpk ? 2 : 0)
                                                                    .arg(highFTP, 0, 'f', wpk ? 2 : 0);
         else FTPString = QString("%1").arg(highFTP, 0, 'f', wpk ? 2 : 0);
 
-        if (!lowPMax && !highPMax) PMaxString = "N/A";
+        if (!lowPMax && !highPMax) PMaxString = tr("N/A");
         else if (lowPMax != highPMax) PMaxString = QString ("%1 - %2").arg(lowPMax, 0, 'f', wpk ? 2 : 0)
                                                                       .arg(highPMax, 0, 'f', wpk ? 2 : 0);
         else PMaxString = QString("%1").arg(highPMax, 0, 'f', wpk ? 2 : 0);
