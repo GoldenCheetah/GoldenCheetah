@@ -191,7 +191,7 @@ MainWindow::MainWindow(const QDir &home)
     // just check the geometry is ok, otherwise just make
     // it slightly smaller than the screensize
     if (geometry().x() < 0 || geometry().y() < 0 || 
-       (geometry().y()+geometry().height()) >= screenSize.height() || (geometry().x()+geometry().width()) >= screenSize.width()) {
+       (geometry().y()+geometry().height()) > screenSize.height() || (geometry().x()+geometry().width()) > screenSize.width()) {
         setGeometry(screenSize.x()+50,screenSize.y()+50,screenSize.width()-150,screenSize.height()-150);
     }
 
