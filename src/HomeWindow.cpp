@@ -46,7 +46,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
 
-    QLabel *titleLabel = new QLabel("Title", this);
+    QLabel *titleLabel = new QLabel(tr("Title"), this);
     QHBoxLayout *hl = new QHBoxLayout;
     hl->setSpacing(5);
     hl->setContentsMargins(0,0,0,0);

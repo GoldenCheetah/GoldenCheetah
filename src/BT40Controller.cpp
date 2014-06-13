@@ -95,7 +95,7 @@ BT40Controller::getRealtimeData(RealtimeData &rtData)
     if(!myBT40->isRunning())
     {
         QMessageBox msgBox;
-        msgBox.setText("Cannot Connect to BT40");
+        msgBox.setText(tr("Cannot Connect to BT40"));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);
