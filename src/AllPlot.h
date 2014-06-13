@@ -101,6 +101,14 @@ class CurveColors : public QObject
 
         void restoreState() {
 
+            // show all labels
+            QHashIterator<QwtPlotMarker *, QwtScaleWidget*> l(labels);
+            while (l.hasNext()) {
+                l.next();
+
+                l.key()->setVisible(true);
+            }
+
             // make all the curves visible (that should be)
             QHashIterator<QwtPlotSeriesItem *, bool> c(state);
             while (c.hasNext()) {
@@ -125,10 +133,21 @@ class CurveColors : public QObject
             if (isolated) restoreState();
 
             state.clear();
+            labels.clear();
             colors.clear();
             lims.clear();
 
-            // get a list of plot curves and state
+            // Labels
+            foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotMarker)) {
+
+                // ignore event / interval markers
+                if (static_cast<QwtPlotMarker*>(item)->lineStyle() == QwtPlotMarker::VLine) continue;
+
+                QwtScaleWidget *x = plot->axisWidget(static_cast<QwtPlotMarker*>(item)->yAxis());
+                labels.insert(static_cast<QwtPlotMarker*>(item), x);
+            }
+
+            // curves
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotCurve)) {
 
                 state.insert(static_cast<QwtPlotSeriesItem*>(item), 
@@ -145,6 +164,8 @@ class CurveColors : public QObject
 
                 lims.insert(curve, lim);
             }
+
+            // interval curves
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotIntervalCurve)) {
 
                 state.insert(static_cast<QwtPlotSeriesItem*>(item), 
@@ -235,6 +256,18 @@ class CurveColors : public QObject
                 }
             }
 
+            // hide labels that are not ours
+            QHashIterator<QwtPlotMarker *, QwtScaleWidget*> l(labels);
+            while (l.hasNext()) {
+                l.next();
+
+                if (l.value() != ours) {
+                    l.key()->setVisible(false);
+                } else {
+                    l.key()->setVisible(true);
+                }
+            }
+
             isolated = true;
         }
 
@@ -257,6 +290,7 @@ class CurveColors : public QObject
         QxtSpanSlider *slider;
         QwtPlot *plot;
         QHash<QwtPlotSeriesItem *, bool> state;
+        QHash<QwtPlotMarker *, QwtScaleWidget*> labels;
         QHash<QwtScaleWidget*, QPalette> colors;
         QHash<QwtPlotSeriesItem *, QPointF> lims;
 
