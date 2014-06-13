@@ -289,7 +289,7 @@ AddSearch::AddSearch(AddDeviceWizard *parent) : QWizardPage(parent), wizard(pare
     bar->setMaximum(100);
     bar->setMinimum(0);
     bar->setValue(0);
-    //bar->setText("Searching...");
+    //bar->setText(tr("Searching..."));
     layout->addWidget(bar);
 
     QHBoxLayout *hlayout2 = new QHBoxLayout;
