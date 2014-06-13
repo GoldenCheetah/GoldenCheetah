@@ -2702,7 +2702,7 @@ SchemePage::addClicked()
     // are we at maximum already?
     if (scheme->invisibleRootItem()->childCount() == 10) {
         QMessageBox err;
-        err.setText("Maximum of 10 zones reached.");
+        err.setText(tr("Maximum of 10 zones reached."));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
@@ -3064,7 +3064,7 @@ CPPage::addZoneClicked()
     // are we at maximum already?
     if (zones->invisibleRootItem()->childCount() == 10) {
         QMessageBox err;
-        err.setText("Maximum of 10 zones reached.");
+        err.setText(tr("Maximum of 10 zones reached."));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;

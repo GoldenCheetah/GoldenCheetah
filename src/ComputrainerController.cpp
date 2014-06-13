@@ -84,7 +84,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     if(!myComputrainer->isRunning())
     {
         QMessageBox msgBox;
-        msgBox.setText("Cannot Connect to Computrainer");
+        msgBox.setText(tr("Cannot Connect to Computrainer"));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop(1);
