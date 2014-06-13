@@ -158,18 +158,19 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 
     // need to restore geometry before setUnifiedToolBar.. on Mac
+    QRect screenSize = desktop->availableGeometry();
     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
-    QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
+    QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM, QVariant());
+
     if (geom == QVariant()) {
 
         // first run -- lets set some sensible defaults...
         // lets put it in the middle of screen 1
-        QRect size = desktop->availableGeometry();
-        struct SizeSettings app = GCColor::defaultSizes(size.height(), size.width());
+        struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
 
         // center on the available screen (minus toolbar/sidebar)
-        move((size.width()-size.x())/2 - app.width/2,
-             (size.height()-size.y())/2 - app.height/2);
+        move((screenSize.width()-screenSize.x())/2 - app.width/2,
+             (screenSize.height()-screenSize.y())/2 - app.height/2);
 
         // set to the right default
         resize(app.width, app.height);
@@ -188,14 +189,20 @@ MainWindow::MainWindow(const QDir &home)
 
     } else {
 
-        QRect size = desktop->availableGeometry();
-
-        // ensure saved geometry isn't greater than current screen size
-        if ((geom.toRect().height() >= size.height()) || (geom.toRect().width() >= size.width()))
-            setGeometry(size.x()+30,size.y()+30,size.width()-60,size.height()-60);
-        else
-            setGeometry(geom.toRect());
+        QRect appsize = geom.toRect();
+        setGeometry(appsize);
     }
+
+    // just check the geometry is ok, otherwise just make
+    // it slightly smaller than the screensize
+    if (geometry().x() < 0 || geometry().y() < 0 || 
+       (geometry().y()+geometry().height()) >= screenSize.height() || (geometry().x()+geometry().width()) >= screenSize.width()) {
+        setGeometry(screenSize.x()+50,screenSize.y()+50,screenSize.width()-150,screenSize.height()-150);
+    }
+
+    // always attempt to center on the available screen (minus toolbar/sidebar)
+    move(((screenSize.width()-screenSize.x())/2) - (geometry().width()/2),
+        ((screenSize.height()-screenSize.y())/2) - (geometry().height()/2));
 
 
     /*----------------------------------------------------------------------
@@ -915,11 +922,11 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
 #ifdef Q_OS_MAC
     if (head) {
-        appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
         head->updateGeometry();
         repaint();
     }
 #endif
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
 
 void
@@ -976,6 +983,7 @@ MainWindow::closeEvent(QCloseEvent* event)
         }
 #endif
     }
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
 
 MainWindow::~MainWindow()
