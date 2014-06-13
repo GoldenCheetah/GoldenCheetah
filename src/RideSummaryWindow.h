@@ -113,6 +113,9 @@ class RideSummaryWindow : public GcChartWindow
         // config changed
         void configChanged();
 
+        // model estimate progress updates
+        void modelProgress(int year, int month);
+
     signals:
 
         void doRefresh();
