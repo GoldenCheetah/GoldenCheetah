@@ -182,11 +182,6 @@ MainWindow::MainWindow(const QDir &home)
         appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
         appsettings->setValue(GC_FONT_CALENDAR_SIZE, app.calendarFont);
 
-        // set the default fontsize
-        QFont font;
-        font.setPointSize(app.defaultFont);
-        QApplication::setFont(font);
-
     } else {
 
         QRect appsize = geom.toRect();
@@ -1862,6 +1857,12 @@ MainWindow::configChanged()
         tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
     tabbar->setPalette(tabbarPalette);
 #endif
+
+    // set the default fontsize
+    QFont font;
+    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
+    font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
+    QApplication::setFont(font); // set default font
 
     head->updateGeometry();
     repaint();
