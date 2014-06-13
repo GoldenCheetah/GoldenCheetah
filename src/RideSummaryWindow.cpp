@@ -117,7 +117,8 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 
 RideSummaryWindow::~RideSummaryWindow()
 {
-    // wait for background thread if needed
+    // cancel background thread if needed
+    future.cancel();
     future.waitForFinished();
 }
 
