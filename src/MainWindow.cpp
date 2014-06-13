@@ -1031,7 +1031,16 @@ void MainWindow::showWorkoutWizard()
 
 void MainWindow::resetWindowLayout()
 {
-    currentTab->resetLayout();
+    QMessageBox msgBox;
+    msgBox.setText(tr("You are about to reset all charts to the default setup"));
+    msgBox.setInformativeText("Do you want to continue?");
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok))
+        currentTab->resetLayout();
 }
 
 void MainWindow::manualProcess(QString name)
