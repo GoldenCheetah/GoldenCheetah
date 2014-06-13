@@ -127,7 +127,11 @@ RideSummaryWindow::configChanged()
     defaultFont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     defaultFont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
 
+#ifdef Q_OS_MAC
+    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
+#else
     rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+2);
+#endif
     rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
 
 
