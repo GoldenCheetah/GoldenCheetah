@@ -1,7 +1,7 @@
 <layout name="analysis" style="0">
 	<chart id="14" name="" title="Summary" >
 		<property name="title" type="QString" value="Summary" />
-		<property name="subtitle" type="QString" value="Tuesday April 15, 2014, 5:40 PM" />
+		<property name="subtitle" type="QString" value="Sunday April 17, 2011, 3:40 PM" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
@@ -270,6 +270,16 @@
 		<property name="ignore" type="bool" value="1" />
 		<property name="grid" type="bool" value="1" />
 		<property name="frame" type="bool" value="0" />
+	</chart>
+	<chart id="20" name="" title="HrPw" >
+		<property name="title" type="QString" value="HrPw" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="shadeZones" type="int" value="0" />
+		<property name="joinLine" type="int" value="0" />
+		<property name="fullplot" type="int" value="0" />
 	</chart>
 	<chart id="13" name="" title="Edit" >
 		<property name="title" type="QString" value="Edit" />
