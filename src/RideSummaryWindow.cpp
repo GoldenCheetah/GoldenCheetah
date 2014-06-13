@@ -78,10 +78,6 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     rideSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     rideSummary->setAcceptDrops(false);
 
-    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-
     vlayout->addWidget(rideSummary);
 
     if (ridesummary) {
@@ -126,6 +122,15 @@ void
 RideSummaryWindow::configChanged()
 {
     setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+
+    QFont defaultFont;
+    defaultFont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
+    defaultFont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
+
+    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+2);
+    rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+
+
     force = true;
     refresh();
     force = false;
