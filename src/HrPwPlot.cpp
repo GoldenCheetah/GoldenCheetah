@@ -86,11 +86,8 @@ HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
 
     // Grid
     grid = new QwtPlotGrid();
-    grid->enableX(false);
-    QPen gridPen;
-    gridPen.setStyle(Qt::DotLine);
-    gridPen.setColor(GColor(CPLOTGRID));
-    grid->setPen(gridPen);
+    grid->enableX(true);
+    grid->enableY(true);
     grid->attach(this);
 
 
@@ -123,11 +120,28 @@ HrPwPlot::configChanged()
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    setPalette(palette);
 
+    // tick draw
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->setTickLength(QwtScaleDiv::MinorTick, 0);
+    setAxisScaleDraw(QwtPlot::xBottom, sd);
     axisWidget(QwtPlot::xBottom)->setPalette(palette);
+
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(QwtScaleDraw::Ticks, false);
+    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    setAxisScaleDraw(QwtPlot::yLeft, sd);
     axisWidget(QwtPlot::yLeft)->setPalette(palette);
+
+    QPen gridPen;
+    gridPen.setColor(GColor(CPLOTGRID));
+    grid->setPen(gridPen);
 }
 
 void
