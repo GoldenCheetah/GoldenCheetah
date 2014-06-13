@@ -47,7 +47,7 @@
 #include <math.h> // for isinf() isnan()
 
 LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) : 
-    bg(NULL), parent(parent), context(context), highlighter(NULL), first(first)
+    bg(NULL), parent(parent), context(context), highlighter(NULL), first(first), isolation(false)
 {
     // don't do this ..
     setAutoReplot(false);
@@ -120,6 +120,8 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) :
     picker->setEnabled(true);
     _canvasPicker = new LTMCanvasPicker(this);
 
+    curveColors = new CurveColors(this);
+
     settings = NULL;
     cogganPMC = skibaPMC = NULL; // cache when replotting a PMC
 
@@ -129,7 +131,6 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) :
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), this, SLOT(pointClicked(QwtPlotCurve*, int)));
-
 }
 
 LTMPlot::~LTMPlot()
@@ -151,9 +152,18 @@ LTMPlot::configUpdate()
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
 
+    axesObject.clear();
+    axesId.clear();
     foreach (QwtAxisId x, supportedAxes) {
         axisWidget(x)->setPalette(palette);
         axisWidget(x)->setPalette(palette);
+
+        // keep track
+        axisWidget(x)->removeEventFilter(this);
+        axisWidget(x)->installEventFilter(this);
+        axesObject << axisWidget(x);
+        axesId << x;
+
     }
     axisWidget(QwtPlot::xBottom)->setPalette(palette);
     QwtLegend *l = static_cast<QwtLegend *>(this->legend());
@@ -163,6 +173,7 @@ LTMPlot::configUpdate()
             w->setPalette(palette);
         }
     }
+    curveColors->saveState();
     updateLegend();
 }
 
@@ -269,6 +280,8 @@ LTMPlot::setData(LTMSettings *set)
         enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
+    axesObject.clear();
+    axesId.clear();
 
     // reset all min/max Y values
     for (int i=0; i<10; i++) minY[i]=0, maxY[i]=0;
@@ -1212,6 +1225,8 @@ LTMPlot::setCompareData(LTMSettings *set)
         enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
+    axesObject.clear();
+    axesId.clear();
 
     // reset all min/max Y values
     for (int i=0; i<10; i++) minY[i]=0, maxY[i]=0;
@@ -2632,10 +2647,55 @@ LTMPlot::chooseYAxis(QString units)
         setAxisVisible(chosen, true);
         axes.insert(units, chosen);
         return chosen;
+
     } else {
         // eek!
         return QwtAxis::yLeft; // just re-use the current yLeft axis
     }
+}
+
+bool
+LTMPlot::eventFilter(QObject *obj, QEvent *event)
+{
+    // is it for other objects ?
+    if (axesObject.contains(obj)) {
+
+        QwtAxisId id = axesId.at(axesObject.indexOf(obj));
+
+        // this is an axes widget
+        //qDebug()<<this<<"event on="<<id<< static_cast<QwtScaleWidget*>(obj)->title().text() <<"event="<<event->type();
+
+        // isolate / restore on mouse enter leave
+        if (!isolation && event->type() == QEvent::Enter) {
+
+            // isolate curve on hover
+            curveColors->isolateAxis(id);
+            replot();
+
+        } else if (!isolation && event->type() == QEvent::Leave) {
+
+            // return to normal when leave
+            curveColors->restoreState();
+            replot();
+
+        } else if (event->type() == QEvent::MouseButtonRelease) {
+
+            // click on any axis to toggle isolation
+            // if isolation is on, just turns it off
+            // if isolation is off, turns it on for the axis clicked
+            if (isolation) {
+                isolation = false;
+                curveColors->restoreState();
+                replot();
+            } else {
+                isolation = true;
+                curveColors->isolateAxis(id, true); // with scale adjust
+                replot();
+            }
+        }
+    }
+
+    return false;
 }
 
 int
