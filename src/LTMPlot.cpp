@@ -2981,7 +2981,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                 mrk->attach(this);
                 mrk->setLineStyle(QwtPlotMarker::VLine);
                 mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                mrk->setLinePen(QPen(color, 0, Qt::DashDotLine));
+                mrk->setLinePen(QPen(color, 0, Qt::DashLine));
                 mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday, 0.0);
 
                 if (first) {
@@ -3003,13 +3003,13 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
                     mrk->attach(this);
                     mrk->setLineStyle(QwtPlotMarker::VLine);
                     mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                    mrk->setLinePen(QPen(color, 0, Qt::DashDotLine));
+                    mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
                     mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
 
                     if (first) {
                         QwtText text(event.name);
                         text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                        text.setColor(color);
+                        text.setColor(Qt::red);
                         mrk->setLabel(text);
                     }
 
