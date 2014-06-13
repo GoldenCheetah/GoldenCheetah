@@ -106,6 +106,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     }
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
+    connect(context->athlete->metricDB, SIGNAL(modelProgress(int,int)), this, SLOT(modelProgress(int,int)));
 
     setChartLayout(vlayout);
     configChanged(); // set colors
@@ -157,6 +158,24 @@ RideSummaryWindow::setFilter(QStringList list)
     refresh();
 }
 #endif
+
+void 
+RideSummaryWindow::modelProgress(int year, int month)
+{
+    // ignore if not visible!
+    if (!amVisible()) return;
+
+    QString string;
+
+    if (!year && !month) {
+        string = "<h3>Model</h3>";
+    } else {
+        string = QString("<h3>Modeling<br>%1 %2 </h3>").arg(QDate::shortMonthName(month)).arg(year);
+    }
+    rideSummary->page()->mainFrame()->evaluateJavaScript(
+        QString("var div = document.getElementById(\"modhead\"); div.innerHTML = '%1'; ").arg(string));;
+
+}
 
 void
 RideSummaryWindow::compareChanged()
@@ -572,10 +591,10 @@ RideSummaryWindow::htmlSummary()
     // MODEL 
     // lets get a table going
     summary += "<td align=\"center\" valign=\"top\" width=\"%1%%\"><table>"
-        "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
+        "<tr><td align=\"center\" colspan=2><div id=\"modhead\">%2</div></td></tr>";
 
     summary = summary.arg(90 / columnNames.count()+1);
-    summary = summary.arg(tr("Model"));
+    summary = summary.arg(tr("<h3>Model</h3>"));
 
     // W;
     summary += QString("<tr><td>%1:</td><td align=\"right\">%2 kJ</td></tr>")

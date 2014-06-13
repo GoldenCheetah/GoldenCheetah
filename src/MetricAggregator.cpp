@@ -547,6 +547,9 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
         QDate firstOfMonth = QDate(year, month, 01);
         QDate lastOfMonth = firstOfMonth.addMonths(1).addDays(-1);
 
+        // let others know where we got to...
+        emit modelProgress(year, month);
+
         // months is a rolling 3 months sets of bests
         QVector<float> wpk; // for getting the wpk values
         months << RideFileCache::meanMaxPowerFor(context, wpk, firstOfMonth, lastOfMonth);
@@ -655,4 +658,5 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
 #if (!defined Q_OS_MAC) || (defined QT_NOBUG39038) || (QT_VERSION < 0x050300) // QTBUG 39038 !!!
     if (!bg) delete bar;
 #endif
+    emit modelProgress(0, 0); // all done
 }

@@ -62,6 +62,7 @@ class MetricAggregator : public QObject
 
     signals:
         void dataChanged(); // when metricDB table changed
+        void modelProgress(int, int); // let others know when we're refreshing the model estimates
 
     public slots:
         void update();
