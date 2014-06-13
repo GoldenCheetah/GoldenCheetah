@@ -383,12 +383,9 @@ CPPlot::plotModel()
                     cpw->ftpValue->setText(QString(tr("%1 w")).arg(pdModel->FTP(), 0, 'f', 0));
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
-                    if (appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() > 0.0) {
-                       int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
-                       cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
-                    } else {
-                        cpw->ftpRank->setText(QString(tr("No Athlet Weight")));
-                    }
+                    int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
+                    cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+
                 } else {
                     cpw->ftpValue->setText(tr("n/a"));
                     cpw->ftpRank->setText(tr("n/a"));
@@ -399,12 +396,9 @@ CPPlot::plotModel()
                     cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
 
                     // Reference 22.5W/kg -> untrained 8W/kg
-                    if (appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() > 0.0) {
-                      int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
-                      cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
-                    } else {
-                      cpw->pmaxRank->setText(QString(tr("No Athlet Weight")));
-                    }
+                    int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
+                    cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+
                 } else  {
                     cpw->pmaxValue->setText(tr("n/a"));
                     cpw->pmaxRank->setText(tr("n/a"));
