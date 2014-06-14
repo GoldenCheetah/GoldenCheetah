@@ -483,7 +483,7 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
 
     // what dates have any power data ?
     QSqlQuery query(dbaccess->connection());
-    bool rc = query.exec("SELECT ride_date FROM metrics WHERE ZData LIKE '%P%' ORDER BY ride_date;");
+    bool rc = query.exec("SELECT ride_date FROM metrics WHERE present LIKE '%P%' ORDER BY ride_date;");
     bool first = true;
     while (rc && query.next()) {
         if (first) {
