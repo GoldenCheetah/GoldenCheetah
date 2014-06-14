@@ -211,6 +211,14 @@ RideNavigator::resetView()
     active = true;
 
     QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
+    int widco = _widths.split("|", QString::SkipEmptyParts).count();
+
+    // something is wrong with the config ? reset 
+    if (widco != cols.count() || widco <= 1) {
+        _columns = QString(tr("*|Workout Code|TSS|Date|"));
+        _widths = QString("0|80|50|50|");
+        cols = _columns.split("|", QString::SkipEmptyParts);
+    }
 
     // to account for translations
     QMap <QString, QString> internalNameMap;
