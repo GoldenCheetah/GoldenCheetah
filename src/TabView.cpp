@@ -155,7 +155,7 @@ TabView::ourStyleSheet()
     return QString::fromUtf8("QScrollBar { background-color: %1; }"
 #ifndef Q_OS_MAC
            "QTabWidget { background: %1; }"
-           "QTabWidget::pane { border: 1px solid darkGray; } "
+           "QTabWidget::pane { border: 1px solid %3; } "
            "QTextEdit { background: %2; }"
 #endif
            "QTreeView { background: %1; }"
@@ -216,7 +216,12 @@ TabView::ourStyleSheet()
            "}"
            "QTableWidget::item:hover { color: black; background: lightGray; }"
            "QTreeView::item:hover { color: black; background: lightGray; }"
-           "").arg(GColor(CPLOTBACKGROUND).name()).arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name());
+           "").arg(GColor(CPLOTBACKGROUND).name())
+#ifndef Q_OS_MAC
+            .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
+            .arg(GColor(CPLOTGRID).name())
+#endif
+            ;
 }
 
 void
