@@ -37,8 +37,8 @@ class AverageWPK : public RideMetric {
     void initialize () {
         setName(tr("Watts Per Kilogram"));
         setType(RideMetric::Average);
-        setMetricUnits(tr("wpk"));
-        setImperialUnits(tr("wpk"));
+        setMetricUnits(tr("w/kg"));
+        setImperialUnits(tr("w/kg"));
         setPrecision(2);
     }
 
@@ -73,8 +73,8 @@ class PeakWPK : public RideMetric {
     PeakWPK() : wpk(0.0), secs(0.0), weight(0.0)
     {
         setType(RideMetric::Peak);
-        setMetricUnits(tr("wpk"));
-        setImperialUnits(tr("wpk"));
+        setMetricUnits(tr("w/kg"));
+        setImperialUnits(tr("w/kg"));
         setPrecision(2);
     }
     void setSecs(double secs) { this->secs=secs; }

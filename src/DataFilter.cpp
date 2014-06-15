@@ -51,6 +51,7 @@ static RideFile::SeriesType nameToSeries(QString name)
     if (!name.compare("xPower", Qt::CaseInsensitive)) return RideFile::xPower;
     if (!name.compare("VAM", Qt::CaseInsensitive)) return RideFile::vam;
     if (!name.compare("wpk", Qt::CaseInsensitive)) return RideFile::wattsKg;
+    if (!name.compare("lrbalance", Qt::CaseInsensitive)) return RideFile::lrbalance;
 
     return RideFile::none;
 
