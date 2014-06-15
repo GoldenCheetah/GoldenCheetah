@@ -51,6 +51,12 @@ SpecialFields::SpecialFields()
     namesmap.insert("Fat Ratio", tr("Fat Ratio"));                   // measure
     namesmap.insert("Height", tr("Height"));                         // measure
     namesmap.insert("BMI", tr("BMI"));                               // measure
+    namesmap.insert("File Format", tr("File Format"));               // set by openRideFile
+    namesmap.insert("Athlete", tr("Athlete"));                       // set by openRideFile
+    namesmap.insert("Year", tr("Year"));                             // set by openRideFile
+    namesmap.insert("Month", tr("Month"));                            // set by openRideFile
+    namesmap.insert("Weekday", tr("Weekday"));                       // set by openRideFile
+
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();

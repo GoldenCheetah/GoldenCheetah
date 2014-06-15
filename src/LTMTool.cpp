@@ -1249,7 +1249,7 @@ void
 LTMTool::addCurrent()
 {
     // give the chart a name
-    if (settings->name == "") settings->name = QString("Chart %1").arg(context->athlete->presets.count()+1);
+    if (settings->name == "") settings->name = QString(tr("Chart %1")).arg(context->athlete->presets.count()+1);
 
     // add the current chart to the presets with a name using the chart title
     context->athlete->presets.append(*settings);
