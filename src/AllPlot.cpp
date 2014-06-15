@@ -2144,12 +2144,20 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         if (rideItem->ride()->wprimeData()->minY < 0) {
             int minCP = rideItem->ride()->wprimeData()->PCP();
             if (minCP)
-                warn = QString("** Minimum CP=%1 **").arg(rideItem->ride()->wprimeData()->PCP());
+                warn = QString(tr("** Minimum CP=%1 **")).arg(rideItem->ride()->wprimeData()->PCP());
             else
-                warn = QString("** Check W' is set correctly **");
+                warn = QString(tr("** Check W' is set correctly **"));
         }
 
-        QwtText text(QString("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ) %6").arg(rideItem->ride()->wprimeData()->TAU)
+        QString matchesText;  // consider Singular/Plural in Text / Zero is in most languages handled like Plural
+        if (count == 1) {
+          matchesText = tr("Tau=%1, CP=%2, W'=%3, %4 match >2kJ (%5 kJ) %6");
+        }
+        else {
+          matchesText = tr("Tau=%1, CP=%2, W'=%3, %4 matches >2kJ (%5 kJ) %6");
+        }
+
+        QwtText text(matchesText.arg(rideItem->ride()->wprimeData()->TAU)
                                                     .arg(rideItem->ride()->wprimeData()->CP)
                                                     .arg(rideItem->ride()->wprimeData()->WPRIME)
                                                     .arg(count)

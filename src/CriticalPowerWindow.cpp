@@ -405,7 +405,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     gridLayout->addWidget(ftpValue, 4, 1);
     gridLayout->addWidget(ftpRank, 4, 2);
 
-    addHelper(QString("CP Model"), helper);
+    addHelper(QString(tr("CP Model")), helper);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
