@@ -1033,7 +1033,7 @@ void MainWindow::resetWindowLayout()
 {
     QMessageBox msgBox;
     msgBox.setText(tr("You are about to reset all charts to the default setup"));
-    msgBox.setInformativeText("Do you want to continue?");
+    msgBox.setInformativeText(tr("Do you want to continue?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Warning);
