@@ -468,8 +468,15 @@ CPPlot::plotModel()
 
         heatCurve->setSamples(time, heat);
         heatCurve->setYAxis(yRight);
+        setAxisScale(yRight, 0, 100);  // fine if only heat is shown and percentage Scale will be fixed if shown
+        if (showPercent) setAxisTitle(yRight, tr("Percent of Best / Heat Rides"));
+        else setAxisTitle(yRight, tr("Heat Rides"));
         heatCurve->attach(this);
     }
+
+    setAxisVisible(yRight, showHeat || (showPercent && rideCurve));
+
+   // setAxisVisible(yRight, showHeat || showPercent);
 
     //
     // HEAT AGE
@@ -1003,12 +1010,19 @@ CPPlot::plotRide(RideItem *rideItem)
             else max = max * 1.05f;
             setAxisScale(yRight, 0, max); // always 100
 
+            // set the right titles in case both Heat and Percent of best is show
+            if (showHeat) setAxisTitle(yRight, tr("Percent of Best / Heat Rides"));
+            else setAxisTitle(yRight, tr("Percent of Best"));
+
         } else {
 
             // JUST A NORMAL CURVE
             rideCurve->setYAxis(yLeft);
             rideCurve->setSamples(timeArray.data() + 1, rideCache->meanMaxArray(rideSeries).constData() + 1,
                                   maxNonZero > 0 ? maxNonZero-1 : 0);
+
+            // Set the YAxis Title if Heat is active
+            if (showHeat) setAxisTitle(yRight, tr("Heat Rides"));
         }
     }
 
@@ -1129,7 +1143,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             int index = xvalue * 60;
             if (index >= 0 && bestsCache && getBests().count() > index) {
                 QDate date = getBestDates()[index];
-                dateStr = date.toString("\nddd, dd MMM yyyy");
+                dateStr = date.toString(tr("\nddd, dd MMM yyyy"));
             }
         }
 
@@ -1138,6 +1152,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
             || (curve == rideCurve && showPercent)) units = QString("%");
         else units = RideFile::unitName(rideSeries, context);
+
+        // no units for Heat Curve
+        if (curve == heatCurve) units = QString(tr("Rides"));
 
         // output the tooltip
         text = QString("%1\n%3 %4%5")
