@@ -416,6 +416,14 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts(pow(-0.0255078477814972*V, 3) + pow(1.42902141301828*V,2) + (10.2050166192824*V) - 6.48951048951042);
         }
         break;
+    case 42:
+        {
+        double V = rtData.getSpeed();
+        // Power curve fit from powercurvesensor
+        //     f(x) = 4.31746 * x -2.59259e-002 * x^2 +  9.41799e-003 * x^3
+        rtData.setWatts(4.31746 * V - 2.59259e-002 * pow(V, 2) + 9.41799e-003 * pow(V, 3));
+        }
+        break;
     }
 }
 
