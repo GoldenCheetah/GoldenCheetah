@@ -27,6 +27,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
+#include "TabView.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -53,17 +54,11 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     // setup the tabs widget
     tabs = new QTabWidget(this);
     tabs->setMovable(true);
-#ifdef WIN32
-    tabs->setStyleSheet("QTabWidget::pane { "
-		    " margin: 0px,0px,0px,0px;"
-		    " border: 0px;"
-		    " border-top: 0px; }");
-#endif
 
     // better styling on Linux with fusion controls
-#if (defined Q_OS_LINUX) && (QT_VERSION >= 0x050000)
-    QStyle *fusion = QStyleFactory::create("fusion");
-    setStyle(fusion);
+#ifndef Q_OS_MAC
+    QStyle *fusion = QStyleFactory::create(OS_STYLE);
+    tabs->setStyle(fusion);
 #endif
     mainLayout->addWidget(tabs);
 
@@ -282,6 +277,9 @@ RideMetadata::configUpdate()
 
     // when constructing we have not registered
     // the properties nor selected a ride
+#ifndef Q_OS_MAC
+    tabs->setStyleSheet(TabView::ourStyleSheet());
+#endif
 
     metadataChanged(); // re-read the values!
 }
