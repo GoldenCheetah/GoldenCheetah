@@ -152,11 +152,12 @@ TabView::setSidebar(QWidget *sidebar)
 QString
 TabView::ourStyleSheet()
 {
-    return QString::fromUtf8("QScrollBar { background-color: %1; }"
+    return QString::fromUtf8("QScrollBar { background-color: %1; border: 0px; }"
 #ifndef Q_OS_MAC
            "QTabWidget { background: %1; }"
-           "QTabWidget::pane { border: 1px solid %3; } "
-           "QTextEdit { background: %2; }"
+           "QTabWidget::pane { border: 1px solid %2; } "
+           "QTextEdit { background: %1; }"
+           "QTextEdit#metadata { background: %3; }"
 #endif
            "QTreeView { background: %1; }"
            "QScrollBar:vertical {"
@@ -218,8 +219,8 @@ TabView::ourStyleSheet()
            "QTreeView::item:hover { color: black; background: lightGray; }"
            "").arg(GColor(CPLOTBACKGROUND).name())
 #ifndef Q_OS_MAC
-            .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
             .arg(GColor(CPLOTGRID).name())
+            .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
 #endif
             ;
 }

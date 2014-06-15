@@ -462,6 +462,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_TEXTBOX : // textbox
         widget = new QTextEdit(this);
 
+        // use special style sheet ..
+        dynamic_cast<QTextEdit*>(widget)->setObjectName("metadata"); 
+
         // rich text hangs 'fontd' for some users
         dynamic_cast<QTextEdit*>(widget)->setAcceptRichText(false); 
         dynamic_cast<QTextEdit*>(widget)->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); 
