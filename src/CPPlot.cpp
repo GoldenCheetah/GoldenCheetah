@@ -384,9 +384,13 @@ CPPlot::plotModel()
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
                     int _ftpLevel = 15 * (pdModel->FTP() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 2.5) / (6.25-2.5) ;
-                    cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+                    if (_ftpLevel > 0 && _ftpLevel < 16) // check bounds
+                        cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+                    else
+                        cpw->ftpRank->setText(tr("n/a"));
 
                 } else {
+
                     cpw->ftpValue->setText(tr("n/a"));
                     cpw->ftpRank->setText(tr("n/a"));
                 }
@@ -397,7 +401,11 @@ CPPlot::plotModel()
 
                     // Reference 22.5W/kg -> untrained 8W/kg
                     int _pMaxLevel = 15 * (pdModel->PMax() / appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() - 8) / (23-8) ;
-                    cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                    if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
+                        cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                    else
+                        cpw->pmaxRank->setText(tr("n/a"));
+
                 } else  {
                     cpw->pmaxValue->setText(tr("n/a"));
                     cpw->pmaxRank->setText(tr("n/a"));
@@ -406,7 +414,7 @@ CPPlot::plotModel()
             } else {
 
                 //WPrime
-                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ/kg")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 2));
+                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 J/kg")).arg(pdModel->WPrime(), 0, 'f', 0));
                 else cpw->wprimeValue->setText(tr("n/a"));
 
                 //CP
@@ -418,7 +426,10 @@ CPPlot::plotModel()
 
                     // Reference 6.25W/kg -> untrained 2.5W/kg
                     int _ftpLevel = 15 * (pdModel->FTP() - 2.5) / (6.25-2.5) ;
-                    cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+                    if (_ftpLevel > 0 && _ftpLevel < 16) // check bounds
+                        cpw->ftpRank->setText(QString("%1").arg(_ftpLevel));
+                    else
+                        cpw->ftpRank->setText(tr("n/a"));
 
                 } else {
                     cpw->ftpValue->setText(tr("n/a"));
@@ -431,7 +442,10 @@ CPPlot::plotModel()
 
                     // Reference 22.5W/kg -> untrained 8W/kg
                     int _pMaxLevel = 15 * (pdModel->PMax() - 8) / (23-8) ;
-                    cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                    if (_pMaxLevel > 0 && _pMaxLevel < 16) // check bounds
+                        cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
+                    else
+                        cpw->pmaxRank->setText(tr("n/a"));
                 } else  {
                     cpw->pmaxValue->setText(tr("n/a"));
                     cpw->pmaxRank->setText(tr("n/a"));
