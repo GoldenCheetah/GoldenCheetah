@@ -115,8 +115,6 @@ TreeMapWindow::TreeMapWindow(Context *context) :
         add->setText(0, title.toPlainText()); // long name
         add->setText(1, factory.metricName(i)); // symbol (hidden)
 
-        // sort by title
-        add->sortChildren(0, Qt::DescendingOrder);
         // by default use workout_time
         if (factory.metricName(i) == "workout_time") allMetrics->child(i)->setSelected(true);
     }
@@ -227,8 +225,9 @@ TreeMapWindow::refresh()
             settings.from = myDateRange.from;
             settings.to = myDateRange.to;
         }
-        settings.field1 = field1->currentText();
-        settings.field2 = field2->currentText();
+        SpecialFields sp;
+        settings.field1 = sp.internalName(field1->currentText());
+        settings.field2 = sp.internalName(field2->currentText());
         settings.data = &results;
 
         // get the data
@@ -267,8 +266,13 @@ TreeMapWindow::cellClicked(QString f1, QString f2)
     // create a list of activities in this cell
     int count = 0;
     foreach(SummaryMetrics x, results) {
-        if (x.getText(settings.field1, tr("(unknown)")) == f1 &&
-            x.getText(settings.field2, tr("(unknown)")) == f2) {
+        // text may either not exists, then "unknown" or just be "" but f1, f2 don't know ""
+        QString x1 = x.getText(settings.field1, tr("(unknown)"));
+        QString x2 = x.getText(settings.field2, tr("(unknown)"));
+        if (x1 == "") x1 = tr("(unknown)");
+        if (x2 == "") x2 = tr("(unknown)");
+        // now we can compare and append
+        if (x1 == f1 && x2 == f2) {
             cell.append(x);
             count++;
         }
@@ -285,8 +289,10 @@ TreeMapWindow::cellClicked(QString f1, QString f2)
 void
 TreeMapWindow::addTextFields(QComboBox *combo)
 {
-    combo->addItem(tr("None"));
+    combo->addItem(tr("None")); // if "None" is changed to not being first any more, adjust public methods f1,f2,setf1,setf2
+    SpecialFields sp;
     foreach (FieldDefinition x, fieldDefinitions) {
-        if (x.type < 4) combo->addItem(x.name);
+        if (x.type < 4) combo->addItem(sp.displayName(x.name));
     }
 }
+

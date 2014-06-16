@@ -73,7 +73,7 @@ class TreeMap
                 delete x;
             }
             children.clear();
-            name = "(unknown)";
+            name = "tr((unknown))";
             value = 0.00;
         }
 
