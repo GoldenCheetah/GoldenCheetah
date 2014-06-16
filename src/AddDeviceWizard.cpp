@@ -1132,6 +1132,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Elite Supercrono Powermag (6)"));
     virtualPower->addItem(tr("Power - Elite Supercrono Powermag (7)"));
     virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));
+    virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));
 
     wheelSize->addItem(tr("Road/Cross (700C/622)")); // 2100mm
     wheelSize->addItem(tr("Tri/TT (650C)")); // 1960mm
