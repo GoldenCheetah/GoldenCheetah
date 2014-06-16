@@ -494,8 +494,11 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
         }
     }
 
-    // if we don't have 2 rides or more then skip this!
-    if (to == QDate()) return;
+    // if we don't have 2 rides or more then skip this but add a blank estimate
+    if (to == QDate()) {
+        context->athlete->PDEstimates << PDEstimate();
+        return;
+    }
 
     // run through each month with a rolling bests
     int year = from.year();
@@ -658,5 +661,11 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
 #if (!defined Q_OS_MAC) || (defined QT_NOBUG39038) || (QT_VERSION < 0x050300) // QTBUG 39038 !!!
     if (!bg) delete bar;
 #endif
+
+    // add a dummy entry if we have no estimates to stop constantly trying to refresh
+    if (context->athlete->PDEstimates.count() == 0) {
+        context->athlete->PDEstimates << PDEstimate();
+    }
+
     emit modelProgress(0, 0); // all done
 }
