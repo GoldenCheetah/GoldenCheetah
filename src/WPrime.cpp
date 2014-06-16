@@ -90,6 +90,7 @@ WPrime::setRide(RideFile *input)
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
     QVector<QPointF> pointsd;
+    double convert = input->context->athlete->useMetricUnits ? 1.00f : MILES_PER_KM;
 
     last=0;
     double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
@@ -112,13 +113,13 @@ WPrime::setRide(RideFile *input)
                     (t + input->recIntSecs()) < p->secs;
                     t += input->recIntSecs()) {
                     points << QPointF(t-offset, 0);
-                    pointsd << QPointF(t-offset, 0);
+                    pointsd << QPointF(t-offset, p->km * convert); // not zero !!!! this is a map from secs -> km not a series
                 }
 
             // lets not go backwards -- or two sampls at the same time
             if ((lp && p->secs > lp->secs) || !lp) {
                 points << QPointF(p->secs - offset, p->watts);
-                pointsd << QPointF(p->secs - offset, input->context->athlete->useMetricUnits ? p->km : p->km * MILES_PER_KM);
+                pointsd << QPointF(p->secs - offset, p->km * convert);
             }
 
             // update state
@@ -137,7 +138,7 @@ WPrime::setRide(RideFile *input)
                 first = false;
             }
             points << QPointF(p->secs - offset, p->watts);
-            pointsd << QPointF(p->secs - offset, input->context->athlete->useMetricUnits ? p->km : p->km * MILES_PER_KM);
+            pointsd << QPointF(p->secs - offset, p->km * convert);
             last = p->secs - offset;
         }
     }
