@@ -34,6 +34,7 @@
 #include <QFileDialog>
 #include <QtGui>
 #include <QTableWidget>
+#include <QButtonGroup>
 #include <QStackedWidget>
 #include <QTextEdit>
 #include <QCheckBox>
@@ -181,6 +182,7 @@ class EditMetricDetailDialog : public QDialog
         MetricDetail *metricDetail;
 
         QRadioButton *chooseMetric, *chooseBest, *chooseEstimate;
+        QButtonGroup *group;
         QWidget *bestWidget, *estimateWidget;
         QStackedWidget *typeStack;
 

@@ -1336,11 +1336,34 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     // choose the type
     chooseMetric = new QRadioButton(tr("Metric"), this);
-    chooseMetric->setChecked(metricDetail->type != 5 && metricDetail->type != 6);
     chooseBest = new QRadioButton(tr("Best"), this);
-    chooseBest->setChecked(metricDetail->type == 5);
     chooseEstimate = new QRadioButton(tr("Estimate"), this);
-    chooseEstimate->setChecked(metricDetail->type == 6);
+
+    // put them into a button group because we
+    // also have radio buttons for watts per kilo / absolute
+    group = new QButtonGroup(this);
+    group->addButton(chooseMetric);
+    group->addButton(chooseBest);
+    group->addButton(chooseEstimate);
+
+    // uncheck them all
+    chooseMetric->setChecked(false);
+    chooseBest->setChecked(false);
+    chooseEstimate->setChecked(false);
+
+    // which one ?
+    switch (metricDetail->type) {
+    default:
+        chooseMetric->setChecked(true);
+        break;
+    case 5:
+        chooseBest->setChecked(true);
+        break;
+    case 6:
+        chooseEstimate->setChecked(true);
+        break;
+    }
+
     QVBoxLayout *radioButtons = new QVBoxLayout;
     radioButtons->addStretch();
     radioButtons->addWidget(chooseMetric);
@@ -1667,6 +1690,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     // when stuff changes rebuild name
     connect(chooseBest, SIGNAL(toggled(bool)), this, SLOT(bestName()));
+    connect(chooseEstimate, SIGNAL(toggled(bool)), this, SLOT(estimateName()));
+    connect(chooseMetric, SIGNAL(toggled(bool)), this, SLOT(metricSelected()));
     connect(duration, SIGNAL(valueChanged(double)), this, SLOT(bestName()));
     connect(durationUnits, SIGNAL(currentIndexChanged(int)), this, SLOT(bestName()));
     connect(dataSeries, SIGNAL(currentIndexChanged(int)), this, SLOT(bestName()));
