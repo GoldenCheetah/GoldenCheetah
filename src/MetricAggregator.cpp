@@ -624,7 +624,10 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
                 add.FTP = model->hasFTP() ? model->FTP() : 0;
 
                 if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
-                context->athlete->PDEstimates << add;
+
+                // so long as the model derived values are sensible ...
+                if (add.WPrime > 10000 && add.CP > 100 && add.PMax > 100 && add.FTP > 100)
+                    context->athlete->PDEstimates << add;
 
                 //qDebug()<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
 
@@ -642,7 +645,9 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
                 add.FTP = model->hasFTP() ? model->FTP() : 0;
                 if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
 
-                context->athlete->PDEstimates << add;
+                // so long as the model derived values are sensible ...
+                if (add.WPrime > 100.0f && add.CP > 1.0f && add.PMax > 1.0f && add.FTP > 1.0f)
+                    context->athlete->PDEstimates << add;
 
                 //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
             }
