@@ -23,6 +23,7 @@
 #include <QWebFrame>
 
 #include "DBAccess.h"
+#include "RideMetric.h"
 #include "MetricAggregator.h"
 #include <QtSql>
 #include <qwt_plot_curve.h>
@@ -220,11 +221,13 @@ QString GcCrashDialog::versionHTML()
     QString wfapi = QString("none");
     #endif
 
+    const RideMetricFactory &factory = RideMetricFactory::instance();
     QString gc_version = tr(
             "<p>Build date: %1 %2"
             "<br>Build id: %3"
             "<br>Version: %4"
             "<br>DB Schema: %5"
+            "<br>Metrics: %7"
             "<br>OS: %6"
             "<br>")
             .arg(__DATE__)
@@ -236,7 +239,8 @@ QString GcCrashDialog::versionHTML()
             .arg("(developer build)")
 #endif
             .arg(schemaVersion)
-            .arg(os);
+            .arg(os)
+            .arg(factory.metricCount());
 
     QString lib_version = tr(
             "<table>"

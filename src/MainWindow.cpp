@@ -156,7 +156,6 @@ MainWindow::MainWindow(const QDir &home)
     /*----------------------------------------------------------------------
      *  GUI setup
      *--------------------------------------------------------------------*/
-
     // need to restore geometry before setUnifiedToolBar.. on Mac
     QRect screenSize = desktop->availableGeometry();
     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
