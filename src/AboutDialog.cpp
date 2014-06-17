@@ -61,6 +61,7 @@ AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
     text->setText(
               tr(
                 "<center>"
+                "<img src=\":images/gc.png\" height=80>"
                 "<h2>GoldenCheetah</h2>"
                 "Cycling Power Analysis Software<br>for Linux, Mac, and Windows"
                 "<p>GoldenCheetah is licensed under the<br>"
