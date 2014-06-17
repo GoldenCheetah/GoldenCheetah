@@ -622,6 +622,8 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
                 add.CP = model->hasCP() ? model->CP() : 0;
                 add.PMax = model->hasPMax() ? model->PMax() : 0;
                 add.FTP = model->hasFTP() ? model->FTP() : 0;
+
+                if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
                 context->athlete->PDEstimates << add;
 
                 //qDebug()<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
@@ -638,6 +640,8 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
                 add.CP = model->hasCP() ? model->CP() : 0;
                 add.PMax = model->hasPMax() ? model->PMax() : 0;
                 add.FTP = model->hasFTP() ? model->FTP() : 0;
+                if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
+
                 context->athlete->PDEstimates << add;
 
                 //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
