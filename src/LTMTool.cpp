@@ -1273,6 +1273,7 @@ EditMetricDetailDialog::modelChanged()
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(2)->setEnabled(models[currentIndex]->hasFTP());
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(3)->setEnabled(models[currentIndex]->hasPMax());
     qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(4)->setEnabled(true);
+    qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(5)->setEnabled(true);
 
     // switch to other estimate if wanted estimate is not selected
     if (ce < 0 || !qobject_cast<QStandardItemModel *>(estimateSelect->model())->item(ce)->isEnabled())
@@ -1316,6 +1317,7 @@ EditMetricDetailDialog::estimateName()
                                                   .arg(estimateDurationUnits->currentText());
             }
             break;
+        case 5 : name = "Endurance Index"; break;
     }
 
     // now the model
@@ -1443,6 +1445,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     estimateSelect->addItem("FTP");
     estimateSelect->addItem("p-Max");
     estimateSelect->addItem("Best Power");
+    estimateSelect->addItem("Endurance Index");
 
     int n=0;
     modelSelect->setCurrentIndex(0); // default to 2parm model
@@ -1868,7 +1871,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->wpk = wpk->isChecked();
     metricDetail->series = seriesList.at(dataSeries->currentIndex());
     metricDetail->model = models[modelSelect->currentIndex()]->code();
-    metricDetail->estimate = estimateSelect->currentIndex(); // 0 - 3
+    metricDetail->estimate = estimateSelect->currentIndex(); // 0 - 5
     metricDetail->smooth = curveSmooth->isChecked();
     metricDetail->trend = curveTrend->isChecked();
     metricDetail->topN = showBest->value();

@@ -2479,6 +2479,10 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                 }
             }
             break;
+
+        case ESTIMATE_EI :
+            value = est.EI;
+            break;
         }
 
         if (n <= maxdays && value > 0) {

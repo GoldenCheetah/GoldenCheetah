@@ -62,6 +62,7 @@ class RideMetric;
 #define ESTIMATE_FTP     2
 #define ESTIMATE_PMAX    3
 #define ESTIMATE_BEST    4
+#define ESTIMATE_EI      5
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {
