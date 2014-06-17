@@ -1065,16 +1065,16 @@ RideSummaryWindow::getPDEstimates()
             if (ridesummary && (!myRideItem || (myRideItem->dateTime.date() < est.from || myRideItem->dateTime.date() > est.to))) continue;
 
             // set low
-            if (est.WPrime > 10000 && (!lowWPrime || est.WPrime < lowWPrime)) lowWPrime = est.WPrime;
-            if (est.CP > 100 && (!lowCP || est.CP < lowCP)) lowCP = est.CP;
-            if (est.FTP > 100 && (!lowFTP || est.FTP < lowFTP)) lowFTP = est.FTP;
-            if (est.PMax > 100 && (!lowPMax || est.PMax < lowPMax)) lowPMax = est.PMax;
+            if (!lowWPrime || est.WPrime < lowWPrime) lowWPrime = est.WPrime;
+            if (!lowCP || est.CP < lowCP) lowCP = est.CP;
+            if (!lowFTP || est.FTP < lowFTP) lowFTP = est.FTP;
+            if (!lowPMax || est.PMax < lowPMax) lowPMax = est.PMax;
 
             // set high
-            if (est.WPrime > 10000 && (!highWPrime || est.WPrime > highWPrime)) highWPrime = est.WPrime;
-            if (est.CP > 100 && (!highCP || est.CP > highCP)) highCP = est.CP;
-            if (est.FTP > 100 && (!highFTP || est.FTP > highFTP)) highFTP = est.FTP;
-            if (est.PMax > 100 && (!highPMax || est.PMax > highPMax)) highPMax = est.PMax;
+            if (!highWPrime || est.WPrime > highWPrime) highWPrime = est.WPrime;
+            if (!highCP || est.CP > highCP) highCP = est.CP;
+            if (!highFTP || est.FTP > highFTP) highFTP = est.FTP;
+            if (!highPMax || est.PMax > highPMax) highPMax = est.PMax;
         }
 
         // ok, so lets set the string to either
