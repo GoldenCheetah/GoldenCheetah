@@ -287,6 +287,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpTitle, *cpValue, *cpRank;
         QLabel *ftpTitle, *ftpValue, *ftpRank;
         QLabel *pmaxTitle, *pmaxValue, *pmaxRank;
+        QLabel *eiTitle, *eiValue;
 
         void addSeries();
         Seasons *seasons;

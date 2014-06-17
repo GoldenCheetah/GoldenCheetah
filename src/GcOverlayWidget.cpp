@@ -38,7 +38,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
-    setMinimumSize(200,200);
+    setMinimumSize(250,200);
     setFocus();
     mode = none;
     initial = true;

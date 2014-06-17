@@ -353,6 +353,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     ftpTitle = new QLabel(tr("FTP"), this);
     ftpValue = new QLabel(tr("0 w"), this);
     ftpRank = new QLabel(tr("n/a"), this);
+    eiTitle = new QLabel(tr("Endurance Index"), this);
+    eiValue = new QLabel(tr("n/a"), this);
 
     // autofill
     titleBlank->setAutoFillBackground(true);
@@ -370,6 +372,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     ftpTitle->setAutoFillBackground(true);
     ftpValue->setAutoFillBackground(true);
     ftpRank->setAutoFillBackground(true);
+    eiTitle->setAutoFillBackground(true);
+    eiValue->setAutoFillBackground(true);
 
     // align all centered
     titleBlank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
@@ -387,6 +391,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     ftpTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     ftpValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     ftpRank->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    eiTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    eiValue->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
     // add to grid
     gridLayout->addWidget(titleBlank, 0, 0);
@@ -404,6 +410,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     gridLayout->addWidget(ftpTitle, 4, 0);
     gridLayout->addWidget(ftpValue, 4, 1);
     gridLayout->addWidget(ftpRank, 4, 2);
+    gridLayout->addWidget(eiTitle, 5, 0);
+    gridLayout->addWidget(eiValue, 5, 1);
 
     addHelper(QString(tr("CP Model")), helper);
 
@@ -512,6 +520,8 @@ CriticalPowerWindow::configChanged()
     ftpTitle->setFont(font);
     ftpValue->setFont(font);
     ftpRank->setFont(font);
+    eiTitle->setFont(font);
+    eiValue->setFont(font);
 
     helper->setPalette(palette);
     titleBlank->setPalette(palette);
@@ -529,6 +539,8 @@ CriticalPowerWindow::configChanged()
     ftpTitle->setPalette(palette);
     ftpValue->setPalette(whitepalette);
     ftpRank->setPalette(whitepalette);
+    eiTitle->setPalette(palette);
+    eiValue->setPalette(whitepalette);
 
     QPen gridPen(GColor(CPLOTGRID));
     grid->setPen(gridPen);

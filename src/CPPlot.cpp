@@ -411,6 +411,11 @@ CPPlot::plotModel()
                     cpw->pmaxRank->setText(tr("n/a"));
                 }
 
+                // Endurance Index
+                if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
+                    cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+                }
+
             } else {
 
                 //WPrime
@@ -450,6 +455,12 @@ CPPlot::plotModel()
                     cpw->pmaxValue->setText(tr("n/a"));
                     cpw->pmaxRank->setText(tr("n/a"));
                 }
+
+                // Endurance Index
+                if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
+                    cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+                }
+
             }
         }
     }
