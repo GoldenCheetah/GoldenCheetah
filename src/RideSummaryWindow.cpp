@@ -615,11 +615,13 @@ RideSummaryWindow::htmlSummary()
     summary += "<tr style=\"height: 3px;\"></tr>";
 
     // CP;
-    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 watts</td></tr>")
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 %3</td></tr>")
             .arg(tr("CP"))
-            .arg(CPString);
-    summary += QString("<tr><td></td><td align=\"right\">%1 w/kg</td></tr>")
-            .arg(CPStringWPK);
+            .arg(CPString)
+            .arg(tr("watts"));
+    summary += QString("<tr><td></td><td align=\"right\">%1 %2</td></tr>")
+            .arg(CPStringWPK)
+            .arg(tr("w/kg"));
 
     // spacer
     summary += "<tr style=\"height: 3px;\"></tr>";
@@ -635,11 +637,13 @@ RideSummaryWindow::htmlSummary()
 #endif
 
     // Pmax;
-    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 watts</td></tr>")
+    summary += QString("<tr><td>%1:</td><td align=\"right\">%2 %3</td></tr>")
             .arg(tr("P-max"))
-            .arg(PMaxString);
-    summary += QString("<tr><td></td><td align=\"right\">%1 w/kg</td></tr>")
-            .arg(PMaxStringWPK);
+            .arg(PMaxString)
+            .arg(tr("watts"));
+    summary += QString("<tr><td></td><td align=\"right\">%1 %2</td></tr>")
+            .arg(PMaxStringWPK)
+            .arg(tr("w/kg"));
 
     summary += "</table></td>";
     summary += "</tr></table>";
@@ -832,7 +836,7 @@ RideSummaryWindow::htmlSummary()
                     RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
                 if (firstRow) {
                     summary += "<tr>";
-                    summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";
+                    summary += "<td align=\"center\" valign=\"bottom\">"+tr("Interval Name")+"</td>";
                     foreach (QString symbol, intervalMetrics) {
                         RideMetricPtr m = metrics.value(symbol);
                         if (!m) continue;
@@ -978,7 +982,7 @@ RideSummaryWindow::htmlSummary()
 
             // date of ride
             summary += QString("<td align=\"center\">%1</td>")
-                       .arg(rideMetrics.getRideDate().date().toString("dd MMM yyyy"));
+                       .arg(rideMetrics.getRideDate().date().toString(tr("dd MMM yyyy")));
 
             for (j = 0; j< totalCols; ++j) {
                 QString symbol = rtotalColumn[j];
