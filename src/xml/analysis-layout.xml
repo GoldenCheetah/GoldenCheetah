@@ -1,7 +1,7 @@
 <layout name="analysis" style="0">
 	<chart id="14" name="" title="Summary" >
 		<property name="title" type="QString" value="Summary" />
-		<property name="subtitle" type="QString" value="Sunday April 17, 2011, 3:40 PM" />
+		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
@@ -146,7 +146,7 @@
 	</chart>
 	<chart id="5" name="" title="Map" >
 		<property name="title" type="QString" value="Map" />
-		<property name="subtitle" type="QString" value="Mole Street Loop" />
+		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
