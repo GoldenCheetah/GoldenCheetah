@@ -94,9 +94,10 @@
 // 73  11  May 2014 Mark Liversedge    Default color of 1,1,1 now uses CPLOTMARKER for ride color, change version to force rebuild
 // 74  20  May 2014 Mark Liversedge    Added Athlete Weight
 // 75  25  May 2014 Mark Liversedge    W' work calculation changed to only include energy above CP
-// 76  14  May 2014 Mark Liversedge    Add new 'present' field that uses Data tag data
+// 76  14  Jun 2014 Mark Liversedge    Add new 'present' field that uses Data tag data
+// 77  18  Jun 2014 Mark Liversedge    Add TSS per hour metric
 
-int DBSchemaVersion = 76;
+int DBSchemaVersion = 77;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

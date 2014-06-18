@@ -202,6 +202,50 @@ class TSS : public RideMetric {
     RideMetric *clone() const { return new TSS(*this); }
 };
 
+class TSSPerHour : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TSSPerHour)
+    double points;
+    double hours;
+
+    public:
+
+    TSSPerHour() : points(0.0), hours(0.0)
+    {
+        setSymbol("coggan_tssperhour");
+        setInternalName("TSS per hour");
+    }
+    void initialize() {
+        setName("TSS per hour");
+        setType(RideMetric::Average);
+        setPrecision(0);
+    }
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+            // tss
+            assert(deps.contains("coggan_tss"));
+            TSS *tss = dynamic_cast<TSS*>(deps.value("coggan_tss"));
+            assert(tss);
+
+            // duration
+            assert(deps.contains("workout_time"));
+            RideMetric *duration = deps.value("workout_time");
+            assert(duration);
+
+            points = tss->value(true);
+            hours = duration->value(true) / 3600;
+
+            // set
+            if (hours) setValue(points/hours);
+            else setValue(0);
+            setCount(hours);
+    }
+
+    RideMetric *clone() const { return new TSSPerHour(*this); }
+};
+
 class EfficiencyFactor : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(EfficiencyFactor)
     double ef;
@@ -253,6 +297,10 @@ static bool addAllCoggan() {
     deps.append("coggan_np");
     deps.append("average_hr");
     RideMetricFactory::instance().addMetric(EfficiencyFactor(), &deps);
+    deps.clear();
+    deps.append("coggan_tss");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(TSSPerHour(), &deps);
     return true;
 }
 
