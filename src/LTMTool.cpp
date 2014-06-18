@@ -1761,9 +1761,15 @@ EditMetricDetailDialog::bestName()
 void
 EditMetricDetailDialog::metricSelected()
 {
+    // only in metric mode
+    if (!chooseMetric->isChecked()) return;
+
     // user selected a different metric
     // so update accordingly
     int index = metricTree->invisibleRootItem()->indexOfChild(metricTree->currentItem());
+
+    // out of bounds !
+    if (index < 0 || index >= ltmTool->metrics.count()) return;
 
     userName->setText(ltmTool->metrics[index].uname);
     userUnits->setText(ltmTool->metrics[index].uunits);
