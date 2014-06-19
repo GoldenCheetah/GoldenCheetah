@@ -48,7 +48,7 @@ class LeftRightBalance : public RideMetric {
         total = count = 0;
 
         foreach (const RideFilePoint *point, ride->dataPoints())  {
-            if (point->lrbalance > 0.0) {
+            if (point->cad && point->lrbalance > 0.0f) {
                 total += point->lrbalance;
                 ++count;
             }

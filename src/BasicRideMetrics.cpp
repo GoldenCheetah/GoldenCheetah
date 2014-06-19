@@ -1150,8 +1150,11 @@ class AvgLTE : public RideMetric {
             double secs = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                secs += ride->recIntSecs();
-                total += point->lte;
+
+                if (point->cad) {
+                    secs += ride->recIntSecs();
+                    total += point->lte;
+                }
             }
 
             if (total > 0.0f && secs > 0.0f) setValue(total / secs);
@@ -1198,8 +1201,10 @@ class AvgRTE : public RideMetric {
             double secs = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                secs += ride->recIntSecs();
-                total += point->rte;
+                if (point->cad) {
+                    secs += ride->recIntSecs();
+                    total += point->rte;
+                }
             }
 
             if (total > 0.0f && secs > 0.0f) setValue(total / secs);
@@ -1246,8 +1251,11 @@ class AvgLPS : public RideMetric {
             double secs = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                secs += ride->recIntSecs();
-                total += point->lps;
+
+                if (point->cad) {
+                    secs += ride->recIntSecs();
+                    total += point->lps;
+                }
             }
 
             if (total > 0.0f && secs > 0.0f) setValue(total / secs);
@@ -1294,8 +1302,11 @@ class AvgRPS : public RideMetric {
             double secs = 0.0f;
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                secs += ride->recIntSecs();
-                total += point->rps;
+
+                if (point->cad) {
+                    secs += ride->recIntSecs();
+                    total += point->rps;
+                }
             }
 
             if (total > 0.0f && secs > 0.0f) setValue(total / secs);
