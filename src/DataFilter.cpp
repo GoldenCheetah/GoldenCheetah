@@ -392,8 +392,14 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
                 QString rename;
                 // get symbol value
                 if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.l->lvalue.n))) == true) {
-                    // numeric
-                    lhsdouble = m.getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+
+                    // check metadata string to number first ...
+                    QString meta = m.getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "unknown");
+                    if (meta == "unknown")
+                        lhsdouble = m.getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                    else
+                        lhsdouble = meta.toDouble();
+
                     //qDebug()<<"symbol" << *(leaf->lvalue.l->lvalue.n) << "is" << lhsdouble << "via" << rename;
                 } else {
                     // string
@@ -437,7 +443,11 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
                 // get symbol value
                 if ((rhsisNumber=df->lookupType.value(*(leaf->rvalue.l->lvalue.n))) == true) {
                     // numeric
-                    rhsdouble = m.getForSymbol(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""));
+                    QString meta = m.getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "unknown");
+                    if (meta == "unknown")
+                        rhsdouble = m.getForSymbol(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""));
+                    else
+                        rhsdouble = meta.toDouble();
                     //qDebug()<<"symbol" << *(leaf->rvalue.l->lvalue.n) << "is" << rhsdouble << "via" << rename;
                 } else {
                     // string
