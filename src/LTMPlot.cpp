@@ -1319,6 +1319,9 @@ LTMPlot::setCompareData(LTMSettings *set)
             case LTM_YEAR:
                 setAxisTitle(xBottom, tr("Year"));
                 break;
+            case LTM_ALL:
+                setAxisTitle(xBottom, tr("All"));
+                break;
             default:
                 setAxisTitle(xBottom, tr("Date"));
                 break;
@@ -2716,6 +2719,7 @@ LTMPlot::groupForDate(QDate date, int groupby)
     case LTM_DAY:
     default:
         return date.toJulianDay();
+    case LTM_ALL: return 1;
 
     }
 }
@@ -2737,7 +2741,9 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);
             QwtText startText = lsd->label((int)(curve->sample(index).x()+0.5));
 
-            if (settings->groupBy != LTM_WEEK)
+            if (settings->groupBy == LTM_ALL)
+                datestr = QString(tr("All"));
+            else if (settings->groupBy != LTM_WEEK)
                 datestr = startText.text();
             else
                 datestr = QString(tr("Week Commencing %1")).arg(startText.text());
