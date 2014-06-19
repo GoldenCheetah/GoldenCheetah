@@ -89,6 +89,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     groupBy->addItem(tr("Months"), LTM_MONTH);
     groupBy->addItem(tr("Years"), LTM_YEAR);
     groupBy->addItem(tr("Time Of Day"), LTM_TOD);
+    groupBy->addItem(tr("All"), LTM_ALL);
     groupBy->setCurrentIndex(0);
     basicsettingsLayout->addRow(new QLabel(tr("Group by")), groupBy);
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing

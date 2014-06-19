@@ -47,6 +47,7 @@ class RideMetric;
 #define LTM_MONTH   3
 #define LTM_YEAR    4
 #define LTM_TOD     5
+#define LTM_ALL     6
 
 // type of metric
 #define METRIC_DB        1

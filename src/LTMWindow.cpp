@@ -127,7 +127,8 @@ LTMWindow::LTMWindow(Context *context) :
             << tr("Weeks")
             << tr("Months")
             << tr("Years")
-            << tr("Time Of Day");
+            << tr("Time Of Day")
+            << tr("All");
     rGroupBy->setStrings(strings);
     rGroupBy->setValue(0);
 
@@ -925,6 +926,9 @@ LTMWindow::refreshDataTable()
     case LTM_TOD :
         summary += tr("time of day");
         break;
+    case LTM_ALL :
+        summary += tr("All");
+        break;
     }
     summary += "</h3><p>";
 
@@ -1072,8 +1076,10 @@ LTMWindow::refreshDataTable()
 
         // fill in the remainder if data doesn't extend to
         // the period we are summarising
-        for (int n=0; n < aggregates[0].x.count(); n++) {
-            aggregates[0].x[n] = n;
+        if (settings.groupBy != LTM_ALL) {
+            for (int n=0; n < aggregates[0].x.count(); n++) {
+                aggregates[0].x[n] = n;
+            }
         }
 
         // formatting ...
