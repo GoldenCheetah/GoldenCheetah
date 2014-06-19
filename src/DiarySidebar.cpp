@@ -125,8 +125,11 @@ DiarySidebar::configChanged()
                                 .arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
 
     // now apply
-    refresh();
+    multiCalendar->refresh();
 
+    // and summary .. forgetting what we already prepared
+    from = to = QDate();
+    setSummary();
 }
 
 void

@@ -238,9 +238,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(context, SIGNAL(presetsChanged()), this, SLOT(presetsChanged()));
     connect(chartTree,SIGNAL(itemSelectionChanged()), this, SLOT(presetTreeWidgetSelectionChanged()));
 
-    // let everyone know what date range we are starting with
-    dateRangeTreeWidgetSelectionChanged();
-
     // setup colors
     configChanged();
 }
@@ -286,6 +283,12 @@ LTMSidebar::configChanged()
 
     // set or reset the autofilter widgets
     autoFilterChanged();
+
+    // forget what we just used...
+    from = to = QDate();
+
+    // let everyone know what date range we are starting with
+    dateRangeTreeWidgetSelectionChanged();
 
 }
 
