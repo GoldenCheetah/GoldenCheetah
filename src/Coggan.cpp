@@ -215,7 +215,7 @@ class TSSPerHour : public RideMetric {
         setInternalName("TSS per hour");
     }
     void initialize() {
-        setName("TSS per hour");
+        setName(tr("TSS per hour"));
         setType(RideMetric::Average);
         setPrecision(0);
     }

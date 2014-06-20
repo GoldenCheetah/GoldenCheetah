@@ -2429,7 +2429,7 @@ PasteSpecialDialog::columnChanged()
 AnomalyDialog::AnomalyDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
 {
     // setup the basic window settings; nonmodal, ontop and delete on close
-    setWindowTitle("Anomalies");
+    setWindowTitle(tr("Anomalies"));
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
     QVBoxLayout *main = new QVBoxLayout(this);
