@@ -19,6 +19,8 @@
 #include "LTMPopup.h"
 #include "MainWindow.h"
 #include "Athlete.h"
+#include <QStyle>
+#include <QScrollBar>
 
 LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -29,7 +31,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(0);
+    mainLayout->setSpacing(10); // some space between the vertical Scroll bars
     setStyleSheet(QString::fromUtf8(
         "border-width: 0px; \
          border-color: rgba(255,255,255,0); \
@@ -76,7 +78,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     QFont rideFont;
     rideFont.setPointSize(SMALLFONT);
     rides->setFont(rideFont);
-    mainLayout->addWidget(rides);
+    mainLayout->addWidget(rides, 0, Qt::AlignRight);
 
     // display the metrics summary here
     metrics = new QTextEdit(this);
@@ -180,18 +182,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         notes->show();
     }
 
-    // Metric summary
-    QString filename = context->athlete->home.absolutePath()+"/ltm-summary.html";
-    if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
-
-    // read it in...
-    QFile summaryFile(filename);
-    if (summaryFile.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream in(&summaryFile);
-        summary = in.readAll();
-        summaryFile.close();
-    }
-            setTitle(title);
+    setTitle(title);
 
     rideSelected();
 }
@@ -298,20 +289,141 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
         notes->show();
     }
 
-    // Metric summary
-    QString filename = context->athlete->home.absolutePath()+"/ltm-summary.html";
-    if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
-
-    // read it in...
-    QFile summaryFile(filename);
-    if (summaryFile.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream in(&summaryFile);
-        summary = in.readAll();
-        summaryFile.close();
-    }
     setTitle(_title);
 
     rideSelected();
+}
+
+QString
+LTMPopup::setSummaryHTML(SummaryMetrics &results)
+{
+    // where we construct the text
+    QString summaryText("");
+
+    // main totals
+    static const QStringList totalColumn = QStringList()
+        << "workout_time"
+        << "time_riding"
+        << "total_distance"
+        << "total_work"
+        << "skiba_wprime_exp"
+        << "elevation_gain";
+
+    static const QStringList averageColumn = QStringList()
+        << "average_speed"
+        << "average_power"
+        << "average_hr"
+        << "average_cad";
+
+    static const QStringList maximumColumn = QStringList()
+        << "max_speed"
+        << "max_power"
+        << "max_heartrate"
+        << "max_cadence"
+        << "skiba_wprime_max";
+
+
+    // user defined
+    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+
+    // in case they were set tand then unset
+    if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+    QStringList metricColumn = s.split(",");
+
+    // foreach of the metrics get the ride value
+    // header of summary
+
+    summaryText = QString("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2//EN\">"
+                          "<html>"
+                          "<head>"
+                          "<title></title>"
+                          "</head>"
+                          "<body>"
+                          "<table border= \"0\" cellspacing=\"10\">"
+                          "<tr>");
+
+
+    for (int i=0; i<4; i++) {
+
+      QString aggname;
+      QStringList list;
+
+      switch(i) {
+          case 0 : // Totals
+              aggname = tr("Totals");
+              list = totalColumn;
+              break;
+
+      case 1 :  // Averages
+              aggname = tr("Averages");
+              list = averageColumn;
+              break;
+
+      case 2 :  // Maximums
+              aggname = tr("Maximums");
+              list = maximumColumn;
+              break;
+
+      case 3 :  // User defined..
+              aggname = tr("Metrics");
+              list = metricColumn;
+      break;
+
+      }
+
+      summaryText += QString("<td align=\"center\" width=\"25%\">"
+                             "<table>"
+                             "<tr>"
+                             "<td align=\"center\" colspan=\"2\">"
+                             "<b>%1</b>"
+                             "</td>"
+                             "</tr>").arg(aggname);
+
+      foreach(QString metricname, list) {
+
+        const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
+
+        QStringList empty; // filter list not used at present
+        QList<SummaryMetrics> resultList1;
+        resultList1 << results;
+
+        // use getAggregated even if it's only 1 file to have consistent value treatment
+        QString value = SummaryMetrics::getAggregated(context, metricname, resultList1, empty, false, context->athlete->useMetricUnits);
+
+        // Maximum Max and Average Average looks nasty, remove from name for display
+        QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
+
+        // don't show units for time values
+        if (metric && (metric->units(context->athlete->useMetricUnits) == "seconds" ||
+                       metric->units(context->athlete->useMetricUnits) == tr("seconds") ||
+                       metric->units(context->athlete->useMetricUnits) == "")) {
+
+          summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td></tr>")
+                                 .arg(s)
+                                 .arg(value);
+
+        } else {
+          summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td></tr>")
+                                 .arg(s)
+                                 .arg(metric ? metric->units(context->athlete->useMetricUnits) : "unknown")
+                                 .arg(value);
+        }
+      }
+      summaryText += QString("</table>"
+                             "</td>");
+
+   }
+
+   // finish off the html document
+   summaryText += QString("</tr>"
+                          "</table>"
+                          "</center>"
+                          "</body>"
+                          "</html>");
+
+
+   return summaryText;
+
 }
 
 void
@@ -324,8 +436,7 @@ LTMPopup::rideSelected()
     if (selected.count() > index) {
 
         // update summary
-        metrics->setText(selected[index].toString(summary, context->athlete->useMetricUnits));
-
+        metrics->setText(setSummaryHTML(selected[index]));
         notes->setText(selected[index].getText("Notes", ""));
     }
     resizeEvent(NULL);
