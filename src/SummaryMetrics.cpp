@@ -136,9 +136,6 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
         double value = rideMetrics.getForSymbol(name);
         double count = rideMetrics.getForSymbol("workout_time"); // for averaging
 
-        // don't include zero values
-        if (value == 0.0f) continue;
-        
         // check values are bounded, just in case
         if (isnan(value) || isinf(value)) value = 0;
 
@@ -157,8 +154,10 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
             // average should be calculated taking into account
             // the duration of the ride, otherwise high value but
             // short rides will skew the overall average
-            rvalue += value*count;
-            rcount += count;
+            if (value || metric->aggregateZero()) {
+                rvalue += value*count;
+                rcount += count;
+            }
             break;
             }
         case RideMetric::Low:

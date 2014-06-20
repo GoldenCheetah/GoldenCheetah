@@ -92,6 +92,9 @@ public:
     // for averages the count of items included in the average
     virtual double count() const { return count_; }
 
+    // when aggregating averages, should we include zeroes ? no by default
+    virtual bool aggregateZero() const { return false; }
+
     // Factor to multiple value to convert from metric to imperial
     virtual double conversion() const { return conversion_; }
     // And sum for example Fahrenheit from CentigradE
