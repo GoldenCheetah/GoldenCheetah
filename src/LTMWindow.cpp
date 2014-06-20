@@ -945,6 +945,9 @@ LTMWindow::refreshDataTable()
         // ignore estimates for now XXX just to stop it crashing
         if (metricDetail.type == METRIC_ESTIMATE) continue;
 
+        // do we aggregate zero values ?
+        bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
+
         QList<SummaryMetrics> *data = NULL; // source data (metrics, bests etc)
         GroupedData a; // aggregated data
 
@@ -1025,7 +1028,9 @@ LTMWindow::refreshDataTable()
 
                     a.y[n] = value;
                     a.x[n] = currentDay - groupForDate(settings.start.date());
-                    secondsPerGroupBy = seconds; // reset for new group
+
+                    if (value || aggZero) secondsPerGroupBy = seconds; // reset for new group
+
                 } else {
                     // sum totals, average averages and choose best for Peaks
                     int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
@@ -1047,7 +1052,7 @@ LTMWindow::refreshDataTable()
                         // average should be calculated taking into account
                         // the duration of the ride, otherwise high value but
                         // short rides will skew the overall average
-                        a.y[n] = ((a.y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                        if (value || aggZero) a.y[n] = ((a.y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
                         break;
                         }
                     case RideMetric::Low:

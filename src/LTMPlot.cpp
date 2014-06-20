@@ -2259,6 +2259,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
 
         int array = rideMetrics.getRideDate().time().hour();
         int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
+        bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
 
         if (metricDetail.uunits == "Ramp" ||
             metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
@@ -2272,7 +2273,8 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
             // average should be calculated taking into account
             // the duration of the ride, otherwise high value but
             // short rides will skew the overall average
-            y[array] = value; //XXX average is broken
+            if (value || aggZero)
+                y[array] = value; //XXX average is broken
             break;
             }
         case RideMetric::Low:
@@ -2296,6 +2298,9 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // do we aggregate ?
+    bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
 
     // Get metric data, either from metricDB for RideFile metrics
     // or from StressCalculator for PM type metrics
@@ -2371,7 +2376,10 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
-                secondsPerGroupBy = seconds; // reset for new group
+
+                // only increment counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy = seconds; 
+
             } else {
                 // sum totals, average averages and choose best for Peaks
                 int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
@@ -2393,7 +2401,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
                     // average should be calculated taking into account
                     // the duration of the ride, otherwise high value but
                     // short rides will skew the overall average
-                    y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    if (value || aggZero) y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
                     break;
                     }
                 case RideMetric::Low:
