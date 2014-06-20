@@ -70,7 +70,9 @@ class LTMPopup : public QWidget
         QTextEdit *notes;
 
         QList<SummaryMetrics> selected;
-        QString summary; // template html with $${...} references
+
+        // builds HTML text for the selected ride
+        QString setSummaryHTML(SummaryMetrics &results);
 
 };
 
