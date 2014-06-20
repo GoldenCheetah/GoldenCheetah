@@ -510,7 +510,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
         case QEvent::ContextMenu:
         {
             //borderMenu(((QMouseEvent *)e)->pos());
-            borderMenu(mapFromGlobal(QCursor::pos()));
+            borderMenu(tableView->mapFromGlobal(QCursor::pos()));
             return true; // I'll take that thanks
             break;
         }
