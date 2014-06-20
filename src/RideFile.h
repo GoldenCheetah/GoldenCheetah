@@ -125,7 +125,7 @@ class RideFile : public QObject // QObject to emit signals
                           vam, wattsKg, lrbalance, lte, rte, lps, rps, 
                           aPower, wprime, aTISS, anTISS, smO2, tHb, none };
 
-        enum specialValues { noTemp = -255 };
+        enum specialValues { NoTemp = -255 };
 
         typedef enum seriestype SeriesType;
         static QString seriesName(SeriesType);
@@ -276,7 +276,7 @@ class RideFile : public QObject // QObject to emit signals
         WPrime *wprime_;
         bool wstale;
         double weight_; // cached to save calls to getWeight();
-        double totalCount;
+        double totalCount, totalTemp;
 
         QVariant getPointFromValue(double value, SeriesType series) const;
         void updateMin(RideFilePoint* point);

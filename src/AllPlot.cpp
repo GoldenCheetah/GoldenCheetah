@@ -1333,7 +1333,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->altArray.empty())
                     totalAlt   += objects->altArray[i];
                 if (!objects->tempArray.empty() ) {
-                    if (objects->tempArray[i] == RideFile::noTemp) {
+                    if (objects->tempArray[i] == RideFile::NoTemp) {
                         dp.temp = (i>0 && !list.empty()?list.back().temp:0.0);
                         totalTemp   += dp.temp;
                     }
@@ -1510,7 +1510,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothTime.append(dp->secs/60);
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             objects->smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
-            if (dp->temp == RideFile::noTemp && !objects->smoothTemp.empty())
+            if (dp->temp == RideFile::NoTemp && !objects->smoothTemp.empty())
                 dp->temp = objects->smoothTemp.last();
             objects->smoothTemp.append(context->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
             objects->smoothWind.append(context->athlete->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);

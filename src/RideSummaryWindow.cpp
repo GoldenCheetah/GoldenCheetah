@@ -522,11 +522,14 @@ RideSummaryWindow::htmlSummary()
 
                  // temperature is a special case, if it is not present fall back to metadata tag
                  // if that is not present then just display '-'
-                 if ((symbol == "average_temp" || symbol == "max_temp") && metrics.getForSymbol(symbol) == RideFile::noTemp)
+
+                 // when summarising a ride temperature is -255 when not present, when aggregating its 0.0
+                 if ((symbol == "average_temp" || symbol == "max_temp") && ridesummary 
+                     && metrics.getForSymbol(symbol) == RideFile::NoTemp) {
 
                     s = s.arg(ride->getTag("Temperature", "-"));
 
-                 else if (m->internalName() == "Pace") { // pace is mm:ss
+                 } else if (m->internalName() == "Pace") { // pace is mm:ss
 
                     double pace;
                     if (ridesummary) pace  = metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion()) + (useMetricUnits ? 0 : m->conversionSum());

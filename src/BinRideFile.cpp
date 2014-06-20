@@ -404,7 +404,7 @@ struct BinFileReaderState
         int i = 0;
         double secs = 0, alt = 0, cad = 0, km = 0, grade = 0, hr = 0;
         double nm = 0, kph = 0, watts = 0;
-        double temperature = RideFile::noTemp;
+        double temperature = RideFile::NoTemp;
         double lrbalance = 0.0;
 
         foreach(const BinField &field, def.fields) {

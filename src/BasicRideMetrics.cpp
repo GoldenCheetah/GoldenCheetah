@@ -640,7 +640,7 @@ struct AvgTemp : public RideMetric {
         if (ride->areDataPresent()->temp) {
             total = count = 0;
             foreach (const RideFilePoint *point, ride->dataPoints()) {
-                if (point->temp != RideFile::noTemp) {
+                if (point->temp != RideFile::NoTemp) {
                     total += point->temp;
                     ++count;
                 }
@@ -648,7 +648,7 @@ struct AvgTemp : public RideMetric {
             setValue(count > 0 ? total / count : count);
             setCount(count);
         } else {
-            setValue(RideFile::noTemp);
+            setValue(RideFile::NoTemp);
             setCount(1);
         }
     }
@@ -840,11 +840,11 @@ class MaxTemp : public RideMetric {
         if (ride->areDataPresent()->temp) {
             double max = 0.0;
             foreach (const RideFilePoint *point, ride->dataPoints())
-                if (point->temp != RideFile::noTemp && point->temp > max) max = point->temp;
+                if (point->temp != RideFile::NoTemp && point->temp > max) max = point->temp;
 
             setValue(max);
         } else {
-            setValue(RideFile::noTemp);
+            setValue(RideFile::NoTemp);
         }
     }
 

@@ -67,6 +67,7 @@ private:
     int calendarText;
     int colorColumn;
     int fileIndex;
+    int tempIndex;
     int dateColumn;
 
     QString starttimeHeader;
@@ -109,7 +110,11 @@ public:
         calendarText = -1;
         colorColumn = -1;
         fileIndex = -1;
+        tempIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "Xaverage_temp") {
+                tempIndex = i;
+            }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename") {
                 fileIndex = i;
             }
@@ -319,6 +324,7 @@ public:
                 }
 
             } else {
+
                 // column 1 = ride_time we have to use ride_date
                 if (proxyIndex.column() == 1)  {
                     QString date;
@@ -330,9 +336,17 @@ public:
                     else date = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), dateColumn)).toString();
 
                     returning = date;//sourceModel()->data(sourceModel()->index(proxyIndex.row(),dateColumn)).toString();
-                }
-                else
+
+                } else {
+
+                    // get the data
                     returning = sourceModel()->data(mapToSource(proxyIndex), role);
+
+                    // -255 temperature means not present
+                    if (mapToSource(proxyIndex).column() == tempIndex && returning.toDouble() == RideFile::NoTemp) {
+                         returning = "";
+                    }
+                }
             }
 
         } else if (proxyIndex.internalPointer() == NULL) {
@@ -359,6 +373,7 @@ public:
             }
         }
 
+        // post process - temperatures of -255 are no available !
         return returning;
 
     }

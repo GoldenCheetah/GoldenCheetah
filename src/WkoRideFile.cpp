@@ -207,7 +207,7 @@ WKO_UCHAR *
 WkoParser::parseRawData(WKO_UCHAR *fb)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
-    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, temp=RideFile::noTemp, interval=0;
+    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, temp=RideFile::NoTemp, interval=0;
 
     int isnull=0;
     WKO_ULONG records, data;
@@ -308,7 +308,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
         // reset point values;
         alt = slope = wind = cad= hr= km= kph= nm= watts= 0.0;
-        temp= RideFile::noTemp;
+        temp= RideFile::NoTemp;
 
         marker = get_bits(thelot, bit++, 1);
 

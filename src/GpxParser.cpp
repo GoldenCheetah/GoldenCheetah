@@ -46,7 +46,7 @@ GpxParser::GpxParser (RideFile* rideFile)
     lon = 0;
     lat = 0;
     hr = 0;
-    temp = RideFile::noTemp;
+    temp = RideFile::NoTemp;
     firstTime = true;
     metadata = false;
 

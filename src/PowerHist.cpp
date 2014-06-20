@@ -1415,7 +1415,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         double v = x.getForSymbol(distMetric, context->athlete->useMetricUnits);
 
         // ignore no temp files
-        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::noTemp) continue;
+        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NoTemp) continue;
 
         // clean up dodgy values
         if (isnan(v) || isinf(v)) v = 0;
@@ -1456,7 +1456,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         double v = x.getForSymbol(distMetric, context->athlete->useMetricUnits);
 
         // ignore no temp files
-        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::noTemp) continue;
+        if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NoTemp) continue;
 
         // clean up dodgy values
         if (isnan(v) || isinf(v)) v = 0;

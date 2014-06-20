@@ -97,8 +97,9 @@
 // 76  14  Jun 2014 Mark Liversedge    Add new 'present' field that uses Data tag data
 // 77  18  Jun 2014 Mark Liversedge    Add TSS per hour metric
 // 78  19  Jun 2014 Mark Liversedge    Do not include zeroes in average L/R pedal smoothness/torque effectiveness
+// 79  20  Jun 2014 Mark Liversedge    Change the way average temperature is handled
 
-int DBSchemaVersion = 78;
+int DBSchemaVersion = 79;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

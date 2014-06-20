@@ -2261,6 +2261,12 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
         bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
 
+        // set aggZero to false and value to zero if is temperature and -255
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+            value = 0;
+            aggZero = false;
+        }
+
         if (metricDetail.uunits == "Ramp" ||
             metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
@@ -2345,6 +2351,12 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 
         // check values are bounded to stop QWT going berserk
         if (isnan(value) || isinf(value)) value = 0;
+
+        // set aggZero to false and value to zero if is temperature and -255
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+            value = 0;
+            aggZero = false;
+        }
 
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.type != METRIC_BEST && metricDetail.metric) {

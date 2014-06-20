@@ -125,7 +125,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
 		rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                       kph, nm, watts, alt,
                                       0.0, 0.0, 0.0, 0.0,
-                                      RideFile::noTemp, 0.0, 
+                                      RideFile::NoTemp, 0.0, 
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
                 QMap<QString,QString> bsm;
                 bsm.insert("value", QString("%1").arg(bs));

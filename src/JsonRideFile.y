@@ -506,7 +506,7 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
                 out << ", \"LON\":" << QString("%1").arg(p->lon, 0, 'g', 11);
             if (ride->areDataPresent()->headwind) out << ", \"HEADWIND\":" << QString("%1").arg(p->headwind);
             if (ride->areDataPresent()->slope) out << ", \"SLOPE\":" << QString("%1").arg(p->slope);
-            if (ride->areDataPresent()->temp && p->temp != RideFile::noTemp) out << ", \"TEMP\":" << QString("%1").arg(p->temp);
+            if (ride->areDataPresent()->temp && p->temp != RideFile::NoTemp) out << ", \"TEMP\":" << QString("%1").arg(p->temp);
             if (ride->areDataPresent()->lrbalance) out << ", \"LRBALANCE\":" << QString("%1").arg(p->lrbalance);
             if (ride->areDataPresent()->lte) out << ", \"LTE\":" << QString("%1").arg(p->lte);
             if (ride->areDataPresent()->rte) out << ", \"RTE\":" << QString("%1").arg(p->rte);
