@@ -66,7 +66,6 @@
 #define HEAD_TYPE    6666
 #define SERVER_TYPE  5555
 #define WORKOUT_TYPE 4444
-#define DEVICE_TYPE  0
 
 class RealtimeController;
 class ComputrainerController;
