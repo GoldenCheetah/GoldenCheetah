@@ -391,7 +391,8 @@ RideSummaryWindow::htmlSummary()
         << "skiba_wprime_max";
 
     // show average and max temp if it is available (in ride summary mode)
-    if (ridesummary && (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-")) {
+    if ((ridesummary && (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-")) ||
+       (!ridesummary && SummaryMetrics::getAggregated(context, "average_temp", data, QStringList(), false, true) != "-")) {
         averageColumn << "average_temp";
         maximumColumn << "max_temp";
     }
