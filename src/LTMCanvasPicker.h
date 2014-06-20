@@ -11,6 +11,7 @@ class QPoint;
 class QCustomEvent;
 class QwtPlot;
 class QwtPlotCurve;
+class QwtPlotCanvas;
 
 class LTMCanvasPicker: public QObject
 {
@@ -27,6 +28,7 @@ signals:
     void pointHover(QwtPlotCurve *, int);
 
 private:
+    QwtPlotCanvas *canvas;
     void select(const QPoint &, bool);
     QwtPlot *plot() { return (QwtPlot *)parent(); }
     const QwtPlot *plot() const { return (QwtPlot *)parent(); }

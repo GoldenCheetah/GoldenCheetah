@@ -19,8 +19,7 @@ LTMCanvasPicker::LTMCanvasPicker(QwtPlot *plot):
     d_selectedCurve(NULL),
     d_selectedPoint(-1)
 {
-    QwtPlotCanvas *canvas = static_cast<QwtPlotCanvas*>(plot->canvas());
-
+    canvas = static_cast<QwtPlotCanvas*>(plot->canvas());
     canvas->installEventFilter(this);
 
 
@@ -41,8 +40,8 @@ bool LTMCanvasPicker::event(QEvent *e)
 
 bool LTMCanvasPicker::eventFilter(QObject *object, QEvent *e)
 {
-    if ( object != (QObject *)plot()->canvas() )
-        return false;
+    // for our canvas ?
+    if (object != canvas) return false;
 
     switch(e->type())
     {
