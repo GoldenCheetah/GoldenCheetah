@@ -623,6 +623,10 @@ struct AvgTemp : public RideMetric {
         setSymbol("average_temp");
         setInternalName("Average Temp");
     }
+
+    // we DO aggregate zero, its -255 we ignore !
+    bool aggregateZero() const { return true; }
+
     void initialize() {
         setName(tr("Average Temp"));
         setMetricUnits(tr("C"));
