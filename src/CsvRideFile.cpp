@@ -235,7 +235,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             }
             else if (lineno > unitsHeader) {
                 double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
-                double temp=RideFile::noTemp;
+                double temp=RideFile::NoTemp;
                 double slope=0.0;
                 bool ok;
                 double lat = 0.0, lon = 0.0;

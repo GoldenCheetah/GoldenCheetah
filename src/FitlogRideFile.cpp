@@ -150,7 +150,7 @@ FitlogFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &f
                     break;
                 f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                               p->watts, p->alt, p->lon, p->lat, p->headwind,
-                              0.0, RideFile::noTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+                              0.0, RideFile::NoTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
             }
             if (f.dataPoints().size() == 0) {
                 // Interval empty, do not compute any metrics

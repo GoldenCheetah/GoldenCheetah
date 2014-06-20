@@ -45,7 +45,7 @@ const QChar deltaChar(0x0394);
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), wprime_(NULL), 
-            wstale(true), weight_(0), totalCount(0), dstale(true)
+            wstale(true), weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -543,7 +543,7 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->headwind = point->headwind;
     if (point->slope<minPoint->slope)
        minPoint->slope = point->slope;
-    if (point->temp<minPoint->temp)
+    if (point->temp != NoTemp && point->temp<minPoint->temp)
        minPoint->temp = point->temp;
     if (minPoint->lte == 0 || point->lte<minPoint->lte)
        minPoint->lte = point->lte;
@@ -588,7 +588,7 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->headwind = point->headwind;
     if (point->slope>maxPoint->slope)
        maxPoint->slope = point->slope;
-    if (point->temp>maxPoint->temp)
+    if (point->temp != NoTemp && point->temp>maxPoint->temp)
        maxPoint->temp = point->temp;
     if (point->lte>maxPoint->lte)
        maxPoint->lte = point->lte;
@@ -621,7 +621,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->lat += point->lat;
     totalPoint->headwind += point->headwind;
     totalPoint->slope += point->slope;
-    totalPoint->temp += point->temp;
+    totalPoint->temp += point->temp == NoTemp ? 0 : point->temp;
     totalPoint->lte += point->lte;
     totalPoint->rte += point->rte;
     totalPoint->lps += point->lps;
@@ -631,6 +631,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->thb += point->thb;
 
     ++totalCount;
+    if (point->temp != NoTemp) ++totalTemp;
 
     // todo : division only for last after last point
     avgPoint->secs = totalPoint->secs/totalCount;
@@ -645,7 +646,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->lat = totalPoint->lat/totalCount;
     avgPoint->headwind = totalPoint->headwind/totalCount;
     avgPoint->slope = totalPoint->slope/totalCount;
-    avgPoint->temp = totalPoint->temp/totalCount;
+    if (totalTemp) avgPoint->temp = totalPoint->temp/totalTemp;
     avgPoint->lrbalance = totalPoint->lrbalance/totalCount;
     avgPoint->lte = totalPoint->lte/totalCount;
     avgPoint->rte = totalPoint->rte/totalCount;
@@ -703,7 +704,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.lat      |= (lat != 0);
     dataPresent.headwind |= (headwind != 0);
     dataPresent.slope    |= (slope != 0);
-    dataPresent.temp     |= (temp != noTemp);
+    dataPresent.temp     |= (temp != NoTemp);
     dataPresent.lrbalance|= (lrbalance != 0);
     dataPresent.lte      |= (lte != 0);
     dataPresent.rte      |= (rte != 0);
@@ -873,7 +874,7 @@ RideFile::getPointValue(int index, SeriesType series) const
 QVariant
 RideFile::getPointFromValue(double value, SeriesType series) const
 {
-    if (series==RideFile::temp && value == RideFile::noTemp)
+    if (series==RideFile::temp && value == RideFile::NoTemp)
         return "";
     else if (series==RideFile::wattsKg)
         return "";

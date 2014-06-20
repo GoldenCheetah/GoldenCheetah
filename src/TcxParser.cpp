@@ -160,7 +160,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // first point
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
-                                  power, alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0.0, 
+                                  power, alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
                                   0.0,0.0,0.0,0.0,0.0,0.0,lap);
 
         } else {
@@ -184,7 +184,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
                 // no smart recording, or delta exceeds HW treshold, just insert the data
                 rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power,
-                                      alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0.0, 
+                                      alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
                                       0.0,0.0,0.0,0.0,0.0,0.0,lap);
 
             } else {
@@ -212,7 +212,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           badgps ? 0 : prevPoint->lat + (deltaLat * weight), // lat
                                           headwind, // headwind
                                           0.0,
-                                          RideFile::noTemp,
+                                          RideFile::NoTemp,
                                           0.0,
                                           0.0,0.0,0.0,0.0,
                                           0.0,0.0,

@@ -998,6 +998,12 @@ LTMWindow::refreshDataTable()
             // check values are bounded to stop QWT going berserk
             if (isnan(value) || isinf(value)) value = 0;
 
+            // set aggZero to false and value to zero if is temperature and -255
+            if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+                value = 0;
+                aggZero = false;
+            }
+
             // Special computed metrics (LTS/STS) have a null metric pointer
             if (metricDetail.type != METRIC_BEST && metricDetail.metric) {
                 // convert from stored metric value to imperial

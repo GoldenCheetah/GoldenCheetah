@@ -166,7 +166,7 @@ struct Bin2FileReaderState
             kph = kph/10.0;
 
         if (temp == 0x8000) //0x8000 = invalid
-            temp = RideFile::noTemp;
+            temp = RideFile::NoTemp;
         else if (temp > 0x7FFF) // Negative
             temp = (temp-0xFFFF)/10.0;
         else

@@ -145,6 +145,15 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
             value += metric->conversionSum();
         }
 
+        // do we aggregate zero values ?
+        bool aggZero = metric->aggregateZero();
+
+        // set aggZero to false and value to zero if is temperature and -255
+        if (metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+            value = 0;
+            aggZero = false;
+        }
+
         switch (metric->type()) {
         case RideMetric::Total:
             rvalue += value;
@@ -154,7 +163,7 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
             // average should be calculated taking into account
             // the duration of the ride, otherwise high value but
             // short rides will skew the overall average
-            if (value || metric->aggregateZero()) {
+            if (value || aggZero) {
                 rvalue += value*count;
                 rcount += count;
             }
@@ -188,6 +197,8 @@ QString SummaryMetrics::getAggregated(Context *context, QString name, const QLis
 
     } else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
 
+    // 0 temp from aggregate means no values 
+    if ((metric->symbol() == "average_temp" || metric->symbol() == "max_temp") && result == "0.0") result = "-";
     return result;
 }
 
