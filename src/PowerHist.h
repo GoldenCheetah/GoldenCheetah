@@ -64,7 +64,7 @@ class penTooltip: public QwtPlotZoomer
          }
 
         virtual QwtText trackerText(const QPoint &/*pos*/) const {
-            QColor bg = QColor(255,255, 170); // toolyip yellow
+            QColor bg = QColor(Qt::lightGray);
 #if QT_VERSION >= 0x040300
             bg.setAlpha(200);
 #endif
