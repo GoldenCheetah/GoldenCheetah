@@ -246,12 +246,12 @@ class AllPlotZoneLabel: public QwtPlotItem
         }
 };
 
-class TimeScaleDraw: public QwtScaleDraw
+class TimeScaleDraw: public ScaleScaleDraw
 {
 
     public:
 
-    TimeScaleDraw(bool *bydist) : QwtScaleDraw(), bydist(bydist) {}
+    TimeScaleDraw(bool *bydist) : ScaleScaleDraw(), bydist(bydist) {}
 
     virtual QwtText label(double v) const
     {
@@ -376,7 +376,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     rpsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     rpsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
 
-    wCurve = new QwtPlotCurve(tr("W' Balance (j)"));
+    wCurve = new QwtPlotCurve(tr("W' Balance (kJ)"));
     wCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     wCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
 
@@ -670,10 +670,10 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     setAxisVisible(xBottom, true);
 
     // highlighter
-    QwtScaleDraw *sd = new QwtScaleDraw;
+    ScaleScaleDraw *sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 2);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 2), sd);
 
     QPalette pal = palette();
@@ -987,64 +987,64 @@ AllPlot::configChanged()
     enableAxis(xBottom, true);
     setAxisVisible(xBottom, true);
 
-    QwtScaleDraw *sd = new QwtScaleDraw;
+    ScaleScaleDraw *sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
     pal.setColor(QPalette::WindowText, GColor(CPOWER));
     pal.setColor(QPalette::Text, GColor(CPOWER));
     axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
-    sd = new QwtScaleDraw;
+    sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 1), sd);
     pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
     pal.setColor(QPalette::Text, GColor(CHEARTRATE));
     axisWidget(QwtAxisId(QwtAxis::yLeft, 1))->setPalette(pal);
 
-    sd = new QwtScaleDraw;
+    sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 3), sd);
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtAxisId(QwtAxis::yLeft, 3))->setPalette(pal);
 
-    sd = new QwtScaleDraw;
+    sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yRight, sd);
     pal.setColor(QPalette::WindowText, GColor(CSPEED));
     pal.setColor(QPalette::Text, GColor(CSPEED));
     axisWidget(QwtPlot::yRight)->setPalette(pal);
 
-    sd = new QwtScaleDraw;
+    sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 1), sd);
     pal.setColor(QPalette::WindowText, GColor(CALTITUDE));
     pal.setColor(QPalette::Text, GColor(CALTITUDE));
     axisWidget(QwtAxisId(QwtAxis::yRight, 1))->setPalette(pal);
 
-    sd = new QwtScaleDraw;
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
-    sd->setLabelRotation(90);// in the 000s
+    sd = new ScaleScaleDraw;
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->setFactor(0.001f); // in kJ
     setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 2), sd);
     pal.setColor(QPalette::WindowText, GColor(CWBAL));
     pal.setColor(QPalette::Text, GColor(CWBAL));
     axisWidget(QwtAxisId(QwtAxis::yRight, 2))->setPalette(pal);
 
-    sd = new QwtScaleDraw;
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd = new ScaleScaleDraw;
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 3), sd);
     pal.setColor(QPalette::WindowText, GColor(CATISS));
@@ -1869,7 +1869,7 @@ AllPlot::setYMax()
 
     if (showW && standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
 
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (j)"));
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (kJ)"));
         setAxisScale(QwtAxisId(QwtAxis::yRight, 2),rideItem->ride()->wprimeData()->minY-1000,rideItem->ride()->wprimeData()->maxY+1000);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
@@ -2769,10 +2769,11 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         }
 
 
-        QwtScaleDraw *sd = new QwtScaleDraw;
+        ScaleScaleDraw *sd = new ScaleScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-        sd->enableComponent(QwtScaleDraw::Ticks, false);
-        sd->enableComponent(QwtScaleDraw::Backbone, false);
+        sd->enableComponent(ScaleScaleDraw::Ticks, false);
+        sd->enableComponent(ScaleScaleDraw::Backbone, false);
+        if (scope == RideFile::wprime) sd->setFactor(0.001f); // Kj
         setAxisScaleDraw(QwtPlot::yLeft, sd);
 
         // title and colour
@@ -2999,7 +3000,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
             case RideFile::wprime:
                 {
-                ourCurve = new QwtPlotCurve(tr("W' Balance (j)"));
+                ourCurve = new QwtPlotCurve(tr("W' Balance (kJ)"));
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 ourCurve2 = new QwtPlotCurve(tr("Matches"));
                 ourCurve2->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
@@ -3259,10 +3260,10 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     setAxisVisible(yLeft, true);
 
     // prettify the chart at the end
-    QwtScaleDraw *sd = new QwtScaleDraw;
+    ScaleScaleDraw *sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(QwtScaleDraw::Ticks, false);
-    sd->enableComponent(QwtScaleDraw::Backbone, false);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     // set the y-axis for largest value we saw +10%
