@@ -578,5 +578,22 @@ class AllPlot : public QwtPlot
         static void nextStep( int& step );
 };
 
+// Produce Labels for X-Axis
+class ScaleScaleDraw: public QwtScaleDraw
+{
+    public:
+
+        ScaleScaleDraw(double factor=1.0f) : factor(factor) {}
+
+        void setFactor(double f) { factor=f; }
+
+        virtual QwtText label(double v) const {
+            return QString("%1").arg(v * factor, 0, 'f', 0);
+        }
+
+    private:
+
+        double factor;
+};
 #endif // _GC_AllPlot_h
 
