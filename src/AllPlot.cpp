@@ -2748,7 +2748,8 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
         // x-axis
         if (thereCurve)
-            setAxisScale(QwtPlot::xBottom, thereCurve->minXValue(), thereCurve->maxXValue());
+            setAxisScale(QwtPlot::xBottom, referencePlot->axisScaleDiv(xBottom).lowerBound(),
+                                           referencePlot->axisScaleDiv(xBottom).upperBound());
         else if (thereICurve)
             setAxisScale(QwtPlot::xBottom, thereICurve->boundingRect().left(), thereICurve->boundingRect().right());
 
