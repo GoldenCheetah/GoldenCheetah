@@ -1,7 +1,7 @@
 <layout name="analysis" style="0">
 	<chart id="14" name="" title="Summary" >
 		<property name="title" type="QString" value="Summary" />
-		<property name="subtitle" type="QString" value="" />
+		<property name="subtitle" type="QString" value="Monday May 27, 2013, 3:35 PM" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
@@ -270,6 +270,24 @@
 		<property name="ignore" type="bool" value="1" />
 		<property name="grid" type="bool" value="1" />
 		<property name="frame" type="bool" value="0" />
+	</chart>
+	<chart id="8" name="" title="3d" >
+		<property name="title" type="QString" value="3d" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="style" type="int" value="0" />
+		<property name="grid" type="bool" value="1" />
+		<property name="legend" type="bool" value="1" />
+		<property name="frame" type="bool" value="1" />
+		<property name="ignore" type="bool" value="1" />
+		<property name="preset" type="int" value="1" />
+		<property name="xseries" type="int" value="0" />
+		<property name="yseries" type="int" value="1" />
+		<property name="zseries" type="int" value="12" />
+		<property name="cseries" type="int" value="12" />
+		<property name="bin" type="QString" value="5" />
 	</chart>
 	<chart id="20" name="" title="HrPw" >
 		<property name="title" type="QString" value="HrPw" />
