@@ -2773,6 +2773,9 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->enableComponent(ScaleScaleDraw::Ticks, false);
         sd->enableComponent(ScaleScaleDraw::Backbone, false);
+        sd->setMinimumExtent(24);
+        sd->setSpacing(0);
+
         if (scope == RideFile::wprime) sd->setFactor(0.001f); // Kj
         setAxisScaleDraw(QwtPlot::yLeft, sd);
 
