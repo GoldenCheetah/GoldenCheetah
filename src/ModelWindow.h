@@ -72,7 +72,7 @@ class ModelWindow : public GcChartWindow
 
     public:
 
-        ModelWindow(Context *, const QDir &);
+        ModelWindow(Context *);
 
         // reveal
         bool hasReveal() { return false; }
@@ -122,11 +122,9 @@ class ModelWindow : public GcChartWindow
     protected:
 
         // passed from Context *
-        QDir home;
         Context *context;
-        bool useMetricUnits;
-        bool active;
 
+        bool active;
         bool dirty;             // settings changed but not reploted
         ModelSettings settings; // last used settings
 
@@ -136,16 +134,12 @@ class ModelWindow : public GcChartWindow
         // layout
         ModelPlot *modelPlot;
 
-        // labels
-        QLabel *nodata;
-
         QLabel *presetLabel,
                *xLabel,
                *yLabel,
                *zLabel,
                *colorLabel,
-               *binLabel,
-               *rpresetLabel;
+               *binLabel;
 
         // top of screen selectors
         QComboBox   *presetValues;
@@ -160,7 +154,6 @@ class ModelWindow : public GcChartWindow
                     *grid,
                     *frame,
                     *legend;
-        QPushButton *resetView;
 
         QLineEdit *binWidthLineEdit;
         QSlider *binWidthSlider;
