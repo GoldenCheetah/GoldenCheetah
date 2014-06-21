@@ -80,9 +80,9 @@ class Water;
 // the core surface plot
 // qwtplot3d api changes between 0.2.x and 0.3.x
 #if QWT3D_MINOR_VERSION > 2
-class BasicModelPlot : public GridPlot
+class ModelPlot : public GridPlot
 #else
-class BasicModelPlot : public SurfacePlot
+class ModelPlot : public SurfacePlot
 #endif
 {
     Q_OBJECT
@@ -90,7 +90,7 @@ class BasicModelPlot : public SurfacePlot
 
 
     public:
-        BasicModelPlot(Context *, ModelSettings *);
+        ModelPlot(Context *, QWidget *parent, ModelSettings *p = NULL);
 
         Context *context;
 
@@ -133,7 +133,7 @@ class Bar : public Qwt3D::VertexEnrichment
 {
 public:
     Bar();
-    Bar(BasicModelPlot *);
+    Bar(ModelPlot *);
 
     Qwt3D::Enrichment* clone() const {return new Bar(*this);}
 
@@ -143,7 +143,7 @@ public:
 
 private:
     double level_;
-    BasicModelPlot *model;
+    ModelPlot *model;
     //double diag_;
 };
 
@@ -152,41 +152,13 @@ class Water : public Qwt3D::VertexEnrichment
 {
     public:
         Water();
-        Water(BasicModelPlot *);
+        Water(ModelPlot *);
         Qwt3D::Enrichment* clone() const {return new Water(*this);}
 
         void drawBegin();
         void drawEnd();
         void draw(Qwt3D::Triple const&);
-        BasicModelPlot *model;
+        ModelPlot *model;
 };
-
-// just a frame containing the raw 3d plot (for now)
-class ModelPlot : public QFrame
-{
-    Q_OBJECT
-    G_OBJECT
-
-    public:
-
-        ModelPlot(Context *, ModelSettings *);
-        void setData(ModelSettings *settings);
-        void resetViewPoint();
-        void setStyle(int);
-        void setGrid(bool);
-        void setLegend(bool, int);
-        void setFrame(bool);
-        void setZPane(int);
-
-        BasicModelPlot *basicModelPlot;
-
-    public slots:
-        void setResolution(int);
-
-    private:
-        Context *context;
-        QVBoxLayout *layout;
-};
-
 
 #endif // _GC_ModelPlot_h

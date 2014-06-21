@@ -146,7 +146,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::PerformanceManager: // retired now returns an LTM
     case GcWindowTypes::LTM: returning = new LTMWindow(context); break;
 #ifdef GC_HAVE_QWTPLOT3D
-    case GcWindowTypes::Model: returning = new ModelWindow(context, context->athlete->home); break;
+    case GcWindowTypes::Model: returning = new ModelWindow(context); break;
 #else
     case GcWindowTypes::Model: returning = new GcWindow(); break;
 #endif

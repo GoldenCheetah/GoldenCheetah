@@ -46,20 +46,16 @@ ModelWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("Longitude"), MODEL_LONG);
 }
 
-ModelWindow::ModelWindow(Context *context, const QDir &home) :
-    GcChartWindow(context), home(home), context(context), ride(NULL), current(NULL)
+ModelWindow::ModelWindow(Context *context) :
+    GcChartWindow(context), context(context), ride(NULL), current(NULL)
 {
-    QWidget *c = new QWidget;
+    QWidget *c = new QWidget(this);
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 
-    // hidden text when plot invalid
-    nodata = new QLabel(tr("No data or bin size too large."), this);
-    nodata->hide();
-
     // the plot widget
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    modelPlot= new ModelPlot(context, NULL);
+    modelPlot= new ModelPlot(context, this);
     zpane = new QSlider(Qt::Vertical);
     zpane->setTickInterval(1);
     zpane->setMinimum(0);
@@ -67,7 +63,6 @@ ModelWindow::ModelWindow(Context *context, const QDir &home) :
     zpane->setValue(0);
     mainLayout->addWidget(zpane);
     mainLayout->addWidget(modelPlot);
-    mainLayout->addWidget(nodata);
     setChartLayout(mainLayout);
 
     // preset Values
@@ -144,11 +139,7 @@ ModelWindow::ModelWindow(Context *context, const QDir &home) :
     legend->setChecked(true);
     cl->addRow(legend);
 
-    //resetView = new QPushButton(tr("Reset View"));
-    //cl->addRow(resetView);
-
     // now connect up the widgets
-    //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
@@ -163,7 +154,6 @@ ModelWindow::ModelWindow(Context *context, const QDir &home) :
     connect(ignore, SIGNAL(stateChanged(int)), this, SLOT(setDirty()));
     connect(binWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
-    //connect(resetView, SIGNAL(clicked()), this, SLOT(resetViewPoint()));
     connect(zpane, SIGNAL(valueChanged(int)), this, SLOT(setZPane(int)));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
@@ -261,12 +251,12 @@ ModelWindow::setData(bool adjustPlot)
 
     // if setdata resulted in the plot being hidden
     // then the settings were not valid.
-    if (modelPlot->basicModelPlot->isHidden()) {
+    if (modelPlot->isHidden()) {
         zpane->hide();
-        nodata->show();
+        setIsBlank(true);
     } else {
         zpane->show();
-        nodata->hide();
+        setIsBlank(false);
     }
     setClean();
 
