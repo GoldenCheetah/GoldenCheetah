@@ -772,6 +772,21 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     plot.coordinates()->axes[Z3].setTicOrientation(-1, 0, 0);
     plot.coordinates()->axes[Z4].setTicOrientation(-1, 0, 0);
 
+    // use the cplotmarker colors for the ticks etc
+    QColor p = GColor(CPLOTMARKER);
+    plot.coordinates()->axes[Z1].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Z2].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Z3].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Z4].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[X1].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[X2].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[X3].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[X4].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Y1].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Y2].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Y3].setColor(p.red(), p.green(), p.blue());
+    plot.coordinates()->axes[Y4].setColor(p.red(), p.green(), p.blue());
+
     // now, at last we can draw the axes markers. phew.
     plot.coordinates()->axes[Z1].draw();
     plot.coordinates()->axes[Z2].draw();
@@ -1161,7 +1176,8 @@ void Water::drawEnd()
         glVertex3d(maxx,maxy,minz);
         glEnd();
 
-        glColor3d(0,0,0);
+        QColor x = GColor(CPLOTMARKER);
+        glColor3d(x.red(),x.green(),x.blue());
         glBegin(GL_LINES);
         glVertex3d(minx,miny,z); glVertex3d(minx,maxy, z);
         glVertex3d(minx,maxy,z); glVertex3d(maxx,maxy, z);
@@ -1276,7 +1292,8 @@ void Bar::drawEnd()
         glVertex3d(maxx,maxy,minz);
         glEnd();
 
-        glColor3d(0,0,0);
+        QColor x = GColor(CPLOTMARKER);
+        glColor3d(x.red(),x.green(),x.blue());
         glBegin(GL_LINES);
         glVertex3d(minx,miny,z); glVertex3d(minx,maxy, z);
         glVertex3d(minx,maxy,z); glVertex3d(maxx,maxy, z);
@@ -1468,7 +1485,8 @@ void Bar::draw(Qwt3D::Triple const& pos)
     glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
     glEnd();
 
-    glColor3d(0,0,0);
+    QColor x = GColor(CPLOTMARKER);
+    glColor3d(x.red(),x.green(),x.blue());
     glBegin(GL_LINES);
     glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
     glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
