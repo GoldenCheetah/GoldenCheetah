@@ -48,8 +48,8 @@ class LTMPopup : public QWidget
         LTMPopup(Context *context);
         void setTitle(QString);
 
-        // when called from LTM chart
-        void setData(LTMSettings &settings, QDate start, QDate end);
+        // when called from LTM chart (time only relevant for LTM_TOD)
+        void setData(LTMSettings &settings, QDate start, QDate end, QTime time);
 
         // when called from a TreeMap chart
         void setData(QList<SummaryMetrics>data, const RideMetric *metric, QString title);

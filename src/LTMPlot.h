@@ -186,6 +186,7 @@ class LTMScaleDraw: public QwtScaleDraw
 
         case LTM_TOD:
             break;
+
         }
     }
 
@@ -197,13 +198,13 @@ class LTMScaleDraw: public QwtScaleDraw
         switch (groupBy) {
         case LTM_DAY:
             upTime = baseTime.addDays((int)v);
-            label = upTime.toString("MMM dd\nyyyy");
+            label = upTime.toString(QObject::tr("MMM dd\nyyyy")); /* 2 line display of date - keep \n in translation */
             break;
 
         case LTM_WEEK:
             {
             QDate week = baseTime.date().addDays((int)v*7);
-            label = week.toString("MMM dd\nyyyy");
+            label = week.toString(QObject::tr("MMM dd\nyyyy")); /* 2 line display of date - keep \n in translation */
             }
             break;
 
@@ -223,6 +224,11 @@ class LTMScaleDraw: public QwtScaleDraw
         case LTM_TOD:
             label = QString("%1:00").arg((int)v);
             break;
+
+        case LTM_ALL:
+            label = QString(QObject::tr("All"));
+            break;
+
         }
         return label;
     }
