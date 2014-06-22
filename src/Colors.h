@@ -98,6 +98,7 @@ class GCColor : public QObject
     public:
         GCColor(Context *);
         static QColor getColor(int);
+        static void setColor(int,QColor);
         static const Colors *colorSet();
         static const Colors *defaultColorSet();
         static void resetColors();
@@ -107,6 +108,7 @@ class GCColor : public QObject
         static QColor alternateColor(QColor); // return the alternate background
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes(); 
+        static void applyTheme(int index);
 
         // for styling things with current preferences
         static bool isFlat();

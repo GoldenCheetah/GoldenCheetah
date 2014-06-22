@@ -115,19 +115,19 @@ MainWindow::MainWindow(const QDir &home)
 
     // bootstrap
     Context *context = new Context(this);
+    GCColor *GCColorSet = new GCColor(context); // get/keep colorset, before athlete...
     context->athlete = new Athlete(context, home);
 
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home.dirName());
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
-    GCColor *GCColorSet = new GCColor(context); // get/keep colorset
-    GCColorSet->colorSet(); // shut up the compiler
 
     #ifdef GC_HAVE_WFAPI
     WFApi *w = WFApi::getInstance(); // ensure created on main thread
     w->apiVersion();//shutup compiler
     #endif
+    GCColorSet->colorSet(); // shut up the compiler
     Library::initialise(context->athlete->home);
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
     QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
