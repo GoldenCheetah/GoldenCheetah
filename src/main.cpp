@@ -177,7 +177,7 @@ main(int argc, char *argv[])
 #elif defined(Q_OS_WIN)
 #if QT_VERSION > 0x050000 // windows and qt5
         QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
-	    QString libraryPath = paths.at(0) + "/GoldenCheetah";
+        QString libraryPath = paths.at(0); 
 #else // windows not qt5
         QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
 #endif // qt5
