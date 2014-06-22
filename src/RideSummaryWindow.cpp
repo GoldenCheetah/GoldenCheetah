@@ -917,7 +917,7 @@ RideSummaryWindow::htmlSummary()
 
             // "n of x activities" shown in header of list when filtered
             summary += ("<p><h3>" + 
-                        QString("%1 of %2").arg(activities).arg(data.count()) 
+                        QString(tr("%1 of %2")).arg(activities).arg(data.count())
                                            + (data.count() == 1 ? tr(" ride") : tr(" rides")) +
                         "</h3><p>");
         } else {

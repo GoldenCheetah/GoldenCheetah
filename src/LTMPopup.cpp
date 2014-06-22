@@ -19,15 +19,13 @@
 #include "LTMPopup.h"
 #include "MainWindow.h"
 #include "Athlete.h"
-#include <QStyle>
-#include <QScrollBar>
 
 LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
     // get application settings
     setAutoFillBackground(false);
     setContentsMargins(0,0,0,0);
-    setFixedWidth(800);
+    setMinimumWidth(800);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -100,6 +98,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     mainLayout->addWidget(notes);
 
     connect(rides, SIGNAL(itemSelectionChanged()), this, SLOT(rideSelected()));
+
 }
 
 void
@@ -140,6 +139,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         // date/time
         QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        t->setTextAlignment(Qt::AlignHCenter);
         rides->setRowCount(count+1);
         rides->setItem(count, 0, t);
         rides->setRowHeight(count, 14);
@@ -155,31 +155,27 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         count++;
     }
 
-    // make em all visible!
+    // make em all visible! - also show rides if only 1 ride selected
     rides->resizeColumnsToContents();
+    rides->setFixedHeight((count > 10 ? 10 : count) * 14 + rides->horizontalHeader()->height());
+    // select the first one only if more than 1 rows exist !
     if (count > 1) {
-        rides->setFixedHeight((count > 10 ? 10 : count) * 14 + rides->horizontalHeader()->height());
+        rides->setRangeSelected(QTableWidgetSelectionRange(0,0,0,1), true);
     }
-
-    // select the first one
-    rides->setRangeSelected(QTableWidgetSelectionRange(0,0,0,1), true);
-
-    // for now at least, if multiple rides then show the table
-    // if single ride show the summary, show all if we're grouping by
-    // days tho, since we're interested in specific rides...
-    if (count > 1) {
-        //int size = ((count+1)*14) + rides->horizontalHeader()->height() + 4;
-        //rides->setFixedHeight(size > 100 ? 100 : size);
-
-        rides->show();
-        metrics->show();
-        notes->show();
-
+    // show rides and metrics if at least 1 rides is selected -
+    // and even if only 1 Rides (since without the Ride we have not date/time)
+    // and the metrics for which the ride was selected
+    if (count == 0) {
+       // no ride
+       rides->hide();
+       metrics->hide();
+       notes->hide();
+       title = tr("No ride selected");
     } else {
-
-        rides->hide();
-        metrics->show();
-        notes->show();
+       // one or more rides
+       rides->show();
+       metrics->show();
+       notes->show();
     }
 
     setTitle(title);
@@ -188,7 +184,7 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
 }
 
 void
-LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
+LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
 {
     // set the title
     QString _title;
@@ -208,10 +204,29 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
                     .arg(end.toString(tr("dd MMMM yyyy")));
             break;
         case LTM_TOD:
+        case LTM_ALL:
             _title = QString(tr("%1 to %2"))
                     .arg(settings.start.date().toString(tr("dd MMMM yy")))
                     .arg(settings.end.date().toString(tr("dd MMMM yy")));
             break;
+
+    }
+
+    // add Search/Filter info to Title
+    if (context->isfiltered || context->ishomefiltered)
+       _title = tr("Search/Filter: ") + _title;
+
+
+    // For LTM_ALL show all Rides which are done in the active/selected Date Range
+    if (settings.groupBy == LTM_ALL) {
+        start = settings.start.date();
+        end = settings.end.date();
+    }
+
+    // For LTM_TOD show all Rides which are done in the active/selected Date Range considering the Ride Time
+    QTime end_time;
+    if (settings.groupBy == LTM_TOD) {
+        end_time = time.addSecs(3599); // full hour to 1 second before next (this also avoids reaching 00:00:00)
     }
 
     // create the ride list
@@ -231,7 +246,14 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
 
     foreach(SummaryMetrics x, (*settings.data)) {
         QDateTime rideDate = x.getRideDate();
-        if (rideDate.date() >= start && rideDate.date() <= end) {
+
+        // check either RideDate (for all Date related groupBy's) or RideTime (for LTM_TOD only)
+        if (((settings.groupBy != LTM_TOD) && (rideDate.date() >= start && rideDate.date() <= end))
+          ||((settings.groupBy == LTM_TOD) && (rideDate.time() >= time && rideDate.time() <= end_time))) {
+
+            // apply filters
+           if (context->isfiltered && !context->filters.contains(x.getFileName())) continue;
+           if (context->ishomefiltered && !context->homeFilters.contains(x.getFileName())) continue;
 
             // we'll select it for summary aggregation
             selected << x;
@@ -239,6 +261,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
             // date/time
             QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+            t->setTextAlignment(Qt::AlignHCenter);
             rides->setRowCount(count+1);
             rides->setItem(count, 0, t);
             rides->setRowHeight(count, 14);
@@ -258,35 +281,29 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
 
     // make em all visible!
     rides->resizeColumnsToContents();
+    rides->setFixedHeight((count > 10 ? 10 : count) * 14 + rides->horizontalHeader()->height());
+
+    // select the first one only if more than 1 rows exist !
     if (count > 1) {
-        rides->setFixedHeight((count > 10 ? 10 : count) * 14 +
-                        rides->horizontalHeader()->height());
+        rides->setRangeSelected(QTableWidgetSelectionRange(0,0,0,settings.metrics.count()), true);
     }
 
-    // select the first one
-    rides->setRangeSelected(QTableWidgetSelectionRange(0,0,0,settings.metrics.count()), true);
-
-    // for now at least, if multiple rides then show the table
-    // if single ride show the summary, show all if we're grouping by
-    // days tho, since we're interested in specific rides...
-    if (count > 1) {
-        //int size = ((count+1)*14) + rides->horizontalHeader()->height() + 4;
-        //rides->setFixedHeight(size > 100 ? 100 : size);
-
-        if (settings.groupBy != LTM_DAY) {
-            rides->show();
-            metrics->show();
-            notes->show();
-        } else {
-            rides->show();
-            metrics->show();
-            notes->show();
-        }
-        _title += QString(tr(" (%1 rides)")).arg(count);
+    // show rides and metrics if at least 1 rides is selected -
+    // and even if only 1 Rides (since without the Ride we have not date/time)
+    // and the metrics for which the ride was selected
+    if (count == 0) {
+       // no ride
+       rides->hide();
+       metrics->hide();
+       notes->hide();
+       _title = tr("No ride selected");
     } else {
-        rides->hide();
-        metrics->show();
-        notes->show();
+       // one or more rides
+       rides->show();
+       metrics->show();
+       notes->show();
+       // give some extrat info
+       if (count > 1) _title += QString(tr(" (%1 rides)")).arg(count);
     }
 
     setTitle(_title);
@@ -463,6 +480,10 @@ LTMPopup::eventFilter(QObject * /*object*/, QEvent *e)
 
     //if (object != (QObject *)plot()->canvas() )
         //return false;
+    //if only 1 Ride in list, ignore any mouse activities
+    if (rides->rowCount() == 1) return false;
+
+    // process mouse
     switch (e->type()) {
     case QEvent::MouseMove:
         {
