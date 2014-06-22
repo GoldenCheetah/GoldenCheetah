@@ -760,6 +760,7 @@ ANT::processMessage(void) {
 int ANT::closePort()
 {
 #ifdef WIN32
+#ifdef GC_HAVE_LIBUSB
     switch (usbMode) {
     case USB2 :
         usb2->close();
@@ -772,6 +773,9 @@ int ANT::closePort()
         return -1;
         break;
     }
+#else
+    return -1;
+#endif
 #else
 
 #ifdef GC_HAVE_LIBUSB
@@ -787,11 +791,11 @@ int ANT::closePort()
 
 bool ANT::find()
 {
-#if defined WIN32 || defined GC_HAVE_LIBUSB
+#if defined GC_HAVE_LIBUSB
     if (usb2->find() == true) return true;
-#endif
 #ifdef WIN32
     if (USBXpress::find() == true) return true;
+#endif
 #endif
     return false;
 }
@@ -799,6 +803,7 @@ bool ANT::find()
 int ANT::openPort()
 {
 #ifdef WIN32
+#ifdef GC_HAVE_LIBUSB
     int rc;
 
     // on windows we try on USB2 then on USB1 then fail...
@@ -815,7 +820,9 @@ int ANT::openPort()
         channels = 0;
         return -1;
     }
-
+#else
+    return -1;
+#endif
 #else
     // LINUX AND MAC USES TERMIO / IOCTL / STDIO
 
@@ -882,6 +889,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     int rc=0;
 
 #ifdef WIN32
+#ifdef GC_HAVE_LIBUSB
     switch (usbMode) {
     case USB1:
         rc = USBXpress::write(&devicePort, bytes, size);
@@ -896,7 +904,9 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 
     if (!rc) rc = -1; // return -1 if nothing written
     return rc;
-
+#else
+    return rc=-1;
+#endif
 #else
 
 #ifdef GC_HAVE_LIBUSB
@@ -924,6 +934,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 int ANT::rawRead(uint8_t bytes[], int size)
 {
 #ifdef WIN32
+#ifdef GC_HAVE_LIBUSB
     switch (usbMode) {
     case USB1:
         return USBXpress::read(&devicePort, bytes, size);
@@ -935,6 +946,9 @@ int ANT::rawRead(uint8_t bytes[], int size)
         break;
     }
 
+#else
+    return -1;
+#endif
 #else
 
 #ifdef GC_HAVE_LIBUSB
