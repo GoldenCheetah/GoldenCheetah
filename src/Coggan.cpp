@@ -219,7 +219,7 @@ class TSSPerHour : public RideMetric {
         setType(RideMetric::Average);
         setPrecision(0);
     }
-    void compute(const RideFile *r, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *, int ,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
                  const Context *) {
