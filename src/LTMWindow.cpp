@@ -860,13 +860,24 @@ LTMWindow::groupForDate(QDate date)
 void
 LTMWindow::pointClicked(QwtPlotCurve*curve, int index)
 {
-    // get the date range for this point
-    QDate start, end;
-    LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
-                        groupForDate(settings.start.date()),
-                        settings.groupBy);
-    lsd->dateRange((int)round(curve->sample(index).x()), start, end);
-    ltmPopup->setData(settings, start, end);
+    // initialize date and time to sensefull boundaries
+    QDate start = QDate(1900,1,1);
+    QDate end   = QDate(2999,12,31);
+    QTime time = QTime(0, 0, 0, 0);
+
+    // now fill the correct values for context
+    if (settings.groupBy != LTM_TOD) {
+      // get the date range for this point (for all date-dependent grouping)
+      LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
+                          groupForDate(settings.start.date()),
+                          settings.groupBy);
+      lsd->dateRange((int)round(curve->sample(index).x()), start, end); }
+    else {
+      // special treatment for LTM_TOD as time dependent grouping
+      time = QTime((int)round(curve->sample(index).x()), 0, 0, 0);
+    }
+    // feed the popup with data
+    ltmPopup->setData(settings, start, end, time);
     popup->show();
 }
 
