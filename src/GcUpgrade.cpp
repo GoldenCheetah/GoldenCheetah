@@ -275,10 +275,17 @@ GcUpgrade::upgrade(const QDir &home)
         // ** high risk of breaking user setups -- this is due to the complexity
         // ** and multiple ways the user can manage their zones.
 
-        // BELOW ARE TODO
-        // 9. Add a W'bal chart to the ride view
-        // 10. Add a CP History chart to the trend view
-        // 11. Add a Library chart to the trend view
+        // BELOW ARE PROBLEMATIC TOO:
+        // ** there are no functions to read/write the layout.xml
+        // ** files without refactoring HomeWindow to do so -- which
+        // ** is a risky change and instead we will need the user
+        // ** to reset their layout to get the latest chart setup:
+        // Add a W'bal chart to the ride view
+        // Add a CP History chart to the trend view
+        // Add a Library chart to the trend view
+
+        // PM deprecation has been handled by returning an LTM chart with
+        // PMC curves when an PM chart is still in the layout.
 
     }
 

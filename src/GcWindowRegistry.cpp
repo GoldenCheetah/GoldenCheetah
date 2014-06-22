@@ -72,6 +72,7 @@ GcWindowRegistry::initialize()
     { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
     { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
+    //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_ANALYSIS, tr("Ride Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
@@ -143,7 +144,23 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(context); break;
     case GcWindowTypes::Histogram: returning = new HistogramWindow(context); break;
     case GcWindowTypes::Distribution: returning = new HistogramWindow(context, true); break;
-    case GcWindowTypes::PerformanceManager: // retired now returns an LTM
+    case GcWindowTypes::PerformanceManager: 
+            {
+                // the old PMC is deprecated so we return an LTM with PMC curves and default settings
+                returning = new LTMWindow(context);
+
+                // a PMC LTM Setting
+                QString value = "AAAACgBQAE0AQwArACsAAAAIADIAMAAwADkAJXS3AAAAAP8AJXZBAAAAAP8AAAABAAH///////////////8AAAALAAAAAwAAAAIAAAAAEgBzAGsAaQBiAGEAXwBzAHQAcwAAAC4AUwBrAGkAYgBhACAAUwBoAG8AcgB0ACAAVABlAHIAbQAgAFMAdAByAGUAcwBzAAAALgBTAGsAaQBiAGEAIABTAGgAbwByAHQAIABUAGUAcgBtACAAUwB0AHIAZQBzAHMAAAAMAFMAdAByAGUAcwBzAAAAAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAfyr8IRwk//////////8B/////wAA//8AAAAAAAA/8AAAAAAAAAAAAAAB//8AAAAAAAAAAAAAAAAAAAAAAgAADhD/////AAAACv////8AAAAAAAAAAAwAMgAgAFAAYQByAG0AAAAAAAAD5wAADhAAAAAAAgAAAAASAHMAawBpAGIAYQBfAGwAdABzAAAALABTAGsAaQBiAGEAIABMAG8AbgBnACAAVABlAHIAbQAgAFMAdAByAGUAcwBzAAAALABTAGsAaQBiAGEAIABMAG8AbgBnACAAVABlAHIAbQAgAFMAdAByAGUAcwBzAAAADABTAHQAcgBlAHMAcwAAAAAAAQAAAAAAAAAAAAAAAAEAAABYAAAAAwAAAEoAAAAbAAAAFP//////////Af//AAD/////AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAIAAA4Q/////wAAAAoAAAAAAAAAAAAAAAAMADIAIABQAGEAcgBtAAAAAAAAA+cAAA4QAAAAAAIAAAAAEABzAGsAaQBiAGEAXwBzAGIAAAAoAFMAawBpAGIAYQAgAFMAdAByAGUAcwBzACAAQgBhAGwAYQBuAGMAZQAAACgAUwBrAGkAYgBhACAAUwB0AHIAZQBzAHMAIABCAGEAbABhAG4AYwBlAAAADABTAHQAcgBlAHMAcwAAAAAAAAAAAADAjzgAAAAAAAH////A////wP///8AAAH//AAAAAP//////////Af//VVX//wAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAQAAAAIAAA4Q/////wAAAAr/////AAAAAAEAAAAMADIAIABQAGEAcgBtAAAAAAAAA+cAAA4QAAAAAAAAAg==";
+
+                // setup and apply the property
+                QByteArray base64(value.toLatin1());
+                QByteArray unmarshall = QByteArray::fromBase64(base64);
+                QDataStream s(&unmarshall, QIODevice::ReadOnly);
+                LTMSettings x;
+                s >> x;
+                returning->setProperty("settings", QVariant().fromValue<LTMSettings>(x));
+            }
+            break;
     case GcWindowTypes::LTM: returning = new LTMWindow(context); break;
 #ifdef GC_HAVE_QWTPLOT3D
     case GcWindowTypes::Model: returning = new ModelWindow(context); break;
