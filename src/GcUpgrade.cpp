@@ -177,11 +177,105 @@ GcUpgrade::upgrade(const QDir &home)
         appsettings->setValue("CCHROME", colorstring);
         GCColor::setColor(CCHROME, chromeColor);
 
-        // BELOW STILL TODO
-        // 5. Notes keywords
-        // 6. Set a default W' for the athlete / power.zones
-        // 7. Check for Power Zones that do not start from zero 
-        // 8. Add TSS, and TISS to the 'Metrics' metadata tab (to avoid FAQ #1)
+        // 5. Metrics and Notes keywords
+        QString filename = home.canonicalPath()+"/metadata.xml";
+        if (QFile(filename).exists()) {
+
+            QList<KeywordDefinition> keywordDefinitions;
+            QList<FieldDefinition>   fieldDefinitions;
+            QString colorfield;
+
+            // read em in
+            RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
+
+            bool updated=false;
+
+            //
+            // ADD METRICS TO METADATA TAB
+            //
+            int pos = -1;
+            int indexTSS=-1, indexAnTISS=-1, indexAeTISS=-1;
+            for(int i=0; i < fieldDefinitions.count(); i++) {
+
+                // current ...
+                FieldDefinition f = fieldDefinitions[i];
+
+                if (f.tab == tr("Metric") && pos < 0) pos = i;
+                if (f.name == "TSS") indexTSS=i;
+                if (f.name == tr("Aerobic TISS")) indexAeTISS=i;
+                if (f.name == tr("Anaerobic TISS")) indexAnTISS=i;
+            }
+
+            // ok, we need to add them to the metadata
+            if (indexTSS < 0 || indexAnTISS < 0 || indexAeTISS < 0) {
+
+                // lets add all at the same place
+                if (indexTSS >= 0) pos = indexTSS;
+                else if (indexAnTISS >= 0) pos = indexAnTISS;
+                else if (indexAeTISS >= 0) pos = indexAeTISS;
+
+                // ok, one at a time, using this as a template
+                FieldDefinition add;
+                add.tab = pos >= 0 ? fieldDefinitions[pos].tab : tr("Metric");
+                add.diary = false;
+                add.type = 4; // double
+
+                // now set pos to non-negative if needed
+                if (pos < 0) pos = 1;
+
+                // add them
+                if (indexAnTISS < 0) { 
+                    add.name = tr("Anaerobic TISS");
+                    fieldDefinitions.insert(pos, add);
+                }
+                if (indexAeTISS < 0) { 
+                    add.name = tr("Aerobic TISS");
+                    fieldDefinitions.insert(pos, add);
+                }
+                if (indexTSS < 0) { 
+                    add.name = tr("TSS");
+                    fieldDefinitions.insert(pos, add);
+                }
+                updated = true;
+            }
+
+            //
+            // DEPRECATE 'default' color keyword and if needed
+            // ADD 'Reverse' color keyword
+            //
+            int defaultIndex = -1, reverseIndex = -1;
+            for(int i=0; i<keywordDefinitions.count(); i++) {
+                if (keywordDefinitions[i].name == "Default") defaultIndex = i;
+                if (keywordDefinitions[i].name == "Reverse") reverseIndex = i;
+            }
+
+            // no more default
+            if (defaultIndex >= 0) {
+                updated = true;
+                keywordDefinitions.removeAt(defaultIndex);
+            }
+
+            // no reverse ?
+            if (reverseIndex < 0) {
+                updated = true;
+                KeywordDefinition add;
+                add.name = "Reverse";
+                add.color = QColor(Qt::black);
+                keywordDefinitions << add;
+            }
+
+            if (updated) {
+                // write a new updated version
+                RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield);
+            }
+        }
+
+        // ** NOTE:
+        // ** Suggestions to update CP/W'/Zones have been ignored due to the
+        // ** high risk of breaking user setups -- this is due to the complexity
+        // ** and multiple ways the user can manage their zones.
+
+        // BELOW ARE TODO
         // 9. Add a W'bal chart to the ride view
         // 10. Add a CP History chart to the trend view
         // 11. Add a Library chart to the trend view
