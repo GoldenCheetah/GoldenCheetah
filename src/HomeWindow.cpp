@@ -71,12 +71,6 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     bigandbold.setPointSize(bigandbold.pointSize() + 2);
     bigandbold.setWeight(QFont::Bold);
 
-    QHBoxLayout *titleBar = new QHBoxLayout;
-
-    QLabel *space = new QLabel("", this);
-    space->setFixedHeight(20);
-    titleBar->addWidget(space);
-
     style = new QStackedWidget(this);
     style->setAutoFillBackground(false);
     layout->setSpacing(0);
