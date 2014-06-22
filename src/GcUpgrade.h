@@ -19,6 +19,7 @@
 #ifndef Gc_GcUpgrade_h
 #define Gc_GcUpgrade_h
 #include "GoldenCheetah.h"
+#include "RideMetadata.h"
 
 // Build ID History
 //
@@ -51,6 +52,8 @@
 
 class GcUpgrade
 {
+    Q_DECLARE_TR_FUNCTIONS(GcUpgrade)
+
 	public:
         GcUpgrade() {}
         int upgrade(const QDir &home);
