@@ -167,6 +167,20 @@
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Aerobic TISS"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Anaerobic TISS"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
 			<fieldname>"TSS"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
