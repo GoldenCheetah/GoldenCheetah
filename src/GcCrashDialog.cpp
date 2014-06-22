@@ -137,6 +137,10 @@ QString GcCrashDialog::versionHTML()
         os += " Lion";
     else if (QSysInfo::MacintoshVersion == 10)
         os += " Mountain Lion";
+    else if (QSysInfo::MacintoshVersion == 11)
+        os += " Mavericks";
+    else if (QSysInfo::MacintoshVersion == 12)
+        os += " Yosemite";
 
     #endif
 

@@ -40,6 +40,10 @@
 #define VERSION3_BUILD 3010 // released
 #define VERSION3_SP1   3030 // released
 #define VERSION3_SP2   3032 // released
+#define VERSION31_UPG  3055 // first build with 3.1 upgrade process (doesn't exist yet)
+
+// will keep changing during testing and before final release
+#define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
 #define VERSION_LATEST 3051

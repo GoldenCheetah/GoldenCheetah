@@ -18,6 +18,7 @@
 
 #include "GoldenCheetah.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "GcUpgrade.h"
 #include <QDebug>
 
@@ -31,6 +32,10 @@ GcUpgrade::upgrade(const QDir &home)
     // for athlete directories from prior to Version 3
     // and can essentially be used as a template for all major release
     // upgrades as it delets old stuff and sets clean
+
+    //----------------------------------------------------------------------
+    // 3.0 upgrade processing
+    //----------------------------------------------------------------------
     if (!last || last < VERSION3_BUILD) {
 
         // For now we always do the same thing
@@ -95,7 +100,9 @@ GcUpgrade::upgrade(const QDir &home)
     // Versions after 3 should add their upgrade processing at this point
     // DO NOT CHANGE THE VERSION 3 UPGRADE PROCESS ABOVE, ADD TO IT BELOW
 
-    // 3.0 SP1 upgrade processing
+    //----------------------------------------------------------------------
+    // 3.0 SP2 upgrade processing
+    //----------------------------------------------------------------------
     if (last < VERSION3_SP2) {
 
         // 2. Remove old CLucece 'index'
@@ -107,6 +114,78 @@ GcUpgrade::upgrade(const QDir &home)
         // 3. Remove metricDBv3 - force rebuild including the search index
         QFile db(QString("%1/metricDBv3").arg(home.canonicalPath()));
         if (db.exists()) db.remove();
+    }
+
+    //----------------------------------------------------------------------
+    // 3.1 upgrade processing
+    //----------------------------------------------------------------------
+
+    if (false && last < VERSION31_BUILD) { // << note this is not activated yet
+
+        // We sought to reset the user defaults in v3.1 to
+        // move away from the ugly default used since GC first
+        // released. This is the first time we actively applied
+        // a new theme and color setting for users.
+
+        // For a full breakdown of all activities applied in VERSION 3.1
+        // they are listed in detail on the associated gitub issue:
+        // see https://github.com/GoldenCheetah/GoldenCheetah/issues/883
+
+        // 1. Delete all backup, CPX, Metrics and Lucene Index
+        QStringList oldfiles;
+        oldfiles << "*.cpi";
+        oldfiles << "*.bak";
+        foreach (QString oldfile, home.entryList(oldfiles, QDir::Files)) {
+            QFile old(QString("%1/%2").arg(home.canonicalPath()).arg(oldfile));
+            old.remove();
+        }
+
+        QFile index(QString("%1/index").arg(home.canonicalPath()));
+        if (index.exists()) {
+            removeIndex(index);
+        }
+
+        QFile db(QString("%1/metricDBv3").arg(home.canonicalPath()));
+        if (db.exists()) db.remove();
+
+
+        // 2. Remove any old charts.xml (it will be WRONG!)
+        QFile charts(QString("%1/charts.xml").arg(home.canonicalPath()));
+        if (charts.exists()) charts.remove();
+
+        // 3. Reset colour defaults **
+        GCColor::applyTheme(0); // set to default theme
+
+        // 4. Theme and Chrome Color
+        QString theme = "Flat";
+        QColor chromeColor = QColor(Qt::darkGray);
+#ifdef Q_OS_MAC
+        // Yosemite or earlier 
+        if (QSysInfo::MacintoshVersion >= 12) {
+
+            chromeColor = QColor(235,235,235);
+        } else {
+
+            // prior to Yosemite .. metallic
+            theme = "Mac";
+            chromeColor = QColor(215,215,215);
+        }
+#endif
+        QString colorstring = QString("%1:%2:%3").arg(chromeColor.red())
+                                                 .arg(chromeColor.green())
+                                                 .arg(chromeColor.blue());
+        appsettings->setValue("CCHROME", colorstring);
+        GCColor::setColor(CCHROME, chromeColor);
+
+        // BELOW STILL TODO
+        // 5. Notes keywords
+        // 6. Set a default W' for the athlete / power.zones
+        // 7. Check for Power Zones that do not start from zero 
+        // 8. Add TSS, and TISS to the 'Metrics' metadata tab (to avoid FAQ #1)
+        // 9. Add a W'bal chart to the ride view
+        // 10. Add a CP History chart to the trend view
+        // 11. Add a Library chart to the trend view
+
     }
 
     return 0;
