@@ -68,7 +68,7 @@ void NullController::getRealtimeData(RealtimeData &rtData) {
         uint8_t b = ++beats;
         uint8_t bpm =60+(rand()%2);
 
-        qDebug()<<"rrdata:"<<m<<b<<bpm;
+        //qDebug()<<"rrdata:"<<m<<b<<bpm;
         emit rrData(m, b, bpm);
     }
 }
