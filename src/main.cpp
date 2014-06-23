@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QtGui>
 #include <QFile>
+#include <QWebSettings>
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
@@ -319,6 +320,9 @@ main(int argc, char *argv[])
 
         // close trainDB
         delete trainDB;
+
+        // clear web caches (stop warning of WebKit leaks)
+        QWebSettings::clearMemoryCaches();
 
     } while (restarting);
 
