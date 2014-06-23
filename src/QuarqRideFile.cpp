@@ -32,7 +32,7 @@ QProcess *getInterpreterProcess( QString path ) {
     antProcess->start( path );
 
     if (!antProcess->waitForStarted()) {
-      delete antProcess;
+      antProcess->deleteLater();
       antProcess = NULL;
     }
 
