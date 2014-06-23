@@ -36,6 +36,10 @@ lessThan(QT_MAJOR_VERSION, 5) {
         QT += macextras
     } else {
         QT += multimedia multimediawidgets
+
+        # we use qt5 multimedia for QT5 and above
+        HEADERS     += VideoWindow.h
+        SOURCES     += VideoWindow.cpp
     }
 }
 
