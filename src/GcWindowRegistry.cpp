@@ -36,6 +36,9 @@
 #ifdef GC_HAVE_VLC
 #include "VideoWindow.h"
 #endif
+#if (defined Q_OS_LINUX || defined WIN32) && QT_VERSION >= 0x050201
+#include "VideoWindow.h"
+#endif
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #endif
@@ -179,7 +182,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #if defined Q_OS_MAC || defined GC_HAVE_VLC // mac uses Quicktime / Win/Linux uses VLC
     case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
 #else
+#if (defined Q_OS_LINUX || defined WIN32) && QT_VERSION >= 0x050201 // QT5 we use QT video playback
+    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
+#else
     case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
+#endif
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(context); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(context); break;
