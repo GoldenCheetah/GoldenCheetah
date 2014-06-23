@@ -942,7 +942,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         // create the hover curve
         hoverCurve = new QwtPlotCurve("Interval");
         hoverCurve->setPen(pen);
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         hoverCurve->setYAxis(QwtPlot::yLeft);
         hoverCurve->setSamples(array);
         hoverCurve->setVisible(true);
@@ -1010,7 +1010,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
 
     // create a curve!
     QwtPlotCurve *curve = new QwtPlotCurve();
-    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     // set its color - based upon index in intervals!

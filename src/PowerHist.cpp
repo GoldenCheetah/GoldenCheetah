@@ -165,7 +165,7 @@ PowerHist::configChanged()
     }
 
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
-    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true) {
+    if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true) {
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
         curveHover->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -1247,7 +1247,7 @@ PowerHist::setDataFromCompare()
         QwtPlotCurve *newCurve = new QwtPlotCurve("");
         newCurve->setStyle(QwtPlotCurve::Steps);
 
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
             newCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         // curve has no brush .. too confusing...
@@ -1352,7 +1352,7 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
         QwtPlotCurve *newCurve = new QwtPlotCurve("");
         newCurve->setStyle(QwtPlotCurve::Steps);
 
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
             newCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         // curve has no brush .. too confusing...

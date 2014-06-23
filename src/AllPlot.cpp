@@ -421,7 +421,7 @@ AllPlotObject::setColor(QColor color)
     QPen pen;
     pen.setWidth(1.0);
     int alpha = 200;
-    bool antialias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
+    bool antialias = appsettings->value(this, GC_ANTIALIAS, true).toBool();
     foreach(QwtPlotCurve *c, worklist) {
 
         pen.setColor(color);
@@ -722,7 +722,7 @@ AllPlot::configChanged()
 {
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
 
-    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) {
+    if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) {
         standard->wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->atissCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->antissCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -3148,7 +3148,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 break;
             }
 
-            bool antialias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
+            bool antialias = appsettings->value(this, GC_ANTIALIAS, true).toBool();
 
             // lets clone !
             if ((ourCurve && thereCurve) || (ourICurve && thereICurve)) {
