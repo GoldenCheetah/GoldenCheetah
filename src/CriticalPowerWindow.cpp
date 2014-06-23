@@ -936,7 +936,7 @@ CriticalPowerWindow::intervalHover(RideFileInterval x)
         for (size_t i=0; i<intervalCurves[index]->data()->size(); i++) array << intervalCurves[index]->data()->sample(i);
 
         QPen pen(Qt::gray);
-        double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
         pen.setWidth(width);
 
         // create the hover curve
@@ -1018,7 +1018,7 @@ CriticalPowerWindow::showIntervalCurve(IntervalItem *current, int index)
     int count=context->athlete->allIntervalItems()->childCount();
     intervalColor.setHsv(index * (255/count), 255,255);
     QPen pen(intervalColor);
-    double width = appsettings->value(this, GC_LINEWIDTH, 1.0).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
     pen.setWidth(width);
     //pen.setStyle(Qt::DotLine);
     intervalColor.setAlpha(64);

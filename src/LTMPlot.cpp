@@ -368,7 +368,7 @@ LTMPlot::setData(LTMSettings *set)
     //qDebug()<<"Created curve data.."<<timer.elapsed();
 
     // setup the curves
-    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
     bool donestack = false;
 
     // now we iterate over the metric details AGAIN
@@ -1383,7 +1383,7 @@ LTMPlot::setCompareData(LTMSettings *set)
         //qDebug()<<"Created curve data.."<<timer.elapsed();
 
         // setup the curves
-        double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+        double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
 
         // now we iterate over the metric details AGAIN
         // but this time in reverse and only plot the

@@ -720,7 +720,7 @@ AllPlot::~AllPlot()
 void
 AllPlot::configChanged()
 {
-    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+    double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
 
     if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) {
         standard->wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
