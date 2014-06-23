@@ -350,7 +350,7 @@ CPPlot::plotModel()
 
             // create curve
             modelCurve = new QwtPlotCurve("Model");
-            if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                 modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
             // set the point data
@@ -473,7 +473,7 @@ CPPlot::plotModel()
         // heat curve
         heatCurve = new QwtPlotCurve("heat");
 
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) heatCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) heatCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         heatCurve->setBrush(QBrush(GColor(CCP).darker(200)));
         heatCurve->setPen(QPen(Qt::NoPen));
@@ -511,7 +511,7 @@ CPPlot::plotModel()
         // HeatCurveByDate
         heatAgeCurve = new CpPlotCurve("heat by date");
 
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             heatAgeCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         heatAgeCurve->setPenWidth(1);
@@ -593,7 +593,7 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
 
     // create curve
     QwtPlotCurve *curve = new QwtPlotCurve("Model");
-    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     if (baseline) {
@@ -735,7 +735,7 @@ CPPlot::plotBests()
             // no zones wanted
             QwtPlotCurve *curve = new QwtPlotCurve(tr("Bests"));
 
-            if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
             // lets make it the right colour for the date series
@@ -858,7 +858,7 @@ CPPlot::plotBests()
 
                 // set the pen color and line width etc
                 QColor color = zoneColor(zone, n_zones);
-                if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+                if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
                 pen.setColor(GColor(CCP)); //XXX color ?
@@ -1917,7 +1917,7 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 
     // create a curve!
     QwtPlotCurve *curve = new QwtPlotCurve();
-    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     // set its color - based upon index in intervals!

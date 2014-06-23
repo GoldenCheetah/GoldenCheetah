@@ -1150,7 +1150,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     QLabel *antiAliasLabel = new QLabel(tr("Antialias"));
     antiAliased = new QCheckBox;
-    antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, false).toBool());
+    antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, true).toBool());
 #ifndef Q_OS_MAC
     QLabel *rideScrollLabel = new QLabel(tr("Ride Scrollbar"));
     rideScroll = new QCheckBox;

@@ -413,7 +413,7 @@ LTMPlot::setData(LTMSettings *set)
         else
             curves.insert(metricDetail.symbol, current);
         stacks.insert(current, stackcounter+1);
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen cpen = QPen(metricDetail.penColor);
         cpen.setWidth(width);
@@ -561,7 +561,7 @@ LTMPlot::setData(LTMSettings *set)
             curves.insert(metricDetail.bestSymbol, current);
         else
             curves.insert(metricDetail.symbol, current);
-        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen cpen = QPen(metricDetail.penColor);
         cpen.setWidth(width);
@@ -618,7 +618,7 @@ LTMPlot::setData(LTMSettings *set)
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
-                if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
                     trend->setRenderHint(QwtPlotItem::RenderAntialiased);
                 trend->setBaseline(0);
                 trend->setYAxis(axisid);
@@ -654,7 +654,7 @@ LTMPlot::setData(LTMSettings *set)
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
-                if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
                     trend->setRenderHint(QwtPlotItem::RenderAntialiased);
                 trend->setBaseline(0);
                 trend->setYAxis(axisid);
@@ -1430,7 +1430,7 @@ LTMPlot::setCompareData(LTMSettings *set)
             else
                 curves.insert(name, current);
             stacks.insert(current, stackcounter+1);
-            if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                 current->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen cpen = QPen(cd.color);
             cpen.setWidth(width);
@@ -1586,7 +1586,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                 curves.insert(cd.name, current);
             else
                 curves.insert(cd.name, current);
-            if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                 current->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen cpen = QPen(cd.color);
             cpen.setWidth(width);
@@ -1641,7 +1641,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     cpen.setWidth(2); // double thickness for trend lines
                     cpen.setStyle(Qt::SolidLine);
                     trend->setPen(cpen);
-                    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                    if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
                         trend->setRenderHint(QwtPlotItem::RenderAntialiased);
                     trend->setBaseline(0);
                     trend->setYAxis(axisid);
@@ -1676,7 +1676,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     cpen.setWidth(2); // double thickness for trend lines
                     cpen.setStyle(Qt::SolidLine);
                     trend->setPen(cpen);
-                    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                    if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
                     trend->setRenderHint(QwtPlotItem::RenderAntialiased);
                     trend->setBaseline(0);
                     trend->setYAxis(axisid);

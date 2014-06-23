@@ -271,7 +271,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_2_3(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CHEARTRATE));
     e2pen.setWidth(1);
@@ -629,7 +629,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP2");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(Qt::yellow);
     e2pen.setWidth(1);
@@ -685,7 +685,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_4_3(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP2");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CCP));
     e2pen.setWidth(1);
@@ -736,7 +736,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WSecond(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_WSecond");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CCADENCE));
     e2pen.setWidth(1);
@@ -765,7 +765,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_WPrime");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CPOWER));
     e2pen.setWidth(1);
@@ -794,7 +794,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_CP(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_CP");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CHEARTRATE));
     e2pen.setWidth(1);
@@ -825,7 +825,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime_CP(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_WPrime_CP");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CCP));
     e2pen.setWidth(1);
@@ -1175,7 +1175,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(CCP)); // Qt::cyan
     e2pen.setWidth(1);
@@ -1204,7 +1204,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("level_eCP_5_3");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(GColor(Qt::lightGray)); // Qt::cyan
     e2pen.setWidth(1);
@@ -1235,7 +1235,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(Model_eCP model, bo
     }
 
     QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_WSecond");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CCADENCE));
@@ -1278,7 +1278,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(Model_eCP model, boo
     }
 
     QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_WPrime");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CPOWER));
@@ -1323,7 +1323,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(Model_eCP model, bool st
     }
 
     QwtPlotIntervalCurve *extendedCPCurve = new QwtPlotIntervalCurve("eCP_5_3_CP");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CHEARTRATE));
@@ -1619,7 +1619,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3(Model_eCP model)
     }
 
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_6_3");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen e2pen(Qt::cyan);
     e2pen.setWidth(1);
@@ -1648,7 +1648,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(Model_eCP model, bo
     }
 
     QwtPlotIntervalCurve *extendedCPCurve2 = new QwtPlotIntervalCurve("eCP_6_3_WSecond");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CCADENCE));
@@ -1690,7 +1690,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WPrime(Model_eCP model, boo
     }
 
     QwtPlotIntervalCurve *extendedCPCurve2 = new QwtPlotIntervalCurve("eCP_6_3_WPrime");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CPOWER));
@@ -1733,7 +1733,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_CP(Model_eCP model, bool st
     }
 
     QwtPlotIntervalCurve *extendedCPCurve2 = new QwtPlotIntervalCurve("eCP_6_3_CP");
-    if (appsettings->value(NULL, GC_ANTIALIAS, false).toBool() == true)
+    if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPen e2pen(GColor(CHEARTRATE));
