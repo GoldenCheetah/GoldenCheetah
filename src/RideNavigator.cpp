@@ -1212,10 +1212,14 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView()
 {
+#if (defined WIN32) && (QT_VERSION > 0x050000)
+    // don't allow ride drop on Windows with QT5
+#else
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
+#endif
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
