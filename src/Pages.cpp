@@ -222,7 +222,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     //
     // Workout directory (train view)
     //
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
+    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
+    // fix old bug..
+    if (workoutDir == "0") workoutDir = "";
     workoutLabel = new QLabel(tr("Workout Library:"));
     workoutDirectory = new QLineEdit;
     workoutDirectory->setText(workoutDir.toString());
@@ -717,7 +719,8 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     weightlabel = new QLabel(weighttext);
 
     nickname = new QLineEdit(this);
-    nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME).toString());
+    nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME, "").toString());
+    if (nickname->text() == "0") nickname->setText("");
 
     dob = new QDateEdit(this);
     dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());

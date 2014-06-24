@@ -189,7 +189,7 @@ main(int argc, char *argv[])
 
         // or did we override in settings?
         QString sh;
-        if ((sh=appsettings->value(NULL, GC_HOMEDIR).toString(), "") != "") localLibraryPath = sh;
+        if ((sh=appsettings->value(NULL, GC_HOMEDIR).toString(), "") != QString("")) localLibraryPath = sh;
 
         // lets try the local library we've worked out...
         QDir home = QDir();
