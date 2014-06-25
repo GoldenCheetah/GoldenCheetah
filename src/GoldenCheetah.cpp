@@ -694,7 +694,7 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
     // reveal widget
     _revealControls = new QWidget();
     _revealControls->setFixedHeight(50);
-    _revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
+    _revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 80%)");
     _revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     _revealAnim = new QPropertyAnimation(_revealControls, "pos");
@@ -759,7 +759,7 @@ GcChartWindow::colorChanged(QColor z)
     QColor fgColor = GCColor::invertColor(z);
 
     // so z is color for bg and fgColor is for fg
-    QString stylesheet = QString("color: rgb(%1, %2, %3); background-color: rgb(%4, %5, %6)")
+    QString stylesheet = QString("color: rgb(%1, %2, %3); background-color: rgba(%4, %5, %6, 80%)")
                                     .arg(fgColor.red())
                                     .arg(fgColor.green())
                                     .arg(fgColor.blue())
