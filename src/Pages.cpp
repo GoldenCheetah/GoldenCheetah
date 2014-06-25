@@ -210,6 +210,7 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteLabel = new QLabel(tr("Athlete Library:"));
     athleteDirectory = new QLineEdit;
     athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
+    athleteWAS = athleteDirectory->text(); // remember what we started with ...
     athleteBrowseButton = new QPushButton(tr("Browse"));
     athleteBrowseButton->setFixedWidth(120);
 

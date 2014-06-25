@@ -197,7 +197,7 @@ void ConfigDialog::saveClicked()
 
     // did the home directory change?
     QString shome = appsettings->value(this, GC_HOMEDIR).toString();
-    if (shome != "0" && shome != "" && QFileInfo(shome).absoluteFilePath() != QFileInfo(home.absolutePath()).absolutePath()) {
+    if (shome != general->generalPage->athleteWAS || QFileInfo(shome).absoluteFilePath() != QFileInfo(home.absolutePath()).absolutePath()) {
 
         // are you sure you want to change the location of the athlete library?
         // if so we will restart, if not I'll revert to current directory
@@ -221,15 +221,21 @@ void ConfigDialog::saveClicked()
             // close all the mainwindows
             foreach(MainWindow *m, mainwindows) m->byebye();
 
+            // NOTE: we don't notifyConfigChanged() now because the context
+            //       has been zapped along with the windows we need to get out
+            //       as quickly as possible.
+            close();
+            return; 
+
         } else {
 
-            // revert to current home 
+            // revert to current home and let everyone know
             appsettings->setValue(GC_HOMEDIR, QFileInfo(home.absolutePath()).absolutePath());
-
         }
-    }
 
-    // do the zones first..
+    } 
+
+    // we're done.
     context->notifyConfigChanged();
     close();
 }

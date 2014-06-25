@@ -61,6 +61,7 @@ class GeneralPage : public QWidget
         GeneralPage(Context *context);
         void saveClicked();
 
+        QString athleteWAS; // remember what we started with !
 
     public slots:
         void browseWorkoutDir();

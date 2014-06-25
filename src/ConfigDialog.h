@@ -42,6 +42,8 @@ class GeneralConfig : public QWidget
     public:
         GeneralConfig(QDir home, Zones *zones, Context *context);
 
+        GeneralPage *generalPage;
+
     public slots:
         void saveClicked();
 
@@ -50,7 +52,6 @@ class GeneralConfig : public QWidget
         Zones *zones;
         Context *context;
 
-        GeneralPage *generalPage;
 };
 
 // ATHLETE PAGE
