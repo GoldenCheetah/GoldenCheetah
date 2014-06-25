@@ -2079,10 +2079,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     if (bydist) {
         startidx = plot->distanceIndex(plot->standard->distanceArray[startidx]);
-        stopidx  = plot->distanceIndex(plot->standard->distanceArray[(stopidx>=plot->standard->distanceArray.size()?plot->standard->distanceArray.size()-1:stopidx)])-1;
+        stopidx  = plot->distanceIndex(plot->standard->distanceArray[(stopidx>=plot->standard->distanceArray.size()?plot->standard->distanceArray.size()-1:stopidx)]);
     } else {
         startidx = plot->timeIndex(plot->standard->timeArray[startidx]/60);
-        stopidx  = plot->timeIndex(plot->standard->timeArray[(stopidx>=plot->standard->timeArray.size()?plot->standard->timeArray.size()-1:stopidx)]/60)-1;
+        stopidx  = plot->timeIndex(plot->standard->timeArray[(stopidx>=plot->standard->timeArray.size()?plot->standard->timeArray.size()-1:stopidx)]/60);
     }
 
     // center the curve title
@@ -2229,33 +2229,34 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata(bydist).data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata(bydist).count());
         standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata(bydist).data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata(bydist).count());
     }
-    standard->wattsCurve->setSamples(xaxis,smoothW,stopidx-startidx);
-    standard->atissCurve->setSamples(xaxis,smoothAT,stopidx-startidx);
-    standard->antissCurve->setSamples(xaxis,smoothANT,stopidx-startidx);
-    standard->npCurve->setSamples(xaxis,smoothN,stopidx-startidx);
-    standard->xpCurve->setSamples(xaxis,smoothX,stopidx-startidx);
-    standard->apCurve->setSamples(xaxis,smoothL,stopidx-startidx);
-    standard->hrCurve->setSamples(xaxis, smoothHR,stopidx-startidx);
-    standard->speedCurve->setSamples(xaxis, smoothS, stopidx-startidx);
-    standard->accelCurve->setSamples(xaxis, smoothAC, stopidx-startidx);
-    standard->wattsDCurve->setSamples(xaxis, smoothWD, stopidx-startidx);
-    standard->cadDCurve->setSamples(xaxis, smoothCD, stopidx-startidx);
-    standard->nmDCurve->setSamples(xaxis, smoothND, stopidx-startidx);
-    standard->hrDCurve->setSamples(xaxis, smoothHD, stopidx-startidx);
-    standard->cadCurve->setSamples(xaxis, smoothC, stopidx-startidx);
-    standard->altCurve->setSamples(xaxis, smoothA, stopidx-startidx);
-    standard->tempCurve->setSamples(xaxis, smoothTE, stopidx-startidx);
+    int points = stopidx - startidx + 1; // e.g. 10 to 12 is 3 points 10,11,12, so not 12-10 !
+    standard->wattsCurve->setSamples(xaxis,smoothW,points);
+    standard->atissCurve->setSamples(xaxis,smoothAT,points);
+    standard->antissCurve->setSamples(xaxis,smoothANT,points);
+    standard->npCurve->setSamples(xaxis,smoothN,points);
+    standard->xpCurve->setSamples(xaxis,smoothX,points);
+    standard->apCurve->setSamples(xaxis,smoothL,points);
+    standard->hrCurve->setSamples(xaxis, smoothHR,points);
+    standard->speedCurve->setSamples(xaxis, smoothS, points);
+    standard->accelCurve->setSamples(xaxis, smoothAC, points);
+    standard->wattsDCurve->setSamples(xaxis, smoothWD, points);
+    standard->cadDCurve->setSamples(xaxis, smoothCD, points);
+    standard->nmDCurve->setSamples(xaxis, smoothND, points);
+    standard->hrDCurve->setSamples(xaxis, smoothHD, points);
+    standard->cadCurve->setSamples(xaxis, smoothC, points);
+    standard->altCurve->setSamples(xaxis, smoothA, points);
+    standard->tempCurve->setSamples(xaxis, smoothTE, points);
 
-    QVector<QwtIntervalSample> tmpWND(stopidx-startidx);
-    memcpy(tmpWND.data(), smoothRS, (stopidx-startidx) * sizeof(QwtIntervalSample));
+    QVector<QwtIntervalSample> tmpWND(points);
+    memcpy(tmpWND.data(), smoothRS, (points) * sizeof(QwtIntervalSample));
     standard->windCurve->setSamples(new QwtIntervalSeriesData(tmpWND));
-    standard->torqueCurve->setSamples(xaxis, smoothNM, stopidx-startidx);
-    standard->balanceLCurve->setSamples(xaxis, smoothBALL, stopidx-startidx);
-    standard->balanceRCurve->setSamples(xaxis, smoothBALR, stopidx-startidx);
-    standard->lteCurve->setSamples(xaxis, smoothLTE, stopidx-startidx);
-    standard->rteCurve->setSamples(xaxis, smoothRTE, stopidx-startidx);
-    standard->lpsCurve->setSamples(xaxis, smoothLPS, stopidx-startidx);
-    standard->rpsCurve->setSamples(xaxis, smoothRPS, stopidx-startidx);
+    standard->torqueCurve->setSamples(xaxis, smoothNM, points);
+    standard->balanceLCurve->setSamples(xaxis, smoothBALL, points);
+    standard->balanceRCurve->setSamples(xaxis, smoothBALR, points);
+    standard->lteCurve->setSamples(xaxis, smoothLTE, points);
+    standard->rteCurve->setSamples(xaxis, smoothRTE, points);
+    standard->lpsCurve->setSamples(xaxis, smoothLPS, points);
+    standard->rpsCurve->setSamples(xaxis, smoothRPS, points);
 
     /*QVector<double> _time(stopidx-startidx);
     qMemCopy( _time.data(), xaxis, (stopidx-startidx) * sizeof( double ) );
@@ -2266,7 +2267,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         tmpWND.append(inter); // plot->standard->smoothRelSpeed.at(i)
     }*/
 
-    int points = stopidx - startidx;
     setSymbol(standard->wCurve, points);
     setSymbol(standard->wattsCurve, points);
     setSymbol(standard->antissCurve, points);
@@ -2294,7 +2294,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     setYMax();
 
-    setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx-1]);
+    setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx]);
     enableAxis(xBottom, true);
     setAxisVisible(xBottom, true);
 
