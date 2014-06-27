@@ -235,48 +235,81 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
     selected.clear();
 
     // set headings
-    rides->setColumnCount(settings.metrics.count()+1);
+    rides->setColumnCount(1);
     QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
+    bool nonRideMetrics = FALSE; // a non Ride specific metrics is shown on the Chart
+    // collect the header texts (to know the number of columns)
     int column = 1;
+    QList<QString> headerList;
     foreach(MetricDetail d, settings.metrics) {
-         h = new QTableWidgetItem(d.name,QTableWidgetItem::Type);
-         rides->setHorizontalHeaderItem(column++,h);
+         // only add columns for ride related metrics (DB, META and BEST)
+         if (d.type == METRIC_DB || d.type == METRIC_META || d.type == METRIC_BEST) {
+             headerList << d.uname;
+             column++;
+         } else {
+             // there is at least one other metrics in the chart, so add info to title
+             nonRideMetrics = TRUE;
+         }
+    }
+    // set the header texts of relevant columns exist
+    if (column > 1) {
+        rides->setColumnCount(column);
+        int i = 1;
+        foreach (QString header, headerList) {
+            h = new QTableWidgetItem(header,QTableWidgetItem::Type);
+            rides->setHorizontalHeaderItem(i++,h);
+        }
     }
 
-    foreach(SummaryMetrics x, (*settings.data)) {
-        QDateTime rideDate = x.getRideDate();
+    // Summary Metrics.data is always available and thus perfect find the rides eligible for the list
+    int i = 0;
+    foreach(SummaryMetrics data, (*settings.data)) {
+        QDateTime rideDate = data.getRideDate();
 
-        // check either RideDate (for all Date related groupBy's) or RideTime (for LTM_TOD only)
-        if (((settings.groupBy != LTM_TOD) && (rideDate.date() >= start && rideDate.date() <= end))
-          ||((settings.groupBy == LTM_TOD) && (rideDate.time() >= time && rideDate.time() <= end_time))) {
+          // check either RideDate (for all Date related groupBy's) or RideTime (for LTM_TOD only)
+          if (((settings.groupBy != LTM_TOD) && (rideDate.date() >= start && rideDate.date() <= end))
+            ||((settings.groupBy == LTM_TOD) && (rideDate.time() >= time && rideDate.time() <= end_time))) {
 
-            // apply filters
-           if (context->isfiltered && !context->filters.contains(x.getFileName())) continue;
-           if (context->ishomefiltered && !context->homeFilters.contains(x.getFileName())) continue;
+              // apply filters
+             if (context->isfiltered && !context->filters.contains(data.getFileName())) continue;
+             if (context->ishomefiltered && !context->homeFilters.contains(data.getFileName())) continue;
 
-            // we'll select it for summary aggregation
-            selected << x;
+             // we'll select it for summary display
+             selected << data;
 
-            // date/time
-            QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
-            t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-            t->setTextAlignment(Qt::AlignHCenter);
-            rides->setRowCount(count+1);
-            rides->setItem(count, 0, t);
-            rides->setRowHeight(count, 14);
+             // date/time
+             QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
+             t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+             t->setTextAlignment(Qt::AlignHCenter);
+             rides->setRowCount(count+1);
+             rides->setItem(count, 0, t);
+             rides->setRowHeight(count, 14);
 
-            // metrics
-            int column = 1;
-            foreach(MetricDetail d, settings.metrics) {
-                QString value = x.getStringForSymbol(d.symbol, context->athlete->useMetricUnits);
-                h = new QTableWidgetItem(value,QTableWidgetItem::Type);
-                h->setFlags(t->flags() & (~Qt::ItemIsEditable));
-                h->setTextAlignment(Qt::AlignHCenter);
-                rides->setItem(count, column++, h);
-            }
-            count++;
-        }
+             // the column data has to be determined depending on the metrics type
+             int column = 1;
+             // per selected Ride find values for each Metrics
+             foreach(MetricDetail d, settings.metrics) {
+                 QString value;
+                 if (d.type == METRIC_DB || d.type == METRIC_META) {
+                     value = data.getStringForSymbol(d.symbol, context->athlete->useMetricUnits);
+                 } else if (d.type == METRIC_BEST) {
+                     // bests are only available if a METRIC_BEST exists
+                     SummaryMetrics bests = settings.bests->at(i);
+                     // and are not considered as standard metrics for rounding, so do it here with precision 0
+                     double v = bests.getForSymbol(d.bestSymbol);
+                     value = QString("%1").arg(v, 0, 'f', 0);
+                 } else {
+                     // for any other type, rides have no data / and no header column is prepared
+                     continue;
+                 }
+                 h = new QTableWidgetItem(value,QTableWidgetItem::Type);
+                 h->setTextAlignment(Qt::AlignHCenter);
+                 rides->setItem(count, column++, h);
+             }
+             count++;
+         }
+         i++;
     }
 
     // make em all visible!
@@ -305,6 +338,8 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
        // give some extrat info
        if (count > 1) _title += QString(tr(" (%1 rides)")).arg(count);
     }
+
+    if (nonRideMetrics) _title += QString(tr(" / non ride-related metrics skipped"));
 
     setTitle(_title);
 
@@ -465,15 +500,18 @@ LTMPopup::resizeEvent(QResizeEvent *)
     int _width = width()-10;
     int _firstWidth = 150;
     int _scrollbarWidth = 20;
-    int _sectionWidth = ((_width-_scrollbarWidth-_firstWidth) / (rides->horizontalHeader()->count()-1)) - 4;
 
     rides->setFixedWidth(_width);
     rides->horizontalHeader()->resizeSection(0, _firstWidth);
+    // only resize if more than Date/Time column exists
+    if (rides->horizontalHeader()->count() > 1) {
+        int _sectionWidth = ((_width-_scrollbarWidth-_firstWidth) / (rides->horizontalHeader()->count()-1)) - 4;
+        rides->horizontalHeader()->resizeSection(0, _firstWidth);
+        for (int i=1; i < rides->horizontalHeader()->count(); i++)
+           rides->horizontalHeader()->resizeSection(i, _sectionWidth);
 
-    for (int i=1; i < rides->horizontalHeader()->count(); i++)
-        rides->horizontalHeader()->resizeSection(i, _sectionWidth);
+    }
 }
-
 bool
 LTMPopup::eventFilter(QObject * /*object*/, QEvent *e)
 {
