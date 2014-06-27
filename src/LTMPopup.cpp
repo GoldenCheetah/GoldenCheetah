@@ -238,7 +238,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
     rides->setColumnCount(1);
     QTableWidgetItem *h = new QTableWidgetItem(tr("Date & Time"), QTableWidgetItem::Type);
     rides->setHorizontalHeaderItem(0,h);
-    bool nonRideMetrics = FALSE; // a non Ride specific metrics is shown on the Chart
+    bool nonRideMetrics = false; // a non Ride specific metrics is shown on the Chart
     // collect the header texts (to know the number of columns)
     int column = 1;
     QList<QString> headerList;
@@ -249,7 +249,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
              column++;
          } else {
              // there is at least one other metrics in the chart, so add info to title
-             nonRideMetrics = TRUE;
+             nonRideMetrics = true;
          }
     }
     // set the header texts of relevant columns exist
