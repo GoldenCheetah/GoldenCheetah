@@ -1,4 +1,4 @@
-infile(config.pri, SOLUTIONS_LIBRARY, yes): CONFIG += qtsoap-uselib
+exists(config.pri):infile(config.pri, SOLUTIONS_LIBRARY, yes): CONFIG += qtsoap-uselib
 TEMPLATE += fakelib
 QTSOAP_LIBNAME = $$qtLibraryTarget(QtSolutions_SOAP-2.7)
 TEMPLATE -= fakelib
