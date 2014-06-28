@@ -33,9 +33,6 @@
 #ifdef GC_HAVE_QWTPLOT3D
 #include "ModelWindow.h"
 #endif
-#ifdef GC_HAVE_VLC
-#include "VideoWindow.h"
-#endif
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #else
