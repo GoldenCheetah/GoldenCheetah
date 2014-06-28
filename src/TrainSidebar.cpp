@@ -338,7 +338,9 @@ intensity->hide(); //XXX!!! temporary
 
 #ifdef Q_OS_MAC
     // get rid of annoying focus rectangle for sidebar components
+#if !defined GC_VIDEO_NONE
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
     deviceTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif

@@ -18,7 +18,6 @@
 
 #ifndef _GC_VideoWindow_h
 #define _GC_VideoWindow_h 1
-#include "GoldenCheetah.h"
 
 // QT stuff etc
 #include <QtGui>
@@ -29,6 +28,26 @@
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
 #include "TrainSidebar.h"
+#include "GoldenCheetah.h"
+
+class MediaHelper
+{
+    public:
+
+        MediaHelper();
+        ~MediaHelper();
+
+        // get a list of supported media
+        // found in the supplied directory
+        QStringList listMedia(QDir directory);
+        bool isMedia(QString);
+
+    private:
+        QStringList supported;
+};
+
+
+#ifndef GC_VIDEO_NONE
 
 // We add references to the Native objects, but since we
 // will be running Qt's moc utility on this file we need
@@ -47,22 +66,6 @@
 // we may add more native widgets in the future
 ADD_COCOA_NATIVE_REF (QTMovie);
 ADD_COCOA_NATIVE_REF (QTMovieView);
-
-class MediaHelper
-{
-    public:
-
-        MediaHelper();
-        ~MediaHelper();
-
-        // get a list of supported media
-        // found in the supplied directory
-        QStringList listMedia(QDir directory);
-        bool isMedia(QString);
-
-    private:
-        QStringList supported;
-};
 
 class QtMacMovieView : public QMacCocoaViewContainer
 {
@@ -114,5 +117,5 @@ class VideoWindow : public GcWindow
         // out video window
         QtMacMovieView *player;
 };
-
+#endif // GC_VIDEO_NONE
 #endif // _GC_VideoWindow_h
