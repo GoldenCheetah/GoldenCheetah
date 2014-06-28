@@ -2997,6 +2997,8 @@ CPPage::defaultClicked()
         font.setWeight(QFont::Normal);
         ranges->currentItem()->setFont(0, font);
         ranges->currentItem()->setFont(1, font);
+        ranges->currentItem()->setFont(2, font);
+
 
         // set the range to use defaults on the scheme page
         zonePage->zones.setScheme(zonePage->schemePage->getScheme());
@@ -3149,6 +3151,7 @@ CPPage::zonesChanged()
             font.setWeight(QFont::Black);
             ranges->currentItem()->setFont(0, font);
             ranges->currentItem()->setFont(1, font);
+            ranges->currentItem()->setFont(2, font);
 
             // show the default button to undo
             defaultButton->show();
@@ -3595,6 +3598,9 @@ LTPage::defaultClicked()
         font.setWeight(QFont::Normal);
         ranges->currentItem()->setFont(0, font);
         ranges->currentItem()->setFont(1, font);
+        ranges->currentItem()->setFont(2, font);
+        ranges->currentItem()->setFont(3, font);
+
 
         // set the range to use defaults on the scheme page
         zonePage->zones.setScheme(zonePage->schemePage->getScheme());
@@ -3768,6 +3774,8 @@ LTPage::zonesChanged()
             font.setWeight(QFont::Black);
             ranges->currentItem()->setFont(0, font);
             ranges->currentItem()->setFont(1, font);
+            ranges->currentItem()->setFont(2, font);
+            ranges->currentItem()->setFont(3, font);
 
             // show the default button to undo
             defaultButton->show();
