@@ -65,7 +65,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
                      "background-color: rgba(255,255,255,0);"
                      "border: 0px;"
                      "margin: 0px;"
-                     "font-size: 8px; }";
+                     "font-size: 10px; }";
     rides->horizontalHeader()->setStyleSheet(styleSheet);
     rides->verticalHeader()->hide();
     rides->setShowGrid(false);
