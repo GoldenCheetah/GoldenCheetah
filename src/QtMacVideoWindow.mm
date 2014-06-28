@@ -16,6 +16,10 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "QtMacVideoWindow.h"
+#include "Context.h"
+
+#ifndef GC_VIDEO_NONE
 //avoid including these in the main headers since all the
 //Objective-C syntax borks the Qt Meta Compiler (moc)
 //we also include them before the QT headers to avoid conflicts
@@ -23,10 +27,6 @@
 #include <QTKit/QTKit.h>
 #include <QTkit/QTMovie.h>
 #include <QTkit/QTMovieView.h>
-
-#include "QtMacVideoWindow.h"
-#include "Context.h"
-
 
 static inline NSString *darwinQStringToNSString (const QString &aString)
 {
@@ -141,6 +141,29 @@ void VideoWindow::mediaSelected(QString filename)
     if (old) [old invalidate];
 }
 
+QtMacMovieView::QtMacMovieView (QWidget *context) : QMacCocoaViewContainer (0, context)
+{
+#if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
+    //setAttribute(Qt::WA_NativeWindow);
+#endif
+
+    NSRect frame;
+    // allocate the player
+    player = [[QTMovieView alloc] initWithFrame:frame];
+    [player setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+    [player setPreservesAspectRatio:YES];
+    [player setControllerVisible:NO];
+
+    setCocoaView (player);
+}
+
+void
+QtMacMovieView::setMovie(NativeQTMovieRef movie)
+{
+    [player setMovie:movie];
+}
+#endif // GC_VIDEO_NONE
+
 MediaHelper::MediaHelper() 
 {
     // get a QTMove object to get the extensions we need
@@ -204,26 +227,4 @@ MediaHelper::isMedia(QString filename)
             return true;
     }
     return false;
-}
-
-QtMacMovieView::QtMacMovieView (QWidget *context) : QMacCocoaViewContainer (0, context)
-{
-#if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
-    //setAttribute(Qt::WA_NativeWindow);
-#endif
-
-    NSRect frame;
-    // allocate the player
-    player = [[QTMovieView alloc] initWithFrame:frame];
-    [player setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-    [player setPreservesAspectRatio:YES];
-    [player setControllerVisible:NO];
-
-    setCocoaView (player);
-}
-
-void
-QtMacMovieView::setMovie(NativeQTMovieRef movie)
-{
-    [player setMovie:movie];
 }
