@@ -36,10 +36,6 @@ lessThan(QT_MAJOR_VERSION, 5) {
         QT += macextras
     } else {
         QT += multimedia multimediawidgets
-
-        # we use qt5 multimedia for QT5 and above
-        HEADERS     += VideoWindow.h
-        SOURCES     += VideoWindow.cpp
     }
 }
 
@@ -151,8 +147,6 @@ CONFIG(debug, debug|release) {
         INCLUDEPATH += $${VLC_INCLUDE}
         LIBS        += $${VLC_LIBS}
         DEFINES     += GC_HAVE_VLC
-        HEADERS     += VideoWindow.h
-        SOURCES     += VideoWindow.cpp
     }
 }
 
@@ -212,6 +206,10 @@ macx {
     #qt segmented control for toolbar (non-Mac)
     HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
     SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
+
+    # we now have videowindow, it will do nothing
+    HEADERS     += VideoWindow.h
+    SOURCES     += VideoWindow.cpp
 }
 
 !win32 {

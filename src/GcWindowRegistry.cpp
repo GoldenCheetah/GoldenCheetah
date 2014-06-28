@@ -36,11 +36,10 @@
 #ifdef GC_HAVE_VLC
 #include "VideoWindow.h"
 #endif
-#if (defined Q_OS_LINUX || defined WIN32) && QT_VERSION >= 0x050201
-#include "VideoWindow.h"
-#endif
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
+#else
+#include "VideoWindow.h"
 #endif
 #include "PfPvWindow.h"
 #include "HrPwWindow.h"
@@ -179,14 +178,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Summary: returning = new SummaryWindow(context); break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
-#if defined Q_OS_MAC || defined GC_HAVE_VLC // mac uses Quicktime / Win/Linux uses VLC
-    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
-#else
-#if (defined Q_OS_LINUX || defined WIN32) && QT_VERSION >= 0x050201 // QT5 we use QT video playback
-    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
-#else
+#ifdef GC_VIDEO_NONE
     case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
-#endif
+#else
+    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(context); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(context); break;

@@ -33,19 +33,9 @@
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #else
-#ifdef GC_HAVE_VLC
 #include "VideoWindow.h"
-#else
-#if QT_VERSION < 0x050201
-// if no VLC on Windows / Linux then no media for QT < 5.2.1
-class MediaHelper {
-    public: bool isMedia(QString) { return false; }
-};
-#else
-#include "VideoWindow.h" // its in there for Win/Linux QT > 5.2.1
 #endif
-#endif
-#endif
+
 #include "ErgFile.h"
 
 QList<Library*> libraries;       // keep track of all the library search paths (global)
