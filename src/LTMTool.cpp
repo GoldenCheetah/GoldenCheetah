@@ -1113,7 +1113,10 @@ LTMTool::presetsChanged()
         add->setFlags(add->flags() | Qt::ItemIsEditable);
         add->setText(0, chart.name);
     }
-    charts->setCurrentItem(charts->invisibleRootItem()->child(0));
+
+    // select the first one, if there are any
+    if (context->athlete->presets.count())
+        charts->setCurrentItem(charts->invisibleRootItem()->child(0));
 }
 
 void
