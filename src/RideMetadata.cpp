@@ -427,6 +427,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     if (meta->sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
         units = meta->sp.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
+        // remove "seconds", since the field will be a QTimeEdit field
+        if (units == "seconds" || units == tr("seconds")) units = "";
+        // layout units name for screen
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
