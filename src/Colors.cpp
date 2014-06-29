@@ -28,7 +28,7 @@
 #ifdef Q_OS_WIN
 #include <windows.h>
 #ifdef GC_HAVE_DWM
-#include "Dwmapi.h"
+#include "dwmapi.h"
 #endif
 #endif
 
