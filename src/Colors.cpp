@@ -451,7 +451,7 @@ GCColor::linearGradient(int size, bool active, bool alternate)
 
             HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
             if (SUCCEEDED(hr)) {
-                BYTE red = GetRValue(wincolor)
+                BYTE red = GetRValue(wincolor);
                 BYTE green = GetGValue(wincolor);
                 BYTE blue = GetBValue(wincolor);
                 color = QColor::fromRgb(red,green,blue,255);
