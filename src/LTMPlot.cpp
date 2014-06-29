@@ -839,7 +839,7 @@ LTMPlot::setData(LTMSettings *set)
 
                             // handle precision of 1 for seconds converted to hours
                             int precision = m->precision();
-                            if (metricDetail.uunits == "seconds") precision=1;
+                            if (metricDetail.uunits == "seconds" || metricDetail.uunits == tr("seconds")) precision=1;
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
@@ -1000,7 +1000,7 @@ LTMPlot::setData(LTMSettings *set)
 
                         // handle precision of 1 for seconds converted to hours
                         int precision = m->precision();
-                        if (metricDetail.uunits == "seconds") precision=1;
+                        if (metricDetail.uunits == "seconds"  || metricDetail.uunits == tr("seconds")) precision=1;
                         if (metricDetail.uunits == "km") precision=0;
 
                         // we have a metric so lets be precise ...
@@ -1851,7 +1851,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                                 // handle precision of 1 for seconds converted to hours
                                 int precision = m->precision();
-                                if (metricDetail.uunits == "seconds") precision=1;
+                                if (metricDetail.uunits == "seconds"  || metricDetail.uunits == tr("seconds")) precision=1;
                                 if (metricDetail.uunits == "km") precision=0;
 
                                 // we have a metric so lets be precise ...
@@ -2013,7 +2013,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                             // handle precision of 1 for seconds converted to hours
                             int precision = m->precision();
-                            if (metricDetail.uunits == "seconds") precision=1;
+                            if (metricDetail.uunits == "seconds"  || metricDetail.uunits == tr("seconds")) precision=1;
                             if (metricDetail.uunits == "km") precision=0;
 
                             // we have a metric so lets be precise ...
