@@ -65,8 +65,11 @@ class CTableWidgetItem : public QTableWidgetItem
             switch(column()) {
 
                 case 2 : return text() < other.text(); // athlete
-                case 3 : return QDate::fromString(text(), QObject::tr("dd, MMM yyyy")) <
-                                QDate::fromString(other.text(), QObject::tr("dd, MMM yyyy")); // date
+
+                case 3 : // the date format in "toString" and "fromString" must be the same !
+                         //: Ensure EQUAL translation for EACH variant of date format used, don't mix
+                         return QDate::fromString(text(), QObject::tr("dd MMM, yyyy")) <
+                                QDate::fromString(other.text(), QObject::tr("dd MMM, yyyy")); // date
                 case 4 : // date or time depending on which view
                          if (text().contains(":")) {
 
@@ -75,18 +78,32 @@ class CTableWidgetItem : public QTableWidgetItem
 
                          } else {
 
-                            return QDate::fromString(text(), QObject::tr("dd, MMM yyyy")) <
-                                   QDate::fromString(other.text(), QObject::tr("dd, MMM yyyy")); // date
+                            return // the date format in "toString" and "fromString" must be the same !
+                                   QDate::fromString(text(), QObject::tr("dd MMM, yyyy")) <
+                                   QDate::fromString(other.text(), QObject::tr("dd MMM, yyyy")); // date
 
                          }
-                case 5 : return QTime::fromString(text(), "hh:mm") < // Duration
-                                QTime::fromString(other.text(), "hh:mm");
 
                 default: // work it out ..
-                         if (text().contains(":")) { // time
-
-                             return QTime::fromString(text()) <
-                                    QTime::fromString(other.text());
+                         // first time & duration
+                         if (text().contains(":") && other.text().contains(":")) {
+                             // time or duration - there are multiple formats possible, so check the one by one
+                             QTime t1 = QTime::fromString(text(), "m:ss");
+                             if (!t1.isValid()) t1 = QTime::fromString(text(), "mm:ss");
+                             if (!t1.isValid()) t1 = QTime::fromString(text(), "h:mm:ss");
+                             if (!t1.isValid()) t1 = QTime::fromString(text(), "hh:mm:ss");
+                             // give up to find proper format for t1, no need to check for the other time
+                             QTime t2;
+                             if (t1.isValid()) {
+                               t2 = QTime::fromString(other.text(), "m:ss");
+                               if (!t2.isValid()) t2 = QTime::fromString(other.text(), "mm:ss");
+                               if (!t2.isValid()) t2 = QTime::fromString(other.text(), "h:mm:ss");
+                               if (!t2.isValid()) t2 = QTime::fromString(other.text(), "hh:mm:ss");
+                             }
+                             // result if both are recognized to be valid
+                             if (t1.isValid() && t2.isValid()) return (t1 < t2);
+                             // not convertible to a time/duration, so treat as text
+                             return text() < other.text();
 
                          } else if (text().contains(QRegExp("[^0-9.,]")) ||
                                     other.text().contains(QRegExp("[^0-9.,]"))) { // alpha
@@ -206,7 +223,7 @@ ComparePane::refreshTable()
         table->setColumnCount(list.count()+1);
         table->horizontalHeader()->setSectionHidden(list.count(), true);
         table->setHorizontalHeaderLabels(list);
-        table->setSortingEnabled(true);
+        table->setSortingEnabled(false);
         table->verticalHeader()->hide();
         table->setShowGrid(false);
         table->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -379,7 +396,7 @@ ComparePane::refreshTable()
         table->setColumnCount(list.count()+1);
         table->horizontalHeader()->setSectionHidden(list.count(), true);
         table->setHorizontalHeaderLabels(list);
-        table->setSortingEnabled(true);
+        table->setSortingEnabled(false);
         table->verticalHeader()->hide();
         table->setShowGrid(false);
         table->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -476,6 +493,8 @@ ComparePane::refreshTable()
 #endif
         table->horizontalHeader()->setStretchLastSection(true);
     }
+    // sorting has to be disabled as long as table content is updated
+    table->setSortingEnabled(true);
     blockSignals(false);
 }
 
