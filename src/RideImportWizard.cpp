@@ -396,7 +396,7 @@ RideImportWizard::process()
                        // Cool, the date and time was extrcted from the source file
                        blanks[i] = false;
                        tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
-                       tableWidget->item(i,2)->setText(ride->startTime().toString(tr("hh:mm:ss ap")));
+                       tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
                    }
 
                    tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
@@ -574,7 +574,7 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,5)->isSelected()) {
             countselected++;
 
-            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), tr("hh:mm:ss"));
+            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), "hh:mm:ss");
             totalduration += duration.hour() * 3600 +
                              duration.minute() * 60 +
                              duration.second();
@@ -624,11 +624,11 @@ RideImportWizard::todayClicked(int index)
             // look at rides with missing start time - we need to populate those
 
             // ride duration
-            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), tr("hh:mm:ss"));
+            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), "hh:mm:ss");
 
             // ride start time
             QTime time(rstart/3600, rstart%3600/60, rstart%60);
-            tableWidget->item(i,2)->setText(time.toString(tr("hh:mm:ss a")));
+            tableWidget->item(i,2)->setText(time.toString("hh:mm:ss"));
             rstart += duration.hour() * 3600 +
                       duration.minute() * 60 +
                       duration.second();
@@ -767,7 +767,7 @@ RideImportWizard::abortClicked()
 
         // Setup the ridetime as a QDateTime
         QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), tr("dd MMM yyyy")),
-                                 QTime().fromString(tableWidget->item(i,2)->text(), tr("hh:mm:ss a")));
+                                 QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
         QString suffix = QFileInfo(filenames[i]).suffix();
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                                .arg ( ridedatetime.date().year(), 4, 10, zero )
@@ -976,7 +976,7 @@ QWidget *RideDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 
         // edit that time
         QTimeEdit *timeEdit = new QTimeEdit(parent);
-        timeEdit->setDisplayFormat("hh:mm:ss a");
+        timeEdit->setDisplayFormat("hh:mm:ss");
         connect(timeEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseTimeEditor()));
         return timeEdit;
     } else {
@@ -1010,7 +1010,7 @@ void RideDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
         dateEdit->setDate(date);
     } else if (index.column() == dateColumn+1) {
         QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
-        QTime time = QTime().fromString(index.model()->data(index, Qt::DisplayRole).toString(), "hh:mm:ss a");;
+        QTime time = QTime().fromString(index.model()->data(index, Qt::DisplayRole).toString(), "hh:mm:ss");;
         timeEdit->setTime(time);
     }
 }
@@ -1027,7 +1027,7 @@ void RideDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
         model->setData(index, value, Qt::DisplayRole);
     } else if (index.column() == dateColumn+1) {
         QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
-        QString value = timeEdit->time().toString("hh:mm:ss a");
+        QString value = timeEdit->time().toString("hh:mm:ss");
         model->setData(index, value, Qt::DisplayRole);
     }
 }

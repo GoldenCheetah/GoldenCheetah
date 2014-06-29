@@ -523,7 +523,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_TIME : // time
         widget = new QTimeEdit(this);
         //widget->setFixedHeight(18);
-        ((QTimeEdit*)widget)->setDisplayFormat("hh:mm:ss AP");
+        ((QTimeEdit*)widget)->setDisplayFormat("hh:mm:ss");
         connect (widget, SIGNAL(timeChanged(const QTime)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;

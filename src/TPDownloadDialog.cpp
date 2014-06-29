@@ -364,7 +364,7 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
 
         add->setText(2, ridedatetime.toString("MMM d, yyyy"));
         add->setTextAlignment(2, Qt::AlignLeft);
-        add->setText(3, ridedatetime.toString("hh:mm:ss ap"));
+        add->setText(3, ridedatetime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
         long secs = workouts[i].value("TimeTotalInSeconds").toInt();
@@ -414,7 +414,7 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
             sync->setTextAlignment(1, Qt::AlignCenter);
             sync->setText(2, ridedatetime.toString("MMM d, yyyy"));
             sync->setTextAlignment(2, Qt::AlignLeft);
-            sync->setText(3, ridedatetime.toString("hh:mm:ss ap"));
+            sync->setText(3, ridedatetime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
@@ -448,7 +448,7 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
 
         add->setText(2, ridedatetime.toString("MMM d, yyyy"));
         add->setTextAlignment(2, Qt::AlignLeft);
-        add->setText(3, ridedatetime.toString("hh:mm:ss ap"));
+        add->setText(3, ridedatetime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
         long secs = rideMetrics[i].getForSymbol("workout_time");
@@ -494,7 +494,7 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
             sync->setTextAlignment(1, Qt::AlignCenter);
             sync->setText(2, ridedatetime.toString("MMM d, yyyy"));
             sync->setTextAlignment(2, Qt::AlignLeft);
-            sync->setText(3, ridedatetime.toString("hh:mm:ss ap"));
+            sync->setText(3, ridedatetime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
