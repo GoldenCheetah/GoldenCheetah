@@ -70,7 +70,7 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
         // we will wipe the original file
         add->setText(1, rideItem->fileName);
         add->setText(2, rideItem->dateTime.toString(tr("dd MMM yyyy")));
-        add->setText(3, rideItem->dateTime.toString(tr("hh:mm:ss ap")));
+        add->setText(3, rideItem->dateTime.toString("hh:mm:ss"));
 
         // interval action
         add->setText(4, tr("Export"));
