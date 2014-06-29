@@ -318,7 +318,7 @@ SplitActivityWizard::setFilesList()
 
         add->setText(0, rideItem->fileName);
         add->setText(1, rideItem->ride()->startTime().toString(tr("dd MMM yyyy")));
-        add->setText(2, rideItem->ride()->startTime().toString(tr("hh:mm:ss ap")));
+        add->setText(2, rideItem->ride()->startTime().toString("hh:mm:ss"));
 
         // get duration and distance, yuk, dup of code below, and from RideImportWizard
         int secs=0;
@@ -365,7 +365,7 @@ SplitActivityWizard::setFilesList()
 
         // date and time
         add->setText(1, ride->startTime().toString(tr("dd MMM yyyy")));
-        add->setText(2, ride->startTime().toString(tr("hh:mm:ss ap")));
+        add->setText(2, ride->startTime().toString("hh:mm:ss"));
 
         // get duration and distance
         int secs=0;
