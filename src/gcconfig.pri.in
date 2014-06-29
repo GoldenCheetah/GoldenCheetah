@@ -225,7 +225,7 @@ macx {
 
 #if you have a version of mingw that properly provides
 #the Dwmapi.h header then uncomment this line
-#GC_HAVE_DWM
+#DEFINES += GC_HAVE_DWM
 
 # What video playback do you want?
 #DEFINES += GC_VIDEO_NONE             # dont add any video playback support
