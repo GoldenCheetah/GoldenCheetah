@@ -109,6 +109,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
+    init = false;
 #ifdef Q_OS_MAC
     head = NULL; // early resize event causes a crash
 #endif
@@ -713,6 +714,8 @@ MainWindow::MainWindow(const QDir &home)
     // catch config changes
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     configChanged();
+
+    init = true;
 }
 
 /*----------------------------------------------------------------------

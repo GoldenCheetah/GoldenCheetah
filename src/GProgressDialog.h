@@ -35,7 +35,7 @@ class GProgressDialog : public QDialog
     public:
 
         // no frame, translucent, no button, no parent - always modal with chrome heading
-        GProgressDialog(QString title, int min, int max, QWidget *parent = NULL);
+        GProgressDialog(QString title, int min, int max, bool modal, QWidget *parent = NULL);
 
         // set value, which in turn repaints the progress at the bottom
         void setValue(int x);

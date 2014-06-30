@@ -165,7 +165,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // create the dialog if we need to show progress for long running uodate
         long elapsedtime = elapsed.elapsed();
         if ((!forceAfterThisDate.isNull() || first || elapsedtime > 6000) && bar == NULL) {
-            bar = new GProgressDialog(title, 0, filenames.count()); // not owned by mainwindow
+            bar = new GProgressDialog(title, 0, filenames.count(), context->mainWindow->init, context->mainWindow);
             bar->show(); // lets hide until elapsed time is > 6 seconds
 
             // lets make sure it goes to the center!
@@ -516,7 +516,8 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
     // progress for the model parameters
     GProgressDialog *bar = NULL;
     if (!bg) {
-        bar = new GProgressDialog(tr("Update Model Estimates"), 1, (lastYear*12 + lastMonth) - (year*12 + month));
+        bar = new GProgressDialog(tr("Update Model Estimates"), 1, (lastYear*12 + lastMonth) - (year*12 + month), 
+                                  context->mainWindow->init, context->mainWindow);
         bar->setValue(1);
         bar->show(); // lets hide until elapsed time is > 6 seconds
         QApplication::processEvents();

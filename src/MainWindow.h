@@ -66,6 +66,7 @@ class MainWindow : public QMainWindow
         ~MainWindow(); // temp to zap db - will move to tab //
 
         void byebye() { close(); } // go bye bye for a restart
+        bool init; // if constructor has completed set to true
 
     protected:
 

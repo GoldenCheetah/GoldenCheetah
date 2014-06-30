@@ -18,16 +18,16 @@
 
 #include "GProgressDialog.h"
 
-GProgressDialog::GProgressDialog(QString title, int min, int max, QWidget *parent) : 
+GProgressDialog::GProgressDialog(QString title, int min, int max, bool modal, QWidget *parent) : 
 
     // sheet on mac and no window manager chrome
-    QDialog(parent, Qt::Sheet | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
+    QDialog(modal ? parent : NULL, Qt::Sheet | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
 
     // defaults
     title(title), min(min), max(max)
 {
     // only block mainwindow
-    setWindowModality(Qt::WindowModal); // only block mainwindow
+    if (modal) setWindowModality(Qt::WindowModal); // only block mainwindow
 
     // zap me when closed and make me see through
     setAttribute(Qt::WA_DeleteOnClose, true);
