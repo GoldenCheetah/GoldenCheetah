@@ -308,7 +308,7 @@ RideSummaryWindow::refresh()
 
         if (ridesummary) {
             RideItem *rideItem = myRideItem;
-            setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP")));
+            setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, hh:mm")));
         } else {
 
             if (myDateRange.name != "") setSubTitle(myDateRange.name);
