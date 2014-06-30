@@ -982,7 +982,7 @@ CPPlot::plotRide(RideItem *rideItem)
     if (maxNonZero == 1) return;
 
     // Right, lets actually plot the ride
-    rideCurve = new QwtPlotCurve(rideItem->dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+    rideCurve = new QwtPlotCurve(rideItem->dateTime.toString(tr("ddd MMM d, yyyy hh:mm")));
     rideCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     rideCurve->setBrush(QBrush(Qt::NoBrush)); // never filled
 
