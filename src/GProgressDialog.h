@@ -20,6 +20,7 @@
 #define _GC_GProgressDialog_h 1
 
 #include "GoldenCheetah.h"
+#include "Settings.h"
 #include "Colors.h"
 
 #include <QWidget>

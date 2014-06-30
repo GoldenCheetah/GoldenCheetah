@@ -62,14 +62,24 @@ void GProgressDialog::paintEvent(QPaintEvent *)
     painter.setPen(QPen(black, 0.5f));
     painter.drawRect(border);
 
-    // heading
+    // heading background and text
     QRectF titlebox(0,0,width(),25);
-    painter.fillRect(titlebox, black);
-    black.setAlpha(240);
-    painter.setPen(QPen(black));
+    QLinearGradient active = GCColor::linearGradient(25, true, false);
+    painter.fillRect(titlebox, QBrush(Qt::white));
+    painter.fillRect(titlebox, active);
+
+    QString chrome = appsettings->value(this, GC_CHROME, "Mac").toString();
+    if (chrome == "Mac") {
+        painter.setPen(QPen(Qt::black));
+    } else {
+        black.setAlpha(240);
+        painter.setPen(QPen(black));
+    }
     painter.drawText(titlebox, title, Qt::AlignVCenter | Qt::AlignCenter);
 
     // informative text
+    black.setAlpha(240);
+    painter.setPen(QPen(black));
     QRectF labelbox(0,25,width(),height()-33);
     painter.drawText(labelbox, text, Qt::AlignVCenter | Qt::AlignCenter);
 
