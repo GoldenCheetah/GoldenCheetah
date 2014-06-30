@@ -46,7 +46,7 @@
 #define GC_SETTINGS_BESTS_METRICS_DEFAULT "5s_critical_power,1m_critical_power,5m_critical_power,20m_critical_power,60m_critical_power"
 #define GC_SETTINGS_SUMMARY_METRICS_DEFAULT "skiba_xpower,skiba_relative_intensity,skiba_bike_score,daniels_points,daniels_equivalent_power,trimp_points,aerobic_decoupling"
 #define GC_SETTINGS_INTERVAL_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,skiba_xpower,max_power,average_hr,ninety_five_percent_hr,average_cad,average_speed"
-#define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm AP"
+#define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm"
 #define GC_UNIT                     "unit"
 #define GC_LANG                     "lang"
 #define GC_NICKNAME                 "nickname"

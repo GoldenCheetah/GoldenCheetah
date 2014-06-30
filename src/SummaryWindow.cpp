@@ -47,5 +47,5 @@ SummaryWindow::rideItemChanged()
     rideMetadata->setProperty("ride", property("ride"));
 
     RideItem *rideItem = myRideItem;
-    if (rideItem) setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP")));
+    if (rideItem) setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, hh:mm")));
 }
