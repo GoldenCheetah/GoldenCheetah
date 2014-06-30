@@ -120,7 +120,8 @@ class CTableWidgetItem : public QTableWidgetItem
                               return text().toDouble() < other.text().toDouble();
                         }
                         break;
-                }
+            }
+            return false; // keep compiler happy
         }
 };
 
