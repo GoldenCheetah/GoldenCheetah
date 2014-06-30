@@ -62,6 +62,8 @@ class CTableWidgetItem : public QTableWidgetItem
 
         bool operator<(const QTableWidgetItem&other) const // for sorting our way
         { 
+            QStringList list;
+
             switch(column()) {
 
                 case 2 : return text() < other.text(); // athlete
@@ -83,36 +85,39 @@ class CTableWidgetItem : public QTableWidgetItem
                                    QDate::fromString(other.text(), QObject::tr("dd MMM, yyyy")); // date
 
                          }
-
                 default: // work it out ..
-                         // first time & duration
+                         // first time & duration (considering the fixed format with at least one ":")
                          if (text().contains(":") && other.text().contains(":")) {
-                             // time or duration - there are multiple formats possible, so check the one by one
-                             QTime t1 = QTime::fromString(text(), "m:ss");
-                             if (!t1.isValid()) t1 = QTime::fromString(text(), "mm:ss");
-                             if (!t1.isValid()) t1 = QTime::fromString(text(), "h:mm:ss");
-                             if (!t1.isValid()) t1 = QTime::fromString(text(), "hh:mm:ss");
-                             // give up to find proper format for t1, no need to check for the other time
-                             QTime t2;
-                             if (t1.isValid()) {
-                               t2 = QTime::fromString(other.text(), "m:ss");
-                               if (!t2.isValid()) t2 = QTime::fromString(other.text(), "mm:ss");
-                               if (!t2.isValid()) t2 = QTime::fromString(other.text(), "h:mm:ss");
-                               if (!t2.isValid()) t2 = QTime::fromString(other.text(), "hh:mm:ss");
+                             // time or duration - (for comparison the can be treated equally by converting to "seconds"
+                             // QTime only works up to 23:59:59 - but in Trends View Durations will be often higher
+                             int factor;
+                             double t1 = 0;
+                             // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
+                             list = text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             factor = 1;
+                             while (!list.isEmpty()) {
+                                 t1 += list.takeLast().toInt() * factor; // start from the end
+                                 factor *= 60; // seconds, minutes, hours
                              }
-                             // result if both are recognized to be valid
-                             if (t1.isValid() && t2.isValid()) return (t1 < t2);
-                             // not convertible to a time/duration, so treat as text
-                             return text() < other.text();
+                             double t2 = 0;
+                             // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
+                             list = other.text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             factor = 1;
+                             while (!list.isEmpty()) {
+                                 t2 += list.takeLast().toInt() * factor; // start from the end
+                                 factor *= 60; // seconds, minutes, hours
+                             }
+
+                             return t1 < t2;
 
                          } else if (text().contains(QRegExp("[^0-9.,]")) ||
                                     other.text().contains(QRegExp("[^0-9.,]"))) { // alpha
 
-                            return text() < other.text();
+                              return text() < other.text();
 
                          } else { // assume numeric
 
-                            return text().toDouble() < other.text().toDouble();
+                              return text().toDouble() < other.text().toDouble();
                         }
                         break;
                 }
@@ -182,6 +187,7 @@ ComparePane::refreshTable()
         table->clearSelection();
         table->clear();
         table->setRowCount(0);
+        table->setColumnCount(0);
 
         // metric summary
         QStringList always;
@@ -354,8 +360,10 @@ ComparePane::refreshTable()
         // STEP ONE : SET THE TABLE HEADINGS
 
         // clear current contents
+        table->clearSelection();
         table->clear();
         table->setRowCount(0);
+        table->setColumnCount(0);
 
         // metric summary
         QStringList always;
