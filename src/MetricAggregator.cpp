@@ -36,6 +36,8 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
+#include "GProgressDialog.h"
+
 MetricAggregator::MetricAggregator(Context *context) : QObject(context), context(context), first(true)
 {
     colorEngine = new ColorEngine(context);
@@ -132,8 +134,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // showing a progress bar as we go
     QTime elapsed;
     elapsed.start();
-    QString title = tr("Updating Statistics\nStarted");
-    QProgressDialog *bar = NULL;
+    QString title = context->athlete->cyclist;
+    GProgressDialog *bar = NULL;
 
     int processed=0;
     int updates=0;
@@ -163,10 +165,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // create the dialog if we need to show progress for long running uodate
         long elapsedtime = elapsed.elapsed();
         if ((!forceAfterThisDate.isNull() || first || elapsedtime > 6000) && bar == NULL) {
-            bar = new QProgressDialog(title, tr("Abort"), 0, filenames.count()); // not owned by mainwindow
-            bar->setWindowFlags(bar->windowFlags() | Qt::FramelessWindowHint);
-            bar->setWindowModality(Qt::WindowModal);
-            bar->setMinimumDuration(0);
+            bar = new GProgressDialog(title, 0, filenames.count()); // not owned by mainwindow
             bar->show(); // lets hide until elapsed time is > 6 seconds
 
             // lets make sure it goes to the center!
@@ -180,7 +179,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
             QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
                                                 .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
                                                 .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
-            QString title = tr("%1\n\nUpdate Statistics\nElapsed: %2\n\n%3").arg(context->athlete->cyclist).arg(elapsedString).arg(name);
+            QString title = tr("Update Statistics\nElapsed: %1\n\n%2").arg(elapsedString).arg(name);
             bar->setLabelText(title);
             bar->setValue(processed);
         }
@@ -515,18 +514,13 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
 
     // if we have a progress dialog lets update the bar to show
     // progress for the model parameters
-#if (!defined Q_OS_MAC) || (defined QT_NOBUG39038) || (QT_VERSION < 0x050300) // QTBUG 39038 !!!
-    QProgressDialog *bar = NULL;
+    GProgressDialog *bar = NULL;
     if (!bg) {
-        bar = new QProgressDialog(tr("Update Model Estimates"), tr("Abort"), 1, (lastYear*12 + lastMonth) - (year*12 + month));
-        bar->setWindowFlags(bar->windowFlags() | Qt::FramelessWindowHint);
-        bar->setWindowModality(Qt::WindowModal);
-        bar->setMinimumDuration(0);
+        bar = new GProgressDialog(tr("Update Model Estimates"), 1, (lastYear*12 + lastMonth) - (year*12 + month));
         bar->setValue(1);
         bar->show(); // lets hide until elapsed time is > 6 seconds
         QApplication::processEvents();
     }
-#endif
 
     QList< QVector<float> > months;
     QList< QVector<float> > monthsKG;
@@ -662,14 +656,11 @@ MetricAggregator::refreshCPModelMetrics(bool bg)
             month ++;
         }
 
-#if (!defined Q_OS_MAC) || (defined QT_NOBUG39038) || (QT_VERSION < 0x050300) // QTBUG 39038 !!!
         // show some progress
         if (!bg) bar->setValue(count);
-#endif
     }
-#if (!defined Q_OS_MAC) || (defined QT_NOBUG39038) || (QT_VERSION < 0x050300) // QTBUG 39038 !!!
+
     if (!bg) delete bar;
-#endif
 
     // add a dummy entry if we have no estimates to stop constantly trying to refresh
     if (context->athlete->PDEstimates.count() == 0) {

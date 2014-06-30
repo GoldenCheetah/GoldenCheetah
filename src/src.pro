@@ -325,6 +325,7 @@ HEADERS += \
         GcWindowRegistry.h \
         GoldenCheetah.h \
         GoogleMapControl.h \
+        GProgressDialog.h \
         GpxParser.h \
         GpxRideFile.h \
         HelpWindow.h \
@@ -523,6 +524,7 @@ SOURCES += \
         GcWindowRegistry.cpp \
         GoldenCheetah.cpp \
         GoogleMapControl.cpp \
+        GProgressDialog.cpp \
         GpxParser.cpp \
         GpxRideFile.cpp \
         HelpWindow.cpp \
