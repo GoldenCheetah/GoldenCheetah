@@ -559,7 +559,7 @@ Themes::Themes()
 
     // we can add more later ....
     add.name = tr("Classic"); // Old GoldenCheetah colors // ** LIGHT **
-    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(Qt::darkRed) << QColor(Qt::blue) << QColor(Qt::red);
+    colors << QColor(Qt::white) << QColor(Qt::black) << QColor(204,67,104) << QColor(Qt::blue) << QColor(Qt::red);
     //            HR              Speed                Power                 Cadence             Torque
     colors << QColor(Qt::red) << QColor(85,170,0) << QColor(255,170,0) << QColor(0,204,204) << QColor(Qt::magenta) ;
     add.colors = colors;
