@@ -1547,9 +1547,11 @@ AllPlot::recalc(AllPlotObject *objects)
     // set curves - we set the intervalHighlighter to whichver is available
 
     //W' curve set to whatever data we have
-    if (rideItem && rideItem->ride() && objects->wCurve->isVisible()) {
-        objects->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata(bydist).data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata(bydist).count());
-        objects->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata(bydist).data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata(bydist).count());
+    if (!objects->wprime.empty()) {
+        objects->wCurve->setSamples(bydist ? objects->wprimeDist.data() : objects->wprimeTime.data(), 
+                                    objects->wprime.data(), objects->wprime.count());
+        objects->mCurve->setSamples(bydist ? objects->matchDist.data() : objects->matchTime.data(), 
+                                    objects->match.data(), objects->match.count());
     }
 
     if (!objects->wattsArray.empty()) {
@@ -1870,7 +1872,9 @@ AllPlot::setYMax()
     if (showW && standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (kJ)"));
-        setAxisScale(QwtAxisId(QwtAxis::yRight, 2),rideItem->ride()->wprimeData()->minY-1000,rideItem->ride()->wprimeData()->maxY+1000);
+        setAxisScale(QwtAxisId(QwtAxis::yRight, 2), qMin(int(standard->wCurve->minYValue()-1000), 0),
+                                                    qMax(int(standard->wCurve->maxYValue()+1000), 0));
+
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
 
@@ -2204,8 +2208,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->npCurve->setVisible(rideItem->ride()->areDataPresent()->np && showNP);
     standard->xpCurve->setVisible(rideItem->ride()->areDataPresent()->xp && showXP);
     standard->apCurve->setVisible(rideItem->ride()->areDataPresent()->apower && showAP);
-    standard->wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
-    standard->mCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState<2 && showW);
+    standard->wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showW);
+    standard->mCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showW);
     standard->hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
     standard->speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
     standard->accelCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showAccel);
@@ -2226,8 +2230,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
     if (showW) {
-        standard->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata(bydist).data(),rideItem->ride()->wprimeData()->ydata().data(),rideItem->ride()->wprimeData()->xdata(bydist).count());
-        standard->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata(bydist).data(),rideItem->ride()->wprimeData()->mydata().data(),rideItem->ride()->wprimeData()->mxdata(bydist).count());
+        standard->wCurve->setSamples(bydist ? plot->standard->wprimeDist.data() : plot->standard->wprimeTime.data(), 
+                                    plot->standard->wprime.data(), plot->standard->wprime.count());
+        standard->mCurve->setSamples(bydist ? plot->standard->matchDist.data() : plot->standard->matchTime.data(), 
+                                    plot->standard->match.data(), plot->standard->match.count());
     }
     int points = stopidx - startidx + 1; // e.g. 10 to 12 is 3 points 10,11,12, so not 12-10 !
     standard->wattsCurve->setSamples(xaxis,smoothW,points);
@@ -2301,7 +2307,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->standard->smoothAltitude.empty()) {
         standard->altCurve->attach(this);
     }
-    if (showW && rideItem->ride()->wprimeData()->xdata(bydist).count()) {
+    if (showW && plot->standard->wprime.count()) {
         standard->wCurve->attach(this);
         standard->mCurve->attach(this);
     }
@@ -3267,6 +3273,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(ScaleScaleDraw::Ticks, false);
     sd->enableComponent(ScaleScaleDraw::Backbone, false);
+    if (scope == RideFile::wprime) sd->setFactor(0.001f); // Kj
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     // set the y-axis for largest value we saw +10%
@@ -3383,8 +3390,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     int totalPoints = xaxis.count();
 
     //W' curve set to whatever data we have
-    //object->wCurve->setSamples(rideItem->ride()->wprimeData()->xdata().data(), rideItem->ride()->wprimeData()->ydata().data(), rideItem->ride()->wprimeData()->xdata().count());
-    //object->mCurve->setSamples(rideItem->ride()->wprimeData()->mxdata().data(), rideItem->ride()->wprimeData()->mydata().data(), rideItem->ride()->wprimeData()->mxdata().count());
+    if (!object->wprime.empty()) {
+        standard->wCurve->setSamples(bydist ? object->wprimeDist.data() : object->wprimeTime.data(), 
+                                    object->wprime.data(), object->wprime.count());
+        standard->mCurve->setSamples(bydist ? object->matchDist.data() : object->matchTime.data(), 
+                                    object->match.data(), object->match.count());
+    }
 
     if (!object->wattsArray.empty()) {
         standard->wattsCurve->setSamples(xaxis.data(), object->smoothWatts.data(), totalPoints);
@@ -3526,8 +3537,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->grid->detach();
 
     // honour user preferences
-    standard->wCurve->setVisible(referencePlot->showPowerState < 2 && referencePlot->showW);
-    standard->mCurve->setVisible(referencePlot->showPowerState < 2 && referencePlot->showW);
+    standard->wCurve->setVisible(referencePlot->showW);
+    standard->mCurve->setVisible(referencePlot->showW);
     standard->wattsCurve->setVisible(referencePlot->showPowerState < 2);
     standard->npCurve->setVisible(referencePlot->showNP);
     standard->atissCurve->setVisible(referencePlot->showATISS);
@@ -3603,6 +3614,15 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
     if (ride && ride->dataPoints().size()) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();
+
+        // fetch w' bal data
+        here->match = ride->wprimeData()->mydata();
+        here->matchTime = ride->wprimeData()->mxdata(false);
+        here->matchDist = ride->wprimeData()->mxdata(true);
+        here->wprime = ride->wprimeData()->ydata();
+        here->wprimeTime = ride->wprimeData()->xdata(false);
+        here->wprimeDist = ride->wprimeData()->xdata(true);
+
         here->wattsArray.resize(dataPresent->watts ? npoints : 0);
         here->atissArray.resize(dataPresent->watts ? npoints : 0);
         here->antissArray.resize(dataPresent->watts ? npoints : 0);
@@ -3664,7 +3684,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (!here->npArray.empty()) here->npCurve->attach(this);
         if (!here->xpArray.empty()) here->xpCurve->attach(this);
         if (!here->apArray.empty()) here->apCurve->attach(this);
-        if (showW && ride && !ride->wprimeData()->ydata().empty()) {
+        if (showW && ride && !here->wprime.empty()) {
             here->wCurve->attach(this);
             here->mCurve->attach(this);
         }
@@ -3695,8 +3715,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             here->balanceRCurve->attach(this);
         }
 
-        here->wCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
-        here->mCurve->setVisible(dataPresent->watts && showPowerState < 2 && showW);
+        here->wCurve->setVisible(dataPresent->watts && showW);
+        here->mCurve->setVisible(dataPresent->watts && showW);
         here->wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         here->atissCurve->setVisible(dataPresent->watts && showATISS);
         here->antissCurve->setVisible(dataPresent->watts && showANTISS);
