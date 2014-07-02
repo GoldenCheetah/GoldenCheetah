@@ -393,7 +393,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
         calculator.setErg(ergfile);
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("W' Balance (j)"));
-        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),calculator.minY-1000,calculator.maxY+1000);
+        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),qMin(double(calculator.minY-1000),double(0)),calculator.maxY+1000);
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
 
         // and the values ... but avoid sharing!
