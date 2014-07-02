@@ -227,7 +227,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::rps: return QString(tr("%"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("meters per hour"));
-    case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/lb"));
+    case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/kg")); // always kg !
     case RideFile::wprime: return QString(useMetricUnits ? tr("joules") : tr("joules"));
     case RideFile::smO2: return QString(tr("%"));
     case RideFile::tHb: return QString(tr("g/dL"));
