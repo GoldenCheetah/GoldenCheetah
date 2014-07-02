@@ -194,7 +194,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
         adds.curveStyle = curveStyle(factory.metricType(i));
         adds.symbolStyle = symbolStyle(factory.metricType(i));
         adds.smooth = false;
-        adds.trend = false;
+        adds.trendtype = 0;
         adds.topN = 1; // show top 1 by default always
         QTextEdit processHTML(adds.metric->name()); // process html encoding of(TM)
         adds.name   = processHTML.toPlainText();
@@ -222,7 +222,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     skibaLTS.curveStyle = QwtPlotCurve::Lines;
     skibaLTS.symbolStyle = QwtSymbol::NoSymbol;
     skibaLTS.smooth = false;
-    skibaLTS.trend = false;
+    skibaLTS.trendtype = 0;
     skibaLTS.topN = 1;
     skibaLTS.uname = skibaLTS.name = tr("Skiba Long Term Stress");
     skibaLTS.units = "Stress";
@@ -237,7 +237,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     skibaSTS.curveStyle = QwtPlotCurve::Lines;
     skibaSTS.symbolStyle = QwtSymbol::NoSymbol;
     skibaSTS.smooth = false;
-    skibaSTS.trend = false;
+    skibaSTS.trendtype = 0;
     skibaSTS.topN = 1;
     skibaSTS.uname = skibaSTS.name = tr("Skiba Short Term Stress");
     skibaSTS.units = "Stress";
@@ -252,7 +252,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     skibaSB.curveStyle = QwtPlotCurve::Steps;
     skibaSB.symbolStyle = QwtSymbol::NoSymbol;
     skibaSB.smooth = false;
-    skibaSB.trend = false;
+    skibaSB.trendtype = 0;
     skibaSB.topN = 1;
     skibaSB.uname = skibaSB.name = tr("Skiba Stress Balance");
     skibaSB.units = "Stress Balance";
@@ -267,7 +267,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     skibaSTR.curveStyle = QwtPlotCurve::Steps;
     skibaSTR.symbolStyle = QwtSymbol::NoSymbol;
     skibaSTR.smooth = false;
-    skibaSTR.trend = false;
+    skibaSTR.trendtype = 0;
     skibaSTR.topN = 1;
     skibaSTR.uname = skibaSTR.name = tr("Skiba STS Ramp");
     skibaSTR.units = "Ramp";
@@ -282,7 +282,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     skibaLTR.curveStyle = QwtPlotCurve::Steps;
     skibaLTR.symbolStyle = QwtSymbol::NoSymbol;
     skibaLTR.smooth = false;
-    skibaLTR.trend = false;
+    skibaLTR.trendtype = 0;
     skibaLTR.topN = 1;
     skibaLTR.uname = skibaLTR.name = tr("Skiba LTS Ramp");
     skibaLTR.units = "Ramp";
@@ -298,7 +298,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     atissLTS.curveStyle = QwtPlotCurve::Lines;
     atissLTS.symbolStyle = QwtSymbol::NoSymbol;
     atissLTS.smooth = false;
-    atissLTS.trend = false;
+    atissLTS.trendtype = 0;
     atissLTS.topN = 1;
     atissLTS.uname = atissLTS.name = tr("Aerobic TISS Long Term Stress");
     atissLTS.units = "Stress";
@@ -313,7 +313,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     atissSTS.curveStyle = QwtPlotCurve::Lines;
     atissSTS.symbolStyle = QwtSymbol::NoSymbol;
     atissSTS.smooth = false;
-    atissSTS.trend = false;
+    atissSTS.trendtype = 0;
     atissSTS.topN = 1;
     atissSTS.uname = atissSTS.name = tr("Aerobic TISS Short Term Stress");
     atissSTS.units = "Stress";
@@ -328,7 +328,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     atissSB.curveStyle = QwtPlotCurve::Steps;
     atissSB.symbolStyle = QwtSymbol::NoSymbol;
     atissSB.smooth = false;
-    atissSB.trend = false;
+    atissSB.trendtype = 0;
     atissSB.topN = 1;
     atissSB.uname = atissSB.name = tr("Aerobic TISS Stress Balance");
     atissSB.units = "Stress Balance";
@@ -343,7 +343,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     atissSTR.curveStyle = QwtPlotCurve::Steps;
     atissSTR.symbolStyle = QwtSymbol::NoSymbol;
     atissSTR.smooth = false;
-    atissSTR.trend = false;
+    atissSTR.trendtype = 0;
     atissSTR.topN = 1;
     atissSTR.uname = atissSTR.name = tr("Aerobic TISS STS Ramp");
     atissSTR.units = "Ramp";
@@ -358,7 +358,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     atissLTR.curveStyle = QwtPlotCurve::Steps;
     atissLTR.symbolStyle = QwtSymbol::NoSymbol;
     atissLTR.smooth = false;
-    atissLTR.trend = false;
+    atissLTR.trendtype = 0;
     atissLTR.topN = 1;
     atissLTR.uname = atissLTR.name = tr("Aerobic TISS LTS Ramp");
     atissLTR.units = "Ramp";
@@ -374,7 +374,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     antissLTS.curveStyle = QwtPlotCurve::Lines;
     antissLTS.symbolStyle = QwtSymbol::NoSymbol;
     antissLTS.smooth = false;
-    antissLTS.trend = false;
+    antissLTS.trendtype = 0;
     antissLTS.topN = 1;
     antissLTS.uname = antissLTS.name = tr("Anaerobic TISS Long Term Stress");
     antissLTS.units = "Stress";
@@ -389,7 +389,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     antissSTS.curveStyle = QwtPlotCurve::Lines;
     antissSTS.symbolStyle = QwtSymbol::NoSymbol;
     antissSTS.smooth = false;
-    antissSTS.trend = false;
+    antissSTS.trendtype = 0;
     antissSTS.topN = 1;
     antissSTS.uname = antissSTS.name = tr("Anaerobic TISS Short Term Stress");
     antissSTS.units = "Stress";
@@ -404,7 +404,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     antissSB.curveStyle = QwtPlotCurve::Steps;
     antissSB.symbolStyle = QwtSymbol::NoSymbol;
     antissSB.smooth = false;
-    antissSB.trend = false;
+    antissSB.trendtype = 0;
     antissSB.topN = 1;
     antissSB.uname = antissSB.name = tr("Anaerobic TISS Stress Balance");
     antissSB.units = "Stress Balance";
@@ -419,7 +419,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     antissSTR.curveStyle = QwtPlotCurve::Steps;
     antissSTR.symbolStyle = QwtSymbol::NoSymbol;
     antissSTR.smooth = false;
-    antissSTR.trend = false;
+    antissSTR.trendtype = 0;
     antissSTR.topN = 1;
     antissSTR.uname = antissSTR.name = tr("Anaerobic TISS STS Ramp");
     antissSTR.units = "Ramp";
@@ -434,7 +434,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     antissLTR.curveStyle = QwtPlotCurve::Steps;
     antissLTR.symbolStyle = QwtSymbol::NoSymbol;
     antissLTR.smooth = false;
-    antissLTR.trend = false;
+    antissLTR.trendtype = 0;
     antissLTR.topN = 1;
     antissLTR.uname = antissLTR.name = tr("Anaerobic TISS LTS Ramp");
     antissLTR.units = "Ramp";
@@ -449,7 +449,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     danielsLTS.curveStyle = QwtPlotCurve::Lines;
     danielsLTS.symbolStyle = QwtSymbol::NoSymbol;
     danielsLTS.smooth = false;
-    danielsLTS.trend = false;
+    danielsLTS.trendtype = 0;
     danielsLTS.topN = 1;
     danielsLTS.uname = danielsLTS.name = tr("Daniels Long Term Stress");
     danielsLTS.units = "Stress";
@@ -464,7 +464,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     danielsSTS.curveStyle = QwtPlotCurve::Lines;
     danielsSTS.symbolStyle = QwtSymbol::NoSymbol;
     danielsSTS.smooth = false;
-    danielsSTS.trend = false;
+    danielsSTS.trendtype = 0;
     danielsSTS.topN = 1;
     danielsSTS.uname = danielsSTS.name = tr("Daniels Short Term Stress");
     danielsSTS.units = "Stress";
@@ -479,7 +479,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     danielsSB.curveStyle = QwtPlotCurve::Steps;
     danielsSB.symbolStyle = QwtSymbol::NoSymbol;
     danielsSB.smooth = false;
-    danielsSB.trend = false;
+    danielsSB.trendtype = 0;
     danielsSB.topN = 1;
     danielsSB.uname = danielsSB.name = tr("Daniels Stress Balance");
     danielsSB.units = "Stress Balance";
@@ -494,7 +494,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     danielsSTR.curveStyle = QwtPlotCurve::Steps;
     danielsSTR.symbolStyle = QwtSymbol::NoSymbol;
     danielsSTR.smooth = false;
-    danielsSTR.trend = false;
+    danielsSTR.trendtype = 0;
     danielsSTR.topN = 1;
     danielsSTR.uname = danielsSTR.name = tr("Daniels STS Ramp");
     danielsSTR.units = "Ramp";
@@ -509,7 +509,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     danielsLTR.curveStyle = QwtPlotCurve::Steps;
     danielsLTR.symbolStyle = QwtSymbol::NoSymbol;
     danielsLTR.smooth = false;
-    danielsLTR.trend = false;
+    danielsLTR.trendtype = 0;
     danielsLTR.topN = 1;
     danielsLTR.uname = danielsLTR.name = tr("Daniels LTS Ramp");
     danielsLTR.units = "Ramp";
@@ -525,7 +525,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     workLTS.curveStyle = QwtPlotCurve::Lines;
     workLTS.symbolStyle = QwtSymbol::NoSymbol;
     workLTS.smooth = false;
-    workLTS.trend = false;
+    workLTS.trendtype = 0;
     workLTS.topN = 1;
     workLTS.uname = workLTS.name = tr("Work (Kj) Long Term Stress");
     workLTS.units = "Stress (Kj)";
@@ -540,7 +540,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     workSTS.curveStyle = QwtPlotCurve::Lines;
     workSTS.symbolStyle = QwtSymbol::NoSymbol;
     workSTS.smooth = false;
-    workSTS.trend = false;
+    workSTS.trendtype = 0;
     workSTS.topN = 1;
     workSTS.uname = workSTS.name = tr("Work (Kj) Short Term Stress");
     workSTS.units = "Stress (Kj)";
@@ -555,7 +555,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     workSB.curveStyle = QwtPlotCurve::Steps;
     workSB.symbolStyle = QwtSymbol::NoSymbol;
     workSB.smooth = false;
-    workSB.trend = false;
+    workSB.trendtype = 0;
     workSB.topN = 1;
     workSB.uname = workSB.name = tr("Work (Kj) Stress Balance");
     workSB.units = "Stress Balance";
@@ -570,7 +570,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     workSTR.curveStyle = QwtPlotCurve::Steps;
     workSTR.symbolStyle = QwtSymbol::NoSymbol;
     workSTR.smooth = false;
-    workSTR.trend = false;
+    workSTR.trendtype = 0;
     workSTR.topN = 1;
     workSTR.uname = workSTR.name = tr("Work (Kj) STS Ramp");
     workSTR.units = "Ramp";
@@ -585,7 +585,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     workLTR.curveStyle = QwtPlotCurve::Steps;
     workLTR.symbolStyle = QwtSymbol::NoSymbol;
     workLTR.smooth = false;
-    workLTR.trend = false;
+    workLTR.trendtype = 0;
     workLTR.topN = 1;
     workLTR.uname = workLTR.name = tr("Work (Kj) LTS Ramp");
     workLTR.units = "Ramp";
@@ -601,7 +601,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     wPrimeWorkLTS.curveStyle = QwtPlotCurve::Lines;
     wPrimeWorkLTS.symbolStyle = QwtSymbol::NoSymbol;
     wPrimeWorkLTS.smooth = false;
-    wPrimeWorkLTS.trend = false;
+    wPrimeWorkLTS.trendtype = 0;
     wPrimeWorkLTS.topN = 1;
     wPrimeWorkLTS.uname = wPrimeWorkLTS.name = tr("W' Work (Kj) Long Term Stress");
     wPrimeWorkLTS.units = "Stress (Kj)";
@@ -616,7 +616,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     wPrimeWorkSTS.curveStyle = QwtPlotCurve::Lines;
     wPrimeWorkSTS.symbolStyle = QwtSymbol::NoSymbol;
     wPrimeWorkSTS.smooth = false;
-    wPrimeWorkSTS.trend = false;
+    wPrimeWorkSTS.trendtype = 0;
     wPrimeWorkSTS.topN = 1;
     wPrimeWorkSTS.uname = wPrimeWorkSTS.name = tr("W' Work (Kj) Short Term Stress");
     wPrimeWorkSTS.units = "Stress (Kj)";
@@ -631,7 +631,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     wPrimeWorkSB.curveStyle = QwtPlotCurve::Steps;
     wPrimeWorkSB.symbolStyle = QwtSymbol::NoSymbol;
     wPrimeWorkSB.smooth = false;
-    wPrimeWorkSB.trend = false;
+    wPrimeWorkSB.trendtype = 0;
     wPrimeWorkSB.topN = 1;
     wPrimeWorkSB.uname = wPrimeWorkSB.name = tr("W' Work (Kj) Stress Balance");
     wPrimeWorkSB.units = "Stress Balance";
@@ -646,7 +646,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     wPrimeWorkSTR.curveStyle = QwtPlotCurve::Steps;
     wPrimeWorkSTR.symbolStyle = QwtSymbol::NoSymbol;
     wPrimeWorkSTR.smooth = false;
-    wPrimeWorkSTR.trend = false;
+    wPrimeWorkSTR.trendtype = 0;
     wPrimeWorkSTR.topN = 1;
     wPrimeWorkSTR.uname = wPrimeWorkSTR.name = tr("W' Work (Kj) STS Ramp");
     wPrimeWorkSTR.units = "Ramp";
@@ -661,7 +661,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     wPrimeWorkLTR.curveStyle = QwtPlotCurve::Steps;
     wPrimeWorkLTR.symbolStyle = QwtSymbol::NoSymbol;
     wPrimeWorkLTR.smooth = false;
-    wPrimeWorkLTR.trend = false;
+    wPrimeWorkLTR.trendtype = 0;
     wPrimeWorkLTR.topN = 1;
     wPrimeWorkLTR.uname = wPrimeWorkLTR.name = tr("W' Work (Kj) LTS Ramp");
     wPrimeWorkLTR.units = "Ramp";
@@ -677,7 +677,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cpWorkLTS.curveStyle = QwtPlotCurve::Lines;
     cpWorkLTS.symbolStyle = QwtSymbol::NoSymbol;
     cpWorkLTS.smooth = false;
-    cpWorkLTS.trend = false;
+    cpWorkLTS.trendtype = 0;
     cpWorkLTS.topN = 1;
     cpWorkLTS.uname = cpWorkLTS.name = tr("Below CP Work (Kj) Long Term Stress");
     cpWorkLTS.units = "Stress (Kj)";
@@ -692,7 +692,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cpWorkSTS.curveStyle = QwtPlotCurve::Lines;
     cpWorkSTS.symbolStyle = QwtSymbol::NoSymbol;
     cpWorkSTS.smooth = false;
-    cpWorkSTS.trend = false;
+    cpWorkSTS.trendtype = 0;
     cpWorkSTS.topN = 1;
     cpWorkSTS.uname = cpWorkSTS.name = tr("Below CP Work (Kj) Short Term Stress");
     cpWorkSTS.units = "Stress (Kj)";
@@ -707,7 +707,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cpWorkSB.curveStyle = QwtPlotCurve::Steps;
     cpWorkSB.symbolStyle = QwtSymbol::NoSymbol;
     cpWorkSB.smooth = false;
-    cpWorkSB.trend = false;
+    cpWorkSB.trendtype = 0;
     cpWorkSB.topN = 1;
     cpWorkSB.uname = cpWorkSB.name = tr("Below CP Work (Kj) Stress Balance");
     cpWorkSB.units = "Stress Balance";
@@ -722,7 +722,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cpWorkSTR.curveStyle = QwtPlotCurve::Steps;
     cpWorkSTR.symbolStyle = QwtSymbol::NoSymbol;
     cpWorkSTR.smooth = false;
-    cpWorkSTR.trend = false;
+    cpWorkSTR.trendtype = 0;
     cpWorkSTR.topN = 1;
     cpWorkSTR.uname = cpWorkSTR.name = tr("Below CP Work (Kj) STS Ramp");
     cpWorkSTR.units = "Ramp";
@@ -737,7 +737,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cpWorkLTR.curveStyle = QwtPlotCurve::Steps;
     cpWorkLTR.symbolStyle = QwtSymbol::NoSymbol;
     cpWorkLTR.smooth = false;
-    cpWorkLTR.trend = false;
+    cpWorkLTR.trendtype = 0;
     cpWorkLTR.topN = 1;
     cpWorkLTR.uname = cpWorkLTR.name = tr("Below CP Work (Kj) LTS Ramp");
     cpWorkLTR.units = "Ramp";
@@ -753,7 +753,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     distanceLTS.curveStyle = QwtPlotCurve::Lines;
     distanceLTS.symbolStyle = QwtSymbol::NoSymbol;
     distanceLTS.smooth = false;
-    distanceLTS.trend = false;
+    distanceLTS.trendtype = 0;
     distanceLTS.topN = 1;
     distanceLTS.uname = distanceLTS.name = tr("Distance (km|mi) Long Term Stress");
     distanceLTS.units = "Stress (km|mi)";
@@ -768,7 +768,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     distanceSTS.curveStyle = QwtPlotCurve::Lines;
     distanceSTS.symbolStyle = QwtSymbol::NoSymbol;
     distanceSTS.smooth = false;
-    distanceSTS.trend = false;
+    distanceSTS.trendtype = 0;
     distanceSTS.topN = 1;
     distanceSTS.uname = distanceSTS.name = tr("Distance (km|mi) Short Term Stress");
     distanceSTS.units = "Stress (km|mi)";
@@ -783,7 +783,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     distanceSB.curveStyle = QwtPlotCurve::Steps;
     distanceSB.symbolStyle = QwtSymbol::NoSymbol;
     distanceSB.smooth = false;
-    distanceSB.trend = false;
+    distanceSB.trendtype = 0;
     distanceSB.topN = 1;
     distanceSB.uname = distanceSB.name = tr("Distance (km|mi) Stress Balance");
     distanceSB.units = "Stress Balance";
@@ -798,7 +798,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     distanceSTR.curveStyle = QwtPlotCurve::Steps;
     distanceSTR.symbolStyle = QwtSymbol::NoSymbol;
     distanceSTR.smooth = false;
-    distanceSTR.trend = false;
+    distanceSTR.trendtype = 0;
     distanceSTR.topN = 1;
     distanceSTR.uname = distanceSTR.name = tr("Distance (km|mi) STS Ramp");
     distanceSTR.units = "Ramp";
@@ -813,7 +813,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     distanceLTR.curveStyle = QwtPlotCurve::Steps;
     distanceLTR.symbolStyle = QwtSymbol::NoSymbol;
     distanceLTR.smooth = false;
-    distanceLTR.trend = false;
+    distanceLTR.trendtype = 0;
     distanceLTR.topN = 1;
     distanceLTR.uname = distanceLTR.name = tr("Distance (km|mi) LTS Ramp");
     distanceLTR.units = "Ramp";
@@ -829,7 +829,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cogganCTL.curveStyle = QwtPlotCurve::Lines;
     cogganCTL.symbolStyle = QwtSymbol::NoSymbol;
     cogganCTL.smooth = false;
-    cogganCTL.trend = false;
+    cogganCTL.trendtype = 0;
     cogganCTL.topN = 1;
     cogganCTL.uname = cogganCTL.name = tr("Coggan Chronic Training Load");
     cogganCTL.units = "CTL";
@@ -844,7 +844,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cogganATL.curveStyle = QwtPlotCurve::Lines;
     cogganATL.symbolStyle = QwtSymbol::NoSymbol;
     cogganATL.smooth = false;
-    cogganATL.trend = false;
+    cogganATL.trendtype = 0;
     cogganATL.topN = 1;
     cogganATL.uname = cogganATL.name = tr("Coggan Acute Training Load");
     cogganATL.units = "ATL";
@@ -859,7 +859,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cogganTSB.curveStyle = QwtPlotCurve::Steps;
     cogganTSB.symbolStyle = QwtSymbol::NoSymbol;
     cogganTSB.smooth = false;
-    cogganTSB.trend = false;
+    cogganTSB.trendtype = 0;
     cogganTSB.topN = 1;
     cogganTSB.uname = cogganTSB.name = tr("Coggan Training Stress Balance");
     cogganTSB.units = "TSB";
@@ -874,7 +874,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cogganSTR.curveStyle = QwtPlotCurve::Steps;
     cogganSTR.symbolStyle = QwtSymbol::NoSymbol;
     cogganSTR.smooth = false;
-    cogganSTR.trend = false;
+    cogganSTR.trendtype = 0;
     cogganSTR.topN = 1;
     cogganSTR.uname = cogganSTR.name = tr("Coggan STS Ramp");
     cogganSTR.units = "Ramp";
@@ -889,7 +889,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     cogganLTR.curveStyle = QwtPlotCurve::Steps;
     cogganLTR.symbolStyle = QwtSymbol::NoSymbol;
     cogganLTR.smooth = false;
-    cogganLTR.trend = false;
+    cogganLTR.trendtype = 0;
     cogganLTR.topN = 1;
     cogganLTR.uname = cogganLTR.name = tr("Coggan LTS Ramp");
     cogganLTR.units = "Ramp";
@@ -905,7 +905,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     trimpLTS.curveStyle = QwtPlotCurve::Lines;
     trimpLTS.symbolStyle = QwtSymbol::NoSymbol;
     trimpLTS.smooth = false;
-    trimpLTS.trend = false;
+    trimpLTS.trendtype = 0;
     trimpLTS.topN = 1;
     trimpLTS.uname = trimpLTS.name = tr("TRIMP Long Term Stress");
     trimpLTS.uunits = tr("Stress");
@@ -919,7 +919,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     trimpSTS.curveStyle = QwtPlotCurve::Lines;
     trimpSTS.symbolStyle = QwtSymbol::NoSymbol;
     trimpSTS.smooth = false;
-    trimpSTS.trend = false;
+    trimpSTS.trendtype = 0;
     trimpSTS.topN = 1;
     trimpSTS.uname = trimpSTS.name = tr("TRIMP Short Term Stress");
     trimpSTS.units = "Stress";
@@ -934,7 +934,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     trimpSB.curveStyle = QwtPlotCurve::Steps;
     trimpSB.symbolStyle = QwtSymbol::NoSymbol;
     trimpSB.smooth = false;
-    trimpSB.trend = false;
+    trimpSB.trendtype = 0;
     trimpSB.topN = 1;
     trimpSB.uname = trimpSB.name = tr("TRIMP Stress Balance");
     trimpSB.units = "Stress Balance";
@@ -949,7 +949,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     trimpSTR.curveStyle = QwtPlotCurve::Steps;
     trimpSTR.symbolStyle = QwtSymbol::NoSymbol;
     trimpSTR.smooth = false;
-    trimpSTR.trend = false;
+    trimpSTR.trendtype = 0;
     trimpSTR.topN = 1;
     trimpSTR.uname = trimpSTR.name = tr("TRIMP STS Ramp");
     trimpSTR.units = "Ramp";
@@ -964,7 +964,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     trimpLTR.curveStyle = QwtPlotCurve::Steps;
     trimpLTR.symbolStyle = QwtSymbol::NoSymbol;
     trimpLTR.smooth = false;
-    trimpLTR.trend = false;
+    trimpLTR.trendtype = 0;
     trimpLTR.topN = 1;
     trimpLTR.uname = trimpLTR.name = tr("TRIMP LTS Ramp");
     trimpLTR.units = "Ramp";
@@ -984,7 +984,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
             metametric.curveStyle = QwtPlotCurve::Lines;
             metametric.symbolStyle = QwtSymbol::NoSymbol;
             metametric.smooth = false;
-            metametric.trend = false;
+            metametric.trendtype = 0;
             metametric.topN = 1;
             metametric.uname = metametric.name = sp.displayName(field.name);
             metametric.units = "";
@@ -1012,7 +1012,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
             measure.curveStyle = QwtPlotCurve::Lines;
             measure.symbolStyle = QwtSymbol::NoSymbol;
             measure.smooth = false;
-            measure.trend = false;
+            measure.trendtype = 0;
             measure.topN = 1;
             measure.uname = "";
             measure.name = QString("%1 (m)").arg(sp.displayName(field.name));
@@ -1622,11 +1622,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     curveSmooth = new QCheckBox(tr("Smooth Curve"), this);
     curveSmooth->setChecked(metricDetail->smooth);
 
-    curveTrend = new QCheckBox(tr("Trend Line"), this);
-    curveTrend->setChecked(metricDetail->trend);
-    curveTrend->hide(); // for now .. in 3.1 we moved to a checkbox, but this is 
-                        // kept for backward compatibility with the settings etc
-
     trendType = new QComboBox(this);
     trendType->addItem(tr("No trend Line"));
     trendType->addItem(tr("Linear Trend"));
@@ -1778,7 +1773,6 @@ EditMetricDetailDialog::metricSelected()
     userName->setText(ltmTool->metrics[index].uname);
     userUnits->setText(ltmTool->metrics[index].uunits);
     curveSmooth->setChecked(ltmTool->metrics[index].smooth);
-    curveTrend->setChecked(ltmTool->metrics[index].trend);
     fillCurve->setChecked(ltmTool->metrics[index].fillCurve);
     labels->setChecked(ltmTool->metrics[index].labels);
     stack->setChecked(ltmTool->metrics[index].stack);
@@ -1883,7 +1877,6 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->model = models[modelSelect->currentIndex()]->code();
     metricDetail->estimate = estimateSelect->currentIndex(); // 0 - 5
     metricDetail->smooth = curveSmooth->isChecked();
-    metricDetail->trend = curveTrend->isChecked();
     metricDetail->topN = showBest->value();
     metricDetail->lowestN = showLowest->value();
     metricDetail->topOut = showOut->value();
