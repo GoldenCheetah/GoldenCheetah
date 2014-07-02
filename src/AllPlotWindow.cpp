@@ -854,7 +854,7 @@ AllPlotWindow::compareChanged()
             // format it for our purposes
             if (fullPlot->bydist) ap->setAxisScale(QwtPlot::xBottom, 0, maxKM);
             else ap->setAxisScale(QwtPlot::xBottom, 0, maxSECS/60.00f);
-            ap->setFixedHeight(100 + (stackWidth *3));
+            ap->setFixedHeight(120 + (stackWidth *4));
 
             // add to layout
             comparePlotLayout->addWidget(ap);
@@ -909,7 +909,7 @@ AllPlotWindow::compareChanged()
             AllPlot *plot = new AllPlot(this, context, x, RideFile::none, false);
             plot->setPalette(palette);
             plot->setAutoFillBackground(false);
-            plot->setFixedHeight(120+(stackWidth*3));
+            plot->setFixedHeight(120+(stackWidth*4));
 
             // tooltip on hover over point -- consider moving this to AllPlot (!)
             plot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
@@ -2693,7 +2693,7 @@ AllPlotWindow::resizeSeriesPlots()
 
     if (update) seriesstackFrame->setUpdatesEnabled(false);
     foreach (AllPlot *plot, seriesPlots)
-        plot->setFixedHeight(100 + (stackWidth *3));
+        plot->setFixedHeight(120 + (stackWidth *4));
     if (update) seriesstackFrame->setUpdatesEnabled(true);
 }
 
@@ -2702,7 +2702,7 @@ AllPlotWindow::resizeComparePlots()
 {
     comparePlotFrame->setUpdatesEnabled(false);
     foreach (AllPlot *plot, allComparePlots)
-        plot->setFixedHeight(100 + (stackWidth *3));
+        plot->setFixedHeight(120 + (stackWidth *4));
     comparePlotFrame->setUpdatesEnabled(true);
 }
 
@@ -2773,7 +2773,7 @@ AllPlotWindow::setupSeriesStackPlots()
         seriesPlots.append(_allPlot);
         addPickers(_allPlot);
         newLayout->addWidget(_allPlot);
-        _allPlot->setFixedHeight(120+(stackWidth*3));
+        _allPlot->setFixedHeight(120+(stackWidth*4));
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtPlot::xBottom, true);
@@ -2901,7 +2901,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setDataFromPlot(fullPlot, startIndex, stopIndex);
         _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
 
-        _allPlot->setFixedHeight(120+stackWidth*3);
+        _allPlot->setFixedHeight(120+stackWidth*4);
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtPlot::xBottom, true);
