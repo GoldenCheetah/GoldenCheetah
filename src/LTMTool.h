@@ -214,8 +214,7 @@ class EditMetricDetailDialog : public QDialog
                        *showLowest,
                        *showOut,
                        *baseLine;
-        QCheckBox *curveSmooth,
-                  *curveTrend; // is now replaced with below, but kept for compatibility
+        QCheckBox *curveSmooth;
         QComboBox *trendType; // replaces above with a selection of trend line types
         QPushButton *applyButton, *cancelButton;
 

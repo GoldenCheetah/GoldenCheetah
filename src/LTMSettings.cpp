@@ -145,6 +145,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<int(11); // version 10
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
+        bool discard = false;
         out<<metric.type;
         out<<metric.stack;
         out<<metric.symbol;
@@ -152,7 +153,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.uname;
         out<<metric.uunits;
         out<<metric.smooth;
-        out<<metric.trend;
+        out<<discard; // was metric.trend but that was deprecated
         out<<metric.topN;
         out<<metric.topOut;
         out<<metric.baseline;
@@ -216,6 +217,7 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
         in>>counter;
     }
 while(counter-- && !in.atEnd()) {
+        bool discard;
         MetricDetail m;
         in>>m.type;
         in>>m.stack;
@@ -224,7 +226,8 @@ while(counter-- && !in.atEnd()) {
         in>>m.uname;
         in>>m.uunits;
         in>>m.smooth;
-        in>>m.trend;
+        in>>discard; // was m.trend but that was deprecated
+        if (discard) m.trendtype = 1; // will be overwritten below if not old settings
         in>>m.topN;
         in>>m.topOut;
         in>>m.baseline;
@@ -263,10 +266,6 @@ while(counter-- && !in.atEnd()) {
             m.trendtype = 0; // default!
         }
 
-        if (m.trend == true) { // migrating from old trendline checkbox
-            m.trendtype = 1;
-            m.trend = false; // lets forget it now
-        }
         
         if (version >= 5) {
             in >>m.labels;

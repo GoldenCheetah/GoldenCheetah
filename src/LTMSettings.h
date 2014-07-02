@@ -69,8 +69,8 @@ class RideMetric;
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), stack(false), model(""), name(""), metric(NULL), smooth(false), trend(false), 
-                     topN(0), lowestN(0), topOut(0), baseline(0.0), 
+    MetricDetail() : type(METRIC_DB), stack(false), model(""), name(""), metric(NULL), smooth(false), 
+                     trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false) {}
@@ -101,8 +101,7 @@ class MetricDetail {
     QString uname, uunits; // user specified name and units (axis choice)
 
     // user configurable settings
-    bool smooth,         // smooth the curve
-         trend;          // add a trend line XX deprecated XX
+    bool smooth;         // smooth the curve
     int trendtype;       // 0 - no trend, 1 - linear, 2 - quadratic
     int topN;            // highlight top N points
     int lowestN;            // highlight top N points
