@@ -310,13 +310,9 @@ WPrime::setErg(ErgFile *input)
     values.resize(0); // the memory is kept for next time so this is efficient
     xvalues.resize(0);
 
-    EXP = PCP_ = 0;
-
     // Get CP
     CP = 250; // defaults
     WPRIME = 20000;
-    CP=250;
-    TAU=545;
 
     if (input->context->athlete->zones()) {
         int zoneRange = input->context->athlete->zones()->whichRange(QDate::currentDate());
@@ -331,132 +327,37 @@ WPrime::setErg(ErgFile *input)
     }
 
     minY = maxY = WPRIME;
-    last = input->Duration / 1000; 
 
+    // how many points ?
+    last = input->Duration / 1000; 
+    values.resize(last);
+    xvalues.resize(last);
 
     // input array contains the actual W' expenditure
     // and will also contain non-zero values
-    double totalBelowCP=0;
-    double countBelowCP=0;
-    QVector<int> inputArray(last+1);
-    EXP = 0;
+    double W = WPRIME;
+    int lap; // passed by reference
     for (int i=0; i<last; i++) {
 
         // get watts at point in time
-        int lap;
         int value = input->wattsAt(i*1000, lap);
 
-        inputArray[i] = value > CP ? value-CP : 0;
-
-        if (value < CP) {
-            totalBelowCP += value;
-            countBelowCP++;
-        } else EXP += value; // total expenditure above CP
-    }
-
-    // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
-
-    // lets run forward from 0s to end of ride
-    minY = WPRIME;
-    maxY = WPRIME;
-    values.resize(last+1);
-    xvalues.resize(last+1);
-
-    double W = WPRIME;
-    for (int t=0; t<=last; t++) {
-
-        if(smoothed.value(t) < CP) {
-            W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
+        if(value < CP) {
+            W  = W + (CP-value)*(WPRIME-W)/WPRIME;
         } else {
-            W  = W + (CP-smoothed.value(t));
+            W  = W + (CP-value);
         }
 
         if (W > maxY) maxY = W;
         if (W < minY) minY = W;
 
-        values[t] = W;
-        xvalues[t] = double(t) / 60.00f;
+        values[i] = W;
+        xvalues[i] = i*1000;
     }
 
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
                                  // so lets not excacerbate the problem - truncate
 
-    // STEP 3: FIND MATCHES
-
-    // SMOOTH DATA SERIES 
-
-    // get raw data adjusted to 1s intervals (as before)
-    QVector<int> smoothArray(last+1);
-    QVector<int> rawArray(last+1);
-    for (int i=0; i<last; i++) {
-        smoothArray[i] = smoothed.value(i);
-        rawArray[i] = smoothed.value(i);
-    }
-    
-    // initialise rolling average
-    double rtot = 0;
-    for (int i=WprimeMatchSmoothing; i>0 && last-i >=0; i--) {
-        rtot += smoothArray[last-i];
-    }
-
-    // now run backwards setting the rolling average
-    for (int i=last; i>=WprimeMatchSmoothing; i--) {
-        int here = smoothArray[i];
-        smoothArray[i] = rtot / WprimeMatchSmoothing;
-        rtot -= here;
-        rtot += smoothArray[i-WprimeMatchSmoothing];
-    }
-
-    // FIND MATCHES -- INTERVALS WHERE POWER > CP 
-    //                 AND W' DEPLETED BY > WprimeMatchMinJoules
-    bool inmatch=false;
-    matches.clear();
-    mvalues.clear();
-    mxvalues.clear();
-    for(int i=0; i<last; i++) {
-
-        Match match;
-
-        if (!inmatch && (smoothArray[i] >= CP || rawArray[i] >= CP)) {
-            inmatch=true;
-            match.start=i;
-        }
-
-        if (inmatch && (smoothArray[i] < CP && rawArray[i] < CP)) {
-
-            // lets work backwards as we're at the end
-            // we only care about raw data to avoid smoothing
-            // artefacts
-            int end=i-1;
-            while (end > match.start && rawArray[end] < CP) {
-                end--;
-            }
-
-            if (end > match.start) {
-
-                match.stop = end;
-                match.secs = (match.stop-match.start) +1; // don't fencepost!
-                match.cost = values[match.start] - values[match.stop];
-
-                if (match.cost >= WprimeMatchMinJoules) {
-                    matches << match;
-                }
-            }
-            inmatch=false;
-        }
-    }
-
-    // SET MATCH SERIES FOR ALLPLOT CHART
-    foreach (struct Match match, matches) {
-
-        // we only count 1kj asa match
-        if (match.cost >= 2000) { //XXX need to agree how to define a match -- or even if we want to...
-            mvalues << values[match.start];
-            mxvalues << xvalues[match.start];
-            mvalues << values[match.stop];
-            mxvalues << xvalues[match.stop];
-        }
-    }
 }
 
 double
