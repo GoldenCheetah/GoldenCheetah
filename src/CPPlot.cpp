@@ -68,9 +68,9 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     setAxisTitle(xBottom, tr("Interval Length"));
 
     // Log scale on x-axis
-    LogTimeScaleDraw *ld = new LogTimeScaleDraw;
-    ld->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(xBottom, ld);
+    ltsd = new LogTimeScaleDraw;
+    ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(xBottom, ltsd);
     setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
 
     // left yAxis scale prettify
@@ -174,22 +174,14 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         }
     }
 
+    enum { linear, inverse, log } scale = log;
+
     switch (criticalSeries) {
 
     case CriticalPowerWindow::work:
         series = tr("Total work");
         units = tr("kJ");
-        //setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-        //setAxisTitle(xBottom, tr("Interval Length (minutes)"));
-        break;
-
-    case CriticalPowerWindow::watts_inv_time:
-        series = tr("Power");
-        units = tr("watts");
-        //setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-        //setAxisScaleDraw(xBottom, new QwtScaleDraw);
-        //ltsd->inv_time = true;
-        //setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+        scale = linear;
         break;
 
     case CriticalPowerWindow::cad:
@@ -275,7 +267,13 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 
     }
 
+    // set scale to match what's needed
+    if (scale != log) setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+    else setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
+
+    // set axis title
     setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
+
     // zap the old curves
     clearCurves();
 }

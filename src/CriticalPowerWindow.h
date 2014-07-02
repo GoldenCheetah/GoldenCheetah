@@ -151,7 +151,7 @@ class CriticalPowerWindow : public GcChartWindow
         int laeI2() const { return laeI2SpinBox->value(); }
         void setLaeI2(int x) { return laeI2SpinBox->setValue(x); }
 
-        enum criticalseriestype { watts, wattsd, wattsKg, xPower, NP, hr, hrd, kph, kphd, cad, cadd, nm, nmd, vam, aPower, work, watts_inv_time};
+        enum criticalseriestype { watts, wattsd, wattsKg, xPower, NP, hr, hrd, kph, kphd, cad, cadd, nm, nmd, vam, aPower, work };
 
         typedef enum criticalseriestype CriticalSeriesType;
 
@@ -182,8 +182,8 @@ class CriticalPowerWindow : public GcChartWindow
         int prevN() { return dateSetting->prevN(); }
         void setPrevN(int x) { dateSetting->setPrevN(x); }
 
-        int shading() { return shadeCombo->currentIndex(); }
-        void setShading(int x) { return shadeCombo->setCurrentIndex(x); }
+        int shading() { return shadeCheck->isChecked(); }
+        void setShading(int x) { return shadeCheck->setChecked(x); }
 
         int shadeIntervals() { return shadeIntervalsCheck->isChecked(); }
         void setShadeIntervals(int x) { return shadeIntervalsCheck->setChecked(x); }
@@ -269,7 +269,7 @@ class CriticalPowerWindow : public GcChartWindow
         QRadioButton *velo1, *velo2, *velo3; // for selecting veloclinic formulation
         QComboBox *cComboSeason;
         QComboBox *ridePlotStyleCombo;
-        QComboBox *shadeCombo;
+        QCheckBox *shadeCheck;
         QCheckBox *shadeIntervalsCheck;
         QCheckBox *showHeatCheck;
         QCheckBox *showHeatByDateCheck;

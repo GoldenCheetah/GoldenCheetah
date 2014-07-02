@@ -101,6 +101,8 @@ class PDModel : public QObject, public QwtSyntheticPointData
         virtual QString name()   { return "Base Model"; }  // model name e.g. CP 2 parameter model
         virtual QString code()   { return "Base"; }        // short name used in metric names e.g. 2P model
 
+        bool inverseTime;
+
     protected:
 
         // using data from setData() and intervals from setIntervals()

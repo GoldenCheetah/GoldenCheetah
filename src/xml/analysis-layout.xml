@@ -66,7 +66,7 @@
 		<property name="resizable" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
 		<property name="mode" type="int" value="0" />
-		<property name="showBest" type="bool" value="0" />
+		<property name="showBest" type="bool" value="1" />
 		<property name="showPercent" type="bool" value="0" />
 		<property name="showGrid" type="bool" value="1" />
 		<property name="season" type="QString" value="Last 3 months" />
@@ -87,7 +87,7 @@
 		<property name="lastN" type="int" value="7" />
 		<property name="lastNX" type="int" value="0" />
 		<property name="prevN" type="int" value="0" />
-		<property name="shading" type="int" value="0" />
+		<property name="shading" type="int" value="1" />
 		<property name="showHeat" type="bool" value="0" />
 		<property name="showHeatByDate" type="bool" value="0" />
 		<property name="shadeIntervals" type="int" value="0" />

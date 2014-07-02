@@ -156,13 +156,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     cl->addRow(new QLabel(tr("Data series")), seriesCombo);
 
     // shading
-    shadeCombo = new QComboBox(this);
-    shadeCombo->addItem(tr("None"));
-    shadeCombo->addItem(tr("Using CP"));
-    shadeCombo->addItem(tr("Using derived CP"));
+    shadeCheck = new QCheckBox(this);
     QLabel *shading = new QLabel(tr("Power Shading"));
-    shadeCombo->setCurrentIndex(2);
-    cl->addRow(shading, shadeCombo);
+    shadeCheck->setChecked(true);
+    cl->addRow(shading, shadeCheck);
 
     showGridCheck = new QCheckBox(this);
     showGridCheck->setChecked(true); // default on
@@ -461,7 +458,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, boo
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
-    connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
+    connect(shadeCheck, SIGNAL(stateChanged(int)), this, SLOT(shadingSelected(int)));
     connect(shadeIntervalsCheck, SIGNAL(stateChanged(int)), this, SLOT(shadeIntervalsChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
@@ -1323,7 +1320,6 @@ CriticalPowerWindow::seriesName(CriticalSeriesType series)
         case vam: return QString(tr("VAM"));
         case aPower: return QString(tr("aPower"));
         case work: return QString(tr("Work"));
-        case watts_inv_time: return QString(tr("Power by inv of time"));
 
         default: return QString(tr("Unknown"));
     }
@@ -1352,7 +1348,6 @@ CriticalPowerWindow::getRideSeries(CriticalSeriesType series)
 
         // non RideFile series
         case work: return RideFile::none;
-        case watts_inv_time: return RideFile::watts;
 
         default: return RideFile::none;
     }
@@ -1377,8 +1372,7 @@ CriticalPowerWindow::addSeries()
                << nmd
                << cadd
                << hrd
-               << work
-               << watts_inv_time;
+               << work;
 
     foreach (CriticalSeriesType x, seriesList) {
         seriesCombo->addItem(seriesName(x), static_cast<int>(x));
