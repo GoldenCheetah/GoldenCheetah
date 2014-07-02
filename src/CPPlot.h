@@ -49,6 +49,7 @@ class Zones;
 class Context;
 class LTMCanvasPicker;
 class CriticalPowerWindow;
+class LogTimeScaleDraw;
 
 #include "PDModel.h" // for all the models
 
@@ -166,6 +167,8 @@ class CPPlot : public QwtPlot
         // other plot objects
         QList<QwtPlotMarker*> referenceLines;
         QList<QwtPlotMarker*> allZoneLabels;
+
+        LogTimeScaleDraw *ltsd;
 
         // tooltip / zooming
         LTMCanvasPicker *canvasPicker;

@@ -21,6 +21,7 @@
 // base class for all models
 PDModel::PDModel(Context *context) :
     QwtSyntheticPointData(PDMODEL_MAXT),
+    inverseTime(false),
     context(context),
     sanI1(0), sanI2(0), anI1(0), anI2(0), aeI1(0), aeI2(0), laeI1(0), laeI2(0),
     cp(0), tau(0), t0(0), minutes(false)
@@ -51,11 +52,17 @@ PDModel::setMinutes(bool x)
 
 double PDModel::x(unsigned int index) const
 {
+    double returning = 1;
+
     // don't start at zero !
     index += 1;
 
-    if (minutes) return (double(index)/60.00f);
-    else return index;
+    if (minutes) returning = (double(index)/60.00f);
+    else returning = index;
+
+    // reverse !
+    if (inverseTime) return 1.00f / returning;
+    else return returning;
 }
 
 
