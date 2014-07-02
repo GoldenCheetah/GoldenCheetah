@@ -158,6 +158,7 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     contributors.append("Patrick McNerthney");
     contributors.append("Dr Phil Skiba");
     contributors.append("Rainer Clasen");
+    contributors.append("Ralf Spenneberg");
     contributors.append("Robb Romans");
     contributors.append("Robert Carlsen");
     contributors.append("Roberto Massa");
