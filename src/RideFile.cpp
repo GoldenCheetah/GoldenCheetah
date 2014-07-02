@@ -126,6 +126,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::xPower: return QString(tr("xPower"));
     case RideFile::aPower: return QString(tr("aPower"));
     case RideFile::aTISS: return QString(tr("aTISS"));
+    case RideFile::anTISS: return QString(tr("anTISS"));
     case RideFile::NP: return QString(tr("Normalized Power"));
     case RideFile::alt: return QString(tr("Altitude"));
     case RideFile::lon: return QString(tr("Longitude"));
@@ -165,6 +166,7 @@ RideFile::colorFor(SeriesType series)
     case RideFile::xPower: return GColor(CXPOWER);
     case RideFile::aPower: return GColor(CAPOWER);
     case RideFile::aTISS: return GColor(CNPOWER);
+    case RideFile::anTISS: return GColor(CNPOWER);
     case RideFile::NP: return GColor(CNPOWER);
     case RideFile::alt: return GColor(CALTITUDE);
     case RideFile::headwind: return GColor(CWINDSPEED);
@@ -210,6 +212,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::xPower: return QString(tr("watts"));
     case RideFile::aPower: return QString(tr("watts"));
     case RideFile::aTISS: return QString(tr("TISS"));
+    case RideFile::anTISS: return QString(tr("TISS"));
     case RideFile::NP: return QString(tr("watts"));
     case RideFile::alt: return QString(useMetricUnits ? tr("metres") : tr("feet"));
     case RideFile::lon: return QString(tr("lon"));
@@ -918,7 +921,8 @@ RideFile::decimalsFor(SeriesType series)
         case watts : return 0; break;
         case xPower : return 0; break;
         case aPower : return 0; break;
-        case aTISS : return 0; break;
+        case aTISS : return 1; break;
+        case anTISS : return 1; break;
         case NP : return 0; break;
         case alt : return 3; break;
         case lon : return 6; break;
@@ -958,6 +962,7 @@ RideFile::maximumFor(SeriesType series)
         case xPower : return 2500; break;
         case aPower : return 2500; break;
         case aTISS : return 1000; break;
+        case anTISS : return 100; break;
         case alt : return 8850; break; // mt everest is highest point above sea level
         case lon : return 180; break;
         case lat : return 90; break;
@@ -995,6 +1000,7 @@ RideFile::minimumFor(SeriesType series)
         case xPower : return 0; break;
         case aPower : return 0; break;
         case aTISS : return 0; break;
+        case anTISS : return 0; break;
         case NP : return 0; break;
         case alt : return -413; break; // the Red Sea is lowest land point on earth
         case lon : return -180; break;

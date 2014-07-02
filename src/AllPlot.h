@@ -357,6 +357,13 @@ class AllPlotObject : public QObject
     QwtPlotCurve *rpsCurve;
 
     // source data
+    QVector<double> match;
+    QVector<double> matchTime;
+    QVector<double> matchDist;
+    QVector<double> wprime;
+    QVector<double> wprimeTime;
+    QVector<double> wprimeDist;
+
     QVector<double> hrArray;
     QVector<double> wattsArray;
     QVector<double> atissArray;
