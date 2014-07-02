@@ -193,7 +193,8 @@ RideEditor::configChanged()
     table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
     table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
 #endif
-    toolbar->setStyleSheet(QString("background: %1; border: 0px;").arg(GColor(CPLOTBACKGROUND).name()));
+    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 }
 
 //----------------------------------------------------------------------
