@@ -1831,6 +1831,8 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 
     double ymax = 0;
     double ymin = 0;
+    double xmax = 0;
+    double xmin = 1.0f/60.0f - 0.001f;
 
     // prepare aggregates
     for (int i = 0; i < compareIntervals.size(); ++i) {
@@ -1861,6 +1863,9 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
                 // now plot using the delta series and NOT the cache
                 plotCache(deltaArray, interval.color);
 
+                // set x-axis max
+                if ((n/60.00f) > xmax) xmax = n/60.00f;
+
                 foreach(double v, deltaArray) {
                     if (v > ymax) ymax = v;
                     if (v < ymin) ymin = v;
@@ -1875,9 +1880,33 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
                 foreach(double v, interval.rideFileCache()->meanMaxArray(rideSeries)) {
                     if (v > ymax) ymax = v;
                 }
+
+                double mins = interval.rideFileCache()->meanMaxArray(rideSeries).count() / 60.00f;
+                if (mins > xmax) xmax = mins;
             }
         }
     }
+
+    // X-AXIS
+
+    // if max xvalue not set then default to 6 hours
+    if (xmax == 0) xmax = 6 * 60;
+
+    // truncate at an hour for energy mode
+    if (criticalSeries == CriticalPowerWindow::work) xmax = 60.0;
+
+    // not interested in short durations for vam
+    if (criticalSeries == CriticalPowerWindow::vam) xmin = 4.993;
+
+    // now set the scale
+    QwtScaleDiv div((double)xmin, (double)xmax);
+    if (criticalSeries == CriticalPowerWindow::work)
+        div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticksEnergy);
+    else
+        div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
+    setAxisScaleDiv(QwtPlot::xBottom, div);
+
+    // Y-AXIS
 
     if (!showDelta && rideSeries == RideFile::watts) {
 
