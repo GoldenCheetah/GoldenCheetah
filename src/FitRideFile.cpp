@@ -690,6 +690,7 @@ struct FitFileReaderState
                 case 34: /* activity */
                 case 49: /* file creator */
                 case 79: /* unknown */
+                case 104: /* battery */
                     break;
                 default:
                     unknown_global_msg_nums.insert(def.global_msg_num);
