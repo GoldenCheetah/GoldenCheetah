@@ -951,10 +951,11 @@ LTMWindow::refreshDataTable()
     //
     QList<GroupedData> aggregates;
 
-    foreach (MetricDetail metricDetail, settings.metrics) {
+    // for estimates we take the metric data and augment
+    // it with the estimate that applies for that date
+    QList<SummaryMetrics> estimates = *(settings.data);
 
-        // ignore estimates for now XXX just to stop it crashing
-        if (metricDetail.type == METRIC_ESTIMATE) continue;
+    foreach (MetricDetail metricDetail, settings.metrics) {
 
         // do we aggregate zero values ?
         bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
@@ -966,6 +967,7 @@ LTMWindow::refreshDataTable()
         a.maxdays = groupForDate(settings.end.date()) - groupForDate(settings.start.date());
         a.x.resize(a.maxdays+1);
         a.y.resize(a.maxdays+1);
+
 
         // set source for data
         QList<SummaryMetrics> PMCdata;
@@ -979,6 +981,81 @@ LTMWindow::refreshDataTable()
             data = &PMCdata;
         } else if (metricDetail.type == METRIC_BEST) {
             data = settings.bests;
+        } else if (metricDetail.type == METRIC_ESTIMATE) {
+
+            // WE BASICALLY TAKE A COPY OF THE RIDE METRICS AND
+            // ADD IN THE ESTIMATE FOR THAT DAY -- SO YOU ONLY
+            // GET ESTIMATES FOR DAYS WITH RIDES
+
+            // lets refresh the model data if we don't have any
+            if (context->athlete->PDEstimates.count() == 0) 
+                context->athlete->metricDB->refreshCPModelMetrics(); 
+
+            // lets nip through all the rides and add in the estimate
+            // that applied for that date
+            data = &estimates;
+
+            // update each ride by adding the estimate for that day
+            for (int i=0; i<estimates.count(); i++) {
+
+                // get the date
+                QDate date = estimates[i].getRideDate().date();
+
+                // get the value
+                double value = 0;
+                foreach(PDEstimate est, context->athlete->PDEstimates) {
+
+                    // ooh this is a match!
+                    if (date >= est.from && date <= est.to && est.wpk == metricDetail.wpk 
+                         && est.model == metricDetail.model) {
+
+                        switch(metricDetail.estimate) {
+                        case ESTIMATE_WPRIME :
+                            value = est.WPrime;
+                            break;
+
+                        case ESTIMATE_CP :
+                            value = est.CP;
+                            break;
+
+                        case ESTIMATE_FTP :
+                            value = est.FTP;
+                            break;
+
+                        case ESTIMATE_PMAX :
+                            value = est.PMax;
+                            break;
+
+                        case ESTIMATE_BEST :
+                            {
+                                value = 0;
+
+                                // we need to find the model 
+                                foreach(PDModel *model, ltmPlot->models) {
+
+                                    // not the one we want
+                                    if (model->code() != metricDetail.model) continue;
+
+                                    // set the paramters previously derived
+                                    model->loadParameters(est.parameters);
+
+                                    // get the model estimate for our duration
+                                    value = model->y(metricDetail.estimateDuration * metricDetail.estimateDuration_units);
+                                }
+                            }
+                            break;
+
+                        case ESTIMATE_EI :
+                            value = est.EI;
+                            break;
+                        }
+                        break;
+                    }
+                }
+
+                // insert the value for this symbol
+                estimates[i].setForSymbol(metricDetail.symbol, value);
+            }
         }
 
         // initialise before looping through the data for this metric
@@ -1136,6 +1213,7 @@ LTMWindow::refreshDataTable()
         }
         summary += "</tr>";
 
+        int row=0;
         for(int i=0; i<aggregates[0].y.count(); i++) {
 
             // in day mode we don't list all the zeroes .. its too many!
@@ -1150,8 +1228,10 @@ LTMWindow::refreshDataTable()
                 if (nonzero == false) continue;
             }
 
-            if (i%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
+            if (row%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
             else summary += "<tr>";
+
+            row++;
 
             // date / month year etc
             summary += "<td align=\"center\" valign=\"top\">%1</td>";
