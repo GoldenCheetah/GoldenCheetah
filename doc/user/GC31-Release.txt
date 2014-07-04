@@ -46,11 +46,12 @@ vii  W' work
 viii Average Pedal Smoothness / Torque Efficiency
 
 4. LTM Chart
-i   LTM settings cleaned up
-ii  Stack mode 
-iii Data table mode
-iv  Labels
-v   Quadratic trend lines
+i   Chart selection sidebar
+ii  LTM settings cleaned up
+iii Stack mode 
+iv  Data table mode
+v   Labels
+vi  Quadratic trend lines
 
 5. CP Chart
 i   User selectable CP models
