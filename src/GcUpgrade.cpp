@@ -120,7 +120,7 @@ GcUpgrade::upgrade(const QDir &home)
     // 3.1 upgrade processing
     //----------------------------------------------------------------------
 
-    if (false && last < VERSION31_BUILD) { // << note this is not activated yet
+    if (last < VERSION31_BUILD) {
 
         // We sought to reset the user defaults in v3.1 to
         // move away from the ugly default used since GC first
