@@ -30,6 +30,12 @@
 
 #define GCC_VERSION QString("%1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__)
 
+#ifndef Q_OS_MAC
+#include "VideoWindow.h"
+#else
+#include "QtMacVideoWindow.h"
+#endif
+
 #ifdef GC_HAVE_QWTPLOT3D
 #include "qwt3d_global.h"
 #endif
@@ -262,6 +268,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
             "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
             "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">VIDEO</td><td>%15</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -278,6 +285,16 @@ QString GcCrashDialog::versionHTML()
             .arg(wfapi)
             .arg(vlc)
             .arg(clucene)
+#ifdef GC_VIDEO_NONE
+            .arg("none")
+#elif defined GC_VIDEO_QUICKTIME
+            .arg("quicktime")
+#elif defined GC_VIDEO_QT5
+            .arg("qt5")
+#elif defined GC_VIDEO_VLC
+            .arg("vlc")
+#endif
+
             ;
 
     QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");

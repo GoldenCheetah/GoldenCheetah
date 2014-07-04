@@ -49,6 +49,10 @@ class MediaHelper
 
 #ifndef GC_VIDEO_NONE
 
+#ifndef GC_VIDEO_QUICKTIME
+#define GC_VIDEO_QUICKTIME
+#endif
+
 // We add references to the Native objects, but since we
 // will be running Qt's moc utility on this file we need
 // to make sure we use the right semantics for compiling
