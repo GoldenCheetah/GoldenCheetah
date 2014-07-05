@@ -737,7 +737,8 @@ void
 AllPlotWindow::compareChanged()
 {
     if (!amVisible()) {
-        compareStale = true;
+        if (context->isCompareIntervals) compareStale = true; // switched on
+        else stale = true; // switched off
         return;
     }
 
