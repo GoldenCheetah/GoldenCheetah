@@ -541,21 +541,25 @@ PowerHist::recalcCompare()
                     QColor color = rangemode ? context->compareDateRanges[intervalNumber].color.darker(200)
                                              : context->compareIntervals[intervalNumber].color.darker(200);
 
-                    // now add a label above the bar
-                    QwtPlotMarker *label = new QwtPlotMarker();
-                    QwtText text(QString("%1%2").arg(int(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
-                    text.setFont(labelFont);
-                    text.setColor(color);
-                    label->setLabel(text);
-                    label->setValue(x+jump+(width/2.00f), yval);
-                    label->setYAxis(QwtPlot::yLeft);
-                    label->setSpacing(5); // not px but by yaxis value !? mad.
-                    label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
-            
-                    // and attach
-                    label->attach(this);
-                    zoneDataLabels << label;
+                    // is this one selected ?
+                    if ((rangemode && context->compareDateRanges[intervalNumber].isChecked()) ||
+                        (!rangemode && context->compareIntervals[intervalNumber].isChecked())) {
 
+                        // now add a label above the bar
+                        QwtPlotMarker *label = new QwtPlotMarker();
+                        QwtText text(QString("%1%2").arg(int(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
+                        text.setFont(labelFont);
+                        text.setColor(color);
+                        label->setLabel(text);
+                        label->setValue(x+jump+(width/2.00f), yval);
+                        label->setYAxis(QwtPlot::yLeft);
+                        label->setSpacing(5); // not px but by yaxis value !? mad.
+                        label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
+            
+                        // and attach
+                        label->attach(this);
+                        zoneDataLabels << label;
+                    }
                 }
             }
 
