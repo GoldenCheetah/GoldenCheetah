@@ -915,14 +915,21 @@ PfPvPlot::recalcCompare()
 
     if (totaltime) {
 
-        tiqMarker[0]->setLabel(QwtText(QString("%1%")
-                      .arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
-        tiqMarker[1]->setLabel(QwtText(QString("%1%")
-                      .arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
-        tiqMarker[2]->setLabel(QwtText(QString("%1%")
-                      .arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
-        tiqMarker[3]->setLabel(QwtText(QString("%1%")
-                      .arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+        QwtText t0(QString("%1%").arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
+        t0.setColor(GColor(CPLOTMARKER));
+        tiqMarker[0]->setLabel(t0);
+
+        QwtText t1(QString("%1%").arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
+        t1.setColor(GColor(CPLOTMARKER));
+        tiqMarker[1]->setLabel(t1);
+
+        QwtText t2(QString("%1%").arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
+        t2.setColor(GColor(CPLOTMARKER));
+        tiqMarker[2]->setLabel(t2);
+
+        QwtText t3(QString("%1%").arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
+        t3.setColor(GColor(CPLOTMARKER));
+        tiqMarker[3]->setLabel(t3);
 
     } else {
 
