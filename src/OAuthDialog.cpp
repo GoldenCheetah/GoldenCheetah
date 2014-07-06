@@ -170,16 +170,17 @@ OAuthDialog::loadFinished()
                 j = view->page()->mainFrame()->toHtml().indexOf("</code>", i+1);
             }
             else  {
-                view->page()->mainFrame()->toHtml().indexOf("\"", at+15);
-                view->page()->mainFrame()->toHtml().indexOf("\"", i+1);
+                i = view->page()->mainFrame()->toHtml().indexOf("\"", at+15);
+                j = view->page()->mainFrame()->toHtml().indexOf("\"", i+1);
             }
             if (i>-1 && j>-1) {
                 QString access_token = view->page()->mainFrame()->toHtml().mid(i+1,j-i-1);
+                //qDebug() << "access_token" << access_token;
+
                 if (site == STRAVA) {
                     appsettings->setCValue(context->athlete->cyclist, GC_STRAVA_TOKEN, access_token);
                 }
                 else if (site == TWITTER) {
-                    //qDebug() << "access_token" << access_token;
 #ifdef GC_HAVE_LIBOAUTH
                     char *reply;
                     char *req_url;
