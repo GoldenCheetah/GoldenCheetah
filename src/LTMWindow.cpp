@@ -144,6 +144,11 @@ LTMWindow::LTMWindow(Context *context) :
     revealLayout->addStretch();
     setRevealLayout(revealLayout);
 
+    // add additional menu items before setting
+    // controls since the menu is SET from setControls
+    QAction *exportData = new QAction(tr("Export Chart Data..."), this);
+    addAction(exportData);
+
     // the controls
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
@@ -203,6 +208,9 @@ LTMWindow::LTMWindow(Context *context) :
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
+
+    // custom menu item
+    connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
 
     configChanged();
 }
@@ -891,6 +899,19 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
+    // clear to force refresh
+	dataSummary->page()->mainFrame()->setHtml("");
+
+    // get string
+    QString summary = dataTable(true);
+
+    // now set it
+	dataSummary->page()->mainFrame()->setHtml(summary);
+}
+
+QString
+LTMWindow::dataTable(bool html)
+{
     // truncate date range to the actual data when not set to any date
     if (settings.data != NULL && (*settings.data).count() != 0) {
 
@@ -906,42 +927,43 @@ LTMWindow::refreshDataTable()
     // need to redo this
     ltmPlot->resetPMC();
 
-    // update the webview to the data table
-	dataSummary->page()->mainFrame()->setHtml("");
-
     // now set to new (avoids a weird crash)
     QString summary;
+
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    //QColor fgColor = GCColor::invertColor(bgColor);
     QColor altColor = GCColor::alternateColor(bgColor);
 
-    summary = GCColor::css();
-    summary += "<center>";
+    // html page prettified with a title
+    if (html) {
 
-    // device summary for ride summary, otherwise how many activities?
-    summary += "<p><h3>" + settings.title + tr(" grouped by ");
+        summary = GCColor::css();
+        summary += "<center>";
 
-    switch (settings.groupBy) {
-    case LTM_DAY :
-        summary += tr("day");
-        break;
-    case LTM_WEEK :
-        summary += tr("week");
-        break;
-    case LTM_MONTH :
-        summary += tr("month");
-        break;
-    case LTM_YEAR :
-        summary += tr("year");
-        break;
-    case LTM_TOD :
-        summary += tr("time of day");
-        break;
-    case LTM_ALL :
-        summary += tr("All");
-        break;
+        // device summary for ride summary, otherwise how many activities?
+        summary += "<p><h3>" + settings.title + tr(" grouped by ");
+
+        switch (settings.groupBy) {
+        case LTM_DAY :
+            summary += tr("day");
+            break;
+        case LTM_WEEK :
+            summary += tr("week");
+            break;
+        case LTM_MONTH :
+            summary += tr("month");
+            break;
+        case LTM_YEAR :
+            summary += tr("year");
+            break;
+        case LTM_TOD :
+            summary += tr("time of day");
+            break;
+        case LTM_ALL :
+            summary += tr("All");
+            break;
+        }
+        summary += "</h3><p>";
     }
-    summary += "</h3><p>";
 
     //
     // STEP1: AGGREGATE DATA INTO GROUPBY FOR EACH METRIC
@@ -1184,14 +1206,19 @@ LTMWindow::refreshDataTable()
         // formatting ...
         LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
 
-        // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
-        summary += "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>Date</b></td>";
-        summary = summary.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20)));
+        if (html) {
+            // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
+            summary += "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>Date</b></td>";
+            summary = summary.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20)));
+        } else {
+            summary += "Date";
+        }
 
         // metric name
         for (int i=0; i < settings.metrics.count(); i++) {
-            summary += "<td align=\"center\" valign=\"top\">"
-                       "<b>%1</b></td>";
+
+            if (html) summary += "<td align=\"center\" valign=\"top\"><b>%1</b></td>";
+            else summary += ", %1";
 
             QString name = settings.metrics[i].uname;
             if (name == "Coggan Acute Training Load") name = "ATL";
@@ -1200,18 +1227,28 @@ LTMWindow::refreshDataTable()
 
             summary = summary.arg(name);
         }
-        summary += "</tr><tr><td></td>";
 
-        // units
-        for (int i=0; i < settings.metrics.count(); i++) {
-            summary += "<td align=\"center\" valign=\"top\">"
-                       "<b>%1</b></td>";
-            QString units = settings.metrics[i].uunits;
-            if (units == "seconds" || units == tr("seconds")) units = tr("hours");
-            if (units == settings.metrics[i].uname) units = "";
-            summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
+        if (html) {
+
+            // html table and units on next line
+            summary += "</tr><tr><td></td>";
+
+            // units
+            for (int i=0; i < settings.metrics.count(); i++) {
+                summary += "<td align=\"center\" valign=\"top\">"
+                        "<b>%1</b></td>";
+                QString units = settings.metrics[i].uunits;
+                if (units == "seconds" || units == tr("seconds")) units = tr("hours");
+                if (units == settings.metrics[i].uname) units = "";
+                summary = summary.arg(units != "" ? QString("(%1)").arg(units) : "");
+            }
+            summary += "</tr>";
+
+        } else {
+
+            // end of heading for CSV
+            summary += "\n";
         }
-        summary += "</tr>";
 
         int row=0;
         for(int i=0; i<aggregates[0].y.count(); i++) {
@@ -1228,18 +1265,22 @@ LTMWindow::refreshDataTable()
                 if (nonzero == false) continue;
             }
 
-            if (row%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
-            else summary += "<tr>";
+            // alternating colors on html output
+            if (html) {
+                if (row%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
+                else summary += "<tr>";
+                row++;
+            }
 
-            row++;
+            // First column, date / month year etc
+            if (html) summary += "<td align=\"center\" valign=\"top\">%1</td>";
+            else summary += "%1";
+            summary = summary.arg(lsd.label(aggregates[0].x[i]+0.5).text().replace("\n", " "));
 
-            // date / month year etc
-            summary += "<td align=\"center\" valign=\"top\">%1</td>";
-            summary = summary.arg(lsd.label(aggregates[0].x[i]+0.5).text());
-
-            // each metric value
+            // Remaining columns - each metric value
             for(int j=0; j<aggregates.count(); j++) {
-                summary += "<td align=\"center\" valign=\"top\">%1</td>";
+                if (html) summary += "<td align=\"center\" valign=\"top\">%1</td>";
+                else summary += ", %1";
 
                 // now format the actual value....
                 const RideMetric *m = settings.metrics[j].metric;
@@ -1260,12 +1301,42 @@ LTMWindow::refreshDataTable()
                     summary = summary.arg(QString("%1").arg(aggregates[j].y[i], 0, 'f', 0));
                 }
             }
-            summary += "</tr>";
-        }
-        summary += "</table>";
-    }
-    summary += "</center>";
 
-    // now set it
-	dataSummary->page()->mainFrame()->setHtml(summary);
+            // ok, this row is done
+            if (html) summary += "</tr>";
+            else summary += "\n"; // csv newline
+        }
+
+        // close table on html page
+        if (html) summary += "</table>";
+    }
+
+    // all done !
+    if (html) summary += "</center>";
+
+    return summary;
+}
+
+void
+LTMWindow::exportData()
+{
+    QString filename = title()+".csv";
+    filename = QFileDialog::getSaveFileName(this, tr("Save Chart Data as CSV"),  QString(), title()+".csv (*.csv)");
+
+    if (!filename.isEmpty()) {
+
+        // can we open the file ?
+        QFile f(filename);
+        if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return; // couldn't open file
+
+        // generate file content
+        QString content = dataTable(false); // want csv
+
+        // open stream and write header
+        QTextStream stream(&f);
+        stream << content;
+
+        // and we're done
+        f.close();
+    }
 }

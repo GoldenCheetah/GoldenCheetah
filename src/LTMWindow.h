@@ -206,6 +206,9 @@ class LTMWindow : public GcChartWindow
         void useStandardRange();
         void useThruToday();
 
+        void exportData();
+        QString dataTable(bool html=true); // true as html, false as csv
+
         void configChanged();
 
     private:
