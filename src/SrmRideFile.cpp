@@ -268,8 +268,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
             alt = 0.0;
         }
-        else {
-            assert(version == 7);
+        else if (version == 7 ){
             watts = readShort(in);
             cad = readByte(in);
             hr = readByte(in);
@@ -279,6 +278,11 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
             alt = readSignedLong(in);
             temp = 0.1 * readSignedShort(in);
+        }
+        else {
+            errorStrings << QString("unsupported SRM file version: %1")
+                .arg( version );
+            return NULL;
         }
 
         if (i == 0) {
