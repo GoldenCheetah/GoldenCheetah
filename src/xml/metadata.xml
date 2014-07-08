@@ -40,6 +40,13 @@
 			<fielddiary>1</fielddiary>
 		</field>
 		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Workout Title"</fieldname>
+			<fieldtype>0</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>1</fielddiary>
+		</field>
+		<field>
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Sport"</fieldname>
 			<fieldtype>2</fieldtype>

@@ -87,6 +87,12 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
             QDomElement code = node.toElement();
             rideFile->setTag("Workout Code", code.text());
 
+        // workout title
+        } else if (node.nodeName() == "title") {
+
+            QDomElement title = node.toElement();
+            rideFile->setTag("Workout Title", title.text());
+
         // goal / objective
         } else if (node.nodeName() == "goal") {
 
@@ -361,6 +367,14 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
         QDomElement code = doc.createElement("code");
         text = doc.createTextNode(wcode); code.appendChild(text);
         root.appendChild(code);
+    }
+
+    // workout title
+    if (ride->getTag("Workout Title", "") != "") {
+        QString wtitle = ride->getTag("Workout Title", "");
+        QDomElement title = doc.createElement("title");
+        text = doc.createTextNode(wtitle); title.appendChild(text);
+        root.appendChild(title);
     }
 
     // goal
