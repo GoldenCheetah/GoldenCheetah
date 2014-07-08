@@ -34,6 +34,9 @@ class GProgressDialog : public QDialog
 
     public:
 
+        enum drag { None, Move };
+        typedef enum drag DragState;
+
         // no frame, translucent, no button, no parent - always modal with chrome heading
         GProgressDialog(QString title, int min, int max, bool modal, QWidget *parent = NULL);
 
@@ -49,8 +52,20 @@ class GProgressDialog : public QDialog
         // painting 
         void paintEvent(QPaintEvent *);
 
+        // watch for minimise click and move with mouse
+        bool eventFilter(QObject *, QEvent *);
+        void setDragState(DragState d);
+        void mousePressEvent(QMouseEvent *);
+        void mouseReleaseEvent(QMouseEvent *);
+        void mouseMoveEvent(QMouseEvent *);
+
     private:
         QString title, text;
         int min, max, value;
+
+        // drag / resize information
+        DragState dragState;
+        int oX, oY, mX, mY; // tracking movement
+
 };
 #endif
