@@ -24,7 +24,10 @@ GProgressDialog::GProgressDialog(QString title, int min, int max, bool modal, QW
     QDialog(modal ? parent : NULL, Qt::Sheet | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
 
     // defaults
-    title(title), min(min), max(max)
+    title(title), min(min), max(max),
+
+    // moving about
+    dragState(None)
 {
     // only block mainwindow
     if (modal) setWindowModality(Qt::WindowModal); // only block mainwindow
@@ -35,6 +38,23 @@ GProgressDialog::GProgressDialog(QString title, int min, int max, bool modal, QW
 
     // not too big dude
     setFixedSize(200, 130);
+
+    // trap mouse events
+    setMouseTracking(true);
+
+    // watch for ESC key
+    installEventFilter(this);
+}
+
+bool
+GProgressDialog::eventFilter(QObject *o, QEvent *e)
+{
+    // hit escape and we minimise -- but not reject !
+    if (o == this && e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
+        showMinimized(); // will only work after first launch when we have a parent
+        return true;
+    }
+    return false;
 }
 
 void GProgressDialog::paintEvent(QPaintEvent *)
@@ -101,5 +121,49 @@ void GProgressDialog::setLabelText(QString label)
 {
     text = label;
     repaint();
+}
+
+void
+GProgressDialog::mousePressEvent(QMouseEvent *e)
+{
+    if (e->button() == Qt::NoButton || isHidden()) {
+        setDragState(None);
+        return;
+    }
+
+    setDragState(Move);
+
+    // get current window state
+    oX = pos().x();
+    oY = pos().y();
+    mX = e->globalX();
+    mY = e->globalY();
+}
+
+void
+GProgressDialog::mouseReleaseEvent(QMouseEvent *)
+{
+    setDragState(None);
+    repaint();
+}
+
+void
+GProgressDialog::mouseMoveEvent(QMouseEvent *e)
+{
+    if (dragState == None) {
+        return;
+    }
+
+    // work out the relative move x and y
+    int relx = e->globalX() - mX;
+    int rely = e->globalY() - mY;
+
+    move(oX + relx, oY + rely);
+}
+
+void
+GProgressDialog::setDragState(DragState d)
+{
+    dragState = d;
 }
 
