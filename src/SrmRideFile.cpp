@@ -285,6 +285,11 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             return NULL;
         }
 
+        if( in.status() != QDataStream::Ok ){
+            errorStrings << QString("premature end of file" );
+            break;
+        }
+
         if (i == 0) {
             result->setStartTime(blockhdrs[blknum].dt);
         }
