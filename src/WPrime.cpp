@@ -64,6 +64,18 @@ WPrime::WPrime()
 {
     // XXX will need to reset metrics when they are added
     minY = maxY = 0;
+    wasIntegral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+}
+
+void
+WPrime::check()
+{
+    bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+    if (integral == wasIntegral) return;
+    else if (rideFile) {
+        wasIntegral = integral;
+        setRide(rideFile); // reset coz calc mode changed
+    }
 }
 
 void

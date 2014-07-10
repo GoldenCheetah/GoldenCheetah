@@ -50,11 +50,11 @@ class WPrime {
         RideFile *ride() { return rideFile; }
 
         // W' 1second time series from 0
-        QVector<double> &ydata() { return values; }
-        QVector<double> &xdata(bool bydist) { return bydist ? xdvalues : xvalues; }
+        QVector<double> &ydata() { check(); return values; }
+        QVector<double> &xdata(bool bydist) { check(); return bydist ? xdvalues : xvalues; }
 
-        QVector<double> &mydata() { return mvalues; }
-        QVector<double> &mxdata(bool bydist) { return bydist ? mxdvalues : mxvalues; }
+        QVector<double> &mydata() { check(); return mvalues; }
+        QVector<double> &mxdata(bool bydist) { check(); return bydist ? mxdvalues : mxvalues; }
 
         double maxMatch();
         double minY, maxY;
@@ -82,6 +82,9 @@ class WPrime {
 
         QwtSpline smoothed, distance;
         int last;
+
+        void check(); // check we don't need to recompute
+        bool wasIntegral;
 };
 
 class WPrimeIntegrator : public QThread
