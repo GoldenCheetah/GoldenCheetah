@@ -1041,6 +1041,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcWindow **here) 
 
     title = new QLineEdit(this);
     chartLayout->addWidget(title);
+    title->setText(GcWindowRegistry::title(type));
 
     win = GcWindowRegistry::newGcWindow(type, context);
     chartLayout->addWidget(win);
