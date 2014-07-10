@@ -50,6 +50,7 @@
 
 #include "WPrime.h"
 #include "Units.h" // for MILES_PER_KM
+#include "Settings.h" // for GC_WBALFORM
 
 const double WprimeMultConst = 1.0;
 const int WPrimeDecayPeriod = 3600; // 1 hour, tried infinite but costly and limited value
@@ -68,6 +69,8 @@ WPrime::WPrime()
 void
 WPrime::setRide(RideFile *input)
 {
+    bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+
     QTime time; // for profiling performance of the code
     time.start();
 
@@ -190,28 +193,72 @@ WPrime::setRide(RideFile *input)
 
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
 
-    // lets run forward from 0s to end of ride
-    minY = WPRIME;
-    maxY = WPRIME;
-    values.resize(last+1);
-    xvalues.resize(last+1);
-    xdvalues.resize(last+1);
+    if (integral) {
 
-    double W = WPRIME;
-    for (int t=0; t<=last; t++) {
+        // integral formula Skiba et al
 
-        if(smoothed.value(t) < CP) {
-            W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
-        } else {
-            W  = W + (CP-smoothed.value(t));
+        minY = WPRIME;
+        maxY = WPRIME;
+        values.resize(last+1);
+        xvalues.resize(last+1);
+        xdvalues.resize(last+1);
+
+        QVector<double> myvalues(last+1);
+
+        int stop = last / 2;
+
+        WPrimeIntegrator a(inputArray, 0, stop, TAU);
+        WPrimeIntegrator b(inputArray, stop+1, last, TAU);
+
+        a.start();
+        b.start();
+
+        a.wait();
+        b.wait();
+
+        // sum values
+        for (int t=0; t<=last; t++) {
+            values[t] = a.output[t] + b.output[t];
+            xvalues[t] = double(t) / 60.00f;
         }
 
-        if (W > maxY) maxY = W;
-        if (W < minY) minY = W;
+        // now subtract WPRIME and work out minimum etc
+        for(int t=0; t <= last; t++) {
+            double value = WPRIME - values[t];
+            values[t] = value;
+            xdvalues[t] = distance.value(t);
 
-        values[t] = W;
-        xvalues[t] = double(t) / 60.00f;
-        xdvalues[t] = distance.value(t);
+            if (value > maxY) maxY = value;
+            if (value < minY) minY = value;
+        }
+
+    } else {
+
+        // differential equation Froncioni / Clarke
+
+        // lets run forward from 0s to end of ride
+        minY = WPRIME;
+        maxY = WPRIME;
+        values.resize(last+1);
+        xvalues.resize(last+1);
+        xdvalues.resize(last+1);
+
+        double W = WPRIME;
+        for (int t=0; t<=last; t++) {
+
+            if(smoothed.value(t) < CP) {
+                W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
+            } else {
+                W  = W + (CP-smoothed.value(t));
+            }
+
+            if (W > maxY) maxY = W;
+            if (W < minY) minY = W;
+
+            values[t] = W;
+            xvalues[t] = double(t) / 60.00f;
+            xdvalues[t] = distance.value(t);
+        }
     }
 
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
@@ -303,6 +350,8 @@ WPrime::setRide(RideFile *input)
 void
 WPrime::setErg(ErgFile *input)
 {
+    bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
+
     QTime time; // for profiling performance of the code
     time.start();
 
@@ -328,36 +377,101 @@ WPrime::setErg(ErgFile *input)
 
     minY = maxY = WPRIME;
 
-    // how many points ?
-    last = input->Duration / 1000; 
-    values.resize(last);
-    xvalues.resize(last);
+    if (integral) {
 
-    // input array contains the actual W' expenditure
-    // and will also contain non-zero values
-    double W = WPRIME;
-    int lap; // passed by reference
-    for (int i=0; i<last; i++) {
+        last = input->Duration / 1000; 
 
-        // get watts at point in time
-        int value = input->wattsAt(i*1000, lap);
+        // input array contains the actual W' expenditure
+        // and will also contain non-zero values
+        double totalBelowCP=0;
+        double countBelowCP=0;
+        QVector<int> inputArray(last+1);
+        EXP = 0;
+        for (int i=0; i<last; i++) {
 
-        if(value < CP) {
-            W  = W + (CP-value)*(WPRIME-W)/WPRIME;
-        } else {
-            W  = W + (CP-value);
+            // get watts at point in time
+            int lap;
+            int value = input->wattsAt(i*1000, lap);
+
+            inputArray[i] = value > CP ? value-CP : 0;
+
+            if (value < CP) {
+                totalBelowCP += value;
+                countBelowCP++;
+            } else EXP += value; // total expenditure above CP
         }
 
-        if (W > maxY) maxY = W;
-        if (W < minY) minY = W;
+        if (countBelowCP > 0)
+            TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+        else
+            TAU = 546.00f * pow(E,-0.01*(CP)) + 316.00f;
 
-        values[i] = W;
-        xvalues[i] = i*1000;
+        TAU = int(TAU); // round it down
+
+        // lets run forward from 0s to end of ride
+        values.resize(last+1);
+        xvalues.resize(last+1);
+
+        QVector<double> myvalues(last+1);
+
+        int stop = last / 2;
+
+        WPrimeIntegrator a(inputArray, 0, stop, TAU);
+        WPrimeIntegrator b(inputArray, stop+1, last, TAU);
+
+        a.start();
+        b.start();
+
+        a.wait();
+        b.wait();
+
+        // sum values
+        for (int t=0; t<=last; t++) {
+            values[t] = a.output[t] + b.output[t];
+            xvalues[t] = t * 1000;
+        }
+
+        // now subtract WPRIME and work out minimum etc
+        for(int t=0; t <= last; t++) {
+            double value = WPRIME - values[t];
+            values[t] = value;
+
+            if (value > maxY) maxY = value;
+            if (value < minY) minY = value;
+        }
+
+    } else {
+
+        // how many points ?
+        last = input->Duration / 1000; 
+        values.resize(last);
+        xvalues.resize(last);
+
+        // input array contains the actual W' expenditure
+        // and will also contain non-zero values
+        double W = WPRIME;
+        int lap; // passed by reference
+        for (int i=0; i<last; i++) {
+
+            // get watts at point in time
+            int value = input->wattsAt(i*1000, lap);
+
+            if(value < CP) {
+                W  = W + (CP-value)*(WPRIME-W)/WPRIME;
+            } else {
+                W  = W + (CP-value);
+            }
+
+            if (W > maxY) maxY = W;
+            if (W < minY) minY = W;
+
+            values[i] = W;
+            xvalues[i] = i*1000;
+        }
     }
 
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
                                  // so lets not excacerbate the problem - truncate
-
 }
 
 double
@@ -411,6 +525,31 @@ WPrime::maxMatch()
     return max;
 }
 
+
+// decay and integrate -- split into threads for best performance
+WPrimeIntegrator::WPrimeIntegrator(QVector<int> &source, int begin, int end, double TAU) :
+    source(source), begin(begin), end(end), TAU(TAU)
+{
+    output.resize(source.size());
+}
+
+void
+WPrimeIntegrator::run()
+{
+    // run from start to stop adding decay to end
+    for (int t=begin; t<end; t++) {
+
+        if (source[t] <= 0) continue;
+
+        for (int i=0; i < WPrimeDecayPeriod && t+i < source.size(); i++) {
+
+            double value = source[t] * pow(E, -(double(i)/TAU));
+ 
+            // integrate
+            output[t+i] += value;
+        }
+    }
+}
 
 //
 // Associated Metrics

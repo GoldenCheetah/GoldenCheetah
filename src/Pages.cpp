@@ -173,7 +173,18 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     
     configLayout->addWidget(hystlabel, 7,0, Qt::AlignRight);
     configLayout->addWidget(hystedit, 7,1, Qt::AlignLeft);
-    
+
+    // wbal formula preference
+    QLabel *wbalFormLabel = new QLabel(tr("W' bal formula:"));
+    wbalForm = new QComboBox(this);
+    wbalForm->addItem(tr("Differential"));
+    wbalForm->addItem(tr("Integral"));
+    if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
+    else wbalForm->setCurrentIndex(1);
+
+    configLayout->addWidget(wbalFormLabel, 8,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 8,1, Qt::AlignLeft);
+
     //
     // Performance manager
     //
@@ -265,6 +276,9 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
+
+    // wbal formula
+    appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
 
     // Performance Manager
     appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());

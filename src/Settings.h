@@ -205,6 +205,9 @@
 // show tabbar
 #define GC_TABBAR                 "show/tabbar"
 
+// wbal formula to use
+#define GC_WBALFORM               "wbal/formula"
+
 #include <QSettings>
 #include <QFileInfo>
 
