@@ -84,6 +84,7 @@ class GcWindowRegistry {
     static GcWindow *newGcWindow(GcWinID id, Context *context);
     static QStringList windowsForType(int type);
     static QList<GcWinID> idsForType(int type);
+    static QString title(GcWinID id);
 };
 
 extern GcWindowRegistry* GcWindows;

@@ -113,6 +113,15 @@ QStringList windowsForType(int type)
     return returning;
 }
 
+QString
+GcWindowRegistry::title(GcWinID id)
+{
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].relevance && GcWindows[i].id == id) 
+            return GcWindows[i].name;
+    }
+}
+
 QList<GcWinID> idsForType(int type)
 {
     QList<GcWinID> returning;
