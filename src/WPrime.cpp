@@ -53,7 +53,7 @@
 #include "Settings.h" // for GC_WBALFORM
 
 const double WprimeMultConst = 1.0;
-const int WPrimeDecayPeriod = 3600; // 1 hour, tried infinite but costly and limited value
+const int WPrimeDecayPeriod = 1800; // 1 hour, tried infinite but costly and limited value
                                     //         on long rides anyway
 const double E = 2.71828183;
 
@@ -553,7 +553,7 @@ WPrimeIntegrator::run()
 
         if (source[t] <= 0) continue;
 
-        for (int i=0; i < WPrimeDecayPeriod && t+i < source.size(); i++) {
+        for (int i=0; i < (TAU*3) /*WPrimeDecayPeriod*/ && t+i < source.size(); i++) {
 
             double value = source[t] * pow(E, -(double(i)/TAU));
  
