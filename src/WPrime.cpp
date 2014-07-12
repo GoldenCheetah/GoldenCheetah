@@ -553,9 +553,14 @@ WPrimeIntegrator::run()
 
         if (source[t] <= 0) continue;
 
-        for (int i=0; i < (TAU*3) /*WPrimeDecayPeriod*/ && t+i < source.size(); i++) {
+        // start at 1, since the actual value shouldn't be adjusted with itself !
+        for (int i=1; i < (TAU*3) /*WPrimeDecayPeriod*/ && t+i < source.size(); i++) {
 
             double value = source[t] * pow(E, -(double(i)/TAU));
+
+            // diminishing returns - we're dealing in kJ, so 10J is nothing !
+            // this saves about 20% in calculation time typically
+            if (value < 10.00f) break;
  
             // integrate
             output[t+i] += value;
