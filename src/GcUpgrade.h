@@ -38,18 +38,19 @@
 // 3050 - V3.1 DEVELOPMENT (accidentally pushed)
 // 3051 - V3.1 DEVELOPMENT
 // 3055 - V3.1 RC1
+// 3056 - V3.1 RC2
 
 #define VERSION3_BUILD 3010 // released
 #define VERSION3_SP1   3030 // released
 #define VERSION3_SP2   3032 // released
-#define VERSION31_UPG  3055 // first build with 3.1 upgrade process
+#define VERSION31_UPG  3056 // first build with 3.1 upgrade process
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3055
-#define VERSION_STRING "V3.1 RC1"
+#define VERSION_LATEST 3056
+#define VERSION_STRING "V3.1 RC2"
 
 class GcUpgrade
 {
