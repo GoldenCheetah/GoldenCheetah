@@ -291,6 +291,8 @@ class TotalWork : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const Context *) {
+
+        joules = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= 0.0)
                 joules += point->watts * ride->recIntSecs();

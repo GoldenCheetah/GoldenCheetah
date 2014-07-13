@@ -98,8 +98,9 @@
 // 77  18  Jun 2014 Mark Liversedge    Add TSS per hour metric
 // 78  19  Jun 2014 Mark Liversedge    Do not include zeroes in average L/R pedal smoothness/torque effectiveness
 // 79  20  Jun 2014 Mark Liversedge    Change the way average temperature is handled
+// 80  13  Jul 2014 Mark Liversedge    W' work + Below CP work = Work
 
-int DBSchemaVersion = 79;
+int DBSchemaVersion = 80;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
