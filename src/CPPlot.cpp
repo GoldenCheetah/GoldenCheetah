@@ -532,6 +532,7 @@ CPPlot::plotModel()
         heatAgeCurve->attach(this);
 
     }
+    zoomer->setZoomBase(false);
 }
 
 // our model for combining a model for delta mode
@@ -614,6 +615,7 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
     curve->attach(this);
 
     intervalCurves.append(curve);
+    zoomer->setZoomBase(false);
 }
 
 // wipe away all the curves
@@ -951,6 +953,7 @@ CPPlot::plotBests()
         // or just add 10% headroom
         setAxisScale(yLeft, 0, 1.1*values[0]);
     }
+    zoomer->setZoomBase(false);
 }
 
 // plot the currently selected ride
@@ -1054,6 +1057,8 @@ CPPlot::plotRide(RideItem *rideItem)
     rideCurve->setYAxis(showPercent ? yRight : yLeft);
     setAxisVisible(yRight, showPercent || showHeat);
     rideCurve->attach(this);
+
+    zoomer->setZoomBase(false);
 }
 
 // notified that the user selected a ride
@@ -1629,7 +1634,7 @@ CPPlot::plotCentile(RideItem *rideItem)
 
 
     qDebug() << "end plotting " << elapsed.elapsed();
-
+    zoomer->setZoomBase(false);
 }
 
 void
@@ -1963,4 +1968,5 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
     curve->attach(this);
 
     intervalCurves.append(curve);
+    zoomer->setZoomBase(false);
 }
