@@ -36,8 +36,8 @@ public:
     HrZoneTime() : level(0), seconds(0.0)
     {
         setType(RideMetric::Total);
-        setMetricUnits("seconds");
-        setImperialUnits("seconds");
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
         setPrecision(0);
         setConversion(1.0);
     }
@@ -75,6 +75,8 @@ public:
     void initialize ()
     {
         setName(tr("H1 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime1(*this); }
 };
@@ -92,6 +94,8 @@ public:
     void initialize ()
     {
         setName(tr("H2 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime2(*this); }
 };
@@ -109,6 +113,8 @@ public:
     void initialize ()
     {
         setName(tr("H3 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime3(*this); }
 };
@@ -126,6 +132,8 @@ public:
     void initialize ()
     {
         setName(tr("H4 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime4(*this); }
 };
@@ -143,6 +151,8 @@ public:
     void initialize ()
     {
         setName(tr("H5 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime5(*this); }
 };
@@ -160,6 +170,8 @@ public:
     void initialize ()
     {
         setName(tr("H6 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime6(*this); }
 };
@@ -177,6 +189,8 @@ public:
     void initialize ()
     {
         setName(tr("H7 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime7(*this); }
 };
@@ -194,6 +208,8 @@ public:
     void initialize ()
     {
         setName(tr("H8 Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     RideMetric *clone() const { return new HrZoneTime8(*this); }
 };

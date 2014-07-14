@@ -36,8 +36,8 @@ class ZoneTime : public RideMetric {
     ZoneTime() : level(0), seconds(0.0)
     {
         setType(RideMetric::Total);
-        setMetricUnits("seconds");
-        setImperialUnits("seconds");
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
         setPrecision(0);
         setConversion(1.0);
     }
@@ -77,6 +77,8 @@ class ZoneTime1 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L1 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime1(*this); }
 };
@@ -94,6 +96,8 @@ class ZoneTime2 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L2 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime2(*this); }
 };
@@ -111,6 +115,8 @@ class ZoneTime3 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L3 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime3(*this); }
 };
@@ -124,10 +130,14 @@ class ZoneTime4 : public ZoneTime {
             setLevel(4);
             setSymbol("time_in_zone_L4");
             setInternalName("L4 Time in Zone");
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         void initialize ()
         {
             setName(tr("L4 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime4(*this); }
 };
@@ -145,6 +155,8 @@ class ZoneTime5 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L5 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime5(*this); }
 };
@@ -162,6 +174,8 @@ class ZoneTime6 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L6 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime6(*this); }
 };
@@ -179,6 +193,8 @@ class ZoneTime7 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L7 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime7(*this); }
 };
@@ -196,6 +212,8 @@ class ZoneTime8 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L8 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime8(*this); }
 };
@@ -213,6 +231,8 @@ class ZoneTime9 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L9 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime9(*this); }
 };
@@ -230,6 +250,8 @@ class ZoneTime10 : public ZoneTime {
         void initialize ()
         {
             setName(tr("L10 Time in Zone"));
+            setMetricUnits(tr("seconds"));
+            setImperialUnits(tr("seconds"));
         }
         RideMetric *clone() const { return new ZoneTime10(*this); }
 };
