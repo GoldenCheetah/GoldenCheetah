@@ -41,39 +41,56 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
-    }
-    else if (site == TWITTER) {
+
+    } else if (site == TWITTER) {
+
 #ifdef GC_HAVE_LIBOAUTH
+
         int rc;
         char **rv = NULL;
         QString token;
         QString url = QString();
         t_key = NULL;
         t_secret = NULL;
-
         const char *request_token_uri = "https://api.twitter.com/oauth/request_token";
-
         char *req_url = NULL;
         char *postarg = NULL;
         char *reply   = NULL;
+
+        // get the url
         req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
-        reply = oauth_http_get(req_url,postarg);
+        if (req_url != NULL) {
 
-        rc = oauth_split_url_parameters(reply, &rv);
-        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
-        token = QString(rv[1]);
-        t_key  =strdup(&(rv[1][12]));
-        t_secret =strdup(&(rv[2][19]));
-        urlstr = QString("https://api.twitter.com/oauth/authorize?");
-        urlstr.append(token);
-        //QDesktopServices::openUrl(QUrl(url));
-        if(rv) free(rv);
+            // post it
+            reply = oauth_http_get(req_url,postarg);
+            if (reply != NULL) {
 
-        //urlstr.append("&oauth_callback=http%3A%2F%2Fwww.goldencheetah.org%2F");
-        requestToken = true;
+                // will split reply into paramters using strdup
+                rc = oauth_split_url_parameters(reply, &rv);
+
+                if (rc >= 3) {
+
+                    // really ?
+                    qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+
+                    token = QString(rv[1]);
+                    t_key  =strdup(&(rv[1][12]));
+                    t_secret =strdup(&(rv[2][19]));
+                    urlstr = QString("https://api.twitter.com/oauth/authorize?");
+                    urlstr.append(token);
+
+                    // free memory using count rc
+                    for(int i=0; i<rc; i++) free(rv[i]);
+                }
+
+                //urlstr.append("&oauth_callback=http%3A%2F%2Fwww.goldencheetah.org%2F");
+                requestToken = true;
+            }
+        }
 #endif
-    }
-    else if (site == CYCLING_ANALYTICS) {
+
+    } else if (site == CYCLING_ANALYTICS) {
+
         urlstr = QString("https://www.cyclinganalytics.com/api/auth?");
         urlstr.append("client_id=").append(GC_CYCLINGANALYTICS_CLIENT_ID).append("&");
         urlstr.append("scope=modify_rides&");

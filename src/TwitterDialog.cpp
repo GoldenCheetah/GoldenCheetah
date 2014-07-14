@@ -130,22 +130,37 @@ TwitterDialog::tweetCurrentRide()
       return;
     }
 
+    bool failed = true;
     const QString strUrl = QUrl::toPercentEncoding(twitterMsg);
     qurl.append(strUrl);
-    const char *req_url = oauth_sign_url2(qurl.toLatin1(), &postarg, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, s_token.toLatin1(), s_secret.toLatin1());
-    const char *strreply = oauth_http_post(req_url,postarg);
+    char *req_url = oauth_sign_url2(qurl.toLatin1(), &postarg, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, s_token.toLatin1(), s_secret.toLatin1());
+    char *strreply;
+    QString post_reply;
 
-    QString post_reply = QString(strreply);
+    if (req_url != NULL) {
+        strreply = oauth_http_post(req_url,postarg);
 
-    if(!post_reply.contains("created_at", Qt::CaseInsensitive)) {
-      QMessageBox oautherr(QMessageBox::Critical, tr("Error Posting Tweet"), tr("There was an error connecting to Twitter.  Check your network connection and try again."));
-      oautherr.setDetailedText(post_reply);
-      oautherr.exec();
-      return;
+        if (strreply != NULL) {
+            post_reply = QString(strreply);
+
+            if (post_reply.contains("created_at", Qt::CaseInsensitive)) {
+
+                failed = false;
+            }
+        }
+        if (postarg) free(postarg);
     }
 
-    if(postarg) free(postarg);
+    // let user know it didn't work
+    if (failed) {
+        QMessageBox oautherr(QMessageBox::Critical, tr("Error Posting Tweet"), 
+            tr("There was an error connecting to Twitter.  Check your network connection and try again."));
+        oautherr.setDetailedText(post_reply); // probably blank
+        oautherr.exec();
+        return;
+    }
 
+    // otherwise all done
     accept();
 
 }
