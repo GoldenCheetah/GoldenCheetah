@@ -68,7 +68,6 @@ class CurveColors : public QObject
 
     public:
         CurveColors(QwtPlot *plot) : isolated(false), plot(plot) {
-            saveState();
 
             // span slider appears when curve isolated
             // to enable zooming in and out
@@ -93,6 +92,8 @@ class CurveColors : public QObject
             slider->hide();
             connect(slider, SIGNAL(lowerPositionChanged(int)), this, SLOT(zoomChanged()));
             connect(slider, SIGNAL(upperPositionChanged(int)), this, SLOT(zoomChanged()));
+
+            saveState();
         }
 
         ~CurveColors() {
@@ -131,6 +132,7 @@ class CurveColors : public QObject
 
             // don't save in this state!!
             if (isolated) restoreState();
+            else slider->hide();
 
             state.clear();
             labels.clear();

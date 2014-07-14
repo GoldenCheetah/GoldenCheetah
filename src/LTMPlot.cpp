@@ -204,6 +204,8 @@ LTMPlot::setData(LTMSettings *set)
     QTime timer;
     timer.start();
 
+    curveColors->isolated = false;
+
     //qDebug()<<"Starting.."<<timer.elapsed();
 
     // wipe away last cached stress calculator
