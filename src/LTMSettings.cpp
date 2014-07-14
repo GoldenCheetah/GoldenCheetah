@@ -67,14 +67,14 @@ EditChartDialog::okClicked()
 {
     // mustn't be blank
     if (chartName->text() == "") {
-        QMessageBox::warning( 0, "Entry Error", "Name is blank");
+        QMessageBox::warning( 0, tr("Entry Error"), tr("Name is blank"));
         return;
     }
 
     // does it already exist?
     foreach (LTMSettings chart, presets) {
         if (chart.name == chartName->text()) {
-            QMessageBox::warning( 0, "Entry Error", "Chart already exists");
+            QMessageBox::warning( 0, tr("Entry Error"), tr("Chart already exists"));
             return;
         }
     }
