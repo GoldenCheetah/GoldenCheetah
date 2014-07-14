@@ -147,7 +147,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 #ifdef Q_OS_MAC
     charts->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    charts->headerItem()->setText(0, "Charts");
+    charts->headerItem()->setText(0, tr("Charts"));
     charts->setColumnCount(1);
     charts->setSelectionMode(QAbstractItemView::SingleSelection);
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -1317,11 +1317,11 @@ EditMetricDetailDialog::estimateName()
         case 3 : name = "p-Max"; break;
         case 4 : 
             {
-                name = QString("Estimate %1 %2 Power").arg(estimateDuration->value())
+                name = QString(tr("Estimate %1 %2 Power")).arg(estimateDuration->value())
                                                   .arg(estimateDurationUnits->currentText());
             }
             break;
-        case 5 : name = "Endurance Index"; break;
+        case 5 : name = tr("Endurance Index"); break;
     }
 
     // now the model
@@ -1747,10 +1747,10 @@ EditMetricDetailDialog::bestName()
     // set uname from current parms
     QString desc = QString(tr("Peak %1")).arg(duration->value());
     switch (durationUnits->currentIndex()) {
-    case 0 : desc += " second "; break;
-    case 1 : desc += " minute "; break;
+    case 0 : desc += tr(" second "); break;
+    case 1 : desc += tr(" minute "); break;
     default:
-    case 2 : desc += " hour "; break;
+    case 2 : desc += tr(" hour "); break;
     }
     desc += RideFile::seriesName(seriesList.at(dataSeries->currentIndex()));
     userName->setText(desc);
@@ -2072,7 +2072,7 @@ LTMTool::importClicked()
 
         } else {
             // oops non existant - does this ever happen?
-            QMessageBox::warning( 0, "Entry Error", QString("Selected file (%1) does not exist").arg(filenames[0]));
+            QMessageBox::warning( 0, tr("Entry Error"), QString(tr("Selected file (%1) does not exist")).arg(filenames[0]));
         }
     }
 }
@@ -2090,8 +2090,8 @@ LTMTool::exportClicked()
         // if exists confirm overwrite
         if (QFileInfo(filenames[0]).exists()) {
             QMessageBox msgBox;
-            msgBox.setText(QString("The selected file (%1) exists.").arg(filenames[0]));
-            msgBox.setInformativeText("Do you want to overwrite it?");
+            msgBox.setText(QString(tr("The selected file (%1) exists.")).arg(filenames[0]));
+            msgBox.setInformativeText(tr("Do you want to overwrite it?"));
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
             msgBox.setDefaultButton(QMessageBox::Cancel);
             msgBox.setIcon(QMessageBox::Warning);
@@ -2159,7 +2159,7 @@ LTMTool::deleteClicked()
 {
     // must have at least 1 child
     if (charts->invisibleRootItem()->childCount() == 1) {
-        QMessageBox::warning(0, "Error", "You must have at least one chart");
+        QMessageBox::warning(0, tr("Error"), tr("You must have at least one chart"));
         return;
 
     } else if (charts->currentItem()) {
