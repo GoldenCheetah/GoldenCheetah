@@ -598,9 +598,15 @@ void ANTChannel::channelId(unsigned char *ant_message) {
 
     unsigned char *message=ant_message+2;
 
+    // channel id data
     device_number=CHANNEL_ID_DEVICE_NUMBER(message);
     device_id=CHANNEL_ID_DEVICE_TYPE_ID(message);
     state=MESSAGE_RECEIVED;
+
+    // high nibble of transmission type used to indicate
+    // it is a kick, A0 gives the game away :)
+    is_kickr = (device_id == ANT_SPORT_POWER_TYPE) && ((CHANNEL_ID_TRANSMISSION_TYPE(message)&0xF0) == 0xA0);
+
     emit channelInfo(number, device_number, device_id);
     setId();
 
