@@ -678,7 +678,7 @@ void ANTChannel::attemptTransition(int message_id)
     // update state
     state=message_id;
 
-    // do transitions
+    // do transitions from top status to bottom status !
     switch (state) {
 
     case ANT_CLOSE_CHANNEL:

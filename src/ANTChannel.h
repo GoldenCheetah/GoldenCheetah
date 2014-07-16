@@ -115,6 +115,7 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_QUARQ,
             CHANNEL_TYPE_FAST_QUARQ,
             CHANNEL_TYPE_FAST_QUARQ_NEW,
+            CHANNEL_TYPE_KICKR,
             CHANNEL_TYPE_GUARD
         };
         typedef enum channeltype ChannelType;
