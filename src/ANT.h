@@ -86,6 +86,7 @@ class ANTMessage;
 class ANTChannel;
 
 typedef struct ant_sensor_type {
+  bool user; // can user select this when calibrating ?
   int type;
   int period;
   int device_id;
@@ -208,6 +209,7 @@ struct setChannelAtom {
 #define ANT_SPORT_SPEED_PERIOD 8118
 #define ANT_SPORT_CADENCE_PERIOD 8102
 #define ANT_SPORT_SandC_PERIOD 8086
+#define ANT_SPORT_KICKR_PERIOD 2048
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
 
@@ -223,6 +225,7 @@ struct setChannelAtom {
 #define ANT_SPORT_FREQUENCY 57
 #define ANT_FAST_QUARQ_FREQUENCY 61
 #define ANT_QUARQ_FREQUENCY 61
+#define ANT_KICKR_FREQUENCY 52
 
 #define ANT_SPORT_CALIBRATION_MESSAGE                 0x01
 

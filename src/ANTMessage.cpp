@@ -627,6 +627,10 @@ ANTMessage ANTMessage::setChannelPeriod(const unsigned char channel,
 ANTMessage ANTMessage::setChannelFreq(const unsigned char channel,
                                       const unsigned char frequency)
 {
+    // Channel Frequency = 2400 MHz + Channel RF Frequency Number * 1.0 MHz
+    // The range is 0-124 with a default value of 66
+    // ANT_SPORT_FREQ = 57
+    // ANT_KICKR_FREQ = 52
     return ANTMessage(2, ANT_CHANNEL_FREQUENCY, channel, frequency);
 }
 
