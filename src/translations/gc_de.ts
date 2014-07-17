@@ -87,17 +87,17 @@
 <context>
     <name>AddFinal</name>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1060"/>
+        <location filename="../AddDeviceWizard.cpp" line="1062"/>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1061"/>
+        <location filename="../AddDeviceWizard.cpp" line="1063"/>
         <source>Confirm configuration and add device</source>
         <translation>Konfiguration bestätigen und Gerät hinzufügen</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1066"/>
+        <location filename="../AddDeviceWizard.cpp" line="1068"/>
         <source>We will now add a new device with the configuration shown below. Please take a moment to review and then click Finish to add the device and complete this wizard, or press the Back button to make amendments.
 
 </source>
@@ -106,287 +106,287 @@
 </translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1077"/>
+        <location filename="../AddDeviceWizard.cpp" line="1079"/>
         <source>Name*</source>
         <translation>Name*</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1078"/>
+        <location filename="../AddDeviceWizard.cpp" line="1080"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1079"/>
+        <location filename="../AddDeviceWizard.cpp" line="1081"/>
         <source>Profile</source>
         <translation>Profil</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1088"/>
+        <location filename="../AddDeviceWizard.cpp" line="1090"/>
         <source>Virtual</source>
         <translation>virtuell</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1089"/>
+        <location filename="../AddDeviceWizard.cpp" line="1091"/>
         <source>Wheel Size</source>
         <translation>Laufradgröße</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1093"/>
+        <location filename="../AddDeviceWizard.cpp" line="1095"/>
         <source>None</source>
         <translation>Kein</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1094"/>
+        <location filename="../AddDeviceWizard.cpp" line="1096"/>
         <source>Power - Kurt Kinetic Cyclone</source>
         <translation>Leistung - Kurt Kinetic Cyclone</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1095"/>
+        <location filename="../AddDeviceWizard.cpp" line="1097"/>
         <source>Power - Kurt Kinetic Road Machine</source>
         <translation>Leistung - Kurt Kinetic Road Machine</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1096"/>
+        <location filename="../AddDeviceWizard.cpp" line="1098"/>
         <source>Power - Cyclops Fluid 2</source>
         <translation>Leistung - Cyclops Fluid 2</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1097"/>
+        <location filename="../AddDeviceWizard.cpp" line="1099"/>
         <source>Power - BT Advanced Training System</source>
         <translation>Leistung - BT Advanced Training System</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1098"/>
+        <location filename="../AddDeviceWizard.cpp" line="1100"/>
         <source>Power - LeMond Revolution</source>
         <translation>Leistung - LeMond Revolution</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1099"/>
+        <location filename="../AddDeviceWizard.cpp" line="1101"/>
         <source>Power - 1UP USA Trainer</source>
         <translation>Leistung - 1UP USA Trainer</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1100"/>
+        <location filename="../AddDeviceWizard.cpp" line="1102"/>
         <source>Power - Minoura V100 Trainer (H)</source>
         <translation>Leistung - Minoura V100 Trainer (H)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1101"/>
+        <location filename="../AddDeviceWizard.cpp" line="1103"/>
         <source>Power - Minoura V100 Trainer (5)</source>
         <translation>Leistung - Minoura V100 Trainer (5)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1102"/>
+        <location filename="../AddDeviceWizard.cpp" line="1104"/>
         <source>Power - Minoura V100 Trainer (4)</source>
         <translation>Leistung - Minoura V100 Trainer (4)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1103"/>
+        <location filename="../AddDeviceWizard.cpp" line="1105"/>
         <source>Power - Minoura V100 Trainer (3)</source>
         <translation>Leistung - Minoura V100 Trainer (3)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1104"/>
+        <location filename="../AddDeviceWizard.cpp" line="1106"/>
         <source>Power - Minoura V100 Trainer (2)</source>
         <translation>Leistung - Minoura V100 Trainer (2)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1105"/>
+        <location filename="../AddDeviceWizard.cpp" line="1107"/>
         <source>Power - Minoura V100 Trainer (1)</source>
         <translation>Leistung - Minoura V100 Trainer (1)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1106"/>
+        <location filename="../AddDeviceWizard.cpp" line="1108"/>
         <source>Power - Minoura V100 Trainer (L)</source>
         <translation>Leistung - Minoura V100 Trainer (L)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1107"/>
+        <location filename="../AddDeviceWizard.cpp" line="1109"/>
         <source>Power - Saris Powerbeam Pro</source>
         <translation>Leistung - Saris Powerbeam Pro</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1108"/>
+        <location filename="../AddDeviceWizard.cpp" line="1110"/>
         <source>Power - Tacx Satori (2)</source>
         <translation>Leistung - Tacx Satori (2)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1109"/>
+        <location filename="../AddDeviceWizard.cpp" line="1111"/>
         <source>Power - Tacx Satori (4)</source>
         <translation>Leistung - Tacx Satori (4)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1110"/>
+        <location filename="../AddDeviceWizard.cpp" line="1112"/>
         <source>Power - Tacx Satori (6)</source>
         <translation>Leistung - Tacx Satori (6)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1111"/>
+        <location filename="../AddDeviceWizard.cpp" line="1113"/>
         <source>Power - Tacx Satori (8)</source>
         <translation>Leistung - Tacx Satori (8)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1112"/>
+        <location filename="../AddDeviceWizard.cpp" line="1114"/>
         <source>Power - Tacx Satori (10)</source>
         <translation>Leistung - Tacx Satori (10)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1113"/>
+        <location filename="../AddDeviceWizard.cpp" line="1115"/>
         <source>Power - Tacx Flow (0)</source>
         <translation>Leistung - Tacx Flow (0)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1114"/>
+        <location filename="../AddDeviceWizard.cpp" line="1116"/>
         <source>Power - Tacx Flow (2)</source>
         <translation>Leistung - Tacx Flow (2)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1115"/>
+        <location filename="../AddDeviceWizard.cpp" line="1117"/>
         <source>Power - Tacx Flow (4)</source>
         <translation>Leistung - Tacx Flow (4)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1116"/>
+        <location filename="../AddDeviceWizard.cpp" line="1118"/>
         <source>Power - Tacx Flow (6)</source>
         <translation>Leistung - Tacx Flow (6)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1117"/>
+        <location filename="../AddDeviceWizard.cpp" line="1119"/>
         <source>Power - Tacx Flow (8)</source>
         <translation>Leistung - Tacx Flow (8)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1118"/>
+        <location filename="../AddDeviceWizard.cpp" line="1120"/>
         <source>Power - Tacx Blue Twist (1)</source>
         <translation>Leistung - Tacx Blue Twist (1)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1119"/>
+        <location filename="../AddDeviceWizard.cpp" line="1121"/>
         <source>Power - Tacx Blue Twist (3)</source>
         <translation>Leistung - Tacx Blue Twist (3)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1120"/>
+        <location filename="../AddDeviceWizard.cpp" line="1122"/>
         <source>Power - Tacx Blue Twist (5)</source>
         <translation>Leistung - Tacx Blue Twist (5)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1121"/>
+        <location filename="../AddDeviceWizard.cpp" line="1123"/>
         <source>Power - Tacx Blue Twist (7)</source>
         <translation>Leistung - Tacx Blue Twist (7)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1122"/>
+        <location filename="../AddDeviceWizard.cpp" line="1124"/>
         <source>Power - Tacx Blue Motion (2)</source>
         <translation>Leistung - Tacx Blue Motion (2)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1123"/>
+        <location filename="../AddDeviceWizard.cpp" line="1125"/>
         <source>Power - Tacx Blue Motion (4)</source>
         <translation>Leistung - Tacx Blue Motion (4)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1124"/>
+        <location filename="../AddDeviceWizard.cpp" line="1126"/>
         <source>Power - Tacx Blue Motion (6)</source>
         <translation>Leistung - Tacx Blue Motion (6)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1125"/>
+        <location filename="../AddDeviceWizard.cpp" line="1127"/>
         <source>Power - Tacx Blue Motion (8)</source>
         <translation>Leistung - Tacx Blue Motion (8)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1126"/>
+        <location filename="../AddDeviceWizard.cpp" line="1128"/>
         <source>Power - Tacx Blue Motion (10)</source>
         <translation>Leistung - Tacx Blue Motion (10)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1127"/>
+        <location filename="../AddDeviceWizard.cpp" line="1129"/>
         <source>Power - Elite Supercrono Powermag (1)</source>
         <translation>Leistung - Elite Supercrono Powermag (1)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1128"/>
+        <location filename="../AddDeviceWizard.cpp" line="1130"/>
         <source>Power - Elite Supercrono Powermag (2)</source>
         <translation>Leistung - Elite Supercrono Powermag (2)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1129"/>
+        <location filename="../AddDeviceWizard.cpp" line="1131"/>
         <source>Power - Elite Supercrono Powermag (3)</source>
         <translation>Leistung - Elite Supercrono Powermag (3)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1130"/>
+        <location filename="../AddDeviceWizard.cpp" line="1132"/>
         <source>Power - Elite Supercrono Powermag (4)</source>
         <translation>Leistung - Elite Supercrono Powermag (4)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1131"/>
+        <location filename="../AddDeviceWizard.cpp" line="1133"/>
         <source>Power - Elite Supercrono Powermag (5)</source>
         <translation>Leistung - Elite Supercrono Powermag (5)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1132"/>
+        <location filename="../AddDeviceWizard.cpp" line="1134"/>
         <source>Power - Elite Supercrono Powermag (6)</source>
         <translation>Leistung - Elite Supercrono Powermag (6)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1133"/>
+        <location filename="../AddDeviceWizard.cpp" line="1135"/>
         <source>Power - Elite Supercrono Powermag (7)</source>
         <translation>Leistung - Elite Supercrono Powermag (7)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1134"/>
+        <location filename="../AddDeviceWizard.cpp" line="1136"/>
         <source>Power - Elite Supercrono Powermag (8)</source>
         <translation>Leistung - Elite Supercrono Powermag (8)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1135"/>
+        <location filename="../AddDeviceWizard.cpp" line="1137"/>
         <source>Power - Elite Qubo Power Fluid</source>
         <translation>Power - Elite Qubo Power Fluid</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1137"/>
+        <location filename="../AddDeviceWizard.cpp" line="1139"/>
         <source>Road/Cross (700C/622)</source>
         <translation>Straße/Cross (700C/622)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1138"/>
+        <location filename="../AddDeviceWizard.cpp" line="1140"/>
         <source>Tri/TT (650C)</source>
         <translation>Tri/TT (650C)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1139"/>
+        <location filename="../AddDeviceWizard.cpp" line="1141"/>
         <source>Mountain (26&quot;)</source>
         <translation>MTB (26&quot;)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1140"/>
+        <location filename="../AddDeviceWizard.cpp" line="1142"/>
         <source>BMX (20&quot;)</source>
         <translation>BMX (20&quot;)</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1145"/>
+        <location filename="../AddDeviceWizard.cpp" line="1147"/>
         <source>Selected by default</source>
         <translation>Standardauswahl</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1152"/>
+        <location filename="../AddDeviceWizard.cpp" line="1154"/>
         <source>Power</source>
         <translation>Leistung</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1153"/>
+        <location filename="../AddDeviceWizard.cpp" line="1155"/>
         <source>Heartrate</source>
         <translation>Herzfrequenz</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1154"/>
+        <location filename="../AddDeviceWizard.cpp" line="1156"/>
         <source>Speed</source>
         <translation>Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="1155"/>
+        <location filename="../AddDeviceWizard.cpp" line="1157"/>
         <source>Cadence</source>
         <translation>Trittfrequenz</translation>
     </message>
@@ -671,48 +671,48 @@ Bei Auswahl von &quot;Zur Bibliothek hinzu kopieren&quot; wird die Datei in die 
         <translation>ANT+-Geräte suchen und koppeln</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="662"/>
+        <location filename="../AddDeviceWizard.cpp" line="664"/>
         <source>Sensor</source>
         <translation>Sensor</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="663"/>
+        <location filename="../AddDeviceWizard.cpp" line="665"/>
         <source>ANT+ Id</source>
         <translation>ANT+-ID</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="664"/>
+        <location filename="../AddDeviceWizard.cpp" line="666"/>
         <source>Value</source>
         <translation>Wert</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="665"/>
+        <location filename="../AddDeviceWizard.cpp" line="667"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="697"/>
-        <location filename="../AddDeviceWizard.cpp" line="741"/>
+        <location filename="../AddDeviceWizard.cpp" line="699"/>
+        <location filename="../AddDeviceWizard.cpp" line="743"/>
         <source>none</source>
         <translation>kein</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="711"/>
+        <location filename="../AddDeviceWizard.cpp" line="713"/>
         <source>Un-Paired</source>
         <translation>nicht gekoppelt</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="748"/>
+        <location filename="../AddDeviceWizard.cpp" line="750"/>
         <source>Unused</source>
         <translation>unbenutzt</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="750"/>
+        <location filename="../AddDeviceWizard.cpp" line="752"/>
         <source>Searching...</source>
         <translation>suche...</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="761"/>
+        <location filename="../AddDeviceWizard.cpp" line="763"/>
         <source>Paired</source>
         <translation>gekoppelt</translation>
     </message>
@@ -720,58 +720,58 @@ Bei Auswahl von &quot;Zur Bibliothek hinzu kopieren&quot; wird die Datei in die 
 <context>
     <name>AddPairBTLE</name>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="832"/>
+        <location filename="../AddDeviceWizard.cpp" line="834"/>
         <source>Pair Devices</source>
         <translation>Geräte koppeln</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="833"/>
+        <location filename="../AddDeviceWizard.cpp" line="835"/>
         <source>Search for and pair Bluetooth 4.0 devices</source>
         <translation>Bluetooth-4.0-Geräte suchen und kopppeln</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="890"/>
+        <location filename="../AddDeviceWizard.cpp" line="892"/>
         <source>Sensor</source>
         <translation>Sensor</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="891"/>
+        <location filename="../AddDeviceWizard.cpp" line="893"/>
         <source>ANT+ Id</source>
         <translation>ANT+-ID</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="892"/>
+        <location filename="../AddDeviceWizard.cpp" line="894"/>
         <source>Value</source>
         <translation>Wert</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="893"/>
+        <location filename="../AddDeviceWizard.cpp" line="895"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="925"/>
-        <location filename="../AddDeviceWizard.cpp" line="969"/>
+        <location filename="../AddDeviceWizard.cpp" line="927"/>
+        <location filename="../AddDeviceWizard.cpp" line="971"/>
         <source>none</source>
         <translation>kein</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="939"/>
+        <location filename="../AddDeviceWizard.cpp" line="941"/>
         <source>Un-Paired</source>
         <translation>nicht gekoppelt</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="976"/>
+        <location filename="../AddDeviceWizard.cpp" line="978"/>
         <source>Unused</source>
         <translation>unbenutzt</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="978"/>
+        <location filename="../AddDeviceWizard.cpp" line="980"/>
         <source>Searching...</source>
         <translation>suche...</translation>
     </message>
     <message>
-        <location filename="../AddDeviceWizard.cpp" line="989"/>
+        <location filename="../AddDeviceWizard.cpp" line="991"/>
         <source>Paired</source>
         <translation>gekoppelt</translation>
     </message>
@@ -2794,7 +2794,7 @@ Setup starten.</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="92"/>
-        <location filename="../CPPlot.cpp" line="1038"/>
+        <location filename="../CPPlot.cpp" line="1041"/>
         <source>Percent of Best</source>
         <translation>Als Prozentanteil des Bestwertes anzeigen</translation>
     </message>
@@ -3000,40 +3000,40 @@ Setup starten.</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="495"/>
-        <location filename="../CPPlot.cpp" line="1037"/>
+        <location filename="../CPPlot.cpp" line="1040"/>
         <source>Percent of Best / Heat Rides</source>
         <translation>Prozent des Bestwertes / &quot;Heat&quot; Trainingseinheiten</translation>
     </message>
     <message>
         <location filename="../CPPlot.cpp" line="496"/>
-        <location filename="../CPPlot.cpp" line="1048"/>
+        <location filename="../CPPlot.cpp" line="1051"/>
         <source>Heat Rides</source>
         <translation>&quot;Heat&quot; Trainingseinheiten</translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="734"/>
+        <location filename="../CPPlot.cpp" line="736"/>
         <source>Bests</source>
         <translation>Bestwerte</translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="983"/>
+        <location filename="../CPPlot.cpp" line="986"/>
         <source>ddd MMM d, yyyy hh:mm</source>
         <translation>ddd, dd.MMM yyyy hh:mm</translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="1169"/>
+        <location filename="../CPPlot.cpp" line="1174"/>
         <source>
 ddd, dd MMM yyyy</source>
         <translation>
 ddd, dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="1180"/>
+        <location filename="../CPPlot.cpp" line="1185"/>
         <source>Rides</source>
         <translation>TE</translation>
     </message>
     <message>
-        <location filename="../CPPlot.cpp" line="1612"/>
+        <location filename="../CPPlot.cpp" line="1617"/>
         <source>%10 %</source>
         <translatorcomment>??? seem ok not to translate</translatorcomment>
         <translation></translation>
@@ -4516,6 +4516,22 @@ an den Computer anschließen und
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
+    <message>
+        <location filename="../LTMSettings.cpp" line="70"/>
+        <location filename="../LTMSettings.cpp" line="77"/>
+        <source>Entry Error</source>
+        <translation>Eingabefehler</translation>
+    </message>
+    <message>
+        <location filename="../LTMSettings.cpp" line="70"/>
+        <source>Name is blank</source>
+        <translation>Name ist leer</translation>
+    </message>
+    <message>
+        <location filename="../LTMSettings.cpp" line="77"/>
+        <source>Chart already exists</source>
+        <translation>Diagramm bereits vorhanden</translation>
+    </message>
 </context>
 <context>
     <name>EditIntervalDialog</name>
@@ -4552,6 +4568,16 @@ an den Computer anschließen und
         <source>Curve Settings</source>
         <translatorcomment>???</translatorcomment>
         <translation>Diagramm Einstellungen</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1320"/>
+        <source>Estimate %1 %2 Power</source>
+        <translation>Schätzung %1 %2 Leistung</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1324"/>
+        <source>Endurance Index</source>
+        <translation>Ausdauer Index</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1344"/>
@@ -4752,6 +4778,21 @@ an den Computer anschließen und
         <location filename="../LTMTool.cpp" line="1748"/>
         <source>Peak %1</source>
         <translation>Beste %1</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1750"/>
+        <source> second </source>
+        <translation> Sekunden </translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1751"/>
+        <source> minute </source>
+        <translation> Minuten </translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="1753"/>
+        <source> hour </source>
+        <translation> Stunden </translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="1934"/>
@@ -6932,7 +6973,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime1</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="221"/>
+        <location filename="../HrTimeInZone.cpp" line="237"/>
         <source>H1 Percent in Zone</source>
         <translation>H1 Prozent in der Zone</translation>
     </message>
@@ -6940,7 +6981,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime2</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="265"/>
+        <location filename="../HrTimeInZone.cpp" line="281"/>
         <source>H2 Percent in Zone</source>
         <translation>H2 Prozent in der Zone</translation>
     </message>
@@ -6948,7 +6989,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime3</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="309"/>
+        <location filename="../HrTimeInZone.cpp" line="325"/>
         <source>H3 Percent in Zone</source>
         <translation>H3 Prozent in der Zone</translation>
     </message>
@@ -6956,7 +6997,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime4</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="353"/>
+        <location filename="../HrTimeInZone.cpp" line="369"/>
         <source>H4 Percent in Zone</source>
         <translation>H4 Prozent in der Zone</translation>
     </message>
@@ -6964,7 +7005,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime5</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="397"/>
+        <location filename="../HrTimeInZone.cpp" line="413"/>
         <source>H5 Percent in Zone</source>
         <translation>H5 Prozent in der Zone</translation>
     </message>
@@ -6972,7 +7013,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime6</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="441"/>
+        <location filename="../HrTimeInZone.cpp" line="457"/>
         <source>H6 Percent in Zone</source>
         <translation>H6 Prozent in der Zone</translation>
     </message>
@@ -6980,7 +7021,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime7</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="485"/>
+        <location filename="../HrTimeInZone.cpp" line="501"/>
         <source>H7 Percent in Zone</source>
         <translation>H7 Prozent in der Zone</translation>
     </message>
@@ -6988,7 +7029,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HrZonePTime8</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="529"/>
+        <location filename="../HrTimeInZone.cpp" line="545"/>
         <source>H8 Percent in Zone</source>
         <translation>H8 Prozent in der Zone</translation>
     </message>
@@ -7007,67 +7048,124 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     </message>
 </context>
 <context>
+    <name>HrZoneTime</name>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="39"/>
+        <location filename="../HrTimeInZone.cpp" line="40"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
+    </message>
+</context>
+<context>
     <name>HrZoneTime1</name>
     <message>
         <location filename="../HrTimeInZone.cpp" line="77"/>
         <source>H1 Time in Zone</source>
         <translation>H1 Zeit in Zone</translation>
     </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="78"/>
+        <location filename="../HrTimeInZone.cpp" line="79"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
+    </message>
 </context>
 <context>
     <name>HrZoneTime2</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="94"/>
+        <location filename="../HrTimeInZone.cpp" line="96"/>
         <source>H2 Time in Zone</source>
         <translation>H2 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="97"/>
+        <location filename="../HrTimeInZone.cpp" line="98"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>HrZoneTime3</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="111"/>
+        <location filename="../HrTimeInZone.cpp" line="115"/>
         <source>H3 Time in Zone</source>
         <translation>H3 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="116"/>
+        <location filename="../HrTimeInZone.cpp" line="117"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>HrZoneTime4</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="128"/>
+        <location filename="../HrTimeInZone.cpp" line="134"/>
         <source>H4 Time in Zone</source>
         <translation>H4 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="135"/>
+        <location filename="../HrTimeInZone.cpp" line="136"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>HrZoneTime5</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="145"/>
+        <location filename="../HrTimeInZone.cpp" line="153"/>
         <source>H5 Time in Zone</source>
         <translation>H5 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="154"/>
+        <location filename="../HrTimeInZone.cpp" line="155"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>HrZoneTime6</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="162"/>
+        <location filename="../HrTimeInZone.cpp" line="172"/>
         <source>H6 Time in Zone</source>
         <translation>H6 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="173"/>
+        <location filename="../HrTimeInZone.cpp" line="174"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>HrZoneTime7</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="179"/>
+        <location filename="../HrTimeInZone.cpp" line="191"/>
         <source>H7 Time in Zone</source>
         <translation>H7 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="192"/>
+        <location filename="../HrTimeInZone.cpp" line="193"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>HrZoneTime8</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="196"/>
+        <location filename="../HrTimeInZone.cpp" line="210"/>
         <source>H8 Time in Zone</source>
         <translation>H8 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../HrTimeInZone.cpp" line="211"/>
+        <location filename="../HrTimeInZone.cpp" line="212"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
@@ -8061,133 +8159,133 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
     <name>LTMPlot</name>
     <message>
         <location filename="../LTMPlot.cpp" line="99"/>
-        <location filename="../LTMPlot.cpp" line="241"/>
-        <location filename="../LTMPlot.cpp" line="1326"/>
+        <location filename="../LTMPlot.cpp" line="243"/>
+        <location filename="../LTMPlot.cpp" line="1328"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="243"/>
-        <location filename="../LTMPlot.cpp" line="1308"/>
+        <location filename="../LTMPlot.cpp" line="245"/>
+        <location filename="../LTMPlot.cpp" line="1310"/>
         <source>Time of Day</source>
         <translation>Tageszeit</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="609"/>
-        <location filename="../LTMPlot.cpp" line="645"/>
+        <location filename="../LTMPlot.cpp" line="611"/>
+        <location filename="../LTMPlot.cpp" line="647"/>
         <source>%1 trend</source>
         <translation>%1 Trend</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="704"/>
+        <location filename="../LTMPlot.cpp" line="706"/>
         <source>%1 Top %2 Outliers</source>
         <translation>%1 Höchste %2 Ausreißer</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="708"/>
+        <location filename="../LTMPlot.cpp" line="710"/>
         <source>%1 Outlier</source>
         <translation>%1 Ausreißer</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="781"/>
+        <location filename="../LTMPlot.cpp" line="783"/>
         <source>%1 Best</source>
         <translation>%1 Bester</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="784"/>
+        <location filename="../LTMPlot.cpp" line="786"/>
         <source>Best %1</source>
         <translation>Bester %1</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1143"/>
+        <location filename="../LTMPlot.cpp" line="1145"/>
         <source>watts</source>
         <translation>Watt</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1154"/>
-        <location filename="../LTMPlot.cpp" line="2185"/>
+        <location filename="../LTMPlot.cpp" line="1156"/>
+        <location filename="../LTMPlot.cpp" line="2187"/>
         <source>trend</source>
         <translation>Trend</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1154"/>
-        <location filename="../LTMPlot.cpp" line="2185"/>
+        <location filename="../LTMPlot.cpp" line="1156"/>
+        <location filename="../LTMPlot.cpp" line="2187"/>
         <source>Outliers</source>
         <translation>Ausreißer</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1154"/>
-        <location filename="../LTMPlot.cpp" line="2185"/>
+        <location filename="../LTMPlot.cpp" line="1156"/>
+        <location filename="../LTMPlot.cpp" line="2187"/>
         <source>Best</source>
         <translation>Bester</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1311"/>
+        <location filename="../LTMPlot.cpp" line="1313"/>
         <source>Day</source>
         <translation>Tag</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1314"/>
+        <location filename="../LTMPlot.cpp" line="1316"/>
         <source>Week</source>
         <translation>Woche</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1317"/>
+        <location filename="../LTMPlot.cpp" line="1319"/>
         <source>Month</source>
         <translation>Monat</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1320"/>
+        <location filename="../LTMPlot.cpp" line="1322"/>
         <source>Year</source>
         <translation>Jahr</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1323"/>
-        <location filename="../LTMPlot.cpp" line="2765"/>
+        <location filename="../LTMPlot.cpp" line="1325"/>
+        <location filename="../LTMPlot.cpp" line="2767"/>
         <source>All</source>
         <translation>Alles</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1631"/>
-        <location filename="../LTMPlot.cpp" line="1666"/>
+        <location filename="../LTMPlot.cpp" line="1633"/>
+        <location filename="../LTMPlot.cpp" line="1668"/>
         <source>%1 %2 trend</source>
         <translation>%1 %2 Trend</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1724"/>
+        <location filename="../LTMPlot.cpp" line="1726"/>
         <source>%1 %2 Outliers</source>
         <translation>%1 %2 Ausreißer</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1797"/>
+        <location filename="../LTMPlot.cpp" line="1799"/>
         <source>%1 %2 Best</source>
         <translation>%1 %2 Beste(r)</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="842"/>
-        <location filename="../LTMPlot.cpp" line="1003"/>
-        <location filename="../LTMPlot.cpp" line="1854"/>
-        <location filename="../LTMPlot.cpp" line="2016"/>
-        <location filename="../LTMPlot.cpp" line="2257"/>
-        <location filename="../LTMPlot.cpp" line="2371"/>
-        <location filename="../LTMPlot.cpp" line="2671"/>
-        <location filename="../LTMPlot.cpp" line="2802"/>
+        <location filename="../LTMPlot.cpp" line="844"/>
+        <location filename="../LTMPlot.cpp" line="1005"/>
+        <location filename="../LTMPlot.cpp" line="1856"/>
+        <location filename="../LTMPlot.cpp" line="2018"/>
+        <location filename="../LTMPlot.cpp" line="2259"/>
+        <location filename="../LTMPlot.cpp" line="2373"/>
+        <location filename="../LTMPlot.cpp" line="2673"/>
+        <location filename="../LTMPlot.cpp" line="2804"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="2271"/>
-        <location filename="../LTMPlot.cpp" line="2400"/>
+        <location filename="../LTMPlot.cpp" line="2273"/>
+        <location filename="../LTMPlot.cpp" line="2402"/>
         <source>Ramp</source>
         <translation>Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="2671"/>
+        <location filename="../LTMPlot.cpp" line="2673"/>
         <source>hours</source>
         <translation>Stunden</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="2769"/>
+        <location filename="../LTMPlot.cpp" line="2771"/>
         <source>Week Commencing %1</source>
         <translation>Woche beginnend am %1</translation>
     </message>
@@ -8536,6 +8634,11 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../LTMTool.cpp" line="120"/>
         <source>Stack Zoom</source>
         <translation>Zoom Stapelanzeige</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="150"/>
+        <source>Charts</source>
+        <translation>Diagramme</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="227"/>
@@ -8889,6 +8992,36 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../LTMTool.cpp" line="2085"/>
         <source>Chart File (*.xml)</source>
         <translation>Diagrammdatei (*.xml)</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2075"/>
+        <source>Entry Error</source>
+        <translation>Eingabefehler</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2075"/>
+        <source>Selected file (%1) does not exist</source>
+        <translation>Gewählte Datei (%1) niht vorhanden</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2093"/>
+        <source>The selected file (%1) exists.</source>
+        <translation>Gewählte Datei (%1) vorhanden.</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2094"/>
+        <source>Do you want to overwrite it?</source>
+        <translation>Wollen Sie sie überschreiben ?</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2162"/>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="2162"/>
+        <source>You must have at least one chart</source>
+        <translation>Sie müssen mindestens ein Diagramm definieren</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="97"/>
@@ -11725,7 +11858,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../WattsPerKilogram.cpp" line="234"/>
         <source>5 min Peak WPK</source>
-        <translation>05min S Bestleistung</translation>
+        <translation>05min Spez. Bestleistung</translation>
     </message>
 </context>
 <context>
@@ -16363,78 +16496,78 @@ F3 drücken, wenn fertig.</translation>
         <translation>Tweet darf maximal 140 Zeichen haben.</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="141"/>
+        <location filename="../TwitterDialog.cpp" line="156"/>
         <source>Error Posting Tweet</source>
         <translation>Fehler bei der Veröffentlichung des Tweets</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="141"/>
+        <location filename="../TwitterDialog.cpp" line="157"/>
         <source>There was an error connecting to Twitter.  Check your network connection and try again.</source>
         <translation>Eine Verbindung zu Twitter konnte nicht hergestellt werden. Bitte überprüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="156"/>
+        <location filename="../TwitterDialog.cpp" line="171"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="176"/>
+        <location filename="../TwitterDialog.cpp" line="191"/>
         <source>Duration: %1 </source>
         <translation>Dauer: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="181"/>
+        <location filename="../TwitterDialog.cpp" line="196"/>
         <source>Time Riding: %1 </source>
         <translation>Fahrzeit: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="186"/>
+        <location filename="../TwitterDialog.cpp" line="201"/>
         <source>Distance: %1 </source>
         <translation>Distanz: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="191"/>
+        <location filename="../TwitterDialog.cpp" line="206"/>
         <source>Climbing: %1 </source>
         <translation>Höhenmeter: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="196"/>
+        <location filename="../TwitterDialog.cpp" line="211"/>
         <source>Work: %1 </source>
         <translation>Arbeit: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="201"/>
+        <location filename="../TwitterDialog.cpp" line="216"/>
         <source>Avg Speed: %1 </source>
         <translation>Durchschnittliche Geschwindigkeit: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="206"/>
+        <location filename="../TwitterDialog.cpp" line="221"/>
         <source>Avg Power: %1 </source>
         <translation>Durchschnittliche Leistung: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="211"/>
+        <location filename="../TwitterDialog.cpp" line="226"/>
         <source>Avg HR: %1 </source>
         <translation>Durchschnittliche Herzfrequenz: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="216"/>
+        <location filename="../TwitterDialog.cpp" line="231"/>
         <source>Avg Cadence: %1 </source>
         <translation>Durchschnittliche Trittfrequenz: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="221"/>
+        <location filename="../TwitterDialog.cpp" line="236"/>
         <source>Max Power: %1 </source>
         <translation>Maximale Leistung: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="226"/>
+        <location filename="../TwitterDialog.cpp" line="241"/>
         <source>Max HR: %1 </source>
         <translation>Maximale Herzfrequenz: %1 </translation>
     </message>
     <message>
-        <location filename="../TwitterDialog.cpp" line="242"/>
-        <location filename="../TwitterDialog.cpp" line="250"/>
+        <location filename="../TwitterDialog.cpp" line="257"/>
+        <location filename="../TwitterDialog.cpp" line="265"/>
         <source>Message Length: %1</source>
         <translation>Fehler bei der Veröffentlichung des Tweets</translation>
     </message>
@@ -16738,7 +16871,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime1</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="257"/>
+        <location filename="../TimeInZone.cpp" line="279"/>
         <source>L1 Percent in Zone</source>
         <translation>L1 Prozent in der Zone</translation>
     </message>
@@ -16746,7 +16879,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime10</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="653"/>
+        <location filename="../TimeInZone.cpp" line="675"/>
         <source>L10 Percent in Zone</source>
         <translation>L10 Prozent in der Zone</translation>
     </message>
@@ -16754,7 +16887,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime2</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="301"/>
+        <location filename="../TimeInZone.cpp" line="323"/>
         <source>L2 Percent in Zone</source>
         <translation>L2 Prozent in der Zone</translation>
     </message>
@@ -16762,7 +16895,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime3</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="345"/>
+        <location filename="../TimeInZone.cpp" line="367"/>
         <source>L3 Percent in Zone</source>
         <translation>L3 Prozent in der Zone</translation>
     </message>
@@ -16770,7 +16903,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime4</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="389"/>
+        <location filename="../TimeInZone.cpp" line="411"/>
         <source>L4 Percent in Zone</source>
         <translation>L4 Prozent in der Zone</translation>
     </message>
@@ -16778,7 +16911,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime5</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="433"/>
+        <location filename="../TimeInZone.cpp" line="455"/>
         <source>L5 Percent in Zone</source>
         <translation>L5 Prozent in der Zone</translation>
     </message>
@@ -16786,7 +16919,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime6</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="477"/>
+        <location filename="../TimeInZone.cpp" line="499"/>
         <source>L6 Percent in Zone</source>
         <translation>L6 Prozent in der Zone</translation>
     </message>
@@ -16794,7 +16927,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime7</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="521"/>
+        <location filename="../TimeInZone.cpp" line="543"/>
         <source>L7 Percent in Zone</source>
         <translation>L7 Prozent in der Zone</translation>
     </message>
@@ -16802,7 +16935,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime8</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="565"/>
+        <location filename="../TimeInZone.cpp" line="587"/>
         <source>L8 Percent in Zone</source>
         <translation>L8 Prozent in der Zone</translation>
     </message>
@@ -16810,7 +16943,7 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZonePTime9</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="609"/>
+        <location filename="../TimeInZone.cpp" line="631"/>
         <source>L9 Percent in Zone</source>
         <translation>L9 Prozent in der Zone</translation>
     </message>
@@ -16829,41 +16962,82 @@ F3 drücken, wenn fertig.</translation>
     </message>
 </context>
 <context>
+    <name>ZoneTime</name>
+    <message>
+        <location filename="../TimeInZone.cpp" line="39"/>
+        <location filename="../TimeInZone.cpp" line="40"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
+    </message>
+</context>
+<context>
     <name>ZoneTime1</name>
     <message>
         <location filename="../TimeInZone.cpp" line="79"/>
         <source>L1 Time in Zone</source>
         <translation>L1 Zeit in Zone</translation>
     </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="80"/>
+        <location filename="../TimeInZone.cpp" line="81"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
+    </message>
 </context>
 <context>
     <name>ZoneTime10</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="232"/>
+        <location filename="../TimeInZone.cpp" line="252"/>
         <source>L10 Time in Zone</source>
         <translation>L10 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="253"/>
+        <location filename="../TimeInZone.cpp" line="254"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime2</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="96"/>
+        <location filename="../TimeInZone.cpp" line="98"/>
         <source>L2 Time in Zone</source>
         <translation>L2 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="99"/>
+        <location filename="../TimeInZone.cpp" line="100"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime3</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="113"/>
+        <location filename="../TimeInZone.cpp" line="117"/>
         <source>L3 Time in Zone</source>
         <translation>L3 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="118"/>
+        <location filename="../TimeInZone.cpp" line="119"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime4</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="130"/>
+        <location filename="../TimeInZone.cpp" line="133"/>
+        <location filename="../TimeInZone.cpp" line="134"/>
+        <location filename="../TimeInZone.cpp" line="139"/>
+        <location filename="../TimeInZone.cpp" line="140"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="138"/>
         <source>L4 Time in Zone</source>
         <translation>L4 Zeit in Zone</translation>
     </message>
@@ -16871,41 +17045,71 @@ F3 drücken, wenn fertig.</translation>
 <context>
     <name>ZoneTime5</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="147"/>
+        <location filename="../TimeInZone.cpp" line="157"/>
         <source>L5 Time in Zone</source>
         <translation>L5 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="158"/>
+        <location filename="../TimeInZone.cpp" line="159"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime6</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="164"/>
+        <location filename="../TimeInZone.cpp" line="176"/>
         <source>L6 Time in Zone</source>
         <translation>L6 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="177"/>
+        <location filename="../TimeInZone.cpp" line="178"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime7</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="181"/>
+        <location filename="../TimeInZone.cpp" line="195"/>
         <source>L7 Time in Zone</source>
         <translation>L7 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="196"/>
+        <location filename="../TimeInZone.cpp" line="197"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime8</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="198"/>
+        <location filename="../TimeInZone.cpp" line="214"/>
         <source>L8 Time in Zone</source>
         <translation>L8 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="215"/>
+        <location filename="../TimeInZone.cpp" line="216"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
     <name>ZoneTime9</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="215"/>
+        <location filename="../TimeInZone.cpp" line="233"/>
         <source>L9 Time in Zone</source>
         <translation>L9 Zeit in Zone</translation>
+    </message>
+    <message>
+        <location filename="../TimeInZone.cpp" line="234"/>
+        <location filename="../TimeInZone.cpp" line="235"/>
+        <source>seconds</source>
+        <translation>Sekunden</translation>
     </message>
 </context>
 <context>
