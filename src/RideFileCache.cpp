@@ -200,8 +200,10 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
     offset += head.wattsKgDistCount * sizeof(float);
     offset += head.aPowerDistCount * sizeof(float);
 
-    // Watts then HR
-    if (series == RideFile::hr) offset += 10 * sizeof(float);
+    // tiz ist currently just for RideFile:watts and RideFile:hr series.
+    // watts is first - so move on with offset only for 'hr'
+    // structure for "tiz" data - watts(10)/CPwatts (4)/HR(10)
+    if (series == RideFile::hr) offset += (10+4) * sizeof(float);
 
     return offset;
 }
