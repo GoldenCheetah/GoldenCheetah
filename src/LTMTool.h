@@ -95,6 +95,8 @@ class LTMTool : public QWidget
 
         DateSettingsEdit *dateSetting;
 
+        static QList<MetricDetail> providePMmetrics();
+
     signals:
 
         void curvesChanged();
