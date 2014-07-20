@@ -103,7 +103,7 @@ LTMSettings::writeChartXML(QDir home, QList<LTMSettings> charts)
  *--------------------------------------------------------------------*/
 
 void
-LTMSettings::readChartXML(QDir home, QList<LTMSettings> &charts)
+LTMSettings::readChartXML(QDir home, bool useMetricUnits, QList<LTMSettings> &charts)
 {
     QFileInfo chartFile(home.absolutePath() + "/charts.xml");
     QFile chartsFile;
@@ -129,33 +129,21 @@ LTMSettings::readChartXML(QDir home, QList<LTMSettings> &charts)
 
     // translate only once and only if the built-in version is imported
     if (builtIn) {
+        // create translation maps (for names and units)
         QMap<QString, QString> nMap;  // names
         QMap<QString, QString> uMap;  // unit of measurement
-        // build up translation maps
-        const RideMetricFactory &factory = RideMetricFactory::instance();
-        for (int i=0; i<factory.metricCount(); i++) {
-            const RideMetric *add = factory.rideMetric(factory.metricName(i));
-            QTextEdit processHTMLname(add->name());
-            // use the .symbol() as key - since only CHART.XML is mapped
-            nMap.insert(add->symbol(), processHTMLname.toPlainText());
-            uMap.insert(add->symbol(), add->units(true)); // JR - HERE UNITS Metric... still to be done
+        LTMTool::getMetricsTranslationMap(nMap, uMap, useMetricUnits);
 
-        }
-        // add mapping for PM metrics (name and unit)
-        QList<MetricDetail> pmMetrics = LTMTool::providePMmetrics();
-        for (int i=0; i<pmMetrics.count(); i++)
-        {
-            nMap.insert(pmMetrics[i].symbol, pmMetrics[i].uname);
-            uMap.insert(pmMetrics[i].symbol, pmMetrics[i].uunits);
-        }
-
-        // no run over all chart metrics and map - name and unit
+        // now run over all chart metrics and map - name and unit
         for (int i=0; i<charts.count(); i++) {
             for (int j=0; j<charts[i].metrics.count(); j++){
                 // no map and substitute
                 QString n  = nMap.value(charts[i].metrics[j].symbol, charts[i].metrics[j].uname);
                 QString u  = uMap.value(charts[i].metrics[j].symbol, charts[i].metrics[j].uunits);
-                charts[i].metrics[j].name = charts[i].metrics[j].uname = n;
+                // set name, unit only if there was text before
+                if (charts[i].metrics[j].name != "") charts[i].metrics[j].name = n;
+                charts[i].metrics[j].uname = n;
+                if (charts[i].metrics[j].units != "") charts[i].metrics[j].units = u;
                 charts[i].metrics[j].units = charts[i].metrics[j].uunits = u;
             }
         }

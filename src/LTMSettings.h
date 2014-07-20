@@ -153,7 +153,7 @@ class LTMSettings {
         }
 
         void writeChartXML(QDir, QList<LTMSettings>);
-        void readChartXML(QDir, QList<LTMSettings>&charts);
+        void readChartXML(QDir, bool, QList<LTMSettings>&charts);
 
         QString name;
         QString title;

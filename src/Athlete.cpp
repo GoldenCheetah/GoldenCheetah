@@ -101,7 +101,7 @@ Athlete::Athlete(Context *context, const QDir &home)
 
     // read athlete's charts.xml and translate etc
     LTMSettings reader;
-    reader.readChartXML(context->athlete->home, presets);
+    reader.readChartXML(context->athlete->home, context->athlete->useMetricUnits, presets);
     translateDefaultCharts(presets);
 
     // Metadata
