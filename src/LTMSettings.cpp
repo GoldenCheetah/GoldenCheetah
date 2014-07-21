@@ -103,16 +103,21 @@ LTMSettings::writeChartXML(QDir home, QList<LTMSettings> charts)
  *--------------------------------------------------------------------*/
 
 void
-LTMSettings::readChartXML(QDir home, QList<LTMSettings> &charts)
+LTMSettings::readChartXML(QDir home, bool useMetricUnits, QList<LTMSettings> &charts)
 {
     QFileInfo chartFile(home.absolutePath() + "/charts.xml");
     QFile chartsFile;
+    bool builtIn;
 
     // if it doesn't exist use our built-in default version
-    if (chartFile.exists())
+    if (chartFile.exists()) {
         chartsFile.setFileName(chartFile.filePath());
-    else
+        builtIn = false;
+    }
+    else {
         chartsFile.setFileName(":/xml/charts.xml");
+        builtIn = true;
+    }
 
     QXmlInputSource source( &chartsFile );
     QXmlSimpleReader xmlReader;
@@ -121,7 +126,31 @@ LTMSettings::readChartXML(QDir home, QList<LTMSettings> &charts)
     xmlReader.setErrorHandler(&handler);
     xmlReader.parse( source );
     charts = handler.getSettings();
+
+    // translate only once and only if the built-in version is imported
+    if (builtIn) {
+        // create translation maps (for names and units)
+        QMap<QString, QString> nMap;  // names
+        QMap<QString, QString> uMap;  // unit of measurement
+        LTMTool::getMetricsTranslationMap(nMap, uMap, useMetricUnits);
+
+        // now run over all chart metrics and map - name and unit
+        for (int i=0; i<charts.count(); i++) {
+            for (int j=0; j<charts[i].metrics.count(); j++){
+                // no map and substitute
+                QString n  = nMap.value(charts[i].metrics[j].symbol, charts[i].metrics[j].uname);
+                QString u  = uMap.value(charts[i].metrics[j].symbol, charts[i].metrics[j].uunits);
+                // set name, unit only if there was text before
+                if (charts[i].metrics[j].name != "") charts[i].metrics[j].name = n;
+                charts[i].metrics[j].uname = n;
+                if (charts[i].metrics[j].units != "") charts[i].metrics[j].units = u;
+                charts[i].metrics[j].units = charts[i].metrics[j].uunits = u;
+            }
+        }
+    }
 }
+
+
 
 /*----------------------------------------------------------------------
  * Marshall/Unmarshall to DataStream to store as a QVariant
