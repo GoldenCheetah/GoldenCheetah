@@ -914,7 +914,12 @@ RideNavigator::dragEnterEvent(QDragEnterEvent *event)
 void
 RideNavigator::dropEvent(QDropEvent *event)
 {
-    QString name = event->mimeData()->data("application/x-columnchooser");
+    QByteArray rawData = event->mimeData()->data("application/x-columnchooser");
+    QDataStream stream(&rawData, QIODevice::ReadOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+    QString name;
+    stream >> name;
+
     tableView->setColumnHidden(logicalHeadings.indexOf(name), false);
     tableView->setColumnWidth(logicalHeadings.indexOf(name), 50);
     tableView->header()->moveSection(tableView->header()->visualIndex(logicalHeadings.indexOf(name)), 1);
@@ -1186,10 +1191,14 @@ ColumnChooser::buttonClicked(QString name)
 {
     // setup the drag data
     QMimeData *mimeData = new QMimeData;
-    QByteArray empty;
-    //  Use UTF-8 in Mime Date to cover also special characters,
-    //  but the Receiver of the mimeData has to be able to handle Utf8() or translate
-    mimeData->setData("application/x-columnchooser", name.toUtf8());
+
+    // we need to pack into a byte array (since UTF8() conversion is not reliable in QT4.8 vs QT 5.3)
+    QByteArray rawData;
+    QDataStream stream(&rawData, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+    stream << name;
+    // send raw
+    mimeData->setData("application/x-columnchooser", rawData);
 
     // create a drag event
     QDrag *drag = new QDrag(this);
