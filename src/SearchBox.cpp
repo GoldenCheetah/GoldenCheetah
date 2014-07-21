@@ -290,7 +290,12 @@ SearchBox::dragEnterEvent(QDragEnterEvent *event)
 void
 SearchBox::dropEvent(QDropEvent *event)
 {
-    QString name = event->mimeData()->data("application/x-columnchooser");
+    QByteArray rawData = event->mimeData()->data("application/x-columnchooser");
+    QDataStream stream(&rawData, QIODevice::ReadOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+    QString name;
+    stream >> name;
+
     // fugly, but it works for BikeScore with the (TM) in it... so...
     // independent of Latin1 or UTF-8 coming from "Column Chooser" the "TM" special sign is not recognized by the parser,
     // so strip the "TM" off for this case (only)
