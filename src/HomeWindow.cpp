@@ -1395,6 +1395,14 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     titleMap.insert("Training Mix", tr("Training Mix"));
     titleMap.insert("W/kg", tr("W/kg"));
     titleMap.insert("Workout", tr("Workout"));
+    titleMap.insert("Stress", tr("Stress"));
+    titleMap.insert("Scatter", tr("Scatter"));
+    titleMap.insert("HrPw", tr("HrPw"));
+    titleMap.insert("Activity Log", tr("Activity Log"));
+    titleMap.insert("HrPw", tr("HrPw"));
+    titleMap.insert("Tracker", tr("Tracker"));
+    titleMap.insert("CP History", tr("CP History"));
+    titleMap.insert("Library", tr("Library"));
 
     foreach(GcWindow *chart, charts) {
         QString chartTitle = chart->property("title").toString();

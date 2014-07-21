@@ -1208,10 +1208,10 @@ LTMWindow::dataTable(bool html)
 
         if (html) {
             // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
-            summary += "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>Date</b></td>";
-            summary = summary.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20)));
+            summary += "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>%2</b></td>";
+            summary = summary.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(tr("Date"));
         } else {
-            summary += "Date";
+            summary += tr("Date");
         }
 
         // metric name
@@ -1221,9 +1221,9 @@ LTMWindow::dataTable(bool html)
             else summary += ", %1";
 
             QString name = settings.metrics[i].uname;
-            if (name == "Coggan Acute Training Load") name = "ATL";
-            if (name == "Coggan Chronic Training Load") name = "CTL";
-            if (name == "Coggan Training Stress Balance") name = "TSB";
+            if (name == "Coggan Acute Training Load" or name == tr("Coggan Acute Training Load")) name = "ATL";
+            if (name == "Coggan Chronic Training Load" or name == tr("Coggan Chronic Training Load")) name = "CTL";
+            if (name == "Coggan Training Stress Balance" or name == tr("Coggan Training Stress Balance")) name = "TSB";
 
             summary = summary.arg(name);
         }
