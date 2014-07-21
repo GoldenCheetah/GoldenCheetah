@@ -1990,7 +1990,7 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../Athlete.cpp" line="427"/>
         <source>KPI Tracker</source>
-        <translation>Leistungskennzahlen (KPI)</translation>
+        <translation>Kennzahlen (KPI)</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="428"/>
@@ -2096,6 +2096,31 @@ Weiter klicken, um fortzufahren
         <location filename="../Athlete.cpp" line="448"/>
         <source>Calories vs Duration</source>
         <translation>Kalorien vs. Zeitdauer</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="449"/>
+        <source>Stress (TISS)</source>
+        <translation>Stress (TISS)</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="450"/>
+        <source>PMC (Coggan)</source>
+        <translation>PMC (Coggan)</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="451"/>
+        <source>PMC (Skiba)</source>
+        <translation>PMC (Skiba)</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="452"/>
+        <source>PMC (TRIMP)</source>
+        <translation>PMC (TRIMP)</translation>
+    </message>
+    <message>
+        <location filename="../Athlete.cpp" line="453"/>
+        <source>CP History</source>
+        <translation>CP Historie</translation>
     </message>
 </context>
 <context>
@@ -3233,7 +3258,7 @@ ddd, dd.MMM yyyy</translation>
 <context>
     <name>ColumnChooser</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="1143"/>
+        <location filename="../RideNavigator.cpp" line="1148"/>
         <source>Column Chooser</source>
         <translation>Spalten auswählen</translation>
     </message>
@@ -4554,194 +4579,194 @@ an den Computer anschließen und
 <context>
     <name>EditMetricDetailDialog</name>
     <message>
-        <location filename="../LTMTool.cpp" line="1544"/>
+        <location filename="../LTMTool.cpp" line="1588"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1545"/>
+        <location filename="../LTMTool.cpp" line="1589"/>
         <source>Axis Label / Units</source>
         <translation>Achsenbeschriftungen und Einheiten</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1339"/>
+        <location filename="../LTMTool.cpp" line="1383"/>
         <source>Curve Settings</source>
         <translatorcomment>???</translatorcomment>
         <translation>Diagramm Einstellungen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1320"/>
+        <location filename="../LTMTool.cpp" line="1364"/>
         <source>Estimate %1 %2 Power</source>
         <translation>Schätzung %1 %2 Leistung</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1324"/>
+        <location filename="../LTMTool.cpp" line="1368"/>
         <source>Endurance Index</source>
         <translation>Ausdauer Index</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1344"/>
+        <location filename="../LTMTool.cpp" line="1388"/>
         <source>Metric</source>
         <translation>Metrik</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1345"/>
+        <location filename="../LTMTool.cpp" line="1389"/>
         <source>Best</source>
         <translation>Bester</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1346"/>
+        <location filename="../LTMTool.cpp" line="1390"/>
         <source>Estimate</source>
         <translation>Schätzung</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1389"/>
-        <location filename="../LTMTool.cpp" line="1470"/>
+        <location filename="../LTMTool.cpp" line="1433"/>
+        <location filename="../LTMTool.cpp" line="1514"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1390"/>
-        <location filename="../LTMTool.cpp" line="1471"/>
+        <location filename="../LTMTool.cpp" line="1434"/>
+        <location filename="../LTMTool.cpp" line="1515"/>
         <source>minutes</source>
         <translation>Minuten</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1391"/>
-        <location filename="../LTMTool.cpp" line="1472"/>
+        <location filename="../LTMTool.cpp" line="1435"/>
+        <location filename="../LTMTool.cpp" line="1516"/>
         <source>hours</source>
         <translation>Stunden</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1428"/>
+        <location filename="../LTMTool.cpp" line="1472"/>
         <source>Peak</source>
         <translation>Beste(r)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1484"/>
+        <location filename="../LTMTool.cpp" line="1528"/>
         <source>Absolute</source>
         <translation>Absolut</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1485"/>
+        <location filename="../LTMTool.cpp" line="1529"/>
         <source>Per Kilogram</source>
         <translation>Per Kilogramm</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1551"/>
+        <location filename="../LTMTool.cpp" line="1595"/>
         <source>Style</source>
         <translation>Darstellung</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1553"/>
+        <location filename="../LTMTool.cpp" line="1597"/>
         <source>Bar</source>
         <translation>Balken</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1554"/>
+        <location filename="../LTMTool.cpp" line="1598"/>
         <source>Line</source>
         <translation>Linie</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1555"/>
+        <location filename="../LTMTool.cpp" line="1599"/>
         <source>Sticks</source>
         <translatorcomment>???</translatorcomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1556"/>
+        <location filename="../LTMTool.cpp" line="1600"/>
         <source>Dots</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1559"/>
+        <location filename="../LTMTool.cpp" line="1603"/>
         <source>Stack</source>
         <translation>Stapel</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1564"/>
+        <location filename="../LTMTool.cpp" line="1608"/>
         <source>Symbol</source>
         <translation>Symbol</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1566"/>
+        <location filename="../LTMTool.cpp" line="1610"/>
         <source>None</source>
         <translation>kein(e)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1567"/>
+        <location filename="../LTMTool.cpp" line="1611"/>
         <source>Circle</source>
         <translation>Kreis</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1568"/>
+        <location filename="../LTMTool.cpp" line="1612"/>
         <source>Square</source>
         <translation>Quadrat</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1569"/>
+        <location filename="../LTMTool.cpp" line="1613"/>
         <source>Diamond</source>
         <translation>Raute</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1570"/>
+        <location filename="../LTMTool.cpp" line="1614"/>
         <source>Triangle</source>
         <translation>Dreieck</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1571"/>
+        <location filename="../LTMTool.cpp" line="1615"/>
         <source>Cross</source>
         <translation>Kreuz</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1572"/>
+        <location filename="../LTMTool.cpp" line="1616"/>
         <source>Hexagon</source>
         <translation>Sechseck</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1573"/>
+        <location filename="../LTMTool.cpp" line="1617"/>
         <source>Star</source>
         <translation>Stern</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1576"/>
+        <location filename="../LTMTool.cpp" line="1620"/>
         <source>Color</source>
         <translation>Farbe</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1579"/>
+        <location filename="../LTMTool.cpp" line="1623"/>
         <source>Fill curve</source>
         <translation>Kurve füllen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1583"/>
+        <location filename="../LTMTool.cpp" line="1627"/>
         <source>Data labels</source>
         <translatorcomment>???</translatorcomment>
         <translation>Beschriftungen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1590"/>
+        <location filename="../LTMTool.cpp" line="1634"/>
         <source>Highlight Highest</source>
         <translation>Höchste hervorheben</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1598"/>
+        <location filename="../LTMTool.cpp" line="1642"/>
         <source>Highlight Lowest</source>
         <translation>Niedrigste hervorheben</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1606"/>
+        <location filename="../LTMTool.cpp" line="1650"/>
         <source>Highlight Outliers</source>
         <translation>Ausreißer hervorheben</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1614"/>
+        <location filename="../LTMTool.cpp" line="1658"/>
         <source>Baseline</source>
         <translatorcomment>???</translatorcomment>
         <translation>Grundwert</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1622"/>
+        <location filename="../LTMTool.cpp" line="1666"/>
         <source>Smooth Curve</source>
         <translation>Kurve glätten</translation>
     </message>
@@ -4750,52 +4775,52 @@ an den Computer anschließen und
         <translation type="vanished">Trendlinie</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1626"/>
+        <location filename="../LTMTool.cpp" line="1670"/>
         <source>No trend Line</source>
         <translation>Keine Trendlinie</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1627"/>
+        <location filename="../LTMTool.cpp" line="1671"/>
         <source>Linear Trend</source>
         <translation>Linear</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1628"/>
+        <location filename="../LTMTool.cpp" line="1672"/>
         <source>Quadratic Trend</source>
         <translation>Quadratisch</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1671"/>
+        <location filename="../LTMTool.cpp" line="1715"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1672"/>
+        <location filename="../LTMTool.cpp" line="1716"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1748"/>
+        <location filename="../LTMTool.cpp" line="1792"/>
         <source>Peak %1</source>
         <translation>Beste %1</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1750"/>
+        <location filename="../LTMTool.cpp" line="1794"/>
         <source> second </source>
         <translation> Sekunden </translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1751"/>
+        <location filename="../LTMTool.cpp" line="1795"/>
         <source> minute </source>
         <translation> Minuten </translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1753"/>
+        <location filename="../LTMTool.cpp" line="1797"/>
         <source> hour </source>
         <translation> Stunden </translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1934"/>
+        <location filename="../LTMTool.cpp" line="1978"/>
         <source>Choose Metric Color</source>
         <translation>Farbe für Metrik auswählen</translation>
     </message>
@@ -6029,17 +6054,17 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>GcWindowDialog</name>
     <message>
-        <location filename="../HomeWindow.cpp" line="1031"/>
+        <location filename="../HomeWindow.cpp" line="1032"/>
         <source>Chart Setup</source>
         <translation>Diagrammeinstellungen</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1069"/>
+        <location filename="../HomeWindow.cpp" line="1070"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1070"/>
+        <location filename="../HomeWindow.cpp" line="1071"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -6718,149 +6743,185 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../HomeWindow.cpp" line="49"/>
+        <location filename="../HomeWindow.cpp" line="50"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="606"/>
+        <location filename="../HomeWindow.cpp" line="607"/>
         <source>Are you sure you want to remove the chart?</source>
         <translation>Diagramm wirklich entfernen?</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="607"/>
+        <location filename="../HomeWindow.cpp" line="608"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1335"/>
+        <location filename="../HomeWindow.cpp" line="1372"/>
         <source>Ride Log</source>
         <translation>Liste der Trainingseinheiten</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1336"/>
+        <location filename="../HomeWindow.cpp" line="1373"/>
         <source>Aerobic Power</source>
         <translation>Aerobe Leistung</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1337"/>
+        <location filename="../HomeWindow.cpp" line="1374"/>
         <source>Anaerobic Power</source>
         <translation>Anaerobe Leistung</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1338"/>
+        <location filename="../HomeWindow.cpp" line="1375"/>
         <source>Cadence</source>
         <translation>Trittfrequenz</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1339"/>
+        <location filename="../HomeWindow.cpp" line="1376"/>
         <source>Calendar</source>
         <translation>Kalender</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1340"/>
+        <location filename="../HomeWindow.cpp" line="1377"/>
         <source>CP</source>
         <translation>CP</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1341"/>
+        <location filename="../HomeWindow.cpp" line="1378"/>
         <source>Details</source>
         <translation>Details</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1342"/>
+        <location filename="../HomeWindow.cpp" line="1379"/>
         <source>Distance</source>
         <translation>Distanz</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1343"/>
+        <location filename="../HomeWindow.cpp" line="1380"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1344"/>
+        <location filename="../HomeWindow.cpp" line="1381"/>
         <source>Elapsed Time</source>
         <translation>Vergangene Zeit</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1345"/>
+        <location filename="../HomeWindow.cpp" line="1382"/>
         <source>Heartrate</source>
         <translation>Herzfrequenz</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1346"/>
+        <location filename="../HomeWindow.cpp" line="1383"/>
         <source>Lap</source>
         <translation>Runde</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1347"/>
+        <location filename="../HomeWindow.cpp" line="1384"/>
         <source>Map</source>
         <translation>Karte</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1348"/>
+        <location filename="../HomeWindow.cpp" line="1385"/>
         <source>Performance</source>
         <translation>Leistung</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1349"/>
+        <location filename="../HomeWindow.cpp" line="1386"/>
         <source>PMC</source>
         <translation>PMC</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1350"/>
+        <location filename="../HomeWindow.cpp" line="1387"/>
         <source>Power</source>
         <translation>Leistung</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1351"/>
+        <location filename="../HomeWindow.cpp" line="1388"/>
         <source>QA</source>
         <translation>QA</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1352"/>
+        <location filename="../HomeWindow.cpp" line="1389"/>
         <source>Ride</source>
         <translation>Trainingseinheit</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1353"/>
+        <location filename="../HomeWindow.cpp" line="1390"/>
         <source>Speed</source>
         <translation>Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1354"/>
+        <location filename="../HomeWindow.cpp" line="1391"/>
         <source>Summary</source>
         <translation>Zusammenfassung</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1355"/>
+        <location filename="../HomeWindow.cpp" line="1392"/>
         <source>Target Power</source>
         <translation>Geplante Leistung</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1356"/>
+        <location filename="../HomeWindow.cpp" line="1393"/>
         <source>Time and Distance</source>
         <translation>Zeit und Distanz</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1357"/>
+        <location filename="../HomeWindow.cpp" line="1394"/>
         <source>Time In Zone</source>
         <translation>Zeit in Zone</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1358"/>
+        <location filename="../HomeWindow.cpp" line="1395"/>
         <source>Training Mix</source>
         <translation>Trainingsmix</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1359"/>
+        <location filename="../HomeWindow.cpp" line="1396"/>
         <source>W/kg</source>
         <translation>W/kg</translation>
     </message>
     <message>
-        <location filename="../HomeWindow.cpp" line="1360"/>
+        <location filename="../HomeWindow.cpp" line="1397"/>
         <source>Workout</source>
         <translation>Trainingseinheit</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1398"/>
+        <source>Stress</source>
+        <translation>Stress</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1399"/>
+        <source>Scatter</source>
+        <translation>Streudiagramm</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1400"/>
+        <location filename="../HomeWindow.cpp" line="1402"/>
+        <source>HrPw</source>
+        <translation>HF/Leistung</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1401"/>
+        <source>Activity Log</source>
+        <translation>Trainingseinheiten</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1403"/>
+        <source>Tracker</source>
+        <translation>Kennzahlen (KPI)</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1404"/>
+        <source>CP History</source>
+        <translation>CP Historie</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1405"/>
+        <source>Library</source>
+        <translation>Bibliothek</translation>
     </message>
 </context>
 <context>
@@ -8561,7 +8622,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>LTMTool</name>
     <message>
-        <location filename="../LTMTool.cpp" line="1141"/>
+        <location filename="../LTMTool.cpp" line="1161"/>
         <source>Metric</source>
         <translation>Metrik</translation>
     </message>
@@ -8641,385 +8702,385 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>Diagramme</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="227"/>
+        <location filename="../LTMTool.cpp" line="362"/>
         <source>Skiba Long Term Stress</source>
         <translation>Skiba Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="229"/>
-        <location filename="../LTMTool.cpp" line="244"/>
-        <location filename="../LTMTool.cpp" line="305"/>
-        <location filename="../LTMTool.cpp" line="320"/>
-        <location filename="../LTMTool.cpp" line="381"/>
-        <location filename="../LTMTool.cpp" line="396"/>
-        <location filename="../LTMTool.cpp" line="456"/>
-        <location filename="../LTMTool.cpp" line="471"/>
-        <location filename="../LTMTool.cpp" line="911"/>
-        <location filename="../LTMTool.cpp" line="926"/>
+        <location filename="../LTMTool.cpp" line="364"/>
+        <location filename="../LTMTool.cpp" line="379"/>
+        <location filename="../LTMTool.cpp" line="440"/>
+        <location filename="../LTMTool.cpp" line="455"/>
+        <location filename="../LTMTool.cpp" line="516"/>
+        <location filename="../LTMTool.cpp" line="531"/>
+        <location filename="../LTMTool.cpp" line="591"/>
+        <location filename="../LTMTool.cpp" line="606"/>
+        <location filename="../LTMTool.cpp" line="1046"/>
+        <location filename="../LTMTool.cpp" line="1061"/>
         <source>Stress</source>
         <translation>Stress</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="242"/>
+        <location filename="../LTMTool.cpp" line="377"/>
         <source>Skiba Short Term Stress</source>
         <translation>Skiba Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="257"/>
+        <location filename="../LTMTool.cpp" line="392"/>
         <source>Skiba Stress Balance</source>
         <translation>Skiba Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="259"/>
-        <location filename="../LTMTool.cpp" line="335"/>
-        <location filename="../LTMTool.cpp" line="411"/>
-        <location filename="../LTMTool.cpp" line="486"/>
-        <location filename="../LTMTool.cpp" line="562"/>
-        <location filename="../LTMTool.cpp" line="638"/>
-        <location filename="../LTMTool.cpp" line="714"/>
-        <location filename="../LTMTool.cpp" line="790"/>
-        <location filename="../LTMTool.cpp" line="941"/>
+        <location filename="../LTMTool.cpp" line="394"/>
+        <location filename="../LTMTool.cpp" line="470"/>
+        <location filename="../LTMTool.cpp" line="546"/>
+        <location filename="../LTMTool.cpp" line="621"/>
+        <location filename="../LTMTool.cpp" line="697"/>
+        <location filename="../LTMTool.cpp" line="773"/>
+        <location filename="../LTMTool.cpp" line="849"/>
+        <location filename="../LTMTool.cpp" line="925"/>
+        <location filename="../LTMTool.cpp" line="1076"/>
         <source>Stress Balance</source>
         <translation>Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="272"/>
+        <location filename="../LTMTool.cpp" line="407"/>
         <source>Skiba STS Ramp</source>
         <translation>Skiba STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="274"/>
-        <location filename="../LTMTool.cpp" line="289"/>
-        <location filename="../LTMTool.cpp" line="350"/>
-        <location filename="../LTMTool.cpp" line="365"/>
-        <location filename="../LTMTool.cpp" line="426"/>
-        <location filename="../LTMTool.cpp" line="441"/>
-        <location filename="../LTMTool.cpp" line="501"/>
-        <location filename="../LTMTool.cpp" line="516"/>
-        <location filename="../LTMTool.cpp" line="577"/>
-        <location filename="../LTMTool.cpp" line="592"/>
-        <location filename="../LTMTool.cpp" line="653"/>
-        <location filename="../LTMTool.cpp" line="668"/>
-        <location filename="../LTMTool.cpp" line="729"/>
-        <location filename="../LTMTool.cpp" line="744"/>
-        <location filename="../LTMTool.cpp" line="805"/>
-        <location filename="../LTMTool.cpp" line="820"/>
-        <location filename="../LTMTool.cpp" line="881"/>
-        <location filename="../LTMTool.cpp" line="896"/>
-        <location filename="../LTMTool.cpp" line="956"/>
-        <location filename="../LTMTool.cpp" line="971"/>
+        <location filename="../LTMTool.cpp" line="409"/>
+        <location filename="../LTMTool.cpp" line="424"/>
+        <location filename="../LTMTool.cpp" line="485"/>
+        <location filename="../LTMTool.cpp" line="500"/>
+        <location filename="../LTMTool.cpp" line="561"/>
+        <location filename="../LTMTool.cpp" line="576"/>
+        <location filename="../LTMTool.cpp" line="636"/>
+        <location filename="../LTMTool.cpp" line="651"/>
+        <location filename="../LTMTool.cpp" line="712"/>
+        <location filename="../LTMTool.cpp" line="727"/>
+        <location filename="../LTMTool.cpp" line="788"/>
+        <location filename="../LTMTool.cpp" line="803"/>
+        <location filename="../LTMTool.cpp" line="864"/>
+        <location filename="../LTMTool.cpp" line="879"/>
+        <location filename="../LTMTool.cpp" line="940"/>
+        <location filename="../LTMTool.cpp" line="955"/>
+        <location filename="../LTMTool.cpp" line="1016"/>
+        <location filename="../LTMTool.cpp" line="1031"/>
+        <location filename="../LTMTool.cpp" line="1091"/>
+        <location filename="../LTMTool.cpp" line="1106"/>
         <source>Ramp</source>
         <translation>Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="287"/>
+        <location filename="../LTMTool.cpp" line="422"/>
         <source>Skiba LTS Ramp</source>
         <translation>Skiba LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="303"/>
+        <location filename="../LTMTool.cpp" line="438"/>
         <source>Aerobic TISS Long Term Stress</source>
         <translation>Aerober TISS Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="318"/>
+        <location filename="../LTMTool.cpp" line="453"/>
         <source>Aerobic TISS Short Term Stress</source>
         <translation>Aerober TISS Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="333"/>
+        <location filename="../LTMTool.cpp" line="468"/>
         <source>Aerobic TISS Stress Balance</source>
         <translation>Aerober TISS Stress Balance (SB)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="348"/>
+        <location filename="../LTMTool.cpp" line="483"/>
         <source>Aerobic TISS STS Ramp</source>
         <translation>Aerober TISS STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="363"/>
+        <location filename="../LTMTool.cpp" line="498"/>
         <source>Aerobic TISS LTS Ramp</source>
         <translation>Aerober TISS LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="379"/>
+        <location filename="../LTMTool.cpp" line="514"/>
         <source>Anaerobic TISS Long Term Stress</source>
         <translation>Anaerober TISS Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="394"/>
+        <location filename="../LTMTool.cpp" line="529"/>
         <source>Anaerobic TISS Short Term Stress</source>
         <translation>Anaerober TISS Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="409"/>
+        <location filename="../LTMTool.cpp" line="544"/>
         <source>Anaerobic TISS Stress Balance</source>
         <translation>Anerober TISS Stress Balance (SB)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="424"/>
+        <location filename="../LTMTool.cpp" line="559"/>
         <source>Anaerobic TISS STS Ramp</source>
         <translation>Anerober TISS STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="439"/>
+        <location filename="../LTMTool.cpp" line="574"/>
         <source>Anaerobic TISS LTS Ramp</source>
         <translation>Anaerober TISS LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="454"/>
+        <location filename="../LTMTool.cpp" line="589"/>
         <source>Daniels Long Term Stress</source>
         <translation>Daniels Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="469"/>
+        <location filename="../LTMTool.cpp" line="604"/>
         <source>Daniels Short Term Stress</source>
         <translation>Daniels Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="484"/>
+        <location filename="../LTMTool.cpp" line="619"/>
         <source>Daniels Stress Balance</source>
         <translation>Daniels Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="499"/>
+        <location filename="../LTMTool.cpp" line="634"/>
         <source>Daniels STS Ramp</source>
         <translation>Daniels STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="514"/>
+        <location filename="../LTMTool.cpp" line="649"/>
         <source>Daniels LTS Ramp</source>
         <translation>Daniels LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="530"/>
+        <location filename="../LTMTool.cpp" line="665"/>
         <source>Work (Kj) Long Term Stress</source>
         <translation>Arbeit (kJ) Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="532"/>
-        <location filename="../LTMTool.cpp" line="547"/>
-        <location filename="../LTMTool.cpp" line="608"/>
-        <location filename="../LTMTool.cpp" line="623"/>
-        <location filename="../LTMTool.cpp" line="684"/>
-        <location filename="../LTMTool.cpp" line="699"/>
+        <location filename="../LTMTool.cpp" line="667"/>
+        <location filename="../LTMTool.cpp" line="682"/>
+        <location filename="../LTMTool.cpp" line="743"/>
+        <location filename="../LTMTool.cpp" line="758"/>
+        <location filename="../LTMTool.cpp" line="819"/>
+        <location filename="../LTMTool.cpp" line="834"/>
         <source>Stress (Kj)</source>
         <translation>Belastung (kJ)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="545"/>
+        <location filename="../LTMTool.cpp" line="680"/>
         <source>Work (Kj) Short Term Stress</source>
         <translation>Arbeit (kJ) Kurzzeitbelastung ( STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="560"/>
+        <location filename="../LTMTool.cpp" line="695"/>
         <source>Work (Kj) Stress Balance</source>
         <translation>Arbeit (kJ) Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="575"/>
+        <location filename="../LTMTool.cpp" line="710"/>
         <source>Work (Kj) STS Ramp</source>
         <translation>Arbeit (kJ) STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="590"/>
+        <location filename="../LTMTool.cpp" line="725"/>
         <source>Work (Kj) LTS Ramp</source>
         <translation>Arbeit (kJ) LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="606"/>
+        <location filename="../LTMTool.cpp" line="741"/>
         <source>W&apos; Work (Kj) Long Term Stress</source>
         <translation>W&apos; Arbeit (kJ) Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="621"/>
+        <location filename="../LTMTool.cpp" line="756"/>
         <source>W&apos; Work (Kj) Short Term Stress</source>
         <translation>W&apos; Arbeit (kJ) Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="636"/>
+        <location filename="../LTMTool.cpp" line="771"/>
         <source>W&apos; Work (Kj) Stress Balance</source>
         <translation>W&apos; Arbeit (kJ) Stress Balance (SB)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="651"/>
+        <location filename="../LTMTool.cpp" line="786"/>
         <source>W&apos; Work (Kj) STS Ramp</source>
         <translation>W&apos; Arbeit (kJ) STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="666"/>
+        <location filename="../LTMTool.cpp" line="801"/>
         <source>W&apos; Work (Kj) LTS Ramp</source>
         <translation>W&apos; Arbeit (kJ) LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="682"/>
+        <location filename="../LTMTool.cpp" line="817"/>
         <source>Below CP Work (Kj) Long Term Stress</source>
         <translation>Sub-CP-Arbeit (kJ) Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="697"/>
+        <location filename="../LTMTool.cpp" line="832"/>
         <source>Below CP Work (Kj) Short Term Stress</source>
         <translation>Sub-CP-Arbeit (kJ) Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="712"/>
+        <location filename="../LTMTool.cpp" line="847"/>
         <source>Below CP Work (Kj) Stress Balance</source>
         <translation>Sub-CP-Arbeit CP (kJ) Stress Balance (SB)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="727"/>
+        <location filename="../LTMTool.cpp" line="862"/>
         <source>Below CP Work (Kj) STS Ramp</source>
         <translation>Sub-CP-Arbeit CP (kJ) STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="742"/>
+        <location filename="../LTMTool.cpp" line="877"/>
         <source>Below CP Work (Kj) LTS Ramp</source>
         <translation>Sub-CP-Arbeit (kJ) LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="758"/>
+        <location filename="../LTMTool.cpp" line="893"/>
         <source>Distance (km|mi) Long Term Stress</source>
         <translation>Distanz (km|mi) LTS</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="760"/>
-        <location filename="../LTMTool.cpp" line="775"/>
+        <location filename="../LTMTool.cpp" line="895"/>
+        <location filename="../LTMTool.cpp" line="910"/>
         <source>Stress (km|mi)</source>
         <translation>Belastung (km|mi)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="773"/>
+        <location filename="../LTMTool.cpp" line="908"/>
         <source>Distance (km|mi) Short Term Stress</source>
         <translation>Distanz (km|mi) STS</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="788"/>
+        <location filename="../LTMTool.cpp" line="923"/>
         <source>Distance (km|mi) Stress Balance</source>
         <translation>Distanz (km|mi) Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="803"/>
+        <location filename="../LTMTool.cpp" line="938"/>
         <source>Distance (km|mi) STS Ramp</source>
         <translation>Distanz (km|mi) STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="818"/>
+        <location filename="../LTMTool.cpp" line="953"/>
         <source>Distance (km|mi) LTS Ramp</source>
         <translation>Distanz (km|mi) LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="834"/>
+        <location filename="../LTMTool.cpp" line="969"/>
         <source>Coggan Chronic Training Load</source>
         <translation>Coggan Langzeit-Trainingsbelastung</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="849"/>
+        <location filename="../LTMTool.cpp" line="984"/>
         <source>Coggan Acute Training Load</source>
         <translation>Coggan Kurzzeit-Trainingsbelastung</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="864"/>
+        <location filename="../LTMTool.cpp" line="999"/>
         <source>Coggan Training Stress Balance</source>
         <translation>Coggan Training Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="879"/>
+        <location filename="../LTMTool.cpp" line="1014"/>
         <source>Coggan STS Ramp</source>
         <translation>Coggan STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="894"/>
+        <location filename="../LTMTool.cpp" line="1029"/>
         <source>Coggan LTS Ramp</source>
         <translation>Coggan LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="910"/>
+        <location filename="../LTMTool.cpp" line="1045"/>
         <source>TRIMP Long Term Stress</source>
         <translation>TRIMP Langzeitbelastung (LTS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="924"/>
+        <location filename="../LTMTool.cpp" line="1059"/>
         <source>TRIMP Short Term Stress</source>
         <translation>TRIMP Kurzzeitbelastung (STS)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="939"/>
+        <location filename="../LTMTool.cpp" line="1074"/>
         <source>TRIMP Stress Balance</source>
         <translation>TRIMP Stress Balance</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="954"/>
+        <location filename="../LTMTool.cpp" line="1089"/>
         <source>TRIMP STS Ramp</source>
         <translation>TRIMP STS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="969"/>
+        <location filename="../LTMTool.cpp" line="1104"/>
         <source>TRIMP LTS Ramp</source>
         <translation>TRIMP LTS Anstieg</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1050"/>
+        <location filename="../LTMTool.cpp" line="298"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1059"/>
+        <location filename="../LTMTool.cpp" line="307"/>
         <source>Use sidebar chart settings</source>
         <translation>Verwende Diagramm Einstellungen von der Sidebar</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1076"/>
+        <location filename="../LTMTool.cpp" line="324"/>
         <source>Basic</source>
         <translation>Grundeinstellungen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1077"/>
+        <location filename="../LTMTool.cpp" line="325"/>
         <source>Preset</source>
         <translation>Voreinstellungen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1145"/>
+        <location filename="../LTMTool.cpp" line="1165"/>
         <source>Estimate</source>
         <translation>Schätzung</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1256"/>
+        <location filename="../LTMTool.cpp" line="1276"/>
         <source>Chart %1</source>
         <translation>Diagramm %1</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2045"/>
-        <location filename="../LTMTool.cpp" line="2085"/>
+        <location filename="../LTMTool.cpp" line="2089"/>
+        <location filename="../LTMTool.cpp" line="2129"/>
         <source>Chart File (*.xml)</source>
         <translation>Diagrammdatei (*.xml)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2075"/>
+        <location filename="../LTMTool.cpp" line="2119"/>
         <source>Entry Error</source>
         <translation>Eingabefehler</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2075"/>
+        <location filename="../LTMTool.cpp" line="2119"/>
         <source>Selected file (%1) does not exist</source>
         <translation>Gewählte Datei (%1) niht vorhanden</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2093"/>
+        <location filename="../LTMTool.cpp" line="2137"/>
         <source>The selected file (%1) exists.</source>
         <translation>Gewählte Datei (%1) vorhanden.</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2094"/>
+        <location filename="../LTMTool.cpp" line="2138"/>
         <source>Do you want to overwrite it?</source>
         <translation>Wollen Sie sie überschreiben ?</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2162"/>
+        <location filename="../LTMTool.cpp" line="2206"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="2162"/>
+        <location filename="../LTMTool.cpp" line="2206"/>
         <source>You must have at least one chart</source>
         <translation>Sie müssen mindestens ein Diagramm definieren</translation>
     </message>
@@ -9074,22 +9135,22 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1078"/>
+        <location filename="../LTMTool.cpp" line="326"/>
         <source>Curves</source>
         <translation>Daten</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1131"/>
+        <location filename="../LTMTool.cpp" line="1151"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1131"/>
+        <location filename="../LTMTool.cpp" line="1151"/>
         <source>Details</source>
         <translation>Details</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="1143"/>
+        <location filename="../LTMTool.cpp" line="1163"/>
         <source>Peak</source>
         <translation>Beste(r)</translation>
     </message>
@@ -9178,6 +9239,27 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../LTMWindow.cpp" line="1155"/>
         <source>Ramp</source>
         <translation>Anstieg</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="1212"/>
+        <location filename="../LTMWindow.cpp" line="1214"/>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="1224"/>
+        <source>Coggan Acute Training Load</source>
+        <translation>Coggan Kurzzeit-Trainingsbelastung</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="1225"/>
+        <source>Coggan Chronic Training Load</source>
+        <translation>Coggan Langzeit-Trainingsbelastung</translation>
+    </message>
+    <message>
+        <location filename="../LTMWindow.cpp" line="1226"/>
+        <source>Coggan Training Stress Balance</source>
+        <translation>Coggan Training Stress Balance</translation>
     </message>
     <message>
         <location filename="../LTMWindow.cpp" line="1241"/>
@@ -11047,32 +11129,32 @@ Zeit: %1
 <context>
     <name>NavigatorCellDelegate</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="983"/>
+        <location filename="../RideNavigator.cpp" line="988"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="998"/>
+        <location filename="../RideNavigator.cpp" line="1003"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="1000"/>
+        <location filename="../RideNavigator.cpp" line="1005"/>
         <source>MMM d, yyyy</source>
         <translation>dd.MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="1001"/>
+        <location filename="../RideNavigator.cpp" line="1006"/>
         <source>Time</source>
         <translation>Uhrzeit</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="1004"/>
+        <location filename="../RideNavigator.cpp" line="1009"/>
         <source>Last updated</source>
         <translation>Zuletzt aktualisiert</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="1007"/>
+        <location filename="../RideNavigator.cpp" line="1012"/>
         <source>ddd MMM d, yyyy hh:mm</source>
         <translation>ddd, dd.MMM yyyy hh:mm</translation>
     </message>
@@ -14567,12 +14649,12 @@ Möchten Sie fortfahren?</translation>
         <translation> und </translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="319"/>
+        <location filename="../SearchBox.cpp" line="324"/>
         <source>Add new search</source>
         <translation>Neue Suche hinzufügen</translation>
     </message>
     <message>
-        <location filename="../SearchBox.cpp" line="320"/>
+        <location filename="../SearchBox.cpp" line="325"/>
         <source>Name:</source>
         <translation>Name:</translation>
     </message>
