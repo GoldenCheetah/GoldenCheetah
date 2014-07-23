@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de">
+<TS version="2.0" language="de">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -2335,7 +2335,7 @@ Weiter klicken, um fortzufahren
     <message>
         <location filename="../BatchExportDialog.cpp" line="42"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../BatchExportDialog.cpp" line="43"/>
@@ -3279,7 +3279,7 @@ ddd, dd.MMM yyyy</translation>
     <message>
         <location filename="../ComparePane.cpp" line="207"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../ComparePane.cpp" line="220"/>
@@ -3629,14 +3629,6 @@ Wollen Sie die Änderung durchführen und Golden Cheetah neu starten?</translati
         <translation>Keine</translation>
     </message>
     <message>
-        <source>Using CP</source>
-        <translation type="vanished">benutze CP</translation>
-    </message>
-    <message>
-        <source>Using derived CP</source>
-        <translation type="vanished">benutze abgeleitete CP</translation>
-    </message>
-    <message>
         <location filename="../CriticalPowerWindow.cpp" line="160"/>
         <source>Power Shading</source>
         <translation>Leistungszonen anzeigen</translation>
@@ -3901,10 +3893,6 @@ Wollen Sie die Änderung durchführen und Golden Cheetah neu starten?</translati
         <location filename="../CriticalPowerWindow.cpp" line="1322"/>
         <source>Work</source>
         <translation>Arbeit</translation>
-    </message>
-    <message>
-        <source>Power by inv of time</source>
-        <translation type="vanished">Leistung nach Zeitintervallen</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="1324"/>
@@ -4771,10 +4759,6 @@ an den Computer anschließen und
         <translation>Kurve glätten</translation>
     </message>
     <message>
-        <source>Trend Line</source>
-        <translation type="vanished">Trendlinie</translation>
-    </message>
-    <message>
         <location filename="../LTMTool.cpp" line="1670"/>
         <source>No trend Line</source>
         <translation>Keine Trendlinie</translation>
@@ -5091,7 +5075,7 @@ an den Computer anschließen und
     <message>
         <location filename="../Pages.cpp" line="2115"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2116"/>
@@ -8362,7 +8346,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../LTMPopup.cpp" line="122"/>
         <location filename="../LTMPopup.cpp" line="239"/>
         <source>Date &amp; Time</source>
-        <translation>Datum / Uhrzeit</translation>
+        <translation>Datum / Zeit</translation>
     </message>
     <message>
         <location filename="../LTMPopup.cpp" line="140"/>
@@ -10691,32 +10675,6 @@ gleichen Trainingseinheit zu einer einzelnen Datei zusammenzuführen.</translati
 <context>
     <name>MetricAggregator</name>
     <message>
-        <source>Updating Statistics
-Started</source>
-        <translation type="vanished">Aktualisierung der Statistiken
-Gestartet</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="vanished">Abbrechen</translation>
-    </message>
-    <message>
-        <source>%1
-
-Update Statistics
-Elapsed: %2
-
-%3</source>
-        <translation type="vanished">%1
-
-Aktualisiere die Statistiken
-
-Zeit: %2
-
-%3
-</translation>
-    </message>
-    <message>
         <location filename="../MetricAggregator.cpp" line="182"/>
         <source>Update Statistics
 Elapsed: %1
@@ -11146,7 +11104,7 @@ Zeit: %1
     <message>
         <location filename="../RideNavigator.cpp" line="1006"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../RideNavigator.cpp" line="1009"/>
@@ -11443,7 +11401,7 @@ Zeit: %1
         <location filename="../RideEditor.cpp" line="2194"/>
         <location filename="../RideEditor.cpp" line="2199"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="2195"/>
@@ -13256,10 +13214,6 @@ yyyy</translation>
         <translation>W/kg</translation>
     </message>
     <message>
-        <source>watts/lb</source>
-        <translation type="vanished">W/lb</translation>
-    </message>
-    <message>
         <location filename="../RideFile.cpp" line="1136"/>
         <source>Invalid date/time in filename:
 %1
@@ -13552,7 +13506,7 @@ Skipping file...</source>
     <message>
         <location filename="../RideImportWizard.cpp" line="451"/>
         <source>Step 3 of 4: Confirm Date and Time</source>
-        <translation>Schritt 3 von 4: Datum und Uhrzeit bestätigen</translation>
+        <translation>Schritt 3 von 4: Datum und Zeit bestätigen</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="468"/>
@@ -13688,7 +13642,7 @@ Skipping file...</source>
         <location filename="../RideNavigator.cpp" line="236"/>
         <location filename="../RideNavigator.cpp" line="237"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../RideNavigator.cpp" line="238"/>
@@ -15198,7 +15152,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="81"/>
         <source>Time</source>
-        <translation>Uhrzeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../SplitActivityWizard.cpp" line="84"/>
@@ -16651,7 +16605,7 @@ F3 drücken, wenn fertig.</translation>
         <location filename="../TwitterDialog.cpp" line="257"/>
         <location filename="../TwitterDialog.cpp" line="265"/>
         <source>Message Length: %1</source>
-        <translation>Fehler bei der Veröffentlichung des Tweets</translation>
+        <translation>Meldungslänge: %1</translation>
     </message>
 </context>
 <context>
