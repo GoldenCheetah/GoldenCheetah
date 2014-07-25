@@ -2027,7 +2027,7 @@ AllPlot::setYMax()
         ymin = (ymin < 0 ? -100 : 0) + ( qRound(ymin) / 100 ) * 100;
 
         int axisHeight = qRound( plotLayout()->canvasRect().height() );
-        int step = 10;
+        int step = 100;
 
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
