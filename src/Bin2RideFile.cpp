@@ -40,14 +40,14 @@ struct Bin2FileReaderState
     int interval;
     double last_interval_secs;
 
-    bool jouleGPS = true;
+    bool jouleGPS;
     bool stopped;
 
     QString deviceInfo;
 
     Bin2FileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), secs(0), km(0),
-        interval(0), last_interval_secs(0.0),  stopped(true)
+        interval(0), last_interval_secs(0.0),  jouleGPS(true), stopped(true)
     {
 
     }
