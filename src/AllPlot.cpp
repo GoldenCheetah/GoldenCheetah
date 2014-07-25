@@ -2019,10 +2019,10 @@ AllPlot::setYMax()
 
         if (referencePlot == NULL) {
             ymin = standard->altCurve->minYValue();
-            ymax = qMax(ymin + 100, 1.05 * standard->altCurve->maxYValue());
+            ymax = qMax(500.000, 1.05 * standard->altCurve->maxYValue());
         } else {
             ymin = referencePlot->standard->altCurve->minYValue();
-            ymax = qMax(ymin + 100, 1.05 * referencePlot->standard->altCurve->maxYValue());
+            ymax = qMax(500.000, 1.05 * referencePlot->standard->altCurve->maxYValue());
         }
         ymin = (ymin < 0 ? -100 : 0) + ( qRound(ymin) / 100 ) * 100;
 
