@@ -19,6 +19,8 @@
 #ifndef _Zones_h
 #define _Zones_h
 #include "GoldenCheetah.h"
+#include "Context.h"
+#include "Athlete.h"
 
 #include <QtCore>
 
@@ -192,7 +194,7 @@ class Zones : public QObject
         // calculate a CRC for the zones data - used to see if zones
         // data is changed since last referenced in Metric code
         // could also be used in Configuration pages (later)
-        quint16 getFingerprint() const;
+        quint16 getFingerprint(Context *context) const;
 };
 
 QColor zoneColor(int zone, int num_zones);

@@ -127,7 +127,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         }
     }
 
-    unsigned long zoneFingerPrint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint())
+    unsigned long zoneFingerPrint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
                                   + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint()); // checksum of *all* zone data (HR and Power)
 
     // update statistics for ride files which are out of date
@@ -276,7 +276,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 void MetricAggregator::addRide(RideItem*ride)
 {
     if (ride && ride->ride()) {
-        importRide(context->athlete->home, ride->ride(), ride->fileName, context->athlete->zones()->getFingerprint(), true);
+        importRide(context->athlete->home, ride->ride(), ride->fileName, context->athlete->zones()->getFingerprint(context), true);
         RideFileCache updater(context, context->athlete->home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
         dataChanged(); // notify models/views
     }

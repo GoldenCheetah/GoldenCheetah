@@ -33,9 +33,9 @@ RideItem::RideItem(int type,
     dateTime(dateTime), zones(zones), hrZones(hrZones)
 { }
 
-RideFile *RideItem::ride()
+RideFile *RideItem::ride(bool open)
 {
-    if (ride_) return ride_;
+    if (!open || ride_) return ride_;
 
     // open the ride file
     QFile file(path + "/" + fileName);

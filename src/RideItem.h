@@ -70,7 +70,10 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         QString path;
         QString fileName;
         QDateTime dateTime;
-        RideFile *ride();
+        // ride() will open the ride if it isn't already when open=true
+        // if we pass false then it will just return ride_ so we can
+        // traverse currently open rides when config changes
+        RideFile *ride(bool open=true);
         const QStringList errors() { return errors_; }
         const Zones *zones;
         const HrZones *hrZones;
