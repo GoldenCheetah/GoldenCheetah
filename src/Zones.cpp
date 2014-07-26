@@ -913,7 +913,7 @@ int Zones::deleteRange(int rnum) {
 }
 
 quint16
-Zones::getFingerprint() const
+Zones::getFingerprint(Context *context) const
 {
     quint64 x = 0;
     for (int i=0; i<ranges.size(); i++) {
@@ -935,5 +935,8 @@ Zones::getFingerprint() const
         }
     }
     QByteArray ba = QByteArray::number(x);
-    return qChecksum(ba, ba.length()) + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
+
+    // if default athlete weight changes everything needs to change !
+    double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "0.0").toDouble();
+    return qChecksum(ba, ba.length()) + weight + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
 }

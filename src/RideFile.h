@@ -216,6 +216,7 @@ class RideFile : public QObject // QObject to emit signals
 
         Context *context;
         double getWeight();
+        void setWeight(double x);
 
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 

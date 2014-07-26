@@ -1887,36 +1887,6 @@ Context::notifyConfigChanged()
     configChanged();
 }
 
-void
-Athlete::configChanged()
-{
-    // re-read Zones in case it changed
-    QFile zonesFile(home.absolutePath() + "/power.zones");
-    if (zonesFile.exists()) {
-        if (!zones_->read(zonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("Zones File Error"),
-                                 zones_->errorString());
-        }
-       else if (! zones_->warningString().isEmpty())
-            QMessageBox::warning(context->mainWindow, tr("Reading Zones File"), zones_->warningString());
-    }
-
-    // reread HR zones
-    QFile hrzonesFile(home.absolutePath() + "/hr.zones");
-    if (hrzonesFile.exists()) {
-        if (!hrzones_->read(hrzonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("HR Zones File Error"),
-                                 hrzones_->errorString());
-        }
-       else if (! hrzones_->warningString().isEmpty())
-            QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
-    }
-
-    QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
-    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
-
-}
-
 /*----------------------------------------------------------------------
  * Measures
  *--------------------------------------------------------------------*/

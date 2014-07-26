@@ -1075,6 +1075,12 @@ RideFile::emitModified()
     emit modified();
 }
 
+void
+RideFile::setWeight(double x)
+{
+    weight_ = x;
+}
+
 double
 RideFile::getWeight()
 {
