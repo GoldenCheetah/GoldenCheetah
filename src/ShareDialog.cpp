@@ -234,6 +234,8 @@ StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *pa
     context(context), ride(ride), parent(parent)
 {
     stravaUploadId = ride->ride()->getTag("Strava uploadId", "");
+    eventLoop = new QEventLoop(this);
+    networkManager = new QNetworkAccessManager(this);
 }
 
 void
@@ -301,9 +303,6 @@ StravaUploader::requestUploadStrava()
     parent->progressLabel->setText(tr("Upload ride to Strava..."));
     parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
-    QEventLoop eventLoop;
-    QNetworkAccessManager networkMgr;
-
     int year = ride->fileName.left(4).toInt();
     int month = ride->fileName.mid(5,2).toInt();
     int day = ride->fileName.mid(8,2).toInt();
@@ -315,8 +314,10 @@ StravaUploader::requestUploadStrava()
     QTime rideTime = QTime(hour, minute, second);
     QDateTime rideDateTime = QDateTime(rideDate, rideTime);
 
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadStravaFinished(QNetworkReply*)));
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+    // trap network response from access manager
+    networkManager->disconnect();
+    connect(networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadStravaFinished(QNetworkReply*)));
+    connect(networkManager, SIGNAL(finished(QNetworkReply *)), eventLoop, SLOT(quit()));
 
     TcxFileReader reader;
 
@@ -371,13 +372,12 @@ StravaUploader::requestUploadStrava()
     multiPart->append(privatePart);
     multiPart->append(filePart);
 
-    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
-    multiPart->setParent(reply.data());
+    networkManager->post(request, multiPart);
 
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload ride... Sending to Strava"));
 
-    eventLoop.exec();
+    eventLoop->exec();
 }
 
 void
@@ -425,19 +425,18 @@ StravaUploader::requestVerifyUpload()
     parent->progressBar->setValue(0);
     parent->progressLabel->setText(tr("Ride processing..."));
 
-    QEventLoop eventLoop;
-    QNetworkAccessManager networkMgr;
-
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestVerifyUploadFinished(QNetworkReply*)));
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+    // reconnect for verify
+    networkManager->disconnect();
+    connect(networkManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestVerifyUploadFinished(QNetworkReply*)));
+    connect(networkManager, SIGNAL(finished(QNetworkReply *)), eventLoop, SLOT(quit()));
     QByteArray out;
 
     QUrl url = QUrl("https://www.strava.com/api/v3/upload/status/"+stravaUploadId+"?token="+token);
     QNetworkRequest request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    networkMgr.post( request, out);
-    eventLoop.exec();
+    networkManager->post(request, out);
+    eventLoop->exec();
 }
 
 void
@@ -808,8 +807,7 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
     multiPart->append(dataTypePart);
     multiPart->append(filePart);
 
-    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
-    multiPart->setParent(reply.data());
+    networkMgr.post(request, multiPart);
 
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload ride... Sending to CyclingAnalytics"));
@@ -982,8 +980,7 @@ SelfLoopsUploader::requestUploadSelfLoops()
     multiPart->append(passwordPart);
     multiPart->append(filePart);
 
-    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
-    multiPart->setParent(reply.data());
+    networkMgr.post(request, multiPart);
 
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload ride... Sending to Selfloops"));
@@ -1292,8 +1289,7 @@ GarminUploader::requestUploadGarmin()
 
     multiPart->append(filePart);
 
-    QScopedPointer<QNetworkReply> reply( networkMgr.post(request, multiPart) );
-    multiPart->setParent(reply.data());
+    networkMgr.post(request, multiPart);
 
     parent->progressBar->setValue(parent->progressBar->value()+30/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload ride... Sending to Garmin Connect"));

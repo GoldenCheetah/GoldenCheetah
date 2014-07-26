@@ -29,6 +29,8 @@
 #include "RideItem.h"
 #include <QDialog>
 #include <QProgressBar>
+#include <QEventLoop>
+#include <QNetworkAccessManager>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -66,8 +68,8 @@ private slots:
 
 private:
     Context *context;
-    ShareDialog *parent;
     RideItem *ride;
+    ShareDialog *parent;
     QDialog *dialog;
 
     QString token;
@@ -76,6 +78,9 @@ private:
 
     bool loggedIn, uploadSuccessful;
     bool overwrite;
+
+    QEventLoop *eventLoop;
+    QNetworkAccessManager *networkManager;
 
     QString uploadStatus;
     QString uploadProgress;
@@ -102,8 +107,8 @@ private slots:
 
 private:
     Context *context;
-    ShareDialog *parent;
     RideItem *ride;
+    ShareDialog *parent;
     QDialog *dialog;
 
     QString rideWithGpsActivityId;
@@ -132,8 +137,8 @@ private slots:
 
 private:
     Context *context;
-    ShareDialog *parent;
     RideItem *ride;
+    ShareDialog *parent;
     QDialog *dialog;
 
     QString token;
@@ -167,8 +172,8 @@ private slots:
 
 private:
     Context *context;
-    ShareDialog *parent;
     RideItem *ride;
+    ShareDialog *parent;
     QDialog *dialog;
 
     QString token;
@@ -208,8 +213,8 @@ private slots:
 
 private:
     Context *context;
-    ShareDialog *parent;
     RideItem *ride;
+    ShareDialog *parent;
     QDialog *dialog;
 
     QNetworkAccessManager networkMgr;
