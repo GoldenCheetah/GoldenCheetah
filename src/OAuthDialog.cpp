@@ -61,7 +61,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
         if (req_url != NULL) {
 
-qDebug()<<"TWITTER: oauth_sign_url ok";
+qDebug()<<"TWITTER: oauth_sign_url ok, req_url="<<req_url<<"postarg="<<postarg;
 
             // post it
             reply = oauth_http_get(req_url,postarg);
