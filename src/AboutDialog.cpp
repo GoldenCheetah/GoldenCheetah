@@ -139,6 +139,7 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     contributors.append("Jim Ley");
     contributors.append("J&#246;rn Rischm&#252;ller");
     contributors.append("John Ehrlinger");
+    contributors.append("Jon Beverley");
     contributors.append("Jon Escombe");
     contributors.append("Josef Gebel");
     contributors.append("Julian Baumgartner");
