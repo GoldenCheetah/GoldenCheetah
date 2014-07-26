@@ -451,6 +451,8 @@ struct Bin2FileReaderState
                             read_bytes(31, &bytes_read, &sum); // dummy
                         else
                             read_bytes(19, &bytes_read, &sum); // dummy
+                        //increase seconds
+                        (secs)++;
                     }
                     else if ((flag & 0x03) == 0x01){
                         t= read_RTC_mark(&secs, &bytes_read, &sum);
