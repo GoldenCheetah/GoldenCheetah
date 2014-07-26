@@ -27,6 +27,7 @@ v    Autofilter in Trends view
 vi   Specify athlete library location
 vii  Improved Dropbox support (CRC)
 viii Find intervals via matches, hills etc
+ix   Fix Elevation
 
 2. Device
 i    Fixed up Tacx Fortius Support
@@ -83,6 +84,6 @@ iv  CP refactored (for models and intervals)
 v   AllPlot refactored (for compare)
 
 BUG FIXES
-i   Over 900 commits since 3.0 including many bug fixes
+i   Over 1000 commits since 3.0 including many bug fixes
 ii  Eradicating assert reduces crashes
 iii Crash dialog/restart to menu
