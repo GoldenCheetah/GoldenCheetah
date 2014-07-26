@@ -61,15 +61,19 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
         req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
         if (req_url != NULL) {
 
+qDebug()<<"TWITTER: oauth_sign_url ok";
+
             // post it
             reply = oauth_http_get(req_url,postarg);
             if (reply != NULL) {
 
+qDebug()<<"TWITTER: oauth_http_get ok";
                 // will split reply into paramters using strdup
                 rc = oauth_split_url_parameters(reply, &rv);
 
                 if (rc >= 3) {
 
+qDebug()<<"TWITTER: oauth_split_url_parameters ok";
                     // really ?
                     qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
 
@@ -81,11 +85,17 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
 
                     // free memory using count rc
                     for(int i=0; i<rc; i++) free(rv[i]);
+                } else {
+qDebug()<<"TWITTER: **** oauth_split_url_parameters NOT ok. rc="<<rc;
                 }
 
                 //urlstr.append("&oauth_callback=http%3A%2F%2Fwww.goldencheetah.org%2F");
                 requestToken = true;
+            } else {
+qDebug()<<"TWITTER: **** oauth_http_get IS NULL";
             }
+        } else {
+qDebug()<<"TWITTER: **** oauth_sign_url IS NULL";
         }
 #endif
 
