@@ -292,7 +292,7 @@ class Vo2max : public RideMetric {
     }
     void initialize () {
         setName(tr("Estimated VO2MAX"));
-        setType(RideMetric::Average);
+        setType(RideMetric::Peak);
         setMetricUnits(tr("ml/min/kg"));
         setImperialUnits(tr("ml/min/kg"));
     }
