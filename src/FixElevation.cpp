@@ -46,7 +46,8 @@ class FixElevationConfig : public DataProcessorConfig
 
         QString explain() {
             return(QString(tr("Fix or add elevation data. If elevation data is "
-                           "present it will be removed and overwritten.")));
+                           "present it will be removed and overwritten."
+                           "\n\nINTERNET CONNECTION REQUIRED.")));
         }
 
         void readConfig() {}
