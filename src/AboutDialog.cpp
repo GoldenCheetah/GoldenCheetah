@@ -78,7 +78,9 @@ AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
                 "BikeScore, xPower courtesy of <a href=\"http://www.physfarm.com\">"
                 "Physfarm Training Systems</a>.<br>"
                 "Virtual Speed courtesy of Tom Compton <a href=\"http://www.analyticcycling.com\">"
-                "Analytic Cycling</a>."
+                "AnalyticCycling</a>.<br>"
+                "Elevation data courtesy of <a href=\"http://www.mapquest.com\">"
+                "MapQuest</a>."
                 "</center>"
                 )
                 .arg(QString(QUrl::fromLocalFile(home.absolutePath()).toEncoded()))
