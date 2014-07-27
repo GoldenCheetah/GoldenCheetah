@@ -305,7 +305,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     }
 
     // if any of the controls change we pass the chart everything
-    connect(showLnY, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(showLnY, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showZeroes, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
     connect(showInCPZones, SIGNAL(stateChanged(int)), this, SLOT(setCPZoned(int)));
@@ -313,8 +313,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShade(int)));
-    connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
-    connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
+    connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
+    connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(forceReplot()));
 
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
