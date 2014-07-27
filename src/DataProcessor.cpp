@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <QApplication>
 #include "DataProcessor.h"
 #include "Context.h"
 #include "AllPlot.h"
@@ -105,9 +106,20 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
 void
 ManualDataProcessorDialog::okClicked()
 {
+    // stop ok button from being clickable and show waiting cursor
+    ok->setEnabled(false);
+    cancel->setEnabled(false);
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
     if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config) == true) {
         context->notifyRideSelected(ride);     // to remain compatible with rest of GC for now
     }
+
+    // reset cursor and wait
+    QApplication::restoreOverrideCursor();
+
+    // and we're done
     accept();
 }
 
