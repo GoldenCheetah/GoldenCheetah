@@ -112,8 +112,7 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
                 //grab a gps point every 20 meters
                 lastDistance = (int) (ride->dataPoints()[i]->km * 1000) + 20;
             }
-            ride->setPointValue(i, RideFile::alt, 0);
-
+            ride->command->setPointValue(i, RideFile::alt, 0);
         }
     }
 
@@ -146,10 +145,12 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
 
         for( std::vector<elevationGPSPoint>::iterator point = elvPoints.begin() ; point != elvPoints.end() ; ++point ) {
             double elev = QString(elevationPoints.at(loopCount).mid(elevationPoints.at(loopCount).indexOf("|")+1)).toDouble();
-            ride->dataPoints()[point->rideFileIndex]->alt = elev;
+            ride->command->setPointValue(point->rideFileIndex, RideFile::alt, elev);
             ++loopCount;
         }
-        ride->setDataPresent(RideFile::alt, true);
+
+        // set data present if not currently so
+        if (ride->areDataPresent()->alt == false) ride->command->setDataPresent(RideFile::alt, true);
 
 
         int lastgood = -1;  // where did we last have decent GPS data?
@@ -184,10 +185,11 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *)
                 errors++;
             }
         }
-
-        ride->command->endLUW();
-
     }
+
+    // close LUW
+    ride->command->endLUW();
+
     if (errors) {
         ride->setTag("GPS errors", QString("%1").arg(errors));
         return true;
