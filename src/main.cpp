@@ -20,6 +20,7 @@
 #include <QtGui>
 #include <QFile>
 #include <QWebSettings>
+#include <QMessageBox>
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
@@ -208,9 +209,9 @@ main(int argc, char *argv[])
                 if (!home.exists(libraryPath)) {
                     if (!home.mkpath(libraryPath)) {
 
-                    qDebug()<<"Failed to create library path\n";
-                    exit(0);
-
+                        // tell user why we aborted !
+                        QMessageBox::critical(NULL, "Exiting", QString("Cannot create library directory (%1)").arg(libraryPath));
+                        exit(0);
                     }
                 }
                 home.cd(libraryPath);
