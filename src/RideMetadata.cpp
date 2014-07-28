@@ -178,8 +178,18 @@ RideMetadata::setExtraTab()
 
             // since we show EVERYTHING, don't let the user edit them
             // we might get more selective later?
-            field->widget->setEnabled(false);
+
+            // set Text Field to 'Read Only' to still enable scrolling,...
+            QTextEdit* textEdit = dynamic_cast<QTextEdit*> (field->widget);
+            if (textEdit)  textEdit->setReadOnly(true);
+            else {
+                QLineEdit* lineEdit = dynamic_cast<QLineEdit*> (field->widget);
+                if (lineEdit) lineEdit->setReadOnly(true);
+                else field->widget->setEnabled(false);
+
+            }
         }
+
     }
 }
 
