@@ -2455,6 +2455,7 @@ AllPlotWindow::setByDistance(int value)
     setAllPlotWidgets(fullPlot->rideItem);
 
     // refresh
+    setupSeriesStack = setupStack = false;
     redrawFullPlot();
     redrawAllPlot();
     setupStackPlots();
