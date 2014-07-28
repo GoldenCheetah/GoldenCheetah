@@ -507,7 +507,6 @@ SOURCES += \
         FitlogRideFile.cpp \
         FitlogParser.cpp \
         FitRideFile.cpp \
-        FixElevation.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
         FixSpikes.cpp \
