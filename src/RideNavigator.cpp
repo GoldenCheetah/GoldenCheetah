@@ -36,8 +36,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
 {
     // get column headings
     // default column layouts etc
-    _columns = QString(tr("*|Workout Code|TSS|Date|"));
-    _widths = QString("0|80|50|50|");
+    _columns = QString(tr("*|Workout Code|Date|"));
+    _widths = QString("0|100|100|");
     _sortByIndex = 2;
     _sortByOrder = 0;
     currentColumn = -1;
@@ -103,6 +103,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->setMouseTracking(true);
     tableView->setFrameStyle(QFrame::NoFrame);
     tableView->setAcceptDrops(true);
+    tableView->setColumnWidth(1, 100);
 
     // good to go
     tableView->show();
@@ -215,8 +216,8 @@ RideNavigator::resetView()
 
     // something is wrong with the config ? reset 
     if (widco != cols.count() || widco <= 1) {
-        _columns = QString(tr("*|Workout Code|TSS|Date|"));
-        _widths = QString("0|80|50|50|");
+        _columns = QString(tr("*|Workout Code|Date|"));
+        _widths = QString("0|100|100|");
         cols = _columns.split("|", QString::SkipEmptyParts);
     }
 
@@ -433,7 +434,8 @@ void
 RideNavigator::showEvent(QShowEvent *)
 {
     init = true;
-    setWidth(geometry().width());
+
+    //setWidth(geometry().width());
 }
 
 // routines called by the sidebar to let the user

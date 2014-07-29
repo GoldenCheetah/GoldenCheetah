@@ -106,7 +106,7 @@ TabView::splitterMoved(int pos,int)
     // we are the analysis view
     // all a bit of a hack to stop the column widths from
     // being adjusted as the splitter gets resized and reset
-    if (type == VIEW_ANALYSIS && active == false)
+    if (type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
         context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
 }
 
@@ -381,7 +381,7 @@ TabView::sidebarChanged()
         // we are the analysis view
         // all a bit of a hack to stop the column widths from
         // being adjusted as the splitter gets resized and reset
-        if (type == VIEW_ANALYSIS && active == false)
+        if (type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
             context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
 
         setUpdatesEnabled(true);
