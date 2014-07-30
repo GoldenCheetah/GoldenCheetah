@@ -1363,6 +1363,21 @@ RideFile::recalculateDerivedSeries()
             p->antiss = anTISS;
         }
 
+        // Slope
+        // If there is no slope data then it can be derived
+        // from distanct and altitude
+        if (lastP) {
+            if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+                double deltaDistance = (p->km - lastP->km) * 1000;
+                double deltaAltitude = p->alt - lastP->alt;
+                if (deltaDistance>0) {
+                    p->slope = (deltaAltitude / deltaDistance) * 100;
+                } else {
+                    p->slope = 0;
+                }
+            }
+        }
+
         // last point
         lastP = p;
     }
@@ -1376,6 +1391,24 @@ RideFile::recalculateDerivedSeries()
 
     avgPoint->apower = APcount ? (APtotal / APcount) : 0;
     totalPoint->apower = APtotal;
+
+    // Smooth the slope if it has been derived
+    if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+        // initialise rolling average
+        double rtot = 0;
+        for (int i=10; i>0 && dataPoints_.length()-i >=0; i--) {
+            rtot += dataPoints_[dataPoints_.length()-i]->slope;
+        }
+
+        // now run backwards setting the rolling average
+        for (int i=dataPoints_.length()-1; i>=10; i--) {
+            double here = dataPoints_[i]->slope;
+            dataPoints_[i]->slope = rtot / 10;
+            rtot -= here;
+            rtot += dataPoints_[i-10]->slope;
+        }
+        setDataPresent(slope, true);
+    }
 
     // and we're done
     dstale=false;
