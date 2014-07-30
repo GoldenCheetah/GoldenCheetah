@@ -181,6 +181,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 void
 ShareDialog::upload()
 {
+qDebug()<<"SHARE: upload.";
     show();
 
     if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() &&
@@ -228,11 +229,13 @@ ShareDialog::upload()
     if (garminChk->isChecked()) {
         garminUploader->upload();
     }
+qDebug()<<"SHARE: upload done";
 }
 
 StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     context(context), ride(ride), parent(parent)
 {
+qDebug()<<"STRAVA: constructor.";
     stravaUploadId = ride->ride()->getTag("Strava uploadId", "");
     eventLoop = new QEventLoop(this);
     networkManager = new QNetworkAccessManager(this);
@@ -241,6 +244,7 @@ StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *pa
 void
 StravaUploader::upload()
 {
+qDebug()<<"STRAVA: upload.";
     // OAuth no more login
     token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
     if (token=="")
@@ -293,6 +297,7 @@ StravaUploader::upload()
         //requestVerifyUpload();
         parent->progressLabel->setText(tr("Successfully uploaded to Strava\n"));
     }
+qDebug()<<"STRAVA: upload done";
 }
 
 // Documentation is at:
@@ -300,6 +305,7 @@ StravaUploader::upload()
 void
 StravaUploader::requestUploadStrava()
 {
+qDebug()<<"STRAVA: request upload";
     parent->progressLabel->setText(tr("Upload ride to Strava..."));
     parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
@@ -378,24 +384,30 @@ StravaUploader::requestUploadStrava()
     parent->progressLabel->setText(tr("Upload ride... Sending to Strava"));
 
     eventLoop->exec();
+qDebug()<<"STRAVA: request upload done.";
 }
 
 void
 StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
 {
+qDebug()<<"STRAVA: requestUploadStravaFinished. reply="<<reply;
     parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload to Strava finished."));
 
     uploadSuccessful = false;
 
+qDebug()<<"STRAVA: about to readline.";
     QString response = reply->readLine();
     //qDebug() << response;
+qDebug()<<"STRAVA: response="<<response;
 
     QScriptValue sc;
     QScriptEngine se;
 
     sc = se.evaluate("("+response+")");
+qDebug()<<"STRAVA: evaluate";
     QString uploadError = sc.property("error").toString();
+qDebug()<<"STRAVA: uploadError=="<<uploadError;
     if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
         uploadError = "";
 
@@ -403,20 +415,28 @@ StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
     {
         //qDebug() << "Error " << reply->error() ;
         //qDebug() << "Error " << uploadError;
+qDebug()<<"STRAVA: was an error, so set errorLabel";
         parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Strava: ") + uploadError + "\n" );
+qDebug()<<"STRAVA: errorLabel="<<parent->errorLabel->text();
     }
     else
     {
+qDebug()<<"STRAVA: success, so set UploadId.";
         stravaUploadId = sc.property("upload_id").toString();
 
+qDebug()<<"STRAVA: stravaUploadId="<<stravaUploadId;
         ride->ride()->setTag("Strava uploadId", stravaUploadId);
+qDebug()<<"STRAVA: tag set";
         ride->setDirty(true);
 
+qDebug()<<"STRAVA: dirty set";
         //qDebug() << "uploadId: " << stravaUploadId;
 
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+qDebug()<<"STRAVA: progressbar set";
         uploadSuccessful = true;
     }
+qDebug()<<"STRAVA: done.";
 }
 
 void
