@@ -422,7 +422,7 @@ qDebug()<<"STRAVA: errorLabel="<<parent->errorLabel->text();
     else
     {
 qDebug()<<"STRAVA: success, so set UploadId.";
-        stravaUploadId = sc.property("upload_id").toString();
+        stravaUploadId = sc.property("id").toString();
 
 qDebug()<<"STRAVA: stravaUploadId="<<stravaUploadId;
         ride->ride()->setTag("Strava uploadId", stravaUploadId);
