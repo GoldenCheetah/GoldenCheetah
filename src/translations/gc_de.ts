@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de">
+<TS version="2.0" language="de">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -3918,52 +3918,52 @@ Wollen Sie die Änderung durchführen und Golden Cheetah neu starten?</translati
 <context>
     <name>CyclingAnalyticsUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="714"/>
+        <location filename="../ShareDialog.cpp" line="746"/>
         <source>Cannot login to CyclingAnalytics. Check permission</source>
         <translation>Anmeldung bei CyclingAnalytics nicht möglich - Autorisation prüfen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="729"/>
+        <location filename="../ShareDialog.cpp" line="761"/>
         <source>This Ride is marked as already on CyclingAnalytics. Are you sure you want to upload it?</source>
         <translation>Trainingseinheit bereits auf Cycling Analytics vorhanden. Wollen Sie sie trotzdem uploaden?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="732"/>
+        <location filename="../ShareDialog.cpp" line="764"/>
         <source>OK</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="733"/>
+        <location filename="../ShareDialog.cpp" line="765"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="754"/>
+        <location filename="../ShareDialog.cpp" line="786"/>
         <source>Error uploading to CyclingAnalytics</source>
         <translation>Fehler beim Upload zu CyclingAnalytics</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="758"/>
+        <location filename="../ShareDialog.cpp" line="790"/>
         <source>Successfully uploaded to CyclingAnalytics</source>
         <translation>Erfolgreich nach CyclingAnalytics übertragen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="765"/>
+        <location filename="../ShareDialog.cpp" line="797"/>
         <source>Upload ride to CyclingAnalytics...</source>
         <translation>Upload der Trainingseinheit zu Cyclinganalytics...</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="813"/>
+        <location filename="../ShareDialog.cpp" line="845"/>
         <source>Upload ride... Sending to CyclingAnalytics</source>
         <translation>Upload der Trainingseinheit... Sende Daten an CyclingAnalytics</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="822"/>
+        <location filename="../ShareDialog.cpp" line="854"/>
         <source>Upload to CyclingAnalytics finished.</source>
         <translation>Upload zu CyclingAnalytics beendet.</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="841"/>
+        <location filename="../ShareDialog.cpp" line="882"/>
         <source> Error from CyclingAnalytics: </source>
         <translation>Fehlermeldung von CyclingAnalytics:</translation>
     </message>
@@ -5797,59 +5797,59 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 <context>
     <name>GarminUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="1067"/>
+        <location filename="../ShareDialog.cpp" line="1115"/>
         <source>This Ride is marked as already on Garmin Connect. Are you sure you want to upload it?</source>
         <translation>Trainingseinheit ist bereits auf Garmin Connect vorhanden. Sind Sie sicher, den Upload zu starten?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1070"/>
+        <location filename="../ShareDialog.cpp" line="1118"/>
         <source>OK</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1071"/>
+        <location filename="../ShareDialog.cpp" line="1119"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1093"/>
+        <location filename="../ShareDialog.cpp" line="1141"/>
         <source>Error uploading to Garmin Connect</source>
         <translation>Fehler beim Upload zu Garmin Connect</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1097"/>
+        <location filename="../ShareDialog.cpp" line="1145"/>
         <source>Successfully uploaded to Garmin Connect</source>
         <translation>Upload zu Garmin Connect erfolgreich</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1104"/>
-        <location filename="../ShareDialog.cpp" line="1165"/>
+        <location filename="../ShareDialog.cpp" line="1152"/>
+        <location filename="../ShareDialog.cpp" line="1213"/>
         <source>Login to Garmin Connect...</source>
         <translation>Anmeldung bei Garmin Connect...</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1128"/>
-        <location filename="../ShareDialog.cpp" line="1210"/>
+        <location filename="../ShareDialog.cpp" line="1176"/>
+        <location filename="../ShareDialog.cpp" line="1258"/>
         <source>Login to Garmin Connect finished.</source>
         <translation>Anmeldung bei Garmin Connect erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1252"/>
+        <location filename="../ShareDialog.cpp" line="1298"/>
         <source>Upload ride to Garmin Connect...</source>
         <translation>Upload der Trainingeinheit zu Garmin Connect...</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1295"/>
+        <location filename="../ShareDialog.cpp" line="1341"/>
         <source>Upload ride... Sending to Garmin Connect</source>
         <translation>Upload läuft ... Sende Trainingseinheit an Garmin Connect</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1306"/>
+        <location filename="../ShareDialog.cpp" line="1352"/>
         <source>Upload to Garmin Connect finished.</source>
         <translation>Upload zu Garmin Connect beendet.</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1324"/>
+        <location filename="../ShareDialog.cpp" line="1367"/>
         <source> Error from Garmin Connect: </source>
         <translation> Fehler von Garmin Connect: </translation>
     </message>
@@ -10131,9 +10131,8 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>ø Geschwindigkeit:</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="202"/>
         <source>Estmate Stress by:</source>
-        <translation>Schätze Streß anhand von:</translation>
+        <translation type="obsolete">Schätze Streß anhand von:</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="203"/>
@@ -10189,6 +10188,11 @@ on and that its display says, &quot;PC Link&quot;</source>
         <location filename="../ManualRideDialog.cpp" line="250"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="../ManualRideDialog.cpp" line="202"/>
+        <source>Estimate Stress by:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="251"/>
@@ -12279,7 +12283,7 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>Fahrrad</translation>
     </message>
     <message>
-        <location filename="../FitRideFile.cpp" line="381"/>
+        <location filename="../FitRideFile.cpp" line="382"/>
         <source>Lap %1</source>
         <translation>Runde %1</translation>
     </message>
@@ -13181,9 +13185,8 @@ yyyy</translation>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../RideFile.cpp" line="222"/>
         <source>°C</source>
-        <translation>°C</translation>
+        <translation type="obsolete">°C</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="231"/>
@@ -13204,6 +13207,11 @@ yyyy</translation>
         <location filename="../RideFile.cpp" line="229"/>
         <source>meters per hour</source>
         <translation>Meter pro Stunde</translation>
+    </message>
+    <message>
+        <location filename="../RideFile.cpp" line="222"/>
+        <source>Â°C</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="230"/>
@@ -13728,7 +13736,6 @@ Skipping file...</source>
         <translation>^(Durchschnitt|Maximale|ø) </translation>
     </message>
     <message>
-        <location filename="../RideSummaryWindow.cpp" line="171"/>
         <location filename="../RideSummaryWindow.cpp" line="609"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Modell&lt;/h3&gt;</translation>
@@ -13933,47 +13940,47 @@ Skipping file...</source>
 <context>
     <name>RideWithGpsUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="518"/>
+        <location filename="../ShareDialog.cpp" line="540"/>
         <source>This Ride is marked as already on RideWithGPS. Are you sure you want to upload it?</source>
         <translation>Diese Trainingseinheit ist bereits zu RideWithGPS hochgeladen. Trotzdem hochladen?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="521"/>
+        <location filename="../ShareDialog.cpp" line="543"/>
         <source>OK</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="522"/>
+        <location filename="../ShareDialog.cpp" line="544"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="543"/>
+        <location filename="../ShareDialog.cpp" line="565"/>
         <source>Error uploading to RideWithGPS</source>
         <translation>Fehler beim Upload zu RideWithGPS</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="547"/>
+        <location filename="../ShareDialog.cpp" line="569"/>
         <source>Successfully uploaded to RideWithGPS</source>
         <translation>Upload zu RideWithGPS erfolgreich</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="554"/>
+        <location filename="../ShareDialog.cpp" line="576"/>
         <source>Upload ride...</source>
         <translation>Upload der Trainingeinheit zu RideWithGps...</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="642"/>
+        <location filename="../ShareDialog.cpp" line="664"/>
         <source>Upload ride... Sending to RideWithGPS</source>
         <translation>Upload läuft ... Sende Trainingseinheit an RideWithGPS</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="652"/>
+        <location filename="../ShareDialog.cpp" line="674"/>
         <source>Upload to RideWithGPS finished.</source>
         <translation>Upload zu RideWithGPS beendet.</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="670"/>
+        <location filename="../ShareDialog.cpp" line="705"/>
         <source> Error from RideWithGPS: </source>
         <translation> Fehlermeldung von RideWithGPS: </translation>
     </message>
@@ -14743,47 +14750,47 @@ Möchten Sie fortfahren?</translation>
 <context>
     <name>SelfLoopsUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="892"/>
+        <location filename="../ShareDialog.cpp" line="931"/>
         <source>This Ride is marked as already on Selfloops. Are you sure you want to upload it?</source>
         <translation>Trainingseinheit ist bereits auf Selfloops vorhanden. Trotzdem hochladen?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="895"/>
+        <location filename="../ShareDialog.cpp" line="934"/>
         <source>OK</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="896"/>
+        <location filename="../ShareDialog.cpp" line="935"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="917"/>
+        <location filename="../ShareDialog.cpp" line="956"/>
         <source>Error uploading to Selfloops</source>
         <translation>Fehler beim Upload nach Selfloops</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="921"/>
+        <location filename="../ShareDialog.cpp" line="960"/>
         <source>Successfully uploaded to Selfloops</source>
         <translation>Upload zu Selfloops erfolgreich</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="940"/>
+        <location filename="../ShareDialog.cpp" line="979"/>
         <source>Upload ride to Selfloops...</source>
         <translation>Upload der Trainingseinheit nach Selfloops...</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="986"/>
+        <location filename="../ShareDialog.cpp" line="1025"/>
         <source>Upload ride... Sending to Selfloops</source>
         <translation>Upload läuft ... Sende Trainingseinheit an Selfloops</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="995"/>
+        <location filename="../ShareDialog.cpp" line="1034"/>
         <source>Upload to Selfloops finished.</source>
         <translation>Upload zu Selfloops beendet.</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="1013"/>
+        <location filename="../ShareDialog.cpp" line="1062"/>
         <source> Error from Selfloops: </source>
         <translation> Fehlermeldung von Selfloops: </translation>
     </message>
@@ -14840,9 +14847,8 @@ Möchten Sie fortfahren?</translation>
         <translation>Selfloops</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="103"/>
         <source>Garmin Connect</source>
-        <translation>Garmin Connect</translation>
+        <translation type="obsolete">Garmin Connect</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="117"/>
@@ -14885,7 +14891,7 @@ Möchten Sie fortfahren?</translation>
         <translation>S&amp;chließen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="190"/>
+        <location filename="../ShareDialog.cpp" line="191"/>
         <source>No share site selected !</source>
         <translation>Keine Website zum teilen gewählt!</translation>
     </message>
@@ -15524,58 +15530,63 @@ Falls eine neu erstellte Trainigseinheit zeitlich mit einer bereits exisiterende
 <context>
     <name>StravaUploader</name>
     <message>
-        <location filename="../ShareDialog.cpp" line="249"/>
+        <location filename="../ShareDialog.cpp" line="250"/>
         <source>Cannot login to Strava. Check permission</source>
         <translation>Login bei Strava nicht möglich. Bitte Autorisierung prüfen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="264"/>
+        <location filename="../ShareDialog.cpp" line="265"/>
         <source>This Ride is marked as already on Strava. Are you sure you want to upload it?</source>
         <translation>Diese Trainingseinheit ist bereits zu Strava hochgeladen. Trotzdem hochladen?</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="267"/>
+        <location filename="../ShareDialog.cpp" line="268"/>
         <source>OK</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="268"/>
+        <location filename="../ShareDialog.cpp" line="269"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="289"/>
+        <location filename="../ShareDialog.cpp" line="290"/>
         <source>Error uploading to Strava</source>
         <translation>Fehler beim Upload nach Strava</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="294"/>
+        <location filename="../ShareDialog.cpp" line="295"/>
         <source>Successfully uploaded to Strava
 </source>
         <translation>Upload zu Strava erfolgreich</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="303"/>
+        <location filename="../ShareDialog.cpp" line="304"/>
         <source>Upload ride to Strava...</source>
         <translation>Upload zu Strava...</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="378"/>
+        <location filename="../ShareDialog.cpp" line="379"/>
         <source>Upload ride... Sending to Strava</source>
         <translation>Upload läuft ... Sende Trainingseinheit an Strava</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="387"/>
+        <location filename="../ShareDialog.cpp" line="388"/>
         <source>Upload to Strava finished.</source>
         <translation>Upload zu Strava beendet.</translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="406"/>
+        <location filename="../ShareDialog.cpp" line="418"/>
+        <source>invalid response or parser exception.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="428"/>
         <source> Error from Strava: </source>
         <translation> Fehlermeldung von Strava: </translation>
     </message>
     <message>
-        <location filename="../ShareDialog.cpp" line="426"/>
+        <location filename="../ShareDialog.cpp" line="447"/>
         <source>Ride processing...</source>
         <translation>Trainingseinheit wird verarbeitet...</translation>
     </message>
