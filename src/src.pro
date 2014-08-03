@@ -438,7 +438,8 @@ HEADERS += \
         WPrime.h \
         ZeoDownload.h \
         Zones.h \
-        ZoneScaleDraw.h
+        ZoneScaleDraw.h \
+        ../qtsolutions/json/mvjson.h
 
 YACCSOURCES += JsonRideFile.y WithingsParser.y
 LEXSOURCES  += JsonRideFile.l WithingsParser.l
@@ -641,6 +642,7 @@ SOURCES += \
         ZeoDownload.cpp \
         Zones.cpp \
         main.cpp \
+        ../qtsolutions/json/mvjson.cpp
 
 RESOURCES = application.qrc \
             RideWindow.qrc
