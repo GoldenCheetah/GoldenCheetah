@@ -74,7 +74,8 @@ private:
 
     QString token;
 
-    QString stravaUploadId, stravaActivityId;
+    int stravaUploadId;
+    QString stravaActivityId;
 
     bool loggedIn, uploadSuccessful;
     bool overwrite;

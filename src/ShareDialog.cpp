@@ -22,6 +22,7 @@
 #include <QUrl>
 #include <QHttpMultiPart>
 #include <QScriptEngine>
+#include "mvjson.h"
 #include "TimeUtils.h"
 #include "Units.h"
 
@@ -236,7 +237,7 @@ StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *pa
     context(context), ride(ride), parent(parent)
 {
 qDebug()<<"STRAVA: constructor.";
-    stravaUploadId = ride->ride()->getTag("Strava uploadId", "");
+    stravaUploadId = ride->ride()->getTag("Strava uploadId", "0").toInt();
     eventLoop = new QEventLoop(this);
     networkManager = new QNetworkAccessManager(this);
 }
@@ -256,7 +257,7 @@ qDebug()<<"STRAVA: upload.";
     }
 
     // already shared ?
-    if(stravaUploadId.length()>0)
+    if(stravaUploadId>0)
     {
         overwrite = false;
 
@@ -401,12 +402,33 @@ qDebug()<<"STRAVA: about to readline.";
     //qDebug() << response;
 qDebug()<<"STRAVA: response="<<response;
 
-    QScriptValue sc;
-    QScriptEngine se;
+    // use a lightweigth json parser to do this
+    QString uploadError="invalid reponse or parser error";
+    try {
 
-    sc = se.evaluate("("+response+")");
-qDebug()<<"STRAVA: evaluate";
-    QString uploadError = sc.property("error").toString();
+qDebug()<<"STRAVA: mvjson parsing";
+        // parse !
+        MVJSONReader jsonResponse(string(response.toLatin1()));
+
+        // get error field
+        if (jsonResponse.root->hasField("error")) {
+            uploadError = jsonResponse.root->getFieldString("error").c_str();
+        } else {
+            uploadError = ""; // no error
+        }
+
+        // get upload_id, but if not available use id
+        if (jsonResponse.root->hasField("upload_id")) {
+            stravaUploadId = jsonResponse.root->getFieldInt("upload_id");
+        } else if (jsonResponse.root->hasField("id")) {
+            stravaUploadId = jsonResponse.root->getFieldInt("id");
+        } else {
+            stravaUploadId = 0;
+        }
+    } catch(...) { // not really sure what exceptions to expect so do them all (bad, sorry)
+        uploadError=tr("invalid response or parser exception.");
+    }
+
 qDebug()<<"STRAVA: uploadError=="<<uploadError;
     if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
         uploadError = "";
@@ -422,10 +444,9 @@ qDebug()<<"STRAVA: errorLabel="<<parent->errorLabel->text();
     else
     {
 qDebug()<<"STRAVA: success, so set UploadId.";
-        stravaUploadId = sc.property("id").toString();
 
 qDebug()<<"STRAVA: stravaUploadId="<<stravaUploadId;
-        ride->ride()->setTag("Strava uploadId", stravaUploadId);
+        ride->ride()->setTag("Strava uploadId", QString("%1").arg(stravaUploadId));
 qDebug()<<"STRAVA: tag set";
         ride->setDirty(true);
 
@@ -451,7 +472,7 @@ StravaUploader::requestVerifyUpload()
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), eventLoop, SLOT(quit()));
     QByteArray out;
 
-    QUrl url = QUrl("https://www.strava.com/api/v3/upload/status/"+stravaUploadId+"?token="+token);
+    QUrl url = QUrl("https://www.strava.com/api/v3/upload/status/"+QString("%1").arg(stravaUploadId)+"?token="+token);
     QNetworkRequest request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
