@@ -21,7 +21,6 @@
 #include "Settings.h"
 #include <QUrl>
 #include <QHttpMultiPart>
-#include <QScriptEngine>
 #include "mvjson.h"
 #include "TimeUtils.h"
 #include "Units.h"
@@ -86,7 +85,7 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     rideWithGpsUploader = new RideWithGpsUploader(context, ride, this);
     cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
     selfLoopsUploader = new SelfLoopsUploader(context, ride, this);
-    garminUploader = new GarminUploader(context, ride, this);
+    //garminUploader = new GarminUploader(context, ride, this); // not in 3.1
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose which sites you wish to share on: "));
@@ -101,15 +100,15 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     cyclingAnalyticsChk->setEnabled(false);
 #endif
     selfLoopsChk = new QCheckBox(tr("Selfloops"));
-    garminChk = new QCheckBox(tr("Garmin Connect"));
-    garminChk->setVisible(false);
+    //garminChk = new QCheckBox(tr("Garmin Connect"));
+    //garminChk->setVisible(false);
 
     QGridLayout *vbox1 = new QGridLayout();
     vbox1->addWidget(stravaChk,0,0);
     vbox1->addWidget(rideWithGPSChk,0,1);
     vbox1->addWidget(cyclingAnalyticsChk,0,2);
     vbox1->addWidget(selfLoopsChk,0,3);
-    vbox1->addWidget(garminChk,0,4);
+    //vbox1->addWidget(garminChk,0,4);
 
 
     groupBox1->setLayout(vbox1);
@@ -182,12 +181,12 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 void
 ShareDialog::upload()
 {
-qDebug()<<"SHARE: upload.";
     show();
 
     if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() &&
-        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked() &&
-        !garminChk->isChecked()) {
+        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked() 
+        //&& !garminChk->isChecked()
+        ) {
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("No share site selected !"));
         aMsgBox.exec();
@@ -211,9 +210,9 @@ qDebug()<<"SHARE: upload.";
     if (selfLoopsChk->isChecked()) {
         shareSiteCount ++;
     }
-    if (garminChk->isChecked()) {
-        shareSiteCount ++;
-    }
+    //if (garminChk->isChecked()) {
+    //    shareSiteCount ++;
+    //}
 
     if (stravaChk->isChecked()) {
         stravaUploader->upload();
@@ -227,16 +226,14 @@ qDebug()<<"SHARE: upload.";
     if (selfLoopsChk->isChecked()) {
         selfLoopsUploader->upload();
     }
-    if (garminChk->isChecked()) {
-        garminUploader->upload();
-    }
-qDebug()<<"SHARE: upload done";
+    //if (garminChk->isChecked()) {
+    //    garminUploader->upload();
+    //}
 }
 
 StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     context(context), ride(ride), parent(parent)
 {
-qDebug()<<"STRAVA: constructor.";
     stravaUploadId = ride->ride()->getTag("Strava uploadId", "0").toInt();
     eventLoop = new QEventLoop(this);
     networkManager = new QNetworkAccessManager(this);
@@ -245,7 +242,6 @@ qDebug()<<"STRAVA: constructor.";
 void
 StravaUploader::upload()
 {
-qDebug()<<"STRAVA: upload.";
     // OAuth no more login
     token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
     if (token=="")
@@ -298,7 +294,6 @@ qDebug()<<"STRAVA: upload.";
         //requestVerifyUpload();
         parent->progressLabel->setText(tr("Successfully uploaded to Strava\n"));
     }
-qDebug()<<"STRAVA: upload done";
 }
 
 // Documentation is at:
@@ -306,7 +301,6 @@ qDebug()<<"STRAVA: upload done";
 void
 StravaUploader::requestUploadStrava()
 {
-qDebug()<<"STRAVA: request upload";
     parent->progressLabel->setText(tr("Upload ride to Strava..."));
     parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
@@ -385,28 +379,23 @@ qDebug()<<"STRAVA: request upload";
     parent->progressLabel->setText(tr("Upload ride... Sending to Strava"));
 
     eventLoop->exec();
-qDebug()<<"STRAVA: request upload done.";
 }
 
 void
 StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
 {
-qDebug()<<"STRAVA: requestUploadStravaFinished. reply="<<reply;
     parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload to Strava finished."));
 
     uploadSuccessful = false;
 
-qDebug()<<"STRAVA: about to readline.";
     QString response = reply->readLine();
     //qDebug() << response;
-qDebug()<<"STRAVA: response="<<response;
 
     // use a lightweigth json parser to do this
     QString uploadError="invalid reponse or parser error";
     try {
 
-qDebug()<<"STRAVA: mvjson parsing";
         // parse !
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
@@ -429,7 +418,6 @@ qDebug()<<"STRAVA: mvjson parsing";
         uploadError=tr("invalid response or parser exception.");
     }
 
-qDebug()<<"STRAVA: uploadError=="<<uploadError;
     if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
         uploadError = "";
 
@@ -437,27 +425,19 @@ qDebug()<<"STRAVA: uploadError=="<<uploadError;
     {
         //qDebug() << "Error " << reply->error() ;
         //qDebug() << "Error " << uploadError;
-qDebug()<<"STRAVA: was an error, so set errorLabel";
         parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Strava: ") + uploadError + "\n" );
-qDebug()<<"STRAVA: errorLabel="<<parent->errorLabel->text();
     }
     else
     {
-qDebug()<<"STRAVA: success, so set UploadId.";
 
-qDebug()<<"STRAVA: stravaUploadId="<<stravaUploadId;
         ride->ride()->setTag("Strava uploadId", QString("%1").arg(stravaUploadId));
-qDebug()<<"STRAVA: tag set";
         ride->setDirty(true);
 
-qDebug()<<"STRAVA: dirty set";
         //qDebug() << "uploadId: " << stravaUploadId;
 
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
-qDebug()<<"STRAVA: progressbar set";
         uploadSuccessful = true;
     }
-qDebug()<<"STRAVA: done.";
 }
 
 void
@@ -487,39 +467,40 @@ StravaUploader::requestVerifyUploadFinished(QNetworkReply *reply)
     if (reply->error() != QNetworkReply::NoError)
         qDebug() << "Error from upload " <<reply->error();
     else {
-        QString response = reply->readLine();
 
-        //qDebug() << response;
+        try {
 
-        QScriptValue sc;
-        QScriptEngine se;
+            // parse the response
+            QString response = reply->readLine();
+            MVJSONReader jsonResponse(string(response.toLatin1()));
 
-        sc = se.evaluate("("+response+")");
-        uploadProgress = sc.property("upload_progress").toString();
+            // get values
+            uploadProgress = jsonResponse.root->getFieldInt("upload_progress");
+            uploadStatus = jsonResponse.root->getFieldString("upload_status").c_str();
+            stravaActivityId = jsonResponse.root->getFieldInt("activity_id");
+
+        } catch(...) {
+
+            // problem!
+            uploadProgress = 0;
+            uploadStatus = "response error or parser exception";
+            stravaActivityId = 0;
+        }
 
         //qDebug() << "upload_progress: " << uploadProgress;
-        parent->progressBar->setValue(uploadProgress.toInt());
-
-        stravaActivityId = sc.property("activity_id").toString();
-
-        if (stravaActivityId.length() == 0) {
-            requestVerifyUpload();
-            return;
-        }
-
-        ride->ride()->setTag("Strava activityId", stravaActivityId);
-        ride->setDirty(true);
-
-        sc = se.evaluate("("+response+")");
-        uploadStatus = sc.property("upload_status").toString();
-
         //qDebug() << "upload_status: " << uploadStatus;
+        parent->progressBar->setValue(uploadProgress);
         parent->progressLabel->setText(uploadStatus);
 
-        if (uploadProgress.toInt() < 97) {
+        // not done yet
+        if (stravaActivityId == 0 || uploadProgress < 97) {
             requestVerifyUpload();
             return;
         }
+
+        // success
+        ride->ride()->setTag("Strava activityId", QString("%1").arg(stravaActivityId));
+        ride->setDirty(true);
         uploadSuccessful = true;
     }
 }
@@ -691,17 +672,30 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
 {
     parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload to RideWithGPS finished."));
-
     uploadSuccessful = false;
 
-    QString response = reply->readAll();
-    //qDebug() << response;
+    QString uploadError;
+    int tripid = 0;
 
-    QScriptValue sc;
-    QScriptEngine se;
+    try {
 
-    sc = se.evaluate("("+response+")");
-    QString uploadError = sc.property("error").toString();
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
+
+        // get values
+        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        if (jsonResponse.root->hasField("trip")) {
+            tripid = jsonResponse.root->getField("trip")->getFieldInt("id");
+        }
+
+    } catch(...) {
+
+        // problem!
+        uploadError = "bad response or parser exception.";
+    }
+
+    // no error so clear
     if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
         uploadError = "";
 
@@ -712,13 +706,10 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
     }
     else
     {
-        QString tripid = sc.property("trip").property("id").toString();
-
-        ride->ride()->setTag("RideWithGPS tripid", tripid);
+        ride->ride()->setTag("RideWithGPS tripid", QString("%1").arg(tripid));
         ride->setDirty(true);
 
         //qDebug() << "tripid: " << tripid;
-
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
@@ -741,7 +732,7 @@ RideWithGpsUploader::closeClicked()
 CyclingAnalyticsUploader::CyclingAnalyticsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     context(context), ride(ride), parent(parent)
 {
-    cyclingAnalyticsUploadId = ride->ride()->getTag("CyclingAnalytics uploadId", "");
+    cyclingAnalyticsUploadId = ride->ride()->getTag("CyclingAnalytics uploadId", "0").toInt();
 }
 
 void
@@ -749,8 +740,8 @@ CyclingAnalyticsUploader::upload()
 {
     // OAuth no more login
     token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
-    if (token=="")
-    {
+    if (token=="") {
+
         QMessageBox aMsgBox;
         aMsgBox.setText(tr("Cannot login to CyclingAnalytics. Check permission"));
         aMsgBox.exec();
@@ -758,8 +749,8 @@ CyclingAnalyticsUploader::upload()
     }
 
     // already shared ?
-    if(cyclingAnalyticsUploadId.length()>0)
-    {
+    if(cyclingAnalyticsUploadId>0) {
+
         overwrite = false;
 
         dialog = new QDialog();
@@ -861,35 +852,42 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalyticsFinished(QNetworkReply *r
 {
     parent->progressBar->setValue(parent->progressBar->value()+50/parent->shareSiteCount);
     parent->progressLabel->setText(tr("Upload to CyclingAnalytics finished."));
-
     uploadSuccessful = false;
 
-    QString response = reply->readAll();
-    //qDebug() << "response" << response;
+    QString uploadError;
+    try {
 
-    QScriptValue sc;
-    QScriptEngine se;
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
 
-    sc = se.evaluate("("+response+")");
-    QString uploadError = sc.property("error").toString();
+        // get values
+        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        cyclingAnalyticsUploadId = jsonResponse.root->getFieldInt("upload_id");
+
+    } catch(...) {
+
+        // problem!
+        uploadError = "bad response or parser exception.";
+        cyclingAnalyticsUploadId = 0;
+    }
+
+    // if not there clean out
     if (uploadError.toLower() == "none" || uploadError.toLower() == "null")
         uploadError = "";
 
-    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError)
-    {
+    if (uploadError.length()>0 || reply->error() != QNetworkReply::NoError) {
         //qDebug() << "Error " << reply->error() ;
         //qDebug() << "Error " << uploadError;
         parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from CyclingAnalytics: ") + uploadError + "\n" );
-    }
-    else
-    {
-        cyclingAnalyticsUploadId = sc.property("upload_id").toString();
 
-        ride->ride()->setTag("CyclingAnalytics uploadId", cyclingAnalyticsUploadId);
+    } else {
+
+        // Success
+        ride->ride()->setTag("CyclingAnalytics uploadId", QString("%1").arg(cyclingAnalyticsUploadId));
         ride->setDirty(true);
 
         //qDebug() << "uploadId: " << cyclingAnalyticsUploadId;
-
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
@@ -913,16 +911,16 @@ CyclingAnalyticsUploader::closeClicked()
 SelfLoopsUploader::SelfLoopsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     context(context), ride(ride), parent(parent)
 {
-    selfloopsUploadId = ride->ride()->getTag("Selfloops uploadId", "");
-    selfloopsActivityId = ride->ride()->getTag("Selfloops activityId", "");
+    selfloopsUploadId = ride->ride()->getTag("Selfloops uploadId", "0").toInt();
+    selfloopsActivityId = ride->ride()->getTag("Selfloops activityId", "0").toInt();
 }
 
 void
 SelfLoopsUploader::upload()
 {
     // allready shared ?
-    if(selfloopsActivityId.length()>0)
-    {
+    if(selfloopsActivityId>0) {
+
         overwrite = false;
 
         dialog = new QDialog();
@@ -1037,30 +1035,38 @@ SelfLoopsUploader::requestUploadSelfLoopsFinished(QNetworkReply *reply)
 
     uploadSuccessful = false;
 
-    QString response = reply->readAll();
-    qDebug() << "response" << response;
+    int error;
+    QString uploadError;
+    try {
 
-    QScriptValue sc;
-    QScriptEngine se;
+        // parse the response
+        QString response = reply->readAll();
+        MVJSONReader jsonResponse(string(response.toLatin1()));
 
-    sc = se.evaluate("("+response+")");
-    QString error = sc.property("error_code").toString();
-    QString uploadError = sc.property("message").toString();
+        // get values
+        error = jsonResponse.root->getFieldInt("error_code");
+        uploadError = jsonResponse.root->getFieldString("message").c_str();
+        selfloopsActivityId = jsonResponse.root->getFieldInt("activity_id");
 
-    if (error.length()>0 || reply->error() != QNetworkReply::NoError)
-    {
-        qDebug() << "Error " << reply->error() ;
-        qDebug() << "Error " << uploadError;
-        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Selfloops: ") + uploadError + "\n" );
+    } catch(...) {
+
+        // problem!
+        error = 500;
+        uploadError = "bad response or parser exception.";
+        selfloopsActivityId = 0;
     }
-    else
-    {
-        selfloopsActivityId = sc.property("activity_id").toString();
 
-        ride->ride()->setTag("Selfloops activityId", selfloopsActivityId);
+    if (error>0 || reply->error() != QNetworkReply::NoError) {
+        //qDebug() << "Error " << reply->error() ;
+        //qDebug() << "Error " << uploadError;
+        parent->errorLabel->setText(parent->errorLabel->text()+ tr(" Error from Selfloops: ") + uploadError + "\n" );
+
+    } else {
+
+        //qDebug() << "activity: " << selfloopsActivityId;
+
+        ride->ride()->setTag("Selfloops activityId", QString("%1").arg(selfloopsActivityId));
         ride->setDirty(true);
-
-        qDebug() << "activity: " << selfloopsActivityId;
 
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
@@ -1081,6 +1087,7 @@ SelfLoopsUploader::closeClicked()
     return;
 }
 
+#if 0 // NOT AVAILABLE -- COMMENTED OUT FOR VERSION 3.1
 /******************/
 /* Garmin Connect */
 /******************/
@@ -1261,8 +1268,6 @@ GarminUploader::requestLoginGarminFinished(QNetworkReply *reply)
         qDebug() << "statusCode " << statusCode;
 
         if(statusCode == 200) {
-            QScriptValue sc;
-            QScriptEngine se;
 
             sc = se.evaluate("("+response+")");
             QString response_url = sc.property("response_url").toString();
@@ -1351,9 +1356,6 @@ GarminUploader::requestUploadGarminFinished(QNetworkReply *reply)
     QString response = reply->readAll();
     qDebug() << "response" << response;
 
-    QScriptValue sc;
-    QScriptEngine se;
-
     sc = se.evaluate("("+response+")");
     QString error = sc.property("error_code").toString();
     QString uploadError = sc.property("message").toString();
@@ -1391,3 +1393,5 @@ GarminUploader::closeClicked()
     dialog->reject();
     return;
 }
+
+#endif

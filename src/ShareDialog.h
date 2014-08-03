@@ -74,17 +74,16 @@ private:
 
     QString token;
 
-    int stravaUploadId;
-    QString stravaActivityId;
-
     bool loggedIn, uploadSuccessful;
     bool overwrite;
 
     QEventLoop *eventLoop;
     QNetworkAccessManager *networkManager;
 
+    int stravaUploadId;
+    int stravaActivityId;
     QString uploadStatus;
-    QString uploadProgress;
+    int uploadProgress;
 };
 
 // uploader to ridewithgps.com
@@ -147,10 +146,9 @@ private:
     bool loggedIn, uploadSuccessful;
     bool overwrite;
 
-    QString cyclingAnalyticsUploadId;
-
     QString uploadStatus;
-    QString uploadProgress;
+    int uploadProgress;
+    int cyclingAnalyticsUploadId;
 };
 
 // uploader to selfloops.com
@@ -182,12 +180,13 @@ private:
     bool loggedIn, uploadSuccessful;
     bool overwrite;
 
-    QString selfloopsUploadId, selfloopsActivityId;
+    int selfloopsUploadId, selfloopsActivityId;
 
     QString uploadStatus;
-    QString uploadProgress;
+    int uploadProgress;
 };
 
+#if 0 // Not enabled in v3.1
 // uploader to connect.garmin.com
 class GarminUploader : public QObject
 {
@@ -230,8 +229,9 @@ private:
     QString garminUploadId, garminActivityId;
 
     QString uploadStatus;
-    QString uploadProgress;
+    int uploadProgress;
 };
+#endif
 
 class ShareDialog : public QDialog
 {
@@ -269,7 +269,7 @@ private:
      QCheckBox *rideWithGPSChk;
      QCheckBox *cyclingAnalyticsChk;
      QCheckBox *selfLoopsChk;
-     QCheckBox *garminChk;
+     //QCheckBox *garminChk;
 
      RideItem *ride;
 
@@ -277,7 +277,7 @@ private:
      RideWithGpsUploader *rideWithGpsUploader;
      CyclingAnalyticsUploader *cyclingAnalyticsUploader;
      SelfLoopsUploader *selfLoopsUploader;
-     GarminUploader *garminUploader;
+     //GarminUploader *garminUploader;
 
      QString athleteId;
 };
