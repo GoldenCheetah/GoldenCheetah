@@ -12,7 +12,7 @@ DEPENDPATH += .
 QMAKE_INFO_PLIST = ./mac/Info.plist.app
 
 ## qwt and libz
-INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
+INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE} ../qtsolutions/json
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm $${LIBZ_LIBS}
 
