@@ -199,7 +199,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     avgKPH->setMaximum(100);
 
     // how to estimate stress
-    QLabel *modeLabel = new QLabel(tr("Estmate Stress by:"), this);
+    QLabel *modeLabel = new QLabel(tr("Estimate Stress by:"), this);
     byDuration = new QRadioButton(tr("Duration"));
     byDistance = new QRadioButton(tr("Distance"));
     byManual = new QRadioButton(tr("Manually"));
