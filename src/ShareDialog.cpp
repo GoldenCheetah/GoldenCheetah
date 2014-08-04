@@ -72,7 +72,7 @@ static QByteArray zCompress(const QByteArray &source)
 ShareDialog::ShareDialog(Context *context, RideItem *item) :
     context(context)
 {
-    setWindowTitle("Share your ride");
+    setWindowTitle(tr("Share your ride"));
 
     // make the dialog a resonable size
     setMinimumWidth(550);
