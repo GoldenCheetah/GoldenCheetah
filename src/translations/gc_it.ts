@@ -15194,6 +15194,7 @@ Salta il file...</translation>
         <translation>Massimi</translation>
     </message>
     <message>
+        <location filename="../RideSummaryWindow.cpp" line="171"/>
         <location filename="../RideSummaryWindow.cpp" line="609"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation type="unfinished"></translation>
@@ -15270,6 +15271,11 @@ Salta il file...</translation>
         <location filename="../RideSummaryWindow.cpp" line="1561"/>
         <source>^(Average|Max) </source>
         <translation>^(Media|Massimo)</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="181"/>
+        <source>&lt;h3&gt;Modeling&lt;br&gt;%1&lt;/h3&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="254"/>
@@ -16373,6 +16379,11 @@ native format. Should we do so?
 </context>
 <context>
     <name>ShareDialog</name>
+    <message>
+        <location filename="../ShareDialog.cpp" line="75"/>
+        <source>Share your ride</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../ShareDialog.cpp" line="91"/>
         <source>Choose which sites you wish to share on: </source>
