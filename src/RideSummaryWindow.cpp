@@ -168,7 +168,7 @@ RideSummaryWindow::modelProgress(int year, int month)
     QString string;
 
     if (!year && !month) {
-        string = "<h3>Model</h3>";
+        string = tr("<h3>Model</h3>");
     } else {
 
 #if 0 // too much info, just do years ...
@@ -178,7 +178,7 @@ RideSummaryWindow::modelProgress(int year, int month)
         else dotstring = "...";
 #endif
 
-        string = QString("<h3>Modeling<br>%1</h3>").arg(year);
+        string = QString(tr("<h3>Modeling<br>%1</h3>")).arg(year);
     }
     rideSummary->page()->mainFrame()->evaluateJavaScript(
         QString("var div = document.getElementById(\"modhead\"); div.innerHTML = '%1'; ").arg(string));;
