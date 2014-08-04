@@ -15992,6 +15992,7 @@ Saltando archivo...</translation>
         <translation>Promedios</translation>
     </message>
     <message>
+        <location filename="../RideSummaryWindow.cpp" line="171"/>
         <location filename="../RideSummaryWindow.cpp" line="609"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Modelo&lt;/h3&gt;</translation>
@@ -16067,6 +16068,11 @@ Saltando archivo...</translation>
         <location filename="../RideSummaryWindow.cpp" line="1134"/>
         <source>Maximums</source>
         <translation>Máximos</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="181"/>
+        <source>&lt;h3&gt;Modeling&lt;br&gt;%1&lt;/h3&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="254"/>
@@ -17163,6 +17169,11 @@ formato GoldenCheetah. ¿Confirmar?</translation>
 </context>
 <context>
     <name>ShareDialog</name>
+    <message>
+        <location filename="../ShareDialog.cpp" line="75"/>
+        <source>Share your ride</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../ShareDialog.cpp" line="91"/>
         <source>Choose which sites you wish to share on: </source>

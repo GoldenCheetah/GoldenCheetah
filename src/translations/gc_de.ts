@@ -13736,9 +13736,15 @@ Skipping file...</source>
         <translation>^(Durchschnitt|Maximale|ø) </translation>
     </message>
     <message>
+        <location filename="../RideSummaryWindow.cpp" line="171"/>
         <location filename="../RideSummaryWindow.cpp" line="609"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Modell&lt;/h3&gt;</translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="181"/>
+        <source>&lt;h3&gt;Modeling&lt;br&gt;%1&lt;/h3&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="254"/>
@@ -14849,6 +14855,11 @@ Möchten Sie fortfahren?</translation>
     <message>
         <source>Garmin Connect</source>
         <translation type="obsolete">Garmin Connect</translation>
+    </message>
+    <message>
+        <location filename="../ShareDialog.cpp" line="75"/>
+        <source>Share your ride</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="117"/>

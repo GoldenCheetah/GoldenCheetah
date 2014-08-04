@@ -15266,6 +15266,7 @@ A ignorar ficheiro...</translation>
         <translation>Médias</translation>
     </message>
     <message>
+        <location filename="../RideSummaryWindow.cpp" line="171"/>
         <location filename="../RideSummaryWindow.cpp" line="609"/>
         <source>&lt;h3&gt;Model&lt;/h3&gt;</source>
         <translation type="unfinished"></translation>
@@ -15345,6 +15346,11 @@ A ignorar ficheiro...</translation>
         <location filename="../RideSummaryWindow.cpp" line="363"/>
         <location filename="../RideSummaryWindow.cpp" line="1134"/>
         <source>Maximums</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="181"/>
+        <source>&lt;h3&gt;Modeling&lt;br&gt;%1&lt;/h3&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -16382,6 +16388,11 @@ Quer continuar?</translation>
 </context>
 <context>
     <name>ShareDialog</name>
+    <message>
+        <location filename="../ShareDialog.cpp" line="75"/>
+        <source>Share your ride</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../ShareDialog.cpp" line="91"/>
         <source>Choose which sites you wish to share on: </source>
