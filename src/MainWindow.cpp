@@ -185,20 +185,34 @@ MainWindow::MainWindow(const QDir &home)
     } else {
 
         QRect appsize = geom.toRect();
+#ifdef Q_OS_WIN
+        //Check if the window is the same size as the available area
+        //if it is them it was maximised when geom was saved
+        //Not sure about Mac so have made it windows only.
+        if ((appsize.width()+appsize.x()==screenSize.width()) &&
+            (appsize.height()+appsize.y()==screenSize.height())) {
+            setWindowState(Qt::WindowMaximized);
+        } else {
+            setGeometry(appsize);
+        }
+#else
         setGeometry(appsize);
+#endif
     }
 
-    // just check the geometry is ok, otherwise just make
-    // it slightly smaller than the screensize
-    if (geometry().x() < 0 || geometry().y() < 0 || 
-       (geometry().y()+geometry().height()) > screenSize.height() || (geometry().x()+geometry().width()) > screenSize.width()) {
-        setGeometry(screenSize.x()+50,screenSize.y()+50,screenSize.width()-150,screenSize.height()-150);
+    // if the window is not maximised
+    if (!isMaximized()) {
+        // just check the geometry is ok, otherwise just make
+        // it slightly smaller than the screensize
+        if (geometry().x() < 0 || geometry().y() < 0 ||
+           (geometry().y()+geometry().height()) > screenSize.height() || (geometry().x()+geometry().width()) > screenSize.width()) {
+            setGeometry(screenSize.x()+50,screenSize.y()+50,screenSize.width()-150,screenSize.height()-150);
+        }
+
+        // always attempt to center on the available screen (minus toolbar/sidebar)
+        move(((screenSize.width()-screenSize.x())/2) - (geometry().width()/2),
+            ((screenSize.height()-screenSize.y())/2) - (geometry().height()/2));
     }
-
-    // always attempt to center on the available screen (minus toolbar/sidebar)
-    move(((screenSize.width()-screenSize.x())/2) - (geometry().width()/2),
-        ((screenSize.height()-screenSize.y())/2) - (geometry().height()/2));
-
 
     /*----------------------------------------------------------------------
      * ScopeBar
