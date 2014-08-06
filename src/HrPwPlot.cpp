@@ -322,7 +322,7 @@ HrPwPlot::recalc()
 
     QwtText textr = QwtText(labelp+"*x+"+labelo+" : R "+labelr+" ("+labeldelay+") \n Power@150:"+labelpower150+"W");
     textr.setFont(QFont("Helvetica", 10, QFont::Bold));
-    textr.setColor(Qt::black);
+    textr.setColor(GColor(CPLOTMARKER));
 
     r_mrk1->setValue(0,0);
     r_mrk1->setLineStyle(QwtPlotMarker::VLine);
