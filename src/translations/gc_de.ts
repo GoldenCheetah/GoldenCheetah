@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de">
+<TS version="2.1" language="de">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -3470,7 +3470,7 @@ Wollen Sie die Änderung durchführen und Golden Cheetah neu starten?</translati
         <location filename="../Pages.cpp" line="443"/>
         <location filename="../Pages.cpp" line="456"/>
         <source>Authorise</source>
-        <translation>Genehmigen</translation>
+        <translation>Autorisieren</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="346"/>
@@ -10131,10 +10131,6 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>ø Geschwindigkeit:</translation>
     </message>
     <message>
-        <source>Estmate Stress by:</source>
-        <translation type="obsolete">Schätze Streß anhand von:</translation>
-    </message>
-    <message>
         <location filename="../ManualRideDialog.cpp" line="203"/>
         <source>Duration</source>
         <translation>Dauer</translation>
@@ -10192,7 +10188,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../ManualRideDialog.cpp" line="202"/>
         <source>Estimate Stress by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Schätze Streß anhand von:</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="251"/>
@@ -13185,8 +13181,9 @@ yyyy</translation>
         <translation>%</translation>
     </message>
     <message>
+        <location filename="../RideFile.cpp" line="222"/>
         <source>°C</source>
-        <translation type="obsolete">°C</translation>
+        <translation>°C</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="231"/>
@@ -13207,11 +13204,6 @@ yyyy</translation>
         <location filename="../RideFile.cpp" line="229"/>
         <source>meters per hour</source>
         <translation>Meter pro Stunde</translation>
-    </message>
-    <message>
-        <location filename="../RideFile.cpp" line="222"/>
-        <source>Â°C</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="230"/>
@@ -13653,7 +13645,7 @@ Skipping file...</source>
         <location filename="../RideNavigator.cpp" line="239"/>
         <location filename="../RideNavigator.cpp" line="240"/>
         <source>Config Checksum</source>
-        <translation type="unfinished"></translation>
+        <translation>Config Checksum</translation>
     </message>
     <message>
         <location filename="../RideNavigator.cpp" line="604"/>
@@ -13744,7 +13736,7 @@ Skipping file...</source>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="181"/>
         <source>&lt;h3&gt;Modeling&lt;br&gt;%1&lt;/h3&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Berechne&lt;br&gt;%1&lt;/h3&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="254"/>
@@ -14853,13 +14845,9 @@ Möchten Sie fortfahren?</translation>
         <translation>Selfloops</translation>
     </message>
     <message>
-        <source>Garmin Connect</source>
-        <translation type="obsolete">Garmin Connect</translation>
-    </message>
-    <message>
         <location filename="../ShareDialog.cpp" line="75"/>
         <source>Share your ride</source>
-        <translation type="unfinished"></translation>
+        <translation>Teile die Trainingseinheit</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="117"/>
@@ -14904,7 +14892,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../ShareDialog.cpp" line="191"/>
         <source>No share site selected !</source>
-        <translation>Keine Website zum teilen gewählt!</translation>
+        <translation>Keine Website zum Teilen gewählt!</translation>
     </message>
 </context>
 <context>
@@ -15589,7 +15577,7 @@ Falls eine neu erstellte Trainigseinheit zeitlich mit einer bereits exisiterende
     <message>
         <location filename="../ShareDialog.cpp" line="418"/>
         <source>invalid response or parser exception.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Antwort oder &apos;Parser&apos; Fehler.</translation>
     </message>
     <message>
         <location filename="../ShareDialog.cpp" line="428"/>
