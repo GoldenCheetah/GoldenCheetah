@@ -40,7 +40,6 @@
 #include "QtMacSegmentedButton.h"
 #endif
 
-extern QApplication *application;
 class ChartBar;
 
 class HomeWindow : public GcWindow

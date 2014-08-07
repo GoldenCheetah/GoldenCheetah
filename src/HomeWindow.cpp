@@ -155,11 +155,12 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
     installEventFilter(this);
-    application->installEventFilter(this);
+    qApp->installEventFilter(this);
 }
 
 HomeWindow::~HomeWindow()
 {
+    qApp->removeEventFilter(this);
 }
 
 void
