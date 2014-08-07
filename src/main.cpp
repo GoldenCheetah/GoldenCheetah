@@ -58,7 +58,6 @@ void nostderr(QString dir)
 #include <QStandardPaths>
 #endif
 
-QApplication *application;
 bool restarting = false;
 
 // root directory shared by all
@@ -142,7 +141,7 @@ main(int argc, char *argv[])
 #endif
 
     // create the application -- only ever ONE regardless of restarts
-    application = new QApplication(argc, argv);
+    QApplication *application = new QApplication(argc, argv);
 
 #ifdef Q_OS_MAC
     // get an autorelease pool setup
