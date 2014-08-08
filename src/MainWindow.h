@@ -189,8 +189,8 @@ class MainWindow : public QMainWindow
         bool saveRideExitDialog(Context *);              // save dirty rides on exit dialog
 
         // save and restore state to context
-        void saveState(Context *);
-        void restoreState(Context *);
+        void saveGCState(Context *);
+        void restoreGCState(Context *);
 
         void configChanged();
 

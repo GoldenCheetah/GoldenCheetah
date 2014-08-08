@@ -157,62 +157,30 @@ MainWindow::MainWindow(const QDir &home)
     /*----------------------------------------------------------------------
      *  GUI setup
      *--------------------------------------------------------------------*/
-    // need to restore geometry before setUnifiedToolBar.. on Mac
-    QRect screenSize = desktop->availableGeometry();
-    appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
-    QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM, QVariant());
+     if (appsettings->contains(GC_SETTINGS_MAIN_GEOM)) {
+         restoreGeometry(appsettings->value(this, GC_SETTINGS_MAIN_GEOM).toByteArray());
+         restoreState(appsettings->value(this, GC_SETTINGS_MAIN_STATE).toByteArray());
+     } else {
+         QRect screenSize = desktop->availableGeometry();
+         // first run -- lets set some sensible defaults...
+         // lets put it in the middle of screen 1
+         struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
 
-    if (geom == QVariant()) {
+         // center on the available screen (minus toolbar/sidebar)
+         move((screenSize.width()-screenSize.x())/2 - app.width/2,
+              (screenSize.height()-screenSize.y())/2 - app.height/2);
 
-        // first run -- lets set some sensible defaults...
-        // lets put it in the middle of screen 1
-        struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
+         // set to the right default
+         resize(app.width, app.height);
 
-        // center on the available screen (minus toolbar/sidebar)
-        move((screenSize.width()-screenSize.x())/2 - app.width/2,
-             (screenSize.height()-screenSize.y())/2 - app.height/2);
+         // set all the default font sizes
+         appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
+         appsettings->setValue(GC_FONT_TITLES_SIZE, app.titleFont);
+         appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, app.markerFont);
+         appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
+         appsettings->setValue(GC_FONT_CALENDAR_SIZE, app.calendarFont);
 
-        // set to the right default
-        resize(app.width, app.height);
-
-        // set all the default font sizes
-        appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
-        appsettings->setValue(GC_FONT_TITLES_SIZE, app.titleFont);
-        appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, app.markerFont);
-        appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
-        appsettings->setValue(GC_FONT_CALENDAR_SIZE, app.calendarFont);
-
-    } else {
-
-        QRect appsize = geom.toRect();
-#ifdef Q_OS_WIN
-        //Check if the window is the same size as the available area
-        //if it is them it was maximised when geom was saved
-        //Not sure about Mac so have made it windows only.
-        if ((appsize.width()+appsize.x()==screenSize.width()) &&
-            (appsize.height()+appsize.y()==screenSize.height())) {
-            setWindowState(Qt::WindowMaximized);
-        } else {
-            setGeometry(appsize);
-        }
-#else
-        setGeometry(appsize);
-#endif
-    }
-
-    // if the window is not maximised
-    if (!isMaximized()) {
-        // just check the geometry is ok, otherwise just make
-        // it slightly smaller than the screensize
-        if (geometry().x() < 0 || geometry().y() < 0 ||
-           (geometry().y()+geometry().height()) > screenSize.height() || (geometry().x()+geometry().width()) > screenSize.width()) {
-            setGeometry(screenSize.x()+50,screenSize.y()+50,screenSize.width()-150,screenSize.height()-150);
-        }
-
-        // always attempt to center on the available screen (minus toolbar/sidebar)
-        move(((screenSize.width()-screenSize.x())/2) - (geometry().width()/2),
-            ((screenSize.height()-screenSize.y())/2) - (geometry().height()/2));
-    }
+     }
 
     /*----------------------------------------------------------------------
      * ScopeBar
@@ -717,7 +685,7 @@ MainWindow::MainWindow(const QDir &home)
     //connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
-    saveState(currentTab->context); // set to whatever we started with
+    saveGCState(currentTab->context); // set to whatever we started with
     selectAnalysis();
 
     //grab focus
@@ -937,7 +905,8 @@ MainWindow::resizeEvent(QResizeEvent*)
         repaint();
     }
 #endif
-    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
 }
 
 void
@@ -953,7 +922,7 @@ MainWindow::showOptions()
 void
 MainWindow::moveEvent(QMoveEvent*)
 {
-    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
 }
 
 void
@@ -994,7 +963,8 @@ MainWindow::closeEvent(QCloseEvent* event)
         }
 #endif
     }
-    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
 }
 
 MainWindow::~MainWindow()
@@ -1445,8 +1415,8 @@ MainWindow::openTab(QString name)
     selectAnalysis(); // sets scope bar ..
 
     // now apply current
-    saveState(currentTab->context);
-    restoreState(currentTab->context);
+    saveGCState(currentTab->context);
+    restoreGCState(currentTab->context);
 
     // show the tabbar if we're gonna open tabs -- but wait till the last second
     // to show it to avoid crappy paint artefacts
@@ -1607,7 +1577,7 @@ MainWindow::setOpenTabMenu()
 }
 
 void
-MainWindow::saveState(Context *context)
+MainWindow::saveGCState(Context *context)
 {
     // save all the current state to the supplied context
     context->showSidebar = showhideSidebar->isChecked();
@@ -1625,7 +1595,7 @@ MainWindow::saveState(Context *context)
 }
 
 void
-MainWindow::restoreState(Context *context)
+MainWindow::restoreGCState(Context *context)
 {
     // restore window state from the supplied context
     showSidebar(context->showSidebar);
@@ -1661,13 +1631,13 @@ MainWindow::switchTab(int index)
 #endif
 
     // save how we are
-    saveState(currentTab->context);
+    saveGCState(currentTab->context);
 
     currentTab = tabList[index];
     tabStack->setCurrentIndex(index);
 
     // restore back
-    restoreState(currentTab->context);
+    restoreGCState(currentTab->context);
 
     setWindowTitle(currentTab->context->athlete->home.dirName());
 
