@@ -61,7 +61,7 @@ class FixTorqueConfig : public DataProcessorConfig
                            "of your power meter was incorrect. It "
                            "takes a single parameter:\n\n"
                            "Torque Adjust - this defines an absolute value "
-                           "in poinds per square inch or newton meters to "
+                           "in pounds per square inch or newton meters to "
                            "modify values by. Negative values are supported. (e.g. enter \"1.2 nm\" or "
                            "\"-0.5 pi\").")));
         }
@@ -106,12 +106,10 @@ static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor(
 bool
 FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
-    // does this ride have torque?
-    if (ride->areDataPresent()->nm == false) return false;
-
     // Lets do it then!
     QString ta;
-    double nmAdjust;
+    double nmAdjust = 0;
+    double percentageAdjust = 0;
 
     if (config == NULL) { // being called automatically
         ta = appsettings->value(NULL, GC_DPTA, "0 nm").toString();
@@ -121,33 +119,53 @@ FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 
     // patrick's torque adjustment code
     bool pi = ta.endsWith("pi", Qt::CaseInsensitive);
+    bool percent = ta.endsWith("%");
     if (pi || ta.endsWith("nm", Qt::CaseInsensitive)) {
         nmAdjust = ta.left(ta.length() - 2).toDouble();
         if (pi) {
             nmAdjust *= 0.11298482933;
         }
     } else {
-        nmAdjust = ta.toDouble();
+        if (percent) {
+            percentageAdjust = ta.left(ta.length() - 1).toDouble();
+        } else {
+            nmAdjust = ta.toDouble();
+        }
     }
 
+    // does this ride have torque?
+    if (ride->areDataPresent()->nm == false && percent == 0) return false;
+
+    // does this ride have power?
+    if (ride->areDataPresent()->watts == false) return false;
+
     // no adjustment required
-    if (nmAdjust == 0) return false;
+    if (nmAdjust == 0 && percentageAdjust == 0) return false;
 
     // apply the change
     ride->command->startLUW("Adjust Torque");
     for (int i=0; i<ride->dataPoints().count(); i++) {
         RideFilePoint *point = ride->dataPoints()[i];
 
-      if (point->nm != 0) {
+        if (point->nm != 0 && nmAdjust != 0) {
             double newnm = point->nm + nmAdjust;
             ride->command->setPointValue(i, RideFile::watts, point->watts * (newnm / point->nm));
             ride->command->setPointValue(i, RideFile::nm, newnm);
         }
+        if (point->watts != 0 && percentageAdjust != 0) {
+            ride->command->setPointValue(i, RideFile::watts, point->watts + (point->watts * (percentageAdjust / 100)));
+        }
+
     }
     ride->command->endLUW();
 
-    double currentta = ride->getTag("Torque Adjust", "0.0").toDouble();
-    ride->setTag("Torque Adjust", QString("%1 nm").arg(currentta + nmAdjust));
+    if (nmAdjust != 0) {
+        double currentta = ride->getTag("Torque Adjust", "0.0").toDouble();
+        ride->setTag("Torque Adjust", QString("%1 nm").arg(currentta + nmAdjust));
+    } else {
+        double currentta = ride->getTag("Power Adjust", "0.0").toDouble();
+        ride->setTag("Power Adjust", QString("%1").arg(currentta + percentageAdjust));
+    }
 
     return true;
 }
