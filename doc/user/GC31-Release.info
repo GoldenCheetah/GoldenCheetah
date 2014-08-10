@@ -1,0 +1,270 @@
+This is GC31-Release.info, produced by makeinfo version 5.2 from
+GC31-Release.texinfo.
+
+
+File: GC31-Release.info,  Node: Top,  Next: Top,  Prev: Top
+
+title
+*****
+
+These release notes are for GoldenCheetah, version 3.1.
+
+* Menu:
+
+* WHATS NEW::  What's new in V3.1
+* CONTRIBUTORS::  List of Contributors to V3.1
+
+
+File: GC31-Release.info,  Node: WHATS NEW,  Next: CONTRIBUTORS,  Prev: CONTRIBUTORS,  Up: Top
+
+1 Whats New
+***********
+
+1.1 Major new features; Compare, Share and Merge
+================================================
+
+We have added a new feature to enable comparing rides and intervals
+across all the charts where it is sensible to try; performance plot, cp
+chart, histogram and QA charts all support compare.  Additionally it is
+possible to compare trends across different seasons as well as
+histograms.  And of course, these are also possible across athletes; so
+you can compare one athletes season or ride with another athletes season
+or ride.
+
+Wherever it is sensible to compare things, we think it is now possible
+to compare things.
+
+We have also unified upload to "cloud" across Strava, RideWithGPS and
+Cycling Analytics.  With a single click you can upload to all services.
+We do not currently support Garmin Connect as they have closed their
+system and only work with commercial partners - for this reason we
+recommend storing data outside for future data security.
+
+Lastly, it is now possible to merge data from different sources into a
+single ridefile.  This is particularly useful when working with
+multipled devices or integrating data from devices like the Moxy SM02
+monitor.
+
+1.2 General Enhancements
+========================
+
+We have made the following general / UI enhancements:
+
+   * Open Athletes in Tabs - it is possible to open up all your athletes
+     within a single window and switch tabs.
+
+   * ChartBar - the chartbar has become a toolbar item and is
+     scrollable.  This dramatically increases the screen estate
+     available for displaying charts and data but also makes the UI less
+     'quirky' and align more to typical desktop application styles.
+
+   * Themes and better support for color customisation - we now have
+     much more sophisticated support for color customisation and support
+     across all the charts.  Themes allow you to switch between light on
+     dark and dark on light setups quickly and easily.
+
+   * Improved Interactivity - mouse over interactivity has been extended
+     over the ride list and most charts for faster exploration of data
+     and to provide a more fluid and dynamic user experience.  This
+     extendes to isolating curves within a chart by hovering over the
+     axis labels and automatically selecting intervals as you hover over
+     their data in the QA and ride charts.
+
+   * Autofilter in Trends view - as well as advance data filtering
+     within chart setup and the toolbar search box we have now added
+     autofilters in the trends sidebar to make it simple to filter data
+     based upon metadata e.g.  all running files or rides on your TT
+     bike.
+
+   * Specify athlete library location - You can now specify where data
+     is stored to make it easier to integrate with backup or other
+     synchronisation tools.
+
+   * Improved Dropbox support (CRC) - We will check the data within a
+     ride has changed (as opposed to its timestamp) before refreshing
+     metrics.  This is to remove unneccessary metric refreshes when
+     copying data between computers or synchronising using tools like
+     Dropbox.
+
+   * Find intervals via matches, hills etc - The find intervals dialog
+     will now find hills as well as sustained efforts using W'
+     consumption (see support for W'bal).
+
+1.3 Enhanced Device Support
+===========================
+
+We have fixed or enhanced device support for:
+
+   * Fixed up Tacx Fortius Support - Dave Waterworth has updated the
+     original beta code for Fortius support to now make the Fortius and
+     fully supported device in train view.
+
+   * Joule GPS updates - the latest firmware is now supported and no
+     longer crashes GC (!).
+
+   * FIT ride file updates - better support for custom FIT sections that
+     are being used by vendors to suport localised data.
+
+   * Pedal Smoothness / Torque Effectiveness support - the Rotor and
+     Vector data series are now extracted and stored in ridefiles and
+     can be plotted alongside all the other ride data series on
+     performance, scatter and histogram plots.
+
+   * Moxy support - we have added support for the Moxy SM02 monitor and
+     can be imported and merged with ride data using the new merge
+     dialog.
+
+1.4 New Metrics Implemented
+===========================
+
+We have implemented a lot of new science in 3.1 and along with that
+there are a lot of associated metrics:
+
+   * Plot bests - It is now possible to plot user-defined durations for
+     power bests.  For example it is now possible to plot 13s power
+     best, but we have extended this to cover all ride data series, so
+     you can plot best durations for heartrate, speed, cadence and so on
+     within a metric trends chart.  This feature has been the most
+     requested feature since LTM was implemeted in 2010, so we've
+     finally got there.
+
+   * Plot Model Estimates - With the new PD models we also derive
+     estimates for W', CP et al using each of the models.  These can
+     then be plotted; an example 'CP History' plot in the trends view is
+     provide as an example.
+
+   * W'bal implemented with metrics - The W'bal data series is derived
+     from power data and can be plotted alongside all other ride data.
+     It has also been implemented within the erg plot to assess ERG
+     workouts before attempting them.
+
+   * TISS implemented - An an Ae TISS have been implemented and can be
+     plotted as data series within a ride but also as inputs into a PMC
+     chart.  An example 'Stress' chart is provided to plot these in the
+     Trends and Rides view.
+
+   * aPower - We have implemented Altitude Power to adjust recorded
+     power to take into account the effect of altitude on vo2max and
+     thus power output.  This can be plotted alongside all other ride
+     data series.
+
+   * Polarised Zones - Histogram chart will now plot power histograms in
+     Polarised Zones as well as the more familar Coggan 7 levels.
+
+   * Pacing Index / Fatigue Index - Experimentally added to help review
+     interval efforts.
+
+   * W' work - To compliment W'bal and Work metrics we now isolate and
+     can track how much W' energy is being expended.  This is closely
+     related to tracking Anaerobic training.
+
+   * Average Pedal Smoothness / Torque Efficiency - the Rotor/Vector
+     metrics can be plotted alongside ride data but also as average
+     metrics to track across weeks, months and seasons.
+
+1.5 Chart Enhancements
+======================
+
+We have made significant changes across all the charts in 3.1.  These
+have been added to support the new models and science and also to try
+and enhance the utility and user experience.
+
+   * LTM Chart - It is now possible to select charts via a Chart
+     selection sidebar thus reducing the number of charts needed to be
+     pre-configured on the chart bar.  We have also tidied up the LTM
+     settings dialog and improved the UX for setting up charts in the
+     first place.  To support the new compare mode we have also added a
+     Stack mode and a Data table mode to look at series in isolation or
+     just review the numbers.  It is also now possible to export the
+     chart data to manipulate or analyse in other tools.  Lastly, we
+     have also added Labels and Quadratic trend lines to create charts
+     that are more readable without resorting to tooltips and guess
+     work.
+
+   * CP Chart - The critical power chart has seen a lot of new features
+     added both to support the new PD models but also to provide the
+     possibility to plot and compare intervals.  The key new features
+     include User selectable CP models and the ability to fine tune the
+     search intervals used by each of the 4 models.  It is also now
+     possible to plot rates of change for power, heartrate etc and also
+     to plot heat and heat by age.  You can also plot a ride as
+     percentge of best or as a centile.  And as with the LTM charts it
+     is also possible to export the PD data and model to review and
+     assess in other tools.
+
+   * Ride Chart - It is now possible to plot lots of derived series; NP,
+     W'bal, xPower, Delta etc and also to plot each series in its own
+     chart with all series shown as a 'stack'.  We have also finally
+     added the ability to create and edit reference lines for power and
+     have added an overlay to display interval data as you hover or
+     select them in the plot.
+
+   * Summary Chart - It is mostly unchanged but will now also support
+     displaying user defined metrics for Athlete Bests for the date
+     range selected.  It will also show model estimates that apply to
+     the ride or for the date range being summarised.
+
+1.6 Code refactoring and 300 issues fixed
+=========================================
+
+Since we release 3.0 in June 2013 we've been busily updating the code to
+fix lots and lots of nits and errors, but also slowly adjusting the code
+to provide a better platform for new features.
+
+We have deferred almost all features related to indoor training to a
+release 3.11 that is planned for the beginning of 2015 with development
+starting in August 2014.
+
+However, some of the (boring, tehcnical) foundational things that
+changed in 3.1 include:
+
+   * QT 5.3 is now supported; so QT video support, QML, Qt Json, faster
+     webkit and for the future, possible support for IOS and Android
+     devices.
+
+   * QWT 6.1 with multiaxis is now supported; lots of bug fixes and
+     better rendering on retina and high resolution displays.
+
+   * CP chart and AllPlot chart refactored to make it possible to extend
+     functionality e.g.  for new PD models and derived data series.
+
+Some of the functionality that has been fixed include reinstated support
+for Strava and Twitter.  We also have better native support for
+look-and-feel differences across the three platforms we currently
+support (Mac, Linux, Windows).
+
+We have also adjusted the startup mechanism to make it possible to
+select a different athlete or create a new one if recovering from a
+fatal crash.
+
+
+File: GC31-Release.info,  Node: CONTRIBUTORS,  Next: WHATS NEW,  Prev: WHATS NEW,  Up: Top
+
+2 Contributors
+**************
+
+2.1 Credits and Contributors
+============================
+
+The main contributors continue to be Mark, Damien and Gareth, but a few
+new contributors have joined the team in the last year and the future
+looks promising.  A particular shout out is deserved for Joern
+Rischmuller who has updated the GC Wiki to cover all functionality - so
+for the first time we have comprehensive user documentation.
+
+The following have all made a contribution to 3.1:
+
+Alejandro Martinez, Bruno Fernandez-Ruiz, Christian Stade-Schuldt,
+Damien Grauser, Dave Waterworth, Eric Johnson, Gareth Coco, Ilja Booij,
+Jaime Jofre, Joern Rischmuller, Jon Beverley, Jon Escombe, KURASHIKI
+Satoru, Mark Liversedge, Rainer Clasen, Ralf Spenneberg, Simon Egli,
+Stig B. Dørmænen, Tom Weichmann, Walter Bürki and Alex Delli.
+
+
+
+Tag Table:
+Node: Top88
+Node: WHATS NEW312
+Node: CONTRIBUTORS10389
+
+End Tag Table

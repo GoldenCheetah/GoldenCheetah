@@ -12,7 +12,7 @@ clean:
 
 MANUAL: GC3-Manual.pdf 
 FAQ: GC3-FAQ.pdf GC3-FAQ.info
-RELEASE: GC3-Release.pdf GC3-Release.info
+RELEASE: GC3-Release.pdf GC3-Release.info GC31-Release.pdf GC31-Release.info
 
 ## The basic commands, good on Linux/Mac
 ## need mingw on Windows
