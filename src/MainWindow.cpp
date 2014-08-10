@@ -219,6 +219,7 @@ MainWindow::MainWindow(const QDir &home)
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
     head = addToolBar(context->athlete->cyclist);
+    head->setObjectName(context->athlete->cyclist);
     head->setContentsMargins(20,0,20,0);
     head->setFloatable(false);
     head->setMovable(false);
