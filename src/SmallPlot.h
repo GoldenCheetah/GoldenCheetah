@@ -40,7 +40,7 @@ class SmallPlot : public QwtPlot
         int smoothing() const { return smooth; }
         void setData(RideItem *rideItem);
         void setData(RideFile *rideFile);
-        void setAxisTitle(int axis, QString label);
+        void setAxisTitle(QwtAxisId axis, QString label);
         void recalc();
         void setYMax();
         void setXTitle();
