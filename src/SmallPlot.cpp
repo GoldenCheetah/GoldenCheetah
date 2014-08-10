@@ -41,25 +41,27 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setXTitle();
-
-    wattsCurve = new QwtPlotCurve("Power");
-
-    //timeCurves.resize(36);// wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    wattsCurve->setPen(QPen(GColor(CPOWER)));
-    wattsCurve->attach(this);
-
-    hrCurve = new QwtPlotCurve("Heart Rate");
-    // hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    hrCurve->setPen(QPen(GColor(CHEARTRATE)));
-    hrCurve->attach(this);
+    setAxesCount(QwtAxis::yLeft, 2);
 
     altCurve = new QwtPlotCurve(tr("Altitude"));
     altCurve->setPen(QPen(GColor(CALTITUDE)));
     QColor brush_color = GColor(CALTITUDEBRUSH);
     brush_color.setAlpha(180);
     altCurve->setBrush(brush_color);
-    altCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,2).id);
+    altCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,1));
     altCurve->attach(this);
+
+    wattsCurve = new QwtPlotCurve("Power");
+    //timeCurves.resize(36);// wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    wattsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,0));
+    wattsCurve->setPen(QPen(GColor(CPOWER)));
+    wattsCurve->attach(this);
+
+    hrCurve = new QwtPlotCurve("Heart Rate");
+    // hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,0));
+    hrCurve->setPen(QPen(GColor(CHEARTRATE)));
+    hrCurve->attach(this);
 
     // grid lines on such a small plot look AWFUL
     //grid = new QwtPlotGrid();
@@ -181,36 +183,38 @@ void
 SmallPlot::setYMax()
 {
     double ymax = 0;
-    double y1max = 0;
+    double y1max = 500;
     QString ylabel = "";
     QString y1label = "";
     if (wattsCurve->isVisible()) {
         ymax = max(ymax, wattsCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + "Watts";
+        ylabel += QString((ylabel == "") ? "" : " / ") + tr("Watts");
     }
     if (hrCurve->isVisible()) {
         ymax = max(ymax, hrCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + "BPM";
+        ylabel += QString((ylabel == "") ? "" : " / ") + tr("BPM");
     }
     if (altCurve->isVisible()) {
-         y1max = altCurve->maxYValue();
+         y1max = max(y1max, altCurve->maxYValue());
          y1label = "m";
     }
-    setAxisScale(yLeft, 0.0, ymax * 1.1);
-    setAxisTitle(yLeft, ylabel);
-    setAxisScale(QwtAxisId(QwtAxis::yLeft,2).id, 0.0, y1max * 1.1);
-    setAxisTitle(QwtAxisId(QwtAxis::yLeft,2).id, y1label);
-    enableAxis(yLeft, false); // hide for a small plot
+    setAxisScale(QwtAxisId(QwtAxis::yLeft,0), 0.0, ymax * 1.1);
+    setAxisTitle(QwtAxisId(QwtAxis::yLeft,0), ylabel);
+    setAxisScale(QwtAxisId(QwtAxis::yLeft,1), 0.0, y1max * 1.1);
+    setAxisTitle(QwtAxisId(QwtAxis::yLeft,1), y1label);
+    setAxisVisible(QwtAxisId(QwtAxis::yLeft,0), false); // hide for a small plot
+    setAxisVisible(QwtAxisId(QwtAxis::yLeft,1), false); // hide for a small plot
 }
 
 void
 SmallPlot::setXTitle()
 {
     setAxisTitle(xBottom, tr("Time (minutes)"));
+    enableAxis(xBottom, true);
 }
 
 void
-SmallPlot::setAxisTitle(int axis, QString label)
+SmallPlot::setAxisTitle(QwtAxisId axis, QString label)
 {
     // setup the default fonts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
