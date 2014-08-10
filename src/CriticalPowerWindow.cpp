@@ -1091,7 +1091,7 @@ CriticalPowerWindow::rideSelected()
         }
         cpPlot->setRide(currentRide);
 
-        if (currentRide->ride() && currentRide->ride()->dataPoints().count() == 0)
+        if (!rangemode && currentRide->ride() && currentRide->ride()->dataPoints().count() == 0)
             setIsBlank(true);
         else
             setIsBlank(false);
