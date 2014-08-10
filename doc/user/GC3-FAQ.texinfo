@@ -9,7 +9,7 @@
 @paragraphindent 0
 
 @copying
-This manual is for Golden Cheetah, version 3.0.
+This manual is for Golden Cheetah, version 3.1.
 
 Copyright @copyright{} 2013 Mark Liversedge
 @end copying
@@ -35,7 +35,7 @@ Copyright @copyright{} 2013 Mark Liversedge
 @node Top,Top,Top,
 @top title
 
-This manual is for GoldenCheetah, version 3.0.
+This manual is for GoldenCheetah, version 3.1.
 @end ifnottex
 
 @menu
@@ -58,24 +58,24 @@ This manual is for GoldenCheetah, version 3.0.
 
 The details chart on the analysis view allows you to override metrics on the metrics tab. 
 By default the most common metrics are listed, including average HR, distance and so on.
-From v3.0 the default setup will also include TSS as a metric you can override here.
+From v3.1 the default setup will also include TSS as a metric you can override here.
 
 If the metric is not there you will need to configure GoldenCheetah to allow it to be shown.
-This is simple to do and described in 3.9 below.
+This is simple to do and described in 3.9 below. The 3.1 upgrade process should have added it
+to the Metric tab if it was not already there.
 
 @section How do I add or remove a chart?
 @cindex add
 @cindex remove
 
-To add a new chart to the view you can select from the + menu on the right hand side of 
-the scope bar (the scope bar is underneath the toolbar and lets you select from Home,
-Analysis, Train etc).
+To add a new chart to the view you can select from the hamburger menu on the right hand side of 
+the chart bar.
 
 Depending upon which view you are on the charts available will differ. For example realtime
 plots only appear on the Train view, whilst charts that work with individual rides will only
 appear on the analysis view.
 
-To remove a chart, when you mouse over a chart (in tabbed or tiled mode) a small triangle
+To remove a chart, when you mouse over a chart (in tabbed or tiled mode) the word 'More...'
 will appear in the top left of the chart. This is a menu drop down, if you click on it
 you will see a `Close' option. This is the option to remove (close) the chart.
 
@@ -110,7 +110,11 @@ the LTM plots.
 @section How do I plot x sec power best?
 @cindex best
 
-As of v3.0 it is still not possible to plot custom durations for power bests. We are
+In v3.1 it is now possible to plot custom durations for any data series on a metric
+trends chart in the Trends view. You will need to add a curve for the data series
+and select `Best' instead of `Metric' or `Estimate' on the curve settings.
+
+For v3.0 or earlier it is still not possible to plot custom durations for power bests. We are
 looking to add this in version 3.1, but for now you can only plot 1s, 5s, 10s, 15s, 20s,
 30s, 1min, 2min, 5min, 10min, 20min, 30min and 60min bests.
 
@@ -147,7 +151,7 @@ implement planning functionality in v3.1.
 @cindex settings
 
 All chart settings can be found under the drop down menu that appears in the top left hand
-corner of a chart when you mouse over it. They will appear as a popup dialog box.
+corner of a chart when you mouse over it, titled `More...'. They will appear as a popup dialog box.
 
 Additionally, when you move the cursor towards the title of a chart in a view that is tabbed
 (not tiled) then a small selection of the most important settings for the chart will appear
@@ -175,7 +179,23 @@ They are processed in the order they are defined with the first match being retu
 care when using values such as 'TT' and 'race' since these can also be part of an English
 word (e.g. ATTEMPT contains 'TT' and graceful contains 'race'.
 
+@section GoldenCheetah doesn't find my PowerTap on Ubuntu Linux.
+@cindex powertap
+@cindex cervo
+@cindex usb
 
+If you're using the USB cradle (as opposed to the older, serial one), the FTDI driver sometimes 
+conflicts with the braille terminal in the default Ubuntu installation. Try unplugging the PT cradle 
+from the computer and uninstalling brltty: sudo apt-get remove brltty
+Then plug the device back in and it should work.
+
+@section GoldenCheetah.dmg installation didn't seem to work.
+
+Are you running OS X Snow Leopard (10.6) or later? You need to be. If you are, and you're still
+having this problem, open Terminal (in Applications -> Utilities) and type this at the prompt:
+
+/Applications/GoldenCheetah.app/Contents/MacOS/GoldenCheetah then press <return>
+and send an email to the mailing list with whatever it prints out. We'll help you debug it.
 
 @node GENERAL,METRICS,MOST COMMON QUESTIONS OF ALL,Top
 @chapter GENERAL
@@ -417,7 +437,7 @@ dialog is designed to be simple and accept only the most common of entries.
 
 @section Can you calculate gradient, virtual power or other derived series from the ride data?
 
-Not in 3.0. We may introduce derived data series in the future.
+Not in 3.1. We plan to extend this functionality in v3.2.
 
 
 
@@ -447,8 +467,8 @@ To join two rides together (making one longer ride from two rides) you can copy 
 in the activity editor and paste special in the ride editor (right click) and then select
 append mode.
 
-If you wish to merge rides, that is much harder and would need to be performed outside
-of GC or by cutting and pasting columns in the activity editor.
+If you wish to merge rides, in v3.1 there is a new Activity->Merge wizard that will walk
+you through merging ride files and also provide the ability to synchronise timestamps.
 
 
 
@@ -567,22 +587,6 @@ using a free service they do not let you retrieve your data.
 
 
 
-@section Upload/Download with Strava fails?
-@cindex Strava
-
-Strava have switched off their v1 and v2 APIs before providing access to their
-v3 APIs. We have requested access to the new v3 API but it has not been granted.
-In the meantime to upload to Strava you can send an email to @email{upload@@strava.com} 
-from you registered email account attaching the ride in a format Strava supports.
-
-We remain committed to helping cyclists download their power data 
-to the computer of their choice, analyze it in whatever way they see fit, and 
-share their methods of analysis with others. 
-
-We will be deprecating support for Strava upload/download in v3 SP1 and have no
-immediate plans to provide support for it in the future.
-
-
 @section What settings do I need to get GoldenCheetah to upload to my Google Calendar?
 @cindex Google
 
@@ -643,8 +647,8 @@ Seasons and Events are created and edited in the sidebar for the Home view. Seas
 listed under date ranges, whilst events are listed under the events sidebar item. In
 both cases they can be created and deleted from the sidebar item's drop down menu.
 
-Please note that in v3.0 events can only be created when a user season is selected, since
-events are associated with a particular season. This constraint will be removed in v3.1.
+Please note that in v3.1 events can only be created when a user season is selected, since
+events are associated with a particular season. This constraint will be removed in v3.2.
 
 @node CHARTS,INDEX,SEASONS AND EVENTS,Top
 @chapter CHARTS
@@ -660,22 +664,6 @@ and select prior '3' to specify a month 3 years prior, similarly 'This' 'month' 
 prior '2' is a month 2 months ago, whilst 'This' 'month' and prior '1' is last month.
 
 'This' 'month' prior and 0 is just this month.
-
-
-
-@section How does the mean max chart calculate CP when showing power?
-@cindex CP
-@cindex algorithm
-
-The CP algorithm searches your best power for two durations; for anaerobic efforts it 
-looks between 15s and 1min, for aerobic it looks for best efforts between 10mins and
-an hour.
-
-Once it has found these two best values it will curve fit the two to enable the
-60min value to be extracted. Bear in mind this is a theoretical number and as described
-above is applicable to the BikeScore algorithm. The value for FTP that the TSS algorithm
-requires is simply the highest value for 60mins for the time period, assuming you have
-performed a 60minute test recently.
 
 
 
@@ -736,7 +724,8 @@ e.g. workout code, sport et al.
 @cindex colour
 
 With the exception of the Long Term Metric plots the colours on the charts are
-configured in the GoldenCheetah preferences pane.
+configured in the GoldenCheetah preferences pane. It is possible to apply a theme
+or change each individual color.
 
 We want to use the same colours to plot each data series across the charts, so you
 can change them globally.
