@@ -1,7 +1,7 @@
-This is GC3-FAQ.info, produced by makeinfo version 4.13 from
+This is GC3-FAQ.info, produced by makeinfo version 5.2 from
 GC3-FAQ.texinfo.
 
-This manual is for Golden Cheetah, version 3.0.
+This manual is for Golden Cheetah, version 3.1.
 
 Copyright (C) 2013 Mark Liversedge
 
@@ -11,7 +11,7 @@ File: GC3-FAQ.info,  Node: Top,  Next: Top,  Prev: Top
 title
 *****
 
-This manual is for GoldenCheetah, version 3.0.
+This manual is for GoldenCheetah, version 3.1.
 
 * Menu:
 
@@ -33,29 +33,30 @@ File: GC3-FAQ.info,  Node: MOST COMMON QUESTIONS OF ALL,  Next: GENERAL,  Prev: 
 1.1 How do I override / manually enter TSS for a ride?
 ======================================================
 
-The details chart on the analysis view allows you to override metrics
-on the metrics tab.  By default the most common metrics are listed,
-including average HR, distance and so on.  From v3.0 the default setup
+The details chart on the analysis view allows you to override metrics on
+the metrics tab.  By default the most common metrics are listed,
+including average HR, distance and so on.  From v3.1 the default setup
 will also include TSS as a metric you can override here.
 
 If the metric is not there you will need to configure GoldenCheetah to
 allow it to be shown.  This is simple to do and described in 3.9 below.
+The 3.1 upgrade process should have added it to the Metric tab if it was
+not already there.
 
 1.2 How do I add or remove a chart?
 ===================================
 
-To add a new chart to the view you can select from the + menu on the
-right hand side of the scope bar (the scope bar is underneath the
-toolbar and lets you select from Home, Analysis, Train etc).
+To add a new chart to the view you can select from the hamburger menu on
+the right hand side of the chart bar.
 
 Depending upon which view you are on the charts available will differ.
 For example realtime plots only appear on the Train view, whilst charts
 that work with individual rides will only appear on the analysis view.
 
-To remove a chart, when you mouse over a chart (in tabbed or tiled
-mode) a small triangle will appear in the top left of the chart. This
-is a menu drop down, if you click on it you will see a `Close' option.
-This is the option to remove (close) the chart.
+To remove a chart, when you mouse over a chart (in tabbed or tiled mode)
+the word 'More...'  will appear in the top left of the chart.  This is a
+menu drop down, if you click on it you will see a 'Close' option.  This
+is the option to remove (close) the chart.
 
 1.3 Can I enter my weight and track/plot it?
 ============================================
@@ -63,16 +64,16 @@ This is the option to remove (close) the chart.
 Weight can be maintained in 3 ways;
 
    * Every athlete is setup with a weight value - this is the fallback
-     value should no     other weight measure be available. It can be
-     found under preferences and athlete.
+     value should no other weight measure be available.  It can be found
+     under preferences and athlete.
 
-   * The 'Weight' field can be maintained in the details screen. This
-     is found on the     'Workout' tab in the details screen by
-     default. Any entry here will be used for this ride     ONLY.
+   * The 'Weight' field can be maintained in the details screen.  This
+     is found on the 'Workout' tab in the details screen by default.
+     Any entry here will be used for this ride ONLY.
 
-   * You can download weight from a withings scale. This is performed
-     manually via the     menu option Tools->Get Withings Data. This is
-     then used to update the local measures     database.
+   * You can download weight from a withings scale.  This is performed
+     manually via the menu option Tools->Get Withings Data.  This is
+     then used to update the local measures database.
 
 When calculating W/KG the Activity value is used if present, if not we
 then fall back to the last Withing measure that was collected, and if
@@ -85,20 +86,25 @@ plotted separately in the LTM plots.
 1.4 How do I plot x sec power best?
 ===================================
 
-As of v3.0 it is still not possible to plot custom durations for power
-bests. We are looking to add this in version 3.1, but for now you can
-only plot 1s, 5s, 10s, 15s, 20s, 30s, 1min, 2min, 5min, 10min, 20min,
-30min and 60min bests.
+In v3.1 it is now possible to plot custom durations for any data series
+on a metric trends chart in the Trends view.  You will need to add a
+curve for the data series and select 'Best' instead of 'Metric' or
+'Estimate' on the curve settings.
+
+For v3.0 or earlier it is still not possible to plot custom durations
+for power bests.  We are looking to add this in version 3.1, but for now
+you can only plot 1s, 5s, 10s, 15s, 20s, 30s, 1min, 2min, 5min, 10min,
+20min, 30min and 60min bests.
 
 1.5 I can't find Aerolab / Performance Manager?
 ===============================================
 
-By default we do not add these charts to the layout. Aerolab can be
-added to the Analysis view via the '+' menu found to the right hand
-side of the GoldenCheetah scope bar.
+By default we do not add these charts to the layout.  Aerolab can be
+added to the Analysis view via the '+' menu found to the right hand side
+of the GoldenCheetah scope bar.
 
 Similarly, the Performance manager can be added to the Home layout via
-the '+' menu. We may deprecate this chart in the near future since the
+the '+' menu.  We may deprecate this chart in the near future since the
 LTM charts can be used to plot a PMC and we expect to implement an
 interactive PMC for planning in v3.1.
 
@@ -107,31 +113,31 @@ interactive PMC for planning in v3.1.
 
 It has been deprecated since the Diary view allows you to summarise by
 day, week and month and add charts to the view that summarise for the
-selection. As the weekly summary was fixed on specific charts and did
-not handle other selections (e.g. monthly) it has been deprecated in
+selection.  As the weekly summary was fixed on specific charts and did
+not handle other selections (e.g.  monthly) it has been deprecated in
 view of the diary view.
 
 At present you can treat the Diary view as you would have the weekly
-summary - they offer the same functionality. We expect the diary view
+summary - they offer the same functionality.  We expect the diary view
 to extend to planned workouts when we implement planning functionality
 in v3.1.
 
 1.7 Where are all the chart settings?
 =====================================
 
-All chart settings can be found under the drop down menu that appears
-in the top left hand corner of a chart when you mouse over it. They
-will appear as a popup dialog box.
+All chart settings can be found under the drop down menu that appears in
+the top left hand corner of a chart when you mouse over it, titled
+'More...'.  They will appear as a popup dialog box.
 
-Additionally, when you move the cursor towards the title of a chart in
-a view that is tabbed (not tiled) then a small selection of the most
+Additionally, when you move the cursor towards the title of a chart in a
+view that is tabbed (not tiled) then a small selection of the most
 important settings for the chart will appear for convenience.
 
 1.8 Where is the preferences / options panel?
 =============================================
 
 On a Mac the configurations page can be found under 'GoldenCheetah ->
-Preferences' on the main menu. Whilst on all other platforms it is
+Preferences' on the main menu.  Whilst on all other platforms it is
 found via 'Tools -> Options'.
 
 We do this to match the general guidelines for the operating system.
@@ -142,14 +148,34 @@ We do this to match the general guidelines for the operating system.
 Activities are coloured according to keywords embedded in their details
 (metadata) you can configure the field that is used and the values that
 are matched and the colours they are shown in from the preferences pane
-via the 'Data Fields' toolbar option then select Notes Processing. The
+via the 'Data Fields' toolbar option then select Notes Processing.  The
 keywords and related words are scanned for to determine if the
 associated colour should be used for this ride.
 
 They are processed in the order they are defined with the first match
-being returned. Take care when using values such as 'TT' and 'race'
-since these can also be part of an English word (e.g. ATTEMPT contains
+being returned.  Take care when using values such as 'TT' and 'race'
+since these can also be part of an English word (e.g.  ATTEMPT contains
 'TT' and graceful contains 'race'.
+
+1.10 GoldenCheetah doesn't find my PowerTap on Ubuntu Linux.
+============================================================
+
+If you're using the USB cradle (as opposed to the older, serial one),
+the FTDI driver sometimes conflicts with the braille terminal in the
+default Ubuntu installation.  Try unplugging the PT cradle from the
+computer and uninstalling brltty: sudo apt-get remove brltty Then plug
+the device back in and it should work.
+
+1.11 GoldenCheetah.dmg installation didn't seem to work.
+========================================================
+
+Are you running OS X Snow Leopard (10.6) or later?  You need to be.  If
+you are, and you're still having this problem, open Terminal (in
+Applications -> Utilities) and type this at the prompt:
+
+/Applications/GoldenCheetah.app/Contents/MacOS/GoldenCheetah then press
+<return> and send an email to the mailing list with whatever it prints
+out.  We'll help you debug it.
 
 
 File: GC3-FAQ.info,  Node: GENERAL,  Next: METRICS,  Prev: MOST COMMON QUESTIONS OF ALL,  Up: Top
@@ -161,31 +187,31 @@ File: GC3-FAQ.info,  Node: GENERAL,  Next: METRICS,  Prev: MOST COMMON QUESTIONS
 ==========================
 
 GoldenCheetah is primarily a program for cyclists that own a power
-meter. It allows them to record, track and review their performance
-against recorded data. It also allows you to ride your turbo and
+meter.  It allows them to record, track and review their performance
+against recorded data.  It also allows you to ride your turbo and
 collect data as you ride.
 
-If you do not have a power meter then some of the functionality will
-not be of use to you as a cyclist. But you can still record and track
-progress. We support HR based TRIMP metrics for a HR based PMC for
+If you do not have a power meter then some of the functionality will not
+be of use to you as a cyclist.  But you can still record and track
+progress.  We support HR based TRIMP metrics for a HR based PMC for
 example.
 
 2.2 What is a good book or resource on training with power?
 ===========================================================
 
 Unquestionably the bible for working with a power meter is Training and
-Racing with a Power Meter by Hunter Allan and Andy Coggan. Make sure
+Racing with a Power Meter by Hunter Allan and Andy Coggan.  Make sure
 you look at the 2nd edition since it is revised quite dramatically.
-Whilst it is heavily  biased towards WKO+ as a software package most of
+Whilst it is heavily biased towards WKO+ as a software package most of
 the functions of note are also available in GoldenCheetah.
 
 2.3 Where can I download the installer for GoldenCheetah ?
 ==========================================================
 
-Stable releases are available from `http://www.goldencheetah.org'
-whilst the latest and greatest code build is available from
-`http://goldencheetah.stand2surf.net'. Development builds are for the
-brave, since they may contain bugs. In reality the development builds
+Stable releases are available from <http://www.goldencheetah.org> whilst
+the latest and greatest code build is available from
+<http://goldencheetah.stand2surf.net>.  Development builds are for the
+brave, since they may contain bugs.  In reality the development builds
 are a changing feast and often contain latest fixes too.
 
 2.4 Where can I get the source code?
@@ -193,23 +219,23 @@ are a changing feast and often contain latest fixes too.
 
 The GoldenCheetah source code is hosted on github and can be cloned
 using the following url;
-`git://github.com/GoldenCheetah/GoldenCheetah.git'
+'git://github.com/GoldenCheetah/GoldenCheetah.git'
 
 2.5 I am a triathlete is GoldenCheetah appropriate for me?
 ==========================================================
 
-GoldenCheetah is not a multi-sport program. For tracking cycling
-performance it is a good choice. But if you are looking for running and
+GoldenCheetah is not a multi-sport program.  For tracking cycling
+performance it is a good choice.  But if you are looking for running and
 swimming metrics and tracking then these features are not available at
-present. It is an excellent choice for analysing cycling aspects of
+present.  It is an excellent choice for analysing cycling aspects of
 triathlon, or working on the trainer.
 
 2.6 Is there a mailing list?
 ============================
 
-The mailing list for GoldenCheetah users is maintained via Google
-Groups at
-`http://groups.google.com/forum/?fromgroups=#forum/golden-cheetah-users'
+The mailing list for GoldenCheetah users is maintained via Google Groups
+at
+<http://groups.google.com/forum/?fromgroups=#forum/golden-cheetah-users>
 the first post you make is moderated and may take a while to appear.
 Once your first post is made you can make future posts without
 moderation.
@@ -217,16 +243,16 @@ moderation.
 2.7 How do I report a bug or request a new feature?
 ===================================================
 
-We use Github issues to record bugs and feature requests. You will need
+We use Github issues to record bugs and feature requests.  You will need
 to create an account on github and then post a new request or bug at
-`http://www.github.com/GoldenCheetah/GoldenCheetah/issues'
+<http://www.github.com/GoldenCheetah/GoldenCheetah/issues>
 
 2.8 How can I contribute?
 =========================
 
 Patches are most welcome via the mailing list or a pull request in
-github. Of equal importance is the timely reporting of bugs and help in
-testing fixes. We also desperately need volunteers to translate into
+github.  Of equal importance is the timely reporting of bugs and help in
+testing fixes.  We also desperately need volunteers to translate into
 non-English languages and help with writing documentation including the
 maintenance of this FAQ.
 
@@ -236,8 +262,8 @@ list.
 2.9 Can I donate to the project?
 ================================
 
-We are an open source project. Our software is developed by a
-community. We do not have any facility to collect funding or spend it!
+We are an open source project.  Our software is developed by a
+community.  We do not have any facility to collect funding or spend it!
 We would rather you spread the word if you think our software is good,
 and maybe help out with documentation, tutorials or translations if you
 can.
@@ -251,70 +277,70 @@ File: GC3-FAQ.info,  Node: METRICS,  Next: DATA,  Prev: GENERAL,  Up: Top
 3.1 What is the difference between xPower, NP and Daniels EqP?
 ==============================================================
 
-They all serve the same purpose - to express the variable power you
-have generated over a given period of time as a single value. This is
-so you can quantify the intensity of the ride and therefore the
-training stress of the ride.
+They all serve the same purpose - to express the variable power you have
+generated over a given period of time as a single value.  This is so you
+can quantify the intensity of the ride and therefore the training stress
+of the ride.
 
 In practice, NP and xPower are largely the same, whilst Daniels EqP
-place much higher emphasise on upper intensity work. For more info on
+place much higher emphasise on upper intensity work.  For more info on
 xPower see Dr Skiba's paper on BikeScore
-`http://www.physfarm.com/bikescore.pdf'
+<http://www.physfarm.com/bikescore.pdf>
 
 3.2 What is the difference between CP and FTP?
 ==============================================
 
 CP is a shorthand for CP60 in GoldenCheetah, and is computed using the
-Scherer/Monod protocol using 3 and 20 minutes. Functional Threshold
-Power (FTP) is an actual measure of the power an athlete sustains for
-60 minutes.
+Scherer/Monod protocol using 3 and 20 minutes.  Functional Threshold
+Power (FTP) is an actual measure of the power an athlete sustains for 60
+minutes.
 
 Since it is very difficult for an athlete to maintain the desired
 intensity FTP 'reality' tends to result in a number that is much lower
-than CP 'theory'. Often users will consider the two as the same.
+than CP 'theory'.  Often users will consider the two as the same.
 
-In GC we compute TSS and BikeScore using your 'CP' value. If you set it
-to your FTP value TSS will be accurate, BikeScore is likely to be
-lower. And if you set it to your CP value BikeScore will be accurate,
-but TSS will be overstated.
+In GC we compute TSS and BikeScore using your 'CP' value.  If you set it
+to your FTP value TSS will be accurate, BikeScore is likely to be lower.
+And if you set it to your CP value BikeScore will be accurate, but TSS
+will be overstated.
 
 3.3 Why does my CP chart show higher watts for a longer duration?
 =================================================================
 
 A higher power average for a longer time is possible if an effort has
-been "book ended".  If, for example, you did a massive 30 second
-effort, followed by freewheeling for 29:30 then another massive 30
-second effort, then your best average for a continuous 30 minutes would
-in fact be lower that your best average for a continuous 30minutes and
-30 seconds.  (Thanks for Jon Hill from the Golden Cheetah Users mailing
+been "book ended".  If, for example, you did a massive 30 second effort,
+followed by freewheeling for 29:30 then another massive 30 second
+effort, then your best average for a continuous 30 minutes would in fact
+be lower that your best average for a continuous 30minutes and 30
+seconds.  (Thanks for Jon Hill from the Golden Cheetah Users mailing
 list for this example).
 
 3.4 Can I set a different CP/FTP for different reasons e.g. CP/FTP on a trainer?
 ================================================================================
 
-We allow you to override the CP value for a specific ride by setting
-the "CP" field to the value you wish to use for the ride in question.
-We do not have a concept of 'separate' Cps for different purposes - you
-will need to specify the CP when the data is imported into GC. But this
+We allow you to override the CP value for a specific ride by setting the
+"CP" field to the value you wish to use for the ride in question.  We do
+not have a concept of 'separate' Cps for different purposes - you will
+need to specify the CP when the data is imported into GC. But this
 allows you to make manual adjustments.
 
 We provide this functionality at user request - we do not endorse the
-concept of multiple CP values. But we do recognise the ongoing debate
+concept of multiple CP values.  But we do recognise the ongoing debate
 regarding physiological stress from working on a trainer vs on the road.
 
 3.5 How do I seed the CTL for my PMC?
 =====================================
 
 You can seed the starting CTL (we call it LTS, for long term stress)
-when you define a season. That way it is re-usable in a number of
-places. To do this you edit the season (date range) in the Home View
+when you define a season.  That way it is re-usable in a number of
+places.  To do this you edit the season (date range) in the Home View
 and can set the Starting LTS.
 
 3.6 Why is elevation different in GoldenCheetah to my other training software / website?
 ========================================================================================
 
 Different programs will use different hysteresis values to smooth the
-small changes in altitude. In GC we use a hysteresis value of 3m.
+small changes in altitude.  In GC we use a hysteresis value of 3m.
 
 If this is of great concern you can adjust the hysteresis value in
 preferences under the general tab.
@@ -322,70 +348,70 @@ preferences under the general tab.
 3.7 Why is a metric e.g. TSS or average power different in GoldenCheetah to Garmin Connect?
 ===========================================================================================
 
-The algorithms for calculating TSS, AP etc are static. They are
+The algorithms for calculating TSS, AP etc are static.  They are
 implemented exactly the same way in GoldenCheetah, Garmin Connect,
-TrainingPeaks etc. The algorithms are extremely simple and not prone to
+TrainingPeaks etc.  The algorithms are extremely simple and not prone to
 difficulty in implementation.
 
 However, how each application treats pauses and stops or loss of data
-accounts for most differences. In GoldenCheetah we always calculate
-AP,TSS etc including stop time. Other applications choose to ignore or
+accounts for most differences.  In GoldenCheetah we always calculate
+AP,TSS etc including stop time.  Other applications choose to ignore or
 smooth segments of short duration.
 
 In addition, if there are anomalies in your data, with large gaps or
 even time going backwards, this will drastically affect GoldenCheetah's
 calculations.
 
-We NEVER attempt to interpret data anomalies - if the results are not
-as you would expect you will need to correct the data. We do not
-'silently' fix the data for you. There is no secret sauce in
+We NEVER attempt to interpret data anomalies - if the results are not as
+you would expect you will need to correct the data.  We do not
+'silently' fix the data for you.  There is no secret sauce in
 GoldenCheetah, we are open and transparent with your data.
 
 3.8 How do I set the metrics shown for intervals in the various summaries?
 ==========================================================================
 
 In the GoldenCheetah preference pane under the Metrics tab you can
-choose the metrics that will be shown in the ride summary charts and
-the metrics that will be shown in the interval summary in the analysis
+choose the metrics that will be shown in the ride summary charts and the
+metrics that will be shown in the interval summary in the analysis
 sidebar.
 
 3.9 How do I add a metric to the details screen (so I can override it) ?
 ========================================================================
 
-If the metric you want (e.g. TSS) is not shown then you will need to
-add it via the GoldenCheetah preferences pane. On Mac this is from the
-menu option GoldenCheetah->Preferences whilst on Windows and Linux it
-is under Tools->Options.
+If the metric you want (e.g.  TSS) is not shown then you will need to
+add it via the GoldenCheetah preferences pane.  On Mac this is from the
+menu option GoldenCheetah->Preferences whilst on Windows and Linux it is
+under Tools->Options.
 
 You will need to select 'Data Fields' option from preferences toolbar
-and then the 'fields' tab. You will see a list of fields that are
-associated with a particular screen tab. If you scroll down you should
+and then the 'fields' tab.  You will see a list of fields that are
+associated with a particular screen tab.  If you scroll down you should
 find entries for the 'Metrics' screen tab, you can insert a new entry
-here with the '+' button. You should make sure the new entry is called
+here with the '+' button.  You should make sure the new entry is called
 exactly the same thing as the metric in question.
 
-For 'TSS' this is relatively straight forward. For others, e.g.
+For 'TSS' this is relatively straight forward.  For others, e.g.
 'Average Heart Rate' you must make sure that the name includes spaces
-etc. Once your metric has been added to the configuration you should
+etc.  Once your metric has been added to the configuration you should
 save that and return to the details screen where you can now maintain
 it.
 
-If you are creating a manual entry then there is no 'details' tab in
-the dialog. Once you have created the entry (and again in this case TSS
-can be entered in the dialog) you should go to the details tab to
-maintain any other specific fields. The manual entry dialog is designed
-to be simple and accept only the most common of entries.
+If you are creating a manual entry then there is no 'details' tab in the
+dialog.  Once you have created the entry (and again in this case TSS can
+be entered in the dialog) you should go to the details tab to maintain
+any other specific fields.  The manual entry dialog is designed to be
+simple and accept only the most common of entries.
 
 3.10 Can you calculate gradient, virtual power or other derived series from the ride data?
 ==========================================================================================
 
-Not in 3.0. We may introduce derived data series in the future.
+Not in 3.1.  We plan to extend this functionality in v3.2.
 
 3.11 Can I export metrics or access the metric database GC uses?
 ================================================================
 
 The metrics are stored within a Sqlite 3 Database called 'metricDBv3'
-that can be found in the athlete directory. You can use any Sqlite 3
+that can be found in the athlete directory.  You can use any Sqlite 3
 tools to query and work with the db.
 
 Alternatively you can export the db in its entirety using the
@@ -408,19 +434,19 @@ To join two rides together (making one longer ride from two rides) you
 can copy rows in the activity editor and paste special in the ride
 editor (right click) and then select append mode.
 
-If you wish to merge rides, that is much harder and would need to be
-performed outside of GC or by cutting and pasting columns in the
-activity editor.
+If you wish to merge rides, in v3.1 there is a new Activity->Merge
+wizard that will walk you through merging ride files and also provide
+the ability to synchronise timestamps.
 
 4.2 How can I find 'spikes' or specific values in activity data?
 ================================================================
 
-The activity editor has a function to find data on its toolbar. You can
+The activity editor has a function to find data on its toolbar.  You can
 specify a range or upper or lower limit and find values less than,
 greater than or between a range of values.
 
 Additionally, the editor will scan the file looking for anomalies -
-where the data appears to be out of normal ranges. These are shown with
+where the data appears to be out of normal ranges.  These are shown with
 a wiggly red line in the editor and can also be listed by clicking on
 the anomalies icon on the editor toolbar.
 
@@ -430,24 +456,24 @@ anomalies in the currently selected ride.
 4.3 How can I fix 'spikes' or 'anomalies' in activity data?
 ===========================================================
 
-You can either manually edit the values in the activity editor (there
-is full undo and redo in the editor). Or you can use the fix tools that
+You can either manually edit the values in the activity editor (there is
+full undo and redo in the editor).  Or you can use the fix tools that
 are listed under the tool menu option (fix power spikes, fix gaps in
 recording, fix gps errors, fix torque.
 
-Each of the fix tools opens a dialog that displays texts to explain
-what the fix tool does.
+Each of the fix tools opens a dialog that displays texts to explain what
+the fix tool does.
 
 4.4 How can I add/remove a field to edit on the details screen?
 ===============================================================
 
 The fields (metadata) that is editable can be configured in the
-preferences pane under the data fields tab. Where no screen is
+preferences pane under the data fields tab.  Where no screen is
 specified (its left blank) it will not be made available.
 
 GoldenCheetah ships with a number of fields defined in the config but
 with no screen set.  If you wish to use them simply set the screen tab
-to the tab you would like it to be shown on. To remove a field set the
+to the tab you would like it to be shown on.  To remove a field set the
 field tab to blank.
 
 4.5 What are 'special fields' ?
@@ -459,10 +485,9 @@ purposes.
 
 Some examples include;
 
-Weight - used in W/KG calculations, Sport and Workout code are     used
-when exporting to other file formats, Identifier is used to assign a
-UUID to the     activity when it is uploaded to online services and so
-on.
+Weight - used in W/KG calculations, Sport and Workout code are used when
+exporting to other file formats, Identifier is used to assign a UUID to
+the activity when it is uploaded to online services and so on.
 
 There is a full list of special fields and their meaning in the Golden
 Cheetah user guide appendices.
@@ -470,8 +495,8 @@ Cheetah user guide appendices.
 4.6 How do I find/add/sort/delete/edit intervals ?
 ==================================================
 
-The context menu (on the right hand side of the splitter handle) for
-the interval sidebar in Analysis view contains a number of options for
+The context menu (on the right hand side of the splitter handle) for the
+interval sidebar in Analysis view contains a number of options for
 working with intervals.
 
 Additionally, you can click and drag on the performance (aka ride) plot
@@ -486,13 +511,13 @@ Activity->Export allows you to export the activity to csv, fitlog, gc
 4.8 Can I use GC to convert data from one format to another on the command line?
 ================================================================================
 
-No. It is something we may add in v3.1
+No.  It is something we may add in v3.1
 
 4.9 Can I delete an athlete and all his/her data?
 =================================================
 
-No. It must be done manually by removing the athlete directory via the
-operating system. Please ensure you do this when GoldenCheetah is not
+No.  It must be done manually by removing the athlete directory via the
+operating system.  Please ensure you do this when GoldenCheetah is not
 running.
 
 
@@ -505,7 +530,7 @@ File: GC3-FAQ.info,  Node: UPLOADING AND DOWNLOADING,  Next: SEASONS AND EVENTS,
 ==================================================
 
 The Sport field in TrainingPeaks must have very specific values,
-although this is not documented in the XML Schema. We recommend using a
+although this is not documented in the XML Schema.  We recommend using a
 sport of "Bike" if you plan on uploading rides to training peaks.
 
 5.2 Why does download from TrainingPeaks say I need a premium account?
@@ -514,48 +539,32 @@ sport of "Bike" if you plan on uploading rides to training peaks.
 Training Peaks only allow paid up members to get access to their data.
 If you are using a free service they do not let you retrieve your data.
 
-5.3 Upload/Download with Strava fails?
-======================================
-
-Strava have switched off their v1 and v2 APIs before providing access
-to their v3 APIs. We have requested access to the new v3 API but it has
-not been granted.  In the meantime to upload to Strava you can send an
-email to <upload@strava.com> from you registered email account
-attaching the ride in a format Strava supports.
-
-We remain committed to helping cyclists download their power data to
-the computer of their choice, analyze it in whatever way they see fit,
-and share their methods of analysis with others.
-
-We will be deprecating support for Strava upload/download in v3 SP1 and
-have no immediate plans to provide support for it in the future.
-
-5.4 What settings do I need to get GoldenCheetah to upload to my Google Calendar?
+5.3 What settings do I need to get GoldenCheetah to upload to my Google Calendar?
 =================================================================================
 
 The upload to Google Calendar uses their CalDAV API, and as such needs
-to specify a collection. This means when entering the details in the
+to specify a collection.  This means when entering the details in the
 passwords pane of preferences you should use the following for the
 caldav url:
 
-`https://www.google.com/calendar/dav/xxxx@gmail.com/events/'
+<https://www.google.com/calendar/dav/xxxx@gmail.com/events/>
 
-Where xxxx is your username. The username will need to be repeated in
+Where xxxx is your username.  The username will need to be repeated in
 the username field and obviously set the password too.
 
-5.5 When setting up my Withings wifi scales where do I get the userid and key ?
+5.4 When setting up my Withings wifi scales where do I get the userid and key ?
 ===============================================================================
 
 You will need to login to your Withings account
-(`http://my.withings.com') and click on the `share' button at the top
-of the dashboard. From there you will get a popup box with lots of
+(<http://my.withings.com>) and click on the 'share' button at the top of
+the dashboard.  From there you will get a popup box with lots of
 options.
 
-If you click on `share on my website' you will be greeted with a number
-of code snippets you can embed in a web page. If you look closely in
-the top right hand corner there will be a box containing the user id
-and public key. These are the two values you need to enter into the
-options dialog.
+If you click on 'share on my website' you will be greeted with a number
+of code snippets you can embed in a web page.  If you look closely in
+the top right hand corner there will be a box containing the user id and
+public key.  These are the two values you need to enter into the options
+dialog.
 
 You will now be able to retrieve withings data via the tools menu.
 
@@ -568,31 +577,31 @@ File: GC3-FAQ.info,  Node: SEASONS AND EVENTS,  Next: CHARTS,  Prev: UPLOADING A
 6.1 Why are there different types of seasons?
 =============================================
 
-This is to help with planning functions. As of v3 there is no real
+This is to help with planning functions.  As of v3 there is no real
 distinction made.  Adhoc seasons are expected to be used solely as date
 ranges and have no associated plan.  Whilst other season types may
-contain plans. This is only relevant for planning functions that are
+contain plans.  This is only relevant for planning functions that are
 not available yet.
 
 6.2 What is event used for?
 ===========================
 
 It is only used to annotate a LTM chart - so you can show an 'event'
-that happened at a particular date. There are no rules about what
-constitutes and event. It could be a race, a training camp or just a
-day that was particularly meaningful e.g. illness, crash.
+that happened at a particular date.  There are no rules about what
+constitutes and event.  It could be a race, a training camp or just a
+day that was particularly meaningful e.g.  illness, crash.
 
 6.3 How do create/edit/delete seasons and events?
 =================================================
 
 Seasons and Events are created and edited in the sidebar for the Home
-view. Seasons are listed under date ranges, whilst events are listed
-under the events sidebar item. In both cases they can be created and
+view.  Seasons are listed under date ranges, whilst events are listed
+under the events sidebar item.  In both cases they can be created and
 deleted from the sidebar item's drop down menu.
 
-Please note that in v3.0 events can only be created when a user season
-is selected, since events are associated with a particular season. This
-constraint will be removed in v3.1.
+Please note that in v3.1 events can only be created when a user season
+is selected, since events are associated with a particular season.  This
+constraint will be removed in v3.2.
 
 
 File: GC3-FAQ.info,  Node: CHARTS,  Next: INDEX,  Prev: SEASONS AND EVENTS,  Up: Top
@@ -610,85 +619,70 @@ similarly 'This' 'month' and prior '2' is a month 2 months ago, whilst
 
 'This' 'month' prior and 0 is just this month.
 
-7.2 How does the mean max chart calculate CP when showing power?
-================================================================
-
-The CP algorithm searches your best power for two durations; for
-anaerobic efforts it looks between 15s and 1min, for aerobic it looks
-for best efforts between 10mins and an hour.
-
-Once it has found these two best values it will curve fit the two to
-enable the 60min value to be extracted. Bear in mind this is a
-theoretical number and as described above is applicable to the
-BikeScore algorithm. The value for FTP that the TSS algorithm requires
-is simply the highest value for 60mins for the time period, assuming
-you have performed a 60minute test recently.
-
-7.3 How should I use Aerolab?
+7.2 How should I use Aerolab?
 =============================
 
 The following is a brief piece of advice from Robert Chung, from a
 discussion on the Golden Cheetah Users mailing list:
 
-Ideally, you'll want calm conditions (both in terms of wind and
-traffic) but here's a     quickie test you can do just to get a handle
-on what to do. Try to find a loop without     stop signs, or an
-out-and-back with maybe a little dip or something in the middle. Make
- sure you won't get hit by a car and have good sight lines. I just go
-around my block a     few times. Do a loop in the drops, then another
-loop faster, then a loop slower; then     repeat with your hands on the
-hoods.
+Ideally, you'll want calm conditions (both in terms of wind and traffic)
+but here's a quickie test you can do just to get a handle on what to do.
+Try to find a loop without stop signs, or an out-and-back with maybe a
+little dip or something in the middle.  Make sure you won't get hit by a
+car and have good sight lines.  I just go around my block a few times.
+Do a loop in the drops, then another loop faster, then a loop slower;
+then repeat with your hands on the hoods.
 
 Weigh yourself and the bike and ballpark the air density.
 
 See whether you can come close to modeling the "true" elevation profile
-by sliding the     CdA slider around. Even with this informal test, as
-long as the wind isn't blowing too     hard, you ought to be able to
-see a difference between the loops where you were in the     drops and
-the loops where you on the hoods, and to spot little bumps and dips in
-the road.
+by sliding the CdA slider around.  Even with this informal test, as long
+as the wind isn't blowing too hard, you ought to be able to see a
+difference between the loops where you were in the drops and the loops
+where you on the hoods, and to spot little bumps and dips in the road.
 
 There is also an overview of Virtual Elevation to measure aerodynamics
 in this YouTube video from the power seminar at Interbike 2011 given by
 Jim Meyer the founder of Quarq:
 
-`http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s'
+<http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s>
 
 Finally, Robert Chung's original paper is included in the docs section
-of the GoldenCheetah repository, you can it up here (click on 'View
-Raw' to download):
+of the GoldenCheetah repository, you can it up here (click on 'View Raw'
+to download):
 
-`https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf'
+<https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf>
 
-7.4 My map doesn't show?
+7.3 My map doesn't show?
 ========================
 
 This is most likely because you have a proxy that requires
-authentication or session details. We do not have sophisticated support
-for internet proxy servers. We will re-use the operating system
+authentication or session details.  We do not have sophisticated support
+for internet proxy servers.  We will re-use the operating system
 settings where they are configured.
 
-7.5 What is the treemap plot used for?
+7.4 What is the treemap plot used for?
 ======================================
 
-Typically it is used to visualise where you spend your time or where
-you get best results.  It is not particularly useful if you do not
-maintain details for each ride e.g. workout code, sport et al.
+Typically it is used to visualise where you spend your time or where you
+get best results.  It is not particularly useful if you do not maintain
+details for each ride e.g.  workout code, sport et al.
 
-7.6 Can I change the colors in plot x ?
+7.5 Can I change the colors in plot x ?
 =======================================
 
 With the exception of the Long Term Metric plots the colours on the
-charts are configured in the GoldenCheetah preferences pane.
+charts are configured in the GoldenCheetah preferences pane.  It is
+possible to apply a theme or change each individual color.
 
 We want to use the same colours to plot each data series across the
 charts, so you can change them globally.
 
-The only colours you cannot change are the colours assigned to
-intervals when plotting them on scatterplot or PfPv. These colours are
-assigned according to their sequence.
+The only colours you cannot change are the colours assigned to intervals
+when plotting them on scatterplot or PfPv.  These colours are assigned
+according to their sequence.
 
-7.7 How do you zoom in on a chart?
+7.6 How do you zoom in on a chart?
 ==================================
 
 You can zoom in on the distribution, scatterplot and PfPv charts by
@@ -699,17 +693,17 @@ bottom of the chart (if you select the full plot in the chart settings).
 
 There are no other zoom options for the other charts.
 
-7.8 I zoomed in but can't zoom out?
+7.7 I zoomed in but can't zoom out?
 ===================================
 
 Right click will zoom back out to the previous zoom level (in the case
 of zooming multiple times).  If you select another activity the chart
 will return to fully zoomed out.
 
-7.9 GoldenCheetah is saying there is no data for a chart, but I'm sure there is?
+7.8 GoldenCheetah is saying there is no data for a chart, but I'm sure there is?
 ================================================================================
 
-You should check in the editor if the data series is present. if the
+You should check in the editor if the data series is present.  if the
 activity is a manual activity entry it will contain no data.
 
 
@@ -722,106 +716,118 @@ Index
 * Menu:
 
 * add:                                   MOST COMMON QUESTIONS OF ALL.
-                                                              (line  20)
+                                                              (line  22)
 * adhoc:                                 SEASONS AND EVENTS.  (line   9)
-* Aerolab <1>:                           CHARTS.              (line  33)
 * Aerolab:                               MOST COMMON QUESTIONS OF ALL.
-                                                              (line  69)
-* algorithm:                             CHARTS.              (line  19)
+                                                              (line  75)
+* Aerolab <1>:                           CHARTS.              (line  19)
 * anomalies:                             DATA.                (line  23)
+* anomalies <1>:                         DATA.                (line  38)
 * AP:                                    METRICS.             (line  80)
 * best:                                  MOST COMMON QUESTIONS OF ALL.
-                                                              (line  61)
+                                                              (line  62)
 * bug:                                   GENERAL.             (line  66)
-* Chung:                                 CHARTS.              (line  33)
+* cervo:                                 MOST COMMON QUESTIONS OF ALL.
+                                                              (line 136)
+* Chung:                                 CHARTS.              (line  19)
 * clone:                                 GENERAL.             (line  40)
-* colour <1>:                            CHARTS.              (line  84)
 * colour:                                MOST COMMON QUESTIONS OF ALL.
-                                                              (line 115)
+                                                              (line 121)
+* colour <1>:                            CHARTS.              (line  68)
 * contribute:                            GENERAL.             (line  73)
-* CP <1>:                                CHARTS.              (line  19)
 * CP:                                    METRICS.             (line  22)
-* CSV:                                   DATA.                (line  88)
+* CP <1>:                                METRICS.             (line  39)
+* CP <2>:                                METRICS.             (line  50)
+* CSV:                                   DATA.                (line  87)
 * CTL:                                   METRICS.             (line  63)
 * cycle:                                 SEASONS AND EVENTS.  (line   9)
 * Daniels:                               METRICS.             (line   9)
 * donate:                                GENERAL.             (line  85)
+* download:                              GENERAL.             (line  31)
 * download <1>:                          UPLOADING AND DOWNLOADING.
                                                               (line  16)
-* download:                              GENERAL.             (line  31)
 * elevation:                             METRICS.             (line  71)
 * EqP:                                   METRICS.             (line   9)
 * event:                                 SEASONS AND EVENTS.  (line  18)
+* event <1>:                             SEASONS AND EVENTS.  (line  26)
 * feature:                               GENERAL.             (line  66)
-* FITLOG:                                DATA.                (line  88)
+* FITLOG:                                DATA.                (line  87)
 * FTP:                                   METRICS.             (line  22)
+* FTP <1>:                               METRICS.             (line  50)
 * Garmin Connect:                        METRICS.             (line  80)
 * github:                                GENERAL.             (line  40)
 * Google:                                UPLOADING AND DOWNLOADING.
-                                                              (line  38)
+                                                              (line  22)
 * install:                               GENERAL.             (line  31)
 * join:                                  DATA.                (line   9)
-* JSON:                                  DATA.                (line  88)
+* JSON:                                  DATA.                (line  87)
 * LTS:                                   METRICS.             (line  63)
 * mail:                                  GENERAL.             (line  56)
-* map:                                   CHARTS.              (line  69)
+* map:                                   CHARTS.              (line  53)
 * merge:                                 DATA.                (line   9)
 * month:                                 CHARTS.              (line   9)
 * NP:                                    METRICS.             (line   9)
 * options:                               MOST COMMON QUESTIONS OF ALL.
-                                                              (line 106)
+                                                              (line 112)
 * override:                              METRICS.             (line 110)
-* PMC <1>:                               METRICS.             (line  63)
 * PMC:                                   MOST COMMON QUESTIONS OF ALL.
-                                                              (line  69)
+                                                              (line  75)
+* PMC <1>:                               METRICS.             (line  63)
+* powertap:                              MOST COMMON QUESTIONS OF ALL.
+                                                              (line 136)
 * preferences:                           MOST COMMON QUESTIONS OF ALL.
-                                                              (line 106)
+                                                              (line 112)
 * prior:                                 CHARTS.              (line   9)
-* PWX:                                   DATA.                (line  88)
+* PWX:                                   DATA.                (line  87)
 * remove:                                MOST COMMON QUESTIONS OF ALL.
-                                                              (line  20)
+                                                              (line  22)
 * report:                                GENERAL.             (line  66)
 * season:                                SEASONS AND EVENTS.  (line   9)
+* season <1>:                            SEASONS AND EVENTS.  (line  26)
 * settings:                              MOST COMMON QUESTIONS OF ALL.
-                                                              (line  95)
+                                                              (line 101)
 * source:                                GENERAL.             (line  40)
 * spikes:                                DATA.                (line  23)
+* spikes <1>:                            DATA.                (line  38)
 * split:                                 DATA.                (line   9)
-* Strava:                                UPLOADING AND DOWNLOADING.
-                                                              (line  22)
-* TCX:                                   DATA.                (line  88)
+* TCX:                                   DATA.                (line  87)
 * trainer:                               METRICS.             (line  50)
 * TrainingPeaks:                         UPLOADING AND DOWNLOADING.
                                                               (line   9)
-* treemap:                               CHARTS.              (line  77)
+* TrainingPeaks <1>:                     UPLOADING AND DOWNLOADING.
+                                                              (line  16)
+* treemap:                               CHARTS.              (line  61)
 * triathlete:                            GENERAL.             (line  47)
-* TSS <1>:                               METRICS.             (line  80)
 * TSS:                                   MOST COMMON QUESTIONS OF ALL.
                                                               (line   9)
-* unzoom:                                CHARTS.              (line 108)
+* TSS <1>:                               METRICS.             (line  80)
+* unzoom:                                CHARTS.              (line  93)
 * upload:                                UPLOADING AND DOWNLOADING.
                                                               (line   9)
-* VE:                                    CHARTS.              (line  33)
+* usb:                                   MOST COMMON QUESTIONS OF ALL.
+                                                              (line 136)
+* VE:                                    CHARTS.              (line  19)
 * weekly summary:                        MOST COMMON QUESTIONS OF ALL.
-                                                              (line  81)
+                                                              (line  87)
 * weight:                                MOST COMMON QUESTIONS OF ALL.
-                                                              (line  36)
+                                                              (line  37)
 * Withings:                              UPLOADING AND DOWNLOADING.
-                                                              (line  51)
+                                                              (line  35)
 * xPower:                                METRICS.             (line   9)
-* zoom:                                  CHARTS.              (line  97)
+* zoom:                                  CHARTS.              (line  82)
+* zoom <1>:                              CHARTS.              (line  93)
 
 
 
 Tag Table:
-Node: Top164
-Node: MOST COMMON QUESTIONS OF ALL609
-Node: GENERAL6062
-Node: METRICS9684
-Node: DATA16676
-Node: UPLOADING AND DOWNLOADING20606
-Node: SEASONS AND EVENTS23387
-Node: CHARTS24784
-Node: INDEX29585
+Node: Top163
+Node: MOST COMMON QUESTIONS OF ALL608
+Node: GENERAL7263
+Node: METRICS10899
+Node: DATA17912
+Node: UPLOADING AND DOWNLOADING21867
+Node: SEASONS AND EVENTS23922
+Node: CHARTS25327
+Node: INDEX29480
 
 End Tag Table
