@@ -511,7 +511,7 @@ Activity->Export allows you to export the activity to csv, fitlog, gc
 4.8 Can I use GC to convert data from one format to another on the command line?
 ================================================================================
 
-No.  It is something we may add in v3.1
+No.  It is something we may add in v3.2
 
 4.9 Can I delete an athlete and all his/her data?
 =================================================
