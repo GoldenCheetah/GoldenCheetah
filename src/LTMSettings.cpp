@@ -121,7 +121,7 @@ LTMSettings::readChartXML(QDir home, bool useMetricUnits, QList<LTMSettings> &ch
 
     QXmlInputSource source( &chartsFile );
     QXmlSimpleReader xmlReader;
-    LTMChartParser( handler );
+    LTMChartParser handler;
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
     xmlReader.parse( source );

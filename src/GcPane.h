@@ -39,7 +39,6 @@ class GcPane : public QWidget
 
     public:
         GcPane();
-        GcPane(QLayout *p);
 
         void setLayout(QLayout *layout); // override standard setLayout
 

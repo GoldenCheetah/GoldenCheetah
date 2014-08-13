@@ -67,10 +67,10 @@ NamedSearches::read()
     QFile namedSearchFile(home.absolutePath() + "/namedsearches.xml");
     QXmlInputSource source( &namedSearchFile );
     QXmlSimpleReader xmlReader;
-    NamedSearchParser( handler );
+    NamedSearchParser handler;
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
-    xmlReader.parse( source );
+    xmlReader.parse(source);
 
     // go read them!
     list = handler.getResults();

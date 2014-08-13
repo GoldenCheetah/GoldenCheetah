@@ -18,12 +18,6 @@
 
 #include "GcPane.h"
 
-GcPane::GcPane(QLayout *p)
-{
-    GcPane();
-    setLayout(p);
-}
-
 GcPane::GcPane() : QWidget(NULL, Qt::FramelessWindowHint),
     borderWidth(4), dragState(None)
 {
