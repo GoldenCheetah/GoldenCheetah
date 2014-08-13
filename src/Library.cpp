@@ -70,10 +70,10 @@ Library::initialise(QDir home)
             // parse it!
             QXmlInputSource source(&libraryXML);
             QXmlSimpleReader xmlReader;
-            LibraryParser(handler);
+            LibraryParser handler;
             xmlReader.setContentHandler(&handler);
             xmlReader.setErrorHandler(&handler);
-            xmlReader.parse( source );
+            xmlReader.parse(source);
             libraries = handler.getLibraries();
 
         } else {

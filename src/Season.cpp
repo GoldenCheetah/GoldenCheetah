@@ -248,7 +248,7 @@ Seasons::readSeasons()
     QFile seasonFile(home.absolutePath() + "/seasons.xml");
     QXmlInputSource source( &seasonFile );
     QXmlSimpleReader xmlReader;
-    SeasonParser( handler );
+    SeasonParser handler;
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
     xmlReader.parse( source );

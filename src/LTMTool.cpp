@@ -2099,7 +2099,7 @@ LTMTool::importClicked()
             // setup XML processor
             QXmlInputSource source( &chartsFile );
             QXmlSimpleReader xmlReader;
-            LTMChartParser (handler);
+            LTMChartParser handler;
             xmlReader.setContentHandler(&handler);
             xmlReader.setErrorHandler(&handler);
 
