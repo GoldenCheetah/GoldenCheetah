@@ -240,7 +240,8 @@ win32 {
 # local qxt widgets - rather than add another dependency on libqxt
 DEFINES += QXT_STATIC
 SOURCES += ../qxt/src/qxtspanslider.cpp \
-           ../qxt/src/qxtstringspinbox.cpp
+           ../qxt/src/qxtstringspinbox.cpp \
+    FixPower.cpp
 HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtspanslider_p.h \
            ../qxt/src/qxtstringspinbox.h 
