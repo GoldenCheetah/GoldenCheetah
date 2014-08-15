@@ -241,7 +241,6 @@ win32 {
 DEFINES += QXT_STATIC
 SOURCES += ../qxt/src/qxtspanslider.cpp \
            ../qxt/src/qxtstringspinbox.cpp \
-    FixElevation.cpp
 HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtspanslider_p.h \
            ../qxt/src/qxtstringspinbox.h 
@@ -513,6 +512,7 @@ SOURCES += \
         FixElevation.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
+        FixPower.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
         FixHRSpikes.cpp \
