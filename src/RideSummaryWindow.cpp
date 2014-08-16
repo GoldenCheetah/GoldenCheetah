@@ -447,6 +447,8 @@ RideSummaryWindow::htmlSummary()
             worklist += metricColumn;
             worklist += timeInZones;
             worklist += timeInZonesHR;
+            // computeMetrics expects unique keys, no duplicates
+            worklist.removeDuplicates();
 
             // go calculate them then...
             QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
@@ -1213,6 +1215,8 @@ RideSummaryWindow::htmlCompareSummary() const
         worklist += metricColumn;
         worklist += timeInZones;
         worklist += timeInZonesHR;
+        // computeMetrics expects unique keys, no duplicates
+        worklist.removeDuplicates();
 
         // go calculate them then...
         RideMetricFactory &factory = RideMetricFactory::instance();
