@@ -99,8 +99,9 @@
 // 78  19  Jun 2014 Mark Liversedge    Do not include zeroes in average L/R pedal smoothness/torque effectiveness
 // 79  20  Jun 2014 Mark Liversedge    Change the way average temperature is handled
 // 80  13  Jul 2014 Mark Liversedge    W' work + Below CP work = Work
+// 81  16  Aug 2014 Joern Rischmueller Added 'Elevation Loss'
 
-int DBSchemaVersion = 80;
+int DBSchemaVersion = 81;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

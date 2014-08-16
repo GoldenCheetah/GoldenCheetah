@@ -271,6 +271,58 @@ static bool elevationGainAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+class ElevationLoss : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ElevationLoss)
+    double eleLoss;
+    double prevalt;
+
+    public:
+
+    ElevationLoss() : eleLoss(0.0), prevalt(0.0)
+    {
+        setSymbol("elevation_loss");
+        setInternalName("Elevation Loss");
+    }
+    void initialize() {
+        setName(tr("Elevation Loss"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("meters"));
+        setImperialUnits(tr("feet"));
+        setConversion(FEET_PER_METER);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        // hysteresis can be configured, we default to 3.0
+        double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
+        if (hysteresis <= 0.1) hysteresis = 3.00;
+
+        bool first = true;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (first) {
+                first = false;
+                prevalt = point->alt;
+            }
+            else if (point->alt < prevalt - hysteresis) {
+                eleLoss += prevalt - point->alt;
+                prevalt = point->alt;
+            }
+            else if (point->alt > prevalt + hysteresis) {
+                prevalt = point->alt;
+            }
+        }
+        setValue(eleLoss);
+    }
+    RideMetric *clone() const { return new ElevationLoss(*this); }
+};
+
+static bool elevationLossAdded =
+    RideMetricFactory::instance().addMetric(ElevationLoss());
+
+//////////////////////////////////////////////////////////////////////////////
+
 class TotalWork : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(TotalWork)
     double joules;
