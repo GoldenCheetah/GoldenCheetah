@@ -1184,8 +1184,8 @@ AllPlot::recalc(AllPlotObject *objects)
         return;
     }
 
-    // if recintsecs is longer than the smoothing there is no point in even trying
-    int applysmooth = smooth < rideItem->ride()->recIntSecs() ? 0 : smooth;
+    // if recintsecs is longer than the smoothing, or equal to the smoothing there is no point in even trying
+    int applysmooth = smooth <= rideItem->ride()->recIntSecs() ? 0 : smooth;
 
     // compare mode breaks
     if (context->isCompareIntervals && applysmooth == 0) applysmooth = 1;
