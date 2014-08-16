@@ -144,5 +144,6 @@
         <file>images/sidebar/folder.png</file>
         <file>images/sidebar/movie.png</file>
         <file>images/sidebar/power.png</file>
+        <file>images/heatmapColors.png</file>
     </qresource>
 </RCC>
