@@ -169,6 +169,7 @@ class MainWindow : public QMainWindow
         void manualRide();
         void exportRide();
         void exportBatch();
+        void generateHeatMap();
         void exportMetrics();
 #ifdef GC_HAVE_LIBOAUTH
         void tweetRide();
