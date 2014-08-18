@@ -1221,6 +1221,27 @@ RideFile::recalculateDerivedSeries()
         if (oCP) CP=oCP;
     }
 
+    // Power Estimation Constants
+    double hRider = 1.7 ; //Height in m
+    double M = getWeight(); //Weight kg
+    double MBik = 9.5; //Bike weight kg
+    double T = 15; //Temp degC in not in ride data
+    double W = 0; //Assume no wind
+    double cCad=.002;
+    double afCd = 0.62;
+    double afSin = 0.89;
+    double afCm = 1.025;
+    double afCdBike = 1.2;
+    double afCATireV = 1.1;
+    double afCATireH = 0.9;
+    double afAFrame = 0.048;
+    double CrV = 0.0031;
+    double ATire = 0.031;
+    double CrEff = CrV;
+    double adipos = sqrt(M/(hRider*750));
+    double CwaBike = afCdBike * (afCATireV * ATire + afCATireH * ATire + afAFrame);
+    qDebug()<<"CwaBike="<<CwaBike<<", afCdBike="<<afCdBike<<", afCATireV="<<afCATireV<<", ATire="<<ATire<<", afCATireH="<<afCATireH<<", afAFrame="<<afAFrame;
+
     // last point looked at
     RideFilePoint *lastP = NULL;
 
@@ -1363,6 +1384,24 @@ RideFile::recalculateDerivedSeries()
             p->antiss = anTISS;
         }
 
+        // Slope
+        // If there is no slope data then it can be derived
+        // from distanct and altitude
+        if (lastP) {
+            if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+                double deltaDistance = (p->km - lastP->km) * 1000;
+                double deltaAltitude = p->alt - lastP->alt;
+                if (deltaDistance>0) {
+                    p->slope = (deltaAltitude / deltaDistance) * 100;
+                } else {
+                    p->slope = 0;
+                }
+                if (p->slope > 20 || p->slope < -20) {
+                    p->slope = lastP->slope;
+                }
+            }
+        }
+
         // last point
         lastP = p;
     }
@@ -1377,6 +1416,72 @@ RideFile::recalculateDerivedSeries()
     avgPoint->apower = APcount ? (APtotal / APcount) : 0;
     totalPoint->apower = APtotal;
 
-    // and we're done
-    dstale=false;
+    // Smooth the slope if it has been derived
+    if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+        int smoothPoints = 10;
+        // initialise rolling average
+        double rtot = 0;
+        for (int i=smoothPoints; i>0 && dataPoints_.length()-i >=0; i--) {
+            rtot += dataPoints_[dataPoints_.length()-i]->slope;
+        }
+
+        // now run backwards setting the rolling average
+        for (int i=dataPoints_.length()-1; i>=smoothPoints; i--) {
+            double here = dataPoints_[i]->slope;
+            dataPoints_[i]->slope = rtot / smoothPoints;
+            rtot -= here;
+            rtot += dataPoints_[i-smoothPoints]->slope;
+        }
+        setDataPresent(slope, true);
+    }
+
+
+
+    foreach(RideFilePoint *p, dataPoints_) {
+    // Estimate Power if not in data
+
+        if (!dataPresent.watts && dataPresent.slope) {
+            if (p->cad > 0) {
+                if (dataPresent.temp) T = p->temp;
+                double Slope = atan(p->slope * .01);
+                double V = p->kph * 0.27777777777778; //Speed m/s
+                double CrDyn = 0.1 * cos(Slope);
+
+                double CwaRider, Ka;
+                double Frg = 9.81 * (MBik + M) * (CrEff * cos(Slope) + sin(Slope));
+
+                double vw=V+W;
+                CwaRider = (1 + p->cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
+                Ka = 176.5 * exp(-p->alt * .0001253) * (CwaRider + CwaBike) / (273 + T);
+                p->watts = afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn);
+                qDebug()<<"w="<<p->watts<<", Ka="<<Ka<<", CwaRi="<<CwaRider<<", slope="<<p->slope<<", v="<<p->kph<<" Cwa="<<(CwaRider + CwaBike);
+            }
+        }
+    }
+
+    // Smooth the power data if it has been derived
+    if (!dataPresent.watts && dataPresent.slope) {
+        int smoothPoints = 3;
+        // initialise rolling average
+        double rtot = 0;
+        for (int i=smoothPoints; i>0 && dataPoints_.length()-i >=0; i--) {
+            rtot += dataPoints_[dataPoints_.length()-i]->watts;
+        }
+
+        // now run backwards setting the rolling average
+        for (int i=dataPoints_.length()-1; i>=smoothPoints; i--) {
+            double here = dataPoints_[i]->watts;
+            dataPoints_[i]->watts = rtot / smoothPoints;
+            if (dataPoints_[i]->watts<0) dataPoints_[i]->watts = 0;
+            rtot -= here;
+            rtot += dataPoints_[i-smoothPoints]->watts;
+        }
+        setDataPresent(watts, true);
+        // rerun to utilise newly caculated power
+        dstale=true;
+    } else {
+        // and we're done
+        dstale=false;
+    }
+
 }
