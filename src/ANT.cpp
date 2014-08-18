@@ -25,6 +25,7 @@
 
 #include "ANT.h"
 #include "ANTMessage.h"
+#include "TrainSidebar.h" // for RT_MODE_{ERGO,SPIN,CALIBRATE}
 #include <QMessageBox>
 #include <QTime>
 #include <QProgressDialog>
@@ -44,6 +45,9 @@
 // network key
 const unsigned char ANT::key[8] = { 0xB9, 0xA5, 0x21, 0xFB, 0xBD, 0x72, 0xC3, 0x45 };
 
+// !!! THE INITIALISATION OF ant_sensor_types BELOW MUST MATCH THE 
+// !!! ENUM FOR CHANNELTYPE IN ANTChannel.h (SORRY, ITS HORRIBLE)
+
 // supported sensor types
 const ant_sensor_type_t ANT::ant_sensor_types[] = {
   { true, ANTChannel::CHANNEL_TYPE_UNUSED, 0, 0, 0, 0, "Unused", '?', "" },
@@ -57,6 +61,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Cadence", 'c', ":images/IconCadence.png" },
   { true, ANTChannel::CHANNEL_TYPE_SandC, ANT_SPORT_SandC_PERIOD, ANT_SPORT_SandC_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Speed + Cadence", 'd', ":images/IconCadence.png" },
+  { true, ANTChannel::CHANNEL_TYPE_CONTROL, ANT_SPORT_CONTROL_PERIOD, ANT_SPORT_CONTROL_TYPE,
+                ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Remote Control", 'r', ":images/IconCadence.png" },
   { false, ANTChannel::CHANNEL_TYPE_KICKR, ANT_SPORT_KICKR_PERIOD, ANT_SPORT_POWER_TYPE,
                 ANT_KICKR_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Kickr", 'k', ":images/IconCadence.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
@@ -85,6 +91,22 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devCo
     baud=115200;
     powerchannels=0;
     configuring = false;
+
+    // kickr command channel
+    kickrTimer = NULL;
+    kickrCounter = 0;
+    kickrSequence = 0;
+    kickrCommandChannel = -1;
+    kickrDeviceID = 0;
+
+    // current and desired modes/load/gradients
+    // set so first time through current != desired
+    currentMode = 0;
+    mode = RT_MODE_ERGO;
+    currentLoad = 0;
+    load = 100; // always set to something
+    currentGradient = 0;
+    gradient = 0.1;
 
     // state machine
     state = ST_WAIT_FOR_SYNC;
@@ -222,6 +244,150 @@ void ANT::run()
     }
 }
 
+void
+ANT::setLoad(double load)
+{
+    if (this->load == load) return;
+
+    // load has changed
+    this->load = load;
+}
+void
+ANT::setGradient(double gradient)
+{
+    if (this->gradient == gradient) return;
+
+    // gradient changed
+    this->gradient = gradient;
+}
+void
+ANT::setMode(int mode)
+{
+    if (this->mode == mode) return;
+
+    // mode changed
+    this->mode = mode;
+}
+
+void
+ANT::kickrCommand()
+{
+    static int lastSequence = -1;
+
+    // mode changed ?
+    if (currentMode != mode) {
+
+        switch(mode) {
+        case RT_MODE_ERGO : // do nothing, just start sending ergo commands below
+           //qDebug()<<"A: setup ergo mode";
+           break;
+
+        case RT_MODE_SPIN : // need to setup for "sim" mode, so sending lots of 
+                            // config to overcome the default values
+            {
+
+            // Slope mode is called "Simulation" mode on a Kickr
+            // We need to set paramters up before we set it and then we
+            // can simply adjust the gradient from there on
+            //qDebug()<<"A: setup slope mode";
+
+            // set rolling resistance (Crr)
+            sendMessage(ANTMessage::kickrRollingResistance(kickrCommandChannel, ++kickrSequence, kickrDeviceID, 0.004f));
+
+            // set wind resistance (C)
+            // where C = A*Cw*Rho
+            // A is effective frontal area (m^2)
+            // Cw is the drag coefficent (unitless)
+            // Rho is the air density (kg/m^3).
+            //
+            // So we default to; A of 0.4 (on the hoods), CdA 1.0 (on the hoods), Rho 1.225 (at sea level)
+            // for more background to this see: http://www.cyclingpowerlab.com/cyclingaerodynamics.aspx
+            //
+            // Our default is therefore 0.4 * 1.0 * 1.225 = 0.49
+            sendMessage(ANTMessage::kickrWindResistance(kickrCommandChannel, ++kickrSequence, kickrDeviceID, 0.49));
+
+            // athlete weight default to 75kg - we don't have a context to refer to ...
+            //double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble();
+            double weight = 75.0; // in kg
+
+            // plus bike, lets be generous and say no water bottles ;)
+            weight += 10.0;
+
+            // set sim mode - we need the athlete weight, use from athlete settings for now
+            sendMessage(ANTMessage::kickrSimMode(kickrCommandChannel, ++kickrSequence, kickrDeviceID, weight));
+
+            }
+            break;
+
+        case RT_MODE_CALIBRATE : // ??? maybe ???
+            //qDebug()<<"A: setup calib mode";
+            break;
+        }
+
+        currentMode = mode;
+        currentLoad = load;
+        currentGradient = gradient;
+        kickrSequence++;
+        kickrCounter = 0;
+    }
+
+    // load has changed ?
+    if (mode == RT_MODE_ERGO && load != currentLoad) { 
+        currentLoad = load;
+        kickrCounter = 0;
+        kickrSequence++;
+    }
+
+    // slope has changed in slope mode
+    if (mode == RT_MODE_SPIN && gradient != currentGradient) {
+        currentGradient = gradient;
+        kickrCounter = 0;
+        kickrSequence++;
+    }
+
+    // 10s timeout ?
+    // 10000ms / 60ms = 166.666666
+    if (kickrCounter++ > 165) {
+        kickrCounter = 0;
+        kickrSequence++;
+    }
+
+    // create message to send
+    ANTMessage toSend;
+
+    switch (mode) {
+
+    default:
+    case RT_MODE_ERGO: 
+        toSend = ANTMessage::kickrErgMode(kickrCommandChannel, kickrSequence, kickrDeviceID, load, false);
+        break;
+
+    case RT_MODE_SPIN: // gradient is between -1.0 and +1.0 so needs conversion from gradient
+        toSend = ANTMessage::kickrGrade(kickrCommandChannel, kickrSequence, kickrDeviceID, gradient/100.00f);
+        break;
+    }
+
+    // log out put 
+    if (lastSequence != kickrSequence) {
+        //qDebug()<<load<<gradient<<"command:" <<QString("0x%1").arg(toSend.data[0], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[1], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[2], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[3], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[4], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[5], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[6], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[7], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[8], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[9], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[10], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[11], 1, 16)
+        //                                     <<QString("0x%1").arg(toSend.data[12], 1, 16);
+        lastSequence = kickrSequence;
+    }
+
+    sendMessage(toSend);
+}
+
 int
 ANT::start()
 {
@@ -266,7 +432,9 @@ ANT::setup()
             addDevice(0, ANTChannel::CHANNEL_TYPE_CADENCE, 2);
             addDevice(0, ANTChannel::CHANNEL_TYPE_HR, 3);
 
-            if (channels > 4) addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
+            if (channels > 4) {
+                addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
+            }
         }
     }
 
@@ -320,10 +488,14 @@ ANT::pause()
 int
 ANT::stop()
 {
+    // stop kickr commands
+    if (kickrTimer && kickrTimer->isActive()) {
+        kickrTimer->stop();
+    }
+
     // Close the connections to ANT devices before we stop. Sending the
     // "close channel" ANT message seems to resolve an intermittent
     // issue of unresponsive USB2 stick on subsequent opens.
-
     if (antIDs.count()) {
         foreach(QString antid, antIDs) {
             if (antid.length()) {
@@ -335,6 +507,11 @@ ANT::stop()
             }
         }
     }
+
+    // and close any channels that are open
+    for (int i=0; i<channels; i++)
+        if (antChannel[i]->status != ANTChannel::Closed)
+            antChannel[i]->close();
 
     // what state are we in anyway?
     pvars.lock();
@@ -359,21 +536,17 @@ ANT::quit(int code)
 void
 ANT::getRealtimeData(RealtimeData &rtData)
 {
-    int mode = rtData.mode;
-    long load = rtData.getLoad();
-    double slope = rtData.getSlope();
-
     rtData = telemetry;
     rtData.mode = mode;
     rtData.setLoad(load);
-    rtData.setSlope(slope);
+    rtData.setSlope(gradient);
 }
 
 /*======================================================================
  * Channel management
  *====================================================================*/
 
-// returns 1 for success, 0 for fail.
+// returns -1 for fail otherwise channel number used
 int
 ANT::addDevice(int device_number, int device_type, int channel_number)
 {
@@ -381,7 +554,7 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
     if (channel_number>-1) {
         //antChannel[channel_number]->close();
         antChannel[channel_number]->open(device_number, device_type);
-        return 1;
+        return channel_number;
     }
 
     // if we already have the device, then return.
@@ -391,10 +564,10 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
     // and 0p on channel 1
     if (device_number != 0) {
         for (int i=0; i<channels; i++) {
-            if (((antChannel[i]->channel_type & 0xf ) == device_type) &&
+            if ((antChannel[i]->channel_type == device_type) &&
                 (antChannel[i]->device_number == device_number)) {
                 // send the channel found...
-                return 1;
+                return i;
             }
         }
     }
@@ -416,12 +589,12 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
                 // increment the number of power channels
                 powerchannels++;
             }
-            return 1;
+            return i;
         }
     }
 
     // there are no unused channels.  fail.
-    return 0;
+    return -1;
 }
 
 // returns 1 for successfully removed, 0 for none found.
@@ -434,10 +607,6 @@ ANT::removeDevice(int device_number, int channel_type)
         ANTChannel *ac = antChannel[i];
 
         if ((ac->channel_type == channel_type) && (ac->device_number == device_number)) {
-
-            if ((ac->control_channel!=ac) && ac->control_channel)
-                removeDevice(device_number, ac->control_channel->channel_type);
-
             ac->close();
             ac->channel_type=ANTChannel::CHANNEL_TYPE_UNUSED;
             ac->device_number=0;
@@ -491,60 +660,6 @@ ANT::startWaitingSearch()
     return 0;
 }
 
-void
-ANT::associateControlChannels() {
-
-    // first, unassociate all control channels
-    for (int i=0; i<channels; i++) antChannel[i]->control_channel=NULL;
-
-    // then, associate cinqos:
-    //    new cinqos get their own selves for control
-    //    old cinqos, look for an open control channel
-    //       if found and open, associate
-    //       elif found and not open yet, nop
-    //       elif not found, open one
-    for (int i=0; i<channels; i++) {
-        ANTChannel *ac=antChannel[i];
-
-        switch (ac->channel_type) {
-            case ANTChannel::CHANNEL_TYPE_POWER:
-                if (ac->is_cinqo) {
-                    if (ac->is_old_cinqo) {
-                        ANTChannel *my_ant_channel;
-
-                        my_ant_channel=findDevice(ac->device_number, ANTChannel::CHANNEL_TYPE_QUARQ);
-                        if (!my_ant_channel) my_ant_channel=findDevice(ac->device_number, ANTChannel::CHANNEL_TYPE_FAST_QUARQ);
-                        if (!my_ant_channel) my_ant_channel=findDevice(ac->device_number, ANTChannel::CHANNEL_TYPE_FAST_QUARQ_NEW);
-
-                        if (my_ant_channel) {
-                            if (my_ant_channel->isSearching()) {
-                                // ignore if searching
-                            } else {
-                                ac->control_channel=my_ant_channel;
-                                ac->sendCinqoSuccess();
-                            }
-                        } else { // no ant channel, let's start one
-                            addDevice(ac->device_number, ANTChannel::CHANNEL_TYPE_QUARQ, -1);
-                        }
-                    } else { // new cinqo
-                        ac->control_channel=ac;
-                        ac->sendCinqoSuccess();
-                    }
-                } // is_cinqo
-                break;
-
-              case ANTChannel::CHANNEL_TYPE_FAST_QUARQ:
-              case ANTChannel::CHANNEL_TYPE_FAST_QUARQ_NEW:
-              case ANTChannel::CHANNEL_TYPE_QUARQ:
-                  ac->is_cinqo=1;
-                  ac->control_channel=ac;
-                  break;
-              default:
-                      ;
-        } // channel_type case
-    } // for-loop
-}
-
 // For serial device discovery
 bool
 ANT::discover(QString name)
@@ -579,7 +694,51 @@ Q_UNUSED(name);
 void
 ANT::channelInfo(int channel, int device_number, int device_id)
 {
+    qDebug()<<"** CONNECTION ESTABLISHED channel:"<<channel<<"device:"<<device_number<<"**";
     emit foundDevice(channel, device_number, device_id);
+
+    // KICKR DETECTED - ACT ACCORDINGLY !
+    // if we just got a power device and its recognised as being a kickr
+    // trainer then we will need to open up the comms channel, unless it
+    // has already been done
+    if (!configuring && antChannel[channel]->is_kickr && antChannel[channel]->command_channel == NULL) {
+
+        kickrDeviceID = device_number;
+        kickrCommandChannel = addDevice(device_number, ANTChannel::CHANNEL_TYPE_KICKR, -1);
+
+        if (kickrCommandChannel >= 0) {
+
+            //qDebug()<<"opened kickr "<< kickrDeviceID<< "communication channel is:"<<kickrCommandChannel;
+            antChannel[channel]->command_channel = antChannel[kickrCommandChannel];
+
+            // start timer to send commands every 63ms
+            if (kickrTimer) {
+
+                // if one already active lets stop it
+                if (kickrTimer->isActive()) kickrTimer->stop();
+
+            } else {
+
+                // first time lets get a new timer
+                kickrTimer = new QTimer(this);
+                kickrTimer->setInterval(KICKR_COMMAND_INTERVAL);
+
+                // connect up the dots
+                connect(kickrTimer, SIGNAL(timeout()), this, SLOT(kickrCommand()));
+            }
+
+            // lets go
+            kickrCounter = 0;
+            kickrSequence = 0;
+            kickrTimer->start();
+
+        } else {
+
+            // need to find a way to communicate back on error
+            qDebug()<<"kickr setup failed, no channels available";
+        }
+    }
+
     //qDebug()<<"found device number"<<device_number<<"type"<<device_id<<"on channel"<<channel
     //<< "is a "<<deviceTypeDescription(device_id) << "with code"<<deviceTypeCode(device_id);
 }
@@ -588,7 +747,7 @@ void
 ANT::dropInfo(int channel, int drops, int received)    // we dropped a message
 {
     double reliability = 100.00f - (100.00f * double(drops) / double(received));
-    //qDebug()<<"Channel"<<channel<<"reliability is"<< (int)(reliability)<<"%";
+    qDebug()<<"Channel"<<channel<<"reliability is"<< (int)(reliability)<<"%";
     emit signalStrength(channel, reliability);
     return;
 }
@@ -599,7 +758,7 @@ ANT::lostInfo(int number)    // we lost the connection
     if (number < 0 || number >= channels) return; // ignore out of bound
 
     emit lostDevice(number);
-    //qDebug()<<"lost info for channel"<<number;
+    qDebug()<<"lost info for channel"<<number;
 }
 
 void
@@ -607,7 +766,7 @@ ANT::staleInfo(int number)   // info is now stale - set to zero
 {
     if (number < 0 || number >= channels) return; // ignore out of bound
 
-    //qDebug()<<"stale info for channel"<<number;
+    qDebug()<<"stale info for channel"<<number;
 }
 
 void
@@ -616,7 +775,7 @@ ANT::slotSearchTimeout(int number) // search timed out
     if (number < 0 || number >= channels) return; // ignore out of bound
 
     emit searchTimeout(number);
-    //qDebug()<<"search timeout on channel"<<number;
+    qDebug()<<"search timeout on channel"<<number;
 }
 
 void
@@ -625,7 +784,7 @@ ANT::slotSearchComplete(int number) // search completed successfully
     if (number < 0 || number >= channels) return; // ignore out of bound
 
     emit searchComplete(number);
-    //qDebug()<<"search completed on channel"<<number;
+    qDebug()<<"search completed on channel"<<number;
 }
 
 /*----------------------------------------------------------------------
@@ -917,19 +1076,21 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     }
 #endif
 
-    int ibytes;
+    if (usbMode == USB1) {
+        int ibytes;
 
-    ioctl(devicePort, FIONREAD, &ibytes);
+        ioctl(devicePort, FIONREAD, &ibytes);
 
-    // timeouts are less critical for writing, since vols are low
-    rc= write(devicePort, bytes, size);
+        // timeouts are less critical for writing, since vols are low
+        rc= write(devicePort, bytes, size);
 
-    if (rc != -1) tcdrain(devicePort); // wait till its gone.
+        if (rc != -1) tcdrain(devicePort); // wait till its gone.
 
-    ioctl(devicePort, FIONREAD, &ibytes);
-    return rc;
+        ioctl(devicePort, FIONREAD, &ibytes);
+        return rc;
+    }
 #endif
-
+    return -1;
 
 }
 

@@ -36,6 +36,7 @@
 #include <QQueue>
 #include <QStringList>
 #include <QTime>
+#include <QTimer>
 #include <QProgressDialog>
 #include <QFile>
 
@@ -166,6 +167,8 @@ struct setChannelAtom {
 #define ANT_CW_INIT            0x53
 #define ANT_CW_TEST            0x48
 
+#define TRANSITION_START       0x00 // start of transition when opening
+
 // ANT message structure.
 #define ANT_OFFSET_SYNC            0
 #define ANT_OFFSET_LENGTH          1
@@ -209,6 +212,7 @@ struct setChannelAtom {
 #define ANT_SPORT_SPEED_PERIOD 8118
 #define ANT_SPORT_CADENCE_PERIOD 8102
 #define ANT_SPORT_SandC_PERIOD 8086
+#define ANT_SPORT_CONTROL_PERIOD 8192
 #define ANT_SPORT_KICKR_PERIOD 2048
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
@@ -218,6 +222,7 @@ struct setChannelAtom {
 #define ANT_SPORT_SPEED_TYPE 0x7B
 #define ANT_SPORT_CADENCE_TYPE 0x7A
 #define ANT_SPORT_SandC_TYPE 0x79
+#define ANT_SPORT_CONTROL_TYPE 0x10
 #define ANT_FAST_QUARQ_TYPE_WAS 11 // before release 1.8
 #define ANT_FAST_QUARQ_TYPE 0x60
 #define ANT_QUARQ_TYPE 0x60
@@ -241,6 +246,26 @@ struct setChannelAtom {
 
 #define ANT_SPORT_AUTOZERO_OFF                        0x00
 #define ANT_SPORT_AUTOZERO_ON                         0x01
+
+// kickr
+#define KICKR_COMMAND_INTERVAL         60 // every 60 ms
+#define KICKR_SET_RESISTANCE_MODE      0x40
+#define KICKR_SET_STANDARD_MODE        0x41
+#define KICKR_SET_ERG_MODE             0x42
+#define KICKR_SET_SIM_MODE             0x43
+#define KICKR_SET_CRR                  0x44
+#define KICKR_SET_C                    0x45
+#define KICKR_SET_GRADE                0x46
+#define KICKR_SET_WIND_SPEED           0x47
+#define KICKR_SET_WHEEL_CIRCUMFERENCE  0x48
+#define KICKR_INIT_SPINDOWN            0x49
+#define KICKR_READ_MODE                0x4A
+#define KICKR_SET_FTP_MODE             0x4B
+// 0x4C-0x4E reserved.
+#define KICKR_CONNECT_ANT_SENSOR       0x4F
+// 0x51-0x59 reserved.
+#define KICKR_SPINDOWN_RESULT          0x5A
+
 
 //======================================================================
 // Worker thread
@@ -299,6 +324,12 @@ public slots:
     // get telemetry
     void getRealtimeData(RealtimeData &);             // return current realtime data
 
+    // kickr command loading - only ANT device we know about to do this so not generic
+    void setLoad(double);
+    void setGradient(double);
+    void setMode(int);
+    void kickrCommand();
+
 public:
 
     static int interpretSuffix(char c); // utility to convert e.g. 'c' to CHANNEL_TYPE_CADENCE
@@ -322,7 +353,6 @@ public:
     int removeDevice(int device_number, int channel_type);
     ANTChannel *findDevice(int device_number, int channel_type);
     int startWaitingSearch();
-    void associateControlChannels();
 
     // transmission
     void sendMessage(ANTMessage);
@@ -401,6 +431,18 @@ private:
     int powerchannels; // how many power channels do we have?
 
     QQueue<setChannelAtom> channelQueue; // messages for configuring channels from controller
+
+    // generic trainer settings
+    double currentLoad, load;
+    double currentGradient, gradient;
+    int currentMode, mode;
+
+    // now kickr specific
+    QTimer *kickrTimer;
+    int kickrCommandChannel;
+    int kickrCounter; // 1-16 for each period
+    unsigned char kickrSequence;
+    int kickrDeviceID;
 
 };
 
