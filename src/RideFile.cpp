@@ -1421,12 +1421,12 @@ RideFile::recalculateDerivedSeries()
         int smoothPoints = 10;
         // initialise rolling average
         double rtot = 0;
-        for (int i=smoothPoints; i>0 && dataPoints_.length()-i >=0; i--) {
-            rtot += dataPoints_[dataPoints_.length()-i]->slope;
+        for (int i=smoothPoints; i>0 && dataPoints_.count()-i >=0; i--) {
+            rtot += dataPoints_[dataPoints_.count()-i]->slope;
         }
 
         // now run backwards setting the rolling average
-        for (int i=dataPoints_.length()-1; i>=smoothPoints; i--) {
+        for (int i=dataPoints_.count()-1; i>=smoothPoints; i--) {
             double here = dataPoints_[i]->slope;
             dataPoints_[i]->slope = rtot / smoothPoints;
             rtot -= here;
@@ -1464,12 +1464,12 @@ RideFile::recalculateDerivedSeries()
         int smoothPoints = 3;
         // initialise rolling average
         double rtot = 0;
-        for (int i=smoothPoints; i>0 && dataPoints_.length()-i >=0; i--) {
-            rtot += dataPoints_[dataPoints_.length()-i]->watts;
+        for (int i=smoothPoints; i>0 && dataPoints_.count()-i >=0; i--) {
+            rtot += dataPoints_[dataPoints_.count()-i]->watts;
         }
 
         // now run backwards setting the rolling average
-        for (int i=dataPoints_.length()-1; i>=smoothPoints; i--) {
+        for (int i=dataPoints_.count()-1; i>=smoothPoints; i--) {
             double here = dataPoints_[i]->watts;
             dataPoints_[i]->watts = rtot / smoothPoints;
             if (dataPoints_[i]->watts<0) dataPoints_[i]->watts = 0;
