@@ -1074,7 +1074,6 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     if (usbMode == USB2) {
         return usb2->write((char *)bytes, size);
     }
-#endif
 
     if (usbMode == USB1) {
         int ibytes;
@@ -1089,6 +1088,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
         ioctl(devicePort, FIONREAD, &ibytes);
         return rc;
     }
+#endif
 #endif
     return -1;
 
