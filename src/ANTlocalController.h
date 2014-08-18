@@ -59,7 +59,11 @@ public:
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);
     void pushRealtimeData(RealtimeData &rtData);
-    void setLoad(double) { return; }
+
+    // now with the kickr we can control trainers
+    void setLoad(double);
+    void setGradient(double);
+    void setMode(int);
 
 signals:
     void foundDevice(int channel, int device_number, int device_id); // channelInfo

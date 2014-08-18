@@ -139,7 +139,6 @@ AddType::clicked(QString p)
         case DEV_BT40 : next = 55; break;
         case DEV_ANTLOCAL : next = 50; break; // pair 
         default:
-        case DEV_KICKR :
         case DEV_CT : next = 60; break; // confirm and add 
         case DEV_FORTIUS : next = 30; break; // confirm and add 
         }

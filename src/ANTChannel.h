@@ -28,6 +28,8 @@
 /* after fast search, wait for slow search.  Otherwise, starting slow
    search might postpone the fast search on another channel. */
 #define CHANNEL_TYPE_WAITING 0x20
+#define CHANNEL_TYPE_RX 0x0
+#define CHANNEL_TYPE_TX 0x10
 #define CHANNEL_TYPE_PAIR   0x40 // to do an Ant pair
 #define MESSAGE_RECEIVED -1
 
@@ -86,7 +88,6 @@ class ANTChannel : public QObject {
         double blanking_timestamp;
         int blanked;
         char id[10]; // short identifier
-        bool channel_assigned;
         ANTChannelInitialisation mi;
 
         int messages_received; // for signal strength metric
@@ -105,6 +106,8 @@ class ANTChannel : public QObject {
 
     public:
 
+        // !!! THIS ENUM LIST MUST MATCH THE ORDER THAT ant_sensor_type_t
+        // !!! IS INITIALISED IN ANT.cpp (SORRY, ITS HORRIBLE)
         enum channeltype {
             CHANNEL_TYPE_UNUSED,
             CHANNEL_TYPE_HR,
@@ -112,13 +115,19 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_SPEED,
             CHANNEL_TYPE_CADENCE,
             CHANNEL_TYPE_SandC,
-            CHANNEL_TYPE_QUARQ,
-            CHANNEL_TYPE_FAST_QUARQ,
-            CHANNEL_TYPE_FAST_QUARQ_NEW,
+            CHANNEL_TYPE_CONTROL,
             CHANNEL_TYPE_KICKR,
             CHANNEL_TYPE_GUARD
         };
         typedef enum channeltype ChannelType;
+
+        // lets track the status as we open and close a channel
+        enum channelstatus {
+            Closed,
+            Opening,
+            Open,
+            Closing
+        } status;
 
         // Channel Information - to save tedious set/getters made public
         int number; // Channel number within Ant chip
@@ -136,7 +145,10 @@ class ANTChannel : public QObject {
 
         int search_type;
         int srm_offset;
-        ANTChannel *control_channel;
+
+        // this is a command channel used by the Kickr and possibly
+        // will be of use for other devices. It is probably rather
+        ANTChannel *command_channel;
 
         ANTChannel(int number, ANT *parent);
 
@@ -157,11 +169,9 @@ class ANTChannel : public QObject {
         void broadcastEvent(unsigned char *message);
         void ackEvent(unsigned char *message);
         void channelId(unsigned char *message);
-        void setChannelID(int device, int id, int txtype);
         void setId();
         void requestCalibrate();
         void attemptTransition(int message_code);
-        void setTimeout(int seconds);
 
         // telemetry for this channel
         double channelValue() { return value; }

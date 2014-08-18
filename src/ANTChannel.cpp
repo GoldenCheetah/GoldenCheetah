@@ -35,16 +35,16 @@ ANTChannel::init()
 {
     channel_type=CHANNEL_TYPE_UNUSED;
     channel_type_flags=0;
+    is_kickr=false;
     is_cinqo=0;
     is_old_cinqo=0;
     is_alt=0;
-    control_channel=NULL;
+    command_channel=NULL; // kickr
     manufacturer_id=0;
     product_id=0;
     product_version=0;
     device_number=0;
     device_id=0;
-    channel_assigned=0;
     state=ANT_UNASSIGN_CHANNEL;
     blanked=1;
     messages_received=0;
@@ -53,6 +53,7 @@ ANTChannel::init()
     srm_offset=400; // default relatively arbitrary, but matches common 'indoors' values
     burstInit();
     value2=value=0;
+    status = Closed;
 }
 
 //
@@ -95,7 +96,12 @@ void ANTChannel::open(int device, int chan_type)
     device_number=device;
     setId();
 
-    attemptTransition(ANT_UNASSIGN_CHANNEL);
+    // lets open the channel
+    qDebug()<<"** OPENING CHANNEL"<<number<<"**";
+    status = Opening;
+
+    // start the transition process 
+    attemptTransition(TRANSITION_START);
 }
 
 // close an ant channel assignment
@@ -103,6 +109,11 @@ void ANTChannel::close()
 {
     emit lostInfo(number);
     lastMessage = ANTMessage();
+
+    // lets shutdown
+    qDebug()<<"** CLOSING CHANNEL"<<number<<"**";
+    status = Closing;
+
     parent->sendMessage(ANTMessage::close(number));
     init();
 }
@@ -118,17 +129,21 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
         break;
     case ANT_BROADCAST_DATA:
         broadcastEvent(ant_message);
+        qDebug()<<"broadcast event:"<<number;
         break;
     case ANT_ACK_DATA:
         ackEvent(ant_message);
+        qDebug()<<"ack data:"<<number;
         break;
     case ANT_CHANNEL_ID:
         channelId(ant_message);
+        qDebug()<<"channel id:"<<number;
         break;
     case ANT_BURST_DATA:
         burstData(ant_message);
         break;
     default:
+        qDebug()<<"dunno?"<<number;
         break; //errors silently ignored for now, would indicate hardware fault.
     }
 
@@ -148,20 +163,29 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
 // break existing code.
 void ANTChannel::channelEvent(unsigned char *ant_message) {
 
+    // we should reimplement this via ANTMessage at some point
     unsigned char *message=ant_message+2;
 
-//qDebug()<<"channel event:"<< ANTMessage::channelEventMessage(*(message+1));
-
+    qDebug()<<number<<"channel event:"<< ANTMessage::channelEventMessage(*(message+1));
     if (MESSAGE_IS_RESPONSE_NO_ERROR(message)) {
 
+        qDebug()<<number<<"channel event response no error";
         attemptTransition(RESPONSE_NO_ERROR_MESSAGE_ID(message));
 
     } else if (MESSAGE_IS_EVENT_CHANNEL_CLOSED(message)) {
 
-        parent->sendMessage(ANTMessage::unassignChannel(number));
+        qDebug()<<number<<"channel event channel closed";
+        if (status != Closing) {
+            qDebug()<<"we got closed!! re-open !!";
+            status = Opening;
+            attemptTransition(TRANSITION_START);
+        } else {
+            parent->sendMessage(ANTMessage::unassignChannel(number));
+        }
 
     } else if (MESSAGE_IS_EVENT_RX_SEARCH_TIMEOUT(message)) {
 
+        qDebug()<<number<<"channel event rx timeout";
         // timeouts are normal for search channel
         if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
 
@@ -187,6 +211,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
     } else if (MESSAGE_IS_EVENT_RX_FAIL(message)) {
 
+        qDebug()<<number<<"channel event rx fail";
         messages_dropped++;
         double t=get_timestamp();
 
@@ -198,11 +223,18 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
     } else if (MESSAGE_IS_EVENT_RX_ACKNOWLEDGED(message)) {
 
-        exit(-10);
+        //this cannot possibly be correct >> exit(-10);
 
     } else if (MESSAGE_IS_EVENT_TRANSFER_TX_COMPLETED(message)) {
+
         // do nothing
-    } 
+
+    }  else {
+
+        // usually a response event, so lets get a debug going
+        qDebug()<<number<<"channel event other ....."<<QString("0x%1 0x%2 %3 %4")
+        .arg(message[0], 1, 16).arg(message[1], 1, 16).arg(message[2]).arg(ANTMessage::channelEventMessage(message[2]));
+    }
 }
 
 // if this is a quarq cinqo then record that fact
@@ -236,6 +268,7 @@ void ANTChannel::sendCinqoSuccess() {}
 //
 void ANTChannel::broadcastEvent(unsigned char *ant_message)
 {
+    qDebug()<<number<<"broadcase event !";
     ANTMessage antMessage(parent, ant_message);
     bool savemessage = true; // flag to stop lastmessage being
                              // overwritten for standard power
@@ -256,7 +289,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
         // The recent bug with not being able to "pair" intermittently, was caused
         // by the write below failing (and any write really, but the one below being
-        // pretty critical) -- because the USB stick needed a USB reset which we know
+        // pretty critical) -- because the USB stick needed a USB reset which we now
         // do every time we open the USB device
         parent->sendMessage(ANTMessage::requestMessage(number, ANT_CHANNEL_ID));
         blanking_timestamp=get_timestamp();
@@ -291,9 +324,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
            // Power
            case CHANNEL_TYPE_POWER:
-           case CHANNEL_TYPE_QUARQ:
-           case CHANNEL_TYPE_FAST_QUARQ:
-           case CHANNEL_TYPE_FAST_QUARQ_NEW:
 
                 // what kind of power device is this?
                 switch(antMessage.data_page) {
@@ -482,13 +512,16 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            // HR
            case CHANNEL_TYPE_HR:
            {
+qDebug()<<"hr broadcast!";
                // cadence first...
                uint16_t time = antMessage.measurementTime - lastMessage.measurementTime;
+qDebug()<<"time="<<time;
                if (time) {
                    nullCount = 0;
                    parent->setBPM(antMessage.instantHeartrate);
                    value2 = value = antMessage.instantHeartrate;
 
+qDebug()<<"instant="<<value2;
                     // lets emit a signal for collected HR R-R data
                     emit rrData(antMessage.measurementTime, antMessage.heartrateBeats, antMessage.instantHeartrate);
 
@@ -603,15 +636,23 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     device_id=CHANNEL_ID_DEVICE_TYPE_ID(message);
     state=MESSAGE_RECEIVED;
 
+    qDebug()<<"CHANNEL ID !!!!!!!!!!!!!!!! device number:"<<device_number<<"id:"<<device_id;
+
     // high nibble of transmission type used to indicate
     // it is a kick, A0 gives the game away :)
     is_kickr = (device_id == ANT_SPORT_POWER_TYPE) && ((CHANNEL_ID_TRANSMISSION_TYPE(message)&0xF0) == 0xA0);
 
-    emit channelInfo(number, device_number, device_id);
+    if (is_kickr) {
+        qDebug()<<number<<"KICKR DETECTED VIA CHANNEL ID EVENT";
+    }
+
+    // tell controller we got a new channel id
     setId();
+    emit channelInfo(number, device_number, device_id);
 
     // if we were searching,
-    if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
+    if (channel_type != CHANNEL_TYPE_KICKR && (channel_type_flags&CHANNEL_TYPE_QUICK_SEARCH)) {
+        qDebug()<<number<<"change timeout setting";
         parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
     }
     channel_type_flags &= ~CHANNEL_TYPE_QUICK_SEARCH;
@@ -661,19 +702,25 @@ void ANTChannel::burstData(unsigned char *ant_message) {
     }
 }
 
-// choose this one..
-void ANTChannel::setChannelID(int device_number, int device_id, int /*txtype*/)
-{
-    parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // lets go back to allowing anything
-    parent->sendMessage(ANTMessage::open(number)); // lets go back to allowing anything
-}
-
+// TRANSITIONING FROM NOT OPEN TO OPEN AND BACK
+// this is basically a transition from an unassigned channel
+// to one with a device open on it and works from top to bottom
+// it is first called by open() to unassign channel and then
+// after each message response from the device we get called here
+// to perform the next action in the sequence
 void ANTChannel::attemptTransition(int message_id)
 {
+    // ignore all the nonsense if we are not trying to transition !
+    if (status != Closing && status != Opening) {
+        qDebug()<<number<<"ignore transition"<<message_id;
+        return;
+    }
 
     const ant_sensor_type_t *st;
     int previous_state=state;
     st=&(parent->ant_sensor_types[channel_type]);
+
+    qDebug()<<number<<"type="<<channel_type<<"device type="<<device_id<<"freq="<<st->frequency;
 
     // update state
     state=message_id;
@@ -681,43 +728,77 @@ void ANTChannel::attemptTransition(int message_id)
     // do transitions from top status to bottom status !
     switch (state) {
 
-    case ANT_CLOSE_CHANNEL:
-        // next step is unassign and start over
-        // but we must wait until event_channel_closed
-        // which is its own channel event
-        state=MESSAGE_RECEIVED;
-        break;
+    case TRANSITION_START:
+        qDebug()<<number<<"TRANSITION start";
 
-    case ANT_UNASSIGN_CHANNEL:
-        channel_assigned=0;
-
-        // lets make sure this channel is assigned to our network
-        // regardless of its current state.
+        // unassign regardless of status
         parent->sendMessage(ANTMessage::unassignChannel(number)); // unassign whatever we had before
 
+        // drops through into assign channel because if the channel currently has no
+        // assignment the unassign channel message will generate an error response not
+        // an unassign channel response. But we don't really know what state the device
+        // might be in, so we unassign then assign at the beginning of a transition
+
+    case ANT_UNASSIGN_CHANNEL:
+        qDebug()<<number<<"TRANSITION from unassigned";
+
         // reassign to whatever we need!
-        parent->sendMessage(ANTMessage::assignChannel(number, 0, st->network)); // recieve channel on network 1
+        if (channel_type == CHANNEL_TYPE_KICKR) {
+            qDebug()<<"assign channel tx for kickr";
+            // channel is a transmit not receiving channel
+            parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_TX, st->network)); // recieve channel on network 1
+
+        } else {
+
+            qDebug()<<"assign channel rx for NOT kickr"<<st->type;
+            // assign and set channel id all in one
+            parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // recieve channel on network 1
+        }
         device_id=st->device_id;
-        parent->sendMessage(ANTMessage::setChannelID(number, 0, device_id, 0)); // lets go back to allowing anything
         setId();
         break;
 
     case ANT_ASSIGN_CHANNEL:
-        channel_assigned=1;
-        parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0));
+
+        qDebug()<<number<<"TRANSITION from assign channel";
+
+        // reassign to whatever we need!
+        if (channel_type == CHANNEL_TYPE_KICKR) {
+
+            qDebug()<<"assign channel id for kickr";
+
+            // set channel id channel, device no, pairing request ?, device type, transmission type
+            parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // we need to be specific!
+        } else {
+
+            qDebug()<<"assign channel id for NOT kickr"<<st->type;
+            parent->sendMessage(ANTMessage::setChannelID(number, 0, device_id, 0)); // lets go back to allowing anything
+        }
         break;
 
     case ANT_CHANNEL_ID:
-        if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
-            parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
+        qDebug()<<number<<"TRANSITION from channel id";
+        if (channel_type == CHANNEL_TYPE_KICKR) {
+
+            // kickr just set to search forever ...
+            qDebug()<<number<<"**** set search timeout to forever ****";
+            parent->sendMessage(ANTMessage::setSearchTimeout(number, 255));
+            
         } else {
-            parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
+            qDebug()<<number<<"**** adjust timeout";
+            if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
+                parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
+            } else {
+                parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
+            }
         }
         break;
 
     case ANT_SEARCH_TIMEOUT:
+        qDebug()<<number<<"TRANSITION from search timeout";
         if (previous_state==ANT_CHANNEL_ID) {
             // continue down the intialization chain
+            qDebug()<<"set channel period in timeout"<<st->period;
             parent->sendMessage(ANTMessage::setChannelPeriod(number, st->period));
         } else {
             // we are setting the ant_search timeout after connected
@@ -727,27 +808,37 @@ void ANTChannel::attemptTransition(int message_id)
         break;
 
     case ANT_CHANNEL_PERIOD:
+        qDebug()<<number<<"TRANSITION from channel period";
+        qDebug()<<"set channel freq in timeout"<<st->frequency;
         parent->sendMessage(ANTMessage::setChannelFreq(number, st->frequency));
         break;
 
     case ANT_CHANNEL_FREQUENCY:
+        qDebug()<<number<<"TRANSITION from channel freq";
         parent->sendMessage(ANTMessage::open(number));
         mi.initialise();
         break;
 
     case ANT_OPEN_CHANNEL:
-        parent->sendMessage(ANTMessage::open(number));
+        qDebug()<<number<<"TRANSITION from open (do nothing)";
+        status = Open;
+        qDebug()<<"** CHANNEL"<<number<<"NOW OPEN **";
+        //parent->sendMessage(ANTMessage::open(number));
+        break;
+
+    case ANT_CLOSE_CHANNEL:
+        // next step is unassign and start over
+        // but we must wait until event_channel_closed
+        // which is its own channel event
+        state=MESSAGE_RECEIVED;
+        qDebug()<<number<<"TRANSITION from closed";
+        status = Closed;
+        qDebug()<<"** CHANNEL"<<number<<"NOW CLOSED **";
         break;
 
     default:
         break;
     }
-}
-
-// set channel timeout
-void ANTChannel::setTimeout(int seconds)
-{
-    parent->sendMessage(ANTMessage::setSearchTimeout(number, seconds/2.5));
 }
 
 // Calibrate... needs fixing in version 3.1
