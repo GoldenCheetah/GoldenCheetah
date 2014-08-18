@@ -1,0 +1,46 @@
+We are proud to announce that GoldenCheetah v3.1 was released today.
+
+It can be downloaded from our new website[http://www.goldencheetah.org/index.html#section-download]
+
+We have recorded a video[https://vimeo.com/99817526] to explain the main changes, and the user guide[https://github.com/GoldenCheetah/GoldenCheetah/wiki/Main-Page_Users-Guide] has been overhauled to cover all the main features along with an updated FAQ[https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ].
+
+We have also added a section on the science of GoldenCheetah[http://www.goldencheetah.org/index.html#section-science] to help users new to power training and analysis.
+
+MAJOR NEW FEATURES
+
+1. Compare Mode
+   * Across Summary, Ride, QA, CP, Histogram, Metric charts
+   * Compare Athletes, Seasons, Rides, Intervals
+   * Easy and intuitive user interface
+
+2. Additional Power Duration Models
+   * Multiple PD models now available
+   * Track changes in model estimates for W', CP, P-Max, FTP over time
+   * Track changes in model estimates for any duration over time
+
+2. Merge data from multiple rides into a single ride
+3. Share Dialog to upload to multiple services in one click
+
+OTHER SELECTED HIGHLIGHTS
+
+* Open Athletes in Tabs
+* Redesign Tabbed mode with a ChartBar
+* Themes and better support for color customisation
+* Improved Interactivity (axes, interval hover)
+
+Device enhancements
+* Fixed up Tacx Fortius Support
+* Pedal Smoothness / Torque Effectiveness support
+
+Metrics and new science
+* Plot best x power
+* Plot estimated W', CP, FTP et al
+* W'bal implemented with metrics
+
+Charts
+* Improved UX for chart configuration and setup
+* Export data for MMP curves, trends data
+* Over 50 new charting options (heat, stack, labels etc etc)
+
+Work on 3.11 starts today, focusing on indoor training.
+
