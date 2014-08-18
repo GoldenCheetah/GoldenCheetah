@@ -122,7 +122,7 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     contributors.append("Berend De Schouwer");
     contributors.append("Bruno Assis");
     contributors.append("Chris Cleeland");
-    contributors.append("Christian Charete");
+    contributors.append("Christian Charette");
     contributors.append("Claus Assmann");
     contributors.append("Dag Gruneau");
     contributors.append("Damien Grauser");
