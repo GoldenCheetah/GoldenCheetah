@@ -43,18 +43,20 @@
 // 3058 - V3.1 RC3X
 // 3059 - V3.1 RC4
 // 3100 - V3.1 RELEASE (August 17 2014)
+// 3101 - V3.11 DEVELOPMENT
 
-#define VERSION3_BUILD 3010 // released
-#define VERSION3_SP1   3030 // released
-#define VERSION3_SP2   3032 // released
-#define VERSION31_UPG  3100 // first build with 3.1 upgrade process
+#define VERSION3_BUILD    3010 // released
+#define VERSION3_SP1      3030 // released
+#define VERSION3_SP2      3032 // released
+#define VERSION31_UPG     3100 // first build with 3.1 upgrade process
+#define VERSION311_BUILD  3101 // first build with 3.1 upgrade process
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // these three will change until we release
-#define VERSION_LATEST 3100
-#define VERSION_STRING "V3.1"
+#define VERSION_LATEST 3101
+#define VERSION_STRING "V3.11 development"
 
 class GcUpgrade
 {
