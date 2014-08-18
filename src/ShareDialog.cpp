@@ -118,6 +118,34 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 
     titleEdit = new QLineEdit();
 
+    // If we have a ride, and it can be opened then lets set the default for the title
+    // We try metadata fields; Title, then Name then Route then Workout Code
+    if (ride && ride->ride()) {
+
+        // is "Title" set?
+        if (!ride->ride()->getTag("Title", "").isEmpty()) {
+            titleEdit->setText(ride->ride()->getTag("Title", ""));
+        } else {
+
+            // is "Name" set?
+            if (!ride->ride()->getTag("Name", "").isEmpty()) {
+                titleEdit->setText(ride->ride()->getTag("Name", ""));
+            } else {
+
+                // is "Route" set?
+                if (!ride->ride()->getTag("Route", "").isEmpty()) {
+                    titleEdit->setText(ride->ride()->getTag("Route", ""));
+                } else {
+
+                    //  is Workout Code set?
+                    if (!ride->ride()->getTag("Workout Code", "").isEmpty()) {
+                        titleEdit->setText(ride->ride()->getTag("Workout Code", ""));
+                    }
+                }
+            }
+        }
+    }
+
     QGridLayout *vbox2 = new QGridLayout();
     vbox2->addWidget(titleEdit,0,0);
 

@@ -555,7 +555,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+U"));
+    rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
@@ -565,6 +565,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tweetAction);
 
     shareAction = new QAction(tr("Share (Strava, RideWithGPS, CyclingAnalytics)..."), this);
+    shareAction->setShortcut(tr("Ctrl+U"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
     rideMenu->addAction(shareAction);
 #endif
