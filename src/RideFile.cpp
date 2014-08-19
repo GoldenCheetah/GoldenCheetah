@@ -461,6 +461,20 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         result->setTag("Month", result->startTime().toString("MMMM"));
         result->setTag("Weekday", result->startTime().toString("ddd"));
 
+        // reset timestamps and distances to always start from zero
+        double timeOffset=0.00f, kmOffset=0.00f;
+        if (result->dataPoints().count()) {
+            timeOffset=result->dataPoints()[0]->secs;
+            kmOffset=result->dataPoints()[0]->km;
+        }
+
+        if (timeOffset || kmOffset) {
+            foreach (RideFilePoint *p, result->dataPoints()) {
+                p->km = p->km - kmOffset;
+                p->secs = p->secs - timeOffset;
+            }
+        }
+
         // calculate derived data series
         result->recalculateDerivedSeries();
 
