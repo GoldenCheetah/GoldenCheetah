@@ -243,6 +243,7 @@ Aerolab::Aerolab(
   rho       = 1.236;
   eta       = 1.0;
   eoffset   = 0.0;
+  constantAlt = false;
 
   insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
   setCanvasBackground(Qt::white);
