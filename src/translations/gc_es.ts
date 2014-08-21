@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es">
+<TS version="2.1" language="es">
 <context>
     <name>AAvgPower</name>
     <message>
@@ -644,7 +644,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     <message>
         <location filename="../AddIntervalDialog.cpp" line="734"/>
         <source>Peak 60min</source>
-        <translation>Pico 30min</translation>
+        <translation>Pico 60min</translation>
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="789"/>
