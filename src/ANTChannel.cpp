@@ -541,9 +541,15 @@ qDebug()<<"instant="<<value2;
                uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
                uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
+                   nullCount = 0;
                    float cadence = 1024*60*revs / time;
                    parent->setCadence(cadence);
                    value2 = value = cadence;
+               } else {
+                   nullCount++;
+                   if (nullCount >= 12) { parent->setCadence(0);
+                                          value = 0;
+                   }
                }
            }
            break;
