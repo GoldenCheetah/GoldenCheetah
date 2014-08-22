@@ -1190,6 +1190,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     timer.start();
 
     MAXX=0.0; // maximum value for x, always from 0-n
+    settings = set;
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -1264,7 +1265,6 @@ LTMPlot::setCompareData(LTMSettings *set)
         if (cogganPMC) { delete cogganPMC; cogganPMC=NULL; }
         if (skibaPMC) { delete skibaPMC; skibaPMC=NULL; }
 
-        settings = set;
         settings->start = QDateTime(cd.start, QTime());
         settings->end = QDateTime(cd.end, QTime());
 
