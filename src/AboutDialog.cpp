@@ -155,6 +155,7 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     contributors.append("Mark Rages");
     contributors.append("Michael Puchowicz");
     contributors.append("Mitsukuni Sato");
+    contributors.append("Omar Torres");
     contributors.append("Ned Harding");
     contributors.append("Okano Takayoshi");
     contributors.append("Patrick McNerthney");
