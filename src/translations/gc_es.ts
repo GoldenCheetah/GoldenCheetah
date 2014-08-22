@@ -115,7 +115,7 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1080"/>
         <source>Port</source>
-        <translation>Puert</translation>
+        <translation>Puerto</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1081"/>
@@ -140,212 +140,212 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1096"/>
         <source>Power - Kurt Kinetic Cyclone</source>
-        <translation></translation>
+        <translation>Potencia - Kurt Kinetic Cyclone</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1097"/>
         <source>Power - Kurt Kinetic Road Machine</source>
-        <translation></translation>
+        <translation>Potencia - Kurt Kinetic Road Machine</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1098"/>
         <source>Power - Cyclops Fluid 2</source>
-        <translation></translation>
+        <translation>Potencia - Cyclops Fluid 2</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1099"/>
         <source>Power - BT Advanced Training System</source>
-        <translation></translation>
+        <translation>Potencia - BT Advanced Training System</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1100"/>
         <source>Power - LeMond Revolution</source>
-        <translation></translation>
+        <translation>Potencia - LeMond Revolution</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1101"/>
         <source>Power - 1UP USA Trainer</source>
-        <translation></translation>
+        <translation>Potencia - 1UP USA Trainer</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1102"/>
         <source>Power - Minoura V100 Trainer (H)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (H)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1103"/>
         <source>Power - Minoura V100 Trainer (5)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (5)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1104"/>
         <source>Power - Minoura V100 Trainer (4)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1105"/>
         <source>Power - Minoura V100 Trainer (3)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (3)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1106"/>
         <source>Power - Minoura V100 Trainer (2)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1107"/>
         <source>Power - Minoura V100 Trainer (1)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (1)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1108"/>
         <source>Power - Minoura V100 Trainer (L)</source>
-        <translation></translation>
+        <translation>Potencia - Minoura V100 Trainer (L)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1109"/>
         <source>Power - Saris Powerbeam Pro</source>
-        <translation></translation>
+        <translation>Potencia - Saris Powerbeam Pro</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1110"/>
         <source>Power - Tacx Satori (2)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Satori (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1111"/>
         <source>Power - Tacx Satori (4)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Satori (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1112"/>
         <source>Power - Tacx Satori (6)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Satori (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1113"/>
         <source>Power - Tacx Satori (8)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Satori (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1114"/>
         <source>Power - Tacx Satori (10)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Satori (10)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1115"/>
         <source>Power - Tacx Flow (0)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Flow (0)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1116"/>
         <source>Power - Tacx Flow (2)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Flow (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1117"/>
         <source>Power - Tacx Flow (4)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Flow (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1118"/>
         <source>Power - Tacx Flow (6)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Flow (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1119"/>
         <source>Power - Tacx Flow (8)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Flow (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1120"/>
         <source>Power - Tacx Blue Twist (1)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Twist (1)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1121"/>
         <source>Power - Tacx Blue Twist (3)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Twist (3)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1122"/>
         <source>Power - Tacx Blue Twist (5)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Twist (5)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1123"/>
         <source>Power - Tacx Blue Twist (7)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Twist (7)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1124"/>
         <source>Power - Tacx Blue Motion (2)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Motion (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1125"/>
         <source>Power - Tacx Blue Motion (4)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Motion (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1126"/>
         <source>Power - Tacx Blue Motion (6)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Motion (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1127"/>
         <source>Power - Tacx Blue Motion (8)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Motion (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1128"/>
         <source>Power - Tacx Blue Motion (10)</source>
-        <translation></translation>
+        <translation>Potencia - Tacx Blue Motion (10)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1129"/>
         <source>Power - Elite Supercrono Powermag (1)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (1)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1130"/>
         <source>Power - Elite Supercrono Powermag (2)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (2)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1131"/>
         <source>Power - Elite Supercrono Powermag (3)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (3)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1132"/>
         <source>Power - Elite Supercrono Powermag (4)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (4)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1133"/>
         <source>Power - Elite Supercrono Powermag (5)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (5)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1134"/>
         <source>Power - Elite Supercrono Powermag (6)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (6)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1135"/>
         <source>Power - Elite Supercrono Powermag (7)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (7)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1136"/>
         <source>Power - Elite Supercrono Powermag (8)</source>
-        <translation></translation>
+        <translation>Potencia - Elite Supercrono Powermag (8)</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1137"/>
         <source>Power - Elite Qubo Power Fluid</source>
-        <translation></translation>
+        <translation>Potencia - Elite Qubo Power Fluid</translation>
     </message>
     <message>
         <location filename="../AddDeviceWizard.cpp" line="1139"/>
@@ -470,7 +470,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca G
     <message>
         <location filename="../AddIntervalDialog.cpp" line="52"/>
         <source>Peak Power</source>
-        <translation>Potencia PIco</translation>
+        <translation>Potencia Pico</translation>
     </message>
     <message>
         <location filename="../AddIntervalDialog.cpp" line="75"/>
@@ -2208,7 +2208,7 @@ Presione Siguiente para Continuar</translation>
     <message>
         <location filename="../Athlete.cpp" line="449"/>
         <source>Stress (TISS)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Estrés (TISS)</translation>
     </message>
     <message>
         <location filename="../Athlete.cpp" line="450"/>
