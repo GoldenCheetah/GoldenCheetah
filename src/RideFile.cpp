@@ -1235,6 +1235,7 @@ RideFile::recalculateDerivedSeries()
         if (oCP) CP=oCP;
     }
 
+#if 0 // use a fix tool
     // Power Estimation Constants
     double hRider = 1.7 ; //Height in m
     double M = getWeight(); //Weight kg
@@ -1255,6 +1256,7 @@ RideFile::recalculateDerivedSeries()
     double adipos = sqrt(M/(hRider*750));
     double CwaBike = afCdBike * (afCATireV * ATire + afCATireH * ATire + afAFrame);
     qDebug()<<"CwaBike="<<CwaBike<<", afCdBike="<<afCdBike<<", afCATireV="<<afCATireV<<", ATire="<<ATire<<", afCATireH="<<afCATireH<<", afAFrame="<<afAFrame;
+#endif
 
     // last point looked at
     RideFilePoint *lastP = NULL;
@@ -1398,6 +1400,7 @@ RideFile::recalculateDerivedSeries()
             p->antiss = anTISS;
         }
 
+#if 0 // updating the primary data series should be done via a Fix Tool
         // Slope
         // If there is no slope data then it can be derived
         // from distanct and altitude
@@ -1418,6 +1421,7 @@ RideFile::recalculateDerivedSeries()
 
         // last point
         lastP = p;
+#endif
     }
 
     // Averages and Totals
@@ -1430,6 +1434,7 @@ RideFile::recalculateDerivedSeries()
     avgPoint->apower = APcount ? (APtotal / APcount) : 0;
     totalPoint->apower = APtotal;
 
+#if 0 // again use a fix tool
     // Smooth the slope if it has been derived
     if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
         int smoothPoints = 10;
@@ -1497,5 +1502,6 @@ RideFile::recalculateDerivedSeries()
         // and we're done
         dstale=false;
     }
-
+#endif
+    dstale=false;
 }

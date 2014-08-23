@@ -100,8 +100,9 @@
 // 79  20  Jun 2014 Mark Liversedge    Change the way average temperature is handled
 // 80  13  Jul 2014 Mark Liversedge    W' work + Below CP work = Work
 // 81  16  Aug 2014 Joern Rischmueller Added 'Elevation Loss'
+// 82  23  Aug 2014 Mark Liversedge    Added W'bal Matches
 
-int DBSchemaVersion = 81;
+int DBSchemaVersion = 82;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

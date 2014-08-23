@@ -659,6 +659,39 @@ class MaxMatch : public RideMetric {
     RideMetric *clone() const { return new MaxMatch(*this); }
 };
 
+class Matches : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(Matches);
+
+    public:
+
+    Matches()
+    {
+        setSymbol("skiba_wprime_matches");
+        setInternalName("W'bal Matches > 2KJ");
+    }
+    void initialize() {
+        setName(tr("W'bal Matches"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("matches"));
+        setImperialUnits(tr("matches"));
+        setPrecision(1);
+    }
+    void compute(const RideFile *r, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        int matches=0;
+        foreach(Match m, const_cast<RideFile*>(r)->wprimeData()->matches) {
+            if (m.cost > 2000) matches++; // 2kj is minimum size
+        }
+        setValue(matches);
+    }
+
+    bool canAggregate() { return false; }
+    RideMetric *clone() const { return new Matches(*this); }
+};
+
 class WPrimeTau : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(WPrimeTau);
 
@@ -777,6 +810,7 @@ class CPExp : public RideMetric {
 static bool addMetrics() {
     RideMetricFactory::instance().addMetric(MinWPrime());
     RideMetricFactory::instance().addMetric(MaxWPrime()); // same thing expressed as a maximum
+    RideMetricFactory::instance().addMetric(Matches());
     RideMetricFactory::instance().addMetric(MaxMatch());
     RideMetricFactory::instance().addMetric(WPrimeTau());
     RideMetricFactory::instance().addMetric(WPrimeExp());
