@@ -513,6 +513,7 @@ SOURCES += \
         FixElevation.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
+        FixPower.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
         FixHRSpikes.cpp \

@@ -146,6 +146,7 @@
 #define GC_DPFS_MAX       "dataprocess/fixspikes/max"
 #define GC_DPFS_VARIANCE  "dataprocess/fixspikes/variance"
 #define GC_DPTA           "dataprocess/torqueadjust/adjustment"
+#define GC_DPPA           "dataprocess/poweradjust/adjustment"
 #define GC_DPFHRS_MAX     "dataprocess/fixhrspikes/max"
 
 // ride navigator
