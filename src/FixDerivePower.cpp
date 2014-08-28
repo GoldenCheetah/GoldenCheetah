@@ -99,6 +99,7 @@ static bool FixDerivePowerAdded = DataProcessorFactory::instance().registerProce
 bool
 FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
+    Q_UNUSED(config);
 
     // Power Estimation Constants
     double hRider = 1.7 ; //Height in m
@@ -119,7 +120,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     double CrEff = CrV;
     double adipos = sqrt(M/(hRider*750));
     double CwaBike = afCdBike * (afCATireV * ATire + afCATireH * ATire + afAFrame);
-    qDebug()<<"CwaBike="<<CwaBike<<", afCdBike="<<afCdBike<<", afCATireV="<<afCATireV<<", ATire="<<ATire<<", afCATireH="<<afCATireH<<", afAFrame="<<afAFrame;
+    //qDebug()<<"CwaBike="<<CwaBike<<", afCdBike="<<afCdBike<<", afCATireV="<<afCATireV<<", ATire="<<ATire<<", afCATireH="<<afCATireH<<", afAFrame="<<afAFrame;
 
     // apply the change
     ride->command->startLUW("Estimate Power");
@@ -167,16 +168,8 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
         ride->setDataPresent(ride->slope, true);
     }
 
-    if (!ride->areDataPresent()->cad) {
-        for (int i=0; i<ride->dataPoints().count(); i++) {
-            RideFilePoint *p = ride->dataPoints()[i];
-            ride->command->setPointValue(i, RideFile::cad, 85);
-        }
-        ride->setDataPresent(ride->cad, true);
-    }
-
     if (ride->areDataPresent()->slope && ride->areDataPresent()->alt
-     && ride->areDataPresent()->km    && ride->areDataPresent()->cad) {
+     && ride->areDataPresent()->km) {
         for (int i=0; i<ride->dataPoints().count(); i++) {
             RideFilePoint *p = ride->dataPoints()[i];
             // Estimate Power if not in data
@@ -190,12 +183,14 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double Frg = 9.81 * (MBik + M) * (CrEff * cos(Slope) + sin(Slope));
 
                 double vw=V+W;
-                CwaRider = (1 + p->cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
+                double cad = ride->areDataPresent()->cad ? p->cad : 85.00;
+
+                CwaRider = (1 + cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
                 Ka = 176.5 * exp(-p->alt * .0001253) * (CwaRider + CwaBike) / (273 + T);
-                qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd*V*M);
+                //qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd*V*M);
                 double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn))+(p->kphd > 1 ? 1 : p->kphd*V*M);
                 ride->command->setPointValue(i, RideFile::watts, watts > 0 ? (watts > 1000 ? 1000 : watts) : 0);
-                qDebug()<<"w="<<p->watts<<", Ka="<<Ka<<", CwaRi="<<CwaRider<<", slope="<<p->slope<<", v="<<p->kph<<" Cwa="<<(CwaRider + CwaBike);
+                //qDebug()<<"w="<<p->watts<<", Ka="<<Ka<<", CwaRi="<<CwaRider<<", slope="<<p->slope<<", v="<<p->kph<<" Cwa="<<(CwaRider + CwaBike);
             } else {
                 ride->command->setPointValue(i, RideFile::watts, 0);
             }
