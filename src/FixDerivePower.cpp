@@ -192,14 +192,16 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double vw=V+W;
                 CwaRider = (1 + p->cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
                 Ka = 176.5 * exp(-p->alt * .0001253) * (CwaRider + CwaBike) / (273 + T);
-                ride->command->setPointValue(i, RideFile::watts, afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn));
+                qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd*V*M);
+                double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn))+(p->kphd > 1 ? 1 : p->kphd*V*M);
+                ride->command->setPointValue(i, RideFile::watts, watts > 0 ? (watts > 1000 ? 1000 : watts) : 0);
                 qDebug()<<"w="<<p->watts<<", Ka="<<Ka<<", CwaRi="<<CwaRider<<", slope="<<p->slope<<", v="<<p->kph<<" Cwa="<<(CwaRider + CwaBike);
             } else {
                 ride->command->setPointValue(i, RideFile::watts, 0);
             }
         }
 
-        int smoothPoints = 8;
+        int smoothPoints = 3;
         // initialise rolling average
         double rtot = 0;
         for (int i=smoothPoints; i>0 && ride->dataPoints().count()-i >=0; i--) {
