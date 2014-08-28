@@ -61,7 +61,7 @@ class FixTorqueConfig : public DataProcessorConfig
                            "of your power meter was incorrect. It "
                            "takes a single parameter:\n\n"
                            "Torque Adjust - this defines an absolute value "
-                           "in poinds per square inch or newton meters to "
+                           "in pounds per square inch or newton meters to "
                            "modify values by. Negative values are supported. (e.g. enter \"1.2 nm\" or "
                            "\"-0.5 pi\").")));
         }
