@@ -197,9 +197,9 @@ WPrime::setRide(RideFile *input)
     }
 
     if (countBelowCP > 0)
-        TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+        TAU = 546.00f * exp(-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
     else
-        TAU = 546.00f * pow(E,-0.01*(CP)) + 316.00f;
+        TAU = 546.00f * exp(-0.01*(CP)) + 316.00f;
 
     TAU = int(TAU); // round it down
 
@@ -414,9 +414,9 @@ WPrime::setErg(ErgFile *input)
         }
 
         if (countBelowCP > 0)
-            TAU = 546.00f * pow(E,-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
+            TAU = 546.00f * exp(-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
         else
-            TAU = 546.00f * pow(E,-0.01*(CP)) + 316.00f;
+            TAU = 546.00f * exp(-0.01*(CP)) + 316.00f;
 
         TAU = int(TAU); // round it down
 
@@ -556,7 +556,7 @@ WPrimeIntegrator::run()
         // start at 1, since the actual value shouldn't be adjusted with itself !
         for (int i=1; i < (TAU*3) /*WPrimeDecayPeriod*/ && t+i < source.size(); i++) {
 
-            double value = source[t] * pow(E, -(double(i)/TAU));
+            double value = source[t] * exp(-(double(i)/TAU));
 
             // diminishing returns - we're dealing in kJ, so 10J is nothing !
             // this saves about 20% in calculation time typically
