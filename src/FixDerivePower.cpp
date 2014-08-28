@@ -101,6 +101,12 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 {
     Q_UNUSED(config);
 
+    // if its already there do nothing !
+    if (ride->areDataPresent()->watts) return false;
+
+    // no dice if we don't have alt and speed
+    if (!ride->areDataPresent()->alt || !ride->areDataPresent()->kph) return false;
+
     // Power Estimation Constants
     double hRider = 1.7 ; //Height in m
     double M = ride->getWeight(); //Weight kg
