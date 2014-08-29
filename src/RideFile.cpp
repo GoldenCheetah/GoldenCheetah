@@ -1250,7 +1250,7 @@ RideFile::recalculateDerivedSeries()
 
                 p->kphd = deltaSpeed / deltaTime;
 
-                // Other delta values -- only interested in growth for power, cadence and torque
+                // Other delta values -- only interested in growth for power, cadence 
                 double pd = (p->watts - lastP->watts) / deltaTime;
                 p->wattsd = pd > 0 && pd < 2500 ? pd : 0;
 
@@ -1258,7 +1258,7 @@ RideFile::recalculateDerivedSeries()
                 p->cadd = cd > 0 && cd < 200 ? cd : 0;
 
                 double nd = (p->nm - lastP->nm) / deltaTime;
-                p->nmd = nd > 0 ? nd : 0;
+                p->nmd = nd; // we want drops when looking for jump out saddle vs sit down
 
                 // we want recovery and increase times for hr
                 p->hrd = (p->hr - lastP->hr) / deltaTime;
