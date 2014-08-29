@@ -365,6 +365,7 @@ RideSummaryWindow::htmlSummary()
         << "workout_time"
         << "time_riding"
         << "total_distance"
+        << "ride_count"
         << "total_work"
         << "skiba_wprime_exp"
         << "elevation_gain";
@@ -372,6 +373,7 @@ RideSummaryWindow::htmlSummary()
     static const QStringList rtotalColumn = QStringList()
         << "workout_time"
         << "total_distance"
+        << "ride_count"
         << "total_work"
         << "skiba_wprime_exp"
         << "elevation_gain";
@@ -489,6 +491,9 @@ RideSummaryWindow::htmlSummary()
             QString symbol = metricsList[j];
 
              if (symbol == "") continue;
+
+             // don't need a count of 1 on a ride summary !
+             if (symbol == "ride_count" && ridesummary) continue;
 
              const RideMetric *m = factory.rideMetric(symbol);
              if (!m) break;
@@ -1138,6 +1143,7 @@ RideSummaryWindow::htmlCompareSummary() const
         << "workout_time"
         << "time_riding"
         << "total_distance"
+        << "ride_count"
         << "total_work"
         << "skiba_wprime_exp"
         << "elevation_gain";
@@ -1531,7 +1537,6 @@ RideSummaryWindow::htmlCompareSummary() const
 
                 case 0: metricsList = totalColumn;
                         columnName = columnNames[0]; 
-                        metricsList << "ride_count"; // number of rides
                         break;
                 case 1: metricsList = metricColumn; columnName = columnNames[3]; break;
                 case 2: metricsList = averageColumn; columnName = columnNames[1]; break;
