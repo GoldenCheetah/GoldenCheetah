@@ -510,6 +510,7 @@ SOURCES += \
         FitlogParser.cpp \
         FitRideFile.cpp \
         FixDerivePower.cpp \
+        FixDeriveTorque.cpp \
         FixElevation.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
