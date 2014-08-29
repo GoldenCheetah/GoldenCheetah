@@ -475,10 +475,10 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
             }
         }
 
-        // calculate derived data series
-        result->recalculateDerivedSeries();
-
         DataProcessorFactory::instance().autoProcess(result);
+
+        // calculate derived data series -- after data fixers applied above
+        result->recalculateDerivedSeries();
 
         // what data is present - after processor in case 'derived' or adjusted
         QString flags;
