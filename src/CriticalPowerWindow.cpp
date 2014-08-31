@@ -1201,6 +1201,7 @@ CriticalPowerWindow::updateCpint(double minutes)
 
     switch (series()) {
 
+        case veloclinicplot:
         case work:
             units = "kJ";
             break;
@@ -1320,6 +1321,7 @@ CriticalPowerWindow::seriesName(CriticalSeriesType series)
         case vam: return QString(tr("VAM"));
         case aPower: return QString(tr("aPower"));
         case work: return QString(tr("Work"));
+        case veloclinicplot: return QString(tr("Veloclinic Plot"));
 
         default: return QString(tr("Unknown"));
     }
@@ -1345,6 +1347,7 @@ CriticalPowerWindow::getRideSeries(CriticalSeriesType series)
         case vam: return RideFile::vam;
         case aPower: return RideFile::aPower;
 
+        case veloclinicplot: return RideFile::watts;
 
         // non RideFile series
         case work: return RideFile::none;
@@ -1372,7 +1375,8 @@ CriticalPowerWindow::addSeries()
                << nmd
                << cadd
                << hrd
-               << work;
+               << work
+               << veloclinicplot;
 
     foreach (CriticalSeriesType x, seriesList) {
         seriesCombo->addItem(seriesName(x), static_cast<int>(x));
