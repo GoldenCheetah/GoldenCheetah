@@ -151,7 +151,7 @@ class CriticalPowerWindow : public GcChartWindow
         int laeI2() const { return laeI2SpinBox->value(); }
         void setLaeI2(int x) { return laeI2SpinBox->setValue(x); }
 
-        enum criticalseriestype { watts, wattsd, wattsKg, xPower, NP, hr, hrd, kph, kphd, cad, cadd, nm, nmd, vam, aPower, work };
+        enum criticalseriestype { watts, wattsd, wattsKg, xPower, NP, hr, hrd, kph, kphd, cad, cadd, nm, nmd, vam, aPower, work, veloclinicplot };
 
         typedef enum criticalseriestype CriticalSeriesType;
 

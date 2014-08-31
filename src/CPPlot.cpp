@@ -178,6 +178,12 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 
     switch (criticalSeries) {
 
+    case CriticalPowerWindow::veloclinicplot:
+        series = tr("Veloclinic Plot");
+        units = tr("J");
+        scale = linear;
+        break;
+
     case CriticalPowerWindow::work:
         series = tr("Total work");
         units = tr("kJ");
@@ -274,8 +280,45 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     // set axis title
     setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
 
+    if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+        setAxisTitle(xBottom, tr("Power"));
+    else
+        setAxisTitle(xBottom, tr("Interval Length"));
+
     // zap the old curves
     clearCurves();
+}
+
+void
+CPPlot::initModel()
+{
+    switch (model) {
+
+    case 0 : // no model - do nothing
+        pdModel = NULL;
+        break;
+    case 1 : // 2 param
+        pdModel = new CP2Model(context);
+        break;
+    case 2 : // 3 param
+        pdModel = new CP3Model(context);
+        break;
+    case 3 : // extended model
+        pdModel = new ExtendedModel(context);
+        break;
+    case 4 : // multimodel
+        pdModel = new MultiModel(context);
+        pdModel->setVariant(modelVariant);
+        break;
+    }
+
+    if (pdModel) {
+
+        // set the model and load data
+        pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
+        pdModel->setMinutes(true); // we're minutes here ...
+        pdModel->setData(bestsCache->meanMaxArray(rideSeries));
+   }
 }
 
 // Plot the dashed line model curve according to the paramters
@@ -319,40 +362,29 @@ CPPlot::plotModel()
     if (!modelCurve) {
 
         // new model please
-        switch (model) {
-
-        case 0 : // no model - do nothing
-            pdModel = NULL;
-            break;
-        case 1 : // 2 param
-            pdModel = new CP2Model(context);
-            break;
-        case 2 : // 3 param
-            pdModel = new CP3Model(context);
-            break;
-        case 3 : // extended model
-            pdModel = new ExtendedModel(context);
-            break;
-        case 4 : // multimodel
-            pdModel = new MultiModel(context);
-            pdModel->setVariant(modelVariant);
-            break;
-        }
+        initModel();
 
         if (pdModel) {
-
-            // set the model and load data
-            pdModel->setIntervals(sanI1, sanI2, anI1, anI2, aeI1, aeI2, laeI1, laeI2);
-            pdModel->setMinutes(true); // we're minutes here ...
-            pdModel->setData(bestsCache->meanMaxArray(rideSeries));
-
             // create curve
             modelCurve = new QwtPlotCurve("Model");
             if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                 modelCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
             // set the point data
-            modelCurve->setData(pdModel);
+            if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+                // TODO plot the model for the veloclinic plot
+                pdModel->setMinutes(false);
+                QVector<double> power(pdModel->size());
+                QVector<double> wprime(pdModel->size());
+                for (size_t t = 0; t < pdModel->size(); t++) {
+                    power[t] = pdModel->y(t);
+                    wprime[t] = (pdModel->y(t)-pdModel->CP()) * (pdModel->x(t)); // Joules
+                }
+                modelCurve->setSamples(power.data(), wprime.data(), pdModel->size()-1);
+            }
+            else
+                modelCurve->setData(pdModel);
+
 
             // curve cosmetics
             QPen pen(GColor(CCP));
@@ -713,13 +745,26 @@ CPPlot::plotBests()
     int shadingCP = 0; 
     if (rideSeries == RideFile::watts && shadeMode) shadingCP = dateCP;
 
+    //For veloclinic plot we need to start by using a 2 parameters model
+    if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+        int selectedModel = model;
+        if (model == 0)
+            model = 1;
+        initModel();
+        model = selectedModel;
+    }
+
+
     // lets setup a time array to the size we want to plot the bests curve
     // and do work at the same time since its used in a few places below
     QVector<double> time(maxNonZero);
     QVector<double> work(maxNonZero);
+    QVector<double> wprime(maxNonZero);
     for (int t = 0; t < maxNonZero; t++) {
         time[t] = (t+1.00f) / 60.00f;
         work[t] = values[t] * t / 1000; // kJ not Joules
+        if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+            wprime[t] = (values[t]<pdModel->CP()?0:(values[t]-pdModel->CP()) * t); // Joules
     }
 
     if (showBest) {
@@ -813,8 +858,10 @@ CPPlot::plotBests()
 
             if (criticalSeries == CriticalPowerWindow::work)
                 curve->setSamples(time, work);
+            else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+                curve->setSamples(bestsCache->meanMaxArray(rideSeries).data()+1, wprime.data(), maxNonZero-1);
             else
-                curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
+                curve->setSamples(time.data(), bestsCache->meanMaxArray(RideFile::watts).data()+1, maxNonZero-1);
 
             curve->attach(this);
             bestsCurves.append(curve);
@@ -852,6 +899,8 @@ CPPlot::plotBests()
                 // set samples
                 if (criticalSeries == CriticalPowerWindow::work) { // this is Energy mode
                     curve->setSamples(time.data() + low, work.data() + low, high - low + 1);
+                } if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+                    curve->setSamples(values + low, wprime.data() + low, high - low + 1);
                 } else {
                     curve->setSamples(time.data() + low, values + low, high - low + 1);
                 }
@@ -929,6 +978,18 @@ CPPlot::plotBests()
         div.setTicks(QwtScaleDiv::MajorTick, LogTimeScaleDraw::ticks);
     setAxisScaleDiv(QwtPlot::xBottom, div);
 
+    if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+        double xmax;
+        xmax = 100 * ceil(values[0] / 100);
+        if (xmax == 100) xmax = 5 * ceil(values[0] / 5);
+
+        // set ymax to nearest 100 if power
+        int max = xmax * 1.1f;
+        max = ((max/100) + 1) * 100;
+
+        setAxisScale(QwtPlot::xBottom, 0, max);
+    }
+
     // Y-AXIS
 
     double ymax;
@@ -941,14 +1002,18 @@ CPPlot::plotBests()
     }
 
     // adjust if for power
-    if (rideSeries == RideFile::watts) {
+    if (rideSeries == RideFile::watts && criticalSeries != CriticalPowerWindow::veloclinicplot) {
 
         // set ymax to nearest 100 if power
         int max = ymax * 1.1f;
         max = ((max/100) + 1) * 100;
 
         setAxisScale(yLeft, 0, max);
-    } else {
+    }
+    else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+        setAxisScale(yLeft, 0, 1.5*pdModel->WPrime());
+    }
+    else {
 
         // or just add 10% headroom
         setAxisScale(yLeft, 0, 1.1*values[0]);
@@ -1164,7 +1229,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         double xvalue = curve->sample(index).x();
         double yvalue = curve->sample(index).y();
         QString text, dateStr;
-        QString units;
+        QString units1;
+        QString units2;
 
         // add when to tooltip if its all curve
         if (bestsCurves.contains(curve)) {
@@ -1175,20 +1241,29 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             }
         }
 
+        if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+            units1 = RideFile::unitName(rideSeries, context);
+        else
+            units1 = ""; // time --> no units
+
         // show percent ?
         if ((((rangemode && context->isCompareDateRanges)
             || (!rangemode && context->isCompareIntervals)) && showDelta && showDeltaPercent)
-            || (curve == rideCurve && showPercent)) units = QString("%");
-        else units = RideFile::unitName(rideSeries, context);
+            || (curve == rideCurve && showPercent)) units2 = QString("%");
+        else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+            units2 = "J"; // Joule
+        else
+            units2 = RideFile::unitName(rideSeries, context);
 
         // no units for Heat Curve
-        if (curve == heatCurve) units = QString(tr("Rides"));
+        if (curve == heatCurve) units2 = QString(tr("Rides"));
 
         // output the tooltip
-        text = QString("%1\n%3 %4%5")
-               .arg(interval_to_str(60.0*xvalue))
+        text = QString("%1%2\n%3 %4%5")
+               .arg(criticalSeries == CriticalPowerWindow::veloclinicplot?QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries)):interval_to_str(60.0*xvalue))
+               .arg(units1)
                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
-               .arg(units)
+               .arg(units2)
                .arg(dateStr);
 
         // set that text up

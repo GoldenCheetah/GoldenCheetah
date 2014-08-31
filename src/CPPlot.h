@@ -121,6 +121,8 @@ class CPPlot : public QwtPlot
         void plotCentile(RideItem *);
         void plotCache(QVector<double> vector, QColor plotColor);
 
+        void initModel();
+
         // utility
         void clearCurves();
         //QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
