@@ -171,6 +171,7 @@ class CPPlot : public QwtPlot
         QList<QwtPlotMarker*> allZoneLabels;
 
         LogTimeScaleDraw *ltsd;
+        QwtScaleDraw *sd;
 
         // tooltip / zooming
         LTMCanvasPicker *canvasPicker;

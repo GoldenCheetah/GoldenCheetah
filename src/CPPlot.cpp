@@ -74,7 +74,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
 
     // left yAxis scale prettify
-    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
@@ -280,10 +280,13 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     // set axis title
     setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
 
-    if (criticalSeries == CriticalPowerWindow::veloclinicplot)
+    if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+        setAxisScaleDraw(xBottom, ltsd);
         setAxisTitle(xBottom, tr("Power"));
-    else
+    } else {
+        setAxisScaleDraw(xBottom, sd);
         setAxisTitle(xBottom, tr("Interval Length"));
+    }
 
     // zap the old curves
     clearCurves();
