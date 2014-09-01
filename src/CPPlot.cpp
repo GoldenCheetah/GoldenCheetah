@@ -282,7 +282,7 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 
     if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
         setAxisScaleDraw(xBottom, ltsd);
-        setAxisTitle(xBottom, tr("Power"));
+        setAxisTitle(xBottom, tr("Power (W)"));
     } else {
         setAxisScaleDraw(xBottom, sd);
         setAxisTitle(xBottom, tr("Interval Length"));
@@ -943,6 +943,12 @@ CPPlot::plotBests()
                     if (criticalSeries == CriticalPowerWindow::work) {
                         x = (time[low] + time[high]) / 2;
                         y = (work[low] + work[high]) / 5;
+                    } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+                        x = (values[low] + values[high]) / 2;
+                        if (wprime[high]<1000 && wprime[low]<1000)
+                            y = -1000;
+                        else
+                            y = pdModel->WPrime()/4;
                     } else {
                         x = sqrt(time[low] * time[high]);
                         y = (values[low] + values[high]) / 5;
@@ -1076,7 +1082,11 @@ CPPlot::plotRide(RideItem *rideItem)
         rideCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1,
                               maxNonZero > 0 ? maxNonZero-1 : 0);
 
-    } else {
+    } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+
+        // Veloclinic plot
+
+    } else  {
 
         // ALL OTHER RIDE SERIES
 
