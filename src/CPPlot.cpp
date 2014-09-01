@@ -375,7 +375,7 @@ CPPlot::plotModel()
 
             // set the point data
             if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
-                // TODO plot the model for the veloclinic plot
+                // Plot the model for the veloclinic plot
                 pdModel->setMinutes(false);
                 QVector<double> power(pdModel->size());
                 QVector<double> wprime(pdModel->size());
@@ -1075,6 +1075,7 @@ CPPlot::plotRide(RideItem *rideItem)
     if (criticalSeries == CriticalPowerWindow::work) {
 
         // WORK
+
         QVector<double> energyArray(rideCache->meanMaxArray(RideFile::watts).size());
         for (int i = 0; i <= maxNonZero; ++i) {
             energyArray[i] = timeArray[i] * rideCache->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
@@ -1086,6 +1087,12 @@ CPPlot::plotRide(RideItem *rideItem)
 
         // Veloclinic plot
 
+        QVector<double> array(rideCache->meanMaxArray(RideFile::watts).size());
+        for (int i = 0; i <= maxNonZero; ++i) {
+            array[i] =  (rideCache->meanMaxArray(rideSeries)[i]<pdModel->CP()?0:(rideCache->meanMaxArray(rideSeries)[i]-pdModel->CP()) * timeArray[i] * 60.0);
+        }
+        rideCurve->setSamples(rideCache->meanMaxArray(rideSeries).constData()  + 1, array.constData() + 1,
+                              maxNonZero > 0 ? maxNonZero-1 : 0);
     } else  {
 
         // ALL OTHER RIDE SERIES
