@@ -766,8 +766,9 @@ CPPlot::plotBests()
     for (int t = 0; t < maxNonZero; t++) {
         time[t] = (t+1.00f) / 60.00f;
         work[t] = values[t] * t / 1000; // kJ not Joules
-        if (criticalSeries == CriticalPowerWindow::veloclinicplot)
-            wprime[t] = (values[t]<pdModel->CP()?0:(values[t]-pdModel->CP()) * t); // Joules
+        if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+            wprime[t] = (values[t]<pdModel->CP()?0:(values[t]-pdModel->CP()) * time[t] * 60.0); // Joules
+        }
     }
 
     if (showBest) {
