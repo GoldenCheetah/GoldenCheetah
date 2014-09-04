@@ -84,7 +84,8 @@ static QString protect(const QString string)
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const char * string)
 {
-    QString string2 = QString::fromLocal8Bit(string);
+    // sending UTF-8 to FLEX demands symetric conversion back to QString
+    QString string2 = QString::fromUtf8(string);
 
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
@@ -293,8 +294,21 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 
         // read in the whole thing
         QTextStream in(&file);
+        // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+        in.setCodec ("UTF-8");
         contents = in.readAll();
         file.close();
+
+        // check if the text string contains the replacement character for UTF-8 encoding
+        // if yes, try to read with Latin1/ISO 8859-1 (assuming this is an "old" non-UTF-8 Json file)
+        if (contents.contains(QChar::ReplacementCharacter)) {
+           if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
+             QTextStream in(&file);
+             in.setCodec ("ISO 8859-1");
+             contents = in.readAll();
+             file.close();
+           }
+         }
 
     } else {
 
@@ -340,6 +354,9 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
 
     // setup streamer
     QTextStream out(&file);
+    // unified codepage and BOM for identification on all platforms
+    out.setCodec("UTF-8");
+    out.setGenerateByteOrderMark(true);
 
     // start of document and ride
     out << "{\n\t\"RIDE\":{\n";
