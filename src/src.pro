@@ -244,7 +244,7 @@ SOURCES += ../qxt/src/qxtspanslider.cpp \
 
 HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtspanslider_p.h \
-           ../qxt/src/qxtstringspinbox.h 
+           ../qxt/src/qxtstringspinbox.h
 
 isEmpty( QTSOAP_INSTALL ) {
     include( ../qtsolutions/soap/qtsoap.pri )
@@ -312,7 +312,8 @@ HEADERS += \
         ExtendedCriticalPower.h \
         FitlogRideFile.h \
         FitlogParser.h \
-        FitRideFile.h \
+        FitRideFile.h \ 
+        GenerateHeatMapDialog.h \
         GcCalendarModel.h \
         GcCrashDialog.h \
         GcOverlayWidget.h \
@@ -518,6 +519,7 @@ SOURCES += \
         FixSpikes.cpp \
         FixTorque.cpp \
         FixHRSpikes.cpp \
+        GenerateHeatMapDialog.cpp \
         GcCrashDialog.cpp \
         GcOverlayWidget.cpp \
         GcPane.cpp \
