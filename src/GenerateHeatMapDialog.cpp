@@ -234,7 +234,7 @@ GenerateHeatMapDialog::generateNow()
                             if (minLon > point->lon) minLon = point->lon;
                             if (minLat > point->lat) minLat = point->lat;
                             if (maxLon < point->lon) maxLon = point->lon;
-                            if (maxLon < point->lat) maxLat = point->lat;
+                            if (maxLat < point->lat) maxLat = point->lat;
 
                         }
 
