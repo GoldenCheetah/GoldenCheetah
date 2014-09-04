@@ -51,20 +51,6 @@ public:
 
     QTreeWidget *files; // choose files to export
 
-    struct heatmapGridAndPoint {
-        int xGrid;
-        int yGrid;
-        int xPixel;
-        int yPixel;
-        bool xNegative;
-        bool yNegative;
-
-        bool operator<(const heatmapGridAndPoint& a) const
-        {
-            return ((  xGrid+(  yGrid*100)+(  xNegative ? 1000 : 0)+(  yNegative ? 1000 : 0))
-                  < (a.xGrid+(a.yGrid*100)+(a.xNegative ? 1000 : 0)+(a.yNegative ? 1000 : 0)));
-        }
-    };
 signals:
 
 private slots:
@@ -73,7 +59,6 @@ private slots:
     void selectClicked();
     void generateNow();
     void allClicked();
-    QString kmlOverlayLine(heatmapGridAndPoint point, double coverageLon, double coverageLat);
 
 private:
     Context *context;

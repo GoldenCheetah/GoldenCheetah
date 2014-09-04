@@ -178,16 +178,12 @@ GenerateHeatMapDialog::cancelClicked()
 void
 GenerateHeatMapDialog::generateNow()
 {
-    // setup vector to store the processed lon lat data into global grid
-    std::vector<heatmapGridAndPoint> globalGrid;
 
-    // Tile size setup coverage is the amount of lon lat covered by one grid
-    // x and y size are the pixel size of the grid squares
-    double coverageLon = 0.05;
-    double coverageLat = 0.05;
-    int xSize = 300;
-    int ySize = 300;
-    int dm = 10; // Diameter of the heat paint brush - thickness of the line
+    double minLat = 999;
+    double maxLat = -999;
+    double minLon = 999;
+    double maxLon = -999;
+    QHash<QString, int> hash;
 
     // loop through the table and export all selected
     for(int i=0; i<files->invisibleRootItem()->childCount(); i++) {
@@ -223,39 +219,23 @@ GenerateHeatMapDialog::generateNow()
                     foreach(const RideFilePoint *point, ride->dataPoints()) {
 
                         if (lastDistance < (int) (point->km * 1000) &&
-                            (point->lon!=0 || point->lat!=0)) {
+                           (point->lon!=0 || point->lat!=0)) {
 
-                            heatmapGridAndPoint gridAndPoint;
-
-                            // Store the grid position
-                            gridAndPoint.xGrid = point->lon/coverageLon;
-                            gridAndPoint.yGrid = point->lat/coverageLat;
-
-                            // Caculate the x axis pixel positions relative to
-                            // the grid square either side of zero longitude
-                            if (point->lon<0) {
-                                gridAndPoint.xPixel = xSize + ((point->lon-((double) gridAndPoint.xGrid*coverageLon)) * (xSize/coverageLon));
-                                gridAndPoint.xNegative = true;
+                            // Pick up a point max every 15m
+                            lastDistance = (int) (point->km * 1000) + 15;
+                            //outhtml << "  new google.maps.LatLng("<<point->lat<<", "<<point->lon<<"),\n";
+                            QString lonlat = QString("%1,%2").arg(floorf(point->lat*100000)/100000).arg(floorf(point->lon*100000)/100000);
+                            if (hash.contains(lonlat)) {
+                                hash[lonlat] = hash[lonlat] + 1;
                             } else {
-                                gridAndPoint.xPixel = ((point->lon-((double) gridAndPoint.xGrid*coverageLon)) * (xSize/coverageLon));
-                                gridAndPoint.xNegative = false;
+                                hash[lonlat] = 1;
                             }
 
-                            // Caculate the y axis pixel positions relative to
-                            // the grid square either side of zero latitude
-                            if (point->lat<0) {
-                                gridAndPoint.yPixel = ((point->lat-((double) gridAndPoint.yGrid*coverageLat)) * (ySize/coverageLat))*-1;
-                                gridAndPoint.yNegative = true;
-                            } else {
-                                gridAndPoint.yPixel = ySize - ((point->lat-((double) gridAndPoint.yGrid*coverageLat)) * (ySize/coverageLat));
-                                gridAndPoint.yNegative = false;
-                            }
+                            if (minLon > point->lon) minLon = point->lon;
+                            if (minLat > point->lat) minLat = point->lat;
+                            if (maxLon < point->lon) maxLon = point->lon;
+                            if (maxLon < point->lat) maxLat = point->lat;
 
-                            // Push into the vector for images to be process in the next loop
-                            globalGrid.push_back(gridAndPoint);
-
-                            // Pick up a point max every 20m
-                            lastDistance = (int) (point->km * 1000) + 40;
                         }
 
                     }
@@ -269,142 +249,45 @@ GenerateHeatMapDialog::generateNow()
         }
     }
 
-    // Sort the vector so that all poins in each grid square are
-    // together so we can just process one image at a time
-    std::sort(globalGrid.begin(), globalGrid.end());
-
-    // Set up image prosessing variables
-    // map is the actual image being drawn
-    QImage *map = new QImage(xSize, ySize, QImage::Format_ARGB32);
-
-    // paint provides the functions for doing the drawing
-    QPainter paint(map);
-
-    // Antialiasing on
-    paint.setRenderHint(QPainter::HighQualityAntialiasing);
-
-    // Load heatmap colour image for later mapping
-    // from gray scale to colours
-    // Could add the option to use different colour scales
-    // by changing this imgage
-    QImage *grad_map = new QImage(":images/heatmapColors.png");
-
-    // pen is the outline - set it off with width = 0
-    QPen g_pen(QColor(0, 0, 0, 0));
-    g_pen.setWidth(0);
-    paint.setPen(g_pen);
-
-    heatmapGridAndPoint lastPoint;
-    lastPoint.xGrid = 999;
-    lastPoint.yGrid = 999;
-
-    // kml file output stream
-    QFile file(dirName->text() + "/HeatMap.kml");
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file);
-
-    out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    out << "<kml xmlns=\"http://earth.google.com/kml/2.2\"><Document>";
-
-    // itterate through the vector and save the image to
-    // disk when we hit each new grid cooridinate
-    for( std::vector<heatmapGridAndPoint>::iterator point = globalGrid.begin() ; point != globalGrid.end() ; ++point ) {
-
-        // Has the grid changed since the last itteration
-        if (lastPoint.xGrid!=point->xGrid || lastPoint.yGrid!=point->yGrid
-         || lastPoint.xNegative!=point->xNegative || lastPoint.yNegative!=point->yNegative) {
-
-            // not the first loop
-            if (lastPoint.xGrid!=999) {
-                // Convert to heat map
-                for(int i = 0; i < xSize; ++i) {
-                    for(int j = 0; j < ySize; ++j) {
-                        int b = qGray(map->pixel(i, j));
-                        if (b >= 251) {
-                            //alpha fade around the edges
-                            map->setPixel(i, j, qRgba(0,0,0,(255 - b)*51));
-                        } else {
-                            // use grayscale value to map to colour in the heatmap
-                            map->setPixel(i, j, grad_map->pixel(255 - b, 0));
-                        }
-                    }
-                };
-
-                // Save the image to disk
-                map->save(dirName->text() + QString("/map_%1%2_%3%4.png")
-                          .arg((lastPoint.xNegative && lastPoint.xGrid == 0) ? "-" : "")
-                          .arg(lastPoint.xGrid)
-                          .arg((lastPoint.yNegative && lastPoint.yGrid == 0) ? "-" : "")
-                          .arg(lastPoint.yGrid));
-
-                // add the tile to the kml
-                out << kmlOverlayLine(lastPoint, coverageLon, coverageLat);
-            }
-
-            // Blank out the image ready to start a new one
-            map->fill(QColor(255, 255, 255, 255));
-            lastPoint = *point;
-        }
-
-        // setup the radial gradient with its center at the lon lat pixel location
-        QRadialGradient grad(point->xPixel, point->yPixel, dm/2); // Create Gradient
-        grad.setColorAt(0, QColor(0, 0, 0, 40)); // Black, varying alpha
-        grad.setColorAt(1, QColor(0, 0, 0, 0)); // Black, completely transparent
-        QBrush g_brush(grad); // Gradient QBrush
-        paint.setBrush(g_brush);
-
-        // Draw a circle
-        paint.drawEllipse(point->xPixel-dm/2, point->yPixel-dm/2, dm, dm); // Draw circle
+    QHashIterator<QString, int> i(hash);
+    QString datapoints = "";
+    while (i.hasNext()) {
+         i.next();
+         datapoints += QString("[%1,%2],")
+                    .arg(i.key())
+                    .arg(i.value());
     }
-
-    // Pick up the last grid square
-    if (lastPoint.xGrid!=999) {
-        // Convert to heat map
-        for(int i = 0; i < xSize; ++i) {
-            for(int j = 0; j < ySize; ++j) {
-                int b = qGray(map->pixel(i, j));
-                if (b >= 251) {
-                    map->setPixel(i, j, qRgba(0,0,0,(255 - b)*51));
-                } else {
-                    map->setPixel(i, j, grad_map->pixel(255 - b, 0)); //grad_map is a QImage gradient map
-                }
-            }
-        };
-        map->save(dirName->text() + QString("/map_%1%2_%3%4.png")
-                  .arg((lastPoint.xNegative && lastPoint.xGrid == 0) ? "-" : "")
-                  .arg(lastPoint.xGrid)
-                  .arg((lastPoint.yNegative && lastPoint.yGrid == 0) ? "-" : "")
-                  .arg(lastPoint.yGrid));
-        out << kmlOverlayLine(lastPoint, coverageLon, coverageLat);
-    }
-
-    // finish off the kml and close the file
-    out << "</Document></kml>";
-    file.close();
-}
-
-QString GenerateHeatMapDialog::kmlOverlayLine(heatmapGridAndPoint point, double coverageLon, double coverageLat)
-{
-    QString kmlContent = "<GroundOverlay>";
-    kmlContent += QString("<name>%1%2 %3%4</name>")
-                            .arg((point.xNegative && point.xGrid == 0) ? "-" : "")
-                            .arg(point.xGrid)
-                            .arg((point.yNegative && point.yGrid == 0) ? "-" : "")
-                            .arg(point.yGrid);
-    kmlContent += "<Icon>";
-    kmlContent += QString("<href>map_%1%2_%3%4.png</href>")
-                            .arg((point.xNegative && point.xGrid == 0) ? "-" : "")
-                            .arg(point.xGrid)
-                            .arg((point.yNegative && point.yGrid == 0) ? "-" : "")
-                            .arg(point.yGrid);
-    kmlContent += "<viewBoundScale>0.75</viewBoundScale>";
-    kmlContent += "</Icon>";
-    kmlContent += "<LatLonBox>";
-    kmlContent += QString("<north>%1</north>").arg((double) point.yGrid*coverageLon+(point.yNegative ? 0 : coverageLon));
-    kmlContent += QString("<south>%1</south>").arg((double) point.yGrid*coverageLon-(point.yNegative ? coverageLon : 0));
-    kmlContent += QString("<east>%1</east>").arg((double) point.xGrid*coverageLat+(point.xNegative ? 0 : coverageLat));
-    kmlContent += QString("<west>%1</west>").arg((double) point.xGrid*coverageLat-(point.xNegative ? coverageLat : 0));
-    kmlContent += "</LatLonBox>";
-    kmlContent += "</GroundOverlay>";
-    return kmlContent;
+    QFile filehtml(dirName->text() + "/HeatMap.htm");
+    filehtml.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream outhtml(&filehtml);
+    outhtml << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Heatmaps</title>\n";
+    outhtml << "<style>\n";
+    outhtml << "html,body,#map-canvas {height: 100%;margin: 0px;padding: 0px;}</style>\n";
+    outhtml << "<script src=\"https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization\"></script>\n";
+    outhtml << "<script>\n";
+    outhtml << "var map,pointarray,heatmap;\n";
+    outhtml << "var dataarray = [\n";
+    outhtml << datapoints;
+    outhtml << "];\n";
+    outhtml << "var hmData = [];\n";
+    outhtml << "function initialize() {\n";
+    outhtml << "dataarray.forEach(function(entry) {hmData.push({location: new google.maps.LatLng(entry[0], entry[1]), weight: entry[2]});});\n";
+    outhtml << "dataarray = [];\n";
+    outhtml << "var mapOptions = { mapTypeId: google.maps.MapTypeId.SATELLITE};\n";
+    outhtml << "map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);\n";
+    outhtml << "var bounds = new google.maps.LatLngBounds();\n";
+    outhtml << "bounds.extend(new google.maps.LatLng(" << minLat <<"," << minLon << "));\n";
+    outhtml << "bounds.extend(new google.maps.LatLng(" << maxLat <<"," << maxLon << "));\n";
+    outhtml << "map.fitBounds(bounds);\n";
+    outhtml << "var pointArray = new google.maps.MVCArray(hmData);\n";
+    outhtml << "heatmap = new google.maps.visualization.HeatmapLayer({data: pointArray, dissipating:true, maxIntensity:30, opacity:0.8});\n";
+    outhtml << "google.maps.event.addListener(map,'zoom_changed',function() {\n";
+    outhtml << "var zoomLevel = map.getZoom();\n";
+    outhtml << "heatmap.set('radius',Math.ceil((Math.pow(zoomLevel,3))/200));\n";
+    outhtml << "});\n";
+    outhtml << "heatmap.setMap(map);\n";
+    outhtml << "}\n";
+    outhtml << "google.maps.event.addDomListener(window,'load',initialize);\n";
+    outhtml << "</script></head><body><div id=\"map-canvas\"></div></body></html>\n";
+    filehtml.close();
 }

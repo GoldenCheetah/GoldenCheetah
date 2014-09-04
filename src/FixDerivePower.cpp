@@ -179,7 +179,8 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
         for (int i=0; i<ride->dataPoints().count(); i++) {
             RideFilePoint *p = ride->dataPoints()[i];
             // Estimate Power if not in data
-            if (p->cad > 0) {
+            double cad = ride->areDataPresent()->cad ? p->cad : 85.00;
+            if (cad > 0) {
                 if (ride->areDataPresent()->temp) T = p->temp;
                 double Slope = atan(p->slope * .01);
                 double V = p->kph * 0.27777777777778; //Speed m/s
@@ -189,7 +190,6 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double Frg = 9.81 * (MBik + M) * (CrEff * cos(Slope) + sin(Slope));
 
                 double vw=V+W;
-                double cad = ride->areDataPresent()->cad ? p->cad : 85.00;
 
                 CwaRider = (1 + cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
                 Ka = 176.5 * exp(-p->alt * .0001253) * (CwaRider + CwaBike) / (273 + T);
