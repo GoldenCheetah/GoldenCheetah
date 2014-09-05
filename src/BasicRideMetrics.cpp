@@ -134,6 +134,127 @@ static bool timeRidingAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+class TimeCarrying : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TimeCarrying)
+    double secsCarrying;
+    double prevalt;
+
+    public:
+
+    TimeCarrying() : secsCarrying(0.0)
+    {
+        setSymbol("time_carrying");
+        setInternalName("Time Carrying");
+    }
+    void initialize() {
+        setName(tr("Time Carrying (Est)"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        secsCarrying = 0;
+        if (ride->areDataPresent()->kph) {
+
+            // hysteresis can be configured, we default to 3.0
+            double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
+            if (hysteresis <= 0.1) hysteresis = 3.00;
+
+            bool first = true;
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                // only consider pushing/carrying with elevation gain
+                if (first) {
+                    first = false;
+                    prevalt = point->alt;
+                }
+                else if (point->alt > prevalt + hysteresis) {
+                    prevalt = point->alt;
+                }
+                else if (point->alt < prevalt - hysteresis) {
+                    prevalt = point->alt;
+                }
+
+                if ((point->kph > 0.0) &&          // we are moving
+                    (point->kph < 8.0) &&          // but slow (even slower than 8 kph)
+                    (point->alt > prevalt) &&  // gaining height
+                    (point->cad == 0.0) &&     // but no cadence
+                    (point->watts == 0.0))     // and no power
+
+                    secsCarrying += ride->recIntSecs();
+            }
+        }
+        setValue(secsCarrying);
+
+    }
+    RideMetric *clone() const { return new TimeCarrying(*this); }
+};
+
+static bool timeCarryingAdded =
+    RideMetricFactory::instance().addMetric(TimeCarrying());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class ElevationGainCarrying : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ElevationGain)
+    double elegain;
+    double prevalt;
+
+    public:
+
+    ElevationGainCarrying() : elegain(0.0), prevalt(0.0)
+    {
+        setSymbol("elevation_gain_carrying");
+        setInternalName("Elevation Gain Carrying");
+    }
+    void initialize() {
+        setName(tr("Elevation Gain Carrying (Est)"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("meters"));
+        setImperialUnits(tr("feet"));
+        setConversion(FEET_PER_METER);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const Context *) {
+
+        // hysteresis can be configured, we default to 3.0
+        double hysteresis = appsettings->value(NULL, GC_ELEVATION_HYSTERESIS).toDouble();
+        if (hysteresis <= 0.1) hysteresis = 3.00;
+
+        bool first = true;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (first) {
+                first = false;
+                prevalt = point->alt;
+            }
+            else if (point->alt > prevalt + hysteresis) {
+                if ((point->kph > 0.0) &&
+                    (point->kph < 8.0) &&
+                    (point->watts == 0.0) &&
+                    (point->cad == 0.0)) {
+                    elegain += point->alt - prevalt;
+                };
+                prevalt = point->alt;
+            }
+            else if (point->alt < prevalt - hysteresis) {
+                prevalt = point->alt;
+            }
+        }
+        setValue(elegain);
+    }
+    RideMetric *clone() const { return new ElevationGainCarrying(*this); }
+};
+
+static bool elevationGainCarryingAdded =
+    RideMetricFactory::instance().addMetric(ElevationGainCarrying());
+
+
+//////////////////////////////////////////////////////////////////////////////
+
 class TotalDistance : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(TotalDistance)
     double km;
