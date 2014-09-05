@@ -101,8 +101,9 @@
 // 80  13  Jul 2014 Mark Liversedge    W' work + Below CP work = Work
 // 81  16  Aug 2014 Joern Rischmueller Added 'Elevation Loss'
 // 82  23  Aug 2014 Mark Liversedge    Added W'bal Matches
+// 83  05  Sep 2014 Joern Rischmueler  Added 'Time Carrying' and 'Elevation Gain Carrying'
 
-int DBSchemaVersion = 82;
+int DBSchemaVersion = 83;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
