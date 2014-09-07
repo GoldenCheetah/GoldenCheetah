@@ -744,6 +744,54 @@ struct AvgHeartRate : public RideMetric {
 static bool avgHeartRateAdded =
     RideMetricFactory::instance().addMetric(AvgHeartRate());
 
+///////////////////////////////////////////////////////////////////////////////
+
+class HrPw : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(HrPw)
+
+    public:
+    HrPw()
+    {
+        setSymbol("hrpw");
+        setInternalName("HrPw Ratio");
+    }
+    void initialize() {
+        setName(tr("HrPw Ratio"));
+        setImperialUnits("");
+        setMetricUnits("");
+        setPrecision(3);
+        setType(RideMetric::Peak);
+    }
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        AvgHeartRate *hr = dynamic_cast<AvgHeartRate*>(deps.value("average_hr"));
+        AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
+
+        if (hr->value(true) > 100 && pw->value(true) > 100) { // ignore silly rides with low values
+            setValue(pw->value(true) / hr->value(true));
+        } else {
+            setValue(0);
+        }
+    }
+    RideMetric *clone() const { return new HrPw(*this); }
+};
+
+static bool addHrPw()
+{
+    QVector<QString> deps;
+    deps.append("average_power");
+    deps.append("average_hr");
+    RideMetricFactory::instance().addMetric(HrPw(), &deps);
+    return true;
+}
+
+static bool hrpwAdded = addHrPw();
+
+///////////////////////////////////////////////////////////////////////////////
+
 //////////////////////////////////////////////////////////////////////////////
 
 struct AvgCadence : public RideMetric {
