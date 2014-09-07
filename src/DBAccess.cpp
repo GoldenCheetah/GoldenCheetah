@@ -102,8 +102,9 @@
 // 81  16  Aug 2014 Joern Rischmueller Added 'Elevation Loss'
 // 82  23  Aug 2014 Mark Liversedge    Added W'bal Matches
 // 83  05  Sep 2014 Joern Rischmueler  Added 'Time Carrying' and 'Elevation Gain Carrying'
+// 84  08  Sep 2014 Mark Liversedge    Added HrPw Ratio
 
-int DBSchemaVersion = 83;
+int DBSchemaVersion = 84;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
