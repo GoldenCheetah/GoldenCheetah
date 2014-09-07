@@ -319,11 +319,18 @@ Seasons::readSeasons()
     season.setId(QUuid("{00000000-0000-0000-0000-000000000007}"));
     seasons.append(season);
 
+    season.setName(tr("Last 2 months"));
+    season.setType(Season::temporary);
+    season.setEnd(today);
+    season.setStart(today.addMonths(-2));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000008}"));
+    seasons.append(season);
+
     season.setName(tr("Last 3 months"));
     season.setType(Season::temporary);
     season.setEnd(today);
     season.setStart(today.addMonths(-3));
-    season.setId(QUuid("{00000000-0000-0000-0000-000000000008}"));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000011}"));
     seasons.append(season);
 
     season.setName(tr("Last 6 months"));
