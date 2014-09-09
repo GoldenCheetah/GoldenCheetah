@@ -792,7 +792,51 @@ static bool hrpwAdded = addHrPw();
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
+class HrNp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(HrNp)
+
+    public:
+    HrNp()
+    {
+        setSymbol("hrnp");
+        setInternalName("HrNp Ratio");
+    }
+    void initialize() {
+        setName(tr("HrNp Ratio"));
+        setImperialUnits("");
+        setMetricUnits("");
+        setPrecision(3);
+        setType(RideMetric::Peak);
+    }
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        AvgHeartRate *hr = dynamic_cast<AvgHeartRate*>(deps.value("average_hr"));
+        RideMetric *pw = dynamic_cast<RideMetric*>(deps.value("coggan_np"));
+
+        if (hr->value(true) > 100 && pw->value(true) > 100) { // ignore silly rides with low values
+            setValue(pw->value(true) / hr->value(true));
+        } else {
+            setValue(0);
+        }
+    }
+    RideMetric *clone() const { return new HrNp(*this); }
+};
+
+static bool addHrNp()
+{
+    QVector<QString> deps;
+    deps.append("coggan_np");
+    deps.append("average_hr");
+    RideMetricFactory::instance().addMetric(HrNp(), &deps);
+    return true;
+}
+
+static bool hrnpAdded = addHrNp();
+
+///////////////////////////////////////////////////////////////////////////////
 
 struct AvgCadence : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(AvgCadence)

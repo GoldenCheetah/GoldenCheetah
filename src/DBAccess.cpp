@@ -103,8 +103,9 @@
 // 82  23  Aug 2014 Mark Liversedge    Added W'bal Matches
 // 83  05  Sep 2014 Joern Rischmueler  Added 'Time Carrying' and 'Elevation Gain Carrying'
 // 84  08  Sep 2014 Mark Liversedge    Added HrPw Ratio
+// 85  09  Sep 2014 Mark Liversedge    Added HrNp Ratio
 
-int DBSchemaVersion = 84;
+int DBSchemaVersion = 85;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
