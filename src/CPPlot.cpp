@@ -750,7 +750,9 @@ CPPlot::plotBests()
     // when we have power and the user wants it to
     // be a rainbow curve. Otherwise its gonna be plain
     int shadingCP = 0; 
-    if (rideSeries == RideFile::watts && shadeMode) shadingCP = dateCP;
+    double shadingRatio = 1.0;
+    if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && shadeMode) shadingCP = dateCP;
+    if (rideSeries == RideFile::wattsKg && shadeMode) shadingRatio = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
 
     //For veloclinic plot we need to start by using a 2 parameters model
     if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
@@ -900,7 +902,7 @@ CPPlot::plotBests()
                 if (nextZone >= power_zone.size())
                     low = 0;
                 else {
-                    while ((low > 0) && (values[low] < power_zone[nextZone]))
+                    while ((low > 0) && (values[low] < power_zone[nextZone]/shadingRatio))
                         --low;
                 }
 
