@@ -273,21 +273,21 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
 
     }
 
-    if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
-        ltsd = new LogTimeScaleDraw;
-        ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
-        setAxisScaleDraw(xBottom, ltsd);
-        setAxisTitle(xBottom, tr("Power (W)"));
-    } else {
-        sd = new QwtScaleDraw;
-        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-        setAxisScaleDraw(xBottom, sd);
-        setAxisTitle(xBottom, tr("Interval Length"));
-    }
-
     // set scale to match what's needed
     if (scale != log) setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
     else setAxisScaleEngine(xBottom, new QwtLogScaleEngine);
+
+    if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
+        sd = new QwtScaleDraw;
+        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        setAxisScaleDraw(xBottom, sd);
+        setAxisTitle(xBottom, tr("Power (W)"));
+    } else {
+        ltsd = new LogTimeScaleDraw;
+        ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        setAxisScaleDraw(xBottom, ltsd);
+        setAxisTitle(xBottom, tr("Interval Length"));
+    }
 
     // set axis title
     setAxisTitle(yLeft, QString ("%1 %2 (%3) %4").arg(prefix).arg(series).arg(units).arg(postfix));
@@ -869,7 +869,7 @@ CPPlot::plotBests()
             else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
                 curve->setSamples(bestsCache->meanMaxArray(rideSeries).data()+1, wprime.data(), maxNonZero-1);
             else
-                curve->setSamples(time.data(), bestsCache->meanMaxArray(RideFile::watts).data()+1, maxNonZero-1);
+                curve->setSamples(time.data(), bestsCache->meanMaxArray(rideSeries).data()+1, maxNonZero-1);
 
             curve->attach(this);
             bestsCurves.append(curve);
