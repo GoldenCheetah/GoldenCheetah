@@ -443,6 +443,7 @@ HEADERS += \
         TreeMapPlot.h \
         TtbDialog.h \
         Units.h \
+        VeloHeroDialog.h \
         Views.h \
         WithingsDownload.h \
         WkoRideFile.h \
@@ -663,6 +664,7 @@ SOURCES += \
         TtbDialog.cpp \
         TRIMPPoints.cpp \
         Units.cpp \
+        VeloHeroDialog.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \
