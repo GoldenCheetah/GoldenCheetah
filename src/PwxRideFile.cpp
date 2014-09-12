@@ -370,8 +370,38 @@ PwxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     }
 
     // workout title
+    QString wtitle;
     if (ride->getTag("Workout Title", "") != "") {
-        QString wtitle = ride->getTag("Workout Title", "");
+        wtitle = ride->getTag("Workout Title", "");
+    } else {
+
+        // We try metadata fields; Title, then Name then Route then Workout Code
+
+        // is "Title" set?
+        if (!ride->getTag("Title", "").isEmpty()) {
+            wtitle = ride->getTag("Title", "");
+        } else {
+
+            // is "Name" set?
+            if (!ride->getTag("Name", "").isEmpty()) {
+                wtitle = ride->getTag("Name", "");
+            } else {
+
+                // is "Route" set?
+                if (!ride->getTag("Route", "").isEmpty()) {
+                    wtitle = ride->getTag("Route", "");
+                } else {
+
+                    //  is Workout Code set?
+                    if (!ride->getTag("Workout Code", "").isEmpty()) {
+                        wtitle = ride->getTag("Workout Code", "");
+                    }
+                }
+            }
+        }
+    }
+    // did we set it to /anything/ ?
+    if (wtitle != "") {
         QDomElement title = doc.createElement("title");
         text = doc.createTextNode(wtitle); title.appendChild(text);
         root.appendChild(title);

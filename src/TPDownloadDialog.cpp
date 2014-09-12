@@ -29,7 +29,7 @@
 
 TPDownloadDialog::TPDownloadDialog(Context *context) : QDialog(context->mainWindow, Qt::Dialog), context(context), downloading(false), aborted(false)
 {
-    setWindowTitle(tr("Download from TrainingPeaks.com"));
+    setWindowTitle(tr("Synchronise TrainingPeaks.com"));
 
     athleter = new TPAthlete(this);
 
@@ -39,6 +39,7 @@ TPDownloadDialog::TPDownloadDialog(Context *context) : QDialog(context->mainWind
                   appsettings->cvalue(context->athlete->cyclist, GC_TPPASS, "null").toString());
 
     QWidget::hide(); // don't show just yet...
+    QApplication::processEvents();
 }
 
 void
