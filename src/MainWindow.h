@@ -178,6 +178,7 @@ class MainWindow : public QMainWindow
         void share();
 #endif
         void uploadTtb();
+        void uploadVeloHero();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();
@@ -251,6 +252,7 @@ class MainWindow : public QMainWindow
         QAction *tweetAction;
         QAction *shareAction;
         QAction *ttbAction;
+        QAction *veloheroAction;
 
         // Miscellany
         QSignalMapper *toolMapper;
