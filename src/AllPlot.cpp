@@ -1247,40 +1247,11 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRTE.resize(rideTimeSecs + 1);
         objects->smoothLPS.resize(rideTimeSecs + 1);
         objects->smoothRPS.resize(rideTimeSecs + 1);
-
-        for (int secs = 0; ((secs < applysmooth)
-                            && (secs < rideTimeSecs)); ++secs) {
-            objects->smoothWatts[secs] = 0.0;
-            objects->smoothNP[secs] = 0.0;
-            objects->smoothAT[secs] = 0.0;
-            objects->smoothANT[secs] = 0.0;
-            objects->smoothXP[secs] = 0.0;
-            objects->smoothAP[secs] = 0.0;
-            objects->smoothHr[secs]    = 0.0;
-            objects->smoothSpeed[secs] = 0.0;
-            objects->smoothAccel[secs] = 0.0;
-            objects->smoothWattsD[secs] = 0.0;
-            objects->smoothCadD[secs] = 0.0;
-            objects->smoothNmD[secs] = 0.0;
-            objects->smoothHrD[secs] = 0.0;
-            objects->smoothCad[secs]   = 0.0;
-            objects->smoothTime[secs]  = secs / 60.0;
-            objects->smoothDistance[secs]  = 0.0;
-            objects->smoothAltitude[secs]  = 0.0;
-            objects->smoothTemp[secs]  = 0.0;
-            objects->smoothWind[secs]  = 0.0;
-            objects->smoothRelSpeed[secs] = QwtIntervalSample();
-            objects->smoothTorque[secs]  = 0.0;
-            objects->smoothLTE[secs]  = 0.0;
-            objects->smoothRTE[secs]  = 0.0;
-            objects->smoothLPS[secs]  = 0.0;
-            objects->smoothRPS[secs]  = 0.0;
-            objects->smoothBalanceL[secs]  = 50;
-            objects->smoothBalanceR[secs]  = 50;
-        }
-
+        // do the smoothing by caculating the average of the "applysmooth" values left
+        // of the current data point - for points in time smaller than "applysmooth"
+        // only the available datapoints left are used to build the average
         int i = 0;
-        for (int secs = applysmooth; secs <= rideTimeSecs; ++secs) {
+        for (int secs = 0; secs <= rideTimeSecs; ++secs) {
             while ((i < objects->timeArray.count()) && (objects->timeArray[i] <= secs)) {
                 DataPoint dp(objects->timeArray[i],
                              (!objects->hrArray.empty() ? objects->hrArray[i] : 0),
