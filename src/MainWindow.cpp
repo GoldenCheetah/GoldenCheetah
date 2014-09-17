@@ -183,6 +183,9 @@ MainWindow::MainWindow(const QDir &home)
 
      }
 
+     // store "last_openend" athlete for next time
+     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
+
     /*----------------------------------------------------------------------
      * ScopeBar
      *--------------------------------------------------------------------*/
