@@ -962,6 +962,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     // state of item
     bool hover = option.state & QStyle::State_MouseOver;
     bool selected = option.state & QStyle::State_Selected;
+    bool focus = option.state & QStyle::State_HasFocus;
 
     // format the cell depending upon what it is...
     QString columnName = rideNavigator->tableView->model()->headerData(index.column(), Qt::Horizontal).toString();
@@ -1067,6 +1068,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             // not selected, so invert ride plot color
             if (hover) painter->setPen(QColor(Qt::black));
             else painter->setPen(rideBG ? rideNavigator->reverseColor : userColor);
+        } else if (!focus) { // selected but out of focus //
+            painter->setPen(QColor(Qt::black));
         }
 
         QRect normal(myOption.rect.x(), myOption.rect.y()+1, myOption.rect.width(), myOption.rect.height());
