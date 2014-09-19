@@ -210,7 +210,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
     double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, temp=RideFile::NoTemp, interval=0;
 
     int isnull=0;
-    WKO_ULONG records, data;
+    WKO_ULONG records=0, data;
     WKO_UCHAR *thelot;
     WKO_USHORT us;
 
@@ -804,6 +804,14 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     num=0;
 
     while (charts) {     // keep parsing until we have no charts left
+
+        // basic bounds check
+        if ((p - fb) > bufferSize) {
+            errors << "Buffer overrun, file may be corrupt / truncated";
+            qDebug()<<"buffer overrun";
+            return NULL;
+        }
+
         enum configtype type=INVALID;
 
         p += donumber(p, &ul);
