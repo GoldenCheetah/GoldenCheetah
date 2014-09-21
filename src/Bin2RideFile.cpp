@@ -23,6 +23,8 @@
 #define UNIT_VERSION 0x2000
 #define SYSTEM_INFO 0x2003
 
+#define BIN2_DEBUG false // debug traces
+
 static int bin2FileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "bin2", "Joule GPS File", new Bin2FileReader());
@@ -112,7 +114,13 @@ struct Bin2FileReaderState
         if (jouleGPS) {
             read_bytes(1, bytes_read, sum); // dummy
             read_bytes(4, bytes_read, sum); // time_moving
-            *secs = double(read_bytes(4, bytes_read, sum));
+
+            // time
+            double newsecs = double(read_bytes(4, bytes_read, sum));
+            if (BIN2_DEBUG)
+                qDebug() << "read_RTC_mark new ridetime" << newsecs << "secs (old" << *secs <<"secs)";
+
+            *secs = newsecs;
             read_bytes(16, bytes_read, sum);  // dummy
         } else {
             read_bytes(13, bytes_read, sum);  // dummy
@@ -126,7 +134,10 @@ struct Bin2FileReaderState
         int intervalNumber = read_bytes(1, bytes_read, sum);
 
         read_bytes(2, bytes_read, sum); // dummy
-        *secs = double(read_bytes(4, bytes_read, sum));
+        double rideTime = double(read_bytes(4, bytes_read, sum));
+        if (BIN2_DEBUG)
+            qDebug() << "read_interval_mark" << rideTime << "at" << *secs <<"secs";
+
         if (jouleGPS)
             read_bytes(24, bytes_read, sum); // dummy
         else
@@ -410,7 +421,8 @@ struct Bin2FileReaderState
             }
 
             if (page_number > 0) {
-                //qDebug() << "page_number" << page_number;
+                if (BIN2_DEBUG)
+                    qDebug() << "page_number" << page_number;
                 int nb_record = 128;
 
                 // Page # >0
@@ -435,18 +447,46 @@ struct Bin2FileReaderState
                     int flag = read_bytes(1, &bytes_read, &sum);
                     //b0..b1: "00" Detail Record
                     //b0..b1: "01" RTC Mark Record
-                    //b0..b1: "00" Interval Record
+                    //b0..b1: "10" Session Mark (Joule GPS)
+                    //b0..b1: "10" Interval Record (Joule 1.0)
+                    //b0..b1: "11" Interval Record (Joule GPS)
+                    //b0..b1: "11" Invalid ( 0xFF)
 
-                    //b2: reserved
+
                     //b3: Power was calculated
-                    //b4: HPR packet missing
+                    //b4: HR packet missing
                     //b5: CAD packet missing
                     //b6: PWR packet missing
                     //b7: Power data = old (No new power calculated)
 
+                    if (BIN2_DEBUG && (flag & 0x03) != 0) {
+                        qDebug() << "flag B0..B1" << (flag & 0x03) << "flag" << flag;
+                        if (flag == 0xff) {
+                            qDebug() << "Invalid record";
+                        }
+                        else {
+                            if ((flag & 0x08) == 0x08) {
+                                qDebug() << "Power was calculated";
+                            }
+                            if ((flag & 0x10) == 0x10) {
+                                qDebug() << "HPR packet missing";
+                            }
+                            if ((flag & 0x20) == 0x20) {
+                                qDebug() << "CAD packet missing";
+                            }
+                            if ((flag & 0x40) == 0x40) {
+                                qDebug() << "PWR packet missing";
+                            }
+                            if ((flag & 0x80) == 0x80) {
+                                qDebug() << "Power data = old";
+                            }
+                        }
+                    }
+
                     if (flag == 0xff) {
                         // means invalid entry
-                        //qDebug() << "invalid" << secs;
+                        if (BIN2_DEBUG)
+                            qDebug() << "invalid at" << secs << "secs";
                         if (jouleGPS)
                             read_bytes(31, &bytes_read, &sum); // dummy
                         else
@@ -455,16 +495,22 @@ struct Bin2FileReaderState
                         (secs)++;
                     }
                     else if ((flag & 0x03) == 0x01){
+                        // The RTC Mark is written when there is a gap in the ride data,
+                        // or when the internal Real Time Clock is adjusted.
                         t= read_RTC_mark(&secs, &bytes_read, &sum);
                     }
                     else if ((jouleGPS && (flag & 0x03) == 0x03) || (!jouleGPS && (flag & 0x03) == 0x02)) {
+                        // The Interval Mark immediately precedes a Detail Record at the same RTC time.
                         int t = read_interval_mark(&secs, &bytes_read, &sum);
                         interval = t;
                     }
                     else if ((flag & 0x03) == 0x00 ){
+                        // The detail record contains current telemetry data.
                         read_detail_record(&secs, &bytes_read, &sum);
                     } else {
-                        //qDebug() << "unknow" << secs;
+                        if (BIN2_DEBUG)
+                            qDebug() << "UNKNOW: flag" << flag << "at" << secs << "secs";
+
                         if (jouleGPS)
                             read_bytes(31, &bytes_read, &sum); // dummy
                         else
