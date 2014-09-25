@@ -75,6 +75,7 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
 
         power = 0.0;
         cadence = 0.0;
+        rcad = 0.0;
         speed = 0.0;
         headwind = 0.0;
         torque = 0;
@@ -103,6 +104,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     else if (qName == "Speed" || qName == "ns3:Speed") { speed = buffer.toDouble() * 3.6; }
     else if (qName == "Value") { hr = buffer.toDouble(); }
     else if (qName == "Cadence") { cadence = buffer.toDouble(); }
+    else if (qName == "RunCadence") { rcad = buffer.toDouble(); }
     else if (qName == "AltitudeMeters") {
         // on Suunto TCX files there are lots of 0 values between valid ones, skip these
         if (buffer.toDouble() != 0) {
@@ -161,7 +163,9 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             // first point
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
                                   power, alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
-                                  0.0,0.0,0.0,0.0,0.0,0.0,lap);
+                                  0.0,0.0,0.0,0.0,0.0,0.0,
+                                  0.0,rcad,0.0, // no running dynamics in the schema ?
+                                  lap);
 
         } else {
 
@@ -177,6 +181,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             double deltaAlt = alt - prevPoint->alt;
             double deltaLon = lon - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
+            double deltarcad = rcad - prevPoint->rcad;
 
             if (prevPoint->lat == 0 && prevPoint->lon == 0) badgps = true;
             // Smart Recording High Water Mark.
@@ -185,7 +190,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                 // no smart recording, or delta exceeds HW treshold, just insert the data
                 rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power,
                                       alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
-                                      0.0,0.0,0.0,0.0,0.0,0.0,lap);
+                                      0.0,0.0,0.0,0.0,0.0,0.0,
+                                      0.0, // vertical oscillation
+                                      rcad, // run cadence
+                                      0.0, // gct
+                                      lap);
 
             } else {
 
@@ -216,6 +225,9 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           0.0,
                                           0.0,0.0,0.0,0.0,
                                           0.0,0.0,
+                                          0.0, // vertical oscillation
+                                          prevPoint->rcad + (deltarcad * weight),// run cadence
+                                          0.0, // gct
                                           lap);
                 }
                 prevPoint = rideFile->dataPoints().back();

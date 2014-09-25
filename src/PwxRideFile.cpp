@@ -249,6 +249,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                     add.nm, add.watts, add.alt, add.lon, add.lat, add.headwind,
                     add.slope, add.temp, add.lrbalance, add.lte, add.rte, add.lps, add.rps,
                     add.smo2, add.thb,
+                    add.rvert, add.rcad, add.rcontact,
                     add.interval);
 
 

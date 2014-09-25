@@ -64,13 +64,17 @@ struct RideFileDataPresent
     // derived
     bool np,xp,apower,wprime,atiss,antiss;
 
+    // running
+    bool rvert, rcad, rcontact;
+
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false), smo2(false), thb(false), interval(false),
-        np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false) {}
+        np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false),
+        rvert(false), rcad(false), rcontact(false) {}
 
 };
 
@@ -123,7 +127,8 @@ class RideFile : public QObject // QObject to emit signals
         enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd,
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
                           vam, wattsKg, lrbalance, lte, rte, lps, rps, 
-                          aPower, wprime, aTISS, anTISS, smO2, tHb, none };
+                          aPower, wprime, aTISS, anTISS, smO2, tHb, 
+                          rvert, rcad, rcontact, none };
 
         enum specialValues { NoTemp = -255 };
 
@@ -151,6 +156,7 @@ class RideFile : public QObject // QObject to emit signals
                          double temperature, double lrbalance,
                          double lte, double rte, double lps, double rps,
                          double smo2, double thb,
+                         double rvert, double rcad, double rcontact,
                          int interval);
 
         void appendPoint(const RideFilePoint &);
@@ -294,6 +300,10 @@ struct RideFilePoint
     double lrbalance, lte, rte, lps, rps;
     double smo2, thb;
     double hrd, cadd, kphd, nmd, wattsd; // acceleration in watts/s km/s
+
+    // running data
+    double rvert, rcad, rcontact;
+
     int interval;
 
     // derived data (we calculate it)
@@ -307,21 +317,25 @@ struct RideFilePoint
                       lps(0.0), rps(0.0),
                       smo2(0.0), thb(0.0),
                       hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0),
+                      rvert(0.0), rcad(0.0), rcontact(0.0),
                       interval(0), xp(0), np(0),
-                      apower(0), atiss(0.0), antiss(0.0) {} 
+                      apower(0), atiss(0.0), antiss(0.0) {}
 
     // create point supplying all values
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
                   double nm, double watts, double alt, double lon, double lat,
                   double headwind, double slope, double temp, double lrbalance, 
                   double lte, double rte, double lps, double rps,
-                  double smo2, double thb, int interval) :
+                  double smo2, double thb, 
+                  double rvert, double rcad, double rcontact,
+                  int interval) :
 
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), watts(watts), alt(alt), lon(lon), 
         lat(lat), headwind(headwind), slope(slope), temp(temp),
         lrbalance(lrbalance), lte(lte), rte(rte), lps(lps), rps(rps),
         smo2(smo2), thb(thb),
-        hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), interval(interval), 
+        hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), 
+        rvert(rvert), rcad(rcad), rcontact(rcontact), interval(interval), 
         xp(0), np(0), apower(0), atiss(0.0), antiss(0.0) {}
 
     // get the value via the series type rather than access direct to the values

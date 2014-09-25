@@ -112,7 +112,8 @@ static QString unprotect(const char * string)
 %token TAGS INTERVALS NAME START STOP
 %token CALIBRATIONS VALUE
 %token REFERENCES
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE LTE RTE LPS RPS THB SMO2
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP 
+%token LRBALANCE LTE RTE LPS RPS THB SMO2 RVERT RCAD RCON
 
 %start document
 %%
@@ -240,6 +241,7 @@ sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, 
                                                     JsonPoint.lte, JsonPoint.rte,
                                                     JsonPoint.lps, JsonPoint.rps,
                                                     JsonPoint.smo2, JsonPoint.thb,
+                                                    JsonPoint.rvert, JsonPoint.rcad, JsonPoint.rcontact,
                                                     JsonPoint.interval);
                                           JsonPoint = RideFilePoint();
                                         }
@@ -265,6 +267,9 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | RPS ':' number                { JsonPoint.rps = JsonNumber; }
         | SMO2 ':' number               { JsonPoint.smo2 = JsonNumber; }
         | THB ':' number                { JsonPoint.thb = JsonNumber; }
+        | RVERT ':' number              { JsonPoint.rvert = JsonNumber; }
+        | RCAD ':' number               { JsonPoint.rcad = JsonNumber; }
+        | RCON ':' number               { JsonPoint.rcontact = JsonNumber; }
         ;
 
 /*
@@ -531,6 +536,9 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             if (ride->areDataPresent()->rps) out << ", \"RPS\":" << QString("%1").arg(p->rps);
             if (ride->areDataPresent()->smo2) out << ", \"SMO2\":" << QString("%1").arg(p->smo2);
             if (ride->areDataPresent()->thb) out << ", \"THB\":" << QString("%1").arg(p->thb);
+            if (ride->areDataPresent()->rcad) out << ", \"RCAD\":" << QString("%1").arg(p->rcad);
+            if (ride->areDataPresent()->rvert) out << ", \"RVERT\":" << QString("%1").arg(p->rvert);
+            if (ride->areDataPresent()->rcontact) out << ", \"RCON\":" << QString("%1").arg(p->rcontact);
 
             // sample points in here!
             out << " }";

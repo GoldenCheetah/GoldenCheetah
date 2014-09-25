@@ -59,6 +59,7 @@ private:
     int	   lap;
     double power;
     double cadence;
+    double rcad;
     double hr;
     double speed;
     double torque;

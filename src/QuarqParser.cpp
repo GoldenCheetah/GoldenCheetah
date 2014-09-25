@@ -51,7 +51,7 @@ QuarqParser::incrementTime( const double new_time )
   while (time_diff > seconds_from_start) {
 
     rideFile->appendPoint(seconds_from_start, cad, hr, km,
-                          kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
+                          kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
 
     seconds_from_start += SAMPLE_INTERVAL;
   }
@@ -113,7 +113,8 @@ QuarqParser::endElement( const QString&, const QString&, const QString& qName)
     // flush one last data point
     if (qName == "Qollector") {
       rideFile->appendPoint(seconds_from_start, cad, hr, km,
-                            kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0, 0);
+                            kph, nm, watts, 0, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, 
+                            0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0, 0);
     }
 
     return true;

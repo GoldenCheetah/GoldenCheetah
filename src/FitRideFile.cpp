@@ -261,7 +261,7 @@ struct FitFileReaderState
             if( value == NA_VALUE )
                 continue;
 
-            printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
+            //printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
         }
     }
 
@@ -273,7 +273,7 @@ struct FitFileReaderState
             if( value == NA_VALUE )
                 continue;
 
-            printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
+            //printf("decodeDeviceInfo  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
         }
     }
 
@@ -389,7 +389,9 @@ struct FitFileReaderState
         double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
         double kph = 0, temperature = RideFile::NoTemp, watts = 0, slope = 0;
         double leftTorqueEff = 0, rightTorqueEff = 0, leftPedalSmooth = 0, rightPedalSmooth = 0;
+        double rvert = 0, rcad = 0, rcontact = 0;
         double smO2 = 0, tHb = 0;
+        bool run=false;
 
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
@@ -420,8 +422,12 @@ struct FitFileReaderState
                         hr = value;
                         break;
                 case 4: // CADENCE
-                        cad = value;
+                        if (run)
+                            rcad = value;
+                        else
+                            cad = value;
                         break;
+
                 case 5: // DISTANCE
                         km = value / 100000.0;
                         break;
@@ -450,6 +456,19 @@ struct FitFileReaderState
                          break;
                 case 31: // GPS Accuracy
                          break;
+
+                case 39: // VERTICAL OSCILLATION
+                         rvert = value / 100.0f;
+                         break;
+
+                case 40: // IS RUNNING ACTIVITY?
+                         run = true;
+                         break;
+
+                case 41: // GROUND CONTACT TIME
+                         rcontact = value / 10.0f;
+                         break;
+
                 case 43: // LEFT_TORQUE_EFFECTIVENESS
                          leftTorqueEff = value / 2.0;
                          //qDebug() << "LEFT_TORQUE_EFFECTIVENESS" << leftTorqueEff;
@@ -470,7 +489,11 @@ struct FitFileReaderState
                          //qDebug() << "COMBINED_PEDAL_SMOOTHNES" << value;
                          break;
 
-                default: unknown_record_fields.insert(field.num);
+                case 53: // RUNNING CADENCE FRACTIONAL VALUE
+                         break;
+
+                default: 
+                         unknown_record_fields.insert(field.num);
             }
         }
         if (time == last_time)
@@ -543,6 +566,9 @@ struct FitFileReaderState
             double deltaRightPS = rightPedalSmooth - prevPoint->rps;
             double deltaSmO2 = smO2 - prevPoint->smo2;
             double deltaTHb = tHb - prevPoint->thb;
+            double deltarvert = rvert - prevPoint->rvert;
+            double deltarcad = rcad - prevPoint->rcad;
+            double deltarcontact = rcontact - prevPoint->rcontact;
 
             // only smooth for less than 30 minutes
             // we don't want to crash / stall on bad
@@ -572,6 +598,9 @@ struct FitFileReaderState
                         prevPoint->rps + (deltaRightPS * weight),
                         prevPoint->smo2 + (deltaSmO2 * weight),
                         prevPoint->thb + (deltaTHb * weight),
+                        prevPoint->rvert + (deltarvert * weight),
+                        prevPoint->rcad + (deltarcad * weight),
+                        prevPoint->rcontact + (deltarcontact * weight),
                         interval);
                 }
                 prevPoint = rideFile->dataPoints().back();
@@ -581,7 +610,7 @@ struct FitFileReaderState
         if (km < 0.00001f) km = last_distance;
         rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, slope, temperature,
                      lrbalance, leftTorqueEff, rightTorqueEff, leftPedalSmooth, rightPedalSmooth,
-                     smO2, tHb, interval);
+                     smO2, tHb, rvert, rcad, rcontact, interval);
         last_time = time;
         last_distance = km;
     }
