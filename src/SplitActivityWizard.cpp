@@ -778,6 +778,7 @@ SplitConfirm::createRideFile(long start, long stop)
                                p->nm, p->watts, p->alt, p->lon, p->lat,
                                p->headwind, p->slope, p->temp, p->lrbalance, p->lte, p->rte, p->lps, p->rps,
                                p->smo2, p->thb,
+                               p->rvert, p->rcad, p->rcontact,
                                p->interval);
     }
 

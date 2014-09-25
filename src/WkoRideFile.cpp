@@ -490,6 +490,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                             kph, nm, watts, alt, lon, lat, wind, slope, temp, 0.0, 
                             0.0,0.0,0.0,0.0, // vector pedal torque eff and smoothness not supported in WKO (?)
                             0.0,0.0,
+                            0.0,0.0,0.0, // running dynamics
                             0);
             }
 

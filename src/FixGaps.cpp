@@ -196,6 +196,9 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double rpsdelta = (point->rps - last->rps) / (double) count;
                 double smo2delta = (point->smo2 - last->smo2) / (double) count;
                 double thbdelta = (point->thb - last->thb) / (double) count;
+                double rcontactdelta = (point->rcontact - last->rcontact) / (double) count;
+                double rcaddelta = (point->rcad - last->rcad) / (double) count;
+                double rvertdelta = (point->rvert - last->rvert) / (double) count;
 
                 // add the points
                 for(int i=0; i<count; i++) {
@@ -219,7 +222,11 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->rps + ((i+1)*rpsdelta),
                                                            last->smo2 + ((i+1)*smo2delta),
                                                            last->thb + ((i+1)*thbdelta),
+                                                           last->rvert + ((i+1)*rvertdelta),
+                                                           last->rcad + ((i+1)*rcaddelta),
+                                                           last->rcontact + ((i+1)*rcontactdelta),
                                                            last->interval);
+
                     ride->command->insertPoint(position++, add);
                 }
 
@@ -250,6 +257,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0.0, 0.0, 0.0, 0.0, //pedal torque / smoothness
                                                            0.0, 0.0, // smO2 / thb
+                                                           0.0, 0.0, 0.0, // running dynamics
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }

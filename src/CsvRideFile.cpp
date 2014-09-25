@@ -396,13 +396,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->appendPoint(seconds, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat, 0.0,
                                           0.0, temp, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                          0.0, 0.0, interval);
+                                          0.0, 0.0, 0.0, 0.0, 0.0, interval);
                else
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
-                                          smo2, thb, interval);
+                                          smo2, thb, 0.0, 0.0, 0.0, interval);
             }
             ++lineno;
         }

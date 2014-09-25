@@ -149,6 +149,18 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("tHb");
             headingsType << RideFile::tHb;
         }
+        if (series == RideFile::rcad || ride->areDataPresent()->rcad) {
+            headings_ << tr("Run Cadence");
+            headingsType << RideFile::rcad;
+        }
+        if (series == RideFile::rvert || ride->areDataPresent()->rvert) {
+            headings_ << tr("Vertical Oscillation");
+            headingsType << RideFile::rvert;
+        }
+        if (series == RideFile::rcontact || ride->areDataPresent()->rcontact) {
+            headings_ << tr("GCT");
+            headingsType << RideFile::rcontact;
+        }
         if (series == RideFile::interval || ride->areDataPresent()->interval) {
             headings_ << tr("Interval");
             headingsType << RideFile::interval;

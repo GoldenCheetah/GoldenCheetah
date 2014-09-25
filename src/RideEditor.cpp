@@ -227,6 +227,9 @@ RideEditor::whatColumns()
          << tr("Right PS")
          << tr("SmO2")
          << tr("tHb")
+         << tr("Vertical Oscillation")
+         << tr("Run Cadence")
+         << tr("GCT")
          << tr("Interval");
 
     return what;
@@ -820,6 +823,9 @@ RideEditor::insColumn(QString name)
     if (name == tr("Right PS")) series = RideFile::rps;
     if (name == tr("SmO2")) series = RideFile::smO2;
     if (name == tr("tHb")) series = RideFile::tHb;
+    if (name == tr("Vertical Oscillation")) series = RideFile::rvert;
+    if (name == tr("Run Cadence")) series = RideFile::rcad;
+    if (name == tr("GCT")) series = RideFile::rcontact;
 
     model->insertColumn(series);
 }

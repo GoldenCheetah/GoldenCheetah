@@ -75,6 +75,9 @@
 \"RPS\"             return RPS;
 \"SMO2\"            return SMO2;
 \"THB\"             return THB;
+\"RCON\"            return RCON;
+\"RVERT\"           return RVERT;
+\"RCAD\"            return RCAD;
 [-+]?[0-9]+            return JS_INTEGER;
 [-+]?[0-9]+e-[0-9]+    return JS_FLOAT;
 [-+]?[0-9]+\.[-+e0-9]*  return JS_FLOAT;
