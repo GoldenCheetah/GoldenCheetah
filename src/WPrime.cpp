@@ -672,9 +672,7 @@ class Matches : public RideMetric {
     void initialize() {
         setName(tr("W'bal Matches"));
         setType(RideMetric::Total);
-        setMetricUnits(tr("matches"));
-        setImperialUnits(tr("matches"));
-        setPrecision(1);
+        setPrecision(0);
     }
     void compute(const RideFile *r, const Zones *, int,
                  const HrZones *, int,
