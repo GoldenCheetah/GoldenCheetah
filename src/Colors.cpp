@@ -340,6 +340,7 @@ GCColor::css()
                    "h3 { color: %1; background-color: %2; } "
                    "h4 { color: %1; background-color: %2; } "
                    "b { color: %1; background-color: %2; } "
+                   "#sharp { color: red; background-color: white; font-weight: bold; } "
 #ifdef Q_OS_MAC
                    "::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.5);  "
                    "-webkit-box-shadow: inset 0 0 1px rgba(255,255,255,0.6); }"

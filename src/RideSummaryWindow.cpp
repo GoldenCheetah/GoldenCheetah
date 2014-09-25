@@ -693,8 +693,14 @@ RideSummaryWindow::htmlSummary()
             foreach(SummaryBest best, bests) {
 
                 // alternating shading
-                if (pos%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
-                else summary += "<tr>";
+                if (pos%2) summary += "<tr bgcolor='" + altColor.name() + "'";
+                else summary += "<tr";
+
+                if (best.date == QDate::currentDate()) {
+                    // its today -- highlight it !
+                    summary += " id=\"sharp\" ";
+                }
+                summary += " >";
 
                 summary += QString("<td align=\"center\">%1.</td><td align=\"center\">%2</td><td align=\"center\">%3</td></tr>")
                            .arg(pos++)
