@@ -40,6 +40,7 @@ class SummaryBest
 class SummaryMetrics
 {
     Q_DECLARE_TR_FUNCTIONS(SummaryMetrics)
+
 	public:
         // filename
 	    QString getFileName() const { return fileName; }
@@ -52,6 +53,9 @@ class SummaryMetrics
         // ride date
         QDateTime getRideDate() const { return rideDate; }
         void setRideDate(QDateTime rideDate) { this->rideDate = rideDate; }
+
+        void setIsRun(bool x) { isrun = x; }
+        bool isRun() { return isrun; }
 
         // for non-rides, ie. measures use same field but overload
         QDateTime getDateTime() const { return rideDate; }
@@ -94,6 +98,7 @@ class SummaryMetrics
 	    QString fileName;
         QString id;
         QDateTime rideDate;
+        bool isrun;
         QMap<QString, double> value;
         QMap<QString, QString> text;
 };

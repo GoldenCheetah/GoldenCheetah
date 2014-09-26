@@ -304,6 +304,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
 
     summaryMetric.setRideDate(dateTime);
     summaryMetric.setId(ride->id());
+    summaryMetric.setIsRun(ride->isRun());
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QStringList metrics;

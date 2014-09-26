@@ -107,6 +107,15 @@ RideFile::wprimeData()
     return wprime_;
 }
 
+bool
+RideFile::isRun()
+{
+    // for now we just look at Sport and if there are any
+    // running specific data series in the data
+    return (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
+           (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact);
+}
+
 QString
 RideFile::seriesName(SeriesType series)
 {
@@ -585,6 +594,12 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->smo2 = point->smo2;
     if (minPoint->thb == 0 || point->thb<minPoint->thb)
        minPoint->thb = point->thb;
+    if (minPoint->rvert == 0 || point->rvert<minPoint->rvert)
+       minPoint->rvert = point->rvert;
+    if (minPoint->rcad == 0 || point->rcad<minPoint->rcad)
+       minPoint->rcad = point->rcad;
+    if (minPoint->rcontact == 0 || point->rcontact<minPoint->rcontact)
+       minPoint->rcontact = point->rcontact;
 }
 
 void RideFile::updateMax(RideFilePoint* point)
@@ -630,6 +645,12 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->smo2 = point->smo2;
     if (point->thb>maxPoint->thb)
        maxPoint->thb = point->thb;
+    if (point->rvert>maxPoint->rvert)
+       maxPoint->rvert = point->rvert;
+    if (point->rcad>maxPoint->rcad)
+       maxPoint->rcad = point->rcad;
+    if (point->rcontact>maxPoint->rcontact)
+       maxPoint->rcontact = point->rcontact;
 }
 
 void RideFile::updateAvg(RideFilePoint* point)
@@ -655,6 +676,9 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->lrbalance += point->lrbalance;
     totalPoint->smo2 += point->smo2;
     totalPoint->thb += point->thb;
+    totalPoint->rvert += point->rvert;
+    totalPoint->rcad += point->rcad;
+    totalPoint->rcontact += point->rcontact;
 
     ++totalCount;
     if (point->temp != NoTemp) ++totalTemp;
@@ -680,6 +704,9 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rps = totalPoint->rps/totalCount;
     avgPoint->smo2 = totalPoint->smo2/totalCount;
     avgPoint->thb = totalPoint->thb/totalCount;
+    avgPoint->rvert = totalPoint->rvert/totalCount;
+    avgPoint->rcad = totalPoint->rcad/totalCount;
+    avgPoint->rcontact = totalPoint->rcontact/totalCount;
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
