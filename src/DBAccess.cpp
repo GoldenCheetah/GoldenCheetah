@@ -104,8 +104,9 @@
 // 83  05  Sep 2014 Joern Rischmueler  Added 'Time Carrying' and 'Elevation Gain Carrying'
 // 84  08  Sep 2014 Mark Liversedge    Added HrPw Ratio
 // 85  09  Sep 2014 Mark Liversedge    Added HrNp Ratio
+// 86  26  Sep 2014 Mark Liversedge    Added isRun first class var
 
-int DBSchemaVersion = 85;
+int DBSchemaVersion = 86;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
@@ -198,6 +199,7 @@ bool DBAccess::createMetricsTable()
                                     "timestamp integer,"
                                     "crc integer,"
                                     "ride_date date,"
+                                    "isRun integer,"
                                     "present varchar,"
                                     "color varchar,"
                                     "fingerprint integer";
@@ -439,7 +441,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     }
 
     // construct an insert statement
-    QString insertStatement = "insert into metrics ( filename, identifier, crc, timestamp, ride_date, present, color, fingerprint ";
+    QString insertStatement = "insert into metrics ( filename, identifier, crc, timestamp, ride_date, isRun, present, color, fingerprint ";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -457,7 +459,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
         }
     }
 
-    insertStatement += " ) values (?,?,?,?,?,?,?,?"; // filename, identifier, crc, timestamp, ride_date, present, color, fingerprint
+    insertStatement += " ) values (?,?,?,?,?,?,?,?,?"; // filename, identifier, crc, timestamp, ride_date, present, color, fingerprint
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
@@ -476,6 +478,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
 	query.addBindValue((int)computeFileCRC(fullPath));
 	query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
+    query.addBindValue(summaryMetrics->isRun());
     query.addBindValue(ride->getTag("Data", ""));
     query.addBindValue(color.name());
     query.addBindValue((int)fingerprint);
@@ -542,7 +545,7 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
     bool found = false;
 
     // construct the select statement
-    QString selectStatement = "SELECT filename, identifier, ride_date, color";
+    QString selectStatement = "SELECT filename, identifier, ride_date, isRun, color";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -566,12 +569,13 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
         summaryMetrics.setFileName(query.value(0).toString());
         summaryMetrics.setId(query.value(1).toString());
         summaryMetrics.setRideDate(query.value(2).toDateTime());
-        color = QColor(query.value(3).toString());
+        summaryMetrics.setIsRun(query.value(3).toInt());
+        color = QColor(query.value(4).toString());
 
         // the values
         int i=0;
         for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+4).toDouble());
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+5).toDouble());
 
         foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
@@ -618,7 +622,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     if (end == QDateTime()) end = QDateTime::currentDateTime().addYears(+10);
 
     // construct the select statement
-    QString selectStatement = "SELECT filename, identifier, ride_date";
+    QString selectStatement = "SELECT filename, identifier, ride_date, isRun";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -645,18 +649,19 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
         summaryMetrics.setFileName(query.value(0).toString());
         summaryMetrics.setId(query.value(1).toString());
         summaryMetrics.setRideDate(query.value(2).toDateTime());
+        summaryMetrics.setIsRun(query.value(3).toInt());
         // the values
         int i=0;
         for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+3).toDouble());
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+4).toDouble());
         foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
-                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+3).toDouble());
+                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+4).toDouble());
                 i++;
             } else if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 QString underscored = field.name;
-                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
+                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+4).toString());
                 i++;
             }
         }
@@ -670,7 +675,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     SummaryMetrics summaryMetrics;
 
     // construct the select statement
-    QString selectStatement = "SELECT filename, identifier";
+    QString selectStatement = "SELECT filename, identifier, isRun";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -692,18 +697,19 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
         // filename and date
         summaryMetrics.setFileName(query.value(0).toString());
         summaryMetrics.setId(query.value(1).toString());
+        summaryMetrics.setIsRun(query.value(2).toInt());
         // the values
         int i=0;
         for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+2).toDouble());
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+3).toDouble());
         foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
-                summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());
+                summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+3).toDouble());
                 i++;
             } else if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 QString underscored = field.name;
-                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+2).toString());
+                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
                 i++;
             }
         }
