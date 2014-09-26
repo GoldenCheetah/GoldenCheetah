@@ -105,6 +105,7 @@ Athlete::Athlete(Context *context, const QDir &home)
     translateDefaultCharts(presets);
 
     // Metadata
+    metricDB = NULL; // warn metadata we haven't got there yet !
     rideMetadata_ = new RideMetadata(context,true);
     rideMetadata_->hide();
 
