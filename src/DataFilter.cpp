@@ -92,7 +92,13 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
     case Leaf::Float : return true;
     case Leaf::Integer : return true;
     case Leaf::String : return false;
-    case Leaf::Symbol : return df->lookupType.value(*(leaf->lvalue.n), false);
+    case Leaf::Symbol : 
+        {
+            QString symbol = *(leaf->lvalue.n);
+            if (symbol == "isRun") return true;
+            else return df->lookupType.value(symbol, false);
+        }
+        break;
     case Leaf::Logical  : return true; // not possible!
     case Leaf::Operation : return true;
     case Leaf::BinaryOperation : return true;
@@ -136,9 +142,13 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             // if so set the type to meta or metric
             // and save the technical name used to do
             // a lookup at execution time
-            QString lookup = df->lookupMap.value(*(leaf->lvalue.n), "");
+            QString symbol = *(leaf->lvalue.n);
+            QString lookup = df->lookupMap.value(symbol, "");
             if (lookup == "") {
-                DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(*(leaf->lvalue.n));
+
+                // isRun isa special, we may add more later (e.g. date)
+                if (symbol != "isRun") 
+                    DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
             }
         }
         break;
@@ -390,9 +400,15 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
             case Leaf::Symbol :
             {
                 QString rename;
-                // get symbol value
-                if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.l->lvalue.n))) == true) {
+                QString symbol = *(leaf->lvalue.l->lvalue.n);
 
+                // is it isRun ?
+                if (symbol == "isRun") {
+                    lhsdouble = m.isRun() ? 1 : 0;
+                    lhsisNumber = true;
+
+                } else if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.l->lvalue.n))) == true) {
+                    // get symbol value
                     // check metadata string to number first ...
                     QString meta = m.getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "unknown");
                     if (meta == "unknown")
@@ -440,8 +456,16 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
             case Leaf::Symbol :
             {
                 QString rename;
+                QString symbol = *(leaf->rvalue.l->lvalue.n);
+
+                // is it isRun ?
+                if (symbol == "isRun") {
+
+                    rhsdouble = m.isRun() ? 1 : 0;
+                    rhsisNumber = true;
+
                 // get symbol value
-                if ((rhsisNumber=df->lookupType.value(*(leaf->rvalue.l->lvalue.n))) == true) {
+                } else if ((rhsisNumber=df->lookupType.value(*(leaf->rvalue.l->lvalue.n))) == true) {
                     // numeric
                     QString meta = m.getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "unknown");
                     if (meta == "unknown")
