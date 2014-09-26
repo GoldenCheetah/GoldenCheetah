@@ -17,6 +17,7 @@
  */
 
 #include "RideMetadata.h"
+#include "MetricAggregator.h"
 #include "SpecialFields.h"
 
 #include "MainWindow.h"
@@ -34,6 +35,7 @@
 #include <QLineEdit>
 #include <QStyle>
 #include <QStyleFactory>
+#include <QSqlQuery>
 
 // shorthand when looking up our ride via  Q_PROPERTY
 #define ourRideItem meta->property("ride").value<RideItem*>()
@@ -460,9 +462,23 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_SHORTTEXT : // shorttext
 
         if (field.values.count()) {
-            completer = new QCompleter(field.values, this);
-            completer->setCaseSensitivity(Qt::CaseInsensitive);
-            completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+            if (field.values.count() == 1 && field.values.at(0) == "*") {
+
+                // get the metdata values from the metric db ....
+                QStringList values;
+
+                // set values from whatever we have done in the past
+                completer = new QCompleter(values, this);
+                completer->setCaseSensitivity(Qt::CaseInsensitive);
+                completer->setCompletionMode(QCompleter::InlineCompletion);
+
+            } else {
+
+                // user specified restricted values
+                completer = new QCompleter(field.values, this);
+                completer->setCaseSensitivity(Qt::CaseInsensitive);
+                completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+            }
         }
         widget = new QLineEdit(this);
         dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
@@ -606,6 +622,8 @@ FormField::editFinished()
 
              // we specified a value list and ignored it...
              if (text != "" && definition.values.count() && definition.values.indexOf(text) == -1) {
+
+                 if (definition.values.count() != 1 && definition.values.at(0) != "*") // wildcard no warning
                   // just warn? - does nothing for now, in case they are just "suggestions"
                  QMessageBox::warning(this, definition.name, tr("You entered '%1' which is not an expected value.").arg(text));
              }
@@ -805,7 +823,24 @@ FormField::metadataChanged()
     switch (definition.type) {
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
-        ((QLineEdit*)widget)->setText(value);
+        { 
+            if (meta->context->athlete->metricDB && completer && 
+                definition.values.count() == 1 && definition.values.at(0) == "*") {
+
+                // set completer if needed for wildcard matching
+                QStringList values;
+                QSqlQuery query(meta->context->athlete->metricDB->db()->connection());
+                bool rc = query.exec(QString("SELECT Z%1 FROM metrics;").arg(meta->context->specialFields.makeTechName(definition.name)));
+                while (rc && query.next()) values << query.value(0).toString();
+
+                delete completer;
+                completer = new QCompleter(values, this);
+                completer->setCaseSensitivity(Qt::CaseInsensitive);
+                completer->setCompletionMode(QCompleter::InlineCompletion);
+                dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
+            }
+            ((QLineEdit*)widget)->setText(value);
+        }
         break;
 
     case FIELD_TEXTBOX : // textbox
