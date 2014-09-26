@@ -730,9 +730,9 @@ RideEditor::copy()
 
             for (int column = selection[0].column();  column <= selection[selection.count()-1].column(); column++) {
                 if (column == selection[selection.count()-1].column())
-                    text += QString("%1").arg(getValue(row,column));
+                    text += QString("%1").arg(getValue(row,column), 0, 'g', 11);
                 else
-                    text += QString("%1\t").arg(getValue(row,column));
+                    text += QString("%1\t").arg(getValue(row,column), 0, 'g', 11);
             }
             text += "\n";
         }
