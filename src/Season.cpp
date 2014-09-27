@@ -330,7 +330,7 @@ Seasons::readSeasons()
     season.setType(Season::temporary);
     season.setEnd(today);
     season.setStart(today.addMonths(-3));
-    season.setId(QUuid("{00000000-0000-0000-0000-000000000011}"));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000012}"));
     seasons.append(season);
 
     season.setName(tr("Last 6 months"));
