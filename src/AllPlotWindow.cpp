@@ -819,8 +819,6 @@ AllPlotWindow::compareChanged()
         spanSlider->setLowerValue(spanSlider->minimum());
         spanSlider->setUpperValue(spanSlider->maximum());
 
-        // don't show alt/slope
-        fullPlot->standard->altSlopeCurve->setVisible(false);
         // redraw for red/no-red title
         fullPlot->replot();
 
@@ -1079,9 +1077,6 @@ AllPlotWindow::redrawFullPlot()
     //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->standard->grid->enableY(false);
-
-    //don't show the ALT/SLOPE plot here
-    fullPlot->standard->altSlopeCurve->setVisible(false);
 
     // use the ride to decide
     if (fullPlot->bydist)
@@ -2262,7 +2257,12 @@ AllPlotWindow::setShowAltSlope(int value)
 
     // compare mode selfcontained update
     if (isCompare()) {
+
+       // transfer changes of setting here (which is more than on/off) also to other plot settings
        fullPlot->showAltSlopeState = value;
+       fullPlot->setAltSlopePlotStyle(fullPlot->standard->altSlopeCurve);
+       allPlot->showAltSlopeState = value;
+       allPlot->setAltSlopePlotStyle(allPlot->standard->altSlopeCurve);
        compareChanged();
        active = false;
        return;
