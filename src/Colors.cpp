@@ -142,6 +142,7 @@ void GCColor::setupColors()
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(108,108,108) },
 #endif
 #endif
+        { tr("Slope"), "CSLOPE", Qt::black },
         { "", "", QColor(0,0,0) },
     };
 
