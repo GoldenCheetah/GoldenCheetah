@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "AllPlotWindow.h"
+#include "AllPlotSlopeCurve.h"
 #include "ReferenceLineDialog.h"
 #include "RideFile.h"
 #include "RideItem.h"
@@ -338,6 +339,17 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     altCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
     altCurve->setZ(-10); // always at the back.
 
+    altSlopeCurve = new AllPlotSlopeCurve(tr("Alt/Slope"));
+    altSlopeCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    altSlopeCurve->setStyle(AllPlotSlopeCurve::SlopeDist1);
+    altSlopeCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 1));
+    altSlopeCurve->setZ(-5); // always at the back.
+
+    slopeCurve = new QwtPlotCurve(tr("Slope"));
+    slopeCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    slopeCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
+
     tempCurve = new QwtPlotCurve(tr("Temperature"));
     tempCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     if (plot->context->athlete->useMetricUnits)
@@ -415,7 +427,8 @@ AllPlotObject::setColor(QColor color)
     worklist << mCurve << wCurve << wattsCurve << atissCurve << antissCurve << npCurve << xpCurve << speedCurve << accelCurve
              << wattsDCurve << cadDCurve << nmDCurve << hrDCurve
              << apCurve << cadCurve << tempCurve << hrCurve << torqueCurve << balanceLCurve
-             << balanceRCurve << lteCurve << rteCurve << lpsCurve << rpsCurve << altCurve;
+             << balanceRCurve << lteCurve << rteCurve << lpsCurve << rpsCurve
+             << altCurve << slopeCurve << altSlopeCurve;
 
     // work through getting progresively lighter
     QPen pen;
@@ -464,6 +477,8 @@ AllPlotObject::~AllPlotObject()
     hrDCurve->detach(); delete hrDCurve;
     cadCurve->detach(); delete cadCurve;
     altCurve->detach(); delete altCurve;
+    slopeCurve->detach(); delete slopeCurve;
+    altSlopeCurve->detach(); delete altSlopeCurve;
     tempCurve->detach(); delete tempCurve;
     windCurve->detach(); delete windCurve;
     torqueCurve->detach(); delete torqueCurve;
@@ -498,6 +513,8 @@ AllPlotObject::setVisible(bool show)
         hrDCurve->detach();
         cadCurve->detach();
         altCurve->detach();
+        slopeCurve->detach();
+        altSlopeCurve->detach();
         tempCurve->detach();
         windCurve->detach();
         torqueCurve->detach();
@@ -526,6 +543,8 @@ AllPlotObject::setVisible(bool show)
         mCurve->attach(plot);
         wCurve->attach(plot);
         wattsCurve->attach(plot);
+        slopeCurve->attach(plot);
+        altSlopeCurve->attach(plot);
         npCurve->attach(plot);
         atissCurve->attach(plot);
         antissCurve->attach(plot);
@@ -583,6 +602,8 @@ AllPlotObject::hideUnwanted()
     if (!plot->showHrD) hrDCurve->detach();
     if (!plot->showCad) cadCurve->detach();
     if (!plot->showAlt) altCurve->detach();
+    if (!plot->showSlope) slopeCurve->detach();
+    if (plot->showAltSlopeState == 0) altSlopeCurve->detach();
     if (!plot->showTemp) tempCurve->detach();
     if (!plot->showWind) windCurve->detach();
     if (!plot->showTorque) torqueCurve->detach();
@@ -605,6 +626,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     rideItem(NULL),
     shade_zones(true),
     showPowerState(3),
+    showAltSlopeState(0),
     showATISS(false),
     showANTISS(false),
     showNP(false),
@@ -619,6 +641,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     showHrD(false),
     showCad(true),
     showAlt(true),
+    showSlope(false),
     showTemp(true),
     showWind(true),
     showTorque(true),
@@ -740,6 +763,8 @@ AllPlot::configChanged()
         standard->hrDCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->slopeCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->altSlopeCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->tempCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->windCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->torqueCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -752,6 +777,8 @@ AllPlot::configChanged()
         standard->intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->intervalHoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
+
+    setAltSlopePlotStyle(standard->altSlopeCurve);
 
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     QPen wattsPen = QPen(GColor(CPOWER));
@@ -787,12 +814,18 @@ AllPlot::configChanged()
     cadPen.setWidth(width);
     standard->cadCurve->setPen(cadPen);
     standard->cadDCurve->setPen(cadPen);
+    QPen slopePen(GColor(CSLOPE));
+    slopePen.setWidth(width);
+    standard->slopeCurve->setPen(slopePen);
     QPen altPen(GColor(CALTITUDE));
     altPen.setWidth(width);
     standard->altCurve->setPen(altPen);
     QColor brush_color = GColor(CALTITUDEBRUSH);
     brush_color.setAlpha(200);
     standard->altCurve->setBrush(brush_color);   // fill below the line
+    QPen altSlopePen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    altSlopePen.setWidth(width);
+    standard->altSlopeCurve->setPen(altSlopePen);
     QPen tempPen = QPen(GColor(CTEMP));
     tempPen.setWidth(width);
     standard->tempCurve->setPen(tempPen);
@@ -940,7 +973,15 @@ AllPlot::configChanged()
         p.setAlpha(64);
         standard->rpsCurve->setBrush(QBrush(p));
 
-        /*p = standard->balanceLCurve->pen().color();
+        p = standard->slopeCurve->pen().color();
+        p.setAlpha(64);
+        standard->slopeCurve->setBrush(QBrush(p));
+
+        /*p = standard->altSlopeCurve->pen().color();
+        p.setAlpha(64);
+        standard->altSlopeCurve->setBrush(QBrush(p));
+
+        p = standard->balanceLCurve->pen().color();
         p.setAlpha(64);
         standard->balanceLCurve->setBrush(QBrush(p));
 
@@ -969,6 +1010,8 @@ AllPlot::configChanged()
         standard->rteCurve->setBrush(Qt::NoBrush);
         standard->lpsCurve->setBrush(Qt::NoBrush);
         standard->rpsCurve->setBrush(Qt::NoBrush);
+        standard->slopeCurve->setBrush(Qt::NoBrush);
+        //standard->altSlopeCurve->setBrush((Qt::NoBrush));
         //standard->balanceLCurve->setBrush(Qt::NoBrush);
         //standard->balanceRCurve->setBrush(Qt::NoBrush);
     }
@@ -1070,15 +1113,15 @@ struct DataPoint {
 
     double time, hr, watts, atiss, antiss, np, ap, xp, speed, cad, 
            alt, temp, wind, torque, lrbalance, lte, rte, lps, rps,
-           kphd, wattsd, cadd, nmd, hrd;
+           kphd, wattsd, cadd, nmd, hrd, slope;
 
     DataPoint(double t, double h, double w, double at, double an, double n, double l, double x, double s, double c, 
               double a, double te, double wi, double tq, double lrb, double lte, double rte, double lps, double rps,
-              double kphd, double wattsd, double cadd, double nmd, double hrd) :
+              double kphd, double wattsd, double cadd, double nmd, double hrd, double sl) :
 
               time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), ap(l), xp(x), speed(s), cad(c), 
               alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), lte(lte), rte(rte), lps(lps), rps(rps),
-              kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd) {}
+              kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -1166,7 +1209,11 @@ AllPlot::recalc(AllPlotObject *objects)
         if (!objects->hrDArray.empty()) objects->hrDCurve->setSamples(data, data);
 
         if (!objects->cadArray.empty()) objects->cadCurve->setSamples(data, data);
-        if (!objects->altArray.empty()) objects->altCurve->setSamples(data, data);
+        if (!objects->altArray.empty()) {
+            objects->altCurve->setSamples(data, data);
+            objects->altSlopeCurve->setSamples(data, data);
+        }
+        if (!objects->slopeArray.empty()) objects->slopeCurve->setSamples(data, data);
         if (!objects->tempArray.empty()) objects->tempCurve->setSamples(data, data);
         if (!objects->windArray.empty()) objects->windCurve->setSamples(new QwtIntervalSeriesData(intData));
         if (!objects->torqueArray.empty()) objects->torqueCurve->setSamples(data, data);
@@ -1209,6 +1256,7 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalCad = 0.0;
         double totalDist = 0.0;
         double totalAlt = 0.0;
+        double totalSlope = 0.0;
         double totalTemp = 0.0;
         double totalWind = 0.0;
         double totalTorque = 0.0;
@@ -1237,6 +1285,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothTime.resize(rideTimeSecs + 1);
         objects->smoothDistance.resize(rideTimeSecs + 1);
         objects->smoothAltitude.resize(rideTimeSecs + 1);
+        objects->smoothSlope.resize(rideTimeSecs + 1);
         objects->smoothTemp.resize(rideTimeSecs + 1);
         objects->smoothWind.resize(rideTimeSecs + 1);
         objects->smoothRelSpeed.resize(rideTimeSecs + 1);
@@ -1276,7 +1325,8 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->wattsDArray.empty() ? objects->wattsDArray[i] : 0),
                              (!objects->cadDArray.empty() ? objects->cadDArray[i] : 0),
                              (!objects->nmDArray.empty() ? objects->nmDArray[i] : 0),
-                             (!objects->hrDArray.empty() ? objects->hrDArray[i] : 0));
+                             (!objects->hrDArray.empty() ? objects->hrDArray[i] : 0),
+                             (!objects->slopeArray.empty() ? objects->slopeArray[i] : 0));
                 if (!objects->wattsArray.empty())
                     totalWatts += objects->wattsArray[i];
 
@@ -1303,6 +1353,8 @@ AllPlot::recalc(AllPlotObject *objects)
                     totalCad   += objects->cadArray[i];
                 if (!objects->altArray.empty())
                     totalAlt   += objects->altArray[i];
+                if (!objects->slopeArray.empty())
+                    totalSlope   += objects->slopeArray[i];
                 if (!objects->tempArray.empty() ) {
                     if (objects->tempArray[i] == RideFile::NoTemp) {
                         dp.temp = (i>0 && !list.empty()?list.back().temp:0.0);
@@ -1350,6 +1402,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalHrD -= dp.hrd;
                 totalCad   -= dp.cad;
                 totalAlt   -= dp.alt;
+                totalSlope -= dp.slope;
                 totalTemp   -= dp.temp;
                 totalWind   -= dp.wind;
                 totalTorque   -= dp.torque;
@@ -1378,6 +1431,7 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothHrD[secs] = 0.0;
                 objects->smoothCad[secs]   = 0.0;
                 objects->smoothAltitude[secs]   = ((secs > 0) ? objects->smoothAltitude[secs - 1] : objects->altArray[secs] ) ;
+                objects->smoothSlope[secs]   =  0.0;
                 objects->smoothTemp[secs]   = 0.0;
                 objects->smoothWind[secs] = 0.0;
                 objects->smoothRelSpeed[secs] =  QwtIntervalSample();
@@ -1405,10 +1459,12 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothHrD[secs]    = totalHrD / double(list.size());
                 objects->smoothCad[secs]      = totalCad / list.size();
                 objects->smoothAltitude[secs]      = totalAlt / list.size();
+                objects->smoothSlope[secs]      = totalSlope / double(list.size());
                 objects->smoothTemp[secs]      = totalTemp / list.size();
                 objects->smoothWind[secs]    = totalWind / list.size();
                 objects->smoothRelSpeed[secs] =  QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(qMin(totalWind / list.size(), totalSpeed / list.size()), qMax(totalWind / list.size(), totalSpeed / list.size()) ) );
                 objects->smoothTorque[secs]    = totalTorque / list.size();
+
 
                 // left /right pedal data
                 double balance = totalBalance / list.size();
@@ -1452,6 +1508,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothTime.resize(0);
         objects->smoothDistance.resize(0);
         objects->smoothAltitude.resize(0);
+        objects->smoothSlope.resize(0);
         objects->smoothTemp.resize(0);
         objects->smoothWind.resize(0);
         objects->smoothRelSpeed.resize(0);
@@ -1481,6 +1538,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothTime.append(dp->secs/60);
             objects->smoothDistance.append(context->athlete->useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             objects->smoothAltitude.append(context->athlete->useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
+            objects->smoothSlope.append(dp->slope);
             if (dp->temp == RideFile::NoTemp && !objects->smoothTemp.empty())
                 dp->temp = objects->smoothTemp.last();
             objects->smoothTemp.append(context->athlete->useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
@@ -1583,6 +1641,10 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!objects->altArray.empty()) {
         objects->altCurve->setSamples(xaxis.data() + startingIndex, objects->smoothAltitude.data() + startingIndex, totalPoints);
+        objects->altSlopeCurve->setSamples(xaxis.data() + startingIndex, objects->smoothAltitude.data() + startingIndex, totalPoints);
+    }
+    if (!objects->slopeArray.empty()) {
+        objects->slopeCurve->setSamples(xaxis.data() + startingIndex, objects->smoothSlope.data() + startingIndex, totalPoints);
     }
 
     if (!objects->tempArray.empty()) {
@@ -1614,7 +1676,7 @@ AllPlot::recalc(AllPlotObject *objects)
     if (!objects->rpsArray.empty()) objects->rpsCurve->setSamples(xaxis.data() + startingIndex, 
                                              objects->smoothRPS.data() + startingIndex, totalPoints);
 
-
+    setAltSlopePlotStyle(objects->altSlopeCurve);
     setYMax();
 
     if (!context->isCompareIntervals) {
@@ -1820,9 +1882,11 @@ AllPlot::setYMax()
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false);
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 3), standard->balanceLCurve->isVisible() ||
                                                      standard->lteCurve->isVisible() ||
-                                                     standard->lpsCurve->isVisible());
+                                                     standard->lpsCurve->isVisible()  ||
+                                                     standard->slopeCurve->isVisible() );
         setAxisVisible(yRight, standard->speedCurve->isVisible());
-        setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible());
+        setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible() ||
+                                                      standard->altSlopeCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), standard->atissCurve->isVisible() || standard->antissCurve->isVisible());
         setAxisVisible(xBottom, true);
@@ -1841,6 +1905,7 @@ AllPlot::setYMax()
 
     }
     // set axis scales
+    // QwtAxis::yRight, 3
     if (((showATISS && standard->atissCurve->isVisible()) || (showANTISS && standard->antissCurve->isVisible()))
          && rideItem && rideItem->ride()) {
 
@@ -1849,6 +1914,7 @@ AllPlot::setYMax()
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
     }
 
+    // QwtAxis::yRight, 2
     if (showW && standard->wCurve->isVisible() && rideItem && rideItem->ride()) {
 
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 2), tr("W' Balance (kJ)"));
@@ -1858,6 +1924,7 @@ AllPlot::setYMax()
         setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 2),Qt::AlignVCenter);
     }
 
+    // QwtAxis::yLeft
     if (standard->wattsCurve->isVisible()) {
         double maxY = (referencePlot == NULL) ? (1.05 * standard->wattsCurve->maxYValue()) :
                                              (1.05 * referencePlot->standard->wattsCurve->maxYValue());
@@ -1881,6 +1948,7 @@ AllPlot::setYMax()
         axisWidget(yLeft)->update();
     }
 
+    // QwtAxis::yLeft, 1
     if (standard->hrCurve->isVisible() || standard->cadCurve->isVisible() || 
        (!context->athlete->useMetricUnits && standard->tempCurve->isVisible())) {
 
@@ -1934,17 +2002,36 @@ AllPlot::setYMax()
         setAxisScaleDiv(QwtAxisId(QwtAxis::yLeft, 1),QwtScaleDiv(ymin, ymax, xytick));
     }
 
-    if (standard->balanceLCurve->isVisible() || standard->lteCurve->isVisible() || standard->lpsCurve->isVisible()) {
+    // QwtAxis::yLeft, 3
+    if ((standard->balanceLCurve->isVisible() || standard->lteCurve->isVisible() ||
+        standard->lpsCurve->isVisible()) || standard->slopeCurve->isVisible()){
 
-        // 0 - 100 percent
-        setAxisTitle(QwtAxisId(QwtAxis::yLeft, 3), tr("Percent"));
-        setAxisScale(QwtAxisId(QwtAxis::yLeft, 3), 0, 100);
+        QStringList labels;
+        double ymin = 0;
+        double ymax = 0;
+
+        if (standard->balanceLCurve->isVisible() || standard->lteCurve->isVisible() ||
+            standard->lpsCurve->isVisible()) {
+          labels << tr("Percent");
+          ymin = 0;
+          ymax = 100;
+        };
+        if (standard->slopeCurve->isVisible()) {
+          labels << tr("Slope");
+          ymin = qMin(standard->slopeCurve->minYValue() * 1.1, ymin);
+          ymax = qMax(standard->slopeCurve->maxYValue() * 1.1, ymax);
+        };
+
+        // Set range from the curves
+        setAxisTitle(QwtAxisId(QwtAxis::yLeft, 3), labels.join(" / "));
+        setAxisScale(QwtAxisId(QwtAxis::yLeft, 3), ymin, ymax);
 
         // not sure about this .. should be done on creation (?)
         standard->balanceLCurve->setBaseline(50);
         standard->balanceRCurve->setBaseline(50);
     }
 
+    // QwtAxis::yRight
     if (standard->speedCurve->isVisible() || (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || standard->torqueCurve->isVisible()) {
         double ymin = -10;
         double ymax = 0;
@@ -1984,7 +2071,9 @@ AllPlot::setYMax()
         setAxisScale(yRight, ymin, 1.05 * ymax);
         //setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
-    if (standard->altCurve->isVisible()) {
+
+    // QwtAxis::yRight, 1
+    if (standard->altCurve->isVisible() || standard->altSlopeCurve->isVisible())  {
         setAxisTitle(QwtAxisId(QwtAxis::yRight, 1), context->athlete->useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin,ymax;
 
@@ -2087,6 +2176,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothS = &plot->standard->smoothSpeed[startidx];
     double *smoothC = &plot->standard->smoothCad[startidx];
     double *smoothA = &plot->standard->smoothAltitude[startidx];
+    double *smoothSL = &plot->standard->smoothSlope[startidx];
     double *smoothD = &plot->standard->smoothDistance[startidx];
     double *smoothTE = &plot->standard->smoothTemp[startidx];
     //double *standard->smoothWND = &plot->standard->smoothWind[startidx];
@@ -2172,6 +2262,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->hrDCurve->detach(); 
     standard->cadCurve->detach();
     standard->altCurve->detach();
+    standard->altSlopeCurve->detach();
+    standard->slopeCurve->detach();
     standard->tempCurve->detach();
     standard->windCurve->detach();
     standard->torqueCurve->detach();
@@ -2199,6 +2291,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->hrDCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHrD);
     standard->cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCad);
     standard->altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAlt);
+    standard->altSlopeCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAltSlopeState > 0);
+    standard->slopeCurve->setVisible(rideItem->ride()->areDataPresent()->slope && showSlope);
     standard->tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTemp);
     standard->windCurve->setVisible(rideItem->ride()->areDataPresent()->headwind && showWind);
     standard->torqueCurve->setVisible(rideItem->ride()->areDataPresent()->nm && showTorque);
@@ -2231,6 +2325,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->hrDCurve->setSamples(xaxis, smoothHD, points);
     standard->cadCurve->setSamples(xaxis, smoothC, points);
     standard->altCurve->setSamples(xaxis, smoothA, points);
+    standard->altSlopeCurve->setSamples(xaxis, smoothA, points);
+    standard->slopeCurve->setSamples(xaxis, smoothSL, points);
     standard->tempCurve->setSamples(xaxis, smoothTE, points);
 
     QVector<QwtIntervalSample> tmpWND(points);
@@ -2269,6 +2365,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setSymbol(standard->hrDCurve, points);
     setSymbol(standard->cadCurve, points);
     setSymbol(standard->altCurve, points);
+    setSymbol(standard->altSlopeCurve, points);
+    setSymbol(standard->slopeCurve, points);
     setSymbol(standard->tempCurve, points);
     setSymbol(standard->torqueCurve, points);
     setSymbol(standard->balanceLCurve, points);
@@ -2278,6 +2376,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setSymbol(standard->lpsCurve, points);
     setSymbol(standard->rpsCurve, points);
 
+    setAltSlopePlotStyle(standard->altSlopeCurve);
     setYMax();
 
     setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx]);
@@ -2286,6 +2385,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     if (!plot->standard->smoothAltitude.empty()) {
         standard->altCurve->attach(this);
+        standard->altSlopeCurve->attach(this);
+    }
+    if (!plot->standard->smoothSlope.empty()) {
+        standard->slopeCurve->attach(this);
     }
     if (showW && plot->standard->wprime.count()) {
         standard->wCurve->attach(this);
@@ -2403,6 +2506,8 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->hrDCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
+    standard->altSlopeCurve->detach();
+    standard->slopeCurve->detach();
     standard->tempCurve->detach();
     standard->windCurve->detach();
     standard->torqueCurve->detach();
@@ -2430,6 +2535,8 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->hrDCurve->setVisible(false);
     standard->cadCurve->setVisible(false);
     standard->altCurve->setVisible(false);
+    standard->altSlopeCurve->setVisible(false);
+    standard->slopeCurve->setVisible(false);
     standard->tempCurve->setVisible(false);
     standard->windCurve->setVisible(false);
     standard->torqueCurve->setVisible(false);
@@ -2442,6 +2549,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
     QwtPlotCurve *ourCurve = NULL, *thereCurve = NULL;
     QwtPlotCurve *ourCurve2 = NULL, *thereCurve2 = NULL;
+    AllPlotSlopeCurve *ourASCurve = NULL, *thereASCurve = NULL;
     QwtPlotIntervalCurve *ourICurve = NULL, *thereICurve = NULL;
     QString title;
 
@@ -2544,9 +2652,23 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
     case RideFile::alt:
         {
-        ourCurve = standard->altCurve;
-        thereCurve = referencePlot->standard->altCurve;
-        title = tr("Altitude");
+        if (secondaryScope == RideFile::none) {
+          ourCurve = standard->altCurve;
+          thereCurve = referencePlot->standard->altCurve;
+          title = tr("Altitude");
+        } else {
+            ourASCurve = standard->altSlopeCurve;
+            thereASCurve = referencePlot->standard->altSlopeCurve;
+            title = tr("Alt/Slope");
+        }
+        }
+        break;
+
+    case RideFile::slope:
+        {
+        ourCurve = standard->slopeCurve;
+        thereCurve = referencePlot->standard->slopeCurve;
+        title = tr("Slope");
         }
         break;
 
@@ -2650,7 +2772,6 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
     default:
     case RideFile::interval:
-    case RideFile::slope:
     case RideFile::vam:
     case RideFile::wattsKg:
     case RideFile::km:
@@ -2661,7 +2782,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     }
 
     // lets clone !
-    if ((ourCurve && thereCurve) || (ourICurve && thereICurve)) {
+    if ((ourCurve && thereCurve) || (ourICurve && thereICurve) || (ourASCurve && thereASCurve)) {
 
         if (ourCurve && thereCurve) {
             // no way to get values, so we run through them
@@ -2675,6 +2796,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             ourCurve->setSamples(array);
             ourCurve->setYAxis(yLeft);
             ourCurve->setBaseline(thereCurve->baseline());
+            ourCurve->setStyle(thereCurve->style());
 
             // symbol when zoomed in super close
             if (array.size() < 150) {
@@ -2732,8 +2854,28 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             ourICurve->setYAxis(yLeft);
         }
 
+        if (ourASCurve && thereASCurve) {
+            // no way to get values, so we run through them
+            ourASCurve->setVisible(true);
+            ourASCurve->attach(this);
+
+            // lets clone the data
+            QVector<QPointF> array;
+            for (size_t i=0; i<thereASCurve->data()->size(); i++) array << thereASCurve->data()->sample(i);
+
+            ourASCurve->setSamples(array);
+            ourASCurve->setYAxis(yLeft);
+            ourASCurve->setBaseline(thereASCurve->baseline());
+            ourASCurve->setStyle(thereASCurve->style());
+
+            QwtSymbol *sym = new QwtSymbol;
+            sym->setStyle(QwtSymbol::NoSymbol);
+            sym->setSize(0);
+            ourASCurve->setSymbol(sym);
+        }
+
         // x-axis
-        if (thereCurve)
+        if (thereCurve || thereASCurve)
             setAxisScale(QwtPlot::xBottom, referencePlot->axisScaleDiv(xBottom).lowerBound(),
                                            referencePlot->axisScaleDiv(xBottom).upperBound());
         else if (thereICurve)
@@ -2750,6 +2892,8 @@ AllPlot::setDataFromPlot(AllPlot *plot)
                 setAxisScale(QwtPlot::yLeft, thereCurve->minYValue(), 1.1f * thereCurve->maxYValue());
             if (thereICurve)
                 setAxisScale(QwtPlot::yLeft, thereICurve->boundingRect().top(), 1.1f * thereICurve->boundingRect().bottom());
+            if (thereASCurve)
+                setAxisScale(QwtPlot::yLeft, thereASCurve->minYValue(), 1.1f * thereASCurve->maxYValue());
         } else {
             setAxisScale(QwtPlot::yLeft, 0, 100); // 100 %
         }
@@ -2774,6 +2918,9 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         } else if (thereICurve) {
             pal.setColor(QPalette::WindowText, thereICurve->pen().color());
             pal.setColor(QPalette::Text, thereICurve->pen().color());
+        } else if (thereASCurve) {
+            pal.setColor(QPalette::WindowText, thereASCurve->pen().color());
+            pal.setColor(QPalette::Text, thereASCurve->pen().color());
         }
         axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
@@ -2827,6 +2974,8 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->hrDCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
+    standard->altSlopeCurve->detach();
+    standard->slopeCurve->detach();
     standard->tempCurve->detach();
     standard->windCurve->detach();
     standard->torqueCurve->detach();
@@ -2854,6 +3003,8 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->hrDCurve->setVisible(false);
     standard->cadCurve->setVisible(false);
     standard->altCurve->setVisible(false);
+    standard->altSlopeCurve->setVisible(false);
+    standard->slopeCurve->setVisible(false);
     standard->tempCurve->setVisible(false);
     standard->windCurve->setVisible(false);
     standard->torqueCurve->setVisible(false);
@@ -2887,6 +3038,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
         QwtPlotCurve *ourCurve = NULL, *thereCurve = NULL;
         QwtPlotCurve *ourCurve2 = NULL, *thereCurve2 = NULL;
+        AllPlotSlopeCurve *ourASCurve = NULL, *thereASCurve = NULL;
         QwtPlotIntervalCurve *ourICurve = NULL, *thereICurve = NULL;
         QString title;
 
@@ -3003,12 +3155,29 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 break;
 
             case RideFile::alt:
+               {
+               if (secondaryScope != RideFile::slope) {
+                   ourCurve = new QwtPlotCurve(tr("Altitude"));
+                   ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                   ourCurve->setZ(-10); // always at the back.
+                   thereCurve = referencePlot->standard->altCurve;
+                   title = tr("Altitude");
+                   } else {
+                   ourASCurve = new AllPlotSlopeCurve(tr("Alt/Slope"));
+                   ourASCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                   ourASCurve->setZ(-5); //
+                   thereASCurve = referencePlot->standard->altSlopeCurve;
+                   title = tr("Alt/Slope");
+                   }
+               }
+               break;
+
+            case RideFile::slope:
                 {
-                ourCurve = new QwtPlotCurve(tr("Altitude"));
+                ourCurve = new QwtPlotCurve(tr("Slope"));
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-                ourCurve->setZ(-10); // always at the back.
-                thereCurve = referencePlot->standard->altCurve;
-                title = tr("Altitude");
+                thereCurve = referencePlot->standard->slopeCurve;
+                title = tr("Slope");
                 }
                 break;
 
@@ -3124,7 +3293,6 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
             default:
             case RideFile::interval:
-            case RideFile::slope:
             case RideFile::vam:
             case RideFile::wattsKg:
             case RideFile::km:
@@ -3137,7 +3305,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
             bool antialias = appsettings->value(this, GC_ANTIALIAS, true).toBool();
 
             // lets clone !
-            if ((ourCurve && thereCurve) || (ourICurve && thereICurve)) {
+            if ((ourCurve && thereCurve) || (ourICurve && thereICurve) || (ourASCurve && thereASCurve)) {
 
                 if (ourCurve && thereCurve) {
 
@@ -3236,6 +3404,38 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     //XXXX FIX LATER XXXX if (ourICurve->maxYValue() > MAXY) MAXY = ourICurve->maxYValue();
                 }
 
+                if (ourASCurve && thereASCurve) {
+
+                    // remember for next time...
+                    compares << ourASCurve;
+
+                    // colours etc
+                    if (antialias) ourASCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                    QPen pen = thereASCurve->pen();
+                    pen.setColor(context->compareIntervals[index].color);
+                    ourASCurve->setPen(pen);
+                    ourASCurve->setVisible(true);
+                    ourASCurve->attach(this);
+
+                    // lets clone the data
+                    QVector<QPointF> array;
+                    for (size_t i=0; i<thereASCurve->data()->size(); i++) array << thereASCurve->data()->sample(i);
+
+                    ourASCurve->setSamples(array);
+                    ourASCurve->setYAxis(yLeft);
+                    ourASCurve->setBaseline(thereASCurve->baseline());
+//                    ourASCurve->setStyle(AllPlotSlopeCurve::SlopeDist3);
+                    setAltSlopePlotStyle (ourASCurve);
+
+                    if (ourASCurve->maxYValue() > MAXY) MAXY = ourASCurve->maxYValue();
+                    if (ourASCurve->minYValue() < MINY) MINY = ourASCurve->minYValue();
+
+                    QwtSymbol *sym = new QwtSymbol;
+                    sym->setStyle(QwtSymbol::NoSymbol);
+                    sym->setSize(0);
+                    ourASCurve->setSymbol(sym);
+
+                }
         }
 
         // move on -- this is used to reference into the compareIntervals
@@ -3324,6 +3524,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->hrDCurve->detach();
     standard->cadCurve->detach();
     standard->altCurve->detach();
+    standard->altSlopeCurve->detach();
+    standard->slopeCurve->detach();
     standard->tempCurve->detach();
     standard->windCurve->detach();
     standard->torqueCurve->detach();
@@ -3353,6 +3555,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->hrDCurve->setVisible(false);
     standard->cadCurve->setVisible(false);
     standard->altCurve->setVisible(false);
+    standard->altSlopeCurve->setVisible(false);
+    standard->slopeCurve->setVisible(false);
     standard->tempCurve->setVisible(false);
     standard->windCurve->setVisible(false);
     standard->torqueCurve->setVisible(false);
@@ -3465,6 +3669,15 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->altCurve->setSamples(xaxis.data(), object->smoothAltitude.data(), totalPoints);
         standard->altCurve->attach(this);
         standard->altCurve->setVisible(true);
+        standard->altSlopeCurve->setSamples(xaxis.data(), object->smoothAltitude.data(), totalPoints);
+        standard->altSlopeCurve->attach(this);
+        standard->altSlopeCurve->setVisible(true);
+    }
+
+    if (!object->slopeArray.empty()) {
+        standard->slopeCurve->setSamples(xaxis.data(), object->smoothSlope.data(), totalPoints);
+        standard->slopeCurve->attach(this);
+        standard->slopeCurve->setVisible(true);
     }
 
     if (!object->tempArray.empty()) {
@@ -3534,6 +3747,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->hrDCurve->setVisible(referencePlot->showHrD);
     standard->cadCurve->setVisible(referencePlot->showCad);
     standard->altCurve->setVisible(referencePlot->showAlt);
+    standard->altSlopeCurve->setVisible(referencePlot->showAltSlopeState > 0);
+    standard->slopeCurve->setVisible(referencePlot->showSlope);
     standard->tempCurve->setVisible(referencePlot->showTemp);
     standard->windCurve->setVisible(referencePlot->showWind);
     standard->torqueCurve->setVisible(referencePlot->showWind);
@@ -3552,6 +3767,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
 
     // set the y-axis scales now
     referencePlot = NULL;
+    setAltSlopePlotStyle(standard->altSlopeCurve);
     setYMax();
 
     // refresh zone background (if needed)
@@ -3618,6 +3834,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->hrDArray.resize(dataPresent->hr ? npoints : 0);
         here->cadArray.resize(dataPresent->cad ? npoints : 0);
         here->altArray.resize(dataPresent->alt ? npoints : 0);
+        here->slopeArray.resize(dataPresent->slope ? npoints : 0);
         here->tempArray.resize(dataPresent->temp ? npoints : 0);
         here->windArray.resize(dataPresent->headwind ? npoints : 0);
         here->torqueArray.resize(dataPresent->nm ? npoints : 0);
@@ -3647,6 +3864,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->hrDCurve->detach();
         here->cadCurve->detach();
         here->altCurve->detach();
+        here->altSlopeCurve->detach();
+        here->slopeCurve->detach();
         here->tempCurve->detach();
         here->windCurve->detach();
         here->torqueCurve->detach();
@@ -3657,7 +3876,11 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->lpsCurve->detach();
         here->rpsCurve->detach();
 
-        if (!here->altArray.empty()) here->altCurve->attach(this);
+        if (!here->altArray.empty()) {
+            here->altCurve->attach(this);
+            here->altSlopeCurve->attach(this);
+        }
+        if (!here->slopeArray.empty()) here->slopeCurve->attach(this);
         if (!here->wattsArray.empty()) here->wattsCurve->attach(this);
         if (!here->atissArray.empty()) here->atissCurve->attach(this);
         if (!here->antissArray.empty()) here->antissCurve->attach(this);
@@ -3707,6 +3930,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->speedCurve->setVisible(dataPresent->kph && showSpeed);
         here->cadCurve->setVisible(dataPresent->cad && showCad);
         here->altCurve->setVisible(dataPresent->alt && showAlt);
+        here->altSlopeCurve->setVisible(dataPresent->alt && showAltSlopeState > 0);
+        here->slopeCurve->setVisible(dataPresent->slope && showSlope);
         here->tempCurve->setVisible(dataPresent->temp && showTemp);
         here->windCurve->setVisible(dataPresent->headwind && showWind);
         here->torqueCurve->setVisible(dataPresent->nm && showWind);
@@ -3769,6 +3994,9 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
                 here->altArray[arrayLength]   = (context->athlete->useMetricUnits
                                            ? point->alt
                                            : point->alt * FEET_PER_METER);
+
+            if (!here->slopeArray.empty()) here->slopeArray[arrayLength] = point->slope;
+
             if (!here->tempArray.empty())
                 here->tempArray[arrayLength]   = point->temp;
 
@@ -3819,6 +4047,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->hrDCurve->detach();
         here->cadCurve->detach();
         here->altCurve->detach();
+        here->altSlopeCurve->detach();
+        here->slopeCurve->detach();
         here->tempCurve->detach();
         here->windCurve->detach();
         here->torqueCurve->detach();
@@ -3853,6 +4083,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (maxSECS > here->maxSECS) here->maxSECS = maxSECS;
     }
 
+    setAltSlopePlotStyle(here->altSlopeCurve);
+
     // set the axis
     setYMax();
 
@@ -3880,6 +4112,7 @@ AllPlot::setShowPower(int id)
     isolation = false;
     curveColors->saveState();
 }
+
 
 void
 AllPlot::setShowNP(bool show)
@@ -4055,6 +4288,35 @@ AllPlot::setShowAlt(bool show)
 {
     showAlt = show;
     standard->altCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowSlope(bool show)
+{
+    showSlope = show;
+    standard->slopeCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowAltSlope(int id)
+{
+    if (showAltSlopeState == id) return;
+
+    showAltSlopeState = id;
+    standard->altSlopeCurve->setVisible(id > 0);
+    setAltSlopePlotStyle(standard->altSlopeCurve);
     setYMax();
 
     // remember the curves and colors
@@ -4253,7 +4515,15 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         standard->rpsCurve->setBrush(QBrush(p));
 
-        /*p = standard->balanceLCurve->pen().color();
+        p = standard->slopeCurve->pen().color();
+        p.setAlpha(64);
+        standard->slopeCurve->setBrush(QBrush(p));
+
+        /*p = standard->altSlopeCurve->pen().color();
+        p.setAlpha(64);
+        standard->altSlopeCurve->setBrush(QBrush(p));
+
+        p = standard->balanceLCurve->pen().color();
         p.setAlpha(64);
         standard->balanceLCurve->setBrush(QBrush(p));
 
@@ -4282,6 +4552,8 @@ AllPlot::setPaintBrush(int state)
         standard->rteCurve->setBrush(Qt::NoBrush);
         standard->lpsCurve->setBrush(Qt::NoBrush);
         standard->rpsCurve->setBrush(Qt::NoBrush);
+        standard->slopeCurve->setBrush(Qt::NoBrush);
+        //standard->altSlopeCurve->setBrush(Qt::NoBrush);
         //standard->balanceLCurve->setBrush(Qt::NoBrush);
         //standard->balanceRCurve->setBrush(Qt::NoBrush);
     }
@@ -4863,4 +5135,26 @@ AllPlot::confirmTmpReference(double value, int axis, bool allowDelete)
     p->setValueForAxis(value, axis);
     p->move(QCursor::pos()-QPoint(40,40));
     p->exec();
+}
+
+
+void
+AllPlot::setAltSlopePlotStyle (AllPlotSlopeCurve *curve){
+
+    if (bydist) {
+        switch (showAltSlopeState) {
+        case 0: {curve->setStyle(AllPlotSlopeCurve::SlopeDist1); break;}
+        case 1: {curve->setStyle(AllPlotSlopeCurve::SlopeDist1); break;}
+        case 2: {curve->setStyle(AllPlotSlopeCurve::SlopeDist2); break;}
+        case 3: {curve->setStyle(AllPlotSlopeCurve::SlopeDist3); break;}
+        }
+
+    } else {
+        switch (showAltSlopeState) {
+        case 0: {curve->setStyle(AllPlotSlopeCurve::SlopeTime1); break;}
+        case 1: {curve->setStyle(AllPlotSlopeCurve::SlopeTime1); break;}
+        case 2: {curve->setStyle(AllPlotSlopeCurve::SlopeTime2); break;}
+        case 3: {curve->setStyle(AllPlotSlopeCurve::SlopeTime3); break;}
+        }
+    }
 }

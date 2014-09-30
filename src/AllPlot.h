@@ -20,6 +20,7 @@
 #define _GC_AllPlot_h 1
 #include "GoldenCheetah.h"
 #include "Colors.h"
+#include "AllPlotSlopeCurve.h"
 
 #include <qwt_plot.h>
 #include <qwt_axis_id.h>
@@ -332,6 +333,8 @@ class AllPlotObject : public QObject
     QVector<QwtPlotCurve*> tmpReferenceLines;
 
     QwtPlotCurve *wattsCurve;
+    QwtPlotCurve *slopeCurve;
+    AllPlotSlopeCurve *altSlopeCurve;
     QwtPlotCurve *atissCurve;
     QwtPlotCurve *antissCurve;
     QwtPlotCurve *npCurve;
@@ -383,6 +386,7 @@ class AllPlotObject : public QObject
     QVector<double> timeArray;
     QVector<double> distanceArray;
     QVector<double> altArray;
+    QVector<double> slopeArray;
     QVector<double> tempArray;
     QVector<double> windArray;
     QVector<double> torqueArray;
@@ -410,6 +414,7 @@ class AllPlotObject : public QObject
     QVector<double> smoothTime;
     QVector<double> smoothDistance;
     QVector<double> smoothAltitude;
+    QVector<double> smoothSlope;
     QVector<double> smoothTemp;
     QVector<double> smoothWind;
     QVector<double> smoothTorque;
@@ -491,6 +496,8 @@ class AllPlot : public QwtPlot
         void setShowTorqueD(bool show);
         void setShowHrD(bool show);
         void setShowPower(int id);
+        void setShowAltSlope(int id);
+        void setShowSlope(bool show);
         void setShowNP(bool show);
         void setShowATISS(bool show);
         void setShowANTISS(bool show);
@@ -535,6 +542,7 @@ class AllPlot : public QwtPlot
         // controls
         bool shade_zones;
         int showPowerState;
+        int showAltSlopeState;
         bool showATISS;
         bool showANTISS;
         bool showNP;
@@ -549,6 +557,7 @@ class AllPlot : public QwtPlot
         bool showHrD;
         bool showCad;
         bool showAlt;
+        bool showSlope;
         bool showTemp;
         bool showWind;
         bool showW;
@@ -584,7 +593,9 @@ class AllPlot : public QwtPlot
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 
+        void setAltSlopePlotStyle (AllPlotSlopeCurve *curve);
         static void nextStep( int& step );
+
 };
 
 // Produce Labels for X-Axis
