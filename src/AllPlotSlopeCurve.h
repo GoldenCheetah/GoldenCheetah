@@ -26,8 +26,8 @@
 #include "qwt_plot_curve.h"
 #include "qwt_text.h"
 
-#include <Qpen>
-#include <Qstring>
+#include <QPen>
+#include <QString>
 
 class QPainter;
 class QPolygonF;

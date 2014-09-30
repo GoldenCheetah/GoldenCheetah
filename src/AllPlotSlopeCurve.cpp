@@ -114,9 +114,9 @@ AllPlotSlopeCurve::CurveStyle AllPlotSlopeCurve::style() const
 }
 
 // draw the ALT/SLOPE curve
-void AllPlotSlopeCurve::drawCurve( QPainter *painter, int style,
+void AllPlotSlopeCurve::drawCurve( QPainter *painter, int,
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-    const QRectF &canvasRect, int from, int to ) const
+    const QRectF &, int from, int to ) const
 {
 
     const QwtSeriesData<QPointF> *series = data();
@@ -150,7 +150,7 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int style,
     double refY = yMap.transform( baseline );
     double sectionStart = 0.0;
     QPolygonF *polygon;
-    QPointF *points;
+    QPointF *points = NULL;
     for (int i = from; i <= to; i++ ) {
         const QPointF sample = series->sample( i );
         if (i == from) {
@@ -172,7 +172,7 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int style,
         };
 
         // we are in a section - so search for the end and if found close polygon
-        if (sample.x() >= (sectionStart+section_delta)) {
+        if (points && sample.x() >= (sectionStart+section_delta)) {
             // we are at the end - close and create polygon and go to next
             double xi = xMap.transform( sample.x() );
             double yi = yMap.transform( sample.y() );
@@ -206,8 +206,8 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int style,
     int i = 0;
     foreach (QPolygonF *p, polygons) {
 
-        double slope; // slope of a section (byDistance = true)
-        double mperh; // meter per hour (climb or descent) (byDistance = false)
+        double slope=0.0f; // slope of a section (byDistance = true)
+        double mperh=0.0f; // meter per hour (climb or descent) (byDistance = false)
         QPointF point1 = calcPoints.at(i);
         QPointF point2 = calcPoints.at(i+1);
 
