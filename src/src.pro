@@ -263,6 +263,7 @@ HEADERS += \
         AerolabWindow.h \
         AllPlot.h \
         AllPlotWindow.h \
+        AllPlotSlopeCurve.h \
         AnalysisSidebar.h \
         ANT.h \
         ANTChannel.h \
@@ -458,6 +459,7 @@ SOURCES += \
         AerolabWindow.cpp \
         AllPlot.cpp \
         AllPlotWindow.cpp \
+        AllPlotSlopeCurve.cpp \
         AnalysisSidebar.cpp \
         ANT.cpp \
         ANTChannel.cpp \

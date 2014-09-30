@@ -70,6 +70,8 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
     Q_PROPERTY(int showTorque READ isShowTorque WRITE setShowTorque USER true)
     Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
+    Q_PROPERTY(int showSlope READ isShowSlope WRITE setShowSlope USER true)
+    Q_PROPERTY(int showAltSlope READ isShowAltSlope WRITE setShowAltSlope USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
     Q_PROPERTY(int showCadD READ isShowCadD WRITE setShowCadD USER true)
     Q_PROPERTY(int showTorqueD READ isShowTorqueD WRITE setShowTorqueD USER true)
@@ -112,6 +114,8 @@ class AllPlotWindow : public GcChartWindow
         int isShowXP() const { return showXP->checkState(); }
         int isShowAP() const { return showAP->checkState(); }
         int isShowAlt() const { return showAlt->checkState(); }
+        int isShowSlope() const { return showSlope->checkState(); }
+        int isShowAltSlope() const { return showAltSlope->currentIndex(); }
         int isShowSpeed() const { return showSpeed->checkState(); }
         int isShowAccel() const { return showAccel->checkState(); }
         int isShowPower() const { return showPower->currentIndex(); }
@@ -155,9 +159,11 @@ class AllPlotWindow : public GcChartWindow
         void setShowSpeed(int state);
         void setShowAccel(int state);
         void setShowAlt(int state);
+        void setShowAltSlope(int state);
         void setShowTemp(int state);
         void setShowWind(int state);
         void setShowPower(int state);
+        void setShowSlope(int state);
         void setShowCad(int state);
         void setShowTorque(int state);
         void setShowHr(int state);
@@ -260,6 +266,8 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showSpeed;
         QCheckBox *showAccel;
         QComboBox *showPower;
+        QCheckBox *showSlope;
+        QComboBox *showAltSlope;
         QCheckBox *showCad;
         QCheckBox *showTorque;
         QCheckBox *showHr;
@@ -309,6 +317,8 @@ class AllPlotWindow : public GcChartWindow
         bool setupSeriesStack; // we optimise this out, its costly
         bool compareStale;     // compare init one off setup
         bool firstShow;
+
+        struct SeriesWanted { RideFile::SeriesType one; RideFile::SeriesType two; };
 
     private slots:
 

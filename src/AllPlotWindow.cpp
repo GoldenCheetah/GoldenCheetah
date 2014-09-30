@@ -222,6 +222,18 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showTorque->setCheckState(Qt::Checked);
     cl2->addRow(new QLabel(""), showTorque);
 
+    showSlope = new QCheckBox(tr("Slope"), this);
+    showSlope->setCheckState(Qt::Checked);
+    cl2->addRow(new QLabel(""), showSlope);
+
+    showAltSlope = new QComboBox(this);
+    showAltSlope->addItem(tr("No Alt/Slope"));
+    showAltSlope->addItem(tr("1min/100m"));
+    showAltSlope->addItem(tr("5min/500m"));
+    showAltSlope->addItem(tr("10min/1000m"));
+    cl2->addRow(new QLabel(tr("Alt/Slope")), showAltSlope);
+    showAltSlope->setCurrentIndex(0);
+
     cl2->addRow(new QLabel(""), new QLabel(""));
 
     showANTISS = new QCheckBox(tr("Anaerobic TISS"), this);
@@ -554,6 +566,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showSpeed, SIGNAL(stateChanged(int)), this, SLOT(setShowSpeed(int)));
     connect(showAccel, SIGNAL(stateChanged(int)), this, SLOT(setShowAccel(int)));
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
+    connect(showSlope, SIGNAL(stateChanged(int)), this, SLOT(setShowSlope(int)));
+    connect(showAltSlope, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowAltSlope(int)));
     connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
     connect(showWind, SIGNAL(stateChanged(int)), this, SLOT(setShowWind(int)));
     connect(showW, SIGNAL(stateChanged(int)), this, SLOT(setShowW(int)));
@@ -805,6 +819,8 @@ AllPlotWindow::compareChanged()
         spanSlider->setLowerValue(spanSlider->minimum());
         spanSlider->setUpperValue(spanSlider->maximum());
 
+        // don't show alt/slope
+        fullPlot->standard->altSlopeCurve->setVisible(false);
         // redraw for red/no-red title
         fullPlot->replot();
 
@@ -878,36 +894,39 @@ AllPlotWindow::compareChanged()
         }
 
         // work out what we want to see
-        QList<RideFile::SeriesType> wanted;
-        if (showPower->currentIndex() < 2) wanted << RideFile::watts;
-        if (showPowerD->isChecked()) wanted << RideFile::wattsd;
-        if (showHr->isChecked()) wanted << RideFile::hr;
-        if (showHrD->isChecked()) wanted << RideFile::hrd;
-        if (showSpeed->isChecked()) wanted << RideFile::kph;
-        if (showAccel->isChecked()) wanted << RideFile::kphd;
-        if (showCad->isChecked()) wanted << RideFile::cad;
-        if (showCadD->isChecked()) wanted << RideFile::cadd;
-        if (showTorque->isChecked()) wanted << RideFile::nm;
-        if (showTorqueD->isChecked()) wanted << RideFile::nmd;
-        if (showAlt->isChecked()) wanted << RideFile::alt;
-        if (showTemp->isChecked()) wanted << RideFile::temp;
-        if (showWind->isChecked()) wanted << RideFile::headwind;
-        if (showNP->isChecked()) wanted << RideFile::NP;
-        if (showATISS->isChecked()) wanted << RideFile::aTISS;
-        if (showANTISS->isChecked()) wanted << RideFile::anTISS;
-        if (showXP->isChecked()) wanted << RideFile::xPower;
-        if (showAP->isChecked()) wanted << RideFile::aPower;
-        if (showW->isChecked()) wanted << RideFile::wprime;
-        if (showBalance->isChecked()) wanted << RideFile::lrbalance;
+        QList<SeriesWanted> wanted;
+        SeriesWanted s;
+        if (showPower->currentIndex() < 2) { s.one = RideFile::watts; s.two = RideFile::none; wanted << s;};
+        if (showPowerD->isChecked()) { s.one = RideFile::wattsd; s.two = RideFile::none; wanted << s;};
+        if (showHr->isChecked()) { s.one = RideFile::hr; s.two = RideFile::none; wanted << s;};
+        if (showHrD->isChecked()) { s.one = RideFile::hrd; s.two = RideFile::none; wanted << s;};
+        if (showSpeed->isChecked()) { s.one = RideFile::kph; s.two = RideFile::none; wanted << s;};
+        if (showAccel->isChecked()) { s.one = RideFile::kphd; s.two = RideFile::none; wanted << s;};
+        if (showCad->isChecked()) { s.one = RideFile::cad; s.two = RideFile::none; wanted << s;};
+        if (showCadD->isChecked()) { s.one = RideFile::cadd; s.two = RideFile::none; wanted << s;};
+        if (showTorque->isChecked()) { s.one = RideFile::nm; s.two = RideFile::none; wanted << s;};
+        if (showTorqueD->isChecked()) { s.one = RideFile::nmd; s.two = RideFile::none; wanted << s;};
+        if (showAlt->isChecked()) { s.one = RideFile::alt; s.two = RideFile::none; wanted << s;};
+        if (showSlope->isChecked()) { s.one = RideFile::slope; s.two = RideFile::none; wanted << s;};
+        if (showAltSlope->currentIndex() > 0) { s.one = RideFile::alt; s.two = RideFile::slope; wanted << s;}; // ALT/SLOPE !
+        if (showTemp->isChecked()) { s.one = RideFile::temp; s.two = RideFile::none; wanted << s;};
+        if (showWind->isChecked()) { s.one = RideFile::headwind; s.two = RideFile::none; wanted << s;};
+        if (showNP->isChecked()) { s.one = RideFile::NP; s.two = RideFile::none; wanted << s;};
+        if (showATISS->isChecked()) { s.one = RideFile::aTISS; s.two = RideFile::none; wanted << s;};
+        if (showANTISS->isChecked()) { s.one = RideFile::anTISS; s.two = RideFile::none; wanted << s;};
+        if (showXP->isChecked()) { s.one = RideFile::xPower; s.two = RideFile::none; wanted << s;};
+        if (showAP->isChecked()) { s.one = RideFile::aPower; s.two = RideFile::none; wanted << s;};
+        if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
+        if (showBalance->isChecked()) { s.one = RideFile::lrbalance; s.two = RideFile::none; wanted << s;};
 
         // create blank and add to gui
         QPalette palette;
         palette.setBrush(QPalette::Background, Qt::NoBrush);
 
-        foreach(RideFile::SeriesType x, wanted) {
+        foreach(SeriesWanted x, wanted) {
 
             // create and setup with normal gui stuff
-            AllPlot *plot = new AllPlot(this, context, x, RideFile::none, false);
+            AllPlot *plot = new AllPlot(this, context, x.one, x.two, false);
             plot->setPalette(palette);
             plot->setAutoFillBackground(false);
             plot->setFixedHeight(120+(stackWidth*4));
@@ -930,7 +949,8 @@ AllPlotWindow::compareChanged()
             connect(plot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), plot, SLOT(pointHover(QwtPlotCurve*, int)));
             // No x axis titles
             plot->bydist = fullPlot->bydist;
-            if (x == RideFile::watts) plot->setShadeZones(showPower->currentIndex() == 0);
+            plot->showAltSlopeState = fullPlot->showAltSlopeState;
+            if (x.one == RideFile::watts) plot->setShadeZones(showPower->currentIndex() == 0);
             else plot->setShadeZones(false);
             plot->setAxisVisible(QwtPlot::xBottom, true);
             plot->enableAxis(QwtPlot::xBottom, true);
@@ -944,18 +964,22 @@ AllPlotWindow::compareChanged()
             plot->setAxisScaleDraw(QwtPlot::yLeft, sd);
     
             // y-axis title and colour
-            plot->setAxisTitle(QwtPlot::yLeft, RideFile::seriesName(x));
+            if (x.one == RideFile::alt && x.two == RideFile::slope) {
+                plot->setAxisTitle(QwtPlot::yLeft, tr("Alt/Slope"));
+               } else {
+                plot->setAxisTitle(QwtPlot::yLeft, RideFile::seriesName(x.one));
+            }
             QPalette pal;
-            pal.setColor(QPalette::WindowText, RideFile::colorFor(x));
-            pal.setColor(QPalette::Text, RideFile::colorFor(x));
+            pal.setColor(QPalette::WindowText, RideFile::colorFor(x.one));
+            pal.setColor(QPalette::Text, RideFile::colorFor(x.one));
             plot->axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
             // remember them
             seriesstackPlotLayout->addWidget(plot);
             seriesPlots << plot;
         }
-        seriesstackPlotLayout->addStretch();
 
+        seriesstackPlotLayout->addStretch();
 
         // now lets get each of them loaded up with data and in the right format!
         foreach(AllPlot *compare, seriesPlots) {
@@ -1055,6 +1079,9 @@ AllPlotWindow::redrawFullPlot()
     //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->standard->grid->enableY(false);
+
+    //don't show the ALT/SLOPE plot here
+    fullPlot->standard->altSlopeCurve->setVisible(false);
 
     // use the ride to decide
     if (fullPlot->bydist)
@@ -1446,6 +1473,8 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	        showSpeed->setEnabled(dataPresent->kph);
 	        showAccel->setEnabled(dataPresent->kph);
 	        showAlt->setEnabled(dataPresent->alt);
+            showAltSlope->setEnabled(dataPresent->alt);
+            showSlope->setEnabled(dataPresent->slope);
             showTemp->setEnabled(dataPresent->temp);
             showWind->setEnabled(dataPresent->headwind);
             showBalance->setEnabled(dataPresent->lrbalance);
@@ -1460,6 +1489,8 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showSpeed->setEnabled(false);
             showCad->setEnabled(false);
             showAlt->setEnabled(false);
+            showAltSlope->setEnabled(false);
+            showSlope->setEnabled(false);
             showTemp->setEnabled(false);
             showWind->setEnabled(false);
             showTorque->setEnabled(false);
@@ -1908,6 +1939,7 @@ AllPlotWindow::setShowPower(int value)
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 }
 
+
 void
 AllPlotWindow::setShowHr(int value)
 {
@@ -2202,6 +2234,51 @@ AllPlotWindow::setShowAlt(int value)
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 }
+
+void
+AllPlotWindow::setShowSlope(int value)
+{
+    showSlope->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showSlope->isEnabled()) ? true : false;
+
+    allPlot->setShowSlope (checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowSlope(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowAltSlope(int value)
+{
+    showAltSlope->setCurrentIndex(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+       fullPlot->showAltSlopeState = value;
+       compareChanged();
+       active = false;
+       return;
+    }
+
+    fullPlot->setShowAltSlope(value);
+    allPlot->setShowAltSlope(value);
+
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowAltSlope(value);
+
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+
 
 void
 AllPlotWindow::setShowTemp(int value)
@@ -2731,43 +2808,47 @@ AllPlotWindow::setupSeriesStackPlots()
     QPalette palette;
     palette.setBrush(QPalette::Background, Qt::NoBrush);
 
-    QList<RideFile::SeriesType> serieslist;
-
+    QList<SeriesWanted> serieslist;
+    SeriesWanted s;
     // lets get a list of what we need to plot -- plot is same order as options in settings
-    if (showPower->currentIndex() < 2 && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::watts;
-    if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::wattsd;
-    if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) serieslist << RideFile::hr;
-    if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) serieslist << RideFile::hrd;
-    if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) serieslist << RideFile::kph;
-    if (showAccel->isChecked() && rideItem->ride()->areDataPresent()->kph) serieslist << RideFile::kphd;
-    if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) serieslist << RideFile::cad;
-    if (showCadD->isChecked() && rideItem->ride()->areDataPresent()->cad) serieslist << RideFile::cadd;
-    if (showTorque->isChecked() && rideItem->ride()->areDataPresent()->nm) serieslist << RideFile::nm;
-    if (showTorqueD->isChecked() && rideItem->ride()->areDataPresent()->nm) serieslist << RideFile::nmd;
-    if (showAlt->isChecked() && rideItem->ride()->areDataPresent()->alt) serieslist << RideFile::alt;
-    if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) serieslist << RideFile::temp;
+    if (showPower->currentIndex() < 2 && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::watts; s.two = RideFile::none; serieslist << s; }
+    if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wattsd;s.two = RideFile::none; serieslist << s; }
+    if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hr; s.two = RideFile::none; serieslist << s; }
+    if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hrd; s.two = RideFile::none; serieslist << s; }
+    if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) { s.one = RideFile::kph; s.two = RideFile::none; serieslist << s; }
+    if (showAccel->isChecked() && rideItem->ride()->areDataPresent()->kph) { s.one = RideFile::kphd; s.two = RideFile::none; serieslist << s; }
+    if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) { s.one = RideFile::cad; s.two = RideFile::none; serieslist << s; }
+    if (showCadD->isChecked() && rideItem->ride()->areDataPresent()->cad) { s.one = RideFile::cadd; s.two = RideFile::none; serieslist << s; }
+    if (showTorque->isChecked() && rideItem->ride()->areDataPresent()->nm) { s.one = RideFile::nm; s.two = RideFile::none; serieslist << s; }
+    if (showTorqueD->isChecked() && rideItem->ride()->areDataPresent()->nm) { s.one = RideFile::nmd; s.two = RideFile::none; serieslist << s; }
+    if (showAlt->isChecked() && rideItem->ride()->areDataPresent()->alt) { s.one = RideFile::alt; s.two = RideFile::none; serieslist << s; }
+    if (showAltSlope->currentIndex() > 0 && rideItem->ride()->areDataPresent()->alt) { s.one = RideFile::alt; s.two = RideFile::slope; serieslist << s; }
+    if (showSlope->isChecked() && rideItem->ride()->areDataPresent()->slope) { s.one = RideFile::slope; s.two = RideFile::none; serieslist << s; }
+    if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) { s.one = RideFile::temp; s.two = RideFile::none; serieslist << s; }
     if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) addHeadwind=true; //serieslist << RideFile::headwind;
-    if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::NP;
-    if (showATISS->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::aTISS;
-    if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::anTISS;
-    if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::xPower;
-    if (showAP->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::aPower;
-    if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) serieslist << RideFile::wprime;
-    if (showBalance->isChecked() && rideItem->ride()->areDataPresent()->lrbalance) serieslist << RideFile::lrbalance;
-    if (showTE->isChecked() && rideItem->ride()->areDataPresent()->lte) serieslist << RideFile::lte << RideFile::rte;
-    if (showPS->isChecked() && rideItem->ride()->areDataPresent()->lps) serieslist << RideFile::lps << RideFile::rps;
+    if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::NP; s.two = RideFile::none; serieslist << s; }
+    if (showATISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::aTISS; s.two = RideFile::none; serieslist << s; }
+    if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::anTISS; s.two = RideFile::none; serieslist << s; }
+    if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::xPower; s.two = RideFile::none; serieslist << s; }
+    if (showAP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::aPower; s.two = RideFile::none; serieslist << s; }
+    if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wprime; s.two = RideFile::none; serieslist << s; }
+    if (showBalance->isChecked() && rideItem->ride()->areDataPresent()->lrbalance) { s.one = RideFile::lrbalance; s.two = RideFile::none; serieslist << s; }
+    if (showTE->isChecked() && rideItem->ride()->areDataPresent()->lte) { s.one = RideFile::lte; s.two = RideFile::none; serieslist << s;
+         s.one = RideFile::rte; s.two = RideFile::none; serieslist << s; }
+    if (showPS->isChecked() && rideItem->ride()->areDataPresent()->lps) { s.one = RideFile::lps; s.two = RideFile::none; serieslist << s;
+         s.one = RideFile::rps; s.two = RideFile::none; serieslist << s; }
 
     bool first = true;
-    foreach(RideFile::SeriesType x, serieslist) {
+    foreach(SeriesWanted x, serieslist) {
 
         // create that plot
-        AllPlot *_allPlot = new AllPlot(this, context, x, (addHeadwind && x == RideFile::kph ? RideFile::headwind : RideFile::none), first);
+        AllPlot *_allPlot = new AllPlot(this, context, x.one, (addHeadwind && x.one == RideFile::kph ? RideFile::headwind : x.two), first);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
         _allPlot->setDataFromPlot(allPlot); // will clone all settings and data for the series
                                                    // being plotted, only works for one series plotting
 
-        if (x == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
+        if (x.one == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
         else _allPlot->setShadeZones(false);
         first = false;
 
@@ -2791,6 +2872,7 @@ AllPlotWindow::setupSeriesStackPlots()
         // controls
 	    _allPlot->replot();
     }
+
     newLayout->addStretch();
 
     // lets make sure the size matches the user preferences
@@ -2928,6 +3010,8 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShowHrD((showHrD->isEnabled()) ? ( showHrD->checkState() == Qt::Checked ) : false );
         _allPlot->setShowCad((showCad->isEnabled()) ? ( showCad->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAlt((showAlt->isEnabled()) ? ( showAlt->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowSlope((showSlope->isEnabled()) ? ( showSlope->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowAltSlope(showAltSlope->currentIndex());
         _allPlot->setShowTemp((showTemp->isEnabled()) ? ( showTemp->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTorque((showTorque->isEnabled()) ? ( showTorque->checkState() == Qt::Checked ) : false );
         _allPlot->setShowW((showW->isEnabled()) ? ( showW->checkState() == Qt::Checked ) : false );
