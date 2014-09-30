@@ -134,46 +134,6 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     // last point looked at
     RideFilePoint *lastP = NULL;
 
-    if (!ride->areDataPresent()->slope && ride->areDataPresent()->alt && ride->areDataPresent()->km) {
-        for (int i=0; i<ride->dataPoints().count(); i++) {
-            RideFilePoint *p = ride->dataPoints()[i];
-            // Slope
-            // If there is no slope data then it can be derived
-            // from distanct and altitude
-            if (lastP) {
-                double deltaDistance = (p->km - lastP->km) * 1000;
-                double deltaAltitude = p->alt - lastP->alt;
-                if (deltaDistance>0) {
-                    ride->command->setPointValue(i, RideFile::slope, (deltaAltitude / deltaDistance) * 100);
-                } else {
-                    ride->command->setPointValue(i, RideFile::slope, 0);
-                }
-                if (p->slope > 20 || p->slope < -20) {
-                    ride->command->setPointValue(i, RideFile::slope, lastP->slope);
-                }
-            }
-            // last point
-            lastP = p;
-        }
-
-        // Smooth the slope if it has been derived
-        int smoothPoints = 10;
-        // initialise rolling average
-        double rtot = 0;
-        for (int i=smoothPoints; i>0 && ride->dataPoints().count()-i >=0; i--) {
-            rtot += ride->dataPoints()[ride->dataPoints().count()-i]->slope;
-        }
-
-        // now run backwards setting the rolling average
-        for (int i=ride->dataPoints().count()-1; i>=smoothPoints; i--) {
-            double here = ride->dataPoints()[i]->slope;
-            ride->dataPoints()[i]->slope = rtot / smoothPoints;
-            rtot -= here;
-            rtot += ride->dataPoints()[i-smoothPoints]->slope;
-        }
-        ride->setDataPresent(ride->slope, true);
-    }
-
     if (ride->areDataPresent()->slope && ride->areDataPresent()->alt
      && ride->areDataPresent()->km) {
         for (int i=0; i<ride->dataPoints().count(); i++) {
