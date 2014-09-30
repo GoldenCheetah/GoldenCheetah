@@ -131,9 +131,6 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     // apply the change
     ride->command->startLUW("Estimate Power");
 
-    // last point looked at
-    RideFilePoint *lastP = NULL;
-
     if (ride->areDataPresent()->slope && ride->areDataPresent()->alt
      && ride->areDataPresent()->km) {
         for (int i=0; i<ride->dataPoints().count(); i++) {
