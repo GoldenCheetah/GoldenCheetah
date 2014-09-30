@@ -1377,8 +1377,42 @@ RideFile::recalculateDerivedSeries()
             p->antiss = anTISS;
         }
 
+        if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+            if (lastP) {
+                double deltaDistance = (p->km - lastP->km) * 1000;
+                double deltaAltitude = p->alt - lastP->alt;
+                if (deltaDistance>0) {
+                    p->slope = (deltaAltitude / deltaDistance) * 100;
+                } else {
+                    p->slope = 0;
+                }
+                if (p->slope > 20 || p->slope < -20) {
+                    p->slope = lastP->slope;
+                }
+            }
+        }
+
         // last point
         lastP = p;
+    }
+
+    // Smooth the slope if it has been derived
+    if (!dataPresent.slope && dataPresent.alt && dataPresent.km) {
+        int smoothPoints = 10;
+        // initialise rolling average
+        double rtot = 0;
+        for (int i=smoothPoints; i>0 && dataPoints_.count()-i >=0; i--) {
+            rtot += dataPoints_[dataPoints_.count()-i]->slope;
+        }
+
+        // now run backwards setting the rolling average
+        for (int i=dataPoints_.count()-1; i>=smoothPoints; i--) {
+            double here = dataPoints_[i]->slope;
+            dataPoints_[i]->slope = rtot / smoothPoints;
+            rtot -= here;
+            rtot += dataPoints_[i-smoothPoints]->slope;
+        }
+        setDataPresent(RideFile::slope, true);
     }
 
     // Averages and Totals
