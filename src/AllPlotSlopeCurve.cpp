@@ -37,23 +37,23 @@ public:
     {     brushes.resize(10);
           brushes[0].setColor (QColor(0,255,0));
           brushes[0].setStyle(Qt::SolidPattern);
-          brushes[1].setColor (QColor(126,255,0));
+          brushes[1].setColor (QColor(0,0,255));
           brushes[1].setStyle(Qt::SolidPattern);
           brushes[2].setColor (QColor(255,255,0));
           brushes[2].setStyle(Qt::SolidPattern);
-          brushes[3].setColor (QColor(255,126,0));
+          brushes[3].setColor (QColor(255,0,0));
           brushes[3].setStyle(Qt::SolidPattern);
           brushes[4].setColor (QColor(255,0,0));
           brushes[4].setStyle(Qt::SolidPattern);
-          brushes[5].setColor (QColor(0,255,126));
+          brushes[5].setColor (QColor(127,127,127));
           brushes[5].setStyle(Qt::SolidPattern);
-          brushes[6].setColor (QColor(0,255,255));
+          brushes[6].setColor (QColor(127,127,127));
           brushes[6].setStyle(Qt::SolidPattern);
-          brushes[7].setColor (QColor(0,126,255));
+          brushes[7].setColor (QColor(127,127,127));
           brushes[7].setStyle(Qt::SolidPattern);
-          brushes[8].setColor (QColor(0,0,205));
+          brushes[8].setColor (QColor(127,127,127));
           brushes[8].setStyle(Qt::SolidPattern);
-          brushes[9].setColor (QColor(255,0,255));
+          brushes[9].setColor (QColor(127,127,127));
           brushes[9].setStyle(Qt::SolidPattern);
 }
 
@@ -221,10 +221,10 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int,
                 slope = 0.0;
             }
             // set the brush
-            if (slope >= 0 && slope < 2) brush = d_data->brushes[0];
-            if (slope >= 2 && slope < 5) brush = d_data->brushes[1];
-            if (slope >= 5 && slope < 9) brush = d_data->brushes[2];
-            if (slope >= 9 && slope < 15) brush = d_data->brushes[3];
+            if (slope >= 0 && slope < 5) brush = d_data->brushes[0];
+            if (slope >= 4 && slope < 7) brush = d_data->brushes[1];
+            if (slope >= 7 && slope < 10) brush = d_data->brushes[2];
+            if (slope >= 10 && slope < 15) brush = d_data->brushes[3];
             if (slope >= 15) brush = d_data->brushes[4];
             if (slope < 0 && slope > -2) brush = d_data->brushes[5];
             if (slope <= -2 && slope > -5) brush = d_data->brushes[6];
@@ -252,6 +252,7 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int,
             if (mperh <= -500) brush = d_data->brushes[5];
 
         };
+        painter->setPen(QColor(127,127,127));
         painter->setBrush( brush );
         // paint the polygon
         QwtPainter::drawPolygon( painter, *p );
