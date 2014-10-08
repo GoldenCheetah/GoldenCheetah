@@ -124,7 +124,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     // user selected a ride on the ride list, we should reflect that too..
     // user moved columns
     connect(tableView->header(), SIGNAL(sectionMoved(int,int,int)), this, SLOT(columnsChanged()));
-    connect(tableView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(columnsChanged()));
+    connect(tableView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(columnsResized(int, int, int)));
     // user sorted by column
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(selectRow()));
     connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
@@ -341,92 +341,9 @@ void RideNavigator::clearSearch()
 
 void RideNavigator::setWidth(int x)
 {
-    if (init == false) return;
+    // use helper function
+    setColumnWidth(x, false);
 
-    active = true;
-
-#if !defined (Q_OS_MAC) || (defined (Q_OS_MAC) && (QT_VERSION < 0x050000)) // on QT5 the scrollbars have no width
-    if (tableView->verticalScrollBar()->isVisible())
-        x -= tableView->verticalScrollBar()->width()
-             + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
-#else // we're on a mac with QT5 .. so dodgy way of spotting preferences for scrollbars...
-      // this is a nasty hack, to see if the 'always on' preference for scrollbars is set we
-      // look at the scrollbar width which is 15 in this case (it is 16 when they 'appear' when
-      // needed. No doubt this will change over time and need to be fixed by referencing the
-      // Mac system preferences via an NSScroller - but that will be a massive hassle.
-      if (tableView->verticalScrollBar()->isVisible() && tableView->verticalScrollBar()->width() == 15)
-          x -= tableView->verticalScrollBar()->width() + 0 ; 
-#endif
-
-    // take the margins into accopunt top
-    x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
-
-    // ** NOTE **
-    // When iterating over the section headings we
-    // always use the tableview not the sortmodel
-    // so we can skip over the virtual column 0
-    // which is used to group by, is visible but
-    // must have a width of 0. This is why all
-    // the for loops start with i=1
-    tableView->setColumnWidth(0,0); // in case use grabbed it
-
-    // is it narrower than the headings?
-    int headwidth=0;
-    int n=0;
-    for (int i=1; i<tableView->header()->count(); i++)
-        if (tableView->header()->isSectionHidden(i) == false) {
-            headwidth += tableView->columnWidth(i);
-            n++;
-        }
-
-    // headwidth is no, x is to-be width
-    // we need to 'stretch' the sections 
-    // proportionally to fit into new
-    // layout
-    int setwidth=0;
-    int newwidth=0;
-    for (int i=1; i<tableView->header()->count(); i++) {
-        if (tableView->header()->isSectionHidden(i) == false) {
-            newwidth = (double)((((double)tableView->columnWidth(i)/(double)headwidth)) * (double)x); 
-            if (newwidth < 20) newwidth = 20;
-            QString columnName = tableView->model()->headerData(i, Qt::Horizontal).toString();
-            if (columnName == "*") newwidth = 0;
-            tableView->setColumnWidth(i, newwidth);
-            setwidth += newwidth;
-        }
-    }
-
-    // UGH. Now account for the fact that the smaller columns
-    //      didn't take their fair share of a negative resize
-    //      so we need to snip off from the larger columns.
-    if (setwidth != x) {
-        // how many columns we got to snip from?
-        int colsleft = 0;
-        for (int i=1; i<tableView->header()->count(); i++)
-            if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20)
-                colsleft++;
-
-        // run through ... again.. snipping off some pixels
-        if (colsleft) {
-            int snip = (setwidth-x) / colsleft; //could be negative too
-            for (int i=1; i<tableView->header()->count(); i++) {
-                if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20) {
-                    tableView->setColumnWidth(i, tableView->columnWidth(i)-snip);
-                    setwidth -= snip;
-                }
-            }
-        }
-    }
-
-    if (setwidth < x)
-        delegate->setWidth(pwidth=setwidth);
-    else
-        delegate->setWidth(pwidth=x);
-
-    // make the scrollbars go away
-    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    active = false;
 }
 
 // make sure the columns are all neat and tidy when the ride navigator is shown
@@ -466,38 +383,16 @@ RideNavigator::setGroupByColumnName(QString name)
 void
 RideNavigator::columnsChanged()
 {
-    if (active == true) return;
-    active = true;
+    // do the work - (column changed, but no "inWidget" column resize)
+    calcColumnsChanged(false);
+}
 
-    visualHeadings.clear(); // they have moved
+void
+RideNavigator::columnsResized(int logicalIndex, int oldSize, int newSize)
+{
 
-    // get the names used
-    for (int i=0; i<tableView->header()->count(); i++) {
-        if (tableView->header()->isSectionHidden(tableView->header()->logicalIndex(i)) != true) {
-            int index = tableView->header()->logicalIndex(i);
-            visualHeadings << logicalHeadings[index];
-        }
-    }
-    // write to config
-    QString headings;
-    foreach(QString name, visualHeadings)
-        headings += name + "|";
-
-    _columns = headings;
-
-    // get column widths
-    QString widths;
-    for (int i=0; i<tableView->header()->count(); i++) {
-        int index = tableView->header()->logicalIndex(i);
-        if (tableView->header()->isSectionHidden(index) != true) {
-           widths += QString("%1|").arg(tableView->columnWidth(index));
-        }
-    }
-
-    // clean up
-    active = false;
-    setWidth(geometry().width()); // calculate width...
-    _widths = widths;
+    // do the work - resize only
+    calcColumnsChanged(true, logicalIndex, oldSize, newSize);
 }
 
 bool
@@ -650,6 +545,194 @@ RideNavigator::setSortBy(int index, Qt::SortOrder order)
     _sortByIndex = index;
     _sortByOrder = static_cast<int>(order);
 }
+
+
+void
+RideNavigator::calcColumnsChanged(bool resized, int logicalIndex, int oldSize, int newSize ) {
+
+    // double use - for "changing" and "only resizing" of the columns
+
+    if (active == true) return;
+    active = true;
+
+    visualHeadings.clear(); // they have moved
+
+    // get the names used
+    for (int i=0; i<tableView->header()->count(); i++) {
+        if (tableView->header()->isSectionHidden(tableView->header()->logicalIndex(i)) != true) {
+            int index = tableView->header()->logicalIndex(i);
+            visualHeadings << logicalHeadings[index];
+        }
+    }
+    // write to config
+    QString headings;
+    foreach(QString name, visualHeadings)
+        headings += name + "|";
+
+    _columns = headings;
+
+    // correct width and store result
+    setColumnWidth(geometry().width(), resized, logicalIndex, oldSize, newSize); // calculate width...
+
+    // get column widths
+    QString widths;
+    for (int i=0; i<tableView->header()->count(); i++) {
+        int index = tableView->header()->logicalIndex(i);
+        if (tableView->header()->isSectionHidden(index) != true) {
+           widths += QString("%1|").arg(tableView->columnWidth(index));
+        }
+    }
+    _widths = widths;
+
+    active = false;
+}
+
+void
+RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidth, int newWidth) {
+
+    // double use - for use after any change (e.g. widget size,..) "changing" and "only resizing" of the columns
+
+    if (init == false) return;
+
+    active = true;
+
+#if !defined (Q_OS_MAC) || (defined (Q_OS_MAC) && (QT_VERSION < 0x050000)) // on QT5 the scrollbars have no width
+    if (tableView->verticalScrollBar()->isVisible())
+        x -= tableView->verticalScrollBar()->width()
+                + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
+#else // we're on a mac with QT5 .. so dodgy way of spotting preferences for scrollbars...
+    // this is a nasty hack, to see if the 'always on' preference for scrollbars is set we
+    // look at the scrollbar width which is 15 in this case (it is 16 when they 'appear' when
+    // needed. No doubt this will change over time and need to be fixed by referencing the
+    // Mac system preferences via an NSScroller - but that will be a massive hassle.
+    if (tableView->verticalScrollBar()->isVisible() && tableView->verticalScrollBar()->width() == 15)
+        x -= tableView->verticalScrollBar()->width() + 0 ;
+#endif
+
+    // take the margins into accopunt top
+    x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
+
+    // ** NOTE **
+    // When iterating over the section headings we
+    // always use the tableview not the sortmodel
+    // so we can skip over the virtual column 0
+    // which is used to group by, is visible but
+    // must have a width of 0. This is why all
+    // the for loops start with i=1
+    tableView->setColumnWidth(0,0); // in case use grabbed it
+
+    // is it narrower than the headings?
+    int headwidth=0;
+    int n=0;
+    for (int i=1; i<tableView->header()->count(); i++)
+        if (tableView->header()->isSectionHidden(i) == false) {
+            headwidth += tableView->columnWidth(i);
+            n++;
+        }
+
+    if (!resized) {
+
+        // headwidth is no, x is to-be width
+        // we need to 'stretch' the sections
+        // proportionally to fit into new
+        // layout
+        int setwidth=0;
+        int newwidth=0;
+        for (int i=1; i<tableView->header()->count(); i++) {
+            if (tableView->header()->isSectionHidden(i) == false) {
+                newwidth = (double)((((double)tableView->columnWidth(i)/(double)headwidth)) * (double)x);
+                if (newwidth < 20) newwidth = 20;
+                QString columnName = tableView->model()->headerData(i, Qt::Horizontal).toString();
+                if (columnName == "*") newwidth = 0;
+                tableView->setColumnWidth(i, newwidth);
+                setwidth += newwidth;
+            }
+        }
+
+        // UGH. Now account for the fact that the smaller columns
+        //      didn't take their fair share of a negative resize
+        //      so we need to snip off from the larger columns.
+        if (setwidth != x) {
+            // how many columns we got to snip from?
+            int colsleft = 0;
+            for (int i=1; i<tableView->header()->count(); i++)
+                if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20)
+                    colsleft++;
+
+            // run through ... again.. snipping off some pixels
+            if (colsleft) {
+                int snip = (setwidth-x) / colsleft; //could be negative too
+                for (int i=1; i<tableView->header()->count(); i++) {
+                    if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20) {
+                        tableView->setColumnWidth(i, tableView->columnWidth(i)-snip);
+                        setwidth -= snip;
+                    }
+                }
+            }
+        }
+
+        if (setwidth < x)
+            delegate->setWidth(pwidth=setwidth);
+        else
+            delegate->setWidth(pwidth=x);
+
+    } else {
+
+        // columns are resized - for each affected column this function is called
+        // and makes sure that
+        // a) nothing gets smaller than 20 and
+        // b) last section is not moved over the right border / does not fill the widget to the right border
+
+        // first step: make sure that the current column got smaller than 20 by resizing
+        if (newWidth < 20) {
+            tableView->setColumnWidth(logicalIndex, oldWidth);
+            // correct the headwidth by the added space
+            headwidth += (oldWidth - newWidth);
+        }
+
+        // get the index of the most right column (since here all further resizing will start)
+        int visIndex = 0;
+        // find the most right visible column
+        for (int i=1; i<tableView->header()->count(); i++) {
+            if (tableView->header()->isSectionHidden(i) == false &&
+                    tableView->header()->visualIndex(i) > visIndex)
+                visIndex = tableView->header()->visualIndex(i);
+        }
+
+        if (headwidth > x) {
+            // now make sure that no column disappears right border of the table view
+            // by taking the overlapping part "cut" from last column(s)
+            int cut = headwidth - x;
+             // now resize, but not smaller than 20 (from right to left of Visible Columns)
+            while (cut >0 && visIndex > 0) {
+                int logIndex = tableView->header()->logicalIndex(visIndex);
+                int k = tableView->columnWidth(logIndex);
+                if (k - cut >= 20) {
+                    tableView->setColumnWidth(logIndex, k-cut);
+                    cut = 0;
+                } else {
+                    tableView->setColumnWidth(logIndex, 20);
+                    cut -= (k-20);
+                }
+                visIndex--;
+            }
+        } else {
+            // since QT on fast mouse moves resizes more columns then expected
+            // give all available space to the last visible column
+            int logIndex = tableView->header()->logicalIndex(visIndex);
+            int k = tableView->columnWidth(logIndex);
+            tableView->setColumnWidth(logIndex, (k+x-headwidth));
+        }
+    }
+
+    // make the scrollbars go away
+    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    active = false;
+
+}
+
+
+
 
 //
 // This function is called for every row in the metricDB
