@@ -96,6 +96,7 @@ class RideNavigator : public GcWindow
 
         // working with columns
         void columnsChanged();
+        void columnsResized(int, int, int);
         void removeColumn();
         void showColumnChooser();
 
@@ -180,6 +181,10 @@ class RideNavigator : public GcWindow
 
         // search filter box
         SearchFilterBox *searchFilterBox;
+
+        // support functions
+        void calcColumnsChanged(bool, int logicalIndex=0, int oldWidth=0, int newWidth=0);
+        void setColumnWidth(int, bool, int logicalIndex=0, int oldWidth=0, int newWidth=0);
 };
 
 //
