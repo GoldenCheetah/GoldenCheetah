@@ -31,9 +31,14 @@
 #include "Units.h"
 #include "TimeUtils.h"
 
+// overlay helper
+#include "TabView.h"
+#include "GcOverlayWidget.h"
+#include "IntervalSummaryWindow.h"
 #include <QDebug>
 
-GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), context(context), range(-1), current(NULL)
+GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), context(context), 
+                                                       range(-1), current(NULL), firstShow(true)
 {
     setControls(NULL);
     setContentsMargins(0,0,0,0);
@@ -51,6 +56,10 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     layout->addWidget(view);
 
     webBridge = new WebBridge(context, this);
+
+    // put a helper on the screen for mouse over intervals...
+    overlayIntervals = new IntervalSummaryWindow(context);
+    addHelper(tr("Intervals"), overlayIntervals);
 
     //
     // connects
@@ -75,6 +84,9 @@ void
 GoogleMapControl::configChanged()
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
+#ifndef Q_OS_MAC
+    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
+#endif
 }
 
 void
@@ -487,6 +499,8 @@ GoogleMapControl::createMarkers()
             "   marker.setMap(map);"
             "   markerList.push(marker);" // keep track of those suckers
             "   google.maps.event.addListener(marker, 'click', function(event) { webBridge.toggleInterval(%4); });"
+            "   google.maps.event.addListener(marker, 'mouseover', function(event) { webBridge.hoverInterval(%4); });"
+            "   google.maps.event.addListener(marker, 'mouseout', function(event) { webBridge.clearHover(); });"
             "}")
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
                                     .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
@@ -638,4 +652,39 @@ WebBridge::toggleInterval(int x)
     IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(x));
     if (current) current->setSelected(!current->isSelected());
     return;
+}
+void 
+WebBridge::hoverInterval(int n)
+{
+    RideItem *rideItem = gm->property("ride").value<RideItem*>();
+    if (rideItem && rideItem->ride() && rideItem->ride()->intervals().count() > n) {
+        context->notifyIntervalHover(rideItem->ride()->intervals().at(n));
+    }
+}
+
+void 
+WebBridge::clearHover()
+{
+}
+
+bool
+GoogleMapControl::event(QEvent *event)
+{
+    // nasty nasty nasty hack to move widgets as soon as the widget geometry
+    // is set properly by the layout system, by default the width is 100 and 
+    // we wait for it to be set properly then put our helper widget on the RHS
+    if (event->type() == QEvent::Resize && geometry().width() != 100) {
+
+        // put somewhere nice on first show
+        if (firstShow) {
+            firstShow = false;
+            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+        }
+
+        // if off the screen move on screen
+        if (helperWidget()->geometry().x() > geometry().width()) {
+            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+        }
+    }
+    return QWidget::event(event);
 }
