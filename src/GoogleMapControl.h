@@ -42,6 +42,7 @@ class QColor;
 class QVBoxLayout;
 class QTabWidget;
 class GoogleMapControl;
+class IntervalSummaryWindow;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
@@ -79,6 +80,9 @@ class WebBridge : public QObject
 
         // display/toggle interval on map
         Q_INVOKABLE void toggleInterval(int);
+        Q_INVOKABLE void hoverInterval(int);
+        Q_INVOKABLE void clearHover();
+
         void intervalsChanged() { emit drawIntervals(); }
 
     signals:
@@ -112,6 +116,8 @@ class GoogleMapControl : public GcChartWindow
         int rideCP; // rider's CP
         QString currentPage;
         RideItem *current;
+        bool firstShow;
+        IntervalSummaryWindow *overlayIntervals;
 
         QColor GetColor(int watts);
         void createHtml();
@@ -120,6 +126,8 @@ class GoogleMapControl : public GcChartWindow
         void loadRide();
         void updateFrame();
 
+    protected:
+        bool event(QEvent *event);
 };
 
 #endif
