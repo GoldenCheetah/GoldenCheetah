@@ -228,9 +228,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     showAltSlope = new QComboBox(this);
     showAltSlope->addItem(tr("No Alt/Slope"));
-    showAltSlope->addItem(tr("1min/100m"));
-    showAltSlope->addItem(tr("5min/500m"));
-    showAltSlope->addItem(tr("10min/1000m"));
+    showAltSlope->addItem(tr("0.1km|mi -  1min"));
+    showAltSlope->addItem(tr("0.5km|mi -  5min"));
+    showAltSlope->addItem(tr("1.0km|mi - 10min"));
     cl2->addRow(new QLabel(tr("Alt/Slope")), showAltSlope);
     showAltSlope->setCurrentIndex(0);
 
