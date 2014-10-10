@@ -3022,6 +3022,11 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setSmoothing(smoothSlider->value());
         _allPlot->setByDistance(comboDistance->currentIndex());
         _allPlot->setShowBalance((showBalance->isEnabled()) ? ( showBalance->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowNP((showNP->isEnabled()) ? ( showNP->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowXP((showXP->isEnabled()) ? ( showXP->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowAP((showAP->isEnabled()) ? ( showAP->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowTE((showTE->isEnabled()) ? ( showTE->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowPS((showPS->isEnabled()) ? ( showPS->checkState() == Qt::Checked ) : false );
 
 	    _allPlot->replot();
     }
