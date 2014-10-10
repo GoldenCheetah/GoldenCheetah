@@ -3021,6 +3021,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setSmoothing(smoothSlider->value());
         _allPlot->setByDistance(comboDistance->currentIndex());
+        _allPlot->setShowBalance((showBalance->isEnabled()) ? ( showBalance->checkState() == Qt::Checked ) : false );
 
 	    _allPlot->replot();
     }
