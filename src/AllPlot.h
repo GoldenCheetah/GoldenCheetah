@@ -33,6 +33,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_compat.h>
 #include <QtGui>
+#include <QFont>
 
 #include <QTableWidget>
 #include <QStackedWidget>
@@ -365,6 +366,7 @@ class AllPlotObject : public QObject
     QVector<double> match;
     QVector<double> matchTime;
     QVector<double> matchDist;
+    QVector<QwtPlotMarker*> matchLabels;
     QVector<double> wprime;
     QVector<double> wprimeTime;
     QVector<double> wprimeDist;
@@ -461,6 +463,7 @@ class AllPlot : public QwtPlot
         void setDataFromPlots(QList<AllPlot*>); // user for single series comparing
         void setDataFromObject(AllPlotObject *object, AllPlot *reference); // for allplot when one per ride in a stack
                                                                            // reference is for settings et al
+        void setMatchLabels(AllPlotObject *object); // set labels from object
 
         // convert from time/distance to index in *smoothed* datapoints
         int timeIndex(double) const;
@@ -592,6 +595,7 @@ class AllPlot : public QwtPlot
         bool isolation;
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
+        QFont labelFont;
 
         void setAltSlopePlotStyle (AllPlotSlopeCurve *curve);
         static void nextStep( int& step );
