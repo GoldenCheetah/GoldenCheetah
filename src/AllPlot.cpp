@@ -721,6 +721,8 @@ void
 AllPlot::configChanged()
 {
     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+    labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
     if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) {
         standard->wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -1124,6 +1126,47 @@ void AllPlot::refreshZoneLabels()
     }
 }
 
+void
+AllPlot::setMatchLabels(AllPlotObject *objects)
+{
+    // clear anyway
+    foreach(QwtPlotMarker *p, objects->matchLabels) {
+        p->detach();
+        delete p;
+    }
+    objects->matchLabels.clear();
+
+    // add new ones, but only if showW
+    if (showW && objects->mCurve) {
+
+        bool below = false;
+        // zip through the matches and add a label
+        for (size_t i=0; i<objects->mCurve->data()->size(); i++) {
+            // mCurve->data()->sample(i);
+
+            // Qwt uses its own text objects
+            QwtText text(QString("%1").arg(objects->mCurve->data()->sample(i).y()/1000.00f, 4, 'f', 1));
+            text.setFont(labelFont);
+            text.setColor(QColor(255,127,0)); // supposed to be configurable !
+
+            // make that mark -- always above with topN
+            QwtPlotMarker *label = new QwtPlotMarker();
+            label->setLabel(text);
+            label->setValue(objects->mCurve->data()->sample(i).x(), objects->mCurve->data()->sample(i).y());
+            label->setYAxis(objects->mCurve->yAxis());
+            label->setSpacing(6); // not px but by yaxis value !? mad.
+            label->setLabelAlignment(below ? (Qt::AlignBottom | Qt::AlignCenter) :
+                                             (Qt::AlignTop | Qt::AlignCenter));
+
+            // and attach
+            label->attach(this);
+            objects->matchLabels << label;
+
+            // toggle top / bottom
+            below = !below;
+        }
+    }
+}
 
 void
 AllPlot::recalc(AllPlotObject *objects)
@@ -1148,6 +1191,7 @@ AllPlot::recalc(AllPlotObject *objects)
 
         objects->wCurve->setSamples(data,data);
         objects->mCurve->setSamples(data,data);
+        setMatchLabels(objects);
 
         if (!objects->atissArray.empty()) objects->atissCurve->setSamples(data, data);
         if (!objects->antissArray.empty()) objects->antissCurve->setSamples(data, data);
@@ -1552,6 +1596,7 @@ AllPlot::recalc(AllPlotObject *objects)
                                     objects->wprime.data(), objects->wprime.count());
         objects->mCurve->setSamples(bydist ? objects->matchDist.data() : objects->matchTime.data(), 
                                     objects->match.data(), objects->match.count());
+        setMatchLabels(objects);
     }
 
     if (!objects->wattsArray.empty()) {
@@ -2243,6 +2288,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
                                     plot->standard->wprime.data(), plot->standard->wprime.count());
         standard->mCurve->setSamples(bydist ? plot->standard->matchDist.data() : plot->standard->matchTime.data(), 
                                     plot->standard->match.data(), plot->standard->match.count());
+        setMatchLabels(standard);
     }
     int points = stopidx - startidx + 1; // e.g. 10 to 12 is 3 points 10,11,12, so not 12-10 !
     standard->wattsCurve->setSamples(xaxis,smoothW,points);
@@ -3404,6 +3450,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
                                     object->wprime.data(), object->wprime.count());
         standard->mCurve->setSamples(bydist ? object->matchDist.data() : object->matchTime.data(), 
                                     object->match.data(), object->match.count());
+        setMatchLabels(standard);
     }
 
     if (!object->wattsArray.empty()) {
