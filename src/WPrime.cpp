@@ -219,19 +219,15 @@ WPrime::setRide(RideFile *input)
 
         int stop = last / 2;
 
-        WPrimeIntegrator a(inputArray, 0, stop, TAU);
-        WPrimeIntegrator b(inputArray, stop+1, last, TAU);
+        WPrimeIntegrator a(inputArray, 0, last, TAU);
 
         a.start();
-        b.start();
-
         a.wait();
-        b.wait();
 
         // sum values
         for (int t=0; t<=last; t++) {
-            values[t] = a.output[t] + b.output[t];
-            xvalues[t] = double(t) / 60.00f;
+            values[t] = a.output[t];
+            xvalues[t] = t / 60.00f;
         }
 
         // now subtract WPRIME and work out minimum etc
@@ -428,19 +424,14 @@ WPrime::setErg(ErgFile *input)
 
         int stop = last / 2;
 
-        WPrimeIntegrator a(inputArray, 0, stop, TAU);
-        WPrimeIntegrator b(inputArray, stop+1, last, TAU);
+        WPrimeIntegrator a(inputArray, 0, last, TAU);
 
         a.start();
-        b.start();
-
         a.wait();
-        b.wait();
 
         // sum values
         for (int t=0; t<=last; t++) {
-            values[t] = a.output[t] + b.output[t];
-            xvalues[t] = t * 1000;
+            values[t] = a.output[t];
         }
 
         // now subtract WPRIME and work out minimum etc
@@ -549,22 +540,11 @@ void
 WPrimeIntegrator::run()
 {
     // run from start to stop adding decay to end
-    for (int t=begin; t<end; t++) {
+    double I = 0.00f;
+    for (int t=0; t<=end; t++) {
 
-        if (source[t] <= 0) continue;
-
-        // start at 1, since the actual value shouldn't be adjusted with itself !
-        for (int i=1; i < (TAU*3) /*WPrimeDecayPeriod*/ && t+i < source.size(); i++) {
-
-            double value = source[t] * exp(-(double(i)/TAU));
-
-            // diminishing returns - we're dealing in kJ, so 10J is nothing !
-            // this saves about 20% in calculation time typically
-            if (value < 10.00f) break;
- 
-            // integrate
-            output[t+i] += value;
-        }
+        I += exp(((double)(t) / TAU)) * source[t];
+        output[t] = exp(-((double)(t) / TAU)) * I;
     }
 }
 

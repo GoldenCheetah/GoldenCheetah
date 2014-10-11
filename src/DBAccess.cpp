@@ -105,8 +105,9 @@
 // 84  08  Sep 2014 Mark Liversedge    Added HrPw Ratio
 // 85  09  Sep 2014 Mark Liversedge    Added HrNp Ratio
 // 86  26  Sep 2014 Mark Liversedge    Added isRun first class var
+// 87  11  Oct 2014 Mark Liversedge    W'bal inegrator fixed up by Dave Waterworth
 
-int DBSchemaVersion = 86;
+int DBSchemaVersion = 87;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
