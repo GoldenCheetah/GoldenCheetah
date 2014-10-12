@@ -365,6 +365,7 @@ HEADERS += \
         MetricAggregator.h \
         NewCyclistDialog.h \
         NullController.h \
+        PaceZones.h \
         Pages.h \
         PDModel.h \
         PfPvPlot.h \
@@ -575,6 +576,7 @@ SOURCES += \
         MetricAggregator.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
+        PaceZones.cpp \
         Pages.cpp \
         PDModel.cpp \
         PeakPower.cpp \

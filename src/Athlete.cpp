@@ -27,6 +27,7 @@
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Zones.h"
+#include "PaceZones.h"
 #include "MetricAggregator.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
@@ -101,6 +102,15 @@ Athlete::Athlete(Context *context, const QDir &home)
 				  hrzones_->errorString());
         } else if (! hrzones_->warningString().isEmpty())
             QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
+    }
+
+    // Pace Zones
+    pacezones_ = new PaceZones;
+    QFile pacezonesFile(home.absolutePath() + "/pace.zones");
+    if (pacezonesFile.exists()) {
+        if (!pacezones_->read(pacezonesFile)) {
+            QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"), pacezones_->errorString());
+        }
     }
 
     // read athlete's charts.xml and translate etc
@@ -489,6 +499,15 @@ Athlete::configChanged()
         }
        else if (! hrzones_->warningString().isEmpty())
             QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
+    }
+
+    // reread Pace zones
+    QFile pacezonesFile(home.absolutePath() + "/pace.zones");
+    if (pacezonesFile.exists()) {
+        if (!pacezones_->read(pacezonesFile)) {
+            QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"),
+                                 pacezones_->errorString());
+        }
     }
 
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);

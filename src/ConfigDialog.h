@@ -74,6 +74,7 @@ class AthleteConfig : public QWidget
         RiderPage *athletePage;
         ZonePage *zonePage;
         HrZonePage *hrZonePage;
+        PaceZonePage *paceZonePage;
 };
 
 // APPEARANCE PAGE
