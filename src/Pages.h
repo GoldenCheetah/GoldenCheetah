@@ -111,6 +111,7 @@ class RiderPage : public QWidget
     public slots:
         void chooseAvatar();
         void unitChanged(int currentIndex);
+        void browseImportDir();
 
     private:
         Context *context;
@@ -124,6 +125,11 @@ class RiderPage : public QWidget
         QTextEdit  *bio;
         QPushButton *avatarButton;
         QPixmap     avatar;
+        QLineEdit *importDirectory;
+        QPushButton *importBrowseButton;
+        QLabel *importLabel;
+        QComboBox *importSetting;
+
 };
 
 class CredentialsPage : public QScrollArea
