@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
+ *
+ * [mostly cut and paste from Zones.cpp]
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
