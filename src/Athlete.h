@@ -124,6 +124,9 @@ class Athlete : public QObject
         void notifySeasonsChanged() { seasonsChanged(); }
         void notifyNamedSearchesChanged() { namedSearchesChanged(); }
 
+        // import rides from athlete specific directory
+        void importFilesWithoutDialog();
+
     signals:
         void zonesChanged();
         void seasonsChanged();
@@ -135,6 +138,7 @@ class Athlete : public QObject
         void checkCPX(RideItem*ride);
         void updateRideFileIntervals();
         void configChanged();
+
 
 };
 #endif

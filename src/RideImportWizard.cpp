@@ -36,6 +36,7 @@
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    dialogMode = standardDialog;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
@@ -47,6 +48,7 @@ RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, Context *conte
 
 RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
+    dialogMode = standardDialog;
     init(files, home, context);
 }
 
@@ -203,13 +205,22 @@ RideImportWizard::init(QList<QString> files, QDir &home, Context * /*mainWindow*
 
     tableWidget->adjustSize();
 
-    // Refresh prior to running down the list & processing...
-    this->show();
 }
 
 int
 RideImportWizard::process()
 {
+
+    // Refresh prior to running down the list & processing...
+    // do it here and not in Constructor, since "dialogMode" might have been changed
+    if (dialogMode == standardDialog) show();
+
+    // set if any error occurs in one of the stages, for the "non-Dialog" modes - to make the widget visible
+    // if an error in one of the steps has happened - first error is set after the first error has occured
+    // and the widget has been made visible (in case of noDialog mode)- from that point on, no need
+    // to "show()" the widget again
+    bool firstError = false;
+    bool sectionError = false;
 
     // set progress bar limits - for each file we
     // will make 5 passes over the files
@@ -244,11 +255,13 @@ RideImportWizard::process()
 
             } else {
                 tableWidget->item(i,5)->setText(tr("Error - Unknown file type"));
+                sectionError = true;
             }
 
         } else {
             //  Cannot open
             tableWidget->item(i,5)->setText(tr("Error - Not a valid file"));
+            sectionError = true;
         }
 
         progressBar->setValue(progressBar->value()+1);
@@ -256,6 +269,11 @@ RideImportWizard::process()
     }
 
     if (aborted) { done(0); }
+    if ((dialogMode == allErrors || dialogMode == allButDupFileErrors)  && sectionError) {
+        firstError = true;
+        show(); // make the widget visible in case an error has happened errors
+        sectionError = false; // reset Error flag for next section
+    }
     repaint();
     QApplication::processEvents();
 
@@ -380,8 +398,10 @@ RideImportWizard::process()
                    // ride != NULL but !errors.isEmpty() means they're just warnings
                    if (errors.isEmpty())
                        tableWidget->item(i,5)->setText(tr("Validated"));
-                   else
+                   else {
                        tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(" ")));
+                       sectionError = true;
+                   }
 
                    // Set Date and Time
                    if (ride->startTime().isNull()) {
@@ -390,6 +410,7 @@ RideImportWizard::process()
                        blanks[i] = true;
                        tableWidget->item(i,1)->setText(tr(""));
                        tableWidget->item(i,2)->setText(tr(""));
+                       sectionError = true;
 
                    } else {
 
@@ -434,11 +455,17 @@ RideImportWizard::process()
                } else {
                    // nope - can't handle this file
                    tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
+                   sectionError = true;
                }
         }
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
         if (aborted) { done(0); }
+        if ((dialogMode == allErrors || dialogMode == allButDupFileErrors) && sectionError && !firstError) {
+            firstError = true;
+            show(); // make the widget visible in case an error has happened errors
+            sectionError = false; // reset Error flag for next section
+        }
         this->repaint();
 
         next:;
@@ -462,6 +489,11 @@ RideImportWizard::process()
         // does nothing for the moment
         progressBar->setValue(progressBar->value()+1);
         progressBar->repaint();
+   }
+    // dialog has to show up for this import to complete the data
+    if (needdates != 0 && (dialogMode == allErrors || dialogMode == allButDupFileErrors) && !firstError) {
+       firstError = true;
+       show(); // make the widget visible in case an error has happened errors
    }
 
    // Wait for user to press save
@@ -489,6 +521,15 @@ RideImportWizard::process()
       abortButton->setDisabled(true);
    }
    connect(tableWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(activateSave()));
+
+   // if running in any "dialog only in error cases mode" and no Error have occured until now,
+   // we need to trigger the final saving step
+   if ((dialogMode == allErrors || dialogMode == allButDupFileErrors) && !firstError) {
+      abortClicked(); // simulate user input - at this point "Abort" == "Save"
+      // in additional simulate the "Finish" user-click
+      context->athlete->isclean = false;
+      context->athlete->metricDB->refreshMetrics();
+   }
 
    return 0;
 }
@@ -693,6 +734,9 @@ removeDuplicate(QString filename)
 void
 RideImportWizard::abortClicked()
 {
+    // similar procedure for "non-Dialog" processing to handle errors like in "process()" here
+    bool sectionError = false;
+    bool fileExistsError = false;
 
     // if done when labelled abort we kill off this dialog
     QString label = abortButton->text();
@@ -792,6 +836,7 @@ RideImportWizard::abortClicked()
             duplicates = findDuplicates(fulltarget);
             if (duplicates.count() && !overwriteFiles) {
                 tableWidget->item(i,5)->setText(tr("Error - File exists"));
+                fileExistsError = true;
             } else {
 
                 // wipe away the duplicate
@@ -858,13 +903,17 @@ RideImportWizard::abortClicked()
                         if (temp.rename(fulltarget)) {
                             tableWidget->item(i,5)->setText(tr("File Overwritten"));
                             //no need to add since its already there!
-                        } else
+                        } else {
                             tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
+                            sectionError = true;
+                        }
                     } else {
                         tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
+                        sectionError = true;
                     }
                 } else {
                     tableWidget->item(i,5)->setText(tr("Error - File exists"));
+                    fileExistsError = true;
                 }
             } else {
                     tableWidget->item(i,5)->setText(tr("Saving file..."));
@@ -879,13 +928,19 @@ RideImportWizard::abortClicked()
                         // BUT! Some charts/windows will hava snaffled away the ridefile
                         // pointer which is now invalid so once all the rides have been imported
                         // we need to select the last one... see below
-                    } else
+                    } else {
                         tableWidget->item(i,5)->setText(tr("Error - copy failed"));
+                        sectionError = true;
+                    }
             }
         }
         QApplication::processEvents();
         if (aborted) { done(0); }
         progressBar->setValue(progressBar->value()+1);
+        if (((sectionError || fileExistsError)  && (dialogMode == allErrors)) ||
+            ((sectionError && !fileExistsError) && (dialogMode == allButDupFileErrors))) {
+            show(); // make the widget visible in case an error was logged
+        }
         this->repaint();
     }
 
@@ -904,6 +959,12 @@ RideImportWizard::abortClicked()
     phaseLabel->setText(donemessage);
     abortButton->setText(tr("Finish"));
     aborted = false;
+}
+
+
+void RideImportWizard::setDialogMode(int mode) {
+
+    dialogMode = mode;
 }
 
 // clean up files

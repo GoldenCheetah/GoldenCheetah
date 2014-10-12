@@ -780,6 +780,20 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     avatarButton->setFixedHeight(140);
     avatarButton->setFixedWidth(140);
 
+    QVariant importDir = appsettings->cvalue(context->athlete->cyclist, GC_IMPORTDIR, "");
+
+    importLabel = new QLabel(tr("Auto Import from"));
+    importDirectory = new QLineEdit;
+    importDirectory->setText(importDir.toString());
+    importBrowseButton = new QPushButton(tr("Browse"));
+    importBrowseButton->setFixedWidth(120);
+
+    importSetting = new QComboBox();
+    importSetting->addItem("No auto import");
+    importSetting->addItem("No duplicate file errors");
+    importSetting->addItem("All errors");
+    importSetting->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_IMPORTSETTINGS).toInt()); // default/unset = 0
+
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
@@ -797,11 +811,18 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(bio, 6, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
+
+    grid->addWidget(importLabel, 7,0, alignment);
+    grid->addWidget(importDirectory, 7,1, alignment);
+    grid->addWidget(importBrowseButton, 7,2, alignment);
+    grid->addWidget(importSetting, 7,3, alignment);
+
     all->addLayout(grid);
     all->addStretch();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
     connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
+    connect (importBrowseButton, SIGNAL(clicked()), this, SLOT(browseImportDir()));
 }
 
 void
@@ -833,6 +854,15 @@ RiderPage::unitChanged(int currentIndex)
 }
 
 void
+RiderPage::browseImportDir()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Import Directory"),
+                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") importDirectory->setText(dir);  //only overwrite current dir, if a new was selected
+}
+
+
+void
 RiderPage::saveClicked()
 {
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
@@ -847,6 +877,11 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_SEX, sex->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home.absolutePath() + "/" + "avatar.png", "PNG");
+
+    // save the import settings
+    appsettings->setCValue(context->athlete->cyclist, GC_IMPORTSETTINGS, importSetting->currentIndex());
+    appsettings->setCValue(context->athlete->cyclist, GC_IMPORTDIR, importDirectory->text());
+
 }
 
 //
