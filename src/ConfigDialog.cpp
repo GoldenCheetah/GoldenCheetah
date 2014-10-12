@@ -265,6 +265,7 @@ AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
     athletePage = new RiderPage(this, context);
     zonePage = new ZonePage(context);
     hrZonePage = new HrZonePage(context);
+    paceZonePage = new PaceZonePage(context);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -273,8 +274,9 @@ AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));
-    tabs->addTab(zonePage, tr("Power"));
-    tabs->addTab(hrZonePage, tr("Heartrate"));
+    tabs->addTab(zonePage, tr("Power Zones"));
+    tabs->addTab(hrZonePage, tr("Heartrate Zones"));
+    tabs->addTab(paceZonePage, tr("Pace Zones"));
 
     mainLayout->addWidget(tabs);
 }
@@ -284,6 +286,7 @@ void AthleteConfig::saveClicked()
     athletePage->saveClicked();
     zonePage->saveClicked();
     hrZonePage->saveClicked();
+    paceZonePage->saveClicked();
 }
 
 // APPEARANCE CONFIG

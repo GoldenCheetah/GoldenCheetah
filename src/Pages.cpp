@@ -2661,7 +2661,7 @@ ProcessorPage::saveClicked()
 }
 
 //
-// Zone Config page
+// Power Zone Config page
 //
 ZonePage::ZonePage(Context *context) : context(context)
 {
@@ -3856,6 +3856,598 @@ LTPage::zonesChanged()
 
             // now replace the current range struct
             zonePage->zones.setHrZoneRange(index, current);
+        }
+    }
+}
+
+//
+// Pace Zone Config page
+//
+PaceZonePage::PaceZonePage(Context *context) : context(context)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    // get current config by reading it in (leave mainwindow zones alone)
+    QFile zonesFile(context->athlete->home.absolutePath() + "/pace.zones");
+    if (zonesFile.exists()) {
+        zones.read(zonesFile);
+        zonesFile.close();
+    }
+
+    // setup maintenance pages using current config
+    schemePage = new PaceSchemePage(this);
+    cvPage = new CVPage(this);
+
+    tabs = new QTabWidget(this);
+    tabs->addTab(cvPage, tr("Critical Velocity"));
+    tabs->addTab(schemePage, tr("Default"));
+
+    layout->addWidget(tabs);
+}
+
+void
+PaceZonePage::saveClicked()
+{
+    appsettings->setValue(GC_PACE, cvPage->metric->isChecked());
+    zones.setScheme(schemePage->getScheme());
+    zones.write(context->athlete->home);
+}
+
+PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
+{
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
+    addButton->setFixedSize(20,20);
+    deleteButton->setFixedSize(20,20);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
+#endif
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2);
+    actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+
+    scheme = new QTreeWidget;
+    scheme->headerItem()->setText(0, tr("Short"));
+    scheme->headerItem()->setText(1, tr("Long"));
+    scheme->headerItem()->setText(2, tr("Percent of CV"));
+    scheme->setColumnCount(3);
+    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
+    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    scheme->setUniformRowHeights(true);
+    scheme->setIndentation(0);
+    //scheme->header()->resizeSection(0,90);
+    //scheme->header()->resizeSection(1,200);
+    //scheme->header()->resizeSection(2,80);
+
+    // setup list
+    for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // tab name
+        add->setText(0, zonePage->zones.getScheme().zone_default_name[i]);
+        // field name
+        add->setText(1, zonePage->zones.getScheme().zone_default_desc[i]);
+
+        // low
+        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+        loedit->setMinimum(0);
+        loedit->setMaximum(1000);
+        loedit->setSingleStep(1.0);
+        loedit->setDecimals(0);
+        loedit->setValue(zonePage->zones.getScheme().zone_default[i]);
+        scheme->setItemWidget(add, 2, loedit);
+    }
+
+    mainLayout->addWidget(scheme);
+    mainLayout->addLayout(actionButtons);
+
+    // button connect
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+PaceSchemePage::addClicked()
+{
+    // are we at maximum already?
+    if (scheme->invisibleRootItem()->childCount() == 10) {
+        QMessageBox err;
+        err.setText(tr("Maximum of 10 zones reached."));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    int index = scheme->invisibleRootItem()->childCount();
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+    loedit->setMinimum(0);
+    loedit->setMaximum(1000);
+    loedit->setSingleStep(1.0);
+    loedit->setDecimals(0);
+    loedit->setValue(100);
+
+    scheme->invisibleRootItem()->insertChild(index, add);
+    scheme->setItemWidget(add, 2, loedit);
+
+    // Short
+    QString text = tr("New");
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
+    }
+    add->setText(0, text);
+
+    // long
+    text = tr("New");
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
+    }
+    add->setText(1, text);
+}
+
+void
+PaceSchemePage::renameClicked()
+{
+    // which one is selected?
+    if (scheme->currentItem()) scheme->editItem(scheme->currentItem(), 0);
+}
+
+void
+PaceSchemePage::deleteClicked()
+{
+    if (scheme->currentItem()) {
+        int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
+        delete scheme->invisibleRootItem()->takeChild(index);
+    }
+}
+
+// just for qSorting
+struct paceschemeitem {
+    QString name, desc;
+    int lo;
+    double trimp;
+    bool operator<(paceschemeitem right) const { return lo < right.lo; }
+};
+
+PaceZoneScheme
+PaceSchemePage::getScheme()
+{
+    // read the scheme widget and return a scheme object
+    QList<paceschemeitem> table;
+    PaceZoneScheme results;
+
+    // read back the details from the table
+    for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
+
+        paceschemeitem add;
+        add.name = scheme->invisibleRootItem()->child(i)->text(0);
+        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
+        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
+        table.append(add);
+    }
+
+    // sort the list into ascending order
+    qSort(table);
+
+    // now update the results
+    results.nzones_default = 0;
+    foreach(paceschemeitem zone, table) {
+        results.nzones_default++;
+        results.zone_default.append(zone.lo);
+        results.zone_default_is_pct.append(true);
+        results.zone_default_name.append(zone.name);
+        results.zone_default_desc.append(zone.desc);
+    }
+
+    return results;
+}
+
+static inline
+double kphFromTime(QTimeEdit *cvedit, bool isminmile)
+{
+    // get the value from a time edit and convert
+    // it to kph so we can store it in the zones file
+
+    double secs = cvedit->time().secsTo(QTime(0,0,0)) * -1;
+    return (isminmile ? KM_PER_MILE : 1.00f ) * (3600.00f / secs);
+}
+
+CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
+{
+    active = false;
+
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setSpacing(10);
+
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
+    addButton->setFixedSize(20,20);
+    deleteButton->setFixedSize(20,20);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
+#endif
+    defaultButton = new QPushButton(tr("Def"));
+    defaultButton->hide();
+
+    addZoneButton = new QPushButton(tr("+"));
+    deleteZoneButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
+    addZoneButton->setFixedSize(20,20);
+    deleteZoneButton->setFixedSize(20,20);
+#else
+    addZoneButton->setText(tr("Add"));
+    deleteZoneButton->setText(tr("Delete"));
+#endif
+
+    QHBoxLayout *zoneButtons = new QHBoxLayout;
+    zoneButtons->addStretch();
+    zoneButtons->setSpacing(0);
+    zoneButtons->addWidget(addZoneButton);
+    zoneButtons->addWidget(deleteZoneButton);
+
+    QHBoxLayout *addLayout = new QHBoxLayout;
+    QLabel *dateLabel = new QLabel(tr("From Date"));
+    QLabel *cpLabel = new QLabel(tr("Critical Velocity"));
+    dateEdit = new QDateEdit;
+    dateEdit->setDate(QDate::currentDate());
+
+    cvEdit = new QTimeEdit(QTime::fromString("05:00", "mm:ss"));
+    cvEdit->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
+    cvEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
+    cvEdit->setDisplayFormat("mm:ss");
+
+    per = new QLabel(this);
+    metric = new QCheckBox("Metric Pace");
+    metric->setChecked(appsettings->value(this, GC_PACE, true).toBool());
+    if (metric->isChecked()) per->setText("per km");
+    else per->setText("per mile");
+
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2);
+    actionButtons->addWidget(cpLabel);
+    actionButtons->addWidget(cvEdit);
+    actionButtons->addWidget(per);
+    actionButtons->addStretch();
+    actionButtons->addWidget(metric);
+    actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(defaultButton);
+
+    addLayout->addWidget(dateLabel);
+    addLayout->addWidget(dateEdit);
+    addLayout->addStretch();
+
+    ranges = new QTreeWidget;
+    ranges->headerItem()->setText(0, tr("From Date"));
+    ranges->headerItem()->setText(1, tr("Critical Velocity"));
+    ranges->setColumnCount(2);
+    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
+    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    ranges->setUniformRowHeights(true);
+    ranges->setIndentation(0);
+    //ranges->header()->resizeSection(0,180);
+
+    // setup list of ranges
+    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // Embolden ranges with manually configured zones
+        QFont font;
+        font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCV ?
+                                        QFont::Normal : QFont::Black);
+
+        // date
+        add->setText(0, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
+        add->setFont(0, font);
+
+        // CV
+        double kph = zonePage->zones.getCV(i);
+        double minsPerKM = 60.00f / kph;
+        double minsPerMile = minsPerKM * KM_PER_MILE;
+
+        add->setText(1, QString("%1 min/km %2 min/mile").arg(minsPerKM, 0, 'f', 2).arg(minsPerMile, 0, 'f', 2));
+        add->setFont(1, font);
+
+    }
+
+    zones = new QTreeWidget;
+    zones->headerItem()->setText(0, tr("Short"));
+    zones->headerItem()->setText(1, tr("Long"));
+    zones->headerItem()->setText(2, tr("From"));
+    zones->setColumnCount(3);
+    zones->setSelectionMode(QAbstractItemView::SingleSelection);
+    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    zones->setUniformRowHeights(true);
+    zones->setIndentation(0);
+    //zones->header()->resizeSection(0,80);
+    //zones->header()->resizeSection(1,150);
+
+    mainLayout->addLayout(addLayout, 0,0);
+    mainLayout->addLayout(actionButtons, 1,0);
+    mainLayout->addWidget(ranges, 2,0);
+    mainLayout->addLayout(zoneButtons, 3,0);
+    mainLayout->addWidget(zones, 4,0);
+
+    // button connect
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
+    connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
+    connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
+    connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+    connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+    connect(metric, SIGNAL(stateChanged(int)), this, SLOT(metricChanged()));
+}
+
+void
+CVPage::metricChanged()
+{
+    // need to switch between metric and imperial!
+    if (metric->isChecked()) per->setText("per km");
+    else per->setText("per mile");
+
+}
+
+void
+CVPage::addClicked()
+{
+    // get current scheme
+    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+
+    int cp = kphFromTime(cvEdit, !metric->isChecked());
+    if( cp <= 0 ){
+        QMessageBox err;
+        err.setText(tr("CV must be > 0"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    int index = zonePage->zones.addZoneRange(dateEdit->date(), kphFromTime(cvEdit, !metric->isChecked()));
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+    ranges->invisibleRootItem()->insertChild(index, add);
+
+    // date
+    add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
+
+    // CP
+    double kph = kphFromTime(cvEdit, !metric->isChecked());
+    double minsPerKM = 60.00f / kph;
+    double minsPerMile = minsPerKM * KM_PER_MILE;
+
+    add->setText(1, QString("%1 min/km %2 min/mile").arg(minsPerKM, 0, 'f', 2).arg(minsPerMile, 0, 'f', 2));
+
+}
+
+void
+CVPage::deleteClicked()
+{
+    if (ranges->currentItem()) {
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        delete ranges->invisibleRootItem()->takeChild(index);
+        zonePage->zones.deleteRange(index);
+    }
+}
+
+void
+CVPage::defaultClicked()
+{
+    if (ranges->currentItem()) {
+
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        PaceZoneRange current = zonePage->zones.getZoneRange(index);
+
+        // unbold
+        QFont font;
+        font.setWeight(QFont::Normal);
+        ranges->currentItem()->setFont(0, font);
+        ranges->currentItem()->setFont(1, font);
+        ranges->currentItem()->setFont(2, font);
+
+
+        // set the range to use defaults on the scheme page
+        zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+        zonePage->zones.setZonesFromCV(index);
+
+        // hide the default button since we are now using defaults
+        defaultButton->hide();
+
+        // update the zones display
+        rangeSelectionChanged();
+    }
+}
+
+void
+CVPage::rangeSelectionChanged()
+{
+    active = true;
+
+    // wipe away current contents of zones
+    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
+        delete zones->itemWidget(item, 2);
+        delete item;
+    }
+
+    // fill with current details
+    if (ranges->currentItem()) {
+
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        PaceZoneRange current = zonePage->zones.getZoneRange(index);
+
+        if (current.zonesSetFromCV) {
+
+            // reapply the scheme in case it has been changed
+            zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+            zonePage->zones.setZonesFromCV(index);
+            current = zonePage->zones.getZoneRange(index);
+
+            defaultButton->hide();
+
+        } else defaultButton->show();
+
+        for (int i=0; i< current.zones.count(); i++) {
+
+            QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
+            add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+            // tab name
+            add->setText(0, current.zones[i].name);
+            // field name
+            add->setText(1, current.zones[i].desc);
+
+            // low
+            QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+            loedit->setMinimum(0);
+            loedit->setMaximum(1000);
+            loedit->setSingleStep(1.0);
+            loedit->setDecimals(0);
+            loedit->setValue(current.zones[i].lo);
+            zones->setItemWidget(add, 2, loedit);
+            connect(loedit, SIGNAL(valueChanged(double)), this, SLOT(zonesChanged()));
+        }
+    }
+
+    active = false;
+}
+
+void
+CVPage::addZoneClicked()
+{
+    // no range selected
+    if (!ranges->currentItem()) return;
+
+    // are we at maximum already?
+    if (zones->invisibleRootItem()->childCount() == 10) {
+        QMessageBox err;
+        err.setText(tr("Maximum of 10 zones reached."));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    active = true;
+    int index = zones->invisibleRootItem()->childCount();
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+    loedit->setMinimum(0);
+    loedit->setMaximum(1000);
+    loedit->setSingleStep(1.0);
+    loedit->setDecimals(0);
+    loedit->setValue(100);
+
+    zones->invisibleRootItem()->insertChild(index, add);
+    zones->setItemWidget(add, 2, loedit);
+    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+
+    // Short
+    QString text = tr("New");
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
+    }
+    add->setText(0, text);
+
+    // long
+    text = tr("New");
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
+    }
+    add->setText(1, text);
+    active = false;
+
+    zonesChanged();
+}
+
+void
+CVPage::deleteZoneClicked()
+{
+    // no range selected
+    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
+        return;
+
+    active = true;
+    if (zones->currentItem()) {
+        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
+        delete zones->invisibleRootItem()->takeChild(index);
+    }
+    active = false;
+
+    zonesChanged();
+}
+
+void
+CVPage::zonesChanged()
+{
+    // only take changes when they are not done programmatically
+    // the active flag is set when the tree is being modified
+    // programmatically, but not when users interact with the widgets
+    if (active == false) {
+        // get the current zone range
+        if (ranges->currentItem()) {
+
+            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+            PaceZoneRange current = zonePage->zones.getZoneRange(index);
+
+            // embolden that range on the list to show it has been edited
+            QFont font;
+            font.setWeight(QFont::Black);
+            ranges->currentItem()->setFont(0, font);
+            ranges->currentItem()->setFont(1, font);
+            ranges->currentItem()->setFont(2, font);
+
+            // show the default button to undo
+            defaultButton->show();
+
+            // we manually edited so save in full
+            current.zonesSetFromCV = false;
+
+            // create the new zoneinfos for this range
+            QList<PaceZoneInfo> zoneinfos;
+            for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
+                QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
+                zoneinfos << PaceZoneInfo(item->text(0),
+                                      item->text(1),
+                                      ((QDoubleSpinBox*)zones->itemWidget(item, 2))->value(),
+                                      0);
+            }
+
+            // now sort the list
+            qSort(zoneinfos);
+
+            // now fill the highs
+            for(int i=0; i<zoneinfos.count(); i++) {
+                if (i+1 <zoneinfos.count())
+                    zoneinfos[i].hi = zoneinfos[i+1].lo;
+                else
+                    zoneinfos[i].hi = INT_MAX;
+            }
+            current.zones = zoneinfos;
+
+            // now replace the current range struct
+            zonePage->zones.setZoneRange(index, current);
         }
     }
 }
