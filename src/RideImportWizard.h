@@ -46,6 +46,8 @@ public:
     RideImportWizard(QList<QString> files, QDir &home, Context *context, QWidget *parent = 0);
     ~RideImportWizard();
     int process();
+    void setDialogMode(int); // default is fullDialog
+    enum DialogMode { standardDialog, allErrors, allButDupFileErrors };
 
 signals:
 
@@ -62,6 +64,7 @@ private:
     QList <bool> blanks; // record of which have a RideFileReader returned date & time
     QDir home; // target directory
     bool aborted;
+    int dialogMode; // see enum
     QLabel *phaseLabel;
     QTableWidget *tableWidget;
     QProgressBar *progressBar;

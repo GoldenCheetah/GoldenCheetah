@@ -1387,6 +1387,7 @@ MainWindow::openWindow(QString name)
     // main window will register itself
     MainWindow *main = new MainWindow(home);
     main->show();
+    main->ridesAutoImport();
 }
 
 void
@@ -1437,6 +1438,9 @@ MainWindow::openTab(QString name)
     showTabbar(true);
 
     setUpdatesEnabled(true);
+
+    // now do the automatic ride file import
+    context->athlete->importFilesWithoutDialog();
 }
 
 void
@@ -1945,5 +1949,12 @@ void
 MainWindow::addIntervals()
 {
     currentTab->addIntervals();
+}
+
+void
+MainWindow::ridesAutoImport() {
+
+    currentTab->context->athlete->importFilesWithoutDialog();
+
 }
 

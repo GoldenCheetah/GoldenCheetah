@@ -286,6 +286,7 @@ main(int argc, char *argv[])
                 if (home.cd(cyclist)) {
                     MainWindow *mainWindow = new MainWindow(home);
                     mainWindow->show();
+                    mainWindow->ridesAutoImport();
                     home.cdUp();
                     anyOpened = true;
                 }
@@ -314,6 +315,7 @@ main(int argc, char *argv[])
             // .. and open a mainwindow
             MainWindow *mainWindow = new MainWindow(home);
             mainWindow->show();
+            mainWindow->ridesAutoImport();
         }
 
         ret=application->exec();

@@ -189,6 +189,9 @@ class MainWindow : public QMainWindow
         void revertRide();
         bool saveRideExitDialog(Context *);              // save dirty rides on exit dialog
 
+        // autoload rides from athlete specific directory (preferences)
+        void ridesAutoImport();
+
         // save and restore state to context
         void saveGCState(Context *);
         void restoreGCState(Context *);
