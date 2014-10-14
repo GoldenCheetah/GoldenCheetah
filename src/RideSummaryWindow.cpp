@@ -26,6 +26,7 @@
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Zones.h"
+#include "PaceZones.h"
 #include "PDModel.h"
 #include "MetricAggregator.h"
 #include "DBAccess.h"
@@ -420,6 +421,18 @@ RideSummaryWindow::htmlSummary()
         << "time_in_zone_L9"
         << "time_in_zone_L10";
 
+    static const QStringList paceTimeInZones = QStringList()
+        << "time_in_zone_P1"
+        << "time_in_zone_P2"
+        << "time_in_zone_P3"
+        << "time_in_zone_P4"
+        << "time_in_zone_P5"
+        << "time_in_zone_P6"
+        << "time_in_zone_P7"
+        << "time_in_zone_P8"
+        << "time_in_zone_P9"
+        << "time_in_zone_P10";
+
     static const QStringList timeInZonesHR = QStringList()
         << "time_in_zone_H1"
         << "time_in_zone_H2"
@@ -448,6 +461,7 @@ RideSummaryWindow::htmlSummary()
             worklist += maximumColumn;
             worklist += metricColumn;
             worklist += timeInZones;
+            worklist += paceTimeInZones;
             worklist += timeInZonesHR;
             // computeMetrics expects unique keys, no duplicates
             worklist.removeDuplicates();
@@ -724,8 +738,43 @@ RideSummaryWindow::htmlSummary()
 
     if (ridesummary && rideItem && rideItem->ride() && rideItem->ride()->isRun()) {
 
-        // no power zones on a run, should show pace here ...
-        // ... when we have pace zones implemented
+        if (context->athlete->paceZones()) {
+
+            // no power zones on a run, should show pace here ...
+            // ... when we have pace zones implemented
+            range = context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+            if (range > -1) {
+
+                numzones = context->athlete->paceZones()->numZones(range);
+
+                if (numzones > 0) {
+
+                    // we have a valid range and it has at least one zone - lets go
+                    QVector<double> time_in_zone(numzones);
+                    for (int i = 0; i < numzones; ++i) {
+
+                        // if using metrics or data
+                        if (ridesummary) time_in_zone[i] = metrics.getForSymbol(paceTimeInZones[i]);
+                        else { // *** THIS IS NOT RELEVANT YET -- NO SUMMARISING FOR SEASONS ***
+                            QStringList filterList = filters;
+                            if (context->ishomefiltered) {
+                                if (filtered) {
+                                    foreach (QString file, filters) {
+                                        if (context->homeFilters.contains(file)) filterList << file;
+                                    }
+                                } else {
+                                    filterList = context->homeFilters;
+                                }
+                            }
+                            time_in_zone[i] = SummaryMetrics::getAggregated(context, paceTimeInZones[i], data, filterList, context->ishomefiltered || filtered, useMetricUnits, true).toDouble();
+                        }
+                    }
+        
+                    summary += tr("<h3>Pace Zones</h3>");
+                    summary += context->athlete->paceZones()->summarize(range, time_in_zone, altColor); //aggregating
+                }
+            }
+        }
 
     } else {
 

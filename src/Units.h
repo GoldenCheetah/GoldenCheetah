@@ -31,5 +31,8 @@
 #define FAHRENHEIT_ADD_CENTIGRADE 32.0f
 #define GPS_COORD_TO_STRING 8
 
+#include <QString>
+extern QString kphToPace(double kph, bool metric);
+
 #endif // _GC_Units_h
 

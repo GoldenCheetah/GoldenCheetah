@@ -24,6 +24,7 @@
 #include "Colors.h"
 #include "Settings.h"
 #include "TimeUtils.h"
+#include "Units.h"
 #include <QtGui>
 #include <QtAlgorithms>
 #include <qcolor.h>
@@ -499,7 +500,7 @@ int PaceZones::whichZone(int rnum, double value) const
     if (value < 0 || isnan(value)) return 0; else return range.zones.size()-1;
 }
 
-void PaceZones::zoneInfo(int rnum, int znum, QString &name, QString &description, int &low, int &high) const
+void PaceZones::zoneInfo(int rnum, int znum, QString &name, QString &description, double &low, double &high) const
 {
     assert(rnum < ranges.size());
     const PaceZoneRange &range = ranges[rnum];
@@ -524,7 +525,7 @@ void PaceZones::setCV(int rnum, double cv)
 }
 
 // generate a list of zones from CV
-int PaceZones::lowsFromCV(QList <int> *lows, double cv) const {
+int PaceZones::lowsFromCV(QList <double> *lows, double cv) const {
     lows->clear();
 
     for (int z = 0; z < scheme.nzones_default; z++) {
@@ -586,12 +587,12 @@ void PaceZones::setZonesFromCV(int rnum)
 }
 
 // return the list of starting values of zones for a given range
-QList <int> PaceZones::getZoneLows(int rnum) const
+QList <double> PaceZones::getZoneLows(int rnum) const
 {
-    if (rnum >= ranges.size()) return QList <int>();
+    if (rnum >= ranges.size()) return QList <double>();
 
     const PaceZoneRange &range = ranges[rnum];
-    QList <int> return_values;
+    QList <double> return_values;
 
     for (int i = 0; i < range.zones.size(); i++) {
         return_values.append(ranges[rnum].zones[i].lo);
@@ -601,13 +602,13 @@ QList <int> PaceZones::getZoneLows(int rnum) const
 }
 
 // return the list of ending values of zones for a given range
-QList <int> PaceZones::getZoneHighs(int rnum) const
+QList <double> PaceZones::getZoneHighs(int rnum) const
 {
 
-    if (rnum >= ranges.size()) return QList <int>();
+    if (rnum >= ranges.size()) return QList <double>();
 
     const PaceZoneRange &range = ranges[rnum];
-    QList <int> return_values;
+    QList <double> return_values;
 
     for (int i = 0; i < range.zones.size(); i++) {
         return_values.append(ranges[rnum].zones[i].hi);
@@ -633,14 +634,24 @@ QList <QString> PaceZones::getZoneNames(int rnum) const
 
 QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor color) const
 {
+
     assert(rnum < ranges.size());
     const PaceZoneRange &range = ranges[rnum];
-    assert(time_in_zone.size() == range.zones.size());
+    if (time_in_zone.size() != range.zones.size()) time_in_zone.resize(range.zones.size());
+
+    // are we in metric or imperial ?
+    bool metric = appsettings->value(this, GC_PACE, true).toBool();
+    QString cvunit = metric ? "kph" : "mph";
+    QString paceunit = metric ? "min/km" : "min/mile";
+    double cvfactor = metric ? 1.0f : KM_PER_MILE;
+
     QString summary;
     if(range.cv > 0) {
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
         summary += "<tr><td align=\"center\">";
-        summary += tr("Critical Power (watts): %1").arg(range.cv);
+        summary += tr("Critical Velocity: %3%4 (%2%1)").arg(cvunit).arg(range.cv / cvfactor, 0, 'f', 2)
+                                                        .arg(kphToPace(range.cv, metric))
+                                                        .arg(paceunit);
         summary += "</td></tr></table>";
     }
     summary += "<table align=\"center\" width=\"70%\" ";
@@ -648,8 +659,8 @@ QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor col
     summary += "<tr>";
     summary += tr("<td align=\"center\">Zone</td>");
     summary += tr("<td align=\"center\">Description</td>");
-    summary += tr("<td align=\"center\">Low (watts)</td>");
-    summary += tr("<td align=\"center\">High (watts)</td>");
+    summary += tr("<td align=\"center\">Low (%1)</td>").arg(paceunit);
+    summary += tr("<td align=\"center\">High (%1)</td>").arg(paceunit);
     summary += tr("<td align=\"center\">Time</td>");
     summary += tr("<td align=\"center\">%</td>");
     summary += "</tr>";
@@ -660,19 +671,20 @@ QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor col
     }
 
     for (int zone = 0; zone < time_in_zone.size(); ++zone) {
+
         if (time_in_zone[zone] > 0.0) {
             QString name, desc;
-            int lo, hi;
+            double lo, hi;
             zoneInfo(rnum, zone, name, desc, lo, hi);
             if (zone % 2 == 0)
                 summary += "<tr bgcolor='" + color.name() + "'>"; else
                 summary += "<tr>"; summary += QString("<td align=\"center\">%1</td>").arg(name);
             summary += QString("<td align=\"center\">%1</td>").arg(desc);
-            summary += QString("<td align=\"center\">%1</td>").arg(lo);
+            summary += QString("<td align=\"center\">%1</td>").arg(kphToPace(lo, metric));
             if (hi == INT_MAX)
                 summary += "<td align=\"center\">MAX</td>"; else
-                summary += QString("<td align=\"center\">%1</td>").arg(hi); summary += QString("<td align=\"center\">%1</td>")
-                                                                                       .arg(time_to_string((unsigned) round(time_in_zone[zone])));
+                summary += QString("<td align=\"center\">%1</td>").arg(kphToPace(hi, metric));
+                summary += QString("<td align=\"center\">%1</td>").arg(time_to_string((unsigned) round(time_in_zone[zone])));
             summary += QString("<td align=\"center\">%1</td>")
                        .arg((double)time_in_zone[zone]/duration * 100, 0, 'f', 0);
             summary += "</tr>";
@@ -878,7 +890,7 @@ int PaceZones::deleteRange(int rnum) {
 }
 
 quint16
-PaceZones::getFingerprint(Context *context) const
+PaceZones::getFingerprint() const
 {
     quint64 x = 0;
     for (int i=0; i<ranges.size(); i++) {
@@ -898,7 +910,5 @@ PaceZones::getFingerprint(Context *context) const
     }
     QByteArray ba = QByteArray::number(x);
 
-    // if default athlete weight changes everything needs to change !
-    double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "0.0").toDouble();
-    return qChecksum(ba, ba.length()) + weight + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
+    return qChecksum(ba, ba.length()); 
 }

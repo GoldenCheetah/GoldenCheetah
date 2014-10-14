@@ -576,6 +576,7 @@ SOURCES += \
         MetricAggregator.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
+        PaceTimeInZone.cpp \
         PaceZones.cpp \
         Pages.cpp \
         PDModel.cpp \
@@ -651,6 +652,7 @@ SOURCES += \
         TreeMapPlot.cpp \
         TtbDialog.cpp \
         TRIMPPoints.cpp \
+        Units.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \

@@ -28,6 +28,7 @@
 #endif
 #include "Zones.h"
 #include "HrZones.h"
+#include "PaceZones.h"
 #include "Settings.h"
 #include "RideItem.h"
 #include "RideMetric.h"
@@ -128,6 +129,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     }
 
     unsigned long zoneFingerPrint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
+                                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
                                   + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint()); // checksum of *all* zone data (HR and Power)
 
     // update statistics for ride files which are out of date

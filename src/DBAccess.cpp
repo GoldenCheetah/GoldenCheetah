@@ -106,8 +106,9 @@
 // 85  09  Sep 2014 Mark Liversedge    Added HrNp Ratio
 // 86  26  Sep 2014 Mark Liversedge    Added isRun first class var
 // 87  11  Oct 2014 Mark Liversedge    W'bal inegrator fixed up by Dave Waterworth
+// 88  14  Oct 2014 Mark Liversedge    Pace Zone Metrics
 
-int DBSchemaVersion = 87;
+int DBSchemaVersion = 88;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
