@@ -108,7 +108,7 @@ RideFile::wprimeData()
 }
 
 bool
-RideFile::isRun()
+RideFile::isRun() const
 {
     // for now we just look at Sport and if there are any
     // running specific data series in the data

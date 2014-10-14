@@ -44,8 +44,8 @@ struct PaceZoneScheme {
 // "L4" "Threshold" is between 270w and 315w
 struct PaceZoneInfo {
     QString name, desc;
-    int lo, hi;
-    PaceZoneInfo(const QString &n, const QString &d, int l, int h) :
+    double lo, hi;
+    PaceZoneInfo(const QString &n, const QString &d, double l, double h) :
         name(n), desc(d), lo(l), hi(h) {}
 
     // used by qSort()
@@ -170,14 +170,14 @@ class PaceZones : public QObject
         // get zoneinfo  for a given range and zone
         void zoneInfo(int range, int zone,
                       QString &name, QString &description,
-                      int &low, int &high) const;
+                      double &low, double &high) const;
 
         QString summarize(int rnum, QVector<double> &time_in_zone, QColor color = QColor(Qt::darkGray)) const;
 
         // get all highs/lows for zones (plot shading uses these)
-        int lowsFromCV(QList <int> *lows, double CV) const;
-        QList <int> getZoneLows(int rnum) const;
-        QList <int> getZoneHighs(int rnum) const;
+        int lowsFromCV(QList <double> *lows, double CV) const;
+        QList <double> getZoneLows(int rnum) const;
+        QList <double> getZoneHighs(int rnum) const;
         QList <QString> getZoneNames(int rnum) const;
 
         // get/set range start and end date
@@ -194,7 +194,7 @@ class PaceZones : public QObject
         // calculate a CRC for the zones data - used to see if zones
         // data is changed since last referenced in Metric code
         // could also be used in Configuration pages (later)
-        quint16 getFingerprint(Context *context) const;
+        quint16 getFingerprint() const;
 };
 
 QColor zoneColor(int zone, int num_zones);
