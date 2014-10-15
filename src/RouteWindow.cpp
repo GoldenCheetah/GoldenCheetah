@@ -169,6 +169,9 @@ void RouteWindow::loadRide()
 
 void RouteWindow::updateFrame()
 {
+    delete webBridge;
+    webBridge = new WebBridgeForRoute(context, this);
+
     view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
 }
 
