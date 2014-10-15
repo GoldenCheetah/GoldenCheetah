@@ -116,8 +116,12 @@ RouteItem::ride()
     if (ride_ != NULL) return ride_;
 
     // open the ride file
-    QFile file(path + "/" + fileName);
+    qDebug() << "path" << path;
+    qDebug() << "fileName" << fileName;
+
     qDebug() << path << "/" << fileName;
+    QFile file(path + "/" + fileName);
+
     ride_ = RideFileFactory::instance().openRideFile(context, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
 

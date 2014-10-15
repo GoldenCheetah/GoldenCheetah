@@ -343,6 +343,9 @@ Athlete::addRide(QString name, bool dosignal)
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
     allRides->insertChild(index, last);
 
+    //Search routes
+    routes->searchRoutesInRide(last->ride());
+
     // if it is the very first ride, we need to select it
     // after we added it
     if (!index) treeWidget->setCurrentItem(last);
