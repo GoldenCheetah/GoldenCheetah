@@ -24,11 +24,13 @@
 #include "IntervalItem.h"
 #include "RouteParser.h"
 #include "RideFile.h"
+#include "GProgressDialog.h"
 
 #include <QString>
 #include <QFile>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+
 
 #define tr(s) QObject::tr(s)
 
@@ -277,15 +279,10 @@ RouteSegment::searchRouteInAllRides(Context* context)
     // showing a progress bar as we go
     QTime elapsed;
     elapsed.start();
-    QString title = tr("Searching route...\nStarted");
-    //QProgressBar bar(title, tr("Abort"), 0, filenames.count(), context, NULL);
-    QProgressBar bar(context->mainWindow);
-    //bar.setWindowModality(Qt::WindowModal);
-    //bar.setMinimumDuration(0);
-    //bar.show();
+    QString title = tr("Searching route");
+    GProgressDialog *bar = NULL;
 
     int processed=0;
-    QApplication::processEvents(); // get that dialog up!
 
     while (iterator.hasNext()) {
         QString name = iterator.next();
@@ -299,10 +296,23 @@ RouteSegment::searchRouteInAllRides(Context* context)
         QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
                                                 .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
                                                 .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
-        QString title = tr("Searching route...\nElapsed: %1\n%2").arg(elapsedString).arg(name);
-        bar.setStatusTip(title);
-        bar.setValue(++processed);
+
+        // create the dialog if we need to show progress for long running uodate
+        if ((elapsedtime > 2000) && bar == NULL) {
+            bar = new GProgressDialog(title, 0, filenames.count(), context->mainWindow->init, context->mainWindow);
+            bar->show(); // lets hide until elapsed time is > 2 seconds
+
+            // lets make sure it goes to the center!
+            QApplication::processEvents();
+        }
+
+        if (bar) {
+            QString title = tr("Searching route in all rides...\nElapsed: %1\n%2").arg(elapsedString).arg(name);
+            bar->setLabelText(title);
+            bar->setValue(++processed);
+        }
         QApplication::processEvents();
+
 
         ride = RideFileFactory::instance().openRideFile(context, file, errors);
         if (ride->isDataPresent(RideFile::lat)) {
@@ -312,14 +322,20 @@ RouteSegment::searchRouteInAllRides(Context* context)
         else
             out << " no GPS datas " << "\r\n";
 
-        /*if (bar.wasCanceled()) {
+        if (bar && bar->wasCanceled()) {
             out << "SEARCH NEW ROUTE CANCELED: " << QDateTime::currentDateTime().toString() + "\r\n";
             break;
-        }*/
+        }
     }
+
+    // now zap the progress bar
+    if (bar) delete bar;
 
     // stop logging
     out << "SEARCH NEW ROUTE ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
+
+    QMessageBox::information(context->mainWindow, tr("Route"), tr("This route '%1' was found %2 times in %3 rides.").arg(this->getName()).arg(this->getRides().count()).arg(processed));
+
     log.close();
 }
 
@@ -472,21 +488,28 @@ Routes::searchRoutesInRide(RideFile* ride)
 
 void
 Routes::createRouteFromInterval(IntervalItem *activeInterval) {
-    qDebug() << "createRouteFromInterval";
-    // create a new route for this interval
-
-
+    // create a new route
     int index = context->athlete->routes->newRoute("route");
     RouteSegment *route = &context->athlete->routes->routes[index];
 
-    double dist = 0, lastLat = 0, lastLon = 0, i = 0;
+    QString name = activeInterval->text(0).trimmed();
+    if (name.contains("("))
+        name = name.left(name.indexOf("(")).trimmed();
+
+    if (name.length()<4 || name.startsWith("Selection #") )
+        name = QString(tr("Route #%1")).arg(context->athlete->routes->routes.length());
+
+    route->setName(name);
+
+    // Construct the route with interval gps data
+    double dist = 0, lastLat = 0, lastLon = 0;
 
     foreach (RideFilePoint *point, activeInterval->ride->dataPoints()) {
-
         if (point->secs >= activeInterval->start && point->secs < activeInterval->stop) {
             if (lastLat != 0 && lastLon != 0 &&
                 point->lat != 0 && point->lon != 0 &&
                 ceil(point->lat) != 180 && ceil(point->lon) != 180) {
+                // distance ith last point
                 double _dist = route->distance(lastLat, lastLon, point->lat, point->lon);
 
                 if (_dist>=0.001)
@@ -500,11 +523,12 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval) {
             }
             lastLat = point->lat;
             lastLon = point->lon;
-            i++;
         }
     }
 
+    // Search this route in all rides
     route->searchRouteInAllRides(context);
 
+    // Save routes
     writeRoutes();
 }
