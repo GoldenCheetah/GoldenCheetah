@@ -64,21 +64,35 @@ static const int stackZoomWidth[8] = { 5, 10, 15, 20, 30, 45, 60, 120 };
 AllPlotWindow::AllPlotWindow(Context *context) :
     GcChartWindow(context), current(NULL), context(context), active(false), stale(true), setupStack(false), setupSeriesStack(false), compareStale(true), firstShow(true)
 {
-    QWidget *c = new QWidget;
-    QVBoxLayout *clv = new QVBoxLayout(c);
-    QHBoxLayout *cl = new QHBoxLayout;
-    QFormLayout *cl1 = new QFormLayout;
-    QFormLayout *cl2 = new QFormLayout;
-    QFormLayout *cl3 = new QFormLayout;
-    cl->addLayout(cl1);
-    cl->addLayout(cl2);
-    clv->addLayout(cl3);
-    clv->addWidget(new QLabel("")); //spacer
-    clv->addLayout(cl);
-    clv->addStretch();
-    setControls(c);
-
+    // basic setup
     setContentsMargins(0,0,0,0);
+    QWidget *c = new QWidget;
+    setControls(c);
+    QVBoxLayout *clv = new QVBoxLayout(c);
+
+    // all the controls
+    QFormLayout *mainControls = new QFormLayout; // basic stuff at top; power, slider etc
+    clv->addLayout(mainControls);
+
+    // aside from basic settings, other stuff is now
+    // in a tab widget as we have so many data series !
+    QTabWidget *st = new QTabWidget(this);
+    clv->addWidget(st);
+
+    // gui controls
+    QWidget *basic = new QWidget(this); // show stack etc
+    QFormLayout *guiControls = new QFormLayout(basic); // show stack etc BUT ALSO ACCEL etc
+    st->addTab(basic, tr("Basic"));
+
+    // data series
+    QWidget *series = new QWidget(this); // data series selection
+    QHBoxLayout *seriesControls = new QHBoxLayout(series);
+    QFormLayout *seriesLeft = new QFormLayout(); // ride side series
+    QFormLayout *seriesRight = new QFormLayout(); // ride side series
+    seriesControls->addLayout(seriesLeft);
+    seriesControls->addLayout(seriesRight); // ack I swapped them around !
+
+    st->addTab(series, tr("Data"));
 
     // Main layout
     //QGridLayout *mainLayout = new QGridLayout();
@@ -132,12 +146,12 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     showStack = new QCheckBox(tr("Stack"), this);
     showStack->setCheckState(Qt::Unchecked);
-    cl1->addRow(showLabel, showStack);
+    guiControls->addRow(showLabel, showStack);
 
     showBySeries = new QCheckBox(tr("By Series"), this);
     showBySeries->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel("", this), showBySeries);
-    cl1->addRow(new QLabel("", this), new QLabel("",this)); // spacer
+    guiControls->addRow(new QLabel("", this), showBySeries);
+    guiControls->addRow(new QLabel("", this), new QLabel("",this)); // spacer
 
     stackWidth = 20;
     stackZoomSlider = new QSlider(Qt::Horizontal,this);
@@ -145,132 +159,132 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     stackZoomSlider->setMaximum(7);
     stackZoomSlider->setTickInterval(1);
     stackZoomSlider->setValue(3);
-    cl1->addRow(new QLabel(tr("Stack Zoom")), stackZoomSlider);
+    guiControls->addRow(new QLabel(tr("Stack Zoom")), stackZoomSlider);
 
     showFull = new QCheckBox(tr("Full plot"), this);
     showFull->setCheckState(Qt::Checked);
-    cl1->addRow(new QLabel(""), showFull);
+    guiControls->addRow(new QLabel(""), showFull);
 
     showHelp = new QCheckBox(tr("Overlay"), this);
     showHelp->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showHelp);
+    guiControls->addRow(new QLabel(""), showHelp);
 
     paintBrush = new QCheckBox(tr("Fill Curves"), this);
     paintBrush->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), paintBrush);
+    guiControls->addRow(new QLabel(""), paintBrush);
 
     showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
-    cl1->addRow(new QLabel(""), showGrid);
-    cl1->addRow(new QLabel(""), new QLabel(""));
+    guiControls->addRow(new QLabel(""), showGrid);
+    guiControls->addRow(new QLabel(""), new QLabel(""));
 
     showAccel = new QCheckBox(tr("Acceleration"), this);
     showAccel->setCheckState(Qt::Checked);
-    cl1->addRow(new QLabel(tr("Delta Series")), showAccel);
+    seriesRight->addRow(new QLabel(tr("Delta Series")), showAccel);
     showPowerD = new QCheckBox(QString(tr("Power %1").arg(deltaChar)), this);
     showPowerD->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showPowerD);
+    seriesRight->addRow(new QLabel(""), showPowerD);
     showCadD = new QCheckBox(QString(tr("Cadence %1").arg(deltaChar)), this);
     showCadD->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showCadD);
+    seriesRight->addRow(new QLabel(""), showCadD);
     showTorqueD = new QCheckBox(QString(tr("Torque %1").arg(deltaChar)), this);
     showTorqueD->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showTorqueD);
+    seriesRight->addRow(new QLabel(""), showTorqueD);
     showHrD = new QCheckBox(QString(tr("Heartrate %1").arg(deltaChar)), this);
     showHrD->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showHrD);
+    seriesRight->addRow(new QLabel(""), showHrD);
 
-    cl1->addRow(new QLabel(""), new QLabel(""));
+    seriesRight->addRow(new QLabel(""), new QLabel(""));
 
     showBalance = new QCheckBox(tr("Balance"), this);
     showBalance->setCheckState(Qt::Checked);
-    cl1->addRow(new QLabel(tr("Left/Right")), showBalance);
+    seriesRight->addRow(new QLabel(tr("Left/Right")), showBalance);
 
     showTE = new QCheckBox(tr("Torque Effectiveness"));
     showTE->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showTE);
+    seriesRight->addRow(new QLabel(""), showTE);
 
     showPS = new QCheckBox(tr("Smoothness"), this);
     showPS->setCheckState(Qt::Unchecked);
-    cl1->addRow(new QLabel(""), showPS);
+    seriesRight->addRow(new QLabel(""), showPS);
 
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(tr("Data series")), showHr);
+    seriesLeft->addRow(new QLabel(tr("Data series")), showHr);
 
     showSpeed = new QCheckBox(tr("Speed"), this);
     showSpeed->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showSpeed);
+    seriesLeft->addRow(new QLabel(""), showSpeed);
 
     showCad = new QCheckBox(tr("Cadence"), this);
     showCad->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showCad);
+    seriesLeft->addRow(new QLabel(""), showCad);
 
     showAlt = new QCheckBox(tr("Altitude"), this);
     showAlt->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showAlt);
+    seriesLeft->addRow(new QLabel(""), showAlt);
 
     showTemp = new QCheckBox(tr("Temperature"), this);
     showTemp->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showTemp);
+    seriesLeft->addRow(new QLabel(""), showTemp);
 
     showWind = new QCheckBox(tr("Headwind"), this);
     showWind->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showWind);
+    seriesLeft->addRow(new QLabel(""), showWind);
 
     showTorque = new QCheckBox(tr("Torque"), this);
     showTorque->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showTorque);
+    seriesLeft->addRow(new QLabel(""), showTorque);
 
     showSlope = new QCheckBox(tr("Slope"), this);
     showSlope->setCheckState(Qt::Checked);
-    cl2->addRow(new QLabel(""), showSlope);
+    seriesLeft->addRow(new QLabel(""), showSlope);
 
     showAltSlope = new QComboBox(this);
     showAltSlope->addItem(tr("No Alt/Slope"));
     showAltSlope->addItem(tr("0.1km|mi -  1min"));
     showAltSlope->addItem(tr("0.5km|mi -  5min"));
     showAltSlope->addItem(tr("1.0km|mi - 10min"));
-    cl2->addRow(new QLabel(tr("Alt/Slope")), showAltSlope);
+    seriesLeft->addRow(new QLabel(tr("Alt/Slope")), showAltSlope);
     showAltSlope->setCurrentIndex(0);
 
-    cl2->addRow(new QLabel(""), new QLabel(""));
+    seriesLeft->addRow(new QLabel(""), new QLabel(""));
 
     showANTISS = new QCheckBox(tr("Anaerobic TISS"), this);
     showANTISS->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(tr("Metrics")), showANTISS);
+    seriesLeft->addRow(new QLabel(tr("Metrics")), showANTISS);
 
     showATISS = new QCheckBox(tr("Aerobic TISS"), this);
     showATISS->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(""), showATISS);
+    seriesLeft->addRow(new QLabel(""), showATISS);
 
     showNP = new QCheckBox(tr("Normalized Power"), this);
     showNP->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(""), showNP);
+    seriesLeft->addRow(new QLabel(""), showNP);
 
     showXP = new QCheckBox(tr("Skiba xPower"), this);
     showXP->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(""), showXP);
+    seriesLeft->addRow(new QLabel(""), showXP);
 
     showAP = new QCheckBox(tr("Altitude Power"), this);
     showAP->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(""), showAP);
+    seriesLeft->addRow(new QLabel(""), showAP);
 
     showW = new QCheckBox(tr("W' balance"), this);
     showW->setCheckState(Qt::Unchecked);
-    cl2->addRow(new QLabel(""), showW);
+    seriesLeft->addRow(new QLabel(""), showW);
 
     showPower = new QComboBox(this);
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
     showPower->addItem(tr("No Power"));
-    cl3->addRow(new QLabel(tr("Shading")), showPower);
+    mainControls->addRow(new QLabel(tr("Shading")), showPower);
     showPower->setCurrentIndex(0);
 
     comboDistance = new QComboBox(this);
     comboDistance->addItem(tr("Time"));
     comboDistance->addItem(tr("Distance"));
-    cl3->addRow(new QLabel(tr("X Axis")), comboDistance);
+    mainControls->addRow(new QLabel(tr("X Axis")), comboDistance);
 
     QLabel *smoothLabel = new QLabel(tr("Smooth"), this);
     smoothLineEdit = new QLineEdit(this);
@@ -287,7 +301,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     QHBoxLayout *smoothLayout = new QHBoxLayout;
     smoothLayout->addWidget(smoothLineEdit);
     smoothLayout->addWidget(smoothSlider);
-    cl3->addRow(smoothLabel, smoothLayout);
+    mainControls->addRow(smoothLabel, smoothLayout);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
