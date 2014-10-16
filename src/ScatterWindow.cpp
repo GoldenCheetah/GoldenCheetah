@@ -43,7 +43,13 @@ ScatterWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("Temperature"), MODEL_TEMP);
     box->addItem(tr("L/R Balance"), MODEL_LRBALANCE);
     box->addItem(tr("L/R Torque Effectiveness"), MODEL_TE);
-    box->addItem(tr("L/R Pedal Smoothness"), MODEL_PS);
+    box->addItem(tr("L/R Pedal Smoothness"), MODEL_TE);
+    box->addItem(tr("Running Vertical Oscillation"), MODEL_RV);
+    box->addItem(tr("Running Cadence"), MODEL_RCAD);
+    box->addItem(tr("Running GCT"), MODEL_RGCT);
+    box->addItem(tr("Gear Ratio"), MODEL_GEAR);
+    box->addItem(tr("Muscle Oxygen"), MODEL_SMO2);
+    box->addItem(tr("Haemoglobin Mass"), MODEL_THB);
     //box->addItem(tr("Interval"), MODEL_INTERVAL); //supported differently for now
     //box->addItem(tr("Latitude"), MODEL_LAT); //weird values make the plot ugly
     //box->addItem(tr("Longitude"), MODEL_LONG); //weird values make the plot ugly
@@ -69,6 +75,12 @@ ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
     list.append(tr("L/R Balance"));
     list.append(tr("L/R Torque Effectiveness"));
     list.append(tr("L/R Pedal Smoothness"));
+    list.append(tr("Running Vertical Oscillation"));
+    list.append(tr("Running Cadence"));
+    list.append(tr("Running GCT"));
+    list.append(tr("Gear Ratio"));
+    list.append(tr("Muscle Oxygen"));
+    list.append(tr("Haemoglobin Mass"));
     box->setStrings(list);
 }
 
