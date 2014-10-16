@@ -517,6 +517,7 @@ class AllPlot : public QwtPlot
         void setShowRCad(bool show);
         void setShowSmO2(bool show);
         void setShowtHb(bool show);
+        void setShowGear(bool show);
         void setShowW(bool show);
         void setShowTorque(bool show);
         void setShowBalance(bool show);
@@ -578,6 +579,7 @@ class AllPlot : public QwtPlot
         bool showRCad;
         bool showSmO2;
         bool showtHb;
+        bool showGear;
 
         // plot objects
         AllPlotObject *standard;

@@ -651,6 +651,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     showRCad(true),
     showSmO2(true),
     showtHb(true),
+    showGear(true),
     bydist(false),
     scope(scope),
     secondaryScope(secScope),
@@ -4446,6 +4447,19 @@ void
 AllPlot::setShowtHb(bool show)
 {
     showtHb = show;
+    //standard->windCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowGear(bool show)
+{
+    showGear = show;
     //standard->windCurve->setVisible(show);
     setYMax();
 
