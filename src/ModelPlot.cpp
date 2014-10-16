@@ -73,7 +73,9 @@ class ModelDataColor : public Color
             } if (iszones == true) { // zone 0 is set to zone 1 to distinguish from no value
                 cHSV = zonecolor.value(val-1, QColor(0,0,0));
             } else if (val) {
-                cHSV.setHsv((double)255 * (double)((val-min)/(max-min)), 255, 255);
+                int red = (double)255 * (double)((val-min)/(max-min));
+                if (red < 0 || red > 255) red = 127;
+                cHSV.setHsv(red, 255, 255);
             }
             cRGB = cHSV.convertTo(QColor::Rgb);
             colour.r = (double) cRGB.red()/(double)255;
@@ -115,7 +117,9 @@ class ModelDataColor : public Color
                 // just add 100 colors graded from min to max
                 for (i=0, val=min; i<100; i++, val += ((max-min)/100)) {
 
-                    cHSV.setHsv((double)255 * (double)((val-min)/(max-min)), 255, 255);
+                    int red = (double)255 * (double)((val-min)/(max-min));
+                    if (red < 0 || red > 255) red = 127;
+                    cHSV.setHsv(red, 255, 255);
                     cRGB = cHSV.convertTo(QColor::Rgb);
                     colour.r = (double) cRGB.red()/(double)255;
                     colour.g = (double) cRGB.green()/(double)255;
@@ -237,6 +241,14 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
         // logic needed and I'm just lookup table!
         case MODEL_XYTIME : return 1;
         case MODEL_POWERZONE : return point->watts;
+        case MODEL_LRBALANCE : return point->lrbalance;
+        case MODEL_RV : return point->rvert;
+        case MODEL_RGCT : return point->rcontact;
+        case MODEL_RCAD : return point->rcad;
+        case MODEL_GEAR : return point->gear;
+        case MODEL_SMO2 : return point->smo2;
+        case MODEL_THB : return point->thb;
+        case MODEL_SLOPE : return point->slope;
     }
     return 0; // ? unknown channel ?
 }
@@ -281,6 +293,14 @@ ModelDataProvider::describeType(int type, bool longer)
             // logic needed and I'm just lookup table!
             case MODEL_XYTIME : return tr("Time at X/Y (%)");
             case MODEL_POWERZONE : return tr("Power Zone");
+            case MODEL_LRBALANCE : return (tr("L/R Balance"));
+            case MODEL_RV :  return (tr("Running Vertical Oscillation"));
+            case MODEL_RGCT : return (tr("Running Ground Contact Time"));
+            case MODEL_RCAD :  return (tr("Running Cadence"));
+            case MODEL_GEAR :  return (tr("Gear Ratio"));
+            case MODEL_SMO2 :  return (tr("Muscle Oxygen"));
+            case MODEL_THB :  return (tr("Haemoglobin Mass"));
+            case MODEL_SLOPE : return (tr("Slope (gradient)"));
         }
         return tr("Unknown");; // ? unknown channel ?
     } else {
@@ -301,6 +321,14 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_POWERZONE : return tr("Zone");
             case MODEL_CPV : return tr("CPV");
             case MODEL_AEPF : return tr("AEPF");
+            case MODEL_LRBALANCE : return (tr("Balance"));
+            case MODEL_RV :  return (tr("RV"));
+            case MODEL_RGCT : return (tr("GCT"));
+            case MODEL_RCAD :  return (tr("Run Cad"));
+            case MODEL_GEAR :  return (tr("Gear"));
+            case MODEL_SMO2 :  return (tr("SmO2"));
+            case MODEL_THB :  return (tr("tHb"));
+            case MODEL_SLOPE : return (tr("Slope"));
         }
         return tr("None");; // ? unknown channel ?
     }
