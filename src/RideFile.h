@@ -127,7 +127,7 @@ class RideFile : public QObject // QObject to emit signals
         enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd,
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
                           vam, wattsKg, lrbalance, lte, rte, lps, rps, 
-                          aPower, wprime, aTISS, anTISS, smO2, tHb, 
+                          aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, none };
 
         enum specialValues { NoTemp = -255 };

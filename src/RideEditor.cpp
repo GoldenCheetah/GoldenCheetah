@@ -821,8 +821,8 @@ RideEditor::insColumn(QString name)
     if (name == tr("Right TE")) series = RideFile::rte;
     if (name == tr("Left PS")) series = RideFile::lps;
     if (name == tr("Right PS")) series = RideFile::rps;
-    if (name == tr("SmO2")) series = RideFile::smO2;
-    if (name == tr("tHb")) series = RideFile::tHb;
+    if (name == tr("SmO2")) series = RideFile::smo2;
+    if (name == tr("tHb")) series = RideFile::thb;
     if (name == tr("Vertical Oscillation")) series = RideFile::rvert;
     if (name == tr("Run Cadence")) series = RideFile::rcad;
     if (name == tr("GCT")) series = RideFile::rcontact;
