@@ -83,6 +83,13 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showPS READ isShowPS WRITE setShowPS USER true)
     Q_PROPERTY(int showTemp READ isShowTemp WRITE setShowTemp USER true)
     Q_PROPERTY(int showW READ isShowW WRITE setShowW USER true)
+
+    Q_PROPERTY(int showRV READ isShowRV WRITE setShowRV USER true)
+    Q_PROPERTY(int showRCad READ isShowRCad WRITE setShowRCad USER true)
+    Q_PROPERTY(int showRGCT READ isShowRGCT WRITE setShowRGCT USER true)
+    Q_PROPERTY(int showSmO2 READ isShowSmO2 WRITE setShowSmO2 USER true)
+    Q_PROPERTY(int showtHb READ isShowtHb WRITE setShowtHb USER true)
+
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
     Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
     Q_PROPERTY(int paintBrush READ isPaintBrush WRITE setPaintBrush USER true)
@@ -131,6 +138,11 @@ class AllPlotWindow : public GcChartWindow
         int isShowBalance() const { return showBalance->checkState(); }
         int isShowTemp() const { return showTemp->checkState(); }
         int isShowW() const { return showW->checkState(); }
+        int isShowRV() const { return showRV->checkState(); }
+        int isShowRCad() const { return showRCad->checkState(); }
+        int isShowRGCT() const { return showRGCT->checkState(); }
+        int isShowSmO2() const { return showSmO2->checkState(); }
+        int isShowtHb() const { return showtHb->checkState(); }
         int isByDistance() const { return comboDistance->currentIndex(); }
         int isPaintBrush() const { return paintBrush->isChecked(); }
         int smoothing() const { return smoothSlider->value(); }
@@ -174,6 +186,11 @@ class AllPlotWindow : public GcChartWindow
         void setShowBalance(int state);
         void setShowPS(int state);
         void setShowTE(int state);
+        void setShowRV(int state);
+        void setShowRCad(int state);
+        void setShowRGCT(int state);
+        void setShowSmO2(int state);
+        void setShowtHb(int state);
         void setShowW(int state);
         void setShowGrid(int state);
         void setPaintBrush(int state);
@@ -281,6 +298,11 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showTE;
         QCheckBox *showPS;
         QCheckBox *showW;
+        QCheckBox *showRV;
+        QCheckBox *showRGCT;
+        QCheckBox *showRCad;
+        QCheckBox *showSmO2;
+        QCheckBox *showtHb;
         QComboBox *comboDistance;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;

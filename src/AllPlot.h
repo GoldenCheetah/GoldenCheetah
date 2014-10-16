@@ -512,6 +512,11 @@ class AllPlot : public QwtPlot
         void setShowAlt(bool show);
         void setShowTemp(bool show);
         void setShowWind(bool show);
+        void setShowRV(bool show);
+        void setShowRGCT(bool show);
+        void setShowRCad(bool show);
+        void setShowSmO2(bool show);
+        void setShowtHb(bool show);
         void setShowW(bool show);
         void setShowTorque(bool show);
         void setShowBalance(bool show);
@@ -568,6 +573,11 @@ class AllPlot : public QwtPlot
         bool showBalance;
         bool showTE;
         bool showPS;
+        bool showRV;
+        bool showRGCT;
+        bool showRCad;
+        bool showSmO2;
+        bool showtHb;
 
         // plot objects
         AllPlotObject *standard;
