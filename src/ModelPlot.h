@@ -59,6 +59,16 @@
 #define MODEL_POWERZONE     13
 #define MODEL_CPV           14
 #define MODEL_AEPF          15
+#define MODEL_HEADWIND      16
+#define MODEL_SLOPE         17
+#define MODEL_TEMP          18
+#define MODEL_LRBALANCE     19
+#define MODEL_RV            22
+#define MODEL_RCAD          23
+#define MODEL_RGCT          24
+#define MODEL_GEAR          25
+#define MODEL_SMO2          26
+#define MODEL_THB           27
 
 using namespace Qwt3D;
 

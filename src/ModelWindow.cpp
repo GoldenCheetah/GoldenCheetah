@@ -42,8 +42,16 @@ ModelWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("CPV"), MODEL_CPV);
     box->addItem(tr("Time"), MODEL_TIME);
     box->addItem(tr("Distance"), MODEL_DISTANCE);
+    box->addItem(tr("Slope"), MODEL_SLOPE);
     box->addItem(tr("Latitude"), MODEL_LAT);
     box->addItem(tr("Longitude"), MODEL_LONG);
+    box->addItem(tr("L/R Balance"), MODEL_LRBALANCE);
+    box->addItem(tr("Running Vertical Oscillation"), MODEL_RV);
+    box->addItem(tr("Running Cadence"), MODEL_RCAD);
+    box->addItem(tr("Running GCT"), MODEL_RGCT);
+    box->addItem(tr("Gear Ratio"), MODEL_GEAR);
+    box->addItem(tr("Muscle Oxygen"), MODEL_SMO2);
+    box->addItem(tr("Haemoglobin Mass"), MODEL_THB);
 }
 
 ModelWindow::ModelWindow(Context *context) :
