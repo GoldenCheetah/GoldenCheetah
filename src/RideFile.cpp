@@ -157,6 +157,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::rvert: return QString(tr("Vertical Oscillation"));
     case RideFile::rcad: return QString(tr("Run Cadence"));
     case RideFile::rcontact: return QString(tr("GCT"));
+    case RideFile::gear: return QString(tr("Gear Ratio"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -202,6 +203,7 @@ RideFile::colorFor(SeriesType series)
     case RideFile::slope:
     case RideFile::rvert:
     case RideFile::rcontact:
+    case RideFile::gear:
     default: return GColor(CPLOTMARKER);
     }
 }
@@ -249,6 +251,7 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::rcad: return QString(tr("spm"));
     case RideFile::rvert: return QString(tr("cm"));
     case RideFile::rcontact: return QString(tr("ms"));
+    case RideFile::gear: return QString(tr("ratio"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -600,6 +603,8 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->rcad = point->rcad;
     if (minPoint->rcontact == 0 || point->rcontact<minPoint->rcontact)
        minPoint->rcontact = point->rcontact;
+    if (minPoint->gear == 0 || point->gear<minPoint->gear)
+       minPoint->gear = point->gear;
 }
 
 void RideFile::updateMax(RideFilePoint* point)
@@ -651,6 +656,8 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->rcad = point->rcad;
     if (point->rcontact>maxPoint->rcontact)
        maxPoint->rcontact = point->rcontact;
+    if (point->gear>maxPoint->gear)
+       maxPoint->gear = point->gear;
 }
 
 void RideFile::updateAvg(RideFilePoint* point)
@@ -679,6 +686,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->rvert += point->rvert;
     totalPoint->rcad += point->rcad;
     totalPoint->rcontact += point->rcontact;
+    totalPoint->gear += point->gear;
 
     ++totalCount;
     if (point->temp != NoTemp) ++totalTemp;
@@ -707,6 +715,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rvert = totalPoint->rvert/totalCount;
     avgPoint->rcad = totalPoint->rcad/totalCount;
     avgPoint->rcontact = totalPoint->rcontact/totalCount;
+    avgPoint->gear = totalPoint->gear/totalCount;
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
@@ -818,6 +827,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case rcad : dataPresent.rcad = value; break;
         case rvert : dataPresent.rvert = value; break;
         case rcontact : dataPresent.rcontact = value; break;
+        case gear : dataPresent.gear = value; break;
         case interval : dataPresent.interval = value; break;
         case wprime : dataPresent.wprime = value; break;
         default:
@@ -855,6 +865,7 @@ RideFile::isDataPresent(SeriesType series)
         case rvert : return dataPresent.rvert; break;
         case rcad : return dataPresent.rcad; break;
         case rcontact : return dataPresent.rcontact; break;
+        case gear : return dataPresent.gear; break;
         case interval : return dataPresent.interval; break;
         default:
         case none : return false; break;
@@ -926,6 +937,7 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::rcad : return rcad; break;
         case RideFile::rvert : return rvert; break;
         case RideFile::rcontact : return rcontact; break;
+        case RideFile::gear : return gear; break;
         case RideFile::interval : return interval; break;
         case RideFile::NP : return np; break;
         case RideFile::xPower : return xp; break;
@@ -1014,6 +1026,7 @@ RideFile::decimalsFor(SeriesType series)
         case rcad : return 0; break;
         case rvert : return 1; break;
         case rcontact : return 1; break;
+        case gear : return 2; break;
         case wprime : return 0; break;
         default:
         case none : break;
@@ -1056,6 +1069,7 @@ RideFile::maximumFor(SeriesType series)
         case rcad : return 500; break;
         case rvert : return 50; break;
         case rcontact : return 1000; break;
+        case gear : return 10; break;
         case wprime : return 99999; break;
         default :
         case none : break;
@@ -1098,6 +1112,7 @@ RideFile::minimumFor(SeriesType series)
         case rcad : return 0; break;
         case rvert : return 0; break;
         case rcontact : return 0; break;
+        case gear : return 0; break;
         case wprime : return 0; break;
         default :
         case none : break;
@@ -1305,6 +1320,11 @@ RideFile::recalculateDerivedSeries()
         if (oCP) CP=oCP;
     }
 
+    // wheelsize - use meta, then config then drop to 2100
+    double wheelsize = getTag(tr("Wheelsize"), "0.0").toDouble();
+    if (wheelsize == 0) wheelsize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
+    wheelsize /= 1000.00f; // need it in meters
+
     // last point looked at
     RideFilePoint *lastP = NULL;
 
@@ -1460,6 +1480,22 @@ RideFile::recalculateDerivedSeries()
                     p->slope = lastP->slope;
                 }
             }
+        }
+
+        // can we derive gear ratio ?
+        // needs speed and cadence
+        if (p->kph && p->cad && !isRun()) {
+
+            // need to say we got it
+            setDataPresent(RideFile::gear, true);
+
+            // calculate gear ratio, without rounding (but will need
+            // to do something to it in order to identify gear)
+            // speed and wheelsize in meters
+            p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
+            
+        } else {
+            p->gear = 0.0f;
         }
 
         // last point

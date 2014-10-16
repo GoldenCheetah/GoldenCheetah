@@ -262,6 +262,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showTorque->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(""), showTorque);
 
+    showGear = new QCheckBox(tr("Gear Ratio"), this);
+    showGear->setCheckState(Qt::Checked);
+    seriesLeft->addRow(new QLabel(""), showGear);
+
     showSlope = new QCheckBox(tr("Slope"), this);
     showSlope->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(""), showSlope);
@@ -2440,6 +2444,27 @@ AllPlotWindow::setShowtHb(int value)
     allPlot->setShowtHb(checked);
     foreach (AllPlot *plot, allPlots)
         plot->setShowtHb(checked);
+
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowGear(int value)
+{
+    showGear->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = (( value == Qt::Checked ) && showGear->isEnabled()) ? true : false;
+
+    allPlot->setShowGear(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowGear(checked);
 
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
