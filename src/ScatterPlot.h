@@ -60,6 +60,12 @@
 #define MODEL_LRBALANCE     19
 #define MODEL_TE            20
 #define MODEL_PS            21
+#define MODEL_RV            22
+#define MODEL_RCAD          23
+#define MODEL_RGCT          24
+#define MODEL_GEAR          25
+#define MODEL_SMO2          26
+#define MODEL_THB           27
 
 // the data provider for the plot
 class ScatterSettings;

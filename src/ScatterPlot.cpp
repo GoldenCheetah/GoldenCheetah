@@ -90,6 +90,13 @@ pointType(const RideFilePoint *point, int type, int side, bool metric, double cr
         case MODEL_LRBALANCE : return !side ? point->lrbalance : (100 - point->lrbalance);
         case MODEL_TE : return side ? point->rte : point->lte;
         case MODEL_PS : return side ? point->rps : point->lps;
+
+        case MODEL_RV : return point->rvert;
+        case MODEL_RGCT : return point->rcontact;
+        case MODEL_RCAD : return point->rcad;
+        case MODEL_GEAR : return point->gear;
+        case MODEL_SMO2 : return point->smo2;
+        case MODEL_THB : return point->thb;
     }
     return 0; // ? unknown channel ?
 }
@@ -139,6 +146,12 @@ QString ScatterPlot::describeType(int type, bool longer, bool metric)
             case MODEL_LRBALANCE : return (tr("L/R Balance"));
             case MODEL_TE : return (tr("Torque Efficiency"));
             case MODEL_PS : return (tr("Pedal Smoothness"));
+            case MODEL_RV :  return (tr("Running Vertical Oscillation"));
+            case MODEL_RGCT : return (tr("Running Ground Contact Time"));
+            case MODEL_RCAD :  return (tr("Running Cadence"));
+            case MODEL_GEAR :  return (tr("Gear Ratio"));
+            case MODEL_SMO2 :  return (tr("Muscle Oxygen"));
+            case MODEL_THB :  return (tr("Haemoglobin Mass"));
         }
         return (tr("Unknown"));; // ? unknown channel ?
     } else {
@@ -165,6 +178,12 @@ QString ScatterPlot::describeType(int type, bool longer, bool metric)
             case MODEL_LRBALANCE : return (tr("Balance"));
             case MODEL_TE : return (tr("TE"));
             case MODEL_PS : return (tr("PS"));
+            case MODEL_RV :  return (tr("RV"));
+            case MODEL_RGCT : return (tr("GCT"));
+            case MODEL_RCAD :  return (tr("Run Cad"));
+            case MODEL_GEAR :  return (tr("Gear"));
+            case MODEL_SMO2 :  return (tr("SmO2"));
+            case MODEL_THB :  return (tr("tHb"));
         }
         return (tr("None")); // ? unknown channel ?
     }
