@@ -167,7 +167,6 @@ RideFile::colorFor(SeriesType series)
 {
     switch (series) {
     case RideFile::cad: return GColor(CCADENCE);
-    case RideFile::rcad: return GColor(CCADENCE);
     case RideFile::cadd: return GColor(CCADENCE);
     case RideFile::hr: return GColor(CHEARTRATE);
     case RideFile::hrd: return GColor(CHEARTRATE);
@@ -195,15 +194,16 @@ RideFile::colorFor(SeriesType series)
     case RideFile::wprime: return GColor(CWBAL);
     case RideFile::smo2: return GColor(CWBAL);
     case RideFile::thb: return GColor(CSPEED);
+    case RideFile::slope: return GColor(CSLOPE);
+    case RideFile::rvert: return GColor(CRV);
+    case RideFile::rcontact: return GColor(CRGCT);
+    case RideFile::rcad: return GColor(CRCAD);
+    case RideFile::gear: return GColor(CGEAR);
     case RideFile::secs:
     case RideFile::km:
     case RideFile::vam:
     case RideFile::lon:
     case RideFile::lat:
-    case RideFile::slope:
-    case RideFile::rvert:
-    case RideFile::rcontact:
-    case RideFile::gear:
     default: return GColor(CPLOTMARKER);
     }
 }
@@ -1069,7 +1069,7 @@ RideFile::maximumFor(SeriesType series)
         case rcad : return 500; break;
         case rvert : return 50; break;
         case rcontact : return 1000; break;
-        case gear : return 10; break;
+        case gear : return 30; break;
         case wprime : return 99999; break;
         default :
         case none : break;

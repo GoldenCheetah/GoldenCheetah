@@ -851,16 +851,24 @@ AllPlot::configChanged()
     QPen npPen = QPen(GColor(CNPOWER));
     npPen.setWidth(width);
     standard->npCurve->setPen(npPen);
-
-    // XXX XXX for now (being lazy) just reuse power for all these new ones
-    // can come back and add color config later !!!!!! XXX XXX
-    standard->rvCurve->setPen(npPen);
-    standard->rcadCurve->setPen(npPen);
-    standard->rgctCurve->setPen(npPen);
-    standard->gearCurve->setPen(npPen);
-    standard->smo2Curve->setPen(npPen);
-    standard->thbCurve->setPen(npPen);
-    // XXX XXX
+    QPen rvPen = QPen(GColor(CRV));
+    rvPen.setWidth(width);
+    standard->rvCurve->setPen(rvPen);
+    QPen rcadPen = QPen(GColor(CRCAD));
+    rcadPen.setWidth(width);
+    standard->rcadCurve->setPen(rcadPen);
+    QPen rgctPen = QPen(GColor(CRGCT));
+    rgctPen.setWidth(width);
+    standard->rgctCurve->setPen(rgctPen);
+    QPen gearPen = QPen(GColor(CGEAR));
+    gearPen.setWidth(width);
+    standard->gearCurve->setPen(gearPen);
+    QPen smo2Pen = QPen(GColor(CSMO2));
+    smo2Pen.setWidth(width);
+    standard->smo2Curve->setPen(smo2Pen);
+    QPen thbPen = QPen(GColor(CTHB));
+    thbPen.setWidth(width);
+    standard->thbCurve->setPen(thbPen);
 
     QPen antissPen = QPen(GColor(CANTISS));
     antissPen.setWidth(width);
@@ -5041,17 +5049,29 @@ AllPlot::setPaintBrush(int state)
         p = standard->npCurve->pen().color();
         p.setAlpha(64);
         standard->npCurve->setBrush(QBrush(p));
-
-        // XXX !!! all the same 
-        standard->rvCurve->setBrush(QBrush(p));
-        standard->rgctCurve->setBrush(QBrush(p));
-        standard->rcadCurve->setBrush(QBrush(p));
-        standard->gearCurve->setBrush(QBrush(p));
-        standard->smo2Curve->setBrush(QBrush(p));
-        standard->thbCurve->setBrush(QBrush(p));
-        // XXX
         standard->atissCurve->setBrush(QBrush(p));
         standard->antissCurve->setBrush(QBrush(p));
+
+
+        p = standard->rvCurve->pen().color();
+        p.setAlpha(64);
+        standard->rvCurve->setBrush(QBrush(p));
+        p = standard->rgctCurve->pen().color();
+        p.setAlpha(64);
+        standard->rgctCurve->setBrush(QBrush(p));
+        p = standard->rcadCurve->pen().color();
+        p.setAlpha(64);
+        standard->rcadCurve->setBrush(QBrush(p));
+        p = standard->gearCurve->pen().color();
+        p.setAlpha(64);
+        standard->gearCurve->setBrush(QBrush(p));
+        p = standard->smo2Curve->pen().color();
+        p.setAlpha(64);
+        standard->smo2Curve->setBrush(QBrush(p));
+        p = standard->thbCurve->pen().color();
+        p.setAlpha(64);
+        standard->thbCurve->setBrush(QBrush(p));
+
 
         p = standard->xpCurve->pen().color();
         p.setAlpha(64);
