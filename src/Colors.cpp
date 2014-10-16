@@ -76,6 +76,13 @@ void GCColor::setupColors()
         { tr("Altitude Shading"), "COLORALTITUDESHADE", QColor(Qt::lightGray) },
         { tr("Wind Speed"), "COLORWINDSPEED", Qt::darkGreen },
         { tr("Torque"), "COLORTORQUE", Qt::magenta },
+        { tr("Slope"), "CSLOPE", Qt::green },
+        { tr("Gear Ratio"), "COLORGEAR", QColor(0xff, 0x90, 0x00) },
+        { tr("Run Vertical Oscillation"), "COLORRVERT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
+        { tr("Run Cadence"), "COLORRCAD", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
+        { tr("Run Ground Contact"), "COLORGCT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
+        { tr("Muscle Oxygen (SmO2)"), "COLORSMO2", QColor(0x33, 0x99, 0xff) }, // same as moxy monitor
+        { tr("Hameoglobin Mass (tHb)"), "COLORTHB", QColor(0xff,0xcc,0x33) },
         { tr("Load"), "COLORLOAD", Qt::yellow },
         { tr("TSS"), "COLORTSS", Qt::green },
         { tr("Short Term Stress"), "COLORSTS", Qt::blue },
@@ -142,7 +149,6 @@ void GCColor::setupColors()
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(108,108,108) },
 #endif
 #endif
-        { tr("Slope"), "CSLOPE", Qt::black },
         { "", "", QColor(0,0,0) },
     };
 
