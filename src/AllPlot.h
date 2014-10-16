@@ -144,8 +144,9 @@ class CurveColors : public QObject
             // Labels
             foreach(QwtPlotItem *item, plot->itemList(QwtPlotItem::Rtti_PlotMarker)) {
 
-                // ignore event / interval markers
-                if (static_cast<QwtPlotMarker*>(item)->lineStyle() == QwtPlotMarker::VLine) continue;
+                // ignore event / interval markers / blanks
+                if (static_cast<QwtPlotMarker*>(item)->lineStyle() == QwtPlotMarker::VLine ||
+                    static_cast<QwtPlotMarker*>(item)->label().text() == "") continue;
 
                 QwtScaleWidget *x = plot->axisWidget(static_cast<QwtPlotMarker*>(item)->yAxis());
                 labels.insert(static_cast<QwtPlotMarker*>(item), x);
