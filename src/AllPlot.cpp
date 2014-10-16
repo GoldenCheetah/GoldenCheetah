@@ -1934,6 +1934,10 @@ AllPlot::recalc(AllPlotObject *objects)
         refreshZoneLabels();
     }
 
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+
     replot();
 }
 
@@ -4279,7 +4283,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
     // bsically clear out
     //standard->wattsArray.clear();
-    standard->curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
+    //standard->curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
 
     setDataFromRideFile(rideItem->ride(), standard);
 
