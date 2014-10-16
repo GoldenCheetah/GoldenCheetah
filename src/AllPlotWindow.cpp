@@ -72,7 +72,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     // all the controls
     QFormLayout *mainControls = new QFormLayout; // basic stuff at top; power, slider etc
-    clv->addLayout(mainControls);
 
     // aside from basic settings, other stuff is now
     // in a tab widget as we have so many data series !
@@ -81,7 +80,11 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     // gui controls
     QWidget *basic = new QWidget(this); // show stack etc
-    QFormLayout *guiControls = new QFormLayout(basic); // show stack etc BUT ALSO ACCEL etc
+    QVBoxLayout *basicControls = new QVBoxLayout(basic);
+    basicControls->addLayout(mainControls);
+    QFormLayout *guiControls = new QFormLayout; // show stack etc BUT ALSO ACCEL etc
+    basicControls->addLayout(guiControls);
+    basicControls->addStretch();
     st->addTab(basic, tr("Basic"));
 
     // data series
@@ -92,7 +95,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     seriesControls->addLayout(seriesLeft);
     seriesControls->addLayout(seriesRight); // ack I swapped them around !
 
-    st->addTab(series, tr("Data"));
+    st->addTab(series, tr("Curves"));
 
     // Main layout
     //QGridLayout *mainLayout = new QGridLayout();
@@ -269,6 +272,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showSlope = new QCheckBox(tr("Slope"), this);
     showSlope->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(""), showSlope);
+
+    seriesLeft->addRow(new QLabel(""), new QLabel(""));
 
     showAltSlope = new QComboBox(this);
     showAltSlope->addItem(tr("No Alt/Slope"));
