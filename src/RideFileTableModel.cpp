@@ -141,13 +141,13 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Right PS");
             headingsType << RideFile::rps;
         }
-        if (series == RideFile::smO2 || ride->areDataPresent()->smo2) {
+        if (series == RideFile::smo2 || ride->areDataPresent()->smo2) {
             headings_ << tr("SmO2");
-            headingsType << RideFile::smO2;
+            headingsType << RideFile::smo2;
         }
-        if (series == RideFile::tHb || ride->areDataPresent()->thb) {
+        if (series == RideFile::thb || ride->areDataPresent()->thb) {
             headings_ << tr("tHb");
-            headingsType << RideFile::tHb;
+            headingsType << RideFile::thb;
         }
         if (series == RideFile::rcad || ride->areDataPresent()->rcad) {
             headings_ << tr("Run Cadence");

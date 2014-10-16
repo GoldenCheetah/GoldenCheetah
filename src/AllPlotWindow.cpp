@@ -608,6 +608,12 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showTorqueD, SIGNAL(stateChanged(int)), this, SLOT(setShowTorqueD(int)));
     connect(showHrD, SIGNAL(stateChanged(int)), this, SLOT(setShowHrD(int)));
     connect(showNP, SIGNAL(stateChanged(int)), this, SLOT(setShowNP(int)));
+    connect(showRV, SIGNAL(stateChanged(int)), this, SLOT(setShowRV(int)));
+    connect(showRCad, SIGNAL(stateChanged(int)), this, SLOT(setShowRCad(int)));
+    connect(showRGCT, SIGNAL(stateChanged(int)), this, SLOT(setShowRGCT(int)));
+    connect(showGear, SIGNAL(stateChanged(int)), this, SLOT(setShowGear(int)));
+    connect(showSmO2, SIGNAL(stateChanged(int)), this, SLOT(setShowSmO2(int)));
+    connect(showtHb, SIGNAL(stateChanged(int)), this, SLOT(setShowtHb(int)));
     connect(showATISS, SIGNAL(stateChanged(int)), this, SLOT(setShowATISS(int)));
     connect(showANTISS, SIGNAL(stateChanged(int)), this, SLOT(setShowANTISS(int)));
     connect(showXP, SIGNAL(stateChanged(int)), this, SLOT(setShowXP(int)));
@@ -959,6 +965,12 @@ AllPlotWindow::compareChanged()
         if (showTemp->isChecked()) { s.one = RideFile::temp; s.two = RideFile::none; wanted << s;};
         if (showWind->isChecked()) { s.one = RideFile::headwind; s.two = RideFile::none; wanted << s;};
         if (showNP->isChecked()) { s.one = RideFile::NP; s.two = RideFile::none; wanted << s;};
+        if (showRV->isChecked()) { s.one = RideFile::rvert; s.two = RideFile::none; wanted << s;};
+        if (showRCad->isChecked()) { s.one = RideFile::rcad; s.two = RideFile::none; wanted << s;};
+        if (showRGCT->isChecked()) { s.one = RideFile::rcontact; s.two = RideFile::none; wanted << s;};
+        if (showGear->isChecked()) { s.one = RideFile::gear; s.two = RideFile::none; wanted << s;};
+        if (showSmO2->isChecked()) { s.one = RideFile::smo2; s.two = RideFile::none; wanted << s;};
+        if (showtHb->isChecked()) { s.one = RideFile::thb; s.two = RideFile::none; wanted << s;};
         if (showATISS->isChecked()) { s.one = RideFile::aTISS; s.two = RideFile::none; wanted << s;};
         if (showANTISS->isChecked()) { s.one = RideFile::anTISS; s.two = RideFile::none; wanted << s;};
         if (showXP->isChecked()) { s.one = RideFile::xPower; s.two = RideFile::none; wanted << s;};
@@ -3002,6 +3014,12 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) { s.one = RideFile::temp; s.two = RideFile::none; serieslist << s; }
     if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) addHeadwind=true; //serieslist << RideFile::headwind;
     if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::NP; s.two = RideFile::none; serieslist << s; }
+    if (showRV->isChecked() && rideItem->ride()->areDataPresent()->rvert) { s.one = RideFile::rvert; s.two = RideFile::none; serieslist << s; }
+    if (showRCad->isChecked() && rideItem->ride()->areDataPresent()->rcad) { s.one = RideFile::rcad; s.two = RideFile::none; serieslist << s; }
+    if (showRGCT->isChecked() && rideItem->ride()->areDataPresent()->rcontact) { s.one = RideFile::rcontact; s.two = RideFile::none; serieslist << s; }
+    if (showGear->isChecked() && rideItem->ride()->areDataPresent()->gear) { s.one = RideFile::gear; s.two = RideFile::none; serieslist << s; }
+    if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
+    if (showtHb->isChecked() && rideItem->ride()->areDataPresent()->thb) { s.one = RideFile::thb; s.two = RideFile::none; serieslist << s; }
     if (showATISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::aTISS; s.two = RideFile::none; serieslist << s; }
     if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::anTISS; s.two = RideFile::none; serieslist << s; }
     if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::xPower; s.two = RideFile::none; serieslist << s; }
@@ -3198,6 +3216,12 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setByDistance(comboDistance->currentIndex());
         _allPlot->setShowBalance((showBalance->isEnabled()) ? ( showBalance->checkState() == Qt::Checked ) : false );
         _allPlot->setShowNP((showNP->isEnabled()) ? ( showNP->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowRV((showRV->isEnabled()) ? ( showRV->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowRCad((showRCad->isEnabled()) ? ( showRCad->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowRGCT((showRGCT->isEnabled()) ? ( showRGCT->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowGear((showGear->isEnabled()) ? ( showGear->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowSmO2((showSmO2->isEnabled()) ? ( showSmO2->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowtHb((showtHb->isEnabled()) ? ( showtHb->checkState() == Qt::Checked ) : false );
         _allPlot->setShowXP((showXP->isEnabled()) ? ( showXP->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAP((showAP->isEnabled()) ? ( showAP->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTE((showTE->isEnabled()) ? ( showTE->checkState() == Qt::Checked ) : false );

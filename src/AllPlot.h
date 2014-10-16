@@ -338,6 +338,12 @@ class AllPlotObject : public QObject
     AllPlotSlopeCurve *altSlopeCurve;
     QwtPlotCurve *atissCurve;
     QwtPlotCurve *antissCurve;
+    QwtPlotCurve *rvCurve;
+    QwtPlotCurve *rcadCurve;
+    QwtPlotCurve *rgctCurve;
+    QwtPlotCurve *gearCurve;
+    QwtPlotCurve *smo2Curve;
+    QwtPlotCurve *thbCurve;
     QwtPlotCurve *npCurve;
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
@@ -375,6 +381,12 @@ class AllPlotObject : public QObject
     QVector<double> wattsArray;
     QVector<double> atissArray;
     QVector<double> antissArray;
+    QVector<double> rvArray;
+    QVector<double> rcadArray;
+    QVector<double> rgctArray;
+    QVector<double> gearArray;
+    QVector<double> smo2Array;
+    QVector<double> thbArray;
     QVector<double> npArray;
     QVector<double> xpArray;
     QVector<double> apArray;
@@ -402,6 +414,12 @@ class AllPlotObject : public QObject
     QVector<double> smoothWatts;
     QVector<double> smoothAT;
     QVector<double> smoothANT;
+    QVector<double> smoothRV;
+    QVector<double> smoothRCad;
+    QVector<double> smoothRGCT;
+    QVector<double> smoothGear;
+    QVector<double> smoothSmO2;
+    QVector<double> smoothtHb;
     QVector<double> smoothNP;
     QVector<double> smoothAP;
     QVector<double> smoothXP;

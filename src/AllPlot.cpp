@@ -293,6 +293,30 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     npCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     npCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
 
+    rvCurve = new QwtPlotCurve(tr("Vertical Oscillation"));
+    rvCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    rvCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+
+    rcadCurve = new QwtPlotCurve(tr("Run Cadence"));
+    rcadCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    rcadCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+
+    rgctCurve = new QwtPlotCurve(tr("GCT"));
+    rgctCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    rgctCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+
+    gearCurve = new QwtPlotCurve(tr("Gear Ratio"));
+    gearCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    gearCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+
+    smo2Curve = new QwtPlotCurve(tr("SmO2"));
+    smo2Curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    smo2Curve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+
+    thbCurve = new QwtPlotCurve(tr("tHb"));
+    thbCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    thbCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+
     xpCurve = new QwtPlotCurve(tr("xPower"));
     xpCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     xpCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
@@ -428,7 +452,8 @@ AllPlotObject::setColor(QColor color)
              << wattsDCurve << cadDCurve << nmDCurve << hrDCurve
              << apCurve << cadCurve << tempCurve << hrCurve << torqueCurve << balanceLCurve
              << balanceRCurve << lteCurve << rteCurve << lpsCurve << rpsCurve
-             << altCurve << slopeCurve << altSlopeCurve;
+             << altCurve << slopeCurve << altSlopeCurve
+             << rvCurve << rcadCurve << rgctCurve << gearCurve << smo2Curve << thbCurve;
 
     // work through getting progresively lighter
     QPen pen;
@@ -466,6 +491,12 @@ AllPlotObject::~AllPlotObject()
     atissCurve->detach(); delete atissCurve;
     antissCurve->detach(); delete antissCurve;
     npCurve->detach(); delete npCurve;
+    rcadCurve->detach(); delete rcadCurve;
+    rvCurve->detach(); delete rvCurve;
+    rgctCurve->detach(); delete rgctCurve;
+    gearCurve->detach(); delete gearCurve;
+    smo2Curve->detach(); delete smo2Curve;
+    thbCurve->detach(); delete thbCurve;
     xpCurve->detach(); delete xpCurve;
     apCurve->detach(); delete apCurve;
     hrCurve->detach(); delete hrCurve;
@@ -500,6 +531,12 @@ AllPlotObject::setVisible(bool show)
         wCurve->detach();
         wattsCurve->detach();
         npCurve->detach();
+        rcadCurve->detach();
+        rvCurve->detach();
+        rgctCurve->detach();
+        gearCurve->detach();
+        smo2Curve->detach();
+        thbCurve->detach();
         atissCurve->detach();
         antissCurve->detach();
         xpCurve->detach();
@@ -546,6 +583,12 @@ AllPlotObject::setVisible(bool show)
         slopeCurve->attach(plot);
         altSlopeCurve->attach(plot);
         npCurve->attach(plot);
+        rvCurve->attach(plot);
+        rcadCurve->attach(plot);
+        rgctCurve->attach(plot);
+        gearCurve->attach(plot);
+        smo2Curve->attach(plot);
+        thbCurve->attach(plot);
         atissCurve->attach(plot);
         antissCurve->attach(plot);
         xpCurve->attach(plot);
@@ -587,6 +630,12 @@ AllPlotObject::hideUnwanted()
 {
     if (plot->showPowerState>1) wattsCurve->detach();
     if (!plot->showNP) npCurve->detach();
+    if (!plot->showRV) rvCurve->detach();
+    if (!plot->showRCad) rcadCurve->detach();
+    if (!plot->showRGCT) rgctCurve->detach();
+    if (!plot->showGear) gearCurve->detach();
+    if (!plot->showSmO2) smo2Curve->detach();
+    if (!plot->showtHb) thbCurve->detach();
     if (!plot->showATISS) atissCurve->detach();
     if (!plot->showANTISS) antissCurve->detach();
     if (!plot->showXP) xpCurve->detach();
@@ -758,6 +807,12 @@ AllPlot::configChanged()
         standard->atissCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->antissCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->npCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->rvCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->rcadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->rgctCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->gearCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->smo2Curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->thbCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->xpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->apCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->wCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -796,6 +851,17 @@ AllPlot::configChanged()
     QPen npPen = QPen(GColor(CNPOWER));
     npPen.setWidth(width);
     standard->npCurve->setPen(npPen);
+
+    // XXX XXX for now (being lazy) just reuse power for all these new ones
+    // can come back and add color config later !!!!!! XXX XXX
+    standard->rvCurve->setPen(npPen);
+    standard->rcadCurve->setPen(npPen);
+    standard->rgctCurve->setPen(npPen);
+    standard->gearCurve->setPen(npPen);
+    standard->smo2Curve->setPen(npPen);
+    standard->thbCurve->setPen(npPen);
+    // XXX XXX
+
     QPen antissPen = QPen(GColor(CANTISS));
     antissPen.setWidth(width);
     standard->antissCurve->setPen(antissPen);
@@ -913,6 +979,30 @@ AllPlot::configChanged()
         p.setAlpha(64);
         standard->npCurve->setBrush(QBrush(p));
 
+        p = standard->rvCurve->pen().color();
+        p.setAlpha(64);
+        standard->rvCurve->setBrush(QBrush(p));
+
+        p = standard->rcadCurve->pen().color();
+        p.setAlpha(64);
+        standard->rcadCurve->setBrush(QBrush(p));
+
+        p = standard->rgctCurve->pen().color();
+        p.setAlpha(64);
+        standard->rgctCurve->setBrush(QBrush(p));
+
+        p = standard->gearCurve->pen().color();
+        p.setAlpha(64);
+        standard->gearCurve->setBrush(QBrush(p));
+
+        p = standard->smo2Curve->pen().color();
+        p.setAlpha(64);
+        standard->smo2Curve->setBrush(QBrush(p));
+
+        p = standard->thbCurve->pen().color();
+        p.setAlpha(64);
+        standard->thbCurve->setBrush(QBrush(p));
+
         p = standard->xpCurve->pen().color();
         p.setAlpha(64);
         standard->xpCurve->setBrush(QBrush(p));
@@ -1000,7 +1090,19 @@ AllPlot::configChanged()
         standard->wattsCurve->setBrush(Qt::NoBrush);
         standard->atissCurve->setBrush(Qt::NoBrush);
         standard->antissCurve->setBrush(Qt::NoBrush);
+        standard->rvCurve->setBrush(Qt::NoBrush);
+        standard->rcadCurve->setBrush(Qt::NoBrush);
+        standard->rgctCurve->setBrush(Qt::NoBrush);
+        standard->gearCurve->setBrush(Qt::NoBrush);
+        standard->smo2Curve->setBrush(Qt::NoBrush);
+        standard->thbCurve->setBrush(Qt::NoBrush);
         standard->npCurve->setBrush(Qt::NoBrush);
+        standard->rvCurve->setBrush(Qt::NoBrush);
+        standard->rcadCurve->setBrush(Qt::NoBrush);
+        standard->rgctCurve->setBrush(Qt::NoBrush);
+        standard->gearCurve->setBrush(Qt::NoBrush);
+        standard->smo2Curve->setBrush(Qt::NoBrush);
+        standard->thbCurve->setBrush(Qt::NoBrush);
         standard->xpCurve->setBrush(Qt::NoBrush);
         standard->apCurve->setBrush(Qt::NoBrush);
         standard->wCurve->setBrush(Qt::NoBrush);
@@ -1119,15 +1221,18 @@ AllPlot::setHighlightIntervals(bool state)
 
 struct DataPoint {
 
-    double time, hr, watts, atiss, antiss, np, ap, xp, speed, cad, 
+    double time, hr, watts, atiss, antiss, np, rv, rcad, rgct, gear,
+           smo2, thb, ap, xp, speed, cad, 
            alt, temp, wind, torque, lrbalance, lte, rte, lps, rps,
            kphd, wattsd, cadd, nmd, hrd, slope;
 
-    DataPoint(double t, double h, double w, double at, double an, double n, double l, double x, double s, double c, 
+    DataPoint(double t, double h, double w, double at, double an, double n, double rv, double rcad, double rgct,
+              double gear, double smo2, double thb, double l, double x, double s, double c, 
               double a, double te, double wi, double tq, double lrb, double lte, double rte, double lps, double rps,
               double kphd, double wattsd, double cadd, double nmd, double hrd, double sl) :
 
-              time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), ap(l), xp(x), speed(s), cad(c), 
+              time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), rv(rv), rcad(rcad), rgct(rgct),
+              gear(gear), smo2(smo2), thb(thb), ap(l), xp(x), speed(s), cad(c), 
               alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), lte(lte), rte(rte), lps(lps), rps(rps),
               kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl) {}
 };
@@ -1245,6 +1350,12 @@ AllPlot::recalc(AllPlotObject *objects)
         if (!objects->atissArray.empty()) objects->atissCurve->setSamples(data, data);
         if (!objects->antissArray.empty()) objects->antissCurve->setSamples(data, data);
         if (!objects->npArray.empty()) objects->npCurve->setSamples(data, data);
+        if (!objects->rvArray.empty()) objects->rvCurve->setSamples(data, data);
+        if (!objects->rcadArray.empty()) objects->rcadCurve->setSamples(data, data);
+        if (!objects->rgctArray.empty()) objects->rgctCurve->setSamples(data, data);
+        if (!objects->gearArray.empty()) objects->gearCurve->setSamples(data, data);
+        if (!objects->smo2Array.empty()) objects->smo2Curve->setSamples(data, data);
+        if (!objects->thbArray.empty()) objects->thbCurve->setSamples(data, data);
         if (!objects->xpArray.empty()) objects->xpCurve->setSamples(data, data);
         if (!objects->apArray.empty()) objects->apCurve->setSamples(data, data);
         if (!objects->wattsArray.empty()) objects->wattsCurve->setSamples(data, data);
@@ -1292,6 +1403,12 @@ AllPlot::recalc(AllPlotObject *objects)
 
         double totalWatts = 0.0;
         double totalNP = 0.0;
+        double totalRCad = 0.0;
+        double totalRV = 0.0;
+        double totalRGCT = 0.0;
+        double totalGear = 0.0;
+        double totalSmO2 = 0.0;
+        double totaltHb = 0.0;
         double totalATISS = 0.0;
         double totalANTISS = 0.0;
         double totalXP = 0.0;
@@ -1318,12 +1435,18 @@ AllPlot::recalc(AllPlotObject *objects)
 
         QList<DataPoint> list;
 
-        objects->smoothWatts.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
-        objects->smoothNP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
-        objects->smoothAT.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
-        objects->smoothANT.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
-        objects->smoothXP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
-        objects->smoothAP.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+        objects->smoothWatts.resize(rideTimeSecs + 1);
+        objects->smoothNP.resize(rideTimeSecs + 1);
+        objects->smoothRV.resize(rideTimeSecs + 1);
+        objects->smoothRCad.resize(rideTimeSecs + 1);
+        objects->smoothRGCT.resize(rideTimeSecs + 1);
+        objects->smoothGear.resize(rideTimeSecs + 1);
+        objects->smoothSmO2.resize(rideTimeSecs + 1);
+        objects->smoothtHb.resize(rideTimeSecs + 1);
+        objects->smoothAT.resize(rideTimeSecs + 1);
+        objects->smoothANT.resize(rideTimeSecs + 1);
+        objects->smoothXP.resize(rideTimeSecs + 1);
+        objects->smoothAP.resize(rideTimeSecs + 1);
         objects->smoothHr.resize(rideTimeSecs + 1);
         objects->smoothSpeed.resize(rideTimeSecs + 1);
         objects->smoothAccel.resize(rideTimeSecs + 1);
@@ -1358,6 +1481,12 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->atissArray.empty() ? objects->atissArray[i] : 0),
                              (!objects->antissArray.empty() ? objects->antissArray[i] : 0),
                              (!objects->npArray.empty() ? objects->npArray[i] : 0),
+                             (!objects->rvArray.empty() ? objects->rvArray[i] : 0),
+                             (!objects->rcadArray.empty() ? objects->rcadArray[i] : 0),
+                             (!objects->rgctArray.empty() ? objects->rgctArray[i] : 0),
+                             (!objects->gearArray.empty() ? objects->gearArray[i] : 0),
+                             (!objects->smo2Array.empty() ? objects->smo2Array[i] : 0),
+                             (!objects->thbArray.empty() ? objects->thbArray[i] : 0),
                              (!objects->apArray.empty() ? objects->apArray[i] : 0),
                              (!objects->xpArray.empty() ? objects->xpArray[i] : 0),
                              (!objects->speedArray.empty() ? objects->speedArray[i] : 0),
@@ -1381,6 +1510,12 @@ AllPlot::recalc(AllPlotObject *objects)
                     totalWatts += objects->wattsArray[i];
 
                 if (!objects->npArray.empty()) totalNP += objects->npArray[i];
+                if (!objects->rvArray.empty()) totalRV += objects->rvArray[i];
+                if (!objects->rcadArray.empty()) totalRCad += objects->rcadArray[i];
+                if (!objects->rgctArray.empty()) totalRGCT += objects->rgctArray[i];
+                if (!objects->gearArray.empty()) totalGear += objects->gearArray[i];
+                if (!objects->smo2Array.empty()) totalSmO2 += objects->smo2Array[i];
+                if (!objects->thbArray.empty()) totaltHb += objects->thbArray[i];
                 if (!objects->atissArray.empty()) totalATISS += objects->atissArray[i];
                 if (!objects->antissArray.empty()) totalANTISS += objects->antissArray[i];
 
@@ -1439,6 +1574,12 @@ AllPlot::recalc(AllPlotObject *objects)
                 DataPoint &dp = list.front();
                 totalWatts -= dp.watts;
                 totalNP -= dp.np;
+                totalRV -= dp.rv;
+                totalRCad -= dp.rcad;
+                totalRGCT -= dp.rgct;
+                totalGear -= dp.gear;
+                totalSmO2 -= dp.smo2;
+                totaltHb -= dp.thb;
                 totalATISS -= dp.atiss;
                 totalANTISS -= dp.antiss;
                 totalAP -= dp.ap;
@@ -1468,6 +1609,12 @@ AllPlot::recalc(AllPlotObject *objects)
             if (list.empty()) {
                 objects->smoothWatts[secs] = 0.0;
                 objects->smoothNP[secs] = 0.0;
+                objects->smoothRV[secs] = 0.0;
+                objects->smoothRCad[secs] = 0.0;
+                objects->smoothRGCT[secs] = 0.0;
+                objects->smoothGear[secs] = 0.0;
+                objects->smoothSmO2[secs] = 0.0;
+                objects->smoothtHb[secs] = 0.0;
                 objects->smoothAT[secs] = 0.0;
                 objects->smoothANT[secs] = 0.0;
                 objects->smoothXP[secs] = 0.0;
@@ -1496,6 +1643,12 @@ AllPlot::recalc(AllPlotObject *objects)
             else {
                 objects->smoothWatts[secs]    = totalWatts / list.size();
                 objects->smoothNP[secs]    = totalNP / list.size();
+                objects->smoothRV[secs]    = totalRV / list.size();
+                objects->smoothRCad[secs]    = totalRCad / list.size();
+                objects->smoothRGCT[secs]    = totalRGCT / list.size();
+                objects->smoothGear[secs]    = totalGear / list.size();
+                objects->smoothSmO2[secs]    = totalSmO2 / list.size();
+                objects->smoothtHb[secs]    = totaltHb / list.size();
                 objects->smoothAT[secs]    = totalATISS / list.size();
                 objects->smoothANT[secs]    = totalANTISS / list.size();
                 objects->smoothXP[secs]    = totalXP / list.size();
@@ -1543,6 +1696,12 @@ AllPlot::recalc(AllPlotObject *objects)
         // no standard->smoothing .. just raw data
         objects->smoothWatts.resize(0);
         objects->smoothNP.resize(0);
+        objects->smoothRV.resize(0);
+        objects->smoothRCad.resize(0);
+        objects->smoothRGCT.resize(0);
+        objects->smoothGear.resize(0);
+        objects->smoothSmO2.resize(0);
+        objects->smoothtHb.resize(0);
         objects->smoothAT.resize(0);
         objects->smoothANT.resize(0);
         objects->smoothXP.resize(0);
@@ -1573,6 +1732,12 @@ AllPlot::recalc(AllPlotObject *objects)
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             objects->smoothWatts.append(dp->watts);
             objects->smoothNP.append(dp->np);
+            objects->smoothRV.append(dp->rvert);
+            objects->smoothRCad.append(dp->rcad);
+            objects->smoothRGCT.append(dp->rcontact);
+            objects->smoothGear.append(dp->gear);
+            objects->smoothSmO2.append(dp->smo2);
+            objects->smoothtHb.append(dp->thb);
             objects->smoothAT.append(dp->atiss);
             objects->smoothANT.append(dp->antiss);
             objects->smoothXP.append(dp->xp);
@@ -1644,6 +1809,30 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!objects->atissArray.empty()) {
         objects->atissCurve->setSamples(xaxis.data() + startingIndex, objects->smoothAT.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->rvArray.empty()) {
+        objects->rvCurve->setSamples(xaxis.data() + startingIndex, objects->smoothRV.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->rcadArray.empty()) {
+        objects->rcadCurve->setSamples(xaxis.data() + startingIndex, objects->smoothRCad.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->rgctArray.empty()) {
+        objects->rgctCurve->setSamples(xaxis.data() + startingIndex, objects->smoothRGCT.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->gearArray.empty()) {
+        objects->gearCurve->setSamples(xaxis.data() + startingIndex, objects->smoothGear.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->smo2Array.empty()) {
+        objects->smo2Curve->setSamples(xaxis.data() + startingIndex, objects->smoothSmO2.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->thbArray.empty()) {
+        objects->thbCurve->setSamples(xaxis.data() + startingIndex, objects->smoothtHb.data() + startingIndex, totalPoints);
     }
 
     if (!objects->npArray.empty()) {
@@ -1926,6 +2115,12 @@ AllPlot::setYMax()
                               standard->atissCurve->isVisible() || 
                               standard->antissCurve->isVisible() || 
                               standard->npCurve->isVisible() || 
+                              standard->rvCurve->isVisible() || 
+                              standard->rcadCurve->isVisible() || 
+                              standard->rgctCurve->isVisible() || 
+                              standard->gearCurve->isVisible() || 
+                              standard->smo2Curve->isVisible() || 
+                              standard->thbCurve->isVisible() || 
                               standard->xpCurve->isVisible() || 
                               standard->apCurve->isVisible());
 
@@ -2218,6 +2413,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     double *smoothW = &plot->standard->smoothWatts[startidx];
     double *smoothN = &plot->standard->smoothNP[startidx];
+    double *smoothRV = &plot->standard->smoothRV[startidx];
+    double *smoothRCad = &plot->standard->smoothRCad[startidx];
+    double *smoothRGCT = &plot->standard->smoothRGCT[startidx];
+    double *smoothGear = &plot->standard->smoothGear[startidx];
+    double *smoothSmO2 = &plot->standard->smoothSmO2[startidx];
+    double *smoothtHb = &plot->standard->smoothtHb[startidx];
     double *smoothAT = &plot->standard->smoothAT[startidx];
     double *smoothANT = &plot->standard->smoothANT[startidx];
     double *smoothX = &plot->standard->smoothXP[startidx];
@@ -2302,6 +2503,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->atissCurve->detach();
     standard->antissCurve->detach();
     standard->npCurve->detach();
+    standard->rvCurve->detach();
+    standard->rcadCurve->detach();
+    standard->rgctCurve->detach();
+    standard->gearCurve->detach();
+    standard->smo2Curve->detach();
+    standard->thbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -2329,6 +2536,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->atissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showATISS);
     standard->antissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showANTISS);
     standard->npCurve->setVisible(rideItem->ride()->areDataPresent()->np && showNP);
+    standard->rvCurve->setVisible(rideItem->ride()->areDataPresent()->rvert && showRV);
+    standard->rcadCurve->setVisible(rideItem->ride()->areDataPresent()->rcad && showRCad);
+    standard->gearCurve->setVisible(rideItem->ride()->areDataPresent()->gear && showGear);
+    standard->smo2Curve->setVisible(rideItem->ride()->areDataPresent()->smo2 && showSmO2);
+    standard->thbCurve->setVisible(rideItem->ride()->areDataPresent()->thb && showtHb);
+    standard->rgctCurve->setVisible(rideItem->ride()->areDataPresent()->rcontact && showRGCT);
     standard->xpCurve->setVisible(rideItem->ride()->areDataPresent()->xp && showXP);
     standard->apCurve->setVisible(rideItem->ride()->areDataPresent()->apower && showAP);
     standard->wCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showW);
@@ -2366,6 +2579,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->atissCurve->setSamples(xaxis,smoothAT,points);
     standard->antissCurve->setSamples(xaxis,smoothANT,points);
     standard->npCurve->setSamples(xaxis,smoothN,points);
+    standard->rvCurve->setSamples(xaxis,smoothRV,points);
+    standard->rcadCurve->setSamples(xaxis,smoothRCad,points);
+    standard->rgctCurve->setSamples(xaxis,smoothRGCT,points);
+    standard->gearCurve->setSamples(xaxis,smoothGear,points);
+    standard->smo2Curve->setSamples(xaxis,smoothSmO2,points);
+    standard->thbCurve->setSamples(xaxis,smoothtHb,points);
     standard->xpCurve->setSamples(xaxis,smoothX,points);
     standard->apCurve->setSamples(xaxis,smoothL,points);
     standard->hrCurve->setSamples(xaxis, smoothHR,points);
@@ -2406,6 +2625,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setSymbol(standard->antissCurve, points);
     setSymbol(standard->atissCurve, points);
     setSymbol(standard->npCurve, points);
+    setSymbol(standard->rvCurve, points);
+    setSymbol(standard->rcadCurve, points);
+    setSymbol(standard->rgctCurve, points);
+    setSymbol(standard->gearCurve, points);
+    setSymbol(standard->smo2Curve, points);
+    setSymbol(standard->thbCurve, points);
     setSymbol(standard->xpCurve, points);
     setSymbol(standard->apCurve, points);
     setSymbol(standard->hrCurve, points);
@@ -2457,6 +2682,24 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (!plot->standard->smoothNP.empty()) {
         standard->npCurve->attach(this);
+    }
+    if (!plot->standard->smoothRV.empty()) {
+        standard->rvCurve->attach(this);
+    }
+    if (!plot->standard->smoothRCad.empty()) {
+        standard->rcadCurve->attach(this);
+    }
+    if (!plot->standard->smoothRGCT.empty()) {
+        standard->rgctCurve->attach(this);
+    }
+    if (!plot->standard->smoothGear.empty()) {
+        standard->gearCurve->attach(this);
+    }
+    if (!plot->standard->smoothSmO2.empty()) {
+        standard->smo2Curve->attach(this);
+    }
+    if (!plot->standard->smoothtHb.empty()) {
+        standard->thbCurve->attach(this);
     }
     if (!plot->standard->smoothXP.empty()) {
         standard->xpCurve->attach(this);
@@ -2547,6 +2790,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->atissCurve->detach();
     standard->antissCurve->detach();
     standard->npCurve->detach();
+    standard->rvCurve->detach();
+    standard->rcadCurve->detach();
+    standard->rgctCurve->detach();
+    standard->gearCurve->detach();
+    standard->smo2Curve->detach();
+    standard->thbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -2576,6 +2825,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->atissCurve->setVisible(false);
     standard->antissCurve->setVisible(false);
     standard->npCurve->setVisible(false);
+    standard->rvCurve->setVisible(false);
+    standard->rcadCurve->setVisible(false);
+    standard->rgctCurve->setVisible(false);
+    standard->gearCurve->setVisible(false);
+    standard->smo2Curve->setVisible(false);
+    standard->thbCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
@@ -2761,6 +3016,54 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         ourCurve = standard->npCurve;
         thereCurve = referencePlot->standard->npCurve;
         title = tr("NP");
+        }
+        break;
+
+    case RideFile::rvert:
+        {
+        ourCurve = standard->rvCurve;
+        thereCurve = referencePlot->standard->rvCurve;
+        title = tr("Vertical Oscillation");
+        }
+        break;
+
+    case RideFile::rcad:
+        {
+        ourCurve = standard->rcadCurve;
+        thereCurve = referencePlot->standard->rcadCurve;
+        title = tr("Run Cadence");
+        }
+        break;
+
+    case RideFile::rcontact:
+        {
+        ourCurve = standard->rgctCurve;
+        thereCurve = referencePlot->standard->rgctCurve;
+        title = tr("GCT");
+        }
+        break;
+
+    case RideFile::gear:
+        {
+        ourCurve = standard->gearCurve;
+        thereCurve = referencePlot->standard->gearCurve;
+        title = tr("Gear Ratio");
+        }
+        break;
+
+    case RideFile::smo2:
+        {
+        ourCurve = standard->smo2Curve;
+        thereCurve = referencePlot->standard->smo2Curve;
+        title = tr("SmO2");
+        }
+        break;
+
+    case RideFile::thb:
+        {
+        ourCurve = standard->thbCurve;
+        thereCurve = referencePlot->standard->thbCurve;
+        title = tr("tHb");
         }
         break;
 
@@ -3015,6 +3318,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->atissCurve->detach();
     standard->antissCurve->detach();
     standard->npCurve->detach();
+    standard->rvCurve->detach();
+    standard->rcadCurve->detach();
+    standard->rgctCurve->detach();
+    standard->gearCurve->detach();
+    standard->smo2Curve->detach();
+    standard->thbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -3044,6 +3353,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->atissCurve->setVisible(false);
     standard->antissCurve->setVisible(false);
     standard->npCurve->setVisible(false);
+    standard->rvCurve->setVisible(false);
+    standard->rcadCurve->setVisible(false);
+    standard->rgctCurve->setVisible(false);
+    standard->gearCurve->setVisible(false);
+    standard->smo2Curve->setVisible(false);
+    standard->thbCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
@@ -3274,6 +3589,60 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->npCurve;
                 title = tr("NP");
+                }
+                break;
+
+            case RideFile::rvert:
+                {
+                ourCurve = new QwtPlotCurve(tr("Vertical Oscillation"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->rvCurve;
+                title = tr("Vertical Oscillation");
+                }
+                break;
+
+            case RideFile::rcad:
+                {
+                ourCurve = new QwtPlotCurve(tr("Run Cadence"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->rcadCurve;
+                title = tr("Run Cadence");
+                }
+                break;
+
+            case RideFile::rcontact:
+                {
+                ourCurve = new QwtPlotCurve(tr("GCT"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->rgctCurve;
+                title = tr("GCT");
+                }
+                break;
+
+            case RideFile::gear:
+                {
+                ourCurve = new QwtPlotCurve(tr("Gear Ratio"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->gearCurve;
+                title = tr("Gear Ratio");
+                }
+                break;
+
+            case RideFile::smo2:
+                {
+                ourCurve = new QwtPlotCurve(tr("SmO2"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->smo2Curve;
+                title = tr("SmO2");
+                }
+                break;
+
+            case RideFile::thb:
+                {
+                ourCurve = new QwtPlotCurve(tr("tHb"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->thbCurve;
+                title = tr("tHb");
                 }
                 break;
 
@@ -3565,6 +3934,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->atissCurve->detach();
     standard->antissCurve->detach();
     standard->npCurve->detach();
+    standard->rvCurve->detach();
+    standard->rcadCurve->detach();
+    standard->rgctCurve->detach();
+    standard->gearCurve->detach();
+    standard->smo2Curve->detach();
+    standard->thbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -3596,6 +3971,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->atissCurve->setVisible(false);
     standard->antissCurve->setVisible(false);
     standard->npCurve->setVisible(false);
+    standard->rvCurve->setVisible(false);
+    standard->rcadCurve->setVisible(false);
+    standard->rgctCurve->setVisible(false);
+    standard->gearCurve->setVisible(false);
+    standard->smo2Curve->setVisible(false);
+    standard->thbCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
@@ -3656,6 +4037,42 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->npCurve->setSamples(xaxis.data(), object->smoothNP.data(), totalPoints);
         standard->npCurve->attach(this);
         standard->npCurve->setVisible(true);
+    }
+
+    if (!object->rvArray.empty()) {
+        standard->rvCurve->setSamples(xaxis.data(), object->smoothRV.data(), totalPoints);
+        standard->rvCurve->attach(this);
+        standard->rvCurve->setVisible(true);
+    }
+
+    if (!object->rcadArray.empty()) {
+        standard->rcadCurve->setSamples(xaxis.data(), object->smoothRCad.data(), totalPoints);
+        standard->rcadCurve->attach(this);
+        standard->rcadCurve->setVisible(true);
+    }
+
+    if (!object->rgctArray.empty()) {
+        standard->rgctCurve->setSamples(xaxis.data(), object->smoothRGCT.data(), totalPoints);
+        standard->rgctCurve->attach(this);
+        standard->rgctCurve->setVisible(true);
+    }
+
+    if (!object->gearArray.empty()) {
+        standard->gearCurve->setSamples(xaxis.data(), object->smoothGear.data(), totalPoints);
+        standard->gearCurve->attach(this);
+        standard->gearCurve->setVisible(true);
+    }
+
+    if (!object->smo2Array.empty()) {
+        standard->smo2Curve->setSamples(xaxis.data(), object->smoothSmO2.data(), totalPoints);
+        standard->smo2Curve->attach(this);
+        standard->smo2Curve->setVisible(true);
+    }
+
+    if (!object->thbArray.empty()) {
+        standard->thbCurve->setSamples(xaxis.data(), object->smoothtHb.data(), totalPoints);
+        standard->thbCurve->attach(this);
+        standard->thbCurve->setVisible(true);
     }
 
     if (!object->xpArray.empty()) {
@@ -3787,6 +4204,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->mCurve->setVisible(referencePlot->showW);
     standard->wattsCurve->setVisible(referencePlot->showPowerState < 2);
     standard->npCurve->setVisible(referencePlot->showNP);
+    standard->rvCurve->setVisible(referencePlot->showRV);
+    standard->rcadCurve->setVisible(referencePlot->showRCad);
+    standard->rgctCurve->setVisible(referencePlot->showRGCT);
+    standard->gearCurve->setVisible(referencePlot->showGear);
+    standard->smo2Curve->setVisible(referencePlot->showSmO2);
+    standard->thbCurve->setVisible(referencePlot->showtHb);
     standard->atissCurve->setVisible(referencePlot->showATISS);
     standard->antissCurve->setVisible(referencePlot->showANTISS);
     standard->xpCurve->setVisible(referencePlot->showXP);
@@ -3876,6 +4299,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->atissArray.resize(dataPresent->watts ? npoints : 0);
         here->antissArray.resize(dataPresent->watts ? npoints : 0);
         here->npArray.resize(dataPresent->np ? npoints : 0);
+        here->rcadArray.resize(dataPresent->rcad ? npoints : 0);
+        here->rvArray.resize(dataPresent->rvert ? npoints : 0);
+        here->rgctArray.resize(dataPresent->rcontact ? npoints : 0);
+        here->smo2Array.resize(dataPresent->smo2 ? npoints : 0);
+        here->thbArray.resize(dataPresent->thb ? npoints : 0);
+        here->gearArray.resize(dataPresent->gear ? npoints : 0);
         here->xpArray.resize(dataPresent->xp ? npoints : 0);
         here->apArray.resize(dataPresent->apower ? npoints : 0);
         here->hrArray.resize(dataPresent->hr ? npoints : 0);
@@ -3906,6 +4335,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->atissCurve->detach();
         here->antissCurve->detach();
         here->npCurve->detach();
+        here->rcadCurve->detach();
+        here->rvCurve->detach();
+        here->rgctCurve->detach();
+        here->gearCurve->detach();
+        here->smo2Curve->detach();
+        here->thbCurve->detach();
         here->xpCurve->detach();
         here->apCurve->detach();
         here->hrCurve->detach();
@@ -3938,6 +4373,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (!here->atissArray.empty()) here->atissCurve->attach(this);
         if (!here->antissArray.empty()) here->antissCurve->attach(this);
         if (!here->npArray.empty()) here->npCurve->attach(this);
+        if (!here->rvArray.empty()) here->rvCurve->attach(this);
+        if (!here->rcadArray.empty()) here->rcadCurve->attach(this);
+        if (!here->rgctArray.empty()) here->rgctCurve->attach(this);
+        if (!here->gearArray.empty()) here->gearCurve->attach(this);
+        if (!here->smo2Array.empty()) here->smo2Curve->attach(this);
+        if (!here->thbArray.empty()) here->thbCurve->attach(this);
         if (!here->xpArray.empty()) here->xpCurve->attach(this);
         if (!here->apArray.empty()) here->apCurve->attach(this);
         if (showW && ride && !here->wprime.empty()) {
@@ -3977,6 +4418,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->atissCurve->setVisible(dataPresent->watts && showATISS);
         here->antissCurve->setVisible(dataPresent->watts && showANTISS);
         here->npCurve->setVisible(dataPresent->np && showNP);
+        here->rcadCurve->setVisible(dataPresent->rcad && showRCad);
+        here->rvCurve->setVisible(dataPresent->rvert && showRV);
+        here->rgctCurve->setVisible(dataPresent->rcontact && showRGCT);
+        here->gearCurve->setVisible(dataPresent->gear && showGear);
+        here->smo2Curve->setVisible(dataPresent->smo2 && showSmO2);
+        here->thbCurve->setVisible(dataPresent->thb && showtHb);
         here->xpCurve->setVisible(dataPresent->xp && showXP);
         here->apCurve->setVisible(dataPresent->apower && showAP);
         here->hrCurve->setVisible(dataPresent->hr && showHr);
@@ -4023,6 +4470,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             if (!here->atissArray.empty()) here->atissArray[arrayLength] = max(0, point->atiss);
             if (!here->antissArray.empty()) here->antissArray[arrayLength] = max(0, point->antiss);
             if (!here->npArray.empty()) here->npArray[arrayLength] = max(0, point->np);
+            if (!here->rvArray.empty()) here->rvArray[arrayLength] = max(0, point->rvert);
+            if (!here->rcadArray.empty()) here->rcadArray[arrayLength] = max(0, point->rcad);
+            if (!here->rgctArray.empty()) here->rgctArray[arrayLength] = max(0, point->rcontact);
+            if (!here->gearArray.empty()) here->gearArray[arrayLength] = max(0, point->gear);
+            if (!here->smo2Array.empty()) here->smo2Array[arrayLength] = max(0, point->smo2);
+            if (!here->thbArray.empty()) here->thbArray[arrayLength] = max(0, point->thb);
             if (!here->xpArray.empty()) here->xpArray[arrayLength] = max(0, point->xp);
             if (!here->apArray.empty()) here->apArray[arrayLength] = max(0, point->apower);
 
@@ -4089,6 +4542,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->atissCurve->detach();
         here->antissCurve->detach();
         here->npCurve->detach();
+        here->rvCurve->detach();
+        here->rcadCurve->detach();
+        here->rgctCurve->detach();
+        here->gearCurve->detach();
+        here->smo2Curve->detach();
+        here->thbCurve->detach();
         here->xpCurve->detach();
         here->apCurve->detach();
         here->hrCurve->detach();
@@ -4172,6 +4631,84 @@ AllPlot::setShowNP(bool show)
 {
     showNP = show;
     standard->npCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowRV(bool show)
+{
+    showRV = show;
+    standard->rvCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowRCad(bool show)
+{
+    showRCad = show;
+    standard->rcadCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowRGCT(bool show)
+{
+    showRGCT = show;
+    standard->rgctCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowGear(bool show)
+{
+    showGear = show;
+    standard->gearCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowSmO2(bool show)
+{
+    showSmO2 = show;
+    standard->smo2Curve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowtHb(bool show)
+{
+    showtHb = show;
+    standard->thbCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
@@ -4392,84 +4929,6 @@ AllPlot::setShowTemp(bool show)
 }
 
 void
-AllPlot::setShowRV(bool show)
-{
-    showRV = show;
-    //standard->windCurve->setVisible(show);
-    setYMax();
-
-    // remember the curves and colors
-    isolation = false;
-    curveColors->saveState();
-    replot();
-}
-
-void
-AllPlot::setShowRGCT(bool show)
-{
-    showRGCT = show;
-    //standard->windCurve->setVisible(show);
-    setYMax();
-
-    // remember the curves and colors
-    isolation = false;
-    curveColors->saveState();
-    replot();
-}
-
-void
-AllPlot::setShowRCad(bool show)
-{
-    showRCad = show;
-    //standard->windCurve->setVisible(show);
-    setYMax();
-
-    // remember the curves and colors
-    isolation = false;
-    curveColors->saveState();
-    replot();
-}
-
-void
-AllPlot::setShowSmO2(bool show)
-{
-    showSmO2 = show;
-    //standard->windCurve->setVisible(show);
-    setYMax();
-
-    // remember the curves and colors
-    isolation = false;
-    curveColors->saveState();
-    replot();
-}
-
-void
-AllPlot::setShowtHb(bool show)
-{
-    showtHb = show;
-    //standard->windCurve->setVisible(show);
-    setYMax();
-
-    // remember the curves and colors
-    isolation = false;
-    curveColors->saveState();
-    replot();
-}
-
-void
-AllPlot::setShowGear(bool show)
-{
-    showGear = show;
-    //standard->windCurve->setVisible(show);
-    setYMax();
-
-    // remember the curves and colors
-    isolation = false;
-    curveColors->saveState();
-    replot();
-}
-
-void
 AllPlot::setShowWind(bool show)
 {
     showWind = show;
@@ -4582,6 +5041,15 @@ AllPlot::setPaintBrush(int state)
         p = standard->npCurve->pen().color();
         p.setAlpha(64);
         standard->npCurve->setBrush(QBrush(p));
+
+        // XXX !!! all the same 
+        standard->rvCurve->setBrush(QBrush(p));
+        standard->rgctCurve->setBrush(QBrush(p));
+        standard->rcadCurve->setBrush(QBrush(p));
+        standard->gearCurve->setBrush(QBrush(p));
+        standard->smo2Curve->setBrush(QBrush(p));
+        standard->thbCurve->setBrush(QBrush(p));
+        // XXX
         standard->atissCurve->setBrush(QBrush(p));
         standard->antissCurve->setBrush(QBrush(p));
 
@@ -4665,6 +5133,12 @@ AllPlot::setPaintBrush(int state)
         standard->wCurve->setBrush(Qt::NoBrush);
         standard->wattsCurve->setBrush(Qt::NoBrush);
         standard->npCurve->setBrush(Qt::NoBrush);
+        standard->rvCurve->setBrush(Qt::NoBrush);
+        standard->rgctCurve->setBrush(Qt::NoBrush);
+        standard->rcadCurve->setBrush(Qt::NoBrush);
+        standard->gearCurve->setBrush(Qt::NoBrush);
+        standard->smo2Curve->setBrush(Qt::NoBrush);
+        standard->thbCurve->setBrush(Qt::NoBrush);
         standard->atissCurve->setBrush(Qt::NoBrush);
         standard->antissCurve->setBrush(Qt::NoBrush);
         standard->xpCurve->setBrush(Qt::NoBrush);
