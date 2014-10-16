@@ -1069,7 +1069,7 @@ RideFile::maximumFor(SeriesType series)
         case rcad : return 500; break;
         case rvert : return 50; break;
         case rcontact : return 1000; break;
-        case gear : return 30; break;
+        case gear : return 7; break; // 53x8
         case wprime : return 99999; break;
         default :
         case none : break;
@@ -1493,6 +1493,9 @@ RideFile::recalculateDerivedSeries()
             // to do something to it in order to identify gear)
             // speed and wheelsize in meters
             p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
+
+            // truncate big values
+            if (p->gear > maximumFor(RideFile::gear)) p->gear = 0;
             
         } else {
             p->gear = 0.0f;
