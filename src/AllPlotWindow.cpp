@@ -208,6 +208,32 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showPS->setCheckState(Qt::Unchecked);
     seriesRight->addRow(new QLabel(""), showPS);
 
+    // running !
+    seriesRight->addRow(new QLabel(""), new QLabel(""));
+
+    showRV = new QCheckBox(tr("Vertical Oscillation"), this);
+    showRV->setCheckState(Qt::Checked);
+    seriesRight->addRow(new QLabel(tr("Running")), showRV);
+
+    showRGCT = new QCheckBox(tr("Ground Contact Time"), this);
+    showRGCT->setCheckState(Qt::Checked);
+    seriesRight->addRow(new QLabel(""), showRGCT);
+
+    showRCad = new QCheckBox(tr("Cadence"), this);
+    showRCad->setCheckState(Qt::Checked);
+    seriesRight->addRow(new QLabel(""), showRCad);
+
+    seriesRight->addRow(new QLabel(""), new QLabel(""));
+
+    showSmO2 = new QCheckBox(tr("SmO2"), this);
+    showSmO2->setCheckState(Qt::Checked);
+    seriesRight->addRow(new QLabel(tr("Moxy")), showSmO2);
+
+    showtHb = new QCheckBox(tr("tHb"), this);
+    showtHb->setCheckState(Qt::Checked);
+    seriesRight->addRow(new QLabel(""), showtHb);
+
+    // "standard"
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(tr("Data series")), showHr);
@@ -2310,6 +2336,111 @@ AllPlotWindow::setShowTemp(int value)
     allPlot->setShowTemp(checked);
     foreach (AllPlot *plot, allPlots)
         plot->setShowTemp(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowRV(int value)
+{
+    showRV->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = (( value == Qt::Checked ) && showRV->isEnabled()) ? true : false;
+
+    allPlot->setShowRV(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowRV(checked);
+
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowRGCT(int value)
+{
+    showRGCT->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = (( value == Qt::Checked ) && showRGCT->isEnabled()) ? true : false;
+
+    allPlot->setShowRGCT(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowRGCT(checked);
+
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowRCad(int value)
+{
+    showRCad->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = (( value == Qt::Checked ) && showRCad->isEnabled()) ? true : false;
+
+    allPlot->setShowRCad(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowRCad(checked);
+
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowSmO2(int value)
+{
+    showSmO2->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = (( value == Qt::Checked ) && showSmO2->isEnabled()) ? true : false;
+
+    allPlot->setShowSmO2(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowSmO2(checked);
+
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+}
+
+void
+AllPlotWindow::setShowtHb(int value)
+{
+    showtHb->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = (( value == Qt::Checked ) && showtHb->isEnabled()) ? true : false;
+
+    allPlot->setShowtHb(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowtHb(checked);
+
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 }

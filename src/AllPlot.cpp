@@ -646,6 +646,11 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     showWind(true),
     showTorque(true),
     showBalance(true),
+    showRV(true),
+    showRGCT(true),
+    showRCad(true),
+    showSmO2(true),
+    showtHb(true),
     bydist(false),
     scope(scope),
     secondaryScope(secScope),
@@ -4377,6 +4382,71 @@ AllPlot::setShowTemp(bool show)
 {
     showTemp = show;
     standard->tempCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowRV(bool show)
+{
+    showRV = show;
+    //standard->windCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowRGCT(bool show)
+{
+    showRGCT = show;
+    //standard->windCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowRCad(bool show)
+{
+    showRCad = show;
+    //standard->windCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowSmO2(bool show)
+{
+    showSmO2 = show;
+    //standard->windCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowtHb(bool show)
+{
+    showtHb = show;
+    //standard->windCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
