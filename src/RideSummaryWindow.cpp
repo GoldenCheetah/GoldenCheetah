@@ -554,7 +554,9 @@ RideSummaryWindow::htmlSummary()
                  } else if (m->internalName() == "Pace") { // pace is mm:ss
 
                     double pace;
-                    if (ridesummary) pace  = metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion()) + (useMetricUnits ? 0 : m->conversionSum());
+                    bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+
+                    if (ridesummary) pace  = metrics.getForSymbol(symbol) * (metricPace ? 1 : m->conversion()) + (metricPace ? 0 : m->conversionSum());
                     else {
                       QStringList filterList = filters;
                       if (context->ishomefiltered) {
@@ -567,7 +569,7 @@ RideSummaryWindow::htmlSummary()
                               filterList = context->homeFilters;
                           }
                       }
-                      pace = SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, useMetricUnits).toDouble();
+                      pace = SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, metricPace).toDouble();
                     }
 
                     s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
@@ -909,6 +911,8 @@ RideSummaryWindow::htmlSummary()
 
                 QHash<QString,RideMetricPtr> metrics =
                     RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
+                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+
                 if (firstRow) {
                     summary += "<tr>";
                     summary += "<td align=\"center\" valign=\"bottom\">"+tr("Interval Name")+"</td>";
@@ -916,10 +920,19 @@ RideSummaryWindow::htmlSummary()
                         RideMetricPtr m = metrics.value(symbol);
                         if (!m) continue;
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
-                        if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
+                        if (m->internalName() == "Pace") { // pace is mm:ss
+
+                            summary += " (" + m->units(metricPace) + ")";
+                        
+                        } else if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
                             ; // don't do anything
-                        else if (m->units(useMetricUnits).size() > 0)
+
+                        } else if (m->units(useMetricUnits).size() > 0) {
+
                             summary += " (" + m->units(useMetricUnits) + ")";
+
+                        }
+
                         summary += "</td>";
                     }
                     summary += "</tr>";
@@ -940,7 +953,7 @@ RideSummaryWindow::htmlSummary()
                         summary += s.arg(time_to_string(m->value(useMetricUnits)));
                     else if (m->internalName() == "Pace") { // pace is mm:ss
 
-                        double pace  = m->value(useMetricUnits);
+                        double pace  = m->value(metricPace);
                         summary += s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
 
                     } else {
