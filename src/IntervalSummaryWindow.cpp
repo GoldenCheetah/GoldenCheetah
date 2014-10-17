@@ -164,7 +164,8 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
             m->units(metricUnits) == tr("seconds"))
             html += s.arg(time_to_string(m->value(metricUnits)));
         else if (m->internalName() == "Pace") {
-            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricUnits)*60).toString("mm:ss"));
+            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricPace)*60).toString("mm:ss"));
         } else
             html += s.arg(m->value(metricUnits), 0, 'f', m->precision());
 
@@ -237,7 +238,8 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
             m->units(metricUnits) == tr("seconds"))
             html += s.arg(time_to_string(m->value(metricUnits)));
         else if (m->internalName() == "Pace") {
-            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricUnits)*60).toString("mm:ss"));
+            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricPace)*60).toString("mm:ss"));
         } else
             html += s.arg(m->value(metricUnits), 0, 'f', m->precision());
 
