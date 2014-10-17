@@ -663,7 +663,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setStyle(QwtPlotCurve::Lines);
 
                 // perform quadratic curve fit to data
-                LTMTrend2 regress(xdata.data(), ydata.data(), count);
+                LTMTrend2 regress(xdata.data(), ydata.data(), count+1);
 
                 QVector<double> xtrend;
                 QVector<double> ytrend;
@@ -1685,7 +1685,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setStyle(QwtPlotCurve::Lines);
     
                     // perform quadratic curve fit to data
-                    LTMTrend2 regress(xdata.data(), ydata.data(), count);
+                    LTMTrend2 regress(xdata.data(), ydata.data(), count+1);
     
                     QVector<double> xtrend;
                     QVector<double> ytrend;
