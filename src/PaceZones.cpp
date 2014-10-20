@@ -41,14 +41,14 @@ static const QDate date_infinity(9999,12,31);
 void PaceZones::initializeZoneParameters()
 {
     static int initial_zone_default[] = {
-        0, 55, 75, 90, 105, 120, 150
+        0, 80, 87, 95, 105, 119
     };
     static const QString initial_zone_default_desc[] = {
         tr("Active Recovery"), tr("Endurance"), tr("Tempo"), tr("Threshold"),
-        tr("VO2Max"), tr("Anaerobic"), tr("Neuromuscular")
+        tr("VO2Max"), tr("Anaerobic")
     };
     static const char *initial_zone_default_name[] = {
-        "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7"
+        "Z1", "Z2", "Z3", "Z4", "Z5", "Z6"
     };
 
     static int initial_nzones_default =
