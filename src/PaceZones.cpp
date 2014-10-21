@@ -40,6 +40,18 @@ static const QDate date_infinity(9999,12,31);
 // initialize default static zone parameters
 void PaceZones::initializeZoneParameters()
 {
+    // these default zones are based upon the Skiba pace zones 
+    // but expressed as a percentage of Critical Velocity in km/h
+    // rather than as a percentage of LT Pace in minutes/mile
+    //
+    // Name         %LT Pace         %CV
+    // AR              > 125        0 - 80
+    // Endurance    124 - 115      80 - 87
+    // Tempo        114 - 105      88 - 95
+    // Threshold    104 - 95       95 - 105
+    // Vo2Max        94 - 84      105 - 119
+    // Anaerobic       < 84         > 119
+    //
     static int initial_zone_default[] = {
         0, 80, 87, 95, 105, 119
     };
