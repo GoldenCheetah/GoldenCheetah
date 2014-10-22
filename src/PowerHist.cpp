@@ -156,6 +156,10 @@ PowerHist::configChanged()
             pen.setColor(GColor(CCADENCE).darker(200));
             brush_color = GColor(CCADENCE);
             break;
+        case RideFile::gear:
+            pen.setColor(GColor(CGEAR).darker(200));
+            brush_color = GColor(CGEAR);
+            break;
         default:
         case RideFile::hr:
             pen.setColor(GColor(CHEARTRATE).darker(200));
@@ -411,6 +415,12 @@ PowerHist::recalcCompare()
 
             array = &cid.kphArray;
             arrayLength = cid.kphArray.size();
+
+        } else if (series == RideFile::gear) {
+
+            array = &cid.gearArray;
+            arrayLength = cid.gearArray.size();
+
 
         } else if (series == RideFile::cad) {
             array = &cid.cadArray;
@@ -891,6 +901,11 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
         arrayLength = standard.kphArray.size();
         selectedArray = &standard.kphSelectedArray;
 
+    } else if (series == RideFile::gear) {
+        array = &standard.gearArray;
+        arrayLength = standard.gearArray.size();
+        selectedArray = &standard.gearSelectedArray;
+
     } else if (series == RideFile::cad) {
         array = &standard.cadArray;
         arrayLength = standard.cadArray.size();
@@ -1085,6 +1100,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.nmArray.resize(0);
     standard.hrArray.resize(0);
     standard.kphArray.resize(0);
+    standard.gearArray.resize(0);
     standard.cadArray.resize(0);
 
     // we do not use the selected array since it is
@@ -1098,6 +1114,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.hrSelectedArray.resize(0);
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
+    standard.gearSelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
 
     longFromDouble(standard.wattsArray, cache->distributionArray(RideFile::watts));
@@ -1106,6 +1123,7 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(standard.hrArray, cache->distributionArray(RideFile::hr));
     longFromDouble(standard.nmArray, cache->distributionArray(RideFile::nm));
     longFromDouble(standard.cadArray, cache->distributionArray(RideFile::cad));
+    longFromDouble(standard.gearArray, cache->distributionArray(RideFile::gear));
     longFromDouble(standard.kphArray, cache->distributionArray(RideFile::kph));
 
     if (!context->athlete->useMetricUnits) {
@@ -1212,6 +1230,7 @@ PowerHist::setDataFromCompare()
         add.hrArray.resize(0);
         add.hrZoneArray.resize(10);
         add.kphArray.resize(0);
+        add.gearArray.resize(0);
         add.cadArray.resize(0);
 
         longFromDouble(add.wattsArray, s->distributionArray(RideFile::watts));
@@ -1219,6 +1238,7 @@ PowerHist::setDataFromCompare()
         longFromDouble(add.aPowerArray, s->distributionArray(RideFile::aPower));
         longFromDouble(add.hrArray, s->distributionArray(RideFile::hr));
         longFromDouble(add.nmArray, s->distributionArray(RideFile::nm));
+        longFromDouble(add.gearArray, s->distributionArray(RideFile::gear));
         longFromDouble(add.cadArray, s->distributionArray(RideFile::cad));
         longFromDouble(add.kphArray, s->distributionArray(RideFile::kph));
 
@@ -1551,6 +1571,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
     bool hasData = ((series == RideFile::watts || series == RideFile::wattsKg) && ride->areDataPresent()->watts) ||
                    (series == RideFile::nm && ride->areDataPresent()->nm) ||
                    (series == RideFile::kph && ride->areDataPresent()->kph) ||
+                   (series == RideFile::gear && ride->areDataPresent()->gear) ||
                    (series == RideFile::cad && ride->areDataPresent()->cad) ||
                    (series == RideFile::aPower && ride->areDataPresent()->apower) ||
                    (series == RideFile::hr && ride->areDataPresent()->hr);
@@ -1585,6 +1606,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     static const double hrDelta    = 1.0;
     static const double kphDelta   = 0.1;
     static const double cadDelta   = 1.0;
+    static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals section
     static const int maxSize = 4096;
 
     // recording interval in minutes
@@ -1599,6 +1621,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.hrArray.resize(0);
     standard.hrZoneArray.resize(0);
     standard.kphArray.resize(0);
+    standard.gearArray.resize(0);
     standard.cadArray.resize(0);
 
     standard.wattsSelectedArray.resize(0);
@@ -1609,6 +1632,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.hrSelectedArray.resize(0);
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
+    standard.gearSelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
 
     // unit conversion factor for imperial units for selected parameters
@@ -1768,6 +1792,19 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
             }
         }
 
+        int gearIndex = int(floor(p1->gear / gearDelta));
+        if (gearIndex >= 0 && gearIndex < maxSize) {
+            if (gearIndex >= standard.gearArray.size())
+                standard.gearArray.resize(gearIndex + 1);
+            standard.gearArray[gearIndex]++;
+
+            if (selected) {
+                if (gearIndex >= standard.gearSelectedArray.size())
+                    standard.gearSelectedArray.resize(gearIndex + 1);
+                standard.gearSelectedArray[gearIndex]++;
+            }
+        }
+
         int cadIndex = int(floor(p1->cad / cadDelta));
         if (cadIndex >= 0 && cadIndex < maxSize) {
             if (cadIndex >= standard.cadArray.size())
@@ -1879,6 +1916,10 @@ PowerHist::setParameterAxisTitle()
 
         case RideFile::nm:
             axislabel = QString(tr("Torque (%1)")).arg(context->athlete->useMetricUnits ? tr("N-m") : tr("ft-lbf"));
+            break;
+
+        case RideFile::gear:
+            axislabel = tr("Gear Ratio");
             break;
 
         default:
