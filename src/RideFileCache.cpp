@@ -58,6 +58,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     wattsDistribution.resize(0);
     hrDistribution.resize(0);
     cadDistribution.resize(0);
+    gearDistribution.resize(0);
     nmDistribution.resize(0);
     kphDistribution.resize(0);
     xPowerDistribution.resize(0);
@@ -193,6 +194,7 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
     offset += head.wattsDistCount * sizeof(float);
     offset += head.hrDistCount * sizeof(float);
     offset += head.cadDistCount * sizeof(float);
+    offset += head.gearDistCount * sizeof(float);
     offset += head.nmDistrCount * sizeof(float);
     offset += head.kphDistCount * sizeof(float);
     offset += head.xPowerDistCount * sizeof(float);
@@ -362,6 +364,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     wattsDistribution.resize(0);
     hrDistribution.resize(0);
     cadDistribution.resize(0);
+    gearDistribution.resize(0);
     nmDistribution.resize(0);
     kphDistribution.resize(0);
     xPowerDistribution.resize(0);
@@ -397,15 +400,16 @@ RideFileCache::RideFileCache(RideFile *ride) :
     doubleArray(wattsKgMeanMaxDouble, wattsKgMeanMax, RideFile::wattsKg);
     doubleArray(aPowerMeanMaxDouble, aPowerMeanMax, RideFile::aPower);
 
-    doubleArray(wattsDistributionDouble, wattsDistribution, RideFile::watts);
-    doubleArray(hrDistributionDouble, hrDistribution, RideFile::hr);
-    doubleArray(cadDistributionDouble, cadDistribution, RideFile::cad);
-    doubleArray(nmDistributionDouble, nmDistribution, RideFile::nm);
-    doubleArray(kphDistributionDouble, kphDistribution, RideFile::kph);
-    doubleArray(xPowerDistributionDouble, xPowerDistribution, RideFile::xPower);
-    doubleArray(npDistributionDouble, npDistribution, RideFile::NP);
-    doubleArray(wattsKgDistributionDouble, wattsKgDistribution, RideFile::wattsKg);
-    doubleArray(aPowerDistributionDouble, aPowerDistribution, RideFile::aPower);
+    doubleArrayForDistribution(wattsDistributionDouble, wattsDistribution);
+    doubleArrayForDistribution(hrDistributionDouble, hrDistribution);
+    doubleArrayForDistribution(cadDistributionDouble, cadDistribution);
+    doubleArrayForDistribution(gearDistributionDouble, gearDistribution);
+    doubleArrayForDistribution(nmDistributionDouble, nmDistribution);
+    doubleArrayForDistribution(kphDistributionDouble, kphDistribution);
+    doubleArrayForDistribution(xPowerDistributionDouble, xPowerDistribution);
+    doubleArrayForDistribution(npDistributionDouble, npDistribution);
+    doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
+    doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
 }
 
 int
@@ -414,6 +418,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
     switch (series) {
         case RideFile::secs : return 0; break;
         case RideFile::cad : return 0; break;
+        case RideFile::gear : return 2; break;
         case RideFile::hr : return 0; break;
         case RideFile::km : return 3; break;
         case RideFile::kph : return 1; break;
@@ -604,6 +609,10 @@ RideFileCache::distributionArray(RideFile::SeriesType series)
             return cadDistributionDouble;
             break;
 
+       case RideFile::gear:
+           return gearDistributionDouble;
+           break;
+
         case RideFile::hr:
             return hrDistributionDouble;
             break;
@@ -726,6 +735,7 @@ void RideFileCache::RideFileCache::compute()
     computeDistribution(wattsDistribution, RideFile::watts);
     computeDistribution(hrDistribution, RideFile::hr);
     computeDistribution(cadDistribution, RideFile::cad);
+    computeDistribution(gearDistribution, RideFile::gear);
     computeDistribution(nmDistribution, RideFile::nm);
     computeDistribution(kphDistribution, RideFile::kph);
     computeDistribution(wattsKgDistribution, RideFile::wattsKg);
@@ -1393,6 +1403,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             distAggregate(wattsDistributionDouble, rideCache.wattsDistributionDouble);
             distAggregate(hrDistributionDouble, rideCache.hrDistributionDouble);
             distAggregate(cadDistributionDouble, rideCache.cadDistributionDouble);
+            distAggregate(gearDistributionDouble, rideCache.gearDistributionDouble);
             distAggregate(nmDistributionDouble, rideCache.nmDistributionDouble);
             distAggregate(kphDistributionDouble, rideCache.kphDistributionDouble);
             distAggregate(xPowerDistributionDouble, rideCache.xPowerDistributionDouble);
@@ -1496,6 +1507,7 @@ RideFileCache::serialize(QDataStream *out)
     head.npDistCount = xPowerDistribution.size();
     head.hrDistCount = hrDistribution.size();
     head.cadDistCount = cadDistribution.size();
+    head.gearDistCount = gearDistribution.size();
     head.nmDistrCount = nmDistribution.size();
     head.kphDistCount = kphDistribution.size();
     head.wattsKgDistCount = wattsKgDistribution.size();
@@ -1524,6 +1536,7 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) wattsDistribution.data(), sizeof(float) * wattsDistribution.size());
     out->writeRawData((const char *) hrDistribution.data(), sizeof(float) * hrDistribution.size());
     out->writeRawData((const char *) cadDistribution.data(), sizeof(float) * cadDistribution.size());
+    out->writeRawData((const char *) gearDistribution.data(), sizeof(float) * gearDistribution.size());
     out->writeRawData((const char *) nmDistribution.data(), sizeof(float) * nmDistribution.size());
     out->writeRawData((const char *) kphDistribution.data(), sizeof(float) * kphDistribution.size());
     out->writeRawData((const char *) xPowerDistribution.data(), sizeof(float) * xPowerDistribution.size());
@@ -1568,6 +1581,7 @@ RideFileCache::readCache()
         wattsDistribution.resize(head.wattsDistCount);
         hrDistribution.resize(head.hrDistCount);
         cadDistribution.resize(head.cadDistCount);
+        gearDistribution.resize(head.gearDistCount);
         nmDistribution.resize(head.nmDistrCount);
         kphDistribution.resize(head.kphDistCount);
         xPowerDistribution.resize(head.xPowerDistCount);
@@ -1597,6 +1611,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) wattsDistribution.data(), sizeof(float) * wattsDistribution.size());
         inFile.readRawData((char *) hrDistribution.data(), sizeof(float) * hrDistribution.size());
         inFile.readRawData((char *) cadDistribution.data(), sizeof(float) * cadDistribution.size());
+        inFile.readRawData((char *) gearDistribution.data(), sizeof(float) * gearDistribution.size());
         inFile.readRawData((char *) nmDistribution.data(), sizeof(float) * nmDistribution.size());
         inFile.readRawData((char *) kphDistribution.data(), sizeof(float) * kphDistribution.size());
         inFile.readRawData((char *) xPowerDistribution.data(), sizeof(float) * xPowerDistribution.size());
@@ -1626,15 +1641,16 @@ RideFileCache::readCache()
         doubleArray(wattsKgMeanMaxDouble, wattsKgMeanMax, RideFile::wattsKg);
         doubleArray(aPowerMeanMaxDouble, aPowerMeanMax, RideFile::aPower);
 
-        doubleArray(wattsDistributionDouble, wattsDistribution, RideFile::watts);
-        doubleArray(hrDistributionDouble, hrDistribution, RideFile::hr);
-        doubleArray(cadDistributionDouble, cadDistribution, RideFile::cad);
-        doubleArray(nmDistributionDouble, nmDistribution, RideFile::nm);
-        doubleArray(kphDistributionDouble, kphDistribution, RideFile::kph);
-        doubleArray(xPowerDistributionDouble, xPowerDistribution, RideFile::xPower);
-        doubleArray(npDistributionDouble, npDistribution, RideFile::NP);
-        doubleArray(wattsKgDistributionDouble, wattsKgDistribution, RideFile::wattsKg);
-        doubleArray(aPowerDistributionDouble, aPowerDistribution, RideFile::aPower);
+        doubleArrayForDistribution(wattsDistributionDouble, wattsDistribution);
+        doubleArrayForDistribution(hrDistributionDouble, hrDistribution);
+        doubleArrayForDistribution(cadDistributionDouble, cadDistribution);
+        doubleArrayForDistribution(gearDistributionDouble, gearDistribution);
+        doubleArrayForDistribution(nmDistributionDouble, nmDistribution);
+        doubleArrayForDistribution(kphDistributionDouble, kphDistribution);
+        doubleArrayForDistribution(xPowerDistributionDouble, xPowerDistribution);
+        doubleArrayForDistribution(npDistributionDouble, npDistribution);
+        doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
+        doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
 
         cacheFile.close();
     }
@@ -1646,6 +1662,15 @@ void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, Rid
     double divisor = pow(10, decimalsFor(series)); // ? 10 : 1;
     into.resize(from.size());
     for(int i=0; i<from.size(); i++) into[i] = double(from[i]) / divisor;
+
+    return;
+}
+
+// for Distribution Series the values in Long/Float are ALWAYS Seconds (therefor no decimals adjustment calcuation required)
+void RideFileCache::doubleArrayForDistribution(QVector<double> &into, QVector<float> &from)
+{
+    into.resize(from.size());
+    for(int i=0; i<from.size(); i++) into[i] = double(from[i]);
 
     return;
 }

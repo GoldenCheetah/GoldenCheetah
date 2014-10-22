@@ -26,6 +26,7 @@ static const double nmDelta    = 0.1;
 static const double hrDelta    = 1.0;
 static const double kphDelta   = 0.1;
 static const double cadDelta   = 1.0;
+static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals sections
 
 // digits for text entry validator
 static const int wattsDigits = 0;
@@ -34,6 +35,7 @@ static const int nmDigits    = 1;
 static const int hrDigits    = 0;
 static const int kphDigits   = 1;
 static const int cadDigits   = 0;
+static const int gearDigits  = 2;
 
 
 //
@@ -832,7 +834,8 @@ void HistogramWindow::addSeries()
                << RideFile::kph
                << RideFile::cad
                << RideFile::nm
-               << RideFile::aPower;
+               << RideFile::aPower
+               << RideFile::gear;
 
     foreach (RideFile::SeriesType x, seriesList) 
         seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
@@ -1087,6 +1090,7 @@ HistogramWindow::getDelta()
             case 4: return cadDelta;
             case 5: return nmDelta;
             case 6: return wattsDelta; //aPower
+            case 7: return gearDelta;
             default: return 1;
         }
     }
@@ -1115,6 +1119,7 @@ HistogramWindow::getDigits()
             case  4: return cadDigits;
             case  5: return nmDigits;
             case  6: return wattsDigits; // aPower
+            case  7: return gearDigits;
             default: return 1;
         }
     }

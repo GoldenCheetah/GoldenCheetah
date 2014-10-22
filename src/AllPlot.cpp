@@ -308,6 +308,8 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     gearCurve = new QwtPlotCurve(tr("Gear Ratio"));
     gearCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     gearCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    gearCurve->setStyle(QwtPlotCurve::Steps);
+    gearCurve->setCurveAttribute(QwtPlotCurve::Inverted);
 
     smo2Curve = new QwtPlotCurve(tr("SmO2"));
     smo2Curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
@@ -1291,18 +1293,18 @@ AllPlot::setHighlightIntervals(bool state)
 
 struct DataPoint {
 
-    double time, hr, watts, atiss, antiss, np, rv, rcad, rgct, gear,
+    double time, hr, watts, atiss, antiss, np, rv, rcad, rgct,
            smo2, thb, ap, xp, speed, cad, 
            alt, temp, wind, torque, lrbalance, lte, rte, lps, rps,
            kphd, wattsd, cadd, nmd, hrd, slope;
 
     DataPoint(double t, double h, double w, double at, double an, double n, double rv, double rcad, double rgct,
-              double gear, double smo2, double thb, double l, double x, double s, double c, 
+              double smo2, double thb, double l, double x, double s, double c,
               double a, double te, double wi, double tq, double lrb, double lte, double rte, double lps, double rps,
               double kphd, double wattsd, double cadd, double nmd, double hrd, double sl) :
 
               time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), rv(rv), rcad(rcad), rgct(rgct),
-              gear(gear), smo2(smo2), thb(thb), ap(l), xp(x), speed(s), cad(c), 
+              smo2(smo2), thb(thb), ap(l), xp(x), speed(s), cad(c),
               alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), lte(lte), rte(rte), lps(lps), rps(rps),
               kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl) {}
 };
@@ -1476,7 +1478,6 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalRCad = 0.0;
         double totalRV = 0.0;
         double totalRGCT = 0.0;
-        double totalGear = 0.0;
         double totalSmO2 = 0.0;
         double totaltHb = 0.0;
         double totalATISS = 0.0;
@@ -1510,7 +1511,6 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRV.resize(rideTimeSecs + 1);
         objects->smoothRCad.resize(rideTimeSecs + 1);
         objects->smoothRGCT.resize(rideTimeSecs + 1);
-        objects->smoothGear.resize(rideTimeSecs + 1);
         objects->smoothSmO2.resize(rideTimeSecs + 1);
         objects->smoothtHb.resize(rideTimeSecs + 1);
         objects->smoothAT.resize(rideTimeSecs + 1);
@@ -1554,7 +1554,6 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->rvArray.empty() ? objects->rvArray[i] : 0),
                              (!objects->rcadArray.empty() ? objects->rcadArray[i] : 0),
                              (!objects->rgctArray.empty() ? objects->rgctArray[i] : 0),
-                             (!objects->gearArray.empty() ? objects->gearArray[i] : 0),
                              (!objects->smo2Array.empty() ? objects->smo2Array[i] : 0),
                              (!objects->thbArray.empty() ? objects->thbArray[i] : 0),
                              (!objects->apArray.empty() ? objects->apArray[i] : 0),
@@ -1583,7 +1582,6 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->rvArray.empty()) totalRV += objects->rvArray[i];
                 if (!objects->rcadArray.empty()) totalRCad += objects->rcadArray[i];
                 if (!objects->rgctArray.empty()) totalRGCT += objects->rgctArray[i];
-                if (!objects->gearArray.empty()) totalGear += objects->gearArray[i];
                 if (!objects->smo2Array.empty()) totalSmO2 += objects->smo2Array[i];
                 if (!objects->thbArray.empty()) totaltHb += objects->thbArray[i];
                 if (!objects->atissArray.empty()) totalATISS += objects->atissArray[i];
@@ -1647,7 +1645,6 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalRV -= dp.rv;
                 totalRCad -= dp.rcad;
                 totalRGCT -= dp.rgct;
-                totalGear -= dp.gear;
                 totalSmO2 -= dp.smo2;
                 totaltHb -= dp.thb;
                 totalATISS -= dp.atiss;
@@ -1682,7 +1679,6 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRV[secs] = 0.0;
                 objects->smoothRCad[secs] = 0.0;
                 objects->smoothRGCT[secs] = 0.0;
-                objects->smoothGear[secs] = 0.0;
                 objects->smoothSmO2[secs] = 0.0;
                 objects->smoothtHb[secs] = 0.0;
                 objects->smoothAT[secs] = 0.0;
@@ -1716,7 +1712,6 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRV[secs]    = totalRV / list.size();
                 objects->smoothRCad[secs]    = totalRCad / list.size();
                 objects->smoothRGCT[secs]    = totalRGCT / list.size();
-                objects->smoothGear[secs]    = totalGear / list.size();
                 objects->smoothSmO2[secs]    = totalSmO2 / list.size();
                 objects->smoothtHb[secs]    = totaltHb / list.size();
                 objects->smoothAT[secs]    = totalATISS / list.size();
@@ -1769,7 +1764,6 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRV.resize(0);
         objects->smoothRCad.resize(0);
         objects->smoothRGCT.resize(0);
-        objects->smoothGear.resize(0);
         objects->smoothSmO2.resize(0);
         objects->smoothtHb.resize(0);
         objects->smoothAT.resize(0);
@@ -1853,6 +1847,13 @@ AllPlot::recalc(AllPlotObject *objects)
 
         }
     }
+
+    // and now set data series which MUST not be smoothed AT ALL (e.g. gear ratio)
+    objects->smoothGear.resize(0);
+    foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
+        objects->smoothGear.append(dp->gear);
+    }
+
 
     QVector<double> &xaxis = bydist ? objects->smoothDistance : objects->smoothTime;
     int startingIndex = qMin(smooth, xaxis.count());
