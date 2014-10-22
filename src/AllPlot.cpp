@@ -311,11 +311,11 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
 
     smo2Curve = new QwtPlotCurve(tr("SmO2"));
     smo2Curve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    smo2Curve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    smo2Curve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
     thbCurve = new QwtPlotCurve(tr("tHb"));
     thbCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
-    thbCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
+    thbCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
 
     xpCurve = new QwtPlotCurve(tr("xPower"));
     xpCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
@@ -1157,14 +1157,14 @@ AllPlot::configChanged()
     pal.setColor(QPalette::Text, GColor(CPOWER));
     axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
-    sd = new ScaleScaleDraw;
-    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(ScaleScaleDraw::Ticks, false);
-    sd->enableComponent(ScaleScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 1), sd);
-    pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
-    pal.setColor(QPalette::Text, GColor(CHEARTRATE));
-    axisWidget(QwtAxisId(QwtAxis::yLeft, 1))->setPalette(pal);
+    // some axis show multiple things so color them 
+    // to match up if only one curve is selected; 
+    // e.g. left, 1 typically has HR, Cadence
+    // on the same curve but can also have SmO2 and Temp
+    // since it gets set a few places we do it with
+    // a special method
+    setLeftOnePalette();
+    setRightPalette(); 
 
     sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -1175,14 +1175,6 @@ AllPlot::configChanged()
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtAxisId(QwtAxis::yLeft, 3))->setPalette(pal);
 
-    sd = new ScaleScaleDraw;
-    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    sd->enableComponent(ScaleScaleDraw::Ticks, false);
-    sd->enableComponent(ScaleScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtPlot::yRight, sd);
-    pal.setColor(QPalette::WindowText, GColor(CSPEED));
-    pal.setColor(QPalette::Text, GColor(CSPEED));
-    axisWidget(QwtPlot::yRight)->setPalette(pal);
 
     sd = new ScaleScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -1213,6 +1205,76 @@ AllPlot::configChanged()
     axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
 
     curveColors->saveState();
+}
+
+void
+AllPlot::setLeftOnePalette()
+{
+    // always use the last, so BPM overrides
+    // Cadence then Temp then SmO2 ...
+    QColor single = QColor(Qt::red);
+    if (standard->smo2Curve->isVisible()) {
+        single = GColor(CSMO2);
+    }
+    if (standard->tempCurve->isVisible() && !context->athlete->useMetricUnits) {
+        single = GColor(CTEMP);
+    }
+    if (standard->cadCurve->isVisible()) {
+        single = GColor(CCADENCE);
+    }
+    if (standard->hrCurve->isVisible()) {
+        single = GColor(CHEARTRATE);
+    }
+
+    // lets go
+    ScaleScaleDraw *sd = new ScaleScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 1), sd);
+
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setColor(QPalette::WindowText, single);
+    pal.setColor(QPalette::Text, single);
+
+    // now work it out ....
+    axisWidget(QwtAxisId(QwtAxis::yLeft, 1))->setPalette(pal);
+}
+
+void
+AllPlot::setRightPalette()
+{
+    // always use the last, so BPM overrides
+    // Cadence then Temp then SmO2 ...
+    QColor single = QColor(Qt::green);
+    if (standard->speedCurve->isVisible()) {
+        single = GColor(CSPEED);
+    }
+    if (standard->tempCurve->isVisible() && context->athlete->useMetricUnits) {
+        single = GColor(CTEMP);
+    }
+    if (standard->thbCurve->isVisible()) {
+        single = GColor(CTHB);
+    }
+    if (standard->torqueCurve->isVisible()) {
+        single = GColor(CTORQUE);
+    }
+
+    // lets go
+    ScaleScaleDraw *sd = new ScaleScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    sd->enableComponent(ScaleScaleDraw::Ticks, false);
+    sd->enableComponent(ScaleScaleDraw::Backbone, false);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 0), sd);
+
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setColor(QPalette::WindowText, single);
+    pal.setColor(QPalette::Text, single);
+
+    // now work it out ....
+    axisWidget(QwtAxisId(QwtAxis::yRight, 0))->setPalette(pal);
 }
 
 void 
@@ -2131,18 +2193,16 @@ AllPlot::setYMax()
                               standard->rcadCurve->isVisible() || 
                               standard->rgctCurve->isVisible() || 
                               standard->gearCurve->isVisible() || 
-                              standard->smo2Curve->isVisible() || 
-                              standard->thbCurve->isVisible() || 
                               standard->xpCurve->isVisible() || 
                               standard->apCurve->isVisible());
 
-        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), standard->hrCurve->isVisible() || standard->cadCurve->isVisible());
+        setAxisVisible(QwtAxisId(QwtAxis::yLeft, 1), standard->hrCurve->isVisible() || standard->cadCurve->isVisible() || standard->smo2Curve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 2), false);
         setAxisVisible(QwtAxisId(QwtAxis::yLeft, 3), standard->balanceLCurve->isVisible() ||
                                                      standard->lteCurve->isVisible() ||
                                                      standard->lpsCurve->isVisible()  ||
                                                      standard->slopeCurve->isVisible() );
-        setAxisVisible(yRight, standard->speedCurve->isVisible());
+        setAxisVisible(yRight, standard->speedCurve->isVisible() || standard->torqueCurve->isVisible() || standard->thbCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible() ||
                                                       standard->altSlopeCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
@@ -2207,7 +2267,7 @@ AllPlot::setYMax()
     }
 
     // QwtAxis::yLeft, 1
-    if (standard->hrCurve->isVisible() || standard->cadCurve->isVisible() || 
+    if (standard->hrCurve->isVisible() || standard->cadCurve->isVisible() || standard->smo2Curve->isVisible() ||
        (!context->athlete->useMetricUnits && standard->tempCurve->isVisible())) {
 
         double ymin = 0;
@@ -2220,6 +2280,13 @@ AllPlot::setYMax()
                 ymax = standard->hrCurve->maxYValue();
             else
                 ymax = referencePlot->standard->hrCurve->maxYValue();
+        }
+        if (standard->smo2Curve->isVisible()) {
+            labels << tr("SmO2");
+            if (referencePlot == NULL)
+                ymax = qMax(ymax, standard->smo2Curve->maxYValue());
+            else
+                ymax = qMax(ymax, referencePlot->standard->smo2Curve->maxYValue());
         }
         if (standard->cadCurve->isVisible()) {
             labels << tr("RPM");
@@ -2289,8 +2356,11 @@ AllPlot::setYMax()
         standard->balanceRCurve->setBaseline(50);
     }
 
-    // QwtAxis::yRight
-    if (standard->speedCurve->isVisible() || (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || standard->torqueCurve->isVisible()) {
+    // QwtAxis::yRight, 0
+    if (standard->speedCurve->isVisible() || standard->thbCurve->isVisible() || 
+        (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || 
+         standard->torqueCurve->isVisible()) {
+
         double ymin = -10;
         double ymax = 0;
 
@@ -2317,6 +2387,14 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, referencePlot->standard->tempCurve->maxYValue());
             }
         }
+        if (standard->thbCurve->isVisible()) {
+            labels << tr("tHb");
+
+            if (referencePlot == NULL)
+                ymax = qMax(ymax, standard->thbCurve->maxYValue());
+            else
+                ymax = qMax(ymax, referencePlot->standard->thbCurve->maxYValue());
+        }
         if (standard->torqueCurve->isVisible()) {
             labels << (context->athlete->useMetricUnits ? tr("Nm") : tr("ftLb"));
 
@@ -2325,9 +2403,23 @@ AllPlot::setYMax()
             else
                 ymax = qMax(ymax, referencePlot->standard->torqueCurve->maxYValue());
         }
-        setAxisTitle(yRight, labels.join(" / "));
-        setAxisScale(yRight, ymin, 1.05 * ymax);
-        //setAxisLabelAlignment(yRight,Qt::AlignVCenter);
+
+        int axisHeight = qRound( plotLayout()->canvasRect().height() );
+        int step = 10;
+
+        if (axisHeight) {
+            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yRight) );
+            int labelWidth = labelWidthMetric.width( "888 " );
+            ymax *= 1.05;
+            while((qCeil(ymax / step) * labelWidth) > axisHeight) nextStep(step);
+        }
+
+        QwtValueList xytick[QwtScaleDiv::NTickTypes];
+        for (int i=0;i<ymax;i+=step)
+            xytick[QwtScaleDiv::MajorTick]<<i;
+
+        setAxisTitle(QwtAxisId(QwtAxis::yRight, 0), labels.join(" / "));
+        setAxisScaleDiv(QwtAxisId(QwtAxis::yRight, 0),QwtScaleDiv(0, ymax, xytick));
     }
 
     // QwtAxis::yRight, 1

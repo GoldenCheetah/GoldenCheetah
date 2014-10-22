@@ -500,6 +500,8 @@ class AllPlot : public QwtPlot
         // refresh data / plot parameters
         void recalc(AllPlotObject *objects);
         void setYMax();
+        void setLeftOnePalette(); // color of yLeft,1 axis
+        void setRightPalette(); // color of yRight,0 axis
         void setXTitle();
         void setHighlightIntervals(bool);
 
