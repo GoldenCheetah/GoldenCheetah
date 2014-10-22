@@ -31,6 +31,7 @@
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>
+#include <math.h>
 
 #define mark() \
 { \
@@ -1489,20 +1490,73 @@ RideFile::recalculateDerivedSeries()
             // need to say we got it
             setDataPresent(RideFile::gear, true);
 
-            // calculate gear ratio, without rounding (but will need
-            // to do something to it in order to identify gear)
+            // calculate gear ratio, with simple 3 level rounding (considering that the ratio steps are not linear):
+            // -> below ratio 1, round to next 0,05 border (ratio step of 2 tooth change is around 0,03 for 20/36 (MTB)
+            // -> above ratio 1 and 3,  round to next 0,1 border (MTB + Racebike - bigger differences per shifting step)
+            // -> above ration 3, round to next 0,5 border (mainly Racebike - even wider differences)
             // speed and wheelsize in meters
-            p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
+            // but only if ride point has power, cadence and speed > 0 otherwise calculation will give a random result
+            if (p->watts > 0.0f && p->cad > 0.0f && p->kph > 0.0f) {
+                p->gear = (1000.00f * p->kph) / (p->cad * 60.00f * wheelsize);
+                // do the rounding
+                double rounding = 0.0f;
+                if (p->gear < 1.0f) {
+                  rounding = 0.05f;
+                }
+                else if (p->gear >= 1.0f && p->gear < 3.0f) {
+                    rounding = 0.1f;
+                } else {
+                    rounding = 0.5f;
+                }
+                double mod = fmod(p->gear, rounding);
+                double factor = trunc(p->gear / rounding);
+                if (mod < rounding) p->gear = factor * rounding;
+                else p->gear = (factor+1) * rounding;
+
+                // final rounding to 2 decimals
+                p->gear = round(p->gear * 100.00f) / 100.00f;
+            }
+            else {
+                p->gear = 0.0f; // to be filled up with previous gear later
+            }
 
             // truncate big values
             if (p->gear > maximumFor(RideFile::gear)) p->gear = 0;
-            
+
         } else {
             p->gear = 0.0f;
         }
 
         // last point
         lastP = p;
+    }
+
+    // remove gear outlier (for single outlier values = 1 second) and
+    // fill 0 gaps in Gear series with previous or next gear ration value (whichever of those is above 0)
+    if (dataPresent.gear) {
+        double last = 0.0f;
+        double current = 0.0f;
+        double next = 0.0f;
+        double lastGear = 0.0;
+        for (int i = 0; i<dataPoints_.count(); i++) {
+            // first handle the zeros
+            if (dataPoints_[i]->gear > 0)
+                lastGear = dataPoints_[i]->gear;
+            else
+                dataPoints_[i]->gear = lastGear;
+            // set the single outliers (there might be better ways, but this is easy
+            if (i>0) last = dataPoints_[i-1]->gear; else last = 0.0f;
+            current = dataPoints_[i]->gear;
+            if (i<dataPoints_.count()-1) next = dataPoints_[i+1]->gear; else next = 0.0f;
+            // if there is a big jump to current in relation to last-next consider this a outlier
+            double diff1 = abs(last-next);
+            double diff2 = abs(last-current);
+            if ((diff1 < 0.01f) || (diff2 >= (diff1+0.5f))){
+                // single outlier (no shift up/down in 2 seconds
+                dataPoints_[i]->gear = (last>next) ? last : next;
+            }
+
+        }
     }
 
     // Smooth the slope if it has been derived

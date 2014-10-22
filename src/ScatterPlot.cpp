@@ -310,8 +310,13 @@ void ScatterPlot::setData (ScatterSettings *settings)
             double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
             double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
 
-            // skip zeroes?
-            if (settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
+            // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
+            if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
+                 && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
+            if ((settings->x == MODEL_GEAR)
+                 && settings->ignore && (xv == 0.0f || int(yv) == 0)) continue;
+            if ((settings->y == MODEL_GEAR)
+                 && settings->ignore && (int(xv) == 0 || yv == 0.0f)) continue;
 
             // add it 
             x <<xv;
@@ -451,6 +456,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
     else setAxisScale(yLeft, minY, maxY);
     if (settings->x == MODEL_CPV) setAxisScale(xBottom, 0, 3);
     else setAxisScale(xBottom, minX, maxX);
+
+    // gear
+    if (settings->x == MODEL_GEAR) setAxisScale(xBottom, 0, 7);
+    if (settings->y == MODEL_GEAR) setAxisScale(yLeft, 0, 7);
 
 
     // and those interval markers
