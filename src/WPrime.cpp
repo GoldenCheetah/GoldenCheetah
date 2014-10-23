@@ -217,8 +217,6 @@ WPrime::setRide(RideFile *input)
 
         QVector<double> myvalues(last+1);
 
-        int stop = last / 2;
-
         WPrimeIntegrator a(inputArray, 0, last, TAU);
 
         a.start();
@@ -388,6 +386,8 @@ WPrime::setErg(ErgFile *input)
     if (integral) {
 
         last = input->Duration / 1000; 
+        values.resize(last);
+        xvalues.resize(last);
 
         // input array contains the actual W' expenditure
         // and will also contain non-zero values
@@ -422,8 +422,6 @@ WPrime::setErg(ErgFile *input)
 
         QVector<double> myvalues(last+1);
 
-        int stop = last / 2;
-
         WPrimeIntegrator a(inputArray, 0, last, TAU);
 
         a.start();
@@ -432,6 +430,7 @@ WPrime::setErg(ErgFile *input)
         // sum values
         for (int t=0; t<=last; t++) {
             values[t] = a.output[t];
+            xvalues[t] = t * 1000.00f;
         }
 
         // now subtract WPRIME and work out minimum etc
