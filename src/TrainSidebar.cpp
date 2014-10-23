@@ -1176,7 +1176,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // W'bal on the fly
             // using Dave Waterworth's reformulation
-            double TAU = 300; //XXX fixme make it config -- but where ???? XXX
+            double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
             // any watts expended in last 200msec?
             double JOULES = double(rtData.getWatts() - FTP) / 5.00f;
