@@ -174,11 +174,13 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     wbalCurvePredict->setPen(wbalPen);
     wbalCurvePredict->setVisible(true);
 
-    wbalCurveActual = new QwtPlotCurve("W'bal Actual");
-    wbalCurveActual->attach(this);
-    wbalCurveActual->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    wbalCurve = new QwtPlotCurve("W'bal Actual");
+    wbalCurve->attach(this);
+    wbalCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
     QPen wbalPenA = QPen(GColor(CWBAL), 1.0); // actual lighter
-    wbalCurveActual->setPen(wbalPenA);
+    wbalCurve->setPen(wbalPenA);
+    wbalData = new CurveData;
+    wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
 
     sd = new QwtScaleDraw;
     sd->enableComponent(QwtScaleDraw::Ticks, false);
@@ -385,10 +387,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
             }
         }
 
-        // wbal predict curve and clear actual curve
-        QVector<double> empty;
-        wbalCurveActual->setSamples(empty, empty);
-
         // compute wbal curve for the erg file
         calculator.setErg(ergfile);
 
@@ -450,11 +448,13 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     double speed = rtdata.getSpeed();
     double cad = rtdata.getCadence();
     double hr = rtdata.getHr();
+    double wbal = rtdata.getWbal();
 
     wattssum += watts;
     hrsum += hr;
     cadsum += cad;
     speedsum += speed;
+    wbalsum += wbal;
 
     if (counter < 25) {
         counter++;
@@ -464,8 +464,9 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
         hr = hrsum / 26;
         cad = cadsum / 26;
         speed = speedsum / 26;
+        wbal = wbalsum / 26;
         counter=0;
-        wattssum = hrsum = cadsum = speedsum = 0;
+        wbalsum = wattssum = hrsum = cadsum = speedsum = 0;
     }
 
     double zero = 0;
@@ -485,6 +486,10 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     if (!cadData->count()) cadData->append(&zero, &cad, 1);
     cadData->append(&x, &cad, 1);
     cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
+
+    if (!wbalData->count()) wbalData->append(&zero, &wbal, 1);
+    wbalData->append(&x, &wbal, 1);
+    wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
 }
 
 void
@@ -497,7 +502,7 @@ void
 ErgFilePlot::reset()
 {
     // reset data
-    counter = hrsum = wattssum = speedsum = cadsum = 0;
+    counter = wbalsum = hrsum = wattssum = speedsum = cadsum = 0;
 
     // note the origin of the data is not a point 0, but the first
     // average over 5 seconds. this leads to a small gap on the left
@@ -507,7 +512,9 @@ ErgFilePlot::reset()
     // once for time/distance of 0 and once for the current point in time
     wattsData->clear();
     wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
-    cadData->clear();
+    wbalData->clear();
+    wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
+    wbalData->clear();
     cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
     hrData->clear();
     hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());

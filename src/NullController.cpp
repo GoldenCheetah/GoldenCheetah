@@ -53,7 +53,8 @@ bool NullController::find() {
 
 void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setName((char *)"Null");
-    rtData.setWatts(load + ((rand()%25)-15)); // for testing virtual power
+    //rtData.setWatts(load + ((rand()%25)-15)); // for testing virtual power
+    rtData.setWatts(load); // no randomisation
     rtData.setLoad(load);
     rtData.setSpeed(25 + ((rand()%5)-2));
     rtData.setCadence(85 + ((rand()%10)-5));

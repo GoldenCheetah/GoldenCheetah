@@ -253,6 +253,10 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(round(sum/1000))); // kJoules
         break;
 
+    case RealtimeData::Wbal:
+        valueLabel->setText(QString("%1").arg(rtData.getWbal()/1000.00f, 0, 'f', 1)); // kJoules
+        break;
+
     // COGGAN Metrics
     case RealtimeData::NP:
     case RealtimeData::IF:
@@ -511,6 +515,10 @@ void DialWindow::seriesChanged()
     case RealtimeData::AvgSpeed:
     case RealtimeData::AvgSpeedLap:
             foreground = GColor(CSPEED);
+            break;
+
+    case RealtimeData::Wbal:
+            foreground = GColor(CWBAL);
             break;
 
     case RealtimeData::Cadence:

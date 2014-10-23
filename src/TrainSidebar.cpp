@@ -388,6 +388,7 @@ intensity->hide(); //XXX!!! temporary
     hrcount = 0;
     spdcount = 0;
     lodcount = 0;
+    wbalr = wbal = 0;
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
@@ -558,11 +559,16 @@ TrainSidebar::configChanged()
     // And select default workout to Ergo
     QModelIndex firstWorkout = sortModel->index(0, 0, QModelIndex());
     workoutTree->setCurrentIndex(firstWorkout);
+
     // Athlete
     FTP=285; // default to 285 if zones are not set
-    int range = context->athlete->zones()->whichRange(QDate::currentDate());
-    if (range != -1) FTP = context->athlete->zones()->getCP(range);
+    WPRIME = 20000;
 
+    int range = context->athlete->zones()->whichRange(QDate::currentDate());
+    if (range != -1) {
+        FTP = context->athlete->zones()->getCP(range);
+        WPRIME = context->athlete->zones()->getWprime(range);
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -867,6 +873,8 @@ void TrainSidebar::Start()       // when start button is pressed
         session_elapsed_msec = 0;
         lap_time.start();
         lap_elapsed_msec = 0;
+        wbalr = 0;
+        wbal = WPRIME;
         calibrating = false;
 
         if (status & RT_WORKOUT) {
@@ -1015,6 +1023,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     spdcount = 0;
     lodcount = 0;
     displayWorkoutLap = displayLap =0;
+    wbalr = 0;
+    wbal = WPRIME;
     session_elapsed_msec = 0;
     session_time.restart();
     lap_elapsed_msec = 0;
@@ -1162,9 +1172,21 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // just in case...
             if (isnan(vs) || isinf(vs)) vs = 0.00f;
-
             rtData.setVirtualSpeed(vs);
 
+            // W'bal on the fly
+            // using Dave Waterworth's reformulation
+            double TAU = 300; //XXX fixme make it config -- but where ???? XXX
+
+            // any watts expended in last 200msec?
+            double JOULES = double(rtData.getWatts() - FTP) / 5.00f;
+            if (JOULES < 0) JOULES = 0;
+
+            // running total of replenishment
+            wbalr += JOULES * exp((total_msecs/1000.00f) / TAU);
+            wbal = WPRIME - (wbalr * exp((-total_msecs/1000.00f) / TAU));
+
+            rtData.setWbal(wbal);
 
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry

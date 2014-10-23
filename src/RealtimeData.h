@@ -37,7 +37,7 @@ public:
     enum dataseries { None=0, Time, LapTime, Distance, Lap,
                       Watts, Speed, Cadence, HeartRate, Load,
                       XPower, BikeScore, RI, Joules, SkibaVI,
-                      NP, TSS, IF, VI,
+                      NP, TSS, IF, VI, Wbal,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining };
@@ -56,6 +56,7 @@ public:
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
+    void setWbal(double speed);
     void setVirtualSpeed(double speed);
     void setWheelRpm(double wheelRpm);
     void setCadence(double aCadence);
@@ -76,6 +77,7 @@ public:
     double getHr() const;
     long getTime() const;
     double getSpeed() const;
+    double getWbal() const;
     double getVirtualSpeed() const;
     double getWheelRpm() const;
     double getCadence() const;
@@ -98,6 +100,7 @@ private:
     // derived data
     double distance;
     double virtualSpeed;
+    double wbal;
     long lap;
     long msecs;
     long lapMsecs;
