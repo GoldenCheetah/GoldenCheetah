@@ -62,7 +62,7 @@ struct RideFileDataPresent
     bool lrbalance, lte, rte, lps, rps, smo2, thb, interval;
 
     // derived
-    bool np,xp,apower,wprime,atiss,antiss,gear;
+    bool np,xp,apower,wprime,atiss,antiss,gear,hhb,o2hb;
 
     // running
     bool rvert, rcad, rcontact;
@@ -73,7 +73,7 @@ struct RideFileDataPresent
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false), smo2(false), thb(false), interval(false),
-        np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false),gear(false),
+        np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false),gear(false),hhb(false),o2hb(false),
         rvert(false), rcad(false), rcontact(false) {}
 
 };
@@ -128,7 +128,7 @@ class RideFile : public QObject // QObject to emit signals
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
                           vam, wattsKg, lrbalance, lte, rte, lps, rps, 
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
-                          rvert, rcad, rcontact, gear, none };
+                          rvert, rcad, rcontact, gear, o2hb, hhb, none };
 
         enum specialValues { NoTemp = -255 };
 
@@ -309,7 +309,7 @@ struct RideFilePoint
 
     // derived data (we calculate it)
     // xPower, normalised power, aPower
-    double xp, np, apower, atiss, antiss, gear;
+    double xp, np, apower, atiss, antiss, gear, hhb, o2hb;
 
     // create blank point
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), nm(0.0), 
@@ -320,7 +320,7 @@ struct RideFilePoint
                       hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0),
                       rvert(0.0), rcad(0.0), rcontact(0.0),
                       interval(0), xp(0), np(0),
-                      apower(0), atiss(0.0), antiss(0.0), gear(0.0) {}
+                      apower(0), atiss(0.0), antiss(0.0), gear(0.0), hhb(0.0), o2hb(0.0) {}
 
     // create point supplying all values
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
@@ -337,7 +337,7 @@ struct RideFilePoint
         smo2(smo2), thb(thb),
         hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), 
         rvert(rvert), rcad(rcad), rcontact(rcontact), interval(interval), 
-        xp(0), np(0), apower(0), atiss(0.0), antiss(0.0), gear(0.0) {}
+        xp(0), np(0), apower(0), atiss(0.0), antiss(0.0), gear(0.0),hhb(0.0),o2hb(0.0) {}
 
     // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;

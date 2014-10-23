@@ -81,8 +81,10 @@ void GCColor::setupColors()
         { tr("Run Vertical Oscillation"), "COLORRVERT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
         { tr("Run Cadence"), "COLORRCAD", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
         { tr("Run Ground Contact"), "COLORGCT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
-        { tr("Muscle Oxygen (SmO2)"), "COLORSMO2", QColor(0x33, 0x99, 0xff) }, // same as moxy monitor
-        { tr("Hameoglobin Mass (tHb)"), "COLORTHB", QColor(0xff,0xcc,0x33) },
+        { tr("Muscle Oxygen (SmO2)"), "COLORSMO2", QColor(0x00, 0x89, 0x77) }, // green same as moxy monitor
+        { tr("Haemoglobin Mass (tHb)"), "COLORTHB", QColor(0xa3,0x44,0x02) },  // brown same as moxy monitor
+        { tr("Oxygenated Haemoglobin (O2Hb)"), "CO2HB", QColor(0xd1,0x05,0x72) },
+        { tr("Deoxygenated Haemoglobin (HHb)"), "CHHB", QColor(0x00,0x7f,0xcc) },
         { tr("Load"), "COLORLOAD", Qt::yellow },
         { tr("TSS"), "COLORTSS", Qt::green },
         { tr("Short Term Stress"), "COLORSTS", Qt::blue },

@@ -155,6 +155,8 @@ RideFile::seriesName(SeriesType series)
     case RideFile::wprime: return QString(tr("W' balance"));
     case RideFile::smo2: return QString(tr("SmO2"));
     case RideFile::thb: return QString(tr("THb"));
+    case RideFile::o2hb: return QString(tr("O2Hb"));
+    case RideFile::hhb: return QString(tr("HHb"));
     case RideFile::rvert: return QString(tr("Vertical Oscillation"));
     case RideFile::rcad: return QString(tr("Run Cadence"));
     case RideFile::rcontact: return QString(tr("GCT"));
@@ -193,8 +195,10 @@ RideFile::colorFor(SeriesType series)
     case RideFile::interval: return QColor(Qt::white);
     case RideFile::wattsKg: return GColor(CPOWER);
     case RideFile::wprime: return GColor(CWBAL);
-    case RideFile::smo2: return GColor(CWBAL);
-    case RideFile::thb: return GColor(CSPEED);
+    case RideFile::smo2: return GColor(CSMO2);
+    case RideFile::thb: return GColor(CTHB);
+    case RideFile::o2hb: return GColor(CO2HB);
+    case RideFile::hhb: return GColor(CHHB);
     case RideFile::slope: return GColor(CSLOPE);
     case RideFile::rvert: return GColor(CRV);
     case RideFile::rcontact: return GColor(CRGCT);
@@ -249,6 +253,8 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::wprime: return QString(useMetricUnits ? tr("joules") : tr("joules"));
     case RideFile::smo2: return QString(tr("%"));
     case RideFile::thb: return QString(tr("g/dL"));
+    case RideFile::o2hb: return QString(tr(""));
+    case RideFile::hhb: return QString(tr(""));
     case RideFile::rcad: return QString(tr("spm"));
     case RideFile::rvert: return QString(tr("cm"));
     case RideFile::rcontact: return QString(tr("ms"));
@@ -935,6 +941,8 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::rps : return rps; break;
         case RideFile::thb : return thb; break;
         case RideFile::smo2 : return smo2; break;
+        case RideFile::o2hb : return o2hb; break;
+        case RideFile::hhb : return hhb; break;
         case RideFile::rcad : return rcad; break;
         case RideFile::rvert : return rvert; break;
         case RideFile::rcontact : return rcontact; break;
@@ -1525,6 +1533,14 @@ RideFile::recalculateDerivedSeries()
 
         } else {
             p->gear = 0.0f;
+        }
+
+        // split out O2Hb and HHb when we have SmO2 and tHb
+        // O2Hb is oxygenated haemoglobin and HHb is deoxygenated haemoglobin
+        if (dataPresent.smo2 && dataPresent.thb && p->thb && p->smo2) {
+
+            p->o2hb = p->thb * p->smo2 / 100;
+            p->hhb = p->thb - p->o2hb;
         }
 
         // last point
