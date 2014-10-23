@@ -89,6 +89,8 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showRGCT READ isShowRGCT WRITE setShowRGCT USER true)
     Q_PROPERTY(int showSmO2 READ isShowSmO2 WRITE setShowSmO2 USER true)
     Q_PROPERTY(int showtHb READ isShowtHb WRITE setShowtHb USER true)
+    Q_PROPERTY(int showO2Hb READ isShowO2Hb WRITE setShowO2Hb USER true)
+    Q_PROPERTY(int showHHb READ isShowHHb WRITE setShowHHb USER true)
     Q_PROPERTY(int showGear READ isShowGear WRITE setShowGear USER true)
 
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
@@ -144,6 +146,8 @@ class AllPlotWindow : public GcChartWindow
         int isShowRGCT() const { return showRGCT->checkState(); }
         int isShowSmO2() const { return showSmO2->checkState(); }
         int isShowtHb() const { return showtHb->checkState(); }
+        int isShowO2Hb() const { return showO2Hb->checkState(); }
+        int isShowHHb() const { return showHHb->checkState(); }
         int isShowGear() const { return showGear->checkState(); }
         int isByDistance() const { return comboDistance->currentIndex(); }
         int isPaintBrush() const { return paintBrush->isChecked(); }
@@ -193,6 +197,8 @@ class AllPlotWindow : public GcChartWindow
         void setShowRGCT(int state);
         void setShowSmO2(int state);
         void setShowtHb(int state);
+        void setShowO2Hb(int state);
+        void setShowHHb(int state);
         void setShowGear(int state);
         void setShowW(int state);
         void setShowGrid(int state);
@@ -306,6 +312,8 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showRCad;
         QCheckBox *showSmO2;
         QCheckBox *showtHb;
+        QCheckBox *showO2Hb;
+        QCheckBox *showHHb;
         QCheckBox *showGear;
         QComboBox *comboDistance;
         QSlider *smoothSlider;

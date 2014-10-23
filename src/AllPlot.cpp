@@ -702,6 +702,8 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     showRCad(true),
     showSmO2(true),
     showtHb(true),
+    showO2Hb(true),
+    showHHb(true),
     showGear(true),
     bydist(false),
     scope(scope),
@@ -4814,6 +4816,32 @@ AllPlot::setShowtHb(bool show)
 {
     showtHb = show;
     standard->thbCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowO2Hb(bool show)
+{
+    showO2Hb = show;
+    //standard->o2hbCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowHHb(bool show)
+{
+    showHHb = show;
+    //standard->HhbCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
