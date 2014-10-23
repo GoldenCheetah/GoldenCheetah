@@ -319,6 +319,14 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     thbCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     thbCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
 
+    o2hbCurve = new QwtPlotCurve(tr("O2Hb"));
+    o2hbCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    o2hbCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
+
+    hhbCurve = new QwtPlotCurve(tr("HHb"));
+    hhbCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    hhbCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 0));
+
     xpCurve = new QwtPlotCurve(tr("xPower"));
     xpCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     xpCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 0));
@@ -455,7 +463,9 @@ AllPlotObject::setColor(QColor color)
              << apCurve << cadCurve << tempCurve << hrCurve << torqueCurve << balanceLCurve
              << balanceRCurve << lteCurve << rteCurve << lpsCurve << rpsCurve
              << altCurve << slopeCurve << altSlopeCurve
-             << rvCurve << rcadCurve << rgctCurve << gearCurve << smo2Curve << thbCurve;
+             << rvCurve << rcadCurve << rgctCurve << gearCurve 
+             << smo2Curve << thbCurve << o2hbCurve << hhbCurve;
+
 
     // work through getting progresively lighter
     QPen pen;
@@ -499,6 +509,8 @@ AllPlotObject::~AllPlotObject()
     gearCurve->detach(); delete gearCurve;
     smo2Curve->detach(); delete smo2Curve;
     thbCurve->detach(); delete thbCurve;
+    o2hbCurve->detach(); delete o2hbCurve;
+    hhbCurve->detach(); delete hhbCurve;
     xpCurve->detach(); delete xpCurve;
     apCurve->detach(); delete apCurve;
     hrCurve->detach(); delete hrCurve;
@@ -539,6 +551,8 @@ AllPlotObject::setVisible(bool show)
         gearCurve->detach();
         smo2Curve->detach();
         thbCurve->detach();
+        o2hbCurve->detach();
+        hhbCurve->detach();
         atissCurve->detach();
         antissCurve->detach();
         xpCurve->detach();
@@ -591,6 +605,8 @@ AllPlotObject::setVisible(bool show)
         gearCurve->attach(plot);
         smo2Curve->attach(plot);
         thbCurve->attach(plot);
+        o2hbCurve->attach(plot);
+        hhbCurve->attach(plot);
         atissCurve->attach(plot);
         antissCurve->attach(plot);
         xpCurve->attach(plot);
@@ -638,6 +654,8 @@ AllPlotObject::hideUnwanted()
     if (!plot->showGear) gearCurve->detach();
     if (!plot->showSmO2) smo2Curve->detach();
     if (!plot->showtHb) thbCurve->detach();
+    if (!plot->showO2Hb) o2hbCurve->detach();
+    if (!plot->showHHb) hhbCurve->detach();
     if (!plot->showATISS) atissCurve->detach();
     if (!plot->showANTISS) antissCurve->detach();
     if (!plot->showXP) xpCurve->detach();
@@ -817,6 +835,8 @@ AllPlot::configChanged()
         standard->gearCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->smo2Curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->thbCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->o2hbCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->hhbCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->xpCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->apCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->wCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -873,6 +893,12 @@ AllPlot::configChanged()
     QPen thbPen = QPen(GColor(CTHB));
     thbPen.setWidth(width);
     standard->thbCurve->setPen(thbPen);
+    QPen o2hbPen = QPen(GColor(CO2HB));
+    o2hbPen.setWidth(width);
+    standard->o2hbCurve->setPen(o2hbPen);
+    QPen hhbPen = QPen(GColor(CHHB));
+    hhbPen.setWidth(width);
+    standard->hhbCurve->setPen(hhbPen);
 
     QPen antissPen = QPen(GColor(CANTISS));
     antissPen.setWidth(width);
@@ -1015,6 +1041,14 @@ AllPlot::configChanged()
         p.setAlpha(64);
         standard->thbCurve->setBrush(QBrush(p));
 
+        p = standard->o2hbCurve->pen().color();
+        p.setAlpha(64);
+        standard->o2hbCurve->setBrush(QBrush(p));
+
+        p = standard->hhbCurve->pen().color();
+        p.setAlpha(64);
+        standard->hhbCurve->setBrush(QBrush(p));
+
         p = standard->xpCurve->pen().color();
         p.setAlpha(64);
         standard->xpCurve->setBrush(QBrush(p));
@@ -1108,13 +1142,9 @@ AllPlot::configChanged()
         standard->gearCurve->setBrush(Qt::NoBrush);
         standard->smo2Curve->setBrush(Qt::NoBrush);
         standard->thbCurve->setBrush(Qt::NoBrush);
+        standard->o2hbCurve->setBrush(Qt::NoBrush);
+        standard->hhbCurve->setBrush(Qt::NoBrush);
         standard->npCurve->setBrush(Qt::NoBrush);
-        standard->rvCurve->setBrush(Qt::NoBrush);
-        standard->rcadCurve->setBrush(Qt::NoBrush);
-        standard->rgctCurve->setBrush(Qt::NoBrush);
-        standard->gearCurve->setBrush(Qt::NoBrush);
-        standard->smo2Curve->setBrush(Qt::NoBrush);
-        standard->thbCurve->setBrush(Qt::NoBrush);
         standard->xpCurve->setBrush(Qt::NoBrush);
         standard->apCurve->setBrush(Qt::NoBrush);
         standard->wCurve->setBrush(Qt::NoBrush);
@@ -1258,6 +1288,12 @@ AllPlot::setRightPalette()
     if (standard->tempCurve->isVisible() && context->athlete->useMetricUnits) {
         single = GColor(CTEMP);
     }
+    if (standard->o2hbCurve->isVisible()) {
+        single = GColor(CO2HB);
+    }
+    if (standard->hhbCurve->isVisible()) {
+        single = GColor(CHHB);
+    }
     if (standard->thbCurve->isVisible()) {
         single = GColor(CTHB);
     }
@@ -1296,17 +1332,17 @@ AllPlot::setHighlightIntervals(bool state)
 struct DataPoint {
 
     double time, hr, watts, atiss, antiss, np, rv, rcad, rgct,
-           smo2, thb, ap, xp, speed, cad, 
+           smo2, thb, o2hb, hhb, ap, xp, speed, cad, 
            alt, temp, wind, torque, lrbalance, lte, rte, lps, rps,
            kphd, wattsd, cadd, nmd, hrd, slope;
 
     DataPoint(double t, double h, double w, double at, double an, double n, double rv, double rcad, double rgct,
-              double smo2, double thb, double l, double x, double s, double c,
+              double smo2, double thb, double o2hb, double hhb, double l, double x, double s, double c,
               double a, double te, double wi, double tq, double lrb, double lte, double rte, double lps, double rps,
               double kphd, double wattsd, double cadd, double nmd, double hrd, double sl) :
 
               time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), rv(rv), rcad(rcad), rgct(rgct),
-              smo2(smo2), thb(thb), ap(l), xp(x), speed(s), cad(c),
+              smo2(smo2), thb(thb), o2hb(o2hb), hhb(hhb), ap(l), xp(x), speed(s), cad(c),
               alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), lte(lte), rte(rte), lps(lps), rps(rps),
               kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl) {}
 };
@@ -1430,6 +1466,8 @@ AllPlot::recalc(AllPlotObject *objects)
         if (!objects->gearArray.empty()) objects->gearCurve->setSamples(data, data);
         if (!objects->smo2Array.empty()) objects->smo2Curve->setSamples(data, data);
         if (!objects->thbArray.empty()) objects->thbCurve->setSamples(data, data);
+        if (!objects->o2hbArray.empty()) objects->o2hbCurve->setSamples(data, data);
+        if (!objects->hhbArray.empty()) objects->hhbCurve->setSamples(data, data);
         if (!objects->xpArray.empty()) objects->xpCurve->setSamples(data, data);
         if (!objects->apArray.empty()) objects->apCurve->setSamples(data, data);
         if (!objects->wattsArray.empty()) objects->wattsCurve->setSamples(data, data);
@@ -1482,6 +1520,8 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalRGCT = 0.0;
         double totalSmO2 = 0.0;
         double totaltHb = 0.0;
+        double totalO2Hb = 0.0;
+        double totalHHb = 0.0;
         double totalATISS = 0.0;
         double totalANTISS = 0.0;
         double totalXP = 0.0;
@@ -1515,6 +1555,8 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRGCT.resize(rideTimeSecs + 1);
         objects->smoothSmO2.resize(rideTimeSecs + 1);
         objects->smoothtHb.resize(rideTimeSecs + 1);
+        objects->smoothO2Hb.resize(rideTimeSecs + 1);
+        objects->smoothHHb.resize(rideTimeSecs + 1);
         objects->smoothAT.resize(rideTimeSecs + 1);
         objects->smoothANT.resize(rideTimeSecs + 1);
         objects->smoothXP.resize(rideTimeSecs + 1);
@@ -1558,6 +1600,8 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->rgctArray.empty() ? objects->rgctArray[i] : 0),
                              (!objects->smo2Array.empty() ? objects->smo2Array[i] : 0),
                              (!objects->thbArray.empty() ? objects->thbArray[i] : 0),
+                             (!objects->o2hbArray.empty() ? objects->o2hbArray[i] : 0),
+                             (!objects->hhbArray.empty() ? objects->hhbArray[i] : 0),
                              (!objects->apArray.empty() ? objects->apArray[i] : 0),
                              (!objects->xpArray.empty() ? objects->xpArray[i] : 0),
                              (!objects->speedArray.empty() ? objects->speedArray[i] : 0),
@@ -1586,6 +1630,8 @@ AllPlot::recalc(AllPlotObject *objects)
                 if (!objects->rgctArray.empty()) totalRGCT += objects->rgctArray[i];
                 if (!objects->smo2Array.empty()) totalSmO2 += objects->smo2Array[i];
                 if (!objects->thbArray.empty()) totaltHb += objects->thbArray[i];
+                if (!objects->o2hbArray.empty()) totalO2Hb += objects->o2hbArray[i];
+                if (!objects->hhbArray.empty()) totalHHb += objects->hhbArray[i];
                 if (!objects->atissArray.empty()) totalATISS += objects->atissArray[i];
                 if (!objects->antissArray.empty()) totalANTISS += objects->antissArray[i];
 
@@ -1649,6 +1695,8 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalRGCT -= dp.rgct;
                 totalSmO2 -= dp.smo2;
                 totaltHb -= dp.thb;
+                totalO2Hb -= dp.o2hb;
+                totalHHb -= dp.hhb;
                 totalATISS -= dp.atiss;
                 totalANTISS -= dp.antiss;
                 totalAP -= dp.ap;
@@ -1683,6 +1731,8 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRGCT[secs] = 0.0;
                 objects->smoothSmO2[secs] = 0.0;
                 objects->smoothtHb[secs] = 0.0;
+                objects->smoothO2Hb[secs] = 0.0;
+                objects->smoothHHb[secs] = 0.0;
                 objects->smoothAT[secs] = 0.0;
                 objects->smoothANT[secs] = 0.0;
                 objects->smoothXP[secs] = 0.0;
@@ -1716,6 +1766,8 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRGCT[secs]    = totalRGCT / list.size();
                 objects->smoothSmO2[secs]    = totalSmO2 / list.size();
                 objects->smoothtHb[secs]    = totaltHb / list.size();
+                objects->smoothO2Hb[secs]    = totalO2Hb / list.size();
+                objects->smoothHHb[secs]    = totalHHb / list.size();
                 objects->smoothAT[secs]    = totalATISS / list.size();
                 objects->smoothANT[secs]    = totalANTISS / list.size();
                 objects->smoothXP[secs]    = totalXP / list.size();
@@ -1768,6 +1820,8 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRGCT.resize(0);
         objects->smoothSmO2.resize(0);
         objects->smoothtHb.resize(0);
+        objects->smoothO2Hb.resize(0);
+        objects->smoothHHb.resize(0);
         objects->smoothAT.resize(0);
         objects->smoothANT.resize(0);
         objects->smoothXP.resize(0);
@@ -1804,6 +1858,8 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothGear.append(dp->gear);
             objects->smoothSmO2.append(dp->smo2);
             objects->smoothtHb.append(dp->thb);
+            objects->smoothO2Hb.append(dp->o2hb);
+            objects->smoothHHb.append(dp->hhb);
             objects->smoothAT.append(dp->atiss);
             objects->smoothANT.append(dp->antiss);
             objects->smoothXP.append(dp->xp);
@@ -1906,6 +1962,14 @@ AllPlot::recalc(AllPlotObject *objects)
 
     if (!objects->thbArray.empty()) {
         objects->thbCurve->setSamples(xaxis.data() + startingIndex, objects->smoothtHb.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->o2hbArray.empty()) {
+        objects->o2hbCurve->setSamples(xaxis.data() + startingIndex, objects->smoothO2Hb.data() + startingIndex, totalPoints);
+    }
+
+    if (!objects->hhbArray.empty()) {
+        objects->hhbCurve->setSamples(xaxis.data() + startingIndex, objects->smoothHHb.data() + startingIndex, totalPoints);
     }
 
     if (!objects->npArray.empty()) {
@@ -2205,7 +2269,9 @@ AllPlot::setYMax()
                                                      standard->lteCurve->isVisible() ||
                                                      standard->lpsCurve->isVisible()  ||
                                                      standard->slopeCurve->isVisible() );
-        setAxisVisible(yRight, standard->speedCurve->isVisible() || standard->torqueCurve->isVisible() || standard->thbCurve->isVisible());
+        setAxisVisible(yRight, standard->speedCurve->isVisible() || standard->torqueCurve->isVisible() || 
+                               standard->thbCurve->isVisible() || standard->o2hbCurve->isVisible() || standard->hhbCurve->isVisible());
+
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 1), standard->altCurve->isVisible() ||
                                                       standard->altSlopeCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
@@ -2361,6 +2427,7 @@ AllPlot::setYMax()
 
     // QwtAxis::yRight, 0
     if (standard->speedCurve->isVisible() || standard->thbCurve->isVisible() || 
+        standard->o2hbCurve->isVisible() || standard->hhbCurve->isVisible() ||
         (context->athlete->useMetricUnits && standard->tempCurve->isVisible()) || 
          standard->torqueCurve->isVisible()) {
 
@@ -2390,8 +2457,8 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, referencePlot->standard->tempCurve->maxYValue());
             }
         }
-        if (standard->thbCurve->isVisible()) {
-            labels << tr("tHb");
+        if (standard->thbCurve->isVisible() || standard->o2hbCurve->isVisible() || standard->hhbCurve->isVisible()) {
+            labels << tr("Hb");
 
             if (referencePlot == NULL)
                 ymax = qMax(ymax, standard->thbCurve->maxYValue());
@@ -2526,6 +2593,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothGear = &plot->standard->smoothGear[startidx];
     double *smoothSmO2 = &plot->standard->smoothSmO2[startidx];
     double *smoothtHb = &plot->standard->smoothtHb[startidx];
+    double *smoothO2Hb = &plot->standard->smoothO2Hb[startidx];
+    double *smoothHHb = &plot->standard->smoothHHb[startidx];
     double *smoothAT = &plot->standard->smoothAT[startidx];
     double *smoothANT = &plot->standard->smoothANT[startidx];
     double *smoothX = &plot->standard->smoothXP[startidx];
@@ -2616,6 +2685,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->gearCurve->detach();
     standard->smo2Curve->detach();
     standard->thbCurve->detach();
+    standard->o2hbCurve->detach();
+    standard->hhbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -2648,6 +2719,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->gearCurve->setVisible(rideItem->ride()->areDataPresent()->gear && showGear);
     standard->smo2Curve->setVisible(rideItem->ride()->areDataPresent()->smo2 && showSmO2);
     standard->thbCurve->setVisible(rideItem->ride()->areDataPresent()->thb && showtHb);
+    standard->o2hbCurve->setVisible(rideItem->ride()->areDataPresent()->o2hb && showO2Hb);
+    standard->hhbCurve->setVisible(rideItem->ride()->areDataPresent()->hhb && showHHb);
     standard->rgctCurve->setVisible(rideItem->ride()->areDataPresent()->rcontact && showRGCT);
     standard->xpCurve->setVisible(rideItem->ride()->areDataPresent()->xp && showXP);
     standard->apCurve->setVisible(rideItem->ride()->areDataPresent()->apower && showAP);
@@ -2692,6 +2765,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->gearCurve->setSamples(xaxis,smoothGear,points);
     standard->smo2Curve->setSamples(xaxis,smoothSmO2,points);
     standard->thbCurve->setSamples(xaxis,smoothtHb,points);
+    standard->o2hbCurve->setSamples(xaxis,smoothO2Hb,points);
+    standard->hhbCurve->setSamples(xaxis,smoothHHb,points);
     standard->xpCurve->setSamples(xaxis,smoothX,points);
     standard->apCurve->setSamples(xaxis,smoothL,points);
     standard->hrCurve->setSamples(xaxis, smoothHR,points);
@@ -2738,6 +2813,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setSymbol(standard->gearCurve, points);
     setSymbol(standard->smo2Curve, points);
     setSymbol(standard->thbCurve, points);
+    setSymbol(standard->o2hbCurve, points);
+    setSymbol(standard->hhbCurve, points);
     setSymbol(standard->xpCurve, points);
     setSymbol(standard->apCurve, points);
     setSymbol(standard->hrCurve, points);
@@ -2807,6 +2884,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     }
     if (!plot->standard->smoothtHb.empty()) {
         standard->thbCurve->attach(this);
+    }
+    if (!plot->standard->smoothO2Hb.empty()) {
+        standard->o2hbCurve->attach(this);
+    }
+    if (!plot->standard->smoothHHb.empty()) {
+        standard->hhbCurve->attach(this);
     }
     if (!plot->standard->smoothXP.empty()) {
         standard->xpCurve->attach(this);
@@ -2903,6 +2986,8 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->gearCurve->detach();
     standard->smo2Curve->detach();
     standard->thbCurve->detach();
+    standard->o2hbCurve->detach();
+    standard->hhbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -2938,6 +3023,8 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->gearCurve->setVisible(false);
     standard->smo2Curve->setVisible(false);
     standard->thbCurve->setVisible(false);
+    standard->o2hbCurve->setVisible(false);
+    standard->hhbCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
@@ -3171,6 +3258,22 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         ourCurve = standard->thbCurve;
         thereCurve = referencePlot->standard->thbCurve;
         title = tr("tHb");
+        }
+        break;
+
+    case RideFile::o2hb:
+        {
+        ourCurve = standard->o2hbCurve;
+        thereCurve = referencePlot->standard->o2hbCurve;
+        title = tr("O2Hb");
+        }
+        break;
+
+    case RideFile::hhb:
+        {
+        ourCurve = standard->hhbCurve;
+        thereCurve = referencePlot->standard->hhbCurve;
+        title = tr("HHb");
         }
         break;
 
@@ -3431,6 +3534,8 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->gearCurve->detach();
     standard->smo2Curve->detach();
     standard->thbCurve->detach();
+    standard->o2hbCurve->detach();
+    standard->hhbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -3466,6 +3571,8 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->gearCurve->setVisible(false);
     standard->smo2Curve->setVisible(false);
     standard->thbCurve->setVisible(false);
+    standard->o2hbCurve->setVisible(false);
+    standard->hhbCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
@@ -3750,6 +3857,24 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->thbCurve;
                 title = tr("tHb");
+                }
+                break;
+
+            case RideFile::o2hb:
+                {
+                ourCurve = new QwtPlotCurve(tr("O2Hb"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->o2hbCurve;
+                title = tr("O2Hb");
+                }
+                break;
+
+            case RideFile::hhb:
+                {
+                ourCurve = new QwtPlotCurve(tr("HHb"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->hhbCurve;
+                title = tr("HHb");
                 }
                 break;
 
@@ -4047,6 +4172,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->gearCurve->detach();
     standard->smo2Curve->detach();
     standard->thbCurve->detach();
+    standard->o2hbCurve->detach();
+    standard->hhbCurve->detach();
     standard->xpCurve->detach();
     standard->apCurve->detach();
     standard->hrCurve->detach();
@@ -4084,6 +4211,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->gearCurve->setVisible(false);
     standard->smo2Curve->setVisible(false);
     standard->thbCurve->setVisible(false);
+    standard->o2hbCurve->setVisible(false);
+    standard->hhbCurve->setVisible(false);
     standard->xpCurve->setVisible(false);
     standard->apCurve->setVisible(false);
     standard->hrCurve->setVisible(false);
@@ -4180,6 +4309,18 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->thbCurve->setSamples(xaxis.data(), object->smoothtHb.data(), totalPoints);
         standard->thbCurve->attach(this);
         standard->thbCurve->setVisible(true);
+    }
+
+    if (!object->o2hbArray.empty()) {
+        standard->o2hbCurve->setSamples(xaxis.data(), object->smoothO2Hb.data(), totalPoints);
+        standard->o2hbCurve->attach(this);
+        standard->o2hbCurve->setVisible(true);
+    }
+
+    if (!object->hhbArray.empty()) {
+        standard->hhbCurve->setSamples(xaxis.data(), object->smoothHHb.data(), totalPoints);
+        standard->hhbCurve->attach(this);
+        standard->hhbCurve->setVisible(true);
     }
 
     if (!object->xpArray.empty()) {
@@ -4317,6 +4458,8 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->gearCurve->setVisible(referencePlot->showGear);
     standard->smo2Curve->setVisible(referencePlot->showSmO2);
     standard->thbCurve->setVisible(referencePlot->showtHb);
+    standard->o2hbCurve->setVisible(referencePlot->showO2Hb);
+    standard->hhbCurve->setVisible(referencePlot->showHHb);
     standard->atissCurve->setVisible(referencePlot->showATISS);
     standard->antissCurve->setVisible(referencePlot->showANTISS);
     standard->xpCurve->setVisible(referencePlot->showXP);
@@ -4411,6 +4554,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rgctArray.resize(dataPresent->rcontact ? npoints : 0);
         here->smo2Array.resize(dataPresent->smo2 ? npoints : 0);
         here->thbArray.resize(dataPresent->thb ? npoints : 0);
+        here->o2hbArray.resize(dataPresent->o2hb ? npoints : 0);
+        here->hhbArray.resize(dataPresent->hhb ? npoints : 0);
         here->gearArray.resize(dataPresent->gear ? npoints : 0);
         here->xpArray.resize(dataPresent->xp ? npoints : 0);
         here->apArray.resize(dataPresent->apower ? npoints : 0);
@@ -4448,6 +4593,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->gearCurve->detach();
         here->smo2Curve->detach();
         here->thbCurve->detach();
+        here->o2hbCurve->detach();
+        here->hhbCurve->detach();
         here->xpCurve->detach();
         here->apCurve->detach();
         here->hrCurve->detach();
@@ -4486,6 +4633,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         if (!here->gearArray.empty()) here->gearCurve->attach(this);
         if (!here->smo2Array.empty()) here->smo2Curve->attach(this);
         if (!here->thbArray.empty()) here->thbCurve->attach(this);
+        if (!here->o2hbArray.empty()) here->o2hbCurve->attach(this);
+        if (!here->hhbArray.empty()) here->hhbCurve->attach(this);
         if (!here->xpArray.empty()) here->xpCurve->attach(this);
         if (!here->apArray.empty()) here->apCurve->attach(this);
         if (showW && ride && !here->wprime.empty()) {
@@ -4531,6 +4680,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->gearCurve->setVisible(dataPresent->gear && showGear);
         here->smo2Curve->setVisible(dataPresent->smo2 && showSmO2);
         here->thbCurve->setVisible(dataPresent->thb && showtHb);
+        here->o2hbCurve->setVisible(dataPresent->o2hb && showO2Hb);
+        here->hhbCurve->setVisible(dataPresent->hhb && showHHb);
         here->xpCurve->setVisible(dataPresent->xp && showXP);
         here->apCurve->setVisible(dataPresent->apower && showAP);
         here->hrCurve->setVisible(dataPresent->hr && showHr);
@@ -4583,6 +4734,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             if (!here->gearArray.empty()) here->gearArray[arrayLength] = max(0, point->gear);
             if (!here->smo2Array.empty()) here->smo2Array[arrayLength] = max(0, point->smo2);
             if (!here->thbArray.empty()) here->thbArray[arrayLength] = max(0, point->thb);
+            if (!here->o2hbArray.empty()) here->o2hbArray[arrayLength] = max(0, point->o2hb);
+            if (!here->hhbArray.empty()) here->hhbArray[arrayLength] = max(0, point->hhb);
             if (!here->xpArray.empty()) here->xpArray[arrayLength] = max(0, point->xp);
             if (!here->apArray.empty()) here->apArray[arrayLength] = max(0, point->apower);
 
@@ -4655,6 +4808,8 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->gearCurve->detach();
         here->smo2Curve->detach();
         here->thbCurve->detach();
+        here->o2hbCurve->detach();
+        here->hhbCurve->detach();
         here->xpCurve->detach();
         here->apCurve->detach();
         here->hrCurve->detach();
@@ -4828,7 +4983,7 @@ void
 AllPlot::setShowO2Hb(bool show)
 {
     showO2Hb = show;
-    //standard->o2hbCurve->setVisible(show);
+    standard->o2hbCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
@@ -4841,7 +4996,7 @@ void
 AllPlot::setShowHHb(bool show)
 {
     showHHb = show;
-    //standard->HhbCurve->setVisible(show);
+    standard->hhbCurve->setVisible(show);
     setYMax();
 
     // remember the curves and colors
@@ -5196,6 +5351,12 @@ AllPlot::setPaintBrush(int state)
         p = standard->thbCurve->pen().color();
         p.setAlpha(64);
         standard->thbCurve->setBrush(QBrush(p));
+        p = standard->o2hbCurve->pen().color();
+        p.setAlpha(64);
+        standard->o2hbCurve->setBrush(QBrush(p));
+        p = standard->hhbCurve->pen().color();
+        p.setAlpha(64);
+        standard->hhbCurve->setBrush(QBrush(p));
 
 
         p = standard->xpCurve->pen().color();
@@ -5284,6 +5445,8 @@ AllPlot::setPaintBrush(int state)
         standard->gearCurve->setBrush(Qt::NoBrush);
         standard->smo2Curve->setBrush(Qt::NoBrush);
         standard->thbCurve->setBrush(Qt::NoBrush);
+        standard->o2hbCurve->setBrush(Qt::NoBrush);
+        standard->hhbCurve->setBrush(Qt::NoBrush);
         standard->atissCurve->setBrush(Qt::NoBrush);
         standard->antissCurve->setBrush(Qt::NoBrush);
         standard->xpCurve->setBrush(Qt::NoBrush);

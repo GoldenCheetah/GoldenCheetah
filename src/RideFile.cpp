@@ -602,6 +602,10 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->lrbalance = point->lrbalance;
     if (minPoint->smo2 == 0 || point->smo2<minPoint->smo2)
        minPoint->smo2 = point->smo2;
+    if (minPoint->o2hb == 0 || point->o2hb<minPoint->o2hb)
+       minPoint->o2hb = point->o2hb;
+    if (minPoint->hhb == 0 || point->hhb<minPoint->hhb)
+       minPoint->hhb = point->hhb;
     if (minPoint->thb == 0 || point->thb<minPoint->thb)
        minPoint->thb = point->thb;
     if (minPoint->rvert == 0 || point->rvert<minPoint->rvert)
@@ -657,6 +661,10 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->smo2 = point->smo2;
     if (point->thb>maxPoint->thb)
        maxPoint->thb = point->thb;
+    if (point->o2hb>maxPoint->o2hb)
+       maxPoint->o2hb = point->o2hb;
+    if (point->hhb>maxPoint->hhb)
+       maxPoint->hhb = point->hhb;
     if (point->rvert>maxPoint->rvert)
        maxPoint->rvert = point->rvert;
     if (point->rcad>maxPoint->rcad)
@@ -690,6 +698,8 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->lrbalance += point->lrbalance;
     totalPoint->smo2 += point->smo2;
     totalPoint->thb += point->thb;
+    totalPoint->o2hb += point->o2hb;
+    totalPoint->hhb += point->hhb;
     totalPoint->rvert += point->rvert;
     totalPoint->rcad += point->rcad;
     totalPoint->rcontact += point->rcontact;
@@ -719,6 +729,8 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rps = totalPoint->rps/totalCount;
     avgPoint->smo2 = totalPoint->smo2/totalCount;
     avgPoint->thb = totalPoint->thb/totalCount;
+    avgPoint->o2hb = totalPoint->o2hb/totalCount;
+    avgPoint->hhb = totalPoint->hhb/totalCount;
     avgPoint->rvert = totalPoint->rvert/totalCount;
     avgPoint->rcad = totalPoint->rcad/totalCount;
     avgPoint->rcontact = totalPoint->rcontact/totalCount;
@@ -831,6 +843,8 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case rps : dataPresent.rps = value; break;
         case smo2 : dataPresent.smo2 = value; break;
         case thb : dataPresent.thb = value; break;
+        case o2hb : dataPresent.o2hb = value; break;
+        case hhb : dataPresent.hhb = value; break;
         case rcad : dataPresent.rcad = value; break;
         case rvert : dataPresent.rvert = value; break;
         case rcontact : dataPresent.rcontact = value; break;
@@ -869,6 +883,8 @@ RideFile::isDataPresent(SeriesType series)
         case rte : return dataPresent.rte; break;
         case smo2 : return dataPresent.smo2; break;
         case thb : return dataPresent.thb; break;
+        case o2hb : return dataPresent.o2hb; break;
+        case hhb : return dataPresent.hhb; break;
         case rvert : return dataPresent.rvert; break;
         case rcad : return dataPresent.rcad; break;
         case rcontact : return dataPresent.rcontact; break;
@@ -903,6 +919,8 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case rps : dataPoints_[index]->rps = value; break;
         case smo2 : dataPoints_[index]->smo2 = value; break;
         case thb : dataPoints_[index]->thb = value; break;
+        case o2hb : dataPoints_[index]->o2hb = value; break;
+        case hhb : dataPoints_[index]->hhb = value; break;
         case rcad : dataPoints_[index]->rcad = value; break;
         case rvert : dataPoints_[index]->rvert = value; break;
         case rcontact : dataPoints_[index]->rcontact = value; break;
@@ -1032,6 +1050,8 @@ RideFile::decimalsFor(SeriesType series)
         case rte : return 0; break;
         case smo2 : return 0; break;
         case thb : return 2; break;
+        case o2hb : return 2; break;
+        case hhb : return 2; break;
         case rcad : return 0; break;
         case rvert : return 1; break;
         case rcontact : return 1; break;
@@ -1075,6 +1095,8 @@ RideFile::maximumFor(SeriesType series)
         case lrbalance : return 100; break;
         case smo2 : return 100; break;
         case thb : return 20; break;
+        case o2hb : return 20; break;
+        case hhb : return 20; break;
         case rcad : return 500; break;
         case rvert : return 50; break;
         case rcontact : return 1000; break;
@@ -1118,6 +1140,8 @@ RideFile::minimumFor(SeriesType series)
         case lrbalance : return 0; break;
         case smo2 : return 0; break;
         case thb : return 0; break;
+        case o2hb : return 0; break;
+        case hhb : return 0; break;
         case rcad : return 0; break;
         case rvert : return 0; break;
         case rcontact : return 0; break;
@@ -1537,10 +1561,18 @@ RideFile::recalculateDerivedSeries()
 
         // split out O2Hb and HHb when we have SmO2 and tHb
         // O2Hb is oxygenated haemoglobin and HHb is deoxygenated haemoglobin
-        if (dataPresent.smo2 && dataPresent.thb && p->thb && p->smo2) {
+        if (dataPresent.smo2 && dataPresent.thb) {
 
-            p->o2hb = p->thb * p->smo2 / 100;
-            p->hhb = p->thb - p->o2hb;
+            if (p->smo2 > 0 && p->thb > 0) {
+                setDataPresent(RideFile::o2hb, true);
+                setDataPresent(RideFile::hhb, true);
+
+                p->o2hb = (p->thb * p->smo2) / 100.00f;
+                p->hhb = p->thb - p->o2hb;
+            } else {
+
+                p->o2hb = p->hhb = 0;
+            }
         }
 
         // last point

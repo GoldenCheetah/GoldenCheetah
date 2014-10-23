@@ -3074,6 +3074,8 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showGear->isChecked() && rideItem->ride()->areDataPresent()->gear) { s.one = RideFile::gear; s.two = RideFile::none; serieslist << s; }
     if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
     if (showtHb->isChecked() && rideItem->ride()->areDataPresent()->thb) { s.one = RideFile::thb; s.two = RideFile::none; serieslist << s; }
+    if (showO2Hb->isChecked() && rideItem->ride()->areDataPresent()->o2hb) { s.one = RideFile::o2hb; s.two = RideFile::none; serieslist << s; }
+    if (showHHb->isChecked() && rideItem->ride()->areDataPresent()->hhb) { s.one = RideFile::hhb; s.two = RideFile::none; serieslist << s; }
     if (showATISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::aTISS; s.two = RideFile::none; serieslist << s; }
     if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::anTISS; s.two = RideFile::none; serieslist << s; }
     if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::xPower; s.two = RideFile::none; serieslist << s; }
@@ -3276,6 +3278,8 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShowGear((showGear->isEnabled()) ? ( showGear->checkState() == Qt::Checked ) : false );
         _allPlot->setShowSmO2((showSmO2->isEnabled()) ? ( showSmO2->checkState() == Qt::Checked ) : false );
         _allPlot->setShowtHb((showtHb->isEnabled()) ? ( showtHb->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowO2Hb((showO2Hb->isEnabled()) ? ( showO2Hb->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowHHb((showHHb->isEnabled()) ? ( showHHb->checkState() == Qt::Checked ) : false );
         _allPlot->setShowXP((showXP->isEnabled()) ? ( showXP->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAP((showAP->isEnabled()) ? ( showAP->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTE((showTE->isEnabled()) ? ( showTE->checkState() == Qt::Checked ) : false );

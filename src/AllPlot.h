@@ -345,6 +345,8 @@ class AllPlotObject : public QObject
     QwtPlotCurve *gearCurve;
     QwtPlotCurve *smo2Curve;
     QwtPlotCurve *thbCurve;
+    QwtPlotCurve *o2hbCurve;
+    QwtPlotCurve *hhbCurve;
     QwtPlotCurve *npCurve;
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
@@ -388,6 +390,8 @@ class AllPlotObject : public QObject
     QVector<double> gearArray;
     QVector<double> smo2Array;
     QVector<double> thbArray;
+    QVector<double> o2hbArray;
+    QVector<double> hhbArray;
     QVector<double> npArray;
     QVector<double> xpArray;
     QVector<double> apArray;
@@ -421,6 +425,8 @@ class AllPlotObject : public QObject
     QVector<double> smoothGear;
     QVector<double> smoothSmO2;
     QVector<double> smoothtHb;
+    QVector<double> smoothO2Hb;
+    QVector<double> smoothHHb;
     QVector<double> smoothNP;
     QVector<double> smoothAP;
     QVector<double> smoothXP;
