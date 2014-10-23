@@ -25,7 +25,7 @@ RealtimeData::RealtimeData()
 {
     name[0] = '\0';
 	hr= watts= altWatts= speed= wheelRpm= load= slope = 0.0;
-	cadence = distance = virtualSpeed = 0.0;
+	cadence = distance = virtualSpeed = wbal = 0.0;
 	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
 
     memset(spinScan, 0, 24);
@@ -50,6 +50,10 @@ void RealtimeData::setHr(double hr)
 void RealtimeData::setSpeed(double speed)
 {
     this->speed = speed;
+}
+void RealtimeData::setWbal(double wbal)
+{
+    this->wbal = wbal;
 }
 void RealtimeData::setVirtualSpeed(double speed)
 {
@@ -108,6 +112,10 @@ double RealtimeData::getHr() const
 double RealtimeData::getSpeed() const
 {
     return speed;
+}
+double RealtimeData::getWbal() const
+{
+    return wbal;
 }
 double RealtimeData::getVirtualSpeed() const
 {
@@ -217,6 +225,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << IF;
         seriesList << VI;
         seriesList << Joules;
+        seriesList << Wbal;
         seriesList << AvgWatts;
         seriesList << AvgSpeed;
         seriesList << AvgCadence;
@@ -260,6 +269,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Joules: return tr("kJoules");
+        break;
+
+    case Wbal: return tr("W' bal");
         break;
 
     case XPower: return tr("XPower");

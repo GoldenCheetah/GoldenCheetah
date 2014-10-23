@@ -153,7 +153,7 @@ class ErgFilePlot : public QwtPlot
 
 	QwtPlotGrid *grid;
 	QwtPlotCurve *LodCurve;
-    QwtPlotCurve *wbalCurveActual;
+    QwtPlotCurve *wbalCurve;
     QwtPlotCurve *wbalCurvePredict;
 	QwtPlotCurve *wattsCurve;
 	QwtPlotCurve *hrCurve;
@@ -164,12 +164,14 @@ class ErgFilePlot : public QwtPlot
     CurveData *wattsData,
               *hrData,
               *cadData,
+              *wbalData,
               *speedData;
 
     double counter;
     double wattssum,
            hrsum,
            cadsum,
+           wbalsum,
            speedsum;
 
     ErgFileData *lodData;

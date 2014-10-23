@@ -199,7 +199,8 @@ class TrainSidebar : public GcWindow
         QSlider *intensitySlider;
         int lastAppliedIntensity;// remember how we scaled last time
 
-        int FTP; // current FTP
+        int FTP; // current FTP / CP
+        int WPRIME; // current W'
 
         QList<DeviceConfiguration> Devices;
 
@@ -239,6 +240,7 @@ class TrainSidebar : public GcWindow
         QCheckBox   *recordSelector;
         QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;
+        double wbalr, wbal;
 };
 
 class MultiDeviceDialog : public QDialog

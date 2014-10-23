@@ -409,12 +409,7 @@ WPrime::setErg(ErgFile *input)
             } else EXP += value; // total expenditure above CP
         }
 
-        if (countBelowCP > 0)
-            TAU = 546.00f * exp(-0.01*(CP - (totalBelowCP/countBelowCP))) + 316.00f;
-        else
-            TAU = 546.00f * exp(-0.01*(CP)) + 316.00f;
-
-        TAU = int(TAU); // round it down
+        TAU = 300; //XXX fixme XXX needs config
 
         // lets run forward from 0s to end of ride
         values.resize(last+1);
