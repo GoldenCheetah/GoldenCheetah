@@ -139,6 +139,7 @@ class ANTChannel : public QObject {
 
         // special cases
         bool is_kickr;
+        bool is_moxy; // bool
         bool is_cinqo; // bool
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
         bool is_alt; // is alternative channel for power
@@ -185,6 +186,7 @@ class ANTChannel : public QObject {
         void sendCinqoError();
         void sendCinqoSuccess();
         void checkCinqo();
+        void checkMoxy();
 
         void setAlt(bool value) { is_alt = value; }
 

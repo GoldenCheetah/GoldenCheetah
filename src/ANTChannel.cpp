@@ -36,6 +36,7 @@ ANTChannel::init()
     channel_type=CHANNEL_TYPE_UNUSED;
     channel_type_flags=0;
     is_kickr=false;
+    is_moxy=false;
     is_cinqo=0;
     is_old_cinqo=0;
     is_alt=0;
@@ -257,6 +258,14 @@ void ANTChannel::checkCinqo()
     }
 }
 
+// are we a moxy ?
+void ANTChannel::checkMoxy()
+{
+    // we are a moxy !
+    if (!is_moxy && manufacturer_id==76)
+        is_moxy=1;
+}
+
 // notify we have a cinqo, does nothing
 void ANTChannel::sendCinqoSuccess() {}
 
@@ -304,6 +313,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         product_version&=0x00ff;
         product_version|=(PRODUCT_SW_REV(message))<<8;
         checkCinqo();
+        checkMoxy();
 
     } else if (MESSAGE_IS_MANUFACTURER(message)) {
 
@@ -560,13 +570,17 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                if (time) {
                    nullCount = 0;
                    float cadence = 1024*60*revs / time;
-                   parent->setCadence(cadence);
+
+                   if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
+                   else parent->setCadence(cadence);
                    value = cadence;
+
                } else {
+
                    nullCount++;
-                   if (nullCount >= 12) { parent->setCadence(0);
-                                          value = 0;
-                    }
+                   if (!is_moxy && nullCount >= 12) { parent->setCadence(0);
+                        value = 0;
+                   }
                }
 
                // now speed ...
@@ -576,12 +590,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    dualNullCount = 0;
 
                    float rpm = 1024*60*revs / time;
-                   parent->setWheelRpm(rpm);
+                   if (is_moxy) /* do nothing for now */ ; //XXX fixme when moxy arrives XXX
+                   else parent->setWheelRpm(rpm);
                    value2 = rpm;
+
                } else {
 
                     dualNullCount++;
-                    if (dualNullCount >= 12) {
+                    if (!is_moxy && dualNullCount >= 12) {
                         parent->setWheelRpm(0);
                         value2 = 0;
                     }
