@@ -409,7 +409,7 @@ WPrime::setErg(ErgFile *input)
             } else EXP += value; // total expenditure above CP
         }
 
-        TAU = 300; //XXX fixme XXX needs config
+        TAU = appsettings->cvalue(input->context->athlete->cyclist, GC_WBALTAU, 300).toInt();
 
         // lets run forward from 0s to end of ride
         values.resize(last+1);

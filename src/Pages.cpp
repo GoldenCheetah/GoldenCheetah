@@ -733,6 +733,8 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     QString weighttext = QString(tr("Weight (%1)")).arg(context->athlete->useMetricUnits ? tr("kg") : tr("lb"));
     weightlabel = new QLabel(weighttext);
 
+    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
+
     nickname = new QLineEdit(this);
     nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME, "").toString());
     if (nickname->text() == "0") nickname->setText("");
@@ -763,6 +765,12 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     weight->setMinimum(0.0);
     weight->setDecimals(1);
     weight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * (context->athlete->useMetricUnits ? 1.0 : LB_PER_KG));
+
+    wbaltau = new QSpinBox(this);
+    wbaltau->setMinimum(30);
+    wbaltau->setMaximum(1200);
+    wbaltau->setSingleStep(10);
+    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
 
     bio = new QTextEdit(this);
     bio->setText(appsettings->cvalue(context->athlete->cyclist, GC_BIO).toString());
@@ -801,21 +809,23 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(sexlabel, 2, 0, alignment);
     grid->addWidget(unitlabel, 3, 0, alignment);
     grid->addWidget(weightlabel, 4, 0, alignment);
-    grid->addWidget(biolabel, 5, 0, alignment);
+    grid->addWidget(wbaltaulabel, 5, 0, alignment);
+    grid->addWidget(biolabel, 6, 0, alignment);
 
     grid->addWidget(nickname, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
     grid->addWidget(unitCombo, 3, 1, alignment);
     grid->addWidget(weight, 4, 1, alignment);
-    grid->addWidget(bio, 6, 0, 1, 4);
+    grid->addWidget(wbaltau, 5, 1, alignment);
+    grid->addWidget(bio, 7, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
 
-    grid->addWidget(importLabel, 7,0, alignment);
-    grid->addWidget(importDirectory, 7,1, alignment);
-    grid->addWidget(importBrowseButton, 7,2, alignment);
-    grid->addWidget(importSetting, 7,3, alignment);
+    grid->addWidget(importLabel, 8,0, alignment);
+    grid->addWidget(importDirectory, 8,1, alignment);
+    grid->addWidget(importBrowseButton, 8,2, alignment);
+    grid->addWidget(importSetting, 8,3, alignment);
 
     all->addLayout(grid);
     all->addStretch();
@@ -868,6 +878,7 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DOB, dob->date());
     appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
+    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
     if (unitCombo->currentIndex()==0)
         appsettings->setCValue(context->athlete->cyclist, GC_UNIT, GC_UNIT_METRIC);
@@ -2904,7 +2915,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
 
     wEdit = new QDoubleSpinBox;
     wEdit->setMinimum(0);
-    wEdit->setMaximum(40000);
+    wEdit->setMaximum(100000);
     wEdit->setSingleStep(100);
     wEdit->setDecimals(0);
 

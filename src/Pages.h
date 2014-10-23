@@ -122,8 +122,10 @@ class RiderPage : public QWidget
         QDateEdit *dob;
         QComboBox *sex;
         QLabel *weightlabel;
+        QLabel *wbaltaulabel;
         QComboBox *unitCombo;
         QDoubleSpinBox *weight;
+        QSpinBox *wbaltau;
         QTextEdit  *bio;
         QPushButton *avatarButton;
         QPixmap     avatar;

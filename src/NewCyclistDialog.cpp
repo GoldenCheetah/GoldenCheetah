@@ -36,6 +36,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QLabel *biolabel = new QLabel(tr("Bio"));
     QLabel *cplabel = new QLabel(tr("Critical Power (FTP)"));
     QLabel *wlabel = new QLabel(tr("W' (J)"));
+    QLabel *wbaltaulabel = new QLabel(tr("W'bal Tau (s)"));
     QLabel *resthrlabel = new QLabel(tr("Resting Heartrate"));
     QLabel *lthrlabel = new QLabel(tr("Lactate Heartrate"));
     QLabel *maxhrlabel = new QLabel(tr("Maximum Heartrate"));
@@ -69,9 +70,15 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
 
     w = new QSpinBox(this);
     w->setMinimum(0);
-    w->setMaximum(40000);
+    w->setMaximum(100000);
     w->setSingleStep(100);
     w->setValue(20000); // default to 20kj
+
+    wbaltau = new QSpinBox(this);
+    wbaltau->setMinimum(30);
+    wbaltau->setMaximum(1200);
+    wbaltau->setSingleStep(10);
+    wbaltau->setValue(300); // default to 300s
 
     resthr = new QSpinBox(this);
     resthr->setMinimum(30);
@@ -111,10 +118,11 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(weightlabel, 4, 0, alignment);
     grid->addWidget(cplabel, 5, 0, alignment);
     grid->addWidget(wlabel, 6, 0, alignment);
-    grid->addWidget(resthrlabel, 7, 0, alignment);
-    grid->addWidget(lthrlabel, 8, 0, alignment);
-    grid->addWidget(maxhrlabel, 9, 0, alignment);
-    grid->addWidget(biolabel, 10, 0, alignment);
+    grid->addWidget(wbaltaulabel, 7, 0, alignment);
+    grid->addWidget(resthrlabel, 8, 0, alignment);
+    grid->addWidget(lthrlabel, 9, 0, alignment);
+    grid->addWidget(maxhrlabel, 10, 0, alignment);
+    grid->addWidget(biolabel, 11, 0, alignment);
 
     grid->addWidget(name, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
@@ -123,10 +131,11 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(weight, 4, 1, alignment);
     grid->addWidget(cp, 5, 1, alignment);
     grid->addWidget(w, 6, 1, alignment);
-    grid->addWidget(resthr, 7, 1, alignment);
-    grid->addWidget(lthr, 8, 1, alignment);
-    grid->addWidget(maxhr, 9, 1, alignment);
-    grid->addWidget(bio, 11, 0, 1, 4);
+    grid->addWidget(wbaltau, 7, 1, alignment);
+    grid->addWidget(resthr, 8, 1, alignment);
+    grid->addWidget(lthr, 9, 1, alignment);
+    grid->addWidget(maxhr, 10, 1, alignment);
+    grid->addWidget(bio, 12, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -223,6 +232,7 @@ NewCyclistDialog::saveClicked()
 
                 appsettings->setCValue(name->text(), GC_DOB, dob->date());
                 appsettings->setCValue(name->text(), GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
+                appsettings->setCValue(name->text(), GC_WBALTAU, wbaltau->value());
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
                 appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
                 avatar.save(home.path() + "/" + name->text() + "/" + "avatar.png", "PNG");
