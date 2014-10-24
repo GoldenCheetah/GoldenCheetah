@@ -200,6 +200,7 @@ PfPvPlot::PfPvPlot(Context *context)
 
     merge_intervals = false;
     frame_intervals = true;
+    gear_ratio_display = false;
 
     // only default on first time through, after this the user may have adjusted
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false) shade_zones = false;
@@ -529,7 +530,7 @@ PfPvPlot::setData(RideItem *_rideItem)
     if (ride) {
 
         // quickly erase old data
-        curve->setVisible(false);
+        mainCurvesSetVisible(false);
 
 
         // due to the discrete power and cadence values returned by the
@@ -537,10 +538,12 @@ PfPvPlot::setData(RideItem *_rideItem)
         // Rather than pass them all to the curve, use a set to strip
         // out duplicates.
         std::set<std::pair<double, double> > dataSet;
-        std::set<std::pair<double, double> > dataSetSelected;
 
+        const int num_gearRatio_Plots = 4;
+        QVector<std::set<std::pair<double, double> > > gearSet(num_gearRatio_Plots);
         long tot_cad = 0;
         long tot_cad_points = 0;
+
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
@@ -553,7 +556,20 @@ PfPvPlot::setData(RideItem *_rideItem)
                     dataSet.insert(std::make_pair<double, double>(aepf, cpv));
                     tot_cad += p1->cad;
                     tot_cad_points++;
-                }
+
+                    // fill the dataSets for gearRatio display
+                    if (p1->gear != 0) {
+                        if (p1->gear > 0.0f && p1->gear <= 1.00f) {
+                            gearSet[0].insert(std::make_pair<double, double>(aepf, cpv));
+                        } else if (p1->gear > 1.00f && p1->gear <= 2.50f ) {
+                            gearSet[1].insert(std::make_pair<double, double>(aepf, cpv));
+                        } else if (p1->gear > 2.50f && p1->gear <= 4.00 ) {
+                            gearSet[2].insert(std::make_pair<double, double>(aepf, cpv));
+                        } else {  // > 4.0
+                            gearSet[3].insert(std::make_pair<double, double>(aepf, cpv));
+                        }
+                    }
+                 }
             }
         }
 
@@ -562,7 +578,7 @@ PfPvPlot::setData(RideItem *_rideItem)
         if (tot_cad_points == 0) {
             //setTitle(tr("no cadence"));
             refreshZoneItems();
-            curve->setVisible(false);
+            mainCurvesSetVisible(false);
 
         } else {
             // Now that we have the set of points, transform them into the
@@ -597,14 +613,68 @@ PfPvPlot::setData(RideItem *_rideItem)
             // averages for intervals
             refreshIntervalMarkers();
 
-            curve->setSymbol(sym);
-            curve->setVisible(true);
+            // now the curves for gearRatio
+            if (gearRatioCurves.size()) {
+               QListIterator<QwtPlotCurve *> g(gearRatioCurves);
+               while (g.hasNext()) {
+                   QwtPlotCurve *curve = g.next();
+                   curve->detach();
+                   delete curve;
+               }
+            }
+            gearRatioCurves.clear();
+
+            // get the detailed data
+            QVector<QwtArray<double> > aepfArrayGearRatio(num_gearRatio_Plots);
+            QVector<QwtArray<double> > cpvArrayGearRatio(num_gearRatio_Plots);
+
+            for (int i=0;i<num_gearRatio_Plots;i++) {
+                std::set<std::pair<double, double> >::const_iterator m(gearSet[i].begin());
+                while (m != gearSet[i].end()) {
+                    const std::pair<double, double>& dataPoint = *m;
+
+                    aepfArrayGearRatio[i].push_back(dataPoint.first);
+                    cpvArrayGearRatio[i].push_back(dataPoint.second);
+
+                    ++m;
+                }
+            }
+
+            // create the plots
+            for (int i=0;i<num_gearRatio_Plots;i++) {
+                QwtPlotCurve *gearCurve;
+                gearCurve = new QwtPlotCurve();
+                QwtSymbol *sym = new QwtSymbol;
+                sym->setStyle(QwtSymbol::Diamond);
+                sym->setSize(3);
+                sym->setBrush(QBrush(Qt::NoBrush));
+                sym->setPen(QPen(Qt::red));
+                switch (i) {
+                  case 0: sym->setPen(QPen(Qt::red));  sym->setBrush(QBrush(Qt::red));  break;
+                  case 1: sym->setPen(QPen(Qt::yellow)); sym->setBrush(QBrush(Qt::yellow));break;
+                  case 2: sym->setPen(QPen(Qt::green));  sym->setBrush(QBrush(Qt::green));break;
+                  case 3: sym->setPen(QPen(Qt::blue));  sym->setBrush(QBrush(Qt::blue)); break;
+                    // default means something is wrong, but no err
+                  default: sym->setPen(QPen(Qt::white)); sym->setBrush(QBrush(Qt::white));
+                }
+                gearCurve->setSymbol(sym);
+                gearCurve->setStyle(QwtPlotCurve::Dots);
+                gearCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                gearCurve->setSamples(cpvArrayGearRatio[i], aepfArrayGearRatio[i]);
+                gearCurve->attach(this);
+
+                gearRatioCurves.append(gearCurve);
+
+            }
+
         }
+        mainCurvesSetVisible(true);
+
     } else {
 
         //setTitle("no data");
         refreshZoneItems();
-        curve->setVisible(false);
+        mainCurvesSetVisible(false);
     }
 
     replot();
@@ -695,8 +765,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        int num_intervals=intervalCount();
 
        if (mergeIntervals()) num_intervals = 1;
-       if (frameIntervals() || num_intervals==0) curve->setVisible(true);
-       if (frameIntervals()==false && num_intervals) curve->setVisible(false);
+       if (frameIntervals() || num_intervals==0) mainCurvesSetVisible(true);
+       if (frameIntervals()==false && num_intervals) mainCurvesSetVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
        long tot_cad = 0;
@@ -1165,6 +1235,15 @@ PfPvPlot::setFrameIntervals(bool value)
 }
 
 void
+PfPvPlot::setGearRatioDisplay(bool value)
+{
+    gear_ratio_display = value;
+    if (context->isCompareIntervals) return;
+    mainCurvesSetVisible(true);
+    replot();
+}
+
+void
 PfPvPlot::showCompareIntervals()
 {
     // Remove interval curve
@@ -1179,7 +1258,7 @@ PfPvPlot::showCompareIntervals()
     intervalCurves.clear();
 
     // quickly erase old data
-    curve->setVisible(false);
+    mainCurvesSetVisible(false);
 
     int num_intervals = context->compareIntervals.count();
 
@@ -1286,3 +1365,17 @@ PfPvPlot::showCompareIntervals()
     replot();
 }
 
+void
+PfPvPlot::mainCurvesSetVisible(bool visible) {
+
+    if (gearRatioCurves.size()) {
+        QListIterator<QwtPlotCurve *> i(gearRatioCurves);
+        while (i.hasNext()) {
+            QwtPlotCurve *curve = i.next();
+            curve->setVisible(visible ? gear_ratio_display : false);
+        }
+    }
+
+    curve->setVisible(visible ? !gear_ratio_display : false);
+
+}

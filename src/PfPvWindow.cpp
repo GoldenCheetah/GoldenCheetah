@@ -168,6 +168,11 @@ PfPvWindow::PfPvWindow(Context *context) :
     frameIntervalPfPvCheckBox->setText(tr("Frame intervals"));
     frameIntervalPfPvCheckBox->setCheckState(Qt::Checked);
     cl->addWidget(frameIntervalPfPvCheckBox);
+
+    gearRatioDisplayPfPvCheckBox = new QCheckBox;
+    gearRatioDisplayPfPvCheckBox->setText(tr("Gear Ratio Display"));
+    gearRatioDisplayPfPvCheckBox->setCheckState(Qt::Checked);
+    cl->addWidget(gearRatioDisplayPfPvCheckBox);
     cl->addStretch();
 
     connect(pfPvPlot, SIGNAL(changedCP(const QString&)), qaCPValue, SLOT(setText(const QString&)) );
@@ -182,6 +187,7 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(rMergeInterval, SIGNAL(stateChanged(int)), this, SLOT(setrMergeIntervalsPfPvFromCheckBox()));
     connect(frameIntervalPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
     connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
+    connect(gearRatioDisplayPfPvCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setGearRatioDisplayPfPvFromCheckBox()));
     connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
 
     // GC signals
@@ -198,6 +204,8 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
     configChanged();
+    // share current setting with Plot
+    setGearRatioDisplayPfPvFromCheckBox();
 }
 
 void
@@ -324,6 +332,15 @@ PfPvWindow::setrFrameIntervalsPfPvFromCheckBox()
         frameIntervalPfPvCheckBox->setChecked(rFrameInterval->isChecked());
     }
 }
+
+void
+PfPvWindow::setGearRatioDisplayPfPvFromCheckBox()
+{
+    if (pfPvPlot->gearRatioDisplay() != gearRatioDisplayPfPvCheckBox->isChecked()) {
+        pfPvPlot->setGearRatioDisplay(gearRatioDisplayPfPvCheckBox->isChecked());
+    }
+}
+
 
 void
 PfPvWindow::setQaCPFromLineEdit()

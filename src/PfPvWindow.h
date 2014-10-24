@@ -63,6 +63,7 @@ class PfPvWindow : public GcChartWindow
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool merge READ merge WRITE setMerge USER true)
     Q_PROPERTY(bool frame READ frame WRITE setFrame USER true)
+    Q_PROPERTY(bool gearRatio READ gearRatio WRITE setGearRatio USER true)
 
     public:
 
@@ -84,6 +85,8 @@ class PfPvWindow : public GcChartWindow
         void setMerge(bool x) { mergeIntervalPfPvCheckBox->setChecked(x); }
         bool frame() const { return frameIntervalPfPvCheckBox->isChecked(); }
         void setFrame(bool x) { frameIntervalPfPvCheckBox->setChecked(x); }
+        bool gearRatio() const { return gearRatioDisplayPfPvCheckBox->isChecked(); }
+        void setGearRatio(bool x) { gearRatioDisplayPfPvCheckBox->setChecked(x); }
 
         bool isCompare() const;
 
@@ -105,6 +108,7 @@ class PfPvWindow : public GcChartWindow
         void setrMergeIntervalsPfPvFromCheckBox();
         void setFrameIntervalsPfPvFromCheckBox();
         void setrFrameIntervalsPfPvFromCheckBox();
+        void setGearRatioDisplayPfPvFromCheckBox();
         void doubleClicked(int, int);
         void configChanged();
         void compareChanged();
@@ -118,6 +122,7 @@ class PfPvWindow : public GcChartWindow
         QCheckBox *shadeZonesPfPvCheckBox;
         QCheckBox *mergeIntervalPfPvCheckBox;
         QCheckBox *frameIntervalPfPvCheckBox;
+        QCheckBox *gearRatioDisplayPfPvCheckBox;
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;
