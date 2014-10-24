@@ -72,6 +72,8 @@ class PfPvPlot : public QwtPlot
         void setMergeIntervals(bool value);
         bool frameIntervals() const { return frame_intervals; }
         void setFrameIntervals(bool value);
+        bool gearRatioDisplay() const { return gear_ratio_display; }
+        void setGearRatioDisplay(bool value);
         void setAxisTitle(int axis, QString label);
 
         void showCompareIntervals();
@@ -93,6 +95,7 @@ class PfPvPlot : public QwtPlot
 
         Context *context;
         QwtPlotCurve *curve;
+        QList <QwtPlotCurve *> gearRatioCurves;
         QwtPlotCurve *hover;
         QList <QwtPlotCurve *> intervalCurves;
         QList <QwtPlotMarker *> intervalMarkers;
@@ -107,9 +110,13 @@ class PfPvPlot : public QwtPlot
         double cl_;
         bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
         bool merge_intervals, frame_intervals;
+        bool gear_ratio_display;
 
         double timeInQuadrant[4]; // time in seconds spent in each quadrant
         QwtPlotMarker *tiqMarker[4]; // time in seconds spent in each quadrant
+
+    private:
+        void mainCurvesSetVisible(bool);
 };
 
 #endif // _GC_QaPlot_h
