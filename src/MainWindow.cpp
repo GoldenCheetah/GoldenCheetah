@@ -121,7 +121,7 @@ MainWindow::MainWindow(const QDir &home)
     context->athlete = new Athlete(context, home);
 
     setWindowIcon(QIcon(":images/gc.png"));
-    setWindowTitle(context->athlete->home.dirName());
+    setWindowTitle(context->athlete->home->root().dirName());
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
 
@@ -130,7 +130,7 @@ MainWindow::MainWindow(const QDir &home)
     w->apiVersion();//shutup compiler
     #endif
     GCColorSet->colorSet(); // shut up the compiler
-    Library::initialise(context->athlete->home);
+    Library::initialise(context->athlete->home->workouts());
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
     QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
     if (listOfProxies.count() > 0) {
@@ -153,7 +153,7 @@ MainWindow::MainWindow(const QDir &home)
     // if no workout directory is configured, default to the
     // top level GoldenCheetah directory
     if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home.absolutePath() + "/../").absolutePath());
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->workouts().absolutePath() + "/../").absolutePath());
 
     /*----------------------------------------------------------------------
      *  GUI setup
@@ -184,7 +184,7 @@ MainWindow::MainWindow(const QDir &home)
      }
 
      // store "last_openend" athlete for next time
-     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home.dirName());
+     appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home->root().dirName());
 
     /*----------------------------------------------------------------------
      * ScopeBar
@@ -479,11 +479,11 @@ MainWindow::MainWindow(const QDir &home)
     currentTab = new Tab(context);
 
     // first tab
-    tabs.insert(currentTab->context->athlete->home.dirName(), currentTab);
+    tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
 
     // stack, list and bar all share a common index
     tabList.append(currentTab);
-    tabbar->addTab(currentTab->context->athlete->home.dirName());
+    tabbar->addTab(currentTab->context->athlete->home->root().dirName());
     tabStack->addWidget(currentTab);
     tabStack->setCurrentIndex(0);
 
@@ -919,7 +919,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home, currentTab->context->athlete->zones_, currentTab->context);
+    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context->athlete->zones_, currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
@@ -1000,7 +1000,7 @@ MainWindow::closeAll()
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog *ad = new AboutDialog(currentTab->context, currentTab->context->athlete->home);
+    AboutDialog *ad = new AboutDialog(currentTab->context, currentTab->context->athlete->home->root());
     ad->exec();
 }
 
@@ -1167,7 +1167,7 @@ MainWindow::dropEvent(QDropEvent *event)
 
     if (currentTab->currentView() != 3) { // we're not on train view
         // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (&urls, currentTab->context->athlete->home, currentTab->context);
+        RideImportWizard *dialog = new RideImportWizard (&urls, currentTab->context->athlete->home->imports(), currentTab->context);
         dialog->process(); // do it!
     } else {
         QStringList filenames;
@@ -1186,7 +1186,7 @@ MainWindow::dropEvent(QDropEvent *event)
 void
 MainWindow::downloadRide()
 {
-    (new DownloadRideDialog(currentTab->context, currentTab->context->athlete->home))->show();
+    (new DownloadRideDialog(currentTab->context, currentTab->context->athlete->home->downloads()))->show();
 }
 
 
@@ -1266,7 +1266,7 @@ MainWindow::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentTab->context->athlete->home, currentTab->context);
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentTab->context->athlete->home->imports(), currentTab->context);
         import->process();
     }
 }
@@ -1360,7 +1360,7 @@ MainWindow::addDevice()
 void
 MainWindow::newCyclistWindow()
 {
-    QDir newHome = currentTab->context->athlete->home;
+    QDir newHome = currentTab->context->athlete->home->root();
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) openWindow(name);
@@ -1369,7 +1369,7 @@ MainWindow::newCyclistWindow()
 void
 MainWindow::newCyclistTab()
 {
-    QDir newHome = currentTab->context->athlete->home;
+    QDir newHome = currentTab->context->athlete->home->root();
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) openTab(name);
@@ -1415,18 +1415,18 @@ MainWindow::openTab(QString name)
     currentTab = new Tab(context);
 
     // first tab
-    tabs.insert(currentTab->context->athlete->home.dirName(), currentTab);
+    tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
 
     // stack, list and bar all share a common index
     tabList.append(currentTab);
-    tabbar->addTab(currentTab->context->athlete->home.dirName());
+    tabbar->addTab(currentTab->context->athlete->home->root().dirName());
     tabStack->addWidget(currentTab);
 
     // switch to newly created athlete
     tabbar->setCurrentIndex(tabList.count()-1);
 
     // kick off on analysis
-    setWindowTitle(currentTab->context->athlete->home.dirName());
+    setWindowTitle(currentTab->context->athlete->home->root().dirName());
     selectAnalysis(); // sets scope bar ..
 
     // now apply current
@@ -1665,7 +1665,7 @@ MainWindow::switchTab(int index)
     // restore back
     restoreGCState(currentTab->context);
 
-    setWindowTitle(currentTab->context->athlete->home.dirName());
+    setWindowTitle(currentTab->context->athlete->home->root().dirName());
 
     setUpdatesEnabled(true);
 }

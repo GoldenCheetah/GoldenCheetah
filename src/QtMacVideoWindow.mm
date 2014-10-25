@@ -34,8 +34,8 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
     (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length());
 }
 
-VideoWindow::VideoWindow(Context *context, const QDir &home)  :
-GcWindow(context), home(home), context(context), hasMovie(false)
+VideoWindow::VideoWindow(Context *context)  :
+GcWindow(context), context(context), hasMovie(false)
 {
 
     setControls(NULL);

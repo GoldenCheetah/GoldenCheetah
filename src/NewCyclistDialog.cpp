@@ -20,6 +20,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "GcUpgrade.h"
+#include "Athlete.h"
 
 NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
 {
@@ -200,6 +201,20 @@ NewCyclistDialog::saveClicked()
         if (!home.exists(name->text())) {
             if (home.mkdir(name->text())) {
 
+                QDir athleteDir = QDir(home.absolutePath()+'/'+name->text());
+                AthleteDirectoryStructure *athleteHome = new AthleteDirectoryStructure(athleteDir);
+
+                // create the sub-Dirs here
+                athleteHome->root().mkdir(Athlete_Activities);
+                athleteHome->root().mkdir(Athlete_Imports);
+                athleteHome->root().mkdir(Athlete_Downloads);
+                athleteHome->root().mkdir(Athlete_Config);
+                athleteHome->root().mkdir(Athlete_Cache);
+                athleteHome->root().mkdir(Athlete_Calendar);
+                athleteHome->root().mkdir(Athlete_Workouts);
+                athleteHome->root().mkdir(Athlete_Logs);
+                athleteHome->root().mkdir(Athlete_Temp);
+
                 // set the last version to the latest version
                 appsettings->setCValue(name->text(), GC_VERSION_USED, GcUpgrade::version());
 
@@ -235,17 +250,17 @@ NewCyclistDialog::saveClicked()
                 appsettings->setCValue(name->text(), GC_WBALTAU, wbaltau->value());
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
                 appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
-                avatar.save(home.path() + "/" + name->text() + "/" + "avatar.png", "PNG");
+                avatar.save(athleteHome->config().absolutePath() + "/" + name->text() + "/" + "avatar.png", "PNG");
 
                 // Setup Power Zones
                 Zones zones;
                 zones.addZoneRange(QDate(1900, 01, 01), cp->value(), w->value());
-                zones.write(QDir(home.path() + "/" + name->text()));
+                zones.write(athleteHome->config().absolutePath() + "/" + name->text());
 
                 // HR Zones too!
                 HrZones hrzones;
                 hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
-                hrzones.write(QDir(home.path() + "/" + name->text()));
+                hrzones.write(athleteHome->config().absolutePath() + "/" + name->text());
 
                 accept();
             } else {

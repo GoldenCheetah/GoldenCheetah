@@ -244,7 +244,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     // measures
     QList<FieldDefinition> measureDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
-    QString filename = context->athlete->home.absolutePath()+"/measures.xml";
+    QString filename = context->athlete->home->config().absolutePath()+"/measures.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
     RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions, colorfield);

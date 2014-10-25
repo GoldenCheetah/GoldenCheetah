@@ -48,7 +48,7 @@ class NamedSearches : public QObject {
 
     public:
         NamedSearches(Athlete *athlete) : athlete(athlete) { 
-            home = athlete->home;
+            home = athlete->home->config();
             read();
         }
         void read();

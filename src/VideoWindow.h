@@ -158,7 +158,7 @@ class VideoWindow : public GcWindow
 
     public:
 
-        VideoWindow(Context *, const QDir &);
+        VideoWindow(Context *);
         ~VideoWindow();
 
     public slots:
@@ -175,7 +175,6 @@ class VideoWindow : public GcWindow
         void resizeEvent(QResizeEvent *);
 
         // passed from Context *
-        QDir home;
         Context *context;
 
         bool m_MediaChanged;

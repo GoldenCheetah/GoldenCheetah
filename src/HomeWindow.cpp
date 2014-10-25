@@ -1157,7 +1157,7 @@ HomeWindow::saveState()
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
     if (charts.count() == 0) return; // don't save empty, use default instead
 
-    QString filename = context->athlete->home.absolutePath() + "/" + name + "-layout.xml";
+    QString filename = context->athlete->home->config().absolutePath() + "/" + name + "-layout.xml";
     QFile file(filename);
     file.open(QFile::WriteOnly);
     file.resize(0);
@@ -1211,7 +1211,7 @@ HomeWindow::restoreState(bool useDefault)
     bool defaultUsed = false;
 
     // restore window state
-    QString filename = context->athlete->home.absolutePath() + "/" + name + "-layout.xml";
+    QString filename = context->athlete->home->config().absolutePath() + "/" + name + "-layout.xml";
     QFileInfo finfo(filename);
 
     if (useDefault) QFile::remove(filename);

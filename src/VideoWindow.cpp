@@ -19,8 +19,8 @@
 #include "VideoWindow.h"
 #include "Context.h"
 
-VideoWindow::VideoWindow(Context *context, const QDir &home)  :
-    GcWindow(context), home(home), context(context), m_MediaChanged(false)
+VideoWindow::VideoWindow(Context *context)  :
+    GcWindow(context), context(context), m_MediaChanged(false)
 {
     setControls(NULL);
     setProperty("color", QColor(Qt::black));
