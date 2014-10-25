@@ -55,7 +55,7 @@ RouteItem::RouteItem(RouteSegment *route, const RouteRide *routeRide,
     setTextAlignment(2, Qt::AlignRight);
 
     QDateTime dt;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
     while (i.hasNext()) {
         QString name = i.next(), notesFileName;
 

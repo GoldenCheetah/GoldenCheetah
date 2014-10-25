@@ -57,7 +57,7 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
     QStringList errors;
 
 #ifdef GC_HAVE_ICAL
-    QString remoteCache = context->athlete->home.absolutePath()+"/remote.ics";
+    QString remoteCache = context->athlete->home->calendar().absolutePath()+"/remote.ics";
     QFile remoteCacheFile(remoteCache);
 
     if (fulltext != "") {

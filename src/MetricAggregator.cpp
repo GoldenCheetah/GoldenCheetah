@@ -98,7 +98,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     // Get a list of the ride files
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
-    QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home);
+    QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home->activities());
     QStringListIterator i(filenames);
 
     // get a Hash map of statistic records and timestamps
@@ -120,7 +120,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // Delete statistics for non-existant ride files
     QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
-        if (QFile(context->athlete->home.absolutePath() + "/" + d.key()).exists() == false) {
+        if (QFile(context->athlete->home->activities().absolutePath() + "/" + d.key()).exists() == false) {
             dbaccess->deleteRide(d.key());
 #ifdef GC_HAVE_LUCENE
             context->athlete->lucene->deleteRide(d.key());
@@ -144,7 +144,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QApplication::processEvents(); // get that dialog up!
 
     // log of progress
-    QFile log(context->athlete->home.absolutePath() + "/" + "metric.log");
+    QFile log(context->athlete->home->logs().absolutePath() + "/" + "metric.log");
     log.open(QIODevice::WriteOnly);
     log.resize(0);
     QTextStream out(&log);
@@ -152,7 +152,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     while (i.hasNext()) {
         QString name = i.next();
-        QFile file(context->athlete->home.absolutePath() + "/" + name);
+        QFile file(context->athlete->home->activities().absolutePath() + "/" + name);
 
         // if it s missing or out of date then update it!
         status current = dbStatus.value(name);
@@ -197,7 +197,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
             // have been mucked up by dropbox / file copying / backups etc
 
             // but still update if we're doing this because settings changed not the ride!
-            QString fullPath =  QString(context->athlete->home.absolutePath()) + "/" + name;
+            QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + name;
             if ((crc == 0 || crc != DBAccess::computeFileCRC(fullPath)) ||
                 zoneFingerPrint != fingerprint ||
                 (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
@@ -215,7 +215,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                     out << "Getting weight: " << name << "\r\n";
                     ride->getWeight();
                     out << "Updating statistics: " << name << "\r\n";
-                    importRide(context->athlete->home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
+                    importRide(context->athlete->home->activities(), ride, name, zoneFingerPrint, (dbTimeStamp > 0));
 
                 }
                 updates++;
@@ -227,7 +227,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // we only want to check so passing check=true
         // because we don't actually want the results now
         // it will also check the file CRC as well as timestamps
-        RideFileCache updater(context, context->athlete->home.absolutePath() + "/" + name, ride, true);
+        RideFileCache updater(context, context->athlete->home->activities().absolutePath() + "/" + name, ride, true);
 
         // free memory - if needed
         if (ride) delete ride;
@@ -278,8 +278,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 void MetricAggregator::addRide(RideItem*ride)
 {
     if (ride && ride->ride()) {
-        importRide(context->athlete->home, ride->ride(), ride->fileName, context->athlete->zones()->getFingerprint(context), true);
-        RideFileCache updater(context, context->athlete->home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
+        importRide(context->athlete->home->activities(), ride->ride(), ride->fileName, context->athlete->zones()->getFingerprint(context), true);
+        RideFileCache updater(context, context->athlete->home->activities().absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
         dataChanged(); // notify models/views
     }
 }

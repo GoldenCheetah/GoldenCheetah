@@ -42,8 +42,8 @@ class RideImportWizard : public QDialog
 
 
 public:
-    RideImportWizard(QList<QUrl> *urls, QDir &home, Context *context, QWidget *parent = 0);
-    RideImportWizard(QList<QString> files, QDir &home, Context *context, QWidget *parent = 0);
+    RideImportWizard(QList<QUrl> *urls, QDir home, Context *context, QWidget *parent = 0);
+    RideImportWizard(QList<QString> files, QDir home, Context *context, QWidget *parent = 0);
     ~RideImportWizard();
     int process();
     void setDialogMode(int); // default is fullDialog
@@ -59,7 +59,7 @@ private slots:
     void activateSave();
 
 private:
-    void init(QList<QString> files, QDir &home, Context *context);
+    void init(QList<QString> files, QDir home, Context *context);
     QList <QString> filenames; // list of filenames passed
     QList <bool> blanks; // record of which have a RideFileReader returned date & time
     QDir home; // target directory

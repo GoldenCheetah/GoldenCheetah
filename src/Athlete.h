@@ -50,6 +50,7 @@ class QSqlTableModel;
 class PDEstimate;
 class LTMSettings;
 class Routes;
+class AthleteDirectoryStructure;
 
 class Context;
 
@@ -58,14 +59,15 @@ class Athlete : public QObject
     Q_OBJECT
 
     public:
-        Athlete(Context *context, const QDir &home);
+        Athlete(Context *context, const QDir &homeDir);
         ~Athlete();
         void close();
 
         // basic athlete info
         QString cyclist; // the cyclist name
         bool useMetricUnits;
-        QDir home;
+        AthleteDirectoryStructure *home;
+        const AthleteDirectoryStructure *directoryStructure() const {return home; }
 
         // zones
         const Zones *zones() const { return zones_; }
@@ -147,4 +149,60 @@ class Athlete : public QObject
 
 
 };
+
+// SubDirs into which the different file types of GC will be stored
+// root() is still the .../AthleteDirectory/AthleteName like before
+
+// static const QString Athlete_Activities = "/activities";
+// static const QString Athlete_Imports = "/imports";
+// static const QString Athlete_Downloads = "/downloads";
+// static const QString Athlete_Config = "/config";
+// static const QString Athlete_Cache = "/cache";
+// static const QString Athlete_Calendar = "/calendar";
+// static const QString Athlete_Workouts = "/workouts";
+// static const QString Athlete_Logs = "/logs";
+// static const QString Athlete_Temp = "/temp";
+
+
+
+
+// For code adoption to new HomeDir Object, don't add subdir's yet
+// the change needs migration from root() to subdirs being ready
+
+static const QString Athlete_Activities = "";
+static const QString Athlete_Imports = "";
+static const QString Athlete_Downloads = "";
+static const QString Athlete_Config = "";
+static const QString Athlete_Cache = "";
+static const QString Athlete_Calendar = "";
+static const QString Athlete_Workouts = "";
+static const QString Athlete_Temp = "";
+static const QString Athlete_Logs = "";
+
+
+class AthleteDirectoryStructure : public QObject {
+        Q_OBJECT
+
+        public:
+            AthleteDirectoryStructure(const QDir home);
+            ~AthleteDirectoryStructure();
+
+            QDir activities() { return QDir(myhome.absolutePath()+Athlete_Activities); }
+            QDir imports(){ return QDir(myhome.absolutePath()+Athlete_Imports);}
+            QDir downloads() { return QDir(myhome.absolutePath()+Athlete_Downloads);}
+            QDir config() { return QDir(myhome.absolutePath()+Athlete_Config);}
+            QDir cache() { return QDir(myhome.absolutePath()+Athlete_Cache);}
+            QDir calendar() { return QDir(myhome.absolutePath()+Athlete_Calendar);}
+            QDir workouts() { return QDir(myhome.absolutePath()+Athlete_Workouts);}
+            QDir logs() { return QDir(myhome.absolutePath()+Athlete_Logs);}
+            QDir temp() { return QDir(myhome.absolutePath()+Athlete_Temp);}
+            QDir root() { return myhome; }
+
+        private:
+
+            QDir myhome;
+
+};
+
+
 #endif

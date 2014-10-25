@@ -169,7 +169,7 @@ ICalendar::ICalendar(Context *context) : QWidget(context->mainWindow), context(c
     // get from local and remote calendar
 
     // local file
-    QString localFilename = context->athlete->home.absolutePath()+"/calendar.ics";
+    QString localFilename = context->athlete->home->calendar().absolutePath()+"/calendar.ics";
     QFile localFile(localFilename);
     if (localFile.exists() && localFile.open(QFile::ReadOnly | QFile::Text)) {
 

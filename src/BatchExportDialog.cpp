@@ -232,7 +232,7 @@ BatchExportDialog::exportFiles()
             // open it..
             QStringList errors;
             QList<RideFile*> rides;
-            QFile thisfile(QString(context->athlete->home.absolutePath()+"/"+current->text(1)));
+            QFile thisfile(QString(context->athlete->home->activities().absolutePath()+"/"+current->text(1)));
             RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
 
             // open success?

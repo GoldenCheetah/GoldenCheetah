@@ -402,7 +402,7 @@ SplitActivityWizard::setFilesList()
 QString
 SplitActivityWizard::hasBackup(QString filename)
 {
-    QString backupFilename = context->athlete->home.absolutePath() + "/" + filename + ".bak";
+    QString backupFilename = context->athlete->home->activities().absolutePath() + "/" + filename + ".bak";
 
     if (QFile(backupFilename).exists()) {
 
@@ -432,7 +432,7 @@ SplitActivityWizard::conflicts(QDateTime datetime)
     // now make a regexp for all know ride types
     foreach(QString suffix, RideFileFactory::instance().suffixes()) {
 
-        QString conflict = context->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
+        QString conflict = context->athlete->home->activities().absolutePath() + "/" + targetnosuffix + "." + suffix;
         if (QFile(conflict).exists()) returning << conflict;
     }
     return returning;
@@ -710,7 +710,7 @@ SplitConfirm::initializePage()
     // it will always conflict with current ride, so we pick that
     // up as a special case.
     // we check against existing rides AND the rides we WILL create
-    QString originalFileName = wizard->context->athlete->home.absolutePath() + "/" + wizard->rideItem->fileName;
+    QString originalFileName = wizard->context->athlete->home->activities().absolutePath() + "/" + wizard->rideItem->fileName;
     QList<QDateTime> toBeCreated;
     foreach(RideFile *ride, wizard->activities) {
 
@@ -820,7 +820,7 @@ SplitConfirm::validatePage()
         for(int i=0; i<wizard->activities.count(); i++) {
 
             QTreeWidgetItem *current = wizard->files->invisibleRootItem()->child(i+off);
-            QString target = wizard->context->athlete->home.absolutePath() + "/" + current->text(0);
+            QString target = wizard->context->athlete->home->activities().absolutePath() + "/" + current->text(0);
 
             JsonFileReader reader;
             QFile out(target);

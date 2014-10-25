@@ -114,7 +114,7 @@ DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
     // check we have one and use built in if not there
     RideMetadata::readXML(":/xml/measures.xml", mkeywordDefinitions, mfieldDefinitions, mcolorfield);
-	initDatabase(context->athlete->home);
+    initDatabase(context->athlete->home->cache());
 }
 
 DBAccess::~DBAccess()
@@ -230,7 +230,7 @@ bool DBAccess::createMetricsTable()
         //if (!rc) qDebug()<<"create table failed!"  << query.lastError();
 
         // add row to version database
-        QString metadataXML =  QString(context->athlete->home.absolutePath()) + "/metadata.xml";
+        QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
         int metadatacrcnow = computeFileCRC(metadataXML);
         QDateTime timestamp = QDateTime::currentDateTime();
 
@@ -336,7 +336,7 @@ void DBAccess::checkDBVersion()
 {
 
     // get a CRC for metadata.xml
-    QString metadataXML =  QString(context->athlete->home.absolutePath()) + "/metadata.xml";
+    QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
     int metadatacrcnow = computeFileCRC(metadataXML);
 
     // get a CRC for measures.xml
@@ -474,7 +474,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
 	query.prepare(insertStatement);
 
     // filename, crc, timestamp, ride date
-    QString fullPath =  QString(context->athlete->home.absolutePath()) + "/" + summaryMetrics->getFileName();
+    QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + summaryMetrics->getFileName();
 	query.addBindValue(summaryMetrics->getFileName());
 	query.addBindValue(summaryMetrics->getId());
 	query.addBindValue((int)computeFileCRC(fullPath));
