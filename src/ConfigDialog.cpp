@@ -153,7 +153,6 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, Context *context) :
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(horizontalLayout);
-    mainLayout->addStretch();
     mainLayout->addLayout(buttonsLayout);
     mainLayout->setSpacing(0);
     contents->setLayout(mainLayout);
