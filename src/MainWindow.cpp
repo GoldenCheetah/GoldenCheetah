@@ -1537,6 +1537,10 @@ MainWindow::setOpenWindowMenu()
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
+        // icon / mugshot ?
+        QString icon = QString("%1/%2/avatar.png").arg(gcroot).arg(name);
+        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
+
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
             QMapIterator<QString, Tab*> t(x->tabs);
@@ -1572,6 +1576,10 @@ MainWindow::setOpenTabMenu()
 
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
+
+        // icon / mugshot ?
+        QString icon = QString("%1/%2/avatar.png").arg(gcroot).arg(name);
+        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
