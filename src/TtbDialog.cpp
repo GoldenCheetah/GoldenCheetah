@@ -216,7 +216,7 @@ TtbDialog::requestUpload()
     body->append( textPart );
 
 
-    QString fname = context->athlete->home.absoluteFilePath(".ttbupload.pwx" );
+    QString fname = context->athlete->home->temp().absoluteFilePath(".ttbupload.pwx" );
     QFile *uploadFile = new QFile( fname );
     uploadFile->setParent(body);
 

@@ -457,7 +457,7 @@ RouteWindow::resetRoutes()
             allRides->setText(0, route->getName());
 
             RouteItem *last = NULL;
-            QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home));
+            QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
             while (i.hasNext()) {
                 QString name = i.next(), notesFileName;
                 QDateTime dt;
@@ -466,7 +466,7 @@ RouteWindow::resetRoutes()
                         QDateTime dateTime = dt.addSecs(route->getRides()[j].start);
 
                         //last = new RouteItem(route, RIDE_TYPE, mainWindow->home.path(), name, dateTime, mainWindow);
-                        last = new RouteItem(route, &route->getRides()[j], context->athlete->home.path(), context);
+                        last = new RouteItem(route, &route->getRides()[j], context->athlete->home->activities().path(), context);
 
 
                         QString time = QTime(0,0,0,0).addSecs(route->getRides()[j].stop- route->getRides()[j].start).toString("hh:mm:ss");

@@ -67,7 +67,7 @@ class ScatterWindow : public GcChartWindow
 
     public:
 
-        ScatterWindow(Context *, const QDir &);
+        ScatterWindow(Context *);
 
         // reveal
         bool hasReveal() { return true; }
@@ -105,7 +105,6 @@ class ScatterWindow : public GcChartWindow
     protected:
 
         // passed from Context *
-        QDir home;
         Context *context;
         bool useMetricUnits;
         bool active;

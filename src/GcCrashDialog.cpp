@@ -64,10 +64,10 @@
 #include "WFApi.h"
 #endif
 
-GcCrashDialog::GcCrashDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
+GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
     setAttribute(Qt::WA_DeleteOnClose, true); // caller must delete me, once they've extracted the name
-    setWindowTitle(QString(tr("%1 Crash Recovery").arg(home.dirName())));
+    setWindowTitle(QString(tr("%1 Crash Recovery").arg(home.root().dirName())));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -308,7 +308,7 @@ GcCrashDialog::setHTML()
     QString text;
 
     // the cyclist...
-    text += QString("<center><h3>Cyclist: \"%1\"</h3></center><br>").arg(home.dirName());
+    text += QString("<center><h3>Cyclist: \"%1\"</h3></center><br>").arg(home.root().dirName());
 
     // version info
     text += "<center><h3>Version Info</h3></center>";
@@ -317,7 +317,7 @@ GcCrashDialog::setHTML()
     // metric log...
     text += "<center><h3>Metric Log</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    QFile metriclog(home.absolutePath() + "/" + "metric.log");
+    QFile metriclog(home.logs().absolutePath() + "/" + "metric.log");
     if (metriclog.open(QIODevice::ReadOnly)) {
 
         // read in line by line and add to diag file
@@ -336,10 +336,10 @@ GcCrashDialog::setHTML()
     // files...
     text += "<center><h3>Athlete Directory</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    foreach(QString file, home.entryList(QDir::NoFilter, QDir::Time)) {
+    foreach(QString file, home.activities().entryList(QDir::NoFilter, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
-                .arg(QFileInfo(home.absolutePath() + "/" + file).lastModified().toString());
+                .arg(QFileInfo(home.activities().absolutePath() + "/" + file).lastModified().toString());
     }
     text += "</table></center>";
 

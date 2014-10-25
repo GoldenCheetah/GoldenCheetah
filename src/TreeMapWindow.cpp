@@ -53,7 +53,7 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     setControls(c);
 
     // read metadata.xml
-    QString filename = context->athlete->home.absolutePath()+"/metadata.xml";
+    QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
     RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);

@@ -46,8 +46,8 @@
 #include <QXmlSimpleReader>
 #include <QFileDialog>
 
-CriticalPowerWindow::CriticalPowerWindow(const QDir &home, Context *context, bool rangemode) :
-    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false), hoverCurve(NULL), firstShow(true)
+CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
+    GcChartWindow(context), _dateRange("{00000000-0000-0000-0000-000000000001}"), context(context), currentRide(NULL), rangemode(rangemode), isfiltered(false), stale(true), useCustom(false), useToToday(false), active(false), hoverCurve(NULL), firstShow(true)
 {
     //
     // reveal controls widget

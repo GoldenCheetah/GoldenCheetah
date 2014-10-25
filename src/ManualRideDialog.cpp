@@ -486,7 +486,7 @@ ManualRideDialog::okClicked()
                            .arg (rideDateTime.time().minute(), 2, 10, zero)
                            .arg (rideDateTime.time().second(), 2, 10, zero);
 
-    QString filename = context->athlete->home.absolutePath() + "/" + basename + ".json";
+    QString filename = context->athlete->home->activities().absolutePath() + "/" + basename + ".json";
 
     QFile out(filename);
     bool success = RideFileFactory::instance().writeRideFile(context, rideFile, out, "json");

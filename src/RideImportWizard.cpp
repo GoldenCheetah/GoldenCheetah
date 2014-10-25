@@ -34,7 +34,7 @@
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
-RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, Context *context, QWidget *parent) : QDialog(parent), context(context)
+RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir home, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
     dialogMode = standardDialog;
     setAttribute(Qt::WA_DeleteOnClose);
@@ -46,14 +46,14 @@ RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, Context *conte
     filenames.clear();
 }
 
-RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, Context *context, QWidget *parent) : QDialog(parent), context(context)
+RideImportWizard::RideImportWizard(QList<QString> files, QDir home, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
     dialogMode = standardDialog;
     init(files, home, context);
 }
 
 void
-RideImportWizard::init(QList<QString> files, QDir &home, Context * /*mainWindow*/)
+RideImportWizard::init(QList<QString> files, QDir home, Context * /*mainWindow*/)
 {
 
     // initialise dialog box
@@ -119,7 +119,7 @@ RideImportWizard::init(QList<QString> files, QDir &home, Context * /*mainWindow*
     statusHeading->setText(tr("Import Status"));
     tableWidget->setHorizontalHeaderItem(5, statusHeading);
 
-    // save target dir
+    // save target dir for the file import
     this->home = home;
 
     // Fill in the filenames and all the textItems

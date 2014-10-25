@@ -24,13 +24,15 @@
 #include <QWebView>
 #include <QFileDialog>
 
+#include "Athlete.h"
+
 class GcCrashDialog : public QDialog
 {
     Q_OBJECT
 
     public:
         GcCrashDialog(QDir);
-        QDir home;
+        AthleteDirectoryStructure home;
         static QString versionHTML();
 
     public slots:

@@ -144,8 +144,8 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     switch(id) {
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(context); break;
     case GcWindowTypes::AllPlot: returning = new AllPlotWindow(context); break;
-    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(context->athlete->home, context, false); break;
-    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(context->athlete->home, context, true); break;
+    case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(context, false); break;
+    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(context, true); break;
 #ifdef GC_HAVE_ICAL
     case GcWindowTypes::Diary: returning = new DiaryWindow(context); break;
 #else
@@ -182,14 +182,14 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(context, true); break;
     case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(context, false); break;
-    case GcWindowTypes::Scatter: returning = new ScatterWindow(context, context->athlete->home); break;
+    case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
     case GcWindowTypes::Summary: returning = new SummaryWindow(context); break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
 #ifdef GC_VIDEO_NONE
     case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
 #else
-    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context, context->athlete->home); break;
+    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(context); break;
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(context); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(context); break;

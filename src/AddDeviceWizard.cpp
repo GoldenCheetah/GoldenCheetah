@@ -553,7 +553,7 @@ AddFirmware::validatePage()
     if (copy->isChecked()) {
 
         QString fileName = QFileInfo(filePath).fileName();
-        QString targetFileName = QFileInfo(context->athlete->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
+        QString targetFileName = QFileInfo(context->athlete->home->root().absolutePath() + "/../").absolutePath() + "/" + fileName;
 
         // check not the same thing!
         if(QFileInfo(fileName).absolutePath() != QFileInfo(targetFileName).absolutePath()) {

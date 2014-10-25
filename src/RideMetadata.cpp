@@ -115,7 +115,7 @@ RideMetadata::warnDateTime(QDateTime datetime)
     // now make a regexp for all know ride types
     foreach(QString suffix, RideFileFactory::instance().suffixes()) {
 
-        QString conflict = context->athlete->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
+        QString conflict = context->athlete->home->activities().absolutePath() + "/" + targetnosuffix + "." + suffix;
         if (QFile(conflict).exists() && QFileInfo(conflict).fileName() != rideItem()->fileName) {
             QMessageBox::warning(this, "Date/Time Entry", "A ride already exists with that date/time, if you do not change it then you will overwrite and lose existing data");
             return; // only warn on the first conflict!
@@ -243,7 +243,7 @@ RideMetadata::configUpdate()
     setFont(QFont());
 
     // read metadata.xml
-    QString filename = context->athlete->home.absolutePath()+"/metadata.xml";
+    QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
     readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
