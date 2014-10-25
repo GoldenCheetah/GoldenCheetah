@@ -33,10 +33,10 @@ using namespace lucene::store;
 Lucene::Lucene(QObject *parent, Context *context) : QObject(parent), context(context)
 {
     // create the directory if needed
-    context->athlete->home.mkdir("index");
+    context->athlete->home->cache().mkdir("index");
 
     // make index directory if needed
-    dir = QDir(context->athlete->home.canonicalPath() + "/index");
+    dir = QDir(context->athlete->home->cache().canonicalPath() + "/index");
 
     try {
 

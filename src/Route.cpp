@@ -264,14 +264,14 @@ RouteSegment::searchRouteInAllRides(Context* context)
     qDebug() << "searchRouteInAllRides()";
 
     // log of progress
-    QFile log(context->athlete->home.absolutePath() + "/" + "routes.log");
+    QFile log(context->athlete->home->logs().absolutePath() + "/" + "routes.log");
     log.open(QIODevice::ReadWrite);
     QTextStream out(&log);
 
     out << "SEARCH NEW ROUTE STARTS: " << QDateTime::currentDateTime().toString() + "\r\n";
 
 
-    QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home);
+    QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home->activities());
     QStringListIterator iterator(filenames);
     QStringList errors;
 
@@ -286,7 +286,7 @@ RouteSegment::searchRouteInAllRides(Context* context)
 
     while (iterator.hasNext()) {
         QString name = iterator.next();
-        QFile file(context->athlete->home.absolutePath() + "/" + name);
+        QFile file(context->athlete->home->activities().absolutePath() + "/" + name);
         out << "Opening ride: " << name;
 
         RideFile *ride = NULL;
@@ -469,7 +469,7 @@ void
 Routes::searchRoutesInRide(RideFile* ride)
 {   
     // log of progress
-    QFile log(context->athlete->home.absolutePath() + "/" + "routes2.log");
+    QFile log(context->athlete->home->logs().absolutePath() + "/" + "routes2.log");
     log.open(QIODevice::ReadWrite);
     QTextStream out(&log);
 

@@ -311,7 +311,7 @@ TPDownloadDialog::refreshClicked()
     // Whilst we wait for the results lets fill the map of existing rideFiles
     // (but ignore seconds since they aren't reliable)
     rideFiles.clear();
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
     for (i.toFront(); i.hasNext();) rideFiles << QFileInfo(i.next()).baseName().mid(0,14);
 
 }
@@ -673,7 +673,7 @@ TPDownloadDialog::syncNext()
 
                 // read in the file
                 QStringList errors;
-                QFile file(context->athlete->home.absolutePath() + "/" + curr->text(1));
+                QFile file(context->athlete->home->activities().absolutePath() + "/" + curr->text(1));
                 RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
                 if (ride) {
@@ -828,7 +828,7 @@ TPDownloadDialog::uploadNext()
 
             // read in the file
             QStringList errors;
-            QFile file(context->athlete->home.absolutePath() + "/" + curr->text(1));
+            QFile file(context->athlete->home->activities().absolutePath() + "/" + curr->text(1));
             RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
             if (ride) {
@@ -902,7 +902,7 @@ TPDownloadDialog::saveRide(RideFile *ride, QDomDocument &, QStringList &errors)
                            .arg ( ridedatetime.time().minute(), 2, 10, zero )
                            .arg ( ridedatetime.time().second(), 2, 10, zero );
 
-    QString filename = context->athlete->home.absolutePath() + "/" + targetnosuffix + ".json";
+    QString filename = context->athlete->home->activities().absolutePath() + "/" + targetnosuffix + ".json";
 
     // exists?
     QFileInfo fileinfo(filename);

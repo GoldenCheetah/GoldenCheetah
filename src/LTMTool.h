@@ -133,7 +133,6 @@ class LTMTool : public QWidget
         QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
         QwtSymbol::Style symbolStyle(RideMetric::MetricType);
 
-        const QDir home;
         Context *context;
         bool active; // ignore season changed signals since we triggered them
 

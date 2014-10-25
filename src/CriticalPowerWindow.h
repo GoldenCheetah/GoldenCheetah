@@ -85,7 +85,7 @@ class CriticalPowerWindow : public GcChartWindow
 
     public:
 
-        CriticalPowerWindow(const QDir &home, Context *context, bool range);
+        CriticalPowerWindow(Context *context, bool range);
 
         // compare is supported
         bool isCompare() const {
@@ -256,7 +256,6 @@ class CriticalPowerWindow : public GcChartWindow
 
         bool event(QEvent *event);
 
-        QDir home;
         CPPlot *cpPlot;
         Context *context;
         QLabel *cpintTimeValue;

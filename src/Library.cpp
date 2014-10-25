@@ -154,7 +154,7 @@ Library::importFiles(Context *context, QStringList files)
             // set target directory
             QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
             if (workoutDir == "") {
-                QDir root = context->athlete->home;
+                QDir root = context->athlete->home->workouts();
                 root.cdUp();
                 workoutDir = root.absolutePath();
             }
@@ -178,7 +178,7 @@ Library::importFiles(Context *context, QStringList files)
         trainDB->endLUW();
 
         // now write to disk.. any refs we added
-        LibraryParser::serialize(context->athlete->home);
+        LibraryParser::serialize(context->athlete->home->workouts());
 
         // Tell traintool to select what was imported
         if (videos.count()) context->notifySelectVideo(videos[0]);
@@ -199,7 +199,7 @@ Library::removeRef(Context *context, QString ref)
     int index = refs.indexOf(ref);
     if (index >= 0) {
         refs.removeAt(index);
-        LibraryParser::serialize(context->athlete->home);
+        LibraryParser::serialize(context->athlete->home->workouts());
     }
 }
 
@@ -402,7 +402,7 @@ LibrarySearchDialog::search()
 
 
             // now write to disk..
-            LibraryParser::serialize(context->athlete->home);
+            LibraryParser::serialize(context->athlete->home->workouts());
         }
 
         // ok, we;ve completed a search without aborting
@@ -746,12 +746,12 @@ WorkoutImportDialog::import()
     }
 
     // now write to disk..
-    LibraryParser::serialize(context->athlete->home);
+    LibraryParser::serialize(context->athlete->home->workouts());
 
     // set target directory
     QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
     if (workoutDir == "") {
-        QDir root = context->athlete->home;
+        QDir root = context->athlete->home->workouts();
         root.cdUp();
         workoutDir = root.absolutePath();
     }

@@ -2577,7 +2577,7 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
 		        (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
                 (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
 
-        sc->calculateStress(context, context->athlete->home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
+        sc->calculateStress(context, context->athlete->home->activities().absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
 
     }
 

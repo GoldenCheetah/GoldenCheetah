@@ -775,8 +775,8 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     bio = new QTextEdit(this);
     bio->setText(appsettings->cvalue(context->athlete->cyclist, GC_BIO).toString());
 
-    if (QFileInfo(context->athlete->home.absolutePath() + "/" + "avatar.png").exists())
-        avatar = QPixmap(context->athlete->home.absolutePath() + "/" + "avatar.png");
+    if (QFileInfo(context->athlete->home->config().absolutePath() + "/" + "avatar.png").exists())
+        avatar = QPixmap(context->athlete->home->config().absolutePath() + "/" + "avatar.png");
     else
         avatar = QPixmap(":/images/noavatar.png");
 
@@ -887,7 +887,7 @@ RiderPage::saveClicked()
 
     appsettings->setCValue(context->athlete->cyclist, GC_SEX, sex->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
-    avatar.save(context->athlete->home.absolutePath() + "/" + "avatar.png", "PNG");
+    avatar.save(context->athlete->home->config().absolutePath() + "/" + "avatar.png", "PNG");
 
     // save the import settings
     appsettings->setCValue(context->athlete->cyclist, GC_IMPORTSETTINGS, importSetting->currentIndex());
@@ -2141,7 +2141,7 @@ MetadataPage::saveClicked()
     appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
 
     // write to metadata.xml
-    RideMetadata::serialize(context->athlete->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
+    RideMetadata::serialize(context->athlete->home->config().absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
 
     // save processors config
     processorPage->saveClicked();
@@ -2679,7 +2679,7 @@ ZonePage::ZonePage(Context *context) : context(context)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home.absolutePath() + "/power.zones");
+    QFile zonesFile(context->athlete->home->config().absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
@@ -2700,7 +2700,7 @@ void
 ZonePage::saveClicked()
 {
     zones.setScheme(schemePage->getScheme());
-    zones.write(context->athlete->home);
+    zones.write(context->athlete->home->config());
 }
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
@@ -3255,7 +3255,7 @@ HrZonePage::HrZonePage(Context *context) : context(context)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home.absolutePath() + "/hr.zones");
+    QFile zonesFile(context->athlete->home->config().absolutePath() + "/hr.zones");
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
@@ -3276,7 +3276,7 @@ void
 HrZonePage::saveClicked()
 {
     zones.setScheme(schemePage->getScheme());
-    zones.write(context->athlete->home);
+    zones.write(context->athlete->home->config());
 }
 
 HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
@@ -3879,7 +3879,7 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home.absolutePath() + "/pace.zones");
+    QFile zonesFile(context->athlete->home->config().absolutePath() + "/pace.zones");
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
@@ -3901,7 +3901,7 @@ PaceZonePage::saveClicked()
 {
     appsettings->setValue(GC_PACE, cvPage->metric->isChecked());
     zones.setScheme(schemePage->getScheme());
-    zones.write(context->athlete->home);
+    zones.write(context->athlete->home->config());
 }
 
 PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
@@ -4513,7 +4513,7 @@ MeasuresPage::MeasuresPage(Context *context) : context(context)
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
 
     // check we have one and use built in if not there
-    QString filename = context->athlete->home.absolutePath()+"/measures.xml";
+    QString filename = context->athlete->home->config().absolutePath()+"/measures.xml";
     QString colorfield;
 
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
@@ -4663,7 +4663,7 @@ MeasuresPage::saveClicked()
     getDefinitions(current);
 
     // write to measures.xml (uses same format as metadata.xml)
-    RideMetadata::serialize(context->athlete->home.absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current, "");
+    RideMetadata::serialize(context->athlete->home->config().absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current, "");
 }
 
 //
@@ -4897,7 +4897,7 @@ SeasonsPage::saveClicked()
     }
 
     // write to disk
-    QString file = QString(context->athlete->home.absolutePath() + "/seasons.xml");
+    QString file = QString(context->athlete->home->config().absolutePath() + "/seasons.xml");
     SeasonParser::serialize(file, array);
 
     // re-read
