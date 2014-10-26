@@ -24,12 +24,12 @@
 	<chart id="2" name="" title="Ride" >
 		<property name="title" type="QString" value="Ride" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1.35135" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="stacked" type="bool" value="1" />
 		<property name="byseries" type="bool" value="1" />
-		<property name="stackWidth" type="int" value="15" />
+		<property name="stackWidth" type="int" value="5" />
 		<property name="showGrid" type="int" value="0" />
 		<property name="showFull" type="int" value="0" />
 		<property name="showHelp" type="int" value="0" />
@@ -41,19 +41,29 @@
 		<property name="showSpeed" type="int" value="2" />
 		<property name="showAccel" type="int" value="0" />
 		<property name="showCad" type="int" value="2" />
-		<property name="showTorque" type="int" value="2" />
+		<property name="showTorque" type="int" value="0" />
 		<property name="showPower" type="int" value="1" />
+		<property name="showSlope" type="int" value="0" />
+		<property name="showAltSlope" type="int" value="1" />
 		<property name="showHr" type="int" value="2" />
 		<property name="showCadD" type="int" value="0" />
 		<property name="showTorqueD" type="int" value="0" />
 		<property name="showPowerD" type="int" value="0" />
 		<property name="showHrD" type="int" value="0" />
-		<property name="showAlt" type="int" value="2" />
+		<property name="showAlt" type="int" value="0" />
 		<property name="showBalance" type="int" value="2" />
 		<property name="showTE" type="int" value="0" />
 		<property name="showPS" type="int" value="0" />
 		<property name="showTemp" type="int" value="0" />
-		<property name="showW" type="int" value="0" />
+		<property name="showW" type="int" value="2" />
+		<property name="showRV" type="int" value="0" />
+		<property name="showRCad" type="int" value="0" />
+		<property name="showRGCT" type="int" value="0" />
+		<property name="showSmO2" type="int" value="2" />
+		<property name="showtHb" type="int" value="2" />
+		<property name="showO2Hb" type="int" value="2" />
+		<property name="showHHb" type="int" value="2" />
+		<property name="showGear" type="int" value="2" />
 		<property name="byDistance" type="int" value="0" />
 		<property name="smoothing" type="int" value="2" />
 		<property name="paintBrush" type="int" value="1" />
@@ -69,7 +79,7 @@
 		<property name="showBest" type="bool" value="1" />
 		<property name="showPercent" type="bool" value="0" />
 		<property name="showGrid" type="bool" value="1" />
-		<property name="season" type="QString" value="Last 3 months" />
+		<property name="season" type="QString" value="Last 2 months" />
 		<property name="cpmodel" type="int" value="3" />
 		<property name="variant" type="int" value="0" />
 		<property name="ani1" type="int" value="120" />
@@ -78,7 +88,7 @@
 		<property name="aei2" type="int" value="3000" />
 		<property name="sani1" type="int" value="20" />
 		<property name="sani2" type="int" value="90" />
-		<property name="laei1" type="int" value="3600" />
+		<property name="laei1" type="int" value="4000" />
 		<property name="laei2" type="int" value="30000" />
 		<property name="laei2" type="int" value="30000" />
 		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
@@ -94,20 +104,27 @@
 		<property name="ridePlotMode" type="int" value="0" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="2" name="" title="Stress" >
-		<property name="title" type="QString" value="Stress" />
+	<chart id="5" name="" title="Map" >
+		<property name="title" type="QString" value="Map" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
+	</chart>
+	<chart id="2" name="" title="Stress" >
+		<property name="title" type="QString" value="Stress" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1.72414" />
+		<property name="resizable" type="bool" value="0" />
 		<property name="stacked" type="bool" value="0" />
-		<property name="byseries" type="bool" value="0" />
-		<property name="stackWidth" type="int" value="20" />
+		<property name="byseries" type="bool" value="1" />
+		<property name="stackWidth" type="int" value="5" />
 		<property name="showGrid" type="int" value="0" />
 		<property name="showFull" type="int" value="0" />
 		<property name="showHelp" type="int" value="0" />
-		<property name="showATISS" type="int" value="2" />
-		<property name="showANTISS" type="int" value="2" />
+		<property name="showATISS" type="int" value="0" />
+		<property name="showANTISS" type="int" value="0" />
 		<property name="showNP" type="int" value="0" />
 		<property name="showXP" type="int" value="0" />
 		<property name="showAP" type="int" value="0" />
@@ -116,17 +133,27 @@
 		<property name="showCad" type="int" value="0" />
 		<property name="showTorque" type="int" value="0" />
 		<property name="showPower" type="int" value="1" />
+		<property name="showSlope" type="int" value="0" />
+		<property name="showAltSlope" type="int" value="0" />
 		<property name="showHr" type="int" value="0" />
 		<property name="showCadD" type="int" value="0" />
 		<property name="showTorqueD" type="int" value="0" />
 		<property name="showPowerD" type="int" value="0" />
 		<property name="showHrD" type="int" value="0" />
-		<property name="showAlt" type="int" value="0" />
+		<property name="showAlt" type="int" value="2" />
 		<property name="showBalance" type="int" value="2" />
 		<property name="showTE" type="int" value="0" />
 		<property name="showPS" type="int" value="0" />
 		<property name="showTemp" type="int" value="0" />
 		<property name="showW" type="int" value="2" />
+		<property name="showRV" type="int" value="0" />
+		<property name="showRCad" type="int" value="0" />
+		<property name="showRGCT" type="int" value="0" />
+		<property name="showSmO2" type="int" value="2" />
+		<property name="showtHb" type="int" value="0" />
+		<property name="showO2Hb" type="int" value="2" />
+		<property name="showHHb" type="int" value="2" />
+		<property name="showGear" type="int" value="0" />
 		<property name="byDistance" type="int" value="0" />
 		<property name="smoothing" type="int" value="2" />
 		<property name="paintBrush" type="int" value="0" />
@@ -135,30 +162,24 @@
 		<property name="title" type="QString" value="QA" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.38095" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="watts" type="QString" value="210" />
-		<property name="rpm" type="QString" value="79" />
-		<property name="crank" type="QString" value="0.16" />
+		<property name="rpm" type="QString" value="87" />
+		<property name="crank" type="QString" value="0.1725" />
 		<property name="shade" type="bool" value="0" />
 		<property name="merge" type="bool" value="0" />
-		<property name="frame" type="bool" value="1" />
-	</chart>
-	<chart id="5" name="" title="Map" >
-		<property name="title" type="QString" value="Map" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
-		<property name="resizable" type="bool" value="0" />
+		<property name="frame" type="bool" value="0" />
+		<property name="gearRatio" type="bool" value="1" />
 	</chart>
 	<chart id="6" name="" title="Power" >
 		<property name="title" type="QString" value="Power" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.38095" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="series" type="int" value="0" />
-		<property name="percent" type="int" value="1" />
+		<property name="percent" type="int" value="0" />
 		<property name="logY" type="bool" value="0" />
 		<property name="zeroes" type="bool" value="0" />
 		<property name="shade" type="bool" value="0" />
@@ -178,11 +199,58 @@
 		<property name="bin" type="double" value="3" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
+	<chart id="2" name="" title="Oxy" >
+		<property name="title" type="QString" value="Oxy" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="2.63158" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="stacked" type="bool" value="0" />
+		<property name="byseries" type="bool" value="0" />
+		<property name="stackWidth" type="int" value="20" />
+		<property name="showGrid" type="int" value="2" />
+		<property name="showFull" type="int" value="0" />
+		<property name="showHelp" type="int" value="0" />
+		<property name="showATISS" type="int" value="0" />
+		<property name="showANTISS" type="int" value="0" />
+		<property name="showNP" type="int" value="0" />
+		<property name="showXP" type="int" value="0" />
+		<property name="showAP" type="int" value="0" />
+		<property name="showSpeed" type="int" value="0" />
+		<property name="showAccel" type="int" value="0" />
+		<property name="showCad" type="int" value="0" />
+		<property name="showTorque" type="int" value="0" />
+		<property name="showPower" type="int" value="1" />
+		<property name="showSlope" type="int" value="0" />
+		<property name="showAltSlope" type="int" value="0" />
+		<property name="showHr" type="int" value="0" />
+		<property name="showCadD" type="int" value="0" />
+		<property name="showTorqueD" type="int" value="0" />
+		<property name="showPowerD" type="int" value="0" />
+		<property name="showHrD" type="int" value="0" />
+		<property name="showAlt" type="int" value="0" />
+		<property name="showBalance" type="int" value="2" />
+		<property name="showTE" type="int" value="0" />
+		<property name="showPS" type="int" value="0" />
+		<property name="showTemp" type="int" value="2" />
+		<property name="showW" type="int" value="0" />
+		<property name="showRV" type="int" value="0" />
+		<property name="showRCad" type="int" value="0" />
+		<property name="showRGCT" type="int" value="0" />
+		<property name="showSmO2" type="int" value="2" />
+		<property name="showtHb" type="int" value="2" />
+		<property name="showO2Hb" type="int" value="2" />
+		<property name="showHHb" type="int" value="2" />
+		<property name="showGear" type="int" value="0" />
+		<property name="byDistance" type="int" value="0" />
+		<property name="smoothing" type="int" value="1" />
+		<property name="paintBrush" type="int" value="0" />
+	</chart>
 	<chart id="6" name="" title="Heartrate" >
 		<property name="title" type="QString" value="Heartrate" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="widthFactor" type="double" value="3.33333" />
+		<property name="heightFactor" type="double" value="3.33333" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="series" type="int" value="2" />
 		<property name="percent" type="int" value="0" />
@@ -208,8 +276,8 @@
 	<chart id="6" name="" title="Speed" >
 		<property name="title" type="QString" value="Speed" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="widthFactor" type="double" value="2.94118" />
+		<property name="heightFactor" type="double" value="3.33333" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="series" type="int" value="3" />
 		<property name="percent" type="int" value="0" />
@@ -229,17 +297,17 @@
 		<property name="distmetric" type="QString" value="workout_time" />
 		<property name="totalmetric" type="QString" value="ride_count" />
 		<property name="dataMode" type="bool" value="1" />
-		<property name="bin" type="double" value="0.6" />
+		<property name="bin" type="double" value="0.1" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
 	<chart id="6" name="" title="Cadence" >
 		<property name="title" type="QString" value="Cadence" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2.27273" />
+		<property name="widthFactor" type="double" value="2.77778" />
+		<property name="heightFactor" type="double" value="3.33333" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="series" type="int" value="4" />
-		<property name="percent" type="int" value="1" />
+		<property name="percent" type="int" value="0" />
 		<property name="logY" type="bool" value="0" />
 		<property name="zeroes" type="bool" value="0" />
 		<property name="shade" type="bool" value="0" />
@@ -263,11 +331,11 @@
 		<property name="title" type="QString" value="Scatter" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.77778" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="xseries" type="int" value="3" />
-		<property name="yseries" type="int" value="7" />
-		<property name="ignore" type="bool" value="1" />
+		<property name="xseries" type="int" value="19" />
+		<property name="yseries" type="int" value="11" />
+		<property name="ignore" type="bool" value="0" />
 		<property name="grid" type="bool" value="1" />
 		<property name="frame" type="bool" value="0" />
 	</chart>
@@ -275,35 +343,17 @@
 		<property name="title" type="QString" value="HrPw" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.77778" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="shadeZones" type="int" value="0" />
 		<property name="joinLine" type="int" value="0" />
 		<property name="fullplot" type="int" value="0" />
 	</chart>
-	<chart id="8" name="" title="3d" >
-		<property name="title" type="QString" value="3d" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
-		<property name="resizable" type="bool" value="0" />
-		<property name="style" type="int" value="0" />
-		<property name="grid" type="bool" value="1" />
-		<property name="legend" type="bool" value="1" />
-		<property name="frame" type="bool" value="1" />
-		<property name="ignore" type="bool" value="1" />
-		<property name="preset" type="int" value="1" />
-		<property name="xseries" type="int" value="0" />
-		<property name="yseries" type="int" value="1" />
-		<property name="zseries" type="int" value="12" />
-		<property name="cseries" type="int" value="12" />
-		<property name="bin" type="QString" value="5" />
-	</chart>
 	<chart id="13" name="" title="Edit" >
 		<property name="title" type="QString" value="Edit" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2.27273" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1" />
 		<property name="resizable" type="bool" value="0" />
 	</chart>
 </layout>
