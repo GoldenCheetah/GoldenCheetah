@@ -30,7 +30,7 @@ using namespace std;
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
 RouteWindow::RouteWindow(Context *context) :
-    GcWindow(context), context(context)
+    GcWindow(context), context(context), routeItem(NULL)
 {
     this->setTitle("Routes");
 
@@ -132,6 +132,7 @@ void RouteWindow::loadStarted()
 
 void RouteWindow::loadRide()
 {
+    qDebug() << "loadRide";
     createHtml();
     view->page()->mainFrame()->setHtml(currentPage);
 
@@ -164,7 +165,7 @@ void RouteWindow::loadRide()
         i++;
     }
     */
-
+    qDebug() << "loadRide END";
 }
 
 void RouteWindow::updateFrame()
@@ -262,22 +263,6 @@ void RouteWindow::createHtml()
     "       var highlighted = intervalList.pop();\n"
     "       highlighted.setMap(null);\n"
     "       j--;\n"
-    "    }\n"
-
-    // how many to draw?
-    "    var intervals = webBridge.intervalCount();\n"
-    "    while (intervals > 0) {\n"
-    "        var latlons = webBridge.getLatLons(intervals);\n"
-    "        var intervalHighlighter = new google.maps.Polyline(polyOptions);\n"
-    "        intervalHighlighter.setMap(map);\n"
-    "        intervalList.push(intervalHighlighter);\n"
-    "        var path = intervalHighlighter.getPath();\n"
-    "        var j=0;\n"
-    "        while (j<latlons.length) {\n"
-    "          path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
-    "          j += 2;\n"
-    "        }\n"
-    "        intervals--;\n"
     "    }\n"
     "}\n"
 
@@ -446,49 +431,45 @@ void
 RouteWindow::resetRoutes()
 {
     qDebug() << "resetRoutes";
+    treeWidget->hide();
     treeWidget->clear();
 
     routes = context->athlete->routes;
     if (routes->routes.count()>0) {
         for (int n=0;n<routes->routes.count();n++) {
+            qDebug() << "route"<<n;
             route = &routes->routes[n];
             RouteItem *allRides = new RouteItem(route, FOLDER_TYPE, treeWidget, context) ; //new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
 
             allRides->setText(0, route->getName());
 
             RouteItem *last = NULL;
-            QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
-            while (i.hasNext()) {
-                QString name = i.next(), notesFileName;
-                QDateTime dt;
-                for (int j=0;j<route->getRides().count();j++) {
-                    if ((route->parseRideFileName(context, name, &notesFileName, &dt)) && (dt == route->getRides()[j].startTime)) { //
-                        QDateTime dateTime = dt.addSecs(route->getRides()[j].start);
 
-                        //last = new RouteItem(route, RIDE_TYPE, mainWindow->home.path(), name, dateTime, mainWindow);
-                        last = new RouteItem(route, &route->getRides()[j], context->athlete->home->activities().path(), context);
+            for (int j=0;j<route->getRides().count();j++) {
+                QDateTime dt = route->getRides()[j].startTime;
+                QDateTime dateTime = dt.addSecs(route->getRides()[j].start);
 
+                last = new RouteItem(route, &route->getRides()[j], context->athlete->home->activities().path(), context);
 
-                        QString time = QTime(0,0,0,0).addSecs(route->getRides()[j].stop- route->getRides()[j].start).toString("hh:mm:ss");
+                QString time = QTime(0,0,0,0).addSecs(route->getRides()[j].stop- route->getRides()[j].start).toString("hh:mm:ss");
 
-                        last->setText(0, dateTime.toString("MMM d, yyyy"));
-                        last->setText(1, dateTime.toString("h:mm AP"));
-                        last->setText(2, time);
+                last->setText(0, dateTime.toString("MMM d, yyyy"));
+                last->setText(1, dateTime.toString("h:mm AP"));
+                last->setText(2, time);
 
-                        allRides->addChild(last);
-                    }
-                }
+                allRides->addChild(last);
             }
+
             treeWidget->expandItem(allRides);
             treeWidget->setFirstItemColumnSpanned (allRides, true);
         }
-
-
 
         route = &routes->routes[0];
         newRideToLoad = true;
         loadRide();
     }
+    treeWidget->show();
+    qDebug() << "resetRoutes END";
 }
 
 void
@@ -586,31 +567,6 @@ RouteWindow::routeChanged(QTreeWidgetItem *item, int column) {
 
 // quick diag, used to debug code only
 void WebBridgeForRoute::call(int count) { qDebug()<<"webBridge call:"<<count; }
-
-// how many intervals are highlighted?
-int
-WebBridgeForRoute::intervalCount()
-{
-    int highlighted;
-    highlighted = 0;
-    if (gm->routeItem == NULL ||  gm->routeItem->type() != ROUTE_TYPE)
-       return highlighted; // not inited yet!
-
-    RideFile *rideFile = gm->routeItem->ride();
-
-    if (context->athlete->allIntervalItems() == NULL ||
-        rideFile == NULL ) return 0; // not inited yet!
-
-    for (int i=0; i<context->athlete->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(i));
-        if (current != NULL) {
-            if (current->isSelected() == true) {
-                ++highlighted;
-            }
-        }
-    }
-    return highlighted;
-}
 
 // get a latlon array for the i'th selected interval
 QVariantList

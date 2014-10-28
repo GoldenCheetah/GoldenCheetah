@@ -48,7 +48,6 @@ class WebBridgeForRoute : public QObject
         Q_INVOKABLE void call(int count);
 
         // drawing basic route, and interval polylines
-        Q_INVOKABLE int intervalCount();
         Q_INVOKABLE QVariantList getLatLons(int i); // get array of latitudes for highlighted n
 
         // once map and basic route is loaded

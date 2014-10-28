@@ -30,8 +30,7 @@ class MainWindow;
 // Because we have subclassed QTreeWidgetItem we
 // need to use our own type, this MUST be greater than
 // QTreeWidgetItem::UserType according to the docs
-#define ROUTE_TYPE 0
-#define INTERVAL_TYPE (QTreeWidgetItem::UserType+1)
+#define ROUTE_TYPE 0 // (QTreeWidgetItem::UserType+2)
 
 class RouteItem : public QObject, public QTreeWidgetItem //<< for signals/slots
 {
