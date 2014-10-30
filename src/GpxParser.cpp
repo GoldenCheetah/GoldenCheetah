@@ -139,7 +139,7 @@ bool
     {
         cad = buffer.toDouble();
     }
-    else if (qName == "gpxdata:power") // from suunto ambit export file
+    else if (qName == "power" || qName == "gpxdata:power") // from suunto ambit export file
     {
         watts = buffer.toDouble();
     }
