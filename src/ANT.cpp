@@ -61,6 +61,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Cadence", 'c', ":images/IconCadence.png" },
   { true, ANTChannel::CHANNEL_TYPE_SandC, ANT_SPORT_SandC_PERIOD, ANT_SPORT_SandC_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Speed + Cadence", 'd', ":images/IconCadence.png" },
+  { true, ANTChannel::CHANNEL_TYPE_MOXY, ANT_SPORT_MOXY_PERIOD, ANT_SPORT_MOXY_TYPE,
+                ANT_MOXY_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Moxy", 'm', ":images/IconMoxy.png" },
   { true, ANTChannel::CHANNEL_TYPE_CONTROL, ANT_SPORT_CONTROL_PERIOD, ANT_SPORT_CONTROL_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Remote Control", 'r', ":images/IconCadence.png" },
   { false, ANTChannel::CHANNEL_TYPE_KICKR, ANT_SPORT_KICKR_PERIOD, ANT_SPORT_POWER_TYPE,
@@ -434,6 +436,7 @@ ANT::setup()
 
             if (channels > 4) {
                 addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 4);
+                addDevice(0, ANTChannel::CHANNEL_TYPE_MOXY, 5);
             }
         }
     }

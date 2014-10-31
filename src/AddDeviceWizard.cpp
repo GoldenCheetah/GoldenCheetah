@@ -677,7 +677,7 @@ AddPair::initializePage()
 
     // defaults
     static const int index4[4] = { 1,2,3,5 };
-    static const int index8[8] = { 1,2,3,4,5,0,0,0 };
+    static const int index8[8] = { 1,2,3,4,5,6,0,0 };
     const int *index = channels == 4 ? index4 : index8;
 
     // how many devices we got then?
@@ -701,7 +701,7 @@ AddPair::initializePage()
         // value
         QLabel *value = new QLabel(this);
         QFont bigger;
-        bigger.setPointSize(25);
+        bigger.setPointSize(20);
         value->setFont(bigger);
         value->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         value->setText("0");
@@ -787,10 +787,18 @@ AddPair::getChannelValues()
 
             // speed+cadence is two values!
             if (p->itemData(p->currentIndex()) == ANTChannel::CHANNEL_TYPE_SandC) {
-            dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1 %2")
+
+                dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1 %2")
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue2(i) //speed
                           * (appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000)
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i))); // cad
+
+            } else if (p->itemData(p->currentIndex()) == ANTChannel::CHANNEL_TYPE_MOXY) {
+
+                dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1 %2")
+                .arg(dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i), 0, 'f', 1) // tHb
+                .arg(dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue2(i), 0, 'f', 1)); // SmO2
+
             } else {
             dynamic_cast<QLabel *>(channelWidget->itemWidget(item,2))->setText(QString("%1")
                 .arg((int)dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->channelValue(i)));
