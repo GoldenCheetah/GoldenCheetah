@@ -117,6 +117,9 @@ class ANTMessage {
         uint16_t wheelRevolutions, crankRevolutions; // speed and power and cadence
         uint8_t instantCadence; // cadence
         uint8_t autoZeroStatus, autoZeroEnable;
+        bool utcTimeRequired; // moxy
+        uint8_t moxyCapabilities; //moxy
+        double tHb, oldsmo2, newsmo2; //moxy
 
     private:
         void init();

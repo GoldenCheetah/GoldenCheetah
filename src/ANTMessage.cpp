@@ -369,7 +369,6 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             case ANTChannel::CHANNEL_TYPE_HR:
                 channel = message[3];
                 measurementTime = message[8] + (message[9]<<8);
-qDebug()<<"measurementtime="<<measurementTime;
                 heartrateBeats =  message[10];
                 instantHeartrate = message[11];
 
@@ -496,6 +495,17 @@ qDebug()<<"measurementtime="<<measurementTime;
                 wheelMeasurementTime = message[8] + (message[9]<<8);
                 wheelRevolutions =  message[10] + (message[11]<<8);
                 break;
+
+            case ANTChannel::CHANNEL_TYPE_MOXY:
+                channel = message[3];
+                utcTimeRequired = message[6] & 0x01;
+                moxyCapabilities = message[7];
+                tHb = 0.01f * double(message[8] + ((message[9]&0x0f)<<8));
+                oldsmo2 = 0.1f * double (((message[9] & 0xf0)>>4) + ((message[10]&0x3f)<<4));
+                newsmo2 = 0.1f * double (((message[10] & 0xc0)>>6) + (message[11]<<2));
+qDebug()<<"moxy"<<utcTimeRequired<<moxyCapabilities<<tHb<<oldsmo2<<newsmo2;
+                break;
+
             default:
                 break;
             }

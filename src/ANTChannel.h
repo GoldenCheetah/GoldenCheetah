@@ -115,6 +115,7 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_SPEED,
             CHANNEL_TYPE_CADENCE,
             CHANNEL_TYPE_SandC,
+            CHANNEL_TYPE_MOXY,
             CHANNEL_TYPE_CONTROL,
             CHANNEL_TYPE_KICKR,
             CHANNEL_TYPE_GUARD
