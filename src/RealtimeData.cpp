@@ -27,6 +27,7 @@ RealtimeData::RealtimeData()
 	hr= watts= altWatts= speed= wheelRpm= load= slope = 0.0;
 	cadence = distance = virtualSpeed = wbal = 0.0;
 	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
+    thb = smo2 = o2hb = hhb = 0.0;
 
     memset(spinScan, 0, 24);
 }
@@ -190,6 +191,18 @@ double RealtimeData::value(DataSeries series) const
     case Load: return load;
         break;
 
+    case tHb: return thb;
+        break;
+
+    case SmO2: return smo2;
+        break;
+
+    case HHb: return hhb;
+        break;
+
+    case O2Hb: return o2hb;
+        break;
+
     case None: 
     default:
         return 0;
@@ -226,6 +239,10 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << VI;
         seriesList << Joules;
         seriesList << Wbal;
+        seriesList << SmO2;
+        seriesList << tHb;
+        seriesList << HHb;
+        seriesList << O2Hb;
         seriesList << AvgWatts;
         seriesList << AvgSpeed;
         seriesList << AvgCadence;
@@ -342,8 +359,36 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case LRBalance: return tr("Left/Right Balance");
         break;
+
+    case tHb: return tr("Total Hb Mass");
+        break;
+
+    case SmO2: return tr("Hb O2 Saturation");
+        break;
+
+    case HHb: return tr("Deoxy Hb");
+        break;
+
+    case O2Hb: return tr("Oxy Hb");
+        break;
     }
 }
+
+void RealtimeData::setHb(double smo2, double thb)
+{
+    this->smo2 = smo2;
+    this->thb = thb;
+    if (smo2 > 0 && thb > 0) {
+        o2hb = (thb * smo2) / 100.00f;
+        hhb = thb - o2hb;
+    } else {
+        o2hb = hhb = 0;
+    }
+}
+double RealtimeData::getSmO2() const { return smo2; }
+double RealtimeData::gettHb() const { return thb; }
+double RealtimeData::getHHb() const { return hhb; }
+double RealtimeData::getO2Hb() const { return o2hb; }
 
 void RealtimeData::setLap(long lap)
 {

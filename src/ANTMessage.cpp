@@ -503,7 +503,6 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 tHb = 0.01f * double(message[8] + ((message[9]&0x0f)<<8));
                 oldsmo2 = 0.1f * double (((message[9] & 0xf0)>>4) + ((message[10]&0x3f)<<4));
                 newsmo2 = 0.1f * double (((message[10] & 0xc0)>>6) + (message[11]<<2));
-qDebug()<<"moxy"<<utcTimeRequired<<moxyCapabilities<<tHb<<oldsmo2<<newsmo2;
                 break;
 
             default:

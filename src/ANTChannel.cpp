@@ -628,6 +628,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             {
                 value = antMessage.tHb;
                 value2 = antMessage.newsmo2;
+                parent->setHb(value2, value);
             }
             break;
 

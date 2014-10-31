@@ -38,6 +38,7 @@ public:
                       Watts, Speed, Cadence, HeartRate, Load,
                       XPower, BikeScore, RI, Joules, SkibaVI,
                       NP, TSS, IF, VI, Wbal,
+                      SmO2, tHb, HHb, O2Hb,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining };
@@ -72,6 +73,14 @@ public:
     void setLap(long);
 
     const char *getName() const;
+
+    // new muscle oxygen stuff
+    void setHb(double smo2, double thb);
+    double getSmO2() const;
+    double gettHb() const;
+    double getHHb() const;
+    double getO2Hb() const;
+
     double getWatts() const;
     double getAltWatts() const;
     double getHr() const;
@@ -96,11 +105,13 @@ private:
     // realtime telemetry
     double hr, watts, altWatts, speed, wheelRpm, load, slope;
     double cadence;      // in rpm
+    double smo2, thb;
 
     // derived data
     double distance;
     double virtualSpeed;
     double wbal;
+    double hhb, o2hb;
     long lap;
     long msecs;
     long lapMsecs;
