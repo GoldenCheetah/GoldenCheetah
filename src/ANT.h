@@ -388,6 +388,7 @@ public:
     void setAltWatts(float x) {
         telemetry.setAltWatts(x);
     }
+    void setHb(double smo2, double thb);
 
 private:
 

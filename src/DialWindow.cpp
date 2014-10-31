@@ -433,6 +433,15 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::SmO2:
+        valueLabel->setText(QString("%1%").arg(value, 0, 'f', 0));
+        break;
+    case RealtimeData::tHb:
+    case RealtimeData::O2Hb:
+    case RealtimeData::HHb:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -535,6 +544,22 @@ void DialWindow::seriesChanged()
 
     case RealtimeData::AltWatts:
             foreground = GColor(CALTPOWER);
+            break;
+
+    case RealtimeData::SmO2:
+            foreground = GColor(CSMO2);
+            break;
+
+    case RealtimeData::tHb:
+            foreground = GColor(CTHB);
+            break;
+
+    case RealtimeData::O2Hb:
+            foreground = GColor(CO2HB);
+            break;
+
+    case RealtimeData::HHb:
+            foreground = GColor(CHHB);
             break;
     }
 

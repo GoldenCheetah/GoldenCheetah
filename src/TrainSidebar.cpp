@@ -1100,6 +1100,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted	
 					// to within defined limits					
 				}
+
+                if (Devices[dev].type == DEV_ANTLOCAL) {
+                    rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant devices right now
+                }
 				
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());

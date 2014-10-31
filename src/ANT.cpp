@@ -183,6 +183,11 @@ void ANT::setWheelRpm(float x) {
     else telemetry.setSpeed(x * appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt() / 1000 * 60 / 1000);
 }
 
+void ANT::setHb(double smo2, double thb)
+{
+    telemetry.setHb(smo2, thb);
+}
+
 /*======================================================================
  * Main thread functions; start, stop etc
  *====================================================================*/
