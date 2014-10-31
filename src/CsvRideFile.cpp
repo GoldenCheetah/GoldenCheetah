@@ -177,7 +177,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      rideFile->setDeviceType("Moxy");
                      rideFile->setFileFormat("Moxy CSV (csv)");
                      unitsHeader = 4;
-                     recInterval = 2;
+                     recInterval = 1;
                      ++lineno;
                      continue;
                 }
@@ -312,7 +312,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
                 else if (moxy)  {
-                    minutes = (recInterval * lineno - unitsHeader)/60.0;
+                    // need to get time from second column and note that
+                    // there will be gaps when recording drops so shouldn't
+                    // assume it is a continuous stream
+                    QTime time = QTime().fromString(line.section(',',1,1), "hh:mm:ss");
+                    double seconds = time.hour() * 3600 + time.minute() * 60 + time.second();
+
+                    minutes = seconds / 60.0f;
                     smo2 = line.section(',', 2, 2).remove("\"").toDouble();
                     thb = line.section(',', 4, 4).remove("\"").toDouble();
                 }
@@ -397,12 +403,28 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           kph, nm, watts, alt, lon, lat, 0.0,
                                           0.0, temp, 0.0, 0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0, 0.0, interval);
-               else
+               else if (moxy) {
+
+                    // hack it in for now
+                    // XXX IT COULD BE RECORDED WITH DIFFERENT INTERVALS XXX
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb, 0.0, 0.0, 0.0, interval);
+                    rideFile->appendPoint((minutes * 60.0)+1, cad, hr, km, // dupe it so we have 1s recording easier to merge
+                                          kph, nm, watts, alt, lon, lat,
+                                          headwind, slope, temp, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
+                                          smo2, thb, 0.0, 0.0, 0.0, interval);
+
+               } else {
+                    rideFile->appendPoint(minutes * 60.0, cad, hr, km,
+                                          kph, nm, watts, alt, lon, lat,
+                                          headwind, slope, temp, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
+                                          smo2, thb, 0.0, 0.0, 0.0, interval);
+               }
             }
             ++lineno;
         }
