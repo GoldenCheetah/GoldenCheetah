@@ -46,6 +46,10 @@ class RealtimePlotWindow : public GcWindow
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
     Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
     Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
+    Q_PROPERTY(int showHHb READ isShowHHb WRITE setShowHHb USER true)
+    Q_PROPERTY(int showO2Hb READ isShowO2Hb WRITE setShowO2Hb USER true)
+    Q_PROPERTY(int showtHb READ isShowtHb WRITE setShowtHb USER true)
+    Q_PROPERTY(int showSmO2 READ isShowSmO2 WRITE setShowSmO2 USER true)
     Q_PROPERTY(int showPow30s READ isShowPow30s WRITE setShowPow30s USER true)
     Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
 
@@ -59,6 +63,10 @@ class RealtimePlotWindow : public GcWindow
         int isShowCad() const { return showCad->checkState(); }
         int isShowAlt() const { return showAlt->checkState(); }
         int isShowPower() const { return showPower->checkState(); }
+        int isShowHHb() const { return showHHb->checkState(); }
+        int isShowO2Hb() const { return showO2Hb->checkState(); }
+        int isShowtHb() const { return showtHb->checkState(); }
+        int isShowSmO2() const { return showSmO2->checkState(); }
         int isShowPow30s() const { return showPow30s->checkState(); }
         int smoothing() const { return smoothSlider->value(); }
 
@@ -74,6 +82,10 @@ class RealtimePlotWindow : public GcWindow
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setShowPower(int state);
+        void setShowHHb(int state);
+        void setShowO2Hb(int state);
+        void setShowSmO2(int state);
+        void setShowtHb(int state);
         void setShowPow30s(int state);
         void setShowHr(int state);
         void setShowSpeed(int state);
@@ -94,6 +106,10 @@ class RealtimePlotWindow : public GcWindow
         QCheckBox *showCad;
         QCheckBox *showAlt;
         QCheckBox *showPower;
+        QCheckBox *showHHb;
+        QCheckBox *showO2Hb;
+        QCheckBox *showSmO2;
+        QCheckBox *showtHb;
         QCheckBox *showPow30s;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
@@ -114,6 +130,18 @@ class RealtimePlotWindow : public GcWindow
         double hrHist[150];
         double hrtot;
         int hrindex;
+        double hhbHist[150];
+        double hhbtot;
+        int hhbindex;
+        double o2hbHist[150];
+        double o2hbtot;
+        int o2hbindex;
+        double smo2Hist[150];
+        double smo2tot;
+        int smo2index;
+        double thbHist[150];
+        double thbtot;
+        int thbindex;
 };
 
 #endif // _GC_RealtimePlotWindow_h

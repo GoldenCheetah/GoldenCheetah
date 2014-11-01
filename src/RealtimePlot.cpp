@@ -126,6 +126,82 @@ QRectF RealtimeHrData::boundingRect() const
     return QRectF(-5000, 5000, 10000, 10000);
 }
 
+// tHb history
+double RealtimethbData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double RealtimethbData::y(size_t i) const { return thbData[(thbCur+i) < MAXSAMPLES ? (thbCur+i) : (thbCur+i-MAXSAMPLES)]; }
+size_t RealtimethbData::size() const { return MAXSAMPLES; }
+//QwtSeriesData *RealtimethbData::copy() const { return new RealtimethbData(const_cast<RealtimethbData*>(this)); }
+void RealtimethbData::init() { thbCur=0; for (int i=0; i<MAXSAMPLES; i++) thbData[i]=0; }
+void RealtimethbData::addData(double v) { thbData[thbCur++] = v; if (thbCur==MAXSAMPLES) thbCur=0; }
+
+QPointF RealtimethbData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF RealtimethbData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
+
+// smo2ence history
+double Realtimesmo2Data::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double Realtimesmo2Data::y(size_t i) const { return smo2Data[(smo2Cur+i) < MAXSAMPLES ? (smo2Cur+i) : (smo2Cur+i-MAXSAMPLES)]; }
+size_t Realtimesmo2Data::size() const { return MAXSAMPLES; }
+//QwtSeriesData *Realtimesmo2Data::copy() const { return new Realtimesmo2Data(const_cast<Realtimesmo2Data*>(this)); }
+void Realtimesmo2Data::init() { smo2Cur=0; for (int i=0; i<MAXSAMPLES; i++) smo2Data[i]=0; }
+void Realtimesmo2Data::addData(double v) { smo2Data[smo2Cur++] = v; if (smo2Cur==MAXSAMPLES) smo2Cur=0; }
+
+QPointF Realtimesmo2Data::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF Realtimesmo2Data::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
+
+// O2Hb history
+double Realtimeo2hbData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double Realtimeo2hbData::y(size_t i) const { return o2hbData[(o2hbCur+i) < MAXSAMPLES ? (o2hbCur+i) : (o2hbCur+i-MAXSAMPLES)]; }
+size_t Realtimeo2hbData::size() const { return MAXSAMPLES; }
+//QwtSeriesData *Realtimeo2hbData::copy() const { return new Realtimeo2hbData(const_cast<Realtimeo2hbData*>(this)); }
+void Realtimeo2hbData::init() { o2hbCur=0; for (int i=0; i<MAXSAMPLES; i++) o2hbData[i]=0; }
+void Realtimeo2hbData::addData(double v) { o2hbData[o2hbCur++] = v; if (o2hbCur==MAXSAMPLES) o2hbCur=0; }
+
+QPointF Realtimeo2hbData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF Realtimeo2hbData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
+
+// HHb history
+double RealtimehhbData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double RealtimehhbData::y(size_t i) const { return hhbData[(hhbCur+i) < MAXSAMPLES ? (hhbCur+i) : (hhbCur+i-MAXSAMPLES)]; }
+size_t RealtimehhbData::size() const { return MAXSAMPLES; }
+//QwtSeriesData *RealtimehhbData::copy() const { return new RealtimehhbData(const_cast<RealtimehhbData*>(this)); }
+void RealtimehhbData::init() { hhbCur=0; for (int i=0; i<MAXSAMPLES; i++) hhbData[i]=0; }
+void RealtimehhbData::addData(double v) { hhbData[hhbCur++] = v; if (hhbCur==MAXSAMPLES) hhbCur=0; }
+
+QPointF RealtimehhbData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF RealtimehhbData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
+
 // Load history
 //double RealtimeLodData::x(size_t i) const { return (double)50-i; }
 //double RealtimeLodData::y(size_t i) const { return lodData[(lodCur+i) < 50 ? (lodCur+i) : (lodCur+i-50)]; }
@@ -143,6 +219,10 @@ RealtimePlot::RealtimePlot() :
     showSpeedState(Qt::Checked),
     showCadState(Qt::Checked),
     showAltState(Qt::Checked),
+    showO2HbState(Qt::Checked),
+    showHHbState(Qt::Checked),
+    showtHbState(Qt::Checked),
+    showSmO2State(Qt::Checked),
     smooth(0)
 {
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
@@ -152,10 +232,14 @@ RealtimePlot::RealtimePlot() :
     spdData = new RealtimeSpdData;
     hrData = new RealtimeHrData;
     cadData = new RealtimeCadData;
+    thbData = new RealtimethbData;
+    o2hbData = new Realtimeo2hbData;
+    hhbData = new RealtimehhbData;
+    smo2Data = new Realtimesmo2Data;
 
     // Setup the axis (of evil :-)
     setAxisTitle(yLeft, "Watts");
-    setAxisTitle(yRight, "Cadence / HR");
+    setAxisTitle(yRight, "Cadence / Hb / HR");
     setAxisTitle(QwtAxisId(QwtAxis::yRight,2).id, "Speed");
     setAxisTitle(xBottom, "Seconds Ago");
     setAxisMaxMinor(xBottom, 0);
@@ -236,6 +320,32 @@ RealtimePlot::RealtimePlot() :
     spdCurve->attach(this);
     spdCurve->setYAxis(QwtAxisId(QwtAxis::yRight,2).id);
 
+    // hhb curve
+    hhbCurve = new QwtPlotCurve("HHb");
+    hhbCurve->setData(hhbData);
+    hhbCurve->attach(this);
+    hhbCurve->setYAxis(QwtPlot::yRight);
+
+    // o2hb
+    o2hbCurve = new QwtPlotCurve("O2Hb");
+    o2hbCurve->setData(o2hbData);
+    o2hbCurve->attach(this);
+    o2hbCurve->setYAxis(QwtPlot::yRight);
+
+    // smo2
+    smo2Curve = new QwtPlotCurve("SmO2");
+    //cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    smo2Curve->setData(smo2Data);
+    smo2Curve->attach(this);
+    smo2Curve->setYAxis(QwtPlot::yRight);
+
+    // tHb
+    thbCurve = new QwtPlotCurve("Speed");
+    //spdCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    thbCurve->setData(thbData);
+    thbCurve->attach(this);
+    thbCurve->setYAxis(QwtPlot::yRight);
+
     // Load
 //    lodCurve = new QwtPlotCurve("Load");
 //    //lodCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -295,6 +405,22 @@ RealtimePlot::configChanged()
     QPen spdpen = QPen(GColor(CSPEED));
     spdpen.setWidth(width);
     spdCurve->setPen(spdpen);
+
+    QPen hhbpen = QPen(GColor(CHHB));
+    hhbpen.setWidth(width);
+    hhbCurve->setPen(hhbpen);
+
+    QPen o2hbpen = QPen(GColor(CO2HB));
+    o2hbpen.setWidth(width);
+    o2hbCurve->setPen(o2hbpen);
+
+    QPen smo2pen = QPen(GColor(CSMO2));
+    smo2pen.setWidth(width);
+    smo2Curve->setPen(smo2pen);
+
+    QPen thbpen = QPen(GColor(CTHB));
+    thbpen.setWidth(width);
+    thbCurve->setPen(thbpen);
 }
 
 void
@@ -320,7 +446,9 @@ RealtimePlot::showHr(int state)
 {
     showHrState = state;
     hrCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+                       showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
+                       showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
 }
 
@@ -338,7 +466,9 @@ RealtimePlot::showCad(int state)
 {
     showCadState = state;
     cadCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+                       showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
+                       showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
 }
 
@@ -348,6 +478,50 @@ RealtimePlot::showAlt(int state)
     showAltState = state;
     altPwrCurve->setVisible(state == Qt::Checked);
     enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showHHb(int state)
+{
+    showHHbState = state;
+    hhbCurve->setVisible(state == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+                       showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
+                       showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showO2Hb(int state)
+{
+    showO2HbState = state;
+    o2hbCurve->setVisible(state == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+                       showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
+                       showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showtHb(int state)
+{
+    showtHbState = state;
+    thbCurve->setVisible(state == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+                       showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
+                       showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showSmO2(int state)
+{
+    showSmO2State = state;
+    smo2Curve->setVisible(state == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+                       showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
+                       showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
 }
 

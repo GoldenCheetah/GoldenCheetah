@@ -58,6 +58,22 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     showPow30s->setCheckState(Qt::Checked);
     cl->addWidget(showPow30s);
 
+    showSmO2 = new QCheckBox(tr("SmO2"), this);
+    showSmO2->setCheckState(Qt::Checked);
+    cl->addWidget(showSmO2);
+
+    showtHb = new QCheckBox(tr("tHb"), this);
+    showtHb->setCheckState(Qt::Checked);
+    cl->addWidget(showtHb);
+
+    showO2Hb = new QCheckBox(tr("O2Hb"), this);
+    showO2Hb->setCheckState(Qt::Checked);
+    cl->addWidget(showO2Hb);
+
+    showHHb = new QCheckBox(tr("HHb"), this);
+    showHHb->setCheckState(Qt::Checked);
+    cl->addWidget(showHHb);
+
     QLabel *smoothLabel = new QLabel(tr("Smoothing (5Hz Samples)"), this);
     smoothLineEdit = new QLineEdit(this);
     smoothLineEdit->setFixedWidth(40);
@@ -86,6 +102,10 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     connect(showSpeed, SIGNAL(stateChanged(int)), this, SLOT(setShowSpeed(int)));
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
+    connect(showSmO2, SIGNAL(stateChanged(int)), this, SLOT(setShowSmO2(int)));
+    connect(showtHb, SIGNAL(stateChanged(int)), this, SLOT(setShowtHb(int)));
+    connect(showO2Hb, SIGNAL(stateChanged(int)), this, SLOT(setShowO2Hb(int)));
+    connect(showHHb, SIGNAL(stateChanged(int)), this, SLOT(setShowHHb(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
 
@@ -94,7 +114,11 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
 
     // lets initialise all the smoothing variables
     hrtot = hrindex = cadtot = cadindex = spdtot = spdindex = alttot = altindex = powtot = powindex = 0;
-    for(int i=0; i<150; i++) powHist[i] = altHist[i] = spdHist[i] = cadHist[i] = hrHist[i] = 0;
+    smo2tot = smo2index = thbtot = thbindex = o2hbtot = o2hbindex = hhbtot = hhbindex = 0;
+    for(int i=0; i<150; i++) {
+        powHist[i] = altHist[i] = spdHist[i] = cadHist[i] = hrHist[i] = 0;
+        smo2Hist[i] = thbHist[i] = o2hbHist[i] = hhbHist[i] = 0;
+    }
 
     // set to zero
     telemetryUpdate(RealtimeData());
@@ -105,7 +129,11 @@ RealtimePlotWindow::start()
 {
     // lets initialise all the smoothing variables
     hrtot = hrindex = cadtot = cadindex = spdtot = spdindex = alttot = altindex = powtot = powindex = 0;
-    for(int i=0; i<150; i++) powHist[i] = altHist[i] = spdHist[i] = cadHist[i] = hrHist[i] = 0;
+    smo2tot = smo2index = thbtot = thbindex = o2hbtot = o2hbindex = hhbtot = hhbindex = 0;
+    for(int i=0; i<150; i++) {
+        powHist[i] = altHist[i] = spdHist[i] = cadHist[i] = hrHist[i] = 0;
+        smo2Hist[i] = thbHist[i] = o2hbHist[i] = hhbHist[i] = 0;
+    }
 }
 
 void
@@ -113,7 +141,11 @@ RealtimePlotWindow::stop()
 {
     // lets initialise all the smoothing variables
     hrtot = hrindex = cadtot = cadindex = spdtot = spdindex = alttot = altindex = powtot = powindex = 0;
-    for(int i=0; i<150; i++) powHist[i] = altHist[i] = spdHist[i] = cadHist[i] = hrHist[i] = 0;
+    smo2tot = smo2index = thbtot = thbindex = o2hbtot = o2hbindex = hhbtot = hhbindex = 0;
+    for(int i=0; i<150; i++) {
+        powHist[i] = altHist[i] = spdHist[i] = cadHist[i] = hrHist[i] = 0;
+        smo2Hist[i] = thbHist[i] = o2hbHist[i] = hhbHist[i] = 0;
+    }
 }
 
 void
@@ -124,8 +156,9 @@ RealtimePlotWindow::pause()
 void
 RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
 {
+
     // lets apply smoothing if we have to
-    if (rtPlot->smooth) {
+    if (rtPlot->smooth > 0) {
 
         // Heartrate
         double hr = rtData.value(RealtimeData::HeartRate);
@@ -166,16 +199,50 @@ RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
         cad = cadtot / rtPlot->smooth;
         rtPlot->cadData->addData(cad);
 
+        // SmO2
+        double smo2 = rtData.value(RealtimeData::SmO2);
+        smo2tot += smo2; smo2tot -= smo2Hist[smo2index]; smo2Hist[smo2index] = smo2;
+        smo2index++; if (smo2index >= rtPlot->smooth) smo2index = 0;
+        smo2 = smo2tot / rtPlot->smooth;
+        rtPlot->smo2Data->addData(smo2);
+
+        // tHb
+        double thb = rtData.value(RealtimeData::tHb);
+        thbtot += thb; thbtot -= thbHist[thbindex]; thbHist[thbindex] = thb;
+        thbindex++; if (thbindex >= rtPlot->smooth) thbindex = 0;
+        thb = thbtot / rtPlot->smooth;
+        rtPlot->thbData->addData(thb);
+
+        // O2Hb
+        double o2hb = rtData.value(RealtimeData::O2Hb);
+        o2hbtot += o2hb; o2hbtot -= o2hbHist[o2hbindex]; o2hbHist[o2hbindex] = o2hb;
+        o2hbindex++; if (o2hbindex >= rtPlot->smooth) o2hbindex = 0;
+        o2hb = o2hbtot / rtPlot->smooth;
+        rtPlot->o2hbData->addData(o2hb);
+
+        // HHb
+        double hhb = rtData.value(RealtimeData::HHb);
+        hhbtot += hhb; hhbtot -= hhbHist[hhbindex]; hhbHist[hhbindex] = hhb;
+        hhbindex++; if (hhbindex >= rtPlot->smooth) hhbindex = 0;
+        hhb = hhbtot / rtPlot->smooth;
+        rtPlot->hhbData->addData(hhb);
+
         // its smoothed to 30s anyway
         rtPlot->pwr30Data->addData(rtData.value(RealtimeData::Watts));
 
     } else {
+
         rtPlot->pwrData->addData(rtData.value(RealtimeData::Watts));
         rtPlot->altPwrData->addData(rtData.value(RealtimeData::AltWatts));
         rtPlot->pwr30Data->addData(rtData.value(RealtimeData::Watts));
         rtPlot->cadData->addData(rtData.value(RealtimeData::Cadence));
         rtPlot->spdData->addData(rtData.value(RealtimeData::Speed));
         rtPlot->hrData->addData(rtData.value(RealtimeData::HeartRate));
+
+        rtPlot->smo2Data->addData(rtData.value(RealtimeData::SmO2));
+        rtPlot->thbData->addData(rtData.value(RealtimeData::tHb));
+        rtPlot->o2hbData->addData(rtData.value(RealtimeData::O2Hb));
+        rtPlot->hhbData->addData(rtData.value(RealtimeData::HHb));
     }
     rtPlot->replot();                // redraw
 }
@@ -226,6 +293,38 @@ RealtimePlotWindow::setShowPower(int value)
 {
     showPower->setChecked(value);
     rtPlot->showPower(value);
+    rtPlot->replot();
+}
+
+void
+RealtimePlotWindow::setShowSmO2(int value)
+{
+    showSmO2->setChecked(value);
+    rtPlot->showSmO2(value);
+    rtPlot->replot();
+}
+
+void
+RealtimePlotWindow::setShowtHb(int value)
+{
+    showtHb->setChecked(value);
+    rtPlot->showtHb(value);
+    rtPlot->replot();
+}
+
+void
+RealtimePlotWindow::setShowO2Hb(int value)
+{
+    showO2Hb->setChecked(value);
+    rtPlot->showO2Hb(value);
+    rtPlot->replot();
+}
+
+void
+RealtimePlotWindow::setShowHHb(int value)
+{
+    showHHb->setChecked(value);
+    rtPlot->showHHb(value);
     rtPlot->replot();
 }
 
