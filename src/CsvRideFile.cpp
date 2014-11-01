@@ -334,7 +334,6 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // there will be gaps when recording drops so shouldn't
                     // assume it is a continuous stream
                     double seconds = moxySeconds(line.section(',',1,1));
-if (lineno < 50) qDebug()<<"MOXY"<<lineno<<seconds;
 
                     if (seconds >0) {
                         minutes = seconds / 60.0f;
