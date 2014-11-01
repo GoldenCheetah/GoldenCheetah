@@ -92,6 +92,7 @@ class MainWindow : public QMainWindow
         void aboutDialog();
         void helpView();
         void logBug();
+        void support();
         void actionClicked(int);
 
         // open and closing windows and tabs
