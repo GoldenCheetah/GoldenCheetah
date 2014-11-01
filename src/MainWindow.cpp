@@ -679,6 +679,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&User Guide"), this, SLOT(helpView()));
     helpMenu->addAction(tr("&Log a bug or feature request"), this, SLOT(logBug()));
+    helpMenu->addAction(tr("&Discussion and Support Forum"), this, SLOT(support()));
     helpMenu->addSeparator();
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
@@ -1054,13 +1055,19 @@ void MainWindow::manualProcess(QString name)
 void
 MainWindow::logBug()
 {
-    QDesktopServices::openUrl(QUrl("http://www.goldencheetah.org/bug-tracker.html"));
+    QDesktopServices::openUrl(QUrl("https://github.com/GoldenCheetah/GoldenCheetah/issues"));
 }
 
 void
 MainWindow::helpView()
 {
     QDesktopServices::openUrl(QUrl("http://www.goldencheetah.org/wiki.html"));
+}
+
+void
+MainWindow::support()
+{
+    QDesktopServices::openUrl(QUrl("https://groups.google.com/forum/#!forum/golden-cheetah-users"));
 }
 
 void
