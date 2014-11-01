@@ -1601,9 +1601,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         fullPlot->hide();
         controlsLayout->setRowStretch(0, 0);
         controlsLayout->setRowStretch(1, 0);
-        spanSlider->hide();
-        scrollLeft->hide();
-        scrollRight->hide();
 
         // show stacked view
         stackFrame->show();
@@ -1645,24 +1642,15 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             fullPlot->show();
             controlsLayout->setRowStretch(0, 100);
             controlsLayout->setRowStretch(1, 20);
-            spanSlider->show();
-            scrollLeft->show();
-            scrollRight->show();
         } else {
             fullPlot->hide();
 
             if (isCompare()) {
                 controlsLayout->setRowStretch(0, 100);
                 controlsLayout->setRowStretch(1, 00);
-                spanSlider->show();
-                scrollLeft->show();
-                scrollRight->show();
             } else {
                 controlsLayout->setRowStretch(0, 100);
                 controlsLayout->setRowStretch(1, 00);
-                spanSlider->hide();
-                scrollLeft->hide();
-                scrollRight->hide();
             }
         }
     }
@@ -2689,19 +2677,10 @@ AllPlotWindow::setShowFull(int value)
     showFull->setChecked(value);
     if (showFull->isChecked()) {
         fullPlot->show();
-        spanSlider->show();
-        scrollLeft->show();
-        scrollRight->show();
         allPlotLayout->setStretch(1,20);
     }
     else {
         fullPlot->hide();
-
-        if (!isCompare()) {
-            spanSlider->hide();
-            scrollLeft->hide();
-            scrollRight->hide();
-        }
         allPlotLayout->setStretch(1,0);
     }
 }
