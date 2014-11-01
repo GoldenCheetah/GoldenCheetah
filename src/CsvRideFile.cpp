@@ -30,6 +30,24 @@ static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "csv","Comma-Separated Values", new CsvFileReader());
 
+static int moxySeconds(QString time)
+{
+    int seconds = 0;
+
+    // moxy csv has time as n:n:n where it is NOT zero padded
+    // and this causes all sorts of dumb problems
+    // so we extract it manually
+    QStringList parts = time.split(":");
+
+    if (parts.count() == 3) {
+        seconds += parts[0].toInt() * 3600;
+        seconds += parts[1].toInt() * 60;
+        seconds += parts[2].toInt();
+    }
+
+    return seconds;
+}
+
 RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
@@ -315,12 +333,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // need to get time from second column and note that
                     // there will be gaps when recording drops so shouldn't
                     // assume it is a continuous stream
-                    QTime time = QTime().fromString(line.section(',',1,1), "hh:mm:ss");
-                    double seconds = time.hour() * 3600 + time.minute() * 60 + time.second();
+                    double seconds = moxySeconds(line.section(',',1,1));
+if (lineno < 50) qDebug()<<"MOXY"<<lineno<<seconds;
 
-                    minutes = seconds / 60.0f;
-                    smo2 = line.section(',', 2, 2).remove("\"").toDouble();
-                    thb = line.section(',', 4, 4).remove("\"").toDouble();
+                    if (seconds >0) {
+                        minutes = seconds / 60.0f;
+                        smo2 = line.section(',', 2, 2).remove("\"").toDouble();
+                        thb = line.section(',', 4, 4).remove("\"").toDouble();
+                    }
                 }
                else if(motoActv) {
                     /* MotoActv saves it all as kind of SI (m, ms, m/s, NM etc)
