@@ -163,6 +163,92 @@ class RealtimeHrData : public QwtSeriesData<QPointF>
     virtual QRectF boundingRect() const;
 };
 
+class RealtimethbData : public QwtSeriesData<QPointF>
+{
+    int thbCur_;
+    int &thbCur;
+    double thbData_[MAXSAMPLES];
+    double (&thbData)[MAXSAMPLES];
+
+    public:
+    RealtimethbData() : thbCur(thbCur_), thbData(thbData_) { init(); }
+
+    double x(size_t i) const ;
+    double y(size_t i) const ;
+    size_t size() const ;
+    //virtual QwtSeriesData *copy() const ;
+    void init() ;
+    void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
+};
+
+class Realtimesmo2Data : public QwtSeriesData<QPointF>
+{
+    int smo2Cur_;
+    int &smo2Cur;
+    double smo2Data_[MAXSAMPLES];
+    double (&smo2Data)[MAXSAMPLES];
+
+    public:
+    Realtimesmo2Data() : smo2Cur(smo2Cur_), smo2Data(smo2Data_) { init(); }
+
+    double x(size_t i) const ;
+    double y(size_t i) const ;
+    size_t size() const ;
+    //virtual QwtSeriesData *copy() const ;
+    void init() ;
+    void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
+};
+
+// tedious virtual data interface for QWT
+class RealtimehhbData : public QwtSeriesData<QPointF>
+{
+    int hhbCur_;
+    int &hhbCur;
+    double hhbData_[MAXSAMPLES];
+    double (&hhbData)[MAXSAMPLES];
+
+    public:
+    RealtimehhbData() : hhbCur(hhbCur_), hhbData(hhbData_) { init(); }
+
+    double x(size_t i) const ;
+    double y(size_t i) const ;
+    size_t size() const ;
+    //virtual QwtSeriesData *copy() const ;
+    void init() ;
+    void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
+};
+
+// tedious virtual data interface for QWT
+class Realtimeo2hbData : public QwtSeriesData<QPointF>
+{
+    int o2hbCur_;
+    int &o2hbCur;
+    double o2hbData_[MAXSAMPLES];
+    double (&o2hbData)[MAXSAMPLES];
+
+    public:
+    Realtimeo2hbData() : o2hbCur(o2hbCur_), o2hbData(o2hbData_) { init(); }
+
+    double x(size_t i) const ;
+    double y(size_t i) const ;
+    size_t size() const ;
+    //virtual QwtSeriesData *copy() const ;
+    void init() ;
+    void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
+};
+
 class RealtimePlot : public QwtPlot
 {
     Q_OBJECT
@@ -177,7 +263,10 @@ class RealtimePlot : public QwtPlot
 	QwtPlotCurve *cadCurve;
 	QwtPlotCurve *spdCurve;
 	QwtPlotCurve *hrCurve;
-	//QwtPlotCurve *lodCurve;
+	QwtPlotCurve *thbCurve;
+	QwtPlotCurve *hhbCurve;
+	QwtPlotCurve *o2hbCurve;
+	QwtPlotCurve *smo2Curve;
 
     int showPowerState;
     int showPow30sState;
@@ -185,11 +274,11 @@ class RealtimePlot : public QwtPlot
     int showSpeedState;
     int showCadState;
     int showAltState;
+    int showO2HbState;
+    int showHHbState;
+    int showtHbState;
+    int showSmO2State;
 
-#if 0
-    // power stores last 30 seconds for 30 second rolling avg, all else
-    // just the last 30 seconds
-#endif
 
     public:
     void setAxisTitle(int axis, QString label);
@@ -200,7 +289,10 @@ class RealtimePlot : public QwtPlot
     RealtimeSpdData *spdData;
     RealtimeHrData *hrData;
     RealtimeCadData *cadData;
-    //RealtimeLodData lodData;
+    RealtimethbData *thbData;
+    Realtimeo2hbData *o2hbData;
+    RealtimehhbData *hhbData;
+    Realtimesmo2Data *smo2Data;
 
     RealtimePlot();
     int smooth;
@@ -213,6 +305,10 @@ class RealtimePlot : public QwtPlot
     void showSpeed(int state);
     void showCad(int state);
     void showAlt(int state);
+    void showO2Hb(int state);
+    void showHHb(int state);
+    void showtHb(int state);
+    void showSmO2(int state);
     void setSmoothing(int value);
 };
 
