@@ -47,6 +47,8 @@ bool RouteParser::endElement( const QString&, const QString&, const QString &qNa
         point.lat = buffer.trimmed().toDouble();
     } else if(qName == "lon") {
         point.lon = buffer.trimmed().toDouble();
+    } else if(qName == "filename") {
+        ride.filename = buffer.trimmed();
     } else if(qName == "date") {
         ride.startTime = QDateTime::fromString(buffer.trimmed(), DATETIME_FORMAT);
     } else if(qName == "start") {
@@ -121,7 +123,7 @@ RouteParser::serialize(QString filename, QList<RouteSegment>routes)
             out << "\t\t<rides>\n";
             qDebug() << "route->getRides() " << route.getRides().count();
             foreach (RouteRide ride, route.getRides() ) {
-                out << QString("\t\t\t<ride><date>%1</date><start>%2</start><stop>%3</stop><precision>%4</precision></ride>\n").arg(ride.startTime.toString(DATETIME_FORMAT)).arg(ride.start).arg(ride.stop).arg(ride.precision);
+                out << QString("\t\t\t<ride><filename>%1</filename><date>%2</date><start>%3</start><stop>%4</stop><precision>%5</precision></ride>\n").arg(ride.filename).arg(ride.startTime.toString(DATETIME_FORMAT)).arg(ride.start).arg(ride.stop).arg(ride.precision);
             }
             out << "\t\t</rides>\n";
 

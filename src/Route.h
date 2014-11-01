@@ -125,14 +125,14 @@ class Routes : public QObject {
 
 struct RouteRide {
 
-    //
+    QString filename;
     QDateTime startTime;
     double start, stop;
     double precision;
 
 
 
-    RouteRide(QDateTime startTime, double start, double stop, double precision) : startTime(startTime), start(start), stop(stop), precision(precision)  {}
+    RouteRide(QString filename, QDateTime startTime, double start, double stop, double precision) : filename(filename), startTime(startTime), start(start), stop(stop), precision(precision)  {}
 
     RouteRide() {}
 };

@@ -159,6 +159,13 @@
 #define GC_SORTBY           "navigator/sortby"
 #define GC_SORTBYORDER      "navigator/sortbyorder"
 
+// route navigator
+#define GC_ROUTEHEADINGS      "routenavigator/headings"
+#define GC_ROUTEHEADINGWIDTHS "routenavigator/headingwidths"
+#define GC_ROUTEGROUPBY       "routenavigator/groupby"
+#define GC_ROUTESORTBY        "routenavigator/sortby"
+#define GC_ROUTESORTBYORDER   "routenavigator/sortbyorder"
+
 //Twitter oauth keys
 #define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
 #define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"

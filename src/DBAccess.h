@@ -64,6 +64,10 @@ class DBAccess
 	    bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long, bool);
         bool deleteRide(QString);
 
+        // Create/Delete Intervals
+        bool importInterval(SummaryMetrics *summaryMetrics, IntervalItem *interval, QString type, QString groupName, QColor color, unsigned long fingerprint, bool modify);
+
+
         // Create/Delete Measures
         bool importMeasure(SummaryMetrics *summaryMetrics);
 
@@ -81,6 +85,10 @@ class DBAccess
         }
 
         SummaryMetrics getRideMetrics(QString filename); // for a filename
+
+        bool getInterval(QString filename, QString type, QString groupName, int start, SummaryMetrics &summaryMetrics, QColor&color);
+        bool getIntervalForRide(QString);
+        bool deleteIntervalsForRide(QString filename);
 
 	    QList<QDateTime> getAllDates();
         QList<Season> getAllSeasons();
@@ -101,6 +109,8 @@ class DBAccess
 	    bool createDatabase();
         bool createMetricsTable();
         bool dropMetricTable();
+        bool createIntervalMetricsTable();
+        bool dropIntervalMetricTable();
         bool createMeasuresTable();
         bool dropMeasuresTable();
 	    void initDatabase(QDir home);

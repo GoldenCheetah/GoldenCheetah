@@ -135,6 +135,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     v3.upgradeLate(context);
 
 
+    // Routes
+    routes = new Routes(context, home->config());
+
     // Search / filter
 #ifdef GC_HAVE_LUCENE
     namedSearches = new NamedSearches(this); // must be before navigator
@@ -150,6 +153,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     sqlModel->setTable("metrics");
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
+    sqlIntervalsModel = new QSqlTableModel(this, metricDB->db()->connection());
+    sqlIntervalsModel->setTable("interval_metrics");
+    sqlIntervalsModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
     // Downloaders
     withingsDownload = new WithingsDownload(context);
     zeoDownload      = new ZeoDownload(context);
@@ -161,9 +168,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     davCalendar = new CalDAV(context); // remote caldav
     davCalendar->download(); // refresh the diary window
 #endif
-
-    // Routes
-    routes = new Routes(context, home->config());
 
     // RIDE TREE -- transitionary
     treeWidget = new QTreeWidget;
@@ -247,6 +251,7 @@ Athlete::~Athlete()
 
     // close the db connection (but clear models first!)
     delete sqlModel;
+    delete sqlIntervalsModel;
     delete metricDB;
 
 #ifdef GC_HAVE_LUCENE
