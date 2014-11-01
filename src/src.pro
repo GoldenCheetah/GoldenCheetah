@@ -398,6 +398,8 @@ HEADERS += \
         RideNavigator.h \
         RideNavigatorProxy.h \
         RideWindow.h \
+        RouteNavigator.h \
+        RouteNavigatorProxy.h \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
@@ -614,6 +616,7 @@ SOURCES += \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
+        RouteNavigator.cpp \
         Route.cpp \
         RouteItem.cpp \
         RouteParser.cpp \

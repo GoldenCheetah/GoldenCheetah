@@ -85,7 +85,8 @@ RouteSegment::addRide(RouteRide _ride)
 int
 RouteSegment::addRideForRideFile(const RideFile *ride, double start, double stop, double precision)
 {
-    RouteRide _route = RouteRide(ride->startTime(), start, stop, precision);
+    qDebug() << "addRideForRideFile" << ride->getTag("Filename","");
+    RouteRide _route = RouteRide(ride->getTag("Filename",""), ride->startTime(), start, stop, precision);
     rides.append(_route);
     return rides.count();
 }

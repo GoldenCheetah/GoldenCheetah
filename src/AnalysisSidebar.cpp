@@ -81,6 +81,36 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     connect(activityAction, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
     activityItem->addWidget(activityHistory);
 
+    // Route
+    routeNavigator = new RouteNavigator(context, true);
+    routeNavigator->setProperty("nomenu", true);
+    groupByMapper = NULL;
+
+    // retrieve settings (properties are saved when we close the window)
+    if (appsettings->cvalue(context->athlete->cyclist, GC_ROUTEHEADINGS, "").toString() != "") {
+        routeNavigator->setSortByIndex(appsettings->cvalue(context->athlete->cyclist, GC_ROUTESORTBY).toInt());
+        routeNavigator->setSortByOrder(appsettings->cvalue(context->athlete->cyclist, GC_ROUTESORTBYORDER).toInt());
+        routeNavigator->setGroupBy(appsettings->cvalue(context->athlete->cyclist, GC_ROUTEGROUPBY).toInt());
+        routeNavigator->setColumns(appsettings->cvalue(context->athlete->cyclist, GC_ROUTEHEADINGS).toString());
+        routeNavigator->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_ROUTEHEADINGWIDTHS).toString());
+    }
+
+    QWidget *routeWidget = new QWidget(this);
+    routeWidget->setContentsMargins(0,0,0,0);
+#ifndef Q_OS_MAC // not on mac thanks
+    routeWidget->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
+#endif
+    QVBoxLayout *routeLayout = new QVBoxLayout(routeWidget);
+    routeLayout->setSpacing(0);
+    routeLayout->setContentsMargins(0,0,0,0);
+    routeLayout->addWidget(routeNavigator);
+
+    routeItem = new GcSplitterItem(tr("Routes"), iconFromPNG(":images/sidebar/folder.png"), this);
+    QAction *routeAction = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    routeItem->addAction(routeAction);
+    connect(routeAction, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
+    routeItem->addWidget(routeWidget);
+
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(context);
 
@@ -102,6 +132,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(activityItem);
+    splitter->addWidget(routeItem);
     splitter->addWidget(intervalItem);
 
     splitter->prepare(context->athlete->cyclist, "analysis");
@@ -132,6 +163,12 @@ AnalysisSidebar::close()
     appsettings->setCValue(context->athlete->cyclist, GC_NAVGROUPBY, rideNavigator->groupBy());
     appsettings->setCValue(context->athlete->cyclist, GC_NAVHEADINGS, rideNavigator->columns());
     appsettings->setCValue(context->athlete->cyclist, GC_NAVHEADINGWIDTHS, rideNavigator->widths());
+
+    appsettings->setCValue(context->athlete->cyclist, GC_ROUTESORTBY, routeNavigator->sortByIndex());
+    appsettings->setCValue(context->athlete->cyclist, GC_ROUTESORTBYORDER, routeNavigator->sortByOrder());
+    appsettings->setCValue(context->athlete->cyclist, GC_ROUTEGROUPBY, routeNavigator->groupBy());
+    appsettings->setCValue(context->athlete->cyclist, GC_ROUTEHEADINGS, routeNavigator->columns());
+    appsettings->setCValue(context->athlete->cyclist, GC_ROUTEHEADINGWIDTHS, routeNavigator->widths());
 }
 
 void

@@ -76,6 +76,8 @@ class MetricAggregator : public QObject
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);
+        bool importInterval(IntervalItem *interval, QString type, QString group, unsigned long fingerprint, bool modify);
+
 	    MetricMap metrics;
         ColorEngine *colorEngine;
 };

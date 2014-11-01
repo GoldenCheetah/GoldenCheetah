@@ -26,6 +26,7 @@
 #include "Zones.h"
 #include "Settings.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideMetric.h"
 #include "TimeUtils.h"
 #include <math.h>
@@ -255,6 +256,88 @@ bool DBAccess::dropMetricTable()
     return rc;
 }
 
+bool DBAccess::createIntervalMetricsTable()
+{
+    QSqlQuery query(db->database(sessionid));
+    bool rc;
+    bool createTables = true;
+
+    // does the table exist?
+    rc = query.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
+    if (rc) {
+        while (query.next()) {
+
+            QString table = query.value(0).toString();
+            if (table == "interval_metrics") {
+                createTables = false;
+                break;
+            }
+        }
+    }
+
+    // we need to create it!
+    if (rc && createTables) {
+        QString createIntervalMetricTable = "create table interval_metrics (identifier varchar,"
+                                    "filename varchar,"
+                                    "timestamp integer,"
+                                    "crc integer,"
+                                    "ride_date date,"
+                                    "type varchar,"
+                                    "groupName varchar,"
+                                    "name varchar,"
+                                    "start integer,"
+                                    "stop integer,"
+                                    "color varchar,"
+                                    "fingerprint integer";
+
+        // Add columns for all the metric factory metrics
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        for (int i=0; i<factory.metricCount(); i++)
+            createIntervalMetricTable += QString(", X%1 double").arg(factory.metricName(i));
+
+        // And all the metadata texts from ride of the intervals
+        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
+                createIntervalMetricTable += QString(", Z%1 varchar").arg(context->specialFields.makeTechName(field.name));
+            }
+        }
+
+        // And all the metadata metrics from ride of the intervals
+        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+                createIntervalMetricTable += QString(", Z%1 double").arg(context->specialFields.makeTechName(field.name));
+            }
+        }
+        createIntervalMetricTable += " )";
+
+        rc = query.exec(createIntervalMetricTable);
+        if (!rc) qDebug()<<"create table interval_metrics failed!"  << query.lastError();
+
+        // add row to version database
+        QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
+        int metadatacrcnow = computeFileCRC(metadataXML);
+        QDateTime timestamp = QDateTime::currentDateTime();
+
+        // wipe current version row
+        query.exec("DELETE FROM version where table_name = \"interval_metrics\"");
+
+        query.prepare("INSERT INTO version (table_name, schema_version, creation_date, metadata_crc ) values (?,?,?,?)");
+        query.addBindValue("interval_metrics");
+        query.addBindValue(DBSchemaVersion);
+        query.addBindValue(timestamp.toTime_t());
+        query.addBindValue(metadatacrcnow);
+        rc = query.exec();
+    }
+    return rc;
+}
+
+bool DBAccess::dropIntervalMetricTable()
+{
+    QSqlQuery query("DROP TABLE interval_metrics", db->database(sessionid));
+    bool rc = query.exec();
+    return rc;
+}
+
 bool DBAccess::createMeasuresTable()
 {
     QSqlQuery query(db->database(sessionid));
@@ -362,10 +445,12 @@ void DBAccess::checkDBVersion()
 
         // wipe away whatever (if anything is there)
         dropMetricTable();
+        dropIntervalMetricTable();
         dropMeasuresTable();
 
         // create afresh
         createMetricsTable();
+        createIntervalMetricsTable();
         createMeasuresTable();
 
         return;
@@ -373,8 +458,9 @@ void DBAccess::checkDBVersion()
 
     // ok we checked out ok, so lets adjust db schema to reflect
     // tne current version / crc
-    bool dropMetric = false;
-    bool dropMeasures = false;
+    bool dropMetric = true;
+    bool dropIntervalMetric = true;
+    bool dropMeasures = true;
 
     while (query.next()) {
 
@@ -383,14 +469,22 @@ void DBAccess::checkDBVersion()
         //int creationdate = query.value(2).toInt(); // not relevant anymore, we use version/crc
         int crc = query.value(3).toInt();
 
-        if (table_name == "metrics" && (currentversion != DBSchemaVersion || crc != metadatacrcnow)) {
-
-            dropMetric = true;
+        if (table_name == "metrics") {
+            if (currentversion == DBSchemaVersion && crc == metadatacrcnow) {
+                dropMetric = false;
+            }
         }
 
-        if (table_name == "measures" && crc != measurescrcnow) {
+        if (table_name == "interval_metrics") {
+            if (currentversion == DBSchemaVersion && crc == metadatacrcnow) {
+                dropIntervalMetric = false;
+            }
+        }
 
-            dropMeasures = true;
+        if (table_name == "measures") {
+            if (crc == measurescrcnow) {
+                dropMeasures = false;
+            }
         }
     }
     query.finish();
@@ -400,6 +494,12 @@ void DBAccess::checkDBVersion()
     if (dropMetric) {
         dropMetricTable();
         createMetricsTable();
+    }
+
+    // "interval_metrics" table, is it up-to-date?
+    if (dropIntervalMetric) {
+        dropIntervalMetricTable();
+        createIntervalMetricsTable();
     }
 
     // "measures" table, is it up-to-date? - export - recreate - import ....
@@ -462,7 +562,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
         }
     }
 
-    insertStatement += " ) values (?,?,?,?,?,?,?,?,?"; // filename, identifier, crc, timestamp, ride_date, present, color, fingerprint
+    insertStatement += " ) values (?,?,?,?,?,?,?,?,?"; // filename, identifier, crc, timestamp, ride_date, isRun, present, color, fingerprint
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
@@ -825,3 +925,172 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
     }
     return measures;
 }
+
+/*----------------------------------------------------------------------
+ * CRUD routines for Interval Metrics table
+ *----------------------------------------------------------------------*/
+bool DBAccess::importInterval(SummaryMetrics *summaryMetrics, IntervalItem *interval, QString type, QString groupName, QColor color, unsigned long fingerprint, bool modify)
+{
+    QSqlQuery query(db->database(sessionid));
+    QDateTime timestamp = QDateTime::currentDateTime();
+
+    if (modify) {
+        // zap the current row
+        query.prepare("DELETE FROM interval_metrics WHERE filename = :filename AND type = :type AND groupName = :groupName AND start = :start;");
+
+        query.bindValue(":filename", summaryMetrics->getFileName());
+        query.bindValue(":type", type);
+        query.bindValue(":groupName", groupName);
+        query.bindValue(":start", interval->start);
+        query.exec();
+    }
+
+    // construct an insert statement
+    QString insertStatement = "insert into interval_metrics ( identifier, filename, crc, timestamp, ride_date, type, groupName, name, start, stop, color, fingerprint ";
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    for (int i=0; i<factory.metricCount(); i++)
+        insertStatement += QString(", X%1 ").arg(factory.metricName(i));
+
+    // And all the metadata texts
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
+            insertStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
+        }
+    }
+        // And all the metadata metrics
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            insertStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
+        }
+    }
+
+
+    insertStatement += " ) values (?,?,?,?,?,?,?,?,?,?,?,?"; // identifier, filename, crc, timestamp, ride_date, type, groupName, name, start, stop, color, fingerprint
+
+    for (int i=0; i<factory.metricCount(); i++)
+        insertStatement += ",?";
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
+            insertStatement += ",?";
+        }
+    }
+    insertStatement += ");";
+
+    query.prepare(insertStatement);
+
+    // filename, crc, timestamp, ride date
+    QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + summaryMetrics->getFileName();
+    query.addBindValue(summaryMetrics->getFileName()+"-"+interval->displaySequence);
+    query.addBindValue(summaryMetrics->getFileName());
+    query.addBindValue((int)computeFileCRC(fullPath));
+    query.addBindValue(timestamp.toTime_t());
+    query.addBindValue(summaryMetrics->getRideDate());
+    query.addBindValue(type); // type
+    query.addBindValue(groupName); // groupName,
+    query.addBindValue(interval->text(0)); // name,
+    query.addBindValue(interval->start); // start,
+    query.addBindValue(interval->stop); // stop,
+    query.addBindValue(color.name());
+    query.addBindValue((int)fingerprint);
+
+    // values
+    for (int i=0; i<factory.metricCount(); i++) {
+        query.addBindValue(summaryMetrics->getForSymbol(factory.metricName(i)));
+    }
+
+    // And all the metadata texts
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+
+        if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type ==7)) {
+            query.addBindValue(interval->ride->getTag(field.name, ""));
+        }
+    }
+    // And all the metadata metrics
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+
+        if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            query.addBindValue(interval->ride->getTag(field.name, "0.0").toDouble());
+        } else if (!context->specialFields.isMetric(field.name)) {
+            if (field.name == "Recording Interval")
+                query.addBindValue(interval->ride->recIntSecs());
+        }
+    }
+
+    // go do it!
+    bool rc = query.exec();
+
+    if(!rc) qDebug() << query.lastError();
+
+    return rc;
+}
+
+bool
+DBAccess::deleteIntervalsForRide(QString filename)
+{
+    QSqlQuery query(db->database(sessionid));
+
+    query.prepare("DELETE FROM interval_metrics WHERE filename = ?;");
+    query.addBindValue(filename);
+    return query.exec();
+}
+
+bool
+DBAccess::getInterval(QString filename, QString type, QString groupName, int start, SummaryMetrics &summaryMetrics, QColor&color)
+{
+    // lookup a ride by filename returning true/false if found
+    bool found = false;
+
+    // construct the select statement
+    QString selectStatement = "SELECT identifier, filename, crc, type, groupName, color"; //identifier, filename, crc, timestamp, ride_date, type, groupName, name, start, stop
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    for (int i=0; i<factory.metricCount(); i++)
+        selectStatement += QString(", X%1 ").arg(factory.metricName(i));
+    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
+            selectStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
+        }
+    }
+    selectStatement += " FROM interval_metrics where filename = :filename AND type = :type AND groupName = :groupName AND start = :start;";
+
+    // execute the select statement
+    QSqlQuery query(selectStatement, db->database(sessionid));
+    query.bindValue(":filename", filename);
+    query.bindValue(":type", type);
+    query.bindValue(":groupName", groupName);
+    query.bindValue(":start", start);
+    query.exec();
+
+    while(query.next())
+    {
+        found = true;
+
+        // filename and date
+        summaryMetrics.setFileName(query.value(0).toString());
+        summaryMetrics.setId(query.value(1).toString());
+        summaryMetrics.setRideDate(query.value(2).toDateTime());
+        summaryMetrics.setIsRun(query.value(3).toInt());
+        color = QColor(query.value(4).toString());
+
+        // the values
+        int i=0;
+        for (; i<factory.metricCount(); i++)
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+5).toDouble());
+
+        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+                QString underscored = field.name;
+                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+4).toDouble());
+                i++;
+            } else if (!context->specialFields.isMetric(field.name) && field.type < 3) {
+                QString underscored = field.name;
+                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+4).toString());
+                i++;
+            }
+        }
+    }
+    query.finish();
+    return found;
+}
+

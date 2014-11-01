@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "GcSideBarItem.h"
 #include "RideNavigator.h"
+#include "RouteNavigator.h"
 #include "DiarySidebar.h" // for GcMultiCalendar
 #include "RideItem.h"
 #include "IntervalTreeView.h"
@@ -39,6 +40,7 @@ class AnalysisSidebar : public QWidget
         void close();
         void setWidth(int x) { rideNavigator->setWidth(x); }
         RideNavigator *rideNavigator;
+        RouteNavigator *routeNavigator;
 
     signals:
 
@@ -86,6 +88,8 @@ class AnalysisSidebar : public QWidget
 
         GcSplitterItem *activityItem;
         QSignalMapper *groupByMapper;
+
+        GcSplitterItem *routeItem;
 
         GcSplitterItem *calendarItem;
         GcMultiCalendar *calendarWidget;

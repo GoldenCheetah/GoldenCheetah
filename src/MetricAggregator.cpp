@@ -31,7 +31,9 @@
 #include "PaceZones.h"
 #include "Settings.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideMetric.h"
+#include "Route.h"
 #include "TimeUtils.h"
 #include <math.h>
 #include <QtXml/QtXml>
@@ -101,7 +103,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home->activities());
     QStringListIterator i(filenames);
 
-    // get a Hash map of statistic records and timestamps
+    // get a Hash maps of statistic records and timestamps
     QSqlQuery query(dbaccess->connection());
     QHash <QString, status> dbStatus;
     bool rc = query.exec("SELECT filename, crc, timestamp, fingerprint FROM metrics ORDER BY ride_date;");
@@ -113,6 +115,16 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         add.fingerprint = query.value(3).toInt();
         dbStatus.insert(filename, add);
     }
+    QHash <QString, status> dbIntervalStatus;
+    rc = query.exec("SELECT type, groupName, filename, start, crc, timestamp, fingerprint FROM interval_metrics ORDER BY ride_date;");
+    while (rc && query.next()) {
+        status add;
+        QString key = query.value(0).toString()+"|"+query.value(1).toString()+"|"+query.value(2).toString()+"|"+query.value(3).toString();
+        add.crc = query.value(4).toInt();
+        add.timestamp = query.value(5).toInt();
+        add.fingerprint = query.value(6).toInt();
+        dbIntervalStatus.insert(key, add);
+    }
 
     // begin LUW -- byproduct of turning off sync (nosync)
     dbaccess->connection().transaction();
@@ -122,11 +134,13 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
         if (QFile(context->athlete->home->activities().canonicalPath() + "/" + d.key()).exists() == false) {
             dbaccess->deleteRide(d.key());
+            dbaccess->deleteIntervalsForRide(d.key());
 #ifdef GC_HAVE_LUCENE
             context->athlete->lucene->deleteRide(d.key());
 #endif
         }
     }
+
 
     unsigned long zoneFingerPrint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
                                   + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
@@ -161,6 +175,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         unsigned long fingerprint = current.fingerprint;
 
         RideFile *ride = NULL;
+        bool updateForRide = false;
 
         processed++;
 
@@ -202,6 +217,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                 zoneFingerPrint != fingerprint ||
                 (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
 
+                updateForRide = true;
                 // log
                 out << "Opening ride: " << name << "\r\n";
 
@@ -221,6 +237,65 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                 updates++;
             }
         }
+
+        QDateTime _rideStartTime;
+        if (ride != NULL) {
+            _rideStartTime = ride->startTime();
+        } else {
+            RideFile::parseRideFileName(name, &_rideStartTime);
+        }
+
+        //Search all Routes for this ride startdate or name
+        Routes* routes = context->athlete->routes;
+        if (routes->routes.count()>0) {
+
+            for (int n=0;n<routes->routes.count();n++) {
+                RouteSegment* route = &routes->routes[n];
+
+                for (int j=0;j<route->getRides().count();j++) {
+                    RouteRide _ride = route->getRides()[j];
+
+                    QDateTime rideStartDate = route->getRides()[j].startTime;
+                    QString rideSegmentName = route->getRides()[j].filename;
+
+                    if (rideSegmentName == name  || rideStartDate == _rideStartTime) {
+                        qDebug() << "find ride "<<name <<" for " <<rideSegmentName;
+
+                        bool updateForInterval = false;
+                        if (!updateForRide) {
+                            // Verify interval in db
+                            // type, groupName, filename, start,
+                            QString key = QString("%1|%2|%3|%4").arg("Route").arg(route->getName()).arg(name).arg(_ride.start);
+
+                            // if it s missing or out of date then update it!
+                            status current = dbIntervalStatus.value(key);
+                            unsigned long dbTimeStamp = current.timestamp;
+                            unsigned long crc = current.crc;
+                            unsigned long fingerprint = current.fingerprint;
+
+                            if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() || zoneFingerPrint != fingerprint) {
+                                qDebug() << "updateForInterval";
+                                qDebug() << "TimeStamp" << dbTimeStamp << QFileInfo(file).lastModified().toTime_t();
+                                qDebug() << " FingerPrint" << zoneFingerPrint << fingerprint;
+                                updateForInterval= true;
+                            }
+                        }
+
+                        if (updateForRide || updateForInterval) {
+                            // read file and process it if we didn't already...
+                            QStringList errors;
+                            if (ride == NULL) ride = RideFileFactory::instance().openRideFile(context, file, errors);
+
+                            qDebug() << "importInterval";
+
+                            IntervalItem* interval = new IntervalItem(ride, route->getName(), _ride.start, _ride.stop, 0, 0, j);
+                            importInterval(interval, "Route", route->getName(), fingerprint, false);
+                        }
+                    }
+                }
+             }
+        }
+
 
         // update cache (will check timestamps itself)
         // if ride wasn't opened it will do it itself
@@ -329,6 +404,57 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
 #ifdef GC_HAVE_LUCENE
     context->athlete->lucene->importRide(&summaryMetric, ride, color, fingerprint, modify);
 #endif
+
+    return true;
+}
+
+bool MetricAggregator::importInterval(IntervalItem *interval, QString type, QString group, unsigned long fingerprint, bool modify)
+{
+    SummaryMetrics summaryMetric;
+
+    const RideFile* ride = interval->ride;
+
+    RideFile subride(const_cast<RideFile*>(ride));
+    int start = ride->timeIndex(interval->start);
+    int end = ride->timeIndex(interval->stop);
+    for (int i = start; i <= end; ++i) {
+        const RideFilePoint *p = ride->dataPoints()[i];
+        subride.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance,
+                      p->lte, p->rte, p->lps, p->rps, p->smo2, p->thb,
+                      p->rvert, p->rcad, p->rcontact, 0);
+
+        // derived data
+        RideFilePoint *l = subride.dataPoints().last();
+        l->np = p->np;
+        l->xp = p->xp;
+        l->apower = p->apower;
+    }
+
+    summaryMetric.setFileName(ride->getTag("Filename",""));
+    summaryMetric.setRideDate(ride->startTime());
+    summaryMetric.setId(ride->id());
+    summaryMetric.setIsRun(ride->isRun());
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QStringList metrics;
+
+    for (int i = 0; i < factory.metricCount(); ++i)
+        metrics << factory.metricName(i);
+
+    // compute all the metrics
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, &subride, context->athlete->zones(), context->athlete->hrZones(), metrics);
+
+    // get metrics into summaryMetric QMap
+    for(int i = 0; i < factory.metricCount(); ++i) {
+        // check for override
+        summaryMetric.setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
+    }
+
+    // what color will this ride be?
+    QColor color = colorEngine->colorFor(ride->getTag(context->athlete->rideMetadata()->getColorField(), ""));
+
+    dbaccess->importInterval(&summaryMetric, interval, type, group, color, fingerprint, modify);
 
     return true;
 }
