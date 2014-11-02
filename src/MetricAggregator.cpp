@@ -120,7 +120,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // Delete statistics for non-existant ride files
     QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
-        if (QFile(context->athlete->home->activities().absolutePath() + "/" + d.key()).exists() == false) {
+        if (QFile(context->athlete->home->activities().canonicalPath() + "/" + d.key()).exists() == false) {
             dbaccess->deleteRide(d.key());
 #ifdef GC_HAVE_LUCENE
             context->athlete->lucene->deleteRide(d.key());
@@ -144,7 +144,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     QApplication::processEvents(); // get that dialog up!
 
     // log of progress
-    QFile log(context->athlete->home->logs().absolutePath() + "/" + "metric.log");
+    QFile log(context->athlete->home->logs().canonicalPath() + "/" + "metric.log");
     log.open(QIODevice::WriteOnly);
     log.resize(0);
     QTextStream out(&log);
@@ -152,7 +152,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     while (i.hasNext()) {
         QString name = i.next();
-        QFile file(context->athlete->home->activities().absolutePath() + "/" + name);
+        QFile file(context->athlete->home->activities().canonicalPath() + "/" + name);
 
         // if it s missing or out of date then update it!
         status current = dbStatus.value(name);
@@ -227,13 +227,13 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         // we only want to check so passing check=true
         // because we don't actually want the results now
         // it will also check the file CRC as well as timestamps
-        RideFileCache updater(context, context->athlete->home->activities().absolutePath() + "/" + name, ride, true);
+        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + name, ride, true);
 
         // free memory - if needed
         if (ride) delete ride;
 
         // for model run...
-        // RideFileCache::meanMaxPowerFor(context, context->athlete->home.absolutePath() + "/" + name);
+        // RideFileCache::meanMaxPowerFor(context, context->athlete->home.canonicalPath() + "/" + name);
 
         if (bar && bar->wasCanceled()) {
             out << "METRIC REFRESH CANCELLED\r\n";
@@ -279,7 +279,7 @@ void MetricAggregator::addRide(RideItem*ride)
 {
     if (ride && ride->ride()) {
         importRide(context->athlete->home->activities(), ride->ride(), ride->fileName, context->athlete->zones()->getFingerprint(context), true);
-        RideFileCache updater(context, context->athlete->home->activities().absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
+        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
         dataChanged(); // notify models/views
     }
 }
@@ -292,7 +292,6 @@ void MetricAggregator::update() {
 bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
 {
     SummaryMetrics summaryMetric;
-    QFile file(path.absolutePath() + "/" + fileName);
 
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     if (!rx.exactMatch(fileName)) {

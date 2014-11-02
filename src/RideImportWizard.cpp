@@ -34,7 +34,7 @@
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
-RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir home, Context *context, QWidget *parent) : QDialog(parent), context(context)
+RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
     dialogMode = standardDialog;
     setAttribute(Qt::WA_DeleteOnClose);
@@ -42,18 +42,18 @@ RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir home, Context *contex
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
         filenames.append(QFileInfo(urls->value(i).toLocalFile()).absoluteFilePath());
-    init(filenames, home, context);
+    init(filenames, context);
     filenames.clear();
 }
 
-RideImportWizard::RideImportWizard(QList<QString> files, QDir home, Context *context, QWidget *parent) : QDialog(parent), context(context)
+RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
     dialogMode = standardDialog;
-    init(files, home, context);
+    init(files, context);
 }
 
 void
-RideImportWizard::init(QList<QString> files, QDir home, Context * /*mainWindow*/)
+RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 {
 
     // initialise dialog box
@@ -75,13 +75,13 @@ RideImportWizard::init(QList<QString> files, QDir home, Context * /*mainWindow*/
     todayButton->addItem(tr("Choose Date"));
     cancelButton = new QPushButton(tr("Cancel"));
     abortButton = new QPushButton(tr("Abort"));
-    overFiles = new QCheckBox(tr("Overwrite Existing Files"));
+    //overFiles = new QCheckBox(tr("Overwrite Existing Files"));  // deprecate for this release... XXX
     // initially the cancel, overwrite and today widgets are hidden
     // they only appear whilst we are asking the user for dates
     cancelButton->setHidden(true);
     todayButton->setHidden(true);
-    overFiles->setHidden(true);
-    overwriteFiles = false;
+    //overFiles->setHidden(true);  // deprecate for this release... XXX
+    //overwriteFiles = false;
 
     aborted = false;
 
@@ -91,7 +91,7 @@ RideImportWizard::init(QList<QString> files, QDir home, Context * /*mainWindow*/
     // only used when editing dates
     connect(todayButton, SIGNAL(activated(int)), this, SLOT(todayClicked(int)));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(overFiles, SIGNAL(clicked()), this, SLOT(overClicked()));
+    // connect(overFiles, SIGNAL(clicked()), this, SLOT(overClicked()));  // deprecate for this release... XXX
 
     // title & headings
     setWindowTitle(tr("Import Ride Files"));
@@ -120,7 +120,8 @@ RideImportWizard::init(QList<QString> files, QDir home, Context * /*mainWindow*/
     tableWidget->setHorizontalHeaderItem(5, statusHeading);
 
     // save target dir for the file import
-    this->home = home;
+    this->homeImports = context->athlete->home->imports();
+    this->homeActivities = context->athlete->home->activities();
 
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
@@ -174,7 +175,7 @@ RideImportWizard::init(QList<QString> files, QDir home, Context * /*mainWindow*/
     buttons->addStretch();
     buttons->addWidget(todayButton);
     buttons->addStretch();
-    buttons->addWidget(overFiles);
+    // buttons->addWidget(overFiles); // deprecate for this release... XXX
     buttons->addWidget(cancelButton);
     buttons->addWidget(abortButton);
 
@@ -534,11 +535,11 @@ RideImportWizard::process()
    return 0;
 }
 
-void
-RideImportWizard::overClicked()
-{
+//void
+//RideImportWizard::overClicked()
+//{
     //overwriteFiles = overFiles->isChecked(); //deprecate in this release XXX
-}
+//}
 
 void
 RideImportWizard::activateSave()
@@ -715,7 +716,7 @@ findDuplicates(QString filename)
 #endif
     // get list and convert to full path
     foreach(QString name, QFileInfo(filename).dir().entryList(filters, spec, QDir::Name)) {
-        duplicates << QFileInfo(filename).dir().path() + "/" + name;
+        duplicates << QFileInfo(filename).dir().canonicalPath() + "/" + name;
     }
 
     return duplicates;
@@ -809,10 +810,12 @@ RideImportWizard::abortClicked()
         if (aborted) { done(0); }
         this->repaint();
 
-        // Setup the ridetime as a QDateTime
+        // serialize the file to .JSON format and copy the source file to the "/imports" directory
+        // add the date/time of the target to the source file name (for identification)
+
+        // Prepare the new file names - Setup the ridetime as a QDateTime
         QDateTime ridedatetime = QDateTime(QDate().fromString(tableWidget->item(i,1)->text(), tr("dd MMM yyyy")),
                                  QTime().fromString(tableWidget->item(i,2)->text(), "hh:mm:ss"));
-        QString suffix = QFileInfo(filenames[i]).suffix();
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                                .arg ( ridedatetime.date().year(), 4, 10, zero )
                                .arg ( ridedatetime.date().month(), 2, 10, zero )
@@ -820,120 +823,67 @@ RideImportWizard::abortClicked()
                                .arg ( ridedatetime.time().hour(), 2, 10, zero )
                                .arg ( ridedatetime.time().minute(), 2, 10, zero )
                                .arg ( ridedatetime.time().second(), 2, 10, zero );
-        QString target = QString ("%1.%2" )
+
+        // file name for the .JSON in /activities directory
+        QString activitiesTarget = QString ("%1.%2" )
                                .arg ( targetnosuffix )
-                               .arg ( suffix );
-        QString fulltarget = home.absolutePath() + "/" + target;
+                               .arg ( "json" );
+        QString activitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
 
-        // if its a gc file we need to parse and serialize
-        // using the ridedatetime and target filename
-        if (filenames[i].endsWith(".gc", Qt::CaseInsensitive) ||
-            filenames[i].endsWith(".json", Qt::CaseInsensitive)) {
+        // file name for the copy to /imports directory
+        QFileInfo importsFile (filenames[i]);
+        QString importsTarget = importsFile.baseName() + "_" + targetnosuffix + "." + importsFile.suffix();
+        QString importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
 
-            QStringList duplicates;
-
-            // CHECK FOR DUPLICATE
-            duplicates = findDuplicates(fulltarget);
-            if (duplicates.count() && !overwriteFiles) {
-                tableWidget->item(i,5)->setText(tr("Error - File exists"));
-                fileExistsError = true;
-            } else {
-
-                // wipe away the duplicate
-                foreach(QString duplicate, duplicates) {
-                    removeDuplicate(duplicate); // we do not use removeRide coz it clashes
-                }
-
-                // read the file (again)
-                QStringList errors;
-                QFile thisfile(filenames[i]);
-                RideFile *ride(RideFileFactory::instance().openRideFile(context, thisfile, errors));
-
-                // update ridedatetime
-                ride->setStartTime(ridedatetime);
-
-                // serialize
-                if (filenames[i].endsWith(".gc")) {
-                    GcFileReader reader;
-                    QFile target(fulltarget);
-                    reader.writeRideFile(context, ride, target);
-                } else {
-                    JsonFileReader reader;
-                    QFile target(fulltarget);
-                    reader.writeRideFile(context, ride, target);
-                }
-
-                // clear
-                delete ride;
-
-                if (duplicates.count()) {
-                    tableWidget->item(i,5)->setText(tr("File Overwritten"));
-                } else {
-                    tableWidget->item(i,5)->setText(tr("File Saved"));
-                    context->athlete->addRide(QFileInfo(fulltarget).fileName(), 
-                                              tableWidget->rowCount() < 20 ? true : false); // don't signal if mass importing
-                }
-            }
-
+        // check if a ride at this point of time already exists in /activities AND
+        // if a source file with the same name already exists in /imports
+        // both are errors which shall block the import as "Dup-Files" errors
+        // The Dup-File status is decided by comparing "RideDateTime" for /activities
+        // and by comparing "OriginalName+RideDateTime" for the /imports
+        if (QFileInfo(activitiesFulltarget).exists()) {
+            tableWidget->item(i,5)->setText(tr("Error - Activity file exists"));
+            fileExistsError = true;
+        } else if (QFileInfo(importsFulltarget).exists()) {
+            tableWidget->item(i,5)->setText(tr("Error - File already imported, but no activity found"));
+            fileExistsError = true;
         } else {
-            // for native file formats the filename IS the ride date time so
-            // no need to write -- we just copy
 
-            // so now we have sourcefile in 'filenames[i]' and target file name in 'target'
-            if (!fulltarget.compare(filenames[i])) { // they are the same file! so skip copy
-                tableWidget->item(i,5)->setText(tr("Error - Source is Target"));
+            // First copy of source then create .JSON (in case of error the last error will be shown)
+            // so start wih the less the less critical part first
 
-            // CHECK FOR DUPLICATE
-            } else if (findDuplicates(fulltarget).count()) {
-                if (overwriteFiles) {
-
-                    // wipe away that duplicate
-                    foreach(QString duplicate, findDuplicates(fulltarget)) {
-                        removeDuplicate(duplicate);
-                    }
-
-                    tableWidget->item(i,5)->setText(tr("Overwriting file..."));
-                    QFile source(filenames[i]);
-                    QString fulltargettmp(home.absolutePath() + tr("/") + targetnosuffix + tr(".tmp"));
-
-                    if (source.copy(fulltargettmp)) {
-
-                        // mv tmp to target
-                        QFile temp(fulltargettmp);
-                        if (temp.rename(fulltarget)) {
-                            tableWidget->item(i,5)->setText(tr("File Overwritten"));
-                            //no need to add since its already there!
-                        } else {
-                            tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
-                            sectionError = true;
-                        }
-                    } else {
-                        tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
-                        sectionError = true;
-                    }
-                } else {
-                    tableWidget->item(i,5)->setText(tr("Error - File exists"));
-                    fileExistsError = true;
-                }
-            } else {
-                    tableWidget->item(i,5)->setText(tr("Saving file..."));
-                    QFile source(filenames[i]);
-                    if (source.copy(fulltarget)) {
-                        tableWidget->item(i,5)->setText(tr("File Saved"));
-                        context->athlete->addRide(QFileInfo(fulltarget).fileName(), 
-                                                  tableWidget->rowCount() < 20 ? true : false); // don't signal if mass importing
-
-                        // free immediately otherwise all imported rides are cached
-                        // and with large imports this can lead to memory exhaustion
-                        // BUT! Some charts/windows will hava snaffled away the ridefile
-                        // pointer which is now invalid so once all the rides have been imported
-                        // we need to select the last one... see below
-                    } else {
-                        tableWidget->item(i,5)->setText(tr("Error - copy failed"));
-                        sectionError = true;
-                    }
+            // copy the source file to /imports with adjusted name
+            tableWidget->item(i,5)->setText(tr("Saving file..."));
+            QFile source(filenames[i]);
+            if (!source.copy(importsFulltarget)) {
+                tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+                sectionError = true;
             }
+
+            // serialize the file to .JSON
+            QStringList errors;
+            QFile thisfile(filenames[i]);
+            RideFile *ride(RideFileFactory::instance().openRideFile(context, thisfile, errors));
+
+            // update ridedatetime and set the Source File name
+            ride->setStartTime(ridedatetime);
+            ride->setTag("Source Filename", importsTarget);
+
+            // serialize
+            JsonFileReader reader;
+            QFile target(activitiesFulltarget);
+            if (reader.writeRideFile(context, ride, target)) {
+
+                tableWidget->item(i,5)->setText(tr("File Saved"));
+                context->athlete->addRide(QFileInfo(activitiesFulltarget).fileName(),
+                                          tableWidget->rowCount() < 20 ? true : false); // don't signal if mass importing
+            }  else {
+                tableWidget->item(i,5)->setText(tr("Error - .JSON creation failed"));
+                sectionError = true;
+            }
+            // clear
+            delete ride;
         }
+
         QApplication::processEvents();
         if (aborted) { done(0); }
         progressBar->setValue(progressBar->value()+1);

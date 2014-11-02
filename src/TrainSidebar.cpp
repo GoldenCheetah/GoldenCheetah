@@ -891,7 +891,7 @@ void TrainSidebar::Start()       // when start button is pressed
             // setup file
             QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
 
-            QString fulltarget = context->athlete->home->activities().absolutePath() + "/" + filename;
+            QString fulltarget = context->athlete->home->activities().canonicalPath() + "/" + filename;
             if (recordFile) delete recordFile;
             recordFile = new QFile(fulltarget);
             if (!recordFile->open(QFile::WriteOnly | QFile::Truncate)) {

@@ -214,6 +214,9 @@
 // wbal formula to use
 #define GC_WBALFORM               "wbal/formula"
 
+// success tracking of more complex upgrades stored on athlete level
+#define GC_UPGRADE_311_FOLDER_SUCCESS  "upgradesuccess/folder311"
+
 #include <QSettings>
 #include <QFileInfo>
 

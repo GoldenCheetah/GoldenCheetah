@@ -459,7 +459,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         }
 
         // legacy support for .notes file
-        QString notesFileName = fileInfo.absolutePath() + '/' + fileInfo.baseName() + ".notes";
+        QString notesFileName = fileInfo.canonicalPath() + '/' + fileInfo.baseName() + ".notes";
         QFile notesFile(notesFileName);
 
         // read it in if it exists and "Notes" is not already set
@@ -484,7 +484,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
         result->setTag("Device", result->deviceType());
         result->setTag("File Format", result->fileFormat());
-        result->setTag("Athlete", QFileInfo(file).dir().dirName());
+        result->setTag("Athlete", context->athlete->cyclist);
         result->setTag("Year", result->startTime().toString("yyyy"));
         result->setTag("Month", result->startTime().toString("MMMM"));
         result->setTag("Weekday", result->startTime().toString("ddd"));

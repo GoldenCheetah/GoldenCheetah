@@ -205,15 +205,7 @@ NewCyclistDialog::saveClicked()
                 AthleteDirectoryStructure *athleteHome = new AthleteDirectoryStructure(athleteDir);
 
                 // create the sub-Dirs here
-                athleteHome->root().mkdir(Athlete_Activities);
-                athleteHome->root().mkdir(Athlete_Imports);
-                athleteHome->root().mkdir(Athlete_Downloads);
-                athleteHome->root().mkdir(Athlete_Config);
-                athleteHome->root().mkdir(Athlete_Cache);
-                athleteHome->root().mkdir(Athlete_Calendar);
-                athleteHome->root().mkdir(Athlete_Workouts);
-                athleteHome->root().mkdir(Athlete_Logs);
-                athleteHome->root().mkdir(Athlete_Temp);
+                athleteHome->createAllSubdirs();
 
                 // set the last version to the latest version
                 appsettings->setCValue(name->text(), GC_VERSION_USED, GcUpgrade::version());
@@ -250,21 +242,22 @@ NewCyclistDialog::saveClicked()
                 appsettings->setCValue(name->text(), GC_WBALTAU, wbaltau->value());
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
                 appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
-                avatar.save(athleteHome->config().absolutePath() + "/" + name->text() + "/" + "avatar.png", "PNG");
+                avatar.save(athleteHome->config().canonicalPath() + "/" + name->text() + "/" + "avatar.png", "PNG");
 
                 // Setup Power Zones
                 Zones zones;
                 zones.addZoneRange(QDate(1900, 01, 01), cp->value(), w->value());
-                zones.write(athleteHome->config().absolutePath() + "/" + name->text());
+                zones.write(athleteHome->config().canonicalPath() + "/" + name->text());
 
                 // HR Zones too!
                 HrZones hrzones;
                 hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
-                hrzones.write(athleteHome->config().absolutePath() + "/" + name->text());
+                hrzones.write(athleteHome->config().canonicalPath() + "/" + name->text());
+
 
                 accept();
             } else {
-                QMessageBox::critical(0, tr("Fatal Error"), tr("Can't create new directory ") + home.path() + "/" + name->text(), "OK");
+                QMessageBox::critical(0, tr("Fatal Error"), tr("Can't create new directory ") + home.canonicalPath() + "/" + name->text(), "OK");
             }
         } else {
             QMessageBox::critical(0, tr("Fatal Error"), tr("Athlete already exists ")  + name->text(), "OK");

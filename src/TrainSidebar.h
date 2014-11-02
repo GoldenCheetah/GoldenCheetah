@@ -171,7 +171,6 @@ class TrainSidebar : public GcWindow
 
         friend class ::MultiDeviceDialog;
 
-        const QDir home;
         Context *context;
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,

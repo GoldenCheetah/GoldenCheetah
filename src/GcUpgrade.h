@@ -20,6 +20,10 @@
 #define Gc_GcUpgrade_h
 #include "GoldenCheetah.h"
 #include "RideMetadata.h"
+#include "Athlete.h"
+#include <QString>
+#include <QWebView>
+
 
 // Build ID History
 //
@@ -58,16 +62,62 @@
 #define VERSION_LATEST 3101
 #define VERSION_STRING "V3.11 development"
 
+class GcUpgradeLogDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        GcUpgradeLogDialog(QDir);
+        void enableButtons();
+        void append(QString, int level=0);
+
+
+    public slots:
+        void saveAs();
+
+    private:
+        QWebView *report;
+        AthleteDirectoryStructure home;
+        QString reportText;
+        QPushButton *proceedButton;
+        QPushButton *saveAsButton;
+
+};
+
+
+
 class GcUpgrade
 {
     Q_DECLARE_TR_FUNCTIONS(GcUpgrade)
 
 	public:
-        GcUpgrade() {}
-        int upgrade(const QDir &home);
+        GcUpgrade() { upgradeError = false; errorCount = 0;}
+        bool upgradeConfirmedByUser(const QDir &home); // upgrade warning in case of critical updates which need a backup
+        int upgrade(const QDir &home);                 // standard upgrade steps
+        int upgradeLate(Context *context);             // final upgrade steps which need a full context to be available first (exceptional use only !)
         static int version() { return VERSION_LATEST; }
         static QString versionString() { return VERSION_STRING; }
         void removeIndex(QFile&);
+
+    private:
+
+        bool moveFile(const QString &source, const QString &target);
+        GcUpgradeLogDialog *upgradeLog;
+        bool upgradeError;
+        int errorCount;
+
 };
+
+
+class GcUpgradeExecuteDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        GcUpgradeExecuteDialog(QString);
+
+};
+
+
 
 #endif

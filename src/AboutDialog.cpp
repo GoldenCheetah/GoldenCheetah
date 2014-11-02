@@ -20,15 +20,15 @@
 #include "GcUpgrade.h"
 #include "GcCrashDialog.h"
 
-AboutDialog::AboutDialog(Context *context, QDir home) : context(context), home(home)
+AboutDialog::AboutDialog(Context *context) : context(context)
 {
     setWindowTitle(tr("About GoldenCheetah"));
 
-    aboutPage = new AboutPage(context, home);
-    versionPage = new VersionPage(context, home);
-    contributorsPage = new ContributorsPage(context, home);
+    aboutPage = new AboutPage(context);
+    versionPage = new VersionPage(context);
+    contributorsPage = new ContributorsPage(context);
 #ifndef GC_VERSION
-    configPage = new ConfigPage(context, home);
+    configPage = new ConfigPage(context);
 #endif
 
     tabWidget = new QTabWidget;
@@ -53,7 +53,7 @@ AboutDialog::AboutDialog(Context *context, QDir home) : context(context), home(h
 //
 // About page
 //
-AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
+AboutPage::AboutPage(Context *context) : context(context)
 {
     QLabel *text;
     text=new QLabel(this);
@@ -81,8 +81,8 @@ AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
                 "AnalyticCycling</a>.<br>"
                 "</center>"
                 )
-                .arg(QString(QUrl::fromLocalFile(home.absolutePath()).toEncoded()))
-                .arg(home.absolutePath().replace(" ", "&nbsp;"))
+                .arg(QString(QUrl::fromLocalFile(context->athlete->home->root().absolutePath()).toEncoded()))
+                .arg(context->athlete->home->root().absolutePath().replace(" ", "&nbsp;"))
     );
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -95,7 +95,7 @@ AboutPage::AboutPage(Context *context, QDir home) : context(context), home(home)
 //
 // Version page
 //
-VersionPage::VersionPage(Context *context, QDir home) : context(context), home(home)
+VersionPage::VersionPage(Context *context) : context(context)
 {
     QLabel *text;
     text=new QLabel(this);
@@ -112,7 +112,7 @@ VersionPage::VersionPage(Context *context, QDir home) : context(context), home(h
 //
 // Contributors page
 //
-ContributorsPage::ContributorsPage(Context *context, QDir home) : context(context), home(home)
+ContributorsPage::ContributorsPage(Context *context) : context(context)
 {
     QStringList contributors;
     contributors.append("Alejandro Martinez");
@@ -194,7 +194,7 @@ ContributorsPage::ContributorsPage(Context *context, QDir home) : context(contex
     setLayout(mainLayout);
 }
 
-ConfigPage::ConfigPage(Context *context, QDir home) : context(context), home(home)
+ConfigPage::ConfigPage(Context *context) : context(context)
 {
     QTextEdit *text = new QTextEdit(this);
     text->setAutoFillBackground(false);

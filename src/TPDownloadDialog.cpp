@@ -673,7 +673,7 @@ TPDownloadDialog::syncNext()
 
                 // read in the file
                 QStringList errors;
-                QFile file(context->athlete->home->activities().absolutePath() + "/" + curr->text(1));
+                QFile file(context->athlete->home->activities().canonicalPath() + "/" + curr->text(1));
                 RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
                 if (ride) {
@@ -828,7 +828,7 @@ TPDownloadDialog::uploadNext()
 
             // read in the file
             QStringList errors;
-            QFile file(context->athlete->home->activities().absolutePath() + "/" + curr->text(1));
+            QFile file(context->athlete->home->activities().canonicalPath() + "/" + curr->text(1));
             RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
             if (ride) {
@@ -902,7 +902,7 @@ TPDownloadDialog::saveRide(RideFile *ride, QDomDocument &, QStringList &errors)
                            .arg ( ridedatetime.time().minute(), 2, 10, zero )
                            .arg ( ridedatetime.time().second(), 2, 10, zero );
 
-    QString filename = context->athlete->home->activities().absolutePath() + "/" + targetnosuffix + ".json";
+    QString filename = context->athlete->home->activities().canonicalPath() + "/" + targetnosuffix + ".json";
 
     // exists?
     QFileInfo fileinfo(filename);
