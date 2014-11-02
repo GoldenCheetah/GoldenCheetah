@@ -293,6 +293,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     customTable->setSelectionMode(QAbstractItemView::SingleSelection);
     customTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     customLayout->addWidget(customTable);
+    connect(customTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
+
 
     // custom buttons
     editCustomButton = new QPushButton(tr("Edit"));
@@ -1197,6 +1199,25 @@ LTMTool::editMetric()
 
         // apply!
         settings->metrics[index] = edit;
+
+        // update
+        refreshCustomTable();
+        curvesChanged();
+    }
+}
+
+void
+LTMTool::doubleClicked( int row, int column )
+{
+    (void) column; // ignore, calm down
+
+    MetricDetail edit = settings->metrics[row];
+    EditMetricDetailDialog dialog(context, this, &edit);
+
+    if (dialog.exec()) {
+
+        // apply!
+        settings->metrics[row] = edit;
 
         // update
         refreshCustomTable();
