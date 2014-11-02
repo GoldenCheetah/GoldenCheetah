@@ -1208,7 +1208,7 @@ CPPlot::setRide(RideItem *rideItem)
             {
                 // MEANMAX
                 // Plot as normal or percent
-                rideCache = new RideFileCache(context, context->athlete->home->cache().absolutePath() + "/" + rideItem->fileName);
+                rideCache = new RideFileCache(context, context->athlete->home->cache().canonicalPath() + "/" + rideItem->fileName);
                 plotRide(rideItem);
                 refreshReferenceLines(rideItem);
             }

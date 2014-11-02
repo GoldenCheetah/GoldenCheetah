@@ -1039,7 +1039,7 @@ MergeConfirm::validatePage()
     // save in GC format
     JsonFileReader reader;
     reader.writeRideFile(wizard->context, ride1->ride(), savedFile);
-    ride1->setFileName(QFileInfo(savedFile).path(), QFileInfo(savedFile).fileName());
+    ride1->setFileName(QFileInfo(savedFile).canonicalPath(), QFileInfo(savedFile).fileName());
 
 
     // We are done

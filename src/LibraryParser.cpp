@@ -75,7 +75,7 @@ LibraryParser::serialize(QDir home)
     home.cdUp();
 
     // open file - truncate contents
-    QString filename = home.absolutePath() + "/library.xml";
+    QString filename = home.canonicalPath() + "/library.xml";
     QFile file(filename);
     file.open(QFile::WriteOnly);
     file.resize(0);

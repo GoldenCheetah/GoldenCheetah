@@ -37,7 +37,7 @@ class DownloadRideDialog : public QDialog
 
 
     public:
-        DownloadRideDialog(Context *context, const QDir &home);
+        DownloadRideDialog(Context *context);
 
         bool isCancelled();
 
@@ -58,7 +58,6 @@ class DownloadRideDialog : public QDialog
     private:
 
         Context *context;
-        QDir home;
         QPushButton *downloadButton, *eraseRideButton, *rescanButton,
             *cancelButton, *closeButton;
         QComboBox *portCombo, *deviceCombo;

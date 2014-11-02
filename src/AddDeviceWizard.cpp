@@ -553,10 +553,10 @@ AddFirmware::validatePage()
     if (copy->isChecked()) {
 
         QString fileName = QFileInfo(filePath).fileName();
-        QString targetFileName = QFileInfo(context->athlete->home->root().absolutePath() + "/../").absolutePath() + "/" + fileName;
+        QString targetFileName = QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath() + "/" + fileName;
 
         // check not the same thing!
-        if(QFileInfo(fileName).absolutePath() != QFileInfo(targetFileName).absolutePath()) {
+        if(QFileInfo(fileName).canonicalPath() != QFileInfo(targetFileName).canonicalPath()) {
             // if the current file exists, wipe it
             if (QFile(targetFileName).exists()) QFile(targetFileName).remove();
             QFile(filePath).copy(targetFileName);

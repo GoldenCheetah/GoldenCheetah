@@ -94,7 +94,7 @@ EditChartDialog::cancelClicked()
 void
 LTMSettings::writeChartXML(QDir home, QList<LTMSettings> charts)
 {
-    LTMChartParser::serialize(QString(home.path() + "/charts.xml"), charts);
+    LTMChartParser::serialize(QString(home.canonicalPath() + "/charts.xml"), charts);
 }
 
 
@@ -105,7 +105,7 @@ LTMSettings::writeChartXML(QDir home, QList<LTMSettings> charts)
 void
 LTMSettings::readChartXML(QDir home, bool useMetricUnits, QList<LTMSettings> &charts)
 {
-    QFileInfo chartFile(home.absolutePath() + "/charts.xml");
+    QFileInfo chartFile(home.canonicalPath() + "/charts.xml");
     QFile chartsFile;
     bool builtIn;
 

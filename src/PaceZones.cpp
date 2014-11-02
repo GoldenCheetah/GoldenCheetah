@@ -780,7 +780,7 @@ void PaceZones::write(QDir home)
 #endif
     }
 
-    QFile file(home.absolutePath() + "/pace.zones");
+    QFile file(home.canonicalPath() + "/pace.zones");
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
