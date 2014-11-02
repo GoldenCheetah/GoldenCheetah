@@ -114,7 +114,7 @@ class TimeRiding : public RideMetric {
                  const Context *) {
 
         secsMovingOrPedaling = 0;
-        if (ride->areDataPresent()->kph) {
+        if (ride->areDataPresent()->kph || ride->areDataPresent()->cad ) {
             foreach (const RideFilePoint *point, ride->dataPoints()) {
                 if ((point->kph > 0.0) || (point->cad > 0.0))
                     secsMovingOrPedaling += ride->recIntSecs();
