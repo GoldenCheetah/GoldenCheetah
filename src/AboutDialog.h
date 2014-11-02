@@ -17,11 +17,10 @@ class AboutDialog: public QDialog
     G_OBJECT
 
     public:
-        AboutDialog(Context *context, QDir home);
+        AboutDialog(Context *context);
 
     private:
         Context *context;
-        QDir home;
 
         AboutPage *aboutPage;
         VersionPage *versionPage;
@@ -40,11 +39,10 @@ class AboutPage : public QWidget
 
 
     public:
-        AboutPage(Context *context, QDir home);
+        AboutPage(Context *context);
 
     private:
         Context *context;
-        QDir home;
 };
 
 class VersionPage : public QWidget
@@ -54,11 +52,10 @@ class VersionPage : public QWidget
 
 
     public:
-        VersionPage(Context *context, QDir home);
+        VersionPage(Context *context);
 
     private:
         Context *context;
-        QDir home;
 };
 
 class ConfigPage : public QWidget
@@ -66,11 +63,10 @@ class ConfigPage : public QWidget
     Q_OBJECT
 
     public:
-        ConfigPage(Context *context, QDir home);
+        ConfigPage(Context *context);
 
     private:
         Context *context;
-        QDir home;
 };
 
 class ContributorsPage : public QWidget
@@ -80,11 +76,10 @@ class ContributorsPage : public QWidget
 
 
     public:
-        ContributorsPage(Context *context, QDir home);
+        ContributorsPage(Context *context);
 
     private:
         Context *context;
-        QDir home;
 
 };
 

@@ -264,7 +264,7 @@ RouteSegment::searchRouteInAllRides(Context* context)
     qDebug() << "searchRouteInAllRides()";
 
     // log of progress
-    QFile log(context->athlete->home->logs().absolutePath() + "/" + "routes.log");
+    QFile log(context->athlete->home->logs().canonicalPath() + "/" + "routes.log");
     log.open(QIODevice::ReadWrite);
     QTextStream out(&log);
 
@@ -286,7 +286,7 @@ RouteSegment::searchRouteInAllRides(Context* context)
 
     while (iterator.hasNext()) {
         QString name = iterator.next();
-        QFile file(context->athlete->home->activities().absolutePath() + "/" + name);
+        QFile file(context->athlete->home->activities().canonicalPath() + "/" + name);
         out << "Opening ride: " << name;
 
         RideFile *ride = NULL;
@@ -391,7 +391,7 @@ Routes::Routes(Context *context, const QDir &home)
 void
 Routes::readRoutes()
 {
-    QFile routeFile(home.absolutePath() + "/routes.xml");
+    QFile routeFile(home.canonicalPath() + "/routes.xml");
 
     QXmlInputSource source( &routeFile );
     QXmlSimpleReader xmlReader;
@@ -435,7 +435,7 @@ Routes::writeRoutes()
 {
     // update routes.xml
 
-    QString file = QString(home.absolutePath() + "/routes.xml");
+    QString file = QString(home.canonicalPath() + "/routes.xml");
     RouteParser::serialize(file, routes);
 
     routesChanged(); // signal!
@@ -469,7 +469,7 @@ void
 Routes::searchRoutesInRide(RideFile* ride)
 {   
     // log of progress
-    QFile log(context->athlete->home->logs().absolutePath() + "/" + "routes2.log");
+    QFile log(context->athlete->home->logs().canonicalPath() + "/" + "routes2.log");
     log.open(QIODevice::ReadWrite);
     QTextStream out(&log);
 

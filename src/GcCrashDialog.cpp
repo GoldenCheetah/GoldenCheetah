@@ -317,7 +317,7 @@ GcCrashDialog::setHTML()
     // metric log...
     text += "<center><h3>Metric Log</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
-    QFile metriclog(home.logs().absolutePath() + "/" + "metric.log");
+    QFile metriclog(home.logs().canonicalPath() + "/" + "metric.log");
     if (metriclog.open(QIODevice::ReadOnly)) {
 
         // read in line by line and add to diag file
@@ -334,15 +334,59 @@ GcCrashDialog::setHTML()
     text += "</table></center>";
 
     // files...
-    text += "<center><h3>Athlete Directory</h3></center>";
+    text += "<center><h3>Athlete Directory - Activities</h3></center>";
     text += "<center><table border=0 cellspacing=10 width=\"90%\">";
     foreach(QString file, home.activities().entryList(QDir::NoFilter, QDir::Time)) {
         text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
                 .arg(file)
-                .arg(QFileInfo(home.activities().absolutePath() + "/" + file).lastModified().toString());
+                .arg(QFileInfo(home.activities().canonicalPath() + "/" + file).lastModified().toString());
     }
     text += "</table></center>";
 
+    text += "<center><h3>Athlete Directory - Cache</h3></center>";
+    text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+    foreach(QString file, home.cache().entryList(QDir::NoFilter, QDir::Time)) {
+        text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
+                .arg(file)
+                .arg(QFileInfo(home.cache().canonicalPath() + "/" + file).lastModified().toString());
+    }
+    text += "</table></center>";
+
+    text += "<center><h3>Athlete Directory - Config</h3></center>";
+    text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+    foreach(QString file, home.config().entryList(QDir::NoFilter, QDir::Time)) {
+        text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
+                .arg(file)
+                .arg(QFileInfo(home.config().canonicalPath() + "/" + file).lastModified().toString());
+    }
+    text += "</table></center>";
+
+    text += "<center><h3>Athlete Directory - Workouts</h3></center>";
+    text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+    foreach(QString file, home.workouts().entryList(QDir::NoFilter, QDir::Time)) {
+        text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
+                .arg(file)
+                .arg(QFileInfo(home.workouts().canonicalPath() + "/" + file).lastModified().toString());
+    }
+    text += "</table></center>";
+
+    text += "<center><h3>Athlete Directory - Imports</h3></center>";
+    text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+    foreach(QString file, home.imports().entryList(QDir::NoFilter, QDir::Time)) {
+        text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
+                .arg(file)
+                .arg(QFileInfo(home.imports().canonicalPath() + "/" + file).lastModified().toString());
+    }
+    text += "</table></center>";
+
+    text += "<center><h3>Athlete Directory - Downloads</h3></center>";
+    text += "<center><table border=0 cellspacing=10 width=\"90%\">";
+    foreach(QString file, home.downloads().entryList(QDir::NoFilter, QDir::Time)) {
+        text += QString("<tr><td align=\"right\"> %1</td><td align=\"left\">%2</td></tr>")
+                .arg(file)
+                .arg(QFileInfo(home.downloads().canonicalPath() + "/" + file).lastModified().toString());
+    }
+    text += "</table></center>";
 
     // settings...
     text += "<center><h3>All Settings</h3></center>";
