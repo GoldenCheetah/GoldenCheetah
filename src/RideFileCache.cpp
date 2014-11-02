@@ -73,7 +73,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
 
     // Get info for ride file and cache file
     QFileInfo rideFileInfo(rideFileName);
-    cacheFileName = rideFileInfo.path() + "/" + rideFileInfo.baseName() + ".cpx";
+    cacheFileName = context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx";
     QFileInfo cacheFileInfo(cacheFileName);
 
     // is it up-to-date?
@@ -253,7 +253,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
         if (first == true) {
 
             // first time through the whole thing is going to be best
-            returning =  meanMaxPowerFor(context, returningwpk, context->athlete->home->activities().absolutePath() + "/" + rideFileName);
+            returning =  meanMaxPowerFor(context, returningwpk, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
             first = false;
 
         } else {
@@ -261,7 +261,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
             QVector<float> thiswpk;
 
             // next time through we should only pick out better times
-            QVector<float> ridebest = meanMaxPowerFor(context, thiswpk, context->athlete->home->activities().absolutePath() + "/" + rideFileName);
+            QVector<float> ridebest = meanMaxPowerFor(context, thiswpk, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
 
             // do we need to increase the returning array?
             if (returning.size() < ridebest.size()) returning.resize(ridebest.size());
@@ -284,7 +284,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
     return returning;
 }
 
-QVector<float> RideFileCache::meanMaxPowerFor(Context *, QVector<float>&wpk, QString fileName)
+QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&wpk, QString fileName)
 {
     QTime start;
     start.start();
@@ -293,7 +293,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *, QVector<float>&wpk, QSt
 
     // Get info for ride file and cache file
     QFileInfo rideFileInfo(fileName);
-    QString cacheFilename = rideFileInfo.path() + "/" + rideFileInfo.baseName() + ".cpx";
+    QString cacheFilename = context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx";
     QFileInfo cacheFileInfo(cacheFilename);
 
     // is it up-to-date?
@@ -1381,7 +1381,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(rideFileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(context, context->athlete->home->activities().absolutePath() + "/" + rideFileName);
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
 
             // lets aggregate
             meanMaxAggregate(wattsMeanMaxDouble, rideCache.wattsMeanMaxDouble, wattsMeanMaxDate, rideDate);
@@ -1459,7 +1459,7 @@ QVector<float> &RideFileCache::heatMeanMaxArray()
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(rideFileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(context, context->athlete->home->activities().absolutePath() + "/" + rideFileName);
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
 
             for(int i=0; i<rideCache.wattsMeanMaxDouble.count() && i<wattsMeanMaxDouble.count(); i++) {
 
@@ -1679,8 +1679,8 @@ double
 RideFileCache::best(Context *context, QString filename, RideFile::SeriesType series, int duration)
 {
     // read the header
-    QFileInfo rideFileInfo(context->athlete->home->activities().absolutePath() + "/" + filename);
-    QString cacheFileName(context->athlete->home->cache().absolutePath() + "/" + rideFileInfo.baseName() + ".cpx");
+    QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + filename);
+    QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
     QFileInfo cacheFileInfo(cacheFileName);
 
     // head
@@ -1718,8 +1718,8 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
     if (zone < 1 || zone > 10) return 0;
 
     // read the header
-    QFileInfo rideFileInfo(context->athlete->home->activities().absolutePath() + "/" + filename);
-    QString cacheFileName(context->athlete->home->cache().absolutePath() + "/" + rideFileInfo.baseName() + ".cpx");
+    QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + filename);
+    QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
     QFileInfo cacheFileInfo(cacheFileName);
 
     // head
@@ -1795,8 +1795,8 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
         if (datetime < from || datetime > to) continue;
 
         // CPX filename
-        QFileInfo rideFileInfo(context->athlete->home->activities().absolutePath() + "/" + filename);
-        QString cacheFileName(context->athlete->home->cache().absolutePath() + "/" + rideFileInfo.baseName() + ".cpx");
+        QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + filename);
+        QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
         QFileInfo cacheFileInfo(cacheFileName);
         RideFileCacheHeader head;
         QFile cacheFile(cacheFileName);

@@ -790,7 +790,7 @@ void Zones::write(QDir home)
 #endif
     }
 
-    QFile file(home.absolutePath() + "/power.zones");
+    QFile file(home.canonicalPath() + "/power.zones");
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);

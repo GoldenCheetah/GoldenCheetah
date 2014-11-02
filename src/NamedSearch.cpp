@@ -64,7 +64,7 @@ static QString unprotect(const QString string)
 void
 NamedSearches::read()
 {
-    QFile namedSearchFile(home.absolutePath() + "/namedsearches.xml");
+    QFile namedSearchFile(home.canonicalPath() + "/namedsearches.xml");
     QXmlInputSource source( &namedSearchFile );
     QXmlSimpleReader xmlReader;
     NamedSearchParser handler;
@@ -101,7 +101,7 @@ void
 NamedSearches::write()
 {
     // update namedSearchs.xml
-    QString file = QString(home.absolutePath() + "/namedsearches.xml");
+    QString file = QString(home.canonicalPath() + "/namedsearches.xml");
     NamedSearchParser::serialize(file, list);
     athlete->notifyNamedSearchesChanged();
 }

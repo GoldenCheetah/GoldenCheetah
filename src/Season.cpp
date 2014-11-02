@@ -245,7 +245,7 @@ EditSeasonEventDialog::cancelClicked()
 void
 Seasons::readSeasons()
 {
-    QFile seasonFile(home.absolutePath() + "/seasons.xml");
+    QFile seasonFile(home.canonicalPath() + "/seasons.xml");
     QXmlInputSource source( &seasonFile );
     QXmlSimpleReader xmlReader;
     SeasonParser handler;
@@ -391,7 +391,7 @@ void
 Seasons::writeSeasons()
 {
     // update seasons.xml
-    QString file = QString(home.absolutePath() + "/seasons.xml");
+    QString file = QString(home.canonicalPath() + "/seasons.xml");
     SeasonParser::serialize(file, seasons);
 
     seasonsChanged(); // signal!

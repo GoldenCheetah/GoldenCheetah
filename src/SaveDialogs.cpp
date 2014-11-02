@@ -138,7 +138,7 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
                                .arg ( ridedatetime.time().second(), 2, 10, zero );
 
     // if there is a notes file we need to rename it (cpi we will ignore)
-    QFile notesFile(currentFI.path() + QDir::separator() + currentFI.baseName() + ".notes");
+    QFile notesFile(currentFI.canonicalPath() + QDir::separator() + currentFI.baseName() + ".notes");
     if (notesFile.exists()) notesFile.remove();
 
     // When datetime changes we need to update
@@ -156,13 +156,13 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
 
         // set the new filename & Start time everywhere
         currentFile.setFileName(rideItem->path + QDir::separator() + targetnosuffix + ".json");
-        rideItem->setFileName(QFileInfo(currentFile).path(), QFileInfo(currentFile).fileName());
+        rideItem->setFileName(QFileInfo(currentFile).canonicalPath(), QFileInfo(currentFile).fileName());
     }
 
     // set target filename
     if (convert) {
         // rename the source
-        savedFile.setFileName(currentFI.path() + QDir::separator() + currentFI.baseName() + ".json");
+        savedFile.setFileName(currentFI.canonicalPath() + QDir::separator() + currentFI.baseName() + ".json");
     } else {
         savedFile.setFileName(currentFile.fileName());
     }
@@ -186,7 +186,7 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
         currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
 
         // rename in memory
-        rideItem->setFileName(QFileInfo(savedFile).path(), QFileInfo(savedFile).fileName());
+        rideItem->setFileName(QFileInfo(savedFile).canonicalPath(), QFileInfo(savedFile).fileName());
     }
 
 

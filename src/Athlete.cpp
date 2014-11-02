@@ -70,7 +70,8 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Before we initialise we need to run the upgrade wizard for this athlete
     GcUpgrade v3;
-    v3.upgrade(context->athlete->home->root());
+    int returnCode = v3.upgrade(home->root());
+    if (returnCode != 0) return;
 
     // metric / non-metric
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
@@ -84,7 +85,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Power Zones
     zones_ = new Zones;
-    QFile zonesFile(home->config().absolutePath() + "/power.zones");
+    QFile zonesFile(home->config().canonicalPath() + "/power.zones");
     if (zonesFile.exists()) {
         if (!zones_->read(zonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("Zones File Error"),
@@ -95,7 +96,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Heartrate Zones
     hrzones_ = new HrZones;
-    QFile hrzonesFile(home->config().absolutePath() + "/hr.zones");
+    QFile hrzonesFile(home->config().canonicalPath() + "/hr.zones");
     if (hrzonesFile.exists()) {
         if (!hrzones_->read(hrzonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("HR Zones File Error"),
@@ -106,7 +107,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Pace Zones
     pacezones_ = new PaceZones;
-    QFile pacezonesFile(home->config().absolutePath() + "/pace.zones");
+    QFile pacezonesFile(home->config().canonicalPath() + "/pace.zones");
     if (pacezonesFile.exists()) {
         if (!pacezones_->read(pacezonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"), pacezones_->errorString());
@@ -125,6 +126,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Date Ranges
     seasons = new Seasons(home->config());
+
+    // seconds step of the upgrade - now everything of configuration needed should be in place in Context
+    v3.upgradeLate(context);
+
 
     // Search / filter
 #ifdef GC_HAVE_LUCENE
@@ -196,7 +201,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(RIDE_TYPE, home->activities().path(), name, dt, zones(), hrZones(), context);
+            last = new RideItem(RIDE_TYPE, home->activities().canonicalPath(), name, dt, zones(), hrZones(), context);
             allRides->addChild(last);
         }
     }
@@ -325,7 +330,7 @@ Athlete::addRide(QString name, bool dosignal)
     QDateTime dt;
     if (!RideFile::parseRideFileName(name, &dt)) return;
 
-    RideItem *last = new RideItem(RIDE_TYPE, home->activities().path(), name, dt, zones(), hrZones(), context);
+    RideItem *last = new RideItem(RIDE_TYPE, home->activities().canonicalPath(), name, dt, zones(), hrZones(), context);
 
     int index = 0;
     while (index < allRides->childCount()) {
@@ -373,15 +378,15 @@ Athlete::removeCurrentRide()
     allRides->removeChild(item);
 
 
-    QFile file(home->activities().absolutePath() + "/" + strOldFileName);
+    QFile file(home->activities().canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
     QString strNewName = strOldFileName + ".bak";
 
     // in case there was an existing bak file, delete it
     // ignore errors since it probably isn't there.
-    QFile::remove(home->activities().absolutePath() + "/" + strNewName);
+    QFile::remove(home->activities().canonicalPath() + "/" + strNewName);
 
-    if (!file.rename(home->activities().absolutePath() + "/" + strNewName)) {
+    if (!file.rename(home->activities().canonicalPath() + "/" + strNewName)) {
         QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2")
             .arg(strOldFileName).arg(strNewName));
     }
@@ -392,7 +397,18 @@ Athlete::removeCurrentRide()
     foreach (QString extension, extras) {
 
         QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
-        QFile::remove(home->activities().absolutePath() + "/" + deleteMe);
+        QFile::remove(home->activities().canonicalPath() + "/" + deleteMe);
+    }
+
+    // rename also the source files either in /imports or in /downloads to allow a second round of import
+    QString sourceFilename = item->ride()->getTag("Source Filename", "");
+    if (sourceFilename != "") {
+        // try to rename in both directories /imports and /downloads
+        // but don't report any errors - files may have been backup already
+        QFile old1 (home->imports().canonicalPath() + "/" + sourceFilename);
+        old1.rename(home->imports().canonicalPath() + "/" + sourceFilename + ".bak");
+        QFile old2 (home->downloads().canonicalPath() + "/" + sourceFilename);
+        old2.rename(home->downloads().canonicalPath() + "/" + sourceFilename + ".bak");
     }
 
     // we don't want the whole delete, select next flicker
@@ -483,7 +499,7 @@ void
 Athlete::configChanged()
 {
     // re-read Zones in case it changed
-    QFile zonesFile(home->config().absolutePath() + "/power.zones");
+    QFile zonesFile(home->config().canonicalPath() + "/power.zones");
     if (zonesFile.exists()) {
         if (!zones_->read(zonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("Zones File Error"),
@@ -494,7 +510,7 @@ Athlete::configChanged()
     }
 
     // reread HR zones
-    QFile hrzonesFile(home->config().absolutePath() + "/hr.zones");
+    QFile hrzonesFile(home->config().canonicalPath() + "/hr.zones");
     if (hrzonesFile.exists()) {
         if (!hrzones_->read(hrzonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("HR Zones File Error"),
@@ -505,7 +521,7 @@ Athlete::configChanged()
     }
 
     // reread Pace zones
-    QFile pacezonesFile(home->config().absolutePath() + "/pace.zones");
+    QFile pacezonesFile(home->config().canonicalPath() + "/pace.zones");
     if (pacezonesFile.exists()) {
         if (!pacezones_->read(pacezonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"),
@@ -557,7 +573,7 @@ Athlete::importFilesWithoutDialog() {
         foreach(QFileInfo f, fileInfos) {
             fileNames.append(f.absoluteFilePath());
         }
-        RideImportWizard *import = new RideImportWizard(fileNames, context->athlete->home->imports(), context);
+        RideImportWizard *import = new RideImportWizard(fileNames, context);
         if (importSettings == 1) import->setDialogMode(RideImportWizard::allButDupFileErrors);
         if (importSettings == 2) import->setDialogMode(RideImportWizard::allErrors);
         import->process();
@@ -569,6 +585,17 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
 
     myhome = home;
 
+    athlete_activities = "activities";
+    athlete_imports = "imports";
+    athlete_downloads = "downloads";
+    athlete_config = "config";
+    athlete_cache = "cache";
+    athlete_calendar = "calendar";
+    athlete_workouts = "workouts";
+    athlete_temp = "temp";
+    athlete_logs = "logs";
+
+
 }
 
 AthleteDirectoryStructure::~AthleteDirectoryStructure() {
@@ -577,5 +604,33 @@ AthleteDirectoryStructure::~AthleteDirectoryStructure() {
 
 }
 
+void
+AthleteDirectoryStructure::createAllSubdirs() {
+
+    myhome.mkdir(athlete_activities);
+    myhome.mkdir(athlete_imports);
+    myhome.mkdir(athlete_downloads);
+    myhome.mkdir(athlete_config);
+    myhome.mkdir(athlete_cache);
+    myhome.mkdir(athlete_calendar);
+    myhome.mkdir(athlete_workouts);
+    myhome.mkdir(athlete_logs);
+    myhome.mkdir(athlete_temp);
 
 
+}
+
+bool
+AthleteDirectoryStructure::subDirsExist() {
+
+    return (activities().exists() &&
+            imports().exists() &&
+            downloads().exists() &&
+            config().exists() &&
+            cache().exists() &&
+            calendar().exists() &&
+            workouts().exists() &&
+            logs().exists() &&
+            temp().exists()
+            );
+}

@@ -698,7 +698,7 @@ void HrZones::write(QDir home)
     }
     }
 
-    QFile file(home.absolutePath() + "/hr.zones");
+    QFile file(home.canonicalPath() + "/hr.zones");
     if (file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);

@@ -170,7 +170,7 @@ main(int argc, char *argv[])
         //this is the path that used to be used for all platforms
         //now different platforms will use their own path
         //this path is checked first to make things easier for long-time users
-        QString oldLibraryPath=QDir::home().path()+"/Library/GoldenCheetah";
+        QString oldLibraryPath=QDir::home().canonicalPath()+"/Library/GoldenCheetah";
 
         //these are the new platform-dependent library paths
 #if defined(Q_OS_MACX)
@@ -218,11 +218,11 @@ main(int argc, char *argv[])
         }
 
         // set global root directory
-        gcroot = home.absolutePath();
+        gcroot = home.canonicalPath();
 
         // now redirect stderr
 #ifndef WIN32
-        if (!debug) nostderr(home.absolutePath());
+        if (!debug) nostderr(home.canonicalPath());
 #endif
 
         // install QT Translator to enable QT Dialogs translation
@@ -284,16 +284,23 @@ main(int argc, char *argv[])
             while (i.hasNext()) {
                 QString cyclist = i.next();
                 if (home.cd(cyclist)) {
-                    MainWindow *mainWindow = new MainWindow(home);
-                    mainWindow->show();
-                    mainWindow->ridesAutoImport();
-                    home.cdUp();
-                    anyOpened = true;
+                    GcUpgrade v3;
+                    if (v3.upgradeConfirmedByUser(home)) {
+                        MainWindow *mainWindow = new MainWindow(home);
+                        mainWindow->show();
+                        mainWindow->ridesAutoImport();
+                        home.cdUp();
+                        anyOpened = true;
+                    } else {
+                        delete trainDB;
+                        return ret;
+                    }
                 }
             }
         }
 
         // ack, didn't manage to open an athlete
+        // and the upgradeWarning was
         // lets ask the user which / create a new one
         if (!anyOpened) {
             ChooseCyclistDialog d(home, true);
@@ -313,9 +320,15 @@ main(int argc, char *argv[])
             }
 
             // .. and open a mainwindow
-            MainWindow *mainWindow = new MainWindow(home);
-            mainWindow->show();
-            mainWindow->ridesAutoImport();
+            GcUpgrade v3;
+            if (v3.upgradeConfirmedByUser(home)) {
+                MainWindow *mainWindow = new MainWindow(home);
+                mainWindow->show();
+                mainWindow->ridesAutoImport();
+            } else {
+                delete trainDB;
+                return ret;
+            }
         }
 
         ret=application->exec();

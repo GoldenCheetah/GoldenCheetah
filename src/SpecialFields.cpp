@@ -56,6 +56,7 @@ SpecialFields::SpecialFields()
     namesmap.insert("Year", tr("Year"));                             // set by openRideFile
     namesmap.insert("Month", tr("Month"));                            // set by openRideFile
     namesmap.insert("Weekday", tr("Weekday"));                       // set by openRideFile
+    namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
 
 
     // now add all the metric fields (for metric overrides)

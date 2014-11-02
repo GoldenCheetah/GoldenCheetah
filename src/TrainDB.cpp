@@ -58,7 +58,7 @@ TrainDB::initDatabase(QDir home)
     // get a connection
     sessionid = "train";
     db = new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", sessionid));
-    db->setDatabaseName(home.absolutePath() + "/trainDB"); 
+    db->setDatabaseName(home.canonicalPath() + "/trainDB");
 
     if (!db->database(sessionid).isOpen()) {
         QMessageBox::critical(0, qApp->translate("TrainDB","Cannot open database"),

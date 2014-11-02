@@ -130,7 +130,7 @@ MainWindow::MainWindow(const QDir &home)
     w->apiVersion();//shutup compiler
     #endif
     GCColorSet->colorSet(); // shut up the compiler
-    Library::initialise(context->athlete->home->workouts());
+    Library::initialise(context->athlete->home->root());
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
     QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
     if (listOfProxies.count() > 0) {
@@ -153,7 +153,7 @@ MainWindow::MainWindow(const QDir &home)
     // if no workout directory is configured, default to the
     // top level GoldenCheetah directory
     if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->workouts().absolutePath() + "/../").absolutePath());
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
 
     /*----------------------------------------------------------------------
      *  GUI setup
@@ -1001,7 +1001,7 @@ MainWindow::closeAll()
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog *ad = new AboutDialog(currentTab->context, currentTab->context->athlete->home->root());
+    AboutDialog *ad = new AboutDialog(currentTab->context);
     ad->exec();
 }
 
@@ -1174,7 +1174,7 @@ MainWindow::dropEvent(QDropEvent *event)
 
     if (currentTab->currentView() != 3) { // we're not on train view
         // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (&urls, currentTab->context->athlete->home->imports(), currentTab->context);
+        RideImportWizard *dialog = new RideImportWizard (&urls, currentTab->context);
         dialog->process(); // do it!
     } else {
         QStringList filenames;
@@ -1193,7 +1193,7 @@ MainWindow::dropEvent(QDropEvent *event)
 void
 MainWindow::downloadRide()
 {
-    (new DownloadRideDialog(currentTab->context, currentTab->context->athlete->home->downloads()))->show();
+    (new DownloadRideDialog(currentTab->context))->show();
 }
 
 
@@ -1273,7 +1273,7 @@ MainWindow::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentTab->context->athlete->home->imports(), currentTab->context);
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentTab->context);
         import->process();
     }
 }
@@ -1391,6 +1391,9 @@ MainWindow::openWindow(QString name)
 
     if (!home.exists()) return;
 
+    GcUpgrade v3;
+    if (!v3.upgradeConfirmedByUser(home)) return;
+
     // main window will register itself
     MainWindow *main = new MainWindow(home);
     main->show();
@@ -1411,6 +1414,9 @@ MainWindow::openTab(QString name)
     home.cd(name);
 
     if (!home.exists()) return;
+
+    GcUpgrade v3;
+    if (!v3.upgradeConfirmedByUser(home)) return;
 
     setUpdatesEnabled(false);
 
@@ -1544,8 +1550,10 @@ MainWindow::setOpenWindowMenu()
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
+        // get the config directory
+        AthleteDirectoryStructure subDirs(name);
         // icon / mugshot ?
-        QString icon = QString("%1/%2/avatar.png").arg(gcroot).arg(name);
+        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
         if (QFile(icon).exists()) action->setIcon(QIcon(icon));
 
         // only allow selection of cyclists which are not already open
@@ -1584,8 +1592,10 @@ MainWindow::setOpenTabMenu()
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
+        // get the config directory
+        AthleteDirectoryStructure subDirs(name);
         // icon / mugshot ?
-        QString icon = QString("%1/%2/avatar.png").arg(gcroot).arg(name);
+        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
         if (QFile(icon).exists()) action->setIcon(QIcon(icon));
 
         // only allow selection of cyclists which are not already open
