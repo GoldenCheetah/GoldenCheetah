@@ -108,6 +108,7 @@ class LTMTool : public QWidget
 
     private slots:
         void editMetric();
+        void doubleClicked( int row, int column );
         void addMetric();
         void deleteMetric();
 
