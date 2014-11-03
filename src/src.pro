@@ -363,6 +363,7 @@ HEADERS += \
         MergeActivityWizard.h \
         MetadataWindow.h \
         MetricAggregator.h \
+        MoxyDevice.h \
         NewCyclistDialog.h \
         NullController.h \
         PaceZones.h \
@@ -574,6 +575,7 @@ SOURCES += \
         MergeActivityWizard.cpp \
         MetadataWindow.cpp \
         MetricAggregator.cpp \
+        MoxyDevice.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
         PaceTimeInZone.cpp \

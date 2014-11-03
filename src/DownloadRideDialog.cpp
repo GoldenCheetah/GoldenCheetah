@@ -109,7 +109,7 @@ DownloadRideDialog::setReadyInstruct()
         if (inst.size() == 0)
             statusLabel->setPlainText(tr("Click Download to begin downloading."));
         else
-            statusLabel->setPlainText(inst + tr(", \nthen click Download."));
+            statusLabel->setPlainText(inst + tr(", then click Download."));
 
         updateAction( actionIdle );
     }
@@ -287,12 +287,14 @@ DownloadRideDialog::downloadClicked()
     connect( this, SIGNAL(cancel()), device.data(), SLOT(cancelled()) );
     connect( device.data(), SIGNAL(updateProgress(QString)), this, SLOT(updateProgress(QString)));
 
-    updateStatus(tr("getting summary ..."));
-    if( ! device->preview( err ) ){
+    if (devtype->canPreview()) {
+        updateStatus(tr("Getting ride list ..."));
+        if( ! device->preview( err ) ){
 
-        QMessageBox::information(this, tr("Preview failed"), err);
-        updateAction( actionIdle );
-        return;
+            QMessageBox::information(this, tr("Get ride list failed"), err);
+            updateAction( actionIdle );
+            return;
+        }
     }
 
     QList<DeviceRideItemPtr> &rides( device->rides() );
@@ -304,11 +306,11 @@ DownloadRideDialog::downloadClicked()
         }
     }
 
-    updateStatus(tr("getting data ..."));
+    updateStatus(tr("Starting Download ..."));
     if (!device->download( context->athlete->home->downloads(), files, err))
     {
         if (cancelled) {
-            QMessageBox::information(this, tr("Download canceled"),
+            QMessageBox::information(this, tr("Download cancelled"),
                                      tr("Cancel clicked by user."));
             cancelled = false;
         }
@@ -325,7 +327,7 @@ DownloadRideDialog::downloadClicked()
     int failures = 0;
     for( int i = 0; i < files.size(); ++i ){
         if( ! files.at(i).startTime.isValid() ){
-            updateStatus(tr("file %1 has no valid timestamp, falling back to 'now'")
+            updateStatus(tr("File %1 has no valid timestamp, falling back to 'now'")
                 .arg(files.at(i).name));
             files[i].startTime = QDateTime::currentDateTime();
         }
@@ -379,7 +381,7 @@ DownloadRideDialog::downloadClicked()
                     .arg(files.at(i).name)
                     .arg(filepath)
                     .arg(strerror(errno)) );
-                updateStatus(tr("failed to rename %1 to %2")
+                updateStatus(tr("Failed to rename %1 to %2")
                     .arg( files.at(i).name )
                     .arg( filename ));
             QFile::remove(files.at(i).name);
@@ -429,7 +431,7 @@ DownloadRideDialog::downloadClicked()
     }
 
     if( ! failures )
-        updateStatus( tr("download completed successfully") );
+        updateStatus( tr("Download completed") );
 
     updateAction( actionIdle );
 }
@@ -458,7 +460,7 @@ DownloadRideDialog::eraseClicked()
 
     QString err;
     if( device->cleanup( err) )
-        updateStatus( tr("cleaned data") );
+        updateStatus( tr("Cleaned data") );
     else
         updateStatus( err );
 
@@ -486,5 +488,3 @@ DownloadRideDialog::closeClicked()
 {
     accept();
 }
-
-

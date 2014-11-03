@@ -100,6 +100,9 @@ struct Devices
     // cleanup for this device type is implemented:
     virtual bool canCleanup() { return false; };
 
+    // can preview ride list
+    virtual bool canPreview() { return true; }; // assume it can !
+
     virtual QString downloadInstructions() const { return ""; };
 
     static QList<QString> typeNames();
