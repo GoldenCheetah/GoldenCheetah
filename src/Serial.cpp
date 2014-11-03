@@ -112,6 +112,7 @@ Serial::open(QString &err)
         perror("tcsetattr");
         assert(0);
     }
+    tcflush(fd, TCIOFLUSH); // clear out the garbage
     return true;
 #else
 Q_UNUSED(err);
@@ -171,6 +172,7 @@ Serial::close()
 {
 #ifndef Q_OS_WIN32
     assert(fd >= 0);
+    tcflush(fd, TCIOFLUSH); // clear out the garbage
     ::close(fd);
     fd = -1;
 #else
@@ -319,15 +321,45 @@ Serial::name() const
 
 bool
 Serial::setBaudRate(int speed, QString &err)
-{   Q_UNUSED(speed); Q_UNUSED(err);
-    /* not yet implemented
+{
 
-    struct termios tty;
-    if (cfsetspeed(&tty, speed) == -1) {
-        perror("cfsetspeed");
-        assert(0);
+    // only really needed for Moxy 
+    // so not doing a big old switch/case
+    if (speed == 115200) {
+
+#ifndef Q_OS_WIN32
+
+        // LINUX / MAC
+        struct termios tty;
+        if (tcgetattr(fd, &tty) == -1) {
+            perror("tcgetattr");
+        }
+        cfsetspeed(&tty, B115200);
+
+        /* put terminal in raw mode after flushing */
+        if (tcsetattr(fd,TCSAFLUSH,&tty) < 0) {
+            qDebug()<<"cannot set raw mode";
+            return false;
+        }
+#else
+
+        // WINDOWS
+
+        DCB deviceSettings;    // serial port settings baud rate et al
+
+        // get current settings
+        if (GetCommState (fd, &deviceSettings) == false) 
+            return false;
+
+        // set the baud rate then
+        deviceSettings.BaudRate = CBR_115200;
+
+        // apply
+        if (SetCommState(fd, &deviceSettings) == false) 
+            return false;
+#endif
+        return true; // this worked
     }
-    */
     return false;
 }
 

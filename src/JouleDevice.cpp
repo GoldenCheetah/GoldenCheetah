@@ -45,7 +45,7 @@ static bool jouleRegistered =
 QString
 JouleDevices::downloadInstructions() const
 {
-    return (tr("Make sure the Joule (1.0 or GPS) unit is turned ON\n"));
+    return (tr("Make sure the Joule (1.0 or GPS) unit is turned ON"));
 }
 
 DevicePtr
