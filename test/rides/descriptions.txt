@@ -82,3 +82,7 @@ Move_2013_08_06_18_00_35.xlsx
 Move_2014_01_16_19_48_44.gpx
 Move_2014_01_17_09_33_11.gpx
    A couple of Suunto Ambit export with milliseconds as time units
+
+moxy.fit
+   A moxy .fit file with smO2 and thb data.
+
