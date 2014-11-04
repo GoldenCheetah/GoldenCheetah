@@ -494,7 +494,7 @@ struct FitFileReaderState
                          break;
 
                 case 54: // tHb
-                        tHb= value/10.0f;
+                        tHb= value/100.0f;
                         break;
                 case 57: // SMO2
                         smO2= value/10.0f;
