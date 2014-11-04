@@ -493,6 +493,12 @@ struct FitFileReaderState
                 case 53: // RUNNING CADENCE FRACTIONAL VALUE
                          break;
 
+                case 54: // tHb
+                        tHb= value/10.0f;
+                        break;
+                case 57: // SMO2
+                        smO2= value/10.0f;
+                        break;
                 default: 
                          unknown_record_fields.insert(field.num);
             }
