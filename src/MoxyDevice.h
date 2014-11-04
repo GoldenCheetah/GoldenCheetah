@@ -23,6 +23,8 @@
 #include "Device.h"
 #include "stdint.h"
 
+#include <QThread>
+
 class DeviceFileInfo;
 
 struct MoxyDevices : public Devices
@@ -36,7 +38,7 @@ struct MoxyDevices : public Devices
     virtual bool canPreview() { return false; }; // Moxy is dumb ass
 };
 
-struct MoxyDevice : public Device
+struct MoxyDevice : public Device,QThread
 {
     Q_DECLARE_TR_FUNCTIONS(MoxyDevice)
 
