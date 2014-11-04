@@ -26,15 +26,13 @@
 #include <errno.h>
 #include <string.h>
 
-#include <QThread> // for msleep
-
 static bool moxyRegistered =
     Devices::addType("Moxy Muscle Oxygen Monitor", DevicesPtr(new MoxyDevices()) );
 
 QString
 MoxyDevices::downloadInstructions() const
 {
-    return (tr("NOT WORKING YET .. DO NOT USE\nMake sure the Moxy is connected via USB"));
+    return (tr("Make sure the Moxy is connected via USB"));
 }
 
 DevicePtr
@@ -53,6 +51,7 @@ MoxyDevice::download( const QDir &tmpdir,
     int bytes=0;
     char vbuf[256];
 
+    QString verString;
     QString deviceInfo;
 
     if (!dev->open(err)) {
@@ -64,63 +63,76 @@ MoxyDevice::download( const QDir &tmpdir,
     // get into engineering mode
     if (writeCommand(dev, "\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     }
 
     if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) <= 0) {
+        dev->close();
         return false;
     }
 
     if (writeCommand(dev, "\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     }
 
     if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) <= 0) {
+        dev->close();
         return false;
     }
 
     // now get a prompt
     if (writeCommand(dev, "\r", err) == false) {
+        dev->close();
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
         return false;
     }
 
     // get a prompt back ?
     if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) <= 0) {
+        dev->close();
         return false;
     }
 
     // now get version
     if (writeCommand(dev, "ver\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     } else if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) > 0) {
         vbuf[bytes-1] = '\0';
+        verString = vbuf;
         deviceInfo += vbuf;
     } else {
+        dev->close();
         return false;
     }
 
     // now get time on unit
     if (writeCommand(dev, "time\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     } else if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) > 0) {
         vbuf[bytes-1] = '\0';
         deviceInfo += vbuf;
     } else {
+        dev->close();
         return false;
     }
 
     // now get battery status
     if (writeCommand(dev, "batt\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     } else if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) > 0) {
         vbuf[bytes-1] = '\0';
         deviceInfo += vbuf;
     } else {
+        dev->close();
         return false;
     }
 
@@ -132,6 +144,7 @@ MoxyDevice::download( const QDir &tmpdir,
         vbuf[bytes-1] = '\0';
         deviceInfo += vbuf;
     } else {
+        dev->close();
         return false;
     }
 
@@ -140,44 +153,177 @@ MoxyDevice::download( const QDir &tmpdir,
     // now lets get the data
     if (writeCommand(dev, "gd\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     }
-    emit updateStatus(deviceInfo);
+
     emit updateStatus(QString(tr("Downloading ... \n")));
 
+    QStringList data;
     do {
         if ((bytes=readData(dev, vbuf, 256, err)) > 0) {
             vbuf[bytes] = '\0';
-            qDebug()<<vbuf;
+            data<<vbuf;
         } else break;
+
+        // don't hang gui !
+        QApplication::processEvents();
+
     } while(vbuf[0] != '>');
 
+    // did we get anything of any value ?
+    if (data.count() < 30) {
+
+        emit updateStatus(QString("Less than a minutes worth of data, skipping."));
+
+    } else {
+
+        // lets create a csv file for import then
+
+        QString tmpl = tmpdir.absoluteFilePath(".mxdl.XXXXXX");
+        QTemporaryFile tmp(tmpl);
+        tmp.setAutoRemove(false);
+        if (!tmp.open()) {
+            err = tr("Failed to create temporary file ") + tmpl + ": " + tmp.error();
+            return false;
+        }
+
+        // QTemporaryFile initially has permissions set to 0600.
+        // Make it readable by everyone.
+        tmp.setPermissions(tmp.permissions() | QFile::ReadOwner | QFile::ReadUser 
+                                            | QFile::ReadGroup | QFile::ReadOther); 
+
+        DeviceDownloadFile file;
+        file.extension = "csv";
+        file.name = tmp.fileName();
+
+        // first row has data and time ?
+        QStringList tokens = data[2].split(",");
+
+        // we got something ?
+        if (tokens.count() != 6) {
+
+            // fall back to "now"
+            file.startTime = QDateTime::currentDateTime();
+
+        } else {
+
+            // parse date and time
+            QStringList mmdd = tokens[0].split("-");
+            int month = mmdd[0].toInt();
+            int day = mmdd[1].toInt();
+            int year = QDate::currentDate().year();
+
+            QStringList hhmmss = tokens[1].split(":");
+            int hh = hhmmss[0].toInt();
+            int mm = hhmmss[1].toInt();
+            int ss = hhmmss[2].toInt();
+
+            file.startTime = QDateTime(QDate(year,month,day), QTime(hh,mm,ss));
+        }
+
+        QTextStream os(&tmp);
+
+        // ok, so moxy csv has version string, header then line data
+        os<<verString;
+        os<<"mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Lap";
+        foreach(QString line, data) os<<line;
+
+        // add to list
+        files << file;
+
+    }
+    
     // exit
     if (writeCommand(dev, "exit\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
         return false;
     }
 
     // close device
     dev->close();
 
+    // success !
     return true;
 }
 
 
 bool
-MoxyDevice::cleanup( QString &err ) {
-    emit updateStatus(tr("Erase all records on computer"));
+MoxyDevice::cleanup( QString &err )
+{
+    int bytes=0;
+    char vbuf[256];
+  
+    emit updateStatus(tr("Erase all records on Moxy"));
 
-    // open device
     if (!dev->open(err)) {
         err = tr("ERROR: open failed: ") + err;
+        return false;
     }
-
     dev->setBaudRate(115200, err);
 
+    // get into engineering mode
+    if (writeCommand(dev, "\r", err) == false) {
+        emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
+        return false;
+    }
+
+    if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) <= 0) {
+        dev->close();
+        return false;
+    }
+
+    if (writeCommand(dev, "\r", err) == false) {
+        emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
+        return false;
+    }
+
+    if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) <= 0) {
+        dev->close();
+        return false;
+    }
+
+    // now get a prompt
+    if (writeCommand(dev, "\r", err) == false) {
+        dev->close();
+        emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        return false;
+    }
+
+    // get a prompt back ?
+    if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) <= 0) {
+        dev->close();
+        return false;
+    }
+
+    // now clear the entries
+    if (writeCommand(dev, "cd\r", err) == false) {
+        emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
+        return false;
+    } else if ((bytes=readUntilPrompt(dev, vbuf, 256, err)) > 0) {
+        vbuf[bytes-1] = '\0';
+        emit updateStatus(vbuf);
+    } else {
+        dev->close();
+        return false;
+    }
+
+
+    // exit engineering mode
+    if (writeCommand(dev, "exit\r", err) == false) {
+        emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
+        dev->close();
+        return false;
+    }
+
+    // close device
     dev->close();
 
+    // success !
     return true;
 }
 
@@ -288,7 +434,8 @@ MoxyDevice::readData(CommPortPtr dev, char *buf, int len, QString &err)
 bool
 MoxyDevice::writeCommand(CommPortPtr dev, const char *command, QString &err)
 {
-    QThread::msleep(100); // wait a tenth of a second
+    // on qt4 we need to waste some cycles
+    msleep(100);
 
     int len = strlen(command);
     int n = dev->write(const_cast<char*>(command), len, err);
