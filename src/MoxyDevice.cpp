@@ -41,6 +41,27 @@ MoxyDevices::newDevice( CommPortPtr dev )
     return DevicePtr( new MoxyDevice( dev ));
 }
 
+static QDateTime dateTimeForRow(QString line)
+{
+    // first row has data and time ?
+    QStringList tokens = line.split(",");
+
+    if (tokens.count() != 6) return QDateTime();
+
+    // parse date and time
+    QStringList mmdd = tokens[0].split("-");
+    int month = mmdd[0].toInt();
+    int day = mmdd[1].toInt();
+    int year = QDate::currentDate().year();
+
+    QStringList hhmmss = tokens[1].split(":");
+    int hh = hhmmss[0].toInt();
+    int mm = hhmmss[1].toInt();
+    int ss = hhmmss[2].toInt();
+
+    return QDateTime(QDate(year,month,day), QTime(hh,mm,ss));
+}
+
 bool
 MoxyDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
@@ -159,11 +180,23 @@ MoxyDevice::download( const QDir &tmpdir,
 
     emit updateStatus(QString(tr("Downloading ... \n")));
 
+    QDateTime last;
     QStringList data;
+    int n=1;
+
     do {
         if ((bytes=readData(dev, vbuf, 256, err)) > 0) {
             vbuf[bytes] = '\0';
             data<<vbuf;
+
+            // new split ?
+            QDateTime line = dateTimeForRow(vbuf);
+            if (line.toMSecsSinceEpoch() > (last.toMSecsSinceEpoch() + 1800000)) {
+                emit updateStatus(QString(tr("Ride #%1: %2 downloading")).arg(n++).arg(line.toString("d-MMM-yy hh:mm")));
+            }
+
+            last = line;
+
         } else break;
 
         // don't hang gui !
@@ -171,67 +204,110 @@ MoxyDevice::download( const QDir &tmpdir,
 
     } while(vbuf[0] != '>');
 
-    // did we get anything of any value ?
-    if (data.count() < 30) {
+    emit updateStatus(QString(tr("\nSaving ... \n")));
 
-        emit updateStatus(QString("Less than a minutes worth of data, skipping."));
+    // for deciding when to split rides
+    last = QDateTime();
+    int rows=0;
+    QTextStream os;
+    QTemporaryFile *tmpFile = NULL; // the file being output
 
-    } else {
+    // the download dialog structure
+    DeviceDownloadFile file;
+    file.extension = "csv";
 
-        // lets create a csv file for import then
+    // run through the data creating rides
+    foreach(QString line, data) {
 
-        QString tmpl = tmpdir.absoluteFilePath(".mxdl.XXXXXX");
-        QTemporaryFile tmp(tmpl);
-        tmp.setAutoRemove(false);
-        if (!tmp.open()) {
-            err = tr("Failed to create temporary file ") + tmpl + ": " + tmp.error();
-            return false;
+        // new split ?
+        QDateTime time = dateTimeForRow(line);
+
+        // ignore badly formatted lines
+        if (time == QDateTime() || !time.isValid()) continue;
+
+        if (time.toMSecsSinceEpoch() > (last.toMSecsSinceEpoch() + 1800000)) {
+
+            // close last file
+            if (tmpFile) {
+
+                // does it have more than 30 rows?
+                if (rows > 30) {
+
+                    tmpFile->close();
+                    files << file;
+
+                    // free memory, but leave on disk
+                    tmpFile->setAutoRemove(false);
+                    delete tmpFile;
+                    tmpFile = NULL;
+
+                } else {
+
+                    // open new one
+                    emit updateStatus(QString(tr(".. discarded as too little data")));
+
+                    tmpFile->close();
+                    tmpFile->setAutoRemove(true);
+                    delete tmpFile;
+                    tmpFile = NULL;
+                }
+                rows = 0;
+            }
+
+            // open new one
+            emit updateStatus(QString(tr("%1 creating")).arg(time.toString("d-MMM-yy hh:mm")));
+
+            QString tmpl = tmpdir.absoluteFilePath(".mxdl.XXXXXX");
+            tmpFile = new QTemporaryFile(tmpl);
+            if (!tmpFile->open()) {
+                err = tr("Failed to create temporary file ") + tmpl + ": " + tmpFile->error();
+                return false;
+            }
+
+            // QTemporaryFile initially has permissions set to 0600.
+            // Make it readable by everyone.
+            tmpFile->setPermissions(tmpFile->permissions() | QFile::ReadOwner | QFile::ReadUser 
+                                                      | QFile::ReadGroup | QFile::ReadOther); 
+
+            file.name = tmpFile->fileName();
+            file.startTime = time;
+
+            os.setDevice(tmpFile);
+            os<<verString;
+            os<<"mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Lap";
         }
 
-        // QTemporaryFile initially has permissions set to 0600.
-        // Make it readable by everyone.
-        tmp.setPermissions(tmp.permissions() | QFile::ReadOwner | QFile::ReadUser 
-                                            | QFile::ReadGroup | QFile::ReadOther); 
+        // ok, so moxy csv has version string, header then line data
+        os<<line;
 
-        DeviceDownloadFile file;
-        file.extension = "csv";
-        file.name = tmp.fileName();
+        rows++;
+        last = time;
+    }
 
-        // first row has data and time ?
-        QStringList tokens = data[2].split(",");
+    // did we close the file already ?
+    if (tmpFile) {
 
-        // we got something ?
-        if (tokens.count() != 6) {
+        // does it have more than 30 rows?
+        if (rows > 30) {
 
-            // fall back to "now"
-            file.startTime = QDateTime::currentDateTime();
+            tmpFile->close();
+            files << file;
+
+            // free memory, but leave on disk
+            tmpFile->setAutoRemove(false);
+            delete tmpFile;
+            tmpFile = NULL;
 
         } else {
 
-            // parse date and time
-            QStringList mmdd = tokens[0].split("-");
-            int month = mmdd[0].toInt();
-            int day = mmdd[1].toInt();
-            int year = QDate::currentDate().year();
+            // open new one
+            emit updateStatus(QString(tr(".. discarded as too little data")));
 
-            QStringList hhmmss = tokens[1].split(":");
-            int hh = hhmmss[0].toInt();
-            int mm = hhmmss[1].toInt();
-            int ss = hhmmss[2].toInt();
-
-            file.startTime = QDateTime(QDate(year,month,day), QTime(hh,mm,ss));
+            tmpFile->close();
+            tmpFile->setAutoRemove(true);
+            delete tmpFile;
+            tmpFile = NULL;
         }
-
-        QTextStream os(&tmp);
-
-        // ok, so moxy csv has version string, header then line data
-        os<<verString;
-        os<<"mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Lap";
-        foreach(QString line, data) os<<line;
-
-        // add to list
-        files << file;
-
     }
     
     // exit
@@ -243,6 +319,10 @@ MoxyDevice::download( const QDir &tmpdir,
 
     // close device
     dev->close();
+
+    if (files.count() == 1) emit updateStatus(QString(tr("\nImporting Single Ride... \n")));
+    else if (files.count() > 0)  emit updateStatus(QString(tr("\nImporting %1 Rides... \n")).arg(files.count()));
+    else emit updateStatus(QString(tr("\nNo rides found to import. \n")));
 
     // success !
     return true;
