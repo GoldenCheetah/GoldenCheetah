@@ -277,7 +277,7 @@ MoxyDevice::download( const QDir &tmpdir,
 
             os.setDevice(tmpFile);
             os<<verString;
-            os<<"mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Lap";
+            os<<"mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Lap\n";
         }
 
         // ok, so moxy csv has version string, header then line data
