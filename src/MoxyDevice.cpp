@@ -75,6 +75,8 @@ MoxyDevice::download( const QDir &tmpdir,
     QString verString;
     QString deviceInfo;
 
+    emit updateProgress(QString(tr("Connecting ... \n")));
+
     if (!dev->open(err)) {
         err = tr("ERROR: open failed: ") + err;
         return false;
@@ -169,8 +171,6 @@ MoxyDevice::download( const QDir &tmpdir,
         return false;
     }
 
-    emit updateStatus(deviceInfo);
-
     // now lets get the data
     if (writeCommand(dev, "gd\r", err) == false) {
         emit updateStatus(QString(tr("Write error: %1\n")).arg(err));
@@ -178,14 +178,19 @@ MoxyDevice::download( const QDir &tmpdir,
         return false;
     }
 
-    emit updateStatus(QString(tr("Downloading ... \n")));
+    emit updateProgress(QString(tr("Downloading ... \n")));
 
     QDateTime last;
     QStringList data;
     int n=1;
 
+    long count = 0;
+
     do {
         if ((bytes=readData(dev, vbuf, 256, err)) > 0) {
+
+            count += bytes;
+            updateProgress(QString(tr("Downloading ... [%1 bytes]")).arg(count));
             vbuf[bytes] = '\0';
             data<<vbuf;
 
@@ -204,7 +209,8 @@ MoxyDevice::download( const QDir &tmpdir,
 
     } while(vbuf[0] != '>');
 
-    emit updateStatus(QString(tr("\nSaving ... \n")));
+    emit updateProgress(QString(tr("Parsing ... ")));
+    emit updateStatus(QString(tr("\nParsing ... ")));
 
     // for deciding when to split rides
     last = QDateTime();
@@ -244,7 +250,7 @@ MoxyDevice::download( const QDir &tmpdir,
                 } else {
 
                     // open new one
-                    emit updateStatus(QString(tr(".. discarded as too little data")));
+                    emit updateStatus(QString(tr("Ride on %1 discarded as too little data")).arg(file.startTime.toString("d-MMM-yy hh:mm")));
 
                     tmpFile->close();
                     tmpFile->setAutoRemove(true);
@@ -253,9 +259,6 @@ MoxyDevice::download( const QDir &tmpdir,
                 }
                 rows = 0;
             }
-
-            // open new one
-            emit updateStatus(QString(tr("%1 creating")).arg(time.toString("d-MMM-yy hh:mm")));
 
             QString tmpl = tmpdir.absoluteFilePath(".mxdl.XXXXXX");
             tmpFile = new QTemporaryFile(tmpl);
@@ -301,8 +304,7 @@ MoxyDevice::download( const QDir &tmpdir,
         } else {
 
             // open new one
-            emit updateStatus(QString(tr(".. discarded as too little data")));
-
+            emit updateStatus(QString(tr("Ride on %1 discarded as too little data")).arg(file.startTime.toString("d-MMM-yy hh:mm")));
             tmpFile->close();
             tmpFile->setAutoRemove(true);
             delete tmpFile;
@@ -320,9 +322,11 @@ MoxyDevice::download( const QDir &tmpdir,
     // close device
     dev->close();
 
-    if (files.count() == 1) emit updateStatus(QString(tr("\nImporting Single Ride... \n")));
-    else if (files.count() > 0)  emit updateStatus(QString(tr("\nImporting %1 Rides... \n")).arg(files.count()));
-    else emit updateStatus(QString(tr("\nNo rides found to import. \n")));
+    if (files.count() > 0)  {
+        emit updateProgress("Importing ...");
+        emit updateStatus(QString(tr("\nImporting %1 Ride(s)... \n")).arg(files.count()));
+
+    } else emit updateStatus(QString(tr("\nNo rides found to import. \n")));
 
     // success !
     return true;
