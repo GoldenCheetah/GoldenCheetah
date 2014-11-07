@@ -62,6 +62,17 @@ static QDateTime dateTimeForRow(QString line)
     return QDateTime(QDate(year,month,day), QTime(hh,mm,ss));
 }
 
+// we need to sort the rows by the timestamp since it is downloaded
+// cycled round and we need to unpick that !
+class MoxyData {
+
+    public:
+    QDateTime timestamp;
+    QString line;
+
+    bool operator<(MoxyData right) const { return timestamp < right.timestamp; }
+};
+
 bool
 MoxyDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
@@ -180,10 +191,7 @@ MoxyDevice::download( const QDir &tmpdir,
 
     emit updateProgress(QString(tr("Downloading ... \n")));
 
-    QDateTime last;
-    QStringList data;
-    int n=1;
-
+    QList<MoxyData> data;
     long count = 0;
 
     do {
@@ -192,15 +200,14 @@ MoxyDevice::download( const QDir &tmpdir,
             count += bytes;
             updateProgress(QString(tr("Downloading ... [%1 bytes]")).arg(count));
             vbuf[bytes] = '\0';
-            data<<vbuf;
 
-            // new split ?
+            // get data
             QDateTime line = dateTimeForRow(vbuf);
-            if (line.toMSecsSinceEpoch() > (last.toMSecsSinceEpoch() + 1800000)) {
-                emit updateStatus(QString(tr("Ride #%1: %2 downloading")).arg(n++).arg(line.toString("d-MMM-yy hh:mm")));
-            }
 
-            last = line;
+            MoxyData row;
+            row.line = vbuf;
+            row.timestamp = line;
+            data << row;
 
         } else break;
 
@@ -212,9 +219,15 @@ MoxyDevice::download( const QDir &tmpdir,
     emit updateProgress(QString(tr("Parsing ... ")));
     emit updateStatus(QString(tr("\nParsing ... ")));
 
+    // we need to sort the data by timestamp since the moxy uses a circular
+    // buffer which mean new lines arrive before old ones.
+    qSort(data);
+
     // for deciding when to split rides
-    last = QDateTime();
+    QDateTime last = QDateTime();
     int rows=0;
+    int nfiles=0;
+
     QTextStream os;
     QTemporaryFile *tmpFile = NULL; // the file being output
 
@@ -223,15 +236,12 @@ MoxyDevice::download( const QDir &tmpdir,
     file.extension = "csv";
 
     // run through the data creating rides
-    foreach(QString line, data) {
-
-        // new split ?
-        QDateTime time = dateTimeForRow(line);
+    foreach(MoxyData line, data) {
 
         // ignore badly formatted lines
-        if (time == QDateTime() || !time.isValid()) continue;
+        if (line.timestamp == QDateTime() || !line.timestamp.isValid()) continue;
 
-        if (time.toMSecsSinceEpoch() > (last.toMSecsSinceEpoch() + 1800000)) {
+        if (line.timestamp.toMSecsSinceEpoch() > (last.toMSecsSinceEpoch() + 1800000)) {
 
             // close last file
             if (tmpFile) {
@@ -239,6 +249,8 @@ MoxyDevice::download( const QDir &tmpdir,
                 // does it have more than 30 rows?
                 if (rows > 30) {
 
+                    // we have one file anyway
+                    emit updateStatus(QString(tr("Ride #%1: %2")).arg(++nfiles).arg(file.startTime.toString("d-MMM-yy hh:mm")));
                     tmpFile->close();
                     files << file;
 
@@ -249,9 +261,7 @@ MoxyDevice::download( const QDir &tmpdir,
 
                 } else {
 
-                    // open new one
-                    emit updateStatus(QString(tr("Ride on %1 discarded as too little data")).arg(file.startTime.toString("d-MMM-yy hh:mm")));
-
+                    // not enough data in this one
                     tmpFile->close();
                     tmpFile->setAutoRemove(true);
                     delete tmpFile;
@@ -273,7 +283,7 @@ MoxyDevice::download( const QDir &tmpdir,
                                                       | QFile::ReadGroup | QFile::ReadOther); 
 
             file.name = tmpFile->fileName();
-            file.startTime = time;
+            file.startTime = line.timestamp;
 
             os.setDevice(tmpFile);
             os<<verString;
@@ -281,18 +291,20 @@ MoxyDevice::download( const QDir &tmpdir,
         }
 
         // ok, so moxy csv has version string, header then line data
-        os<<line;
+        os<<line.line;
 
         rows++;
-        last = time;
+        last = line.timestamp;
     }
 
-    // did we close the file already ?
+    // close last file
     if (tmpFile) {
 
         // does it have more than 30 rows?
         if (rows > 30) {
 
+            // we have one file anyway
+            emit updateStatus(QString(tr("Ride #%1: %2")).arg(++nfiles).arg(file.startTime.toString("d-MMM-yy hh:mm")));
             tmpFile->close();
             files << file;
 
@@ -303,8 +315,7 @@ MoxyDevice::download( const QDir &tmpdir,
 
         } else {
 
-            // open new one
-            emit updateStatus(QString(tr("Ride on %1 discarded as too little data")).arg(file.startTime.toString("d-MMM-yy hh:mm")));
+            // not enough data in this one
             tmpFile->close();
             tmpFile->setAutoRemove(true);
             delete tmpFile;
