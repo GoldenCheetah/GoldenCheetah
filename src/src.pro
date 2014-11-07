@@ -540,6 +540,7 @@ SOURCES += \
         GcWindowRegistry.cpp \
         GoldenCheetah.cpp \
         GoogleMapControl.cpp \
+        GOVSS.cpp \
         GProgressDialog.cpp \
         GpxParser.cpp \
         GpxRideFile.cpp \
