@@ -2559,6 +2559,8 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
         scoreType = "skiba_wprime_exp";
     } else if (metricDetail.symbol.startsWith("distance")) {
         scoreType = "total_distance";
+    } else if (metricDetail.symbol.startsWith("govss")) {
+        scoreType = "govss";
     }
 
     // create the Stress Calculation List
@@ -2647,6 +2649,12 @@ LTMPlot::createPMCCurveData(Context *context, LTMSettings *settings, MetricDetai
             add.setForSymbol("distance_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("distance_sr", sc->getSRvalues()[i]);
             add.setForSymbol("distance_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "govss") {
+            add.setForSymbol("govss_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("govss_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("govss_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("govss_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("govss_lr", sc->getLRvalues()[i]);
         }
         add.setForSymbol("workout_time", 1.0); // averaging is per day
         customData << add;
