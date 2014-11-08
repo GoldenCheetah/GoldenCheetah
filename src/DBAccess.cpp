@@ -108,8 +108,9 @@
 // 87  11  Oct 2014 Mark Liversedge    W'bal inegrator fixed up by Dave Waterworth
 // 88  14  Oct 2014 Mark Liversedge    Pace Zone Metrics
 // 89  07  Nov 2014 Ale Martinez       GOVSS
+// 90  08  Nov 2014 Mark Liversedge    Update data flags for Moxy and Garmin Running Dynamics
 
-int DBSchemaVersion = 89;
+int DBSchemaVersion = 90;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
