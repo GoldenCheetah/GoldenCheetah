@@ -82,6 +82,9 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
                  QString fileName, const QDateTime &dateTime,
                  const Zones *zones, const HrZones *hrZones, Context *context);
 
+        RideItem(int type, RideFile *ride, const QDateTime &dateTime,
+                 const Zones *zones, const HrZones *hrZones, Context *context);
+
         void setDirty(bool);
         bool isDirty() { return isdirty; }
         void setFileName(QString, QString);

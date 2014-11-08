@@ -32,6 +32,7 @@ class SummaryBest
     double nvalue;
     QString value; // formatted value
     QDate date;
+    QString fileName;
 
     // for qsort
     bool operator< (SummaryBest right) const { return (nvalue < right.nvalue); }

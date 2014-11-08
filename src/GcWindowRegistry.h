@@ -72,6 +72,7 @@ Q_DECLARE_METATYPE(GcWinID)
 #define VIEW_ANALYSIS 0x02
 #define VIEW_DIARY    0x04
 #define VIEW_HOME     0x08
+#define VIEW_INTERVAL 0x16
 
 class GcWindowRegistry {
     Q_DECLARE_TR_FUNCTIONS(GcWindowRegistry)

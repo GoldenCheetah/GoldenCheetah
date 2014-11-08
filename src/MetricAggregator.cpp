@@ -32,6 +32,7 @@
 #include "Settings.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "BestIntervalDialog.h"
 #include "RideMetric.h"
 #include "Route.h"
 #include "TimeUtils.h"
@@ -259,43 +260,43 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                     QString rideSegmentName = route->getRides()[j].filename;
 
                     if (rideSegmentName == name  || rideStartDate == _rideStartTime) {
-                        qDebug() << "find ride "<<name <<" for " <<rideSegmentName;
+                        out << "Route " << route->getName() << " in " << name << "\r\n";
+                        //qDebug() << "Route " << route->getName() << " in " << name;
 
                         bool updateForInterval = false;
-                        if (!updateForRide) {
-                            // Verify interval in db
-                            // type, groupName, filename, start,
-                            QString key = QString("%1|%2|%3|%4").arg("Route").arg(route->getName()).arg(name).arg(_ride.start);
 
-                            // if it s missing or out of date then update it!
-                            status current = dbIntervalStatus.value(key);
-                            unsigned long dbTimeStamp = current.timestamp;
-                            unsigned long crc = current.crc;
-                            unsigned long fingerprint = current.fingerprint;
+                        // Verify interval in db
+                        // type, groupName, filename, start,
+                        QString key = QString("%1|%2|%3|%4").arg("Route").arg(route->getName()).arg(name).arg(_ride.start);
 
-                            if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() || zoneFingerPrint != fingerprint) {
-                                qDebug() << "updateForInterval";
-                                qDebug() << "TimeStamp" << dbTimeStamp << QFileInfo(file).lastModified().toTime_t();
-                                qDebug() << " FingerPrint" << zoneFingerPrint << fingerprint;
-                                updateForInterval= true;
-                            }
+                        // if it s missing or out of date then update it!
+                        status intCurrent = dbIntervalStatus.value(key);
+                        unsigned long intDbTimeStamp = intCurrent.timestamp;
+                        //unsigned long intCrc = intCurrent.crc;
+                        unsigned long intFingerprint = intCurrent.fingerprint;
+
+                        if (intDbTimeStamp < QFileInfo(file).lastModified().toTime_t() || zoneFingerPrint != intFingerprint) {
+                            updateForInterval= true;
                         }
 
+
                         if (updateForRide || updateForInterval) {
+                            //qDebug() << "updateForRide " << updateForRide << " updateForInterval " << updateForInterval;
+
                             // read file and process it if we didn't already...
                             QStringList errors;
                             if (ride == NULL) ride = RideFileFactory::instance().openRideFile(context, file, errors);
 
-                            qDebug() << "importInterval";
+                            out << "Insert new Route interval\r\n";
+                            //qDebug() << "Insert new Route interval";
 
                             IntervalItem* interval = new IntervalItem(ride, route->getName(), _ride.start, _ride.stop, 0, 0, j);
-                            importInterval(interval, "Route", route->getName(), fingerprint, false);
+                            importInterval(interval, "Route", route->getName(), zoneFingerPrint, (intDbTimeStamp > 0));
                         }
                     }
                 }
              }
         }
-
 
         // update cache (will check timestamps itself)
         // if ride wasn't opened it will do it itself
@@ -344,6 +345,94 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
     first = false;
 }
+
+bool greaterThan(const SummaryBest &s1, const SummaryBest &s2)
+{
+     return s1.nvalue > s2.nvalue;
+}
+
+void
+MetricAggregator::refreshBestIntervals()
+{
+    // TEST method not used and not finish...
+
+    QString symbol = "20m_critical_power";
+    int n = 10;
+
+    // get all fields...
+    QList<SummaryMetrics> allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
+
+    QList<SummaryBest> bests;
+
+    // get the metric details, so we can convert etc
+    const RideMetric *metric = RideMetricFactory::instance().rideMetric(symbol);
+    if (!metric) return;
+
+    // loop through and aggregate
+    foreach (SummaryMetrics rideMetrics, allRides) {
+
+        // get this value
+        SummaryBest add;
+        add.nvalue = rideMetrics.getForSymbol(symbol);
+        add.date = rideMetrics.getRideDate().date();
+        add.fileName = rideMetrics.getFileName();
+
+        // XXX this needs improving for all cases ... hack for now
+        add.value = QString("%1").arg(add.nvalue, 0, 'f', metric->precision());
+
+        // nil values are not needed
+        if (add.nvalue < 0 || add.nvalue > 0) bests << add;
+    }
+
+    // now sort
+    qStableSort(bests.begin(), bests.end(), greaterThan);
+
+    // truncate
+    if (bests.count() > n) bests.erase(bests.begin()+n,bests.end());
+
+
+    QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home->activities());
+    QStringListIterator i(filenames);
+
+
+    int pos=1;
+    foreach(SummaryBest best, bests) {
+        /*qDebug() << QString("%1. %2W le %3")
+                   .arg(pos)
+                   .arg(best.value)
+                   .arg(best.date.toString(tr("d MMM yyyy")));*/
+        i.toFront();
+        while (i.hasNext()) {
+            QString name = i.next();
+
+
+            if (name == best.fileName) {
+                QFile file(context->athlete->home->activities().canonicalPath() + "/" + name);
+                QStringList errors;
+                RideFile *ride = RideFileFactory::instance().openRideFile(context, file, errors);
+
+                QList<BestIntervalDialog::BestInterval> results;
+                BestIntervalDialog::findBests(ride, 1200, 1, results);
+                if (results.isEmpty()) return;
+                const BestIntervalDialog::BestInterval &b = results.first();
+
+                /*qDebug() << QString("Peak 20min %1 w (%2-%3)")
+                            .arg((int) round(b.avg))
+                            .arg(b.start)
+                            .arg(b.stop);*/
+
+                IntervalItem* interval = new IntervalItem(ride, "Best 20min", b.start, b.stop-ride->recIntSecs(), 0, 0, pos++);
+                importInterval(interval, "Best", "Best 20min", 0l, false);
+
+                i.toBack();
+            }
+        }
+    }
+
+    // END Best
+}
+
+
 
 /*----------------------------------------------------------------------
  * Calculate the metrics for a ride file using the metrics factory

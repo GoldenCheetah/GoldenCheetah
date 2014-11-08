@@ -56,6 +56,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     diary = new QtMacButton(this, QtMacButton::Recessed);
 #endif
     anal = new QtMacButton(this, QtMacButton::Recessed);
+    interval = new QtMacButton(this, QtMacButton::Recessed);
     train = new QtMacButton(this, QtMacButton::Recessed);
 #else
     // Windows / Linux uses GcScopeButton - pushbutton
@@ -64,6 +65,7 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     diary = new GcScopeButton(this);
 #endif
     anal = new GcScopeButton(this);
+    interval = new GcScopeButton(this);
     train = new GcScopeButton(this);
 #endif
 
@@ -83,6 +85,11 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     anal->setChecked(true);
     layout->addWidget(anal);
     connect(anal, SIGNAL(clicked(bool)), this, SLOT(clickedAnal()));
+
+    interval->setText(tr("Intervals"));
+    interval->setWidth(70);
+    layout->addWidget(interval);
+    connect(interval, SIGNAL(clicked(bool)), this, SLOT(clickedInterval()));
 
     train->setText(tr("Train"));
     layout->addWidget(train);
@@ -197,6 +204,7 @@ GcScopeBar::clickedHome()
     diary->setChecked(false);
 #endif
     anal->setChecked(false);
+    interval->setChecked(false);
     train->setChecked(false);
     emit selectHome();
 }
@@ -209,6 +217,7 @@ GcScopeBar::clickedDiary()
     diary->setChecked(true);
 #endif
     anal->setChecked(false);
+    interval->setChecked(false);
     train->setChecked(false);
     emit selectDiary();
 }
@@ -221,8 +230,22 @@ GcScopeBar::clickedAnal()
     diary->setChecked(false);
 #endif
     anal->setChecked(true);
+    interval->setChecked(false);
     train->setChecked(false);
     emit selectAnal();
+}
+
+void
+GcScopeBar::clickedInterval()
+{
+    home->setChecked(false);
+#ifdef GC_HAVE_ICAL
+    diary->setChecked(false);
+#endif
+    anal->setChecked(false);
+    interval->setChecked(true);
+    train->setChecked(false);
+    emit selectInterval();
 }
 
 void
@@ -233,6 +256,7 @@ GcScopeBar::clickedTrain()
     diary->setChecked(false);
 #endif
     anal->setChecked(false);
+    interval->setChecked(false);
     train->setChecked(true);
     emit selectTrain();
 }
@@ -245,9 +269,11 @@ GcScopeBar::selected()
     if (diary->isChecked()) return 1;
     if (anal->isChecked()) return 2;
     if (train->isChecked()) return 3;
+    if (interval->isChecked()) return 4;
 #else
     if (anal->isChecked()) return 1;
     if (train->isChecked()) return 2;
+    if (interval->isChecked()) return 3;
 #endif
 
     // never gets here - shutup compiler
@@ -266,6 +292,7 @@ GcScopeBar::setSelected(int index)
     diary->setChecked(false);
 #endif
     anal->setChecked(false);
+    interval->setChecked(false);
     train->setChecked(false);
 
 #ifdef GC_HAVE_ICAL
@@ -274,12 +301,14 @@ GcScopeBar::setSelected(int index)
         case 1 : diary->setChecked(true); break;
         case 2 : anal->setChecked(true); break;
         case 3 : train->setChecked(true); break;
+        case 4 : interval->setChecked(true); break;
     }
 #else
     switch (index) {
         case 0 : home->setChecked(true); break;
         case 1 : anal->setChecked(true); break;
         case 2 : train->setChecked(true); break;
+        case 3 : interval->setChecked(true); break;
     }
 #endif
 }

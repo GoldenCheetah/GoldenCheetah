@@ -40,6 +40,7 @@ class Tab: public QWidget
         TabView *view(int index);
 
         RideNavigator *rideNavigator(); // to get logical headings
+        IntervalNavigator *routeNavigator(); // to get logical headings
 
     protected:
 
@@ -89,6 +90,7 @@ class Tab: public QWidget
         HomeView *homeView;
         TrainView *trainView;
         DiaryView *diaryView;
+        IntervalView *intervalView;
 
         // Chart Settings Dialog
         ChartSettings *chartSettings;
@@ -96,7 +98,8 @@ class Tab: public QWidget
                        *analysisControls,
                        *trainControls,
                        *diaryControls,
-                       *homeControls;
+                       *homeControls,
+                       *intervalControls;
 
 };
 

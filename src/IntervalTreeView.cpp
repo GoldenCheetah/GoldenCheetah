@@ -46,7 +46,7 @@ IntervalTreeView::IntervalTreeView(Context *context) : context(context)
     connect(this, SIGNAL(itemEntered(QTreeWidgetItem*,int)), this, SLOT(mouseHover(QTreeWidgetItem*,int)));
 }
 
-void 
+void
 IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
 {
     int index = invisibleRootItem()->indexOfChild(item);

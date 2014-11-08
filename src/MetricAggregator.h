@@ -78,6 +78,8 @@ class MetricAggregator : public QObject
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);
         bool importInterval(IntervalItem *interval, QString type, QString group, unsigned long fingerprint, bool modify);
 
+        void refreshBestIntervals();
+
 	    MetricMap metrics;
         ColorEngine *colorEngine;
 };

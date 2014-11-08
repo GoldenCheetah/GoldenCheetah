@@ -194,6 +194,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
     connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
     connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
+    connect(scopebar, SIGNAL(selectInterval()), this, SLOT(selectInterval()));
 
 #if 0
     // Add chart is on the scope bar
@@ -659,6 +660,7 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Rides"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
+    viewMenu->addAction(tr("Intervals"), this, SLOT(selectInterval()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
 #ifdef GC_HAVE_ICAL
     viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
@@ -800,6 +802,7 @@ MainWindow::setChartMenu()
         case 1 : mask = VIEW_ANALYSIS; break;
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
+        case 4 : mask = VIEW_INTERVAL; break;
     }
 
     chartMenu->clear();
@@ -830,6 +833,7 @@ MainWindow::setChartMenu(QMenu *menu)
         case 1 : mask = VIEW_ANALYSIS; break;
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
+        case 4 : mask = VIEW_INTERVAL; break;
     }
 
     menu->clear();
@@ -1095,6 +1099,13 @@ void
 MainWindow::selectHome()
 {
     currentTab->selectView(0);
+    setToolButtons();
+}
+
+void
+MainWindow::selectInterval()
+{
+    currentTab->selectView(4);
     setToolButtons();
 }
 
