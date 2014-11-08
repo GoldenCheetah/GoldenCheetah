@@ -538,6 +538,13 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         else flags += '-';
         if (result->areDataPresent()->lrbalance) flags += 'V'; // V for "Vector" aka lr pedal data
         else flags += '-';
+        if (result->areDataPresent()->smo2 ||
+            result->areDataPresent()->thb) flags += 'O'; // Moxy O2/Haemoglobin
+        else flags += '-';
+        if (result->areDataPresent()->rcontact ||
+            result->areDataPresent()->rvert ||
+            result->areDataPresent()->rcontact) flags += 'R'; // R is for running dynamics
+        else flags += '-';
         result->setTag("Data", flags);
 
     }
