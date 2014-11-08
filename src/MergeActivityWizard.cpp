@@ -309,6 +309,8 @@ MergeSync::getSamplesForRide(RideFile *ride1)
             //if (secs < maxTime-ride1->recIntSecs())
             if (index <= ride1->timeIndex(maxTime))
                 nextPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
+            else
+                break;
         }
         // next point
         // pause ?
@@ -393,6 +395,16 @@ MergeSync::findDelays(RideFile *ride1, RideFile *ride2)
 
     analyse(sample1, sample2, 0);
     analyse(sample2, sample1, 1);
+
+    // the min/max offset for the ride is the diff
+    // between the durations of the two rides
+    int r1secs = ride1->dataPoints().last()->secs;
+    int r2secs = ride2->dataPoints().last()->secs;
+    int diff = abs(r1secs-r2secs);
+
+    delaySlider->setMinimum(diff *-1);
+    delaySlider->setMaximum(diff);
+
 }
 
 void
