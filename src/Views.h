@@ -22,8 +22,10 @@
 #include "TabView.h"
 class TrainSidebar;
 class AnalysisSidebar;
+class IntervalSidebar;
 class QDialog;
 class RideNavigator;
+class IntervalNavigator;
 
 class AnalysisView : public TabView
 {
@@ -48,6 +50,7 @@ class AnalysisView : public TabView
         AnalysisSidebar *analSidebar;
 
 };
+
 class DiaryView : public TabView
 {
     Q_OBJECT
@@ -64,6 +67,7 @@ class DiaryView : public TabView
         void dateRangeChanged(DateRange);
 
 };
+
 class TrainView : public TabView
 {
     Q_OBJECT
@@ -85,6 +89,7 @@ class TrainView : public TabView
         QDialog *p;
 
 };
+
 class HomeView : public TabView
 {
     Q_OBJECT
@@ -103,4 +108,26 @@ class HomeView : public TabView
         void compareChanged(bool);
 };
 
+class IntervalView : public TabView
+{
+    Q_OBJECT
+
+    public:
+
+        IntervalView(Context *context, QStackedWidget *controls);
+        ~IntervalView();
+        void close();
+        void setRide(RideItem*ride);
+
+        IntervalNavigator *routeNavigator();
+
+    public slots:
+
+        bool isBlank();
+        void compareChanged(bool);
+
+    private:
+        IntervalSidebar *intervalSidebar;
+
+};
 #endif // _GC_Views_h

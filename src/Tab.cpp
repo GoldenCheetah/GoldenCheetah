@@ -78,6 +78,15 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     trainView = new TrainView(context, trainControls);
     views->addWidget(trainView);
 
+    // Interval
+    intervalControls = new QStackedWidget(this);
+    intervalControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    intervalControls->setCurrentIndex(0);
+    intervalControls->setContentsMargins(0,0,0,0);
+    masterControls->addWidget(intervalControls);
+    intervalView = new IntervalView(context, intervalControls);
+    views->addWidget(intervalView);
+
     // the dialog box for the chart settings
     chartSettings = new ChartSettings(this, masterControls);
     chartSettings->setMaximumWidth(450);
@@ -109,6 +118,11 @@ RideNavigator *Tab::rideNavigator()
     return analysisView->rideNavigator();
 }
 
+IntervalNavigator *Tab::routeNavigator()
+{
+    return intervalView->routeNavigator();
+}
+
 void
 Tab::close()
 {
@@ -116,11 +130,13 @@ Tab::close()
     homeView->saveState();
     trainView->saveState();
     diaryView->saveState();
+    intervalView->saveState();
 
     analysisView->close();
     homeView->close();
     trainView->close();
     diaryView->close();
+    intervalView->close();
 }
 
 /******************************************************************************
@@ -146,6 +162,7 @@ void Tab::setRide(RideItem*ride)
     homeView->setRide(ride);
     trainView->setRide(ride);
     diaryView->setRide(ride);
+    intervalView->setRide(ride);
 }
 
 TabView *
@@ -157,6 +174,7 @@ Tab::view(int index)
         case 1 : return analysisView;
         case 2 : return diaryView;
         case 3 : return trainView;
+        case 4 : return intervalView;
     }
 }
 

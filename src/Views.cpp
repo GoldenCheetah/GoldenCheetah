@@ -18,6 +18,7 @@
 
 #include "Views.h"
 #include "AnalysisSidebar.h"
+#include "IntervalSidebar.h"
 #include "DiarySidebar.h"
 #include "TrainSidebar.h"
 #include "LTMSidebar.h"
@@ -225,4 +226,57 @@ TrainView::onSelectionChanged()
     } else {
         p->hide();
     }
+}
+
+IntervalView::IntervalView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_INTERVAL)
+{
+    intervalSidebar = new IntervalSidebar(context);
+    HomeWindow *a = new HomeWindow(context, "interval", "Intervals");
+    controls->addWidget(a->controls());
+    controls->setCurrentIndex(0);
+    BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
+
+    setSidebar(intervalSidebar);
+    setPage(a);
+    setBlank(b);
+    setBottom(new ComparePane(context, this, ComparePane::interval));
+
+    connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
+    connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
+}
+
+IntervalNavigator*
+IntervalView::routeNavigator()
+{
+    return intervalSidebar->routeNavigator;
+}
+
+IntervalView::~IntervalView()
+{
+}
+
+void
+IntervalView::setRide(RideItem *ride)
+{
+    page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+}
+
+void
+IntervalView::compareChanged(bool state)
+{
+    // we turned compare on / off
+    context->notifyCompareIntervals(state);
+}
+
+void
+IntervalView::close()
+{
+    static_cast<IntervalSidebar*>(sidebar())->close(); // save settings
+}
+
+bool
+IntervalView::isBlank()
+{
+    if (context->athlete->allRides->childCount() > 0) return false;
+    else return true;
 }

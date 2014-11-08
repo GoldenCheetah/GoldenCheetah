@@ -121,6 +121,7 @@ class MainWindow : public QMainWindow
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
+        void selectInterval();
 
         void setChartMenu();
         void setSubChartMenu();

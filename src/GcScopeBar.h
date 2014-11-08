@@ -74,6 +74,7 @@ public slots:
     void clickedAnal();
     void clickedTrain();
     void clickedDiary();
+    void clickedInterval();
 
     // mainwindow tells us when it switched without user clicking.
     int selected();
@@ -90,6 +91,7 @@ signals:
     void selectAnal();
     void selectTrain();
     void selectDiary();
+    void selectInterval();
 
     void addChart();
 
@@ -100,9 +102,9 @@ private:
     QHBoxLayout *layout;
     GcLabel *searchLabel;
 #ifdef Q_OS_MAC
-    QtMacButton *home, *diary, *anal, *train;
+    QtMacButton *home, *diary, *anal, *train, *interval;
 #else
-    GcScopeButton *home, *diary, *anal, *train;
+    GcScopeButton *home, *diary, *anal, *train, *interval;
 #endif
     bool state;
 };

@@ -59,6 +59,7 @@
 #define VIEW_ANALYSIS 0x02
 #define VIEW_DIARY    0x04
 #define VIEW_HOME     0x08
+#define VIEW_INTERVAL 0x16
 
 // GcWindows initialization is done in initialize method to enable translations
 GcWindowRegistry* GcWindows;
@@ -73,17 +74,17 @@ GcWindowRegistry::initialize()
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
     { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
     //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
-    { VIEW_ANALYSIS, tr("Ride Summary"),GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Ride Summary"),GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
     { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
-    { VIEW_ANALYSIS, tr("Performance"),GcWindowTypes::AllPlot },
+    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Performance"),GcWindowTypes::AllPlot },
     { VIEW_ANALYSIS, tr("Critical Mean Maximals"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
     { VIEW_HOME|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
     { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
-    { VIEW_ANALYSIS, tr("Google Map"),GcWindowTypes::GoogleMap },
+    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Google Map"),GcWindowTypes::GoogleMap },
     { VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
     { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
     { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
@@ -119,7 +120,7 @@ QString
 GcWindowRegistry::title(GcWinID id)
 {
     for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance && GcWindows[i].id == id) 
+        if (GcWindows[i].relevance && GcWindows[i].id == id)
             return GcWindows[i].name;
     }
 }
