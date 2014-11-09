@@ -110,58 +110,42 @@ WPrime::setRide(RideFile *input)
     last=0;
     double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
     bool first = true;
-    if (input->recIntSecs() >= 1) {
-        RideFilePoint *lp=NULL;
-        foreach(RideFilePoint *p, input->dataPoints()) {
 
-            // yuck! nasty data
-            if (p->secs > (25*60*60)) return;
+    RideFilePoint *lp=NULL;
+    foreach(RideFilePoint *p, input->dataPoints()) {
 
-            if (first) {
-                offset = p->secs;
-                first = false;
-            }
+        // yuck! nasty data
+        if (p->secs > (25*60*60)) return;
 
-            // fill gaps in recording with zeroes
-            if (lp)
-                for(int t=lp->secs+input->recIntSecs();
-                    (t + input->recIntSecs()) < p->secs;
-                    t += input->recIntSecs()) {
-                    points << QPointF(t-offset, 0);
-                    pointsd << QPointF(t-offset, p->km * convert); // not zero !!!! this is a map from secs -> km not a series
-                }
-
-            // lets not go backwards -- or two sampls at the same time
-            if ((lp && p->secs > lp->secs) || !lp) {
-                points << QPointF(p->secs - offset, p->watts);
-                pointsd << QPointF(p->secs - offset, p->km * convert);
-            }
-
-            // update state
-            last = p->secs - offset;
-            lp = p;
+        if (first) {
+            offset = p->secs;
+            first = false;
         }
-    } else {
 
-        foreach(RideFilePoint *p, input->dataPoints()) {
-
-            // yuck! nasty data
-            if (p->secs > (25*60*60)) return;
-
-            if (first) {
-                offset = p->secs;
-                first = false;
+        // fill gaps in recording with zeroes
+        if (lp)
+            for(double t=lp->secs+input->recIntSecs();
+                (t + input->recIntSecs()) < p->secs;
+                t += input->recIntSecs()) {
+                points << QPointF(t-offset, 0);
+                pointsd << QPointF(t-offset, p->km * convert); // not zero !!!! this is a map from secs -> km not a series
             }
+
+        // lets not go backwards -- or two sampls at the same time
+        if ((lp && p->secs > lp->secs) || !lp) {
             points << QPointF(p->secs - offset, p->watts);
             pointsd << QPointF(p->secs - offset, p->km * convert);
-            last = p->secs - offset;
         }
+
+        // update state
+        last = p->secs - offset;
+        lp = p;
     }
 
     // Create a spline
-    distance.setSplineType(QwtSpline::Natural);
+    distance.setSplineType(QwtSpline::Periodic);
     distance.setPoints(QPolygonF(pointsd));
-    smoothed.setSplineType(QwtSpline::Natural);
+    smoothed.setSplineType(QwtSpline::Periodic);
     smoothed.setPoints(QPolygonF(points));
 
     // Get CP
