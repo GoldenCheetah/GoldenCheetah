@@ -774,7 +774,7 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     height->setMaximum(999.9);
     height->setMinimum(0.0);
     height->setDecimals(1);
-    height->setValue(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() * (context->athlete->useMetricUnits ? 1.0 : 1.0/CM_PER_INCH));
+    height->setValue(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() * (context->athlete->useMetricUnits ? 100.0 : 100.0/CM_PER_INCH));
 
     wbaltau = new QSpinBox(this);
     wbaltau->setMinimum(30);
@@ -870,7 +870,7 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DOB, dob->date());
     appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
-    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (unitCombo->currentIndex() ? CM_PER_INCH : 1.0));
+    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (unitCombo->currentIndex() ? CM_PER_INCH/100.0 : 1.0/100.0));
     appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
     if (unitCombo->currentIndex()==0)
