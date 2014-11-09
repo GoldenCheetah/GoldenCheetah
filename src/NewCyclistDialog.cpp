@@ -207,8 +207,8 @@ NewCyclistDialog::saveClicked()
                 // create the sub-Dirs here
                 athleteHome->createAllSubdirs();
 
-                // set the last version to the latest version
-                appsettings->setCValue(name->text(), GC_VERSION_USED, GcUpgrade::version());
+                // new Athlete/new Directories - no Upgrade required
+                appsettings->setCValue(name->text(), GC_UPGRADE_311_FOLDER_SUCCESS, true);
 
                 // nice sidebars please!
                 appsettings->setCValue(name->text(), "splitter/LTM/hide", true);
