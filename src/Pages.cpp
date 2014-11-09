@@ -34,6 +34,7 @@
 #include "SpecialFields.h"
 #include "DataProcessor.h"
 #include "OAuthDialog.h"
+#include "RideAutoImportConfig.h"
 
 //
 // Main Config Page - tabs for each sub-page
@@ -797,20 +798,6 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     avatarButton->setFixedHeight(140);
     avatarButton->setFixedWidth(140);
 
-    QVariant importDir = appsettings->cvalue(context->athlete->cyclist, GC_IMPORTDIR, "");
-
-    importLabel = new QLabel(tr("Auto Import from"));
-    importDirectory = new QLineEdit;
-    importDirectory->setText(importDir.toString());
-    importBrowseButton = new QPushButton(tr("Browse"));
-    importBrowseButton->setFixedWidth(120);
-
-    importSetting = new QComboBox();
-    importSetting->addItem("No auto import");
-    importSetting->addItem("No duplicate file errors");
-    importSetting->addItem("All errors");
-    importSetting->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_IMPORTSETTINGS).toInt()); // default/unset = 0
-
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
@@ -833,17 +820,11 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
 
-    grid->addWidget(importLabel, 8,0, alignment);
-    grid->addWidget(importDirectory, 8,1, alignment);
-    grid->addWidget(importBrowseButton, 8,2, alignment);
-    grid->addWidget(importSetting, 8,3, alignment);
-
     all->addLayout(grid);
     all->addStretch();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
     connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
-    connect (importBrowseButton, SIGNAL(clicked()), this, SLOT(browseImportDir()));
 }
 
 void
@@ -882,14 +863,6 @@ RiderPage::unitChanged(int currentIndex)
     }
 }
 
-void
-RiderPage::browseImportDir()
-{
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Import Directory"),
-                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") importDirectory->setText(dir);  //only overwrite current dir, if a new was selected
-}
-
 
 void
 RiderPage::saveClicked()
@@ -908,10 +881,6 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_SEX, sex->currentIndex());
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
-
-    // save the import settings
-    appsettings->setCValue(context->athlete->cyclist, GC_IMPORTSETTINGS, importSetting->currentIndex());
-    appsettings->setCValue(context->athlete->cyclist, GC_IMPORTDIR, importDirectory->text());
 
 }
 
@@ -1221,7 +1190,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->setColumnWidth(0,240);
     themes->setSelectionMode(QAbstractItemView::SingleSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    themes->setUniformRowHeights(true);
+    themes->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     themes->setIndentation(0);
     //colors->header()->resizeSection(0,300);
 
@@ -1232,7 +1201,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     colors->setColumnWidth(0,350);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    colors->setUniformRowHeights(true);
+    colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     colors->setIndentation(0);
     //colors->header()->resizeSection(0,300);
 
@@ -2234,7 +2203,7 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     keywords->setColumnCount(3);
     keywords->setSelectionMode(QAbstractItemView::SingleSelection);
     keywords->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    keywords->setUniformRowHeights(true);
+    //keywords->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     keywords->setIndentation(0);
     //keywords->header()->resizeSection(0,100);
     //keywords->header()->resizeSection(1,45);
@@ -2454,7 +2423,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->setColumnCount(5);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    fields->setUniformRowHeights(true);
+    //fields->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     fields->setIndentation(0);
 
     SpecialFields specials;
@@ -4523,7 +4492,7 @@ MeasuresPage::MeasuresPage(Context *context) : context(context)
     fields->setColumnCount(3);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    fields->setUniformRowHeights(true);
+    //fields->setUniformRowHeights(true);
     fields->setIndentation(0);
     //fields->header()->resizeSection(0,130);
     //fields->header()->resizeSection(1,140);
@@ -4923,3 +4892,202 @@ SeasonsPage::saveClicked()
     // re-read
     context->athlete->seasons->readSeasons();
 }
+
+
+AutoImportPage::AutoImportPage(Context *context) : context(context)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+    browseButton = new QPushButton(tr("Browse"));
+#ifndef Q_OS_MAC
+    upButton = new QToolButton(this);
+    downButton = new QToolButton(this);
+    upButton->setArrowType(Qt::UpArrow);
+    downButton->setArrowType(Qt::DownArrow);
+    upButton->setFixedSize(20,20);
+    downButton->setFixedSize(20,20);
+    addButton->setFixedSize(20,20);
+    deleteButton->setFixedSize(20,20);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+#endif
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2);
+    actionButtons->addWidget(upButton);
+    actionButtons->addWidget(downButton);
+    actionButtons->addStretch();
+    actionButtons->addWidget(browseButton);
+    actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+
+    fields = new QTreeWidget;
+    fields->headerItem()->setText(0, tr("Directory"));
+    fields->headerItem()->setText(1, tr("Import Rule"));
+    fields->setColumnWidth(0,400);
+    fields->setColumnWidth(1,100);
+    fields->setColumnCount(2);
+    fields->setSelectionMode(QAbstractItemView::SingleSelection);
+    //fields->setUniformRowHeights(true);
+    fields->setIndentation(0);
+
+    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+
+    mainLayout->addWidget(fields, 0,0);
+    mainLayout->addLayout(actionButtons, 1,0);
+
+    context->athlete->autoImportConfig->readConfig();
+    QList<RideAutoImportRule> rules = context->athlete->autoImportConfig->getConfig();
+    int index = 0;
+    foreach (RideAutoImportRule rule, rules) {
+        QComboBox *comboButton = new QComboBox(this);
+        addRuleTypes(comboButton);
+        QTreeWidgetItem *add = new QTreeWidgetItem;
+        fields->invisibleRootItem()->insertChild(index, add);
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setText(0, rule.getDirectory());
+
+        add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
+        comboButton->setCurrentIndex(rule.getImportRule());
+        fields->setItemWidget(add, 1, comboButton);
+        index++;
+    }
+
+    // connect up slots
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(browseButton, SIGNAL(clicked()), this, SLOT(browseImportDir()));
+}
+
+void
+AutoImportPage::upClicked()
+{
+    if (fields->currentItem()) {
+        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+        if (index == 0) return; // its at the top already
+
+        //movin on up!
+        QWidget *button = fields->itemWidget(fields->currentItem(),1);
+        QComboBox *comboButton = new QComboBox(this);
+        addRuleTypes(comboButton);
+        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
+        QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
+        fields->invisibleRootItem()->insertChild(index-1, moved);
+        fields->setItemWidget(moved, 1, comboButton);
+        fields->setCurrentItem(moved);
+    }
+}
+
+void
+AutoImportPage::downClicked()
+{
+    if (fields->currentItem()) {
+        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+        if (index == (fields->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+
+        QWidget *button = fields->itemWidget(fields->currentItem(),1);
+        QComboBox *comboButton = new QComboBox(this);
+        addRuleTypes(comboButton);
+        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
+        QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
+        fields->invisibleRootItem()->insertChild(index+1, moved);
+        fields->setItemWidget(moved, 1, comboButton);
+        fields->setCurrentItem(moved);
+    }
+}
+
+
+void
+AutoImportPage::addClicked()
+{
+
+    int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+    if (index < 0) index = 0;
+
+    QComboBox *comboButton = new QComboBox(this);
+    addRuleTypes(comboButton);
+
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    fields->invisibleRootItem()->insertChild(index, add);
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+    add->setText(0, tr("Enter directory or press [Browse] to select"));
+    add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
+    fields->setItemWidget(add, 1, comboButton);
+
+}
+
+void
+AutoImportPage::deleteClicked()
+{
+    if (fields->currentItem()) {
+        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+
+        // zap!
+        delete fields->invisibleRootItem()->takeChild(index);
+    }
+}
+
+void
+AutoImportPage::saveClicked() {
+
+    rules.clear();
+    for(int i=0; i<fields->invisibleRootItem()->childCount(); i++) {
+
+        RideAutoImportRule rule;
+        rule.setDirectory(fields->invisibleRootItem()->child(i)->text(0));
+
+        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i),1);
+        rule.setImportRule(((QComboBox*)button)->currentIndex());
+        rules.append(rule);
+
+    }
+
+    // write to disk
+    QString file = QString(context->athlete->home->config().canonicalPath() + "/autoimport.xml");
+    RideAutoImportConfigParser::serialize(file, rules);
+
+    // re-read
+    context->athlete->autoImportConfig->readConfig();
+
+}
+
+void
+AutoImportPage::addRuleTypes(QComboBox *p) {
+
+
+    p->addItem(tr("No autoimport"));
+    p->addItem(tr("Autoimport with dialog"));
+
+}
+
+void
+AutoImportPage::browseImportDir()
+{
+    QStringList selectedDirs;
+    if (fields->currentItem()) {
+        QFileDialog fileDialog(this);
+        fileDialog.setFileMode(QFileDialog::Directory);
+        fileDialog.setOptions(QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        if (fileDialog.exec()) {
+            selectedDirs = fileDialog.selectedFiles();
+        }
+        if (selectedDirs.count() > 0) {
+            QString dir = selectedDirs.at(0);
+            if (dir != "") {
+                fields->currentItem()->setText(0, dir);
+            }
+        }
+    }
+}
+

@@ -75,6 +75,7 @@ class AthleteConfig : public QWidget
         ZonePage *zonePage;
         HrZonePage *hrZonePage;
         PaceZonePage *paceZonePage;
+        AutoImportPage *autoImportPage;
 };
 
 // APPEARANCE PAGE

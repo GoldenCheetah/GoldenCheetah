@@ -1453,7 +1453,7 @@ MainWindow::openTab(QString name)
     setUpdatesEnabled(true);
 
     // now do the automatic ride file import
-    context->athlete->importFilesWithoutDialog();
+    context->athlete->importFilesWhenOpeningAthlete();
 }
 
 void
@@ -1979,7 +1979,7 @@ MainWindow::addIntervals()
 void
 MainWindow::ridesAutoImport() {
 
-    currentTab->context->athlete->importFilesWithoutDialog();
+    currentTab->context->athlete->importFilesWhenOpeningAthlete();
 
 }
 
