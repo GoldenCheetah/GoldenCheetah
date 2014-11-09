@@ -31,6 +31,7 @@
 #include <QListIterator>
 #include <QItemDelegate>
 #include "Context.h"
+#include "RideAutoImportConfig.h"
 
 // Dialog class to show filenames, import progress and to capture user input
 // of ride date and time
@@ -44,10 +45,10 @@ class RideImportWizard : public QDialog
 public:
     RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent = 0);
     RideImportWizard(QList<QString> files, Context *context, QWidget *parent = 0);
+    RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent = 0);
+
     ~RideImportWizard();
     int process();
-    void setDialogMode(int); // default is fullDialog
-    enum DialogMode { standardDialog, allErrors, allButDupFileErrors };
 
 signals:
 
@@ -65,9 +66,10 @@ private:
     QDir homeImports; // target directory for source files
     QDir homeActivities; // target directory for .JSON
     bool aborted;
-    int dialogMode; // see enum
+    bool autoImportMode;
     QLabel *phaseLabel;
     QTableWidget *tableWidget;
+    QTableWidget *directoryWidget;
     QProgressBar *progressBar;
     QPushButton *abortButton; // also used for save and finish
     QPushButton *cancelButton; // cancel when asking for dates
@@ -75,6 +77,7 @@ private:
     // QCheckBox *overFiles;      // chance to set overwrite when asking for dates // deprecate for this release... XXX
     // bool overwriteFiles; // flag to overwrite files from checkbox               // deprecate for this release... XXX
     Context *context; // caller
+    RideAutoImportConfig *importConfig;
 
     QStringList deleteMe; // list of temp files created during import
 };

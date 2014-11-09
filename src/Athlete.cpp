@@ -47,6 +47,7 @@
 #include "Route.h"
 #include "RouteWindow.h"
 #include "RideImportWizard.h"
+#include "RideAutoImportConfig.h"
 
 
 #include "GcUpgrade.h" // upgrade wizard
@@ -113,6 +114,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
             QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"), pacezones_->errorString());
         }
     }
+
+    // read athlete's autoimport configuration
+    autoImportConfig = new RideAutoImportConfig(home->config());
 
     // read athlete's charts.xml and translate etc
     LTMSettings reader;
@@ -543,39 +547,12 @@ Athlete::configChanged()
 }
 
 void
-Athlete::importFilesWithoutDialog() {
+Athlete::importFilesWhenOpeningAthlete() {
 
-    int importSettings = appsettings->cvalue(context->athlete->cyclist, GC_IMPORTSETTINGS).toInt(); // default/unset = 0
-    if (importSettings == 0) return; // no autoimport requested
+    // just do it if something is configured
+    if (autoImportConfig->hasRules()) {
 
-    QVariant importDirQV = appsettings->cvalue(context->athlete->cyclist, GC_IMPORTDIR, "");
-    QString importDirectory = importDirQV.toString();
-    if (importDirectory == "") return; // no implicit assumptions on the directory - only explicite is allowed
-
-    // now get the files formats
-    const RideFileFactory &rff = RideFileFactory::instance();
-    QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
-    QStringList allFormats;
-    QFileInfoList fileInfos;
-    foreach(QString suffix, rff.suffixes())
-        allFormats << QString("*.%1").arg(suffix);
-
-    // and now the files for the GC formats / no SubDirs considered
-    QDir *importDir = new QDir (importDirectory);
-    if (!importDir->exists()) return;    // directory might not be available (USB,..)
-    if (!importDir->isReadable()) return; // check if directory is readable,
-
-    // now get the files with their full names
-    fileInfos = importDir->entryInfoList(allFormats, QDir::Files, QDir::NoSort);
-    if (!fileInfos.isEmpty()) {
-        QStringList fileNames;
-        foreach(QFileInfo f, fileInfos) {
-            fileNames.append(f.absoluteFilePath());
-        }
-        RideImportWizard *import = new RideImportWizard(fileNames, context);
-        if (importSettings == 1) import->setDialogMode(RideImportWizard::allButDupFileErrors);
-        if (importSettings == 2) import->setDialogMode(RideImportWizard::allErrors);
+        RideImportWizard *import = new RideImportWizard(autoImportConfig, context);
         import->process();
     }
 }
