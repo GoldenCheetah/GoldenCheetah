@@ -331,6 +331,10 @@ GcUpgrade::upgrade(const QDir &home)
 
     }
 
+    //----------------------------------------------------------------------
+    // 3.11 new subfolder introduction and upgrade processing
+    //----------------------------------------------------------------------
+
     // now the special "folder structure" upgrade - which is tracked separately on success
 
     bool folderUpgradeSuccess =  appsettings->cvalue(home.dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false).toBool();
@@ -720,7 +724,7 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "-> Import files: <samp>/imports</samp><br>"
                      "-> Workout related files: <samp>/workouts</samp><br>"
                      "-> Cache files: <samp>/cache</samp><br>"
-                     "-> Calendar files: <samp>/calenar</samp><br>"
+                     "-> Calendar files: <samp>/calendar</samp><br>"
                      "-> Log files: <samp>/logs</samp><br>"
                      "-> Temp files: <samp>/config</samp><br><br>"
                      "The upgrade process will create the new directory structure and move "
