@@ -94,6 +94,12 @@ public:
          has no effect on the mapping. So QwtLogTransform can be used 
          for log2(), log10() or any other logarithmic scale.
  */
+
+#ifndef QT_STATIC_CONST
+#define QT_STATIC_CONST static const
+#define QT_STATIC_CONST_IMPL const
+#endif
+
 class QWT_EXPORT QwtLogTransform: public QwtTransform
 {   
 public:
