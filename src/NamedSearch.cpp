@@ -22,7 +22,7 @@
 #include "Athlete.h"
 #include "GcSideBarItem.h" // for iconFromPNG
 
-// Escape special characters (JSON compliance)
+// Escape special characters (JSON compliance & XML)
 static QString protect(const QString string)
 {
     QString s = string;
@@ -36,8 +36,14 @@ static QString protect(const QString string)
     s.replace("/", "\\/");   // solidus
     s.replace(">", "&gt;");   // angle
     s.replace("<", "&lt;");   // angle
+    s.replace("&", "&amp;");   // ampersand
+    s.replace("'", "&apos;");   // apostrophe
+    s.replace('"', "&quot;");   // quote
+
+
     return s;
 }
+
 
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const QString string)
@@ -58,6 +64,10 @@ static QString unprotect(const QString string)
     s.replace("\\\\", "\\"); // backslash
     s.replace("&gt;", ">");   // angle
     s.replace("&lt;", "<");   // angle
+    s.replace("&amp;", "&");  // ampersand
+    s.replace("&apos;", "'"); // apostrophe
+    s.replace("&quot;", "\""); // quote
+
 
     return s;
 }
