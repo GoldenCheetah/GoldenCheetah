@@ -54,6 +54,7 @@
 #define GC_NICKNAME                 "nickname"
 #define GC_DOB                      "dob"
 #define GC_WEIGHT                   "weight"
+#define GC_HEIGHT                   "height"
 #define GC_WBALTAU                  "wbaltau"
 #define GC_SEX                      "sex"
 #define GC_BIO                      "bio"
