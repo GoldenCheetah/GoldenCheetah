@@ -75,11 +75,10 @@ class LNP : public RideMetric {
         // LNP only makes sense for running
         if (!ride->isRun()) return;
 
-        // Athlete data
-        // unconst naughty boy
+        // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
         double weight = uride->getWeight();
-        double height = (weight+100)/98.43; // Stillman Average, it should be pulled from athlete's profile
+        double height = uride->getWeight();
 
         int rollingwindowsize120 = 120 / ride->recIntSecs();
         int rollingwindowsize30 = 30 / ride->recIntSecs();
@@ -170,11 +169,10 @@ class RTP : public RideMetric {
         // LNP only makes sense for running
         if (!ride->isRun()) return;
 
-        // Athlete data, height should be pulled from athlete's profile
-        // unconst naughty boy
+        // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
         double weight = uride->getWeight();
-        double height = (weight+100)/98.43; // Stillman Average, it should be pulled from athlete's profile
+        double height = uride->getHeight();
         
         const PaceZones *zones = context->athlete->paceZones();
         int zoneRange = context->athlete->paceZones()->whichRange(ride->startTime().date());
