@@ -733,6 +733,9 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     QString weighttext = QString(tr("Weight (%1)")).arg(context->athlete->useMetricUnits ? tr("kg") : tr("lb"));
     weightlabel = new QLabel(weighttext);
 
+    QString heighttext = QString(tr("Height (%1)")).arg(context->athlete->useMetricUnits ? tr("cm") : tr("in"));
+    heightlabel = new QLabel(heighttext);
+
     wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
 
     nickname = new QLineEdit(this);
@@ -765,6 +768,12 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     weight->setMinimum(0.0);
     weight->setDecimals(1);
     weight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * (context->athlete->useMetricUnits ? 1.0 : LB_PER_KG));
+
+    height = new QDoubleSpinBox(this);
+    height->setMaximum(999.9);
+    height->setMinimum(0.0);
+    height->setDecimals(1);
+    height->setValue(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() * (context->athlete->useMetricUnits ? 1.0 : 1.0/CM_PER_INCH));
 
     wbaltau = new QSpinBox(this);
     wbaltau->setMinimum(30);
@@ -809,6 +818,7 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(sexlabel, 2, 0, alignment);
     grid->addWidget(unitlabel, 3, 0, alignment);
     grid->addWidget(weightlabel, 4, 0, alignment);
+    grid->addWidget(heightlabel, 4, 2, alignment);
     grid->addWidget(wbaltaulabel, 5, 0, alignment);
     grid->addWidget(biolabel, 6, 0, alignment);
 
@@ -817,6 +827,7 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     grid->addWidget(sex, 2, 1, alignment);
     grid->addWidget(unitCombo, 3, 1, alignment);
     grid->addWidget(weight, 4, 1, alignment);
+    grid->addWidget(height, 4, 3, alignment);
     grid->addWidget(wbaltau, 5, 1, alignment);
     grid->addWidget(bio, 7, 0, 1, 4);
 
@@ -855,11 +866,19 @@ RiderPage::unitChanged(int currentIndex)
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
         weightlabel->setText(weighttext);
         weight->setValue(weight->value() / LB_PER_KG);
+
+        QString heighttext = QString(tr("Height (%1)")).arg(tr("cm"));
+        heightlabel->setText(heighttext);
+        height->setValue(height->value() * CM_PER_INCH);
     }
     else {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("lb"));
         weightlabel->setText(weighttext);
         weight->setValue(weight->value() * LB_PER_KG);
+
+        QString heighttext = QString(tr("Height (%1)")).arg(tr("in"));
+        heightlabel->setText(heighttext);
+        height->setValue(height->value() / CM_PER_INCH);
     }
 }
 
@@ -878,6 +897,7 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DOB, dob->date());
     appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
+    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (unitCombo->currentIndex() ? CM_PER_INCH : 1.0));
     appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
 
     if (unitCombo->currentIndex()==0)

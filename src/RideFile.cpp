@@ -1249,6 +1249,29 @@ RideFile::getWeight()
     return weight_;
 }
 
+double
+RideFile::getHeight()
+{
+    double const height_default = (this->getWeight()+100.0)/98.43; // default to Stillman Average
+    double height = height_default;
+
+    // ride
+    if ((height = getTag("Height", "0.0").toDouble()) > 0) {
+        return height;
+    }
+
+    // is withings upported for height?
+
+    // global options
+    height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT, height_default).toString().toDouble();
+
+    // if set to zero in global options then override it.
+    // it must not be zero!!!
+    if (height <= 0.00) height = height_default;
+
+    return height;
+}
+
 void RideFile::appendReference(const RideFilePoint &point)
 {
     referencePoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,
