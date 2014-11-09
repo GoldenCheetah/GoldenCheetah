@@ -265,6 +265,7 @@ AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
     zonePage = new ZonePage(context);
     hrZonePage = new HrZonePage(context);
     paceZonePage = new PaceZonePage(context);
+    autoImportPage = new AutoImportPage(context);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -276,6 +277,7 @@ AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
     tabs->addTab(zonePage, tr("Power Zones"));
     tabs->addTab(hrZonePage, tr("Heartrate Zones"));
     tabs->addTab(paceZonePage, tr("Pace Zones"));
+    tabs->addTab(autoImportPage, tr("Auto Import"));
 
     mainLayout->addWidget(tabs);
 }
@@ -286,6 +288,7 @@ void AthleteConfig::saveClicked()
     zonePage->saveClicked();
     hrZonePage->saveClicked();
     paceZonePage->saveClicked();
+    autoImportPage->saveClicked();
 }
 
 // APPEARANCE CONFIG

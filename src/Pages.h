@@ -14,6 +14,7 @@
 #include <QCheckBox>
 #include <QListWidget>
 #include <QList>
+#include <QFileDialog>
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
@@ -30,6 +31,7 @@
 #include "DataProcessor.h"
 #include "Season.h"
 #include "SeasonParser.h"
+#include "RideAutoImportConfig.h"
 
 #ifdef GC_HAVE_LIBOAUTH
 extern "C" {
@@ -113,7 +115,6 @@ class RiderPage : public QWidget
     public slots:
         void chooseAvatar();
         void unitChanged(int currentIndex);
-        void browseImportDir();
 
     private:
         Context *context;
@@ -131,10 +132,6 @@ class RiderPage : public QWidget
         QTextEdit  *bio;
         QPushButton *avatarButton;
         QPixmap     avatar;
-        QLineEdit *importDirectory;
-        QPushButton *importBrowseButton;
-        QLabel *importLabel;
-        QComboBox *importSetting;
 
 };
 
@@ -889,5 +886,43 @@ class MeasuresPage : public QWidget
 #endif
         QPushButton *addButton, *renameButton, *deleteButton;
 };
+
+class AutoImportPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+
+        AutoImportPage(Context *);
+        void saveClicked();
+        void addRuleTypes(QComboBox *p);
+
+    public slots:
+
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void deleteClicked();
+        void browseImportDir();
+
+
+    private:
+
+        Context *context;
+        QList<RideAutoImportRule> rules;
+
+        QTreeWidget *fields;
+
+#ifndef Q_OS_MAC
+        QToolButton *upButton, *downButton;
+#else
+        QPushButton *upButton, *downButton;
+#endif
+        QPushButton *addButton, *renameButton, *deleteButton, *browseButton;
+
+};
+
 
 #endif
