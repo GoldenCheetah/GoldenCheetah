@@ -31,26 +31,131 @@
 #include "JsonRideFile.h"
 #include "TcxRideFile.h"
 #include "MetricAggregator.h"
+#include "RideAutoImportConfig.h"
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
-    dialogMode = standardDialog;
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
         filenames.append(QFileInfo(urls->value(i).toLocalFile()).absoluteFilePath());
+    autoImportMode = false;
     init(filenames, context);
     filenames.clear();
 }
 
 RideImportWizard::RideImportWizard(QList<QString> files, Context *context, QWidget *parent) : QDialog(parent), context(context)
 {
-    dialogMode = standardDialog;
+    autoImportMode = false;
     init(files, context);
 }
+
+
+RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent) : QDialog(parent), context(context), importConfig(dirs)
+{
+    autoImportMode = true;
+    QList<QString> files;
+
+    // get the directories
+    QList<RideAutoImportRule> rules = importConfig->getConfig();
+
+    // prepare the widget to show the status of the directory
+    directoryWidget = new QTableWidget(rules.count(), 3, this);
+
+    directoryWidget->verticalHeader()->setDefaultSectionSize(20);
+
+    QTableWidgetItem *directoryHeading = new QTableWidgetItem;
+    directoryHeading->setText(tr("Directory"));
+    directoryWidget->setHorizontalHeaderItem(0, directoryHeading);
+
+    QTableWidgetItem *importRuleHeading = new QTableWidgetItem;
+    importRuleHeading->setText(tr("Import Rule"));
+    directoryWidget->setHorizontalHeaderItem(1, importRuleHeading);
+
+    QTableWidgetItem *statusHeading = new QTableWidgetItem;
+    statusHeading->setText(tr("Directory Status"));
+    directoryWidget->setHorizontalHeaderItem(2, statusHeading);
+
+    // and get the allowed files formats
+    const RideFileFactory &rff = RideFileFactory::instance();
+    QStringList suffixList = rff.suffixes();
+    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    QStringList allFormats;
+    foreach(QString suffix, rff.suffixes())
+        allFormats << QString("*.%1").arg(suffix);
+
+    // Fill in the directory names and importRuleStatus
+    int i=-1;
+    foreach (RideAutoImportRule rule, rules){
+        i++; // do it here to allow "continue" - and start with "0"
+        QTableWidgetItem *t;
+
+        // Directory
+        t = new QTableWidgetItem();
+        t->setText(rule.getDirectory());
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        directoryWidget->setItem(i,0,t);
+
+        // Import Rule
+        QList<QString> descriptions = rule.getRuleDescriptions();
+        t = new QTableWidgetItem();
+        t->setText(descriptions.at(rule.getImportRule()));
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        directoryWidget->setItem(i,1,t);
+
+        // Import Status
+        t = new QTableWidgetItem();
+        t->setText(tr(""));
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        directoryWidget->setItem(i,2,t);
+
+        // only add files if configured to do so
+        if (rule.getImportRule() == 0) {
+            directoryWidget->item(i,2)->setText(tr("No import"));
+            continue;
+        }
+
+        // do some checks on the directory first
+        QString currentImportDirectory = rule.getDirectory();
+        if (currentImportDirectory == "") {
+            directoryWidget->item(i,2)->setText(tr("No directory"));
+            continue;
+        }
+        QDir *importDir = new QDir (currentImportDirectory);
+        if (!importDir->exists()) {    // directory might not be available (USB,..)
+            directoryWidget->item(i,2)->setText(tr("Directory not available"));
+            continue;
+        }
+        if (!importDir->isReadable()) {
+            directoryWidget->item(i,2)->setText(tr("Directory not readable"));
+            continue;
+        }
+
+        // now get the files with their full names
+        QFileInfoList fileInfos = importDir->entryInfoList(allFormats, QDir::Files, QDir::NoSort);
+        if (!fileInfos.isEmpty()) {
+            int j = 0;
+            foreach(QFileInfo f, fileInfos) {
+                files.append(f.absoluteFilePath());
+                j++;
+            }
+            directoryWidget->item(i,2)->setText(tr("%1 Files selected for import").arg(QString::number(j)));
+          } else {
+            directoryWidget->item(i,2)->setText(tr("No activity files found"));
+            continue;
+        }
+    }
+
+    directoryWidget->setColumnWidth(0, 480);
+    directoryWidget->setColumnWidth(1, 150);
+    directoryWidget->setColumnWidth(2, 250);
+
+    init(files, context);
+}
+
 
 void
 RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
@@ -58,6 +163,7 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 
     // initialise dialog box
     tableWidget = new QTableWidget(files.count(), 6, this);
+
     tableWidget->setItemDelegate(new RideDelegate(1)); // use a delegate for column 1 date
     tableWidget->verticalHeader()->setDefaultSectionSize(20);
     phaseLabel = new QLabel;
@@ -127,12 +233,15 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     for (int i=0; i < files.count(); i++) {
         QTableWidgetItem *t;
 
-        filenames.append(QFileInfo(files[i]).absoluteFilePath());
+        filenames.append(QFileInfo(files[i]).canonicalFilePath());
         blanks.append(true); // by default editable
 
         // Filename
         t = new QTableWidgetItem();
-        t->setText(QFileInfo(files[i]).fileName());
+        if (autoImportMode)
+            t->setText(QFileInfo(files[i]).canonicalFilePath());
+        else
+            t->setText(QFileInfo(files[i]).fileName());
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         tableWidget->setItem(i,0,t);
 
@@ -180,6 +289,10 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     buttons->addWidget(abortButton);
 
     QVBoxLayout *contents = new QVBoxLayout(this);
+    if (autoImportMode) {
+        contents->addWidget(directoryWidget);
+
+    }
     contents->addWidget(tableWidget);
     contents->addWidget(progressBar);
     contents->addLayout(buttons);
@@ -202,26 +315,22 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     resize(920 +
            ((files.count() > 16 ? 24 : 0) +
            ((files.count() > 9 && files.count() < 17) ? 8 : 0)),
-           118 + (files.count() > 16 ? 17*20 : (files.count()+1) * 20));
+           118 + ((files.count() > 16 ? 17*20 : (files.count()+1) * 20)
+           + ((autoImportMode) ? 100 : 0))); // assume not more the 5 directory in average
 
+    if (autoImportMode) directoryWidget->adjustSize();
     tableWidget->adjustSize();
+
+
+    // Refresh prior to running down the list & processing...
+    if (!isActiveWindow()) activateWindow();
+    this->show();
 
 }
 
 int
 RideImportWizard::process()
 {
-
-    // Refresh prior to running down the list & processing...
-    // do it here and not in Constructor, since "dialogMode" might have been changed
-    if (dialogMode == standardDialog) show();
-
-    // set if any error occurs in one of the stages, for the "non-Dialog" modes - to make the widget visible
-    // if an error in one of the steps has happened - first error is set after the first error has occured
-    // and the widget has been made visible (in case of noDialog mode)- from that point on, no need
-    // to "show()" the widget again
-    bool firstError = false;
-    bool sectionError = false;
 
     // set progress bar limits - for each file we
     // will make 5 passes over the files
@@ -234,6 +343,8 @@ RideImportWizard::process()
     // So, therefore the progress bar runs from 0 to files*4. (since step 5 is not implemented yet)
     progressBar->setMinimum(0);
     progressBar->setMaximum(filenames.count()*4);
+    if (!isActiveWindow()) activateWindow();
+
 
     // Pass one - Is it valid?
     phaseLabel->setText(tr("Step 1 of 4: Check file permissions"));
@@ -256,13 +367,11 @@ RideImportWizard::process()
 
             } else {
                 tableWidget->item(i,5)->setText(tr("Error - Unknown file type"));
-                sectionError = true;
             }
 
         } else {
             //  Cannot open
             tableWidget->item(i,5)->setText(tr("Error - Not a valid file"));
-            sectionError = true;
         }
 
         progressBar->setValue(progressBar->value()+1);
@@ -270,11 +379,7 @@ RideImportWizard::process()
     }
 
     if (aborted) { done(0); }
-    if ((dialogMode == allErrors || dialogMode == allButDupFileErrors)  && sectionError) {
-        firstError = true;
-        show(); // make the widget visible in case an error has happened errors
-        sectionError = false; // reset Error flag for next section
-    }
+    if (!isActiveWindow()) activateWindow();
     repaint();
     QApplication::processEvents();
 
@@ -295,6 +400,7 @@ RideImportWizard::process()
               QApplication::processEvents();
 
               if (aborted) { done(0); }
+              if (!isActiveWindow()) activateWindow();
               this->repaint();
               QApplication::processEvents();
 
@@ -401,7 +507,6 @@ RideImportWizard::process()
                        tableWidget->item(i,5)->setText(tr("Validated"));
                    else {
                        tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(" ")));
-                       sectionError = true;
                    }
 
                    // Set Date and Time
@@ -411,7 +516,6 @@ RideImportWizard::process()
                        blanks[i] = true;
                        tableWidget->item(i,1)->setText(tr(""));
                        tableWidget->item(i,2)->setText(tr(""));
-                       sectionError = true;
 
                    } else {
 
@@ -456,17 +560,12 @@ RideImportWizard::process()
                } else {
                    // nope - can't handle this file
                    tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
-                   sectionError = true;
                }
         }
         progressBar->setValue(progressBar->value()+1);
         QApplication::processEvents();
         if (aborted) { done(0); }
-        if ((dialogMode == allErrors || dialogMode == allButDupFileErrors) && sectionError && !firstError) {
-            firstError = true;
-            show(); // make the widget visible in case an error has happened errors
-            sectionError = false; // reset Error flag for next section
-        }
+        if (!isActiveWindow()) activateWindow();
         this->repaint();
 
         next:;
@@ -489,13 +588,11 @@ RideImportWizard::process()
 
         // does nothing for the moment
         progressBar->setValue(progressBar->value()+1);
+        if (!isActiveWindow()) activateWindow();
         progressBar->repaint();
    }
-    // dialog has to show up for this import to complete the data
-    if (needdates != 0 && (dialogMode == allErrors || dialogMode == allButDupFileErrors) && !firstError) {
-       firstError = true;
-       show(); // make the widget visible in case an error has happened errors
-   }
+   // get it on top
+   activateWindow();
 
    // Wait for user to press save
    abortButton->setText(tr("Save"));
@@ -522,15 +619,6 @@ RideImportWizard::process()
       abortButton->setDisabled(true);
    }
    connect(tableWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(activateSave()));
-
-   // if running in any "dialog only in error cases mode" and no Error have occured until now,
-   // we need to trigger the final saving step
-   if ((dialogMode == allErrors || dialogMode == allButDupFileErrors) && !firstError) {
-      abortClicked(); // simulate user input - at this point "Abort" == "Save"
-      // in additional simulate the "Finish" user-click
-      context->athlete->isclean = false;
-      context->athlete->metricDB->refreshMetrics();
-   }
 
    return 0;
 }
@@ -678,7 +766,9 @@ RideImportWizard::todayClicked(int index)
     }
     // phew! - repaint!
     QApplication::processEvents();
+    if (!isActiveWindow()) activateWindow();
     tableWidget->repaint();
+
 }
 
 void
@@ -692,53 +782,10 @@ struct cpi_file_info {
     QString file, inname, outname;
 };
 
-static QStringList
-findDuplicates(QString filename)
-{
-    // does this ride already exist?
-    // either the full name is a match
-    // or the same name but different
-    // filetype: e.g. xxx.gc matches xxx.tcx
-    QStringList duplicates;
-
-    // get a list of possible duplicates (files we support)
-    QString basename = QFileInfo(filename).baseName();
-    QStringList filters;
-    foreach (QString ext, RideFileFactory::instance().suffixes()) {
-        QString check = basename + "." + ext;
-        filters << check;
-    }
-
-    // check if any matched (case insensitive)
-    QFlags<QDir::Filter> spec = QDir::Files;
-#ifdef Q_OS_WIN32
-    spec |= QDir::Hidden;
-#endif
-    // get list and convert to full path
-    foreach(QString name, QFileInfo(filename).dir().entryList(filters, spec, QDir::Name)) {
-        duplicates << QFileInfo(filename).dir().canonicalPath() + "/" + name;
-    }
-
-    return duplicates;
-}
-
-static void
-removeDuplicate(QString filename)
-{
-    // rename to .bak, if that already exists
-    // then wipe it first
-    QString backup = filename + ".bak";
-    QFile(backup).remove(); // wipe it, if it is there
-    QFile(filename).rename(backup);
-}
 
 void
 RideImportWizard::abortClicked()
 {
-    // similar procedure for "non-Dialog" processing to handle errors like in "process()" here
-    bool sectionError = false;
-    bool fileExistsError = false;
-
     // if done when labelled abort we kill off this dialog
     QString label = abortButton->text();
 
@@ -808,6 +855,7 @@ RideImportWizard::abortClicked()
         tableWidget->setCurrentCell(i,5);
         QApplication::processEvents();
         if (aborted) { done(0); }
+        if (!isActiveWindow()) activateWindow();
         this->repaint();
 
         // serialize the file to .JSON format and copy the source file to the "/imports" directory
@@ -842,10 +890,8 @@ RideImportWizard::abortClicked()
         // and by comparing "OriginalName+RideDateTime" for the /imports
         if (QFileInfo(activitiesFulltarget).exists()) {
             tableWidget->item(i,5)->setText(tr("Error - Activity file exists"));
-            fileExistsError = true;
         } else if (QFileInfo(importsFulltarget).exists()) {
             tableWidget->item(i,5)->setText(tr("Error - File already imported, but no activity found"));
-            fileExistsError = true;
         } else {
 
             // First copy of source then create .JSON (in case of error the last error will be shown)
@@ -856,7 +902,6 @@ RideImportWizard::abortClicked()
             QFile source(filenames[i]);
             if (!source.copy(importsFulltarget)) {
                 tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
-                sectionError = true;
             }
 
             // serialize the file to .JSON
@@ -878,7 +923,6 @@ RideImportWizard::abortClicked()
                                           tableWidget->rowCount() < 20 ? true : false); // don't signal if mass importing
             }  else {
                 tableWidget->item(i,5)->setText(tr("Error - .JSON creation failed"));
-                sectionError = true;
             }
             // clear
             delete ride;
@@ -887,10 +931,7 @@ RideImportWizard::abortClicked()
         QApplication::processEvents();
         if (aborted) { done(0); }
         progressBar->setValue(progressBar->value()+1);
-        if (((sectionError || fileExistsError)  && (dialogMode == allErrors)) ||
-            ((sectionError && !fileExistsError) && (dialogMode == allButDupFileErrors))) {
-            show(); // make the widget visible in case an error was logged
-        }
+        if (!isActiveWindow()) activateWindow();
         this->repaint();
     }
 
@@ -911,11 +952,6 @@ RideImportWizard::abortClicked()
     aborted = false;
 }
 
-
-void RideImportWizard::setDialogMode(int mode) {
-
-    dialogMode = mode;
-}
 
 // clean up files
 RideImportWizard::~RideImportWizard()

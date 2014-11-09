@@ -51,6 +51,7 @@ class PDEstimate;
 class LTMSettings;
 class Routes;
 class AthleteDirectoryStructure;
+class RideAutoImportConfig;
 
 class Context;
 
@@ -96,6 +97,9 @@ class Athlete : public QObject
         CalDAV *davCalendar;
 #endif
 
+        // Athlete's autoimport configuration
+        RideAutoImportConfig *autoImportConfig;
+
         // ride metadata definitions
         RideMetadata *rideMetadata() { return rideMetadata_; }
 
@@ -133,7 +137,7 @@ class Athlete : public QObject
         void notifyNamedSearchesChanged() { namedSearchesChanged(); }
 
         // import rides from athlete specific directory
-        void importFilesWithoutDialog();
+        void importFilesWhenOpeningAthlete();
 
     signals:
         void zonesChanged();
