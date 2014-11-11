@@ -123,6 +123,11 @@ class RideFile : public QObject // QObject to emit signals
         RideFile(const QDateTime &startTime, double recIntSecs);
         virtual ~RideFile();
 
+        // construct a new ridefile using the current one, but
+        // resample the data and fill gaps in recording with
+        // the max gap to interpolate also passed as a parameter
+        RideFile *resample(double recIntSecs, int interpolate=30);
+
         // Working with DATASERIES
         enum seriestype { secs=0, cad, cadd, hr, hrd, km, kph, kphd, nm, nmd, watts, wattsd,
                           alt, lon, lat, headwind, slope, temp, interval, NP, xPower, 
@@ -131,8 +136,9 @@ class RideFile : public QObject // QObject to emit signals
                           rvert, rcad, rcontact, gear, o2hb, hhb, none };
 
         enum specialValues { NoTemp = -255 };
-
         typedef enum seriestype SeriesType;
+        static SeriesType lastSeriesType() { return none; }
+
         static QString seriesName(SeriesType);
         static QString unitName(SeriesType, Context *context);
         static int decimalsFor(SeriesType series);
@@ -342,6 +348,7 @@ struct RideFilePoint
 
     // get the value via the series type rather than access direct to the values
     double value(RideFile::SeriesType series) const;
+    void setValue(RideFile::SeriesType series, double value);
 };
 
 struct RideFileReader {

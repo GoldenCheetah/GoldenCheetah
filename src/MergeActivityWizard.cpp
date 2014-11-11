@@ -29,7 +29,7 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
 #ifdef Q_OS_MAX
     setWizardStyle(QWizard::ModernStyle);
 #endif
-    setWindowTitle(tr("Merge rides"));
+    setWindowTitle(tr("Merge Rides"));
 
     // current ride
     ride1 = const_cast<RideItem*>(context->currentRideItem());
@@ -58,14 +58,14 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
 // welcome
 MergeWelcome::MergeWelcome(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Merge Ride"));
+    setTitle(tr("Merge Rides"));
     setSubTitle(tr("Lets get started"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel(tr("This wizard will help you to merge 2 different files\n"
-                               "from the same ride into a single file."));
+    QLabel *label = new QLabel(tr("This wizard will help you to merge data series from two ride files\n"
+                               "into one single ride file."));
     label->setWordWrap(true);
 
     layout->addWidget(label);
@@ -401,6 +401,7 @@ MergeSync::findDelays(RideFile *ride1, RideFile *ride2)
     int r1secs = ride1->dataPoints().last()->secs;
     int r2secs = ride2->dataPoints().last()->secs;
     int diff = abs(r1secs-r2secs);
+    if (diff < 600) diff = 600;
 
     delaySlider->setMinimum(diff *-1);
     delaySlider->setMaximum(diff);
