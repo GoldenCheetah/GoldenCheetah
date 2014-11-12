@@ -890,6 +890,7 @@ IntervalNavigator::selectRide(const QModelIndex &index)
     }
 
     f->clearIntervals();
+    f->addInterval(start, end, "1");
 
     RideItem* rideItem = new RideItem(RIDE_TYPE, f, date, context->rideItem()->zones, context->rideItem()->hrZones, context );
 
