@@ -20,34 +20,47 @@
 #include "Context.h"
 #include "MainWindow.h"
 
-/**
- * Wizard to merge 2 files from same ride
+/*
+ * BASIC FLOW
  *
- **/
+ * 10 Welcome
+ * 20 Select source (import or download)
+ * 25 Download from device
+ * 27 Select a ride from a list
+ * 30 Select mode (join / merge)
+ * 40 Set parameters (source for metadata/series)
+ * 50 Merge Strategy (merge only)
+ * 60 Manual adjustment (merge only)
+ * 70 Save
+ */
+
 MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
 #ifdef Q_OS_MAX
     setWizardStyle(QWizard::ModernStyle);
 #endif
-    setWindowTitle(tr("Merge Rides"));
+    setWindowTitle(tr("Combine Activities"));
+
+    setFixedHeight(530);
+    setFixedWidth(550);
 
     // current ride
     ride1 = const_cast<RideItem*>(context->currentRideItem());
     ride2 = NULL;
 
+    // default to merge not join
+    mode = 0;
+
     // 5 step process, although Conflict may be skipped
-    mergeWelcome = new MergeWelcome(this);
-    addPage(mergeWelcome);
-    mergeUpload = new MergeUpload(this);
-    addPage(mergeUpload);
-    mergeSync = new MergeSync(this);
-    addPage(mergeSync);
-    //mergeParameters = new MergeParameters(this);
-    //addPage(mergeParameters);
-    mergeSelect = new MergeSelect(this);
-    addPage(mergeSelect);
-    mergeConfirm = new MergeConfirm(this);
-    addPage(mergeConfirm);
+    setPage(10, new MergeWelcome(this));
+    setPage(20, new MergeSource(this));
+    setPage(25, new MergeDownload(this));
+    setPage(27, new MergeChoose(this));
+    setPage(30, new MergeMode(this)); // assume merge for now
+    //setPage(40, new MergeParameters(this)); // not yet
+    setPage(50, new MergeSync(this)); // might need to rename to adjust
+    setPage(60, new MergeSelect(this)); // might need to rename to adjust
+    setPage(1000, new MergeConfirm(this));
 }
 
 
@@ -58,54 +71,102 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
 // welcome
 MergeWelcome::MergeWelcome(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Merge Rides"));
+    setTitle(tr("Combine Activities"));
     setSubTitle(tr("Lets get started"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    QLabel *label = new QLabel(tr("This wizard will help you to merge data series from two ride files\n"
-                               "into one single ride file."));
+    QLabel *label = new QLabel(tr("This wizard will help you combine data with "
+                               "the currently selected activity.\n\n"
+                               "You will be able to import or download data before "
+                               "merging or joining the data and manually adjusting "
+                               "the alignment of data series before it is saved."));
     label->setWordWrap(true);
 
     layout->addWidget(label);
     layout->addStretch();
 }
 
-// Upload
-MergeUpload::MergeUpload(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+//Select source for merge
+MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Upload"));
-    setSubTitle(tr("Select file to merge"));
+    setTitle(tr("Select Source"));
+    setSubTitle(tr("Where is the data you want to combine ?"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
-    //: Do not change the time format in translation, keep hh:mm:ss !
-    QLabel *ride1Label = new QLabel(tr("Current ride")+" "+parent->ride1->dateTime.toString(tr("MMM d, yyyy - hh:mm:ss")));
-    layout->addWidget(ride1Label);
-    QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum,QSizePolicy::Expanding );
-    layout->addItem( spacer );
+    mapper = new QSignalMapper(this);
+    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
 
-    QLabel *label = new QLabel(tr("Select the file to merge to this ride."));
-    label->setWordWrap(true);
+    // select a file
+    QCommandLinkButton *p = new QCommandLinkButton(tr("Import from a File"), 
+                                tr("Import and combine from a file on your hard disk"
+                                   " or device mounted as a USB disk to combine with "
+                                   "the current activity."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "import");
+    layout->addWidget(p);
 
+    // download from a device
+    p = new QCommandLinkButton(tr("Download from Device"), 
+                                tr("Download data from a serial port device such as a Moxy Muscle Oxygen Monitor or"
+                                   " bike computer to combine with the current activity."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "download");
+    layout->addWidget(p);
+
+    // select from rides on same day
+    p = new QCommandLinkButton(tr("Existing Activity"), 
+                                tr("Combine data from an activity that has already been imported or downloaded into"
+                                   " GoldenCheetah. Selecting from a list of all available activities. "), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "choose");
+    layout->addWidget(p);
+
+    label = new QLabel("", this);
     layout->addWidget(label);
 
-    uploadButton = new QPushButton(tr("&Upload"));
-    layout->addWidget(uploadButton);
-    connect(uploadButton, SIGNAL(clicked()), this, SLOT(importFile()));
-
-    labelSuccess = new QLabel("--");
-    layout->addWidget(labelSuccess);
-    ride2Label = new QLabel("");
-    layout->addWidget(ride2Label);
-
-    layout->addStretch();
+    next = 50;
+    setFinalPage(false);
 }
 
 void
-MergeUpload::importFile()
+MergeSource::initializePage()
+{
+}
+   
+
+void
+MergeSource::clicked(QString p)
+{
+    // reset -- particularly since we might get here from
+    //          other pages hitting 'Back'
+    initializePage();
+
+    // move on if we imported one
+    if (p == "import" && importFile() == true) {
+        next = 50;
+        wizard->next();
+    }
+
+    // move on if we downloaded one
+    if (p == "download") {
+        next = 25;
+        wizard->next();
+    }
+
+    // select from a list
+    if (p == "choose") {
+        next = 27;
+        wizard->next();
+    }
+
+}
+
+bool
+MergeSource::importFile()
 {
     QVariant lastDirVar = appsettings->value(this, GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant())
@@ -127,12 +188,13 @@ MergeUpload::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        importFile(fileNamesCopy);
+        return importFile(fileNamesCopy);
     }
+    return false;
 }
 
-void
-MergeUpload::importFile(QList<QString> files)
+bool
+MergeSource::importFile(QList<QString> files)
 {
     // get fullpath name for processing
     QFileInfo filename = QFileInfo(files[0]).absoluteFilePath();
@@ -154,35 +216,250 @@ MergeUpload::importFile(QList<QString> files)
 
             // did it parse ok?
             if (ride) {
-                //wizard->addRideFile(ride);
-                labelSuccess->setText(tr("File uploaded"));
-                //: Do not change the time format in translation, keep hh:mm:ss !
-                ride2Label->setText(tr("Second ride")+" "+ride->startTime().toString(tr("MMM d, yyyy - hh:mm:ss")));
+
                 wizard->ride2 = ride;
-                emit completeChanged();
+                return true;
             }
 
         } else {
+
+            wizard->ride2 = NULL;
             errors.append(tr("Error - Unknown file type"));
+            return false;
         }
+    }
+    return false;
+}
 
+// Download dialog embedded
+MergeDownload::MergeDownload(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+{
+    setTitle(tr("Download Activity"));
+    setSubTitle(tr("Download Activity to Combine"));
 
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+
+    // embed download dialog
+    QMdiArea *mdiarea = new QMdiArea(this);
+    layout->addWidget(mdiarea);
+
+    // get a download dialog -- embedded
+    DownloadRideDialog *download = new DownloadRideDialog(parent->context, true);
+    //download->setInputMode(QInputDialog.TextInput);
+    QMdiSubWindow *w = mdiarea->addSubWindow(download, Qt::FramelessWindowHint);
+
+    // maximize and no title bar etc
+    w->showMaximized();
+    layout->addStretch();
+
+    connect(download, SIGNAL(downloadStarts()), this, SLOT(downloadStarts()));
+    connect(download, SIGNAL(downloadEnds()), this, SLOT(downloadEnds()));
+    connect(download, SIGNAL(downloadFiles(QList<DeviceDownloadFile>)), this, 
+                      SLOT(downloadFiles(QList<DeviceDownloadFile>)));
+}
+
+void 
+MergeDownload::downloadFiles(QList<DeviceDownloadFile>files)
+{
+    // Bingo ! only one ride so must be this one
+    // saves having to select from a pesky list
+    // XXX WE NEED TO UPDATE DOWNLOADRIDEDIALOG TO
+    //     ALLOW SELECTION OF RIDES TO PROCESS AND
+    //     ALSO MAKE IT LIMIT THIS TO ONE RIDE WHEN
+    //     EMBEDDED IN MERGEDOWNLOAD ! XXX
+    if (files.count() == 1) {
+
+        QFile thisfile(files[0].name);
+        QStringList errors;
+
+        RideFileReader *reader = RideFileFactory::instance().readerForSuffix(files[0].extension);
+        if (!reader) return;
+ 
+        RideFile *ride = reader->openRideFile(thisfile, errors);
+
+        // did it parse ok?
+        if (ride) {
+
+            wizard->ride2 = ride;
+            next = 50;
+            wizard->next();
+            return;
+        } else {
+
+            wizard->ride2 = NULL;
+            errors.append(tr("Error - Unknown file type"));
+            return;
+        }
     }
 }
 
-
-bool MergeUpload::isComplete() const
+void
+MergeDownload::downloadStarts()
 {
-  return (wizard->ride2 != NULL);
+    wizard->button(QWizard::BackButton)->setEnabled(false);
 }
 
+void
+MergeDownload::downloadEnds()
+{
+    wizard->button(QWizard::BackButton)->setEnabled(true);
+}
 
+void
+MergeDownload::initializePage()
+{
+    // might be needed for download ????
+}
+
+// Choose from the ride list
+MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+{
+    setTitle(tr("Choose an Activity"));
+    setSubTitle(tr("Choose an Existing activity to Combine"));
+
+    chosen = false;
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+
+    files = new QTreeWidget;
+    files->headerItem()->setText(0, tr("Filename"));
+    files->headerItem()->setText(1, tr("Date"));
+    files->headerItem()->setText(2, tr("Time"));
+
+    files->setColumnCount(3);
+    files->setColumnWidth(0, 190); // filename
+    files->setColumnWidth(1, 95); // date
+    files->setColumnWidth(2, 90); // time
+    files->setSelectionMode(QAbstractItemView::SingleSelection);
+    files->setUniformRowHeights(true);
+    files->setIndentation(0);
+
+    // populate with each ride in the ridelist
+    const QTreeWidgetItem *allRides = wizard->context->athlete->allRideItems();
+
+    for (int i=allRides->childCount()-1; i>=0; i--) {
+
+        RideItem *rideItem = static_cast<RideItem*>(allRides->child(i));
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // we will wipe the original file
+        add->setText(0, rideItem->fileName);
+        add->setText(1, rideItem->dateTime.toString(tr("dd MMM yyyy")));
+        add->setText(2, rideItem->dateTime.toString("hh:mm:ss"));
+    }
+
+    layout->addWidget(files);
+    connect(files, SIGNAL(itemSelectionChanged()), this, SLOT(selected()));
+}
+
+void
+MergeChoose::selected()
+{
+    wizard->button(QWizard::BackButton)->setEnabled(true);
+    chosen = true;
+    next = 50;
+    emit completeChanged();
+}
+
+bool
+MergeChoose::validatePage()
+{
+    // make sure the currently selected ride has data
+    // and can be opened etc
+    QString filename = "none";
+
+    // which one is selected ?
+    if (files->currentItem()) filename=files->currentItem()->text(0);
+    
+    // open it..
+    QStringList errors;
+    QList<RideFile*> rides;
+    QFile thisfile(QString(wizard->context->athlete->home->activities().absolutePath()+"/"+filename));
+    RideFile *ride = RideFileFactory::instance().openRideFile(wizard->context, thisfile, errors, &rides);
+
+    if (ride && ride->dataPoints().count()) {
+
+        wizard->ride2 = ride;
+        return true;
+    }
+    return false;
+}
+   
+void
+MergeChoose::initializePage()
+{
+}
+   
+//Select mode for merge
+MergeMode::MergeMode(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+{
+    setTitle(tr("Select Mode"));
+    setSubTitle(tr("How would you like to combine the data ?"));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+
+    mapper = new QSignalMapper(this);
+    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+
+    // merge
+    QCommandLinkButton *p = new QCommandLinkButton(tr("Merge Data to add another data series"), 
+                                tr("Merge data series from one recording into the current activity"
+                                   " where different types of data (e.g. O2 data from a Moxy) have been "
+                                   " recorded by different devices. Taking care to align the data in time."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "merge");
+    layout->addWidget(p);
+
+    // join
+    p = new QCommandLinkButton(tr("Join Data to form a longer activity"), 
+                                tr("Append the data to the end of the current activity "
+                                   " to create a longer activity that was recorded in multiple"
+                                   " parts."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "join");
+    layout->addWidget(p);
+
+    label = new QLabel("", this);
+    layout->addWidget(label);
+
+    next = 50;
+    setFinalPage(false);
+}
+
+void
+MergeMode::initializePage()
+{
+}
+   
+
+void
+MergeMode::clicked(QString p)
+{
+    // reset -- particularly since we might get here from
+    //          other pages hitting 'Back'
+    initializePage();
+
+    if (p == "join") {
+        wizard->mode = 1; // join is easy !
+        next = 1000;
+    } else {
+        // where to next ?
+        wizard->mode = 0; // merge ...
+        next = 50; //XXX will need to decide here !
+    }
+    wizard->next();
+}
 
 // Synchronise start of files
 MergeSync::MergeSync(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Synchronise"));
-    setSubTitle(tr("Start of rides"));
+    setSubTitle(tr("Start of activities"));
 
     // Plot files
     QVBoxLayout *layout = new QVBoxLayout;
@@ -598,7 +875,7 @@ MergeSync::diffForSeries(QVector<DataPoint*> a1, QVector<DataPoint*> a2, int sta
 // parameters
 MergeParameters::MergeParameters(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Merge Parameters"));
+    setTitle(tr("Combine Parameters"));
     setSubTitle(tr("Configure how file are synchronised"));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -841,7 +1118,7 @@ MergeSelect::initializePage()
 MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Confirm"));
-    setSubTitle(tr("Proceed with merge"));
+    setSubTitle(tr("Combine activities"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -895,7 +1172,7 @@ MergeConfirm::validatePage()
     RideFile *ride2 = wizard->ride2;
     //qDebug() << "- ride 1 : " << ride1->ride()->dataPoints().count() << " points\n";
     //qDebug() << "- ride 2 : " << ride2->dataPoints().count() << " points\n";
-
+#if 0
     if (wizard->mergeSelect->keepPower2->isChecked())
        ride1->ride()->setDataPresent(RideFile::watts, true);
     if (wizard->mergeSelect->keepSpeed2->isChecked())
@@ -925,7 +1202,7 @@ MergeConfirm::validatePage()
        ride1->ride()->setDataPresent(RideFile::lon, false);
        ride1->ride()->setDataPresent(RideFile::lat, false);
     }
-
+#endif
     //int i = 0;
     int k = 0;
 
@@ -995,7 +1272,7 @@ MergeConfirm::validatePage()
             previousSecs2 = secs+wizard->delay;
         }
 
-
+#if 0
         if (wizard->mergeSelect->keepPower2->isChecked()) {
            //qDebug() << "- watts : " << point->watts  << "-" << ((point2 && point2 != NULL)?point2->watts:0)  << "-" << point3->watts;
            point->watts = point3->watts;
@@ -1027,10 +1304,10 @@ MergeConfirm::validatePage()
            point->lat = point3->lat;
            point->lon = point3->lon;
         }
+#endif
 
         previousSecs1 = secs;
     }
-
 
 
     //--------------------------------------

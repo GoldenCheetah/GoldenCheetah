@@ -583,7 +583,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Save ride"), this, SLOT(saveRide()), tr("Ctrl+S"));
     rideMenu->addAction(tr("D&elete ride..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &ride..."), this, SLOT(splitRide()));
-    rideMenu->addAction(tr("Merge rides..."), this, SLOT(mergeRide()));
+    rideMenu->addAction(tr("Combine rides..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
 
     // TOOLS MENU

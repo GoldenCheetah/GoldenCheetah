@@ -27,6 +27,9 @@
 #include "Settings.h"
 #include "SmallPlot.h"
 #include "JsonRideFile.h"
+#include "DownloadRideDialog.h"
+#include "Device.h"
+#include "Athlete.h"
 
 #include <qwt_plot_marker.h>
 
@@ -38,6 +41,10 @@
 #include <QWizardPage>
 #include <QLabel>
 #include <QFileDialog>
+#include <QCommandLinkButton>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QTreeWidget>
 
 class MainWindow;
 class SmallPlot;
@@ -74,13 +81,7 @@ class MergeActivityWizard : public QWizard
         bool keepOriginal;
         int delay;
         int stop;
-
-        MergeWelcome    *mergeWelcome;
-        MergeUpload     *mergeUpload;
-        MergeSync       *mergeSync;
-        MergeParameters *mergeParameters;
-        MergeSelect     *mergeSelect;
-        MergeConfirm    *mergeConfirm;
+        int mode; // 0 = merge, 1 = join
 
     private:
 
@@ -134,24 +135,99 @@ class MergeWelcome : public QWizardPage
         MergeActivityWizard *wizard;
 };
 
-class MergeUpload : public QWizardPage
+class MergeSource : public QWizardPage
 {
     Q_OBJECT
 
     public:
-        MergeUpload(MergeActivityWizard *);
+        MergeSource(MergeActivityWizard *);
+        void initializePage();
+        bool validate() const { return false; }
+        bool isComplete() const { return false; }
+        int nextId() const { return next; }
+
+        // importing is easy !
+        bool importFile();
+        bool importFile(QList<QString> files);
+
+    public slots:
+        void clicked(QString);
 
     private:
         MergeActivityWizard *wizard;
-
-        QPushButton *uploadButton;
-        QLabel      *labelSuccess, *ride2Label;
-        bool isComplete() const;
-
-    private slots:
-        void importFile();
-        void importFile(QList<QString> files);
+        QSignalMapper *mapper;
+        QLabel *label;
+        int next;
 };
+
+class MergeDownload : public QWizardPage
+{
+    Q_OBJECT
+
+    public:
+        MergeDownload(MergeActivityWizard *);
+        void initializePage();
+        bool validate() const { return false; }
+        bool isComplete() const { return false; }
+        int nextId() const { return next; }
+
+        // embed a download dialog !
+
+    public slots:
+        void downloadStarts();
+        void downloadEnds();
+        void downloadFiles(QList<DeviceDownloadFile>);
+        //XXX void done(); // we got one ?
+
+    private:
+        MergeActivityWizard *wizard;
+        QLabel *label;
+        int next;
+};
+
+class MergeChoose : public QWizardPage
+{
+    Q_OBJECT
+
+    public:
+        MergeChoose(MergeActivityWizard *);
+        void initializePage();
+        bool validatePage(); 
+        bool isComplete() const { return chosen; }
+        int nextId() const { return next; }
+
+    public slots:
+        void selected();
+
+    private:
+        MergeActivityWizard *wizard;
+        QTreeWidget *files;
+        QLabel *label;
+        int next;
+        bool chosen;
+};
+
+class MergeMode : public QWizardPage
+{
+    Q_OBJECT
+
+    public:
+        MergeMode(MergeActivityWizard *);
+        void initializePage();
+        bool validate() const { return false; }
+        bool isComplete() const { return false; }
+        int nextId() const { return next; }
+
+    public slots:
+        void clicked(QString);
+
+    private:
+        MergeActivityWizard *wizard;
+        QSignalMapper *mapper;
+        QLabel *label;
+        int next;
+};
+
 
 class MergeSync : public QWizardPage
 {

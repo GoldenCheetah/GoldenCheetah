@@ -28,9 +28,9 @@
 #include <errno.h>
 #include <QtGui>
 
-DownloadRideDialog::DownloadRideDialog(Context *context) :
+DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     context(context), cancelled(false),
-    action(actionIdle)
+    action(actionIdle), embedded(embedded)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Download Ride Data"));
@@ -90,6 +90,12 @@ DownloadRideDialog::DownloadRideDialog(Context *context) :
     mainLayout->addLayout(buttonLayout);
 
     scanCommPorts();
+
+    // if embedded we don't want these !
+    if (embedded) {
+        cancelButton->hide();
+        closeButton->hide();
+    }
 }
 
 void
@@ -262,6 +268,8 @@ DownloadRideDialog::deviceChanged( QString deviceType )
 void
 DownloadRideDialog::downloadClicked()
 {
+    emit downloadStarts();
+
     updateAction( actionDownload );
 
     updateProgress( "" );
@@ -293,6 +301,8 @@ DownloadRideDialog::downloadClicked()
 
             QMessageBox::information(this, tr("Get ride list failed"), err);
             updateAction( actionIdle );
+
+            emit downloadEnds();
             return;
         }
     }
@@ -319,10 +329,23 @@ DownloadRideDialog::downloadClicked()
         }
         updateStatus(tr("Download failed"));
         updateAction( actionIdle );
+
+        emit downloadEnds();
         return;
     }
 
     updateProgress( "" );
+
+    // if we are embedded then we don't process the files here
+    // we pass back the list to the widget we are embedded in
+    // via a signal -- we are typically embedded in the 
+    // MergeActivityWizard that chooses a file to merge in
+    if (embedded) {
+        emit downloadEnds();
+        emit downloadFiles(files);
+        updateAction(actionIdle);
+        return;
+    }
 
     int failures = 0;
     for( int i = 0; i < files.size(); ++i ){
@@ -432,6 +455,8 @@ DownloadRideDialog::downloadClicked()
 
     if( ! failures )
         updateStatus( tr("Download completed") );
+
+    emit downloadEnds();
 
     updateAction( actionIdle );
 }
