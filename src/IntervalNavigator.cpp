@@ -889,7 +889,7 @@ IntervalNavigator::selectRide(const QModelIndex &index)
         l->apower = p->apower;
     }
 
-    qDebug() << "dataPoints 2" << f->dataPoints().count();
+    f->clearIntervals();
 
     RideItem* rideItem = new RideItem(RIDE_TYPE, f, date, context->rideItem()->zones, context->rideItem()->hrZones, context );
 
