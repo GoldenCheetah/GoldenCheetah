@@ -78,6 +78,9 @@ static QString protect(const QString string)
     s.replace("\f", "\\f");  // formfeed
     s.replace("/", "\\/");   // solidus
 
+    // add a trailing space to avoid conflicting with GC special tokens
+    s += " "; 
+
     return s;
 }
 
@@ -90,6 +93,9 @@ static QString unprotect(const char * string)
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
     QString s = string2.mid(1,string2.length()-2);
+
+    // does it end with a space (to avoid token conflict) ?
+    if (s.endsWith(" ")) s = s.mid(0, s.length()-1);
 
     // now un-escape the control characters
     s.replace("\\t", "\t");  // tab
