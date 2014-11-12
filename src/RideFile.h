@@ -385,6 +385,7 @@ class RideFileFactory {
             return descriptions_[suffix];
         }
         QRegExp rideFileRegExp() const;
+        RideFileReader *readerForSuffix(QString) const; 
 };
 
 #endif // _RideFile_h

@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include "CommPort.h"
+#include "Device.h"
 
 #include <QtGui>
 #include <QLabel>
@@ -37,12 +38,16 @@ class DownloadRideDialog : public QDialog
 
 
     public:
-        DownloadRideDialog(Context *context);
+        DownloadRideDialog(Context *context, bool embedded=false);
 
         bool isCancelled();
 
     signals:
         void cancel();
+
+        void downloadStarts();
+        void downloadEnds();
+        void downloadFiles(QList<DeviceDownloadFile>);
 
     private slots:
         void downloadClicked();
@@ -75,6 +80,7 @@ class DownloadRideDialog : public QDialog
         } downloadAction;
 
         downloadAction action;
+        bool embedded;
 
         void updateAction( downloadAction action );
         void updatePort();

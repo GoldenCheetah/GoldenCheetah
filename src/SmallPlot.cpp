@@ -104,7 +104,7 @@ SmallPlot::recalc()
     if (!timeArray.size()) return;
 
     int rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
-    if (rideTimeSecs > 7*24*60*60) {
+    if (rideTimeSecs < 0 || rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
         wattsCurve->setSamples(data, data);
         hrCurve->setSamples(data, data);

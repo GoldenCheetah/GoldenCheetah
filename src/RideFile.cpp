@@ -432,6 +432,11 @@ RideFileFactory::writeRideFile(Context *context, const RideFile *ride, QFile &fi
     else return reader->writeRideFile(context, ride, file);
 }
 
+RideFileReader *RideFileFactory::readerForSuffix(QString suffix) const
+{
+    return readFuncs_.value(suffix.toLower());
+}
+
 RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
                                            QStringList &errors, QList<RideFile*> *rideList) const
 {
