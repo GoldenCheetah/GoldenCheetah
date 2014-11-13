@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011-13 Damien Grauser (Damien.Grauser@pev-geneve.ch)
+ *               2014    Mark Liversedgge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,19 +21,26 @@
 #include "Context.h"
 #include "MainWindow.h"
 
-/*
- * BASIC FLOW
+/*----------------------------------------------------------------------
  *
- * 10 Welcome
- * 20 Select source (import or download)
- * 25 Download from device
- * 27 Select a ride from a list
- * 30 Select mode (join / merge)
- * 40 Set parameters (source for metadata/series)
- * 50 Merge Strategy (merge only)
- * 60 Manual adjustment (merge only)
- * 70 Save
- */
+ * Page Flow Summary
+ *
+ * 10 MergeWelcome       Welcome message
+ *
+ * 20 MergeSource        Select source (import or download)
+ *    25 MergeDownload   Download from device
+ *    27 MergeChoose     Select a ride from a list
+ *
+ * 30 MergeMode          Select mode (join / merge)
+ *
+ * if merge (not join)
+ *    40 MergeSelect     Select series to combine
+ *    50 MergeStrategy   Select strategy for aligning data
+ *    60 MergeAdjust     Manually adjust alignment 
+ *
+ * 70 MergeConfirm       Confirm and Save away
+ *
+ *---------------------------------------------------------------------*/
 
 MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
@@ -44,25 +52,127 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
     setFixedHeight(530);
     setFixedWidth(550);
 
+    // initialise before setRide since it checks
+    // to see if memory needs to be freed first
+    ride1 = ride2 = NULL;
+    combined = NULL;
+
     // current ride
-    ride1 = const_cast<RideItem*>(context->currentRideItem());
-    ride2 = NULL;
+    current = const_cast<RideItem*>(context->currentRideItem());
+    recIntSecs= current->ride()->recIntSecs();
+    setRide(&ride1, current->ride());
 
     // default to merge not join
+    // and merge on device clocks
     mode = 0;
+    strategy = 0;
 
     // 5 step process, although Conflict may be skipped
     setPage(10, new MergeWelcome(this));
     setPage(20, new MergeSource(this));
     setPage(25, new MergeDownload(this));
     setPage(27, new MergeChoose(this));
-    setPage(30, new MergeMode(this)); // assume merge for now
-    //setPage(40, new MergeParameters(this)); // not yet
-    setPage(50, new MergeSync(this)); // might need to rename to adjust
-    setPage(60, new MergeSelect(this)); // might need to rename to adjust
+    setPage(30, new MergeMode(this)); 
+    setPage(40, new MergeSelect(this)); 
+    setPage(50, new MergeStrategy(this)); 
+    setPage(60, new MergeAdjust(this)); // might need to rename to adjust
     setPage(1000, new MergeConfirm(this));
 }
 
+void
+MergeActivityWizard::setRide(RideFile **here, RideFile *with)
+{
+    // wipe current
+    if (*here) delete *here;
+
+    // set with new resampled / filled
+    // you may be tempted to optimise this out
+    // but by cloning a working copy like this
+    // we start with a clean ride and no derived
+    // data to 'pollute' the process
+    if (with) *here = with->resample(recIntSecs);
+    else *here = NULL;
+}
+
+void 
+MergeActivityWizard::analyse()
+{
+    // looking at the paramters determine the offset
+    // to be used by both rides XXX not written yet !
+
+    // XXX just make em start together for now !
+    offset1=0;
+    offset2=0;
+}
+
+void 
+MergeActivityWizard::combine()
+{
+    // zap whatever we have
+    if (combined) delete combined;
+
+    // create a combined ride applying the parameters
+    // from the wizard for join or merge
+
+    if (mode == 1) { // JOIN
+
+        // easy peasy -- loop through one then the other !
+        combined = new RideFile(ride1);
+
+        RideFilePoint *lp = NULL;
+
+        foreach(RideFilePoint *p, ride1->dataPoints()) {
+            combined->appendPoint(*p);
+            lp = p;
+        }
+
+        // now add the data from the second one!
+        double distanceOffset=0;
+        double timeOffset=0;
+        bool first=true;
+
+        foreach(RideFilePoint *p, ride2->dataPoints()) {
+            if (first) {
+
+                if (lp) {
+                    distanceOffset = lp->km + p->km;
+                    timeOffset = lp->secs + p->secs + recIntSecs;
+                }
+                first = false;
+            }
+
+            RideFilePoint add = *p;
+            add.secs += timeOffset;
+            add.km += distanceOffset;
+
+            combined->appendPoint(add);
+        }
+
+        // any intervals with a number name? find the last
+        int intervalN=0;
+        foreach(RideFileInterval interval, ride1->intervals()) {
+            int x = interval.name.toInt();
+            if (interval.name == QString("%1").arg(x)) {
+                if (x > intervalN) intervalN = x;
+            }
+        }
+
+        // now run through the intervals for the second ride
+        // and add them but renumber any intervals that are just numbers
+        foreach(RideFileInterval interval, ride2->intervals()) {
+            int x = interval.name.toInt();
+            if (interval.name == QString("%1").arg(x)) {
+                interval.name = QString("%1").arg(x+intervalN);
+            }
+            combined->addInterval(interval.start + timeOffset,
+                                  interval.stop + timeOffset, 
+                                  interval.name);
+        }
+
+    } else { // MERGE
+
+    }
+}
 
 /*----------------------------------------------------------------------
  * Wizard Pages
@@ -128,7 +238,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     label = new QLabel("", this);
     layout->addWidget(label);
 
-    next = 50;
+    next = 30;
     setFinalPage(false);
 }
 
@@ -147,7 +257,7 @@ MergeSource::clicked(QString p)
 
     // move on if we imported one
     if (p == "import" && importFile() == true) {
-        next = 50;
+        next = 30;
         wizard->next();
     }
 
@@ -217,13 +327,13 @@ MergeSource::importFile(QList<QString> files)
             // did it parse ok?
             if (ride) {
 
-                wizard->ride2 = ride;
+                wizard->setRide(&wizard->ride2, ride);
                 return true;
             }
 
         } else {
 
-            wizard->ride2 = NULL;
+            wizard->setRide(&wizard->ride2, NULL);
             errors.append(tr("Error - Unknown file type"));
             return false;
         }
@@ -281,13 +391,13 @@ MergeDownload::downloadFiles(QList<DeviceDownloadFile>files)
         // did it parse ok?
         if (ride) {
 
-            wizard->ride2 = ride;
-            next = 50;
+            wizard->setRide(&wizard->ride2 ,ride);
+            next = 30;
             wizard->next();
             return;
         } else {
 
-            wizard->ride2 = NULL;
+            wizard->setRide(&wizard->ride2, NULL);
             errors.append(tr("Error - Unknown file type"));
             return;
         }
@@ -361,7 +471,7 @@ MergeChoose::selected()
 {
     wizard->button(QWizard::BackButton)->setEnabled(true);
     chosen = true;
-    next = 50;
+    next = 30;
     emit completeChanged();
 }
 
@@ -383,7 +493,7 @@ MergeChoose::validatePage()
 
     if (ride && ride->dataPoints().count()) {
 
-        wizard->ride2 = ride;
+        wizard->setRide(&wizard->ride2, ride);
         return true;
     }
     return false;
@@ -427,7 +537,7 @@ MergeMode::MergeMode(MergeActivityWizard *parent) : QWizardPage(parent), wizard(
     label = new QLabel("", this);
     layout->addWidget(label);
 
-    next = 50;
+    next = 40;
     setFinalPage(false);
 }
 
@@ -446,892 +556,286 @@ MergeMode::clicked(QString p)
 
     if (p == "join") {
         wizard->mode = 1; // join is easy !
+        wizard->combine(); // analyse not required just combined them !
         next = 1000;
     } else {
         // where to next ?
         wizard->mode = 0; // merge ...
-        next = 50; //XXX will need to decide here !
+        next = 40;
     }
     wizard->next();
 }
 
-// Synchronise start of files
-MergeSync::MergeSync(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+//Select merge strategy
+MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Synchronise"));
-    setSubTitle(tr("Start of activities"));
+    setTitle(tr("Select Strategy"));
+    setSubTitle(tr("How should we align the data ?"));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+
+    mapper = new QSignalMapper(this);
+    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+
+    // time
+    QCommandLinkButton *p = new QCommandLinkButton(tr("Align using start time"), 
+                                tr("Align the data from the two activities based upon the start time "
+                                   "for the activities. This will work well if the devices used to "
+                                   "record the data have their clocks synchronised / close to each other."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "time");
+    layout->addWidget(p);
+
+    // shared data
+    shared = new QCommandLinkButton(tr("Align using shared data series"), 
+                                tr("If the two activities both contain the same data series, for example "
+                                   "where both devices recorded cadence or perhaps HR, then we can align the other "
+                                   "data series in time by matching the peaks and troughs in the shared data."), this);
+    connect(shared, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(shared, "shared");
+    layout->addWidget(shared);
+
+    // start at same time
+    p = new QCommandLinkButton(tr("Align starting together"), 
+                                tr("Regardless of the timestamp on the activity, align with both "
+                                   "activities starting at the same time."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "left");
+    layout->addWidget(p);
+
+    // start at same time
+    p = new QCommandLinkButton(tr("Align ending together"), 
+                                tr("Regardless of the timestamp on the activity, align with both "
+                                   "activities ending at the same time."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "right");
+    layout->addWidget(p);
+
+    label = new QLabel("", this);
+    layout->addWidget(label);
+
+    next = 60;
+    setFinalPage(false);
+}
+
+void
+MergeStrategy::initializePage()
+{
+    // are there any shared data ????
+    bool hasShared = false;
+    QMapIterator<RideFile::SeriesType, QCheckBox *> i(wizard->rightSeries);
+    while(i.hasNext()) {
+        i.next();
+        if (wizard->leftSeries.value(i.key(), NULL) != NULL)
+            hasShared = true;
+    }
+    shared->setEnabled(hasShared);
+}
+   
+
+void
+MergeStrategy::clicked(QString p)
+{
+    // reset -- particularly since we might get here from
+    //          other pages hitting 'Back'
+    initializePage();
+
+    if (p == "time") {
+        wizard->strategy = 0;
+    } else if (p == "shared" ) {
+        // where to next ?
+        wizard->strategy = 1; // merge ...
+    } else if (p == "left" ) {
+        wizard->strategy = 2; // merge ...
+    } else if (p == "right" ) {
+        wizard->strategy = 3; // merge ...
+    }
+
+    // now run strategy and get on
+    wizard->analyse();
+    wizard->combine();
+
+    // lets do this thing !
+    next = 60;
+    wizard->next();
+}
+
+// Synchronise start of files
+MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
+{
+    setTitle(tr("Adjust Alignment"));
+    setSubTitle(tr("Adjust merge alignment in time"));
 
     // Plot files
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
-
-    QHBoxLayout *smallPlot1Layout = new QHBoxLayout;
-    smallPlot1 = new SmallPlot(this);
-    smallPlot1->setData(parent->ride1);
-    smallPlot1->setFixedHeight(150);
-    smallPlot1Layout->addWidget(smallPlot1);
-    layout->addItem(smallPlot1Layout);
-
-    bg1 = new MergeSyncBackground(this, wizard->ride1->ride());
-    bg1->attach(smallPlot1);
-
-    QHBoxLayout *smallPlot2Layout = new QHBoxLayout;
-    smallPlot2 = new SmallPlot(this);
-    smallPlot2->setFixedHeight(150);
-    smallPlot2Layout->addWidget(smallPlot2);
-    layout->addItem(smallPlot2Layout);
-
-    bg2 = new MergeSyncBackground(this);
-    bg2->attach(smallPlot2);
-
-    warning = new QLabel(this);
-    warning->setWordWrap(true);
-    QFont font;
-    font.setWeight(QFont::Bold);
-    warning->setFont(font);
-
-    QHBoxLayout *delayLayout = new QHBoxLayout;
-    QLabel *delayLabel = new QLabel(tr("Delay"), this);
-    delayEdit = new QLineEdit(this);
-    delayEdit->setFixedWidth(30);
-
-    delaySlider = new QSlider(Qt::Horizontal, this);
-    delaySlider->setTickPosition(QSlider::TicksBelow);
-    delaySlider->setTickInterval(60);
-    delaySlider->setMinimum(-600);
-    delaySlider->setMaximum(600);
-    delayEdit->setValidator(new QIntValidator(delayEdit));
-
-    QPushButton *delayAutoButton = new QPushButton(tr("&Auto"), this);
-
-    delayLayout->addWidget(delayLabel);
-    delayLayout->addSpacing(10);
-    delayLayout->addWidget(delayEdit);
-    delayLayout->addSpacing(10);
-    delayLayout->addWidget(delaySlider);
-    delayLayout->addSpacing(10);
-    delayLayout->addWidget(delayAutoButton);
-    delayLayout->addStretch();
-    layout->addItem(delayLayout);
-
-    layout->addStretch();
-    layout->addWidget(warning);
-
-    connect(delayEdit, SIGNAL(editingFinished()), this, SLOT(setDelayFromLineEdit()));
-    connect(delaySlider, SIGNAL(valueChanged(int)), this, SLOT(setDelayFromSlider()));
-    connect(delayAutoButton, SIGNAL(clicked()), this, SLOT(findBestDelay()));
 }
 
 void
-MergeSync::initializePage()
+MergeAdjust::initializePage()
 {
-    bg2->setRide(wizard->ride2);
-    smallPlot2->setData(wizard->ride2);
-
-    // Search channels to synchronise
-    watts = wizard->ride1->ride()->isDataPresent(RideFile::watts) &&
-                 wizard->ride2->isDataPresent(RideFile::watts);
-
-    cad = wizard->ride1->ride()->isDataPresent(RideFile::cad) &&
-               wizard->ride2->isDataPresent(RideFile::cad);
-
-    kph =  wizard->ride1->ride()->isDataPresent(RideFile::kph) &&
-                wizard->ride2->isDataPresent(RideFile::kph);
-
-    alt =  wizard->ride1->ride()->isDataPresent(RideFile::alt) &&
-                wizard->ride2->isDataPresent(RideFile::alt);
-
-    hr = wizard->ride1->ride()->isDataPresent(RideFile::hr) &&
-              wizard->ride2->isDataPresent(RideFile::hr);
-
-    seriesCount = 5; //watts, cad, kph, alt, hr;
-    samplesCount = 5;
-    samplesLength = 300;
-
-    findBestDelay();
-}
-
-QVector<DataPoint*>
-MergeSync::getSamplesForRide(RideFile *ride1)
-{
-    QVector<DataPoint*> sample;
-    if (!ride1->isDataPresent(RideFile::secs))
-        return sample;
-
-    int index = 0;
-
-    double minTime = ride1->getMinPoint(RideFile::secs).toDouble();
-    double maxTime = ride1->getMaxPoint(RideFile::secs).toDouble();
-
-    DataPoint *previousPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
-    DataPoint *currentPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
-    DataPoint *nextPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
-
-    for (int secs = minTime+1; secs < maxTime; ++secs) {
-        double hr = 0.0, watts = 0.0, alt = 0.0, cad = 0.0, kph = 0.0;
-        while (currentPoint->time <= secs) {
-            // current point
-            if (currentPoint->time>secs-1) {
-                double pond = (currentPoint->time-secs+1);
-                hr+=pond*currentPoint->hr;
-                watts+=pond*currentPoint->watts;
-                alt+=pond*currentPoint->alt;
-                cad+=pond*currentPoint->cad;
-                kph+=pond*currentPoint->kph;
-            }
-            previousPoint = currentPoint;
-            currentPoint = nextPoint;
-
-            //watts, cad, kph, alt, hr;
-            //if (secs < maxTime-ride1->recIntSecs())
-            if (index <= ride1->timeIndex(maxTime))
-                nextPoint = new DataPoint(ride1->getPointValue(index, RideFile::secs),  ride1->getPointValue(index, RideFile::watts),  ride1->getPointValue(index, RideFile::cad),  ride1->getPointValue(index, RideFile::kph), ride1->getPointValue(index, RideFile::alt), ride1->getPointValue(index++, RideFile::hr));
-            else
-                break;
-        }
-        // next point
-        // pause ?
-        if (currentPoint->time>secs+300) {
-            secs = currentPoint->time;
-            continue;
-        }
-        // next point contribution
-        if (currentPoint->time>secs && previousPoint->time<secs) {
-            double pond = (secs-previousPoint->time);
-            hr+=pond*currentPoint->hr;
-            watts+=pond*currentPoint->watts;
-            alt+=pond*currentPoint->alt;
-            cad+=pond*currentPoint->cad;
-            kph+=pond*currentPoint->kph;
-        }
-
-        DataPoint *pt = new DataPoint(secs, watts, cad, kph, alt, hr);
-        sample.append(pt);
-    }
-    return sample;
-}
-
-void
-MergeSync::analyse(QVector<DataPoint*> points1, QVector<DataPoint*> points2, int analysesCount)
-{
-    for (int j=0;j<points2.count();j++) {
-        for (int sample=0;sample<samplesCount;sample++) {
-            DataPoint pt = diffForSeries(points1, points2, sample*samplesLength, samplesLength);
-            for (int series=0;series<seriesCount;series++) {
-                double r=1;
-                //watts, cad, kph, alt, hr;
-                if (series==0 && watts)
-                    r = pt.watts;
-                else if (series==1 && cad)
-                    r = pt.cad;
-                else if (series==2 && kph)
-                    r = pt.kph;
-                else if (series==3 && alt)
-                    r = pt.alt;
-                else if (series==4 && hr)
-                    r = pt.hr;
-
-                if (minR.count()<series+1) {
-                    minR.append(QList<double>());
-                }
-                if (minR[series].count()<sample+1+analysesCount*samplesCount) {
-                    minR[series].append(1);
-                }
-                if (delay.count()<series+1) {
-                    delay.append(QList<int>());
-                }
-                if (delay[series].count()<sample+1+analysesCount*samplesCount) {
-                    delay[series].append(1);
-                }
-
-                if ( r<minR[series][analysesCount*samplesCount+sample]) {
-                    minR[series][analysesCount*samplesCount+sample] = r;
-                    delay[series][analysesCount*samplesCount+sample] = (analysesCount?-1:1)*(j-sample*samplesLength);
-                }
-            }
-        }
-        points2.remove(0);
-    }
-}
-
-void
-MergeSync::findBestDelay()
-{
-    findDelays(wizard->ride1->ride(), wizard->ride2);
-    //printDelays();
-    int delay = bestDelay();
-    //printDelays();
-    setDelay(delay);
-}
-
-void
-MergeSync::findDelays(RideFile *ride1, RideFile *ride2)
-{
-    QVector<DataPoint*> sample1 = getSamplesForRide(ride1);
-    QVector<DataPoint*> sample2 = getSamplesForRide(ride2);
-
-    analyse(sample1, sample2, 0);
-    analyse(sample2, sample1, 1);
-
-    // the min/max offset for the ride is the diff
-    // between the durations of the two rides
-    int r1secs = ride1->dataPoints().last()->secs;
-    int r2secs = ride2->dataPoints().last()->secs;
-    int diff = abs(r1secs-r2secs);
-    if (diff < 600) diff = 600;
-
-    delaySlider->setMinimum(diff *-1);
-    delaySlider->setMaximum(diff);
-
-}
-
-void
-MergeSync::printDelays()
-{
-    for (int series=0;series<seriesCount;series++) {
-        QString seriesName = "";
-        if (series==0)
-            seriesName = "watts";
-        else if (series==1)
-            seriesName = "cad";
-        else if (series==2)
-            seriesName = "kph";
-        else if (series==3)
-            seriesName = "alt";
-        else if (series==4)
-            seriesName = "hr";
-        fprintf(stderr, "  series %d %s\n", series, seriesName.toLatin1().constData());
-
-        for (int i=0;i<delay[series].count();i++) {
-            fprintf(stderr, "   delay for %d.%d: %d - %f\n", i, series, delay[series].at(i), minR[series].at(i));
-        }
-    }
-}
-
-int
-MergeSync::bestDelay()
-{
-    double minDiff=-1;
-    for (int series=0;series<seriesCount;series++) {
-        for (int i=0;i<delay[series].count();i++) {
-            if (minR[series][i]<minDiff || minDiff==-1) {
-                minDiff = minR[series][i];
-                i=-1;
-            }
-            else if (minR[series][i]>minDiff*3 || minR[series][i]>samplesLength/10000.0) {
-                delay[series].removeAt(i);
-                minR[series].removeAt(i);
-                i--;
-            }
-        }
-    }
-
-    int bestSeries = -1;
-    int bestSeriesValue = 1; //minimum 2 results in series to confirm
-
-    // No priority for a series
-    // Delay from series with more good results (more than 1)
-    // Only if value are in 10sec frame
-    int result = 0;
-    for (int series=0;series<seriesCount;series++) {
-        if (delay[series].count()>bestSeriesValue) {
-            double avg = delay[series].at(0);
-            int minDelay = delay[series].at(0);
-            int maxDelay = delay[series].at(0);
-            for (int i=1;i<delay[series].count();i++) {
-                avg += delay[series].at(i);
-                minDelay=qMin(minDelay,delay[series].at(i));
-                maxDelay=qMax(maxDelay,delay[series].at(i));
-            }
-            // Max difference 10 secs
-            if (maxDelay-minDelay<=10) {
-                result = round(avg/delay[series].count());
-                bestSeries = series;
-                bestSeriesValue = delay[series].count();
-            }
-        }
-    }
-
-
-    if (bestSeries != -1) {
-        QString seriesName = "";
-        if (bestSeries==0)
-            seriesName = tr("watts");
-        else if (bestSeries==1)
-            seriesName = tr("cad");
-        else if (bestSeries==2)
-            seriesName = tr("kph");
-        else if (bestSeries==3)
-            seriesName = tr("alt");
-        else if (bestSeries==4)
-            seriesName = tr("hr");
-        warning->setText(QString(tr("Delay on matching %1 series.")).arg(seriesName));
-    } else
-        warning->setText(QString(tr("Unable to match datas")));
-    return result;
-}
-
-void
-MergeSync::setDelay(int delay)
-{
-    wizard->delay = delay;
-    delaySlider->setValue(delay);
-    delayEdit->setText(QString("%1").arg(delay));
-    if (delay>=0) {
-        bg1->setStartTime(0);
-        bg2->setStartTime(delay);
-    } else {
-        bg1->setStartTime(-delay);
-        bg2->setStartTime(0);
-    }
-
-    double duration1 = wizard->ride1->ride()->getMaxPoint(RideFile::secs).toDouble()-wizard->ride1->ride()->dataPoints().at(0)->secs;
-    double duration2 = wizard->ride2->getMaxPoint(RideFile::secs).toDouble()-wizard->ride2->dataPoints().at(0)->secs;
-    double stop = 0;
-
-    if (duration2 - duration1 >= delay)
-        stop = duration1+delay;
-    else
-        stop = -duration2+delay;
-
-    wizard->stop = stop;
-
-    if (stop>0) {
-        bg1->setEndTime(0);
-        bg2->setEndTime(stop);
-    } else if (stop<0) {
-        bg1->setEndTime(-stop);
-        bg2->setEndTime(0);
-    }
-
-    smallPlot1->replot();
-    smallPlot2->replot();
-}
-
-void
-MergeSync::setDelayFromLineEdit()
-{
-    int delay = delayEdit->text().toInt();
-    setDelay(delay);
-}
-
-void
-MergeSync::setDelayFromSlider()
-{
-    setDelay(delaySlider->value());
-}
-
-DataPoint
-MergeSync::diffForSeries(QVector<DataPoint*> a1, QVector<DataPoint*> a2, int start, int length)
-{
-    DataPoint result(1,1,1,1,1,1);
-    if (a1.count()-start < length  || a2.count()<length)
-        return result;
-
-    //watts, cad, kph, alt, hr;
-    double totalWatts = 0, totalCad = 0, totalKph = 0, totalAlt = 0, totalHr = 0;
-    double diffWatts = 0, diffCad = 0, diffKph = 0, diffAlt = 0, diffHr = 0;
-    double offsetAlt = 0;
-    double variabilityAlt = 0;
-
-    for (int i=0;i<length;i++)
-    {
-        if (hr) {
-            diffHr+=qAbs(a1[i+start]->hr-a2[i]->hr);
-            totalHr+=a1[i+start]->hr;
-        }
-        if (watts) {
-            diffWatts+=qAbs(a1[i+start]->watts-a2[i]->watts);
-            totalWatts+=a1[i+start]->watts;
-        }
-        if (cad) {
-            diffCad+=qAbs(a1[i+start]->cad-a2[i]->cad);
-            totalCad+=a1[i+start]->cad;
-        }
-        if (kph) {
-            diffKph+=qAbs(a1[i+start]->kph-a2[i]->kph);
-            totalKph+=a1[i+start]->kph;
-        }
-        if (alt) {
-            if (i==0)
-                offsetAlt = a1[i+start]->alt-a2[i]->alt;
-            else
-                variabilityAlt += qAbs(a1[i+start]->alt-a1[i+start-1]->alt);
-            diffAlt+=qAbs(a1[i+start]->alt-a2[i]->alt-offsetAlt);
-            totalAlt+=qAbs(a1[i+start]->alt);
-        }
-    }
-
-    result.alt = (totalAlt>0 && variabilityAlt>samplesLength/4) ? diffAlt/totalAlt : 1.0;
-    result.kph = totalKph>0 ? diffKph/totalKph : 1.0;
-    result.cad = totalCad>0 ? diffCad/totalCad : 1.0;
-    result.watts = totalWatts>0 ? diffWatts/totalWatts : 1.0;
-    result.hr = totalHr>0 ? diffHr/totalHr : 1.0;
-
-    //fprintf(stderr, "   pt alt:%f kph:%f cad:%f watts:%f hr:%f \n", result.alt, result.kph, result.cad, result.watts, result.hr);
-    return result;
-}
-
-// parameters
-MergeParameters::MergeParameters(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
-{
-    setTitle(tr("Combine Parameters"));
-    setSubTitle(tr("Configure how file are synchronised"));
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    QLabel *label = new QLabel(tr("No parameters at this time.\n"));
-    label->setWordWrap(true);
-
-    layout->addWidget(label);
-
-    QGridLayout *grid = new QGridLayout;
-
-    layout->addLayout(grid);
-    layout->addStretch();
-
-}
-
-void
-MergeParameters::valueChanged()
-{
-    //wizard->minimumGap = minimumGap->value();
 }
 
 // select
 MergeSelect::MergeSelect(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Select"));
-    setSubTitle(tr("Select series for merged file."));
+    setTitle(tr("Merge Data Series"));
+    setSubTitle(tr("Select the series to merge together"));
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    QHBoxLayout *dataControl1Layout = new QHBoxLayout;
+    QVBoxLayout *mainlayout = new QVBoxLayout(this);
 
-    powerGroup = new QButtonGroup;
-    altPowerGroup = new QButtonGroup;
-    hrGroup = new QButtonGroup;
-    speedGroup = new QButtonGroup;
-    cadGroup = new QButtonGroup;
-    altGroup = new QButtonGroup;
-    gpsGroup = new QButtonGroup;
+    QFont def;
+    def.setWeight(QFont::Bold);
 
-    keepPower1 = new QRadioButton(tr("Power"));
-    powerGroup->addButton(keepPower1);
-    dataControl1Layout->addWidget(keepPower1);
+    QHBoxLayout *names = new QHBoxLayout;
+    leftName = new QLabel("Current Selection", this);
+    rightName = new QLabel("right", this);
+    leftName->setFixedHeight(20);
+    leftName->setFont(def);
+    leftName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    rightName->setFixedHeight(20);
+    rightName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    rightName->setFont(def);
+    names->addWidget(leftName);
+    names->addWidget(rightName);
+    mainlayout->addLayout(names);
 
-    keepAltPower1 = new QRadioButton(tr("AltPower"));
-    altPowerGroup->addButton(keepAltPower1);
-    dataControl1Layout->addWidget(keepAltPower1);
+    QHBoxLayout *leftright = new QHBoxLayout;
+    mainlayout->addLayout(leftright);
 
-    keepHr1 = new QRadioButton(tr("Heart Rate"));
-    hrGroup->addButton(keepHr1);
-    dataControl1Layout->addWidget(keepHr1);
+    QScrollArea *left = new QScrollArea(this);
+    left->setAutoFillBackground(false);
+    left->setWidgetResizable(true);
+    left->setContentsMargins(0,0,0,0);
+    QScrollArea *right = new QScrollArea(this);
+    right->setAutoFillBackground(false);
+    right->setWidgetResizable(true);
+    right->setContentsMargins(0,0,0,0);
 
-    keepSpeed1 = new QRadioButton(tr("Speed"));
-    speedGroup->addButton(keepSpeed1);
-    dataControl1Layout->addWidget(keepSpeed1);
+    leftright->addWidget(left);
+    leftright->addWidget(right);
 
-    keepCad1 = new QRadioButton(tr("Cadence"));
-    cadGroup->addButton(keepCad1);
-    dataControl1Layout->addWidget(keepCad1);
+    // checkboxes on the left
+    QWidget *leftWidget = new QWidget(this);
+    leftWidget->setContentsMargins(0,0,0,0);
+    leftLayout = new QVBoxLayout(leftWidget);
+    leftLayout->setContentsMargins(0,0,0,0);
+    leftLayout->setSpacing(0);
 
-    keepAlt1 = new QRadioButton(tr("Altitude"));
-    altGroup->addButton(keepAlt1);
-    dataControl1Layout->addWidget(keepAlt1);
+    // checkboxes on the right
+    QWidget *rightWidget = new QWidget(this);
+    rightWidget->setContentsMargins(0,0,0,0);
+    rightLayout = new QVBoxLayout(rightWidget);
+    rightLayout->setContentsMargins(0,0,0,0);
+    rightLayout->setSpacing(0);
 
-    keepGPS1 = new QRadioButton(tr("GPS"));
-    gpsGroup->addButton(keepGPS1);
-    dataControl1Layout->addWidget(keepGPS1);
-
-    mainLayout->addLayout(dataControl1Layout);
-
-    QHBoxLayout *dataControl2Layout = new QHBoxLayout;
-
-    keepPower2 = new QRadioButton(tr("Power"), this);
-    powerGroup->addButton(keepPower2);
-    dataControl2Layout->addWidget(keepPower2);
-
-    keepAltPower2 = new QRadioButton(tr("AltPower"), this);
-    altPowerGroup->addButton(keepAltPower2);
-    dataControl2Layout->addWidget(keepAltPower2);
-
-    keepHr2 = new QRadioButton(tr("Heart Rate"), this);
-    hrGroup->addButton(keepHr2);
-    dataControl2Layout->addWidget(keepHr2);
-
-    keepSpeed2 = new QRadioButton(tr("Speed"), this);
-    speedGroup->addButton(keepSpeed2);
-    dataControl2Layout->addWidget(keepSpeed2);
-
-    keepCad2 = new QRadioButton(tr("Cadence"), this);
-    cadGroup->addButton(keepCad2);
-    dataControl2Layout->addWidget(keepCad2);
-
-    keepAlt2 = new QRadioButton(tr("Altitude"), this);
-    altGroup->addButton(keepAlt2);
-    dataControl2Layout->addWidget(keepAlt2);
-
-    keepGPS2 = new QRadioButton(tr("GPS"), this);
-    gpsGroup->addButton(keepGPS2);
-    dataControl2Layout->addWidget(keepGPS2);
-
-    mainLayout->addLayout(dataControl2Layout);
-
-    QHBoxLayout *dataControl3Layout = new QHBoxLayout;
-
-    noPower = new QRadioButton(tr("No Power"));
-    powerGroup->addButton(noPower);
-    dataControl3Layout->addWidget(noPower);
-
-    noAltPower = new QRadioButton(tr("No Alt Power"));
-    altPowerGroup->addButton(noAltPower);
-    dataControl3Layout->addWidget(noAltPower);
-
-    noHr = new QRadioButton(tr("No Heart Rate"));
-    hrGroup->addButton(noHr);
-    dataControl3Layout->addWidget(noHr);
-
-    noSpeed = new QRadioButton(tr("No Speed"));
-    speedGroup->addButton(noSpeed);
-    dataControl3Layout->addWidget(noSpeed);
-
-    noCad = new QRadioButton(tr("No Cadence"));
-    cadGroup->addButton(noCad);
-    dataControl3Layout->addWidget(noCad);
-
-    noAlt = new QRadioButton(tr("No Altitude"));
-    altGroup->addButton(noAlt);
-    dataControl3Layout->addWidget(noAlt);
-
-    noGPS = new QRadioButton(tr("No GPS"));
-    gpsGroup->addButton(noGPS);
-    dataControl3Layout->addWidget(noGPS);
-
-    mainLayout->addLayout(dataControl3Layout);
-    setLayout(mainLayout);
-
+    left->setWidget(leftWidget);
+    right->setWidget(rightWidget);
 }
 
 void
 MergeSelect::initializePage()
 {
+    rightName->setText(QString("%1 (%2)").arg(wizard->ride2->startTime().toString("d MMM yy hh:mm:ss"))
+                                         .arg(wizard->ride2->deviceType()));
 
-    const RideFileDataPresent *dataPresent1 = wizard->ride1->ride()->areDataPresent();
-    const RideFileDataPresent *dataPresent2 = wizard->ride2->areDataPresent();
+    // create a checkbox for each series present in 
+    QMapIterator<RideFile::SeriesType, QCheckBox*> i(wizard->leftSeries);
+    while(i.hasNext()) {
+        i.next();
+        delete i.value();
+    }
+    QMapIterator<RideFile::SeriesType, QCheckBox*> j(wizard->rightSeries);
+    while(j.hasNext()) {
+        j.next();
+        delete j.value();
+    }
+    wizard->leftSeries.clear();
+    wizard->rightSeries.clear();
 
-    // Visible
-    if (!dataPresent1->watts && !dataPresent2->watts) {
-        keepPower1->setFixedWidth(0);
-        keepPower2->setFixedWidth(0);
-        noPower->setFixedWidth(0);
-    }
-    if (!dataPresent1->watts || !dataPresent2->watts) {
-        keepAltPower1->setFixedWidth(0);
-        keepAltPower2->setFixedWidth(0);
-        noAltPower->setFixedWidth(0);
-    }
-    if (!dataPresent1->hr && !dataPresent2->hr) {
-        keepHr1->setFixedWidth(0);
-        keepHr2->setFixedWidth(0);
-        noHr->setFixedWidth(0);
-    }
-    if (!dataPresent1->kph && !dataPresent2->kph) {
-        keepSpeed1->setFixedWidth(0);
-        keepSpeed2->setFixedWidth(0);
-        noSpeed->setFixedWidth(0);
-    }
-    if (!dataPresent1->cad && !dataPresent2->cad) {
-        keepCad1->setFixedWidth(0);
-        keepCad2->setFixedWidth(0);
-        noCad->setFixedWidth(0);
-    }
-    if (!dataPresent1->alt && !dataPresent2->alt) {
-        keepAlt1->setFixedWidth(0);
-        keepAlt2->setFixedWidth(0);
-        noAlt->setFixedWidth(0);
-    }
-    if (!dataPresent1->lat && !dataPresent2->lat) {
-        keepGPS1->setFixedWidth(0);
-        keepGPS2->setFixedWidth(0);
-        noGPS->setFixedWidth(0);
-    }
+    // get rid of the stretch
+    leftLayout->takeAt(0);
+    rightLayout->takeAt(0);
 
-    // Initialise
-    if (&dataPresent1 != NULL && wizard->ride1->ride() && wizard->ride1->ride()->deviceType() != QString("Manual CSV")) {
-            keepPower1->setEnabled(dataPresent1->watts);
-            keepPower1->setChecked(dataPresent1->watts);
-            keepHr1->setEnabled(dataPresent1->hr);
-            keepHr1->setChecked(dataPresent1->hr);
-            keepSpeed1->setEnabled(dataPresent1->kph);
-            keepSpeed1->setChecked(dataPresent1->kph);
-            keepCad1->setEnabled(dataPresent1->cad);
-            keepCad1->setChecked(dataPresent1->cad);
-            keepAlt1->setEnabled(dataPresent1->alt);
-            keepAlt1->setChecked(dataPresent1->alt);
-            keepGPS1->setEnabled(dataPresent1->lat);
-            keepGPS1->setChecked(dataPresent1->lat);
+    for(int i=0; i < static_cast<int>(RideFile::none); i++) {
 
-    } else {
-            keepPower1->setEnabled(false);
-            keepHr1->setEnabled(false);
-            keepSpeed1->setEnabled(false);
-            keepCad1->setEnabled(false);
-            keepAlt1->setEnabled(false);
-            keepGPS1->setEnabled(false);
+        // save us casting all the time 
+        RideFile::SeriesType series = static_cast<RideFile::SeriesType>(i);
+
+        // the one thing we don't select !
+        if (series == RideFile::secs) continue;
+
+        bool lefthas = false;
+        if (wizard->ride1->isDataPresent(series)) {
+            lefthas = true;
+
+            QCheckBox *add = new QCheckBox(wizard->ride1->seriesName(series));
+            add->setChecked(true);
+            add->setEnabled(false);
+
+            leftLayout->addWidget(add);
+            wizard->leftSeries.insert(series, add);
+        }
+
+        if (wizard->ride2->isDataPresent(series)) {
+            QCheckBox *add = new QCheckBox(wizard->ride2->seriesName(series));
+            add->setChecked(!lefthas);
+
+            rightLayout->addWidget(add);
+            wizard->rightSeries.insert(series, add);
+
+            connect(add, SIGNAL(stateChanged(int)), this, SLOT(checkboxes()));
+        }
     }
 
+    leftLayout->addStretch();
+    rightLayout->addStretch();
+}
 
+void
+MergeSelect::checkboxes()
+{
+    // as we turn on/off right side checkboxes we need to
+    // turn off/on left side checkboxes
+    QMapIterator<RideFile::SeriesType,QCheckBox*> i(wizard->rightSeries);
+    while(i.hasNext()) {
 
-    if (&dataPresent2 != NULL && wizard->ride2 && wizard->ride2->deviceType() != QString("Manual CSV")) {
-            keepPower2->setEnabled(dataPresent2->watts);
-            keepPower2->setChecked(dataPresent2->watts && !keepPower1->isChecked());
-            keepHr2->setEnabled(dataPresent2->hr);
-            keepHr2->setChecked(dataPresent2->hr && !keepHr1->isChecked());
-            keepSpeed2->setEnabled(dataPresent2->kph);
-            keepSpeed2->setChecked(dataPresent2->kph && !keepSpeed1->isChecked());
-            keepCad2->setEnabled(dataPresent2->cad);
-            keepCad2->setChecked(dataPresent2->cad && !keepCad1->isChecked());
-            keepAlt2->setEnabled(dataPresent2->alt);
-            keepAlt2->setChecked(dataPresent2->alt && !keepAlt1->isChecked());
-            keepGPS2->setEnabled(dataPresent2->lat);
-            keepGPS2->setChecked(dataPresent2->lat && !keepGPS1->isChecked());
-
-    } else {
-            keepPower2->setEnabled(false);
-            keepHr2->setEnabled(false);
-            keepSpeed2->setEnabled(false);
-            keepCad2->setEnabled(false);
-            keepAlt2->setEnabled(false);
-            keepGPS2->setEnabled(false);
+        i.next();
+        QCheckBox *left=NULL;
+        if ((left=wizard->leftSeries.value(i.key(), NULL)) != NULL) {
+            left->setChecked(!i.value()->isChecked());
+        }
     }
-
-    noPower->setChecked(!keepPower1->isChecked() && !keepPower2->isChecked());
-    noAltPower->setChecked(!keepAltPower1->isChecked() && !keepAltPower2->isChecked());
-    noHr->setChecked(!keepHr1->isChecked() && !keepHr2->isChecked());
-    noSpeed->setChecked(!keepSpeed1->isChecked() && !keepSpeed2->isChecked());
-    noCad->setChecked(!keepCad1->isChecked() && !keepCad2->isChecked());
-    noAlt->setChecked(!keepAlt1->isChecked() && !keepAlt2->isChecked());
-    noGPS->setChecked(!keepGPS1->isChecked() && !keepGPS2->isChecked());
 }
 
 MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Confirm"));
-    setSubTitle(tr("Combine activities"));
+    setSubTitle(tr("Complete and Save"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
+
+    QLabel *label = new QLabel(tr("Press Finish to update the current ride with "
+                               " the combined data.\n\n"
+                               "The changes will not be saved until you save them "
+                               " so you can check and revert or save.\n\n"
+                               "If you continue the ride will be updated, if you "
+                               "do not want to continue either go back and change "
+                               "the settings or press cancel to abort."));
+    label->setWordWrap(true);
+
+    layout->addWidget(label);
     layout->addStretch();
 }
 
 bool
 MergeConfirm::validatePage()
 {
-    // LETS DO IT NOW!
-    QChar zero = QLatin1Char ( '0' );
-
-    //--------------------------------------
-    // STEP 1 : copy the second file as backup
-    //--------------------------------------
-
-
-    // Setup the ridetime as a QDateTime
-    /*QDateTime ridedatetime2 = ride2->startTime();
-    QString suffix2 = QFileInfo(file2->fileName()).suffix();
-
-    QString targetnosuffix2 = QString ( "%1_%2_%3_%4_%5_%6" )
-                               .arg ( ridedatetime2.date().year(), 4, 10, zero )
-                               .arg ( ridedatetime2.date().month(), 2, 10, zero )
-                               .arg ( ridedatetime2.date().day(), 2, 10, zero )
-                               .arg ( ridedatetime2.time().hour(), 2, 10, zero )
-                               .arg ( ridedatetime2.time().minute(), 2, 10, zero )
-                               .arg ( ridedatetime2.time().second(), 2, 10, zero );
-
-    QString target2 = QString ("%1.%2" )
-                           .arg ( targetnosuffix2 )
-                           .arg ( suffix2 );
-    QString fulltarget2 = ride1->path + "/" + target2 + ".bak";
-
-    file2->copy(fulltarget2);*/
-
-    //--------------------------------------
-    // STEP 2 : rename the first file as backup
-    //--------------------------------------
-    QFile   currentFile(wizard->ride1->path + QDir::separator() + wizard->ride1->fileName);
-    QFile   savedFile;
-
-    // rename as backup current
-    currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
-
-
-    //--------------------------------------
-    // STEP 3 : merge files
-    //--------------------------------------
-    RideItem *ride1 = wizard->ride1;
-    RideFile *ride2 = wizard->ride2;
-    //qDebug() << "- ride 1 : " << ride1->ride()->dataPoints().count() << " points\n";
-    //qDebug() << "- ride 2 : " << ride2->dataPoints().count() << " points\n";
-#if 0
-    if (wizard->mergeSelect->keepPower2->isChecked())
-       ride1->ride()->setDataPresent(RideFile::watts, true);
-    if (wizard->mergeSelect->keepSpeed2->isChecked())
-       ride1->ride()->setDataPresent(RideFile::kph, true);
-    if (wizard->mergeSelect->keepHr2->isChecked())
-       ride1->ride()->setDataPresent(RideFile::hr, true);
-    if (wizard->mergeSelect->keepCad2->isChecked())
-       ride1->ride()->setDataPresent(RideFile::cad, true);
-    if (wizard->mergeSelect->keepAlt2->isChecked())
-       ride1->ride()->setDataPresent(RideFile::alt, true);
-    if (wizard->mergeSelect->keepGPS2->isChecked()) {
-       ride1->ride()->setDataPresent(RideFile::lon, true);
-       ride1->ride()->setDataPresent(RideFile::lat, true);
-    }
-
-    if (wizard->mergeSelect->noPower->isChecked())
-       ride1->ride()->setDataPresent(RideFile::watts, false);
-    if (wizard->mergeSelect->noSpeed->isChecked())
-       ride1->ride()->setDataPresent(RideFile::kph, false);
-    if (wizard->mergeSelect->noHr->isChecked())
-       ride1->ride()->setDataPresent(RideFile::hr, false);
-    if (wizard->mergeSelect->noCad->isChecked())
-       ride1->ride()->setDataPresent(RideFile::cad, false);
-    if (wizard->mergeSelect->noAlt->isChecked())
-       ride1->ride()->setDataPresent(RideFile::alt, false);
-    if (wizard->mergeSelect->noGPS->isChecked()) {
-       ride1->ride()->setDataPresent(RideFile::lon, false);
-       ride1->ride()->setDataPresent(RideFile::lat, false);
-    }
-#endif
-    //int i = 0;
-    int k = 0;
-
-    double previousSecs1 = -1;
-    double previousSecs2 = -1;
-    foreach (RideFilePoint *point, ride1->ride()->dataPoints()) {
-        double secs = point->secs;
-
-        RideFilePoint *point3 = new RideFilePoint();
-        point3->watts = 0;
-        point3->kph = 0;
-        point3->hr = 0;
-        point3->cad = 0;
-        point3->alt = 0;
-        point3->lon = 0;
-        point3->lat = 0;
-
-        // Manage delay
-        if ( wizard->delay>=0) {
-            while ((k <  ride2->dataPoints().count()) && (ride2->dataPoints().at(k)->secs < wizard->delay)) {
-                previousSecs2 = ride2->dataPoints().at(k)->secs;
-                k++;
-            }
-        } else {
-            if (secs < -wizard->delay)
-                continue;
-        }
-        // Manage end
-        if ( wizard->stop<0) {
-            if (point->secs>-wizard->stop)
-                break;
-        }
-
-        // current point
-        RideFilePoint *point2 = NULL;
-        while ((k <  ride2->dataPoints().count()) && (ride2->dataPoints().at(k)->secs <= secs+wizard->delay)) {
-            // current point
-            point2 = ride2->dataPoints().at(k) ;
-            double pond = (point2->secs-previousSecs2)/(secs-previousSecs1);
-
-            point3->watts += pond * point2->watts;
-            point3->kph += pond * point2->kph;
-            point3->hr += pond * point2->hr;
-            point3->cad += pond * point2->cad;
-            point3->alt += pond * point2->alt;
-            point3->lon += pond * point2->lon;
-            point3->lat += pond * point2->lat;
-
-            previousSecs2 = ride2->dataPoints().at(k)->secs;
-
-            k++;
-        }
-        // next point contribution
-        if (k <  ride2->dataPoints().count() && previousSecs2 < secs+wizard->delay) {
-            // next point
-            RideFilePoint *nextpoint2 = ride2->dataPoints().at(k) ;
-            double pond = (secs+wizard->delay-previousSecs2)/(secs-previousSecs1);
-
-            point3->watts += pond * nextpoint2->watts;
-            point3->kph += pond * nextpoint2->kph;
-            point3->hr += pond * nextpoint2->hr;
-            point3->cad += pond * nextpoint2->cad;
-            point3->alt += pond * nextpoint2->alt;
-            point3->lon += pond * nextpoint2->lon;
-            point3->lat += pond * nextpoint2->lat;
-
-            previousSecs2 = secs+wizard->delay;
-        }
-
-#if 0
-        if (wizard->mergeSelect->keepPower2->isChecked()) {
-           //qDebug() << "- watts : " << point->watts  << "-" << ((point2 && point2 != NULL)?point2->watts:0)  << "-" << point3->watts;
-           point->watts = point3->watts;
-        }
-
-        if (wizard->mergeSelect->keepSpeed2->isChecked()) {
-           //qDebug() << "- kph : " << point->kph  << "-" << point3->kph;
-           point->kph = point3->kph;
-        }
-
-        if (wizard->mergeSelect->keepHr2->isChecked()) {
-           //qDebug() << "- hr : " << point->hr  << "-" << point3->hr;
-           point->hr = point3->hr;
-        }
-
-        if (wizard->mergeSelect->keepCad2->isChecked()) {
-           //qDebug() << "- cad : " << point->cad  << "-" << point3->cad;
-           point->cad = point3->cad;
-        }
-
-        if (wizard->mergeSelect->keepAlt2->isChecked()) {
-           //qDebug() << "- alt : " << point->alt  << "-" << point3->alt;
-           point->alt = point3->alt;
-        }
-
-        if (wizard->mergeSelect->keepGPS2->isChecked()) {
-           //qDebug() << "- lat : " << point->lat  << "-" << point3->lat;
-           //qDebug() << "- lon : " << point->lon  << "-" << point3->lon;
-           point->lat = point3->lat;
-           point->lon = point3->lon;
-        }
-#endif
-
-        previousSecs1 = secs;
-    }
-
-
-    //--------------------------------------
-    // STEP 4 : save the new (merged) file
-    //--------------------------------------
-
-    // Has the date/time changed?
-    QDateTime ridedatetime = ride1->ride()->startTime();
-    QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
-                               .arg ( ridedatetime.date().year(), 4, 10, zero )
-                               .arg ( ridedatetime.date().month(), 2, 10, zero )
-                               .arg ( ridedatetime.date().day(), 2, 10, zero )
-                               .arg ( ridedatetime.time().hour(), 2, 10, zero )
-                               .arg ( ridedatetime.time().minute(), 2, 10, zero )
-                               .arg ( ridedatetime.time().second(), 2, 10, zero );
-
-    savedFile.setFileName(ride1->path + QDir::separator() + targetnosuffix + ".json");
-
-    // save in GC format
-    JsonFileReader reader;
-    reader.writeRideFile(wizard->context, ride1->ride(), savedFile);
-    ride1->setFileName(QFileInfo(savedFile).canonicalPath(), QFileInfo(savedFile).fileName());
-
-
-    // We are done
+    // We are done -- update BUT DOESNT SAVE
+    //                user can now check !
+    wizard->current->setRide(wizard->combined);
+    wizard->context->notifyRideDirty();
     return true;
 }

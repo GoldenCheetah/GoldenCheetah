@@ -1286,7 +1286,7 @@ AllPlotWindow::rideSelected()
         setIsBlank(false);
 
     // we already plotted it!
-    if (ride == current && stale == false) return;
+    if (!ride->isDirty() && ride == current && stale == false) return;
 
     // ok, its now the current ride
     current = ride;

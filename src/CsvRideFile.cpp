@@ -30,6 +30,15 @@ static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "csv","Comma-Separated Values", new CsvFileReader());
 
+static QDate moxyDate(QString date)
+{
+    QStringList parts = date.split("-");
+    if (parts.count() == 2) {
+        return QDate(QDate::currentDate().year(), parts[0].toInt(), parts[1].toInt());
+    }
+    return QDate::currentDate();
+}
+
 static int moxySeconds(QString time)
 {
     int seconds = 0;
@@ -334,6 +343,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // there will be gaps when recording drops so shouldn't
                     // assume it is a continuous stream
                     double seconds = moxySeconds(line.section(',',1,1));
+
+                    if (startTime == QDateTime()) {
+                        QDate date = moxyDate(line.section(',',0,0));
+                        QTime time = QTime(0,0,0).addSecs(seconds);
+                        startTime = QDateTime(date,time);
+                    }
 
                     if (seconds >0) {
                         minutes = seconds / 60.0f;

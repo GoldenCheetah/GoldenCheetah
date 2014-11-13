@@ -87,6 +87,7 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
 
         void setDirty(bool);
         bool isDirty() { return isdirty; }
+        void setRide(RideFile *);
         void setFileName(QString, QString);
         void setStartTime(QDateTime);
         void freeMemory();

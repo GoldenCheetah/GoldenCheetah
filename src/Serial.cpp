@@ -88,11 +88,11 @@ Serial::open(QString &err)
     int flags = fcntl(fd, F_GETFL, 0);
     if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
         perror("fcntl");
-        assert(0);
+        return false;
     }
     if (tcgetattr(fd, &tty) == -1) {
         perror("tcgetattr");
-        assert(0);
+        return false;
     }
     tty.c_cflag &= ~CRTSCTS; /* no hardware flow control */
     tty.c_cflag &= ~(PARENB | PARODD); /* no parity */
@@ -102,7 +102,7 @@ Serial::open(QString &err)
     tty.c_cflag |= CLOCAL | CREAD; /* ignore modem control lines */
     if (cfsetspeed(&tty, B9600) == -1) {
         perror("cfsetspeed");
-        assert(0);
+        return false;
     }
     tty.c_iflag = IGNBRK; /* ignore BREAK condition on input */
     tty.c_lflag = 0;
@@ -110,7 +110,7 @@ Serial::open(QString &err)
     tty.c_cc[VMIN] = 1; /* all reads return at least one character */
     if (tcsetattr(fd, TCSANOW, &tty) == -1) {
         perror("tcsetattr");
-        assert(0);
+        return false;
     }
     tcflush(fd, TCIOFLUSH); // clear out the garbage
     return true;
