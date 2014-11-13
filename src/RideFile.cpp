@@ -827,13 +827,13 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 
 void RideFile::appendPoint(const RideFilePoint &point)
 {
-    dataPoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,
-                                         point.nm,point.watts,point.alt,point.lon,point.lat,
-                                         point.headwind, point.slope, point.temp, point.lrbalance,
-                                         point.lte, point.rte, point.lps, point.rps,
-                                         point.smo2, point.thb,
-                                         point.rvert, point.rcad, point.rcontact,
-                                         point.interval));
+    appendPoint(point.secs,point.cad,point.hr,point.km,point.kph,
+                point.nm,point.watts,point.alt,point.lon,point.lat,
+                point.headwind, point.slope, point.temp, point.lrbalance,
+                point.lte, point.rte, point.lps, point.rps,
+                point.smo2, point.thb,
+                point.rvert, point.rcad, point.rcontact,
+                point.interval);
 }
 
 void
@@ -1730,131 +1730,191 @@ RideFile::recalculateDerivedSeries()
 RideFile *
 RideFile::resample(double newRecIntSecs, int interpolate)
 {
-    QMap<SeriesType, QwtSpline *> splines;
 
-    // we remember the last point in time with data 
-    double last = 0;
+    // resample if interval has changed
+    if (newRecIntSecs != recIntSecs()) {
 
-    // create a spline for every series present in the ridefile
-    for(int i=0; i < static_cast<int>(none); i++) {
+        QMap<SeriesType, QwtSpline *> splines;
 
-        // save us casting all the time 
-        SeriesType series = static_cast<SeriesType>(i);
+        // we remember the last point in time with data 
+        double last = 0;
 
-        if (series == secs) continue; // don't resample that !
+        // create a spline for every series present in the ridefile
+        for(int i=0; i < static_cast<int>(none); i++) {
 
-        // create a spline if its in the file
-        if (isDataPresent(series)) {
+            // save us casting all the time 
+            SeriesType series = static_cast<SeriesType>(i);
 
-            // collect the x,y points; x=time, y=series
-            QVector<QPointF> points;
+            if (series == secs) continue; // don't resample that !
 
-            double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
-            bool first = true;
-            RideFilePoint *lp=NULL;
+            // create a spline if its in the file
+            if (isDataPresent(series)) {
 
-            foreach(RideFilePoint *p, dataPoints()) {
+                // collect the x,y points; x=time, y=series
+                QVector<QPointF> points;
 
-                // yuck! nasty data -- ignore it
-                if (p->secs > (25*60*60)) continue;
+                double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
+                bool first = true;
+                RideFilePoint *lp=NULL;
 
-                // always start at 0 seconds
-                if (first) {
-                    offset = p->secs;
-                    first = false;
-                }
+                foreach(RideFilePoint *p, dataPoints()) {
 
-                // fill gaps in recording with zeroes
-                if (lp) {
+                    // yuck! nasty data -- ignore it
+                    if (p->secs > (25*60*60)) continue;
 
-                    // fill with zeroes
-                    for(double t=lp->secs+recIntSecs();
-                               (t + recIntSecs()) < p->secs;
-                               t += recIntSecs()) {
-                        points << QPointF(t-offset, 0);
+                    // always start at 0 seconds
+                    if (first) {
+                        offset = p->secs;
+                        first = false;
                     }
+
+                    // fill gaps in recording with zeroes
+                    if (lp) {
+
+                        // fill with zeroes
+                        for(double t=lp->secs+recIntSecs();
+                                (t + recIntSecs()) < p->secs;
+                                t += recIntSecs()) {
+                            points << QPointF(t-offset, 0);
+                        }
+                    }
+
+                    // lets not go backwards -- or two sampls at the same time
+                    if ((lp && p->secs > lp->secs) || !lp) {
+                        points << QPointF(p->secs - offset, p->value(series));
+                        last = p->secs-offset;
+                    }
+
+                    // moving on to next sample
+                    lp = p;
                 }
 
-                // lets not go backwards -- or two sampls at the same time
-                if ((lp && p->secs > lp->secs) || !lp) {
-                    points << QPointF(p->secs - offset, p->value(series));
-                    last = p->secs-offset;
-                }
-
-                // moving on to next sample
-                lp = p;
+                // Now create a spline with the values we've cleaned
+                QwtSpline *spline = new QwtSpline();
+                spline->setSplineType(QwtSpline::Periodic);
+                spline->setPoints(QPolygonF(points));
+                splines.insert(series,spline);
             }
-
-            // Now create a spline with the values we've cleaned
-            QwtSpline *spline = new QwtSpline();
-            spline->setSplineType(QwtSpline::Periodic);
-            spline->setPoints(QPolygonF(points));
-            splines.insert(series,spline);
         }
-    }
 
-    // no data to resample
-    if (splines.count() == 0 || last == 0) return NULL;
+        // no data to resample
+        if (splines.count() == 0 || last == 0) return NULL;
 
-    // we have a bunch of splines so lets add resampled
-    // data points to a clone of the current ride (ie. we
-    // need to update a copy of this ride, not update it
-    // directly)
-    RideFile *returning = new RideFile(this);
-    returning->setRecIntSecs(newRecIntSecs);
-    returning->setDataPresent(secs, true);
+        // we have a bunch of splines so lets add resampled
+        // data points to a clone of the current ride (ie. we
+        // need to update a copy of this ride, not update it
+        // directly)
+        RideFile *returning = new RideFile(this);
+        returning->setRecIntSecs(newRecIntSecs);
+        returning->setDataPresent(secs, true);
 
-    RideFilePoint lp;
-    for (double seconds = 0.0f; seconds < (last-newRecIntSecs); seconds += newRecIntSecs) {
+        RideFilePoint lp;
+        for (double seconds = 0.0f; seconds < (last-newRecIntSecs); seconds += newRecIntSecs) {
 
-        RideFilePoint p;
-        p.secs = seconds;
+            RideFilePoint p;
+            p.secs = seconds;
 
-        // for each spline get the value for point secs
+            // for each spline get the value for point secs
+            QMapIterator<SeriesType, QwtSpline *> iterator(splines);
+            while (iterator.hasNext()) {
+                iterator.next();
+
+                SeriesType series = iterator.key();
+                QwtSpline *spline = iterator.value();
+
+                double sum = 0;
+                for (double i=0; i<1; i+= 0.25) {
+                    double dt = seconds + (newRecIntSecs * i);
+                    double dtn = seconds + (newRecIntSecs * (i+0.25f));
+                    sum += (spline->value(dt) + spline->value(dtn)) /2.0f;
+                }
+                sum /= 4.0f;
+
+                // round to the appropriate decimal places
+                double rounded = 0.0f;
+                if (decimalsFor(series) > 0)
+                    rounded = QString("%1").arg(sum, 15, 'g', decimalsFor(series)).toDouble();
+                else
+                    rounded = qRound(sum);
+
+                // don't go backwards for distance !
+                if (series == km && rounded < lp.km)
+                    p.setValue(series, lp.km);
+                else
+                    p.setValue(series, rounded);
+
+                // make sure we get to see it !
+                returning->setDataPresent(series, true);
+            }
+            returning->appendPoint(p);
+
+            // remember last point
+            lp = p;
+        }
+
+        // clean up and return
+        // wipe away any splines created
         QMapIterator<SeriesType, QwtSpline *> iterator(splines);
         while (iterator.hasNext()) {
             iterator.next();
-
-            SeriesType series = iterator.key();
-            QwtSpline *spline = iterator.value();
-
-            double sum = 0;
-            for (double i=0; i<1; i+= 0.25) {
-                double dt = seconds + (newRecIntSecs * i);
-                double dtn = seconds + (newRecIntSecs * (i+0.25f));
-                sum += (spline->value(dt) + spline->value(dtn)) /2.0f;
-            }
-            sum /= 4.0f;
-
-            // round to the appropriate decimal places
-            double rounded = 0.0f;
-            if (decimalsFor(series) > 0)
-                rounded = QString("%1").arg(sum, 15, 'g', decimalsFor(series)).toDouble();
-            else
-                rounded = qRound(sum);
-
-            // don't go backwards for distance !
-            if (series == km && rounded < lp.km)
-                p.setValue(series, lp.km);
-            else
-                p.setValue(series, rounded);
-
-            // make sure we get to see it !
-            returning->setDataPresent(series, true);
+            delete iterator.value();
         }
-        returning->appendPoint(p);
 
-        // remember last point
-        lp = p;
+        return returning;
+
+    } else {
+
+        // not resampling but cloning a working copy
+        // and removing gaps in recording
+        RideFile *returning = new RideFile(this);
+        returning->setDataPresent(secs, true);
+
+        // now clone the data points with gaps filled
+        double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
+        bool first = true;
+        RideFilePoint *lp=NULL;
+
+        foreach(RideFilePoint *p, dataPoints()) {
+
+            // yuck! nasty data -- ignore it
+            if (p->secs > (25*60*60)) continue;
+
+            // always start at 0 seconds
+            if (first) {
+                offset = p->secs;
+                first = false;
+            }
+
+            // fill gaps in recording with zeroes
+            if (lp) {
+
+                // fill with zeroes
+                for(double t=lp->secs+recIntSecs();
+                        (t + recIntSecs()) < p->secs;
+                        t += recIntSecs()) {
+
+                    RideFilePoint add;
+                    add.km = lp->km;
+                    add.secs = t;
+
+                    returning->appendPoint(add);
+                }
+            }
+
+            // lets not go backwards -- or two sampls at the same time
+            // but essentially just copying the data
+            if ((lp && p->secs > lp->secs) || !lp) {
+
+                RideFilePoint add;
+                add = *p;
+                add.secs -= offset;
+                returning->appendPoint(add);
+            }
+
+            // moving on to next sample
+            lp = p;
+        }
+
+        return returning;
     }
-
-    // clean up and return
-    // wipe away any splines created
-    QMapIterator<SeriesType, QwtSpline *> iterator(splines);
-    while (iterator.hasNext()) {
-        iterator.next();
-        delete iterator.value();
-    }
-
-    return returning;
 }

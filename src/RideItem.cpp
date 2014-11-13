@@ -64,6 +64,16 @@ RideFile *RideItem::ride(bool open)
 }
 
 void
+RideItem::setRide(RideFile *overwrite)
+{
+    RideFile *old = ride_;
+    ride_ = overwrite; // overwrite
+    setDirty(true);
+    notifyRideDataChanged();
+    delete old; // now wipe it once referrers had chance to change
+}
+
+void
 RideItem::notifyRideDataChanged()
 {
     emit rideDataChanged();
