@@ -227,6 +227,11 @@ macx {
 #the Dwmapi.h header then uncomment this line
 #DEFINES += GC_HAVE_DWM
 
+#if you want to build the intervals view, which is being
+#developed ahead of release 3.2, but will not be included
+#in the current release uncomment below
+#DEFINES += GC_HAVE_INTERVALS
+
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
 #DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
