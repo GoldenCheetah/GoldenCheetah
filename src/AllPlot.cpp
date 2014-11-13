@@ -1907,7 +1907,7 @@ AllPlot::recalc(AllPlotObject *objects)
     }
 
     // and now set data series which MUST not be smoothed AT ALL (e.g. gear ratio)
-    objects->smoothGear.resize(0);
+    objects->smoothGear.resize(rideTimeSecs + 1);
     foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
         objects->smoothGear.append(dp->gear);
     }
