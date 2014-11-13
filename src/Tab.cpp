@@ -78,6 +78,7 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     trainView = new TrainView(context, trainControls);
     views->addWidget(trainView);
 
+#ifdef GC_HAVE_INTERVALS
     // Interval
     intervalControls = new QStackedWidget(this);
     intervalControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
@@ -86,6 +87,7 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     masterControls->addWidget(intervalControls);
     intervalView = new IntervalView(context, intervalControls);
     views->addWidget(intervalView);
+#endif
 
     // the dialog box for the chart settings
     chartSettings = new ChartSettings(this, masterControls);
@@ -130,13 +132,17 @@ Tab::close()
     homeView->saveState();
     trainView->saveState();
     diaryView->saveState();
+#ifdef GC_HAVE_INTERVALS
     intervalView->saveState();
+#endif
 
     analysisView->close();
     homeView->close();
     trainView->close();
     diaryView->close();
+#ifdef GC_HAVE_INTERVALS
     intervalView->close();
+#endif
 }
 
 /******************************************************************************
@@ -162,7 +168,9 @@ void Tab::setRide(RideItem*ride)
     homeView->setRide(ride);
     trainView->setRide(ride);
     diaryView->setRide(ride);
+#ifdef GC_HAVE_INTERVALS
     intervalView->setRide(ride);
+#endif
 }
 
 TabView *
@@ -174,7 +182,9 @@ Tab::view(int index)
         case 1 : return analysisView;
         case 2 : return diaryView;
         case 3 : return trainView;
+#ifdef GC_HAVE_INTERVALS
         case 4 : return intervalView;
+#endif
     }
 }
 
