@@ -3035,6 +3035,10 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wattsd;s.two = RideFile::none; serieslist << s; }
     if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hr; s.two = RideFile::none; serieslist << s; }
     if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hrd; s.two = RideFile::none; serieslist << s; }
+    if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
+    if (showtHb->isChecked() && rideItem->ride()->areDataPresent()->thb) { s.one = RideFile::thb; s.two = RideFile::none; serieslist << s; }
+    if (showO2Hb->isChecked() && rideItem->ride()->areDataPresent()->o2hb) { s.one = RideFile::o2hb; s.two = RideFile::none; serieslist << s; }
+    if (showHHb->isChecked() && rideItem->ride()->areDataPresent()->hhb) { s.one = RideFile::hhb; s.two = RideFile::none; serieslist << s; }
     if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) { s.one = RideFile::kph; s.two = RideFile::none; serieslist << s; }
     if (showAccel->isChecked() && rideItem->ride()->areDataPresent()->kph) { s.one = RideFile::kphd; s.two = RideFile::none; serieslist << s; }
     if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) { s.one = RideFile::cad; s.two = RideFile::none; serieslist << s; }
@@ -3051,10 +3055,6 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showRCad->isChecked() && rideItem->ride()->areDataPresent()->rcad) { s.one = RideFile::rcad; s.two = RideFile::none; serieslist << s; }
     if (showRGCT->isChecked() && rideItem->ride()->areDataPresent()->rcontact) { s.one = RideFile::rcontact; s.two = RideFile::none; serieslist << s; }
     if (showGear->isChecked() && rideItem->ride()->areDataPresent()->gear) { s.one = RideFile::gear; s.two = RideFile::none; serieslist << s; }
-    if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
-    if (showtHb->isChecked() && rideItem->ride()->areDataPresent()->thb) { s.one = RideFile::thb; s.two = RideFile::none; serieslist << s; }
-    if (showO2Hb->isChecked() && rideItem->ride()->areDataPresent()->o2hb) { s.one = RideFile::o2hb; s.two = RideFile::none; serieslist << s; }
-    if (showHHb->isChecked() && rideItem->ride()->areDataPresent()->hhb) { s.one = RideFile::hhb; s.two = RideFile::none; serieslist << s; }
     if (showATISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::aTISS; s.two = RideFile::none; serieslist << s; }
     if (showANTISS->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::anTISS; s.two = RideFile::none; serieslist << s; }
     if (showXP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::xPower; s.two = RideFile::none; serieslist << s; }

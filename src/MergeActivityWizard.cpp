@@ -21,6 +21,16 @@
 #include "Context.h"
 #include "MainWindow.h"
 
+// minimum R-squared fit when trying to find offsets to
+// merge ride files. Lower numbers mean happier to take
+// and answer that is less likely to be correct, but then
+// its possibly better than nothing !
+//
+// I have found that with real world data, where no data
+// has been resampled then fits >0.8 are usual 
+// We always use the best fit anyway, this is just to
+// decide what to discard as not valuable
+static const double MINIMUM_R2_FIT = 0.75f; 
 /*----------------------------------------------------------------------
  *
  * Page Flow Summary
@@ -98,11 +108,153 @@ void
 MergeActivityWizard::analyse()
 {
     // looking at the paramters determine the offset
-    // to be used by both rides XXX not written yet !
+    // default to align left if all else fails !
+    offset1 = offset2 = 0;
 
-    // XXX just make em start together for now !
-    offset1=0;
-    offset2=0;
+    switch(strategy) {
+
+    case 0: // align on the time of day
+            // assumes the recording devices have
+            // a clock that is well synchronised
+    {
+            double diff = ride1->startTime().toMSecsSinceEpoch() - ride2->startTime().toMSecsSinceEpoch();
+            int samples = (diff/recIntSecs)/1000.0f;
+
+            if (samples < 0) { // ride2 was later than ride 1
+                offset2 = abs(samples);
+                offset1 = 0;
+            } else { // ride1 was later than ride 2
+                offset1 = samples;
+                offset2 = 0;
+            }
+
+            // but wait, is that too long ?
+            if (offset1 > ride1->dataPoints().count() ||
+                offset2 > ride2->dataPoints().count()) {
+
+                // fallback to align same time
+                offset1 = offset2 = 0;
+            }
+            //qDebug()<<"clocks make ride1 offset="<<offset1<<"and ride2 offset="<<offset2;
+
+    }
+            break;
+
+    case 1: // align on shared series
+            // using a shotgun algorithm
+    {
+            // calculate the R2 fit using the current offset
+            // for the first shared series
+            RideFile *base = ride1;
+            RideFile *fit = ride2;
+
+            // always fit smaller to larger
+            int diff = ride1->dataPoints().count() - ride2->dataPoints().count();
+            if (diff < 0) { // ride2 has more points
+                base=ride2;
+                fit= ride1;
+            } else { // ride1 has more points
+                base=ride1;
+                fit=ride2;
+            }
+
+            double bestFit=0.0;
+            int offsetFit=0;
+            RideFile::SeriesType bestSeries=RideFile::none;
+
+            QMapIterator<RideFile::SeriesType, QCheckBox *> i(rightSeries);
+            while(i.hasNext()) {
+                i.next();
+                if (i.key() != RideFile::km && leftSeries.value(i.key(), NULL) != NULL) {
+
+                    // for each shared series look for best fit
+                    RideFile::SeriesType shared = i.key();
+
+                    double bestR2 = 0.0f;
+                    int bestOffset = 0;
+
+                    // no more than shifting by a third of the ride backwards or forwards
+                    for(int offset=-1 * (base->dataPoints().count()/3); 
+                            offset<base->dataPoints().count()/3; 
+                            offset++) {
+
+                        double SStot=0.0f, SSres=0.0f;
+                        double mean =0.0f;
+                        int count=0;
+
+                        for(int i=0; (i+offset)<base->dataPoints().count(); i++) {
+                            if ((i+offset)>0) {
+                                mean += base->dataPoints()[i+offset]->value(shared);
+                            }
+                            count++;
+                        }
+                        mean /= double(count);
+                
+                        for(int i=0; (i+offset)<base->dataPoints().count() && i<fit->dataPoints().count(); i++) {
+                            if((i+offset)>0) {
+                                SSres += pow(base->dataPoints()[i+offset]->value(shared) - fit->dataPoints()[i]->value(shared), 2);
+                                SStot += pow(base->dataPoints()[i+offset]->value(shared) - mean, 2);
+                            }
+                        }
+
+                        double R2= 1.0f - (SSres/SStot);
+                        if (R2 > bestR2) {
+                            bestR2= R2;
+                            bestOffset=offset;
+                        }
+                    }
+
+                    // is this a better fit ?
+                    if (bestR2 > bestFit) {
+                        bestFit=bestR2;
+                        offsetFit=bestOffset;
+                        bestSeries=shared;
+                        Q_UNUSED(bestSeries); // shutup compiler when qDebugs commented out below
+                    }
+                    //qDebug()<<"best R2="<<bestR2<<"at best offset"<<bestOffset<<"with series"<<fit->seriesName(shared);
+                }
+            }
+            //qDebug()<<"THEREFORE: best R2="<<bestFit<<"at best offset"<<offsetFit<<"with series"<<ride1->seriesName(bestSeries);
+
+            // so lets turn that into an offset for ride1 and ride2
+            if (bestFit > MINIMUM_R2_FIT) {
+                if (diff <0) { // ride2 was the base
+                    if (offsetFit<0) {
+                        offset2=offsetFit * -1;
+                        offset1=0;
+                    } else {
+                        offset1=offsetFit;
+                        offset2=0;
+                    }
+                } else {
+                    if (offsetFit<0) {
+                        offset1=offsetFit * -1;
+                        offset2=0;
+                    } else {
+                        offset2=offsetFit;
+                        offset1=0;
+                    }
+                }
+            }
+    }
+            break;
+
+    case 2: // align begin
+            offset1=0;
+            offset2=0;
+            break;
+
+    case 3: // align end
+            int offset = ride1->dataPoints().count() - ride2->dataPoints().count();
+            if (offset < 0) {
+                offset1 = abs(offset);
+                offset2 = 0;
+            } else {
+                offset2 = abs(offset);
+                offset1 = 0;
+            }
+            break;
+    }
 }
 
 void 
@@ -111,14 +263,15 @@ MergeActivityWizard::combine()
     // zap whatever we have
     if (combined) delete combined;
 
+    // and build a new one
+    combined = new RideFile(ride1);
+
     // create a combined ride applying the parameters
     // from the wizard for join or merge
 
     if (mode == 1) { // JOIN
 
         // easy peasy -- loop through one then the other !
-        combined = new RideFile(ride1);
-
         RideFilePoint *lp = NULL;
 
         foreach(RideFilePoint *p, ride1->dataPoints()) {
@@ -171,6 +324,68 @@ MergeActivityWizard::combine()
 
     } else { // MERGE
 
+        RideFilePoint last;
+
+        for (int i=0; i<ride1->dataPoints().count() + offset1 ||
+                      i<ride2->dataPoints().count() + offset2; i++) {
+
+            // fresh point
+            RideFilePoint add;
+            add.secs = i * recIntSecs;
+            add.km = last.km; // if not getting copied at least stay in same place!
+
+            // fold in ride 1 values
+            if (offset1 <= i && i < ride1->dataPoints().count()+offset1) {
+
+                RideFilePoint source = *(ride1->dataPoints()[i-offset1]);
+   
+                // copy across the data we want
+                QMapIterator<RideFile::SeriesType,QCheckBox*> i(leftSeries);
+                while(i.hasNext()) {
+                    i.next();
+                    // we want this series !
+                    if (i.value()->isChecked()) {
+                        add.setValue(i.key(), source.value(i.key()));
+                    }
+                }
+            }
+
+            // fold in ride 2 values
+            if (offset2 <= i && i < ride2->dataPoints().count()+offset2) {
+
+                RideFilePoint source = *(ride2->dataPoints()[i-offset2]);
+   
+                // copy across the data we want
+                QMapIterator<RideFile::SeriesType,QCheckBox*> i(rightSeries);
+                while(i.hasNext()) {
+                    i.next();
+                    // we want this series !
+                    if (i.value()->isChecked()) {
+                        add.setValue(i.key(), source.value(i.key()));
+                    }
+                }
+            }
+
+            combined->appendPoint(add);
+            last = add;
+        }
+
+        // now realign the intervals, first we need to
+        // clear what we already have in combined
+        combined->clearIntervals();
+
+        // run through what we got then
+        foreach(RideFileInterval interval, ride1->intervals()) {
+            combined->addInterval(interval.start + offset1,
+                                  interval.stop + offset1, 
+                                  interval.name);
+        }
+        // run through what we got then
+        foreach(RideFileInterval interval, ride2->intervals()) {
+            combined->addInterval(interval.start + offset2,
+                                  interval.stop + offset2, 
+                                  interval.name);
+        }
     }
 }
 
@@ -622,12 +837,12 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
 void
 MergeStrategy::initializePage()
 {
-    // are there any shared data ????
+    // are there any shared data -- ignoring time and distance
     bool hasShared = false;
     QMapIterator<RideFile::SeriesType, QCheckBox *> i(wizard->rightSeries);
     while(i.hasNext()) {
         i.next();
-        if (wizard->leftSeries.value(i.key(), NULL) != NULL)
+        if (i.key() != RideFile::km && wizard->leftSeries.value(i.key(), NULL) != NULL)
             hasShared = true;
     }
     shared->setEnabled(hasShared);
