@@ -127,7 +127,7 @@ DownloadRideDialog::scanCommPorts()
 
     QString err;
     devList = CommPort::listCommPorts(err);
-    if (err != "") {
+    if (err != "" && !embedded) {
         QString msg = tr("Warning(s):\n\n") + err + tr("\n\nYou may need to (re)install "
             "the FTDI or PL2303 drivers before downloading.");
         QMessageBox::warning(0, tr("Error Loading Device Drivers"), msg,

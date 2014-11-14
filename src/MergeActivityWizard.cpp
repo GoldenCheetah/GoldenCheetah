@@ -54,7 +54,7 @@ static const double MINIMUM_R2_FIT = 0.75f;
 
 MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->mainWindow), context(context)
 {
-#ifdef Q_OS_MAX
+#ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
 #endif
     setWindowTitle(tr("Combine Activities"));
@@ -881,19 +881,39 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     setTitle(tr("Adjust Alignment"));
     setSubTitle(tr("Adjust merge alignment in time"));
 
+    // need more space on this page!
+    setContentsMargins(0,0,0,0);
+
     // Plot files
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
+    layout->setSpacing(5);
+    layout->setContentsMargins(5,5,5,5);
 
     spanSlider = new QxtSpanSlider(Qt::Horizontal, this);
     spanSlider->setFocusPolicy(Qt::NoFocus);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
     spanSlider->setLowerValue(0);
     spanSlider->setUpperValue(15);
+#ifdef Q_OS_MAC
+    // BUG in QMacStyle and painting of spanSlider
+    // so we use a plain style to avoid it, but only
+    // on a MAC, since win and linux are fine
+#if QT_VERSION > 0x5000
+    QStyle *style = QStyleFactory::create("fusion");
+#else
+    QStyle *style = QStyleFactory::create("Cleanlooks");
+#endif
+    spanSlider->setStyle(style);
+#endif
 
     fullPlot = new AllPlot(this, NULL, wizard->context);
     fullPlot->setPaintBrush(0);
+#ifdef Q_OS_MAC
     fullPlot->setFixedHeight(300);
+#else
+    fullPlot->setFixedHeight(300);
+#endif
     fullPlot->setHighlightIntervals(false);
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->setWantAxis(false, true);
