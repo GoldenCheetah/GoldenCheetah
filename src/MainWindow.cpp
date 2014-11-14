@@ -60,6 +60,7 @@
 #include "TwitterDialog.h"
 #include "ShareDialog.h"
 #include "TtbDialog.h"
+#include "VeloHeroDialog.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
 #include "WorkoutWizard.h"
@@ -580,6 +581,10 @@ MainWindow::MainWindow(const QDir &home)
     connect(ttbAction, SIGNAL(triggered(bool)), this, SLOT(uploadTtb()));
     rideMenu->addAction(ttbAction);
 
+    veloheroAction = new QAction(tr("Upload to Velo Hero..."), this);
+    connect(veloheroAction, SIGNAL(triggered(bool)), this, SLOT(uploadVeloHero()));
+    rideMenu->addAction(veloheroAction);
+
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save ride"), this, SLOT(saveRide()), tr("Ctrl+S"));
     rideMenu->addAction(tr("D&elete ride..."), this, SLOT(deleteRide()));
@@ -856,8 +861,13 @@ MainWindow::setActivityMenu()
         if (activityId == "") ttbAction->setEnabled(true);
         else ttbAction->setEnabled(false);
 
+        QString veloHeroWorkoutId = currentTab->context->ride->ride()->getTag("VeloHeroExercise", "");
+        if (veloHeroWorkoutId == "") veloheroAction->setEnabled(true);
+        else veloheroAction->setEnabled(false);
+
     } else {
         ttbAction->setEnabled(false);
+        veloheroAction->setEnabled(false);
     }
 }
 
@@ -1764,6 +1774,24 @@ MainWindow::uploadTtb()
 
     if (item) { // menu is disabled anyway, but belt and braces
         TtbDialog d(currentTab->context, item);
+        d.exec();
+    }
+}
+
+/*----------------------------------------------------------------------
+* Velo Hero (http://www.velohero.com)
+*--------------------------------------------------------------------*/
+
+void
+MainWindow::uploadVeloHero()
+{
+    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE) return;
+
+    RideItem *item = dynamic_cast<RideItem*>(_item);
+
+    if (item) { // menu is disabled anyway, but belt and braces
+        VeloHeroDialog d(currentTab->context, item);
         d.exec();
     }
 }
