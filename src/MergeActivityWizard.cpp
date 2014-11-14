@@ -65,6 +65,7 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
     // initialise before setRide since it checks
     // to see if memory needs to be freed first
     ride1 = ride2 = NULL;
+    combinedItem = new RideItem(NULL, context);
     combined = NULL;
 
     // current ride
@@ -260,11 +261,9 @@ MergeActivityWizard::analyse()
 void 
 MergeActivityWizard::combine()
 {
-    // zap whatever we have
-    if (combined) delete combined;
-
     // and build a new one
     combined = new RideFile(ride1);
+    combinedItem->setRide(combined); // will delete old one
 
     // create a combined ride applying the parameters
     // from the wizard for join or merge
@@ -885,11 +884,110 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     // Plot files
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
+
+    spanSlider = new QxtSpanSlider(Qt::Horizontal, this);
+    spanSlider->setFocusPolicy(Qt::NoFocus);
+    spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+    spanSlider->setLowerValue(0);
+    spanSlider->setUpperValue(15);
+
+    fullPlot = new AllPlot(this, NULL, wizard->context);
+    fullPlot->setPaintBrush(0);
+    fullPlot->setFixedHeight(300);
+    fullPlot->setHighlightIntervals(false);
+    static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
+    fullPlot->setWantAxis(false, true);
+    QPalette pal = palette();
+    fullPlot->axisWidget(QwtPlot::xBottom)->setPalette(pal);
+
+    layout->addWidget(spanSlider);
+    layout->addWidget(fullPlot);
+    layout->addStretch();
+
+    QLabel *adjust = new QLabel(tr("Adjust:"));
+    adjustSlider = new QSlider(Qt::Horizontal, this);
+    reset = new QPushButton(tr("Reset"));
+
+    QHBoxLayout *hl = new QHBoxLayout;
+    hl->addWidget(adjust);
+    hl->addWidget(adjustSlider);
+    hl->addWidget(reset);
+    layout->addLayout(hl);
+    layout->addStretch();
+
+    connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(zoomChanged()));
+    connect(spanSlider, SIGNAL(upperPositionChanged(int)), this, SLOT(zoomChanged()));
+
+    connect(reset, SIGNAL(clicked()), this, SLOT(resetClicked()));
+    connect(adjustSlider, SIGNAL(valueChanged(int)), this, SLOT(offsetChanged()));
 }
 
 void
 MergeAdjust::initializePage()
 {
+    // remember so we can reset
+    offset1 = wizard->offset1;
+    offset2 = wizard->offset2;
+
+    // setup plot
+    fullPlot->setDataFromRide(wizard->combinedItem);
+    spanSlider->setMinimum(0);
+    spanSlider->setMaximum(wizard->combined->dataPoints().last()->secs);
+    spanSlider->setLowerValue(spanSlider->minimum());
+    spanSlider->setUpperValue(spanSlider->maximum());
+    zoomChanged();
+
+    // what to show?
+    fullPlot->setShow(RideFile::none, false); // switch all off
+
+    // now add in what we got
+    QMapIterator<RideFile::SeriesType, QCheckBox *> i(wizard->rightSeries);
+    while(i.hasNext()) {
+        i.next();
+        if (i.value()->isChecked())
+            fullPlot->setShow(i.key(), true);
+    }
+    QMapIterator<RideFile::SeriesType, QCheckBox *> j(wizard->leftSeries);
+    while(j.hasNext()) {
+        j.next();
+        if (j.value()->isChecked())
+            fullPlot->setShow(j.key(), true);
+    }
+
+    // setup adjuster 
+    adjustSlider->setMinimum(-1 * wizard->combined->dataPoints().count() / 3);
+    adjustSlider->setMaximum(wizard->combined->dataPoints().count() / 3);
+    adjustSlider->setValue(wizard->offset2 - wizard->offset1);
+}
+
+void 
+MergeAdjust::offsetChanged()
+{
+    if (adjustSlider->value() < 0) {
+        wizard->offset1 = adjustSlider->value() * -1;
+        wizard->offset2 = 0;
+    } else {
+        wizard->offset1 = 0;
+        wizard->offset2 = adjustSlider->value() * -1;
+    }
+    wizard->combine();
+    fullPlot->setDataFromRide(wizard->combinedItem);
+}
+
+void 
+MergeAdjust::resetClicked()
+{
+    wizard->offset1 = offset1;
+    wizard->offset2 = offset2;
+    initializePage();
+}
+
+
+void
+MergeAdjust::zoomChanged()
+{
+    fullPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
+    fullPlot->replot();
 }
 
 // select

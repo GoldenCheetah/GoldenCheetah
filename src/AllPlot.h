@@ -306,6 +306,7 @@ class CurveColors : public QObject
 };
 
 class AllPlot;
+class MergeAdjust;
 class AllPlotObject : public QObject
 {
     Q_OBJECT;
@@ -474,7 +475,7 @@ class AllPlot : public QwtPlot
 
         // you can declare which series to plot, none means do them all
         // wanttext is to say if plot markers should have text
-        AllPlot(AllPlotWindow *parent, Context *context, 
+        AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, 
                 RideFile::SeriesType series = RideFile::none, RideFile::SeriesType secSeries = RideFile::none, bool wanttext = true);
         ~AllPlot();
 
@@ -520,6 +521,7 @@ class AllPlot : public QwtPlot
 
     public slots:
 
+        void setShow(RideFile::SeriesType, bool);
         void setShowAccel(bool show);
         void setShowPowerD(bool show);
         void setShowCadD(bool show);
@@ -557,7 +559,7 @@ class AllPlot : public QwtPlot
         void setShadeZones(bool x) { shade_zones=x; }
         void setSmoothing(int value);
         void setByDistance(int value);
-        void setWantAxis(bool x) { wantaxis = x;}
+        void setWantAxis(bool x, bool y=false) { wantaxis = x; wantxaxis = y;}
         void configChanged();
 
         // for tooltip
@@ -569,6 +571,7 @@ class AllPlot : public QwtPlot
         friend class ::AllPlotBackground;
         friend class ::AllPlotZoneLabel;
         friend class ::AllPlotWindow;
+        friend class ::MergeAdjust;
         friend class ::IntervalPlotData;
 
         // cached state
@@ -621,6 +624,7 @@ class AllPlot : public QwtPlot
         // array / smooth state
         int smooth;
         bool bydist;
+        bool fill;
 
         // scope of plot (none means all, or just for a specific series
         RideFile::SeriesType scope;
@@ -633,8 +637,9 @@ class AllPlot : public QwtPlot
     private:
 
         AllPlot *referencePlot;
-        AllPlotWindow *parent;
-        bool wanttext, wantaxis;
+        QWidget *parent;
+        AllPlotWindow *window;
+        bool wanttext, wantaxis, wantxaxis;
         bool isolation;
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
@@ -650,17 +655,19 @@ class ScaleScaleDraw: public QwtScaleDraw
 {
     public:
 
-        ScaleScaleDraw(double factor=1.0f) : factor(factor) {}
+        ScaleScaleDraw(double factor=1.0f) : factor(factor), decimals(0) {}
 
         void setFactor(double f) { factor=f; }
+        void setDecimals(int d) { decimals=d; }
 
         virtual QwtText label(double v) const {
-            return QString("%1").arg(v * factor, 0, 'f', 0);
+            return QString("%1").arg(v * factor, 0, 'f', decimals);
         }
 
     private:
 
         double factor;
+        int decimals;
 };
 #endif // _GC_AllPlot_h
 
