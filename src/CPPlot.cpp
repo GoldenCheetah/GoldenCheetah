@@ -1256,6 +1256,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         double xvalue = curve->sample(index).x();
         double yvalue = curve->sample(index).y();
         QString text, dateStr;
+        QString currentRidePercentStr;
         QString units1;
         QString units2;
 
@@ -1282,16 +1283,28 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         else
             units2 = RideFile::unitName(rideSeries, context);
 
+		// for the current ride curve, add a percent of rider's actual best.
+		if (!showPercent && curve == rideCurve && index >= 0 && getBests().count() > index) {
+			double bestY = getBests()[index];
+			if (0 != bestY) {
+				// use 0 decimals for the percent.
+				currentRidePercentStr = QString("\n%1 %2")
+					.arg((yvalue *100)/ bestY, 0, 'f', 0)
+					.arg(tr("Percent of Best"));
+			}
+		}
+
         // no units for Heat Curve
         if (curve == heatCurve) units2 = QString(tr("Rides"));
 
         // output the tooltip
-        text = QString("%1%2\n%3 %4%5")
+        text = QString("%1%2\n%3 %4%5%6")
                .arg(criticalSeries == CriticalPowerWindow::veloclinicplot?QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries)):interval_to_str(60.0*xvalue))
                .arg(units1)
                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                .arg(units2)
-               .arg(dateStr);
+               .arg(dateStr)
+               .arg(currentRidePercentStr);
 
         // set that text up
         zoomer->setText(text);
