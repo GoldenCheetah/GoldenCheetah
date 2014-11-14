@@ -3073,6 +3073,7 @@ AllPlotWindow::setupSeriesStackPlots()
         AllPlot *_allPlot = new AllPlot(this, this, context, x.one, (addHeadwind && x.one == RideFile::kph ? RideFile::headwind : x.two), first);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
+        _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setDataFromPlot(allPlot); // will clone all settings and data for the series
                                                    // being plotted, only works for one series plotting
 
@@ -3203,6 +3204,7 @@ AllPlotWindow::setupStackPlots()
         AllPlot *_allPlot = new AllPlot(this, this, context);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
+        _allPlot->setPaintBrush(paintBrush->checkState());
 
         // add to the list
         allPlots.append(_allPlot);
