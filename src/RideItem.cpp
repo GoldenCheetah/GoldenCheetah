@@ -26,6 +26,10 @@
 #include "HrZones.h"
 #include <math.h>
 
+RideItem::RideItem(RideFile *ride, Context *context) :
+    QTreeWidgetItem(0), ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName(""),
+    zones(NULL), hrZones(NULL) { }
+
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
                    const Zones *zones, const HrZones *hrZones, Context *context) :
@@ -144,12 +148,14 @@ RideItem::setFileName(QString path, QString fileName)
 
 int RideItem::zoneRange()
 {
-    return zones->whichRange(dateTime.date());
+    if (zones) return zones->whichRange(dateTime.date());
+    else return -1;
 }
 
 int RideItem::hrZoneRange()
 {
-    return hrZones->whichRange(dateTime.date());
+    if (hrZones) return hrZones->whichRange(dateTime.date());
+    else return -1;
 }
 int RideItem::numZones()
 {

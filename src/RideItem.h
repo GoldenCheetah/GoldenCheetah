@@ -78,6 +78,7 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         const Zones *zones;
         const HrZones *hrZones;
 
+        RideItem(RideFile *ride, Context *context);
         RideItem(int type, QString path,
                  QString fileName, const QDateTime &dateTime,
                  const Zones *zones, const HrZones *hrZones, Context *context);

@@ -30,8 +30,21 @@
 #include "DownloadRideDialog.h"
 #include "Device.h"
 #include "Athlete.h"
+#include "AllPlot.h"
 
 #include <qwt_plot_marker.h>
+#include <qwt_plot_layout.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_picker.h>
+#include <qwt_scale_widget.h>
+#include <qwt_arrow_button.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_grid.h>
+#include <qwt_text.h>
+#include <qwt_legend.h>
+#include <qwt_series_data.h>
 
 #include <QtGui>
 #include <QButtonGroup>
@@ -47,6 +60,8 @@
 #include <QTreeWidget>
 #include <QScrollArea>
 #include <QCheckBox>
+
+#include <qxtspanslider.h>
 
 class MainWindow;
 class RideItem;
@@ -80,6 +95,7 @@ class MergeActivityWizard : public QWizard
 
         // inpit and result !
         RideItem *current;
+        RideItem *combinedItem; // for interface with AllPlot. *sigh*
         RideFile *combined;
 
         // working copies
@@ -239,8 +255,18 @@ class MergeAdjust : public QWizardPage
 
     private:
         MergeActivityWizard *wizard;
+        AllPlot *fullPlot;
+        QxtSpanSlider *spanSlider;
+
+        QSlider *adjustSlider;
+        QPushButton *reset;
+
+        int offset1, offset2;
 
     private slots:
+        void zoomChanged();
+        void offsetChanged();
+        void resetClicked();
 };
 
 class MergeSelect : public QWizardPage

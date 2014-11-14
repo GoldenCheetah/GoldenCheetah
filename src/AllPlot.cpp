@@ -690,7 +690,7 @@ AllPlotObject::hideUnwanted()
     }
 }
 
-AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType scope, RideFile::SeriesType secScope, bool wanttext):
+AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideFile::SeriesType scope, RideFile::SeriesType secScope, bool wanttext):
     QwtPlot(parent),
     rideItem(NULL),
     shade_zones(true),
@@ -728,6 +728,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
     secondaryScope(secScope),
     context(context),
     parent(parent),
+    window(window),
     wanttext(wanttext),
     isolation(false)
 {
@@ -736,7 +737,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, Context *context, RideFile::SeriesType s
         shade_zones = false;
 
     smooth = 1;
-    wantaxis = true;
+    wantxaxis = wantaxis = true;
     setAutoDelete(false); // no - we are managing it via the AllPlotObjects now
     referencePlot = NULL;
     tooltip = NULL;
@@ -999,7 +1000,7 @@ AllPlot::configChanged()
     standard->grid->setPen(gridPen);
 
     // curve brushes
-    if (parent->isPaintBrush()) {
+    if (fill) {
         QColor p;
         p = standard->wattsCurve->pen().color();
         p.setAlpha(64);
@@ -2276,7 +2277,6 @@ AllPlot::setYMax()
                                                       standard->altSlopeCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 2), standard->wCurve->isVisible());
         setAxisVisible(QwtAxisId(QwtAxis::yRight, 3), standard->atissCurve->isVisible() || standard->antissCurve->isVisible());
-        setAxisVisible(xBottom, true);
 
     } else {
 
@@ -2288,9 +2288,13 @@ AllPlot::setYMax()
         setAxisVisible(QwtAxisId(QwtPlot::yRight,1), false);
         setAxisVisible(QwtAxisId(QwtAxis::yRight,2), false);
         setAxisVisible(QwtAxisId(QwtAxis::yRight,3), false);
-        setAxisVisible(xBottom, false);
 
     }
+
+    // might want xaxis
+    if (wantxaxis) setAxisVisible(xBottom, true);
+    else setAxisVisible(xBottom, false);
+
     // set axis scales
     // QwtAxis::yRight, 3
     if (((showATISS && standard->atissCurve->isVisible()) || (showANTISS && standard->antissCurve->isVisible()))
@@ -3472,6 +3476,10 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         sd->setSpacing(0);
 
         if (scope == RideFile::wprime) sd->setFactor(0.001f); // Kj
+        if (scope == RideFile::thb || scope == RideFile::smo2 
+            || scope == RideFile::o2hb || scope == RideFile::hhb) // Hb
+            sd->setDecimals(1);
+
         setAxisScaleDraw(QwtPlot::yLeft, sd);
 
         // title and colour
@@ -4868,6 +4876,158 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
 }
 
 void
+AllPlot::setShow(RideFile::SeriesType type, bool state)
+{
+    switch(type) {
+
+    case RideFile::none:
+        setShowAccel(false);
+        setShowPowerD(false);
+        setShowCadD(false);
+        setShowTorqueD(false);
+        setShowHrD(false);
+        setShowPower(0);
+        setShowAltSlope(0);
+        setShowSlope(false);
+        setShowNP(false);
+        setShowATISS(false);
+        setShowANTISS(false);
+        setShowXP(false);
+        setShowAP(false);
+        setShowHr(false);
+        setShowSpeed(false);
+        setShowCad(false);
+        setShowAlt(false);
+        setShowTemp(false);
+        setShowWind(false);
+        setShowRV(false);
+        setShowRGCT(false);
+        setShowRCad(false);
+        setShowSmO2(false);
+        setShowtHb(false);
+        setShowO2Hb(false);
+        setShowHHb(false);
+        setShowGear(false);
+        setShowW(false);
+        setShowTorque(false);
+        setShowBalance(false);
+        setShowTE(false);
+        setShowPS(false);
+        break;
+
+    case RideFile::secs: 
+        break;
+    case RideFile::cad: 
+        setShowCad(state);
+        break;
+    case RideFile::hr: 
+        setShowHr(state);
+        break;
+    case RideFile::km: 
+        break;
+    case RideFile::kph: 
+        setShowSpeed(state);
+        break;
+    case RideFile::kphd: 
+        setShowAccel(state);
+        break;
+    case RideFile::wattsd: 
+        setShowPowerD(state);
+        break;
+    case RideFile::cadd: 
+        setShowCadD(state);
+        break;
+    case RideFile::nmd: 
+        setShowTorqueD(state);
+        break;
+    case RideFile::hrd: 
+        setShowHrD(state);
+        break;
+    case RideFile::nm: 
+        setShowTorque(state);
+        break;
+    case RideFile::watts: 
+        setShowPower(state ? 0 : 2);
+        break;
+    case RideFile::xPower: 
+        setShowXP(state);
+        break;
+    case RideFile::aPower: 
+        setShowAP(state);
+        break;
+    case RideFile::aTISS: 
+        setShowATISS(state);
+        break;
+    case RideFile::anTISS: 
+        setShowANTISS(state);
+        break;
+    case RideFile::NP: 
+        setShowNP(state);
+        break;
+    case RideFile::alt: 
+        setShowAlt(state);
+        break;
+    case RideFile::lon: 
+        break;
+    case RideFile::lat: 
+        break;
+    case RideFile::headwind: 
+        setShowWind(state);
+        break;
+    case RideFile::slope: 
+        setShowSlope(state);
+        break;
+    case RideFile::temp: 
+        setShowTemp(state);
+        break;
+    case RideFile::lrbalance: 
+        setShowBalance(state);
+        break;
+    case RideFile::lte: 
+    case RideFile::rte: 
+        setShowTE(state);
+        break;
+    case RideFile::lps: 
+    case RideFile::rps: 
+        setShowPS(state);
+        break;
+    case RideFile::interval: 
+        break;
+    case RideFile::vam: 
+        break;
+    case RideFile::wattsKg: 
+        break;
+    case RideFile::wprime: 
+        setShowW(state);
+        break;
+    case RideFile::smo2: 
+        setShowSmO2(state);
+        break;
+    case RideFile::thb: 
+        setShowtHb(state);
+        break;
+    case RideFile::o2hb: 
+        setShowO2Hb(state);
+        break;
+    case RideFile::hhb: 
+        setShowHHb(state);
+        break;
+    case RideFile::rvert: 
+        setShowRV(state);
+        break;
+    case RideFile::rcad: 
+        setShowRCad(state);
+        break;
+    case RideFile::rcontact: 
+        setShowRGCT(state);
+        break;
+    case RideFile::gear: 
+        setShowGear(state);
+        break;
+    }
+}
+
+void
 AllPlot::setShowPower(int id)
 {
     if (showPowerState == id) return;
@@ -5240,6 +5400,15 @@ AllPlot::setShowW(bool show)
     }
     setYMax();
 
+    // clear labels ?
+    if (show == false) {
+        foreach(QwtPlotMarker *p, standard->matchLabels) {
+            p->detach();
+            delete p;
+        }
+        standard->matchLabels.clear();
+    }
+
     // remember the curves and colors
     isolation = false;
     curveColors->saveState();
@@ -5315,6 +5484,7 @@ AllPlot::setShowGrid(bool show)
 void
 AllPlot::setPaintBrush(int state)
 {
+    fill = state;
     if (state) {
 
         QColor p;
@@ -5953,6 +6123,9 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
 void
 AllPlot::plotTmpReference(int axis, int x, int y)
 {
+    // only if on allplotwindow
+    if (window==NULL) return;
+
     // not supported in compare mode
     if (context->isCompareIntervals) return;
 
@@ -5975,14 +6148,14 @@ AllPlot::plotTmpReference(int axis, int x, int y)
         standard->tmpReferenceLines.clear();
 
         // only plot if they are relevant to the plot.
-        QwtPlotCurve *referenceLine = parent->allPlot->plotReferenceLine(referencePoint);
+        QwtPlotCurve *referenceLine = window->allPlot->plotReferenceLine(referencePoint);
         if (referenceLine) {
             standard->tmpReferenceLines.append(referenceLine);
-            parent->allPlot->replot();
+            window->allPlot->replot();
         }
 
         // now do the series plots
-        foreach(AllPlot *plot, parent->seriesPlots) {
+        foreach(AllPlot *plot, window->seriesPlots) {
             QwtPlotCurve *referenceLine = plot->plotReferenceLine(referencePoint);
             if (referenceLine) {
                 standard->tmpReferenceLines.append(referenceLine);
@@ -5991,7 +6164,7 @@ AllPlot::plotTmpReference(int axis, int x, int y)
         }
 
         // now the stack plots
-        foreach(AllPlot *plot, parent->allPlots) {
+        foreach(AllPlot *plot, window->allPlots) {
             QwtPlotCurve *referenceLine = plot->plotReferenceLine(referencePoint);
             if (referenceLine) {
                 standard->tmpReferenceLines.append(referenceLine);
@@ -6011,12 +6184,12 @@ AllPlot::plotTmpReference(int axis, int x, int y)
             }
         }
         standard->tmpReferenceLines.clear();
-        parent->allPlot->replot();
-        foreach(AllPlot *plot, parent->seriesPlots) {
+        window->allPlot->replot();
+        foreach(AllPlot *plot, window->seriesPlots) {
             plot->replot();
         }
-        parent->allPlot->replot();
-        foreach(AllPlot *plot, parent->allPlots) {
+        window->allPlot->replot();
+        foreach(AllPlot *plot, window->allPlots) {
             plot->replot();
         }
     }
@@ -6026,13 +6199,13 @@ void
 AllPlot::refreshReferenceLinesForAllPlots()
 {
     // not supported in compare mode
-    if (context->isCompareIntervals) return;
+    if (window == NULL || context->isCompareIntervals) return;
 
-    parent->allPlot->refreshReferenceLines();
-    foreach(AllPlot *plot, parent->allPlots) {
+    window->allPlot->refreshReferenceLines();
+    foreach(AllPlot *plot, window->allPlots) {
         plot->refreshReferenceLines();
     }
-    foreach(AllPlot *plot, parent->seriesPlots) {
+    foreach(AllPlot *plot, window->seriesPlots) {
         plot->refreshReferenceLines();
     }
 }
@@ -6041,7 +6214,7 @@ void
 AllPlot::confirmTmpReference(double value, int axis, bool allowDelete)
 {
     // not supported in compare mode
-    if (context->isCompareIntervals) return;
+    if (window == NULL || context->isCompareIntervals) return;
 
     ReferenceLineDialog *p = new ReferenceLineDialog(this, context, allowDelete);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!

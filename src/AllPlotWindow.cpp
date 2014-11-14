@@ -349,7 +349,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     QPalette palette;
     palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
 
-    allPlot = new AllPlot(this, context);
+    allPlot = new AllPlot(this, this, context);
     allPlot->setContentsMargins(0,0,0,0);
     allPlot->enableAxis(QwtPlot::xBottom, true);
     allPlot->setAxisVisible(QwtPlot::xBottom, true);
@@ -548,7 +548,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     scrollRight->setStyle(style);
 #endif
 
-    fullPlot = new AllPlot(this, context);
+    fullPlot = new AllPlot(this, this, context);
     fullPlot->standard->grid->enableY(false);
     fullPlot->setFixedHeight(100);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
@@ -906,7 +906,7 @@ AllPlotWindow::compareChanged()
 
             // create a new one using the interval data object and
             // referencing fullPlot for the user prefs etc
-            AllPlot *ap = new AllPlot(this, context);
+            AllPlot *ap = new AllPlot(this, this, context);
             ap->bydist = fullPlot->bydist;
             ap->setShadeZones(showPower->currentIndex() == 0);
             ap->setDataFromObject(compareIntervalCurves[i], fullPlot);
@@ -997,7 +997,7 @@ AllPlotWindow::compareChanged()
         foreach(SeriesWanted x, wanted) {
 
             // create and setup with normal gui stuff
-            AllPlot *plot = new AllPlot(this, context, x.one, x.two, false);
+            AllPlot *plot = new AllPlot(this, this, context, x.one, x.two, false);
             plot->setPalette(palette);
             plot->setAutoFillBackground(false);
             plot->setFixedHeight(120+(stackWidth*4));
@@ -3070,7 +3070,7 @@ AllPlotWindow::setupSeriesStackPlots()
     foreach(SeriesWanted x, serieslist) {
 
         // create that plot
-        AllPlot *_allPlot = new AllPlot(this, context, x.one, (addHeadwind && x.one == RideFile::kph ? RideFile::headwind : x.two), first);
+        AllPlot *_allPlot = new AllPlot(this, this, context, x.one, (addHeadwind && x.one == RideFile::kph ? RideFile::headwind : x.two), first);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
         _allPlot->setDataFromPlot(allPlot); // will clone all settings and data for the series
@@ -3200,7 +3200,7 @@ AllPlotWindow::setupStackPlots()
         if (stopIndex - startIndex < 2) break;
 
         // create that plot
-        AllPlot *_allPlot = new AllPlot(this, context);
+        AllPlot *_allPlot = new AllPlot(this, this, context);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
 
