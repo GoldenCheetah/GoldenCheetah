@@ -367,6 +367,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *ttbuserLabel = new QLabel(tr("Username"));
     QLabel *ttbpassLabel = new QLabel(tr("Password"));
 
+    QLabel *velohero = new QLabel(tr("Velo Hero"));
+    velohero->setFont(current);
+
+    QLabel *veloherouserLabel = new QLabel(tr("Username"));
+    QLabel *veloheropassLabel = new QLabel(tr("Password"));
+
     QLabel *sel = new QLabel(tr("Selfloops"));
     sel->setFont(current);
 
@@ -480,6 +486,12 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     ttbPass->setEchoMode(QLineEdit::Password);
     ttbPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS, "").toString());
 
+    veloHeroUser = new QLineEdit(this);
+    veloHeroUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER, "").toString());
+
+    veloHeroPass = new QLineEdit(this);
+    veloHeroPass->setEchoMode(QLineEdit::Password);
+    veloHeroPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS, "").toString());
 
     selUser = new QLineEdit(this);
     selUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELUSER, "").toString());
@@ -562,6 +574,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(sel, 38,0);
     grid->addWidget(seluserLabel, 39,0);
     grid->addWidget(selpassLabel, 40,0);
+    grid->addWidget(velohero, 41,0);
+    grid->addWidget(veloherouserLabel, 42,0);
+    grid->addWidget(veloheropassLabel, 43,0);
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -614,6 +629,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     grid->addWidget(selUser, 39, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(selPass, 40, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(veloHeroUser, 42, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(veloHeroPass, 43, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -698,6 +716,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBUSER, ttbUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TTBPASS, ttbPass->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_VELOHEROUSER, veloHeroUser->text());
+    appsettings->setCValue(context->athlete->cyclist, GC_VELOHEROPASS, veloHeroPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELUSER, selUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_SELPASS, selPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPTYPE, tpType->currentIndex());

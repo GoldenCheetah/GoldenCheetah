@@ -180,6 +180,9 @@ class CredentialsPage : public QScrollArea
         QLineEdit *ttbUser;
         QLineEdit *ttbPass;
 
+        QLineEdit *veloHeroUser;
+        QLineEdit *veloHeroPass;
+
         QLineEdit *selUser;
         QLineEdit *selPass;
 
