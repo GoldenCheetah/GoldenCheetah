@@ -1550,6 +1550,7 @@ AllPlot::recalc(AllPlotObject *objects)
 
         objects->smoothWatts.resize(rideTimeSecs + 1);
         objects->smoothNP.resize(rideTimeSecs + 1);
+        objects->smoothGear.resize(rideTimeSecs + 1);
         objects->smoothRV.resize(rideTimeSecs + 1);
         objects->smoothRCad.resize(rideTimeSecs + 1);
         objects->smoothRGCT.resize(rideTimeSecs + 1);
@@ -1808,6 +1809,13 @@ AllPlot::recalc(AllPlotObject *objects)
             }
             objects->smoothDistance[secs] = totalDist;
             objects->smoothTime[secs]  = secs / 60.0;
+
+            // set data series (gearRatio) which are not smoothed at all
+            if (objects->gearArray.empty() || secs >= objects->gearArray.count()) {
+                objects->smoothGear[secs] = 0.0f;
+            } else {
+                objects->smoothGear[secs] = objects->gearArray[secs];
+            }
         }
 
     } else {
@@ -1815,6 +1823,7 @@ AllPlot::recalc(AllPlotObject *objects)
         // no standard->smoothing .. just raw data
         objects->smoothWatts.resize(0);
         objects->smoothNP.resize(0);
+        objects->smoothGear.resize(0);
         objects->smoothRV.resize(0);
         objects->smoothRCad.resize(0);
         objects->smoothRGCT.resize(0);
@@ -1905,13 +1914,6 @@ AllPlot::recalc(AllPlotObject *objects)
 
         }
     }
-
-    // and now set data series which MUST not be smoothed AT ALL (e.g. gear ratio)
-    objects->smoothGear.resize(rideTimeSecs + 1);
-    foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
-        objects->smoothGear.append(dp->gear);
-    }
-
 
     QVector<double> &xaxis = bydist ? objects->smoothDistance : objects->smoothTime;
     int startingIndex = qMin(smooth, xaxis.count());
