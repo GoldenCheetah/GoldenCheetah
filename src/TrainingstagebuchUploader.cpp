@@ -81,10 +81,8 @@ protected:
 };
 
 
-TrainingstagebuchUploader::TrainingstagebuchUploader(Context *context, RideItem *item, ShareDialog *parent ) :
-    context(context),
-    ride( item ),
-    parent( parent ),
+TrainingstagebuchUploader::TrainingstagebuchUploader(Context *context, RideItem *ride, ShareDialog *parent ) :
+    ShareDialogUploader( tr("Trainingstagebuch.org"), context, ride, parent),
     proMember( false )
 {
     exerciseId = ride->ride()->getTag("TtbExercise", "");
@@ -116,41 +114,6 @@ TrainingstagebuchUploader::wasUploaded()
 void
 TrainingstagebuchUploader::upload()
 {
-    QString err;
-    if( !canUpload( err ) ){
-        QMessageBox aMsgBox;
-        aMsgBox.setText(err);
-        aMsgBox.exec();
-        return;
-    }
-
-    if( wasUploaded() ){
-        dialog = new QDialog();
-        QVBoxLayout *layout = new QVBoxLayout;
-
-        QVBoxLayout *layoutLabel = new QVBoxLayout();
-        QLabel *label = new QLabel();
-        label->setText(tr("This Ride is marked as already on Trainingstagebuch. Are you sure you want to upload it?"));
-        layoutLabel->addWidget(label);
-
-        QPushButton *ok = new QPushButton(tr("OK"), dialog);
-        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
-        QHBoxLayout *buttons = new QHBoxLayout();
-        buttons->addStretch();
-        buttons->addWidget(cancel);
-        buttons->addWidget(ok);
-
-        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
-        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
-
-        layout->addLayout(layoutLabel);
-        layout->addLayout(buttons);
-
-        dialog->setLayout(layout);
-
-        if (!dialog->exec()) return;
-    }
-
     uploadSuccessful = false;
     requestSettings();
 
@@ -165,19 +128,6 @@ TrainingstagebuchUploader::upload()
         ride->setDirty(true);
     }
 }
-
-void
-TrainingstagebuchUploader::okClicked()
-{
-    dialog->accept();
-}
-
-void
-TrainingstagebuchUploader::closeClicked()
-{
-    dialog->reject();
-}
-
 
 void
 TrainingstagebuchUploader::requestSettings()

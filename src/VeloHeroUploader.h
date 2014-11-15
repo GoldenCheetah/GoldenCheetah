@@ -39,10 +39,9 @@
 
 #include "Context.h"
 #include "RideItem.h"
+#include "ShareDialog.h"
 
-class ShareDialog;
-
-class VeloHeroUploader : public QObject
+class VeloHeroUploader : public ShareDialogUploader
 {
     Q_OBJECT
     G_OBJECT
@@ -50,10 +49,10 @@ class VeloHeroUploader : public QObject
 public:
     VeloHeroUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void upload();
+    virtual void upload();
 
-    bool canUpload( QString &err );
-    bool wasUploaded();
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
 
 private slots:
     void dispatchReply( QNetworkReply *reply );
@@ -64,19 +63,11 @@ private slots:
     void requestUpload();
     void finishUpload(QNetworkReply *reply);
 
-    void okClicked();
-    void closeClicked();
-
 private:
     enum requestType {
         reqSession,
         reqUpload,
     };
-
-    Context *context;
-    RideItem *ride;
-    ShareDialog *parent;
-    QDialog *dialog;
 
     QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
