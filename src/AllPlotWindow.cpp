@@ -1286,7 +1286,10 @@ AllPlotWindow::rideSelected()
         setIsBlank(false);
 
     // we already plotted it!
-    if (!ride->isDirty() && ride == current && stale == false) return;
+    //XXX the !ride->isDirty() code below makes GC crash when selecting
+    //XXX on the canvas ?!??!? No idea why, but commenting out for now
+    //XXX if (!ride->isDirty() && ride == current && stale == false) return;
+    if (ride == current && stale == false) return;
 
     // ok, its now the current ride
     current = ride;
