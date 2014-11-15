@@ -19,8 +19,6 @@
 #ifndef SHAREDIALOG_H
 #define SHAREDIALOG_H
 #include "GoldenCheetah.h"
-#include "VeloHeroUploader.h"
-#include "TrainingstagebuchUploader.h"
 
 #include <QObject>
 #include <QtGui>
@@ -47,8 +45,33 @@ extern "C" {
 
 class ShareDialog;
 
+// abstract base class for all uploaders
+class ShareDialogUploader : public QObject {
+    Q_OBJECT
+    G_OBJECT
+
+public:
+    ShareDialogUploader( const QString &name, Context *context, RideItem *item, ShareDialog *parent = 0)
+        : _name( name ), context( context ), ride( item ), parent(parent)
+        {};
+
+    const QString &name() { return _name; };
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload()=0;
+
+private:
+    QString _name;
+
+protected:
+    Context *context;
+    RideItem *ride;
+    ShareDialog *parent;
+
+};
+
 // uploader to strava.com
-class StravaUploader : public QObject
+class StravaUploader : public ShareDialogUploader
 {
     Q_OBJECT
     G_OBJECT
@@ -56,7 +79,9 @@ class StravaUploader : public QObject
 public:
     StravaUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void upload();
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload();
 
 private slots:
     void requestUploadStrava();
@@ -65,19 +90,10 @@ private slots:
     void requestVerifyUpload();
     void requestVerifyUploadFinished(QNetworkReply *reply);
 
-    void okClicked();
-    void closeClicked();
-
 private:
-    Context *context;
-    RideItem *ride;
-    ShareDialog *parent;
-    QDialog *dialog;
-
     QString token;
 
     bool loggedIn, uploadSuccessful;
-    bool overwrite;
 
     QEventLoop *eventLoop;
     QNetworkAccessManager *networkManager;
@@ -89,7 +105,7 @@ private:
 };
 
 // uploader to ridewithgps.com
-class RideWithGpsUploader : public QObject
+class RideWithGpsUploader : public ShareDialogUploader
 {
     Q_OBJECT
     G_OBJECT
@@ -97,30 +113,23 @@ class RideWithGpsUploader : public QObject
 public:
     RideWithGpsUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void upload();
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload();
 
 private slots:
 
     void requestUploadRideWithGPS();
     void requestUploadRideWithGPSFinished(QNetworkReply *reply);
 
-    void okClicked();
-    void closeClicked();
-
 private:
-    Context *context;
-    RideItem *ride;
-    ShareDialog *parent;
-    QDialog *dialog;
-
     QString rideWithGpsActivityId;
 
     bool loggedIn, uploadSuccessful;
-    bool overwrite;
 };
 
 // uploader to cyclinganalytics.com
-class CyclingAnalyticsUploader : public QObject
+class CyclingAnalyticsUploader : public ShareDialogUploader
 {
     Q_OBJECT
     G_OBJECT
@@ -128,25 +137,18 @@ class CyclingAnalyticsUploader : public QObject
 public:
     CyclingAnalyticsUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void upload();
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload();
 
 private slots:
     void requestUploadCyclingAnalytics();
     void requestUploadCyclingAnalyticsFinished(QNetworkReply *reply);
 
-    void okClicked();
-    void closeClicked();
-
 private:
-    Context *context;
-    RideItem *ride;
-    ShareDialog *parent;
-    QDialog *dialog;
-
     QString token;
 
     bool loggedIn, uploadSuccessful;
-    bool overwrite;
 
     QString uploadStatus;
     int uploadProgress;
@@ -154,7 +156,7 @@ private:
 };
 
 // uploader to selfloops.com
-class SelfLoopsUploader : public QObject
+class SelfLoopsUploader : public ShareDialogUploader
 {
     Q_OBJECT
     G_OBJECT
@@ -162,25 +164,18 @@ class SelfLoopsUploader : public QObject
 public:
     SelfLoopsUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void upload();
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload();
 
 private slots:
     void requestUploadSelfLoops();
     void requestUploadSelfLoopsFinished(QNetworkReply *reply);
 
-    void okClicked();
-    void closeClicked();
-
 private:
-    Context *context;
-    RideItem *ride;
-    ShareDialog *parent;
-    QDialog *dialog;
-
     QString token;
 
     bool loggedIn, uploadSuccessful;
-    bool overwrite;
 
     int selfloopsUploadId, selfloopsActivityId;
 
@@ -190,7 +185,7 @@ private:
 
 #if 0 // Not enabled in v3.1
 // uploader to connect.garmin.com
-class GarminUploader : public QObject
+class GarminUploader : public ShareDialogUploader
 {
     Q_OBJECT
     G_OBJECT
@@ -198,7 +193,9 @@ class GarminUploader : public QObject
 public:
     GarminUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-    void upload();
+    virtual bool canUpload( QString &err );
+    virtual bool wasUploaded();
+    virtual void upload();
 
 private slots:
     void requestFlowExecutionKey();
@@ -210,15 +207,7 @@ private slots:
     void requestUploadGarmin();
     void requestUploadGarminFinished(QNetworkReply *reply);
 
-    void okClicked();
-    void closeClicked();
-
 private:
-    Context *context;
-    RideItem *ride;
-    ShareDialog *parent;
-    QDialog *dialog;
-
     QNetworkAccessManager networkMgr;
 
     QUrl serverUrl;
@@ -226,7 +215,6 @@ private:
     QString ticket;
 
     bool loggedIn, uploadSuccessful;
-    bool overwrite;
 
     QString garminUploadId, garminActivityId;
 
@@ -260,8 +248,15 @@ signals:
 public slots:
      void upload();
 
+private slots:
+     void okClicked();
+     void closeClicked();
+
 private:
+     void doUploader( ShareDialogUploader *uploader );
+
      Context *context;
+     QDialog *dialog;
 
      QPushButton *uploadButton;
      QPushButton *closeButton;
@@ -277,13 +272,13 @@ private:
 
      RideItem *ride;
 
-     StravaUploader *stravaUploader;
-     RideWithGpsUploader *rideWithGpsUploader;
-     CyclingAnalyticsUploader *cyclingAnalyticsUploader;
-     SelfLoopsUploader *selfLoopsUploader;
-     VeloHeroUploader *veloHeroUploader;
-     TrainingstagebuchUploader *trainingstagebuchUploader;
-     //GarminUploader *garminUploader;
+     ShareDialogUploader *stravaUploader;
+     ShareDialogUploader *rideWithGpsUploader;
+     ShareDialogUploader *cyclingAnalyticsUploader;
+     ShareDialogUploader *selfLoopsUploader;
+     ShareDialogUploader *veloHeroUploader;
+     ShareDialogUploader *trainingstagebuchUploader;
+     //ShareDialogUploader *garminUploader;
 
      QString athleteId;
 };

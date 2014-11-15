@@ -24,6 +24,8 @@
 #include "mvjson.h"
 #include "TimeUtils.h"
 #include "Units.h"
+#include "VeloHeroUploader.h"
+#include "TrainingstagebuchUploader.h"
 
 // acccess to metrics
 #include "MetricAggregator.h"
@@ -32,6 +34,20 @@
 #include "TcxRideFile.h"
 
 #include <zlib.h>
+
+bool
+ShareDialogUploader::canUpload( QString &err )
+{
+    (void)err;
+
+    return true;
+}
+
+bool
+ShareDialogUploader::wasUploaded()
+{
+    return false;
+}
 
 //
 // Utility function to create a QByteArray of data in GZIP format
@@ -92,21 +108,58 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose which sites you wish to share on: "));
 
+    QString err;
+
     stravaChk = new QCheckBox(tr("Strava"));
-#ifndef GC_STRAVA_CLIENT_SECRET
-    stravaChk->setEnabled(false);
-#endif
+    if( ! stravaUploader->canUpload( err ) ){
+        stravaChk->setEnabled( false );
+    } else if( ! stravaUploader->wasUploaded() ){
+        stravaChk->setChecked( true );
+    }
+
     rideWithGPSChk = new QCheckBox(tr("Ride With GPS"));
+    if( ! rideWithGpsUploader->canUpload( err ) ){
+        rideWithGPSChk->setEnabled( false );
+    } else if( ! rideWithGpsUploader->wasUploaded() ){
+        rideWithGPSChk->setChecked( true );
+    }
+
     cyclingAnalyticsChk = new QCheckBox(tr("Cycling Analytics"));
-#ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
-    cyclingAnalyticsChk->setEnabled(false);
-#endif
+    if( ! cyclingAnalyticsUploader->canUpload( err ) ){
+        cyclingAnalyticsChk->setEnabled( false );
+    } else if( ! cyclingAnalyticsUploader->wasUploaded() ){
+        cyclingAnalyticsChk->setChecked( true );
+    }
+
     selfLoopsChk = new QCheckBox(tr("Selfloops"));
+    if( ! selfLoopsUploader->canUpload( err ) ){
+        selfLoopsChk->setEnabled( false );
+    } else if( ! selfLoopsUploader->wasUploaded() ){
+        selfLoopsChk->setChecked( true );
+    }
+
     veloHeroChk = new QCheckBox(tr("VeloHero"));
+    if( ! veloHeroUploader->canUpload( err ) ){
+        veloHeroChk->setEnabled( false );
+    } else if( ! veloHeroUploader->wasUploaded() ){
+        veloHeroChk->setChecked( true );
+    }
+
     trainingstagebuchChk = new QCheckBox(tr("Trainingstagebuch.org"));
+    if( ! trainingstagebuchUploader->canUpload( err ) ){
+        trainingstagebuchChk->setEnabled( false );
+    } else if( ! trainingstagebuchUploader->wasUploaded() ){
+        trainingstagebuchChk->setChecked( true );
+    }
 
     //garminChk = new QCheckBox(tr("Garmin Connect"));
     //garminChk->setVisible(false);
+    //if( ! garminUploader->canUpload( err ) ){
+    //    garminChk->setEnabled( false );
+    //}
+    //if( ! garminUploader->wasUploaded() ){
+    //    garminChk->setChecked( true );
+    //}
 
     QGridLayout *vbox1 = new QGridLayout();
     vbox1->addWidget(stravaChk,0,0);
@@ -229,6 +282,8 @@ ShareDialog::upload()
         return;
     }
 
+    uploadButton->setEnabled(false);
+
     shareSiteCount = 0;
     progressBar->setValue(0);
     progressLabel->setText("");
@@ -256,61 +311,59 @@ ShareDialog::upload()
     //    shareSiteCount ++;
     //}
 
-    if (stravaChk->isChecked()) {
-        stravaUploader->upload();
+    if (stravaChk->isEnabled() && stravaChk->isChecked()) {
+        doUploader( stravaUploader );
     }
-    if (rideWithGPSChk->isChecked()) {
-        rideWithGpsUploader->upload();
+    if (rideWithGPSChk->isEnabled() && rideWithGPSChk->isChecked()) {
+        doUploader( rideWithGpsUploader );
     }
-    if (cyclingAnalyticsChk->isChecked()) {
-        cyclingAnalyticsUploader->upload();
+    if (cyclingAnalyticsChk->isEnabled() && cyclingAnalyticsChk->isChecked()) {
+        doUploader( cyclingAnalyticsUploader );
     }
-    if (selfLoopsChk->isChecked()) {
-        selfLoopsUploader->upload();
+    if (selfLoopsChk->isEnabled() && selfLoopsChk->isChecked()) {
+        doUploader( selfLoopsUploader );
     }
-    if (veloHeroChk->isChecked()) {
-        veloHeroUploader->upload();
+    if (veloHeroChk->isEnabled() && veloHeroChk->isChecked()) {
+        doUploader( veloHeroUploader );
     }
-    if (trainingstagebuchChk->isChecked()) {
-        trainingstagebuchUploader->upload();
+    if (trainingstagebuchChk->isEnabled() && trainingstagebuchChk->isChecked()) {
+        doUploader( trainingstagebuchUploader );
     }
-    //if (garminChk->isChecked()) {
-    //    garminUploader->upload();
+    //if (garminChk->isEnabled() && garminChk->isChecked()) {
+    //    doUploader( garminUploader );
     //}
-}
 
-StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
-    context(context), ride(ride), parent(parent)
-{
-    stravaUploadId = ride->ride()->getTag("Strava uploadId", "0").toInt();
-    eventLoop = new QEventLoop(this);
-    networkManager = new QNetworkAccessManager(this);
+    uploadButton->setEnabled(true);
 }
 
 void
-StravaUploader::upload()
+ShareDialog::okClicked()
 {
-    // OAuth no more login
-    token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
-    if (token=="")
-    {
-        QMessageBox aMsgBox;
-        aMsgBox.setText(tr("Cannot login to Strava. Check permission"));
-        aMsgBox.exec();
-        return;
-    }
+    dialog->accept();
+    return;
+}
 
-    // already shared ?
-    if(stravaUploadId>0)
-    {
-        overwrite = false;
+void
+ShareDialog::closeClicked()
+{
+    dialog->reject();
+    return;
+}
 
+
+void
+ShareDialog::doUploader( ShareDialogUploader *uploader )
+{
+    assert(uploader);
+
+    if( uploader->wasUploaded() ){
         dialog = new QDialog();
         QVBoxLayout *layout = new QVBoxLayout;
 
         QVBoxLayout *layoutLabel = new QVBoxLayout();
         QLabel *label = new QLabel();
-        label->setText(tr("This Ride is marked as already on Strava. Are you sure you want to upload it?"));
+        label->setText(tr("This Ride is marked as already on %1. Are you sure you want to upload it?")
+            .arg(uploader->name()) );
         layoutLabel->addWidget(label);
 
         QPushButton *ok = new QPushButton(tr("OK"), dialog);
@@ -330,6 +383,46 @@ StravaUploader::upload()
 
         if (!dialog->exec()) return;
     }
+
+    uploader->upload();
+}
+
+StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
+    ShareDialogUploader( tr("Strava"), context, ride, parent)
+{
+    stravaUploadId = ride->ride()->getTag("Strava uploadId", "0").toInt();
+    eventLoop = new QEventLoop(this);
+    networkManager = new QNetworkAccessManager(this);
+}
+
+bool
+StravaUploader::canUpload( QString &err )
+{
+#ifdef GC_STRAVA_CLIENT_SECRET
+   token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
+   if( token!="" )
+        return true;
+
+    err = tr("no Strava token set. Please authorize in Settings.");
+#else
+    err = tr("Strava support isn't enabled in this build");
+#endif
+    return false;
+}
+
+bool
+StravaUploader::wasUploaded()
+{
+    return stravaUploadId>0;
+}
+
+void
+StravaUploader::upload()
+{
+    // OAuth no more login
+    token = appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "").toString();
+    if (token=="")
+        return;
 
     requestUploadStrava();
 
@@ -553,59 +646,32 @@ StravaUploader::requestVerifyUploadFinished(QNetworkReply *reply)
     }
 }
 
-void
-StravaUploader::okClicked()
-{
-    dialog->accept();
-    return;
-}
-
-void
-StravaUploader::closeClicked()
-{
-    dialog->reject();
-    return;
-}
-
 RideWithGpsUploader::RideWithGpsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
-    context(context), ride(ride), parent(parent)
+    ShareDialogUploader( tr("Ride With GPS"), context, ride, parent)
 {
     rideWithGpsActivityId = ride->ride()->getTag("RideWithGPS tripid", "");
+}
+
+bool
+RideWithGpsUploader::canUpload( QString &err )
+{
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER).toString();
+    if( username.length() > 0 )
+        return true;
+
+    err = tr("no credentials set for RideWithGps. Please check Settings.");
+    return false;
+}
+
+bool
+RideWithGpsUploader::wasUploaded()
+{
+    return rideWithGpsActivityId.length()>0;
 }
 
 void
 RideWithGpsUploader::upload()
 {
-    if(rideWithGpsActivityId.length()>0)
-    {
-        overwrite = false;
-
-        dialog = new QDialog();
-        QVBoxLayout *layout = new QVBoxLayout;
-
-        QVBoxLayout *layoutLabel = new QVBoxLayout();
-        QLabel *label = new QLabel();
-        label->setText(tr("This Ride is marked as already on RideWithGPS. Are you sure you want to upload it?"));
-        layoutLabel->addWidget(label);
-
-        QPushButton *ok = new QPushButton(tr("OK"), dialog);
-        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
-        QHBoxLayout *buttons = new QHBoxLayout();
-        buttons->addStretch();
-        buttons->addWidget(cancel);
-        buttons->addWidget(ok);
-
-        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
-        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
-
-        layout->addLayout(layoutLabel);
-        layout->addLayout(buttons);
-
-        dialog->setLayout(layout);
-
-        if (!dialog->exec()) return;
-    }
-
     requestUploadRideWithGPS();
 
     if(!uploadSuccessful)
@@ -763,24 +829,31 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
     }
 }
 
-void
-RideWithGpsUploader::okClicked()
-{
-    dialog->accept();
-    return;
-}
-
-void
-RideWithGpsUploader::closeClicked()
-{
-    dialog->reject();
-    return;
-}
-
 CyclingAnalyticsUploader::CyclingAnalyticsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
-    context(context), ride(ride), parent(parent)
+    ShareDialogUploader(tr("CyclingAnalytics"), context, ride, parent)
 {
     cyclingAnalyticsUploadId = ride->ride()->getTag("CyclingAnalytics uploadId", "0").toInt();
+}
+
+bool
+CyclingAnalyticsUploader::canUpload( QString &err )
+{
+#ifdef GC_CYCLINGANALYTICS_CLIENT_SECRET
+    token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
+   if( token!="" )
+        return true;
+
+    err = tr("no CyclingAnalytics token set. Please authorize in Settings.");
+#else
+    err = tr("CyclingAnalytics support isn't enabled in this build");
+#endif
+    return false;
+}
+
+bool
+CyclingAnalyticsUploader::wasUploaded()
+{
+    return cyclingAnalyticsUploadId>0;
 }
 
 void
@@ -788,44 +861,8 @@ CyclingAnalyticsUploader::upload()
 {
     // OAuth no more login
     token = appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "").toString();
-    if (token=="") {
-
-        QMessageBox aMsgBox;
-        aMsgBox.setText(tr("Cannot login to CyclingAnalytics. Check permission"));
-        aMsgBox.exec();
+    if (token=="")
         return;
-    }
-
-    // already shared ?
-    if(cyclingAnalyticsUploadId>0) {
-
-        overwrite = false;
-
-        dialog = new QDialog();
-        QVBoxLayout *layout = new QVBoxLayout;
-
-        QVBoxLayout *layoutLabel = new QVBoxLayout();
-        QLabel *label = new QLabel();
-        label->setText(tr("This Ride is marked as already on CyclingAnalytics. Are you sure you want to upload it?"));
-        layoutLabel->addWidget(label);
-
-        QPushButton *ok = new QPushButton(tr("OK"), dialog);
-        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
-        QHBoxLayout *buttons = new QHBoxLayout();
-        buttons->addStretch();
-        buttons->addWidget(cancel);
-        buttons->addWidget(ok);
-
-        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
-        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
-
-        layout->addLayout(layoutLabel);
-        layout->addLayout(buttons);
-
-        dialog->setLayout(layout);
-
-        if (!dialog->exec()) return;
-    }
 
     requestUploadCyclingAnalytics();
 
@@ -941,62 +978,34 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalyticsFinished(QNetworkReply *r
     }
 }
 
-void
-CyclingAnalyticsUploader::okClicked()
-{
-    dialog->accept();
-    return;
-}
-
-void
-CyclingAnalyticsUploader::closeClicked()
-{
-    dialog->reject();
-    return;
-}
-
 
 SelfLoopsUploader::SelfLoopsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
-    context(context), ride(ride), parent(parent)
+    ShareDialogUploader(tr("SelfLoops"),context, ride, parent)
 {
     selfloopsUploadId = ride->ride()->getTag("Selfloops uploadId", "0").toInt();
     selfloopsActivityId = ride->ride()->getTag("Selfloops activityId", "0").toInt();
 }
 
+bool
+SelfLoopsUploader::canUpload( QString &err )
+{
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_SELUSER).toString();
+    if( username.length() > 0 )
+        return true;
+
+    err = tr("no credentials set for SelfLoops. Please check Settings.");
+    return false;
+}
+
+bool
+SelfLoopsUploader::wasUploaded()
+{
+    return selfloopsActivityId>0;
+}
+
 void
 SelfLoopsUploader::upload()
 {
-    // allready shared ?
-    if(selfloopsActivityId>0) {
-
-        overwrite = false;
-
-        dialog = new QDialog();
-        QVBoxLayout *layout = new QVBoxLayout;
-
-        QVBoxLayout *layoutLabel = new QVBoxLayout();
-        QLabel *label = new QLabel();
-        label->setText(tr("This Ride is marked as already on Selfloops. Are you sure you want to upload it?"));
-        layoutLabel->addWidget(label);
-
-        QPushButton *ok = new QPushButton(tr("OK"), dialog);
-        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
-        QHBoxLayout *buttons = new QHBoxLayout();
-        buttons->addStretch();
-        buttons->addWidget(cancel);
-        buttons->addWidget(ok);
-
-        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
-        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
-
-        layout->addLayout(layoutLabel);
-        layout->addLayout(buttons);
-
-        dialog->setLayout(layout);
-
-        if (!dialog->exec()) return;
-    }
-
     requestUploadSelfLoops();
 
     if(!uploadSuccessful)
@@ -1121,66 +1130,27 @@ SelfLoopsUploader::requestUploadSelfLoopsFinished(QNetworkReply *reply)
     }
 }
 
-void
-SelfLoopsUploader::okClicked()
-{
-    dialog->accept();
-    return;
-}
-
-void
-SelfLoopsUploader::closeClicked()
-{
-    dialog->reject();
-    return;
-}
-
 #if 0 // NOT AVAILABLE -- COMMENTED OUT FOR VERSION 3.1
 /******************/
 /* Garmin Connect */
 /******************/
 
 GarminUploader::GarminUploader(Context *context, RideItem *ride, ShareDialog *parent) :
-    context(context), ride(ride), parent(parent)
+    ShareDialogUploader( tr("Garmin Connect"), context, ride, parent)
 {
     garminUploadId = ride->ride()->getTag("Garmin Connect uploadId", "");
     garminActivityId = ride->ride()->getTag("Garmin Connect activityId", "");
 }
 
+bool
+GarminUploader::wasUploaded()
+{
+    return garminActivityId.length()>0;
+}
+
 void
 GarminUploader::upload()
 {
-    // allready shared ?
-    if(garminActivityId.length()>0)
-    {
-        overwrite = false;
-
-        dialog = new QDialog();
-        QVBoxLayout *layout = new QVBoxLayout;
-
-        QVBoxLayout *layoutLabel = new QVBoxLayout();
-        QLabel *label = new QLabel();
-        label->setText(tr("This Ride is marked as already on Garmin Connect. Are you sure you want to upload it?"));
-        layoutLabel->addWidget(label);
-
-        QPushButton *ok = new QPushButton(tr("OK"), dialog);
-        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
-        QHBoxLayout *buttons = new QHBoxLayout();
-        buttons->addStretch();
-        buttons->addWidget(cancel);
-        buttons->addWidget(ok);
-
-        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
-        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
-
-        layout->addLayout(layoutLabel);
-        layout->addLayout(buttons);
-
-        dialog->setLayout(layout);
-
-        if (!dialog->exec()) return;
-    }
-
     requestFlowExecutionKey();
     //requestUploadGarmin();
 
@@ -1426,20 +1396,6 @@ GarminUploader::requestUploadGarminFinished(QNetworkReply *reply)
         parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
         uploadSuccessful = true;
     }
-}
-
-void
-GarminUploader::okClicked()
-{
-    dialog->accept();
-    return;
-}
-
-void
-GarminUploader::closeClicked()
-{
-    dialog->reject();
-    return;
 }
 
 #endif
