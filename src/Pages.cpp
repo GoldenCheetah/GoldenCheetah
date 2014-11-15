@@ -320,15 +320,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     main->setContentsMargins(0,0,0,0);
 
     QGridLayout *grid = new QGridLayout;
+    unsigned int row = 0;
 
-    QLabel *gc = new QLabel(tr("Golden Cheetah Racing"));
     QFont current;
     current.setWeight(QFont::Black);
-    gc->setFont(current);
 
-    QLabel *gcurlLabel = new QLabel(tr("Website"));
-    QLabel *gcuserLabel = new QLabel(tr("Username"));
-    QLabel *gcpassLabel = new QLabel(tr("Password"));
+    //////////////////////////////////////////////////
+    // TrainingPeaks
 
     QLabel *tp = new QLabel(tr("TrainingPeaks"));
     tp->setFont(current);
@@ -337,83 +335,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QLabel *userLabel = new QLabel(tr("Username"));
     QLabel *passLabel = new QLabel(tr("Password"));
     QLabel *typeLabel = new QLabel(tr("Account Type"));
-
-    QLabel *twp = new QLabel(tr("Twitter"));
-    twp->setFont(current);
-
-    QLabel *twurlLabel = new QLabel(tr("Website"));
-    QLabel *twauthLabel = new QLabel(tr("Authorise"));
-
-    QLabel *str = new QLabel(tr("Strava"));
-    str->setFont(current);
-
-    //QLabel *struserLabel = new QLabel(tr("Username"));
-    //QLabel *strpassLabel = new QLabel(tr("Password"));
-    QLabel *strauthLabel = new QLabel(tr("Authorise"));
-
-    QLabel *can = new QLabel(tr("Cycling Analytics"));
-    can->setFont(current);
-    QLabel *canauthLabel = new QLabel(tr("Authorise"));
-
-    QLabel *rwgps = new QLabel(tr("RideWithGPS"));
-    rwgps->setFont(current);
-
-    QLabel *rwgpsuserLabel = new QLabel(tr("Username"));
-    QLabel *rwgpspassLabel = new QLabel(tr("Password"));
-
-    QLabel *ttb = new QLabel(tr("Trainingstagebuch"));
-    ttb->setFont(current);
-
-    QLabel *ttbuserLabel = new QLabel(tr("Username"));
-    QLabel *ttbpassLabel = new QLabel(tr("Password"));
-
-    QLabel *velohero = new QLabel(tr("Velo Hero"));
-    velohero->setFont(current);
-
-    QLabel *veloherouserLabel = new QLabel(tr("Username"));
-    QLabel *veloheropassLabel = new QLabel(tr("Password"));
-
-    QLabel *sel = new QLabel(tr("Selfloops"));
-    sel->setFont(current);
-
-    QLabel *seluserLabel = new QLabel(tr("Username"));
-    QLabel *selpassLabel = new QLabel(tr("Password"));
-
-    QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
-    wip->setFont(current);
-
-    QLabel *wiurlLabel = new QLabel(tr("Website"));
-    QLabel *wiuserLabel = new QLabel(tr("User Id"));
-    QLabel *wipassLabel = new QLabel(tr("Public Key"));
-
-    QLabel *zeo = new QLabel(tr("Zeo Sleep Data"));
-    zeo->setFont(current);
-
-    QLabel *zeourlLabel = new QLabel(tr("Website"));
-    QLabel *zeouserLabel = new QLabel(tr("User"));
-    QLabel *zeopassLabel = new QLabel(tr("Password"));
-
-
-    QLabel *webcal = new QLabel(tr("Web Calendar"));
-    webcal->setFont(current);
-    QLabel *wcurlLabel = new QLabel(tr("Webcal URL"));
-
-    QLabel *dv = new QLabel(tr("CalDAV Calendar"));
-    dv->setFont(current);
-    QLabel *dvurlLabel = new QLabel(tr("CalDAV URL"));
-    QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
-    QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
-
-
-    gcURL = new QLineEdit(this);
-    gcURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCURL, "http://race.goldencheetah.org").toString());
-
-    gcUser = new QLineEdit(this);
-    gcUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCUSER, "").toString());
-
-    gcPass = new QLineEdit(this);
-    gcPass->setEchoMode(QLineEdit::Password);
-    gcPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCPASS, "").toString());
 
     tpURL = new QLineEdit(this);
     tpURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TPURL, "http://www.trainingpeaks.com").toString());
@@ -435,6 +356,62 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     tpType->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_TPTYPE, "0").toInt());
 
+    grid->addWidget(tp, row, 0);
+
+    grid->addWidget(urlLabel, ++row, 0);
+    grid->addWidget(tpURL, row, 1, 0);
+
+    grid->addWidget(userLabel, ++row, 0);
+    grid->addWidget(tpUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(passLabel, ++row, 0);
+    grid->addWidget(tpPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(typeLabel, ++row, 0);
+    grid->addWidget(tpType, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+
+    //////////////////////////////////////////////////
+    // Golden Cheetah Racing
+
+    QLabel *gc = new QLabel(tr("Golden Cheetah Racing"));
+    gc->setFont(current);
+
+    QLabel *gcurlLabel = new QLabel(tr("Website"));
+    QLabel *gcuserLabel = new QLabel(tr("Username"));
+    QLabel *gcpassLabel = new QLabel(tr("Password"));
+
+    gcURL = new QLineEdit(this);
+    gcURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCURL, "http://race.goldencheetah.org").toString());
+
+    gcUser = new QLineEdit(this);
+    gcUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCUSER, "").toString());
+
+    gcPass = new QLineEdit(this);
+    gcPass->setEchoMode(QLineEdit::Password);
+    gcPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCPASS, "").toString());
+
+    grid->addWidget(gc, ++row, 0);
+
+    grid->addWidget(gcurlLabel, ++row, 0);
+    grid->addWidget(gcURL, row, 1, 0);
+
+    grid->addWidget(gcuserLabel, ++row, 0);
+    grid->addWidget(gcUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(gcpassLabel, ++row, 0);
+    grid->addWidget(gcPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    //////////////////////////////////////////////////
+    // Twitter
+
+    QLabel *twp = new QLabel(tr("Twitter"));
+    twp->setFont(current);
+
+    QLabel *twurlLabel = new QLabel(tr("Website"));
+    QLabel *twauthLabel = new QLabel(tr("Authorise"));
+
+
     twitterURL = new QLineEdit(this);
     twitterURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TWURL, "http://www.twitter.com").toString());
     twitterAuthorise = new QPushButton(tr("Authorise"), this);
@@ -446,6 +423,30 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     twitterAuthorised->setIconSize(QSize(16,16));
     twitterAuthorised->setFixedHeight(16);
     twitterAuthorised->setFixedWidth(16);
+
+    grid->addWidget(twp, ++row, 0);
+
+    grid->addWidget(twurlLabel, ++row, 0);
+    grid->addWidget(twitterURL, row, 1, 0);
+
+    grid->addWidget(twauthLabel, ++row, 0);
+    grid->addWidget(twitterAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_TOKEN, "")!="")
+        grid->addWidget(twitterAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        twitterAuthorised->hide(); // if no token no show
+
+    //grid->addWidget(twpinLabel, ++row, 0);
+
+    //////////////////////////////////////////////////
+    // Strava
+
+    QLabel *str = new QLabel(tr("Strava"));
+    str->setFont(current);
+
+    //QLabel *struserLabel = new QLabel(tr("Username"));
+    //QLabel *strpassLabel = new QLabel(tr("Password"));
+    QLabel *strauthLabel = new QLabel(tr("Authorise"));
 
     stravaAuthorise = new QPushButton(tr("Authorise"), this);
 
@@ -460,6 +461,22 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     stravaAuthorised->setFixedHeight(16);
     stravaAuthorised->setFixedWidth(16);
 
+    grid->addWidget(str, ++row, 0);
+
+    grid->addWidget(strauthLabel, ++row, 0);
+    grid->addWidget(stravaAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "")!="")
+        grid->addWidget(stravaAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        stravaAuthorised->hide(); // if no token no show
+
+    //////////////////////////////////////////////////
+    // Cycling Analytics
+
+    QLabel *can = new QLabel(tr("Cycling Analytics"));
+    can->setFont(current);
+    QLabel *canauthLabel = new QLabel(tr("Authorise"));
+
     cyclingAnalyticsAuthorise = new QPushButton(tr("Authorise"), this);
 #ifndef GC_CYCLINGANALYTICS_CLIENT_SECRET
     cyclingAnalyticsAuthorise->setEnabled(false);
@@ -472,6 +489,24 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     cyclingAnalyticsAuthorised->setFixedHeight(16);
     cyclingAnalyticsAuthorised->setFixedWidth(16);
 
+    grid->addWidget(can, ++row, 0);
+
+    grid->addWidget(canauthLabel, ++row, 0);
+    grid->addWidget(cyclingAnalyticsAuthorise, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    if (appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "")!="")
+        grid->addWidget(cyclingAnalyticsAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    else
+        cyclingAnalyticsAuthorised->hide();
+
+    //////////////////////////////////////////////////
+    // RideWithGPS
+
+    QLabel *rwgps = new QLabel(tr("RideWithGPS"));
+    rwgps->setFont(current);
+
+    QLabel *rwgpsuserLabel = new QLabel(tr("Username"));
+    QLabel *rwgpspassLabel = new QLabel(tr("Password"));
+
     rideWithGPSUser = new QLineEdit(this);
     rideWithGPSUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_RWGPSUSER, "").toString());
 
@@ -479,26 +514,23 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     rideWithGPSPass->setEchoMode(QLineEdit::Password);
     rideWithGPSPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_RWGPSPASS, "").toString());
 
-    ttbUser = new QLineEdit(this);
-    ttbUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER, "").toString());
+    grid->addWidget(rwgps, ++row, 0);
 
-    ttbPass = new QLineEdit(this);
-    ttbPass->setEchoMode(QLineEdit::Password);
-    ttbPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS, "").toString());
+    grid->addWidget(rwgpsuserLabel, ++row, 0);
+    grid->addWidget(rideWithGPSUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    veloHeroUser = new QLineEdit(this);
-    veloHeroUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER, "").toString());
+    grid->addWidget(rwgpspassLabel, ++row, 0);
+    grid->addWidget(rideWithGPSPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    veloHeroPass = new QLineEdit(this);
-    veloHeroPass->setEchoMode(QLineEdit::Password);
-    veloHeroPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS, "").toString());
+    //////////////////////////////////////////////////
+    // Withings Wifi Scales
 
-    selUser = new QLineEdit(this);
-    selUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELUSER, "").toString());
+    QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
+    wip->setFont(current);
 
-    selPass = new QLineEdit(this);
-    selPass->setEchoMode(QLineEdit::Password);
-    selPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELPASS, "").toString());
+    QLabel *wiurlLabel = new QLabel(tr("Website"));
+    QLabel *wiuserLabel = new QLabel(tr("User Id"));
+    QLabel *wipassLabel = new QLabel(tr("Public Key"));
 
     wiURL = new QLineEdit(this);
     wiURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
@@ -508,6 +540,27 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
     wiPass = new QLineEdit(this);
     wiPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_WIKEY, "").toString());
+
+    grid->addWidget(wip, ++row, 0);
+
+    grid->addWidget(wiurlLabel, ++row, 0);
+    grid->addWidget(wiURL, row, 1, 0);
+
+    grid->addWidget(wiuserLabel, ++row, 0);
+    grid->addWidget(wiUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(wipassLabel, ++row, 0);
+    grid->addWidget(wiPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    //////////////////////////////////////////////////
+    // Zeo Sleep Data
+
+    QLabel *zeo = new QLabel(tr("Zeo Sleep Data"));
+    zeo->setFont(current);
+
+    QLabel *zeourlLabel = new QLabel(tr("Website"));
+    QLabel *zeouserLabel = new QLabel(tr("User"));
+    QLabel *zeopassLabel = new QLabel(tr("Password"));
 
     zeoURL = new QLineEdit(this);
     zeoURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080/").toString());
@@ -519,8 +572,40 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     zeoPass->setEchoMode(QLineEdit::Password);
     zeoPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_ZEOPASS, "").toString());
 
+    grid->addWidget(zeo, ++row, 0);
+
+    grid->addWidget(zeourlLabel, ++row, 0);
+    grid->addWidget(zeoURL, row, 1, 0);
+
+    grid->addWidget(zeouserLabel, ++row, 0);
+    grid->addWidget(zeoUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(zeopassLabel, ++row, 0);
+    grid->addWidget(zeoPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    //////////////////////////////////////////////////
+    // Web Calendar
+
+    QLabel *webcal = new QLabel(tr("Web Calendar"));
+    webcal->setFont(current);
+    QLabel *wcurlLabel = new QLabel(tr("Webcal URL"));
+
     webcalURL = new QLineEdit(this);
     webcalURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_WEBCAL_URL, "").toString());
+
+    grid->addWidget(webcal, ++row, 0);
+
+    grid->addWidget(wcurlLabel, ++row, 0);
+    grid->addWidget(webcalURL, row, 1, 0);
+
+    //////////////////////////////////////////////////
+    // CalDAV Calendar
+
+    QLabel *dv = new QLabel(tr("CalDAV Calendar"));
+    dv->setFont(current);
+    QLabel *dvurlLabel = new QLabel(tr("CalDAV URL"));
+    QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
+    QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
 
     dvURL = new QLineEdit(this);
     QString url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
@@ -534,104 +619,92 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     dvPass->setEchoMode(QLineEdit::Password);
     dvPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_DVPASS, "").toString());
 
-    grid->addWidget(tp, 0,0);
-    grid->addWidget(urlLabel, 1,0);
-    grid->addWidget(userLabel, 2,0);
-    grid->addWidget(passLabel, 3,0);
-    grid->addWidget(typeLabel, 4,0);
-    grid->addWidget(gc, 5,0);
-    grid->addWidget(gcurlLabel, 6,0);
-    grid->addWidget(gcuserLabel, 7,0);
-    grid->addWidget(gcpassLabel, 8,0);
-    grid->addWidget(twp, 9,0);
-    grid->addWidget(twurlLabel, 10,0);
-    grid->addWidget(twauthLabel, 11,0);
-    //grid->addWidget(twpinLabel, 12,0);
-    grid->addWidget(str, 13,0);
-    grid->addWidget(strauthLabel, 14,0);
-    grid->addWidget(can, 15,0);
-    grid->addWidget(canauthLabel, 16,0);
-    grid->addWidget(rwgps, 18,0);
-    grid->addWidget(rwgpsuserLabel, 19,0);
-    grid->addWidget(rwgpspassLabel, 20,0);
-    grid->addWidget(wip, 21,0);
-    grid->addWidget(wiurlLabel, 22,0);
-    grid->addWidget(wiuserLabel, 23,0);
-    grid->addWidget(wipassLabel, 24,0);
-    grid->addWidget(zeo, 25,0);
-    grid->addWidget(zeourlLabel, 26,0);
-    grid->addWidget(zeouserLabel, 27,0);
-    grid->addWidget(zeopassLabel, 28,0);
-    grid->addWidget(webcal, 29, 0);
-    grid->addWidget(wcurlLabel, 30, 0);
-    grid->addWidget(dv, 31,0);
-    grid->addWidget(dvurlLabel, 32,0);
-    grid->addWidget(dvuserLabel, 33,0);
-    grid->addWidget(dvpassLabel, 34,0);
-    grid->addWidget(ttb, 35,0);
-    grid->addWidget(ttbuserLabel, 36,0);
-    grid->addWidget(ttbpassLabel, 37,0);
-    grid->addWidget(sel, 38,0);
-    grid->addWidget(seluserLabel, 39,0);
-    grid->addWidget(selpassLabel, 40,0);
-    grid->addWidget(velohero, 41,0);
-    grid->addWidget(veloherouserLabel, 42,0);
-    grid->addWidget(veloheropassLabel, 43,0);
+    grid->addWidget(dv, ++row, 0);
 
-    grid->addWidget(tpURL, 1, 1, 0);
-    grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(tpPass, 3, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(tpType, 4, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvurlLabel, ++row, 0);
+    grid->addWidget(dvURL, row, 1, 0);
 
-    grid->addWidget(gcURL, 6, 1, 0);
-    grid->addWidget(gcUser, 7, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(gcPass, 8, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvuserLabel, ++row, 0);
+    grid->addWidget(dvUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(twitterURL, 10, 1, 0);
-    grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvpassLabel, ++row, 0);
+    grid->addWidget(dvPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    if (appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_TOKEN, "")!="")
-        grid->addWidget(twitterAuthorised, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        twitterAuthorised->hide(); // if no token no show
+    //////////////////////////////////////////////////
+    // Trainingstagebuch
 
-    grid->addWidget(stravaAuthorise, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_STRAVA_TOKEN, "")!="")
-        grid->addWidget(stravaAuthorised, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        stravaAuthorised->hide(); // if no token no show
+    QLabel *ttb = new QLabel(tr("Trainingstagebuch"));
+    ttb->setFont(current);
 
-    grid->addWidget(cyclingAnalyticsAuthorise, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    if (appsettings->cvalue(context->athlete->cyclist, GC_CYCLINGANALYTICS_TOKEN, "")!="")
-        grid->addWidget(cyclingAnalyticsAuthorised, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    else
-        cyclingAnalyticsAuthorised->hide();
+    QLabel *ttbuserLabel = new QLabel(tr("Username"));
+    QLabel *ttbpassLabel = new QLabel(tr("Password"));
 
-    grid->addWidget(rideWithGPSUser, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(rideWithGPSPass, 20, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    ttbUser = new QLineEdit(this);
+    ttbUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER, "").toString());
 
-    grid->addWidget(wiURL, 22, 1, 0);
-    grid->addWidget(wiUser, 23, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(wiPass, 24, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    ttbPass = new QLineEdit(this);
+    ttbPass->setEchoMode(QLineEdit::Password);
+    ttbPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_TTBPASS, "").toString());
 
-    grid->addWidget(zeoURL, 26, 1, 0);
-    grid->addWidget(zeoUser, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(zeoPass, 28, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttb, ++row, 0);
 
-    grid->addWidget(webcalURL, 30, 1, 0);
+    grid->addWidget(ttbuserLabel, ++row, 0);
+    grid->addWidget(ttbUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(dvURL, 32, 1, 0);
-    grid->addWidget(dvUser, 33, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(dvPass, 34, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttbpassLabel, ++row, 0);
+    grid->addWidget(ttbPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(ttbUser, 36, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(ttbPass, 37, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    //////////////////////////////////////////////////
+    // Selfloops
 
-    grid->addWidget(selUser, 39, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(selPass, 40, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    QLabel *sel = new QLabel(tr("Selfloops"));
+    sel->setFont(current);
 
-    grid->addWidget(veloHeroUser, 42, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(veloHeroPass, 43, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    QLabel *seluserLabel = new QLabel(tr("Username"));
+    QLabel *selpassLabel = new QLabel(tr("Password"));
+
+    selUser = new QLineEdit(this);
+    selUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELUSER, "").toString());
+
+    selPass = new QLineEdit(this);
+    selPass->setEchoMode(QLineEdit::Password);
+    selPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_SELPASS, "").toString());
+
+    grid->addWidget(sel, ++row, 0);
+
+    grid->addWidget(seluserLabel, ++row, 0);
+    grid->addWidget(selUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(selpassLabel, ++row, 0);
+    grid->addWidget(selPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    //////////////////////////////////////////////////
+    // Velo Hero
+
+    QLabel *velohero = new QLabel(tr("Velo Hero"));
+    velohero->setFont(current);
+
+    QLabel *veloherouserLabel = new QLabel(tr("Username"));
+    QLabel *veloheropassLabel = new QLabel(tr("Password"));
+
+    veloHeroUser = new QLineEdit(this);
+    veloHeroUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER, "").toString());
+
+    veloHeroPass = new QLineEdit(this);
+    veloHeroPass->setEchoMode(QLineEdit::Password);
+    veloHeroPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROPASS, "").toString());
+
+    grid->addWidget(velohero, ++row, 0);
+
+    grid->addWidget(veloherouserLabel, ++row, 0);
+    grid->addWidget(veloHeroUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(veloheropassLabel, ++row, 0);
+    grid->addWidget(veloHeroPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+
+    //////////////////////////////////////////////////
+    // End of grid
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
