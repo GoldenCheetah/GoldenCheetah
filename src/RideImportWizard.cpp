@@ -142,7 +142,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 files.append(f.absoluteFilePath());
                 j++;
             }
-            directoryWidget->item(i,2)->setText(tr("%1 Files selected for import").arg(QString::number(j)));
+            directoryWidget->item(i,2)->setText(tr("%1 files for import selected").arg(QString::number(j)));
           } else {
             directoryWidget->item(i,2)->setText(tr("No activity files found"));
             continue;
@@ -291,7 +291,11 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     QVBoxLayout *contents = new QVBoxLayout(this);
     if (autoImportMode) {
         contents->addWidget(directoryWidget);
-
+        // only show table if files are available in autoimportMode
+        if (files.count() == 0) {
+            tableWidget->setVisible(false);
+            progressBar->setVisible(false);
+        }
     }
     contents->addWidget(tableWidget);
     contents->addWidget(progressBar);
@@ -320,7 +324,6 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 
     if (autoImportMode) directoryWidget->adjustSize();
     tableWidget->adjustSize();
-
 
     // Refresh prior to running down the list & processing...
     if (!isActiveWindow()) activateWindow();
@@ -619,6 +622,16 @@ RideImportWizard::process()
       abortButton->setDisabled(true);
    }
    connect(tableWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(activateSave()));
+
+   // in autoimport mode / no files, skip "Save",... and goto "Finish"
+   if (autoImportMode && filenames.count()== 0) {
+       cancelButton->setHidden(true);
+       todayButton->setHidden(true);
+       abortButton->setDisabled(false);
+       phaseLabel->setText(tr("No files for automatic import selected."));
+       abortButton->setText(tr("Finish"));
+       aborted = false;
+   }
 
    return 0;
 }
