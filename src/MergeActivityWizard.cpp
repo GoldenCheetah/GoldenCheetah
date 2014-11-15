@@ -988,10 +988,23 @@ MergeAdjust::offsetChanged()
         wizard->offset2 = 0;
     } else {
         wizard->offset1 = 0;
-        wizard->offset2 = adjustSlider->value() * -1;
+        wizard->offset2 = adjustSlider->value();
     }
     wizard->combine();
+
     fullPlot->setDataFromRide(wizard->combinedItem);
+
+    bool rescale = (spanSlider->minimum() == spanSlider->lowerValue() &&
+                    spanSlider->maximum() == spanSlider->upperValue());
+
+    spanSlider->setMinimum(0);
+    spanSlider->setMaximum(wizard->combined->dataPoints().last()->secs);
+
+    if (rescale) {
+        spanSlider->setLowerValue(spanSlider->minimum());
+        spanSlider->setUpperValue(spanSlider->maximum());
+        zoomChanged();
+    }
 }
 
 void 
