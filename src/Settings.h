@@ -155,18 +155,23 @@
 #define GC_DPFHRS_MAX     "dataprocess/fixhrspikes/max"
 
 // ride navigator
-#define GC_NAVHEADINGS    "navigator/headings"
+#define GC_NAVHEADINGS      "navigator/headings"
 #define GC_NAVHEADINGWIDTHS "bavigator/headingwidths"
 #define GC_NAVGROUPBY       "navigator/groupby"
 #define GC_SORTBY           "navigator/sortby"
 #define GC_SORTBYORDER      "navigator/sortbyorder"
 
-// route navigator
+// route interval navigator
 #define GC_ROUTEHEADINGS      "routenavigator/headings"
 #define GC_ROUTEHEADINGWIDTHS "routenavigator/headingwidths"
-#define GC_ROUTEGROUPBY       "routenavigator/groupby"
 #define GC_ROUTESORTBY        "routenavigator/sortby"
 #define GC_ROUTESORTBYORDER   "routenavigator/sortbyorder"
+
+// best interval navigator
+#define GC_BESTHEADINGS      "bestnavigator/headings"
+#define GC_BESTHEADINGWIDTHS "bestnavigator/headingwidths"
+#define GC_BESTSORTBY        "bestnavigator/sortby"
+#define GC_BESTSORTBYORDER   "bestnavigator/sortbyorder"
 
 //Twitter oauth keys
 #define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key

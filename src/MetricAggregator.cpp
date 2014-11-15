@@ -330,6 +330,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 #endif
     context->athlete->isclean = true;
 
+    refreshBestIntervals();
+
     // clear out the estimates if something changed!
     if (updates) context->athlete->PDEstimates.clear();
 
@@ -358,6 +360,9 @@ MetricAggregator::refreshBestIntervals()
 
     QString symbol = "20m_critical_power";
     int n = 10;
+
+    // Remove old interval
+    dbaccess->deleteIntervalsForTypeAndGroupName("Best", "Best 20min");
 
     // get all fields...
     QList<SummaryMetrics> allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
