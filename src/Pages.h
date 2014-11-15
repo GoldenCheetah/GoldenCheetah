@@ -146,9 +146,11 @@ class CredentialsPage : public QScrollArea
         void saveClicked();
 
     public slots:
+#ifdef GC_HAVE_LIBOAUTH
         void authoriseTwitter();
         void authoriseStrava();
         void authoriseCyclingAnalytics();
+#endif
 
     private:
         Context *context;
@@ -163,6 +165,7 @@ class CredentialsPage : public QScrollArea
         QLineEdit *gcUser;
         QLineEdit *gcPass;
 
+#ifdef GC_HAVE_LIBOAUTH
         QLineEdit *twitterURL; // url for twitter.com
         QPushButton *twitterAuthorise;
         QLineEdit *twitterPIN;
@@ -172,7 +175,7 @@ class CredentialsPage : public QScrollArea
         char *s_id, *s_secret;
 
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
-
+#endif
 
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;
