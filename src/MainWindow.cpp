@@ -554,10 +554,14 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("&Manual ride entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
+#ifdef GC_HAVE_LIBOAUTH
+    shareAction = new QAction(tr("Share Online..."), this);
+    shareAction->setShortcut(tr("Ctrl+U"));
+    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
+    rideMenu->addAction(shareAction);
+#endif
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
     rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
-    rideMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
-    rideMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+T"));
@@ -568,11 +572,6 @@ MainWindow::MainWindow(const QDir &home)
     tweetAction = new QAction(tr("Tweet Ride"), this);
     connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
     rideMenu->addAction(tweetAction);
-
-    shareAction = new QAction(tr("Share (Strava, RideWithGPS, CyclingAnalytics, VeloHero, Trainigstagebuch)..."), this);
-    shareAction->setShortcut(tr("Ctrl+U"));
-    connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
-    rideMenu->addAction(shareAction);
 #endif
 
     rideMenu->addSeparator ();
@@ -606,16 +605,18 @@ MainWindow::MainWindow(const QDir &home)
     //optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr ("")); // planned for v3.1
     optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
 #endif
+    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
+    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
 
+    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
     QMap<QString, DataProcessor*> processors = factory.getProcessors();
 
     if (processors.count()) {
 
-        optionsMenu->addSeparator();
         toolMapper = new QSignalMapper(this); // maps each option
         QMapIterator<QString, DataProcessor*> i(processors);
         connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
@@ -625,7 +626,7 @@ MainWindow::MainWindow(const QDir &home)
             i.next();
             // The localized processor name is shown in menu
             QAction *action = new QAction(QString("%1...").arg(i.value()->name()), this);
-            optionsMenu->addAction(action);
+            editMenu->addAction(action);
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, i.key());
         }
