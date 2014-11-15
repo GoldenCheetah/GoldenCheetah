@@ -405,6 +405,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     //////////////////////////////////////////////////
     // Twitter
 
+#ifdef GC_HAVE_LIBOAUTH
     QLabel *twp = new QLabel(tr("Twitter"));
     twp->setFont(current);
 
@@ -436,11 +437,15 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     else
         twitterAuthorised->hide(); // if no token no show
 
+    connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
+#endif
+
     //grid->addWidget(twpinLabel, ++row, 0);
 
     //////////////////////////////////////////////////
     // Strava
 
+#ifdef GC_HAVE_LIBOAUTH
     QLabel *str = new QLabel(tr("Strava"));
     str->setFont(current);
 
@@ -470,9 +475,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     else
         stravaAuthorised->hide(); // if no token no show
 
+    connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
+#endif
+
     //////////////////////////////////////////////////
     // Cycling Analytics
 
+#ifdef GC_HAVE_LIBOAUTH
     QLabel *can = new QLabel(tr("Cycling Analytics"));
     can->setFont(current);
     QLabel *canauthLabel = new QLabel(tr("Authorise"));
@@ -497,6 +506,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         grid->addWidget(cyclingAnalyticsAuthorised, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
     else
         cyclingAnalyticsAuthorised->hide();
+
+    connect(cyclingAnalyticsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseCyclingAnalytics()));
+#endif
 
     //////////////////////////////////////////////////
     // RideWithGPS
@@ -715,19 +727,15 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     setWidgetResizable(true);
     setWidget(main);
 
-    connect(twitterAuthorise, SIGNAL(clicked()), this, SLOT(authoriseTwitter()));
-    connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
-    connect(cyclingAnalyticsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseCyclingAnalytics()));
 }
 
 
+#ifdef GC_HAVE_LIBOAUTH
 void CredentialsPage::authoriseTwitter()
 {
-#ifdef GC_HAVE_LIBOAUTH
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
-#endif
     /*
 #ifdef GC_HAVE_LIBOAUTH
     int rc;
@@ -757,24 +765,25 @@ void CredentialsPage::authoriseTwitter()
 #endif
     */
 }
+#endif
 
+#ifdef GC_HAVE_LIBOAUTH
 void CredentialsPage::authoriseStrava()
 {
-#ifdef GC_HAVE_LIBOAUTH
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
-#endif
 }
+#endif
 
+#ifdef GC_HAVE_LIBOAUTH
 void CredentialsPage::authoriseCyclingAnalytics()
 {
-#ifdef GC_HAVE_LIBOAUTH
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::CYCLING_ANALYTICS);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
-#endif
 }
+#endif
 
 void
 CredentialsPage::saveClicked()

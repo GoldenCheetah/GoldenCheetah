@@ -70,6 +70,7 @@ protected:
 
 };
 
+#ifdef GC_HAVE_LIBOAUTH
 // uploader to strava.com
 class StravaUploader : public ShareDialogUploader
 {
@@ -103,6 +104,7 @@ private:
     QString uploadStatus;
     int uploadProgress;
 };
+#endif
 
 // uploader to ridewithgps.com
 class RideWithGpsUploader : public ShareDialogUploader
@@ -128,6 +130,7 @@ private:
     bool loggedIn, uploadSuccessful;
 };
 
+#ifdef GC_HAVE_LIBOAUTH
 // uploader to cyclinganalytics.com
 class CyclingAnalyticsUploader : public ShareDialogUploader
 {
@@ -154,6 +157,7 @@ private:
     int uploadProgress;
     int cyclingAnalyticsUploadId;
 };
+#endif
 
 // uploader to selfloops.com
 class SelfLoopsUploader : public ShareDialogUploader
@@ -262,9 +266,11 @@ private:
      QPushButton *closeButton;
 
 
+#ifdef GC_HAVE_LIBOAUTH
      QCheckBox *stravaChk;
-     QCheckBox *rideWithGPSChk;
      QCheckBox *cyclingAnalyticsChk;
+#endif
+     QCheckBox *rideWithGPSChk;
      QCheckBox *selfLoopsChk;
      QCheckBox *veloHeroChk;
      QCheckBox *trainingstagebuchChk;
@@ -272,9 +278,11 @@ private:
 
      RideItem *ride;
 
+#ifdef GC_HAVE_LIBOAUTH
      ShareDialogUploader *stravaUploader;
-     ShareDialogUploader *rideWithGpsUploader;
      ShareDialogUploader *cyclingAnalyticsUploader;
+#endif
+     ShareDialogUploader *rideWithGpsUploader;
      ShareDialogUploader *selfLoopsUploader;
      ShareDialogUploader *veloHeroUploader;
      ShareDialogUploader *trainingstagebuchUploader;
