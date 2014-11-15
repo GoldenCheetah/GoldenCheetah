@@ -441,9 +441,9 @@ HEADERS += \
         TrainSidebar.h \
         TreeMapWindow.h \
         TreeMapPlot.h \
-        TtbDialog.h \
+        TrainingstagebuchUploader.h \
         Units.h \
-        VeloHeroDialog.h \
+        VeloHeroUploader.h \
         Views.h \
         WithingsDownload.h \
         WkoRideFile.h \
@@ -661,10 +661,10 @@ SOURCES += \
         TrainSidebar.cpp \
         TreeMapWindow.cpp \
         TreeMapPlot.cpp \
-        TtbDialog.cpp \
+        TrainingstagebuchUploader.cpp \
         TRIMPPoints.cpp \
         Units.cpp \
-        VeloHeroDialog.cpp \
+        VeloHeroUploader.cpp \
         Views.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \
