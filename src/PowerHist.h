@@ -26,6 +26,7 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "PaceZones.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
@@ -49,6 +50,8 @@ class PowerHistBackground;
 class PowerHistZoneLabel;
 class HrHistBackground;
 class HrHistZoneLabel;
+class PaceHistBackground;
+class PaceHistZoneLabel;
 class LTMCanvasPicker;
 class ZoneScaleDraw;
 class SummaryMetrics;
@@ -94,7 +97,7 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
 
         // storage for data counts
         QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsCPZoneArray, wattsKgArray, nmArray, hrArray,
-                              hrZoneArray, kphArray, cadArray, gearArray, metricArray;
+                              hrZoneArray, kphArray, paceZoneArray, cadArray, gearArray, metricArray;
 
         // storage for data counts in interval selected
         QVector<unsigned int> aPowerSelectedArray, 
@@ -104,6 +107,7 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
                               wattsKgSelectedArray,
                               nmSelectedArray, hrSelectedArray,
                               hrZoneSelectedArray, kphSelectedArray,
+                              paceZoneSelectedArray,
                               cadSelectedArray, gearSelectedArray;
 };
 
@@ -112,6 +116,8 @@ class PowerHist : public QwtPlot
     Q_OBJECT
     G_OBJECT
 
+    friend class ::PaceHistBackground;
+    friend class ::PaceHistZoneLabel;
     friend class ::HrHistBackground;
     friend class ::HrHistZoneLabel;
     friend class ::PowerHistBackground;
@@ -187,13 +193,16 @@ class PowerHist : public QwtPlot
 
     protected:
 
+        bool isZoningEnabled();
         void refreshHRZoneLabels();
+        void refreshPaceZoneLabels();
         void setParameterAxisTitle();
         bool isSelected(const RideFilePoint *p, double);
         void percentify(QVector<double> &, double factor); // and a function to convert
 
         bool shadeZones() const; // check if zone shading is both wanted and possible
         bool shadeHRZones() const; // check if zone shading is both wanted and possible
+        bool shadePaceZones() const; // check if zone shading is both wanted and possible
 
         // plot settings
         RideItem *rideItem;
@@ -216,6 +225,7 @@ class PowerHist : public QwtPlot
         QwtPlotGrid *grid;
         PowerHistBackground *bg;
         HrHistBackground *hrbg;
+        PaceHistBackground *pacebg;
         penTooltip *zoomer;
         LTMCanvasPicker *canvasPicker;
 
@@ -228,6 +238,7 @@ class PowerHist : public QwtPlot
         // background shading
         QList <PowerHistZoneLabel *> zoneLabels;
         QList <HrHistZoneLabel *> hrzoneLabels;
+        QList <PaceHistZoneLabel *> pacezoneLabels;
 
         // zone data labels (actual values)
         QList <QwtPlotMarker *> zoneDataLabels;
@@ -543,6 +554,145 @@ public:
               const QRectF &rect) const
     {
 	if (parent->shadeHRZones()) {
+            int x = xMap.transform(watts);
+	    int y = (rect.bottom() + rect.top()) / 2;
+
+	    // the following code based on source for QwtPlotMarker::draw()
+            QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
+	    tr.moveCenter(QPoint(y, -x));
+	    painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
+	    text.draw(painter, tr);
+	}
+    }
+};
+
+// define a background class to handle shading of pace zones
+// draws pace zone bands IF zones are defined and the option
+// to draw bonds has been selected
+class PaceHistBackground: public QwtPlotItem
+{
+private:
+    PowerHist *parent;
+
+public:
+    PaceHistBackground(PowerHist *_parent)
+    {
+        setZ(0.0);
+        parent = _parent;
+    }
+
+    virtual int rtti() const
+    {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    virtual void draw(QPainter *painter,
+                      const QwtScaleMap &xMap, const QwtScaleMap &,
+                      const QRectF &rect) const
+    {
+	RideItem *rideItem = parent->rideItem;
+
+    // only for running activities
+	if (! rideItem || ! rideItem->isRun())
+	    return;
+
+	const PaceZones *zones = parent->context->athlete->paceZones();
+	int zone_range = parent->context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+
+	if (parent->shadePaceZones() && (zone_range >= 0)) {
+	    QList <double> zone_lows = zones->getZoneLows(zone_range);
+	    int num_zones = zone_lows.size();
+	    if (num_zones > 0) {
+		for (int z = 0; z < num_zones; z ++) {
+                    QRectF r = rect;
+
+		    QColor shading_color =
+			paceZoneColor(z, num_zones);
+		    shading_color.setHsv(
+					 shading_color.hue(),
+					 shading_color.saturation() / 4,
+					 shading_color.value()
+					 );
+		    r.setLeft(xMap.transform(zone_lows[z]));
+		    if (z + 1 < num_zones)
+			r.setRight(xMap.transform(zone_lows[z + 1]));
+		    if (r.right() >= r.left())
+			painter->fillRect(r, shading_color);
+		}
+	    }
+	}
+    }
+};
+
+// Zone labels are drawn if pace zone bands are enabled, automatically
+// at the center of the plot
+class PaceHistZoneLabel: public QwtPlotItem
+{
+private:
+    PowerHist *parent;
+    int zone_number;
+    double watts;
+    QwtText text;
+
+public:
+    PaceHistZoneLabel(PowerHist *_parent, int _zone_number)
+    {
+	parent = _parent;
+	zone_number = _zone_number;
+
+	RideItem *rideItem = parent->rideItem;
+
+    // only for running activities
+	if (! rideItem || ! rideItem->isRun())
+	    return;
+
+	const PaceZones *zones = parent->context->athlete->paceZones();
+	int zone_range = parent->context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+
+	setZ(1.0 + zone_number / 100.0);
+
+	// create new zone labels if we're shading
+	if (parent->shadePaceZones() && (zone_range >= 0)) {
+	    QList <double> zone_lows = zones->getZoneLows(zone_range);
+	    QList <QString> zone_names = zones->getZoneNames(zone_range);
+	    int num_zones = zone_lows.size();
+	    assert(zone_names.size() == num_zones);
+	    if (zone_number < num_zones) {
+                double min = parent->minX;
+                if (zone_lows[zone_number]>min)
+                    min = zone_lows[zone_number];
+
+                watts =
+		    (
+		     (zone_number + 1 < num_zones) ?
+                     0.5 * (min + zone_lows[zone_number + 1]) :
+		     (
+		      (zone_number > 0) ?
+		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
+		      2.0 * zone_lows[zone_number]
+		      )
+		     );
+
+		text = QwtText(zone_names[zone_number]);
+		text.setFont(QFont("Helvetica",24, QFont::Bold));
+		QColor text_color = hrZoneColor(zone_number, num_zones);
+		text_color.setAlpha(64);
+		text.setColor(text_color);
+	    }
+	}
+
+    }
+
+    virtual int rtti() const
+    {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    void draw(QPainter *painter,
+	      const QwtScaleMap &xMap, const QwtScaleMap &,
+              const QRectF &rect) const
+    {
+	if (parent->shadePaceZones()) {
             int x = xMap.transform(watts);
 	    int y = (rect.bottom() + rect.top()) / 2;
 

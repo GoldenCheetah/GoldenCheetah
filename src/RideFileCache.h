@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 18;
+static const unsigned int RideFileCacheVersion = 19;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -60,6 +60,7 @@ static const unsigned int RideFileCacheVersion = 18;
 // 13-15    24-Feb-14    Add crc to the header
 // 17       09-Jun-14    Move wpk meanmax array next to watts for fast read
 // 18       19-Oct-14    Added gearRatio distribution
+// 19       11-Nov-14    Added Pace Zones distribution
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -178,6 +179,7 @@ class RideFileCache
         QVector<float> &wattsZoneArray() { return wattsTimeInZone; }
         QVector<float> &wattsCPZoneArray() { return wattsCPTimeInZone; } // moderate, heavy and severe domains
         QVector<float> &hrZoneArray() { return hrTimeInZone; }
+        QVector<float> &paceZoneArray() { return paceTimeInZone; }
 
         QVector<float> &heatMeanMaxArray();  // will compute if neccessary
 
@@ -307,6 +309,7 @@ class RideFileCache
         QVector<float> wattsTimeInZone;   // time in zone in seconds
         QVector<float> wattsCPTimeInZone;   // time in zone in seconds for moderate, heavy and severe domains
         QVector<float> hrTimeInZone;      // time in zone in seconds
+        QVector<float> paceTimeInZone;      // time in zone in seconds
 };
 
 // Working structured inherited from CPPlot.cpp
