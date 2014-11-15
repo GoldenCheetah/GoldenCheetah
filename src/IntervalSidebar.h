@@ -39,6 +39,7 @@ class IntervalSidebar : public QWidget
         void close();
         void setWidth(int x) { routeNavigator->setWidth(x); }
         IntervalNavigator *routeNavigator;
+        IntervalNavigator *bestNavigator;
 
     signals:
 
@@ -53,7 +54,9 @@ class IntervalSidebar : public QWidget
 
         // analysis menu
         void routePopup();
-        void showActivityMenu(const QPoint &pos);
+        void showRouteMenu(const QPoint &pos);
+        void bestPopup();
+        void showBestMenu(const QPoint &pos);
 
         // interval menu
         /*void intervalPopup();
@@ -86,8 +89,8 @@ class IntervalSidebar : public QWidget
         QSignalMapper *groupByMapper;
 
         GcSplitterItem *routeItem;
+        GcSplitterItem *bestItem;
 
-        GcSplitterItem *intervalItem;
         QSplitter *intervalSplitter;
         IntervalSummaryWindow *intervalSummaryWindow;
         IntervalItem *activeInterval; // currently active for context menu popup

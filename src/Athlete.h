@@ -82,7 +82,8 @@ class Athlete : public QObject
         bool isclean;
         MetricAggregator *metricDB;
         QSqlTableModel *sqlModel;
-        QSqlTableModel *sqlIntervalsModel;
+        QSqlTableModel *sqlRouteIntervalsModel;
+        QSqlTableModel *sqlBestIntervalsModel;
         RideMetadata *rideMetadata_;
         Seasons *seasons;
         QList<PDEstimate> PDEstimates;

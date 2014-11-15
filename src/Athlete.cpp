@@ -153,9 +153,15 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     sqlModel->setTable("metrics");
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
-    sqlIntervalsModel = new QSqlTableModel(this, metricDB->db()->connection());
-    sqlIntervalsModel->setTable("interval_metrics");
-    sqlIntervalsModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    sqlRouteIntervalsModel = new QSqlTableModel(this, metricDB->db()->connection());
+    sqlRouteIntervalsModel->setTable("interval_metrics");
+    sqlRouteIntervalsModel->setFilter("type='Route'");
+    sqlRouteIntervalsModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+    sqlBestIntervalsModel = new QSqlTableModel(this, metricDB->db()->connection());
+    sqlBestIntervalsModel->setTable("interval_metrics");
+    sqlBestIntervalsModel->setFilter("type='Best'");
+    sqlBestIntervalsModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
     // Downloaders
     withingsDownload = new WithingsDownload(context);
@@ -251,7 +257,8 @@ Athlete::~Athlete()
 
     // close the db connection (but clear models first!)
     delete sqlModel;
-    delete sqlIntervalsModel;
+    delete sqlRouteIntervalsModel;
+    delete sqlBestIntervalsModel;
     delete metricDB;
 
 #ifdef GC_HAVE_LUCENE

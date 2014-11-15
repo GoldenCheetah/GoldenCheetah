@@ -74,7 +74,7 @@ class IntervalNavigator : public GcWindow
     friend class ::SearchBox;
 
     public:
-        IntervalNavigator(Context *, bool mainwindow = false);
+        IntervalNavigator(Context *, QString type, bool mainwindow = false);
         ~IntervalNavigator();
 
         void borderMenu(const QPoint &pos);
@@ -156,6 +156,8 @@ class IntervalNavigator : public GcWindow
         QMap <QString, QString> nameMap;
         QMap<QString, const RideMetric *> columnMetrics;
 
+        QString type;
+
     private:
         bool active;
         bool mainwindow;
@@ -164,6 +166,8 @@ class IntervalNavigator : public GcWindow
         int pwidth;
         IntervalNavigatorCellDelegate *delegate;
         QVBoxLayout *mainLayout;
+
+        QSqlTableModel *sqlModel;
 
         // properties
         int _sortByIndex;

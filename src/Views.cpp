@@ -251,6 +251,12 @@ IntervalView::routeNavigator()
     return intervalSidebar->routeNavigator;
 }
 
+IntervalNavigator*
+IntervalView::bestNavigator()
+{
+    return intervalSidebar->bestNavigator;
+}
+
 IntervalView::~IntervalView()
 {
 }
