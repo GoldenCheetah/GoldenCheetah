@@ -197,6 +197,6 @@ class PaceZones : public QObject
         quint16 getFingerprint() const;
 };
 
-QColor zoneColor(int zone, int num_zones);
+QColor paceZoneColor(int zone, int num_zones);
 
 #endif // _PaceZones_h
