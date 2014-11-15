@@ -17,14 +17,13 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef VELOHERODIALOG_H
-#define VELOHERODIALOG_H
+#ifndef VELOHEROUPLOADER_H
+#define VELOHEROUPLOADER_H
 #include "GoldenCheetah.h"
 
 #include <QObject>
 #include <QtGui>
 #include <QDialog>
-#include <QProgressBar>
 #include <QLabel>
 #include <QUrl>
 #include <QHttpMultiPart>
@@ -41,22 +40,22 @@
 #include "Context.h"
 #include "RideItem.h"
 
-class VeloHeroDialog : public QDialog
+class ShareDialog;
+
+class VeloHeroUploader : public QObject
 {
     Q_OBJECT
     G_OBJECT
 
 public:
-    VeloHeroDialog(Context *context, RideItem *item);
+    VeloHeroUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-signals:
+    void upload();
 
-public slots:
-    void uploadToVeloHero();
+    bool canUpload( QString &err );
+    bool wasUploaded();
 
 private slots:
-    void uploadProgress(qint64 sent, qint64 total);
-
     void dispatchReply( QNetworkReply *reply );
 
     void requestSession();
@@ -65,6 +64,7 @@ private slots:
     void requestUpload();
     void finishUpload(QNetworkReply *reply);
 
+    void okClicked();
     void closeClicked();
 
 private:
@@ -75,17 +75,17 @@ private:
 
     Context *context;
     RideItem *ride;
+    ShareDialog *parent;
+    QDialog *dialog;
 
-    QProgressBar *progressBar;
-    QLabel *progressLabel;
-    QPushButton *closeButton;
-
+    QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
     requestType currentRequest;
 
     QString sessionId;
     QString exerciseId;
+    bool uploadSuccessful;
 
 };
 
-#endif // VELOHERODIALOG_H
+#endif // VELOHEROUPLOADER_H

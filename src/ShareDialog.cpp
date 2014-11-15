@@ -85,6 +85,8 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     rideWithGpsUploader = new RideWithGpsUploader(context, ride, this);
     cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
     selfLoopsUploader = new SelfLoopsUploader(context, ride, this);
+    veloHeroUploader = new VeloHeroUploader(context, ride, this);
+    trainingstagebuchUploader = new TrainingstagebuchUploader(context, ride, this);
     //garminUploader = new GarminUploader(context, ride, this); // not in 3.1
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -100,6 +102,9 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     cyclingAnalyticsChk->setEnabled(false);
 #endif
     selfLoopsChk = new QCheckBox(tr("Selfloops"));
+    veloHeroChk = new QCheckBox(tr("VeloHero"));
+    trainingstagebuchChk = new QCheckBox(tr("Trainingstagebuch.org"));
+
     //garminChk = new QCheckBox(tr("Garmin Connect"));
     //garminChk->setVisible(false);
 
@@ -108,7 +113,9 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     vbox1->addWidget(rideWithGPSChk,0,1);
     vbox1->addWidget(cyclingAnalyticsChk,0,2);
     vbox1->addWidget(selfLoopsChk,0,3);
-    //vbox1->addWidget(garminChk,0,4);
+    vbox1->addWidget(veloHeroChk,0,4);
+    vbox1->addWidget(trainingstagebuchChk,0,5);
+    //vbox1->addWidget(garminChk,0,6);
 
 
     groupBox1->setLayout(vbox1);
@@ -212,7 +219,8 @@ ShareDialog::upload()
     show();
 
     if (!stravaChk->isChecked() && !rideWithGPSChk->isChecked() &&
-        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked() 
+        !cyclingAnalyticsChk->isChecked() && !selfLoopsChk->isChecked() &&
+        !veloHeroChk->isChecked() && !trainingstagebuchChk->isChecked()
         //&& !garminChk->isChecked()
         ) {
         QMessageBox aMsgBox;
@@ -238,6 +246,12 @@ ShareDialog::upload()
     if (selfLoopsChk->isChecked()) {
         shareSiteCount ++;
     }
+    if (veloHeroChk->isChecked()) {
+        shareSiteCount ++;
+    }
+    if (trainingstagebuchChk->isChecked()) {
+        shareSiteCount ++;
+    }
     //if (garminChk->isChecked()) {
     //    shareSiteCount ++;
     //}
@@ -253,6 +267,12 @@ ShareDialog::upload()
     }
     if (selfLoopsChk->isChecked()) {
         selfLoopsUploader->upload();
+    }
+    if (veloHeroChk->isChecked()) {
+        veloHeroUploader->upload();
+    }
+    if (trainingstagebuchChk->isChecked()) {
+        trainingstagebuchUploader->upload();
     }
     //if (garminChk->isChecked()) {
     //    garminUploader->upload();

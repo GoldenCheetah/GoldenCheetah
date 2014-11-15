@@ -142,7 +142,6 @@ class MainWindow : public QMainWindow
         void showLowbar(bool want);
 
         // Analysis View
-        void setActivityMenu();
         void showTools();
         void showRhoEstimator();
 
@@ -177,8 +176,6 @@ class MainWindow : public QMainWindow
         void tweetRide();
         void share();
 #endif
-        void uploadTtb();
-        void uploadVeloHero();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();
@@ -251,8 +248,6 @@ class MainWindow : public QMainWindow
 
         QAction *tweetAction;
         QAction *shareAction;
-        QAction *ttbAction;
-        QAction *veloheroAction;
 
         // Miscellany
         QSignalMapper *toolMapper;

@@ -16,7 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "TtbDialog.h"
+#include "TrainingstagebuchUploader.h"
+#include "ShareDialog.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "TimeUtils.h"
@@ -50,7 +51,7 @@ const QString TTB_URL( "http://trainingstagebuch.org" );
 class TtbParser : public QXmlDefaultHandler
 {
 public:
-    friend class TtbDialog;
+    friend class TrainingstagebuchUploader;
 
     bool startElement( const QString&, const QString&, const QString&,
         const QXmlAttributes& )
@@ -80,61 +81,108 @@ protected:
 };
 
 
-TtbDialog::TtbDialog(Context *context, RideItem *item) :
+TrainingstagebuchUploader::TrainingstagebuchUploader(Context *context, RideItem *item, ShareDialog *parent ) :
     context(context),
     ride( item ),
+    parent( parent ),
     proMember( false )
 {
     exerciseId = ride->ride()->getTag("TtbExercise", "");
 
-    setWindowTitle("Trainingstagebuch");
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    QVBoxLayout *progressLayout = new QVBoxLayout;
-    progressLabel = new QLabel("", this);
-    progressBar = new QProgressBar(this);
-    progressLayout->addWidget(progressBar);
-    progressLayout->addWidget(progressLabel);
-
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
-
-    closeButton = new QPushButton(tr("&Cancel"), this);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(closeButton);
-
-    mainLayout->addLayout(progressLayout);
-    mainLayout->addLayout(buttonLayout);
-
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this,
         SLOT(dispatchReply(QNetworkReply*)));
-
-    show();
-
-    uploadToTtb();
 }
 
-void
-TtbDialog::uploadToTtb()
+bool
+TrainingstagebuchUploader::canUpload( QString &err )
 {
-    // TODO: check for user/pw
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_TTBUSER).toString();
 
-    // TODO: ask for overwrite
+    if( username.length() > 0 ){
+        return true;
+    }
 
-    progressBar->setValue(0);
+    err = tr("Cannot upload to Trainingstagebuch without credentials. Check Settings");
+    return false;
+}
+
+bool
+TrainingstagebuchUploader::wasUploaded()
+{
+    return exerciseId.length() > 0;
+}
+
+
+void
+TrainingstagebuchUploader::upload()
+{
+    QString err;
+    if( !canUpload( err ) ){
+        QMessageBox aMsgBox;
+        aMsgBox.setText(err);
+        aMsgBox.exec();
+        return;
+    }
+
+    if( wasUploaded() ){
+        dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout;
+
+        QVBoxLayout *layoutLabel = new QVBoxLayout();
+        QLabel *label = new QLabel();
+        label->setText(tr("This Ride is marked as already on Trainingstagebuch. Are you sure you want to upload it?"));
+        layoutLabel->addWidget(label);
+
+        QPushButton *ok = new QPushButton(tr("OK"), dialog);
+        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
+        QHBoxLayout *buttons = new QHBoxLayout();
+        buttons->addStretch();
+        buttons->addWidget(cancel);
+        buttons->addWidget(ok);
+
+        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
+
+        layout->addLayout(layoutLabel);
+        layout->addLayout(buttons);
+
+        dialog->setLayout(layout);
+
+        if (!dialog->exec()) return;
+    }
+
+    uploadSuccessful = false;
     requestSettings();
+
+    if( !uploadSuccessful ){
+        parent->progressLabel->setText(tr("Error uploading to Trainingstagebuch.org"));
+
+    } else {
+        parent->progressLabel->setText(tr("successfully uploaded to Trainingstagebuch.org as %1")
+            .arg(exerciseId));
+
+        ride->ride()->setTag("TtbExercise", exerciseId );
+        ride->setDirty(true);
+    }
 }
 
 void
-TtbDialog::closeClicked()
+TrainingstagebuchUploader::okClicked()
 {
-    reject();
+    dialog->accept();
 }
 
 void
-TtbDialog::requestSettings()
+TrainingstagebuchUploader::closeClicked()
 {
-    progressLabel->setText(tr("getting Settings..."));
+    dialog->reject();
+}
+
+
+void
+TrainingstagebuchUploader::requestSettings()
+{
+    parent->progressLabel->setText(tr("getting Settings from Trainingstagebuch.org..."));
 
     currentRequest = reqSettings;
 
@@ -162,13 +210,14 @@ TtbDialog::requestSettings()
     request.setRawHeader( "Accept-Charset", "utf-8" );
 
     networkMgr.get( request );
-    progressBar->setValue(2);
+    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
+    eventLoop.exec();
 }
 
 void
-TtbDialog::requestSession()
+TrainingstagebuchUploader::requestSession()
 {
-    progressLabel->setText(tr("getting new Session..."));
+    parent->progressLabel->setText(tr("getting new Trainingstagebuch.org Session..."));
 
     currentRequest = reqSession;
 
@@ -197,15 +246,15 @@ TtbDialog::requestSession()
     request.setRawHeader( "Accept-Charset", "utf-8" );
 
     networkMgr.get( request );
-    progressBar->setValue(6);
+    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
 }
 
 void
-TtbDialog::requestUpload()
+TrainingstagebuchUploader::requestUpload()
 {
     assert(sessionId.length() > 0 );
 
-    progressLabel->setText(tr("preparing upload ..."));
+    parent->progressLabel->setText(tr("preparing Trainingstagebuch.org data ..."));
 
     QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType );
 
@@ -222,16 +271,17 @@ TtbDialog::requestUpload()
 
     PwxFileReader reader;
     reader.writeRideFile(context, ride->ride(), *uploadFile );
-    progressBar->setValue(12);
+    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
 
     int limit = proMember
         ? 8 * 1024 * 1024
         : 4 * 1024 * 1024;
     if( uploadFile->size() >= limit ){
-        progressLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
+        parent->errorLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
             .arg(uploadFile->size())
             .arg(limit) );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
@@ -245,7 +295,7 @@ TtbDialog::requestUpload()
     body->append( filePart );
 
 
-    progressLabel->setText(tr("uploading ..."));
+    parent->progressLabel->setText(tr("sending to Trainingstagebuch.org ..."));
 
     currentRequest = reqUpload;
 
@@ -271,27 +321,16 @@ TtbDialog::requestUpload()
 
     QNetworkReply *reply = networkMgr.post( request, body );
     body->setParent( reply );
-
-    connect(reply, SIGNAL(uploadProgress(qint64,qint64)), this,
-        SLOT(uploadProgress(qint64,qint64)));
 }
 
 void
-TtbDialog::uploadProgress(qint64 sent, qint64 total)
-{
-    if( total < 0 )
-        return;
-
-    progressBar->setValue( 12.0 + sent / total * 88 );
-}
-
-void
-TtbDialog::dispatchReply( QNetworkReply *reply )
+TrainingstagebuchUploader::dispatchReply( QNetworkReply *reply )
 {
     if( reply->error() != QNetworkReply::NoError ){
-        progressLabel->setText( tr("request failed: ")
+        parent->errorLabel->setText( tr("request failed: ")
             + reply->errorString() );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
@@ -299,10 +338,11 @@ TtbDialog::dispatchReply( QNetworkReply *reply )
     if( ! status.isValid() || status.toInt() != 200 ){
         QVariant msg( reply->attribute( QNetworkRequest::HttpReasonPhraseAttribute ) );
 
-        progressLabel->setText( tr("request failed, Server response: %1 %2")
+        parent->errorLabel->setText( tr("request failed, Server response: %1 %2")
             .arg(status.toInt())
             .arg(msg.toString()) );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
 
         return;
     }
@@ -325,7 +365,7 @@ TtbDialog::dispatchReply( QNetworkReply *reply )
 class TtbSettingsParser : public TtbParser
 {
 public:
-    friend class TtbDialog;
+    friend class TrainingstagebuchUploader;
 
     TtbSettingsParser() :
         pro(false),
@@ -355,9 +395,9 @@ protected:
 };
 
 void
-TtbDialog::finishSettings(QNetworkReply *reply)
+TrainingstagebuchUploader::finishSettings(QNetworkReply *reply)
 {
-    progressBar->setValue(4);
+    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
 
     TtbSettingsParser handler;
     QXmlInputSource source( reply );
@@ -366,16 +406,18 @@ TtbDialog::finishSettings(QNetworkReply *reply)
     reader.setContentHandler( &handler );
 
     if( ! reader.parse( source ) ){
-        progressLabel->setText(tr("failed to parse Settings response: ")
+        parent->errorLabel->setText(tr("failed to parse Settings response: ")
             +handler.errorString());
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
     if( handler.error.length() > 0 ){
-        progressLabel->setText(tr("failed to get settings: ")
+        parent->errorLabel->setText(tr("failed to get settings: ")
             +handler.error );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
@@ -392,7 +434,7 @@ TtbDialog::finishSettings(QNetworkReply *reply)
 class TtbSessionParser : public TtbParser
 {
 public:
-    friend class TtbDialog;
+    friend class TrainingstagebuchUploader;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {
@@ -411,9 +453,9 @@ protected:
 };
 
 void
-TtbDialog::finishSession(QNetworkReply *reply)
+TrainingstagebuchUploader::finishSession(QNetworkReply *reply)
 {
-    progressBar->setValue(8);
+    parent->progressBar->setValue(parent->progressBar->value()+5/parent->shareSiteCount);
 
     TtbSessionParser handler;
     QXmlInputSource source( reply );
@@ -422,24 +464,27 @@ TtbDialog::finishSession(QNetworkReply *reply)
     reader.setContentHandler( &handler );
 
     if( ! reader.parse( source ) ){
-        progressLabel->setText(tr("failed to parse Session response: ")
+        parent->errorLabel->setText(tr("failed to parse Session response: ")
             +handler.errorString());
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
     if( handler.error.length() > 0 ){
-        progressLabel->setText(tr("failed to get new session: ")
+        parent->errorLabel->setText(tr("failed to get new session: ")
             +handler.error );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
     sessionId = handler.session;
 
     if( sessionId.length() == 0 ){
-        progressLabel->setText(tr("got empty session"));
-        closeButton->setText(tr("&Close"));
+        parent->errorLabel->setText(tr("got empty session"));
+
+        eventLoop.quit();
         return;
     }
 
@@ -449,7 +494,7 @@ TtbDialog::finishSession(QNetworkReply *reply)
 class TtbUploadParser : public TtbParser
 {
 public:
-    friend class TtbDialog;
+    friend class TrainingstagebuchUploader;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {
@@ -468,10 +513,9 @@ protected:
 };
 
 void
-TtbDialog::finishUpload(QNetworkReply *reply)
+TrainingstagebuchUploader::finishUpload(QNetworkReply *reply)
 {
-    progressBar->setValue(100);
-    closeButton->setText(tr("&Close"));
+    parent->progressBar->setValue(parent->progressBar->value()+60/parent->shareSiteCount);
 
     TtbUploadParser handler;
     QXmlInputSource source( reply );
@@ -480,31 +524,32 @@ TtbDialog::finishUpload(QNetworkReply *reply)
     reader.setContentHandler( &handler );
 
     if( ! reader.parse( source ) ){
-        progressLabel->setText(tr("failed to parse upload response: ")
+        parent->errorLabel->setText(tr("failed to parse upload response: ")
             +handler.errorString());
+
+        eventLoop.quit();
         return;
     }
 
     if( handler.error.length() > 0 ){
-        progressLabel->setText(tr("failed to upload file: ")
+        parent->errorLabel->setText(tr("failed to upload file: ")
             +handler.error );
+
+        eventLoop.quit();
         return;
     }
 
     exerciseId = handler.id;
 
     if( exerciseId.length() == 0 ){
-        progressLabel->setText(tr("got empty exercise"));
+        parent->errorLabel->setText(tr("got empty exercise"));
+
+        eventLoop.quit();
         return;
     }
 
-    progressLabel->setText(tr("successfully uploaded as %1")
-        .arg(exerciseId));
-
-    ride->ride()->setTag("TtbExercise", exerciseId );
-    ride->setDirty(true);
-
-    accept();
+    uploadSuccessful = true;
+    eventLoop.quit();
 }
 
 

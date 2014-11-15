@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef TTBDIALOG_H
-#define TTBDIALOG_H
+#ifndef TRAININGSTAGEBUCHUPLOADER_H
+#define TRAININGSTAGEBUCHUPLOADER_H
 #include "GoldenCheetah.h"
 
 #include <QObject>
@@ -40,22 +40,22 @@
 #include "Context.h"
 #include "RideItem.h"
 
-class TtbDialog : public QDialog
+class ShareDialog;
+
+class TrainingstagebuchUploader : public QObject
 {
     Q_OBJECT
     G_OBJECT
 
 public:
-    TtbDialog(Context *context, RideItem *item);
+    TrainingstagebuchUploader(Context *context, RideItem *item, ShareDialog *parent = 0);
 
-signals:
+    void upload();
 
-public slots:
-    void uploadToTtb();
+    bool canUpload( QString &err );
+    bool wasUploaded();
 
 private slots:
-    void uploadProgress(qint64 sent, qint64 total);
-
     void dispatchReply( QNetworkReply *reply );
 
     void requestSettings();
@@ -67,6 +67,7 @@ private slots:
     void requestUpload();
     void finishUpload(QNetworkReply *reply);
 
+    void okClicked();
     void closeClicked();
 
 private:
@@ -78,18 +79,18 @@ private:
 
     Context *context;
     RideItem *ride;
+    ShareDialog *parent;
+    QDialog *dialog;
 
-    QProgressBar *progressBar;
-    QLabel *progressLabel;
-    QPushButton *closeButton;
-
+    QEventLoop eventLoop;
     QNetworkAccessManager networkMgr;
     requestType currentRequest;
 
     bool proMember;
     QString sessionId;
     QString exerciseId;
+    bool uploadSuccessful;
 
 };
 
-#endif // TTBDIALOG_H
+#endif // TRAININGSTAGEBUCHUPLOADER_H
