@@ -148,4 +148,55 @@ class HrZoneScaleDraw: public QwtScaleDraw
         QList <int> from, to;
 
 };
+
+class PaceZoneScaleDraw: public QwtScaleDraw
+{
+    public:
+        PaceZoneScaleDraw(const PaceZones *zones, int range=-1) : zones(zones) {
+            setRange(range);
+            setTickLength(QwtScaleDiv::MajorTick, 3);
+        }
+
+        // modify later if neccessary
+        void setPaceZones(PaceZones *z) {
+            zones=z;
+            names.clear();
+            from.clear();
+            to.clear();
+        }
+
+        // when we set the range we are choosing the texts
+        void setRange(int x) {
+            range=x;
+            if (range >= 0) {
+                names = zones->getZoneNames(range);
+                from = zones->getZoneLows(range);
+                to = zones->getZoneHighs(range);
+            } else {
+                names.clear();
+                from.clear();
+                to.clear();
+            }
+        }
+
+        // return label
+        virtual QwtText label(double v) const
+        {
+            if (v < 0 || v > (names.count()-1) || range < 0) return QString("");
+            else {
+                return names[v];
+#if 0
+                if (v == names.count()-1) return QString("%1\n%2kph+").arg(names[v]).arg(from[v]);
+                else return QString("%1\n%2-%3kph").arg(names[v]).arg(from[v]).arg(to[v]);
+#endif
+            }
+        }
+
+    private:
+        const PaceZones *zones;
+        int range;
+        QList<QString> names;
+        QList <double> from, to;
+
+};
 #endif
