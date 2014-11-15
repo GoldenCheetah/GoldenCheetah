@@ -55,8 +55,8 @@ CONFIG(debug, debug|release) {
     INCLUDEPATH += $${LIBOAUTH_INCLUDE}
     LIBS        += $${LIBOAUTH_LIBS}
     DEFINES     += GC_HAVE_LIBOAUTH
-    SOURCES     += OAuthDialog.cpp TwitterDialog.cpp ShareDialog.cpp
-    HEADERS     += OAuthDialog.h TwitterDialog.h ShareDialog.h
+    SOURCES     += OAuthDialog.cpp TwitterDialog.cpp
+    HEADERS     += OAuthDialog.h TwitterDialog.h
 }
 
 !isEmpty( D2XX_INCLUDE ) {
@@ -414,6 +414,7 @@ HEADERS += \
         SeasonParser.h \
         Serial.h \
         Settings.h \
+        ShareDialog.h \
         SpecialFields.h \
         SpinScanPlot.h \
         SpinScanPolarPlot.h \
@@ -631,6 +632,7 @@ SOURCES += \
         SeasonParser.cpp \
         Serial.cpp \
         Settings.cpp \
+        ShareDialog.cpp \
         SmallPlot.cpp \
         SpecialFields.cpp \
         SpinScanPlot.cpp \
