@@ -975,8 +975,8 @@ MergeAdjust::initializePage()
     }
 
     // setup adjuster 
-    adjustSlider->setMinimum(-1 * wizard->combined->dataPoints().count() / 3);
-    adjustSlider->setMaximum(wizard->combined->dataPoints().count() / 3);
+    adjustSlider->setMinimum(-1 * wizard->combined->dataPoints().count());
+    adjustSlider->setMaximum(wizard->combined->dataPoints().count());
     adjustSlider->setValue(wizard->offset2 - wizard->offset1);
 }
 
