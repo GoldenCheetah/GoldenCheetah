@@ -59,8 +59,6 @@
 #include "BatchExportDialog.h"
 #include "TwitterDialog.h"
 #include "ShareDialog.h"
-#include "TtbDialog.h"
-#include "VeloHeroDialog.h"
 #include "WithingsDownload.h"
 #include "ZeoDownload.h"
 #include "WorkoutWizard.h"
@@ -571,19 +569,11 @@ MainWindow::MainWindow(const QDir &home)
     connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
     rideMenu->addAction(tweetAction);
 
-    shareAction = new QAction(tr("Share (Strava, RideWithGPS, CyclingAnalytics)..."), this);
+    shareAction = new QAction(tr("Share (Strava, RideWithGPS, CyclingAnalytics, VeloHero, Trainigstagebuch)..."), this);
     shareAction->setShortcut(tr("Ctrl+U"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
     rideMenu->addAction(shareAction);
 #endif
-
-    ttbAction = new QAction(tr("Upload to Trainingstagebuch..."), this);
-    connect(ttbAction, SIGNAL(triggered(bool)), this, SLOT(uploadTtb()));
-    rideMenu->addAction(ttbAction);
-
-    veloheroAction = new QAction(tr("Upload to Velo Hero..."), this);
-    connect(veloheroAction, SIGNAL(triggered(bool)), this, SLOT(uploadVeloHero()));
-    rideMenu->addAction(veloheroAction);
 
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save ride"), this, SLOT(saveRide()), tr("Ctrl+S"));
@@ -678,7 +668,6 @@ MainWindow::MainWindow(const QDir &home)
     styleAction->setChecked(true);
 
 
-    connect(rideMenu, SIGNAL(aboutToShow()), this, SLOT(setActivityMenu()));
     connect(subChartMenu, SIGNAL(aboutToShow()), this, SLOT(setSubChartMenu()));
     connect(subChartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
@@ -847,27 +836,6 @@ MainWindow::setChartMenu(QMenu *menu)
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask)
             menu->addAction(GcWindows[i].name);
-    }
-}
-
-void
-MainWindow::setActivityMenu()
-{
-    // enable/disable upload if already uploaded
-    if (currentTab->context->ride && currentTab->context->ride->ride()) {
-
-
-        QString activityId = currentTab->context->ride->ride()->getTag("TtbExercise", "");
-        if (activityId == "") ttbAction->setEnabled(true);
-        else ttbAction->setEnabled(false);
-
-        QString veloHeroWorkoutId = currentTab->context->ride->ride()->getTag("VeloHeroExercise", "");
-        if (veloHeroWorkoutId == "") veloheroAction->setEnabled(true);
-        else veloheroAction->setEnabled(false);
-
-    } else {
-        ttbAction->setEnabled(false);
-        veloheroAction->setEnabled(false);
     }
 }
 
@@ -1759,42 +1727,6 @@ MainWindow::share()
     }
 }
 #endif
-
-/*----------------------------------------------------------------------
-* trainingstagebuch.org
-*--------------------------------------------------------------------*/
-
-void
-MainWindow::uploadTtb()
-{
-    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE) return;
-
-    RideItem *item = dynamic_cast<RideItem*>(_item);
-
-    if (item) { // menu is disabled anyway, but belt and braces
-        TtbDialog d(currentTab->context, item);
-        d.exec();
-    }
-}
-
-/*----------------------------------------------------------------------
-* Velo Hero (http://www.velohero.com)
-*--------------------------------------------------------------------*/
-
-void
-MainWindow::uploadVeloHero()
-{
-    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE) return;
-
-    RideItem *item = dynamic_cast<RideItem*>(_item);
-
-    if (item) { // menu is disabled anyway, but belt and braces
-        VeloHeroDialog d(currentTab->context, item);
-        d.exec();
-    }
-}
 
 /*----------------------------------------------------------------------
  * Import Workout from Disk

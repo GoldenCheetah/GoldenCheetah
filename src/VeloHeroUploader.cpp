@@ -17,7 +17,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "VeloHeroDialog.h"
+#include "VeloHeroUploader.h"
+#include "ShareDialog.h"
 #include "Athlete.h"
 #include "Settings.h"
 #include "TimeUtils.h"
@@ -51,7 +52,7 @@ const QString VELOHERO_URL( "http://app.velohero.com" );
 class VeloHeroParser : public QXmlDefaultHandler
 {
 public:
-    friend class VeloHeroDialog;
+    friend class VeloHeroUploader;
 
     bool startElement( const QString&, const QString&, const QString&,
         const QXmlAttributes& )
@@ -81,61 +82,105 @@ protected:
 };
 
 
-VeloHeroDialog::VeloHeroDialog(Context *context, RideItem *item) :
+VeloHeroUploader::VeloHeroUploader(Context *context, RideItem *item, ShareDialog *parent ) :
     context(context),
-    ride( item )
+    ride( item ),
+    parent( parent )
 {
     exerciseId = ride->ride()->getTag("VeloHeroExercise", "");
 
-    setWindowTitle("Velo Hero");
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    QVBoxLayout *progressLayout = new QVBoxLayout;
-    progressLabel = new QLabel("", this);
-    progressBar = new QProgressBar(this);
-    progressLayout->addWidget(progressBar);
-    progressLayout->addWidget(progressLabel);
-
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
-
-    closeButton = new QPushButton(tr("&Cancel"), this);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(closeButton);
-
-    mainLayout->addLayout(progressLayout);
-    mainLayout->addLayout(buttonLayout);
-
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this,
         SLOT(dispatchReply(QNetworkReply*)));
+}
 
-    show();
+bool
+VeloHeroUploader::canUpload( QString &err )
+{
+    QString username = appsettings->cvalue(context->athlete->cyclist, GC_VELOHEROUSER).toString();
 
-    uploadToVeloHero();
+    if( username.length() > 0 ){
+        return true;
+    }
+
+    err = tr("Cannot upload to VeloHero without credentials. Check Settings");
+    return false;
+}
+
+bool
+VeloHeroUploader::wasUploaded()
+{
+    return exerciseId.length() > 0;
 }
 
 void
-VeloHeroDialog::uploadToVeloHero()
+VeloHeroUploader::upload()
 {
-    // TODO: check for user/pw
+    QString err;
+    if( !canUpload( err ) ){
+        QMessageBox aMsgBox;
+        aMsgBox.setText(err);
+        aMsgBox.exec();
+        return;
+    }
 
-    // TODO: ask for overwrite
+    if( wasUploaded() ){
+        dialog = new QDialog();
+        QVBoxLayout *layout = new QVBoxLayout;
 
-    progressBar->setValue(0);
+        QVBoxLayout *layoutLabel = new QVBoxLayout();
+        QLabel *label = new QLabel();
+        label->setText(tr("This Ride is marked as already on VeloHero. Are you sure you want to upload it?"));
+        layoutLabel->addWidget(label);
+
+        QPushButton *ok = new QPushButton(tr("OK"), dialog);
+        QPushButton *cancel = new QPushButton(tr("Cancel"), dialog);
+        QHBoxLayout *buttons = new QHBoxLayout();
+        buttons->addStretch();
+        buttons->addWidget(cancel);
+        buttons->addWidget(ok);
+
+        connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+        connect(cancel, SIGNAL(clicked()), this, SLOT(closeClicked()));
+
+        layout->addLayout(layoutLabel);
+        layout->addLayout(buttons);
+
+        dialog->setLayout(layout);
+
+        if (!dialog->exec()) return;
+    }
+
+    uploadSuccessful = false;
     requestSession();
 
+    if( !uploadSuccessful ){
+        parent->progressLabel->setText(tr("Error uploading to VeloHero"));
+
+    } else {
+        parent->progressLabel->setText(tr("successfully uploaded to VeloHero as %1")
+            .arg(exerciseId));
+
+        ride->ride()->setTag("VeloHeroExercise", exerciseId );
+        ride->setDirty(true);
+    }
 }
 
 void
-VeloHeroDialog::closeClicked()
+VeloHeroUploader::okClicked()
 {
-    reject();
+    dialog->accept();
 }
 
 void
-VeloHeroDialog::requestSession()
+VeloHeroUploader::closeClicked()
 {
-    progressLabel->setText(tr("getting new session..."));
+    dialog->reject();
+}
+
+void
+VeloHeroUploader::requestSession()
+{
+    parent->progressLabel->setText(tr("getting new VeloHero session..."));
 
     currentRequest = reqSession;
 
@@ -164,15 +209,16 @@ VeloHeroDialog::requestSession()
     request.setRawHeader( "Accept-Charset", "utf-8" );
 
     networkMgr.get( request );
-    progressBar->setValue(6);
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
+    eventLoop.exec();
 }
 
 void
-VeloHeroDialog::requestUpload()
+VeloHeroUploader::requestUpload()
 {
     assert(sessionId.length() > 0 );
 
-    progressLabel->setText(tr("preparing upload ..."));
+    parent->progressLabel->setText(tr("preparing VeloHero data ..."));
 
     QHttpMultiPart *body = new QHttpMultiPart( QHttpMultiPart::FormDataType );
 
@@ -188,14 +234,15 @@ VeloHeroDialog::requestUpload()
 
     PwxFileReader reader;
     reader.writeRideFile(context, ride->ride(), *uploadFile );
-    progressBar->setValue(12);
+    parent->progressBar->setValue(parent->progressBar->value()+20/parent->shareSiteCount);
 
     int limit = 16777216; // 16MB
     if( uploadFile->size() >= limit ){
-        progressLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
+        parent->errorLabel->setText(tr("temporary file too large for upload: %1 > %1 bytes")
             .arg(uploadFile->size())
             .arg(limit) );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
@@ -209,7 +256,7 @@ VeloHeroDialog::requestUpload()
     body->append( filePart );
 
 
-    progressLabel->setText(tr("uploading ..."));
+    parent->progressLabel->setText(tr("sending to VeloHero..."));
 
     currentRequest = reqUpload;
 
@@ -236,26 +283,16 @@ VeloHeroDialog::requestUpload()
     QNetworkReply *reply = networkMgr.post( request, body );
     body->setParent( reply );
 
-    connect(reply, SIGNAL(uploadProgress(qint64,qint64)), this,
-        SLOT(uploadProgress(qint64,qint64)));
 }
 
 void
-VeloHeroDialog::uploadProgress(qint64 sent, qint64 total)
-{
-    if( total < 0 )
-        return;
-
-    progressBar->setValue( 12.0 + sent / total * 88 );
-}
-
-void
-VeloHeroDialog::dispatchReply( QNetworkReply *reply )
+VeloHeroUploader::dispatchReply( QNetworkReply *reply )
 {
     if( reply->error() != QNetworkReply::NoError ){
-        progressLabel->setText( tr("request failed: ")
+        parent->errorLabel->setText( tr("request failed: ")
             + reply->errorString() );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.exec();
         return;
     }
 
@@ -263,11 +300,11 @@ VeloHeroDialog::dispatchReply( QNetworkReply *reply )
     if( ! status.isValid() || status.toInt() != 200 ){
         QVariant msg( reply->attribute( QNetworkRequest::HttpReasonPhraseAttribute ) );
 
-        progressLabel->setText( tr("request failed, server response: %1 %2")
+        parent->errorLabel->setText( tr("request failed, server response: %1 %2")
             .arg(status.toInt())
             .arg(msg.toString()) );
-        closeButton->setText(tr("&Close"));
 
+        eventLoop.quit();
         return;
     }
 
@@ -285,7 +322,7 @@ VeloHeroDialog::dispatchReply( QNetworkReply *reply )
 class VeloHeroSessionParser : public VeloHeroParser
 {
 public:
-    friend class VeloHeroDialog;
+    friend class VeloHeroUploader;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {
@@ -304,9 +341,9 @@ protected:
 };
 
 void
-VeloHeroDialog::finishSession(QNetworkReply *reply)
+VeloHeroUploader::finishSession(QNetworkReply *reply)
 {
-    progressBar->setValue(8);
+    parent->progressBar->setValue(parent->progressBar->value()+10/parent->shareSiteCount);
 
     VeloHeroSessionParser handler;
     QXmlInputSource source( reply );
@@ -315,24 +352,27 @@ VeloHeroDialog::finishSession(QNetworkReply *reply)
     reader.setContentHandler( &handler );
 
     if( ! reader.parse( source ) ){
-        progressLabel->setText(tr("failed to parse session response: ")
+        parent->errorLabel->setText(tr("failed to parse session response: ")
             +handler.errorString());
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
     if( handler.error.length() > 0 ){
-        progressLabel->setText(tr("failed to get new session: ")
+        parent->errorLabel->setText(tr("failed to get new session: ")
             +handler.error );
-        closeButton->setText(tr("&Close"));
+
+        eventLoop.quit();
         return;
     }
 
     sessionId = handler.session;
 
     if( sessionId.length() == 0 ){
-        progressLabel->setText(tr("got empty session"));
-        closeButton->setText(tr("&Close"));
+        parent->errorLabel->setText(tr("got empty session"));
+
+        eventLoop.quit();
         return;
     }
 
@@ -342,7 +382,7 @@ VeloHeroDialog::finishSession(QNetworkReply *reply)
 class VeloHeroUploadParser : public VeloHeroParser
 {
 public:
-    friend class VeloHeroDialog;
+    friend class VeloHeroUploader;
 
     bool endElement( const QString& a, const QString&b, const QString& qName )
     {
@@ -361,10 +401,9 @@ protected:
 };
 
 void
-VeloHeroDialog::finishUpload(QNetworkReply *reply)
+VeloHeroUploader::finishUpload(QNetworkReply *reply)
 {
-    progressBar->setValue(100);
-    closeButton->setText(tr("&Close"));
+    parent->progressBar->setValue(parent->progressBar->value()+60/parent->shareSiteCount);
 
     VeloHeroUploadParser handler;
     QXmlInputSource source( reply );
@@ -373,31 +412,33 @@ VeloHeroDialog::finishUpload(QNetworkReply *reply)
     reader.setContentHandler( &handler );
 
     if( ! reader.parse( source ) ){
-        progressLabel->setText(tr("failed to parse upload response: ")
+        parent->errorLabel->setText(tr("failed to parse upload response: ")
             +handler.errorString());
+
+        eventLoop.quit();
         return;
     }
 
     if( handler.error.length() > 0 ){
-        progressLabel->setText(tr("failed to upload file: ")
+        parent->errorLabel->setText(tr("failed to upload file: ")
             +handler.error );
+
+        eventLoop.quit();
         return;
     }
 
     exerciseId = handler.id;
 
     if( exerciseId.length() == 0 ){
-        progressLabel->setText(tr("got empty exercise"));
+        parent->errorLabel->setText(tr("got empty exercise"));
+
+        eventLoop.quit();
         return;
     }
 
-    progressLabel->setText(tr("successfully uploaded as %1")
-        .arg(exerciseId));
+    uploadSuccessful = true;
+    eventLoop.quit();
 
-    ride->ride()->setTag("VeloHeroExercise", exerciseId );
-    ride->setDirty(true);
-
-    accept();
 }
 
 

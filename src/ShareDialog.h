@@ -19,6 +19,8 @@
 #ifndef SHAREDIALOG_H
 #define SHAREDIALOG_H
 #include "GoldenCheetah.h"
+#include "VeloHeroUploader.h"
+#include "TrainingstagebuchUploader.h"
 
 #include <QObject>
 #include <QtGui>
@@ -269,6 +271,8 @@ private:
      QCheckBox *rideWithGPSChk;
      QCheckBox *cyclingAnalyticsChk;
      QCheckBox *selfLoopsChk;
+     QCheckBox *veloHeroChk;
+     QCheckBox *trainingstagebuchChk;
      //QCheckBox *garminChk;
 
      RideItem *ride;
@@ -277,6 +281,8 @@ private:
      RideWithGpsUploader *rideWithGpsUploader;
      CyclingAnalyticsUploader *cyclingAnalyticsUploader;
      SelfLoopsUploader *selfLoopsUploader;
+     VeloHeroUploader *veloHeroUploader;
+     TrainingstagebuchUploader *trainingstagebuchUploader;
      //GarminUploader *garminUploader;
 
      QString athleteId;
