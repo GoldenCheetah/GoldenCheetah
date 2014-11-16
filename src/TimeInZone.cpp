@@ -49,7 +49,7 @@ class ZoneTime : public RideMetric {
     {
         seconds = 0;
         // get zone ranges
-        if (zone && zoneRange >= 0) {
+        if (zone && zoneRange >= 0 && ride->areDataPresent()->watts) {
             // iterate and compute
             foreach(const RideFilePoint *point, ride->dataPoints()) {
                 if (zone->whichZone(zoneRange, point->watts) == level)
