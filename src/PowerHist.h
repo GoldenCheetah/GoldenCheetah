@@ -599,6 +599,9 @@ public:
 	const PaceZones *zones = parent->context->athlete->paceZones();
 	int zone_range = parent->context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
 
+    // unit conversion factor for imperial units
+    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+
 	if (parent->shadePaceZones() && (zone_range >= 0)) {
 	    QList <double> zone_lows = zones->getZoneLows(zone_range);
 	    int num_zones = zone_lows.size();
@@ -613,9 +616,9 @@ public:
 					 shading_color.saturation() / 4,
 					 shading_color.value()
 					 );
-		    r.setLeft(xMap.transform(zone_lows[z]));
+		    r.setLeft(xMap.transform(zone_lows[z]*speed_factor));
 		    if (z + 1 < num_zones)
-			r.setRight(xMap.transform(zone_lows[z + 1]));
+			r.setRight(xMap.transform(zone_lows[z + 1]*speed_factor));
 		    if (r.right() >= r.left())
 			painter->fillRect(r, shading_color);
 		}
@@ -649,6 +652,9 @@ public:
 	const PaceZones *zones = parent->context->athlete->paceZones();
 	int zone_range = parent->context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
 
+    // unit conversion factor for imperial units
+    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : 0.62137119);
+
 	setZ(1.0 + zone_number / 100.0);
 
 	// create new zone labels if we're shading
@@ -659,17 +665,17 @@ public:
 	    assert(zone_names.size() == num_zones);
 	    if (zone_number < num_zones) {
                 double min = parent->minX;
-                if (zone_lows[zone_number]>min)
-                    min = zone_lows[zone_number];
+                if (zone_lows[zone_number]*speed_factor > min)
+                    min = zone_lows[zone_number]*speed_factor;
 
                 watts =
 		    (
 		     (zone_number + 1 < num_zones) ?
-                     0.5 * (min + zone_lows[zone_number + 1]) :
+                     0.5 * (min + zone_lows[zone_number + 1]*speed_factor) :
 		     (
 		      (zone_number > 0) ?
-		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
-		      2.0 * zone_lows[zone_number]
+		      (1.5 * zone_lows[zone_number]*speed_factor - 0.5 * zone_lows[zone_number - 1]*speed_factor) :
+		      2.0 * zone_lows[zone_number]*speed_factor
 		      )
 		     );
 
