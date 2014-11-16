@@ -120,6 +120,7 @@ class IntervalView : public TabView
         void setRide(RideItem*ride);
 
         IntervalNavigator *routeNavigator();
+        IntervalNavigator *bestNavigator();
 
     public slots:
 

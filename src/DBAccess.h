@@ -89,6 +89,7 @@ class DBAccess
         bool getInterval(QString filename, QString type, QString groupName, int start, SummaryMetrics &summaryMetrics, QColor&color);
         bool getIntervalForRide(QString);
         bool deleteIntervalsForRide(QString filename);
+        bool deleteIntervalsForTypeAndGroupName(QString type, QString groupName);
 
 	    QList<QDateTime> getAllDates();
         QList<Season> getAllSeasons();

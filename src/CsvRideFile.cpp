@@ -310,10 +310,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      nm = 0; //no torque
                      kph = line.section(',', 0, 0).toDouble();
                      dfpm = line.section( ',', 11, 11).toDouble();
+                     headwind = line.section(',', 1, 1).toDouble();
                      if( iBikeVersion >= 11 && ( dfpm > 0.0 || dfpmExists ) ) {
                          dfpmExists = true;
                          watts = dfpm;
-                         headwind = line.section(',', 1, 1).toDouble();
                      }
                      else {
                          watts = line.section(',', 2, 2).toDouble();
@@ -322,10 +322,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      cad = line.section(',', 4, 4).toDouble();
                      hr = line.section(',', 5, 5).toDouble();
                      alt = line.section(',', 6, 6).toDouble();
+                     slope = line.section(',', 7, 7).toDouble();
+                     temp = line.section(',', 8, 8).toDouble();
                      lat = line.section(',', 12, 12).toDouble();
                      lon = line.section(',', 13, 13).toDouble();
-                     temp = line.section(',', 8, 8).toDouble();
-                     slope = line.section(',', 7, 7).toDouble();
+
+
                      int lap = line.section(',', 9, 9).toInt();
                      if (lap > 0) {
                          iBikeInterval += 1;
