@@ -1809,7 +1809,6 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
         // CPX filename
         QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + filename);
         QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
-        QFileInfo cacheFileInfo(cacheFileName);
         RideFileCacheHeader head;
         QFile cacheFile(cacheFileName);
 
@@ -1846,6 +1845,8 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
 
                 cacheFile.seek(qint64(offset));
                 inFile.readRawData((char*)&value, sizeof(float));
+                double divisor = pow(10, decimalsFor(workitem.series));
+                value = value / divisor;
 
             }
             add.setForSymbol(workitem.bestSymbol, value);
