@@ -211,7 +211,7 @@ QList<SummaryBest>
 SummaryMetrics::getBests(Context *context, QString symbol, int n, 
                          const QList<SummaryMetrics> &data, 
                          const QStringList &filters, bool filtered, 
-                         bool /* useMetricUnits */)
+                         bool useMetricUnits )
 {
     QList<SummaryBest> results;
 
@@ -229,6 +229,9 @@ SummaryMetrics::getBests(Context *context, QString symbol, int n,
         // get this value
         SummaryBest add;
         add.nvalue = rideMetrics.getForSymbol(symbol);
+        if (useMetricUnits == false) {
+            add.nvalue *= metric->conversion();
+        }
         add.date = rideMetrics.getRideDate().date();
 
         // XXX this needs improving for all cases ... hack for now

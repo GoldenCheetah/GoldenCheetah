@@ -1291,8 +1291,7 @@ LTMWindow::dataTable(bool html)
                     if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision=1;
 
                     // we have a metric so lets be precise ...
-                    QString v = QString("%1").arg(aggregates[j].y[i] * (context->athlete->useMetricUnits ? 1 : m->conversion())
-                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum()), 0, 'f', precision);
+                    QString v = QString("%1").arg(aggregates[j].y[i], 0, 'f', precision);
 
                     summary = summary.arg(v);
 
