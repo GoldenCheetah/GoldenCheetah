@@ -407,10 +407,11 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
 
       f *= eta; // adjust for drivetrain efficiency if using a crank-based meter
       double s   = slope( f, a, m, crr, cda, rho, headwind );
-      double de  = s * v * dt;
+      double de  = s * v * dt * (context->athlete->useMetricUnits ? 1 : FEET_PER_METER);
 
       e += de;
       t += dt;
+
       veArray[arrayLength] = e;
 
       vlast = v;
