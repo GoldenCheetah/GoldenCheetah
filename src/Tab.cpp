@@ -115,14 +115,22 @@ Tab::~Tab()
     delete views;
 }
 
-RideNavigator *Tab::rideNavigator()
+RideNavigator *
+Tab::rideNavigator()
 {
     return analysisView->rideNavigator();
 }
 
-IntervalNavigator *Tab::routeNavigator()
+IntervalNavigator *
+Tab::routeNavigator()
 {
     return intervalView->routeNavigator();
+}
+
+IntervalNavigator *
+Tab::bestNavigator()
+{
+    return intervalView->bestNavigator();
 }
 
 void

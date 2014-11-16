@@ -147,6 +147,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Julian Simioni");
     contributors.append("Justin Knotzke");
     contributors.append("Keisuke Yamaguchi");
+    contributors.append("Keith Reynolds");
     contributors.append("Ken Sallot");
     contributors.append("Luke NRG");
     contributors.append("Magnus Gille");

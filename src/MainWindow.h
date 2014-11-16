@@ -174,8 +174,8 @@ class MainWindow : public QMainWindow
         void exportMetrics();
 #ifdef GC_HAVE_LIBOAUTH
         void tweetRide();
-        void share();
 #endif
+        void share();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();

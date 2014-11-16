@@ -41,6 +41,7 @@ class Tab: public QWidget
 
         RideNavigator *rideNavigator(); // to get logical headings
         IntervalNavigator *routeNavigator(); // to get logical headings
+        IntervalNavigator *bestNavigator(); // to get logical headings
 
     protected:
 

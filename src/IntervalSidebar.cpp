@@ -47,9 +47,14 @@ IntervalSidebar::IntervalSidebar(Context *context) : QWidget(context->mainWindow
     mainLayout->addWidget(splitter);
 
     // Route
-    routeNavigator = new IntervalNavigator(context, true);
+    routeNavigator = new IntervalNavigator(context, "Route", true);
     routeNavigator->setProperty("nomenu", true);
     groupByMapper = NULL;
+
+    // Bests
+    bestNavigator = new IntervalNavigator(context, "Best", true);
+    bestNavigator->setProperty("nomenu", true);
+
 
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(context->athlete->cyclist, GC_ROUTEHEADINGS, "").toString() != "") {
@@ -58,6 +63,12 @@ IntervalSidebar::IntervalSidebar(Context *context) : QWidget(context->mainWindow
         //routeNavigator->setGroupBy(appsettings->cvalue(context->athlete->cyclist, GC_ROUTEGROUPBY).toInt());
         routeNavigator->setColumns(appsettings->cvalue(context->athlete->cyclist, GC_ROUTEHEADINGS).toString());
         routeNavigator->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_ROUTEHEADINGWIDTHS).toString());
+    }
+    if (appsettings->cvalue(context->athlete->cyclist, GC_BESTHEADINGS, "").toString() != "") {
+        bestNavigator->setSortByIndex(appsettings->cvalue(context->athlete->cyclist, GC_BESTSORTBY).toInt());
+        bestNavigator->setSortByOrder(appsettings->cvalue(context->athlete->cyclist, GC_BESTSORTBYORDER).toInt());
+        bestNavigator->setColumns(appsettings->cvalue(context->athlete->cyclist, GC_BESTHEADINGS).toString());
+        bestNavigator->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_BESTHEADINGWIDTHS).toString());
     }
 
     QWidget *routeWidget = new QWidget(this);
@@ -76,7 +87,27 @@ IntervalSidebar::IntervalSidebar(Context *context) : QWidget(context->mainWindow
     connect(routeAction, SIGNAL(triggered(void)), this, SLOT(routePopup()));
     routeItem->addWidget(routeWidget);
 
+
+
+
+    QWidget *bestWidget = new QWidget(this);
+    bestWidget->setContentsMargins(0,0,0,0);
+#ifndef Q_OS_MAC // not on mac thanks
+    bestWidget->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
+#endif
+    QVBoxLayout *bestLayout = new QVBoxLayout(bestWidget);
+    bestLayout->setSpacing(0);
+    bestLayout->setContentsMargins(0,0,0,0);
+    bestLayout->addWidget(bestNavigator);
+
+    bestItem = new GcSplitterItem(tr("Bests"), iconFromPNG(":images/sidebar/folder.png"), this);
+    QAction *bestAction = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    bestItem->addAction(bestAction);
+    connect(bestAction, SIGNAL(triggered(void)), this, SLOT(bestPopup()));
+    bestItem->addWidget(bestWidget);
+
     splitter->addWidget(routeItem);
+    splitter->addWidget(bestItem);
 
     splitter->prepare(context->athlete->cyclist, "interval");
 
@@ -84,8 +115,9 @@ IntervalSidebar::IntervalSidebar(Context *context) : QWidget(context->mainWindow
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // right click menus...
-    connect(routeNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
+    connect(routeNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showRouteMenu(const QPoint &)));
     //connect(context->athlete->intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showIntervalMenu(const QPoint &)));
+    connect(bestNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showBestMenu(const QPoint &)));
 
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
@@ -108,6 +140,9 @@ IntervalSidebar::configChanged()
     routeNavigator->tableView->viewport()->setPalette(GCColor::palette());
     routeNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
+    bestNavigator->tableView->viewport()->setPalette(GCColor::palette());
+    bestNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
+
     // interval tree
     context->athlete->intervalWidget->setPalette(GCColor::palette());
     context->athlete->intervalWidget->setStyleSheet(GCColor::stylesheet());
@@ -126,12 +161,14 @@ void
 IntervalSidebar::setFilter(QStringList filter)
 {
     routeNavigator->searchStrings(filter);
+    bestNavigator->searchStrings(filter);
 }
 
 void
 IntervalSidebar::clearFilter()
 {
     routeNavigator->clearSearch();
+    bestNavigator->clearSearch();
 }
 
 /***********************************************************************
@@ -141,11 +178,11 @@ void
 IntervalSidebar::routePopup()
 {
     // set the point for the menu and call below
-    showActivityMenu(this->mapToGlobal(QPoint(routeItem->pos().x()+routeItem->width()-20, routeItem->pos().y())));
+    showRouteMenu(this->mapToGlobal(QPoint(routeItem->pos().x()+routeItem->width()-20, routeItem->pos().y())));
 }
 
 void
-IntervalSidebar::showActivityMenu(const QPoint &pos)
+IntervalSidebar::showRouteMenu(const QPoint &pos)
 {
     if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
 
@@ -181,6 +218,40 @@ IntervalSidebar::showActivityMenu(const QPoint &pos)
         // expand / collapse
         QAction *collapseAll = new QAction(tr("Collapse All"), context->athlete->treeWidget);
         connect(collapseAll, SIGNAL(triggered(void)), routeNavigator->tableView, SLOT(collapseAll()));
+        menu.addAction(collapseAll);
+        menu.exec(pos);
+    }
+}
+
+void
+IntervalSidebar::bestPopup()
+{
+    // set the point for the menu and call below
+    showBestMenu(this->mapToGlobal(QPoint(routeItem->pos().x()+routeItem->width()-20, routeItem->pos().y())));
+}
+
+void
+IntervalSidebar::showBestMenu(const QPoint &pos)
+{
+    if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
+
+    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
+    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
+        QMenu menu(context->athlete->treeWidget);
+
+        // ride navigator stuff
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
+        connect(colChooser, SIGNAL(triggered(void)), bestNavigator, SLOT(showColumnChooser()));
+        menu.addAction(colChooser);
+
+        // expand / collapse
+        QAction *expandAll = new QAction(tr("Expand All"), context->athlete->treeWidget);
+        connect(expandAll, SIGNAL(triggered(void)), bestNavigator->tableView, SLOT(expandAll()));
+        menu.addAction(expandAll);
+
+        // expand / collapse
+        QAction *collapseAll = new QAction(tr("Collapse All"), context->athlete->treeWidget);
+        connect(collapseAll, SIGNAL(triggered(void)), bestNavigator->tableView, SLOT(collapseAll()));
         menu.addAction(collapseAll);
         menu.exec(pos);
     }

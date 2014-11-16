@@ -554,12 +554,10 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("&Manual ride entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
-#ifdef GC_HAVE_LIBOAUTH
     shareAction = new QAction(tr("Share Online..."), this);
     shareAction->setShortcut(tr("Ctrl+U"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(share()));
     rideMenu->addAction(shareAction);
-#endif
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
     rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
 #ifdef GC_HAVE_SOAP
@@ -1709,6 +1707,7 @@ MainWindow::tweetRide()
         twitterDialog->exec();
     }
 }
+#endif
 
 /*----------------------------------------------------------------------
 * Share : Twitter, Strava, RideWithGPS
@@ -1727,7 +1726,6 @@ MainWindow::share()
         d.exec();
     }
 }
-#endif
 
 /*----------------------------------------------------------------------
  * Import Workout from Disk

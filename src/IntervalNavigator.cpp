@@ -32,7 +32,7 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
-IntervalNavigator::IntervalNavigator(Context *context, bool mainwindow) : context(context), active(false), _groupBy(-1)
+IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwindow) : context(context), type(type), active(false), _groupBy(-1)
 {
     // get column headings
     // default column layouts etc
@@ -54,11 +54,20 @@ IntervalNavigator::IntervalNavigator(Context *context, bool mainwindow) : contex
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
-    context->athlete->sqlIntervalsModel->select();
-    while (context->athlete->sqlIntervalsModel->canFetchMore(QModelIndex())) context->athlete->sqlIntervalsModel->fetchMore(QModelIndex());
+    if (type == "Best")
+        sqlModel = context->athlete->sqlBestIntervalsModel;
+    else
+        sqlModel= context->athlete->sqlRouteIntervalsModel;
+
+    //QString filter = QString("type='%1'").arg(type);
+    //context->athlete->sqlIntervalsModel->setFilter(filter);
+    sqlModel->select();
+
+
+    while (sqlModel->canFetchMore(QModelIndex())) sqlModel->fetchMore(QModelIndex());
 
     searchFilter = new IntervalSearchFilter(this);
-    searchFilter->setSourceModel(context->athlete->sqlIntervalsModel); // filter out/in search results
+    searchFilter->setSourceModel(sqlModel); // filter out/in search results
 
 
     groupByModel = new IntervalGroupByModel(this);
@@ -252,9 +261,11 @@ IntervalNavigator::configChanged()
 void
 IntervalNavigator::refresh()
 {
-    context->athlete->sqlIntervalsModel->select();
-    while (context->athlete->sqlIntervalsModel->canFetchMore(QModelIndex()))
-        context->athlete->sqlIntervalsModel->fetchMore(QModelIndex());
+    //QString filter = QString("type='%1'").arg(type);
+    //context->athlete->sqlIntervalsModel->setFilter(filter);
+    sqlModel->select();
+    while (sqlModel->canFetchMore(QModelIndex()))
+        sqlModel->fetchMore(QModelIndex());
 
     active=false;
 

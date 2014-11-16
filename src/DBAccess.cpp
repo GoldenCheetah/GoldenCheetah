@@ -1036,6 +1036,17 @@ DBAccess::deleteIntervalsForRide(QString filename)
 }
 
 bool
+DBAccess::deleteIntervalsForTypeAndGroupName(QString type, QString groupName)
+{
+    QSqlQuery query(db->database(sessionid));
+
+    query.prepare("DELETE FROM interval_metrics WHERE type = :type AND groupName = :groupName;");
+    query.addBindValue(type); // type
+    query.addBindValue(groupName); // groupName,
+    return query.exec();
+}
+
+bool
 DBAccess::getInterval(QString filename, QString type, QString groupName, int start, SummaryMetrics &summaryMetrics, QColor&color)
 {
     // lookup a ride by filename returning true/false if found
