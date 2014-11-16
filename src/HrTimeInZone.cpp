@@ -47,7 +47,7 @@ public:
     {
         seconds = 0;
         // get zone ranges
-        if (hrZone && hrZoneRange >= 0) {
+        if (hrZone && hrZoneRange >= 0 && ride->areDataPresent()->hr) {
             // iterate and compute
             foreach(const RideFilePoint *point, ride->dataPoints()) {
                 if (hrZone->whichZone(hrZoneRange, point->hr) == level)
