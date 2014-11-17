@@ -1,0 +1,12 @@
+# Ignores for Eclipse
+/.settings/
+
+# Ignores for Android Projects
+/bin/
+/gen/
+/publish/
+/local.properties
+/secure.properties
+
+# Ignores for Mac machines
+.DS_Store
