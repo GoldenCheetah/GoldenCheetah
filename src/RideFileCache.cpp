@@ -69,9 +69,11 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
-    wattsCPTimeInZone.resize(4); // zero, moderate, heavy, severe
+    wattsCPTimeInZone.resize(4); // zero, I, II, III
     hrTimeInZone.resize(10);
+    hrCPTimeInZone.resize(4); // zero, I, II, III
     paceTimeInZone.resize(10);
+    paceCPTimeInZone.resize(4); // zero, I, II, III
 
     // Get info for ride file and cache file
     QFileInfo rideFileInfo(rideFileName);
@@ -204,10 +206,11 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
     offset += head.wattsKgDistCount * sizeof(float);
     offset += head.aPowerDistCount * sizeof(float);
 
-    // tiz ist currently just for RideFile:watts and RideFile:hr series.
-    // watts is first - so move on with offset only for 'hr'
-    // structure for "tiz" data - watts(10)/CPwatts (4)/HR(10)
+    // tiz ist currently just for RideFile:watts, RideFile:hr and RideFile:kph series.
+    // watts is first - so move on with offset only for 'hr' and 'kph'
+    // structure for "tiz" data - watts(10)/CPwatts(4)/HR(10)/CPhr(4)/PACE(10)/CPpace
     if (series == RideFile::hr) offset += (10+4) * sizeof(float);
+    if (series == RideFile::kph) offset += 2*(10+4) * sizeof(float);
 
     return offset;
 }
@@ -378,7 +381,9 @@ RideFileCache::RideFileCache(RideFile *ride) :
     wattsTimeInZone.resize(10);
     wattsCPTimeInZone.resize(4);
     hrTimeInZone.resize(10);
+    hrCPTimeInZone.resize(4);
     paceTimeInZone.resize(10);
+    paceCPTimeInZone.resize(4);
 
     ride->getWeight();
     ride->recalculateDerivedSeries(); // accel and others
@@ -1242,6 +1247,9 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (hrZoneRange != -1) LTHR=context->athlete->hrZones()->getLT(hrZoneRange);
     else LTHR=0;
 
+    if (paceZoneRange != -1) CV=context->athlete->paceZones()->getCV(paceZoneRange);
+    else CV=0;
+
     // setup the array based upon the ride
     int decimals = decimalsFor(series); //RideFile::decimalsFor(series) ? 1 : 0;
     double min = RideFile::minimumFor(series) * pow(10, decimals);
@@ -1264,15 +1272,15 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         if (series == RideFile::watts && zoneRange != -1)
             wattsTimeInZone[context->athlete->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
 
-        // CP zones :- moderate(<Z2), heavy (<CP and >Z2), severe (>CP)
+        // Polarized zones :- I(<0.85*CP), II (<CP and >0.85*CP), III (>CP)
         if (series == RideFile::watts && zoneRange != -1 && CP) {
-            if (dp->value(series) < 1) // moderate zero watts
+            if (dp->value(series) < 1) // I zero watts
                 wattsCPTimeInZone[0] += ride->recIntSecs();
-            if (dp->value(series) < (CP*0.85f)) // moderate
+            if (dp->value(series) < (CP*0.85f)) // I
                 wattsCPTimeInZone[1] += ride->recIntSecs();
-            else if (dp->value(series) < CP) // heavy
+            else if (dp->value(series) < CP) // II
                 wattsCPTimeInZone[2] += ride->recIntSecs();
-            else // severe
+            else // III
                 wattsCPTimeInZone[3] += ride->recIntSecs();
         }
 
@@ -1280,9 +1288,33 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         if (series == RideFile::hr && hrZoneRange != -1)
             hrTimeInZone[context->athlete->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
 
+        // Polarized zones :- I(<0.9*LTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
+        if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
+            if (dp->value(series) < 1) // I zero
+                hrCPTimeInZone[0] += ride->recIntSecs();
+            if (dp->value(series) < (LTHR*0.9f)) // I
+                hrCPTimeInZone[1] += ride->recIntSecs();
+            else if (dp->value(series) < LTHR) // II
+                hrCPTimeInZone[2] += ride->recIntSecs();
+            else // III
+                hrCPTimeInZone[3] += ride->recIntSecs();
+        }
+
         // pace time in zone, only for running activities
         if (ride->isRun() && series == RideFile::kph && paceZoneRange != -1)
             paceTimeInZone[context->athlete->paceZones()->whichZone(paceZoneRange, dp->value(series))] += ride->recIntSecs();
+
+        // Polarized zones :- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
+        if (series == RideFile::kph && paceZoneRange != -1 && CV) {
+            if (dp->value(series) < 1) // I zero
+                paceCPTimeInZone[0] += ride->recIntSecs();
+            if (dp->value(series) < (CV*0.9f)) // I
+                paceCPTimeInZone[1] += ride->recIntSecs();
+            else if (dp->value(series) < CV) // II
+                paceCPTimeInZone[2] += ride->recIntSecs();
+            else // III
+                paceCPTimeInZone[3] += ride->recIntSecs();
+        }
 
         int offset = lvalue - min;
         if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
@@ -1372,7 +1404,9 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     wattsTimeInZone.resize(10);
     wattsCPTimeInZone.resize(4);
     hrTimeInZone.resize(10);
+    hrCPTimeInZone.resize(4);
     paceTimeInZone.resize(10);
+    paceCPTimeInZone.resize(4);
 
     // set cursor busy whilst we aggregate -- bit of feedback
     // and less intrusive than a popup box
@@ -1425,7 +1459,11 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
                 paceTimeInZone[i] += rideCache.paceTimeInZone[i];
                 hrTimeInZone[i] += rideCache.hrTimeInZone[i];
                 wattsTimeInZone[i] += rideCache.wattsTimeInZone[i];
-                if (i<4) wattsCPTimeInZone[i] += rideCache.wattsCPTimeInZone[i];
+                if (i<4) {
+                    paceCPTimeInZone[i] += rideCache.paceCPTimeInZone[i];
+                    hrCPTimeInZone[i] += rideCache.hrCPTimeInZone[i];
+                    wattsCPTimeInZone[i] += rideCache.wattsCPTimeInZone[i];
+                }
             }
         }
     }
@@ -1496,6 +1534,7 @@ RideFileCache::serialize(QDataStream *out)
     head.crc = crc;
     head.CP = CP;
     head.LTHR = LTHR;
+    head.CV = CV;
 
     head.wattsMeanMaxCount = wattsMeanMax.size();
     head.hrMeanMaxCount = hrMeanMax.size();
@@ -1558,7 +1597,9 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(float) * wattsTimeInZone.size());
     out->writeRawData((const char *) wattsCPTimeInZone.data(), sizeof(float) * wattsCPTimeInZone.size());
     out->writeRawData((const char *) hrTimeInZone.data(), sizeof(float) * hrTimeInZone.size());
+    out->writeRawData((const char *) hrCPTimeInZone.data(), sizeof(float) * hrCPTimeInZone.size());
     out->writeRawData((const char *) paceTimeInZone.data(), sizeof(float) * paceTimeInZone.size());
+    out->writeRawData((const char *) paceCPTimeInZone.data(), sizeof(float) * paceCPTimeInZone.size());
 }
 
 void
@@ -1634,7 +1675,9 @@ RideFileCache::readCache()
         inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(float) * 10);
         inFile.readRawData((char *) wattsCPTimeInZone.data(), sizeof(float) * 4);
         inFile.readRawData((char *) hrTimeInZone.data(), sizeof(float) * 10);
+        inFile.readRawData((char *) hrCPTimeInZone.data(), sizeof(float) * 4);
         inFile.readRawData((char *) paceTimeInZone.data(), sizeof(float) * 10);
+        inFile.readRawData((char *) paceCPTimeInZone.data(), sizeof(float) * 4);
 
         // setup the doubles the users use
         doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);
