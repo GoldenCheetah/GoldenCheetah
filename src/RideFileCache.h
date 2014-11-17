@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 19;
+static const unsigned int RideFileCacheVersion = 20;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -61,6 +61,7 @@ static const unsigned int RideFileCacheVersion = 19;
 // 17       09-Jun-14    Move wpk meanmax array next to watts for fast read
 // 18       19-Oct-14    Added gearRatio distribution
 // 19       11-Nov-14    Added Pace Zones distribution
+// 20       17-Nov-14    Added Polarized Zones for HR and Pace
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -105,6 +106,7 @@ struct RideFileCacheHeader {
 
     int LTHR, // used to calculate Time in Zone (TIZ)
         CP;   // used to calculate Time in Zone (TIZ)
+    double CV;   // used to calculate Time in Zone (TIZ)
                 
 };
 
@@ -177,9 +179,11 @@ class RideFileCache
         QVector<QDate> &meanMaxDates(RideFile::SeriesType series); // the dates of the bests
         QVector<double> &distributionArray(RideFile::SeriesType); // return distribution array for the given series
         QVector<float> &wattsZoneArray() { return wattsTimeInZone; }
-        QVector<float> &wattsCPZoneArray() { return wattsCPTimeInZone; } // moderate, heavy and severe domains
+        QVector<float> &wattsCPZoneArray() { return wattsCPTimeInZone; } // Polarized Zones
         QVector<float> &hrZoneArray() { return hrTimeInZone; }
+        QVector<float> &hrCPZoneArray() { return hrCPTimeInZone; } // Polarized Zones
         QVector<float> &paceZoneArray() { return paceTimeInZone; }
+        QVector<float> &paceCPZoneArray() { return paceCPTimeInZone; } // Polarized Zones
 
         QVector<float> &heatMeanMaxArray();  // will compute if neccessary
 
@@ -215,6 +219,7 @@ class RideFileCache
         // used for zoning
         int CP;
         int LTHR;
+        double CV;
 
         //
         // MEAN MAXIMAL VALUES
@@ -307,9 +312,11 @@ class RideFileCache
 
 
         QVector<float> wattsTimeInZone;   // time in zone in seconds
-        QVector<float> wattsCPTimeInZone;   // time in zone in seconds for moderate, heavy and severe domains
+        QVector<float> wattsCPTimeInZone;   // time in zone in seconds for polarized zones
         QVector<float> hrTimeInZone;      // time in zone in seconds
+        QVector<float> hrCPTimeInZone;   // time in zone in seconds for polarized zones
         QVector<float> paceTimeInZone;      // time in zone in seconds
+        QVector<float> paceCPTimeInZone;   // time in zone in seconds for polarized zones
 };
 
 // Working structured inherited from CPPlot.cpp
