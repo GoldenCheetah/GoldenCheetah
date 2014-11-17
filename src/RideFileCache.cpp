@@ -1301,11 +1301,12 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         }
 
         // pace time in zone, only for running activities
-        if (ride->isRun() && series == RideFile::kph && paceZoneRange != -1)
+        if (series == RideFile::kph && paceZoneRange != -1 && ride->isRun())
             paceTimeInZone[context->athlete->paceZones()->whichZone(paceZoneRange, dp->value(series))] += ride->recIntSecs();
 
         // Polarized zones :- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
-        if (series == RideFile::kph && paceZoneRange != -1 && CV) {
+        // only for running activities
+        if (series == RideFile::kph && paceZoneRange != -1 && CV && ride->isRun()) {
             if (dp->value(series) < 1) // I zero
                 paceCPTimeInZone[0] += ride->recIntSecs();
             if (dp->value(series) < (CV*0.9f)) // I
