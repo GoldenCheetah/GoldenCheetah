@@ -1833,7 +1833,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
                 // round to the appropriate decimal places
                 double rounded = 0.0f;
                 if (decimalsFor(series) > 0)
-                    rounded = QString("%1").arg(sum, 15, 'g', decimalsFor(series)).toDouble();
+                    rounded = QString("%1").arg(sum, 15, 'f', decimalsFor(series)).toDouble();
                 else
                     rounded = qRound(sum);
 
