@@ -20,24 +20,24 @@ import java.util.EnumSet;
 public class HeartRate extends Base
 {
     public HeartRate(MultiDeviceSearchResult result, Context mContext) {
-		super(result, mContext);
-		releaseHandle = AntPlusHeartRatePcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
-	}
+        super(result, mContext);
+        releaseHandle = AntPlusHeartRatePcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
+    }
     
-	public IPluginAccessResultReceiver<AntPlusHeartRatePcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusHeartRatePcc>() {
+    public IPluginAccessResultReceiver<AntPlusHeartRatePcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusHeartRatePcc>() {
         //Handle the result, connecting to events on success or reporting failure to user.
         @Override
         public void onResultReceived(AntPlusHeartRatePcc result, RequestAccessResult resultCode, DeviceState initialDeviceState)
         {
-        	if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SUCCESS) {
-        		result.subscribeHeartRateDataEvent(
-    	    		new IHeartRateDataReceiver() {
-    	    			@Override
-    	    			public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final DataState dataState) {
-    	    				writeData("HR", String.valueOf(computedHeartRate));
-    	    			}
-    	    		}
-    	    	);
+            if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SUCCESS) {
+                result.subscribeHeartRateDataEvent(
+                    new IHeartRateDataReceiver() {
+                        @Override
+                        public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final DataState dataState) {
+                            writeData("HR", String.valueOf(computedHeartRate));
+                        }
+                    }
+                );
             }
         }
     };
