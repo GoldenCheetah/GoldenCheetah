@@ -43,26 +43,26 @@ public class RideService extends Service
     public         boolean             rideStarted = false;
     
     public static  HeartRate           hr;
-	public static  Power               w;
-	public static  Gps                 gps;
-	public static  Sensors             sensors;
-	
-	MultiDeviceSearch                  mSearch;
-	MultiDeviceSearch.SearchCallbacks  mCallback;
-	MultiDeviceSearch.RssiCallback     mRssiCallback;
-	
-	public int                        notifyID = 1;
-	NotificationManager               mNotificationManager;
-	
-	public String                     file_name = "";
-	SharedPreferences settings;
-	
+    public static  Power               w;
+    public static  Gps                 gps;
+    public static  Sensors             sensors;
+    
+    MultiDeviceSearch                  mSearch;
+    MultiDeviceSearch.SearchCallbacks  mCallback;
+    MultiDeviceSearch.RssiCallback     mRssiCallback;
+    
+    public int                        notifyID = 1;
+    NotificationManager               mNotificationManager;
+    
+    public String                     file_name = "";
+    SharedPreferences settings;
+    
     /**
      * 
      * @return BufferedWriter
      */
     public static BufferedWriter getBuf() { 
-    	return buf; 
+        return buf; 
     }
     
     /**
@@ -70,7 +70,7 @@ public class RideService extends Service
      * @return start_time
      */
     public static long getStartTime() { 
-    	return start_time; 
+        return start_time; 
     }
     
     
@@ -79,7 +79,7 @@ public class RideService extends Service
      * @return start_time
      */
     public static Map<String, String> getCurrentValues() { 
-    	return current_values; 
+        return current_values; 
     }
     
     
@@ -88,7 +88,7 @@ public class RideService extends Service
      * @return w
      */
     public static Power getPower() { 
-    	return w; 
+        return w; 
     }
     
     /**
@@ -96,10 +96,10 @@ public class RideService extends Service
      * @return w
      */
     public static void setPower(Power pw) { 
-    	w = pw;
-    	if(w == null) {
-    		w = pw;
-    	}
+        w = pw;
+        if(w == null) {
+            w = pw;
+        }
     }
     
     /**
@@ -107,158 +107,158 @@ public class RideService extends Service
      * @return hr
      */
     public static HeartRate getHeartRate() { 
-    	return hr; 
+        return hr; 
     }
     
 
     public static void setHeartRate(HeartRate phr) {
-    	if(hr == null) {
-    		hr = phr;
-    	}
+        if(hr == null) {
+            hr = phr;
+        }
     }
 
     
     public static void setGps(Gps pgps) {
-    	if(gps == null) {
-    		gps = pgps;
-    	}
+        if(gps == null) {
+            gps = pgps;
+        }
     }
     
     public static Gps getGps() {
-    	return gps;
+        return gps;
     }
     
     
     public static void setSensors(Sensors psens) {
-    	if(sensors == null) {
-    		sensors = psens;
-    	}
+        if(sensors == null) {
+            sensors = psens;
+        }
     }
     
     public static Sensors getSensors() {
-    	return sensors;
+        return sensors;
     }
-	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		startRide();
-		return Service.START_NOT_STICKY;
-	}
+    
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        startRide();
+        return Service.START_NOT_STICKY;
+    }
 
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
-	
-	public boolean onUnbind (Intent intent) {
-		return true;
-	}
-	
-	@Override
-	public void onDestroy() {
-		stopRide();
-		super.onDestroy();
-	}
-	
+    @Override
+    public IBinder onBind(Intent arg0) {
+        return null;
+    }
+    
+    public boolean onUnbind (Intent intent) {
+        return true;
+    }
+    
+    @Override
+    public void onDestroy() {
+        stopRide();
+        super.onDestroy();
+    }
+    
     protected void startRide() {
-    	if(rideStarted) return;
-    	
-    	start_time     = System.currentTimeMillis();
-    	file_name      = "ride-" + start_time + ".json";
+        if(rideStarted) return;
+        
+        start_time     = System.currentTimeMillis();
+        file_name      = "ride-" + start_time + ".json";
 
-    	current_values = new HashMap<String, String>();
-    	
-    	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
-    	f.setTimeZone(TimeZone.getTimeZone("UTC"));
-    	String utc = f.format(new Date(start_time));
-    	
-    	Calendar cal = Calendar.getInstance();
-    	cal.setTimeInMillis(start_time);
-    	
-    	String month      = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
-    	String week_day   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-    	String year       = Integer.toString(cal.get(Calendar.YEAR));
-    	settings          = getSharedPreferences(StartActivity.PREFS_NAME, 0);
-    	String rider_name = settings.getString(StartActivity.RIDER_NAME, "");
-    	final Set<String> pairedAnts = settings.getStringSet(StartActivity.PAIRED_ANTS, null);
-    	
-    	
-    	current_values.put("SECS", "0.0");
-    	
-    	String rideHeadder = "{" +
-			"\"RIDE\":{" +
-				"\"STARTTIME\":\"" + utc + " UTC\"," +
-				"\"RECINTSECS\":1," +
-				"\"DEVICETYPE\":\"Android\"," +
-				"\"IDENTIFIER\":\"\"," +
-				"\"TAGS\":{" +
-					"\"Athlete\":\"" + rider_name + "\"," +
-					"\"Calendar Text\":\"Auto Recored Android Ride\"," +
-					"\"Change History\":\"\"," +
-					"\"Data\":\"\"," +
-					"\"Device\":\"\"," +
-					"\"Device Info\":\"\"," +
-					"\"File Format\":\"\"," +
-					"\"Filename\":\"\"," +
-					"\"Month\":\"" + month +"\"," +
-					"\"Notes\":\"\"," +
-					"\"Objective\":\"\"," +
-					"\"Sport\":\"Bike\"," +
-					"\"Weekday\":\"" + week_day + "\"," +
-					"\"Workout Code\":\"\"," +
-					"\"Year\":\"" + year + "\"" +
-				"}," +
-				"\"SAMPLES\":[{\"SECS\":0}";
+        current_values = new HashMap<String, String>();
+        
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
+        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String utc = f.format(new Date(start_time));
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(start_time);
+        
+        String month      = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+        String week_day   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        String year       = Integer.toString(cal.get(Calendar.YEAR));
+        settings          = getSharedPreferences(StartActivity.PREFS_NAME, 0);
+        String rider_name = settings.getString(StartActivity.RIDER_NAME, "");
+        final Set<String> pairedAnts = settings.getStringSet(StartActivity.PAIRED_ANTS, null);
+        
+        
+        current_values.put("SECS", "0.0");
+        
+        String rideHeadder = "{" +
+            "\"RIDE\":{" +
+                "\"STARTTIME\":\"" + utc + " UTC\"," +
+                "\"RECINTSECS\":1," +
+                "\"DEVICETYPE\":\"Android\"," +
+                "\"IDENTIFIER\":\"\"," +
+                "\"TAGS\":{" +
+                    "\"Athlete\":\"" + rider_name + "\"," +
+                    "\"Calendar Text\":\"Auto Recored Android Ride\"," +
+                    "\"Change History\":\"\"," +
+                    "\"Data\":\"\"," +
+                    "\"Device\":\"\"," +
+                    "\"Device Info\":\"\"," +
+                    "\"File Format\":\"\"," +
+                    "\"Filename\":\"\"," +
+                    "\"Month\":\"" + month +"\"," +
+                    "\"Notes\":\"\"," +
+                    "\"Objective\":\"\"," +
+                    "\"Sport\":\"Bike\"," +
+                    "\"Weekday\":\"" + week_day + "\"," +
+                    "\"Workout Code\":\"\"," +
+                    "\"Year\":\"" + year + "\"" +
+                "}," +
+                "\"SAMPLES\":[{\"SECS\":0}";
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-        	File dir = new File(
-				Environment.getExternalStoragePublicDirectory(
-					Environment.DIRECTORY_DOCUMENTS
-				), 
-				"Rides"
-			);
-        	
-        	File file = new File(
-				Environment.getExternalStoragePublicDirectory(
-					Environment.DIRECTORY_DOCUMENTS
-				) + "/Rides", 
-				"ride-" + start_time + ".json"
-			);
-        	
-        	try {
-        		dir.mkdirs();
-        		file.createNewFile();
-				buf = new BufferedWriter(new FileWriter(file, true));
-				buf.write(rideHeadder);
-				
-				if(gps == null) {
-                	gps = new Gps(this);
+            File dir = new File(
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS
+                ), 
+                "Rides"
+            );
+            
+            File file = new File(
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS
+                ) + "/Rides", 
+                "ride-" + start_time + ".json"
+            );
+            
+            try {
+                dir.mkdirs();
+                file.createNewFile();
+                buf = new BufferedWriter(new FileWriter(file, true));
+                buf.write(rideHeadder);
+                
+                if(gps == null) {
+                    gps = new Gps(this);
                 }   
-				
-				if(sensors == null) {
-					sensors = new Sensors(this);
+                
+                if(sensors == null) {
+                    sensors = new Sensors(this);
                 }
-				
-			    mCallback = new MultiDeviceSearch.SearchCallbacks(){
-			        public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
-			        {
-			            if (!deviceFound.isAlreadyConnected() && (pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))))  {
-			            	launchConnection(deviceFound);
-			            }
-			        }
+                
+                mCallback = new MultiDeviceSearch.SearchCallbacks(){
+                    public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
+                    {
+                        if (!deviceFound.isAlreadyConnected() && (pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))))  {
+                            launchConnection(deviceFound);
+                        }
+                    }
 
-					@Override
-					public void onSearchStopped(RequestAccessResult arg0) {}
-			    };
-			    
-			    mRssiCallback = new MultiDeviceSearch.RssiCallback() {
-			        @Override
-			        public void onRssiUpdate(final int resultId, final int rssi){}
-			    };
+                    @Override
+                    public void onSearchStopped(RequestAccessResult arg0) {}
+                };
+                
+                mRssiCallback = new MultiDeviceSearch.RssiCallback() {
+                    @Override
+                    public void onRssiUpdate(final int resultId, final int rssi){}
+                };
 
-		        // start the multi-device search
-			    mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
-			} catch (IOException e) {}
-        	 
+                // start the multi-device search
+                mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
+            } catch (IOException e) {}
+             
         }
         rideStarted = true;
         
@@ -284,7 +284,7 @@ public class RideService extends Service
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
         if(mNotificationManager == null) {
-        	mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
 
         startForeground(notifyID, mBuilder.build());
@@ -292,33 +292,33 @@ public class RideService extends Service
    
     
     protected void stopRide() {
-    	if(!rideStarted) return;
-    	    	
-    	if(w != null) {
-    		w.onDestroy();
-    	}
-    	
-    	if(hr != null) {
-    		hr.onDestroy();
-    	}
-    	
-    	if(gps != null) {
-    		gps.onDestroy();
-    	}
-    	
-    	if(sensors != null) {
-    		sensors.onDestroy();
-    	}
-    	
-    	mSearch.close();
-    	
-    	try {
-    		buf.write("]}}");
-			buf.close();
-		} catch (IOException e) {}
-    	
-    	rideStarted = false;
-    	mNotificationManager.cancel(notifyID);
+        if(!rideStarted) return;
+                
+        if(w != null) {
+            w.onDestroy();
+        }
+        
+        if(hr != null) {
+            hr.onDestroy();
+        }
+        
+        if(gps != null) {
+            gps.onDestroy();
+        }
+        
+        if(sensors != null) {
+            sensors.onDestroy();
+        }
+        
+        mSearch.close();
+        
+        try {
+            buf.write("]}}");
+            buf.close();
+        } catch (IOException e) {}
+        
+        rideStarted = false;
+        mNotificationManager.cancel(notifyID);
     }
     
     
@@ -330,7 +330,7 @@ public class RideService extends Service
                 break;
             case BIKE_POWER:
                 if(w == null) {
-                	w = new Power(result, this);
+                    w = new Power(result, this);
                 }
                 break;
             case BIKE_SPD:
@@ -345,7 +345,7 @@ public class RideService extends Service
                 break;
             case HEARTRATE:
                 if(hr == null) {
-                	hr = new HeartRate(result, this);
+                    hr = new HeartRate(result, this);
                 }                 
                 break;
             case STRIDE_SDM:
