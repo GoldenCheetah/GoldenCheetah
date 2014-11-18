@@ -96,18 +96,18 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
     public:
 
         // storage for data counts
-        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray, wattsCPZoneArray, wattsKgArray, nmArray, hrArray,
-                              hrZoneArray, kphArray, paceZoneArray, cadArray, gearArray, metricArray;
+        QVector<unsigned int> aPowerArray, wattsArray, wattsZoneArray,
+                              wattsCPZoneArray, wattsKgArray, nmArray,
+                              hrArray, hrZoneArray, hrCPZoneArray,
+                              kphArray, paceZoneArray, paceCPZoneArray,
+                              cadArray, gearArray, metricArray;
 
         // storage for data counts in interval selected
-        QVector<unsigned int> aPowerSelectedArray, 
-                              wattsSelectedArray, 
-                              wattsZoneSelectedArray, 
-                              wattsCPZoneSelectedArray,
-                              wattsKgSelectedArray,
-                              nmSelectedArray, hrSelectedArray,
-                              hrZoneSelectedArray, kphSelectedArray,
-                              paceZoneSelectedArray,
+        QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray,
+                              wattsZoneSelectedArray, wattsCPZoneSelectedArray,
+                              wattsKgSelectedArray, nmSelectedArray,
+                              hrSelectedArray, hrZoneSelectedArray, hrCPZoneSelectedArray,
+                              kphSelectedArray, paceZoneSelectedArray, paceCPZoneSelectedArray,
                               cadSelectedArray, gearSelectedArray;
 };
 
