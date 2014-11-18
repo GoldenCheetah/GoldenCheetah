@@ -54,19 +54,21 @@ public class Base
 	    	current_values.put(key, value);
 
         	try {
-        		buf.write(",{");
-        		
-        		buf.write("\"");
-        		buf.write("SECS");
-        		buf.write("\":");
-        		buf.write(ts);
-        		
-        		buf.write(",\"");
-        		buf.write(key);
-        		buf.write("\":");
-        		buf.write(value);
-        		
-            	buf.write("}");
+        		synchronized (buf) {
+        			buf.write(",{");
+            		
+            		buf.write("\"");
+            		buf.write("SECS");
+            		buf.write("\":");
+            		buf.write(ts);
+            		
+            		buf.write(",\"");
+            		buf.write(key);
+            		buf.write("\":");
+            		buf.write(value);
+            		
+                	buf.write("}");
+				}
 			} catch (IOException e) {}
 	    }
     }
@@ -78,27 +80,29 @@ public class Base
     		current_values.put("SECS", ts);
 
         	try {
-        		buf.write(",{");
-        		
-        		buf.write("\"");
-        		buf.write("SECS");
-        		buf.write("\":");
-        		buf.write(ts);
-        		
-        		for (Map.Entry<String, String> entry : map.entrySet())
-    	    	{
-        			String key   = entry.getKey();
-        			String value = entry.getValue();
-        			
-    	    	    buf.write(",\"");
-            		buf.write(key);
-            		buf.write("\":");
-            		buf.write(value);
+        		synchronized (buf) {
+        			buf.write(",{");
             		
-            		current_values.put(key, value);
-    	    	}
+            		buf.write("\"");
+            		buf.write("SECS");
+            		buf.write("\":");
+            		buf.write(ts);
+            		
+            		for (Map.Entry<String, String> entry : map.entrySet())
+        	    	{
+            			String key   = entry.getKey();
+            			String value = entry.getValue();
+            			
+        	    	    buf.write(",\"");
+                		buf.write(key);
+                		buf.write("\":");
+                		buf.write(value);
+                		
+                		current_values.put(key, value);
+        	    	}
 
-            	buf.write("}");
+                	buf.write("}");
+				}
 			} catch (IOException e) {}
     }
     
