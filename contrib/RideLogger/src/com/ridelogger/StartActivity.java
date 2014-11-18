@@ -33,7 +33,7 @@ public class StartActivity extends FragmentActivity
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
-    {	
+    {    
         super.onCreate(savedInstanceState);   
         rsi = new Intent(this, RideService.class);
         
@@ -41,25 +41,25 @@ public class StartActivity extends FragmentActivity
         String rider_name = settings.getString(RIDER_NAME, "");
         
         if(rider_name == "") {
-        	// 1. Instantiate an AlertDialog.Builder with its constructor
-        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            // 1. Instantiate an AlertDialog.Builder with its constructor
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        	// 2. Chain together various setter methods to set the dialog characteristics
-        	builder.setMessage("What is your Golder Cheata Rider Name")
-        	       .setTitle("Chose Rider Name");
-        	
-        	// Set up the input
-        	final EditText input = new EditText(this);
-        	// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        	input.setInputType(InputType.TYPE_CLASS_TEXT);
-        	builder.setView(input);
+            // 2. Chain together various setter methods to set the dialog characteristics
+            builder.setMessage("What is your Golder Cheata Rider Name")
+                   .setTitle("Chose Rider Name");
+            
+            // Set up the input
+            final EditText input = new EditText(this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
 
-        	
-        	builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+            
+            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                	String name = input.getText().toString();
+                    String name = input.getText().toString();
                     if(name != "" && name != null) {
-                    	SharedPreferences.Editor editor = settings.edit();
+                        SharedPreferences.Editor editor = settings.edit();
                         editor.putString(RIDER_NAME, name);
                         editor.commit();
                         setupAnt();
@@ -67,58 +67,58 @@ public class StartActivity extends FragmentActivity
                 }
             });
 
-        	// 3. Get the AlertDialog from create()
-        	dialog = builder.create();
-        	dialog.show();
+            // 3. Get the AlertDialog from create()
+            dialog = builder.create();
+            dialog.show();
         } else {
-	        toggleRide();
-	        finish();
+            toggleRide();
+            finish();
         }
     }
     
     protected void setupAnt() {
-    	
-    	MultiDeviceSearch                        mSearch;
-    	MultiDeviceSearch.SearchCallbacks        mCallback;
-    	MultiDeviceSearch.RssiCallback           mRssiCallback;
-    	final ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();
-	    mCallback = new MultiDeviceSearch.SearchCallbacks(){
-	        public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
-	        {
-	        	if(!foundDevices.contains(deviceFound)) {
-	        		foundDevices.add(deviceFound);
-	        		selectDevicesDialog(foundDevices);
-	        	}
-	        }
+        
+        MultiDeviceSearch                        mSearch;
+        MultiDeviceSearch.SearchCallbacks        mCallback;
+        MultiDeviceSearch.RssiCallback           mRssiCallback;
+        final ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();
+        mCallback = new MultiDeviceSearch.SearchCallbacks(){
+            public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
+            {
+                if(!foundDevices.contains(deviceFound)) {
+                    foundDevices.add(deviceFound);
+                    selectDevicesDialog(foundDevices);
+                }
+            }
 
-			@Override
-			public void onSearchStopped(RequestAccessResult arg0) {}
-	    };
-	    
-	    mRssiCallback = new MultiDeviceSearch.RssiCallback() {
-	        @Override
-	        public void onRssiUpdate(final int resultId, final int rssi){}
-	    };
+            @Override
+            public void onSearchStopped(RequestAccessResult arg0) {}
+        };
+        
+        mRssiCallback = new MultiDeviceSearch.RssiCallback() {
+            @Override
+            public void onRssiUpdate(final int resultId, final int rssi){}
+        };
 
         // start the multi-device search
-	    mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
+        mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
     }
     
     protected void selectDevicesDialog(final ArrayList<MultiDeviceSearchResult> foundDevices) {
-    	final ArrayList<Integer>      mSelectedItems     = new ArrayList<Integer>();  // Where we track the selected items
-    	final ArrayList<CharSequence> foundDevicesString = new ArrayList<CharSequence>();
-    	
-    	for(MultiDeviceSearchResult device : foundDevices) { 
-    		foundDevicesString.add(device.getAntDeviceType() + " - " + device.getDeviceDisplayName());
+        final ArrayList<Integer>      mSelectedItems     = new ArrayList<Integer>();  // Where we track the selected items
+        final ArrayList<CharSequence> foundDevicesString = new ArrayList<CharSequence>();
+        
+        for(MultiDeviceSearchResult device : foundDevices) { 
+            foundDevicesString.add(device.getAntDeviceType() + " - " + device.getDeviceDisplayName());
         }
-    	CharSequence[] foundDevicesCharSeq = foundDevicesString.toArray(new CharSequence[foundDevicesString.size()]);
-    	
+        CharSequence[] foundDevicesCharSeq = foundDevicesString.toArray(new CharSequence[foundDevicesString.size()]);
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         
         // Set the dialog title
-		builder.setTitle("Select Paired Ant Devices")
-	        // Specify the list array, the items to be selected by default (null for none),
-	        // and the listener through which to receive callbacks when items are selected
+        builder.setTitle("Select Paired Ant Devices")
+            // Specify the list array, the items to be selected by default (null for none),
+            // and the listener through which to receive callbacks when items are selected
            .setMultiChoiceItems(foundDevicesCharSeq, null, new DialogInterface.OnMultiChoiceClickListener() {
                @Override
                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -135,12 +135,12 @@ public class StartActivity extends FragmentActivity
            .setPositiveButton("Pair", new DialogInterface.OnClickListener() {
                @Override
                public void onClick(DialogInterface dialog, int id) {
-            	   ArrayList<String> ids = new ArrayList<String>();
-            	   for(Integer index : mSelectedItems) { 
-            		   ids.add(Integer.toString(foundDevices.get(index).getAntDeviceNumber()));
+                   ArrayList<String> ids = new ArrayList<String>();
+                   for(Integer index : mSelectedItems) { 
+                       ids.add(Integer.toString(foundDevices.get(index).getAntDeviceNumber()));
                    }
-            	   
-            	   SharedPreferences.Editor editor = settings.edit();
+                   
+                   SharedPreferences.Editor editor = settings.edit();
                    editor.putStringSet(PAIRED_ANTS, new HashSet<String>(ids));
                    editor.commit();
                    toggleRide();
@@ -154,34 +154,34 @@ public class StartActivity extends FragmentActivity
     
     @Override
     protected void onDestroy() {
-    	// TODO Auto-generated method stub
-    	super.onDestroy();
+        // TODO Auto-generated method stub
+        super.onDestroy();
     }
 
-	
+    
     private void stopRide() {
-    	Toast toast = Toast.makeText(getApplicationContext(), "Stoping Ride!", Toast.LENGTH_LONG);
-    	toast.show();
-    	this.stopService(rsi);
-	}
+        Toast toast = Toast.makeText(getApplicationContext(), "Stoping Ride!", Toast.LENGTH_LONG);
+        toast.show();
+        this.stopService(rsi);
+    }
     
 
-	protected void toggleRide() {
-    	if(!isServiceRunning(RideService.class)) {
-    		startRide();
-    	} else {
-    		stopRide();
-    	}
+    protected void toggleRide() {
+        if(!isServiceRunning(RideService.class)) {
+            startRide();
+        } else {
+            stopRide();
+        }
     }
     
 
     private void startRide() {
-    	if(!isServiceRunning(RideService.class)) {
-	    	this.startService(rsi);
-    	}
+        if(!isServiceRunning(RideService.class)) {
+            this.startService(rsi);
+        }
         Toast toast = Toast.makeText(getApplicationContext(), "Starting Ride!", Toast.LENGTH_LONG);
-    	toast.show();
-	}
+        toast.show();
+    }
     
     
     private boolean isServiceRunning(Class<?> serviceClass) {
