@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE AndroidXML>
+<resources>
+    <string name="app_name">Ride Logger</string>
+    <string name="service_name">Logging Ride</string>
+</resources>
