@@ -2238,7 +2238,7 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
                 if (series == RideFile::kph && (!rideItem || rideItem->isRun())) {
                     bool metric = appsettings->value(this, GC_PACE, true).toBool();
                     QString paceunit = metric ? tr("min/km") : tr("min/mile");
-                    text = tr("%1 Pace (%2)\n").arg(kphToPace(xvalue, metric)).arg(paceunit);
+                    text = tr("%1 Pace (%2)\n").arg(metric ? kphToPace(xvalue, metric) : mphToPace(xvalue, metric)).arg(paceunit);
                 }
                 // output the tooltip
                 text += QString("%1 %2\n%3 %4")
