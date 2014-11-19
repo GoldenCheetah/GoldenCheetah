@@ -34,6 +34,7 @@
 
 #include <QString>
 extern QString kphToPace(double kph, bool metric);
+extern QString mphToPace(double mph, bool metric);
 
 #endif // _GC_Units_h
 
