@@ -48,3 +48,11 @@ QString kphToPace(double kph, bool metric)
                   .arg(minutes, 2, 10, QLatin1Char('0'))
                   .arg(seconds, 2, 10, QLatin1Char('0'));
 }
+
+QString mphToPace(double mph, bool metric)
+{
+    // convert to kph and then use kph function
+    double kph = mph * KM_PER_MILE;
+
+    return kphToPace(kph, metric);
+}
