@@ -30,6 +30,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "Colors.h"
+#include "Units.h"
 
 #include "ZoneScaleDraw.h"
 
@@ -2232,12 +2233,21 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
         } else if (yvalue > 0) {
 
             if (source != Metric) {
+                // for speed series prepend pace with units according to settings
+                // only when there is no ride (home) or the activity is a run.
+                if (series == RideFile::kph && (!rideItem || rideItem->isRun())) {
+                    bool metric = appsettings->value(this, GC_PACE, true).toBool();
+                    QString paceunit = metric ? tr("min/km") : tr("min/mile");
+                    text = tr("%1 Pace (%2)\n").arg(kphToPace(xvalue, metric)).arg(paceunit);
+                }
                 // output the tooltip
-                text = QString("%1 %2\n%3 %4")
+                text += QString("%1 %2\n%3 %4")
                             .arg(xvalue, 0, 'f', digits)
                             .arg(this->axisTitle(curve->xAxis()).text())
                             .arg(yvalue, 0, 'f', 1)
                             .arg(absolutetime ? tr("minutes") : tr("%"));
+
+
             } else {
                 text = QString("%1 %2\n%3 %4")
                             .arg(xvalue, 0, 'f', digits)
