@@ -168,7 +168,7 @@ public class RideService extends Service
 
         current_values = new HashMap<String, String>();
         
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
         String utc = f.format(new Date(start_time));
         
