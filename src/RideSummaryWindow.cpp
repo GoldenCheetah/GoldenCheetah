@@ -977,16 +977,40 @@ RideSummaryWindow::htmlSummary()
         // we have after filtering has been applied, otherwise it is just
         // the number of entries
         int activities = 0;
+        int runs = 0;
+        int rides = 0;
+        int totalruns = 0;
+        int totalrides = 0;
         if (context->ishomefiltered || context->isfiltered || filtered) {
 
             foreach (SummaryMetrics activity, data) {
+                if (activity.isRun()) {
+                    totalruns++;
+                } else {
+                    totalrides++;
+                }
                 if (filtered && !filters.contains(activity.getFileName())) continue;
                 if (context->isfiltered && !context->filters.contains(activity.getFileName())) continue;
                 if (context->ishomefiltered && !context->homeFilters.contains(activity.getFileName())) continue;
+                if (activity.isRun()) {
+                    runs++;
+                } else {
+                    rides++;
+                }
                 activities++;
             }
 
-        } else activities = data.count();
+        } else {
+            activities = data.count();
+            foreach (SummaryMetrics activity, data) {
+               if (activity.isRun()) {
+                    runs++;
+                } else {
+                    rides++;
+                }
+            }
+
+        }
 
         // some people have a LOT of metrics, so we only show so many since
         // you quickly run out of screen space, but if they have > 4 we can
@@ -997,18 +1021,19 @@ RideSummaryWindow::htmlSummary()
         else totalCols = rtotalColumn.count();
         int metricCols = metricColumn.count() > 7 ? 7 : metricColumn.count();
 
+        //Rides first
         if (context->ishomefiltered || context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
-            summary += ("<p><h3>" + 
-                        QString(tr("%1 of %2")).arg(activities).arg(data.count())
-                                           + (data.count() == 1 ? tr(" ride") : tr(" rides")) +
+            summary += ("<p><h3>" +
+                        QString(tr("%1 of %2")).arg(rides).arg(totalrides)
+                                           + (totalrides == 1 ? tr(" ride") : tr(" rides")) +
                         "</h3><p>");
         } else {
 
             // just "n activities" shown in header of list when not filtered
-            summary += ("<p><h3>" + 
-                        QString("%1").arg(activities) + (activities == 1 ? tr(" ride") : tr(" rides")) +
+            summary += ("<p><h3>" +
+                        QString("%1").arg(rides) + (rides == 1 ? tr(" ride") : tr(" rides")) +
                         "</h3><p>");
         }
         
@@ -1061,6 +1086,104 @@ RideSummaryWindow::htmlSummary()
             if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
             if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
             if (context->ishomefiltered && !context->homeFilters.contains(rideMetrics.getFileName())) continue;
+
+            if (rideMetrics.isRun()) continue;
+
+            if (even) summary += "<tr>";
+            else {
+                    summary += "<tr bgcolor='" + altColor.name() + "'>";
+            }
+            even = !even;
+
+            // date of ride
+            summary += QString("<td align=\"center\">%1</td>")
+                       .arg(rideMetrics.getRideDate().date().toString(tr("dd MMM yyyy")));
+
+            for (j = 0; j< totalCols; ++j) {
+                QString symbol = rtotalColumn[j];
+
+                // get this value
+                QString value = rideMetrics.getStringForSymbol(symbol,useMetricUnits);
+                summary += QString("<td align=\"center\">%1</td>").arg(value);
+            }
+            for (j = 0; j< metricCols; ++j) {
+                QString symbol = metricColumn[j];
+
+                // get this value
+                QString value = rideMetrics.getStringForSymbol(symbol,useMetricUnits);
+                summary += QString("<td align=\"center\">%1</td>").arg(value);
+            }
+            summary += "</tr>";
+        }
+        summary += "</table><br>";
+
+        //Now runs
+        if (context->ishomefiltered || context->isfiltered || filtered) {
+
+            // "n of x activities" shown in header of list when filtered
+            summary += ("<p><h3>" +
+                        QString(tr("%1 of %2")).arg(runs).arg(totalruns)
+                                           + (totalruns == 1 ? tr(" run") : tr(" runs")) +
+                        "</h3><p>");
+        } else {
+
+            // just "n activities" shown in header of list when not filtered
+            summary += ("<p><h3>" +
+                        QString("%1").arg(runs) + (runs == 1 ? tr(" run") : tr(" runs")) +
+                        "</h3><p>");
+        }
+
+        // table of activities
+        summary += "<table align=\"center\" width=\"80%\" border=\"0\">";
+
+        // header row 1 - name
+        summary += "<tr>";
+        summary += tr("<td align=\"center\">Date</td>");
+        for (j = 0; j< totalCols; ++j) {
+            QString symbol = rtotalColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+        }
+        for (j = 0; j< metricCols; ++j) {
+            QString symbol = metricColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            summary += QString("<td align=\"center\">%1</td>").arg(m->name());
+        }
+        summary += "</tr>";
+
+        // header row 2 - units
+        summary += "<tr>";
+        summary += tr("<td align=\"center\"></td>"); // date no units
+        for (j = 0; j< totalCols; ++j) {
+            QString symbol = rtotalColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            QString units = m->units(useMetricUnits);
+            if (units == "seconds" || units == tr("seconds")) units = "";
+            summary += QString("<td align=\"center\">%1</td>").arg(units);
+        }
+        for (j = 0; j< metricCols; ++j) {
+            QString symbol = metricColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            QString units = m->units(useMetricUnits);
+            if (units == "seconds" || units == tr("seconds")) units = "";
+            summary += QString("<td align=\"center\">%1</td>").arg(units);
+        }
+        summary += "</tr>";
+
+        // activities 1 per row
+        even = false;
+        foreach (SummaryMetrics rideMetrics, data) {
+
+            // apply the filter if there is one active
+            if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
+            if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
+            if (context->ishomefiltered && !context->homeFilters.contains(rideMetrics.getFileName())) continue;
+
+            if (!rideMetrics.isRun()) continue;
 
             if (even) summary += "<tr>";
             else {
