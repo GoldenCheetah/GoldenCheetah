@@ -255,12 +255,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     file.close();
                     return NULL;
                 }
+
                 if (degCUnits.indexIn(line) != -1)
                     tempType = degC;
                 else if (degFUnits.indexIn(line) != -1)
                     tempType = degF;
-            }
-            else if (lineno > unitsHeader) {
+
+            } else if (lineno > unitsHeader) {
                 double minutes=0,nm=0,kph=0,watts=0,km=0,cad=0,alt=0,hr=0,dfpm=0, seconds=0.0;
                 double temp=RideFile::NoTemp;
                 double slope=0.0;
@@ -297,8 +298,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         kph *= KM_PER_MILE;
                         alt *= METERS_PER_FOOT;
                     }
-                }
-                else if (iBike) {
+
+                } else if (iBike) {
                     // this must be iBike
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
@@ -339,8 +340,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         alt *= METERS_PER_FOOT;
                         headwind *= KM_PER_MILE;
                     }
-                }
-                else if (moxy)  {
+
+                } else if (moxy)  {
+
+                    // we get crappy lines with no data so ignore them
+                    // I think they're supposed to be delimeters for the file
+                    // content, but are just noise to us !
+                    if (line == (" ,,,,,") || line == ",,,,,") continue;
+
                     // need to get time from second column and note that
                     // there will be gaps when recording drops so shouldn't
                     // assume it is a continuous stream
