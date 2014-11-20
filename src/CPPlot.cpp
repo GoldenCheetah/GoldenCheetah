@@ -1256,7 +1256,8 @@ CPPlot::setRide(RideItem *rideItem)
 void
 CPPlot::pointHover(QwtPlotCurve *curve, int index)
 {
-    if (showBest && curve == modelCurve) return; // ignore model curve hover
+    if (criticalSeries == CriticalPowerWindow::watts && showBest && curve == modelCurve) 
+        return; // ignore model curve hover
 
     if (index >= 0) {
 
