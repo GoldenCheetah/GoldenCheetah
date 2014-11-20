@@ -1,7 +1,5 @@
 package com.ridelogger.listners;
 
-import android.content.Context;
-
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc.DataState;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc.IHeartRateDataReceiver;
@@ -10,19 +8,28 @@ import com.dsi.ant.plugins.antplus.pcc.defines.EventFlag;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
-
+import com.ridelogger.RideService;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
 /**
- * Base class to connects to Heart Rate Plugin and display all the event data.
+ * HeartRate
+ * @author Chet Henry
+ * Listen to and log Ant+ HearRate events
  */
-public class HeartRate extends Base
+public class HeartRate extends Ant
 {
-    public HeartRate(MultiDeviceSearchResult result, Context mContext) {
+    public HeartRate(MultiDeviceSearchResult result, RideService mContext) {
         super(result, mContext);
         releaseHandle = AntPlusHeartRatePcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
     }
+    
+    
+    public HeartRate(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
+        super(result, mContext, psnoop);
+        releaseHandle = AntPlusHeartRatePcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
+    }
+    
     
     public IPluginAccessResultReceiver<AntPlusHeartRatePcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusHeartRatePcc>() {
         //Handle the result, connecting to events on success or reporting failure to user.
@@ -41,4 +48,11 @@ public class HeartRate extends Base
             }
         }
     };
+    
+    
+    @Override
+    public void zeroReadings()
+    {
+        alterCurrentData("HR", "0");
+    }
 }
