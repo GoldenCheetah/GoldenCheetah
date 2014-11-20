@@ -2233,21 +2233,21 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
         } else if (yvalue > 0) {
 
             if (source != Metric) {
-                // for speed series prepend pace with units according to settings
+                // for speed series add pace with units according to settings
                 // only when there is no ride (home) or the activity is a run.
+                QString paceStr;
                 if (series == RideFile::kph && (!rideItem || rideItem->isRun())) {
-                    bool metric = appsettings->value(this, GC_PACE, true).toBool();
-                    QString paceunit = metric ? tr("min/km") : tr("min/mile");
-                    text = tr("%1 Pace (%2)\n").arg(metric ? kphToPace(xvalue, metric) : mphToPace(xvalue, metric)).arg(paceunit);
+                    bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                    QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
+                    paceStr = tr("\n%1 Pace (%2)").arg(context->athlete->useMetricUnits ? kphToPace(xvalue, metricPace) : mphToPace(xvalue, metricPace)).arg(paceunit);
                 }
                 // output the tooltip
-                text += QString("%1 %2\n%3 %4")
+                text = QString("%1 %2%5\n%3 %4")
                             .arg(xvalue, 0, 'f', digits)
                             .arg(this->axisTitle(curve->xAxis()).text())
                             .arg(yvalue, 0, 'f', 1)
-                            .arg(absolutetime ? tr("minutes") : tr("%"));
-
-
+                            .arg(absolutetime ? tr("minutes") : tr("%"))
+                            .arg(paceStr);
             } else {
                 text = QString("%1 %2\n%3 %4")
                             .arg(xvalue, 0, 'f', digits)

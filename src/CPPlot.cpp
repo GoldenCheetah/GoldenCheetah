@@ -46,6 +46,7 @@
 #include "Settings.h"
 #include "LTMCanvasPicker.h"
 #include "TimeUtils.h"
+#include "Units.h"
 
 
 CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(parent), parent(parent),
@@ -1261,7 +1262,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         double xvalue = curve->sample(index).x();
         double yvalue = curve->sample(index).y();
-        QString text, dateStr;
+        QString text, dateStr, paceStr;
         QString currentRidePercentStr;
         QString units1;
         QString units2;
@@ -1286,6 +1287,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             || (curve == rideCurve && showPercent)) units2 = QString("%");
         else if (criticalSeries == CriticalPowerWindow::veloclinicplot)
             units2 = "J"; // Joule
+        else if (criticalSeries == CriticalPowerWindow::kph)
+            units2 = tr("kph"); // yAxis doesn't obey units settings yet, remove when fixed
         else
             units2 = RideFile::unitName(rideSeries, context);
 
@@ -1303,14 +1306,24 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         // no units for Heat Curve
         if (curve == heatCurve) units2 = QString(tr("Rides"));
 
+        // for speed series add pace with units according to settings
+        if (criticalSeries == CriticalPowerWindow::kph) {
+            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+            QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
+            // yAxis doesn't obey units yet
+            // when fixed, change true to: context->athlete->useMetricUnits
+            paceStr = QString("\n%1 %2").arg(true ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);
+        }
+
         // output the tooltip
-        text = QString("%1%2\n%3 %4%5%6")
+        text = QString("%1%2\n%3 %4%7%5%6")
                .arg(criticalSeries == CriticalPowerWindow::veloclinicplot?QString("%1").arg(xvalue, 0, 'f', RideFile::decimalsFor(rideSeries)):interval_to_str(60.0*xvalue))
                .arg(units1)
                .arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                .arg(units2)
                .arg(dateStr)
-               .arg(currentRidePercentStr);
+               .arg(currentRidePercentStr)
+               .arg(paceStr);
 
         // set that text up
         zoomer->setText(text);
