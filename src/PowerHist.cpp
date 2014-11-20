@@ -346,7 +346,7 @@ PowerHist::refreshPaceZoneLabels()
 
     if (!rideItem || !rideItem->isRun()) return;
 
-    if (series == RideFile::kph) {
+    if (series == RideFile::kph && context->athlete->paceZones()) {
         const PaceZones *zones = context->athlete->paceZones();
         int zone_range = context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
 
@@ -1824,7 +1824,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     int LTHR = hrZoneRange != -1 ? context->athlete->hrZones()->getLT(hrZoneRange) : 0;
 
     int paceZoneRange = context->athlete->paceZones() ? context->athlete->paceZones()->whichRange(ride->startTime().date()) : -1;
-    double CV = (zoneRange != -1) ? context->athlete->paceZones()->getCV(paceZoneRange) : 0.0;
+    double CV = (paceZoneRange != -1) ? context->athlete->paceZones()->getCV(paceZoneRange) : 0.0;
 
     foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
