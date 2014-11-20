@@ -57,7 +57,7 @@ public class Power extends Base
                 result.subscribeCalculatedPowerEvent(new ICalculatedPowerReceiver() {
                         @Override
                         public void onNewCalculatedPower(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedPower) {
-                            writeData("WATTS", String.format("%.1f", calculatedPower));
+                            alterCurrentData("WATTS", reduceNumberToString(calculatedPower));
                         }
                     }
                 );
@@ -66,7 +66,7 @@ public class Power extends Base
                     new ICalculatedTorqueReceiver() {
                         @Override
                         public void onNewCalculatedTorque(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedTorque) {
-                            writeData("NM", String.format("%.1f", calculatedTorque));
+                            alterCurrentData("NM", reduceNumberToString(calculatedTorque));
                         }
                     }
                 );
@@ -75,7 +75,7 @@ public class Power extends Base
                     new ICalculatedCrankCadenceReceiver() {
                         @Override
                         public void onNewCalculatedCrankCadence(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedCrankCadence) {
-                            writeData("RPM", String.format("%.1f", calculatedCrankCadence));
+                            alterCurrentData("RPM", reduceNumberToString(calculatedCrankCadence));
                         }
                     }
                 );
@@ -85,7 +85,7 @@ public class Power extends Base
                         @Override
                         public void onNewCalculatedWheelSpeed(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedWheelSpeed)
                         {
-                            writeData("KMH", String.format("%.1f", calculatedWheelSpeed));
+                            alterCurrentData("KMH", reduceNumberToString(calculatedWheelSpeed));
                         }
                     }
                 );
@@ -95,7 +95,7 @@ public class Power extends Base
                         @Override
                         public void onNewCalculatedWheelDistance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedWheelDistance) 
                         {
-                            writeData("KM", String.format("%.1f", calculatedWheelDistance));
+                            alterCurrentData("KM", reduceNumberToString(calculatedWheelDistance));
                         }
                     }
                 );
@@ -105,7 +105,7 @@ public class Power extends Base
                         @Override
                         public void onNewInstantaneousCadence(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final int instantaneousCadence)
                         {
-                            writeData("RPM", String.format("%d", instantaneousCadence));
+                            alterCurrentData("RPM", reduceNumberToString(instantaneousCadence));
                         }
                     }
                 );
@@ -115,7 +115,7 @@ public class Power extends Base
                         @Override
                         public void onNewRawPowerOnlyData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final int instantaneousPower, final long accumulatedPower)
                         {
-                            writeData("WATTS", String.format("%d", instantaneousPower));
+                            alterCurrentData("WATTS", reduceNumberToString(instantaneousPower));
                         }
                     }
                 );
@@ -125,7 +125,7 @@ public class Power extends Base
                         @Override
                         public void onNewPedalPowerBalance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final boolean rightPedalIndicator, final int pedalPowerPercentage)
                         {
-                            writeData("LTE", String.format("%d", pedalPowerPercentage));
+                            alterCurrentData("LTE", reduceNumberToString(pedalPowerPercentage));
                         }
                     }
                 );
@@ -135,7 +135,7 @@ public class Power extends Base
                         @Override
                         public void onNewRawWheelTorqueData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long wheelTorqueUpdateEventCount, final long accumulatedWheelTicks, final BigDecimal accumulatedWheelPeriod, final BigDecimal accumulatedWheelTorque)
                         {
-                            writeData("NM", String.format("%.1f", accumulatedWheelTorque));
+                            alterCurrentData("NM", reduceNumberToString(accumulatedWheelTorque));
                         }
                     }
                 );
@@ -145,7 +145,7 @@ public class Power extends Base
                         @Override
                         public void onNewRawCrankTorqueData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long crankTorqueUpdateEventCount, final long accumulatedCrankTicks, final BigDecimal accumulatedCrankPeriod, final BigDecimal accumulatedCrankTorque)
                         {
-                            writeData("NM", String.format("%.1f", accumulatedCrankTorque));
+                            alterCurrentData("NM", reduceNumberToString(accumulatedCrankTorque));
                         }
                     }
                 );
@@ -156,9 +156,9 @@ public class Power extends Base
                         public void onNewTorqueEffectiveness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final BigDecimal leftTorqueEffectiveness, final BigDecimal rightTorqueEffectiveness)
                         {                            
                             Map<String, String> map = new HashMap<String, String>();
-                            map.put("LTE", String.format("%.1f", leftTorqueEffectiveness));
-                            map.put("RTE", String.format("%.1f", rightTorqueEffectiveness));
-                            writeData(map);
+                            map.put("LTE", reduceNumberToString(leftTorqueEffectiveness));
+                            map.put("RTE", reduceNumberToString(rightTorqueEffectiveness));
+                            alterCurrentData(map);
                         }
     
                     }
@@ -169,9 +169,9 @@ public class Power extends Base
                         public void onNewPedalSmoothness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final boolean separatePedalSmoothnessSupport, final BigDecimal leftOrCombinedPedalSmoothness, final BigDecimal rightPedalSmoothness)
                         {
                             Map<String, String> map = new HashMap<String, String>();
-                            map.put("SNPLC", String.format("%.1f", leftOrCombinedPedalSmoothness));
-                            map.put("SNPR",  String.format("%.1f", rightPedalSmoothness));
-                            writeData(map);
+                            map.put("SNPLC", reduceNumberToString(leftOrCombinedPedalSmoothness));
+                            map.put("SNPR",  reduceNumberToString(rightPedalSmoothness));
+                            alterCurrentData(map);
                         }
                     }
                 );
