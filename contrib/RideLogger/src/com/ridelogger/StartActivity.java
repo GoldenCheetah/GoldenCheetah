@@ -54,7 +54,6 @@ public class StartActivity extends FragmentActivity
             // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(input);
-
             
             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
