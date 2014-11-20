@@ -13,10 +13,11 @@ gcconfig.pri
 .DS_Store
 profile
 
-# ignore Qt moc files
+# ignore Qt/moc files
 moc_*
 qrc_application.cpp
 qrc_RideWindow.cpp
+.qmake.stash
 
 # ignore other object files
 *.o
