@@ -21,13 +21,13 @@ public class Gps extends Base
         LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
                     Map<String, String> map = new HashMap<String, String>();
-                    map.put("ALTITUDE", Double.toString(location.getAltitude()) );
-                    map.put("KPH",      Float.toString( location.getSpeed())    );
-                    map.put("bearing",  Float.toString( location.getBearing())  );
-                    map.put("gpsa",     Float.toString( location.getAccuracy()) );
-                    map.put("LAT",      Double.toString(location.getLatitude()) );
-                    map.put("LON",      Double.toString(location.getLongitude()));
-                    writeData(map);
+                    map.put("ALTITUDE", reduceNumberToString(location.getAltitude()) );
+                    map.put("KPH",      reduceNumberToString(location.getSpeed())    );
+                    map.put("bearing",  reduceNumberToString(location.getBearing())  );
+                    map.put("gpsa",     reduceNumberToString(location.getAccuracy()) );
+                    map.put("LAT",      reduceNumberToString(location.getLatitude()) );
+                    map.put("LON",      reduceNumberToString(location.getLongitude()));
+                    alterCurrentData(map);
                 }
             
                 @Override

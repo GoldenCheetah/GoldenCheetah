@@ -11,6 +11,7 @@ import com.ridelogger.RideService;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -76,34 +77,112 @@ public class Base
     
     public void writeData(Map<String, String> map)
     {
-            String ts = String.valueOf((double) (System.currentTimeMillis() - start_time) / 1000.0);
-            current_values.put("SECS", ts);
+        String ts = String.valueOf((double) (System.currentTimeMillis() - start_time) / 1000.0);
+        current_values.put("SECS", ts);
 
-            try {
-                synchronized (buf) {
-                    buf.write(",{");
+        try {
+            synchronized (buf) {
+                buf.write(",{");
+                
+                buf.write("\"");
+                buf.write("SECS");
+                buf.write("\":");
+                buf.write(ts);
+                
+                for (Map.Entry<String, String> entry : map.entrySet())
+                {
+                    String key   = entry.getKey();
+                    String value = entry.getValue();
                     
-                    buf.write("\"");
-                    buf.write("SECS");
+                    buf.write(",\"");
+                    buf.write(key);
                     buf.write("\":");
-                    buf.write(ts);
+                    buf.write(value);
                     
-                    for (Map.Entry<String, String> entry : map.entrySet())
-                    {
-                        String key   = entry.getKey();
-                        String value = entry.getValue();
-                        
-                        buf.write(",\"");
-                        buf.write(key);
-                        buf.write("\":");
-                        buf.write(value);
-                        
-                        current_values.put(key, value);
-                    }
-
-                    buf.write("}");
+                    current_values.put(key, value);
                 }
-            } catch (IOException e) {}
+
+                buf.write("}");
+            }
+        } catch (IOException e) {}
+    }
+    
+    
+    public void alterCurrentData(String key, String value)
+    {
+        synchronized (current_values) {
+            current_values.put("SECS", getTs());
+            current_values.put(key, value);
+        }
+
+    }
+    
+    
+    public void alterCurrentData(Map<String, String> map)
+    {
+        synchronized (current_values) {
+            current_values.put("SECS", getTs());
+            
+            for (Map.Entry<String, String> entry : map.entrySet())
+            {               
+                current_values.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+    
+    
+    public void writeCurrentData()
+    {
+        try {
+            synchronized (buf) {
+                buf.write(",{");
+                
+                for (Map.Entry<String, String> entry : current_values.entrySet())
+                {                   
+                    buf.write(",\"");
+                    buf.write(entry.getKey());
+                    buf.write("\":");
+                    buf.write(entry.getValue());
+                }
+
+                buf.write("}");
+            }
+        } catch (IOException e) {}
+    }
+    
+    
+    public String getTs() {
+        return reduceNumberToString((double) (System.currentTimeMillis() - start_time) / 1000.0);   
+    }
+    
+    
+    public static String reduceNumberToString(double d)
+    {
+        if(d == (long) d)
+            return String.format("%d",(long)d);
+        else
+            return String.format("%f", d);
+    }
+    
+    
+    public static String reduceNumberToString(float d)
+    {
+        if(d == (long) d)
+            return String.format("%d",(long)d);
+        else
+            return String.format("%f", d);
+    }
+    
+    
+    public static String reduceNumberToString(BigDecimal d)
+    {
+        try {
+            long test = d.longValueExact();
+            return String.format("%d", test);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return String.format("%s", d.toPlainString());
+        }
     }
     
     
