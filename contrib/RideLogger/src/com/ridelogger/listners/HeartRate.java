@@ -34,7 +34,7 @@ public class HeartRate extends Base
                     new IHeartRateDataReceiver() {
                         @Override
                         public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final DataState dataState) {
-                            writeData("HR", String.valueOf(computedHeartRate));
+                            alterCurrentData("HR", reduceNumberToString(computedHeartRate));
                         }
                     }
                 );

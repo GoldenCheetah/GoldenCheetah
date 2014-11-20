@@ -30,6 +30,7 @@ public class StartActivity extends FragmentActivity
     public static final String PAIRED_ANTS = "PairedAnts";
     SharedPreferences settings;
     AlertDialog dialog;
+    public MultiDeviceSearch mSearch;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -78,7 +79,6 @@ public class StartActivity extends FragmentActivity
     
     protected void setupAnt() {
         
-        MultiDeviceSearch                        mSearch;
         MultiDeviceSearch.SearchCallbacks        mCallback;
         MultiDeviceSearch.RssiCallback           mRssiCallback;
         final ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();

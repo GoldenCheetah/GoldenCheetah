@@ -46,7 +46,7 @@ public class Sensors extends Base
                 public final void onSensorChanged(SensorEvent event) {
                     // The light sensor returns a single value.
                     // Many sensors return 3 values, one for each axis.
-                    writeData("lux",  Float.toString(event.values[0]));
+                    alterCurrentData("lux",  reduceNumberToString(event.values[0]));
                 }
               };
               
@@ -60,10 +60,10 @@ public class Sensors extends Base
                 @Override
                 public final void onSensorChanged(SensorEvent event) {                
                     Map<String, String> map = new HashMap<String, String>();
-                    map.put("ms2x", Float.toString(event.values[0]));
-                    map.put("ms2y", Float.toString(event.values[1]));
-                    map.put("ms2z", Float.toString(event.values[2]));
-                    writeData(map);
+                    map.put("ms2x", reduceNumberToString(event.values[0]));
+                    map.put("ms2y", reduceNumberToString(event.values[1]));
+                    map.put("ms2z", reduceNumberToString(event.values[2]));
+                    alterCurrentData(map);
                 }
               };
               
@@ -78,7 +78,7 @@ public class Sensors extends Base
                 public final void onSensorChanged(SensorEvent event) {
                     // The light sensor returns a single value.
                     // Many sensors return 3 values, one for each axis.
-                    writeData("press",  Float.toString(event.values[0]));
+                    alterCurrentData("press",  reduceNumberToString(event.values[0]));
                 }
               };
               
@@ -93,7 +93,7 @@ public class Sensors extends Base
                 public final void onSensorChanged(SensorEvent event) {
                     // The light sensor returns a single value.
                     // Many sensors return 3 values, one for each axis.
-                    writeData("temp",  Float.toString(event.values[0]));
+                    alterCurrentData("temp",  reduceNumberToString(event.values[0]));
                 }
               };
               
@@ -107,10 +107,10 @@ public class Sensors extends Base
                 @Override
                 public final void onSensorChanged(SensorEvent event) {
                     Map<String, String> map = new HashMap<String, String>();
-                    map.put("uTx", Float.toString(event.values[0]));
-                    map.put("uTy", Float.toString(event.values[1]));
-                    map.put("uTz", Float.toString(event.values[2]));
-                    writeData(map);
+                    map.put("uTx", reduceNumberToString(event.values[0]));
+                    map.put("uTy", reduceNumberToString(event.values[1]));
+                    map.put("uTz", reduceNumberToString(event.values[2]));
+                    alterCurrentData(map);
                 }
               };
               
