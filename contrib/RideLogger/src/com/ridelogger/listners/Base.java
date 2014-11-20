@@ -1,58 +1,45 @@
 package com.ridelogger.listners;
 
-import android.content.Context;
-
-import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
-import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
-import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IDeviceStateChangeReceiver;
-import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
-import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
 import com.ridelogger.RideService;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * Base class to connects to Heart Rate Plugin and display all the event data.
+ * Base
+ * @author Chet Henry
+ * Base sensor class that has methods to time stamp are write to buffer
  */
-public class Base 
+public class Base<T>
 {
     public static BufferedWriter      buf;
-    public static long                start_time;
-    public static Map<String, String> current_values;
-    public PccReleaseHandle<?>        releaseHandle;
-    public Context                    context;
+    public static long                startTime;
+    public static Map<String, String> currentValues;
     
-    public Base(MultiDeviceSearchResult result, Context mContext) {
+    public RideService                context;
+        
+    public Base(RideService mContext) {
         init(mContext);
     }
     
-    public Base(Context mContext) {
-        init(mContext);
+    //setup references to buffer and current values and context
+    public void init(RideService mContext) {
+        buf           = RideService.buf;           //shared file buffer object
+        currentValues = RideService.currentValues; //shared currentValues object
+        context       = mContext;
     }
     
-    public void init(Context mContext) {
-        buf            = RideService.getBuf();
-        start_time     = RideService.getStartTime();
-        current_values = RideService.getCurrentValues();
-        context        = mContext;
-    }
-    
-    IDeviceStateChangeReceiver mDeviceStateChangeReceiver = new IDeviceStateChangeReceiver() {
-        @Override
-        public void onDeviceStateChange(final DeviceState newDeviceState){}
-    };
-    
-    public IPluginAccessResultReceiver<?> mResultReceiver;
     
     public void writeData(String key, String value)
     {
-        if(!current_values.containsKey(key) || current_values.get(key) != value) {
-            String ts = String.valueOf((double) (System.currentTimeMillis() - start_time) / 1000.0);
-            current_values.put("SECS", ts);
-            current_values.put(key, value);
+        if(!currentValues.containsKey(key) || currentValues.get(key) != value) {
+            String ts = getTs();
+            currentValues.put("SECS", ts);
+            currentValues.put(key, value);
 
             try {
                 synchronized (buf) {
@@ -77,8 +64,8 @@ public class Base
     
     public void writeData(Map<String, String> map)
     {
-        String ts = String.valueOf((double) (System.currentTimeMillis() - start_time) / 1000.0);
-        current_values.put("SECS", ts);
+        String ts = getTs();
+        currentValues.put("SECS", ts);
 
         try {
             synchronized (buf) {
@@ -99,7 +86,7 @@ public class Base
                     buf.write("\":");
                     buf.write(value);
                     
-                    current_values.put(key, value);
+                    currentValues.put(key, value);
                 }
 
                 buf.write("}");
@@ -110,9 +97,10 @@ public class Base
     
     public void alterCurrentData(String key, String value)
     {
-        synchronized (current_values) {
-            current_values.put("SECS", getTs());
-            current_values.put(key, value);
+        synchronized (currentValues) {
+            currentValues.put("SECS", getTs());
+            currentValues.put(key, value);
+            writeCurrentData();
         }
 
     }
@@ -120,13 +108,15 @@ public class Base
     
     public void alterCurrentData(Map<String, String> map)
     {
-        synchronized (current_values) {
-            current_values.put("SECS", getTs());
+        synchronized (currentValues) {
+            currentValues.put("SECS", getTs());
             
             for (Map.Entry<String, String> entry : map.entrySet())
             {               
-                current_values.put(entry.getKey(), entry.getValue());
+                currentValues.put(entry.getKey(), entry.getValue());
             }
+            
+            writeCurrentData();
         }
     }
     
@@ -137,8 +127,17 @@ public class Base
             synchronized (buf) {
                 buf.write(",{");
                 
-                for (Map.Entry<String, String> entry : current_values.entrySet())
-                {                   
+                Iterator<Entry<String, String>> it = currentValues.entrySet().iterator();
+                if(it.hasNext()) {
+                    buf.write("\"");
+                    Entry<String, String> entry = it.next();
+                    buf.write(entry.getKey());
+                    buf.write("\":");
+                    buf.write(entry.getValue());
+                }
+                
+                while (it.hasNext()) {
+                    Entry<String, String> entry = it.next();
                     buf.write(",\"");
                     buf.write(entry.getKey());
                     buf.write("\":");
@@ -152,7 +151,7 @@ public class Base
     
     
     public String getTs() {
-        return reduceNumberToString((double) (System.currentTimeMillis() - start_time) / 1000.0);   
+        return reduceNumberToString((double) (System.currentTimeMillis() - RideService.startTime) / 1000.0);   
     }
     
     
@@ -185,13 +184,8 @@ public class Base
         }
     }
     
-    
-    public void onDestroy()
-    {
-        if(releaseHandle != null) {
-            releaseHandle.close();
-        }
-    }
+    //Clean up my listners here
+    public void onDestroy() {}
 }
 
 
