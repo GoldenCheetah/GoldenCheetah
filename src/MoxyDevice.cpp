@@ -410,6 +410,8 @@ MoxyDevice::cleanup( QString &err )
         return false;
     }
 
+    // give it some time to get the work done !
+    sleep(3);
 
     // exit engineering mode
     if (writeCommand(dev, "exit\r", err) == false) {
