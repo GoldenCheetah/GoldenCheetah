@@ -19,6 +19,7 @@ import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
 import com.ridelogger.R;
+import com.ridelogger.listners.Base;
 import com.ridelogger.listners.Gps;
 import com.ridelogger.listners.HeartRate;
 import com.ridelogger.listners.Power;
@@ -35,145 +36,84 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
+/**
+ * RideService
+ * @author Chet Henry
+ * Performs ride logging from sensors as an android service
+ */
 public class RideService extends Service
 {
-    public static  BufferedWriter      buf;
-    public static  long                start_time;
-    public static  Map<String, String> current_values;
-    public         boolean             rideStarted = false;
+    public static  BufferedWriter       buf;                  //writes to log file buffered
+    public static  long                 startTime;            //start time of the ride
+    public static  Map<String, String>  currentValues;        //hash of current values
+    public         boolean              rideStarted = false;  //have we started logging the ride
     
-    public static  HeartRate           hr;
-    public static  Power               w;
-    public static  Gps                 gps;
-    public static  Sensors             sensors;
+    public static  Map<String, Base<?>> sensors;              //All other Android sensor class
     
-    MultiDeviceSearch                  mSearch;
-    MultiDeviceSearch.SearchCallbacks  mCallback;
-    MultiDeviceSearch.RssiCallback     mRssiCallback;
+    MultiDeviceSearch                   mSearch;              //Ant+ device search class to init connections
+    MultiDeviceSearch.SearchCallbacks   mCallback;            //Ant+ device class to setup sensors after they are found
+    MultiDeviceSearch.RssiCallback      mRssiCallback;        //Ant+ class to do something with the signal strength on device find
     
-    public int                        notifyID = 1;
-    NotificationManager               mNotificationManager;
+    public int                          notifyID = 1;         //Id of the notification in the top android bar that this class creates and alters
+    NotificationManager                 mNotificationManager; //Manager class to setup and alter our notification
     
-    public String                     file_name = "";
-    SharedPreferences settings;
+    public String                       fileName = "";        //File where the ride will go
+    SharedPreferences                   settings;             //Object to load our setting from android's storage
+    public Boolean                      snoop    = false;     //should we log others ant+ devices 
     
     /**
-     * 
-     * @return BufferedWriter
+     * starts the ride on service start
      */
-    public static BufferedWriter getBuf() { 
-        return buf; 
-    }
-    
-    /**
-     * 
-     * @return start_time
-     */
-    public static long getStartTime() { 
-        return start_time; 
-    }
-    
-    
-    /**
-     * 
-     * @return start_time
-     */
-    public static Map<String, String> getCurrentValues() { 
-        return current_values; 
-    }
-    
-    
-    /**
-     * 
-     * @return w
-     */
-    public static Power getPower() { 
-        return w; 
-    }
-    
-    /**
-     * 
-     * @return w
-     */
-    public static void setPower(Power pw) { 
-        w = pw;
-        if(w == null) {
-            w = pw;
-        }
-    }
-    
-    /**
-     * 
-     * @return hr
-     */
-    public static HeartRate getHeartRate() { 
-        return hr; 
-    }
-    
-
-    public static void setHeartRate(HeartRate phr) {
-        if(hr == null) {
-            hr = phr;
-        }
-    }
-
-    
-    public static void setGps(Gps pgps) {
-        if(gps == null) {
-            gps = pgps;
-        }
-    }
-    
-    public static Gps getGps() {
-        return gps;
-    }
-    
-    
-    public static void setSensors(Sensors psens) {
-        if(sensors == null) {
-            sensors = psens;
-        }
-    }
-    
-    public static Sensors getSensors() {
-        return sensors;
-    }
-    
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startRide();
         return Service.START_NOT_STICKY;
     }
-
+    
+    /**
+     * sets android service settings
+     */
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
     }
     
+    
+    /**
+     * sets android service settings
+     */
+    @Override
     public boolean onUnbind (Intent intent) {
         return true;
     }
     
+    
+    /**
+     * stop the ride on service stop
+     */
     @Override
     public void onDestroy() {
         stopRide();
         super.onDestroy();
     }
     
+    /**
+     * start a ride if there is not one started yet
+     */
     protected void startRide() {
         if(rideStarted) return;
         
-        start_time     = System.currentTimeMillis();
-        file_name      = "ride-" + start_time + ".json";
-
-        current_values = new HashMap<String, String>();
+        startTime     = System.currentTimeMillis();
+        fileName      = "ride-" + startTime + ".json";
+        currentValues = new HashMap<String, String>();
         
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd HH:mm:ss");
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String utc = f.format(new Date(start_time));
+        
+        String utc = f.format(new Date(startTime));
         
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(start_time);
+        cal.setTimeInMillis(startTime);
         
         String month      = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
         String week_day   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
@@ -183,7 +123,7 @@ public class RideService extends Service
         final Set<String> pairedAnts = settings.getStringSet(StartActivity.PAIRED_ANTS, null);
         
         
-        current_values.put("SECS", "0.0");
+        currentValues.put("SECS", "0.0");
         
         String rideHeadder = "{" +
             "\"RIDE\":{" +
@@ -221,7 +161,7 @@ public class RideService extends Service
                 Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_DOCUMENTS
                 ) + "/Rides", 
-                "ride-" + start_time + ".json"
+                "ride-" + startTime + ".json"
             );
             
             try {
@@ -230,19 +170,20 @@ public class RideService extends Service
                 buf = new BufferedWriter(new FileWriter(file, true));
                 buf.write(rideHeadder);
                 
-                if(gps == null) {
-                    gps = new Gps(this);
-                }   
+                sensors = new HashMap<String, Base<?>>();
                 
-                if(sensors == null) {
-                    sensors = new Sensors(this);
-                }
+                sensors.put("GPS", new Gps(this));
+                sensors.put("AndroidSensors", new Sensors(this));
                 
                 mCallback = new MultiDeviceSearch.SearchCallbacks(){
                     public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
                     {
-                        if (!deviceFound.isAlreadyConnected() && (pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))))  {
-                            launchConnection(deviceFound);
+                        if (!deviceFound.isAlreadyConnected())  {
+                            if(pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))) {
+                                launchConnection(deviceFound, false);
+                            } else if (snoop) {
+                                launchConnection(deviceFound, true);
+                            }
                         }
                     }
 
@@ -267,7 +208,7 @@ public class RideService extends Service
                 new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Ride On")
-                .setContentText("Building ride: " + file_name + " Click to stop ride.");
+                .setContentText("Building ride: " + fileName + " Click to stop ride.");
         mBuilder.setProgress(0, 0, true);
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, StartActivity.class);
@@ -291,25 +232,17 @@ public class RideService extends Service
     }
    
     
+    //stop the ride and clean up resources
     protected void stopRide() {
         if(!rideStarted) return;
-                
-        if(w != null) {
-            w.onDestroy();
-        }
+
         
-        if(hr != null) {
-            hr.onDestroy();
+        for (Map.Entry<String, Base<?>> entry : sensors.entrySet())
+        {                   
+            entry.getValue().onDestroy();
         }
-        
-        if(gps != null) {
-            gps.onDestroy();
-        }
-        
-        if(sensors != null) {
-            sensors.onDestroy();
-        }
-        
+
+        //stop the Ant+ search
         mSearch.close();
         
         try {
@@ -322,16 +255,21 @@ public class RideService extends Service
     }
     
     
-    public void launchConnection(MultiDeviceSearchResult result)
+    //remove snooped sensors if they are not longer in range
+    public void releaseSnoopedSensor(Base<?> sensor) {
+        sensors.remove(sensor);
+    }
+    
+    
+    //launch ant+ connection
+    public void launchConnection(MultiDeviceSearchResult result, Boolean snoop)
     {
         switch (result.getAntDeviceType())
         {
             case BIKE_CADENCE:
                 break;
             case BIKE_POWER:
-                if(w == null) {
-                    w = new Power(result, this);
-                }
+                sensors.put(String.valueOf(result.getAntDeviceNumber()), new Power(result, this, snoop));
                 break;
             case BIKE_SPD:
                 break;
@@ -344,9 +282,7 @@ public class RideService extends Service
             case WEIGHT_SCALE:
                 break;
             case HEARTRATE:
-                if(hr == null) {
-                    hr = new HeartRate(result, this);
-                }                 
+                sensors.put(String.valueOf(result.getAntDeviceNumber()), new HeartRate(result, this, snoop));            
                 break;
             case STRIDE_SDM:
                 break;

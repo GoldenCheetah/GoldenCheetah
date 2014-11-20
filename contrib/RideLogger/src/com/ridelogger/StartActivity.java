@@ -30,6 +30,7 @@ public class StartActivity extends FragmentActivity
     public static final String PAIRED_ANTS = "PairedAnts";
     SharedPreferences settings;
     AlertDialog dialog;
+    public MultiDeviceSearch mSearch;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,7 +54,6 @@ public class StartActivity extends FragmentActivity
             // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(input);
-
             
             builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -78,7 +78,6 @@ public class StartActivity extends FragmentActivity
     
     protected void setupAnt() {
         
-        MultiDeviceSearch                        mSearch;
         MultiDeviceSearch.SearchCallbacks        mCallback;
         MultiDeviceSearch.RssiCallback           mRssiCallback;
         final ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();

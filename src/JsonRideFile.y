@@ -229,7 +229,7 @@ references: REFERENCES ':' '[' reference_list ']'
                                           JsonPoint = RideFilePoint();
                                         }
 reference_list: reference | reference_list ',' reference;
-reference: '{' series '}'               { JsonRide->appendReference(JsonPoint);
+reference: '{' series_list '}'          { JsonRide->appendReference(JsonPoint);
                                           JsonPoint = RideFilePoint();
                                         }
 
@@ -276,7 +276,10 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | RVERT ':' number              { JsonPoint.rvert = JsonNumber; }
         | RCAD ':' number               { JsonPoint.rcad = JsonNumber; }
         | RCON ':' number               { JsonPoint.rcontact = JsonNumber; }
+        | string ':' number             { }
+        | string ':' string
         ;
+
 
 /*
  * Primitives
