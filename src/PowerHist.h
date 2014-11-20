@@ -597,7 +597,7 @@ public:
 	    return;
 
 	const PaceZones *zones = parent->context->athlete->paceZones();
-	int zone_range = parent->context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
     const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : 0.62137119);
@@ -650,7 +650,7 @@ public:
 	    return;
 
 	const PaceZones *zones = parent->context->athlete->paceZones();
-	int zone_range = parent->context->athlete->paceZones()->whichRange(rideItem->dateTime.date());
+	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
     const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : 0.62137119);
