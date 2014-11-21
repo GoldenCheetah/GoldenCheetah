@@ -162,7 +162,7 @@ public class StartActivity extends FragmentActivity
     
     @Override
     protected void onDestroy() {
-        mSearch.close();
+        if(mSearch != null) mSearch.close();
         super.onDestroy();
     }
     
