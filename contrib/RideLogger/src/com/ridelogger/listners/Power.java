@@ -8,12 +8,7 @@ import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedCrankCaden
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedPowerReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedTorqueReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IInstantaneousCadenceReceiver;
-import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IPedalPowerBalanceReceiver;
-import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IPedalSmoothnessReceiver;
-import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IRawCrankTorqueDataReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IRawPowerOnlyDataReceiver;
-import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IRawWheelTorqueDataReceiver;
-import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ITorqueEffectivenessReceiver;
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
 import com.dsi.ant.plugins.antplus.pcc.defines.EventFlag;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
@@ -32,7 +27,7 @@ import java.util.Map;
  */
 public class Power extends Ant
 {
-    public BigDecimal          wheelCircumferenceInMeters = new BigDecimal("2.07"); //size of wheel to calculate speed
+    public BigDecimal wheelCircumferenceInMeters = new BigDecimal("2.07"); //size of wheel to calculate speed
     
     //setup listeners and logging 
     public Power(MultiDeviceSearchResult result, RideService mContext) {
@@ -40,18 +35,18 @@ public class Power extends Ant
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
     }
     
+    
     public Power(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
         super(result, mContext, psnoop);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
     }
-
+    
     
     //Handle messages
     protected IPluginAccessResultReceiver<AntPlusBikePowerPcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusBikePowerPcc>() {
         //Handle the result, connecting to events on success or reporting failure to user.
         @Override
-        public void onResultReceived(AntPlusBikePowerPcc result, RequestAccessResult resultCode, DeviceState initialDeviceState)
-        {
+        public void onResultReceived(AntPlusBikePowerPcc result, RequestAccessResult resultCode, DeviceState initialDeviceState) {
             if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SUCCESS) {
                 result.subscribeCalculatedPowerEvent(new ICalculatedPowerReceiver() {
                         @Override
@@ -119,12 +114,12 @@ public class Power extends Ant
                     }
                 );
 
-                result.subscribePedalPowerBalanceEvent(
+                /*result.subscribePedalPowerBalanceEvent(
                     new IPedalPowerBalanceReceiver() {
                         @Override
                         public void onNewPedalPowerBalance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final boolean rightPedalIndicator, final int pedalPowerPercentage)
                         {
-                            //alterCurrentData("LTE", reduceNumberToString(pedalPowerPercentage));
+                            alterCurrentData("LTE", reduceNumberToString(pedalPowerPercentage));
                         }
                     }
                 );
@@ -154,10 +149,10 @@ public class Power extends Ant
                         @Override
                         public void onNewTorqueEffectiveness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final BigDecimal leftTorqueEffectiveness, final BigDecimal rightTorqueEffectiveness)
                         {                            
-                            //Map<String, String> map = new HashMap<String, String>();
-                            //map.put("LTE", reduceNumberToString(leftTorqueEffectiveness));
-                            //map.put("RTE", reduceNumberToString(rightTorqueEffectiveness));
-                            //alterCurrentData(map);
+                            Map<String, String> map = new HashMap<String, String>();
+                            map.put("LTE", reduceNumberToString(leftTorqueEffectiveness));
+                            map.put("RTE", reduceNumberToString(rightTorqueEffectiveness));
+                            alterCurrentData(map);
                         }
     
                     }
@@ -167,13 +162,13 @@ public class Power extends Ant
                         @Override
                         public void onNewPedalSmoothness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final boolean separatePedalSmoothnessSupport, final BigDecimal leftOrCombinedPedalSmoothness, final BigDecimal rightPedalSmoothness)
                         {
-                            //Map<String, String> map = new HashMap<String, String>();
-                            //map.put("SNPLC", reduceNumberToString(leftOrCombinedPedalSmoothness));
-                            //map.put("SNPR",  reduceNumberToString(rightPedalSmoothness));
-                            //alterCurrentData(map);
+                            Map<String, String> map = new HashMap<String, String>();
+                            map.put("SNPLC", reduceNumberToString(leftOrCombinedPedalSmoothness));
+                            map.put("SNPR",  reduceNumberToString(rightPedalSmoothness));
+                            alterCurrentData(map);
                         }
                     }
-                );
+                );*/
             }
         }
     };

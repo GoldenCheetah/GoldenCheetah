@@ -48,18 +48,18 @@ public class RideService extends Service
     public static  Map<String, String>  currentValues;        //hash of current values
     public         boolean              rideStarted = false;  //have we started logging the ride
     
-    public static  Map<String, Base<?>> sensors;              //All other Android sensor class
-    
+    public static  Map<String, Base<?>> sensors     = new HashMap<String, Base<?>>();
+                                                              //All other Android sensor class
     MultiDeviceSearch                   mSearch;              //Ant+ device search class to init connections
     MultiDeviceSearch.SearchCallbacks   mCallback;            //Ant+ device class to setup sensors after they are found
     MultiDeviceSearch.RssiCallback      mRssiCallback;        //Ant+ class to do something with the signal strength on device find
     
     public int                          notifyID = 1;         //Id of the notification in the top android bar that this class creates and alters
-    NotificationManager                 mNotificationManager; //Manager class to setup and alter our notification
     
     public String                       fileName = "";        //File where the ride will go
     SharedPreferences                   settings;             //Object to load our setting from android's storage
-    public Boolean                      snoop    = false;     //should we log others ant+ devices 
+    public Boolean                      snoop    = false;     //should we log others ant+ devices
+    Set<String>                         pairedAnts;           //list of ant devices to pair with
     
     /**
      * starts the ride on service start
@@ -110,19 +110,18 @@ public class RideService extends Service
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
         
-        String utc = f.format(new Date(startTime));
+        String utc   = f.format(new Date(startTime));
         
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(startTime);
         
-        String month      = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
-        String week_day   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        String year       = Integer.toString(cal.get(Calendar.YEAR));
-        settings          = getSharedPreferences(StartActivity.PREFS_NAME, 0);
-        String rider_name = settings.getString(StartActivity.RIDER_NAME, "");
+        String month                 = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
+        String week_day              = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
+        String year                  = Integer.toString(cal.get(Calendar.YEAR));
+        settings                     = getSharedPreferences(StartActivity.PREFS_NAME, 0);
+        String rider_name            = settings.getString(StartActivity.RIDER_NAME, "");
         final Set<String> pairedAnts = settings.getStringSet(StartActivity.PAIRED_ANTS, null);
-        
-        
+         
         currentValues.put("SECS", "0.0");
         
         String rideHeadder = "{" +
@@ -170,9 +169,7 @@ public class RideService extends Service
                 buf = new BufferedWriter(new FileWriter(file, true));
                 buf.write(rideHeadder);
                 
-                sensors = new HashMap<String, Base<?>>();
-                
-                sensors.put("GPS", new Gps(this));
+                sensors.put("GPS",            new Gps(this));
                 sensors.put("AndroidSensors", new Sensors(this));
                 
                 mCallback = new MultiDeviceSearch.SearchCallbacks(){
@@ -197,36 +194,26 @@ public class RideService extends Service
                 };
 
                 // start the multi-device search
-                mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
+                mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback); 
             } catch (IOException e) {}
              
         }
         rideStarted = true;
         
-        
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("Ride On")
-                .setContentText("Building ride: " + fileName + " Click to stop ride.");
-        mBuilder.setProgress(0, 0, true);
-        // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, StartActivity.class);
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(StartActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-        if(mNotificationManager == null) {
-            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        }
+        //build the notification in the top android drawer
+        NotificationCompat.Builder mBuilder = new NotificationCompat
+            .Builder(this)
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setContentTitle("Ride On")
+            .setContentText("Building ride: " + fileName + " Click to stop ride.")
+            .setProgress(0, 0, true)
+            .setContentIntent(
+                TaskStackBuilder
+                    .create(this)
+                    .addParentStack(StartActivity.class)
+                    .addNextIntent(new Intent(this, StartActivity.class))
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            );
 
         startForeground(notifyID, mBuilder.build());
     }
@@ -236,9 +223,7 @@ public class RideService extends Service
     protected void stopRide() {
         if(!rideStarted) return;
 
-        
-        for (Map.Entry<String, Base<?>> entry : sensors.entrySet())
-        {                   
+        for (Map.Entry<String, Base<?>> entry : sensors.entrySet()) {                   
             entry.getValue().onDestroy();
         }
 
@@ -251,6 +236,7 @@ public class RideService extends Service
         } catch (IOException e) {}
         
         rideStarted = false;
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(notifyID);
     }
     
@@ -262,10 +248,8 @@ public class RideService extends Service
     
     
     //launch ant+ connection
-    public void launchConnection(MultiDeviceSearchResult result, Boolean snoop)
-    {
-        switch (result.getAntDeviceType())
-        {
+    public void launchConnection(MultiDeviceSearchResult result, Boolean snoop) {
+        switch (result.getAntDeviceType()) {
             case BIKE_CADENCE:
                 break;
             case BIKE_POWER:
