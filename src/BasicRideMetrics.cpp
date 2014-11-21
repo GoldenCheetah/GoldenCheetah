@@ -790,6 +790,52 @@ static bool addHrPw()
 
 static bool hrpwAdded = addHrPw();
 
+//////////////////////////////////////////////////////////////////////
+
+class WattsRPE : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(WattsRPE)
+
+    public:
+    WattsRPE()
+    {
+        setSymbol("wattsRPE");
+        setInternalName("Watts:RPE Ratio");
+    }
+    void initialize() {
+        setName(tr("Watts:RPE Ratio"));
+        setImperialUnits("");
+        setMetricUnits("");
+        setPrecision(3);
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+
+        double ratio = 0.0f;
+        AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
+        double rpe = ride->getTag("RPE", "0").toDouble();
+
+        if (pw->value(true) > 100 && rpe > 0) { // ignore silly rides with low values
+            ratio = pw->value(true) / rpe;
+        }
+        setValue(ratio);
+    }
+    RideMetric *clone() const { return new WattsRPE(*this); }
+};
+
+static bool addWattsRPE()
+{
+    QVector<QString> deps;
+    deps.append("average_power");
+    RideMetricFactory::instance().addMetric(WattsRPE(), &deps);
+    return true;
+}
+
+static bool wattsRPEAdded = addWattsRPE();
+
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 class HrNp : public RideMetric {

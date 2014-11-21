@@ -111,8 +111,9 @@
 // 89  07  Nov 2014 Ale Martinez       GOVSS
 // 90  08  Nov 2014 Mark Liversedge    Update data flags for Moxy and Garmin Running Dynamics
 // 91  16  Nov 2014 Damien Grauser     Do not include values if data not present in TimeInZone and HRTimeInZone
+// 92  21  Nov 2014 Mark Liversedge    Added Watts:RPE ratio
 
-int DBSchemaVersion = 91;
+int DBSchemaVersion = 92;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
