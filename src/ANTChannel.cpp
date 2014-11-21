@@ -40,7 +40,6 @@ ANTChannel::init()
     is_cinqo=0;
     is_old_cinqo=0;
     is_alt=0;
-    command_channel=NULL; // kickr
     manufacturer_id=0;
     product_id=0;
     product_version=0;
@@ -677,7 +676,7 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     emit channelInfo(number, device_number, device_id);
 
     // if we were searching,
-    if (channel_type != CHANNEL_TYPE_KICKR && (channel_type_flags&CHANNEL_TYPE_QUICK_SEARCH)) {
+    if (channel_type_flags&CHANNEL_TYPE_QUICK_SEARCH) {
         //qDebug()<<number<<"change timeout setting";
         parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
     }
@@ -768,18 +767,9 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_UNASSIGN_CHANNEL:
         //qDebug()<<number<<"TRANSITION from unassigned";
 
-        // reassign to whatever we need!
-        if (channel_type == CHANNEL_TYPE_KICKR) {
-            //qDebug()<<"assign channel tx for kickr";
-            // channel is a transmit not receiving channel
-            parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_TX, st->network)); // recieve channel on network 1
+        // assign and set channel id all in one
+        parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // recieve channel on network 1
 
-        } else {
-
-            //qDebug()<<"assign channel rx for NOT kickr"<<st->type;
-            // assign and set channel id all in one
-            parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // recieve channel on network 1
-        }
         device_id=st->device_id;
         setId();
         break;
@@ -788,35 +778,16 @@ void ANTChannel::attemptTransition(int message_id)
 
         //qDebug()<<number<<"TRANSITION from assign channel";
 
-        // reassign to whatever we need!
-        if (channel_type == CHANNEL_TYPE_KICKR) {
-
-            //qDebug()<<"assign channel id for kickr";
-
-            // set channel id channel, device no, pairing request ?, device type, transmission type
-            parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // we need to be specific!
-        } else {
-
-            //qDebug()<<"assign channel id for NOT kickr"<<st->type;
-            parent->sendMessage(ANTMessage::setChannelID(number, 0, device_id, 0)); // lets go back to allowing anything
-        }
+        parent->sendMessage(ANTMessage::setChannelID(number, 0, device_id, 0)); // lets go back to allowing anything
         break;
 
     case ANT_CHANNEL_ID:
         //qDebug()<<number<<"TRANSITION from channel id";
-        if (channel_type == CHANNEL_TYPE_KICKR) {
-
-            // kickr just set to search forever ...
-            //qDebug()<<number<<"**** set search timeout to forever ****";
-            parent->sendMessage(ANTMessage::setSearchTimeout(number, 255));
-            
+        //qDebug()<<number<<"**** adjust timeout";
+        if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
+            parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
         } else {
-            //qDebug()<<number<<"**** adjust timeout";
-            if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
-                parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
-            } else {
-                parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
-            }
+            parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
         }
         break;
 

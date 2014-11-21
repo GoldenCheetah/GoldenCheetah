@@ -65,8 +65,6 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_MOXY_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Moxy", 'm', ":images/IconMoxy.png" },
   { true, ANTChannel::CHANNEL_TYPE_CONTROL, ANT_SPORT_CONTROL_PERIOD, ANT_SPORT_CONTROL_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Remote Control", 'r', ":images/IconCadence.png" },
-  { false, ANTChannel::CHANNEL_TYPE_KICKR, ANT_SPORT_KICKR_PERIOD, ANT_SPORT_POWER_TYPE,
-                ANT_KICKR_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Kickr", 'k', ":images/IconCadence.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -94,12 +92,9 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devCo
     powerchannels=0;
     configuring = false;
 
-    // kickr command channel
-    kickrTimer = NULL;
-    kickrCounter = 0;
-    kickrSequence = 0;
-    kickrCommandChannel = -1;
+    // kickr
     kickrDeviceID = 0;
+    kickrChannel = -1;
 
     // current and desired modes/load/gradients
     // set so first time through current != desired
@@ -279,50 +274,21 @@ ANT::setMode(int mode)
 void
 ANT::kickrCommand()
 {
-    static int lastSequence = -1;
+    // we don't have a kickr !
+    if (kickrChannel < 0) return;
 
     // mode changed ?
     if (currentMode != mode) {
 
         switch(mode) {
         case RT_MODE_ERGO : // do nothing, just start sending ergo commands below
-           //qDebug()<<"A: setup ergo mode";
+            {
+            }
            break;
 
         case RT_MODE_SPIN : // need to setup for "sim" mode, so sending lots of 
                             // config to overcome the default values
             {
-
-            // Slope mode is called "Simulation" mode on a Kickr
-            // We need to set paramters up before we set it and then we
-            // can simply adjust the gradient from there on
-            //qDebug()<<"A: setup slope mode";
-
-            // set rolling resistance (Crr)
-            sendMessage(ANTMessage::kickrRollingResistance(kickrCommandChannel, ++kickrSequence, kickrDeviceID, 0.004f));
-
-            // set wind resistance (C)
-            // where C = A*Cw*Rho
-            // A is effective frontal area (m^2)
-            // Cw is the drag coefficent (unitless)
-            // Rho is the air density (kg/m^3).
-            //
-            // So we default to; A of 0.4 (on the hoods), CdA 1.0 (on the hoods), Rho 1.225 (at sea level)
-            // for more background to this see: http://www.cyclingpowerlab.com/cyclingaerodynamics.aspx
-            //
-            // Our default is therefore 0.4 * 1.0 * 1.225 = 0.49
-            sendMessage(ANTMessage::kickrWindResistance(kickrCommandChannel, ++kickrSequence, kickrDeviceID, 0.49));
-
-            // athlete weight default to 75kg - we don't have a context to refer to ...
-            //double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble();
-            double weight = 75.0; // in kg
-
-            // plus bike, lets be generous and say no water bottles ;)
-            weight += 10.0;
-
-            // set sim mode - we need the athlete weight, use from athlete settings for now
-            sendMessage(ANTMessage::kickrSimMode(kickrCommandChannel, ++kickrSequence, kickrDeviceID, weight));
-
             }
             break;
 
@@ -334,29 +300,16 @@ ANT::kickrCommand()
         currentMode = mode;
         currentLoad = load;
         currentGradient = gradient;
-        kickrSequence++;
-        kickrCounter = 0;
     }
 
     // load has changed ?
     if (mode == RT_MODE_ERGO && load != currentLoad) { 
         currentLoad = load;
-        kickrCounter = 0;
-        kickrSequence++;
     }
 
     // slope has changed in slope mode
     if (mode == RT_MODE_SPIN && gradient != currentGradient) {
         currentGradient = gradient;
-        kickrCounter = 0;
-        kickrSequence++;
-    }
-
-    // 10s timeout ?
-    // 10000ms / 60ms = 166.666666
-    if (kickrCounter++ > 165) {
-        kickrCounter = 0;
-        kickrSequence++;
     }
 
     // create message to send
@@ -366,30 +319,12 @@ ANT::kickrCommand()
 
     default:
     case RT_MODE_ERGO: 
-        toSend = ANTMessage::kickrErgMode(kickrCommandChannel, kickrSequence, kickrDeviceID, load, false);
+        toSend = ANTMessage::kickrErgMode(kickrChannel, kickrDeviceID, load, false);
         break;
 
     case RT_MODE_SPIN: // gradient is between -1.0 and +1.0 so needs conversion from gradient
-        toSend = ANTMessage::kickrGrade(kickrCommandChannel, kickrSequence, kickrDeviceID, gradient/100.00f);
+        toSend = ANTMessage::kickrGrade(kickrChannel, kickrDeviceID, gradient/100.00f);
         break;
-    }
-
-    // log out put 
-    if (lastSequence != kickrSequence) {
-        //qDebug()<<load<<gradient<<"command:" <<QString("0x%1").arg(toSend.data[0], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[1], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[2], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[3], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[4], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[5], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[6], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[7], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[8], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[9], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[10], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[11], 1, 16)
-        //                                     <<QString("0x%1").arg(toSend.data[12], 1, 16);
-        lastSequence = kickrSequence;
     }
 
     sendMessage(toSend);
@@ -496,11 +431,6 @@ ANT::pause()
 int
 ANT::stop()
 {
-    // stop kickr commands
-    if (kickrTimer && kickrTimer->isActive()) {
-        kickrTimer->stop();
-    }
-
     // Close the connections to ANT devices before we stop. Sending the
     // "close channel" ANT message seems to resolve an intermittent
     // issue of unresponsive USB2 stick on subsequent opens.
@@ -709,42 +639,15 @@ ANT::channelInfo(int channel, int device_number, int device_id)
     // if we just got a power device and its recognised as being a kickr
     // trainer then we will need to open up the comms channel, unless it
     // has already been done
-    if (!configuring && antChannel[channel]->is_kickr && antChannel[channel]->command_channel == NULL) {
+    if (!configuring && antChannel[channel]->is_kickr && kickrDeviceID != device_number) {
 
         kickrDeviceID = device_number;
-        kickrCommandChannel = addDevice(device_number, ANTChannel::CHANNEL_TYPE_KICKR, -1);
+        kickrChannel = channel;
 
-        if (kickrCommandChannel >= 0) {
+        // lets go ?
 
-            //qDebug()<<"opened kickr "<< kickrDeviceID<< "communication channel is:"<<kickrCommandChannel;
-            antChannel[channel]->command_channel = antChannel[kickrCommandChannel];
-
-            // start timer to send commands every 63ms
-            if (kickrTimer) {
-
-                // if one already active lets stop it
-                if (kickrTimer->isActive()) kickrTimer->stop();
-
-            } else {
-
-                // first time lets get a new timer
-                kickrTimer = new QTimer(this);
-                kickrTimer->setInterval(KICKR_COMMAND_INTERVAL);
-
-                // connect up the dots
-                connect(kickrTimer, SIGNAL(timeout()), this, SLOT(kickrCommand()));
-            }
-
-            // lets go
-            kickrCounter = 0;
-            kickrSequence = 0;
-            kickrTimer->start();
-
-        } else {
-
-            // need to find a way to communicate back on error
-            qDebug()<<"kickr setup failed, no channels available";
-        }
+        // need to find a way to communicate back on error
+        qDebug()<<"kickr found."<<kickrDeviceID<<"on channel"<<kickrChannel;
     }
 
     //qDebug()<<"found device number"<<device_number<<"type"<<device_id<<"on channel"<<channel

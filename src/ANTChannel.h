@@ -117,7 +117,6 @@ class ANTChannel : public QObject {
             CHANNEL_TYPE_SandC,
             CHANNEL_TYPE_MOXY,
             CHANNEL_TYPE_CONTROL,
-            CHANNEL_TYPE_KICKR,
             CHANNEL_TYPE_GUARD
         };
         typedef enum channeltype ChannelType;
@@ -147,10 +146,6 @@ class ANTChannel : public QObject {
 
         int search_type;
         int srm_offset;
-
-        // this is a command channel used by the Kickr and possibly
-        // will be of use for other devices. It is probably rather
-        ANTChannel *command_channel;
 
         ANTChannel(int number, ANT *parent);
 
