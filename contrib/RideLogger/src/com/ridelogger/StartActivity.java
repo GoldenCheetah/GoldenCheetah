@@ -29,6 +29,7 @@ public class StartActivity extends FragmentActivity
     public static final String RIDER_NAME = "RiderName";
     public static final String PAIRED_ANTS = "PairedAnts";
     SharedPreferences settings;
+    MultiDeviceSearch mSearch;
     
     /**
      * start up our class
@@ -103,7 +104,7 @@ public class StartActivity extends FragmentActivity
         };
 
         // start the multi-device search
-        MultiDeviceSearch mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
+        mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
     }
     
     
@@ -161,7 +162,7 @@ public class StartActivity extends FragmentActivity
     
     @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
+        mSearch.close();
         super.onDestroy();
     }
     
