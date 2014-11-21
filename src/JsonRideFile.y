@@ -42,6 +42,7 @@ static RideFile *JsonRide;
 
 // term state data is held in these variables
 static RideFilePoint JsonPoint;
+static RideFilePoint LastJsonPoint;
 static RideFileInterval JsonInterval;
 static RideFileCalibration JsonCalibration;
 static QString JsonString,
@@ -230,7 +231,8 @@ references: REFERENCES ':' '[' reference_list ']'
                                         }
 reference_list: reference | reference_list ',' reference;
 reference: '{' series '}'               { JsonRide->appendReference(JsonPoint);
-                                          JsonPoint = RideFilePoint();
+                                          JsonPoint     = RideFilePoint();
+                                          LastJsonPoint = RideFilePoint();
                                         }
 
 /*
@@ -238,7 +240,34 @@ reference: '{' series '}'               { JsonRide->appendReference(JsonPoint);
  */
 samples: SAMPLES ':' '[' sample_list ']' ;
 sample_list: sample | sample_list ',' sample ;
-sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, JsonPoint.cad,
+sample: '{' series_list '}'             { 
+                                          if(JsonPoint.secs      == INT_MAX) JsonPoint.secs      = LastJsonPoint.secs;
+                                          if(JsonPoint.cad       == INT_MAX) JsonPoint.cad       = LastJsonPoint.cad;
+                                          if(JsonPoint.hr        == INT_MAX) JsonPoint.hr        = LastJsonPoint.hr;
+                                          if(JsonPoint.km        == INT_MAX) JsonPoint.km        = LastJsonPoint.km;
+                                          if(JsonPoint.kph       == INT_MAX) JsonPoint.kph       = LastJsonPoint.kph;
+                                          if(JsonPoint.nm        == INT_MAX) JsonPoint.nm        = LastJsonPoint.nm;
+                                          if(JsonPoint.watts     == INT_MAX) JsonPoint.watts     = LastJsonPoint.watts;
+                                          if(JsonPoint.alt       == INT_MAX) JsonPoint.alt       = LastJsonPoint.alt;
+                                          if(JsonPoint.lon       == INT_MAX) JsonPoint.lon       = LastJsonPoint.lon;
+                                          if(JsonPoint.lat       == INT_MAX) JsonPoint.lat       = LastJsonPoint.lat;
+                                          if(JsonPoint.headwind  == INT_MAX) JsonPoint.headwind  = LastJsonPoint.headwind;
+                                          if(JsonPoint.slope     == INT_MAX) JsonPoint.slope     = LastJsonPoint.slope;
+                                          if(JsonPoint.temp      == INT_MAX) JsonPoint.temp      = LastJsonPoint.temp;
+                                          if(JsonPoint.lrbalance == INT_MAX) JsonPoint.lrbalance = LastJsonPoint.lrbalance;
+                                          if(JsonPoint.lte       == INT_MAX) JsonPoint.lte       = LastJsonPoint.lte;
+                                          if(JsonPoint.rte       == INT_MAX) JsonPoint.rte       = LastJsonPoint.rte;
+                                          if(JsonPoint.lps       == INT_MAX) JsonPoint.lps       = LastJsonPoint.lps;
+                                          if(JsonPoint.rps       == INT_MAX) JsonPoint.rps       = LastJsonPoint.rps;
+                                          if(JsonPoint.smo2      == INT_MAX) JsonPoint.smo2      = LastJsonPoint.smo2;
+                                          if(JsonPoint.thb       == INT_MAX) JsonPoint.thb       = LastJsonPoint.thb;
+                                          if(JsonPoint.rvert     == INT_MAX) JsonPoint.rvert     = LastJsonPoint.rvert;
+                                          if(JsonPoint.rcad      == INT_MAX) JsonPoint.rcad      = LastJsonPoint.rcad;
+                                          if(JsonPoint.rcontact  == INT_MAX) JsonPoint.rcontact  = LastJsonPoint.rcontact;
+                                          if(JsonPoint.interval  == INT_MAX) JsonPoint.interval  = LastJsonPoint.interval;
+                                          
+                                            
+                                          JsonRide->appendPoint(JsonPoint.secs, JsonPoint.cad,
                                                     JsonPoint.hr, JsonPoint.km, JsonPoint.kph,
                                                     JsonPoint.nm, JsonPoint.watts, JsonPoint.alt,
                                                     JsonPoint.lon, JsonPoint.lat,
@@ -249,7 +278,16 @@ sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, 
                                                     JsonPoint.smo2, JsonPoint.thb,
                                                     JsonPoint.rvert, JsonPoint.rcad, JsonPoint.rcontact,
                                                     JsonPoint.interval);
-                                          JsonPoint = RideFilePoint();
+                                          LastJsonPoint = JsonPoint;
+                                          
+                                          //start the point maxed out to use as a is set test
+                                          JsonPoint     = RideFilePoint(INT_MAX, INT_MAX,
+                                                    INT_MAX, INT_MAX, INT_MAX, INT_MAX, 
+                                                    INT_MAX, INT_MAX, INT_MAX, INT_MAX,
+                                                    INT_MAX, INT_MAX, INT_MAX, INT_MAX,
+                                                    INT_MAX, INT_MAX, INT_MAX, INT_MAX, 
+                                                    INT_MAX, INT_MAX, INT_MAX, INT_MAX,
+                                                    INT_MAX, INT_MAX);
                                         }
 
 series_list: series | series_list ',' series ;
