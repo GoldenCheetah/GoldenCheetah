@@ -229,7 +229,7 @@ references: REFERENCES ':' '[' reference_list ']'
                                           JsonPoint = RideFilePoint();
                                         }
 reference_list: reference | reference_list ',' reference;
-reference: '{' series_list '}'          { JsonRide->appendReference(JsonPoint);
+reference: '{' series '}'               { JsonRide->appendReference(JsonPoint);
                                           JsonPoint = RideFilePoint();
                                         }
 
