@@ -748,12 +748,14 @@ CPPlot::plotBests()
     const double *values = bestsCache->meanMaxArray(rideSeries).constData() + 1;
 
     // we can only do shading of the bests curve
-    // when we have power and the user wants it to
+    // when we have power or speed and the user wants it to
     // be a rainbow curve. Otherwise its gonna be plain
     int shadingCP = 0; 
     double shadingRatio = 1.0;
     if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && shadeMode) shadingCP = dateCP;
     if (rideSeries == RideFile::wattsKg && shadeMode) shadingRatio = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
+    double shadingCV = 0.0;
+    if (rideSeries == RideFile::kph && shadeMode) shadingCV = dateCV;
 
     //For veloclinic plot we need to start by using a 2 parameters model
     if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
@@ -779,7 +781,7 @@ CPPlot::plotBests()
     }
 
     if (showBest) {
-        if (shadingCP == 0) {
+        if (shadingCP == 0 && shadingCV == 0.0) {
 
             // PLAIN CURVE
 
@@ -877,7 +879,7 @@ CPPlot::plotBests()
             curve->attach(this);
             bestsCurves.append(curve);
 
-        } else {
+        } else if (shadingCP > 0) {
 
             //
             // RAINBOW CURVE We are plotting power AND the user wants a rainbow
@@ -971,8 +973,85 @@ CPPlot::plotBests()
                 high = low;
                 ++zone;
             }
+        } else if (shadingCV > 0.0) {
+
+            //
+            // RAINBOW CURVE We are plotting speed AND the user wants a rainbow
+            //
+
+            // set zones from shading CV
+            QList <double> pace_zone;
+            int n_zones = context->athlete->paceZones()->lowsFromCV(&pace_zone, shadingCV);
+
+            // now run through each zone and create a curve
+            int high = maxNonZero - 1;
+            int zone = 0;
+            while (zone < n_zones && high > 0) {
+
+                // create the curve
+                QwtPlotCurve *curve = new QwtPlotCurve("");
+                bestsCurves.append(curve);
+                curve->attach(this);
+
+                // get range for the curve
+                int low = high - 1;
+                int nextZone = zone + 1;
+                if (nextZone >= pace_zone.size())
+                    low = 0;
+                else {
+                    while ((low > 0) && (values[low] < pace_zone[nextZone]))
+                        --low;
+                }
+
+                // set samples
+                curve->setSamples(time.data() + low, values + low, high - low + 1);
+
+                // set the pen color and line width etc
+                QColor color = paceZoneColor(zone, n_zones);
+                if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
+                    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                QPen pen(color.darker(200));
+                pen.setColor(GColor(CCP)); //XXX color ?
+                double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
+                pen.setWidth(width);
+                curve->setPen(pen);
+
+                // use a linear gradient
+                if (shadeMode && shadingCV) { // 0 value means no shading please - and only if proper value for shadingCV
+                    color.setAlpha(128);
+                    QColor color1 = color.darker();
+                    QLinearGradient linearGradient(0, 0, 0, height());
+                    linearGradient.setColorAt(0.0, color);
+                    linearGradient.setColorAt(1.0, color1);
+                    linearGradient.setSpread(QGradient::PadSpread);
+                    curve->setBrush(linearGradient);   // fill below the line
+                }
+
+                // now the labels
+                if (shadeMode) {
+
+                    QwtText text(context->athlete->paceZones()->getDefaultZoneName(zone));
+                    text.setFont(QFont("Helvetica", 20, QFont::Bold));
+                    color.setAlpha(255);
+                    text.setColor(color);
+                    QwtPlotMarker *label_mark = new QwtPlotMarker();
+
+                    // place the text in the geometric mean in time, at a decent power
+                    double x, y;
+                    x = sqrt(time[low] * time[high]);
+                    y = (values[low] + values[high]) / 5;
+
+                    label_mark->setValue(x, y);
+                    label_mark->setLabel(text);
+                    label_mark->attach(this);
+                    allZoneLabels.append(label_mark);
+                }
+
+                high = low;
+                ++zone;
+            }
         }
-    }
+}
 
 
     // X-AXIS
