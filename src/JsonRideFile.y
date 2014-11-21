@@ -276,7 +276,10 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | RVERT ':' number              { JsonPoint.rvert = JsonNumber; }
         | RCAD ':' number               { JsonPoint.rcad = JsonNumber; }
         | RCON ':' number               { JsonPoint.rcontact = JsonNumber; }
+        | string ':' number             { }
+        | string ':' string
         ;
+
 
 /*
  * Primitives
