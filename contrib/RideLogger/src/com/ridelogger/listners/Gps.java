@@ -34,7 +34,7 @@ public class Gps extends Base<Gps>
                     map.put("gpsa",     reduceNumberToString(location.getAccuracy()) );
                     map.put("LAT",      reduceNumberToString(location.getLatitude()) );
                     map.put("LON",      reduceNumberToString(location.getLongitude()));
-                    alterCurrentData(map);
+                    writeData(map);
                 }
             
                 @Override

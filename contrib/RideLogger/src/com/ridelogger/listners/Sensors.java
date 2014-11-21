@@ -53,7 +53,7 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("lux",  reduceNumberToString(event.values[0]));
+                  writeData("lux",  reduceNumberToString(event.values[0]));
               }
             };
             
@@ -70,7 +70,7 @@ public class Sensors extends Base<Object>
                   map.put("ms2x", reduceNumberToString(event.values[0]));
                   map.put("ms2y", reduceNumberToString(event.values[1]));
                   map.put("ms2z", reduceNumberToString(event.values[2]));
-                  alterCurrentData(map);
+                  writeData(map);
               }
             };
             
@@ -85,7 +85,7 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("press",  reduceNumberToString(event.values[0]));
+                  writeData("press",  reduceNumberToString(event.values[0]));
               }
             };
             
@@ -100,7 +100,7 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("temp",  reduceNumberToString(event.values[0]));
+                  writeData("temp",  reduceNumberToString(event.values[0]));
               }
             };
             
@@ -117,7 +117,7 @@ public class Sensors extends Base<Object>
                   map.put("uTx", reduceNumberToString(event.values[0]));
                   map.put("uTy", reduceNumberToString(event.values[1]));
                   map.put("uTz", reduceNumberToString(event.values[2]));
-                  alterCurrentData(map);
+                  writeData(map);
               }
             };
             

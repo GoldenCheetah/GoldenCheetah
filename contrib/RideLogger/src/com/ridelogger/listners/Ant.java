@@ -51,6 +51,7 @@ public class Ant extends Base<Object>
         }
     };
 
+
     @Override
     public void onDestroy()
     {
@@ -58,6 +59,7 @@ public class Ant extends Base<Object>
             releaseHandle.close();
         }
     }
+    
     
     @Override
     public void writeData(String key, String value)
@@ -85,6 +87,7 @@ public class Ant extends Base<Object>
     {
         super.alterCurrentData(prefix + key, value);
     }
+    
     
     @Override
     public void alterCurrentData(Map<String, String> map)
