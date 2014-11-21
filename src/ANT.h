@@ -442,11 +442,8 @@ private:
     int currentMode, mode;
 
     // now kickr specific
-    QTimer *kickrTimer;
-    int kickrCommandChannel;
-    int kickrCounter; // 1-16 for each period
-    unsigned char kickrSequence;
     int kickrDeviceID;
+    int kickrChannel;
 
 };
 
