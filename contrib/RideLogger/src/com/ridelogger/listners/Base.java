@@ -76,8 +76,7 @@ public class Base<T>
                 buf.write("\":");
                 buf.write(ts);
                 
-                for (Map.Entry<String, String> entry : map.entrySet())
-                {
+                for (Map.Entry<String, String> entry : map.entrySet()) {
                     String key   = entry.getKey();
                     String value = entry.getValue();
                     
@@ -111,8 +110,7 @@ public class Base<T>
         synchronized (currentValues) {
             currentValues.put("SECS", getTs());
             
-            for (Map.Entry<String, String> entry : map.entrySet())
-            {               
+            for (Map.Entry<String, String> entry : map.entrySet()) {               
                 currentValues.put(entry.getKey(), entry.getValue());
             }
             

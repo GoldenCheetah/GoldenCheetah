@@ -60,6 +60,27 @@ public class Ant extends Base<Object>
     }
     
     @Override
+    public void writeData(String key, String value)
+    {
+        super.writeData(prefix + key, value);
+    }
+    
+    
+    @Override
+    public void writeData(Map<String, String> map)
+    {
+        if(prefix != "") {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                map.remove(entry);
+                map.put(prefix + entry.getKey(), entry.getValue());
+            }
+        }
+        
+        super.writeData(map);
+    }
+
+
+    @Override
     public void alterCurrentData(String key, String value)
     {
         super.alterCurrentData(prefix + key, value);
@@ -68,10 +89,11 @@ public class Ant extends Base<Object>
     @Override
     public void alterCurrentData(Map<String, String> map)
     {
-        for (Map.Entry<String, String> entry : map.entrySet())
-        {         
-            map.remove(entry);
-            map.put(prefix + entry.getKey(), entry.getValue());
+        if(prefix != "") {
+            for (Map.Entry<String, String> entry : map.entrySet()) {         
+                map.remove(entry);
+                map.put(prefix + entry.getKey(), entry.getValue());
+            }
         }
         
         super.alterCurrentData(map);
