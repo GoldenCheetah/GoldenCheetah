@@ -157,7 +157,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     // shading
     shadeCheck = new QCheckBox(this);
-    QLabel *shading = new QLabel(tr("Power Shading"));
+    QLabel *shading = new QLabel(tr("Zone Shading"));
     shadeCheck->setChecked(true);
     cl->addRow(shading, shadeCheck);
 
@@ -1090,6 +1090,13 @@ CriticalPowerWindow::rideSelected()
         } else {
             cpPlot->setDateCP(0);
         }
+        if (context->athlete->paceZones()) {
+            int paceZoneRange = context->athlete->paceZones()->whichRange(currentRide->dateTime.date());
+            double CV = paceZoneRange >= 0.0 ? context->athlete->paceZones()->getCV(paceZoneRange) : 0.0;
+            cpPlot->setDateCV(CV);
+        } else {
+            cpPlot->setDateCV(0.0);
+        }
         cpPlot->setRide(currentRide);
 
         if (!rangemode && currentRide->ride() && currentRide->ride()->dataPoints().count() == 0)
@@ -1473,6 +1480,19 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
             int dateCP = (CPfrom + CPto) / 2;
 
             cpPlot->setDateCP(dateCP);
+        }
+
+        // lets work out the average CV configure value
+        if (context->athlete->paceZones()) {
+            int fromZoneRange = context->athlete->paceZones()->whichRange(cfrom);
+            int toZoneRange = context->athlete->paceZones()->whichRange(cto);
+
+            double CVfrom = fromZoneRange >= 0 ? context->athlete->paceZones()->getCV(fromZoneRange) : 0.0;
+            double CVto = toZoneRange >= 0 ? context->athlete->paceZones()->getCV(toZoneRange) : CVfrom;
+            if (CVfrom == 0.0) CVfrom = CVto;
+            double dateCV = (CVfrom + CVto) / 2.0;
+
+            cpPlot->setDateCV(dateCV);
         }
 
         cpPlot->setDateRange(dateRange.from, dateRange.to);

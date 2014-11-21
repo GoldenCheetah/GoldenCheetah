@@ -73,6 +73,7 @@ class CPPlot : public QwtPlot
         void setShadeMode(int x);
         void setShadeIntervals(int x);
         void setDateCP(int x) { dateCP = x; }
+        void setDateCV(double x) { dateCV = x; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
         void setPlotType(int index);
         void setModel(int sanI1, int sanI2, int anI1, int anI2, 
@@ -137,6 +138,7 @@ class CPPlot : public QwtPlot
         Context *context;
         RideFileCache *rideCache, *bestsCache;
         int dateCP;
+        double dateCV;
 
         // settings
         RideFile::SeriesType rideSeries;
