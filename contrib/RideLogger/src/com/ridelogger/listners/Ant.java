@@ -1,7 +1,6 @@
 package com.ridelogger.listners;
 
 import java.util.Map;
-
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IDeviceStateChangeReceiver;

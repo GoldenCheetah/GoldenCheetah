@@ -149,12 +149,13 @@ public class Base<T>
         } catch (IOException e) {}
     }
     
-    
+    //get current time stamp
     public String getTs() {
         return reduceNumberToString((double) (System.currentTimeMillis() - RideService.startTime) / 1000.0);   
     }
     
     
+    //reduce number data types to consistently formatted strings
     public static String reduceNumberToString(double d)
     {
         if(d == (long) d)
@@ -164,6 +165,7 @@ public class Base<T>
     }
     
     
+    //reduce number data types to consistently formatted strings
     public static String reduceNumberToString(float d)
     {
         if(d == (long) d)
@@ -173,18 +175,14 @@ public class Base<T>
     }
     
     
+    //reduce number data types to consistently formatted strings
     public static String reduceNumberToString(BigDecimal d)
     {
-        try {
-            long test = d.longValueExact();
-            return String.format("%d", test);
-        } catch (Exception e) {
-            // TODO: handle exception
-            return String.format("%s", d.toPlainString());
-        }
+        return String.format("%s", d.toPlainString());
     }
     
-    //Clean up my listners here
+    
+    //Clean up my listeners here
     public void onDestroy() {}
 }
 
