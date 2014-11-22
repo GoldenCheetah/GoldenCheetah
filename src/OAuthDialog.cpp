@@ -123,7 +123,6 @@ void
 OAuthDialog::urlChanged(const QUrl &url)
 {
     if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
-        url.toString().startsWith("https://www.cyclinganalytics.com/?code=") ||
         url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
         QString code = url.toString().right(url.toString().length()-url.toString().indexOf("code=")-5);
 
