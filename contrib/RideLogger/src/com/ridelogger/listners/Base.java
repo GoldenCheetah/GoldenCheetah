@@ -1,8 +1,8 @@
 package com.ridelogger.listners;
 
+import com.ridelogger.GzipWriter;
 import com.ridelogger.RideService;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -16,7 +16,7 @@ import java.util.Map.Entry;
  */
 public class Base<T>
 {
-    public static BufferedWriter      buf;
+    public static GzipWriter          buf;
     public static long                startTime;
     public static Map<String, String> currentValues;
     
@@ -28,9 +28,9 @@ public class Base<T>
     
     //setup references to buffer and current values and context
     public void init(RideService mContext) {
-        buf           = RideService.buf;           //shared file buffer object
-        currentValues = RideService.currentValues; //shared currentValues object
         context       = mContext;
+        buf           = context.buf;           //shared file buffer object
+        currentValues = context.currentValues; //shared currentValues object
     }
     
     
@@ -149,7 +149,7 @@ public class Base<T>
     
     //get current time stamp
     public String getTs() {
-        return reduceNumberToString((double) (System.currentTimeMillis() - RideService.startTime) / 1000.0);   
+        return reduceNumberToString((double) (System.currentTimeMillis() - context.startTime) / 1000.0);   
     }
     
     

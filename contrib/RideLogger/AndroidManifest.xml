@@ -4,12 +4,13 @@
     package="com.ridelogger"
     android:versionCode="030100"
     android:versionName="3.1.0" >
-    <uses-sdk
-        android:minSdkVersion="19"
-        android:targetSdkVersion="20" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-sdk android:minSdkVersion="19"
+          android:targetSdkVersion="19"
+          android:maxSdkVersion="22" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
