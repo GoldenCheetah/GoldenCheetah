@@ -346,7 +346,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     // we get crappy lines with no data so ignore them
                     // I think they're supposed to be delimeters for the file
                     // content, but are just noise to us !
-                    if (line == (" ,,,,,") || line == ",,,,,") continue;
+                    if (line == (" ,,,,,") || line == ",,,,," ||
+                        line == "" || line == " ") continue;
 
                     // need to get time from second column and note that
                     // there will be gaps when recording drops so shouldn't
