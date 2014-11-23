@@ -726,7 +726,7 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "-> Cache files: <samp>/cache</samp><br>"
                      "-> Calendar files: <samp>/calendar</samp><br>"
                      "-> Log files: <samp>/logs</samp><br>"
-                     "-> Temp files: <samp>/config</samp><br><br>"
+                     "-> Temp files: <samp>/temp</samp><br><br>"
                      "The upgrade process will create the new directory structure and move "
                      "the existing files to the new directories as needed. During the upgrade "
                      "all activity/ride files will be converted to GoldenCheetah's native "
