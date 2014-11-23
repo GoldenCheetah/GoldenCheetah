@@ -821,7 +821,7 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     // create the buttons for the whole Dialog - but only make visible what is needed at the point in time
     proceedButton = new QPushButton(tr("Proceed to Athlete"), this);
-    connect(proceedButton, SIGNAL(clicked()), this, SLOT(checkAndAccept()));
+    connect(proceedButton, SIGNAL(clicked()), this, SLOT(accept()));
     saveAsButton = new QPushButton(tr("Save Upgrade Report..."), this);
     saveAsButton->setDefault(true);
     connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
@@ -862,22 +862,6 @@ GcUpgradeLogDialog::saveAs()
     file.close();
 }
 
-void
-GcUpgradeLogDialog::checkAndAccept()
-{
-    QPoint currentPosition = report->page()->mainFrame()->scrollPosition();
-
-    if (currentPosition.y() != report->page()->mainFrame()->scrollBarMaximum(Qt::Vertical)) {
-
-      QMessageBox msgBox;
-      msgBox.setText(tr("You need to scroll to the end of process log to be able to proceed!"));
-      msgBox.exec();
-
-    } else {
-       emit accept();
-    }
-}
-
 
 void
 GcUpgradeLogDialog::append(QString text, int level) {
@@ -896,6 +880,7 @@ GcUpgradeLogDialog::append(QString text, int level) {
             reportText += QString("%1 <br>").arg(text);
         }
         report->page()->mainFrame()->setHtml(reportText);
+        report->page()->mainFrame()->setScrollBarValue(Qt::Vertical, report->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
         this->repaint();
         QApplication::processEvents();
 
