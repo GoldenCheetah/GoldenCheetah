@@ -18,8 +18,8 @@ import android.hardware.SensorManager;
  */
 public class Sensors extends Base<Object>
 {
-    private SensorManager       mSensorManager;
-    
+    public static final double  CRASHMAGNITUDE = 15.0;
+    private SensorManager       mSensorManager;    
     private Sensor              mLight;
     private Sensor              mAccel;
     private Sensor              mPress;
@@ -71,6 +71,17 @@ public class Sensors extends Base<Object>
                   map.put("ms2y", reduceNumberToString(event.values[1]));
                   map.put("ms2z", reduceNumberToString(event.values[2]));
                   alterCurrentData(map);
+                  
+                  if(context.detectCrash) {
+                      float ax = event.values[0];
+                      float ay = event.values[1];
+                      float az = event.values[2];
+                      double amag = Math.sqrt(ax*ax+ay*ay+az*az);
+                      
+                      if(amag > CRASHMAGNITUDE) {
+                          context.phoneCrash(amag);
+                      }
+                  }
               }
             };
             
