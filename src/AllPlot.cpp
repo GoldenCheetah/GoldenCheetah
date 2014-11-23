@@ -5836,12 +5836,22 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
             xstring = t.toString("hh:mm:ss");
         }
 
+        // for speed curve add pace with units according to settings
+        // only when the activity is a run.
+        QString paceStr;
+        if (curve->title() == tr("Speed") && rideItem && rideItem->isRun()) {
+            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+            QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
+            paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);
+        }
+
         // output the tooltip
-        QString text = QString("%1 %2\n%3 %4")
+        QString text = QString("%1 %2%5\n%3 %4")
                         .arg(yvalue, 0, 'f', 1)
                         .arg(this->axisTitle(curve->yAxis()).text())
                         .arg(xstring)
-                        .arg(this->axisTitle(curve->xAxis()).text());
+                        .arg(this->axisTitle(curve->xAxis()).text())
+                        .arg(paceStr);
 
         // set that text up
         tooltip->setText(text);
