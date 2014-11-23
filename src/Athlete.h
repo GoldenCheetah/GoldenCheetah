@@ -167,6 +167,7 @@ class AthleteDirectoryStructure : public QObject {
 
             QDir activities() { return QDir(myhome.absolutePath()+"/"+athlete_activities); }
             QDir imports(){ return QDir(myhome.absolutePath()+"/"+athlete_imports);}
+            QDir records(){ return QDir(myhome.absolutePath()+"/"+athlete_records);}
             QDir downloads() { return QDir(myhome.absolutePath()+"/"+athlete_downloads);}
             QDir config() { return QDir(myhome.absolutePath()+"/"+athlete_config);}
             QDir cache() { return QDir(myhome.absolutePath()+"/"+athlete_cache);}
@@ -196,6 +197,7 @@ class AthleteDirectoryStructure : public QObject {
 
             QString athlete_activities;
             QString athlete_imports;
+            QString athlete_records;
             QString athlete_downloads;
             QString athlete_config;
             QString athlete_cache;
