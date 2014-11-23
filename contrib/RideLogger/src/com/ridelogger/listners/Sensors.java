@@ -20,7 +20,7 @@ import android.hardware.SensorManager;
  */
 public class Sensors extends Base<Object>
 {
-    public static final double  CRASHMAGNITUDE = 15.0;
+    public static final double  CRASHMAGNITUDE = 30.0;
     private SensorManager       mSensorManager;    
     private Sensor              mLight;
     private Sensor              mAccel;
