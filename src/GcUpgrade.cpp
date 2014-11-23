@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QWebFrame>
+#include <QScrollBar>
 
 bool
 GcUpgrade::upgradeConfirmedByUser(const QDir &home)
@@ -691,7 +692,7 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
 {
 
     setWindowTitle(QString(tr("Athlete %1").arg(athlete)));
-    this->setMinimumWidth(500);
+    this->setMinimumWidth(550);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -740,18 +741,23 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "before proceeding with the upgrade. We can't take responsibility for "
                      "any loss of data during the process. </b> </center> <br>"
                      ));
+    scrollText = new QScrollArea();
+    scrollText->setWidget(text);
+    vertical = scrollText->verticalScrollBar();
+    vertical->setTracking(false);
+    connect(vertical, SIGNAL(valueChanged(int)), this, SLOT(checkVerticalScroll(int)));
 
     toprow->addWidget(critical);
     toprow->addWidget(header);
     layout->addLayout(toprow);
-    layout->addWidget(text);
+    layout->addWidget(scrollText);
 
     QHBoxLayout *lastRow = new QHBoxLayout;
 
-    // create the buttons for the whole Dialog - but only make visible what is needed at the point in time
-    QPushButton *proceedButton = new QPushButton(tr("Proceed with Upgrade"), this);
+    proceedButton = new QPushButton(tr("Proceed with Upgrade"), this);
+    proceedButton->setEnabled(false);
     connect(proceedButton, SIGNAL(clicked()), this, SLOT(accept()));
-    QPushButton *abortButton = new QPushButton(tr("Abort Upgrade"), this);
+    abortButton = new QPushButton(tr("Abort Upgrade"), this);
     abortButton->setDefault(true);
     connect(abortButton, SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -763,6 +769,15 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
 
 }
 
+void
+GcUpgradeExecuteDialog::checkVerticalScroll(int value)
+{
+    if (value == vertical->maximum()) {
+        proceedButton->setEnabled(true);
+    }else {
+        proceedButton->setEnabled(false);
+    }
+}
 
 
 GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
@@ -806,7 +821,7 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     // create the buttons for the whole Dialog - but only make visible what is needed at the point in time
     proceedButton = new QPushButton(tr("Proceed to Athlete"), this);
-    connect(proceedButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(proceedButton, SIGNAL(clicked()), this, SLOT(checkAndAccept()));
     saveAsButton = new QPushButton(tr("Save Upgrade Report..."), this);
     saveAsButton->setDefault(true);
     connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAs()));
@@ -848,6 +863,23 @@ GcUpgradeLogDialog::saveAs()
 }
 
 void
+GcUpgradeLogDialog::checkAndAccept()
+{
+    QPoint currentPosition = report->page()->mainFrame()->scrollPosition();
+
+    if (currentPosition.y() != report->page()->mainFrame()->scrollBarMaximum(Qt::Vertical)) {
+
+      QMessageBox msgBox;
+      msgBox.setText(tr("You need to scroll to the end of process log to be able to proceed!"));
+      msgBox.exec();
+
+    } else {
+       emit accept();
+    }
+}
+
+
+void
 GcUpgradeLogDialog::append(QString text, int level) {
 
         switch (level) {
@@ -871,6 +903,7 @@ GcUpgradeLogDialog::append(QString text, int level) {
 
 void
 GcUpgradeLogDialog::enableButtons() {
-    proceedButton->setDisabled(false);
     saveAsButton->setDisabled(false);
+    proceedButton->setDisabled(false);
+
 }
