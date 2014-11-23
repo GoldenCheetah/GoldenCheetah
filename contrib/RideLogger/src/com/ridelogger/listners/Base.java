@@ -1,8 +1,8 @@
 package com.ridelogger.listners;
 
+import com.ridelogger.GzipWriter;
 import com.ridelogger.RideService;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -16,7 +16,7 @@ import java.util.Map.Entry;
  */
 public class Base<T>
 {
-    public static BufferedWriter      buf;
+    public static GzipWriter          buf;
     public static long                startTime;
     public static Map<String, String> currentValues;
     
