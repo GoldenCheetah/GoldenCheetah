@@ -119,6 +119,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp moxyCSV("FW Part Number:", Qt::CaseInsensitive);
     bool moxy = false;
 
+    QRegExp gcCSV("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
+    bool gc = false;
+
     int recInterval = 1;
 
     if (!file.open(QFile::ReadOnly)) {
@@ -208,6 +211,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      ++lineno;
                      continue;
                 }
+                else if(gcCSV.indexIn(line) != -1) {
+                    moxy = true;
+                    rideFile->setDeviceType("GoldenCheetah");
+                    rideFile->setFileFormat("GoldenCheetah CSV (csv)");
+                    unitsHeader = 1;
+                    recInterval = 1;
+                    ++lineno;
+                    continue;
+               }
                  // default
                  rideFile->setDeviceType("PowerTap");
                  rideFile->setFileFormat("PowerTap CSV (csv)");
@@ -273,7 +285,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 int pause=0;
                 quint64 ms;
 
-                if (!ergomo && !iBike && !motoActv && !moxy) {
+                if (!ergomo && !iBike && !motoActv && !moxy &&!gc) {
                      minutes = line.section(',', 0, 0).toDouble();
                      nm = line.section(',', 1, 1).toDouble();
                      kph = line.section(',', 2, 2).toDouble();
@@ -299,7 +311,35 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         alt *= METERS_PER_FOOT;
                     }
 
-                } else if (iBike) {
+                } else if (gc) {
+                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+
+                    seconds = line.section(',', 0, 0).toDouble();
+                    minutes = seconds / 60.0f;
+                    cad = line.section(',', 1, 1).toDouble();
+                    hr = line.section(',', 2, 2).toDouble();
+                    km = line.section(',', 3, 3).toDouble();
+                    kph = line.section(',', 4, 4).toDouble();
+                    nm = line.section(',', 5, 5).toDouble();
+                    watts = line.section(',', 6, 6).toDouble();
+                    alt = line.section(',', 7, 7).toDouble();
+                    lon = line.section(',', 8, 8).toDouble();
+                    lat = line.section(',', 9, 9).toDouble();
+                    headwind = line.section(',', 10, 10).toDouble();
+                    slope = line.section(',', 11, 11).toDouble();
+                    temp = line.section(',', 12, 12).toDouble();
+                    interval = line.section(',', 13, 13).toInt();
+                    /*lrbalance = line.section(',', 14, 14).toInt();
+                    lte = line.section(',', 15, 15).toInt();
+                    rte = line.section(',', 16, 16).toInt();
+                    lps = line.section(',', 17, 17).toInt();
+                    rps = line.section(',', 18, 18).toInt();*/
+                    smo2 = line.section(',', 19, 19).toInt();
+                    thb = line.section(',', 20, 20).toInt();
+                    //o2hb = line.section(',', 21, 21).toInt();
+                    //hhb = line.section(',', 22, 22).toInt();
+
+               } else if (iBike) {
                     // this must be iBike
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
