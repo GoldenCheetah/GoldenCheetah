@@ -14,20 +14,26 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.InputType;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 public class StartActivity extends FragmentActivity
 {
     Intent rsi;
-    public static final String PREFS_NAME = "RideLogger";
-    public static final String RIDER_NAME = "RiderName";
-    public static final String PAIRED_ANTS = "PairedAnts";
+    public static final String PREFS_NAME       = "RideLogger";
+    public static final String RIDER_NAME       = "RiderName";
+    public static final String EMERGENCY_NUMBER = "EmergencyNumbuer";
+    public static final String DETECT_CRASH     = "DetectCrash";
+    public static final String PHONE_HOME       = "PhoneHome";
+    public static final String PAIRED_ANTS      = "PairedAnts";
     SharedPreferences settings;
     MultiDeviceSearch mSearch;
     
@@ -42,39 +48,188 @@ public class StartActivity extends FragmentActivity
         settings                         = getSharedPreferences(PREFS_NAME, 0);
         final String           riderName = settings.getString(RIDER_NAME, "");
         
+
+        
         if(riderName == "") {
-            // 1. Instantiate an AlertDialog.Builder with its constructor
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            // 2. Chain together various setter methods to set the dialog characteristics
-            builder.setMessage("What is your Golder Cheata Rider Name")
-                   .setTitle("Chose Rider Name");
-            
-            // Set up the input
-            final EditText riderNameInput = new EditText(this);
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            riderNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(riderNameInput);
-            
-            builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    String riderName = riderNameInput.getText().toString();
-                    if(riderName != "" && riderName != null) {
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(RIDER_NAME, riderName);
-                        editor.commit();
-                        setupAnt();
-                    }
+            final Runnable setupAntRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    setupAnt();
                 }
-            });
-
-            // 3. Get the AlertDialog from create()
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            };
+            
+            final Runnable setupPhoneHomeRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    promptDialogCheckBox(
+                        "Update Emergency Contact", 
+                        "Should a text messesage be sent on ride start and every 10 min. to your emergency contact?",
+                        PHONE_HOME,
+                        setupAntRunnable
+                    );
+                }
+            };
+            
+            final Runnable setupDetectCrashRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    promptDialogCheckBox(
+                        "Crash Detection", 
+                        "Should a text messesage be sent on crash detction to your emergency contact?",
+                        DETECT_CRASH,
+                        setupPhoneHomeRunnable
+                    );
+                }
+            };
+            
+            Runnable setupEmergencyContactRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    promptDialogInput(
+                        "Emergency Contact", 
+                        "Emergency phone number to update position on crash detection",
+                        EMERGENCY_NUMBER,
+                        setupDetectCrashRunnable
+                    );
+                }
+            };
+            
+            promptDialogInput(
+                "Chose Rider Name", 
+                "What is your Golder Cheata Rider Name",
+                RIDER_NAME,
+                setupEmergencyContactRunnable
+            );
         } else {
             toggleRide();
             finish();
         }
+    }
+    
+    
+    /**
+     * TextBox Dialog Prompt
+     * @param title
+     * @param message
+     * @param settingSaveKey
+     * @param callBack
+     */
+    public void promptDialogInput(String title, String message, final String settingSaveKey, final Runnable callBack) {
+     // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        
+        OnClickListener positiveClick = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                String value = input.getText().toString();
+                if(value != "" && value != null) {
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(settingSaveKey, value).commit();
+                    callBack.run();
+                }
+            }
+        };
+        promptDialog(title, message, input, positiveClick);
+    }
+    
+    
+    /**
+     * TextBox Dialog Prompt
+     * @param title
+     * @param message
+     * @param settingSaveKey
+     * @param callBack
+     */
+    public void promptDialogPhone(String title, String message, final String settingSaveKey, final Runnable callBack) {
+     // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_PHONE);
+        
+        OnClickListener positiveClick = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                String value = input.getText().toString();
+                if(value != "" && value != null) {
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(settingSaveKey, value).commit();
+                    callBack.run();
+                }
+            }
+        };
+        promptDialog(title, message, input, positiveClick);
+    }
+    
+    
+    /**
+     * Checkbox dialog prompt
+     * @param title
+     * @param message
+     * @param settingSaveKey
+     * @param callBack
+     */
+    public void promptDialogCheckBox(String title, String message, final String settingSaveKey, final Runnable callBack) {
+       final CheckBox input = new CheckBox(this);
+       OnClickListener positiveClick = new DialogInterface.OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+               if(input.isChecked()) {
+                   SharedPreferences.Editor editor = settings.edit();
+                   editor.putBoolean(settingSaveKey, true).commit();
+                   callBack.run();
+               }
+           }
+       };
+       
+       promptDialog(title, message, input, positiveClick);
+    }
+    
+    
+    /**
+     * very general dialog prompt without positiveLabel
+     * @param title
+     * @param message
+     * @param view
+     * @param positiveClick
+     */
+    public void promptDialog(
+            String          title, 
+            String          message,
+            View            view,
+            OnClickListener positiveClick
+    ) {
+        promptDialog(title, message, view, positiveClick, null);
+    }
+    
+    
+    /**
+     * very general dialog prompt
+     * @param title
+     * @param message
+     * @param view
+     * @param positiveClick
+     * @param positiveLabel
+     */
+    public void promptDialog(
+              String          title, 
+              String          message,
+              View            view,
+              OnClickListener positiveClick,
+              String          positiveLabel
+    ) {
+        if(positiveLabel == null) positiveLabel = "Next";
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // 2. Chain together various setter methods to set the dialog characteristics
+        AlertDialog dialog = builder
+            .setMessage(message)
+            .setTitle(title)
+            .setView(view)
+            .setPositiveButton(positiveLabel, positiveClick)
+            .create();
+
+        // 3. Get the AlertDialog from create()
+        dialog.show();
     }
     
     
@@ -85,6 +240,7 @@ public class StartActivity extends FragmentActivity
         MultiDeviceSearch.SearchCallbacks        mCallback;
         MultiDeviceSearch.RssiCallback           mRssiCallback;
         final ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();
+        selectDevicesDialog(foundDevices);
         mCallback = new MultiDeviceSearch.SearchCallbacks(){
             public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
             {
