@@ -48,12 +48,12 @@ import android.telephony.SmsManager;
  */
 public class RideService extends Service
 {
-    public static  GzipWriter           buf;                  //writes to log file buffered
-    public static  long                 startTime;            //start time of the ride
-    public static  Map<String, String>  currentValues;        //hash of current values
-    public         boolean              rideStarted = false;  //have we started logging the ride
-    
-    public static  Map<String, Base<?>> sensors     = new HashMap<String, Base<?>>();
+    public GzipWriter                   buf;                  //writes to log file buffered
+    public long                         startTime;            //start time of the ride
+    public Map<String, String>          currentValues;        //hash of current values
+    public boolean                      rideStarted = false;  //have we started logging the ride
+                                        
+    public Map<String, Base<?>>         sensors     = new HashMap<String, Base<?>>();
                                                               //All other Android sensor class
     MultiDeviceSearch                   mSearch;              //Ant+ device search class to init connections
     MultiDeviceSearch.SearchCallbacks   mCallback;            //Ant+ device class to setup sensors after they are found
@@ -65,7 +65,6 @@ public class RideService extends Service
     SharedPreferences                   settings;             //Object to load our setting from android's storage
     public Boolean                      snoop    = false;     //should we log others ant+ devices
     Set<String>                         pairedAnts;           //list of ant devices to pair with
-    private TimerTask                   smsHomeTimerTask;     //timer task to send periodic messages to emergency contact
     public  boolean                     phoneHome = false;    //if we should send the messages or not
     private Timer                       timer;                //timer class to control the periodic messages
     public boolean                      detectCrash = false;  //should we try to detect crashes and message emergency contact
@@ -218,14 +217,17 @@ public class RideService extends Service
         
         if(phoneHome) {
             timer = new Timer();
-            smsHomeTimerTask = new TimerTask() {              
-                @Override  
-                public void run() {
-                    phoneHome();
-                }  
-            };
             
-            timer.scheduleAtFixedRate(smsHomeTimerTask, 600000, 600000); //every ten min let them know where you are at
+            timer.scheduleAtFixedRate(
+                new TimerTask() {              
+                    @Override  
+                    public void run() {
+                        phoneHome();
+                    }  
+                },
+                600000, 
+                600000
+            ); //every ten min let them know where you are at
             phoneStart();
         }
         
@@ -254,7 +256,7 @@ public class RideService extends Service
     public void phoneCrash(double mag) {
         String body = "CRASH DETECTED!\n";
         if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
-            body = body + "https://www.google.com/maps/@" + currentValues.get("LAT") + "," + currentValues.get("LON") + ",10z";
+            body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
         } else {
             body = body + "Unknow location.";
         }
@@ -262,14 +264,43 @@ public class RideService extends Service
         smsHome(body);
     }
     
-   
+    
     /**
      * let a love one know where you are at about every 10 min
      */
-    public void phoneStart() {
-        String body = "I'm starting my ride";
+    public void phoneCrashConfirm() {
+        String body = "CRASH CONFIRMED!\n";
         if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
-            body = body + ":\n https://www.google.com/maps/@" + currentValues.get("LAT") + "," + currentValues.get("LON") + ",10z";
+            body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
+        } else {
+            body = body + "Unknow location.";
+        }
+        smsHome(body);
+    }
+    
+   
+    /**
+     * let them know we are starting
+     */
+    public void phoneStart() {
+        smsWithLocation("I'm starting my ride");
+    }
+    
+    
+    /**
+     * let them know we are stopping
+     */
+    public void phoneStop() {
+        smsWithLocation("I'm done with my ride");
+    }
+    
+    
+    /**
+     * send an sms with location
+     */
+    public void smsWithLocation(String body) {
+        if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
+            body = body + "\n https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
         } else {
             body = body + ".";
         }
@@ -282,8 +313,7 @@ public class RideService extends Service
      * let a love one know where you are at about every 10 min
      */
     public void phoneHome() {
-        String body = "I'm here:\n https://www.google.com/maps/@" + currentValues.get("LAT") + "," + currentValues.get("LON") + ",10z";
-        smsHome(body);
+        smsWithLocation("I'm riding:");
     }
     
     
@@ -299,6 +329,8 @@ public class RideService extends Service
     //stop the ride and clean up resources
     protected void stopRide() {
         if(!rideStarted) return;
+        
+        phoneStop();
 
         for (Map.Entry<String, Base<?>> entry : sensors.entrySet()) {                   
             entry.getValue().onDestroy();
