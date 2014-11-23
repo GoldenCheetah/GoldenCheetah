@@ -74,6 +74,7 @@ class GcUpgradeLogDialog : public QDialog
 
     public slots:
         void saveAs();
+        void checkAndAccept();
 
     private:
         QWebView *report;
@@ -115,6 +116,15 @@ class GcUpgradeExecuteDialog : public QDialog
 
     public:
         GcUpgradeExecuteDialog(QString);
+
+    public slots:
+        void checkVerticalScroll(int value);
+
+    private:
+        QScrollArea *scrollText;
+        QScrollBar *vertical;
+        QPushButton *proceedButton;
+        QPushButton *abortButton;
 
 };
 
