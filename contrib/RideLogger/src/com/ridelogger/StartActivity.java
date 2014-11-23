@@ -222,8 +222,8 @@ public class StartActivity extends FragmentActivity
 
         // 2. Chain together various setter methods to set the dialog characteristics
         AlertDialog dialog = builder
-            .setMessage(title)
-            .setTitle(message)
+            .setMessage(message)
+            .setTitle(title)
             .setView(view)
             .setPositiveButton(positiveLabel, positiveClick)
             .create();
