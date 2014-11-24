@@ -166,7 +166,7 @@ public:
             }
 
             return sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()),
-                                        proxyIndex.column()-2, // accomodate virtual columns
+                                        proxyIndex.column()-2, // accommodate virtual columns
                                         QModelIndex());
         }
         return QModelIndex();
@@ -183,7 +183,7 @@ public:
         } else {
             QModelIndex *p = new QModelIndex(createIndex(groupNo, 0, (void*)NULL));
             if (sourceIndex.row() > 0 && sourceIndex.row() < sourceRowToGroupRow.size())
-                return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+2, &p); // accomodate virtual columns
+                return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+2, &p); // accommodate virtual columns
             else
                 return QModelIndex();
         }
@@ -395,7 +395,7 @@ public:
 
     QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const {
         if (section>1)
-            return sourceModel()->headerData(section-2, orientation, role); // accomodate virtual columns
+            return sourceModel()->headerData(section-2, orientation, role); // accommodate virtual columns
         else if (section == 1) // return header for virtual column ride_time
             return  QVariant(starttimeHeader);
         else
@@ -404,7 +404,7 @@ public:
 
     bool setHeaderData (int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole) {
         if (section>1)
-            return sourceModel()->setHeaderData(section-2, orientation, value, role); // accomodate virtual columns
+            return sourceModel()->setHeaderData(section-2, orientation, value, role); // accommodate virtual columns
         else if (section == 1) // set header for virtual column ride_time
             starttimeHeader = value.toString();
 
@@ -412,7 +412,7 @@ public:
     }
 
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const {
-        return sourceModel()->columnCount(QModelIndex())+2; // accomodate virtual group column and starttime
+        return sourceModel()->columnCount(QModelIndex())+2; // accommodate virtual group column and starttime
     }
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const {
@@ -463,7 +463,7 @@ public:
     void setGroupBy(int column) {
 
         // shift down
-        if (column >= 0) column -= 2; // accomodate virtual column
+        if (column >= 0) column -= 2; // accommodate virtual column
 
         groupBy = column < 0 ? -1 : column;
         setGroups();
@@ -562,7 +562,7 @@ public slots:
         beginResetModel();
 
         clearGroups();
-        setGroupBy(groupBy+2); // accomodate virtual columns
+        setGroupBy(groupBy+2); // accommodate virtual columns
 
         endResetModel();// we're clean
 

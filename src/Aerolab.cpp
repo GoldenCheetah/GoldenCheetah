@@ -390,7 +390,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       double f     = 0.0;
       double a     = 0.0;
 
-      // Use km data insteed of formula for file with a stop (gap).
+      // Use km data instead of formula for file with a stop (gap).
       //d += v * dt;
       //distanceArray[arrayLength] = d/1000;
 

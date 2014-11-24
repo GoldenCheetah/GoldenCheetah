@@ -1722,7 +1722,7 @@ void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, Rid
     return;
 }
 
-// for Distribution Series the values in Long/Float are ALWAYS Seconds (therefor no decimals adjustment calcuation required)
+// for Distribution Series the values in Long/Float are ALWAYS Seconds (therefore no decimals adjustment calculation required)
 void RideFileCache::doubleArrayForDistribution(QVector<double> &into, QVector<float> &from)
 {
     into.resize(from.size());
@@ -1810,12 +1810,12 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
 // and return as an array of SummaryMetrics.
 //
 // this is to 're-use' the metric api (especially in the LTM code) for passing back multiple
-// bests across multiple rides in one object. We do this so we can optimise the read/seek acroos
+// bests across multiple rides in one object. We do this so we can optimise the read/seek across
 // the CPX files within a single call.
 //
 // We order the bests requested in the order they will appear in the CPX file so we can open
 // and seek forward to each value before putting into the summary metric. Since it is placed
-// on the stack as a return paramater we also don't need to worry about memory allocation just
+// on the stack as a return parameter we also don't need to worry about memory allocation just
 // like the metric code works.
 // 
 //

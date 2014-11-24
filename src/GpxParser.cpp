@@ -156,7 +156,7 @@ bool
             return true;
         }
         // we need to figure out the distance by using the lon,lat
-        // using teh haversine formula
+        // using the haversine formula
         double r = 6371;
         double dlat = toRadians(lat -lastLat);  // convert to radians
 

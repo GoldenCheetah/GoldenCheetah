@@ -412,10 +412,10 @@ DownloadRideDialog::downloadClicked()
             continue;
         }
 
-        // remove the tempoary download file after successfull creation/renaming (just in case)
+        // remove the temporary download file after successful creation/renaming (just in case)
         QFile::remove(files.at(i).name);
 
-        // File sucessfully downloaded and stored with proper extension - now convert to .JSON
+        // File successfully downloaded and stored with proper extension - now convert to .JSON
         QStringList errors;
         QFile currentFile(filepath);
         QString targetFileName;

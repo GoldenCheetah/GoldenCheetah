@@ -36,7 +36,7 @@
 //    into the future -- but crucially, no need to bother if power above CP is 0.
 //    This typically reduces the cpu cycles by a factor of 4
 //
-// 2. Because the decay is calculated forward at time u we can do these in paralle;
+// 2. Because the decay is calculated forward at time u we can do these in parallel;
 //    i.e. run multiple threads for t=0 through t=time/nthreads. This reduced the
 //    elapsed time by a factor of about 2/3rds on a dual core processor.
 //
@@ -131,7 +131,7 @@ WPrime::setRide(RideFile *input)
                 pointsd << QPointF(t-offset, p->km * convert); // not zero !!!! this is a map from secs -> km not a series
             }
 
-        // lets not go backwards -- or two sampls at the same time
+        // lets not go backwards -- or two samples at the same time
         if ((lp && p->secs > lp->secs) || !lp) {
             points << QPointF(p->secs - offset, p->watts);
             pointsd << QPointF(p->secs - offset, p->km * convert);
@@ -252,7 +252,7 @@ WPrime::setRide(RideFile *input)
     }
 
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
-                                 // so lets not excacerbate the problem - truncate
+                                 // so lets not exacerbate the problem - truncate
 
     //qDebug()<<"compute W'bal curve took"<<time.elapsed();
 
@@ -452,7 +452,7 @@ WPrime::setErg(ErgFile *input)
     }
 
     if (minY < -30000) minY = 0; // the data is definitely out of bounds!
-                                 // so lets not excacerbate the problem - truncate
+                                 // so lets not exacerbate the problem - truncate
 }
 
 double

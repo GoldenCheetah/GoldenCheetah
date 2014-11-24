@@ -1214,7 +1214,7 @@ RideSummaryWindow::htmlSummary()
         summary += "</table><br>";
     }
 
-    // sumarise errors reading file if it was a ride summary
+    // summarise errors reading file if it was a ride summary
     if (ridesummary && !rideItem->errors().empty()) {
 
         summary += tr("<p><h2>Errors reading file:</h2><ul>");
@@ -1596,7 +1596,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 }
                 summary += "</tr>";
 
-                // now the sumamry
+                // now the summary
                 int counter = 0;
                 int rows = 0;
                 foreach (SummaryMetrics metrics, intervalMetrics) {
@@ -1668,7 +1668,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 }
                 summary += "</tr>";
 
-                // now the sumamry
+                // now the summary
                 int counter = 0;
                 int rows = 0;
                 foreach (SummaryMetrics metrics, intervalMetrics) {
@@ -1864,7 +1864,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 }
                 summary += "</tr>";
 
-                // now the sumamry
+                // now the summary
                 int counter = 0;
                 foreach (CompareDateRange dr, context->compareDateRanges) {
 
@@ -1936,7 +1936,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 }
                 summary += "</tr>";
 
-                // now the sumamry
+                // now the summary
                 int counter = 0;
                 foreach (CompareDateRange dr, context->compareDateRanges) {
 

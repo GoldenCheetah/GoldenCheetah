@@ -27,7 +27,7 @@
 #include "VeloHeroUploader.h"
 #include "TrainingstagebuchUploader.h"
 
-// acccess to metrics
+// access to metrics
 #include "MetricAggregator.h"
 #include "RideMetric.h"
 #include "DBAccess.h"
@@ -547,8 +547,8 @@ StravaUploader::requestUploadStravaFinished(QNetworkReply *reply)
     QString response = reply->readLine();
     //qDebug() << response;
 
-    // use a lightweigth json parser to do this
-    QString uploadError="invalid reponse or parser error";
+    // use a lightweight json parser to do this
+    QString uploadError="invalid response or parser error";
     try {
 
         // parse !

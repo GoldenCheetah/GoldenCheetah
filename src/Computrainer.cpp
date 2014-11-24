@@ -505,7 +505,7 @@ void Computrainer::run()
     double curPower;                      // current output power in Watts
     double curHeartRate;                  // current heartrate in BPM
     double curCadence;                    // current cadence in RPM
-    double curSpeed;                      // current speef in KPH
+    double curSpeed;                      // current speed in KPH
     double curRRC;                        // calibrated Rolling Resistance
     bool curhrconnected;                  // is HR sensor connected?
     bool curcadconnected;                 // is CAD sensor connected?

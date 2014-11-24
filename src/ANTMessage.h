@@ -71,17 +71,17 @@ class ANTMessage {
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
         static ANTMessage kickrErgMode(const unsigned char channel, ushort usDeviceId, ushort usWatts, bool bSimSpeed);
-        //static ANTMessage kickrFtpMode(const unsigned char channel, unsigned char seq, ushort usDeviceId, ushort usFtp, ushort usPercent);
-        //static ANTMessage kickrSlopeMode(const unsigned char channel, unsigned char seq, ushort usDeviceId, ushort scale);
-        //static ANTMessage kickrStdMode(const unsigned char channel, unsigned char seq, ushort usDeviceId, ushort eLevel);
-        //static ANTMessage kickrSimMode(const unsigned char channel, unsigned char seq, ushort usDeviceId, float fWeight);
-        //static ANTMessage kickrWindResistance(const unsigned char channel, unsigned char seq, ushort usDeviceId, float fC) ;
-        //static ANTMessage kickrRollingResistance(const unsigned char channel, unsigned char seq, ushort usDeviceId, float fCrr);
+        static ANTMessage kickrFtpMode(const unsigned char channel, ushort usDeviceId, ushort usFtp, ushort usPercent);
+        static ANTMessage kickrSlopeMode(const unsigned char channel, ushort usDeviceId, ushort scale);
+        static ANTMessage kickrStdMode(const unsigned char channel, ushort usDeviceId, ushort eLevel);
+        static ANTMessage kickrSimMode(const unsigned char channel, ushort usDeviceId, float fWeight);
+        static ANTMessage kickrWindResistance(const unsigned char channel, ushort usDeviceId, float fC) ;
+        static ANTMessage kickrRollingResistance(const unsigned char channel, ushort usDeviceId, float fCrr);
         static ANTMessage kickrGrade(const unsigned char channel, ushort usDeviceId, float fGrade);
-        //static ANTMessage kickrWindSpeed(const unsigned char channel, unsigned char seq, ushort usDeviceId, float mpsWindSpeed);
-        //static ANTMessage kickrWheelCircumference(const unsigned char channel, unsigned char seq, ushort usDeviceId, float mmCircumference);
-        //static ANTMessage kickrReadMode(const unsigned char channel, unsigned char seq, ushort usDeviceId);
-        //static ANTMessage kickrInitSpindown(const unsigned char channel, unsigned char seq, ushort usDeviceId);
+        static ANTMessage kickrWindSpeed(const unsigned char channel, ushort usDeviceId, float mpsWindSpeed);
+        static ANTMessage kickrWheelCircumference(const unsigned char channel, ushort usDeviceId, float mmCircumference);
+        static ANTMessage kickrReadMode(const unsigned char channel, ushort usDeviceId);
+        static ANTMessage kickrInitSpindown(const unsigned char channel, ushort usDeviceId);
 
         // convert a channel event message id to human readable string
         static const char * channelEventMessage(unsigned char c);

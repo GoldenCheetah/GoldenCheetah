@@ -63,7 +63,7 @@ GcUpgrade::upgrade(const QDir &home)
     // Upgrade processing was introduced in Version 3 -- below must be performed
     // for athlete directories from prior to Version 3
     // and can essentially be used as a template for all major release
-    // upgrades as it delets old stuff and sets clean
+    // upgrades as it deletes old stuff and sets clean
 
     //----------------------------------------------------------------------
     // 3.0 upgrade processing
@@ -502,7 +502,7 @@ GcUpgrade::upgrade(const QDir &home)
                   .arg(QString::number(ok)).arg(newHome.workouts().dirName()).arg(QString::number(fail)),2);
 
         // the conversion of all activities to .json is done in "lateUpgrade" - since the prerequisites
-        // on the "context" setup are not fullfilled at this early stage
+        // on the "context" setup are not fulfilled at this early stage
 
     }
 
@@ -557,7 +557,7 @@ GcUpgrade::upgradeLate(Context *context)
                         okConvert++;
                         upgradeLog->append(tr("-> Information: Activity %1 - Successfully converted to .JSON").arg(activitiesFileName));
 
-                        // copy source file to the /imports folder (only if conversion was successfull)
+                        // copy source file to the /imports folder (only if conversion was successful)
                         bool success = moveFile(QString("%1/%2").arg(context->athlete->home->root().canonicalPath()).arg(activitiesFileName),
                                                 QString("%1/%2").arg(context->athlete->home->imports().canonicalPath()).arg(activitiesFileName));
                         if (success) {
@@ -640,7 +640,7 @@ GcUpgrade::moveFile(const QString &source, const QString &target) {
             // just log, but not critical for the upgrade since the copy worked
             upgradeLog->append(QString(tr("-> Information: Deletion of copied file %1 failed" )).arg(source));
         }
-        // even if remove failed, the copy was successfull - so GC is fine
+        // even if remove failed, the copy was successful - so GC is fine
         return true;
       }
 

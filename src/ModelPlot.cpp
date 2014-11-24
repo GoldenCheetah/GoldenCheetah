@@ -365,7 +365,7 @@ ModelDataProvider::ModelDataProvider (ModelPlot &plot, ModelSettings *settings) 
     if (cranklength == 0.0) cranklength = 0.175;
 
     // Run through the ridefile points putting the selected
-    // values into the approprate bins
+    // values into the appropriate bins
     settings->colorProvider->color.clear();
     settings->colorProvider->num.clear();
     settings->colorProvider->zonecolor.clear();
@@ -683,7 +683,7 @@ ModelDataProvider::ModelDataProvider (ModelPlot &plot, ModelSettings *settings) 
     setDomain(maxbinx,minbinx,minbiny,maxbiny); // max x/y vals
 
     // set the barsize to a sensible radius (20% space)
-    // the +settting->xbin bit is to offset the additional mx/my bug
+    // the +setting->xbin bit is to offset the additional mx/my bug
     double xr = 0.8 * (((double)settings->xbin/((double)(maxbinx-minbinx)+(settings->xbin))) / 2.0);
     double yr = 0.8 * (((double)settings->ybin/((double)(maxbiny-minbiny)+(settings->ybin))) / 2.0);
 
@@ -740,7 +740,7 @@ ModelDataProvider::ModelDataProvider (ModelPlot &plot, ModelSettings *settings) 
     plot.setOrtho(false);
     plot.setSmoothMesh(true);
 
-    // cordinates - labels, gridlines, tic markers etc
+    // coordinates - labels, gridlines, tic markers etc
     if (settings->gridlines == true)
         plot.coordinates()->setGridLines(true, true, Qwt3D::BACK | Qwt3D::LEFT | Qwt3D::FLOOR);
     else

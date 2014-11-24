@@ -93,7 +93,7 @@ RouteWindow::RouteWindow(Context *context) :
 
 
 
-    // now we're up and runnning lets connect the signals
+    // now we're up and running lets connect the signals
     connect(view, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
     //connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 

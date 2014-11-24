@@ -401,7 +401,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
     // not for the table?
     if (object != (QObject *)tableView) return false;
 
-    // what happenned?
+    // what happnned?
     switch(e->type())
     {
         case QEvent::ContextMenu:
@@ -609,7 +609,7 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
         x -= tableView->verticalScrollBar()->width() + 0 ;
 #endif
 
-    // take the margins into accopunt top
+    // take the margins into account top
     x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
 
     // ** NOTE **
@@ -956,7 +956,7 @@ RideNavigator::rideTreeSelectionChanged()
     QTreeWidgetItem *which;
     if (context->athlete->rideTreeWidget()->selectedItems().count())
         which = context->athlete->rideTreeWidget()->selectedItems().first();
-    else // no rides slected
+    else // no rides selected
         which = NULL;
 
     if (which && which->type() == RIDE_TYPE) {
@@ -1053,7 +1053,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     const RideMetric *m;
     QString value;
 
-    // are we a selected cell ? need to paint acordingly
+    // are we a selected cell ? need to paint accordingly
     //bool selected = false;
     //if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
         //if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
@@ -1067,7 +1067,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         double metricValue = index.model()->data(index, Qt::DisplayRole).toDouble();
 
         if (metricValue) {
-            // metric / imperial converstion
+            // metric / imperial conversion
             metricValue *= (rideNavigator->context->athlete->useMetricUnits) ? 1 : m->conversion();
             metricValue += (rideNavigator->context->athlete->useMetricUnits) ? 0 : m->conversionSum();
 

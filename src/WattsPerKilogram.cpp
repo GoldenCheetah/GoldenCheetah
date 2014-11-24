@@ -55,7 +55,7 @@ class AverageWPK : public RideMetric {
         double weight = uride->getWeight();
         double ap = deps.value("average_power")->value(true);
 
-        // calclate watts per kilo
+        // calculate watts per kilo
         setCount(secs);
         setValue((secs && ap && weight) ? ap/weight : 0);
     }

@@ -985,7 +985,7 @@ static QString unprotect(QString buffer)
     // html special chars are automatically handled
     // other special characters will not work
     // cross-platform but will work locally, so not a biggie
-    // i.e. if thedefault charts.xml has a special character
+    // i.e. if the default charts.xml has a special character
     // in it it should be added here
     return s;
 }

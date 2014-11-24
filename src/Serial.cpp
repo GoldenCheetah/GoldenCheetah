@@ -389,7 +389,7 @@ find_devices(char *result[], int capacity)
     // /dev/ttyU[0-9]                  - Open BSD usb serial devices
     // /dev/ttyUSB[0-9]                - Standard USB/Serial device on Linux/Mac
     // /dev/ttyS[0-2]                  - Serial TTY, 0-2 is restrictive, but noone has complained yet!
-    // /dev/ttyACM*                    - ACM converter, admittidly used largely for Mobiles
+    // /dev/ttyACM*                    - ACM converter, admittedly used largely for Mobiles
     // /dev/ttyMI*                     - MOXA PCI cards
     // /dev/rfcomm*                    - Bluetooth devices
     if (regcomp(&reg, 

@@ -2362,7 +2362,7 @@ KeywordsPage::pageSelected()
     // load in texts from metadata
     fieldChooser->clear();
 
-    // get the current fields defiitions 
+    // get the current fields definitions 
     QList<FieldDefinition> fromFieldsPage;
     parent->fieldsPage->getDefinitions(fromFieldsPage);
     foreach(FieldDefinition x, fromFieldsPage) {
