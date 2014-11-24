@@ -38,7 +38,11 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     setAttribute(Qt::WA_TranslucentBackground);
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
+#ifdef GC_HAVE_MUMODEL
+    setMinimumSize(400,200); //XX temp for MU model...
+#else
     setMinimumSize(250,200);
+#endif
     setFocus();
     mode = none;
     initial = true;
@@ -114,8 +118,7 @@ GcOverlayWidget::configChanged()
 void
 GcOverlayWidget::addWidget(QString title, QWidget *widget)
 {
-    //We don't stop the widget from processing local mouse
-    //events since it may well be interactive in future.
+    // we want this one
     //widget->setParent(this);
     //widget->releaseMouse();
     //widget->setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -376,7 +379,7 @@ void GcOverlayWidget::setCursorShape(const QPoint &e_pos)
             setCursor(QCursor(Qt::SizeVerCursor));
             mode = resizeb;
         }
-    } else {
+    } else if (e_pos.y() <= y() + 23 ) {
         setCursor(QCursor(Qt::ArrowCursor));
         mode = moving;
     }
@@ -398,7 +401,7 @@ void GcOverlayWidget::mouseMoveEvent(QMouseEvent *e)
         return;
     }
  
-    if ((mode == moving || mode == none) && e->buttons() && Qt::LeftButton) {
+    if (mode == moving && e->buttons() && Qt::LeftButton) {
         QPoint toMove = e->globalPos() - position;
         if (toMove.x() < 0) return;
         if (toMove.y() < 0) return;

@@ -31,6 +31,7 @@
 #include "TimeUtils.h"
 #include "IntervalItem.h"
 #include "GcOverlayWidget.h"
+#include "MUWidget.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -410,6 +411,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     gridLayout->addWidget(eiTitle, 5, 0);
     gridLayout->addWidget(eiValue, 5, 1);
 
+#ifdef GC_HAVE_MUMODEL
+    addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
+#endif
     addHelper(QString(tr("CP Model")), helper);
 
     if (rangemode) {

@@ -365,6 +365,9 @@ HEADERS += \
         MetadataWindow.h \
         MetricAggregator.h \
         MoxyDevice.h \
+        MUPlot.h \
+        MUPool.h \
+        MUWidget.h \
         NewCyclistDialog.h \
         NullController.h \
         PaceZones.h \
@@ -584,6 +587,8 @@ SOURCES += \
         MetadataWindow.cpp \
         MetricAggregator.cpp \
         MoxyDevice.cpp \
+        MUPlot.cpp \
+        MUWidget.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
         PaceTimeInZone.cpp \
