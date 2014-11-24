@@ -93,7 +93,7 @@ IntervalSummaryWindow::intervalHover(RideFileInterval x)
     // if we're not visible don't bother
     if (!isVisible()) return;
 
-    // we already have summries!
+    // we already have summaries!
     if (context->athlete->intervalWidget->selectedItems().count()) return;
 
     QString html = GCColor::css();

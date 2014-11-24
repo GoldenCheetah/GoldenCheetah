@@ -246,7 +246,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         QRegExp gcPattern("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.txt$");
         gcPattern.setCaseSensitivity(Qt::CaseInsensitive);
 
-        // Racemermate uses name-mode-yyyy-mm-dd-hh-mm-ss.CDF.txt
+        // Racermate uses name-mode-yyyy-mm-dd-hh-mm-ss.CDF.txt
         QRegExp rmPattern("^.*/[^-]*-[^-]*-(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)-(\\d\\d)-(\\d\\d)-(\\d\\d)\\.cdf.txt$");
         rmPattern.setCaseSensitivity(Qt::CaseInsensitive);
 

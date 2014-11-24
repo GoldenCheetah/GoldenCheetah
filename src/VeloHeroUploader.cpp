@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 
-// acccess to metrics
+// access to metrics
 #include "PwxRideFile.h"
 
 /*

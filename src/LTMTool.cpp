@@ -2212,7 +2212,7 @@ LTMTool::importClicked()
             context->notifyPresetsChanged();
 
         } else {
-            // oops non existant - does this ever happen?
+            // oops non existent - does this ever happen?
             QMessageBox::warning( 0, tr("Entry Error"), QString(tr("Selected file (%1) does not exist")).arg(filenames[0]));
         }
     }

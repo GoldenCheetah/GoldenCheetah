@@ -107,7 +107,7 @@ PDModel::deriveCPParameters(bool three)
     const double t3 = aeI1;
     const double t4 = aeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4;
 
     // find the indexes associated with the bounds
@@ -238,7 +238,7 @@ CP2Model::CP()
 void CP2Model::onDataChanged() 
 { 
     // calc tau etc and make sure the interval is
-    // set corretly - i.e. 'domain of validity'
+    // set correctly - i.e. 'domain of validity'
     deriveCPParameters(); 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 
@@ -309,7 +309,7 @@ CP3Model::PMax()
 void CP3Model::onDataChanged() 
 { 
     // calc tau etc and make sure the interval is
-    // set corretly - i.e. 'domain of validity'
+    // set correctly - i.e. 'domain of validity'
     deriveCPParameters(true); 
     setInterval(QwtInterval(tau, PDMODEL_MAXT));
 
@@ -449,10 +449,10 @@ MultiModel::PMax()
 void MultiModel::onDataChanged() 
 { 
     // calc tau etc and make sure the interval is
-    // set corretly - i.e. 'domain of validity'
+    // set correctly - i.e. 'domain of validity'
     deriveCPParameters(true); 
 
-    // and veloclinic paramters too;
+    // and veloclinic parameters too;
     w1 = cp*tau*60; // initial estimate from classic cp model
     p1 = PMax() - cp;
     p2 = cp;
@@ -561,7 +561,7 @@ void
 ExtendedModel::onDataChanged()
 {
     // calc tau etc and make sure the interval is
-    // set corretly - i.e. 'domain of validity'
+    // set correctly - i.e. 'domain of validity'
     deriveExtCPParameters();
     setInterval(QwtInterval(etau, PDMODEL_MAXT));
 
@@ -593,7 +593,7 @@ ExtendedModel::deriveExtCPParameters()
     const double t7 = laeI1;
     const double t8 = laeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
 
     // find the indexes associated with the bounds

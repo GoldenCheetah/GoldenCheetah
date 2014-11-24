@@ -296,8 +296,8 @@ public:
 };
 
 
-// RPE is the rate of percieved exercion (borg scale).
-// Is a numerical value the riders give in "average" fatigue of the training session he percieved.
+// RPE is the rate of perceived exercion (borg scale).
+// Is a numerical value the riders give in "average" fatigue of the training session he perceived.
 //
 // Calculate the session RPE that is the product of RPE * time (minutes) of training/race ride. I
 // We have 3 different "training load" parameters:

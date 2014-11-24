@@ -937,7 +937,7 @@ HistogramWindow::updateChart()
 
         if (rangemode) {
 
-            // set the date range to the appropiate selection
+            // set the date range to the appropriate selection
             DateRange use;
             if (useCustom) {
 
@@ -1036,7 +1036,7 @@ HistogramWindow::updateChart()
         powerHist->recalc(true); // interval changed? force recalc
         powerHist->replot();
 
-        interval = false;// we force a recalc whem called coz intervals
+        interval = false;// we force a recalc when called coz intervals
                         // have been selected. The recalc routine in
                         // powerhist optimises out, but doesn't keep track
                         // of interval selection -- simplifies the setters

@@ -231,7 +231,7 @@ this differently
                 if (balance) {
                     // Power LRB + PI:  The value contains :
                     //  - Left Right Balance (LRB) and
-                    //  - Pedalling Index (PI)
+                    //  - Pedaling Index (PI)
                     //
                     // in the following formula:
                     // value = PI * 256 + LRB   PI bits 15-8  LRB bits 7-0

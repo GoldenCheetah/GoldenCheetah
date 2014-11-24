@@ -419,7 +419,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
         connect(context, SIGNAL(compareDateRangesStateChanged(bool)), SLOT(forceReplot()));
         connect(context, SIGNAL(compareDateRangesChanged()), SLOT(forceReplot()));
     } else {
-        // when working on a ride we can selecct intervals!
+        // when working on a ride we can select intervals!
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
         connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
@@ -550,7 +550,7 @@ void
 CriticalPowerWindow::modelChanged()
 {
     // we changed from/to a 2 or 3 parameter model
-    // so lets set some semsible defaults, these are
+    // so lets set some sensible defaults, these are
     // based on advice from our exercise physiologist friends
     // for best results in predicting both W' and CP and providing
     // a reasonable fit for durations < 2mins.

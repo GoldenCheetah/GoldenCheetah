@@ -143,7 +143,7 @@ FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 	  double deltaHR = (ride->dataPoints()[i]->hr - ride->dataPoints()[lastgood]->hr) / double(i-lastgood);
 
 	  for (int j=lastgood+1; j<i; j++) {
-	    // Round as fractional HR is not very uselful
+	    // Round as fractional HR is not very useful
 	    ride->command->setPointValue(j, RideFile::hr, ride->dataPoints()[lastgood]->hr + round(double(j-lastgood)*deltaHR));
 	    spikes++;
 	  }

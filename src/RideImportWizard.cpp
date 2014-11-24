@@ -337,7 +337,7 @@ RideImportWizard::process()
 
     // set progress bar limits - for each file we
     // will make 5 passes over the files
-    //         1. checking it is a file ane readable
+    //         1. checking if a file is readable
     //         2. parsing it with the RideFileReader
     //         3. [optional] collect date/time information from user
     //         4. copy file into Library

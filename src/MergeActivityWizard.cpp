@@ -108,7 +108,7 @@ MergeActivityWizard::setRide(RideFile **here, RideFile *with)
 void 
 MergeActivityWizard::analyse()
 {
-    // looking at the paramters determine the offset
+    // looking at the parameters determine the offset
     // default to align left if all else fails !
     offset1 = offset2 = 0;
 

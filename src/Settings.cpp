@@ -40,5 +40,5 @@ GSettings::value(const QObject * /*me*/, const QString key, const QVariant def) 
 
 
 // initialise with no cyclist
-// as soon as a cyclist is opened it will be intialised via mainwindow
+// as soon as a cyclist is opened it will be initialised via mainwindow
 GSettings *appsettings = GetApplicationSettings();

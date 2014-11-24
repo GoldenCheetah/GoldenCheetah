@@ -515,13 +515,13 @@ PowerHist::recalcCompare()
                 double low = high - round(binw/delta);
                 if (low==0 && !withz) low++;
                 parameterValue[i] = high*delta;
-                totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
+                totalTime[i]  = 1e-9;  // nonzero to accommodate log plot
                 while (low < high && low<arrayLength) {
                     totalTime[i] += dt * (*array)[low++];
                 }
             }
 
-            totalTime[i] = 1e-9;       // nonzero to accomodate log plot
+            totalTime[i] = 1e-9;       // nonzero to accommodate log plot
             parameterValue[i] = i * delta * binw;
             totalTime[0] = 1e-9;
             parameterValue[0] = 0;
@@ -571,13 +571,13 @@ PowerHist::recalcCompare()
             labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
             labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
-            // 0.625 = golden ratio for gaps betwen group of cols
+            // 0.625 = golden ratio for gaps between group of cols
             // 0.9 = 10% space between each col in group
 
             double width = (0.625 / ncols) * 0.90f;
             double jump = acol * (0.625 / ncols);
             
-            // we're not binning instead we are prettyfing the columnar
+            // we're not binning instead we are prettyfying the columnar
             // display in much the same way as the weekly summary workds
             // Each zone column will have 4 points
             QVector<double> xaxis (array->size() * 4);
@@ -1085,16 +1085,16 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
             double low = high - round(binw/delta);
             if (low==0 && !withz) low++;
             x[i] = high*delta;
-            y[i]  = 1e-9;  // nonzero to accomodate log plot
-            sy[i] = 1e-9;  // nonzero to accomodate log plot
+            y[i]  = 1e-9;  // nonzero to accommodate log plot
+            sy[i] = 1e-9;  // nonzero to accommodate log plot
             while (low < high && low<arrayLength) {
                 if (selectedArray && (*selectedArray).size()>low)
                     sy[i] += dt * (*selectedArray)[low];
                 y[i] += dt * (*array)[low++];
             }
         }
-        y[i] = 1e-9;       // nonzero to accomodate log plot
-        sy[i] = 1e-9;       // nonzero to accomodate log plot
+        y[i] = 1e-9;       // nonzero to accommodate log plot
+        sy[i] = 1e-9;       // nonzero to accommodate log plot
         x[i] = i * delta * binw;
         y[0] = 1e-9;
         sy[0] = 1e-9;
@@ -1669,7 +1669,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         // ignore out of bounds data
         if ((int)(v)<min || (int)(v)>max) continue;
 
-        // increment value, are intitialised to zero above
+        // increment value, are inititialised to zero above
         // there will be some loss of precision due to totalising
         // a double in an int, but frankly that should be minimal
         // since most values of note are integer based anyway.
@@ -1687,7 +1687,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
     // metrics across rides!
     curveSelected->hide();
 
-    // now set all the plot paramaters to match the data
+    // now set all the plot parameters to match the data
     source = Metric;
     zoned = false;
     rideItem = NULL;

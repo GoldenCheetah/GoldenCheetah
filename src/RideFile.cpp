@@ -1317,7 +1317,7 @@ RideFile::getHeight()
         return height;
     }
 
-    // is withings upported for height?
+    // is withings supported for height?
 
     // global options
     height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT, height_default).toString().toDouble();
@@ -1779,7 +1779,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
                         }
                     }
 
-                    // lets not go backwards -- or two sampls at the same time
+                    // lets not go backwards -- or two samples at the same time
                     if ((lp && p->secs > lp->secs) || !lp) {
                         points << QPointF(p->secs - offset, p->value(series));
                         last = p->secs-offset;

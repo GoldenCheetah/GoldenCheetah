@@ -130,7 +130,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // begin LUW -- byproduct of turning off sync (nosync)
     dbaccess->connection().transaction();
 
-    // Delete statistics for non-existant ride files
+    // Delete statistics for non-existent ride files
     QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
         if (QFile(context->athlete->home->activities().canonicalPath() + "/" + d.key()).exists() == false) {

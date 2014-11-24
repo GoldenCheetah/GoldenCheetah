@@ -485,7 +485,7 @@ IntervalNavigator::eventFilter(QObject *object, QEvent *e)
     // not for the table?
     if (object != (QObject *)tableView) return false;
 
-    // what happenned?
+    // what happened?
     switch(e->type())
     {
         case QEvent::ContextMenu:
@@ -688,7 +688,7 @@ IntervalNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int old
         x -= tableView->verticalScrollBar()->width() + 0 ;
 #endif
 
-    // take the margins into accopunt top
+    // take the margins into account top
     x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
 
     // ** NOTE **
@@ -938,7 +938,7 @@ IntervalNavigator::rideTreeSelectionChanged()
     QTreeWidgetItem *which;
     if (context->athlete->rideTreeWidget()->selectedItems().count())
         which = context->athlete->rideTreeWidget()->selectedItems().first();
-    else // no rides slected
+    else // no rides selected
         which = NULL;
 
     if (which && which->type() == RIDE_TYPE) {
@@ -1035,7 +1035,7 @@ void IntervalNavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionV
     const RideMetric *m;
     QString value;
 
-    // are we a selected cell ? need to paint acordingly
+    // are we a selected cell ? need to paint accordingly
     //bool selected = false;
     //if (IntervalNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
         //if (IntervalNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
@@ -1049,7 +1049,7 @@ void IntervalNavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionV
         double metricValue = index.model()->data(index, Qt::DisplayRole).toDouble();
 
         if (metricValue) {
-            // metric / imperial converstion
+            // metric / imperial conversion
             metricValue *= (intervalNavigator->context->athlete->useMetricUnits) ? 1 : m->conversion();
             metricValue += (intervalNavigator->context->athlete->useMetricUnits) ? 0 : m->conversionSum();
 

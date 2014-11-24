@@ -467,7 +467,7 @@ AllPlotObject::setColor(QColor color)
              << smo2Curve << thbCurve << o2hbCurve << hhbCurve;
 
 
-    // work through getting progresively lighter
+    // work through getting progressively lighter
     QPen pen;
     pen.setWidth(1.0);
     int alpha = 200;
@@ -1585,7 +1585,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRTE.resize(rideTimeSecs + 1);
         objects->smoothLPS.resize(rideTimeSecs + 1);
         objects->smoothRPS.resize(rideTimeSecs + 1);
-        // do the smoothing by caculating the average of the "applysmooth" values left
+        // do the smoothing by calculating the average of the "applysmooth" values left
         // of the current data point - for points in time smaller than "applysmooth"
         // only the available datapoints left are used to build the average
         int i = 0;
@@ -2137,7 +2137,7 @@ AllPlot::refreshCalibrationMarkers()
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     QColor color = GColor(CPOWER);
-    color.setAlpha(15); // almost invisble !
+    color.setAlpha(15); // almost invisible !
 
     if (rideItem && rideItem->ride()) {
         foreach(const RideFileCalibration &calibration, rideItem->ride()->calibrations()) {
@@ -4529,7 +4529,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     // we don't have a reference plot
     referencePlot = NULL;
 
-    // bsically clear out
+    // basically clear out
     //standard->wattsArray.clear();
     //standard->curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
 
@@ -4725,7 +4725,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             // where 'high precision' time slice is an artefact
             // of double precision or slight timing anomalies
             // e.g. where realtime gives timestamps like
-            // 940.002 followed by 940.998 and were previouslt
+            // 940.002 followed by 940.998 and were previously
             // both rounded to 940s
             //
             // NOTE: this rounding mechanism is identical to that

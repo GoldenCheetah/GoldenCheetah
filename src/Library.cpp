@@ -405,7 +405,7 @@ LibrarySearchDialog::search()
             LibraryParser::serialize(context->athlete->home->root());
         }
 
-        // ok, we;ve completed a search without aborting
+        // ok, we've completed a search without aborting
         // so lets rebuild the database of workouts and videos
         // using what we found...
         updateDB();
@@ -702,7 +702,7 @@ WorkoutImportDialog::WorkoutImportDialog(Context *context, QStringList files) :
     okButton = new QPushButton(tr("OK"), this);
     okButton->setDefault(true);
 
-    // if importing workoouts..
+    // if importing workouts..
     overwrite = new QCheckBox(tr("Overwite existing files"),this);
     if (!workouts.count()) overwrite->hide();
 

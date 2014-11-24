@@ -35,7 +35,7 @@
 // the standard themes, a global object
 static Themes allThemes;
 
-// Number of confugurable metric colors + 1 for sentinel value
+// Number of configurable metric colors + 1 for sentinel value
 static Colors ColorList[CNUMOFCFGCOLORS+1], DefaultColorList[CNUMOFCFGCOLORS+1];
 
 static void copyArray(Colors source[], Colors target[])
@@ -154,7 +154,7 @@ void GCColor::setupColors()
         { "", "", QColor(0,0,0) },
     };
 
-    // set the defaults to system detaults
+    // set the defaults to system defaults
     init[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
     init[CTOOLBAR].color = QPalette().color(QPalette::Window);
 

@@ -32,7 +32,7 @@
 //
 // ENCODING
 // To encode a message 8 bytes of message data are passed and a checksum
-// is calculataed.
+// is calculated.
 //
 // Since many of the message types do not require all data to be encoded
 // there are a number of static convenience methods that take the message
@@ -681,31 +681,112 @@ ANTMessage ANTMessage::close(const unsigned char channel)
 // kickr broadcast commands, lifted largely from the Wahoo SDK example: KICKRDemo/WFAntBikePowerCodec.cs
 ANTMessage ANTMessage::kickrErgMode(const unsigned char channel, ushort usDeviceId, ushort usWatts, bool bSimSpeed)
 {
-    Q_UNUSED(channel);
-    Q_UNUSED(usDeviceId);
-    Q_UNUSED(usWatts);
-    Q_UNUSED(bSimSpeed);
-    //return ANTMessage(9, ANT_BROADCAST_DATA, channel, // broadcast
-    //       KICKR_SET_ERG_MODE, seq, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8),
-    //                                       (unsigned char)usWatts, (unsigned char)(usWatts>>8),
-    //                                       (unsigned char)(bSimSpeed) ? 1 : 0);
-    return ANTMessage(); // shutup compiler till we work it out
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_ERG_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8),
+                                           (unsigned char)usWatts, (unsigned char)(usWatts>>8),
+                                           (unsigned char)(bSimSpeed) ? 1 : 0);
+}
+
+ANTMessage ANTMessage::kickrSlopeMode(const unsigned char channel, ushort usDeviceId, ushort scale)
+{
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_RESISTANCE_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)scale, (unsigned char)(scale>>8));
+}
+
+ANTMessage ANTMessage::kickrSimMode(const unsigned char channel, ushort usDeviceId, float fWeight)
+{
+    // weight encoding
+    ushort usWeight = (ushort)(fWeight * 100.0);
+
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_SIM_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usWeight, (unsigned char)(usWeight>>8));
+}
+
+ANTMessage ANTMessage::kickrStdMode(const unsigned char channel, ushort usDeviceId, ushort eLevel)
+{
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_STANDARD_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)eLevel, (unsigned char)(eLevel>>8));
+}
+
+ANTMessage ANTMessage::kickrFtpMode(const unsigned char channel, ushort usDeviceId, ushort usFtp, ushort usPercent)
+{
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_FTP_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usFtp, (unsigned char)(usFtp>>8),
+                                    (unsigned char)usPercent, (unsigned char)(usPercent>>8));
+}
+
+ANTMessage ANTMessage::kickrRollingResistance(const unsigned char channel, ushort usDeviceId, float fCrr)
+{
+    // crr encoding
+    ushort usCrr = (ushort)(fCrr * 10000.0);
+
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_CRR, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usCrr, (unsigned char)(usCrr>>8));
+}
+
+ANTMessage ANTMessage::kickrWindResistance(const unsigned char channel, ushort usDeviceId, float fC)
+{
+    // wind resistance encoding
+    ushort usC = (ushort)(fC * 1000.0);
+
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_C, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usC, (unsigned char)(usC>>8));
 }
 
 ANTMessage ANTMessage::kickrGrade(const unsigned char channel, ushort usDeviceId, float fGrade)
 {
-    Q_UNUSED(channel);
-    Q_UNUSED(usDeviceId);
-    Q_UNUSED(fGrade);
-    //// grade encoding
-    //if (fGrade > 1) fGrade = 1;
-    //if (fGrade < -1) fGrade = -1;
 
-    //fGrade = fGrade + 1;
-    //ushort usGrade = (ushort)(fGrade * 65536 / 2);
+    // grade encoding
+    if (fGrade > 1) fGrade = 1;
+    if (fGrade < -1) fGrade = -1;
 
-    //return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
-           //KICKR_SET_GRADE, seq, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
-                                    //(unsigned char)usGrade, (unsigned char)(usGrade>>8));
-    return ANTMessage(); // shutup compiler till we work it out
+    fGrade = fGrade + 1;
+    ushort usGrade = (ushort)(fGrade * 65536 / 2);
+
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_GRADE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usGrade, (unsigned char)(usGrade>>8));
+}
+
+ANTMessage ANTMessage::kickrWindSpeed(const unsigned char channel, ushort usDeviceId, float mpsWindSpeed)
+{
+    // windspeed encoding
+    if (mpsWindSpeed > 32.768f) mpsWindSpeed = 32.768f;
+    if (mpsWindSpeed < -32.768f) mpsWindSpeed = -32.768f;
+
+    // the wind speed is transmitted in 1/1000 mps resolution.
+    mpsWindSpeed = mpsWindSpeed + 32.768f;
+    ushort usSpeed = (ushort)(mpsWindSpeed * 1000);
+
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_WIND_SPEED, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usSpeed, (unsigned char)(usSpeed>>8));
+}
+
+ANTMessage ANTMessage::kickrWheelCircumference(const unsigned char channel, ushort usDeviceId, float mmCircumference)
+{
+    // circumference encoding
+    ushort usCirc = (ushort)(mmCircumference * 10.0);
+
+    return ANTMessage(7, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_SET_WHEEL_CIRCUMFERENCE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8), // preamble
+                                    (unsigned char)usCirc, (unsigned char)(usCirc>>8));
+}
+
+ANTMessage ANTMessage::kickrReadMode(const unsigned char channel, ushort usDeviceId)
+{
+    return ANTMessage(5, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_INIT_SPINDOWN, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8)); // preamble
+}
+
+ANTMessage ANTMessage::kickrInitSpindown(const unsigned char channel, ushort usDeviceId)
+{
+    return ANTMessage(5, ANT_BROADCAST_DATA, channel, // broadcast
+           KICKR_READ_MODE, (unsigned char)usDeviceId, (unsigned char)(usDeviceId>>8)); // preamble
 }

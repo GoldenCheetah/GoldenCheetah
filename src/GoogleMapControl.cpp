@@ -373,7 +373,7 @@ GoogleMapControl::drawShadedRoute()
 }
 
 //
-// Static helper - havervine formaula for calculating the distance
+// Static helper - havervine formula for calculating the distance
 //                 between 2 geo co-ordinates
 //
 static const double DEG_TO_RAD = 0.017453292519943295769236907684886;

@@ -259,7 +259,7 @@ icalcomponent *createEvent(RideItem *rideItem)
     icalcomponent_set_description(event, rideItem->ride()->getTag("Calendar Text", "").toLatin1());
 
     // attach ridefile
-    // google doesn't suport attachments yet. There is a labs option to use google docs
+    // google doesn't support attachments yet. There is a labs option to use google docs
     // but it is only available to Google Apps customers.
 
     // put the event into root

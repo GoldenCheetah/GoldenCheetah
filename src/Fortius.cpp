@@ -34,7 +34,7 @@
 // 10            Calibration Value - Lo Byte
 // 11            Calibration High - Hi Byte
 
-// Encoded Calibration is 130 x Callibration Value + 1040 so calibration of zero gives 0x0410
+// Encoded Calibration is 130 x Calibration Value + 1040 so calibration of zero gives 0x0410
 
 const static uint8_t ergo_command[12] = {
      // 0     1     2     3     4     5     6     7    8      9     10    11
@@ -333,7 +333,7 @@ void Fortius::run()
     int curButtons;                       // Button status
     int curSteering;                    // Angle of steering controller
     // UNUSED int curStatus;
-    uint8_t pedalSensor;                // 1 when using is cycling else 0, fed back to brake although appears unecessary
+    uint8_t pedalSensor;                // 1 when using is cycling else 0, fed back to brake although appears unnecessary
 
     // we need to average out power for the last second
     // since we get updates every 10ms (100hz)
@@ -551,8 +551,8 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     }
     else if (mode == FT_CALIBRATE)
     {
-        // Not yet implemented, easy enough to start callibration but appears that the callibration factor needs
-        // to be calculated by observing the brake power and speed after callibratio starts (i.e. it's not returned
+        // Not yet implemented, easy enough to start calibration but appears that the calibration factor needs
+        // to be calculated by observing the brake power and speed after calibration starts (i.e. it's not returned
         // by the brake).
     }
     

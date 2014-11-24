@@ -38,7 +38,7 @@ VideoWindow::VideoWindow(Context *context)  :
 #warning "WARNING: Please ensure the VLC QT4 plugin (gui/libqt4_plugin) is NOT available as it will cause GC to crash."
 #endif
 
-    // config paramaters to libvlc
+    // config parameters to libvlc
     const char * const vlc_args[] = {
                     "-I", "dummy", /* Don't use any interface */
                     "--ignore-config", /* Don't use VLC's config */

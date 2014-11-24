@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Darren Hague & Eric Brandt
- *               Modified to suport Linux and OSX by Mark Liversedge
+ *               Modified to support Linux and OSX by Mark Liversedge
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
