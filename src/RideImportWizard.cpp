@@ -522,7 +522,7 @@ RideImportWizard::process()
 
                    } else {
 
-                       // Cool, the date and time was extrcted from the source file
+                       // Cool, the date and time was extracted from the source file
                        blanks[i] = false;
                        tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
                        tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
@@ -607,7 +607,7 @@ RideImportWizard::process()
 
    if (needdates == 0) {
       // no need to wait for the user to input dates
-      // nd press save if all the dates are set
+      // and press save if all the dates are set
       // (i.e. they got set by the file importers already)
       // do nothing for now since we need to confirm dates
       // and confirm overwrite files rather than importing

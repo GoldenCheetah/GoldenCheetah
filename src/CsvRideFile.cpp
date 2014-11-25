@@ -344,7 +344,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 } else if (moxy)  {
 
                     // we get crappy lines with no data so ignore them
-                    // I think they're supposed to be delimeters for the file
+                    // I think they're supposed to be delimiters for the file
                     // content, but are just noise to us !
                     if (line == (" ,,,,,") || line == ",,,,," ||
                         line == "" || line == " ") continue;

@@ -150,7 +150,6 @@ void GoogleMapControl::createHtml()
     }
 
     // No GPS data, so sorry no map
-    // No GPS data, so sorry no map
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
     if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {

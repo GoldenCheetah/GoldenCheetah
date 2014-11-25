@@ -201,7 +201,7 @@ MoxyDevice::download( const QDir &tmpdir,
             updateProgress(QString(tr("Downloading ... [%1 bytes]")).arg(count));
             vbuf[bytes] = '\0';
 
-            // ignore 'delimeters' (they're just noise)
+            // ignore 'delimiters' (they're just noise)
             if (QString(vbuf) == " ,,,,," || QString(vbuf) == ",,,,,") continue;
 
             // get data
