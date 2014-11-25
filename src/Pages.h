@@ -255,6 +255,9 @@ class DevicePage : public QWidget
 
         QList<DeviceType> devices;
 
+        QLineEdit *pcfedit;
+        QLineEdit *poffedit;
+
         QPushButton *addButton;
         QPushButton *delButton;
 

@@ -215,6 +215,8 @@
 #define GC_TM_METRIC              "tm/metric"
 
 #define FORTIUS_FIRMWARE          "fortius/firmware"
+#define GC_POWER_CORRECTION_FACTOR "train/powercf"
+#define GC_POWER_OFFSET           "train/poweroff"
 #define TRAIN_MULTI               "train/multi"
 
 // batch export last options

@@ -46,6 +46,13 @@ ANTlocalController::setDevice(QString device)
 int
 ANTlocalController::start()
 {
+    double pcf = appsettings->value(this, GC_POWER_CORRECTION_FACTOR).toDouble();
+    RealtimeController::setPowerCorrectionFactor(pcf);
+    double poff = appsettings->value(this, GC_POWER_OFFSET).toDouble();
+    RealtimeController::setPowerOffset(poff);
+
+    qDebug("Set realtime power correction factor of %f and power offset of %f", pcf, poff);
+
     logger.open();
     myANTlocal->start();
     myANTlocal->setup();
