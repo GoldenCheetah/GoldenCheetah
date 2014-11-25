@@ -72,9 +72,24 @@ RideItem::setRide(RideFile *overwrite)
 {
     RideFile *old = ride_;
     ride_ = overwrite; // overwrite
+
+    // connect up to new one
+    connect(ride_, SIGNAL(modified()), this, SLOT(modified()));
+    connect(ride_, SIGNAL(saved()), this, SLOT(saved()));
+    connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
+
+    // don't bother with the old one any more
+    disconnect(old);
+
+    // update status
     setDirty(true);
     notifyRideDataChanged();
-    delete old; // now wipe it once referrers had chance to change
+
+    //XXX SORRY ! memory leak XXX
+    //XXX delete old; // now wipe it once referrers had chance to change
+    //XXX this is only used by MergeActivityWizard and causes issues
+    //XXX because the data is accessed in separate threads (Wizard is a dialog)
+    //XXX because it is such an edge case (Merge) we will leave it for now
 }
 
 void

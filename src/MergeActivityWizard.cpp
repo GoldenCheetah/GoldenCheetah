@@ -1165,9 +1165,8 @@ MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), w
 
     QLabel *label = new QLabel(tr("Press Finish to update the current ride with "
                                " the combined data.\n\n"
-                               "The changes will not be saved until you save them "
-                               " so you can check and revert or save.\n\n"
-                               "If you continue the ride will be updated, if you "
+                               "The changes will be saved and cannot be undone.\n\n"
+                               "If you press continue the ride will be saved, if you "
                                "do not want to continue either go back and change "
                                "the settings or press cancel to abort."));
     label->setWordWrap(true);
@@ -1179,9 +1178,10 @@ MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), w
 bool
 MergeConfirm::validatePage()
 {
-    // We are done -- update BUT DOESNT SAVE
-    //                user can now check !
+    // We are done -- save and mark done
     wizard->current->setRide(wizard->combined);
-    wizard->context->notifyRideDirty();
+    wizard->context->mainWindow->saveSilent(wizard->context, wizard->current);
+    wizard->current->setDirty(false); // lose changes
+
     return true;
 }
