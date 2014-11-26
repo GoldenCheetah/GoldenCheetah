@@ -174,9 +174,13 @@ public class RideService extends Service
                 fileName
             );
             
+            
             try {
                 dir.mkdirs();
                 file.createNewFile();
+                file.setReadable(true);
+                file.setWritable(true);
+                
                 OutputStream bufWriter = new BufferedOutputStream(new FileOutputStream(file));
                 buf = new GzipWriter(bufWriter);
                 
