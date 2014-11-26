@@ -565,7 +565,13 @@ Athlete::importFilesWhenOpeningAthlete() {
     if (autoImportConfig->hasRules()) {
 
         RideImportWizard *import = new RideImportWizard(autoImportConfig, context);
-        import->process();
+
+        // only process the popup if we have any files available at all
+        if ( import->getNumberOfFiles() > 0) {
+           import->process();
+        } else {
+           delete import;
+        }
     }
 }
 
