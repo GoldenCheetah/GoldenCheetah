@@ -239,8 +239,8 @@ public class RideService extends Service
         NotificationCompat.Builder mBuilder = new NotificationCompat
             .Builder(this)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setContentTitle("Ride On")
-            .setContentText("Building ride: " + fileName + " Click to stop ride.")
+            .setContentTitle(getString(R.string.ride_on))
+            .setContentText(getString(R.string.building_ride) + fileName +  getString(R.string.click_to_stop))
             .setProgress(0, 0, true)
             .setContentIntent(
                 TaskStackBuilder

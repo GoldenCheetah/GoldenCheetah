@@ -62,8 +62,8 @@ public class StartActivity extends FragmentActivity
                 @Override
                 public void run() {
                     promptDialogCheckBox(
-                        "Update Emergency Contact", 
-                        "Should a text messesage be sent on ride start and every 10 min. to your emergency contact?",
+                        getString(R.string.emergency_contact_dialog_title), 
+                        getString(R.string.emergency_contact_dialog_note),
                         PHONE_HOME,
                         setupAntRunnable
                     );
@@ -74,8 +74,8 @@ public class StartActivity extends FragmentActivity
                 @Override
                 public void run() {
                     promptDialogCheckBox(
-                        "Crash Detection", 
-                        "Should a text messesage be sent on crash detction to your emergency contact?",
+                        getString(R.string.crash_detection_dialog_title), 
+                        getString(R.string.crash_detection_dialog_note),
                         DETECT_CRASH,
                         setupPhoneHomeRunnable
                     );
@@ -86,8 +86,8 @@ public class StartActivity extends FragmentActivity
                 @Override
                 public void run() {
                     promptDialogInput(
-                        "Emergency Contact", 
-                        "Emergency phone number to update position on crash detection",
+                        getString(R.string.emergency_contact_number_dialog_title), 
+                        getString(R.string.emergency_contact_number_dialog_note),
                         EMERGENCY_NUMBER,
                         setupDetectCrashRunnable
                     );
@@ -95,8 +95,8 @@ public class StartActivity extends FragmentActivity
             };
             
             promptDialogInput(
-                "Chose Rider Name", 
-                "What is your Golder Cheata Rider Name",
+                getString(R.string.gc_rider_name_dialog_title), 
+                getString(R.string.gc_rider_name_dialog_note),
                 RIDER_NAME,
                 setupEmergencyContactRunnable
             );
@@ -216,7 +216,7 @@ public class StartActivity extends FragmentActivity
               OnClickListener positiveClick,
               String          positiveLabel
     ) {
-        if(positiveLabel == null) positiveLabel = "Next";
+        if(positiveLabel == null) positiveLabel = getString(R.string.save_setting_button);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -280,7 +280,7 @@ public class StartActivity extends FragmentActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         
         // Set the dialog title
-        builder.setTitle("Select Paired Ant Devices")
+        builder.setTitle(getString(R.string.ant_pair_dialog_title))
             // Specify the list array, the items to be selected by default (null for none),
             // and the listener through which to receive callbacks when items are selected
            .setMultiChoiceItems(foundDevicesCharSeq, null, new DialogInterface.OnMultiChoiceClickListener() {
@@ -296,7 +296,7 @@ public class StartActivity extends FragmentActivity
                }
            })
            // Set the action buttons
-           .setPositiveButton("Pair", new DialogInterface.OnClickListener() {
+           .setPositiveButton(getString(R.string.save_setting_button), new DialogInterface.OnClickListener() {
                @Override
                public void onClick(DialogInterface dialog, int id) {
                    ArrayList<String> ids = new ArrayList<String>();
@@ -327,7 +327,7 @@ public class StartActivity extends FragmentActivity
      * stop ride and clean up references 
      */
     private void stopRide() {
-        Toast toast = Toast.makeText(getApplicationContext(), "Stoping Ride!", Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.stopping_ride), Toast.LENGTH_LONG);
         toast.show();
         this.stopService(rsi);
     }
@@ -352,7 +352,7 @@ public class StartActivity extends FragmentActivity
         if(!isServiceRunning(RideService.class)) {
             this.startService(rsi);
         }
-        Toast toast = Toast.makeText(getApplicationContext(), "Starting Ride!", Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.starting_ride), Toast.LENGTH_LONG);
         toast.show();
     }
     

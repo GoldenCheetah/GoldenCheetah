@@ -3,4 +3,31 @@
 <resources>
     <string name="app_name">Ride Logger</string>
     <string name="service_name">Logging Ride</string>
+    
+    <string name="emergency_contact_dialog_title">Emergency Contact</string>
+    <string name="emergency_contact_dialog_note">Should a text messesage be sent on ride start and every 10 min. to your emergency contact?</string>
+
+    <string name="crash_detection_dialog_title">Crash Detection</string>
+    <string name="crash_detection_dialog_note">Should a text messesage be sent on crash detction to your emergency contact?</string>
+    
+    
+    <string name="emergency_contact_number_dialog_title">Emergency Contact Number</string>
+    <string name="emergency_contact_number_dialog_note">Emergency phone number to update position on crash detection</string>
+    
+    
+    <string name="ant_pair_dialog_title">Emergency Contact Number</string>
+    <string name="ant_pair_dialog_note">Emergency phone number to update position on crash detection.</string>
+  
+    <string name="gc_rider_name_dialog_title">Enter Rider Name</string>
+    <string name="gc_rider_name_dialog_note">What is your Golder Cheata Rider Name?</string>
+  
+    <string name="save_setting_button">Next</string>
+    
+    <string name="starting_ride">Starting Ride!</string>
+    <string name="stopping_ride">Stoping Ride!</string>
+    
+    <string name="ride_on">Ride On</string>
+    <string name="building_ride">Building ride: </string>
+    
+    <string name="click_to_stop"> Click to stop ride.</string>
 </resources>
