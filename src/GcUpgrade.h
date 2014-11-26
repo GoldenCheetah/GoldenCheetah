@@ -74,6 +74,7 @@ class GcUpgradeLogDialog : public QDialog
 
     public slots:
         void saveAs();
+        void linkClickedSlot( QUrl );
 
     private:
         QWebView *report;
