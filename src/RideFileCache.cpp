@@ -1330,7 +1330,6 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         int offset = lvalue - min;
         if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
     }
-if (series == RideFile::smo2) qDebug()<<"smo2 array="<<array;
 }
 
 //
