@@ -606,6 +606,10 @@ GcUpgrade::upgradeLate(Context *context)
                                           "will be done again each time you open the athlete, until the conversion was "
                                           "successful - and had no more errors.</center>")),2);
 
+            upgradeLog->append(QString(tr("<center><br>Latest information about possible upgrade problems and concepts to resolve them are available in the<br>"
+                                         "<a href= \"https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide\" target=\"_blank\">"
+                                         "Upgrade v3.11 Troubleshooting Guide<a>")),1);
+
             // document that upgrade failed at least one time
             appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false);
 
@@ -809,7 +813,10 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
     report->setContentsMargins(0,0,0,0);
     report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    report->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    report->setContextMenuPolicy(Qt::NoContextMenu);
     report->setAcceptDrops(false);
+    connect( report, SIGNAL( linkClicked( QUrl ) ), this, SLOT( linkClickedSlot( QUrl ) ) );
 
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     report->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
@@ -860,6 +867,13 @@ GcUpgradeLogDialog::saveAs()
 
     }
     file.close();
+}
+
+void
+GcUpgradeLogDialog::linkClickedSlot( QUrl url )
+{
+    QDesktopServices::openUrl( url );
+
 }
 
 
