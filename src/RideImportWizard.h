@@ -48,6 +48,7 @@ public:
     RideImportWizard(RideAutoImportConfig *dirs, Context *context, QWidget *parent = 0);
 
     ~RideImportWizard();
+    int getNumberOfFiles();  // get the number of files selected for processing
     int process();
 
 signals:
@@ -62,6 +63,7 @@ private slots:
 private:
     void init(QList<QString> files, Context *context);
     QList <QString> filenames; // list of filenames passed
+    int numberOfFiles; // number of files to be processed
     QList <bool> blanks; // record of which have a RideFileReader returned date & time
     QDir homeImports; // target directory for source files
     QDir homeActivities; // target directory for .JSON
