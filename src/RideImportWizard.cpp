@@ -154,6 +154,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     directoryWidget->setColumnWidth(2, 250);
 
     init(files, context);
+
 }
 
 
@@ -325,15 +326,22 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     if (autoImportMode) directoryWidget->adjustSize();
     tableWidget->adjustSize();
 
-    // Refresh prior to running down the list & processing...
-    if (!isActiveWindow()) activateWindow();
-    this->show();
+    // set number of files / so that a caller of the constructor can decide what to do
+    numberOfFiles = files.count();
+}
 
+int
+RideImportWizard::getNumberOfFiles() {
+    return numberOfFiles;
 }
 
 int
 RideImportWizard::process()
 {
+
+    // Make visible and put in front prior to running down the list & processing...
+    if (!isActiveWindow()) activateWindow();
+    this->show();
 
     // set progress bar limits - for each file we
     // will make 5 passes over the files
