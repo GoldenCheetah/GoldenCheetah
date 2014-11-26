@@ -400,6 +400,13 @@ RideSummaryWindow::htmlSummary()
         maximumColumn << "max_temp";
     }
 
+    // if o2 data is available show the average and max
+    if ((ridesummary && ride->areDataPresent()->smo2) || 
+       (!ridesummary && SummaryMetrics::getAggregated(context, "average_smo2", data, QStringList(), false, true) != "-")) {
+        averageColumn << "average_smo2";
+        maximumColumn << "max_smo2";
+    }
+
     // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
