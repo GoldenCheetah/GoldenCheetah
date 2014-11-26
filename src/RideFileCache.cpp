@@ -66,6 +66,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     npDistribution.resize(0);
     wattsKgDistribution.resize(0);
     aPowerDistribution.resize(0);
+    smo2Distribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -205,6 +206,7 @@ static long offsetForTiz(RideFileCacheHeader head, RideFile::SeriesType series)
     offset += head.npDistCount * sizeof(float);
     offset += head.wattsKgDistCount * sizeof(float);
     offset += head.aPowerDistCount * sizeof(float);
+    offset += head.smo2DistCount * sizeof(float);
 
     // tiz ist currently just for RideFile:watts, RideFile:hr and RideFile:kph series.
     // watts is first - so move on with offset only for 'hr' and 'kph'
@@ -376,6 +378,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     npDistribution.resize(0);
     wattsKgDistribution.resize(0);
     aPowerDistribution.resize(0);
+    smo2Distribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -418,6 +421,7 @@ RideFileCache::RideFileCache(RideFile *ride) :
     doubleArrayForDistribution(npDistributionDouble, npDistribution);
     doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
     doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
+    doubleArrayForDistribution(smo2DistributionDouble, smo2Distribution);
 }
 
 int
@@ -449,6 +453,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::vam : return 0; break;
         case RideFile::wattsKg : return 2; break;
         case RideFile::aPower : return 0; break;
+        case RideFile::smo2 : return 0; break;
         case RideFile::lrbalance : return 1; break;
         case RideFile::wprime :  return 0; break;
         case RideFile::none : break;
@@ -637,6 +642,10 @@ RideFileCache::distributionArray(RideFile::SeriesType series)
             return aPowerDistributionDouble;
             break;
 
+        case RideFile::smo2:
+            return smo2DistributionDouble;
+            break;
+
         case RideFile::wattsKg:
             return wattsKgDistributionDouble;
             break;
@@ -748,6 +757,7 @@ void RideFileCache::RideFileCache::compute()
     computeDistribution(kphDistribution, RideFile::kph);
     computeDistribution(wattsKgDistribution, RideFile::wattsKg);
     computeDistribution(aPowerDistribution, RideFile::aPower);
+    computeDistribution(smo2Distribution, RideFile::smo2);
 
     // wait for them threads
     thread1.wait();
@@ -1320,6 +1330,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         int offset = lvalue - min;
         if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
     }
+if (series == RideFile::smo2) qDebug()<<"smo2 array="<<array;
 }
 
 //
@@ -1400,6 +1411,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     npDistribution.resize(0);
     wattsKgDistribution.resize(0);
     aPowerDistribution.resize(0);
+    smo2Distribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -1454,6 +1466,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             distAggregate(npDistributionDouble, rideCache.npDistributionDouble);
             distAggregate(wattsKgDistributionDouble, rideCache.wattsKgDistributionDouble);
             distAggregate(aPowerDistributionDouble, rideCache.aPowerDistributionDouble);
+            distAggregate(smo2DistributionDouble, rideCache.smo2DistributionDouble);
 
             // cumulate timeinzones
             for (int i=0; i<10; i++) {
@@ -1562,6 +1575,7 @@ RideFileCache::serialize(QDataStream *out)
     head.kphDistCount = kphDistribution.size();
     head.wattsKgDistCount = wattsKgDistribution.size();
     head.aPowerDistCount = aPowerDistribution.size();
+    head.smo2DistCount = smo2Distribution.size();
 
     out->writeRawData((const char *) &head, sizeof(head));
 
@@ -1593,6 +1607,7 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) npDistribution.data(), sizeof(float) * npDistribution.size());
     out->writeRawData((const char *) wattsKgDistribution.data(), sizeof(float) * wattsKgDistribution.size());
     out->writeRawData((const char *) aPowerDistribution.data(), sizeof(float) * aPowerDistribution.size());
+    out->writeRawData((const char *) smo2Distribution.data(), sizeof(float) * smo2Distribution.size());
 
     // time in zone
     out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(float) * wattsTimeInZone.size());
@@ -1641,6 +1656,7 @@ RideFileCache::readCache()
         npDistribution.resize(head.npDistCount);
         wattsKgDistribution.resize(head.wattsKgDistCount);
         aPowerDistribution.resize(head.aPowerDistCount);
+        smo2Distribution.resize(head.smo2DistCount);
 
         // read in the arrays
         inFile.readRawData((char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
@@ -1671,6 +1687,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) npDistribution.data(), sizeof(float) * npDistribution.size());
         inFile.readRawData((char *) wattsKgDistribution.data(), sizeof(float) * wattsKgDistribution.size());
         inFile.readRawData((char *) aPowerDistribution.data(), sizeof(float) * aPowerDistribution.size());
+        inFile.readRawData((char *) smo2Distribution.data(), sizeof(float) * smo2Distribution.size());
 
         // time in zone
         inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(float) * 10);
@@ -1707,6 +1724,7 @@ RideFileCache::readCache()
         doubleArrayForDistribution(npDistributionDouble, npDistribution);
         doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
         doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
+        doubleArrayForDistribution(smo2DistributionDouble, smo2Distribution);
 
         cacheFile.close();
     }

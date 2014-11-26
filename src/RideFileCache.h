@@ -40,7 +40,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 20;
+static const unsigned int RideFileCacheVersion = 21;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -62,6 +62,7 @@ static const unsigned int RideFileCacheVersion = 20;
 // 18       19-Oct-14    Added gearRatio distribution
 // 19       11-Nov-14    Added Pace Zones distribution
 // 20       17-Nov-14    Added Polarized Zones for HR and Pace
+// 21       27-Nov-14    Added SmO2 distribution 
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -102,7 +103,8 @@ struct RideFileCacheHeader {
                  xPowerDistCount,
                  npDistCount,
                  wattsKgDistCount,
-                 aPowerDistCount;
+                 aPowerDistCount,
+                 smo2DistCount;
 
     int LTHR, // used to calculate Time in Zone (TIZ)
         CP;   // used to calculate Time in Zone (TIZ)
@@ -298,6 +300,7 @@ class RideFileCache
         QVector<float> npDistribution; // RideFile::kph
         QVector<float> wattsKgDistribution; // RideFile::wattsKg
         QVector<float> aPowerDistribution; // RideFile::aPower
+        QVector<float> smo2Distribution; // RideFile::smo2
 
         QVector<double> wattsDistributionDouble; // RideFile::watts
         QVector<double> hrDistributionDouble; // RideFile::hr
@@ -309,6 +312,7 @@ class RideFileCache
         QVector<double> npDistributionDouble; // RideFile::np
         QVector<double> wattsKgDistributionDouble; // RideFile::wattsKg
         QVector<double> aPowerDistributionDouble; // RideFile::aPower
+        QVector<double> smo2DistributionDouble; // RideFile::aPower
 
 
         QVector<float> wattsTimeInZone;   // time in zone in seconds
