@@ -161,6 +161,10 @@ PowerHist::configChanged()
             pen.setColor(GColor(CCADENCE).darker(200));
             brush_color = GColor(CCADENCE);
             break;
+        case RideFile::smo2:
+            pen.setColor(GColor(CSMO2).darker(200));
+            brush_color = GColor(CSMO2);
+            break;
         case RideFile::gear:
             pen.setColor(GColor(CGEAR).darker(200));
             brush_color = GColor(CGEAR);
@@ -477,6 +481,11 @@ PowerHist::recalcCompare()
                 arrayLength = cid.paceZoneArray.size();
 
             }
+
+        } else if (series == RideFile::smo2) {
+
+            array = &cid.smo2Array;
+            arrayLength = cid.smo2Array.size();
 
         } else if (series == RideFile::gear) {
 
@@ -1053,6 +1062,11 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
             selectedArray = &standard.paceZoneSelectedArray;
         }
 
+    } else if (series == RideFile::smo2) {
+        array = &standard.smo2Array;
+        arrayLength = standard.smo2Array.size();
+        selectedArray = &standard.smo2SelectedArray;
+
     } else if (series == RideFile::gear) {
         array = &standard.gearArray;
         arrayLength = standard.gearArray.size();
@@ -1255,6 +1269,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.paceZoneArray.resize(10);
     standard.paceCPZoneArray.resize(3);
     standard.gearArray.resize(0);
+    standard.smo2Array.resize(0);
     standard.cadArray.resize(0);
 
     // we do not use the selected array since it is
@@ -1269,6 +1284,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
     standard.gearSelectedArray.resize(0);
+    standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
 
     longFromDouble(standard.wattsArray, cache->distributionArray(RideFile::watts));
@@ -1278,6 +1294,7 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(standard.nmArray, cache->distributionArray(RideFile::nm));
     longFromDouble(standard.cadArray, cache->distributionArray(RideFile::cad));
     longFromDouble(standard.gearArray, cache->distributionArray(RideFile::gear));
+    longFromDouble(standard.smo2Array, cache->distributionArray(RideFile::smo2));
     longFromDouble(standard.kphArray, cache->distributionArray(RideFile::kph));
 
     if (!context->athlete->useMetricUnits) {
@@ -1397,6 +1414,7 @@ PowerHist::setDataFromCompare()
         add.paceZoneArray.resize(10);
         add.paceCPZoneArray.resize(3);
         add.gearArray.resize(0);
+        add.smo2Array.resize(0);
         add.cadArray.resize(0);
 
         longFromDouble(add.wattsArray, s->distributionArray(RideFile::watts));
@@ -1405,6 +1423,7 @@ PowerHist::setDataFromCompare()
         longFromDouble(add.hrArray, s->distributionArray(RideFile::hr));
         longFromDouble(add.nmArray, s->distributionArray(RideFile::nm));
         longFromDouble(add.gearArray, s->distributionArray(RideFile::gear));
+        longFromDouble(add.smo2Array, s->distributionArray(RideFile::smo2));
         longFromDouble(add.cadArray, s->distributionArray(RideFile::cad));
         longFromDouble(add.kphArray, s->distributionArray(RideFile::kph));
 
@@ -1746,6 +1765,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                    (series == RideFile::nm && ride->areDataPresent()->nm) ||
                    (series == RideFile::kph && ride->areDataPresent()->kph) ||
                    (series == RideFile::gear && ride->areDataPresent()->gear) ||
+                   (series == RideFile::smo2 && ride->areDataPresent()->smo2) ||
                    (series == RideFile::cad && ride->areDataPresent()->cad) ||
                    (series == RideFile::aPower && ride->areDataPresent()->apower) ||
                    (series == RideFile::hr && ride->areDataPresent()->hr);
@@ -1781,6 +1801,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     static const double kphDelta   = 0.1;
     static const double cadDelta   = 1.0;
     static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals section
+    static const double smo2Delta  = 1;
     static const int maxSize = 4096;
 
     // recording interval in minutes
@@ -1799,6 +1820,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.paceZoneArray.resize(0);
     standard.paceCPZoneArray.resize(0);
     standard.gearArray.resize(0);
+    standard.smo2Array.resize(0);
     standard.cadArray.resize(0);
 
     standard.wattsSelectedArray.resize(0);
@@ -1810,6 +1832,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
     standard.gearSelectedArray.resize(0);
+    standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
 
     // unit conversion factor for imperial units for selected parameters
@@ -2020,6 +2043,19 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
             }
         }
 
+        int smo2Index = int(floor(p1->smo2 / smo2Delta));
+        if (smo2Index >= 0 && smo2Index < maxSize) {
+            if (smo2Index >= standard.smo2Array.size())
+                standard.smo2Array.resize(smo2Index + 1);
+            standard.smo2Array[smo2Index]++;
+
+            if (selected) {
+                if (smo2Index >= standard.smo2SelectedArray.size())
+                    standard.smo2SelectedArray.resize(smo2Index + 1);
+                standard.smo2SelectedArray[smo2Index]++;
+            }
+        }
+
         int gearIndex = int(floor(p1->gear / gearDelta));
         if (gearIndex >= 0 && gearIndex < maxSize) {
             if (gearIndex >= standard.gearArray.size())
@@ -2151,6 +2187,10 @@ PowerHist::setParameterAxisTitle()
 
         case RideFile::gear:
             axislabel = tr("Gear Ratio");
+            break;
+
+        case RideFile::smo2:
+            axislabel = tr("SmO2");
             break;
 
         default:

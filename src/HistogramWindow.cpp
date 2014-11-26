@@ -835,7 +835,8 @@ void HistogramWindow::addSeries()
                << RideFile::cad
                << RideFile::nm
                << RideFile::aPower
-               << RideFile::gear;
+               << RideFile::gear
+               << RideFile::smo2;
 
     foreach (RideFile::SeriesType x, seriesList) 
         seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));

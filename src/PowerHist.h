@@ -100,7 +100,7 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
                               wattsCPZoneArray, wattsKgArray, nmArray,
                               hrArray, hrZoneArray, hrCPZoneArray,
                               kphArray, paceZoneArray, paceCPZoneArray,
-                              cadArray, gearArray, metricArray;
+                              cadArray, gearArray, smo2Array, metricArray;
 
         // storage for data counts in interval selected
         QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray,
@@ -108,7 +108,7 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
                               wattsKgSelectedArray, nmSelectedArray,
                               hrSelectedArray, hrZoneSelectedArray, hrCPZoneSelectedArray,
                               kphSelectedArray, paceZoneSelectedArray, paceCPZoneSelectedArray,
-                              cadSelectedArray, gearSelectedArray;
+                              cadSelectedArray, smo2SelectedArray, gearSelectedArray;
 };
 
 class PowerHist : public QwtPlot

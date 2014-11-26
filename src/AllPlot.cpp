@@ -3480,7 +3480,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         if (scope == RideFile::wprime) sd->setFactor(0.001f); // Kj
         if (scope == RideFile::thb || scope == RideFile::smo2 
             || scope == RideFile::o2hb || scope == RideFile::hhb) // Hb
-            sd->setDecimals(1);
+            sd->setDecimals(2);
 
         setAxisScaleDraw(QwtPlot::yLeft, sd);
 
