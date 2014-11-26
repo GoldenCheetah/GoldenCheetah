@@ -1002,7 +1002,7 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     	powerCorrectionFactor.setValue(1.0);  // default is 1.0, i.e. no scaling correction
 
     QLabel *pcflabel = new QLabel(tr("vPower correction factor (1.0 = no correction):"));
-    pcfedit = new QLineEdit(QString::number(powerCorrectionFactor.toFloat(), 'e', 3),this);
+    pcfedit = new QLineEdit(QString::number(powerCorrectionFactor.toFloat(), 'f', 3),this);
 
     // Power offset  GC_POWER_OFFSET
     QVariant powerOffset = appsettings->value(this, GC_POWER_OFFSET);
