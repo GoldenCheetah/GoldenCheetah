@@ -26,9 +26,6 @@
 #include <algorithm> // for std::sort
 #include "math.h"
 
-enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy};
-typedef enum csvtypes CsvType;
-
 static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "csv","Comma-Separated Values", new CsvFileReader());
@@ -77,7 +74,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     // Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID
     // Minutes, Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID
     // Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)
-    QRegExp powertapCSV("Minutes,[ ]?Torq \\(N-m\\),Km/h,Watts,Km,Cadence,Hrate,ID", Qt::CaseInsensitive);
+    QRegExp powertapCSV("Minutes,[ ]?Torq \\(N-m\\),(Km/h|MPH),Watts,(Km|Miles),Cadence,Hrate,ID", Qt::CaseInsensitive);
 
     // TODO: a more robust regex for ergomo files
     // i don't have an example with english headers
@@ -662,37 +659,99 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) const
     // Use the column headers that make WKO+ happy.
     double convertUnit;
     QTextStream out(&file);
-    if (!bIsMetric)
-    {
-        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID,Altitude (feet)\n";
-        convertUnit = MILES_PER_KM;
-    }
-    else {
-        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
-        convertUnit = 1.0;
-    }
 
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
-        if (point->secs == 0.0)
-            continue;
-        out << point->secs/60.0;
-        out << ",";
-        out << ((point->nm >= 0) ? point->nm : 0.0);
-        out << ",";
-        out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
-        out << ",";
-        out << ((point->watts >= 0) ? point->watts : 0.0);
-        out << ",";
-        out << point->km * convertUnit;
-        out << ",";
-        out << point->cad;
-        out << ",";
-        out << point->hr;
-        out << ",";
-        out << point->interval;
-        out << ",";
-        out << point->alt;
-        out << "\n";
+    CsvType format = powertap;
+
+    if (format == gc) {
+        // CSV File header
+        out << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->secs == 0.0)
+                continue;
+            out << point->secs;
+            out << ",";
+            out << point->cad;
+            out << ",";
+            out << point->hr;
+            out << ",";
+            out << point->km;
+            out << ",";
+            out << ((point->kph >= 0) ? point->kph : 0.0);
+            out << ",";
+            out << ((point->nm >= 0) ? point->nm : 0.0);
+            out << ",";
+            out << ((point->watts >= 0) ? point->watts : 0.0);
+            out << ",";
+            out << point->alt;
+            out << ",";
+            out << point->lon;
+            out << ",";
+            out << point->lat;
+            out << ",";
+            out << point->headwind;
+            out << ",";
+            out << point->slope;
+            out << ",";
+            out << point->temp;
+            out << ",";
+            out << point->interval;
+            out << ",";
+            out << point->lrbalance;
+            out << ",";
+            out << point->lte;
+            out << ",";
+            out << point->rte;
+            out << ",";
+            out << point->lps;
+            out << ",";
+            out << point->rps;
+            out << ",";
+            out << point->smo2;
+            out << ",";
+            out << point->thb;
+            out << ",";
+            out << point->o2hb;
+            out << ",";
+            out << point->hhb;
+
+            out << "\n";
+        }
+    }
+    else if (format == powertap) {
+        if (!bIsMetric)
+        {
+            out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID,Altitude (feet)\n";
+            convertUnit = MILES_PER_KM;
+        }
+        else {
+            out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
+            convertUnit = 1.0;
+        }
+
+
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->secs == 0.0)
+                continue;
+            out << point->secs/60.0;
+            out << ",";
+            out << ((point->nm >= 0) ? point->nm : 0.0);
+            out << ",";
+            out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
+            out << ",";
+            out << ((point->watts >= 0) ? point->watts : 0.0);
+            out << ",";
+            out << point->km * convertUnit;
+            out << ",";
+            out << point->cad;
+            out << ",";
+            out << point->hr;
+            out << ",";
+            out << point->interval;
+            out << ",";
+            out << point->alt;
+            out << "\n";
+        }
     }
 
     file.close();
