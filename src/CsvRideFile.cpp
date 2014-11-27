@@ -136,6 +136,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int iBikeInterval = 0;
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
+
+    int secsIndex, minutesIndex = -1;
+
     while (!is.atEnd()) {
         // the readLine() method doesn't handle old Macintosh CR line endings
         // this workaround will load the the entire file if it has CR endings
@@ -270,7 +273,23 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
                 }
             }
-            if (lineno == unitsHeader && csvType != moxy) {
+            if (lineno == unitsHeader && csvType == generic) {
+                QRegExp timeHeaderSecs("( )*(secs|sec|time)( )*", Qt::CaseInsensitive);
+                QRegExp timeHeaderMins("( )*(min|minutes)( )*", Qt::CaseInsensitive);
+                QStringList headers = line.split(",");
+
+                QStringListIterator i(headers);
+
+                while (i.hasNext()) {
+                    QString header = i.next();
+                    if (timeHeaderSecs.indexIn(header) != -1)  {
+                        secsIndex = headers.indexOf(header);
+                    } else if (timeHeaderMins.indexIn(header) != -1)  {
+                        minutesIndex = headers.indexOf(header);
+                    }
+                }
+            }
+            else if (lineno == unitsHeader && csvType != moxy) {
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
                 else if (englishUnits.indexIn(line) != -1)
@@ -494,8 +513,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                          kph *= KM_PER_MILE;
                          alt *= METERS_PER_FOOT;
                      }
-                } else  {
-
+                } else {
+                    if (secsIndex > -1) {
+                        seconds = line.section(',', secsIndex, secsIndex).toDouble();
+                        minutes = seconds / 60.0f;
+                     }
                 }
 
                 // PT reports no data as watts == -1.
