@@ -5845,9 +5845,11 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
             paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);
         }
 
+        bool isHB= curve->title().text().contains("Hb");
+
         // output the tooltip
         QString text = QString("%1 %2%5\n%3 %4")
-                        .arg(yvalue, 0, 'f', 1)
+                        .arg(yvalue, 0, 'f', isHB ? 2 : 1)
                         .arg(this->axisTitle(curve->yAxis()).text())
                         .arg(xstring)
                         .arg(this->axisTitle(curve->xAxis()).text())
