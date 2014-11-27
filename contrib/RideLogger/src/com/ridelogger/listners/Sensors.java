@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.ridelogger.RideService;
+import com.ridelogger.StartActivity;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -62,23 +63,23 @@ public class Sensors extends Base<Object>
             mSensorManager.registerListener(luxListner,   mLight, 3000000);
         }
         if(mAccel != null) {
-            accelListner = new SensorEventListener() {
-                private boolean crashed = false;
-                private Timer   timer   = new Timer();
-                private double[] St     = new double[3];
-    
-                @Override
-                public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
-                  
-                @Override
-                public final void onSensorChanged(SensorEvent event) {                
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("ms2x", reduceNumberToString(event.values[0]));
-                    map.put("ms2y", reduceNumberToString(event.values[1]));
-                    map.put("ms2z", reduceNumberToString(event.values[2]));
-                    alterCurrentData(map);
-                    
-                    if(context.detectCrash) {
+            if(context.settings.getBoolean(StartActivity.DETECT_CRASH, false)) {
+                accelListner = new SensorEventListener() {
+                    private boolean crashed = false;
+                    private Timer   timer   = new Timer();
+                    private double[] St     = new double[3];
+        
+                    @Override
+                    public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
+                      
+                    @Override
+                    public final void onSensorChanged(SensorEvent event) {                
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("ms2x", reduceNumberToString(event.values[0]));
+                        map.put("ms2y", reduceNumberToString(event.values[1]));
+                        map.put("ms2z", reduceNumberToString(event.values[2]));
+                        alterCurrentData(map);
+                        
                         if(St.length == 0) {
                             St[0] = event.values[0];
                             St[1] = event.values[1];
@@ -94,16 +95,7 @@ public class Sensors extends Base<Object>
                         if(amag > CRASHMAGNITUDE && !crashed) {
                             crashed = true;
                             context.phoneCrash(amag);
-                            timer.schedule(
-                                new TimerTask() {              
-                                    @Override  
-                                    public void run() {
-                                        crashed = false;
-                                    }  
-                                }, 
-                                180000
-                            ); //in three min reset
-                            
+
                             if(context.currentValues.containsKey("KPH")) {
                                 timer.schedule(
                                     new TimerTask() {              
@@ -113,16 +105,43 @@ public class Sensors extends Base<Object>
                                             // confirm the crash
                                             if(1.0 > Double.parseDouble(context.currentValues.get("KPH"))) {
                                                 context.phoneCrashConfirm();
+                                            } else {
+                                                crashed = false;
+                                                context.phoneHome();
                                             }
                                         }  
                                     }, 
                                     5000
                                 ); //in five sec reset
+                            } else {
+                                timer.schedule(
+                                    new TimerTask() {              
+                                        @Override  
+                                        public void run() {
+                                            crashed = false;
+                                        }  
+                                    }, 
+                                    180000
+                                ); //in three min reset
                             }
                         }
                     }
-                }
-            };
+                };
+            } else {
+                accelListner = new SensorEventListener() {
+                    @Override
+                    public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
+                      
+                    @Override
+                    public final void onSensorChanged(SensorEvent event) {                
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("ms2x", reduceNumberToString(event.values[0]));
+                        map.put("ms2y", reduceNumberToString(event.values[1]));
+                        map.put("ms2z", reduceNumberToString(event.values[2]));
+                        alterCurrentData(map);
+                    }
+                };
+            }
             
             
             

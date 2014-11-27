@@ -62,12 +62,10 @@ public class RideService extends Service
     public int                          notifyID = 1;         //Id of the notification in the top android bar that this class creates and alters
     
     public String                       fileName = "";        //File where the ride will go
-    SharedPreferences                   settings;             //Object to load our setting from android's storage
+    public SharedPreferences            settings;             //Object to load our setting from android's storage
     public Boolean                      snoop    = false;     //should we log others ant+ devices
     Set<String>                         pairedAnts;           //list of ant devices to pair with
-    public  boolean                     phoneHome = false;    //if we should send the messages or not
     private Timer                       timer;                //timer class to control the periodic messages
-    public boolean                      detectCrash = false;  //should we try to detect crashes and message emergency contact
     public String                       emergencyNumbuer;     //the number to send the messages to
     
     /**
@@ -129,8 +127,6 @@ public class RideService extends Service
         String year      = Integer.toString(cal.get(Calendar.YEAR));
         settings         = getSharedPreferences(StartActivity.PREFS_NAME, 0);
         emergencyNumbuer = settings.getString(StartActivity.EMERGENCY_NUMBER, "");
-        detectCrash      = settings.getBoolean(StartActivity.DETECT_CRASH, false);
-        phoneHome        = settings.getBoolean(StartActivity.PHONE_HOME, false);
         pairedAnts       = settings.getStringSet(StartActivity.PAIRED_ANTS, null);
          
         currentValues.put("SECS", "0.0");
@@ -219,8 +215,9 @@ public class RideService extends Service
         }
         rideStarted = true;
         
-        if(phoneHome) {
+        if(settings.getBoolean(StartActivity.PHONE_HOME, false)) {
             timer = new Timer();
+            int period = Integer.parseInt(settings.getString(StartActivity.PHONE_HOME_PERIOD, "10"));
             
             timer.scheduleAtFixedRate(
                 new TimerTask() {              
@@ -229,8 +226,8 @@ public class RideService extends Service
                         phoneHome();
                     }  
                 },
-                600000, 
-                600000
+                60000 * period, 
+                60000 * period
             ); //every ten min let them know where you are at
             phoneStart();
         }
@@ -258,26 +255,26 @@ public class RideService extends Service
      * let a love one know where you are at about every 10 min
      */
     public void phoneCrash(double mag) {
-        String body = "CRASH DETECTED!\n";
+        String body = getString(R.string.crash_warning) + "\n";
         if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
             body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
         } else {
-            body = body + "Unknow location.";
+            body = body + getString(R.string.crash_unknow_location);
         }
-        body =  body + "\n Mag: " + String.valueOf(mag);
+        body =  body + "\n " + getString(R.string.crash_magnitude) + ": " + String.valueOf(mag);
         smsHome(body);
     }
     
     
     /**
-     * let a love one know where you are at about every 10 min
+     * confirm the crash if we are not moving
      */
     public void phoneCrashConfirm() {
-        String body = "CRASH CONFIRMED!\n";
+        String body = getString(R.string.crash_warning) + "!\n";
         if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
             body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
         } else {
-            body = body + "Unknow location.";
+            body = body + getString(R.string.crash_unknow_location);
         }
         smsHome(body);
     }
@@ -287,7 +284,7 @@ public class RideService extends Service
      * let them know we are starting
      */
     public void phoneStart() {
-        smsWithLocation("I'm starting my ride");
+        smsWithLocation(getString(R.string.ride_start_sms));
     }
     
     
@@ -295,7 +292,7 @@ public class RideService extends Service
      * let them know we are stopping
      */
     public void phoneStop() {
-        smsWithLocation("I'm done with my ride");
+        smsWithLocation(getString(R.string.ride_stop_sms));
     }
     
     
@@ -305,8 +302,6 @@ public class RideService extends Service
     public void smsWithLocation(String body) {
         if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
             body = body + "\n https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
-        } else {
-            body = body + ".";
         }
         
         smsHome(body);
@@ -317,7 +312,7 @@ public class RideService extends Service
      * let a love one know where you are at about every 10 min
      */
     public void phoneHome() {
-        smsWithLocation("I'm riding:");
+        smsWithLocation(getString(R.string.riding_ok_sms));
     }
     
     

@@ -5,23 +5,32 @@
     <string name="service_name">Logging Ride</string>
     
     <string name="emergency_contact_dialog_title">Emergency Contact</string>
-    <string name="emergency_contact_dialog_note">Should a text messesage be sent on ride start and every 10 min. to your emergency contact?</string>
+    <string name="emergency_contact_dialog_note">Should a text messesage be sent on ride start and periodically to let your emergency contact know you are alright?</string>
 
+    <string name="sms_period_dialog_title">Emergency Contact SMS Period</string>
+    <string name="sms_period_dialog_note">Period in Minutes:</string>
+    
+    
     <string name="crash_detection_dialog_title">Crash Detection</string>
     <string name="crash_detection_dialog_note">Should a text messesage be sent on crash detction to your emergency contact?</string>
-    
     
     <string name="emergency_contact_number_dialog_title">Emergency Contact Number</string>
     <string name="emergency_contact_number_dialog_note">Emergency phone number to update position on crash detection</string>
     
+    <string name="ant_setup_title">Set Ant+</string>
+    <string name="ant_setup_note">Pair your Ant+ devices now?</string>
     
-    <string name="ant_pair_dialog_title">Emergency Contact Number</string>
-    <string name="ant_pair_dialog_note">Emergency phone number to update position on crash detection.</string>
+    <string name="ant_pair_dialog_title">Select Ant Devices</string>
+    <string name="ant_pair_dialog_button_label">Pair</string>
   
     <string name="gc_rider_name_dialog_title">Enter Rider Name</string>
     <string name="gc_rider_name_dialog_note">What is your Golder Cheata Rider Name?</string>
   
     <string name="save_setting_button">Next</string>
+    <string name="skip_setting_button">Skip</string>
+    
+    <string name="boolean_dialog_yes">Yes</string>
+    <string name="boolean_dialog_no">No</string>
     
     <string name="starting_ride">Starting Ride!</string>
     <string name="stopping_ride">Stoping Ride!</string>
@@ -30,4 +39,26 @@
     <string name="building_ride">Building ride: </string>
     
     <string name="click_to_stop"> Click to stop ride.</string>
+
+    <string name="ride_start_title">Start Ride</string>
+    <string name="ride_start_note">Make sure locations is turned on.  Internet connection is NOT required.</string>
+  
+    <string name="start_and_close">Start</string>
+    <string name="edit_settings">Settings</string>
+    
+    <string name="ride_stop_title">Ride in Progress</string>
+    <string name="ride_stop_note">Would you like to stop the ride or view current values.</string>
+  
+    <string name="stop_and_close">Stop</string>
+    <string name="view">View</string>
+    
+    <string name="crash_warning">WARNING CRASH!</string>
+    <string name="crash_confirm">CRASH CONFIRMED!</string>
+    <string name="crash_unknow_location">Unknow location.</string>
+    <string name="crash_magnitude">Mag</string>
+    
+    <string name="ride_start_sms">I\'m starting my ride.</string>
+    <string name="ride_stop_sms">I\'m starting my ride.</string>
+    <string name="riding_ok_sms">I\'m ok.</string>
+    
 </resources>
