@@ -10,7 +10,6 @@
     <string name="sms_period_dialog_title">Emergency Contact SMS Period</string>
     <string name="sms_period_dialog_note">Period in Minutes:</string>
     
-    
     <string name="crash_detection_dialog_title">Crash Detection</string>
     <string name="crash_detection_dialog_note">Should a text messesage be sent on crash detction to your emergency contact?</string>
     

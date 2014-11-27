@@ -1,8 +1,15 @@
 package com.ridelogger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Map.Entry;
 
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
@@ -12,16 +19,26 @@ import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchRe
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class StartActivity extends FragmentActivity
@@ -35,8 +52,44 @@ public class StartActivity extends FragmentActivity
     public static final String PAIRED_ANTS       = "PairedAnts";
     public static final String PHONE_HOME_PERIOD = "PhoneHomePeriod";
     
-    SharedPreferences settings;
-    MultiDeviceSearch mSearch;
+    GridLayout grid;
+    public Map<String, TextView> textViews;
+        
+    private  SharedPreferences settings;
+    private  MultiDeviceSearch mSearch;
+    private RunningServiceInfo service;
+    
+    Messenger mService = null;
+    boolean mIsBound;
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+    
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            updateValues(msg.getData());
+        }
+    }
+    
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            try {
+                Message msg = Message.obtain();
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            }
+            catch (RemoteException e) {
+                // In this case the service has crashed before we could even do anything with it
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been unexpectedly disconnected - process crashed.
+            mService = null;
+        }
+    };
+
+    
     
     /**
      * start up our class
@@ -55,6 +108,12 @@ public class StartActivity extends FragmentActivity
         }
     }
     
+    BroadcastReceiver mReceiver;
+    
+    
+    /**
+     * setup the settings for the user
+     */
     public void setupSettings() {
         final Runnable askAntRunnable = new Runnable() {
             @Override
@@ -417,6 +476,13 @@ public class StartActivity extends FragmentActivity
     @Override
     protected void onDestroy() {
         if(mSearch != null) mSearch.close();
+        
+        if (mIsBound) {
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+        }
+        
         super.onDestroy();
         finish();
     }
@@ -436,7 +502,8 @@ public class StartActivity extends FragmentActivity
      * start or stop ride
      */
     protected void toggleRide() {
-        if(!isServiceRunning(RideService.class)) {
+        service = getServiceRunning(RideService.class);
+        if(service == null) {
             final Runnable startAndCloseRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -461,9 +528,16 @@ public class StartActivity extends FragmentActivity
                 getString(R.string.edit_settings)
             );            
         } else {
+            final StartActivity that = this;
             final Runnable viewRunnable = new Runnable() {
                 @Override
-                public void run() {}
+                public void run() {
+                    bindService(new Intent(that, RideService.class), mConnection, Context.BIND_AUTO_CREATE);
+                    mIsBound = true;
+                    setContentView(R.layout.activity_dashboard);
+                    textViews = new HashMap<String, TextView>();
+                    grid = (GridLayout)findViewById(R.id.GridLayout1);
+                }
             };
             
             final Runnable stopRunnable = new Runnable() {
@@ -485,14 +559,35 @@ public class StartActivity extends FragmentActivity
         }
     }
     
+    
+    /**
+     * update the text fields with current values
+     * @param bundle 
+     */
+    public void updateValues(Bundle bundle) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> currentValues = (Map<String, String>) bundle.getSerializable("currentValues");
+        TextView tv;
+        Iterator<Entry<String, String>> it = currentValues.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, String> entry = it.next();
+            String key = entry.getKey();
+            if(!textViews.containsKey(key)) {
+                tv = new TextView(this);
+                textViews.put(key, tv);
+                grid.addView(tv);
+            }
+            textViews.get(key).setText(entry.getValue() + " " + key);
+        }        
+    }
+    
 
     /**
      * start the ride and notify the user of success
      */
     private void startRide() {
-        if(!isServiceRunning(RideService.class)) {
-            this.startService(rsi);
-        }
+        this.startService(rsi);
+        
         Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.starting_ride), Toast.LENGTH_LONG);
         toast.show();
     }
@@ -503,13 +598,13 @@ public class StartActivity extends FragmentActivity
      * @param serviceClass
      * @return
      */
-    private boolean isServiceRunning(Class<?> serviceClass) {
+    private RunningServiceInfo getServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
+                return service;
             }
         }
-        return false;
+        return null;
     }
 }

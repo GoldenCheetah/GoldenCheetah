@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,8 +36,13 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 
@@ -66,7 +72,36 @@ public class RideService extends Service
     public Boolean                      snoop    = false;     //should we log others ant+ devices
     Set<String>                         pairedAnts;           //list of ant devices to pair with
     private Timer                       timer;                //timer class to control the periodic messages
+    private Timer                       timerUI;                //timer class to control the periodic messages
     public String                       emergencyNumbuer;     //the number to send the messages to
+    final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
+    Messenger replyTo;
+    
+    class IncomingHandler extends Handler { // Handler of incoming messages from clients.
+        @Override
+        public void handleMessage(Message msg) {
+            
+            if(msg.replyTo != null && timerUI != null) {
+                replyTo = msg.replyTo;
+                timerUI.scheduleAtFixedRate(
+                    new TimerTask() {              
+                        @Override  
+                        public void run() {                    
+                            Message msg = Message.obtain(null, 2, 0, 0);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("currentValues", (Serializable) currentValues);
+                            msg.setData(bundle);
+                            try {
+                                replyTo.send(msg);
+                            } catch (RemoteException e) { }
+                        }
+                    },
+                    1000, 
+                    1000
+                ); //every second update the screen
+            }
+        }
+    }
     
     /**
      * starts the ride on service start
@@ -77,12 +112,14 @@ public class RideService extends Service
         return Service.START_NOT_STICKY;
     }
     
+    
     /**
      * sets android service settings
      */
     @Override
     public IBinder onBind(Intent arg0) {
-        return null;
+        timerUI = new Timer();
+        return mMessenger.getBinder();
     }
     
     
@@ -91,6 +128,10 @@ public class RideService extends Service
      */
     @Override
     public boolean onUnbind (Intent intent) {
+        if(timerUI != null) {
+            timerUI.cancel();
+        }
+        
         return true;
     }
     
@@ -261,6 +302,7 @@ public class RideService extends Service
         } else {
             body = body + getString(R.string.crash_unknow_location);
         }
+        
         body =  body + "\n " + getString(R.string.crash_magnitude) + ": " + String.valueOf(mag);
         smsHome(body);
     }
@@ -276,6 +318,7 @@ public class RideService extends Service
         } else {
             body = body + getString(R.string.crash_unknow_location);
         }
+        
         smsHome(body);
     }
     
@@ -343,6 +386,10 @@ public class RideService extends Service
         //stop the phoneHome timer if we need to.
         if(timer != null) {
             timer.cancel();
+        }
+        
+        if(timerUI != null) {
+            timerUI.cancel();
         }
         
         try {
