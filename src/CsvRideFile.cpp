@@ -212,7 +212,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      continue;
                 }
                 else if(gcCSV.indexIn(line) != -1) {
-                    moxy = true;
+                    gc = true;
                     rideFile->setDeviceType("GoldenCheetah");
                     rideFile->setFileFormat("GoldenCheetah CSV (csv)");
                     unitsHeader = 1;
