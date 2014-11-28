@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.ridelogger.R;
 import com.ridelogger.RideService;
-import com.ridelogger.StartActivity;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -63,7 +63,7 @@ public class Sensors extends Base<Object>
             mSensorManager.registerListener(luxListner,   mLight, 3000000);
         }
         if(mAccel != null) {
-            if(context.settings.getBoolean(StartActivity.DETECT_CRASH, false)) {
+            if(context.settings.getBoolean(context.getString(R.string.PREF_DETECT_CRASH), false)) {
                 accelListner = new SensorEventListener() {
                     private boolean crashed = false;
                     private Timer   timer   = new Timer();

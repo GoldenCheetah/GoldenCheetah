@@ -30,5 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.ridelogger.SettingsActivity"
+            android:label="@string/setting_title" >
+        </activity>
     </application>
 </manifest>
