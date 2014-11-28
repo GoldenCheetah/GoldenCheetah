@@ -1,7 +1,6 @@
 package com.ridelogger.listners;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -74,7 +73,7 @@ public class Sensors extends Base<Object>
                       
                     @Override
                     public final void onSensorChanged(SensorEvent event) {                
-                        Map<String, String> map = new HashMap<String, String>();
+                        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                         map.put("ms2x", reduceNumberToString(event.values[0]));
                         map.put("ms2y", reduceNumberToString(event.values[1]));
                         map.put("ms2z", reduceNumberToString(event.values[2]));
@@ -134,7 +133,7 @@ public class Sensors extends Base<Object>
                       
                     @Override
                     public final void onSensorChanged(SensorEvent event) {                
-                        Map<String, String> map = new HashMap<String, String>();
+                        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                         map.put("ms2x", reduceNumberToString(event.values[0]));
                         map.put("ms2y", reduceNumberToString(event.values[1]));
                         map.put("ms2z", reduceNumberToString(event.values[2]));
@@ -184,7 +183,7 @@ public class Sensors extends Base<Object>
               
               @Override
               public final void onSensorChanged(SensorEvent event) {
-                  Map<String, String> map = new HashMap<String, String>();
+                  LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                   map.put("uTx", reduceNumberToString(event.values[0]));
                   map.put("uTy", reduceNumberToString(event.values[1]));
                   map.put("uTz", reduceNumberToString(event.values[2]));

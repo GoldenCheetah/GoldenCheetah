@@ -17,8 +17,7 @@ import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchRe
 import com.ridelogger.RideService;
 import java.math.BigDecimal;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * Power
@@ -149,7 +148,7 @@ public class Power extends Ant
                         @Override
                         public void onNewTorqueEffectiveness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final BigDecimal leftTorqueEffectiveness, final BigDecimal rightTorqueEffectiveness)
                         {                            
-                            Map<String, String> map = new HashMap<String, String>();
+                            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                             map.put("LTE", reduceNumberToString(leftTorqueEffectiveness));
                             map.put("RTE", reduceNumberToString(rightTorqueEffectiveness));
                             alterCurrentData(map);
@@ -162,7 +161,7 @@ public class Power extends Ant
                         @Override
                         public void onNewPedalSmoothness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final boolean separatePedalSmoothnessSupport, final BigDecimal leftOrCombinedPedalSmoothness, final BigDecimal rightPedalSmoothness)
                         {
-                            Map<String, String> map = new HashMap<String, String>();
+                            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                             map.put("SNPLC", reduceNumberToString(leftOrCombinedPedalSmoothness));
                             map.put("SNPR",  reduceNumberToString(rightPedalSmoothness));
                             alterCurrentData(map);
@@ -177,7 +176,7 @@ public class Power extends Ant
     @Override
     public void zeroReadings()
     {
-        Map<String, String> map = new HashMap<String, String>();
+        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
         map.put("WATTS", "0");
         map.put("NM",    "0");
         map.put("CAD",   "0");

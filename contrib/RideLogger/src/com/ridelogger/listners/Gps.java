@@ -1,10 +1,7 @@
 package com.ridelogger.listners;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.LinkedHashMap;
 import com.ridelogger.RideService;
-
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,7 +24,7 @@ public class Gps extends Base<Gps>
         //listen to gps events and log them
         LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
-                    Map<String, String> map = new HashMap<String, String>();
+                    LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                     map.put("ALTITUDE", reduceNumberToString(location.getAltitude()) );
                     map.put("KPH",      reduceNumberToString(location.getSpeed())    );
                     map.put("bearing",  reduceNumberToString(location.getBearing())  );

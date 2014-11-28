@@ -6,6 +6,7 @@ import com.ridelogger.RideService;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,7 +19,7 @@ public class Base<T>
 {
     public static GzipWriter          buf;
     public static long                startTime;
-    public static Map<String, String> currentValues;
+    public static LinkedHashMap<String, String> currentValues;
     
     public RideService                context;
         
@@ -62,7 +63,7 @@ public class Base<T>
     }
     
     
-    public void writeData(Map<String, String> map)
+    public void writeData(LinkedHashMap<String, String> map)
     {
         String ts = getTs();
         currentValues.put("SECS", ts);
@@ -105,7 +106,7 @@ public class Base<T>
     }
     
     
-    public void alterCurrentData(Map<String, String> map)
+    public void alterCurrentData(LinkedHashMap<String, String> map)
     {
         synchronized (currentValues) {
             currentValues.put("SECS", getTs());

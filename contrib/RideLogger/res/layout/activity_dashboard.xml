@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE AndroidXML>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/LayoutData"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnWidth="90dp"
-    android:horizontalSpacing="10dp"
+    android:columnWidth="150dp"
     android:numColumns="auto_fit"
+    android:verticalSpacing="10dp"
+    android:horizontalSpacing="10dp"
     android:stretchMode="columnWidth"
-    android:verticalSpacing="10dp" >
-
-</TableLayout>
+    android:gravity="center"
+/>

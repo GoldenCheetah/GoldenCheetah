@@ -1,9 +1,6 @@
 package com.ridelogger;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.LinkedHashMap;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -12,7 +9,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,20 +16,17 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TableLayout;
-import android.widget.TextView;
+import android.widget.GridView;
 import android.widget.Toast;
 
 public class StartActivity extends FragmentActivity
 {
     Intent rsi;
     
-    TableLayout layout;
-    public Map<String, TextView> textViews;
+    GridView layout;
         
     private RunningServiceInfo service;
     
@@ -69,6 +62,8 @@ public class StartActivity extends FragmentActivity
             mService = null;
         }
     };
+
+    private CurrentValuesAdapter currentValuesAdapter;
     
     
     @Override
@@ -106,9 +101,10 @@ public class StartActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         rsi             = new Intent(this, RideService.class);
-        layout          = (TableLayout)findViewById(R.id.LayoutData);
-        textViews       = new HashMap<String, TextView>();
-             
+        
+        layout = (GridView) findViewById(R.id.LayoutData);
+        currentValuesAdapter = new CurrentValuesAdapter(this);
+        layout.setAdapter(currentValuesAdapter);
     }
     
     @Override
@@ -175,24 +171,8 @@ public class StartActivity extends FragmentActivity
      */
     public void updateValues(Bundle bundle) {
         @SuppressWarnings("unchecked")
-        Map<String, String> currentValues = (Map<String, String>) bundle.getSerializable("currentValues");
-        TextView tv;
-        Iterator<Entry<String, String>> it = currentValues.entrySet().iterator();
-        
-        while (it.hasNext()) {
-            Entry<String, String> entry = it.next();
-            String key = entry.getKey();
-            if(!textViews.containsKey(key)) {
-                tv = new TextView(this);
-                tv.setTextAppearance(this, android.R.attr.textAppearanceLarge);
-                tv.setTypeface(null, Typeface.BOLD);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
-                
-                textViews.put(key, tv);
-                layout.addView(tv);
-            }
-            textViews.get(key).setText(entry.getValue() + " " + key);
-        }        
+        LinkedHashMap<String, String> currentValues = (LinkedHashMap<String, String>) bundle.getSerializable("currentValues");
+        currentValuesAdapter.update(currentValues);       
     }
     
     
