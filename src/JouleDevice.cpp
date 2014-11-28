@@ -40,7 +40,7 @@
 #define ERASE_RIDE_DETAIL  0x2024
 
 static bool jouleRegistered =
-    Devices::addType("Joule 1.0 or GPS (BETA)", DevicesPtr(new JouleDevices()) );
+    Devices::addType("Joule 1.0 or GPS", DevicesPtr(new JouleDevices()) );
 
 QString
 JouleDevices::downloadInstructions() const
