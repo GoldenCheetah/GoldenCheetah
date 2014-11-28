@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+        <PreferenceCategory
+            android:title="@string/PREFS_NAME"
+            android:persistent="true">
+
+        <EditTextPreference
+                android:key="@string/PREF_RIDER_NAME"
+                android:title="@string/gc_rider_name_dialog_title"
+                android:summary="@string/gc_rider_name_dialog_note" />
+        
+        <EditTextPreference
+                android:key="@string/PREF_EMERGENCY_NUMBER"
+                android:title="@string/emergency_contact_number_dialog_title"
+                android:summary="@string/emergency_contact_number_dialog_note" />
+
+        <CheckBoxPreference
+                android:layout="?android:attr/preferenceLayoutChild"
+                android:dependency="@string/PREF_EMERGENCY_NUMBER"
+                android:key="@string/PREF_DETECT_CRASH"
+                android:title="@string/crash_detection_dialog_title"
+                android:summary="@string/crash_detection_dialog_note" />
+        
+        <!-- The visual style of a child is defined by this styled theme attribute. -->
+        <CheckBoxPreference
+                android:layout="?android:attr/preferenceLayoutChild"
+                android:dependency="@string/PREF_EMERGENCY_NUMBER"
+                android:key="@string/PREF_PHONE_HOME"
+                android:title="@string/emergency_contact_dialog_title"
+                android:summary="@string/emergency_contact_dialog_note" />
+        
+        <EditTextPreference
+                android:layout="?android:attr/preferenceLayoutChild"
+                android:dependency="@string/PREF_PHONE_HOME"
+                android:key="@string/PREF_PHONE_HOME_PERIOD"
+                android:title="@string/sms_period_dialog_title"
+                android:summary="@string/sms_period_dialog_note" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

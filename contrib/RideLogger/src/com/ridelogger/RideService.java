@@ -22,7 +22,6 @@ import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
-import com.ridelogger.R;
 import com.ridelogger.listners.Base;
 import com.ridelogger.listners.Gps;
 import com.ridelogger.listners.HeartRate;
@@ -43,6 +42,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 
@@ -80,8 +80,13 @@ public class RideService extends Service
     class IncomingHandler extends Handler { // Handler of incoming messages from clients.
         @Override
         public void handleMessage(Message msg) {
+            if(timerUI != null) {
+                timerUI.cancel();
+            }
             
-            if(msg.replyTo != null && timerUI != null) {
+            timerUI = new Timer();
+            
+            if(msg.replyTo != null) {
                 replyTo = msg.replyTo;
                 timerUI.scheduleAtFixedRate(
                     new TimerTask() {              
@@ -118,7 +123,6 @@ public class RideService extends Service
      */
     @Override
     public IBinder onBind(Intent arg0) {
-        timerUI = new Timer();
         return mMessenger.getBinder();
     }
     
@@ -166,9 +170,10 @@ public class RideService extends Service
         String month     = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
         String weekDay   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
         String year      = Integer.toString(cal.get(Calendar.YEAR));
-        settings         = getSharedPreferences(StartActivity.PREFS_NAME, 0);
-        emergencyNumbuer = settings.getString(StartActivity.EMERGENCY_NUMBER, "");
-        pairedAnts       = settings.getStringSet(StartActivity.PAIRED_ANTS, null);
+        
+        settings         = PreferenceManager.getDefaultSharedPreferences(this);
+        emergencyNumbuer = settings.getString(getString(R.string.PREF_EMERGENCY_NUMBER), "");
+        pairedAnts       = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
          
         currentValues.put("SECS", "0.0");
         
@@ -179,7 +184,7 @@ public class RideService extends Service
                 "\"DEVICETYPE\":\"Android\"," +
                 "\"IDENTIFIER\":\"\"," +
                 "\"TAGS\":{" +
-                    "\"Athlete\":\"" + settings.getString(StartActivity.RIDER_NAME, "") + "\"," +
+                    "\"Athlete\":\"" + settings.getString(getString(R.string.PREF_RIDER_NAME), "") + "\"," +
                     "\"Calendar Text\":\"Auto Recored Android Ride\"," +
                     "\"Change History\":\"\"," +
                     "\"Data\":\"\"," +
@@ -256,9 +261,9 @@ public class RideService extends Service
         }
         rideStarted = true;
         
-        if(settings.getBoolean(StartActivity.PHONE_HOME, false)) {
+        if(settings.getBoolean(getString(R.string.PREF_PHONE_HOME), false)) {
             timer = new Timer();
-            int period = Integer.parseInt(settings.getString(StartActivity.PHONE_HOME_PERIOD, "10"));
+            int period = Integer.parseInt(settings.getString(getString(R.string.PREF_PHONE_HOME_PERIOD), "10"));
             
             timer.scheduleAtFixedRate(
                 new TimerTask() {              
@@ -278,7 +283,7 @@ public class RideService extends Service
             .Builder(this)
             .setSmallIcon(R.drawable.ic_launcher)
             .setContentTitle(getString(R.string.ride_on))
-            .setContentText(getString(R.string.building_ride) + fileName +  getString(R.string.click_to_stop))
+            .setContentText(getString(R.string.building_ride) + " " + fileName + " " + getString(R.string.click_to_stop))
             .setProgress(0, 0, true)
             .setContentIntent(
                 TaskStackBuilder
@@ -312,7 +317,7 @@ public class RideService extends Service
      * confirm the crash if we are not moving
      */
     public void phoneCrashConfirm() {
-        String body = getString(R.string.crash_warning) + "!\n";
+        String body = getString(R.string.crash_confirm) + "!\n";
         if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
             body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
         } else {
