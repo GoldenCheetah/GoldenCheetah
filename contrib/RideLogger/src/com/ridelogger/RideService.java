@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -56,10 +56,10 @@ public class RideService extends Service
 {
     public GzipWriter                   buf;                  //writes to log file buffered
     public long                         startTime;            //start time of the ride
-    public Map<String, String>          currentValues;        //hash of current values
+    public LinkedHashMap<String, String>          currentValues;        //hash of current values
     public boolean                      rideStarted = false;  //have we started logging the ride
                                         
-    public Map<String, Base<?>>         sensors     = new HashMap<String, Base<?>>();
+    public LinkedHashMap<String, Base<?>>         sensors     = new LinkedHashMap<String, Base<?>>();
                                                               //All other Android sensor class
     MultiDeviceSearch                   mSearch;              //Ant+ device search class to init connections
     MultiDeviceSearch.SearchCallbacks   mCallback;            //Ant+ device class to setup sensors after they are found
@@ -157,7 +157,7 @@ public class RideService extends Service
         
         startTime     = System.currentTimeMillis();
         fileName      = "ride-" + startTime + ".json.gzip";
-        currentValues = new HashMap<String, String>();
+        currentValues = new LinkedHashMap<String, String>();
         
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));

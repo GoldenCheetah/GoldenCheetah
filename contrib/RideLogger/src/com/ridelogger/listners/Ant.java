@@ -1,6 +1,8 @@
 package com.ridelogger.listners;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IDeviceStateChangeReceiver;
@@ -67,7 +69,7 @@ public class Ant extends Base<Object>
     
     
     @Override
-    public void writeData(Map<String, String> map)
+    public void writeData(LinkedHashMap<String, String> map)
     {
         if(prefix != "") {
             for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -87,7 +89,7 @@ public class Ant extends Base<Object>
     }
     
     @Override
-    public void alterCurrentData(Map<String, String> map)
+    public void alterCurrentData(LinkedHashMap<String, String> map)
     {
         if(prefix != "") {
             for (Map.Entry<String, String> entry : map.entrySet()) {         
