@@ -231,7 +231,7 @@ public class RideService extends Service
                 sensors.put("GPS",            new Gps(this));
                 sensors.put("AndroidSensors", new Sensors(this));
                 
-                if(!pairedAnts.isEmpty()){
+                if(pairedAnts != null && !pairedAnts.isEmpty()){
                     mCallback = new MultiDeviceSearch.SearchCallbacks(){
                         public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
                         {
