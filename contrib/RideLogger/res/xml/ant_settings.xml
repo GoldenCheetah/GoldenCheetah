@@ -3,7 +3,7 @@
         <PreferenceCategory
             android:title="@string/PREFS_NAME">
 
-        <com.ridelogger.DynamicMultiSelectListPreference
+        <MultiSelectListPreference
             android:key="@string/PREF_PAIRED_ANTS"
             android:title="@string/ant_pair_dialog_title"
             android:summary="@string/ant_pair_dialog_button_note"

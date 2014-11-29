@@ -1,8 +1,11 @@
 package com.ridelogger;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
@@ -10,6 +13,10 @@ import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.RemoteException;
+import android.preference.MultiSelectListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
@@ -40,7 +47,7 @@ public class SettingsActivity extends PreferenceActivity {
      */
     public static class AntFragment extends PreferenceFragment {
         private MultiDeviceSearch mSearch;
-        private DynamicMultiSelectListPreference mMultiSelectListPreference;
+        private MultiSelectListPreference mMultiSelectListPreference;
 
         
         @Override
@@ -48,9 +55,28 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             
             addPreferencesFromResource(R.xml.ant_settings);
-            mMultiSelectListPreference = (DynamicMultiSelectListPreference) findPreference(getString(R.string.PREF_PAIRED_ANTS));            
-            
+            mMultiSelectListPreference = (MultiSelectListPreference) findPreference(getString(R.string.PREF_PAIRED_ANTS));
+            mMultiSelectListPreference.setEnabled(false);
+
             setupAnt();
+
+            Timer timer = new Timer();
+            final Handler handler = new Handler();
+            
+            timer.schedule(
+                new TimerTask() {
+                    @Override  
+                    public void run() {
+                        handler.post(new Runnable() {
+    
+                            public void run() {
+                                mMultiSelectListPreference.setEnabled(true);
+                            }
+                        });
+                    }
+                },
+                5000
+            );      
         }
 
         /**
@@ -110,8 +136,6 @@ public class SettingsActivity extends PreferenceActivity {
                     foundDevicesValues.toArray(new CharSequence[foundDevicesValues.size()])
                 );
             }
-            
-            mMultiSelectListPreference.refresh();
         }
         
         @Override
