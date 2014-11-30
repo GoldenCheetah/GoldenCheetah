@@ -1,8 +1,5 @@
 package com.ridelogger;
 
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
@@ -13,16 +10,25 @@ import android.widget.TextView;
 public class CurrentValuesAdapter extends BaseAdapter {
 
     public StartActivity                 context;
-    public LinkedHashMap<String, TextView> tvs = new LinkedHashMap<String, TextView>();
+    
+    public TextView[] tvs = new TextView[RideService.TOTALSENSORS];
 
     public CurrentValuesAdapter(StartActivity c) {
         context = c;
+        
+        for (int i = 0; i < RideService.TOTALSENSORS; i++) {
+            tvs[i] = new TextView(context);
+            tvs[i].setTextAppearance(context, android.R.attr.textAppearanceLarge);
+            tvs[i].setTypeface(null, Typeface.BOLD);
+            tvs[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            tvs[i].setText(String.format("%.2f", (float) 0.0) + " " +  RideService.KEYS[i].toString().toLowerCase());
+        }
     }
     
     
     @Override
     public int getCount() {
-        return tvs.size();
+        return tvs.length;
     }
     
 
@@ -40,33 +46,27 @@ public class CurrentValuesAdapter extends BaseAdapter {
 
     @Override    
     public View getView(int position, View convertView, ViewGroup parent) {        
-        if (convertView == null) {  // if it's not recycled, initialize some attributes
-            return (TextView) tvs.values().toArray()[position];
+        if (convertView == null) {
+            return (TextView) tvs[position];
         } else {
             return (TextView) convertView;
         }
     }
     
     
-    public void update(LinkedHashMap<String, String> currentValues) {
-        for (Entry<String, String> entry : currentValues.entrySet()) {
-            String key = entry.getKey();
-            
-            String value = String.format("%.2f", Float.valueOf(entry.getValue())) + " " +  key.toLowerCase();
-            
-            
-            if(tvs.containsKey(key)) {
-                tvs.get(key).setText(value);
+    public void update(float[] values) {
+        for (int i = 0; i < values.length; i++) {
+            if(tvs[i] != null) {
+                tvs[i].setText(String.format("%.2f", values[i]) + " " +  RideService.KEYS[i].toString().toLowerCase());
             } else {
-                TextView tv = new TextView(context);
-                tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
-                tv.setTypeface(null, Typeface.BOLD);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                tv.setText(value);
-                
-                tvs.put(key, tv);
+                tvs[i] = new TextView(context);
+                tvs[i].setTextAppearance(context, android.R.attr.textAppearanceLarge);
+                tvs[i].setTypeface(null, Typeface.BOLD);
+                tvs[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                tvs[i].setText(String.format("%.2f", values[i]) + " " +  RideService.KEYS[i].toString().toLowerCase());
             }
         }
+        
         this.notifyDataSetChanged();
     }
 }

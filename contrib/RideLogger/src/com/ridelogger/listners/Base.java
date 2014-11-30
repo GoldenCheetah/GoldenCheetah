@@ -4,11 +4,6 @@ import com.ridelogger.GzipWriter;
 import com.ridelogger.RideService;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Base
@@ -17,11 +12,10 @@ import java.util.Map.Entry;
  */
 public class Base<T>
 {
-    public static GzipWriter          buf;
-    public static long                startTime;
-    public static LinkedHashMap<String, String> currentValues;
+    public GzipWriter  buf;
+    public long        startTime;
     
-    public RideService                context;
+    public RideService context;
         
     public Base(RideService mContext) {
         init(mContext);
@@ -31,30 +25,28 @@ public class Base<T>
     public void init(RideService mContext) {
         context       = mContext;
         buf           = context.buf;           //shared file buffer object
-        currentValues = context.currentValues; //shared currentValues object
     }
     
     
-    public void writeData(String key, String value)
+    public void writeData(int key, float value)
     {
-        if(!currentValues.containsKey(key) || currentValues.get(key) != value) {
-            String ts = getTs();
-            currentValues.put("SECS", ts);
-            currentValues.put(key, value);
+        if(context.currentValues[key] != value) {
+            context.currentValues[RideService.SECS] = getTs();
+            context.currentValues[key]              = value;
 
             try {
                 synchronized (buf) {
                     buf.write(",{");
                     
                     buf.write("\"");
-                    buf.write("SECS");
+                    buf.write((String) RideService.KEYS[RideService.SECS]);
                     buf.write("\":");
-                    buf.write(ts);
+                    buf.write(String.format("%f", context.currentValues[RideService.SECS]));
                     
                     buf.write(",\"");
-                    buf.write(key);
+                    buf.write((String) RideService.KEYS[key]);
                     buf.write("\":");
-                    buf.write(value);
+                    buf.write(String.format("%f", value));
                     
                     buf.write("}");
                 }
@@ -63,30 +55,27 @@ public class Base<T>
     }
     
     
-    public void writeData(LinkedHashMap<String, String> map)
+    public void writeData(int[] keys, float[] values)
     {
-        String ts = getTs();
-        currentValues.put("SECS", ts);
+        context.currentValues[RideService.SECS] = getTs();
 
         try {
             synchronized (buf) {
                 buf.write(",{");
                 
                 buf.write("\"");
-                buf.write("SECS");
+                buf.write((String) RideService.KEYS[RideService.SECS]);
                 buf.write("\":");
-                buf.write(ts);
+                buf.write(String.format("%f", context.currentValues[RideService.SECS]));
                 
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    String key   = entry.getKey();
-                    String value = entry.getValue();
-                    
+                int i = 0;
+                for (int key : keys) {
+                    context.currentValues[key] = values[i];
                     buf.write(",\"");
-                    buf.write(key);
+                    buf.write((String) RideService.KEYS[key]);
                     buf.write("\":");
-                    buf.write(value);
-                    
-                    currentValues.put(key, value);
+                    buf.write(String.format("%f", context.currentValues[i]));
+                    i++;
                 }
 
                 buf.write("}");
@@ -95,27 +84,73 @@ public class Base<T>
     }
     
     
-    public void alterCurrentData(String key, String value)
+    public void writeSnoopedData(int key, float value)
     {
-        synchronized (currentValues) {
-            currentValues.put("SECS", getTs());
-            currentValues.put(key, value);
-            writeCurrentData();
+        if(context.currentValues[key] != value) {
+            context.snoopedValues[RideService.SECS] = getTs();
+            context.snoopedValues[key]              = value;
         }
-
     }
     
     
-    public void alterCurrentData(LinkedHashMap<String, String> map)
+    public void writeSnoopedData(int[] keys, float[] values)
     {
-        synchronized (currentValues) {
-            currentValues.put("SECS", getTs());
+        context.snoopedValues[RideService.SECS] = getTs();
+        synchronized (context.snoopedValues) {
+            int i = 0;
+            for (int key : keys) {
+                context.snoopedValues[key] = values[i];
+                i++;
+            }
+        }
+    }
+    
+    
+    public void alterCurrentData(int key, float value)
+    {
+        synchronized (context.currentValues) {
+            context.currentValues[RideService.SECS] = getTs();
+            context.currentValues[key] = value;
+            writeCurrentData();
+        }
+    }
+    
+    
+    public void alterSnoopedData(int key, float value)
+    {
+        synchronized (context.snoopedValues) {
+            context.snoopedValues[RideService.SECS] = getTs();
+            context.snoopedValues[key] = value;
+        }
+    }
+    
+    
+    public void alterCurrentData(int[] keys, float[] values)
+    {
+        synchronized (context.currentValues) {
+            context.currentValues[RideService.SECS] = getTs();
             
-            for (Map.Entry<String, String> entry : map.entrySet()) {               
-                currentValues.put(entry.getKey(), entry.getValue());
+            int i = 0;
+            for (int key : keys) {
+                context.currentValues[key] = values[i];
+                i++;
             }
             
             writeCurrentData();
+        }
+    }
+    
+    
+    public void alterSnoopedData(int[] keys, float[] values)
+    {
+        synchronized (context.snoopedValues) {
+            context.snoopedValues[RideService.SECS] = getTs();
+            
+            int i = 0;
+            for (int key : keys) {
+                context.snoopedValues[key] = values[i];
+                i++;
+            }
         }
     }
     
@@ -125,22 +160,16 @@ public class Base<T>
         try {
             synchronized (buf) {
                 buf.write(",{");
+                buf.write("\"");
+                buf.write((String) RideService.KEYS[0]);
+                buf.write("\":");
+                buf.write(String.format("%f", context.currentValues[0]));
                 
-                Iterator<Entry<String, String>> it = currentValues.entrySet().iterator();
-                if(it.hasNext()) {
-                    buf.write("\"");
-                    Entry<String, String> entry = it.next();
-                    buf.write(entry.getKey());
-                    buf.write("\":");
-                    buf.write(entry.getValue());
-                }
-                
-                while (it.hasNext()) {
-                    Entry<String, String> entry = it.next();
+                for (int i = 1; i < context.currentValues.length; i++) {
                     buf.write(",\"");
-                    buf.write(entry.getKey());
+                    buf.write((String) RideService.KEYS[i]);
                     buf.write("\":");
-                    buf.write(entry.getValue());
+                    buf.write(String.format("%f", context.currentValues[i]));
                 }
 
                 buf.write("}");
@@ -148,36 +177,10 @@ public class Base<T>
         } catch (IOException e) {}
     }
     
+    
     //get current time stamp
-    public String getTs() {
-        return reduceNumberToString((double) (System.currentTimeMillis() - context.startTime) / 1000.0);   
-    }
-    
-    
-    //reduce number data types to consistently formatted strings
-    public static String reduceNumberToString(double d)
-    {
-        if(d == (long) d)
-            return String.format("%d",(long)d);
-        else
-            return String.format("%f", d);
-    }
-    
-    
-    //reduce number data types to consistently formatted strings
-    public static String reduceNumberToString(float d)
-    {
-        if(d == (long) d)
-            return String.format("%d",(long)d);
-        else
-            return String.format("%f", d);
-    }
-    
-    
-    //reduce number data types to consistently formatted strings
-    public static String reduceNumberToString(BigDecimal d)
-    {
-        return String.format("%s", d.toPlainString());
+    public float getTs() {
+        return (float) ((System.currentTimeMillis() - context.startTime) / 1000.0);   
     }
     
     

@@ -1,7 +1,4 @@
 package com.ridelogger;
-
-import java.util.LinkedHashMap;
-
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.BroadcastReceiver;
@@ -38,6 +35,8 @@ public class StartActivity extends FragmentActivity
     
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     
+    private CurrentValuesAdapter currentValuesAdapter;
+    
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -63,8 +62,6 @@ public class StartActivity extends FragmentActivity
         }
     };
 
-    private CurrentValuesAdapter currentValuesAdapter;
-    
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -73,8 +70,6 @@ public class StartActivity extends FragmentActivity
         inflater.inflate(R.menu.start_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
-    
-    
 
     
     @Override
@@ -106,6 +101,7 @@ public class StartActivity extends FragmentActivity
         currentValuesAdapter = new CurrentValuesAdapter(this);
         layout.setAdapter(currentValuesAdapter);
     }
+    
     
     @Override
     protected void onResume() {
@@ -170,8 +166,7 @@ public class StartActivity extends FragmentActivity
      * @param bundle 
      */
     public void updateValues(Bundle bundle) {
-        @SuppressWarnings("unchecked")
-        LinkedHashMap<String, String> currentValues = (LinkedHashMap<String, String>) bundle.getSerializable("currentValues");
+        float[] currentValues = (float[]) bundle.getSerializable("currentValues");
         currentValuesAdapter.update(currentValues);       
     }
     
