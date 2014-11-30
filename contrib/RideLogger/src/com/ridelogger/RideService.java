@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,27 +52,84 @@ import android.telephony.SmsManager;
  * Performs ride logging from sensors as an android service
  */
 public class RideService extends Service
-{
-    public GzipWriter                   buf;                  //writes to log file buffered
-    public long                         startTime;            //start time of the ride
-    public LinkedHashMap<String, String>          currentValues;        //hash of current values
-    public boolean                      rideStarted = false;  //have we started logging the ride
+{    
+    public static final int notifyID     = 1;                  //Id of the notification in the top android bar that this class creates and alters   
+    public static final int TOTALSENSORS = 25;
+    
+    public static final int SECS         = 0;
+    public static final int KPH          = 1;
+    public static final int ALTITUDE     = 2;
+    public static final int bearing      = 3;
+    public static final int gpsa         = 4;
+    public static final int LAT          = 5;
+    public static final int LON          = 6;
+    public static final int HR           = 7;
+    public static final int WATTS        = 8;
+    public static final int NM           = 9;
+    public static final int CAD          = 10;
+    public static final int KM           = 11;
+    public static final int LTE          = 12;
+    public static final int RTE          = 13;
+    public static final int SNPLC        = 14;
+    public static final int SNPR         = 15;
+    public static final int ms2x         = 16;
+    public static final int ms2y         = 17;
+    public static final int ms2z         = 18;
+    public static final int temp         = 19;
+    public static final int uTx          = 20;
+    public static final int uTy          = 21;
+    public static final int uTz          = 22;
+    public static final int press        = 23;
+    public static final int lux          = 24;
+    
+    public static CharSequence[] KEYS    = {
+        "SECS", 
+        "KPH", 
+        "ALTITUDE", 
+        "bearing", 
+        "gpsa", 
+        "LAT", 
+        "LON",
+        "HR",
+        "WATTS",
+        "NM",
+        "CAD",
+        "KM",
+        "LTE",
+        "RTE",
+        "SNPLC",
+        "SNPR",
+        "ms2x",
+        "ms2y",
+        "ms2z",
+        "temp",
+        "uTx",
+        "uTy",
+        "uTz",
+        "press",
+        "lux"
+    };
+    
+    public float[]           currentValues = new float[RideService.TOTALSENSORS]; //float array of current values
+    public float[]           snoopedValues = new float[RideService.TOTALSENSORS]; //float array of snooped values
+    public GzipWriter        buf;                           //writes to log file buffered
+    public long              startTime;                     //start time of the ride
+    public boolean           rideStarted   = false;         //have we started logging the ride
+    public Boolean           snoop         = false;         //should we log others ant+ devices
+    private Set<String>      pairedAnts;                    //list of ant devices to pair with
+    private Timer            timer;                         //timer class to control the periodic messages
+    private Timer            timerUI;                       //timer class to control the periodic messages
+    private String           emergencyNumbuer;              //the number to send the messages to
+
                                         
-    public LinkedHashMap<String, Base<?>>         sensors     = new LinkedHashMap<String, Base<?>>();
+    public LinkedHashMap<String, Base<?>> sensors   = new LinkedHashMap<String, Base<?>>();
                                                               //All other Android sensor class
-    MultiDeviceSearch                   mSearch;              //Ant+ device search class to init connections
-    MultiDeviceSearch.SearchCallbacks   mCallback;            //Ant+ device class to setup sensors after they are found
-    MultiDeviceSearch.RssiCallback      mRssiCallback;        //Ant+ class to do something with the signal strength on device find
+    MultiDeviceSearch                     mSearch;              //Ant+ device search class to init connections
+    MultiDeviceSearch.SearchCallbacks     mCallback;            //Ant+ device class to setup sensors after they are found
+    MultiDeviceSearch.RssiCallback        mRssiCallback;        //Ant+ class to do something with the signal strength on device find
     
-    public int                          notifyID = 1;         //Id of the notification in the top android bar that this class creates and alters
     
-    public String                       fileName = "";        //File where the ride will go
-    public SharedPreferences            settings;             //Object to load our setting from android's storage
-    public Boolean                      snoop    = false;     //should we log others ant+ devices
-    Set<String>                         pairedAnts;           //list of ant devices to pair with
-    private Timer                       timer;                //timer class to control the periodic messages
-    private Timer                       timerUI;                //timer class to control the periodic messages
-    public String                       emergencyNumbuer;     //the number to send the messages to
+    
     final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
     Messenger replyTo;
     
@@ -94,7 +150,7 @@ public class RideService extends Service
                         public void run() {                    
                             Message msg = Message.obtain(null, 2, 0, 0);
                             Bundle bundle = new Bundle();
-                            bundle.putSerializable("currentValues", (Serializable) currentValues);
+                            bundle.putSerializable("currentValues", currentValues);
                             msg.setData(bundle);
                             try {
                                 replyTo.send(msg);
@@ -119,7 +175,7 @@ public class RideService extends Service
     
     
     /**
-     * sets android service settings
+     * returns the messenger to talk to the app with
      */
     @Override
     public IBinder onBind(Intent arg0) {
@@ -128,7 +184,7 @@ public class RideService extends Service
     
     
     /**
-     * sets android service settings
+     * releases the timer that sends messages to the app
      */
     @Override
     public boolean onUnbind (Intent intent) {
@@ -156,8 +212,7 @@ public class RideService extends Service
         if(rideStarted) return;
         
         startTime     = System.currentTimeMillis();
-        fileName      = "ride-" + startTime + ".json.gzip";
-        currentValues = new LinkedHashMap<String, String>();
+        final String fileName      = "ride-" + startTime + ".json.gzip";
         
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -171,11 +226,11 @@ public class RideService extends Service
         String weekDay   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
         String year      = Integer.toString(cal.get(Calendar.YEAR));
         
-        settings         = PreferenceManager.getDefaultSharedPreferences(this);
-        emergencyNumbuer = settings.getString(getString(R.string.PREF_EMERGENCY_NUMBER), "");
-        pairedAnts       = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        emergencyNumbuer           = settings.getString(getString(R.string.PREF_EMERGENCY_NUMBER), "");
+        pairedAnts                 = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
          
-        currentValues.put("SECS", "0.0");
+        currentValues[SECS] = (float) 0.0;
         
         String rideHeadder = "{" +
             "\"RIDE\":{" +
@@ -301,15 +356,10 @@ public class RideService extends Service
      * let a love one know where you are at about every 10 min
      */
     public void phoneCrash(double mag) {
-        String body = getString(R.string.crash_warning) + "\n";
-        if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
-            body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
-        } else {
-            body = body + getString(R.string.crash_unknow_location);
-        }
-        
-        body =  body + "\n " + getString(R.string.crash_magnitude) + ": " + String.valueOf(mag);
-        smsHome(body);
+        smsHome(
+                getString(R.string.crash_warning) + "\n" + getLocationLink()
+                + "\n " + getString(R.string.crash_magnitude) + ": " + String.valueOf(mag)
+        );
     }
     
     
@@ -317,14 +367,7 @@ public class RideService extends Service
      * confirm the crash if we are not moving
      */
     public void phoneCrashConfirm() {
-        String body = getString(R.string.crash_confirm) + "!\n";
-        if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
-            body = body + "https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
-        } else {
-            body = body + getString(R.string.crash_unknow_location);
-        }
-        
-        smsHome(body);
+        smsHome(getString(R.string.crash_confirm) + "!\n" + getLocationLink());
     }
     
    
@@ -347,12 +390,8 @@ public class RideService extends Service
     /**
      * send an sms with location
      */
-    public void smsWithLocation(String body) {
-        if(currentValues.containsKey("LAT") && currentValues.containsKey("LON")) {
-            body = body + "\n https://www.google.com/maps/place/" + currentValues.get("LAT") + "," + currentValues.get("LON");
-        }
-        
-        smsHome(body);
+    public void smsWithLocation(String body) {        
+        smsHome(body + "\n " + getLocationLink());
     }
     
     
@@ -369,7 +408,16 @@ public class RideService extends Service
      */
     public void smsHome(String body) {
         SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(emergencyNumbuer, null, body, null, null);
+        if(emergencyNumbuer != null) {
+            smsManager.sendTextMessage(emergencyNumbuer, null, body, null, null);
+        }
+    }
+    
+    public String getLocationLink() {
+        if(currentValues[LAT] != 0.0 || currentValues[LON] != 0.0) {
+            return "https://www.google.com/maps/place/" + currentValues[LAT] + "," + currentValues[LON];
+        }
+        return getString(R.string.crash_unknow_location);
     }
     
     

@@ -1,13 +1,11 @@
 package com.ridelogger.listners;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IDeviceStateChangeReceiver;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
+
 import com.ridelogger.RideService;
 
 
@@ -21,20 +19,16 @@ public class Ant extends Base<Object>
     public PccReleaseHandle<?>            releaseHandle;    //Handle class
     public IPluginAccessResultReceiver<?> mResultReceiver;  //Receiver class
     public Boolean                        snooped  = false; //should we snoop others connections?
-    public String                         prefix   = "";    //prefix log messages with this
     public Ant                            that     = null;                           
     //setup listeners and logging 
     public Ant(MultiDeviceSearchResult result, RideService mContext) {
         super(mContext);
     }
     
-    public Ant(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
+    public Ant(MultiDeviceSearchResult result, RideService mContext, Boolean pSnoop) {
         super(mContext);
         that = this;
-        if(psnoop) {
-            snooped  = true;
-            prefix = "SNOOPED-";
-        }
+        snooped  = pSnoop;
     }
     
     
@@ -62,43 +56,45 @@ public class Ant extends Base<Object>
     }
     
     @Override
-    public void writeData(String key, String value)
+    public void writeData(int key, float value)
     {
-        super.writeData(prefix + key, value);
+        if(snooped) {
+            super.writeSnoopedData(key, value);
+        } else {
+            super.writeData(key, value);
+        }
     }
     
     
     @Override
-    public void writeData(LinkedHashMap<String, String> map)
+    public void writeData(int[] keys, float[] values)
     {
-        if(prefix != "") {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                map.remove(entry);
-                map.put(prefix + entry.getKey(), entry.getValue());
-            }
+        if(snooped) {
+            super.writeSnoopedData(keys, values);
+        } else {
+            super.writeData(keys, values);
         }
-        
-        super.writeData(map);
     }
 
 
     @Override
-    public void alterCurrentData(String key, String value)
-    {
-        super.alterCurrentData(prefix + key, value);
+    public void alterCurrentData(int key, float value)
+    {        
+        if(snooped) {
+            super.alterSnoopedData(key, value);
+        } else {
+            super.alterCurrentData(key, value);
+        }
     }
     
     @Override
-    public void alterCurrentData(LinkedHashMap<String, String> map)
+    public void alterCurrentData(int[] keys, float[] values)
     {
-        if(prefix != "") {
-            for (Map.Entry<String, String> entry : map.entrySet()) {         
-                map.remove(entry);
-                map.put(prefix + entry.getKey(), entry.getValue());
-            }
+        if(snooped) {
+            super.alterSnoopedData(keys, values);
+        } else {
+            super.alterCurrentData(keys, values);
         }
-        
-        super.alterCurrentData(map);
     }
     
     

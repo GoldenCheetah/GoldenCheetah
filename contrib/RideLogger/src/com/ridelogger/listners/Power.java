@@ -14,10 +14,11 @@ import com.dsi.ant.plugins.antplus.pcc.defines.EventFlag;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
+
 import com.ridelogger.RideService;
+
 import java.math.BigDecimal;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 
 /**
  * Power
@@ -50,7 +51,7 @@ public class Power extends Ant
                 result.subscribeCalculatedPowerEvent(new ICalculatedPowerReceiver() {
                         @Override
                         public void onNewCalculatedPower(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedPower) {
-                            alterCurrentData("WATTS", reduceNumberToString(calculatedPower));
+                            alterCurrentData(RideService.WATTS, calculatedPower.floatValue());
                         }
                     }
                 );
@@ -59,7 +60,7 @@ public class Power extends Ant
                     new ICalculatedTorqueReceiver() {
                         @Override
                         public void onNewCalculatedTorque(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedTorque) {
-                            alterCurrentData("NM", reduceNumberToString(calculatedTorque));
+                            alterCurrentData(RideService.NM, calculatedTorque.floatValue());
                         }
                     }
                 );
@@ -68,7 +69,7 @@ public class Power extends Ant
                     new ICalculatedCrankCadenceReceiver() {
                         @Override
                         public void onNewCalculatedCrankCadence(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedCrankCadence) {
-                            alterCurrentData("CAD", reduceNumberToString(calculatedCrankCadence));
+                            alterCurrentData(RideService.CAD, calculatedCrankCadence.floatValue());
                         }
                     }
                 );
@@ -78,7 +79,7 @@ public class Power extends Ant
                         @Override
                         public void onNewCalculatedWheelSpeed(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedWheelSpeed)
                         {
-                            alterCurrentData("KPH", reduceNumberToString(calculatedWheelSpeed));
+                            alterCurrentData(RideService.KPH, calculatedWheelSpeed.floatValue());
                         }
                     }
                 );
@@ -88,7 +89,7 @@ public class Power extends Ant
                         @Override
                         public void onNewCalculatedWheelDistance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedWheelDistance) 
                         {
-                            alterCurrentData("KM", reduceNumberToString(calculatedWheelDistance));
+                            alterCurrentData(RideService.KM, calculatedWheelDistance.floatValue());
                         }
                     }
                 );
@@ -98,7 +99,7 @@ public class Power extends Ant
                         @Override
                         public void onNewInstantaneousCadence(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final int instantaneousCadence)
                         {
-                            alterCurrentData("CAD", reduceNumberToString(instantaneousCadence));
+                            alterCurrentData(RideService.CAD, instantaneousCadence);
                         }
                     }
                 );
@@ -108,7 +109,7 @@ public class Power extends Ant
                         @Override
                         public void onNewRawPowerOnlyData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final int instantaneousPower, final long accumulatedPower)
                         {
-                            alterCurrentData("WATTS", reduceNumberToString(instantaneousPower));
+                            alterCurrentData(RideService.WATTS, instantaneousPower);
                         }
                     }
                 );
@@ -118,7 +119,7 @@ public class Power extends Ant
                         @Override
                         public void onNewPedalPowerBalance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final boolean rightPedalIndicator, final int pedalPowerPercentage)
                         {
-                            alterCurrentData("LTE", reduceNumberToString(pedalPowerPercentage));
+                            alterCurrentData(RideService.LTE, pedalPowerPercentage);
                         }
                     }
                 );
@@ -128,7 +129,7 @@ public class Power extends Ant
                         @Override
                         public void onNewRawWheelTorqueData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long wheelTorqueUpdateEventCount, final long accumulatedWheelTicks, final BigDecimal accumulatedWheelPeriod, final BigDecimal accumulatedWheelTorque)
                         {
-                            alterCurrentData("NM", reduceNumberToString(accumulatedWheelTorque));
+                            alterCurrentData(RideService.NM, accumulatedWheelTorque);
                         }
                     }
                 );
@@ -138,7 +139,7 @@ public class Power extends Ant
                         @Override
                         public void onNewRawCrankTorqueData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long crankTorqueUpdateEventCount, final long accumulatedCrankTicks, final BigDecimal accumulatedCrankPeriod, final BigDecimal accumulatedCrankTorque)
                         {
-                            alterCurrentData("NM", reduceNumberToString(accumulatedCrankTorque));
+                            alterCurrentData(RideService.NM, accumulatedCrankTorque);
                         }
                     }
                 );
@@ -148,10 +149,17 @@ public class Power extends Ant
                         @Override
                         public void onNewTorqueEffectiveness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final BigDecimal leftTorqueEffectiveness, final BigDecimal rightTorqueEffectiveness)
                         {                            
-                            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                            map.put("LTE", reduceNumberToString(leftTorqueEffectiveness));
-                            map.put("RTE", reduceNumberToString(rightTorqueEffectiveness));
-                            alterCurrentData(map);
+                            int[] keys = {
+                                    RideService.LTE,
+                                    RideService.RTE
+                            };
+                            
+                            float[] values = {
+                                    leftTorqueEffectiveness,
+                                    rightTorqueEffectiveness
+                            }
+                            
+                            alterCurrentData(keys, values);
                         }
     
                     }
@@ -161,9 +169,16 @@ public class Power extends Ant
                         @Override
                         public void onNewPedalSmoothness(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final boolean separatePedalSmoothnessSupport, final BigDecimal leftOrCombinedPedalSmoothness, final BigDecimal rightPedalSmoothness)
                         {
-                            LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                            map.put("SNPLC", reduceNumberToString(leftOrCombinedPedalSmoothness));
-                            map.put("SNPR",  reduceNumberToString(rightPedalSmoothness));
+                            int[] keys = {
+                                    RideService.SNPLC,
+                                    RideService.SNPR
+                            };
+                            
+                            float[] values = {
+                                    leftOrCombinedPedalSmoothness,
+                                    rightPedalSmoothness
+                            }
+
                             alterCurrentData(map);
                         }
                     }
@@ -175,14 +190,24 @@ public class Power extends Ant
     
     @Override
     public void zeroReadings()
-    {
-        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-        map.put("WATTS", "0");
-        map.put("NM",    "0");
-        map.put("CAD",   "0");
-        map.put("KPH",   "0");
-        map.put("KM",    "0");
-        alterCurrentData(map);
+    {   
+        int[] keys = {
+                RideService.WATTS,
+                RideService.NM, 
+                RideService.CAD,
+                RideService.KPH,
+                RideService.KM
+        };
+        
+        float[] values = {
+                (float) 0.0,
+                (float) 0.0,
+                (float) 0.0,
+                (float) 0.0,
+                (float) 0.0
+        };
+        
+        alterCurrentData(keys, values);
     }
 }
 

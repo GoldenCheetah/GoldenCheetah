@@ -1,6 +1,5 @@
 package com.ridelogger.listners;
 
-import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -8,10 +7,12 @@ import com.ridelogger.R;
 import com.ridelogger.RideService;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.preference.PreferenceManager;
 
 /**
  * Sensors
@@ -55,14 +56,16 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("lux",  reduceNumberToString(event.values[0]));
+                  alterCurrentData(RideService.lux,  event.values[0]);
               }
             };
             
             mSensorManager.registerListener(luxListner,   mLight, 3000000);
         }
+        
         if(mAccel != null) {
-            if(context.settings.getBoolean(context.getString(R.string.PREF_DETECT_CRASH), false)) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+            if(settings.getBoolean(context.getString(R.string.PREF_DETECT_CRASH), false)) {
                 accelListner = new SensorEventListener() {
                     private boolean crashed = false;
                     private Timer   timer   = new Timer();
@@ -73,11 +76,13 @@ public class Sensors extends Base<Object>
                       
                     @Override
                     public final void onSensorChanged(SensorEvent event) {                
-                        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                        map.put("ms2x", reduceNumberToString(event.values[0]));
-                        map.put("ms2y", reduceNumberToString(event.values[1]));
-                        map.put("ms2z", reduceNumberToString(event.values[2]));
-                        alterCurrentData(map);
+                        int[] keys = {
+                                RideService.ms2x,
+                                RideService.ms2y,
+                                RideService.ms2z
+                        };
+
+                        alterCurrentData(keys, event.values);
                         
                         if(St.length == 0) {
                             St[0] = event.values[0];
@@ -95,14 +100,14 @@ public class Sensors extends Base<Object>
                             crashed = true;
                             context.phoneCrash(amag);
 
-                            if(context.currentValues.containsKey("KPH")) {
+                            if(!Float.isNaN(context.currentValues[RideService.KPH])) {
                                 timer.schedule(
                                     new TimerTask() {              
                                         @Override  
                                         public void run() {
                                             //if we are traveling less then 1km/h at 5 seconds after crash detection
                                             // confirm the crash
-                                            if(1.0 > Double.parseDouble(context.currentValues.get("KPH"))) {
+                                            if(1.0 > context.currentValues[RideService.KPH]) {
                                                 context.phoneCrashConfirm();
                                             } else {
                                                 crashed = false;
@@ -132,20 +137,21 @@ public class Sensors extends Base<Object>
                     public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
                       
                     @Override
-                    public final void onSensorChanged(SensorEvent event) {                
-                        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                        map.put("ms2x", reduceNumberToString(event.values[0]));
-                        map.put("ms2y", reduceNumberToString(event.values[1]));
-                        map.put("ms2z", reduceNumberToString(event.values[2]));
-                        alterCurrentData(map);
+                    public final void onSensorChanged(SensorEvent event) {                                        
+                        int[] keys = {
+                                RideService.ms2x,
+                                RideService.ms2y,
+                                RideService.ms2z
+                        };
+                        
+                        alterCurrentData(keys, event.values);
                     }
                 };
             }
-            
-            
-            
+
             mSensorManager.registerListener(accelListner, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        
         if(mPress != null) {
             pressListner = new SensorEventListener() {
               @Override
@@ -155,12 +161,13 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("press",  reduceNumberToString(event.values[0]));
+                  alterCurrentData(RideService.press,  event.values[0]);
               }
             };
             
             mSensorManager.registerListener(pressListner, mPress, 3000000);
         }
+        
         if(mTemp != null) {
             tempListner = new SensorEventListener() {
               @Override
@@ -170,24 +177,27 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("temp",  reduceNumberToString(event.values[0]));
+                  alterCurrentData(RideService.temp,  event.values[0]);
               }
             };
             
             mSensorManager.registerListener(tempListner,  mTemp,  3000000);
         }
+        
         if(mField != null) {
             fieldListner = new SensorEventListener() {
               @Override
               public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
               
               @Override
-              public final void onSensorChanged(SensorEvent event) {
-                  LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                  map.put("uTx", reduceNumberToString(event.values[0]));
-                  map.put("uTy", reduceNumberToString(event.values[1]));
-                  map.put("uTz", reduceNumberToString(event.values[2]));
-                  alterCurrentData(map);
+              public final void onSensorChanged(SensorEvent event) {                  
+                  int[] keys = {
+                          RideService.uTx,
+                          RideService.uTy,
+                          RideService.uTz
+                  };
+                  
+                  alterCurrentData(keys, event.values);
               }
             };
             

@@ -41,7 +41,7 @@ public class HeartRate extends Ant
                     new IHeartRateDataReceiver() {
                         @Override
                         public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final DataState dataState) {
-                            alterCurrentData("HR", reduceNumberToString(computedHeartRate));
+                            alterCurrentData(RideService.HR, computedHeartRate);
                         }
                     }
                 );
@@ -53,6 +53,6 @@ public class HeartRate extends Ant
     @Override
     public void zeroReadings()
     {
-        alterCurrentData("HR", "0");
+        alterCurrentData(RideService.HR, (float) 0.0);
     }
 }
