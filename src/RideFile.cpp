@@ -1376,12 +1376,12 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
 //
 
 void
-RideFile::recalculateDerivedSeries()
+RideFile::recalculateDerivedSeries(bool force)
 {
     // derived data is calculated from the data that is present
     // we should set to 0 where we cannot derive since we may
     // be called after data is deleted or added
-    if (dstale == false) return; // we're already up to date
+    if (!force && dstale == false) return; // we're already up to date
 
     //
     // NP Initialisation -- working variables
