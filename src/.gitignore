@@ -1,1 +1,50 @@
+# xcode noise
+build/*
+*.pbxuser
+*.mode1v3
+Info.plist
+*.xcodeproj
 gcconfig.pri
+
+# old skool
+.svn
+
+# osx noise
+.DS_Store
+profile
+
+# ignore Qt/moc files
+moc_*
+qrc_application.cpp
+qrc_RideWindow.cpp
+.qmake.stash
+
+# ignore other object files
+*.o
+
+# logfiles
+vlc-log.txt
+antlog.bin
+
+# ignore lex/yacc generated files
+*_lex.cpp
+*_yacc.cpp
+*_yacc.h
+
+# ignore qmake-generated Makefile
+Makefile
+
+# ignore executables
+GoldenCheetah
+GoldenCheetah.exe
+GoldenCheetah.app
+
+#ignore ctags for vim
+tags
+
+#ignore patches
+*.patch
+
+#ignore qm
+*.qm
+
