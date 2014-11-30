@@ -1119,16 +1119,15 @@ LTMWindow::dataTable(bool html)
                 // Because the metrics may have been setup differently than the athlete profile, try to
                 // avoid aberrations by trying to match the units in the legend; if they are not
                 // recognized, then trust that the user knows what she wants (or has been given).
-                bool convert = context->athlete->useMetricUnits == false;
-                const RideMetric *aw = RideMetricFactory::instance().rideMetric(metricDetail.symbol);
-                if (aw != NULL) {
-                    if (aw->units(true) == metricDetail.uunits) {
-                        convert = false;
-                    } else if (aw->units(false) == metricDetail.uunits) {
-                        convert = true;
-                    }
+                // What we should do is separate user axis labeling from selected units in the UI and model.
+                bool convert;
+                if (metricDetail.metric->units(true) == metricDetail.uunits) {
+                    convert = false;
+                } else if (metricDetail.metric->units(false) == metricDetail.uunits) {
+                    convert = true;
+                } else {
+                    convert = context->athlete->useMetricUnits == false;
                 }
-
                 // convert from stored metric value to imperial if warranted
                 if (convert) {
                     value *= metricDetail.metric->conversion();
