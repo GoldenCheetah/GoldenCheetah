@@ -729,7 +729,7 @@ FormField::editFinished()
                 // Add units - for now, without a space but should be localized?
                 const RideMetric *aw = RideMetricFactory::instance().rideMetric("athlete_weight");
                 QString units = aw->units(useMetric);
-                value = QString("%1%2").arg(value, units);
+                value = QString("%1 %2").arg(value, units);
             }
             calendarText += QString("%1\n").arg(value);
         }
