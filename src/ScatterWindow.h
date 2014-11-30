@@ -69,6 +69,9 @@ class ScatterWindow : public GcChartWindow
 
         ScatterWindow(Context *);
 
+        // compare is supported
+        bool isCompare() const { return context->isCompareIntervals; }
+
         // reveal
         bool hasReveal() { return true; }
 
@@ -101,6 +104,9 @@ class ScatterWindow : public GcChartWindow
         void setIgnore();
         void setrFrame();
         void setrIgnore();
+
+        // compare mode started or items to compare changed
+        void compareChanged();
 
     protected:
 
