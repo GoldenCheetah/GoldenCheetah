@@ -298,132 +298,193 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     for (int side = 0; side < curves; side++) {
 
-        //
-        // GET ALL DATA AND MIN / MAX
-        //
-        int points=0;
-        QVector<double> x;
-        QVector<double> y;
+        if (context->isCompareIntervals == false) {
+            //
+            // GET ALL DATA AND MIN / MAX
+            //
+            int points=0;
+            QVector<double> x;
+            QVector<double> y;
 
-        foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
-
-            double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-            double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
-
-            // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
-            if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
-                 && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
-            if ((settings->x == MODEL_GEAR)
-                 && settings->ignore && (xv == 0.0f || int(yv) == 0)) continue;
-            if ((settings->y == MODEL_GEAR)
-                 && settings->ignore && (int(xv) == 0 || yv == 0.0f)) continue;
-
-            // add it 
-            x <<xv;
-            y <<yv;
-            points++;
-
-            if (yv > maxY) maxY = yv;
-            if (yv < minY) minY = yv;
-            if (xv > maxX) maxX = xv;
-            if (xv < minX) minX = xv;
-        }
-
-        //
-        // CREATE INTERVAL CURVES (and use framing data from above if needed)
-        //
-        if (intervals.count() > 0) {
-
-            // interval data in here
-            QVector<QVector<double> > xvals(intervals.count()); // array of curve x arrays
-            QVector<QVector<double> > yvals(intervals.count()); // array of curve x arrays
-            QVector<int> points(intervals.count());             // points in eac curve
-
-            // extract interval data
             foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-                double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
 
-                if (!(settings->ignore && (x == 0 && y ==0))) {
+                // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
+                if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
+                     && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
+                if ((settings->x == MODEL_GEAR)
+                     && settings->ignore && (xv == 0.0f || int(yv) == 0)) continue;
+                if ((settings->y == MODEL_GEAR)
+                     && settings->ignore && (int(xv) == 0 || yv == 0.0f)) continue;
 
-                    // which interval is it in?
-                    for (int idx=0; idx<intervals.count(); idx++) {
+                // add it
+                x <<xv;
+                y <<yv;
+                points++;
 
-                        IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(intervals[idx]));
+                if (yv > maxY) maxY = yv;
+                if (yv < minY) minY = yv;
+                if (xv > maxX) maxX = xv;
+                if (xv < minX) minX = xv;
+            }
 
-                        if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
-                            xvals[idx].append(x);
-                            yvals[idx].append(y);
-                            points[idx]++;
+            //
+            // CREATE INTERVAL CURVES (and use framing data from above if needed)
+            //
+            if (intervals.count() > 0) {
+
+                // interval data in here
+                QVector<QVector<double> > xvals(intervals.count()); // array of curve x arrays
+                QVector<QVector<double> > yvals(intervals.count()); // array of curve x arrays
+                QVector<int> points(intervals.count());             // points in eac curve
+
+                // extract interval data
+                foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
+
+                    double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                    double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+
+                    if (!(settings->ignore && (x == 0 && y ==0))) {
+
+                        // which interval is it in?
+                        for (int idx=0; idx<intervals.count(); idx++) {
+
+                            IntervalItem *current = dynamic_cast<IntervalItem *>(context->athlete->allIntervalItems()->child(intervals[idx]));
+
+                            if (point->secs+settings->ride->ride()->recIntSecs() > current->start && point->secs< current->stop) {
+                                xvals[idx].append(x);
+                                yvals[idx].append(y);
+                                points[idx]++;
+                            }
                         }
                     }
                 }
+
+                // now we have the interval data lets create the curves
+                QMapIterator<int, int> order(displaySequence);
+                while (order.hasNext()) {
+                    order.next();
+                    int idx = order.value();
+
+                    QColor intervalColor;
+                    intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
+                    // left / right are darker lighter
+                    if (side) intervalColor = intervalColor.lighter(50);
+
+                    QwtSymbol *sym = new QwtSymbol;
+                    sym->setStyle(QwtSymbol::Ellipse);
+                    sym->setSize(4);
+                    sym->setBrush(QBrush(intervalColor));
+                    sym->setPen(QPen(intervalColor));
+
+                    QwtPlotCurve *ic = new QwtPlotCurve();
+
+                    ic->setSymbol(sym);
+                    ic->setStyle(QwtPlotCurve::Dots);
+                    ic->setRenderHint(QwtPlotItem::RenderAntialiased);
+                    ic->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
+                    ic->attach(this);
+
+                    intervalCurves.append(ic);
+                }
             }
 
-            // now we have the interval data lets create the curves
-            QMapIterator<int, int> order(displaySequence);
-            while (order.hasNext()) {
-                order.next();
-                int idx = order.value();
+            // setup the framing curve
+            if (intervals.count() == 0 || settings->frame) {
 
-                QColor intervalColor;
-                intervalColor.setHsv((255/context->athlete->allIntervalItems()->childCount()) * (intervals[idx]), 255,255);
-                // left / right are darker lighter
-                if (side) intervalColor = intervalColor.lighter(50);
+                if (side) {
 
-                QwtSymbol *sym = new QwtSymbol;
-                sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4);
-                sym->setBrush(QBrush(intervalColor));
-                sym->setPen(QPen(intervalColor));
+                    QwtSymbol *sym = new QwtSymbol;
+                    sym->setStyle(QwtSymbol::Ellipse);
+                    sym->setSize(4);
+                    sym->setPen(QPen(Qt::cyan));
+                    sym->setBrush(QBrush(Qt::cyan));
 
-                QwtPlotCurve *ic = new QwtPlotCurve();
+                    curve2 = new QwtPlotCurve();
+                    curve2->setSymbol(sym);
+                    curve2->setStyle(QwtPlotCurve::Dots);
+                    curve2->setRenderHint(QwtPlotItem::RenderAntialiased);
+                    curve2->setSamples(x.constData(), y.constData(), points);
+                    curve2->setZ(-1);
+                    curve2->attach(this);
 
-                ic->setSymbol(sym);
-                ic->setStyle(QwtPlotCurve::Dots);
-                ic->setRenderHint(QwtPlotItem::RenderAntialiased);
-                ic->setSamples(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
-                ic->attach(this);
+                } else {
 
-                intervalCurves.append(ic);
+                    QwtSymbol *sym = new QwtSymbol;
+                    sym->setStyle(QwtSymbol::Ellipse);
+                    sym->setSize(4);
+                    sym->setPen(QPen(Qt::red));
+                    sym->setBrush(QBrush(Qt::red));
+
+                    curve = new QwtPlotCurve();
+                    curve->setSymbol(sym);
+                    curve->setStyle(QwtPlotCurve::Dots);
+                    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                    curve->setSamples(x.constData(), y.constData(), points);
+                    curve->setZ(-1);
+                    curve->attach(this);
+                }
             }
         }
+        else {
 
-        // setup the framing curve
-        if (intervals.count() == 0 || settings->frame) {
+            if (context->compareIntervals.count() > 0) {
 
-            if (side) {
+                //
+                // CREATE COMPARE CURVES
+                //
 
-                QwtSymbol *sym = new QwtSymbol;
-                sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4);
-                sym->setPen(QPen(Qt::cyan));
-                sym->setBrush(QBrush(Qt::cyan));
+                for (int i=0; i< context->compareIntervals.count(); i++) {
+                    CompareInterval interval = context->compareIntervals.at(i);
 
-                curve2 = new QwtPlotCurve();
-                curve2->setSymbol(sym);
-                curve2->setStyle(QwtPlotCurve::Dots);
-                curve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-	            curve2->setSamples(x.constData(), y.constData(), points);
-                curve2->setZ(-1);
-                curve2->attach(this);
+                    if (interval.checked == false)
+                        continue;
 
-            } else {
+                    // interval data in here
+                    QVector<double> xval;
+                    QVector<double> yval;
+                    int nbPoints = 0;
 
-                QwtSymbol *sym = new QwtSymbol;
-                sym->setStyle(QwtSymbol::Ellipse);
-                sym->setSize(4);
-                sym->setPen(QPen(Qt::red));
-                sym->setBrush(QBrush(Qt::red));
+                    // extract interval data
+                    foreach(const RideFilePoint *point, interval.data->dataPoints()) {
 
-                curve = new QwtPlotCurve();
-                curve->setSymbol(sym);
-                curve->setStyle(QwtPlotCurve::Dots);
-                curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-	            curve->setSamples(x.constData(), y.constData(), points);
-                curve->setZ(-1);
-                curve->attach(this);
+                        double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                        double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+
+                        if (y > maxY) maxY = y;
+                        if (y < minY) minY = y;
+                        if (x > maxX) maxX = x;
+                        if (x < minX) minX = x;
+
+                        if (!(settings->ignore && (x == 0 && y ==0))) {
+                            xval.append(x);
+                            yval.append(y);
+                            nbPoints++;
+                        }
+                    }
+
+                    QColor intervalColor = interval.color;
+                    // left / right are darker lighter
+                    if (side) intervalColor = intervalColor.lighter(50);
+
+                    QwtSymbol *sym = new QwtSymbol;
+                    sym->setStyle(QwtSymbol::Ellipse);
+                    sym->setSize(4);
+                    sym->setBrush(QBrush(intervalColor));
+                    sym->setPen(QPen(intervalColor));
+
+                    QwtPlotCurve *ic = new QwtPlotCurve();
+
+                    ic->setSymbol(sym);
+                    ic->setStyle(QwtPlotCurve::Dots);
+                    ic->setRenderHint(QwtPlotItem::RenderAntialiased);
+                    ic->setSamples(xval.constData(), yval.constData(), nbPoints);
+                    ic->attach(this);
+
+                    intervalCurves.append(ic);
+                }
             }
         }
     }
@@ -599,6 +660,8 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
         delete is;
     }
     intervalMarkers.clear();
+
+    if (context->isCompareIntervals) return;
 
     // do we have a ride with intervals to refresh ?
     int count=0;
