@@ -717,8 +717,21 @@ FormField::editFinished()
     QString calendarText;
     foreach (FieldDefinition field, meta->getFields()) {
         if (field.diary == true) {
-            calendarText += QString("%1\n")
-                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+            QString value = ourRideItem->ride()->getTag(field.name, "");
+            if (field.name == "Weight") {
+                bool useMetric = meta->context->athlete->useMetricUnits;
+                if (useMetric == false) {
+                    // Another fix for weight, maybe build an abstraction for that? :(
+                    // This is needed in multiple places too (RideFile & RideMetaData).
+                    double lbs = (double) qRound(100 * (value.toDouble() * LB_PER_KG + 0.001)) / 100;
+                    value = QString("%1").arg(lbs);
+                }
+                // Add units - for now, without a space but should be localized?
+                const RideMetric *aw = RideMetricFactory::instance().rideMetric("athlete_weight");
+                QString units = aw->units(useMetric);
+                value = QString("%1%2").arg(value, units);
+            }
+            calendarText += QString("%1\n").arg(value);
         }
     }
     ourRideItem->ride()->setTag("Calendar Text", calendarText);
