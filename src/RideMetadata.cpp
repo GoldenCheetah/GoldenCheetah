@@ -863,9 +863,13 @@ FormField::metadataChanged()
         break;
 
     case FIELD_INTEGER : // integer
-        if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
-            double lbs = value.toDouble() * LB_PER_KG;
-            value = QString("%1").arg(lbs);
+        if (definition.name == "Weight") {
+            // They asked for an integer... There will be rounding issues in display, but as
+            // long as the field is not edited the original value won't be clobbered.
+            // This approach could be used for other metrics if needed.
+            double conv = meta->context->athlete->useMetricUnits ? 1. : LB_PER_KG;
+            int roundedLbs = qRound(value.toDouble() * conv);
+            value = QString("%1").arg(roundedLbs);
         }
         ((QSpinBox*)widget)->setValue(value.toInt());
         break;
