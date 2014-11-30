@@ -178,7 +178,7 @@ class RideFile : public QObject // QObject to emit signals
         // STATE IS MAINTAINED IN 'bool dstale' BELOW
         // TO ENSURE IT IS ONLY REFRESHED IF NEEDED
         //
-        void recalculateDerivedSeries();
+        void recalculateDerivedSeries(bool force=false);
 
         // Working with DATAPRESENT flags
         inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
