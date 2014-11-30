@@ -19,7 +19,6 @@ public class Ant extends Base<Object>
     public PccReleaseHandle<?>            releaseHandle;    //Handle class
     public IPluginAccessResultReceiver<?> mResultReceiver;  //Receiver class
     public Boolean                        snooped  = false; //should we snoop others connections?
-    public Ant                            that     = null;                           
     //setup listeners and logging 
     public Ant(MultiDeviceSearchResult result, RideService mContext) {
         super(mContext);
@@ -27,7 +26,6 @@ public class Ant extends Base<Object>
     
     public Ant(MultiDeviceSearchResult result, RideService mContext, Boolean pSnoop) {
         super(mContext);
-        that = this;
         snooped  = pSnoop;
     }
     
@@ -41,7 +39,7 @@ public class Ant extends Base<Object>
                 zeroReadings();
                 if(snooped) {
                     releaseHandle.close(); // release ourselves if snooped
-                    context.releaseSnoopedSensor(that);
+                    context.releaseSnoopedSensor(Ant.this);
                 }
             }
         }
