@@ -17,7 +17,7 @@ include( $${QWT_ROOT}/qwtfunctions.pri )
 TEMPLATE          = lib
 TARGET            = $$qwtLibraryTarget(qwt)
 
-DESTDIR           = $${OUT_PWD}/../lib
+DESTDIR           = $${QWT_ROOT}/lib
 
 contains(QWT_CONFIG, QwtDll) {
 

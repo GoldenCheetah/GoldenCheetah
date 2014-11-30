@@ -446,7 +446,8 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     }
 
     // we need to show what units we use for weight...
-    if (field.name == "Weight" && field.type == FIELD_DOUBLE) {
+    // TODO: those should be taken from the weigth metric instead? Though translation would need to change.
+    if (field.name == "Weight") {
         units = meta->context->athlete->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
@@ -703,7 +704,7 @@ FormField::editFinished()
 
             // we need to convert from display value to 
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+            if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -862,6 +863,10 @@ FormField::metadataChanged()
         break;
 
     case FIELD_INTEGER : // integer
+        if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+            double lbs = value.toDouble() * LB_PER_KG;
+            value = QString("%1").arg(lbs);
+        }
         ((QSpinBox*)widget)->setValue(value.toInt());
         break;
 
