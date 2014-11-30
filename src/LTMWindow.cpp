@@ -1118,7 +1118,7 @@ LTMWindow::dataTable(bool html)
             if (metricDetail.type != METRIC_BEST && metricDetail.metric) {
                 // Because the metrics may have been setup differently than the athlete profile, try to
                 // avoid aberrations by trying to match the units in the legend; if they are not
-                // recogbnized, then trust that the user knows what she wants (or has been given).
+                // recognized, then trust that the user knows what she wants (or has been given).
                 bool convert = context->athlete->useMetricUnits == false;
                 const RideMetric *aw = RideMetricFactory::instance().rideMetric(metricDetail.symbol);
                 if (aw != NULL) {
