@@ -142,8 +142,7 @@ public class StartActivity extends FragmentActivity
     public void bindToService() {
         service = getServiceRunning(RideService.class);
         if(service != null) {
-            final StartActivity that = this;
-            bindService(new Intent(that, RideService.class), mConnection, Context.BIND_AUTO_CREATE);
+            bindService(new Intent(StartActivity.this, RideService.class), mConnection, Context.BIND_AUTO_CREATE);
             mIsBound = true;
         }
     }

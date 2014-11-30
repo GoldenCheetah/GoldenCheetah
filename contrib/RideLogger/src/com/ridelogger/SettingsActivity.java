@@ -11,26 +11,70 @@ import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.MultiSelectListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
-public class SettingsActivity extends PreferenceActivity {   
+public class SettingsActivity extends PreferenceActivity {
     
     /**
      * This fragment contains a second-level set of preference that you
      * can get to by tapping an item in the first preferences fragment.
      */
     public static class GeneralFragment extends PreferenceFragment {
+        
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.general_settings);
         }
+        
+        
+        @Override
+        public void onResume() {
+            // TODO Auto-generated method stub
+            super.onResume();
+            
+            if(((SettingsActivity) getActivity()).getServiceRunning(RideService.class) != null) {
+                Preference pref = findPreference(getString(R.string.PREF_RIDER_NAME));
+                pref.setEnabled(false);
+                
+                pref = findPreference(getString(R.string.PREF_EMERGENCY_NUMBER));
+                pref.setEnabled(false);
+            }
+        }
     }
+    
+    
+    /**
+     * This fragment contains a second-level set of preference that you
+     * can get to by tapping an item in the first preferences fragment.
+     */
+    public static class SensorsFragment extends PreferenceFragment {        
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            addPreferencesFromResource(R.xml.sensors_settings);
+            MultiSelectListPreference mMultiSelectListPreference = (MultiSelectListPreference) findPreference(getString(R.string.PREF_TRACKING_SENSORS));
+            mMultiSelectListPreference.setEntries( RideService.KEYS );
+            
+            CharSequence[] keys = new CharSequence[RideService.KEYS.length];
+            
+            for (int i = 0; i < RideService.KEYS.length; i++) {
+                keys[i] = String.valueOf(i);
+            }
+            mMultiSelectListPreference.setEntryValues(keys);
+        }
+    }
+    
     
     @Override
     public boolean isValidFragment(String fragment) {
@@ -43,8 +87,37 @@ public class SettingsActivity extends PreferenceActivity {
      * can get to by tapping an item in the first preferences fragment.
      */
     public static class AntFragment extends PreferenceFragment {
+        
         private MultiDeviceSearch mSearch;
         private MultiSelectListPreference mMultiSelectListPreference;
+
+        @Override
+        public void onResume() {
+            // TODO Auto-generated method stub
+            super.onResume();
+            
+            if(((SettingsActivity) getActivity()).getServiceRunning(RideService.class) != null) {
+                setupAnt();
+
+                Timer timer = new Timer();
+                final Handler handler = new Handler();
+                
+                timer.schedule(
+                    new TimerTask() {
+                        @Override  
+                        public void run() {
+                            handler.post(new Runnable() {
+        
+                                public void run() {
+                                    mMultiSelectListPreference.setEnabled(true);
+                                }
+                            });
+                        }
+                    },
+                    5000
+                );      
+            }
+        }
 
         
         @Override
@@ -54,27 +127,8 @@ public class SettingsActivity extends PreferenceActivity {
             addPreferencesFromResource(R.xml.ant_settings);
             mMultiSelectListPreference = (MultiSelectListPreference) findPreference(getString(R.string.PREF_PAIRED_ANTS));
             mMultiSelectListPreference.setEnabled(false);
-
-            setupAnt();
-
-            Timer timer = new Timer();
-            final Handler handler = new Handler();
-            
-            timer.schedule(
-                new TimerTask() {
-                    @Override  
-                    public void run() {
-                        handler.post(new Runnable() {
-    
-                            public void run() {
-                                mMultiSelectListPreference.setEnabled(true);
-                            }
-                        });
-                    }
-                },
-                5000
-            );      
         }
+        
 
         /**
          * try to pair some ant+ devices
@@ -135,6 +189,7 @@ public class SettingsActivity extends PreferenceActivity {
             }
         }
         
+        
         @Override
         public void onDestroy() {
             if(mSearch != null) mSearch.close();
@@ -148,5 +203,21 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.layout.settings, target);
+    }
+    
+    
+    /**
+     * is a service running or not
+     * @param serviceClass
+     * @return
+     */
+    public RunningServiceInfo getServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return service;
+            }
+        }
+        return null;
     }
 }

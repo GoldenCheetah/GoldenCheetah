@@ -43,6 +43,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 
 
@@ -54,7 +55,7 @@ import android.telephony.SmsManager;
 public class RideService extends Service
 {    
     public static final int notifyID     = 1;                  //Id of the notification in the top android bar that this class creates and alters   
-    public static final int TOTALSENSORS = 25;
+    
     
     public static final int SECS         = 0;
     public static final int KPH          = 1;
@@ -109,6 +110,8 @@ public class RideService extends Service
         "press",
         "lux"
     };
+    
+    public static final int TOTALSENSORS = RideService.KEYS.length;
     
     public float[]           currentValues = new float[RideService.TOTALSENSORS]; //float array of current values
     public float[]           snoopedValues = new float[RideService.TOTALSENSORS]; //float array of snooped values
@@ -408,7 +411,7 @@ public class RideService extends Service
      */
     public void smsHome(String body) {
         SmsManager smsManager = SmsManager.getDefault();
-        if(emergencyNumbuer != null) {
+        if(emergencyNumbuer != null && PhoneNumberUtils.isWellFormedSmsAddress(emergencyNumbuer)) {
             smsManager.sendTextMessage(emergencyNumbuer, null, body, null, null);
         }
     }

@@ -20,7 +20,7 @@
     <string name="ant_setup_note">Pair your Ant+ devices now?</string>
     
     <string name="ant_pair_dialog_title">Select Ant Devices</string>
-    <string name="ant_pair_dialog_button_note">Pair</string>
+    <string name="ant_pair_dialog_button_note">Pair</string>    
   
     <string name="gc_rider_name_dialog_title">Enter Rider Name</string>
     <string name="gc_rider_name_dialog_note">What is your Golder Cheata Rider Name?</string>
@@ -68,12 +68,19 @@
     <string name="setting_ant_title">Ant+</string>
     <string name="setting_ant_note">Setup your Ant+ Devices</string>
     
+    <string name="setting_sensors_title">Display Sensors</string>
+    <string name="setting_sensors_note">List of Sensors Display</string>
+    
+    <string name="setting_size_title">Display Text Size</string>
+    
     <string name="PREFS_NAME">RideLogger</string>      
     <string name="PREF_RIDER_NAME">RiderName</string>       
     <string name="PREF_EMERGENCY_NUMBER">EmergencyNumbuer</string>
     <string name="PREF_DETECT_CRASH">DetectCrash</string>     
     <string name="PREF_PHONE_HOME">PhoneHome</string>       
     <string name="PREF_PAIRED_ANTS">PairedAnts</string>      
-    <string name="PREF_PHONE_HOME_PERIOD">PhoneHomePeriod</string> 
+    <string name="PREF_PHONE_HOME_PERIOD">PhoneHomePeriod</string>
+    <string name="PREF_TRACKING_SENSORS">TrackingSensors</string>
+    <string name="PREF_TRACKING_SIZE">TrackingSize</string>
     
 </resources>
