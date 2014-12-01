@@ -13,13 +13,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class CurrentValuesAdapter extends BaseAdapter {
-    public StartActivity  context;
-    public int            count     = 0;
-    public int[]          keys;
-    public TextView[]     keyTvs    = new TextView[RideService.TOTALSENSORS];
-    public TextView[]     valuesTvs = new TextView[RideService.TOTALSENSORS];
+    public StartActivity    context;
+    
+    public int[]            keys;
+    public TextView[]       keyTvs    = new TextView[RideService.TOTALSENSORS];
+    public TextView[]       valuesTvs = new TextView[RideService.TOTALSENSORS];
     public RelativeLayout[] lls       = new RelativeLayout[RideService.TOTALSENSORS];
-    public int            size      = 20;
+    public int              size      = 20;
+    public boolean          imperial  = false;
+    public int              count     = 0;
     public static SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
     public CurrentValuesAdapter(StartActivity c) {
@@ -27,6 +29,8 @@ public class CurrentValuesAdapter extends BaseAdapter {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         Set<String> sensors        = settings.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
         size                       = Integer.valueOf(settings.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
+        imperial                   = settings.getBoolean(context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS), false);
+        
         
         if(sensors != null && sensors.size() > 0) {
             keys = new int[sensors.size()];
@@ -55,6 +59,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
                             valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
                             keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, (int) (size * 0.75));
                         }
+                        notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_SENSORS)) {
                         Set<String> sensors = sharedPreferences.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
                         keys = new int[sensors.size()];
@@ -66,6 +71,36 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         }
                         
                         context.layout.setAdapter(CurrentValuesAdapter.this);
+                    } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
+                        imperial = sharedPreferences.getBoolean(pkey, false);
+                        
+                        if(!imperial) {
+                            for(int key : keys) {
+                                keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+                            }
+                        } else {
+                            for(int key : keys) {
+                                switch (key) {
+                                    case RideService.ALTITUDE:
+                                        keyTvs[key].setText("ft");
+                                        break;
+                                        
+                                    case RideService.KPH:
+                                        keyTvs[key].setText("mph");
+                                        break;
+                                        
+                                    case RideService.KM:
+                                        keyTvs[key].setText("m");
+                                        break;
+                        
+                                    default:
+                                        keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+                                        break;
+                                }
+                            }
+                        }
+                        
+                        notifyDataSetChanged();
                     }
                 }
             }
@@ -112,7 +147,29 @@ public class CurrentValuesAdapter extends BaseAdapter {
         keyTvs[key] = new TextView(context);
         
         keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, (int) (size * 0.55));
-        keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+        
+        
+        if(!imperial) {
+            keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+        } else {
+            switch (key) {
+                case RideService.ALTITUDE:
+                    keyTvs[key].setText("ft");
+                    break;
+                    
+                case RideService.KPH:
+                    keyTvs[key].setText("mph");
+                    break;
+                    
+                case RideService.KM:
+                    keyTvs[key].setText("miles");
+                    break;
+    
+                default:
+                    keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+                    break;
+            }
+        }
     }
     
     
@@ -146,7 +203,27 @@ public class CurrentValuesAdapter extends BaseAdapter {
     
     public void update(float[] values) {
         for (int key: keys) {
-            valuesTvs[key].setText(String.format("%.2f", values[key]));
+            if(!imperial) {
+                valuesTvs[key].setText(String.format("%.2f", values[key]));
+            } else {
+                switch (key) {
+                    case RideService.ALTITUDE:
+                        valuesTvs[key].setText(String.format("%.2f", values[key] * 3.28084));
+                        break;
+                    
+                    case RideService.KPH:
+                        valuesTvs[key].setText(String.format("%.2f", values[key] * 0.621371));
+                        break;
+
+                    case RideService.KM:
+                        valuesTvs[key].setText(String.format("%.2f", values[key] * 0.621371));
+                        break;
+        
+                    default:
+                        valuesTvs[key].setText(String.format("%.2f", values[key]));
+                        break;
+                }
+            }
         }
         
         notifyDataSetChanged();
