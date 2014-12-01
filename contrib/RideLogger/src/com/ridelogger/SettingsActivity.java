@@ -92,11 +92,29 @@ public class SettingsActivity extends PreferenceActivity {
         private MultiSelectListPreference mMultiSelectListPreference;
 
         @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            
+            addPreferencesFromResource(R.xml.ant_settings);
+            mMultiSelectListPreference = (MultiSelectListPreference) findPreference(getString(R.string.PREF_PAIRED_ANTS));
+        }
+        
+        @Override
         public void onResume() {
             // TODO Auto-generated method stub
             super.onResume();
-            
-            if(((SettingsActivity) getActivity()).getServiceRunning(RideService.class) != null) {
+            initAntSearch();
+        }
+
+        
+        /**
+         * search for ant+ if we are not recording
+         */
+        public void initAntSearch() {
+            mMultiSelectListPreference.setEnabled(false);
+            if(((SettingsActivity) getActivity()).getServiceRunning(RideService.class) == null) {
+                mMultiSelectListPreference.setSummary(R.string.searching_for_ants);
+                
                 setupAnt();
 
                 Timer timer = new Timer();
@@ -104,29 +122,29 @@ public class SettingsActivity extends PreferenceActivity {
                 
                 timer.schedule(
                     new TimerTask() {
+                        
                         @Override  
                         public void run() {
-                            handler.post(new Runnable() {
-        
-                                public void run() {
-                                    mMultiSelectListPreference.setEnabled(true);
-                                }
-                            });
+                            if(mMultiSelectListPreference.getEntryValues().length > 0) {
+                                handler.post(new Runnable() {
+                                    public void run() {
+                                        mMultiSelectListPreference.setEnabled(true);
+                                        mMultiSelectListPreference.setSummary(R.string.found_ants);
+                                    }
+                                });
+                            } else {
+                                handler.post(new Runnable() {
+                                    public void run() {
+                                        mMultiSelectListPreference.setEnabled(true);
+                                        mMultiSelectListPreference.setSummary(R.string.no_found_ants);
+                                    }
+                                });
+                            }
                         }
                     },
                     5000
                 );      
             }
-        }
-
-        
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            
-            addPreferencesFromResource(R.xml.ant_settings);
-            mMultiSelectListPreference = (MultiSelectListPreference) findPreference(getString(R.string.PREF_PAIRED_ANTS));
-            mMultiSelectListPreference.setEnabled(false);
         }
         
 

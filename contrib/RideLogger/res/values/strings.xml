@@ -68,6 +68,10 @@
     <string name="setting_ant_title">Ant+</string>
     <string name="setting_ant_note">Setup your Ant+ Devices</string>
     
+    <string name="searching_for_ants">Searching for Ant+ Devices...</string>
+    <string name="found_ants">Found Ant+ Devices, Press to Pair.</string>
+    <string name="no_found_ants">Nothing found to pair.</string>
+    
     <string name="setting_sensors_title">Display Sensors</string>
     <string name="setting_sensors_note">List of Sensors Display</string>
     
