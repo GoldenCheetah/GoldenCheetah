@@ -9,14 +9,17 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class CurrentValuesAdapter extends BaseAdapter {
-    public StartActivity context;
-    public int           count  = 0;
-    public int[]         keys;
-    public TextView[]    tvs    = new TextView[RideService.TOTALSENSORS];
-    public int           size   = 20;
+    public StartActivity  context;
+    public int            count     = 0;
+    public int[]          keys;
+    public TextView[]     keyTvs    = new TextView[RideService.TOTALSENSORS];
+    public TextView[]     valuesTvs = new TextView[RideService.TOTALSENSORS];
+    public RelativeLayout[] lls       = new RelativeLayout[RideService.TOTALSENSORS];
+    public int            size      = 20;
     public static SharedPreferences.OnSharedPreferenceChangeListener spChanged;
 
     public CurrentValuesAdapter(StartActivity c) {
@@ -30,6 +33,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
             int i = 0;
             for(String sensor : sensors) {
                 keys[i] = Integer.parseInt(sensor);
+                initRelativeLayout(keys[i]);
                 i++;
             }
         } else {
@@ -37,11 +41,8 @@ public class CurrentValuesAdapter extends BaseAdapter {
             
             for (int i = 0; i < RideService.KEYS.length; i++) {
                 keys[i] = i;
+                initRelativeLayout(keys[i]);
             }
-        }
-        
-        for (int key: keys) {
-            tvs[key] = getNewTv(key);
         }
         
         settings.registerOnSharedPreferenceChangeListener(
@@ -51,7 +52,8 @@ public class CurrentValuesAdapter extends BaseAdapter {
                     if(pkey == context.getString(R.string.PREF_TRACKING_SIZE)) {
                         size = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
                         for (int key: keys) {
-                            tvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+                            valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+                            keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, (int) (size * 0.75));
                         }
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_SENSORS)) {
                         Set<String> sensors = sharedPreferences.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
@@ -59,11 +61,8 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         int i = 0;
                         for(String sensor : sensors) {
                             keys[i] = Integer.parseInt(sensor);
+                            initRelativeLayout(keys[i]);
                             i++;
-                        }
-                        tvs = new TextView[RideService.TOTALSENSORS];
-                        for (int key: keys) {
-                            tvs[key] = getNewTv(key);
                         }
                         
                         context.layout.setAdapter(CurrentValuesAdapter.this);
@@ -73,15 +72,47 @@ public class CurrentValuesAdapter extends BaseAdapter {
         );
     }
     
-    public TextView getNewTv(int key){
-        TextView tv = new TextView(context);
+    public void initRelativeLayout(int key) {
+        lls[key] = new RelativeLayout(context);
+        initValueTv(key);
+        initKeyTv(key);
         
-        tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
-        tv.setTypeface(null, Typeface.BOLD);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-        tv.setText(String.format("%.2f", 0.0) + " " +  RideService.KEYS[key].toString().toLowerCase());
+        RelativeLayout.LayoutParams valueLayoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
         
-        return tv;
+        valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        
+        lls[key].addView(valuesTvs[key], valueLayoutParams);
+        
+        RelativeLayout.LayoutParams keyLayoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        
+        keyLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        keyLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        
+        lls[key].addView(keyTvs[key], keyLayoutParams);
+    }
+    
+    public void initValueTv(int key){
+        valuesTvs[key] = new TextView(context);
+        
+        valuesTvs[key].setTextAppearance(context, android.R.attr.textAppearanceLarge);
+        valuesTvs[key].setTypeface(null, Typeface.BOLD);
+        valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+        valuesTvs[key].setText(String.format("%.2f", 0.0));
+    }
+    
+    
+    public void initKeyTv(int key){
+        keyTvs[key] = new TextView(context);
+        
+        keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, (int) (size * 0.55));
+        keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
     }
     
     
@@ -106,16 +137,16 @@ public class CurrentValuesAdapter extends BaseAdapter {
     @Override    
     public View getView(int position, View convertView, ViewGroup parent) {        
         if (convertView == null) {
-            return (TextView) tvs[keys[position]];
+            return (RelativeLayout) lls[keys[position]];
         } else {
-            return (TextView) convertView;
+            return (RelativeLayout) convertView;
         }
     }
     
     
     public void update(float[] values) {
         for (int key: keys) {
-            tvs[key].setText(String.format("%.2f", values[key]) + " " +  RideService.KEYS[key].toString().toLowerCase());
+            valuesTvs[key].setText(String.format("%.2f", values[key]));
         }
         
         notifyDataSetChanged();

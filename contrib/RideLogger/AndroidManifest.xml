@@ -16,7 +16,8 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo.Light">
         <service
            android:name="com.ridelogger.RideService"
            android:icon="@drawable/ic_launcher"
