@@ -8,6 +8,7 @@
     android:numColumns="auto_fit"
     android:verticalSpacing="10dp"
     android:horizontalSpacing="10dp"
+    android:padding="5dp"
     android:stretchMode="columnWidth"
     android:gravity="center"
 />
