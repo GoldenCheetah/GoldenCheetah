@@ -115,6 +115,12 @@ public class StartActivity extends FragmentActivity
         unBindToService();
     }
     
+    @Override
+    protected void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+    }
+    
     
     /**
      * setup the settings for the user
