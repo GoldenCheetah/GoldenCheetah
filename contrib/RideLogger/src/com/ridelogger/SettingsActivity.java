@@ -122,7 +122,6 @@ public class SettingsActivity extends PreferenceActivity {
                 
                 timer.schedule(
                     new TimerTask() {
-                        
                         @Override  
                         public void run() {
                             if(mMultiSelectListPreference.getEntryValues().length > 0) {

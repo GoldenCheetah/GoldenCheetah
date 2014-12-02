@@ -8,6 +8,12 @@
             android:title="@string/ant_pair_dialog_title"
             android:summary="@string/ant_pair_dialog_button_note"
             />
+        
+        <EditTextPreference 
+            android:key="@string/PREF_WHEEL_SIZE"
+            android:title="@string/setting_wheel_size"
+            android:defaultValue="2.07"
+            />
 
     </PreferenceCategory>
 

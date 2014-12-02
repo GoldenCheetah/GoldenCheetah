@@ -1,4 +1,5 @@
 package com.ridelogger.listners;
+import android.preference.PreferenceManager;
 
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.CalculatedWheelDistanceReceiver;
@@ -14,7 +15,7 @@ import com.dsi.ant.plugins.antplus.pcc.defines.EventFlag;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
-
+import com.ridelogger.R;
 import com.ridelogger.RideService;
 
 import java.math.BigDecimal;
@@ -27,18 +28,20 @@ import java.util.EnumSet;
  */
 public class Power extends Ant
 {
-    public BigDecimal wheelCircumferenceInMeters = new BigDecimal("2.07"); //size of wheel to calculate speed
+    public BigDecimal wheelCircumferenceInMeters; //size of wheel to calculate speed
     
     //setup listeners and logging 
     public Power(MultiDeviceSearchResult result, RideService mContext) {
         super(result, mContext);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
+        wheelCircumferenceInMeters = new BigDecimal(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_DETECT_CRASH), "2.07"));
     }
     
     
     public Power(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
         super(result, mContext, psnoop);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
+        wheelCircumferenceInMeters = new BigDecimal(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_DETECT_CRASH), "2.07"));
     }
     
     
