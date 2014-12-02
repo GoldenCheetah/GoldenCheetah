@@ -18,13 +18,8 @@ public class Base<T>
     public RideService context;
         
     public Base(RideService mContext) {
-        init(mContext);
-    }
-    
-    //setup references to buffer and current values and context
-    public void init(RideService mContext) {
         context       = mContext;
-        buf           = context.buf;           //shared file buffer object
+        buf           = context.buf; //shared file buffer object
     }
     
     

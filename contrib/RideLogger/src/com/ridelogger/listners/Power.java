@@ -2,7 +2,6 @@ package com.ridelogger.listners;
 import android.preference.PreferenceManager;
 
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc;
-import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.CalculatedWheelDistanceReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.CalculatedWheelSpeedReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.DataSource;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedCrankCadenceReceiver;
@@ -34,14 +33,18 @@ public class Power extends Ant
     public Power(MultiDeviceSearchResult result, RideService mContext) {
         super(result, mContext);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
-        wheelCircumferenceInMeters = new BigDecimal(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_DETECT_CRASH), "2.07"));
+        wheelCircumferenceInMeters = new BigDecimal(
+                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.07")
+        );
     }
     
     
     public Power(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
         super(result, mContext, psnoop);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
-        wheelCircumferenceInMeters = new BigDecimal(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_DETECT_CRASH), "2.07"));
+        wheelCircumferenceInMeters = new BigDecimal(
+                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.07")
+        );
     }
     
     
