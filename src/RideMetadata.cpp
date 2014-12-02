@@ -722,8 +722,7 @@ FormField::editFinished()
             if (field.name == "Weight") {
                 bool useMetric = meta->context->athlete->useMetricUnits;
                 if (useMetric == false) {
-                    // Another fix for weight, maybe build an abstraction for that? :(
-                    // This is needed in multiple places too (RideFile & RideMetaData).
+                    // This code appears in RideFile.cpp and RideMetaData.cpp and needs to be kept in sync for now.
                     double lbs = (double) qRound(100 * (value.toDouble() * LB_PER_KG + 0.001)) / 100;
                     value = QString("%1").arg(lbs);
                 }
