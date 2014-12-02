@@ -215,7 +215,7 @@ public class RideService extends Service
         if(rideStarted) return;
         
         startTime     = System.currentTimeMillis();
-        final String fileName      = "ride-" + startTime + ".json.gzip";
+        final String fileName      = "ride-" + startTime + ".json.gz";
         
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
