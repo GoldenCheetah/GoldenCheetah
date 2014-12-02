@@ -87,7 +87,7 @@ public class Power extends Ant
                     }
                 );
 
-                result.subscribeCalculatedWheelDistanceEvent(
+                /*result.subscribeCalculatedWheelDistanceEvent(
                     new CalculatedWheelDistanceReceiver(wheelCircumferenceInMeters) {
                         @Override
                         public void onNewCalculatedWheelDistance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedWheelDistance) 
@@ -95,7 +95,7 @@ public class Power extends Ant
                             alterCurrentData(RideService.KM, calculatedWheelDistance.floatValue());
                         }
                     }
-                );
+                );*/
 
                 result.subscribeInstantaneousCadenceEvent(
                     new IInstantaneousCadenceReceiver() {
