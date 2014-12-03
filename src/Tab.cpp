@@ -99,11 +99,8 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
     // selects the latest ride in the list:
-    if (context->athlete->allRides->childCount() != 0)
-        context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(context->athlete->allRides->childCount()-1));
-
-    // Kick off - select a ride and switch to Analysis View
-    context->athlete->rideTreeWidgetSelectionChanged();
+    if (context->athlete->rideList.count() != 0) 
+        context->athlete->selectRideFile(context->athlete->rideList.last()->fileName);
 }
 
 Tab::~Tab()

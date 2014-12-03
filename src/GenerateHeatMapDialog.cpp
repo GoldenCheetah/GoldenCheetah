@@ -53,11 +53,7 @@ GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    const QTreeWidgetItem *allRides = context->athlete->allRideItems();
-
-    for (int i=0; i<allRides->childCount(); i++) {
-
-        RideItem *rideItem = static_cast<RideItem*>(allRides->child(i));
+    foreach (RideItem *rideItem, context->athlete->rideList) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);

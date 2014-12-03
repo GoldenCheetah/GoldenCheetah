@@ -184,14 +184,16 @@ IntervalSidebar::routePopup()
 void
 IntervalSidebar::showRouteMenu(const QPoint &pos)
 {
-    if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
+    if (context->ride == 0) return; //none selected!
 
-    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
-    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
-        QMenu menu(context->athlete->treeWidget);
+    RideItem *rideItem = (RideItem *)context->ride;
+
+    if (rideItem != NULL) { 
+
+        QMenu menu(routeNavigator);
 
         // ride navigator stuff
-        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), routeNavigator);
         connect(colChooser, SIGNAL(triggered(void)), routeNavigator, SLOT(showColumnChooser()));
         menu.addAction(colChooser);
 
@@ -211,12 +213,12 @@ IntervalSidebar::showRouteMenu(const QPoint &pos)
 
         }*/
         // expand / collapse
-        QAction *expandAll = new QAction(tr("Expand All"), context->athlete->treeWidget);
+        QAction *expandAll = new QAction(tr("Expand All"), routeNavigator);
         connect(expandAll, SIGNAL(triggered(void)), routeNavigator->tableView, SLOT(expandAll()));
         menu.addAction(expandAll);
 
         // expand / collapse
-        QAction *collapseAll = new QAction(tr("Collapse All"), context->athlete->treeWidget);
+        QAction *collapseAll = new QAction(tr("Collapse All"), routeNavigator);
         connect(collapseAll, SIGNAL(triggered(void)), routeNavigator->tableView, SLOT(collapseAll()));
         menu.addAction(collapseAll);
         menu.exec(pos);
@@ -233,24 +235,26 @@ IntervalSidebar::bestPopup()
 void
 IntervalSidebar::showBestMenu(const QPoint &pos)
 {
-    if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
+    if (context->ride == 0) return; //none selected!
 
-    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
-    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
-        QMenu menu(context->athlete->treeWidget);
+    RideItem *rideItem = context->ride;
+
+    if (rideItem != NULL) {
+
+        QMenu menu(bestNavigator);
 
         // ride navigator stuff
-        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), bestNavigator);
         connect(colChooser, SIGNAL(triggered(void)), bestNavigator, SLOT(showColumnChooser()));
         menu.addAction(colChooser);
 
         // expand / collapse
-        QAction *expandAll = new QAction(tr("Expand All"), context->athlete->treeWidget);
+        QAction *expandAll = new QAction(tr("Expand All"), bestNavigator);
         connect(expandAll, SIGNAL(triggered(void)), bestNavigator->tableView, SLOT(expandAll()));
         menu.addAction(expandAll);
 
         // expand / collapse
-        QAction *collapseAll = new QAction(tr("Collapse All"), context->athlete->treeWidget);
+        QAction *collapseAll = new QAction(tr("Collapse All"), bestNavigator);
         connect(collapseAll, SIGNAL(triggered(void)), bestNavigator->tableView, SLOT(collapseAll()));
         menu.addAction(collapseAll);
         menu.exec(pos);

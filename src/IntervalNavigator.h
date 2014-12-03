@@ -107,7 +107,6 @@ class IntervalNavigator : public GcWindow
         void cursorRide();
         void selectRow();
         bool eventFilter(QObject *object, QEvent *e);
-        void rideTreeSelectionChanged(); // watch main window
 
         // drop column headings from column chooser
         void dragEnterEvent(QDragEnterEvent *event);

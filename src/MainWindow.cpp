@@ -115,7 +115,7 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     // bootstrap
-    Context *context = new Context(this);
+    context = new Context(this);
     GCColor *GCColorSet = new GCColor(context); // get/keep colorset, before athlete...
     context->athlete = new Athlete(context, home);
 
@@ -1208,8 +1208,7 @@ MainWindow::generateHeatMap()
 void
 MainWindow::exportRide()
 {
-    if ((currentTab->context->athlete->treeWidget->selectedItems().size() != 1)
-        || (currentTab->context->athlete->treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+    if (currentTab->context->ride == NULL) {
         QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
         return;
     }
@@ -1231,7 +1230,8 @@ MainWindow::exportRide()
     getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    bool result = RideFileFactory::instance().writeRideFile(currentTab->context, currentTab->context->currentRide(), file, getSuffix.cap(1));
+    RideFile *currentRide = context->ride ? context->ride->ride() : NULL;
+    bool result = RideFileFactory::instance().writeRideFile(currentTab->context, currentRide, file, getSuffix.cap(1));
 
     if (result == false) {
         QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
@@ -1317,11 +1317,13 @@ MainWindow::mergeRide()
 void
 MainWindow::deleteRide()
 {
-    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE) {
+    RideItem *_item = currentTab->context->ride;
+
+    if (_item==NULL) { 
         QMessageBox::critical(this, tr("Delete Ride"), tr("No ride selected!"));
         return;
     }
+
     RideItem *item = static_cast<RideItem*>(_item);
     QMessageBox msgBox;
     msgBox.setText(tr("Are you sure you want to delete the ride:"));
@@ -1696,8 +1698,8 @@ MainWindow::exportMetrics()
 void
 MainWindow::tweetRide()
 {
-    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE) return;
+    RideItem *_item = currentTab->context->ride;
+    if (_item==NULL) return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
@@ -1716,13 +1718,8 @@ MainWindow::tweetRide()
 void
 MainWindow::share()
 {
-    QTreeWidgetItem *_item = currentTab->context->athlete->treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE) return;
-
-    RideItem *item = dynamic_cast<RideItem*>(_item);
-
-    if (item) { // menu is disabled anyway, but belt and braces
-        ShareDialog d(currentTab->context, item);
+    if (currentTab->context->ride) { // menu is disabled anyway, but belt and braces
+        ShareDialog d(currentTab->context, currentTab->context->ride);
         d.exec();
     }
 }
@@ -1797,7 +1794,7 @@ void
 MainWindow::uploadTP()
 {
     if (currentTab->context->ride) {
-        TPUploadDialog uploader(currentTab->context->athlete->cyclist, currentTab->context->currentRide(), currentTab->context);
+        TPUploadDialog uploader(currentTab->context->athlete->cyclist, currentTab->context->ride->ride(), currentTab->context);
         uploader.exec();
     }
 }
@@ -1917,7 +1914,8 @@ MainWindow::refreshCalendar()
 void
 MainWindow::uploadCalendar()
 {
-    currentTab->context->athlete->davCalendar->upload((RideItem*)currentTab->context->currentRideItem()); // remove const coz it updates the ride
+    if (currentTab->context->currentRideItem())
+        currentTab->context->athlete->davCalendar->upload((RideItem*)currentTab->context->currentRideItem()); // remove const coz it updates the ride
                                                // to set GID and upload date
 }
 #endif

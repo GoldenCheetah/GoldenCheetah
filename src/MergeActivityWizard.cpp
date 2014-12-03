@@ -661,11 +661,7 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    const QTreeWidgetItem *allRides = wizard->context->athlete->allRideItems();
-
-    for (int i=allRides->childCount()-1; i>=0; i--) {
-
-        RideItem *rideItem = static_cast<RideItem*>(allRides->child(i));
+    foreach (RideItem *rideItem, wizard->context->athlete->rideList) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);

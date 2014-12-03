@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <QTreeWidgetItem>
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "RideFile.h"
@@ -27,20 +26,20 @@
 #include <math.h>
 
 RideItem::RideItem(RideFile *ride, Context *context) :
-    QTreeWidgetItem(0), ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName(""),
+    ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName(""),
     zones(NULL), hrZones(NULL) { }
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
                    const Zones *zones, const HrZones *hrZones, Context *context) :
-    QTreeWidgetItem(type), ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName),
+    ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName),
     dateTime(dateTime), zones(zones), hrZones(hrZones)
 { }
 
 RideItem::RideItem(int type,
                    RideFile *ride, const QDateTime &dateTime,
                    const Zones *zones, const HrZones *hrZones, Context *context) :
-    QTreeWidgetItem(type), ride_(ride), context(context), isdirty(true), isedit(false),
+    ride_(ride), context(context), isdirty(true), isedit(false),
     dateTime(dateTime), zones(zones), hrZones(hrZones)
 { }
 
@@ -131,23 +130,9 @@ RideItem::setDirty(bool val)
 
     if (isdirty == true) {
 
-        // show ride in bold on the list view
-        for (int i=0; i<3; i++) {
-            QFont current = font(i);
-            current.setWeight(QFont::Black);
-            setFont(i, current);
-        }
-
         context->notifyRideDirty();
 
     } else {
-
-        // show ride in normal on the list view
-        for (int i=0; i<3; i++) {
-            QFont current = font(i);
-            current.setWeight(QFont::Normal);
-            setFont(i, current);
-        }
 
         context->notifyRideClean();
     }
@@ -197,10 +182,5 @@ void
 RideItem::setStartTime(QDateTime newDateTime)
 {
     dateTime = newDateTime;
-    setText(0, dateTime.toString(tr("ddd")));
-    setText(1, dateTime.toString(tr("MMM d, yyyy")));
-    setText(2, dateTime.toString("hh:mm"));
-
     ride()->setStartTime(newDateTime);
-    context->notifyRideSelected(this);
 }
