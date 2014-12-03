@@ -200,7 +200,6 @@ class MainWindow : public QMainWindow
 
     private:
 
-        Context *context;
         GcScopeBar *scopebar;
         Tab *currentTab;
         QList<Tab*> tabList;
