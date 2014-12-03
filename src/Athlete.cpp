@@ -198,7 +198,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(RIDE_TYPE, home->activities().canonicalPath(), name, dt, zones(), hrZones(), context);
+            last = new RideItem(home->activities().canonicalPath(), name, dt, context);
             rideList << last;
         }
     }
@@ -307,7 +307,7 @@ Athlete::addRide(QString name, bool dosignal)
     if (!RideFile::parseRideFileName(name, &dt)) return;
 
     // new ride item
-    RideItem *last = new RideItem(RIDE_TYPE, home->activities().canonicalPath(), name, dt, zones(), hrZones(), context);
+    RideItem *last = new RideItem(home->activities().canonicalPath(), name, dt, context);
 
     // now add to the list, or replace if already there
     bool added = false;

@@ -29,12 +29,9 @@ class RideEditor;
 class Context;
 class Zones;
 class HrZones;
+class PaceZones;
 
-// Because we have subclassed QTreeWidgetItem we
-// need to use our own type, this MUST be greater than
-// QTreeWidgetItem::UserType according to the docs
-#define FOLDER_TYPE 0
-#define RIDE_TYPE (QTreeWidgetItem::UserType+1)
+Q_DECLARE_METATYPE(RideItem*)
 
 class RideItem : public QObject
 {
@@ -45,9 +42,8 @@ class RideItem : public QObject
 
     protected:
 
-        QVector<double> time_in_zone;
-        QVector<double> time_in_hr_zone;
         RideFile *ride_;
+
         QStringList errors_;
         Context *context; // to notify widgets when date/time changes
         bool isdirty;
@@ -70,39 +66,28 @@ class RideItem : public QObject
         QString path;
         QString fileName;
         QDateTime dateTime;
+        const QStringList errors() { return errors_; }
+
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can
         // traverse currently open rides when config changes
         RideFile *ride(bool open=true);
-        const QStringList errors() { return errors_; }
-        const Zones *zones;
-        const HrZones *hrZones;
 
+        // create and destroy
         RideItem(RideFile *ride, Context *context);
-        RideItem(int type, QString path,
-                 QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, const HrZones *hrZones, Context *context);
+        RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
+        RideItem(RideFile *ride, QDateTime &dateTime, Context *context);
+        void freeMemory();
 
-        RideItem(int type, RideFile *ride, const QDateTime &dateTime,
-                 const Zones *zones, const HrZones *hrZones, Context *context);
-
+        // state
         void setDirty(bool);
         bool isDirty() { return isdirty; }
         bool isRun() { return ride_ ? ride_->isRun() : false; }
+
+        // get/set
         void setRide(RideFile *);
         void setFileName(QString, QString);
         void setStartTime(QDateTime);
-        void freeMemory();
-
-        int zoneRange();
-        int hrZoneRange();
-        int numZones();
-
-        int numHrZones();
-#if 0
-        double timeInZone(int zone);
-        double timeInHrZone(int zone);
-#endif
 };
-Q_DECLARE_METATYPE(RideItem*)
+
 #endif // _GC_RideItem_h

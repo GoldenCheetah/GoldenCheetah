@@ -111,10 +111,10 @@ class AllPlotBackground: public QwtPlotItem
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem) {
+        } else if (rideItem && parent->context->athlete->zones()) {
 
-            zones = rideItem->zones;
-            zone_range = rideItem->zoneRange();
+            zones = parent->context->athlete->zones();
+            zone_range = parent->context->athlete->zones()->whichRange(rideItem->dateTime.date());
 
         } else {
 
@@ -182,10 +182,10 @@ class AllPlotZoneLabel: public QwtPlotItem
                 if (zone_range == -1)
                     zone_range = zones->whichRange(QDate::currentDate());
 
-            } else if (rideItem) {
+            } else if (rideItem && parent->context->athlete->zones()) {
 
-                zones = rideItem->zones;
-                zone_range = rideItem->zoneRange();
+                zones = parent->context->athlete->zones();
+                zone_range = parent->context->athlete->zones()->whichRange(rideItem->dateTime.date());
 
             } else {
 
@@ -1375,13 +1375,13 @@ void AllPlot::refreshZoneLabels()
     }
     zoneLabels.clear();
 
-    if (rideItem) {
-        int zone_range = rideItem->zoneRange();
-        const Zones *zones = rideItem->zones;
+    if (rideItem && context->athlete->zones()) {
+
+        int zone_range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
-            int num_zones = zones->numZones(zone_range);
+            int num_zones = context->athlete->zones()->numZones(zone_range);
             for (int z = 0; z < num_zones; z ++) {
                 AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
                 label->attach(this);
