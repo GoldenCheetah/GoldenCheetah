@@ -515,8 +515,9 @@ ModelDataProvider::ModelDataProvider (ModelPlot &plot, ModelSettings *settings) 
     // COLOR
     // if needed convert average power to the related power zone
     // but only if ranges are defined i.e. user has set CP
-	const Zones *zones = settings->ride->zones;
-	int zone_range = settings->ride->zoneRange();
+	const Zones *zones = plot.context->athlete->zones();
+    int zone_range = -1;
+    if (zones) zone_range = zones->whichRange(settings->ride->dateTime.date());
     if (settings->color == MODEL_POWERZONE && zone_range >= 0) {
         // if we need to color by power zones
         // zones are setup and we want to color by them
