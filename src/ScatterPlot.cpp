@@ -18,6 +18,7 @@
 
 #include "ScatterPlot.h"
 #include "ScatterWindow.h"
+#include "Statistic.h"
 #include "IntervalItem.h"
 #include "Context.h"
 #include "Context.h"
@@ -259,6 +260,13 @@ void ScatterPlot::setData (ScatterSettings *settings)
     }
     intervalCurves.clear();
 
+    // clear out any label
+    foreach(QwtPlotMarker *c, labels) {
+        c->detach();
+        delete c;
+    }
+    labels.clear();
+
     // count the currently selected intervals
     QVector<int> intervals;
     QMap<int,int> displaySequence;
@@ -436,7 +444,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 // CREATE COMPARE CURVES
                 //
 
-                for (int i=0; i< context->compareIntervals.count(); i++) {
+                int i=0;
+                if (settings->compareMode > 0)
+                    i++;
+                for (i; i< context->compareIntervals.count(); i++) {
                     CompareInterval interval = context->compareIntervals.at(i);
 
                     if (interval.checked == false)
@@ -450,8 +461,22 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     // extract interval data
                     foreach(const RideFilePoint *point, interval.data->dataPoints()) {
 
-                        double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                        double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                        double x;
+                        double y;
+                        if (settings->compareMode == 1) {
+                            const RideFilePoint *refPoint = context->compareIntervals.at(0).data->dataPoints().at(context->compareIntervals.at(0).data->timeIndex(point->secs));
+                            x = pointType(refPoint, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                            y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                        }
+                        else if (settings->compareMode == 2) {
+                            const RideFilePoint *refPoint = context->compareIntervals.at(0).data->dataPoints().at(context->compareIntervals.at(0).data->timeIndex(point->secs));
+                            x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                            y = pointType(refPoint, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                        }
+                        else {
+                            x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
+                            y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                        }
 
                         if (y > maxY) maxY = y;
                         if (y < minY) minY = y;
@@ -484,6 +509,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     ic->attach(this);
 
                     intervalCurves.append(ic);
+
+                    if (settings->trendLine>0)  {
+                        addTrendLine(xval, yval, nbPoints, intervalColor);
+                    }
                 }
             }
         }
@@ -753,4 +782,95 @@ ScatterPlot::setAxisTitle(int axis, QString label)
     title.setFont(stGiles);
     QwtPlot::setAxisFont(axis, stGiles);
     QwtPlot::setAxisTitle(axis, title);
+}
+
+void
+ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoints, QColor intervalColor)
+{
+    QwtPlotCurve *trend = new QwtPlotCurve();
+
+    // cosmetics
+    QPen cpen = QPen(intervalColor.darker(200));
+    cpen.setWidth(2); // double thickness for trend lines
+    cpen.setStyle(Qt::SolidLine);
+    trend->setPen(cpen);
+    if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
+        trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+    trend->setBaseline(0);
+    trend->setYAxis(yLeft);
+    trend->setStyle(QwtPlotCurve::Lines);
+
+    // perform linear regression
+    Statistic regress(xval.data(), yval.data(), nbPoints);
+    double xtrend[2], ytrend[2];
+    xtrend[0] = 0.0;
+    ytrend[0] = regress.getYforX(0.0);
+    // point 2 is at far right of chart, not the last point
+    // since we may be forecasting...
+    xtrend[1] = regress.maxX;
+    ytrend[1] = regress.getYforX(regress.maxX);
+    trend->setSamples(xtrend,ytrend, 2);
+
+    trend->attach(this);
+
+    intervalCurves.append(trend);
+
+    // make that mark -- always above with topN
+    QwtPlotMarker *label = new QwtPlotMarker();
+    QString labelString = regress.label();
+    QwtText text(labelString);
+    text.setColor(intervalColor.darker(200));
+    label->setLabel(text);
+    label->setValue(xtrend[1]*0.8, ytrend[1]*0.9);
+    label->setYAxis(yLeft);
+    label->setSpacing(6); // not px but by yaxis value !? mad.
+    label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
+
+    // and attach
+    label->attach(this);
+    labels << label;
+}
+
+void
+ScatterPlot::smooth(QVector<double> *xval, QVector<double> *yval, int *count, double recInterval, int applySmooth)
+{
+    int newcount=0;
+    QVector<double> newxval;
+    QVector<double> newyval;
+
+    if (applySmooth > recInterval) {
+        double totalX = 0.0;
+        double totalY = 0.0;
+
+        int j=0;
+
+        for (int i = 0; i < *count; i++) {
+            j++;
+
+            if (j<applySmooth) {
+                totalX += xval->at(i)*recInterval;
+                totalY += yval->at(i)*recInterval;
+            }
+            else {
+                double part = recInterval-j+applySmooth;
+                totalX += xval->at(i)*part;
+                totalY += yval->at(i)*part;
+
+                double smoothX = totalX/applySmooth;
+                double smoothY = totalY/applySmooth;
+
+                newxval.append(smoothX);
+                newyval.append(smoothY);
+                newcount++;
+
+                j=0;
+                totalX = xval->at(i)*(recInterval-part);
+                totalY = yval->at(i)*(recInterval-part);
+            }
+        }
+    }
+
+    count = &newcount;
+    xval = &newxval;
+    yval = &newyval;
 }

@@ -315,7 +315,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         }
 
         // now do intervals
-        refreshBestIntervals();
+        //refreshBestIntervals();
 
 #endif
 

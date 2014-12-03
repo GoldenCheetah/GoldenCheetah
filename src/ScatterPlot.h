@@ -95,7 +95,8 @@ class ScatterPlot : public QwtPlot
         double cranklength;
 
         QList <QwtPlotCurve *> intervalCurves; // each curve on plot
-        QList <QwtPlotMarker *> intervalMarkers; // each curve on plot
+        QList <QwtPlotMarker *> intervalMarkers; // each marker on plot
+        QList <QwtPlotMarker *> labels; // each label on plot
 
         QwtPlotCurve *curve, *curve2; // when we are plotting l/r curve=left curve2=right
         QwtPlotCurve *hover, *hover2; // similarly for hover
@@ -105,6 +106,10 @@ class ScatterPlot : public QwtPlot
 
     private:
         static QString describeType(int type, bool longer, bool metric);
+
+        void addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoints, QColor intervalColor);
+
+        void smooth(QVector<double> *xval, QVector<double> *yval, int *count, double recInterval, int applySmooth);
 
         // save the settings
         RideItem *ride; // what we plotting?

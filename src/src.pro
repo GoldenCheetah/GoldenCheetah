@@ -430,6 +430,7 @@ HEADERS += \
         SmfRideFile.h \
         SrdRideFile.h \
         SrmRideFile.h \
+        Statistic.h \
         StressCalculator.h \
         SummaryMetrics.h \
         SummaryWindow.h \
@@ -651,6 +652,7 @@ SOURCES += \
         SmfRideFile.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
+        Statistic.cpp \
         StressCalculator.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \
