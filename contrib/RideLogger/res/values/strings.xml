@@ -75,7 +75,7 @@
     <string name="setting_sensors_title">Display Sensors</string>
     <string name="setting_sensors_note">List of Sensors Display</string>
     
-    <string name="setting_wheel_size">Wheel Diamater in Meters</string>
+    <string name="setting_wheel_size">Wheel Circumference in Meters</string>
 
     <string name="imperial_units_title">Imperial Units</string>
     <string name="imperial_units_note">Show Measurements in Imperial Units</string>

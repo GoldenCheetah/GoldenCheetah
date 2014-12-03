@@ -34,7 +34,7 @@ public class Power extends Ant
         super(result, mContext);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
         wheelCircumferenceInMeters = new BigDecimal(
-                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.07")
+                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.096")
         );
     }
     
@@ -43,7 +43,7 @@ public class Power extends Ant
         super(result, mContext, psnoop);
         releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
         wheelCircumferenceInMeters = new BigDecimal(
-                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.07")
+                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.096")
         );
     }
     
