@@ -41,6 +41,7 @@ public:
         setPrecision(0);
         setConversion(1.0);
     }
+    bool isTime() const { return true; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
     void compute(const RideFile *ride, const Zones *, int, const HrZones *hrZone, int hrZoneRange,
                  const QHash<QString,RideMetric*> &, const Context *)
