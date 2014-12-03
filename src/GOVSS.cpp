@@ -79,7 +79,7 @@ class LNP : public RideMetric {
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
         double weight = uride->getWeight();
-        double height = uride->getWeight();
+        double height = uride->getHeight();
 
         int rollingwindowsize120 = 120 / ride->recIntSecs();
         int rollingwindowsize30 = 30 / ride->recIntSecs();
@@ -175,7 +175,7 @@ class XPace : public RideMetric {
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
         double weight = uride->getWeight();
-        double height = uride->getWeight();
+        double height = uride->getHeight();
 
         assert(deps.contains("govss_lnp"));
         LNP *lnp = dynamic_cast<LNP*>(deps.value("govss_lnp"));
