@@ -3,6 +3,7 @@ package com.ridelogger;
 import java.util.Set;
 
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
@@ -57,8 +58,10 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         size = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
                         for (int key: keys) {
                             valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-                            keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, (int) (size * 0.75));
                         }
+                        
+                        context.layout.setColumnWidth(getWidth());
+                        
                         notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_SENSORS)) {
                         Set<String> sensors = sharedPreferences.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
@@ -69,7 +72,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
                             initRelativeLayout(keys[i]);
                             i++;
                         }
-                        
+
                         context.layout.setAdapter(CurrentValuesAdapter.this);
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
                         imperial = sharedPreferences.getBoolean(pkey, false);
@@ -118,7 +121,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         );
         
         valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         
         lls[key].addView(valuesTvs[key], valueLayoutParams);
         
@@ -127,27 +130,27 @@ public class CurrentValuesAdapter extends BaseAdapter {
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
         
+        keyLayoutParams.addRule(RelativeLayout.BELOW, valuesTvs[key].getId());
         keyLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         keyLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         
         lls[key].addView(keyTvs[key], keyLayoutParams);
     }
     
+    
     public void initValueTv(int key){
         valuesTvs[key] = new TextView(context);
-        
         valuesTvs[key].setTextAppearance(context, android.R.attr.textAppearanceLarge);
         valuesTvs[key].setTypeface(null, Typeface.BOLD);
         valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
         valuesTvs[key].setText(String.format("%.2f", 0.0));
+        valuesTvs[key].setId(key + 1);
     }
     
     
     public void initKeyTv(int key){
         keyTvs[key] = new TextView(context);
-        
-        keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, (int) (size * 0.55));
-        
+        keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         
         if(!imperial) {
             keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
@@ -227,5 +230,22 @@ public class CurrentValuesAdapter extends BaseAdapter {
         }
         
         notifyDataSetChanged();
+    }
+
+    /**
+     * returns the size of the cell basted on 8 chars wide and the configured size param
+     * @return int
+     */
+    public int getWidth() {
+        TextView tv = new TextView(context);
+        tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+        tv.setText(String.format("%.2f", 1111.11));
+        
+        Rect bounds = new Rect();
+        tv.getPaint().getTextBounds("9999.99", 0, "9999.99".length(), bounds);
+        
+        return bounds.width();
     }
 }

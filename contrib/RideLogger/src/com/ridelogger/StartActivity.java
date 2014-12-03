@@ -100,6 +100,7 @@ public class StartActivity extends FragmentActivity
         layout = (GridView) findViewById(R.id.LayoutData);
         currentValuesAdapter = new CurrentValuesAdapter(this);
         layout.setAdapter(currentValuesAdapter);
+        layout.setColumnWidth(currentValuesAdapter.getWidth());
     }
     
     
