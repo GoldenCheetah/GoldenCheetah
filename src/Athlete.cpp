@@ -367,7 +367,7 @@ Athlete::removeCurrentRide()
     // remove from the cache, before deleting it this is so
     // any aggregating functions no longer see it, when recalculating
     // during aride deleted operation
-    rideList.removeAt(index);
+    rideList.remove(index, 1);
 
     // delete the file by renaming it
     QString strOldFileName = context->ride->fileName;
