@@ -15,6 +15,7 @@ bin/
 plugins/
 resources/
 src/debug/
+src/release/
 
 qwt/src/debug/
 qwt/src/release/
@@ -26,4 +27,6 @@ qwt/src/object_script.libqwt.Release
 qwt/src/object_script.libqwtd.Debug
 qwt/src/Makefile.Release
 qwt/src/Makefile.Debug
+qwt/textengines/mathml/debug/
+qwt/textengines/mathml/release/
 build.pro.user
