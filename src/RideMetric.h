@@ -107,6 +107,12 @@ public:
                          const QHash<QString,RideMetric*> &deps,
                          const Context *context = 0) = 0;
 
+    // is a time value, ie. render as hh:mm:ss
+    virtual bool isTime() const { return false; }
+
+    // Convert value to string, taking into account metric pref
+    virtual QString toString(bool useMetricUnits);
+
     // Fill in the value of the ride metric using the mapping provided.  For
     // example, average speed might be specified by the mapping
     //

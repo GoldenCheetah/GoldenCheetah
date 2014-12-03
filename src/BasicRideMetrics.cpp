@@ -65,6 +65,7 @@ class WorkoutTime : public RideMetric {
         setSymbol("workout_time");
         setInternalName("Duration");
     }
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("Duration"));
         setMetricUnits(tr("seconds"));
@@ -103,6 +104,7 @@ class TimeRiding : public RideMetric {
         setSymbol("time_riding");
         setInternalName("Time Riding");
     }
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("Time Riding"));
         setMetricUnits(tr("seconds"));
@@ -146,6 +148,7 @@ class TimeCarrying : public RideMetric {
         setSymbol("time_carrying");
         setInternalName("Time Carrying");
     }
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("Time Carrying (Est)"));
         setMetricUnits(tr("seconds"));
@@ -549,6 +552,7 @@ class Pace : public RideMetric {
         setSymbol("pace");
         setInternalName("Pace");
     }
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("Pace"));
         setType(RideMetric::Average);
