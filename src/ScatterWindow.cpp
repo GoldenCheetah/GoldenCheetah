@@ -104,7 +104,7 @@ ScatterWindow::ScatterWindow(Context *context) :
     rIgnore->setChecked(true);
     rIgnore->hide();
     rFrameInterval = new QCheckBox(tr("Frame intervals"));
-    rFrameInterval->setChecked(true);
+    rFrameInterval->setChecked(true); 
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -159,6 +159,20 @@ ScatterWindow::ScatterWindow(Context *context) :
     frame->setChecked(true);
     cl->addRow(frame);
 
+    compareMode = new QComboBox(this);
+    compareMode->addItem(tr("All intervals/rides"));
+    compareMode->addItem(tr("First intervals/rides on X-axis"));
+    compareMode->addItem(tr("First intervals/rides on Y-axis"));
+    cl->addRow(new QLabel(tr("Compare mode")), compareMode);
+    compareMode->setCurrentIndex(0);
+
+    trendLine = new QComboBox(this);
+    trendLine->addItem(tr("No"));
+    trendLine->addItem(tr("Auto"));
+    trendLine->addItem(tr("Linear"));
+    cl->addRow(new QLabel(tr("Trend line")), trendLine);
+    trendLine->setCurrentIndex(0);
+
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -174,6 +188,8 @@ ScatterWindow::ScatterWindow(Context *context) :
     connect(ignore, SIGNAL(stateChanged(int)), this, SLOT(setIgnore()));
     connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrame()));
     connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
+    connect(compareMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setCompareMode(int)));
+    connect(compareMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setXAxisFromReference(int)));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // comparing things
@@ -257,6 +273,22 @@ ScatterWindow::setrIgnore()
 }
 
 void
+ScatterWindow::setCompareMode(int value)
+{
+    compareMode->setCurrentIndex(value);
+    settings.compareMode = value;
+    setData();
+}
+
+void
+ScatterWindow::setTrendLine(int value)
+{
+    trendLine->setCurrentIndex(value);
+    settings.trendLine = value;
+    setData();
+}
+
+void
 ScatterWindow::intervalSelected()
 {
     if (!amVisible())
@@ -301,6 +333,8 @@ ScatterWindow::setData()
     settings.ignore = ignore->isChecked();
     settings.gridlines = grid->isChecked();
     settings.frame = frame->isChecked();
+    settings.compareMode = compareMode->currentIndex();
+    settings.trendLine = trendLine->currentIndex();
 
     /* Not a blank state ? Just no data and we can change series ?
     if ((setting.x == MODEL_POWER || setting.y == MODEL_POWER ) && !ride->ride()->isDataPresent(RideFile::watts))

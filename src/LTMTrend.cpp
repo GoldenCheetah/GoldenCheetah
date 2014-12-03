@@ -46,6 +46,18 @@ LTMTrend::LTMTrend(double *xdata, double *ydata, int count) :
         b = ( double(points) * sumXY - sumY * sumX) /
             ( double(points) * sumXsquared - sumX * sumX);
         a = (sumY - b * sumX) / double(points);
+        double r = ( double(points) * sumXY - sumY * sumX) /
+            sqrt(( double(points) * sumXsquared - sumX * sumX) * ( double(points) * sumYsquared - sumY * sumY));
+
+        double sx = b * ( sumXY - sumX * sumY / double(points) );
+        double sy2 = sumYsquared - sumY * sumY / double(points);
+        double sy = sy2 - sx;
+
+        double coefD = sx / sy2;
+        double coefC = sqrt(coefD);
+        double stdError = sqrt(sy / double(points - 2));
+
+        qDebug() << coefD << coefC << stdError << r;
     }
 }
 
