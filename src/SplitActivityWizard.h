@@ -33,6 +33,7 @@
 #include <QCheckBox>
 #include <QMessageBox>
 #include <QLabel>
+#include <QTreeWidget>
 
 #include <qwt_plot_marker.h>
 
