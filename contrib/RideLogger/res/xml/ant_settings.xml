@@ -12,7 +12,7 @@
         <EditTextPreference 
             android:key="@string/PREF_WHEEL_SIZE"
             android:title="@string/setting_wheel_size"
-            android:defaultValue="2.07"
+            android:defaultValue="2.096"
             />
 
     </PreferenceCategory>

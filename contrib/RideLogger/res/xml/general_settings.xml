@@ -34,7 +34,8 @@
                 android:dependency="@string/PREF_PHONE_HOME"
                 android:key="@string/PREF_PHONE_HOME_PERIOD"
                 android:title="@string/sms_period_dialog_title"
-                android:summary="@string/sms_period_dialog_note" />
+                android:summary="@string/sms_period_dialog_note"
+                android:defaultValue="20" />
 
     </PreferenceCategory>
 
