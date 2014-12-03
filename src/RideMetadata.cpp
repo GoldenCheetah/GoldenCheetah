@@ -567,6 +567,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     widget->setPalette(meta->palette);
     //widget->setFont(font);
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+
+    // if save is being called flush all the values out ready to save as they are
+    connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(editFinished()));
 }
 
 FormField::~FormField()

@@ -122,6 +122,7 @@ class Context : public QObject
         void notifyIntervalHover(RideFileInterval x) { emit intervalHover(x); }
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
+        void notifyMetadataFlush() { metadataFlush(); }
 
         void notifyCompareIntervals(bool state);
         void notifyCompareIntervalsChanged();
@@ -147,6 +148,7 @@ class Context : public QObject
         void intervalHover(RideFileInterval);
         void intervalZoom(IntervalItem*);
         void zoomOut();
+        void metadataFlush();
         void rideDirty(RideItem*);
         void rideClean(RideItem*);
 

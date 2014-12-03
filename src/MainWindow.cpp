@@ -115,7 +115,7 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     // bootstrap
-    context = new Context(this);
+    Context *context = new Context(this);
     GCColor *GCColorSet = new GCColor(context); // get/keep colorset, before athlete...
     context->athlete = new Athlete(context, home);
 
@@ -1230,7 +1230,7 @@ MainWindow::exportRide()
     getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    RideFile *currentRide = context->ride ? context->ride->ride() : NULL;
+    RideFile *currentRide = currentTab->context->ride ? currentTab->context->ride->ride() : NULL;
     bool result = RideFileFactory::instance().writeRideFile(currentTab->context, currentRide, file, getSuffix.cap(1));
 
     if (result == false) {
@@ -1269,6 +1269,10 @@ MainWindow::importFile()
 void
 MainWindow::saveRide()
 {
+    // only save if neccessary
+    if (currentTab->context->ride->isDirty()) currentTab->context->notifyMetadataFlush();
+    else return;
+
     if (currentTab->context->ride)
         saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
     else {
