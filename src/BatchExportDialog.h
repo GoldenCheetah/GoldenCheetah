@@ -28,7 +28,7 @@
 #include "RideFile.h"
 
 #include <QtGui>
-#include <QTableWidget>
+#include <QTreeWidget>
 #include <QProgressBar>
 #include <QList>
 #include <QFileDialog>

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ *           (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,16 +21,10 @@
 #define _GC_RideItem_h 1
 #include "GoldenCheetah.h"
 
-#include <QtGui>
-#include <QTreeWidgetItem>
 #include "RideMetric.h"
 
 class RideFile;
-class RideEditor;
 class Context;
-class Zones;
-class HrZones;
-class PaceZones;
 
 Q_DECLARE_METATYPE(RideItem*)
 
