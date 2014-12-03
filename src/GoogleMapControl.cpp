@@ -106,9 +106,14 @@ GoogleMapControl::rideSelected()
     // Route metadata ...
     setSubTitle(ride->ride()->getTag("Route", tr("Route")));
 
-    range =ride->zoneRange();
-    if(range < 0) rideCP = 300;  // default cp to 300 watts
-    else rideCP = ride->zones->getCP(range);
+    // default to ..
+    range = -1;
+    rideCP = 300;
+
+    if (context->athlete->zones()) {
+        range = context->athlete->zones()->whichRange(ride->dateTime.date());
+        if (range >= 0) rideCP = context->athlete->zones()->getCP(range);
+    }
 
     loadRide();
 }

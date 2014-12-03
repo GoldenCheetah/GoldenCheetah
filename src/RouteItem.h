@@ -31,6 +31,7 @@ class MainWindow;
 // need to use our own type, this MUST be greater than
 // QTreeWidgetItem::UserType according to the docs
 #define ROUTE_TYPE 0 // (QTreeWidgetItem::UserType+2)
+#define FOLDER_TYPE 1 // (QTreeWidgetItem::UserType+2)
 
 class RouteItem : public QObject, public QTreeWidgetItem //<< for signals/slots
 {

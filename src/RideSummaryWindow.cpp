@@ -787,11 +787,11 @@ RideSummaryWindow::htmlSummary()
 
     } else {
 
-        if (ridesummary && rideItem) {
-            // get zones to use via ride for ridesummary
+        if (ridesummary && rideItem && context->athlete->zones()) {
 
-            numzones = rideItem->numZones();
-            range = rideItem->zoneRange();
+            // get zones to use via ride for ridesummary
+            range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
+            if (range > -1) numzones = context->athlete->zones()->numZones(range);
 
         // or for end of daterange plotted for daterange summary
         } else if (context->athlete->zones()) {
@@ -835,10 +835,11 @@ RideSummaryWindow::htmlSummary()
     int hrrange = -1;
 
     // get zones to use via ride for ridesummary
-    if (ridesummary && rideItem) {
+    if (ridesummary && rideItem && context->athlete->hrZones()) {
 
-        numhrzones = rideItem->numHrZones();
-        hrrange = rideItem->hrZoneRange();
+        // get zones to use via ride for ridesummary
+        hrrange = context->athlete->hrZones()->whichRange(rideItem->dateTime.date());
+        if (hrrange > -1) numhrzones = context->athlete->hrZones()->numZones(hrrange);
 
     // or for end of daterange plotted for daterange summary
     } else if (context->athlete->hrZones()) {

@@ -43,7 +43,7 @@
 
 RouteItem::RouteItem(RouteSegment *route, const RouteRide *routeRide,
                    QString path, Context *context) :
-    QTreeWidgetItem(RIDE_TYPE), route(route), routeRide(routeRide),
+    QTreeWidgetItem(ROUTE_TYPE), route(route), routeRide(routeRide),
     ride_(NULL), context(context), isdirty(false), isedit(false), path(path)
 {
     QDateTime dateTime = routeRide->startTime.addSecs(routeRide->start);

@@ -25,23 +25,16 @@
 #include "HrZones.h"
 #include <math.h>
 
-RideItem::RideItem(RideFile *ride, Context *context) :
-    ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName(""),
-    zones(NULL), hrZones(NULL) { }
+RideItem::RideItem(RideFile *ride, Context *context) 
+    : 
+    ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName("") {}
 
-RideItem::RideItem(int type,
-                   QString path, QString fileName, const QDateTime &dateTime,
-                   const Zones *zones, const HrZones *hrZones, Context *context) :
-    ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName),
-    dateTime(dateTime), zones(zones), hrZones(hrZones)
-{ }
+RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
+    :
+    ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName), dateTime(dateTime) {}
 
-RideItem::RideItem(int type,
-                   RideFile *ride, const QDateTime &dateTime,
-                   const Zones *zones, const HrZones *hrZones, Context *context) :
-    ride_(ride), context(context), isdirty(true), isedit(false),
-    dateTime(dateTime), zones(zones), hrZones(hrZones)
-{ }
+RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
+    : ride_(ride), context(context), isdirty(true), isedit(false), dateTime(dateTime) {}
 
 RideFile *RideItem::ride(bool open)
 {
@@ -144,29 +137,6 @@ RideItem::setFileName(QString path, QString fileName)
 {
     this->path = path;
     this->fileName = fileName;
-}
-
-int RideItem::zoneRange()
-{
-    if (zones) return zones->whichRange(dateTime.date());
-    else return -1;
-}
-
-int RideItem::hrZoneRange()
-{
-    if (hrZones) return hrZones->whichRange(dateTime.date());
-    else return -1;
-}
-int RideItem::numZones()
-{
-    int zone_range = zoneRange();
-    return (zone_range >= 0) ? zones->numZones(zone_range) : 0;
-}
-
-int RideItem::numHrZones()
-{
-    int hr_zone_range = hrZoneRange();
-    return (hr_zone_range >= 0) ? hrZones->numZones(hr_zone_range) : 0;
 }
 
 void
