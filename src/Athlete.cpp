@@ -175,23 +175,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     davCalendar->download(); // refresh the diary window
 #endif
 
-    // RIDE TREE -- transitionary
-    treeWidget = new QTreeWidget;
-    treeWidget->setColumnCount(3);
-    treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    treeWidget->header()->resizeSection(0,60);
-    treeWidget->header()->resizeSection(1,100);
-    treeWidget->header()->resizeSection(2,70);
-    treeWidget->header()->hide();
-    treeWidget->setAlternatingRowColors (false);
-    treeWidget->setIndentation(5);
-    treeWidget->hide();
-
-    allRides = new QTreeWidgetItem(context->athlete->treeWidget, FOLDER_TYPE);
-    allRides->setText(0, tr("All Activities"));
-    treeWidget->expandItem(context->athlete->allRides);
-    treeWidget->setFirstItemColumnSpanned (context->athlete->allRides, true);
-
     //.INTERVALS TREE -- transitionary
     intervalWidget = new IntervalTreeView(context);
     intervalWidget->setColumnCount(1);
@@ -209,20 +192,19 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     allIntervals->setText(0, tr("Intervals"));
 
     // populate ride list
-    QTreeWidgetItem *last = NULL;
+    RideItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home->activities()));
     while (i.hasNext()) {
         QString name = i.next();
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
             last = new RideItem(RIDE_TYPE, home->activities().canonicalPath(), name, dt, zones(), hrZones(), context);
-            allRides->addChild(last);
+            rideList << last;
         }
     }
 
     // trap signals
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
@@ -253,7 +235,6 @@ Athlete::~Athlete()
     delete rideCalendar;
     delete davCalendar;
 #endif
-    delete treeWidget;
 
     // close the db connection (but clear models first!)
     delete sqlModel;
@@ -274,31 +255,16 @@ Athlete::~Athlete()
 
 void Athlete::selectRideFile(QString fileName)
 {
-    for (int i = 0; i < allRides->childCount(); i++)
-    {
-        context->ride = (RideItem*) allRides->child(i);
-        if (context->ride->fileName == fileName) {
-            treeWidget->scrollToItem(allRides->child(i),
-                QAbstractItemView::EnsureVisible);
-            treeWidget->setCurrentItem(allRides->child(i));
-            i = allRides->childCount();
-        }
-    }
-}
+    // it already is ...
+    if (context->ride && context->ride->fileName == fileName) return;
 
-void
-Athlete::rideTreeWidgetSelectionChanged()
-{
-    if (treeWidget->selectedItems().isEmpty())
-        context->ride = NULL;
-    else {
-        QTreeWidgetItem *which = treeWidget->selectedItems().first();
-        if (which->type() != RIDE_TYPE) return; // ignore!
-        else
-            context->ride = (RideItem*) which;
-    }
+    // lets find it
+    foreach (RideItem *rideItem, rideList) {
 
-    // emit signal!
+        context->ride = (RideItem*) rideItem;
+        if (context->ride->fileName == fileName) 
+            break;
+    }
     context->notifyRideSelected(context->ride);
 }
 
@@ -314,85 +280,97 @@ Athlete::updateRideFileIntervals()
 {
     // iterate over context->athlete->allIntervals as they are now defined
     // and update the RideFile->intervals
-    RideItem *which = (RideItem *)treeWidget->selectedItems().first();
-    RideFile *current = which->ride();
-    current->clearIntervals();
-    for (int i=0; i < allIntervals->childCount(); i++) {
-        // add the intervals as updated
-        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
-        current->addInterval(it->start, it->stop, it->text(0));
+    if (context->ride) {
+
+        RideFile *current = context->ride->ride();
+        current->clearIntervals();
+
+        for (int i=0; i < allIntervals->childCount(); i++) {
+            // add the intervals as updated
+            IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+            current->addInterval(it->start, it->stop, it->text(0));
+        }
+
+        // emit signal for interval data changed
+        context->notifyIntervalsChanged();
+
+        // set dirty
+        context->ride->setDirty(true);
     }
-
-    // emit signal for interval data changed
-    context->notifyIntervalsChanged();
-
-    // set dirty
-    which->setDirty(true);
-}
-
-const RideFile *
-Athlete::currentRide()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        return NULL;
-    }
-    return ((RideItem*) treeWidget->selectedItems().first())->ride();
 }
 
 void
 Athlete::addRide(QString name, bool dosignal)
 {
+    // ignore malformed names
     QDateTime dt;
     if (!RideFile::parseRideFileName(name, &dt)) return;
 
+    // new ride item
     RideItem *last = new RideItem(RIDE_TYPE, home->activities().canonicalPath(), name, dt, zones(), hrZones(), context);
 
-    int index = 0;
-    while (index < allRides->childCount()) {
-        QTreeWidgetItem *item = allRides->child(index);
-        if (item->type() != RIDE_TYPE) continue;
-        RideItem *other = static_cast<RideItem*>(item);
-
-        if (other->dateTime > dt) break;
-        if (other->fileName == name) {
-            delete allRides->takeChild(index);
+    // now add to the list, or replace if already there
+    bool added = false;
+    for (int index=0; index < rideList.count(); index++) {
+        if (rideList[index]->fileName == last->fileName) {
+            rideList[index] = last;
             break;
         }
-        ++index;
     }
+
+    if (!added) rideList << last;
+    qSort(rideList); // sort by date
+
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
-    allRides->insertChild(index, last);
 
     //Search routes
     routes->searchRoutesInRide(last->ride());
 
-    // if it is the very first ride, we need to select it
-    // after we added it
-    if (!index) treeWidget->setCurrentItem(last);
+    // notify everyone to select it
+    context->ride = last;
+    context->notifyRideSelected(last);
 }
 
 void
 Athlete::removeCurrentRide()
 {
-    int x = 0;
+    if (context->ride == NULL) return;
 
-    QTreeWidgetItem *_item = treeWidget->currentItem();
-    if (_item->type() != RIDE_TYPE) return;
-    RideItem *item = static_cast<RideItem*>(_item);
+    RideItem *select = NULL; // ride to select once its gone
+    RideItem *todelete = context->ride;
 
-    QTreeWidgetItem *itemToSelect = NULL;
-    for (x=0; x<allRides->childCount(); ++x)
-        if (item==allRides->child(x)) break;
+    bool found = false;
+    int index=0; // index to wipe out
 
-    if (x>0) itemToSelect = allRides->child(x-1);
+    // find ours in the list and select the one
+    // immediately after it, but if it is the last
+    // one on the list select the one before
+    for(index=0; index < rideList.count(); index++) {
 
-    if ((x+1)<allRides->childCount())
-        itemToSelect = allRides->child(x+1);
+       if (rideList[index]->fileName == context->ride->fileName) {
 
-    QString strOldFileName = item->fileName;
-    allRides->removeChild(item);
+          // bingo!
+          found = true;
+          if (rideList.count()-index > 1) select = rideList[index+1];
+          else if (index > 0) select = rideList[index-1];
+          break;
 
+       }
+    }
+
+    // WTAF!?
+    if (!found) {
+        qDebug()<<"ERROR: delete not found.";
+        return;
+    }
+
+    // remove from the cache, before deleting it this is so
+    // any aggregating functions no longer see it, when recalculating
+    // during aride deleted operation
+    rideList.removeAt(index);
+
+    // delete the file by renaming it
+    QString strOldFileName = context->ride->fileName;
 
     QFile file(home->activities().canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
@@ -417,7 +395,7 @@ Athlete::removeCurrentRide()
     }
 
     // rename also the source files either in /imports or in /downloads to allow a second round of import
-    QString sourceFilename = item->ride()->getTag("Source Filename", "");
+    QString sourceFilename = todelete->ride()->getTag("Source Filename", "");
     if (sourceFilename != "") {
         // try to rename in both directories /imports and /downloads
         // but don't report any errors - files may have been backup already
@@ -430,27 +408,22 @@ Athlete::removeCurrentRide()
     // we don't want the whole delete, select next flicker
     context->mainWindow->setUpdatesEnabled(false);
 
+    // select a different ride
+    context->ride = select;
+
     // notify AFTER deleted from DISK..
-    context->notifyRideDeleted(item);
+    context->notifyRideDeleted(todelete);
 
     // ..but before MEMORY cleared
-    item->freeMemory();
-    delete item;
-
-    // any left?
-    if (allRides->childCount() == 0) {
-        context->ride = NULL;
-        context->notifyRideSelected(NULL); // notifies children
-    }
-
-    treeWidget->setCurrentItem(itemToSelect);
+    todelete->freeMemory();
+    delete todelete;
 
     // now we can update
     context->mainWindow->setUpdatesEnabled(true);
     QApplication::processEvents();
 
-    context->notifyRideSelected((RideItem*)itemToSelect);
-
+    // now select another ride
+    context->notifyRideSelected(select);
 }
 
 void
@@ -549,8 +522,7 @@ Athlete::configChanged()
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // forget all the cached weight values in case weight changed
-    for (int i=0; i<allRides->childCount(); i++) {
-        RideItem *rideItem = static_cast<RideItem*>(allRides->child(i));
+    foreach (RideItem *rideItem, rideList) {
         if (rideItem->ride(false)) {
             rideItem->ride(false)->setWeight(0);
             rideItem->ride(false)->getWeight();

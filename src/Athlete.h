@@ -116,24 +116,20 @@ class Athlete : public QObject
 #endif
         Context *context;
 
-        // The ride collection -- transitionary
-        QTreeWidget *treeWidget;
-        QTreeWidgetItem *allRides;
-        QTreeWidgetItem *allIntervals;
-        IntervalTreeView *intervalWidget;
-
-        // access to the ride collection
+        // ride collection
+        QVector<RideItem*> rideList;
         void selectRideFile(QString);
         void addRide(QString name, bool bSelect=true);
         void removeCurrentRide();
 
-        QTreeWidget *rideTreeWidget() { return treeWidget; }
-        const QTreeWidgetItem *allRideItems() { return allRides; }
+        // interval selection
+        QTreeWidgetItem *allIntervals;
+        IntervalTreeView *intervalWidget;
         const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
-        const RideFile * currentRide();
         IntervalTreeView *intervalTreeWidget() { return intervalWidget; }
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
 
+        // xones etc
         void notifyZonesChanged() { zonesChanged(); }
         void notifySeasonsChanged() { seasonsChanged(); }
         void notifyNamedSearchesChanged() { namedSearchesChanged(); }
@@ -147,7 +143,6 @@ class Athlete : public QObject
         void namedSearchesChanged();
 
     public slots:
-        void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
         void checkCPX(RideItem*ride);
         void updateRideFileIntervals();

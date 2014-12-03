@@ -100,14 +100,20 @@ class RideNavigator : public GcWindow
         void removeColumn();
         void showColumnChooser();
 
-        // user double clicked or pressed enter on ride
+        // user changed ride selection somewhere else
+        void setRide(RideItem*);
+
+        // user double clicked/hit return on a ride
+        // not used at present, for the future
         void selectRide(const QModelIndex &index);
 
-        // user selection here or on mainwindow's ride list
+        // user changed sort order, so ride is off screen
+        // bring it back in view
         void cursorRide();
-        void selectRow();
+
+        // user selection so line up
+        void selectionChanged(QItemSelection);
         bool eventFilter(QObject *object, QEvent *e);
-        void rideTreeSelectionChanged(); // watch main window
 
         // drop column headings from column chooser
         void dragEnterEvent(QDragEnterEvent *event);
@@ -164,6 +170,7 @@ class RideNavigator : public GcWindow
         int pwidth;
         NavigatorCellDelegate *delegate;
         QVBoxLayout *mainLayout;
+        RideItem *currentItem;
 
         // properties
         int _sortByIndex;
@@ -259,6 +266,15 @@ class RideTreeView : public QTreeView
 
     public:
         RideTreeView();
+
+    signals:
+        void rowSelected(QItemSelection);
+
+    public slots:
+        void selectionChanged (const QItemSelection &selected, const QItemSelection&deselected) {
+            rowSelected(selected);
+            QTreeView::selectionChanged(selected,deselected);
+        }
 
     protected:
          void dragEnterEvent(QDragEnterEvent *e) {

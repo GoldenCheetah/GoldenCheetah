@@ -122,6 +122,7 @@ void
 AnalysisSidebar::setRide(RideItem*ride)
 {
     calendarWidget->setRide(ride);
+    rideNavigator->setRide(ride);
 }
 
 void
@@ -185,23 +186,24 @@ AnalysisSidebar::analysisPopup()
 void
 AnalysisSidebar::showActivityMenu(const QPoint &pos)
 {
-    if (context->athlete->treeWidget->selectedItems().size() == 0) return; //none selected!
+    if (context->ride == 0) return; //none selected!
 
-    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
-    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
-        QMenu menu(context->athlete->treeWidget);
+    RideItem *rideItem = context->ride;
+
+    if (rideItem != NULL) { 
+        QMenu menu(rideNavigator);
 
 
-        QAction *actSaveRide = new QAction(tr("Save Changes"), context->athlete->treeWidget);
+        QAction *actSaveRide = new QAction(tr("Save Changes"), rideNavigator);
         connect(actSaveRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(saveRide()));
 
-        QAction *revertRide = new QAction(tr("Revert to Saved version"), context->athlete->treeWidget);
+        QAction *revertRide = new QAction(tr("Revert to Saved version"), rideNavigator);
         connect(revertRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(revertRide()));
 
-        QAction *actDeleteRide = new QAction(tr("Delete Ride"), context->athlete->treeWidget);
+        QAction *actDeleteRide = new QAction(tr("Delete Ride"), rideNavigator);
         connect(actDeleteRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(deleteRide()));
 
-        QAction *actSplitRide = new QAction(tr("Split Ride"), context->athlete->treeWidget);
+        QAction *actSplitRide = new QAction(tr("Split Ride"), rideNavigator);
         connect(actSplitRide, SIGNAL(triggered(void)), context->mainWindow, SLOT(splitRide()));
 
         if (rideItem->isDirty() == true) {
@@ -212,7 +214,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         menu.addAction(actDeleteRide);
         menu.addAction(actSplitRide);
 #ifdef GC_HAVE_ICAL
-        QAction *actUploadCalendar = new QAction(tr("Upload Ride to Calendar"), context->athlete->treeWidget);
+        QAction *actUploadCalendar = new QAction(tr("Upload Ride to Calendar"), rideNavigator);
         connect(actUploadCalendar, SIGNAL(triggered(void)), context->mainWindow, SLOT(uploadCalendar()));
         menu.addAction(actUploadCalendar);
 #endif
@@ -222,20 +224,20 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         menu.addSeparator();
 
         // ride navigator stuff
-        QAction *colChooser = new QAction(tr("Show Column Chooser"), context->athlete->treeWidget);
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), rideNavigator);
         connect(colChooser, SIGNAL(triggered(void)), rideNavigator, SLOT(showColumnChooser()));
         menu.addAction(colChooser);
 
         if (rideNavigator->groupBy() >= 0) {
 
             // already grouped lets ungroup
-            QAction *nogroups = new QAction(tr("Do Not Show In Groups"), context->athlete->treeWidget);
+            QAction *nogroups = new QAction(tr("Do Not Show In Groups"), rideNavigator);
             connect(nogroups, SIGNAL(triggered(void)), rideNavigator, SLOT(noGroups()));
             menu.addAction(nogroups);
 
         } else {
 
-            QMenu *groupByMenu = new QMenu(tr("Group By"), context->athlete->treeWidget);
+            QMenu *groupByMenu = new QMenu(tr("Group By"), rideNavigator);
             groupByMenu->setEnabled(true);
             menu.addMenu(groupByMenu);
 
@@ -247,7 +249,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             foreach(QString heading, rideNavigator->columnNames()) {
                 if (heading == "*") continue; // special hidden column
 
-                QAction *groupByAct = new QAction(heading, context->athlete->treeWidget);
+                QAction *groupByAct = new QAction(heading, rideNavigator);
                 connect(groupByAct, SIGNAL(triggered()), groupByMapper, SLOT(map()));
                 groupByMenu->addAction(groupByAct);
 
@@ -256,12 +258,12 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             }
         }
         // expand / collapse
-        QAction *expandAll = new QAction(tr("Expand All"), context->athlete->treeWidget);
+        QAction *expandAll = new QAction(tr("Expand All"), rideNavigator);
         connect(expandAll, SIGNAL(triggered(void)), rideNavigator->tableView, SLOT(expandAll()));
         menu.addAction(expandAll);
 
         // expand / collapse
-        QAction *collapseAll = new QAction(tr("Collapse All"), context->athlete->treeWidget);
+        QAction *collapseAll = new QAction(tr("Collapse All"), rideNavigator);
         connect(collapseAll, SIGNAL(triggered(void)), rideNavigator->tableView, SLOT(collapseAll()));
         menu.addAction(collapseAll);
         menu.exec(pos);
@@ -274,7 +276,7 @@ AnalysisSidebar::intervalPopup()
     // always show the 'find best' 'find peaks' options
     QMenu menu(intervalItem);
 
-    RideItem *rideItem = (RideItem *)context->athlete->treeWidget->selectedItems().first();
+    RideItem *rideItem = context->ride;
 
     if (rideItem != NULL && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
         QAction *actFindBest = new QAction(tr("Find Intervals..."), intervalItem);
@@ -408,13 +410,6 @@ void
 AnalysisSidebar::findPowerPeaks()
 {
 
-    if (!context->ride) return;
-
-    QTreeWidgetItem *which = context->athlete->treeWidget->selectedItems().first();
-    if (which->type() != RIDE_TYPE) {
-        return;
-    }
-
     if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) {
 
         addIntervalForPowerPeaksForSecs(context->ride->ride(), 5, "Peak 5s");
@@ -433,6 +428,7 @@ AnalysisSidebar::findPowerPeaks()
         context->athlete->updateRideFileIntervals();
 
     } else {
+
         if (!context->ride || !context->ride->ride())
             QMessageBox::critical(this, tr("Find Power Peaks"), tr("No ride selected"));
         else

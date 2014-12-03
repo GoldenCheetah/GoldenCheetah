@@ -36,7 +36,7 @@ class HrZones;
 #define FOLDER_TYPE 0
 #define RIDE_TYPE (QTreeWidgetItem::UserType+1)
 
-class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
+class RideItem : public QObject
 {
 
     Q_OBJECT

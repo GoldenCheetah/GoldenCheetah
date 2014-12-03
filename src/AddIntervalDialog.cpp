@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
+#include "RideItem.h"
 #include "WPrime.h"
 #include <QMap>
 #include <math.h>
@@ -416,7 +417,7 @@ struct CompareBests {
 void
 AddIntervalDialog::createClicked()
 {
-    const RideFile *ride = context->currentRide();
+    const RideFile *ride = context->ride ? context->ride->ride() : NULL;
     if (!ride) {
         QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
         return;
@@ -861,7 +862,7 @@ AddIntervalDialog::addClicked()
             double start = resultsTable->item(i,3)->text().toDouble();
             double stop = resultsTable->item(i,4)->text().toDouble();
             QString name = resultsTable->item(i,2)->text();
-            const RideFile *ride = context->currentRide();
+            const RideFile *ride = context->ride ? context->ride->ride() : NULL;
 
             QTreeWidgetItem *allIntervals = context->athlete->mutableIntervalItems();
             QTreeWidgetItem *last =

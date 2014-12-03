@@ -94,10 +94,10 @@ MainWindow::saveRideExitDialog(Context *context)
     // have we been told to not warn on exit?
     if (warnExit() == false) return true; // just close regardless!
 
-    for (int i=0; i<context->athlete->allRides->childCount(); i++) {
-        RideItem *curr = (RideItem *)context->athlete->allRides->child(i);
-        if (curr->isDirty() == true) dirtyList.append(curr);
-    }
+    // get a list of rides to save
+    foreach (RideItem *rideItem, context->athlete->rideList)
+        if (rideItem->isDirty() == true) 
+            dirtyList.append(rideItem);
 
     // we have some files to save...
     if (dirtyList.count() > 0) {

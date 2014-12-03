@@ -80,7 +80,7 @@ void AnalysisView::close()
 bool
 AnalysisView::isBlank()
 {
-    if (context->athlete->allRides->childCount() > 0) return false;
+    if (context->athlete->rideList.count() > 0) return false;
     else return true;
 }
 
@@ -120,7 +120,7 @@ DiaryView::dateRangeChanged(DateRange dr)
 bool
 DiaryView::isBlank()
 {
-    if (context->athlete->allRides->childCount() > 0) return false;
+    if (context->athlete->rideList.count() > 0) return false;
     else return true;
 }
 
@@ -163,7 +163,7 @@ HomeView::dateRangeChanged(DateRange dr)
 bool
 HomeView::isBlank()
 {
-    if (context->athlete->allRides->childCount() > 0) return false;
+    if (context->athlete->rideList.count() > 0) return false;
     else return true;
 }
 
@@ -283,6 +283,6 @@ IntervalView::close()
 bool
 IntervalView::isBlank()
 {
-    if (context->athlete->allRides->childCount() > 0) return false;
+    if (context->athlete->rideList.count() > 0) return false;
     else return true;
 }
