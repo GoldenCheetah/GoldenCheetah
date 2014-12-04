@@ -72,9 +72,8 @@ public class CurrentValuesAdapter extends BaseAdapter {
                             keys[i] = Integer.parseInt(sensor);
                             i++;
                         }
-                        notifyDataSetChanged();
                         
-                        //context.layout.setAdapter(CurrentValuesAdapter.this);
+                        context.layout.setAdapter(CurrentValuesAdapter.this);
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
                         imperial = sharedPreferences.getBoolean(pkey, false);
                         
