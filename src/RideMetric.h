@@ -44,6 +44,7 @@ public:
 
     enum metrictype { Total, Average, Peak, Low } types;
     typedef enum metrictype MetricType;
+    int index_;
 
     RideMetric() {
         // some sensible defaults
@@ -54,8 +55,14 @@ public:
         type_ = Total;
         count_ = 1;
         value_ = 0.0;
+        index_ = -1;
     }
     virtual ~RideMetric() {}
+
+    // need an index for offset into array, each metric
+    // now has a numeric identifier from 0 - metricCount
+    int index() const { return index_; }
+    void setIndex(int x) { index_ = x; }
 
     // Initialization moved from constructor to enable translation
     virtual void initialize() {}
@@ -232,7 +239,9 @@ class RideMetricFactory {
     bool addMetric(const RideMetric &metric,
                    const QVector<QString> *deps = NULL) {
         assert(!metrics.contains(metric.symbol()));
-        metrics.insert(metric.symbol(), metric.clone());
+        RideMetric *newMetric = metric.clone();
+        newMetric->setIndex(metrics.count());
+        metrics.insert(metric.symbol(), newMetric);
         metricNames.append(metric.symbol());
         metricTypes.append(metric.type());
         if (deps) {
