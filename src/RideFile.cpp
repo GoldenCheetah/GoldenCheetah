@@ -484,8 +484,21 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         QString calendarText;
         foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (field.diary == true && result->getTag(field.name, "") != "") {
+                QString value = result->getTag(field.name, "");
+                if (field.name == "Weight") {
+                    bool useMetric = context->athlete->useMetricUnits;
+                    if (useMetric == false) {
+                        // This code appears in RideFile.cpp and RideMetaData.cpp and needs to be kept in sync for now.
+                        double lbs = (double) qRound(100 * (value.toDouble() * LB_PER_KG + 0.001)) / 100;
+                        value = QString("%1").arg(lbs);
+                    }
+                    // Add units (the format should be localized)
+                    const RideMetric *aw = RideMetricFactory::instance().rideMetric("athlete_weight");
+                    QString units = aw->units(useMetric);
+                    value = QString("%1 %2").arg(value, units);
+                }
                 calendarText += QString("%1\n")
-                        .arg(result->getTag(field.name, ""));
+                        .arg(value);
             }
         }
         result->setTag("Calendar Text", calendarText);

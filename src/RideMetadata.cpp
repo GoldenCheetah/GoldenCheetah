@@ -446,7 +446,8 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     }
 
     // we need to show what units we use for weight...
-    if (field.name == "Weight" && field.type == FIELD_DOUBLE) {
+    // TODO: those should be taken from the weigth metric instead? Though translation would need to change.
+    if (field.name == "Weight") {
         units = meta->context->athlete->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
@@ -706,7 +707,7 @@ FormField::editFinished()
 
             // we need to convert from display value to 
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+            if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -720,8 +721,20 @@ FormField::editFinished()
     QString calendarText;
     foreach (FieldDefinition field, meta->getFields()) {
         if (field.diary == true) {
-            calendarText += QString("%1\n")
-                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+            QString value = ourRideItem->ride()->getTag(field.name, "");
+            if (field.name == "Weight") {
+                bool useMetric = meta->context->athlete->useMetricUnits;
+                if (useMetric == false) {
+                    // This code appears in RideFile.cpp and RideMetaData.cpp and needs to be kept in sync for now.
+                    double lbs = (double) qRound(100 * (value.toDouble() * LB_PER_KG + 0.001)) / 100;
+                    value = QString("%1").arg(lbs);
+                }
+                // Add units - for now, without a space but should be localized?
+                const RideMetric *aw = RideMetricFactory::instance().rideMetric("athlete_weight");
+                QString units = aw->units(useMetric);
+                value = QString("%1 %2").arg(value, units);
+            }
+            calendarText += QString("%1\n").arg(value);
         }
     }
     ourRideItem->ride()->setTag("Calendar Text", calendarText);
@@ -852,6 +865,14 @@ FormField::metadataChanged()
         break;
 
     case FIELD_INTEGER : // integer
+        if (definition.name == "Weight") {
+            // They asked for an integer... There will be rounding issues in display, but as
+            // long as the field is not edited the original value won't be clobbered.
+            // This approach could be used for other metrics if needed.
+            double conv = meta->context->athlete->useMetricUnits ? 1. : LB_PER_KG;
+            int roundedLbs = qRound(value.toDouble() * conv);
+            value = QString("%1").arg(roundedLbs);
+        }
         ((QSpinBox*)widget)->setValue(value.toInt());
         break;
 

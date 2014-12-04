@@ -1116,11 +1116,24 @@ LTMWindow::dataTable(bool html)
 
             // Special computed metrics (LTS/STS) have a null metric pointer
             if (metricDetail.type != METRIC_BEST && metricDetail.metric) {
-                // convert from stored metric value to imperial
-                if (context->athlete->useMetricUnits == false) {
+                // Because the metrics may have been setup differently than the athlete profile, try to
+                // avoid aberrations by trying to match the units in the legend; if they are not
+                // recognized, then trust that the user knows what she wants (or has been given).
+                // What we should do is separate user axis labeling from selected units in the UI and model.
+                bool convert;
+                if (metricDetail.metric->units(true) == metricDetail.uunits) {
+                    convert = false;
+                } else if (metricDetail.metric->units(false) == metricDetail.uunits) {
+                    convert = true;
+                } else {
+                    convert = context->athlete->useMetricUnits == false;
+                }
+                // convert from stored metric value to imperial if warranted
+                if (convert) {
                     value *= metricDetail.metric->conversion();
                     value += metricDetail.metric->conversionSum();
                 }
+
 
             // convert seconds to hours
             if (metricDetail.metric->units(true) == "seconds" ||
