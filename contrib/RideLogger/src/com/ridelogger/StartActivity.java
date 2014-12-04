@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -101,6 +102,9 @@ public class StartActivity extends FragmentActivity
         currentValuesAdapter = new CurrentValuesAdapter(this);
         layout.setAdapter(currentValuesAdapter);
         layout.setColumnWidth(currentValuesAdapter.getWidth());
+        layout.setBackgroundColor(Color.BLACK);
+        layout.setVerticalSpacing(4);
+        layout.setHorizontalSpacing(4);
     }
     
     
