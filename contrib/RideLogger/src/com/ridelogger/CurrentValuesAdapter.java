@@ -3,6 +3,7 @@ package com.ridelogger;
 import java.util.Set;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
@@ -17,9 +18,9 @@ public class CurrentValuesAdapter extends BaseAdapter {
     public StartActivity    context;
     
     public int[]            keys;
-    public TextView[]       keyTvs    = new TextView[RideService.TOTALSENSORS];
-    public TextView[]       valuesTvs = new TextView[RideService.TOTALSENSORS];
-    public RelativeLayout[] lls       = new RelativeLayout[RideService.TOTALSENSORS];
+    public String[]         values    = new String[RideService.KEYS.length];
+    public String[]         keyLabels = new String[RideService.KEYS.length];
+    public RelativeLayout[] lls       = new RelativeLayout[RideService.KEYS.length];
     public int              size      = 20;
     public boolean          imperial  = false;
     public int              count     = 0;
@@ -37,8 +38,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
             keys = new int[sensors.size()];
             int i = 0;
             for(String sensor : sensors) {
-                keys[i] = Integer.parseInt(sensor);
-                initRelativeLayout(keys[i]);
+                keys[i]   = Integer.parseInt(sensor);
                 i++;
             }
         } else {
@@ -46,9 +46,15 @@ public class CurrentValuesAdapter extends BaseAdapter {
             
             for (int i = 0; i < RideService.KEYS.length; i++) {
                 keys[i] = i;
-                initRelativeLayout(keys[i]);
             }
         }
+        
+        
+        for (int i = 0; i < RideService.KEYS.length; i++) {
+            values[i] = "0.0";
+        }
+        
+        updateKeyLables();
         
         settings.registerOnSharedPreferenceChangeListener(
             new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -56,12 +62,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String pkey) {
                     if(pkey == context.getString(R.string.PREF_TRACKING_SIZE)) {
                         size = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
-                        for (int key: keys) {
-                            valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-                        }
-                        
                         context.layout.setColumnWidth(getWidth());
-                        
                         notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_SENSORS)) {
                         Set<String> sensors = sharedPreferences.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
@@ -69,40 +70,15 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         int i = 0;
                         for(String sensor : sensors) {
                             keys[i] = Integer.parseInt(sensor);
-                            initRelativeLayout(keys[i]);
                             i++;
                         }
-
-                        context.layout.setAdapter(CurrentValuesAdapter.this);
+                        notifyDataSetChanged();
+                        
+                        //context.layout.setAdapter(CurrentValuesAdapter.this);
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
                         imperial = sharedPreferences.getBoolean(pkey, false);
                         
-                        if(!imperial) {
-                            for(int key : keys) {
-                                keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
-                            }
-                        } else {
-                            for(int key : keys) {
-                                switch (key) {
-                                    case RideService.ALTITUDE:
-                                        keyTvs[key].setText("ft");
-                                        break;
-                                        
-                                    case RideService.KPH:
-                                        keyTvs[key].setText("mph");
-                                        break;
-                                        
-                                    case RideService.KM:
-                                        keyTvs[key].setText("m");
-                                        break;
-                        
-                                    default:
-                                        keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
-                                        break;
-                                }
-                            }
-                        }
-                        
+                        updateKeyLables();
                         notifyDataSetChanged();
                     }
                 }
@@ -110,10 +86,40 @@ public class CurrentValuesAdapter extends BaseAdapter {
         );
     }
     
-    public void initRelativeLayout(int key) {
-        lls[key] = new RelativeLayout(context);
-        initValueTv(key);
-        initKeyTv(key);
+    public void updateKeyLables() {
+        if(!imperial) {
+            for(int key : keys) {
+                keyLabels[key] = RideService.KEYS[key].toString().toLowerCase();
+            }
+        } else {
+            for(int key : keys) {
+                switch (key) {
+                    case RideService.ALTITUDE:
+                        keyLabels[key] = "ft";
+                        break;
+                        
+                    case RideService.KPH:
+                        keyLabels[key] = "mph";
+                        break;
+                        
+                    case RideService.KM:
+                        keyLabels[key] = "m";
+                        break;
+        
+                    default:
+                        keyLabels[key] = RideService.KEYS[key].toString().toLowerCase();
+                        break;
+                }
+            }
+        }
+    }
+    
+    public RelativeLayout newRelativeLayout(int key) {
+        RelativeLayout view = new RelativeLayout(context);
+        view.setBackgroundColor(Color.WHITE);
+        
+        TextView valueView = newValueTv(key);
+        TextView keyView   = newKeyTv(key);
         
         RelativeLayout.LayoutParams valueLayoutParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -123,56 +129,63 @@ public class CurrentValuesAdapter extends BaseAdapter {
         valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         
-        lls[key].addView(valuesTvs[key], valueLayoutParams);
+        view.addView(valueView, valueLayoutParams);
         
         RelativeLayout.LayoutParams keyLayoutParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
         
-        keyLayoutParams.addRule(RelativeLayout.BELOW, valuesTvs[key].getId());
+        keyLayoutParams.addRule(RelativeLayout.BELOW, valueView.getId());
         keyLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         keyLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         
-        lls[key].addView(keyTvs[key], keyLayoutParams);
+        view.addView(keyView, keyLayoutParams);
+        
+        return view;
     }
     
     
-    public void initValueTv(int key){
-        valuesTvs[key] = new TextView(context);
-        valuesTvs[key].setTextAppearance(context, android.R.attr.textAppearanceLarge);
-        valuesTvs[key].setTypeface(null, Typeface.BOLD);
-        valuesTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-        valuesTvs[key].setText(String.format("%.2f", 0.0));
-        valuesTvs[key].setId(key + 1);
+    public TextView newValueTv(int key){
+        TextView tv = new TextView(context);
+        tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
+        tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+        tv.setText(String.format("%.1f", 0.0));
+        tv.setId(key + 1);
+        return tv;
     }
     
     
-    public void initKeyTv(int key){
-        keyTvs[key] = new TextView(context);
-        keyTvs[key].setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+    public TextView newKeyTv(int key){
+        TextView tv = new TextView(context);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tv.setBackgroundColor(Color.LTGRAY);
+        tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tv.setPadding(4, 1, 4, 1);
         
         if(!imperial) {
-            keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+            tv.setText(keyLabels[key]);
         } else {
             switch (key) {
                 case RideService.ALTITUDE:
-                    keyTvs[key].setText("ft");
+                    tv.setText("ft");
                     break;
                     
                 case RideService.KPH:
-                    keyTvs[key].setText("mph");
+                    tv.setText("mph");
                     break;
                     
                 case RideService.KM:
-                    keyTvs[key].setText("miles");
+                    tv.setText("miles");
                     break;
     
                 default:
-                    keyTvs[key].setText(RideService.KEYS[key].toString().toLowerCase());
+                    tv.setText(keyLabels[key]);
                     break;
             }
         }
+        return tv;
     }
     
     
@@ -197,33 +210,45 @@ public class CurrentValuesAdapter extends BaseAdapter {
     @Override    
     public View getView(int position, View convertView, ViewGroup parent) {        
         if (convertView == null) {
-            return (RelativeLayout) lls[keys[position]];
+            return newRelativeLayout(keys[position]);
         } else {
-            return (RelativeLayout) convertView;
+            RelativeLayout view = (RelativeLayout) convertView;
+            TextView valueView  = (TextView) (view.getChildAt(0));
+            TextView valueKey   = (TextView) (view.getChildAt(1));
+            
+            if(valueView.getText() != values[keys[position]])
+                valueView.setText(values[keys[position]]);
+            
+            valueView.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+            
+            if(valueKey.getText() != keyLabels[keys[position]])
+                valueKey.setText(keyLabels[keys[position]]);
+            
+            return convertView;
         }
     }
     
     
-    public void update(float[] values) {
+    public void update(float[] current_float_values) {
         for (int key: keys) {
             if(!imperial) {
-                valuesTvs[key].setText(String.format("%.2f", values[key]));
+                values[key] = String.format("%.1f", current_float_values[key]);
             } else {
                 switch (key) {
                     case RideService.ALTITUDE:
-                        valuesTvs[key].setText(String.format("%.2f", values[key] * 3.28084));
+                        values[key] = String.format("%.1f", current_float_values[key] * 3.28084);
                         break;
                     
                     case RideService.KPH:
-                        valuesTvs[key].setText(String.format("%.2f", values[key] * 0.621371));
+                        values[key] = String.format("%.1f", current_float_values[key] * 0.621371);
                         break;
 
                     case RideService.KM:
-                        valuesTvs[key].setText(String.format("%.2f", values[key] * 0.621371));
+                        values[key] = String.format("%.1f", current_float_values[key] * 0.621371);
                         break;
         
                     default:
-                        valuesTvs[key].setText(String.format("%.2f", values[key]));
+                        values[key] = String.format("%.1f", current_float_values[key]);
                         break;
                 }
             }
@@ -239,12 +264,12 @@ public class CurrentValuesAdapter extends BaseAdapter {
     public int getWidth() {
         TextView tv = new TextView(context);
         tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
-        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-        tv.setText(String.format("%.2f", 1111.11));
+        tv.setText(String.format("%.1f", 1111.11));
         
         Rect bounds = new Rect();
-        tv.getPaint().getTextBounds("9999.99", 0, "9999.99".length(), bounds);
+        tv.getPaint().getTextBounds("9999.9", 0, "9999.9".length(), bounds);
         
         return bounds.width();
     }
