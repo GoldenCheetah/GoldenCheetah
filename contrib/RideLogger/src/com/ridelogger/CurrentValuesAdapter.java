@@ -270,6 +270,6 @@ public class CurrentValuesAdapter extends BaseAdapter {
         Rect bounds = new Rect();
         tv.getPaint().getTextBounds("9999.9", 0, "9999.9".length(), bounds);
         
-        return bounds.width();
+        return bounds.width() + 16;
     }
 }
