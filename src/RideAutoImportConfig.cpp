@@ -107,7 +107,7 @@ RideAutoImportConfigParser::endElement( const QString&, const QString&, const QS
 }
 
 bool
-RideAutoImportConfigParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes )
+RideAutoImportConfigParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes& )
 {
     buffer.clear();
     if(name == "rule") {
