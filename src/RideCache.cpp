@@ -18,6 +18,8 @@
 
 #include "RideCache.h"
 
+#include "DBAccess.h"
+
 #include "Context.h"
 #include "Athlete.h"
 #include "Route.h"
@@ -203,24 +205,54 @@ RideCache::removeCurrentRide()
 void RideCache::load() {}
 void RideCache::save() {}
 
-// refresh the metrics XXX not implemented yet
+// check if we need to refresh the metrics then start the thread if needed
 void
 RideCache::refresh()
 {
 
     // already on it !
     if (isRunning()) return;
-    else {
 
-        bool stale = false;
-        foreach(RideItem *item, rides_) {
-            if (item->isstale) {
-                stale = true;
-                break;
+
+    bool stale = false;
+
+    foreach(RideItem *item, rides_) {
+
+        // is db version different ?
+        if (item->dbversion != DBSchemaVersion) {
+
+            item->isstale = true;
+
+        // or have cp / zones have changed ?
+        } else if (item->fingerprint != fingerprint) {
+
+            item->isstale = true;
+
+        // or has file content changed ?
+        } else {
+
+            // has timestamp changed ?
+            QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + item->fileName;
+            QFile file(fullPath);
+
+            if (item->timestamp < QFileInfo(file).lastModified().toTime_t()) {
+
+                // if timestamp has changed then check crc
+                unsigned long crc = DBAccess::computeFileCRC(fullPath);
+
+                if (item->crc == 0 || item->crc != crc) {
+                    item->crc = crc; // update as expensive to calculate
+                    item->isstale = true;
+                }
             }
         }
-        if (stale) start();
+
+        // ok set stale so we refresh
+        if (item->isstale) stale = true;
     }
+
+    // start if there is work to do
+    if (stale) start();
 }
 
 void RideCache::run()
@@ -242,6 +274,11 @@ void RideCache::run()
 
             // now clear stale flag
             item->isstale = false;
+
+            // update fingerprints etc, crc done above
+            item->fingerprint = fingerprint;
+            item->dbversion = DBSchemaVersion;
+            item->timestamp = QDateTime::currentDateTime().toTime_t();
 
             // update progress
             progress_ = 100.0f * ((rides_.indexOf(item)+1) / double(rides_.count()));

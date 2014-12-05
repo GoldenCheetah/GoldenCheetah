@@ -1878,13 +1878,6 @@ MainWindow::configChanged()
 
 }
 
-void
-Context::notifyConfigChanged()
-{
-    // .. then tell everyone else
-    configChanged();
-}
-
 /*----------------------------------------------------------------------
  * Measures
  *--------------------------------------------------------------------*/

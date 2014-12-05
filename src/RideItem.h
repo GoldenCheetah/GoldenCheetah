@@ -23,6 +23,10 @@
 
 #include "RideMetric.h"
 
+#include <QString>
+#include <QMap>
+#include <QVector>
+
 class RideFile;
 class Context;
 
@@ -37,7 +41,14 @@ class RideItem : public QObject
 
     protected:
 
+        // ridefile
         RideFile *ride_;
+
+        // precomputed metrics
+        QVector<double> metrics_;
+
+        // metadata (used by navigator)
+        QMap<QString,QString> metadata_;
 
         QStringList errors_;
         Context *context; // to notify widgets when date/time changes
@@ -59,17 +70,25 @@ class RideItem : public QObject
         bool isstale;     // metric data is out of date and needs recomputing
         bool isedit;      // is being edited at the moment
 
+        // get at the data
         QString path;
         QString fileName;
         QDateTime dateTime;
-        unsigned long crc, timestamp;
 
+        // context the item was updated to
+        unsigned long fingerprint; // zones
+        unsigned long crc, timestamp; // file content
+        int dbversion; // metric version
+
+        // access to the cached data !
+        RideFile *ride(bool open=true);
+        QVector<double> &metrics() { return metrics_; }
+        QMap<QString, QString> &metadata() { return metadata_; }
         const QStringList errors() { return errors_; }
 
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can
         // traverse currently open rides when config changes
-        RideFile *ride(bool open=true);
         void close();
         bool isOpen();
 
