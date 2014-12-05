@@ -460,14 +460,14 @@ GcUpgrade::upgrade(const QDir &home)
                   .arg(QString::number(ok)).arg(newHome.activities().dirName()).arg(QString::number(fail)),2);
 
 
-        // 3.6 keep the .BAK files and store in /imports()
+        // 3.6 keep the .BAK files and store in /fileBackup()
         QStringList bakFiles;
         bakFiles << "*.bak";
         upgradeLog->append(tr("Start copying of: Activity files (.BAK)..."),3);
         ok = 0; fail = 0;
         foreach (QString bakFile, newHome.root().entryList(bakFiles, QDir::Files)) {
             bool success = moveFile(QString("%1/%2").arg(newHome.root().canonicalPath()).arg(bakFile),
-                     QString("%1/%2").arg(newHome.imports().canonicalPath()).arg(bakFile));
+                     QString("%1/%2").arg(newHome.fileBackup().canonicalPath()).arg(bakFile));
             if (success) {
                 ok++;
             } else {
@@ -477,7 +477,7 @@ GcUpgrade::upgrade(const QDir &home)
         }
         errorCount += fail;
         upgradeLog->append(QString(tr("%1 activity backup (.BAK) files moved to subdirectory: %2 - %3 failed" ))
-                  .arg(QString::number(ok)).arg(newHome.imports().dirName()).arg(QString::number(fail)),2);
+                  .arg(QString::number(ok)).arg(newHome.fileBackup().dirName()).arg(QString::number(fail)),2);
 
         // 3.6 now sort the rest of the files (extension checks are re-use)
         MediaHelper mediaFile;
@@ -727,6 +727,7 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "-> Configuration files: <samp>/config</samp><br>"
                      "-> Download files: <samp>/downloads</samp><br>"
                      "-> Import files: <samp>/imports</samp><br>"
+                     "-> Backups of Activity/Ride files: <samp>/bak</samp><br>"
                      "-> Workout related files: <samp>/workouts</samp><br>"
                      "-> Cache files: <samp>/cache</samp><br>"
                      "-> Calendar files: <samp>/calendar</samp><br>"

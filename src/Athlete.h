@@ -164,6 +164,7 @@ class AthleteDirectoryStructure : public QObject {
             QDir imports(){ return QDir(myhome.absolutePath()+"/"+athlete_imports);}
             QDir records(){ return QDir(myhome.absolutePath()+"/"+athlete_records);}
             QDir downloads() { return QDir(myhome.absolutePath()+"/"+athlete_downloads);}
+            QDir fileBackup() { return QDir(myhome.absolutePath()+"/"+athlete_fileBackup);}
             QDir config() { return QDir(myhome.absolutePath()+"/"+athlete_config);}
             QDir cache() { return QDir(myhome.absolutePath()+"/"+athlete_cache);}
             QDir calendar() { return QDir(myhome.absolutePath()+"/"+athlete_calendar);}
@@ -175,6 +176,7 @@ class AthleteDirectoryStructure : public QObject {
             QString getActivitiesSubDir() {return athlete_activities; }
             QString getImportsSubDir() {return athlete_imports; }
             QString getDownloadsSubDir() {return athlete_downloads; }
+            QString getFileBackupSubDir() {return athlete_fileBackup;}
             QString getConfigSubDir() {return athlete_config; }
             QString getCacheSubDir() {return athlete_cache; }
             QString getWorkoutsSubDir() {return athlete_workouts; }
@@ -194,6 +196,7 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_imports;
             QString athlete_records;
             QString athlete_downloads;
+            QString athlete_fileBackup;
             QString athlete_config;
             QString athlete_cache;
             QString athlete_calendar;

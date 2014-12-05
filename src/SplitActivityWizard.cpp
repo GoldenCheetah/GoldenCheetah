@@ -402,7 +402,7 @@ SplitActivityWizard::setFilesList()
 QString
 SplitActivityWizard::hasBackup(QString filename)
 {
-    QString backupFilename = context->athlete->home->activities().canonicalPath() + "/" + filename + ".bak";
+    QString backupFilename = context->athlete->home->fileBackup().canonicalPath() + "/" + filename + ".bak";
 
     if (QFile(backupFilename).exists()) {
 
