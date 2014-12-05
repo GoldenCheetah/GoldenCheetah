@@ -27,14 +27,18 @@
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
-    ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName("") {}
+    ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    crc(0), timestamp(0) {}
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
-    ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), fileName(fileName), dateTime(dateTime) {}
+    ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
+    fileName(fileName), dateTime(dateTime), crc(0), timestamp(0) {}
 
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
-    : ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime) {}
+    :
+    ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
+    crc(0), timestamp(0) {}
 
 RideFile *RideItem::ride(bool open)
 {
@@ -139,8 +143,14 @@ RideItem::setFileName(QString path, QString fileName)
     this->fileName = fileName;
 }
 
+bool
+RideItem::isOpen()
+{
+    return ride_ != NULL;
+}
+
 void
-RideItem::freeMemory()
+RideItem::close()
 {
     if (ride_) {
         delete ride_;

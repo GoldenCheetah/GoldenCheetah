@@ -62,18 +62,21 @@ class RideItem : public QObject
         QString path;
         QString fileName;
         QDateTime dateTime;
+        unsigned long crc, timestamp;
+
         const QStringList errors() { return errors_; }
 
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can
         // traverse currently open rides when config changes
         RideFile *ride(bool open=true);
+        void close();
+        bool isOpen();
 
         // create and destroy
         RideItem(RideFile *ride, Context *context);
         RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
         RideItem(RideFile *ride, QDateTime &dateTime, Context *context);
-        void freeMemory();
 
         // state
         void setDirty(bool);

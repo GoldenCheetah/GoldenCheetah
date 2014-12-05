@@ -1286,7 +1286,7 @@ MainWindow::saveRide()
 void
 MainWindow::revertRide()
 {
-    currentTab->context->ride->freeMemory();
+    currentTab->context->ride->close();
     currentTab->context->ride->ride(); // force re-load
 
     // in case reverted ride has different starttime

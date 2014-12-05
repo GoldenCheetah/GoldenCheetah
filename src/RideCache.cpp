@@ -23,8 +23,16 @@
 #include "Route.h"
 #include "RouteWindow.h"
 
+#include "Zones.h"
+#include "HrZones.h"
+#include "PaceZones.h"
+
 RideCache::RideCache(Context *context) : context(context)
 {
+    progress_ = 100;
+    exiting = false;
+    configChanged();
+
     // set the list
     // populate ride list
     RideItem *last = NULL;
@@ -43,13 +51,31 @@ RideCache::RideCache(Context *context) : context(context)
     load();
 
     // do we have any stale items ?
-    refresh();
+    //XXX moved to tab during testing XXX refresh();
+    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 }
 
 RideCache::~RideCache()
 {
+    exiting = true;
+
     // save to store
     save();
+}
+
+void
+RideCache::configChanged()
+{
+    // remember what it was before
+    unsigned long prior = fingerprint;
+
+    // get the new zone configuration fingerprint
+    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
+                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
+                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint());
+
+    // if zones etc changed then recalculate metrics
+    if (prior != fingerprint) refresh();
 }
 
 // add a new ride
@@ -162,7 +188,7 @@ RideCache::removeCurrentRide()
     context->notifyRideDeleted(todelete);
 
     // ..but before MEMORY cleared
-    todelete->freeMemory();
+    todelete->close();
     delete todelete;
 
     // now we can update
@@ -181,6 +207,8 @@ void RideCache::save() {}
 void
 RideCache::refresh()
 {
+
+    // already on it !
     if (isRunning()) return;
     else {
 
@@ -197,5 +225,44 @@ RideCache::refresh()
 
 void RideCache::run()
 {
-    //XXX not implemented but where metrics and meta get refreshed.
+
+    bool haveStale = true;
+
+    do {
+
+        context->notifyRefreshStart();
+
+        // run through each ride and refresh cache if needed
+        foreach(RideItem *item, rides()) {
+
+            // lets update metrics and meta etc
+            // XXX NO REFRESH CODE YET XXX
+            // XXX SIMULATE WITH A SLEEP XXX
+            msleep(10);
+
+            // now clear stale flag
+            item->isstale = false;
+
+            // update progress
+            progress_ = 100.0f * ((rides_.indexOf(item)+1) / double(rides_.count()));
+
+            // update progress bar
+            context->notifyRefreshUpdate();
+            QApplication::processEvents();
+        }
+
+        context->notifyRefreshEnd();
+
+        // trap any changes after we swept through
+        haveStale=false;
+        if (!exiting) {
+            foreach(RideItem *item, rides_) {
+                if (item->isstale) {
+                    haveStale = true;
+                    break;
+                }
+            }
+        }
+
+    } while (!exiting && haveStale);
 }
