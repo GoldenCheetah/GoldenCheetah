@@ -6131,6 +6131,9 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
+    // turn off hover when mouse leaves
+    if (event->type() == QEvent::Leave) context->notifyIntervalHover(RideFileInterval());
+
     return false;
 }
 

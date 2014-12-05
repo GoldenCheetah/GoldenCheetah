@@ -19,6 +19,7 @@
 
 #include "MergeActivityWizard.h"
 #include "Context.h"
+#include "RideCache.h"
 #include "MainWindow.h"
 
 // minimum R-squared fit when trying to find offsets to
@@ -661,7 +662,7 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    foreach (RideItem *rideItem, wizard->context->athlete->rideList) {
+    foreach (RideItem *rideItem, wizard->context->athlete->rideCache->rides()) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);

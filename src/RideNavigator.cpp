@@ -19,6 +19,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Colors.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
@@ -959,7 +960,7 @@ RideNavigator::selectionChanged(QItemSelection selected)
 
     // lets make sure we know what we've selected, so we don't
     // select it twice
-    foreach(RideItem *item, context->athlete->rideList) {
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
        if (item->fileName == filename) {
            currentItem = item;
            break;
