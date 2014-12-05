@@ -747,9 +747,6 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      ));
     scrollText = new QScrollArea();
     scrollText->setWidget(text);
-    vertical = scrollText->verticalScrollBar();
-    vertical->setTracking(false);
-    connect(vertical, SIGNAL(valueChanged(int)), this, SLOT(checkVerticalScroll(int)));
 
     toprow->addWidget(critical);
     toprow->addWidget(header);
@@ -758,8 +755,8 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
 
     QHBoxLayout *lastRow = new QHBoxLayout;
 
-    proceedButton = new QPushButton(tr("Proceed with Upgrade"), this);
-    proceedButton->setEnabled(false);
+    proceedButton = new QPushButton(tr("Accept conditions and proceed with Upgrade"), this);
+    proceedButton->setEnabled(true);
     connect(proceedButton, SIGNAL(clicked()), this, SLOT(accept()));
     abortButton = new QPushButton(tr("Abort Upgrade"), this);
     abortButton->setDefault(true);
@@ -773,15 +770,6 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
 
 }
 
-void
-GcUpgradeExecuteDialog::checkVerticalScroll(int value)
-{
-    if (value == vertical->maximum()) {
-        proceedButton->setEnabled(true);
-    }else {
-        proceedButton->setEnabled(false);
-    }
-}
 
 
 GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
