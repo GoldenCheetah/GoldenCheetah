@@ -22,12 +22,6 @@ import android.preference.PreferenceManager;
 public class Sensors extends Base<Object>
 {
     public static final double  CRASHMAGNITUDE = 30.0;
-    private SensorManager       mSensorManager;    
-    private Sensor              mLight;
-    private Sensor              mAccel;
-    private Sensor              mPress;
-    private Sensor              mTemp;
-    private Sensor              mField;
     
     private SensorEventListener luxListner;
     private SensorEventListener accelListner;
@@ -39,13 +33,13 @@ public class Sensors extends Base<Object>
     {
         super(mContext);
         
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         
-        mLight         = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mAccel         = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mPress         = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-        mTemp          = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-        mField         = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        Sensor mLight         = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        Sensor mAccel         = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        Sensor mPress         = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+        Sensor mTemp          = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        Sensor mField         = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
           
         if(mLight != null) {
           luxListner = new SensorEventListener() {
@@ -208,6 +202,7 @@ public class Sensors extends Base<Object>
     @Override
     public void onDestroy()
     {
+        SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         if(luxListner != null) {
             mSensorManager.unregisterListener(luxListner);
         }

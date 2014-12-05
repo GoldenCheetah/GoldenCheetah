@@ -11,23 +11,29 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class CurrentValuesAdapter extends BaseAdapter {
-    public StartActivity    context;
+    private StartActivity    context;
     
-    public int[]            keys;
-    public String[]         values    = new String[RideService.KEYS.length];
-    public String[]         keyLabels = new String[RideService.KEYS.length];
-    public RelativeLayout[] lls       = new RelativeLayout[RideService.KEYS.length];
-    public int              size      = 20;
-    public boolean          imperial  = false;
-    public int              count     = 0;
-    public static SharedPreferences.OnSharedPreferenceChangeListener spChanged;
+    private int[]            keys;
+    private String[]         values    = new String[RideService.KEYS.length];
+    private String[]         keyLabels = new String[RideService.KEYS.length];
+    private int              size      = 20;
+    private boolean          imperial  = false;
 
-    public CurrentValuesAdapter(StartActivity c) {
+    private GridView layout;
+
+    public CurrentValuesAdapter(StartActivity c, GridView tlayout) {
         context                    = c;
+        layout                     = tlayout;
+        
+        layout.setBackgroundColor(Color.BLACK);
+        layout.setVerticalSpacing(4);
+        layout.setHorizontalSpacing(4);
+        
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         Set<String> sensors        = settings.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
         size                       = Integer.valueOf(settings.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
@@ -62,7 +68,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String pkey) {
                     if(pkey == context.getString(R.string.PREF_TRACKING_SIZE)) {
                         size = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
-                        context.layout.setColumnWidth(getWidth());
+                        setupWidth();
                         notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_SENSORS)) {
                         Set<String> sensors = sharedPreferences.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
@@ -73,7 +79,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
                             i++;
                         }
                         
-                        context.layout.setAdapter(CurrentValuesAdapter.this);
+                        layout.setAdapter(CurrentValuesAdapter.this);
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
                         imperial = sharedPreferences.getBoolean(pkey, false);
                         
@@ -85,7 +91,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         );
     }
     
-    public void updateKeyLables() {
+    private void updateKeyLables() {
         if(!imperial) {
             for(int key : keys) {
                 keyLabels[key] = RideService.KEYS[key].toString().toLowerCase();
@@ -113,7 +119,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         }
     }
     
-    public RelativeLayout newRelativeLayout(int key) {
+    private RelativeLayout newRelativeLayout(int key) {
         RelativeLayout view = new RelativeLayout(context);
         view.setBackgroundColor(Color.WHITE);
         
@@ -145,7 +151,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
     }
     
     
-    public TextView newValueTv(int key){
+    private TextView newValueTv(int key){
         TextView tv = new TextView(context);
         tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
         tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
@@ -156,7 +162,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
     }
     
     
-    public TextView newKeyTv(int key){
+    private TextView newKeyTv(int key){
         TextView tv = new TextView(context);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         tv.setBackgroundColor(Color.LTGRAY);
@@ -260,7 +266,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
      * returns the size of the cell basted on 8 chars wide and the configured size param
      * @return int
      */
-    public int getWidth() {
+    private void setupWidth() {
         TextView tv = new TextView(context);
         tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
         tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
@@ -269,7 +275,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         
         Rect bounds = new Rect();
         tv.getPaint().getTextBounds("9999.9", 0, "9999.9".length(), bounds);
-        
-        return bounds.width() + 16;
+
+        layout.setColumnWidth(bounds.width() + 16);
     }
 }

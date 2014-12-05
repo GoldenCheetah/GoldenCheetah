@@ -39,15 +39,6 @@ public class Power extends Ant
     }
     
     
-    public Power(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
-        super(result, mContext, psnoop);
-        releaseHandle = AntPlusBikePowerPcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
-        wheelCircumferenceInMeters = new BigDecimal(
-                PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.PREF_WHEEL_SIZE), "2.096")
-        );
-    }
-    
-    
     //Handle messages
     protected IPluginAccessResultReceiver<AntPlusBikePowerPcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusBikePowerPcc>() {
         //Handle the result, connecting to events on success or reporting failure to user.

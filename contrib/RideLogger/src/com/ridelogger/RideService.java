@@ -9,9 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -55,7 +53,6 @@ import android.telephony.SmsManager;
 public class RideService extends Service
 {    
     public static final int notifyID     = 1;                  //Id of the notification in the top android bar that this class creates and alters   
-    
     
     public static final int SECS         = 0;
     public static final int KPH          = 1;
@@ -110,27 +107,20 @@ public class RideService extends Service
         "press",
         "lux"
     };
-    
-    public static final int TOTALSENSORS = RideService.KEYS.length;
-    
-    public float[]           currentValues = new float[RideService.TOTALSENSORS]; //float array of current values
-    public float[]           snoopedValues = new float[RideService.TOTALSENSORS]; //float array of snooped values
-    public GzipWriter        buf;                           //writes to log file buffered
-    public long              startTime;                     //start time of the ride
-    public boolean           rideStarted   = false;         //have we started logging the ride
-    public Boolean           snoop         = false;         //should we log others ant+ devices
-    private Set<String>      pairedAnts;                    //list of ant devices to pair with
-    private Timer            timer;                         //timer class to control the periodic messages
-    private Timer            timerUI;                       //timer class to control the periodic messages
-    private String           emergencyNumbuer;              //the number to send the messages to
+        
+    public float[]            currentValues = new float[RideService.KEYS.length]; //float array of current values
+    public GzipWriter         buf;                           //writes to log file buffered
+    public long               startTime;                     //start time of the ride
+    private boolean           rideStarted   = false;         //have we started logging the ride
+    private Set<String>       pairedAnts;                    //list of ant devices to pair with
+    private Timer             timer;                         //timer class to control the periodic messages
+    private Timer             timerUI;                       //timer class to control the periodic messages
+    private String            emergencyNumbuer;              //the number to send the messages to
 
                                         
-    public LinkedHashMap<String, Base<?>> sensors   = new LinkedHashMap<String, Base<?>>();
-                                                              //All other Android sensor class
-    MultiDeviceSearch                     mSearch;              //Ant+ device search class to init connections
-    MultiDeviceSearch.SearchCallbacks     mCallback;            //Ant+ device class to setup sensors after they are found
-    MultiDeviceSearch.RssiCallback        mRssiCallback;        //Ant+ class to do something with the signal strength on device find
-    
+    private Base<?>[] sensors;
+    private int sensor_index = 0;
+    MultiDeviceSearch                     mSearch;   //Ant+ device search class to init connections    
     
     
     final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
@@ -141,6 +131,7 @@ public class RideService extends Service
         public void handleMessage(Message msg) {
             if(timerUI != null) {
                 timerUI.cancel();
+                timerUI = null;
             }
             
             timerUI = new Timer();
@@ -193,6 +184,7 @@ public class RideService extends Service
     public boolean onUnbind (Intent intent) {
         if(timerUI != null) {
             timerUI.cancel();
+            timerUI = null;
         }
         
         return true;
@@ -286,27 +278,35 @@ public class RideService extends Service
                 
                 buf.write(rideHeadder);
                 
-                sensors.put("GPS",            new Gps(this));
-                sensors.put("AndroidSensors", new Sensors(this));
+                if(pairedAnts != null) {
+                    sensors = new Base<?>[pairedAnts.size() + 2];
+                } else {
+                    sensors = new Base<?>[2];
+                }
+                
+                sensors[sensor_index++] = new Gps(this);
+                sensors[sensor_index++] = new Sensors(this);
+                
+                
                 
                 if(pairedAnts != null && !pairedAnts.isEmpty()){
-                    mCallback = new MultiDeviceSearch.SearchCallbacks(){
+                    MultiDeviceSearch.SearchCallbacks mCallback = new MultiDeviceSearch.SearchCallbacks(){
                         public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
                         {
                             if (!deviceFound.isAlreadyConnected())  {
                                 if(pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))) {
-                                    launchConnection(deviceFound, false);
-                                } else if (snoop) {
-                                    launchConnection(deviceFound, true);
+                                    launchConnection(deviceFound);
                                 }
                             }
                         }
     
                         @Override
-                        public void onSearchStopped(RequestAccessResult arg0) {}
+                        public void onSearchStopped(RequestAccessResult arg0) {
+                            mSearch = null;
+                        }
                     };
                     
-                    mRssiCallback = new MultiDeviceSearch.RssiCallback() {
+                    MultiDeviceSearch.RssiCallback mRssiCallback = new MultiDeviceSearch.RssiCallback() {
                         @Override
                         public void onRssiUpdate(final int resultId, final int rssi){}
                     };
@@ -430,8 +430,10 @@ public class RideService extends Service
         
         phoneStop();
 
-        for (Map.Entry<String, Base<?>> entry : sensors.entrySet()) {                   
-            entry.getValue().onDestroy();
+        for(Base<?> sensor: sensors) {
+            if(sensor != null) {
+                sensor.onDestroy();
+            }
         }
 
         //stop the Ant+ search
@@ -442,10 +444,12 @@ public class RideService extends Service
         //stop the phoneHome timer if we need to.
         if(timer != null) {
             timer.cancel();
+            timer = null;
         }
         
         if(timerUI != null) {
             timerUI.cancel();
+            timerUI = null;
         }
         
         try {
@@ -459,19 +463,13 @@ public class RideService extends Service
     }
     
     
-    //remove snooped sensors if they are not longer in range
-    public void releaseSnoopedSensor(Base<?> sensor) {
-        sensors.remove(sensor);
-    }
-    
-    
     //launch ant+ connection
-    public void launchConnection(MultiDeviceSearchResult result, Boolean snoop) {
+    public void launchConnection(MultiDeviceSearchResult result) {
         switch (result.getAntDeviceType()) {
             case BIKE_CADENCE:
                 break;
             case BIKE_POWER:
-                sensors.put(String.valueOf(result.getAntDeviceNumber()), new Power(result, this, snoop));
+                sensors[sensor_index++] = new Power(result, this);
                 break;
             case BIKE_SPD:
                 break;
@@ -484,7 +482,7 @@ public class RideService extends Service
             case WEIGHT_SCALE:
                 break;
             case HEARTRATE:
-                sensors.put(String.valueOf(result.getAntDeviceNumber()), new HeartRate(result, this, snoop));            
+                sensors[sensor_index++] = new HeartRate(result, this);            
                 break;
             case STRIDE_SDM:
                 break;

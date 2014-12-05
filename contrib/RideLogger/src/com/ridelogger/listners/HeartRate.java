@@ -25,12 +25,6 @@ public class HeartRate extends Ant
     }
     
     
-    public HeartRate(MultiDeviceSearchResult result, RideService mContext, Boolean psnoop) {
-        super(result, mContext, psnoop);
-        releaseHandle = AntPlusHeartRatePcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
-    }
-    
-    
     public IPluginAccessResultReceiver<AntPlusHeartRatePcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusHeartRatePcc>() {
         //Handle the result, connecting to events on success or reporting failure to user.
         @Override
