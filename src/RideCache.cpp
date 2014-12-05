@@ -135,31 +135,21 @@ RideCache::removeCurrentRide()
 
     // in case there was an existing bak file, delete it
     // ignore errors since it probably isn't there.
-    QFile::remove(context->athlete->home->activities().canonicalPath() + "/" + strNewName);
+    QFile::remove(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName);
 
-    if (!file.rename(context->athlete->home->activities().canonicalPath() + "/" + strNewName)) {
+    if (!file.rename(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName)) {
         QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2")
             .arg(strOldFileName).arg(strNewName));
     }
 
-    // remove any other derived/additional files; notes, cpi etc
+    // remove any other derived/additional files; notes, cpi etc (they can only exist in /cache )
     QStringList extras;
     extras << "notes" << "cpi" << "cpx";
     foreach (QString extension, extras) {
 
         QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
-        QFile::remove(context->athlete->home->activities().canonicalPath() + "/" + deleteMe);
-    }
+        QFile::remove(context->athlete->home->cache().canonicalPath() + "/" + deleteMe);
 
-    // rename also the source files either in /imports or in /downloads to allow a second round of import
-    QString sourceFilename = todelete->ride()->getTag("Source Filename", "");
-    if (sourceFilename != "") {
-        // try to rename in both directories /imports and /downloads
-        // but don't report any errors - files may have been backup already
-        QFile old1 (context->athlete->home->imports().canonicalPath() + "/" + sourceFilename);
-        old1.rename(context->athlete->home->imports().canonicalPath() + "/" + sourceFilename + ".bak");
-        QFile old2 (context->athlete->home->downloads().canonicalPath() + "/" + sourceFilename);
-        old2.rename(context->athlete->home->downloads().canonicalPath() + "/" + sourceFilename + ".bak");
     }
 
     // we don't want the whole delete, select next flicker
