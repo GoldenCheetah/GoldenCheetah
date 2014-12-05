@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "RideMetadata.h"
+#include "RideCache.h"
 #include "RideFileCache.h"
 #include "RideMetric.h"
 #include "Settings.h"
@@ -44,11 +45,10 @@
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "LTMSettings.h"
-#include "Route.h"
-#include "RouteWindow.h"
 #include "RideImportWizard.h"
 #include "RideAutoImportConfig.h"
-
+#include "Route.h"
+#include "RouteWindow.h"
 
 #include "GcUpgrade.h" // upgrade wizard
 #include "GcCrashDialog.h" // recovering from a crash?
@@ -191,17 +191,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allIntervals->setText(0, tr("Intervals"));
 
-    // populate ride list
-    RideItem *last = NULL;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(home->activities()));
-    while (i.hasNext()) {
-        QString name = i.next();
-        QDateTime dt;
-        if (RideFile::parseRideFileName(name, &dt)) {
-            last = new RideItem(home->activities().canonicalPath(), name, dt, context);
-            rideList << last;
-        }
-    }
+    rideCache = new RideCache(context);
 
     // trap signals
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -221,6 +211,9 @@ Athlete::close()
 
 Athlete::~Athlete()
 {
+    // close the ride cache down first
+    delete rideCache;
+
     // save those preset charts
     LTMSettings reader;
     reader.writeChartXML(home->config(), presets); // don't write it until we fix the code
@@ -259,7 +252,7 @@ void Athlete::selectRideFile(QString fileName)
     if (context->ride && context->ride->fileName == fileName) return;
 
     // lets find it
-    foreach (RideItem *rideItem, rideList) {
+    foreach (RideItem *rideItem, rideCache->rides()) {
 
         context->ride = (RideItem*) rideItem;
         if (context->ride->fileName == fileName) 
@@ -302,129 +295,15 @@ Athlete::updateRideFileIntervals()
 void
 Athlete::addRide(QString name, bool dosignal)
 {
-    // ignore malformed names
-    QDateTime dt;
-    if (!RideFile::parseRideFileName(name, &dt)) return;
-
-    // new ride item
-    RideItem *last = new RideItem(home->activities().canonicalPath(), name, dt, context);
-
-    // now add to the list, or replace if already there
-    bool added = false;
-    for (int index=0; index < rideList.count(); index++) {
-        if (rideList[index]->fileName == last->fileName) {
-            rideList[index] = last;
-            break;
-        }
-    }
-
-    if (!added) rideList << last;
-    qSort(rideList); // sort by date
-
-    if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
-
-    //Search routes
-    routes->searchRoutesInRide(last->ride());
-
-    // notify everyone to select it
-    context->ride = last;
-    context->notifyRideSelected(last);
+    rideCache->addRide(name, dosignal);
 }
 
 void
 Athlete::removeCurrentRide()
 {
-    if (context->ride == NULL) return;
-
-    RideItem *select = NULL; // ride to select once its gone
-    RideItem *todelete = context->ride;
-
-    bool found = false;
-    int index=0; // index to wipe out
-
-    // find ours in the list and select the one
-    // immediately after it, but if it is the last
-    // one on the list select the one before
-    for(index=0; index < rideList.count(); index++) {
-
-       if (rideList[index]->fileName == context->ride->fileName) {
-
-          // bingo!
-          found = true;
-          if (rideList.count()-index > 1) select = rideList[index+1];
-          else if (index > 0) select = rideList[index-1];
-          break;
-
-       }
-    }
-
-    // WTAF!?
-    if (!found) {
-        qDebug()<<"ERROR: delete not found.";
-        return;
-    }
-
-    // remove from the cache, before deleting it this is so
-    // any aggregating functions no longer see it, when recalculating
-    // during aride deleted operation
-    rideList.remove(index, 1);
-
-    // delete the file by renaming it
-    QString strOldFileName = context->ride->fileName;
-
-    QFile file(home->activities().canonicalPath() + "/" + strOldFileName);
-    // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
-    QString strNewName = strOldFileName + ".bak";
-
-    // in case there was an existing bak file, delete it
-    // ignore errors since it probably isn't there.
-    QFile::remove(home->activities().canonicalPath() + "/" + strNewName);
-
-    if (!file.rename(home->activities().canonicalPath() + "/" + strNewName)) {
-        QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2")
-            .arg(strOldFileName).arg(strNewName));
-    }
-
-    // remove any other derived/additional files; notes, cpi etc
-    QStringList extras;
-    extras << "notes" << "cpi" << "cpx";
-    foreach (QString extension, extras) {
-
-        QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
-        QFile::remove(home->activities().canonicalPath() + "/" + deleteMe);
-    }
-
-    // rename also the source files either in /imports or in /downloads to allow a second round of import
-    QString sourceFilename = todelete->ride()->getTag("Source Filename", "");
-    if (sourceFilename != "") {
-        // try to rename in both directories /imports and /downloads
-        // but don't report any errors - files may have been backup already
-        QFile old1 (home->imports().canonicalPath() + "/" + sourceFilename);
-        old1.rename(home->imports().canonicalPath() + "/" + sourceFilename + ".bak");
-        QFile old2 (home->downloads().canonicalPath() + "/" + sourceFilename);
-        old2.rename(home->downloads().canonicalPath() + "/" + sourceFilename + ".bak");
-    }
-
-    // we don't want the whole delete, select next flicker
-    context->mainWindow->setUpdatesEnabled(false);
-
-    // select a different ride
-    context->ride = select;
-
-    // notify AFTER deleted from DISK..
-    context->notifyRideDeleted(todelete);
-
-    // ..but before MEMORY cleared
-    todelete->freeMemory();
-    delete todelete;
-
-    // now we can update
-    context->mainWindow->setUpdatesEnabled(true);
-    QApplication::processEvents();
-
-    // now select another ride
-    context->notifyRideSelected(select);
+    rideCache->removeCurrentRide();
 }
+
 
 void
 Athlete::checkCPX(RideItem*ride)
@@ -522,7 +401,7 @@ Athlete::configChanged()
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // forget all the cached weight values in case weight changed
-    foreach (RideItem *rideItem, rideList) {
+    foreach (RideItem *rideItem, rideCache->rides()) {
         if (rideItem->ride(false)) {
             rideItem->ride(false)->setWeight(0);
             rideItem->ride(false)->getWeight();

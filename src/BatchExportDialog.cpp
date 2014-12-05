@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 
 BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
@@ -53,7 +54,7 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    foreach (RideItem *rideItem, context->athlete->rideList) {
+    foreach (RideItem *rideItem, context->athlete->rideCache->rides()) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);

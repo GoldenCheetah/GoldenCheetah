@@ -41,7 +41,6 @@ class RideItem : public QObject
 
         QStringList errors_;
         Context *context; // to notify widgets when date/time changes
-        bool isdirty;
 
     public slots:
         void modified();
@@ -56,7 +55,9 @@ class RideItem : public QObject
 
     public:
 
-        bool isedit; // is being edited at the moment
+        bool isdirty;     // ride data has changed and needs saving
+        bool isstale;     // metric data is out of date and needs recomputing
+        bool isedit;      // is being edited at the moment
 
         QString path;
         QString fileName;
@@ -77,6 +78,7 @@ class RideItem : public QObject
         // state
         void setDirty(bool);
         bool isDirty() { return isdirty; }
+        bool isStale() { return isstale; }
         bool isRun() { return ride_ ? ride_->isRun() : false; }
 
         // get/set

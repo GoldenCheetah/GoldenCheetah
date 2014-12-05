@@ -52,7 +52,7 @@ class LTMSettings;
 class Routes;
 class AthleteDirectoryStructure;
 class RideAutoImportConfig;
-
+class RideCache;
 class Context;
 
 class Athlete : public QObject
@@ -117,7 +117,7 @@ class Athlete : public QObject
         Context *context;
 
         // ride collection
-        QVector<RideItem*> rideList;
+        RideCache *rideCache;
         void selectRideFile(QString);
         void addRide(QString name, bool bSelect=true);
         void removeCurrentRide();
