@@ -117,12 +117,8 @@ class GcUpgradeExecuteDialog : public QDialog
     public:
         GcUpgradeExecuteDialog(QString);
 
-    public slots:
-        void checkVerticalScroll(int);
-
     private:
         QScrollArea *scrollText;
-        QScrollBar *vertical;
         QPushButton *proceedButton;
         QPushButton *abortButton;
 
