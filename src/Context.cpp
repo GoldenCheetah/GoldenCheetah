@@ -56,3 +56,10 @@ Context::notifyCompareDateRangesChanged()
         emit compareDateRangesChanged(); 
     }
 }
+
+void
+Context::notifyConfigChanged()
+{
+    configChanged();
+}
+

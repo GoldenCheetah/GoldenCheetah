@@ -73,12 +73,14 @@ class MetricAggregator : public QObject
         Context *context;
         DBAccess *dbaccess;
         bool first;
+        bool refreshing;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);
         bool importInterval(IntervalItem *interval, QString type, QString group, unsigned long fingerprint, bool modify);
-
+#ifdef GC_HAVE_INTERVALS
         void refreshBestIntervals();
+#endif
 
 	    MetricMap metrics;
         ColorEngine *colorEngine;

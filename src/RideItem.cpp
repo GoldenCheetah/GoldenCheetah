@@ -25,20 +25,33 @@
 #include "HrZones.h"
 #include <math.h>
 
+// used to create a temporary ride item that is not in the cache and just
+// used to enable using the same calling semantics in things like the
+// merge wizard and interval navigator
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    crc(0), timestamp(0) {}
+    fingerprint(0), crc(0), timestamp(0), dbversion(0) {}
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
     ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
-    fileName(fileName), dateTime(dateTime), crc(0), timestamp(0) {}
+    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0) {}
 
+// Create a new RideItem destined for the ride cache and used for caching
+// pre-computed metrics and storing ride metadata
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
     ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
-    crc(0), timestamp(0) {}
+    fingerprint(0), crc(0), timestamp(0), dbversion(0)
+{
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    // ressize and initialize so we can store metric values at
+    // RideMetric::index offsets into the metrics_ qvector
+    metrics_.fill(0, factory.metricCount());
+}
 
 RideFile *RideItem::ride(bool open)
 {
