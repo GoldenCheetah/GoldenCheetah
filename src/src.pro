@@ -390,6 +390,7 @@ HEADERS += \
         ComputrainerController.h \
         RealtimePlot.h \
         RideAutoImportConfig.h \
+        RideCache.h \
         RideEditor.h \
         RideFile.h \
         RideFileCache.h \
@@ -613,6 +614,7 @@ SOURCES += \
         RealtimePlotWindow.cpp \
         ReferenceLineDialog.cpp \
         RideAutoImportConfig.cpp \
+        RideCache.cpp \
         RideEditor.cpp \
         RideFile.cpp \
         RideFileCache.cpp \

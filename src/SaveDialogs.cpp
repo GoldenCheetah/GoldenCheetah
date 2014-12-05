@@ -18,6 +18,7 @@
 #include "MainWindow.h"
 #include "Tab.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
 #include "RideItem.h"
@@ -95,7 +96,7 @@ MainWindow::saveRideExitDialog(Context *context)
     if (warnExit() == false) return true; // just close regardless!
 
     // get a list of rides to save
-    foreach (RideItem *rideItem, context->athlete->rideList)
+    foreach (RideItem *rideItem, context->athlete->rideCache->rides())
         if (rideItem->isDirty() == true) 
             dirtyList.append(rideItem);
 
