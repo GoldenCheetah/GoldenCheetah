@@ -92,6 +92,9 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     chartbar = new ChartBar(context);
     tabLayout->addWidget(chartbar);
+#ifdef WANT_RIDECACHE
+    tabLayout->addWidget(new ProgressLine(this, context));
+#endif
     tabLayout->addWidget(tabbed);
     style->addWidget(tabArea);
 

@@ -31,6 +31,8 @@ class Context;
 
 class RideCache : public QThread
 {
+    Q_OBJECT
+
     public:
 
         RideCache(Context *context);
@@ -49,9 +51,15 @@ class RideCache : public QThread
 
         // the background refresher !
         void refresh(); // calls start() and doesn't wait
+        double progress() { return progress_; }
 
         // the thread code that gets run to refresh
         void run();
+
+    public slots:
+
+        // user updated options/preferences
+        void configChanged();
 
     protected:
 
@@ -59,6 +67,9 @@ class RideCache : public QThread
 
         Context *context;
         QVector<RideItem*> rides_;
+        bool exiting;
+	double progress_; // percent
+        unsigned long fingerprint; // zone configuration fingerprint
 };
 
 #endif // _GC_RideCache_h
