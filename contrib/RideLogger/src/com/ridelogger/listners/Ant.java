@@ -18,15 +18,11 @@ public class Ant extends Base<Object>
 {
     public PccReleaseHandle<?>            releaseHandle;    //Handle class
     public IPluginAccessResultReceiver<?> mResultReceiver;  //Receiver class
-    public Boolean                        snooped  = false; //should we snoop others connections?
-    //setup listeners and logging 
-    public Ant(MultiDeviceSearchResult result, RideService mContext) {
-        super(mContext);
-    }
     
-    public Ant(MultiDeviceSearchResult result, RideService mContext, Boolean pSnoop) {
+    //setup listeners and logging 
+    public Ant(MultiDeviceSearchResult result, RideService mContext)
+    {
         super(mContext);
-        snooped  = pSnoop;
     }
     
     
@@ -37,10 +33,6 @@ public class Ant extends Base<Object>
             //if we lose a device zero out its values
             if(newDeviceState.equals(DeviceState.DEAD)) {
                 zeroReadings();
-                if(snooped) {
-                    releaseHandle.close(); // release ourselves if snooped
-                    context.releaseSnoopedSensor(Ant.this);
-                }
             }
         }
     };
@@ -56,43 +48,27 @@ public class Ant extends Base<Object>
     @Override
     public void writeData(int key, float value)
     {
-        if(snooped) {
-            super.writeSnoopedData(key, value);
-        } else {
-            super.writeData(key, value);
-        }
+        super.writeData(key, value);
     }
     
     
     @Override
     public void writeData(int[] keys, float[] values)
     {
-        if(snooped) {
-            super.writeSnoopedData(keys, values);
-        } else {
-            super.writeData(keys, values);
-        }
+        super.writeData(keys, values);
     }
 
 
     @Override
     public void alterCurrentData(int key, float value)
-    {        
-        if(snooped) {
-            super.alterSnoopedData(key, value);
-        } else {
-            super.alterCurrentData(key, value);
-        }
+    {
+        super.alterCurrentData(key, value);
     }
     
     @Override
     public void alterCurrentData(int[] keys, float[] values)
     {
-        if(snooped) {
-            super.alterSnoopedData(keys, values);
-        } else {
-            super.alterCurrentData(keys, values);
-        }
+        super.alterCurrentData(keys, values);
     }
     
     

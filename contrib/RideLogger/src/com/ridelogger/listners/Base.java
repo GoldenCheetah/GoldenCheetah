@@ -77,30 +77,8 @@ public class Base<T>
             }
         } catch (IOException e) {}
     }
-    
-    
-    public void writeSnoopedData(int key, float value)
-    {
-        if(context.currentValues[key] != value) {
-            context.snoopedValues[RideService.SECS] = getTs();
-            context.snoopedValues[key]              = value;
-        }
-    }
-    
-    
-    public void writeSnoopedData(int[] keys, float[] values)
-    {
-        context.snoopedValues[RideService.SECS] = getTs();
-        synchronized (context.snoopedValues) {
-            int i = 0;
-            for (int key : keys) {
-                context.snoopedValues[key] = values[i];
-                i++;
-            }
-        }
-    }
-    
-    
+
+
     public void alterCurrentData(int key, float value)
     {
         synchronized (context.currentValues) {
@@ -109,16 +87,7 @@ public class Base<T>
             writeCurrentData();
         }
     }
-    
-    
-    public void alterSnoopedData(int key, float value)
-    {
-        synchronized (context.snoopedValues) {
-            context.snoopedValues[RideService.SECS] = getTs();
-            context.snoopedValues[key] = value;
-        }
-    }
-    
+
     
     public void alterCurrentData(int[] keys, float[] values)
     {
@@ -132,20 +101,6 @@ public class Base<T>
             }
             
             writeCurrentData();
-        }
-    }
-    
-    
-    public void alterSnoopedData(int[] keys, float[] values)
-    {
-        synchronized (context.snoopedValues) {
-            context.snoopedValues[RideService.SECS] = getTs();
-            
-            int i = 0;
-            for (int key : keys) {
-                context.snoopedValues[key] = values[i];
-                i++;
-            }
         }
     }
     
