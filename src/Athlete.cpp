@@ -435,6 +435,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     athlete_imports = "imports";
     athlete_records = "records";
     athlete_downloads = "downloads";
+    athlete_fileBackup = "bak";
     athlete_config = "config";
     athlete_cache = "cache";
     athlete_calendar = "calendar";
@@ -458,6 +459,7 @@ AthleteDirectoryStructure::createAllSubdirs() {
     myhome.mkdir(athlete_imports);
     myhome.mkdir(athlete_records);
     myhome.mkdir(athlete_downloads);
+    myhome.mkdir(athlete_fileBackup);
     myhome.mkdir(athlete_config);
     myhome.mkdir(athlete_cache);
     myhome.mkdir(athlete_calendar);
@@ -475,6 +477,7 @@ AthleteDirectoryStructure::subDirsExist() {
             imports().exists() &&
             records().exists() &&
             downloads().exists() &&
+            fileBackup().exists() &&
             config().exists() &&
             cache().exists() &&
             calendar().exists() &&
