@@ -27,14 +27,14 @@
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
-    ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName("") {}
+    ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName("") {}
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
-    ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName), dateTime(dateTime) {}
+    ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), fileName(fileName), dateTime(dateTime) {}
 
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
-    : ride_(ride), context(context), isdirty(true), isedit(false), dateTime(dateTime) {}
+    : ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime) {}
 
 RideFile *RideItem::ride(bool open)
 {

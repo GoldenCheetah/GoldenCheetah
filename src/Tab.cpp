@@ -20,6 +20,7 @@
 #include "Tab.h"
 #include "Views.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "MainWindow.h"
@@ -99,8 +100,8 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
     // selects the latest ride in the list:
-    if (context->athlete->rideList.count() != 0) 
-        context->athlete->selectRideFile(context->athlete->rideList.last()->fileName);
+    if (context->athlete->rideCache->rides().count() != 0) 
+        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
 }
 
 Tab::~Tab()
