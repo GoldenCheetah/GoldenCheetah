@@ -900,29 +900,36 @@ RideImportWizard::abortClicked()
         QString activitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
 
         // file name for the copy to /imports directory
+        bool reimport = false;  // check if file is taken from /imports or /downloads - then no need to rename or copy
+        QString importsFulltarget = "";
+        QString importsTarget = "";
         QFileInfo importsFile (filenames[i]);
-        QString importsTarget = importsFile.baseName() + "_" + targetnosuffix + "." + importsFile.suffix();
-        QString importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
+        if (importsFile.canonicalFilePath() == (homeImports.canonicalPath() + "/" + targetnosuffix + "." + importsFile.suffix())) {
+            reimport = true;
+        } else {
+            reimport = false;
+            // add the GC file base name to create unique file names during import
+            // there should not be 2 ride files with exactly the same time stamp (as this is also not foreseen for the .json)
+            importsTarget = importsFile.baseName() + "_" + targetnosuffix + "." + importsFile.suffix();
+            importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
+        }
 
-        // check if a ride at this point of time already exists in /activities AND
-        // if a source file with the same name already exists in /imports
-        // both are errors which shall block the import as "Dup-Files" errors
-        // The Dup-File status is decided by comparing "RideDateTime" for /activities
-        // and by comparing "OriginalName+RideDateTime" for the /imports
+
+        // check if a ride at this point of time already exists in /activities
         if (QFileInfo(activitiesFulltarget).exists()) {
             tableWidget->item(i,5)->setText(tr("Error - Activity file exists"));
-        } else if (QFileInfo(importsFulltarget).exists()) {
-            tableWidget->item(i,5)->setText(tr("Error - File already imported, but no activity found"));
         } else {
 
-            // First copy of source then create .JSON (in case of error the last error will be shown)
+            // First copy of source (if required) then create .JSON (in case of error the last error will be shown)
             // so start wih the less the less critical part first
 
-            // copy the source file to /imports with adjusted name
             tableWidget->item(i,5)->setText(tr("Saving file..."));
-            QFile source(filenames[i]);
-            if (!source.copy(importsFulltarget)) {
-                tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+            if (!reimport) {
+                // copy the source file to /imports with adjusted name
+                QFile source(filenames[i]);
+                if (!source.copy(importsFulltarget)) {
+                    tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+                }
             }
 
             // serialize the file to .JSON
