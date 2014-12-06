@@ -18,11 +18,12 @@ import android.widget.TextView;
 public class CurrentValuesAdapter extends BaseAdapter {
     private StartActivity    context;
     
-    private int[]            keys;
-    private String[]         values    = new String[RideService.KEYS.length];
-    private String[]         keyLabels = new String[RideService.KEYS.length];
-    private int              size      = 20;
-    private boolean          imperial  = false;
+    private int[]             keys;
+    private String[]          values    = new String[RideService.KEYS.length];
+    private String[]          keyLabels = new String[RideService.KEYS.length];
+    private int               size      = 20;
+    private boolean           imperial  = false;
+    private SharedPreferences settings  = null;
 
     private GridView layout;
 
@@ -34,10 +35,11 @@ public class CurrentValuesAdapter extends BaseAdapter {
         layout.setVerticalSpacing(4);
         layout.setHorizontalSpacing(4);
         
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        Set<String> sensors        = settings.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
-        size                       = Integer.valueOf(settings.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
-        imperial                   = settings.getBoolean(context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS), false);
+        settings            = PreferenceManager.getDefaultSharedPreferences(context);
+        Set<String> sensors = settings.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
+        
+        size                = Integer.valueOf(settings.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
+        imperial            = settings.getBoolean(context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS), false);
         
         
         if(sensors != null && sensors.size() > 0) {
