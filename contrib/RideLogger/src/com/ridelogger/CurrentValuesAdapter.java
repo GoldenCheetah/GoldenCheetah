@@ -80,6 +80,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         }
                         
                         layout.setAdapter(CurrentValuesAdapter.this);
+                        notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
                         imperial = sharedPreferences.getBoolean(pkey, false);
                         
