@@ -7,7 +7,6 @@ import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
 import com.dsi.ant.plugins.antplus.pcc.defines.EventFlag;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
-import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
 import com.ridelogger.RideService;
 import java.math.BigDecimal;
 import java.util.EnumSet;
@@ -19,29 +18,45 @@ import java.util.EnumSet;
  */
 public class HeartRate extends Ant
 {
-    public HeartRate(MultiDeviceSearchResult result, RideService mContext) {
-        super(result, mContext);
-        releaseHandle = AntPlusHeartRatePcc.requestAccess(context, result.getAntDeviceNumber(), 0, mResultReceiver, mDeviceStateChangeReceiver);
+    public IPluginAccessResultReceiver<AntPlusHeartRatePcc> mResultReceiver;
+    
+    public HeartRate(int pDeviceNumber, RideService mContext) {
+        super(pDeviceNumber, mContext);
+        
+        mResultReceiver = new IPluginAccessResultReceiver<AntPlusHeartRatePcc>() {
+            //Handle the result, connecting to events on success or reporting failure to user.
+            @Override
+            public void onResultReceived(AntPlusHeartRatePcc result, RequestAccessResult resultCode, DeviceState initialDeviceState)
+            {
+                if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SUCCESS) {
+                    deviceNumber = result.getAntDeviceNumber();
+                    result.subscribeHeartRateDataEvent(
+                        new IHeartRateDataReceiver() {
+                            @Override
+                            public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final DataState dataState) {
+                                alterCurrentData(RideService.HR, (float) computedHeartRate);
+                            }
+                        }
+                    );
+                } else if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SEARCH_TIMEOUT) {
+                    requestAccess();
+                }
+            }
+        };
+        
+        
+        requestAccess();
     }
     
     
-    public IPluginAccessResultReceiver<AntPlusHeartRatePcc> mResultReceiver = new IPluginAccessResultReceiver<AntPlusHeartRatePcc>() {
-        //Handle the result, connecting to events on success or reporting failure to user.
-        @Override
-        public void onResultReceived(AntPlusHeartRatePcc result, RequestAccessResult resultCode, DeviceState initialDeviceState)
-        {
-            if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SUCCESS) {
-                result.subscribeHeartRateDataEvent(
-                    new IHeartRateDataReceiver() {
-                        @Override
-                        public void onNewHeartRateData(final long estTimestamp, EnumSet<EventFlag> eventFlags, final int computedHeartRate, final long heartBeatCount, final BigDecimal heartBeatEventTime, final DataState dataState) {
-                            alterCurrentData(RideService.HR, (float) computedHeartRate);
-                        }
-                    }
-                );
-            }
-        }
-    };
+    
+    @Override
+    protected void requestAccess() {
+        releaseHandle = AntPlusHeartRatePcc.requestAccess(context, deviceNumber, 0, mResultReceiver, mDeviceStateChangeReceiver);
+    }
+    
+    
+    
     
     
     @Override
