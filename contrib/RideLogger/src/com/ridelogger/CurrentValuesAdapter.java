@@ -19,17 +19,17 @@ public class CurrentValuesAdapter extends BaseAdapter {
     private StartActivity    context;
     
     private int[]             keys;
-    private String[]          values    = new String[RideService.KEYS.length];
-    private String[]          keyLabels = new String[RideService.KEYS.length];
+    private String[]          values;
+    private String[]          keyLabels;
     private int               size      = 20;
     private boolean           imperial  = false;
     private SharedPreferences settings  = null;
 
     private GridView layout;
 
-    public CurrentValuesAdapter(StartActivity c, GridView tlayout) {
+    public CurrentValuesAdapter(StartActivity c, GridView pLayout) {
         context                    = c;
-        layout                     = tlayout;
+        layout                     = pLayout;
         
         layout.setBackgroundColor(Color.BLACK);
         layout.setVerticalSpacing(4);
@@ -41,28 +41,9 @@ public class CurrentValuesAdapter extends BaseAdapter {
         size                = Integer.valueOf(settings.getString(context.getString(R.string.PREF_TRACKING_SIZE), "20"));
         imperial            = settings.getBoolean(context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS), false);
         
-        
-        if(sensors != null && sensors.size() > 0) {
-            keys = new int[sensors.size()];
-            int i = 0;
-            for(String sensor : sensors) {
-                keys[i]   = Integer.parseInt(sensor);
-                i++;
-            }
-        } else {
-            keys = new int[RideService.KEYS.length];
-            
-            for (int i = 0; i < RideService.KEYS.length; i++) {
-                keys[i] = i;
-            }
-        }
-        
-        
-        for (int i = 0; i < RideService.KEYS.length; i++) {
-            values[i] = "0.0";
-        }
-        
-        updateKeyLables();
+        initKeys(sensors);
+        initKeyLables();
+        initValues();
         
         settings.registerOnSharedPreferenceChangeListener(
             new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -74,19 +55,19 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_SENSORS)) {
                         Set<String> sensors = sharedPreferences.getStringSet(context.getString(R.string.PREF_TRACKING_SENSORS), null);
-                        keys = new int[sensors.size()];
-                        int i = 0;
-                        for(String sensor : sensors) {
-                            keys[i] = Integer.parseInt(sensor);
-                            i++;
-                        }
+                        
+                        initKeys(sensors);
+                        initKeyLables();
+                        initValues();
                         
                         layout.setAdapter(CurrentValuesAdapter.this);
                         notifyDataSetChanged();
                     } else if (pkey == context.getString(R.string.PREF_TRACKING_IMPERIAL_UNITS)) {
                         imperial = sharedPreferences.getBoolean(pkey, false);
                         
-                        updateKeyLables();
+                        initKeyLables();
+                        initValues();
+                        
                         notifyDataSetChanged();
                     }
                 }
@@ -94,7 +75,26 @@ public class CurrentValuesAdapter extends BaseAdapter {
         );
     }
     
-    private void updateKeyLables() {
+    
+    private void initKeys(Set<String> sensors) {
+        if(sensors != null && sensors.size() > 0) {
+            keys  = new int[sensors.size()];
+            int i = 0;
+            for(String sensor : sensors) {
+                keys[i]   = Integer.parseInt(sensor);
+                i++;
+            }
+        } else {
+            keys = new int[RideService.KEYS.length];
+            for (int i = 0; i < RideService.KEYS.length; i++) {
+                keys[i] = i;
+            }
+        }        
+    }
+    
+    private void initKeyLables() {
+        keyLabels = new String[keys.length];
+        
         if(!imperial) {
             for(int key : keys) {
                 keyLabels[key] = RideService.KEYS[key].toString().toLowerCase();
@@ -118,6 +118,17 @@ public class CurrentValuesAdapter extends BaseAdapter {
                         keyLabels[key] = RideService.KEYS[key].toString().toLowerCase();
                         break;
                 }
+            }
+        }
+    }
+    
+    private void initValues() {
+        values    = new String[keys.length];
+        for (int key : keys) {
+            if(key == RideService.SECS) { 
+                values[key] = "00:00:00";
+            } else {
+                values[key] = "0.0";
             }
         }
     }
@@ -171,28 +182,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         tv.setBackgroundColor(Color.LTGRAY);
         tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
         tv.setPadding(4, 1, 4, 1);
-        
-        if(!imperial) {
-            tv.setText(keyLabels[key]);
-        } else {
-            switch (key) {
-                case RideService.ALTITUDE:
-                    tv.setText("ft");
-                    break;
-                    
-                case RideService.KPH:
-                    tv.setText("mph");
-                    break;
-                    
-                case RideService.KM:
-                    tv.setText("miles");
-                    break;
-    
-                default:
-                    tv.setText(keyLabels[key]);
-                    break;
-            }
-        }
+        tv.setText(keyLabels[key]);
         return tv;
     }
     
@@ -239,7 +229,14 @@ public class CurrentValuesAdapter extends BaseAdapter {
     
     public void update(float[] current_float_values) {
         for (int key: keys) {
-            if(!imperial) {
+            if(key == RideService.SECS) {
+                int hr = (int) (current_float_values[key]/3600);
+                int rem = (int) (current_float_values[key]%3600);
+                int mn = rem/60;
+                int sec = rem%60;
+                
+                values[key] = (hr<10 ? "0" : "") + hr + ":" + (mn<10 ? "0" : "") + mn + ":" + (sec<10 ? "0" : "")+sec;
+            } else if(!imperial) {
                 values[key] = String.format("%.1f", current_float_values[key]);
             } else {
                 switch (key) {
@@ -277,7 +274,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         tv.setText(String.format("%.1f", 1111.11));
         
         Rect bounds = new Rect();
-        tv.getPaint().getTextBounds("9999.9", 0, "9999.9".length(), bounds);
+        tv.getPaint().getTextBounds("00:00:00", 0, "00:00:00".length(), bounds);
 
         layout.setColumnWidth(bounds.width() + 16);
     }

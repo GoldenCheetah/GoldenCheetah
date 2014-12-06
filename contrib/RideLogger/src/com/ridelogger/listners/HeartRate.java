@@ -39,7 +39,9 @@ public class HeartRate extends Ant
                         }
                     );
                 } else if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SEARCH_TIMEOUT) {
-                    requestAccess();
+                    if(deviceNumber != 0) {
+                        requestAccess();
+                    }
                 }
             }
         };
