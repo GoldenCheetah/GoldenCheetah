@@ -940,3 +940,38 @@ Zones::getFingerprint(Context *context) const
     double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "0.0").toDouble();
     return qChecksum(ba, ba.length()) + weight + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
 }
+
+// get fingerprint just for the range that applies on this date
+quint16
+Zones::getFingerprint(Context *context, QDate forDate) const
+{
+    quint64 x = 0;
+
+    // which range to apply ?
+    int i = whichRange(forDate);
+    if (i >= 0) {
+
+        // from
+        x += ranges[i].begin.toJulianDay();
+
+        // to
+        x += ranges[i].end.toJulianDay();
+
+        // CP
+        x += ranges[i].cp;
+
+        // W'
+        x += ranges[i].wprime;
+
+        // each zone definition (manual edit/default changed)
+        for (int j=0; j<ranges[i].zones.count(); j++) {
+            x += ranges[i].zones[j].lo;
+        }
+    }
+    QByteArray ba = QByteArray::number(x);
+
+    // if default athlete weight changes everything needs to change !
+    double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "0.0").toDouble();
+    return qChecksum(ba, ba.length()) + weight + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
+}
+

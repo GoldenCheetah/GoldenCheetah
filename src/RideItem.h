@@ -100,6 +100,7 @@ class RideItem : public QObject
         // state
         void setDirty(bool);
         bool isDirty() { return isdirty; }
+        bool checkStale(); // check if we need to refresh
         bool isStale() { return isstale; }
         bool isRun() { return ride_ ? ride_->isRun() : false; }
 

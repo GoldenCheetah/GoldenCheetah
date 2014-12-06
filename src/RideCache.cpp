@@ -68,7 +68,9 @@ RideCache::~RideCache()
 void
 RideCache::configChanged()
 {
-    // remember what it was before
+    // this is the overall config fingerprint, not for a specific
+    // ride. We now refresh only when the zones change, and refresh
+    // a single ride only when the zones that apply to that ride change
     unsigned long prior = fingerprint;
 
     // get the new zone configuration fingerprint
@@ -218,37 +220,8 @@ RideCache::refresh()
 
     foreach(RideItem *item, rides_) {
 
-        // is db version different ?
-        if (item->dbversion != DBSchemaVersion) {
-
-            item->isstale = true;
-
-        // or have cp / zones have changed ?
-        } else if (item->fingerprint != fingerprint) {
-
-            item->isstale = true;
-
-        // or has file content changed ?
-        } else {
-
-            // has timestamp changed ?
-            QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + item->fileName;
-            QFile file(fullPath);
-
-            if (item->timestamp < QFileInfo(file).lastModified().toTime_t()) {
-
-                // if timestamp has changed then check crc
-                unsigned long crc = DBAccess::computeFileCRC(fullPath);
-
-                if (item->crc == 0 || item->crc != crc) {
-                    item->crc = crc; // update as expensive to calculate
-                    item->isstale = true;
-                }
-            }
-        }
-
         // ok set stale so we refresh
-        if (item->isstale) stale = true;
+        if (item->checkStale()) stale = true;
     }
 
     // start if there is work to do

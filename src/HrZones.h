@@ -208,6 +208,11 @@ class HrZones : public QObject
         // data is changed since last referenced in Metric code
         // could also be used in Configuration pages (later)
         quint16 getFingerprint() const;
+
+        // this is the fingerprint for a specific DATE so that we
+        // can be more granular -- did the zone config for the date of
+        // a particular ride change ?
+        quint16 getFingerprint(QDate date) const;
 };
 
 QColor hrZoneColor(int zone, int num_zones);

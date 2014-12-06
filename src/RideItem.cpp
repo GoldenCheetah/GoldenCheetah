@@ -20,9 +20,10 @@
 #include "RideMetric.h"
 #include "RideFile.h"
 #include "Context.h"
-#include "Context.h"
+#include "DBAccess.h" // only for DBSchemaVersion
 #include "Zones.h"
 #include "HrZones.h"
+#include "PaceZones.h"
 #include <math.h>
 
 // used to create a temporary ride item that is not in the cache and just
@@ -176,4 +177,57 @@ RideItem::setStartTime(QDateTime newDateTime)
 {
     dateTime = newDateTime;
     ride()->setStartTime(newDateTime);
+}
+
+// check if we need to be refreshed
+bool
+RideItem::checkStale()
+{
+    // if we're marked stale already then just return that !
+    if (isstale) return true;
+
+    // is db version different ?
+    if (dbversion != DBSchemaVersion) {
+
+        isstale = true;
+
+    } else {
+
+        // or have cp / zones have changed ?
+        // note we now get the fingerprint from the zone range
+        // and not the entire config so that if you add a new
+        // range (e.g. set CP from today) but none of the other
+        // ranges change then there is no need to recompute the
+        // metrics for older rides !
+
+        // get the new zone configuration fingerprint that applies for the ride date
+        unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+                      + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                      + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+
+        if (fingerprint != rfingerprint) {
+
+            isstale = true;
+
+        } else {
+
+            // or has file content changed ?
+            QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + fileName;
+            QFile file(fullPath);
+
+            // has timestamp changed ?
+            if (timestamp < QFileInfo(file).lastModified().toTime_t()) {
+
+                // if timestamp has changed then check crc
+                unsigned long fcrc = DBAccess::computeFileCRC(fullPath);
+
+                if (crc == 0 || crc != fcrc) {
+                    crc = fcrc; // update as expensive to calculate
+                    isstale = true;
+                }
+            }
+        }
+    }
+
+    return isstale;
 }
