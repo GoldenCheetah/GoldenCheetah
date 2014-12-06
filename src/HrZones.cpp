@@ -877,3 +877,30 @@ HrZones::getFingerprint() const
     QByteArray ba = QByteArray::number(x);
     return qChecksum(ba, ba.length());
 }
+
+quint16
+HrZones::getFingerprint(QDate forDate) const
+{
+    quint64 x = 0;
+
+    int i = whichRange(forDate);
+    if (i >= 0) {
+
+        // from
+        x += ranges[i].begin.toJulianDay();
+
+        // to
+        x += ranges[i].end.toJulianDay();
+
+        // CP
+        x += ranges[i].lt;
+
+        // each zone definition (manual edit/default changed)
+        for (int j=0; j<ranges[i].zones.count(); j++) {
+            x += ranges[i].zones[j].lo;
+
+        }
+    }
+    QByteArray ba = QByteArray::number(x);
+    return qChecksum(ba, ba.length());
+}
