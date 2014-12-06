@@ -3,6 +3,7 @@ package com.ridelogger;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,14 +15,20 @@ import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchRe
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 
 public class SettingsActivity extends PreferenceActivity {
+    
+    static ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();
     
     /**
      * This fragment contains a second-level set of preference that you
@@ -87,9 +94,14 @@ public class SettingsActivity extends PreferenceActivity {
      * can get to by tapping an item in the first preferences fragment.
      */
     public static class AntFragment extends PreferenceFragment {
-        
         private MultiDeviceSearch mSearch;
         private MultiSelectListPreference mMultiSelectListPreference;
+        
+        @Override
+        public void onConfigurationChanged(Configuration newConfig) {
+            // TODO Auto-generated method stub
+            super.onConfigurationChanged(newConfig);
+        }
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -153,7 +165,6 @@ public class SettingsActivity extends PreferenceActivity {
         protected void setupAnt() {
             MultiDeviceSearch.SearchCallbacks        mCallback;
             MultiDeviceSearch.RssiCallback           mRssiCallback;
-            final ArrayList<MultiDeviceSearchResult> foundDevices = new ArrayList<MultiDeviceSearchResult>();
             
             updateList(foundDevices);
             
@@ -220,6 +231,26 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.layout.settings, target);
+        
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        settings.registerOnSharedPreferenceChangeListener(
+                new SharedPreferences.OnSharedPreferenceChangeListener() {
+                    @Override
+                    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String pkey) {
+                        if (pkey == getString(R.string.PREF_PAIRED_ANTS)) {
+                            Set<String> sensors = sharedPreferences.getStringSet(pkey, null);
+                            if(sensors != null && sensors.size() > 0) {
+                                Editor editor = sharedPreferences.edit();
+                                for(MultiDeviceSearchResult result : foundDevices) {
+                                    sensors.contains(String.valueOf(result.getAntDeviceNumber()));
+                                    editor.putInt(String.valueOf(result.getAntDeviceNumber()), result.getAntDeviceType().getIntValue());
+                                }
+                                editor.commit();
+                            }
+                        }
+                    }
+                }
+            );
     }
     
     
