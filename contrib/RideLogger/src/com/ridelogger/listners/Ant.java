@@ -44,22 +44,6 @@ public class Ant extends Base<Object>
             releaseHandle.close();
         }
     }
-
-
-    @Override
-    public void alterCurrentData(int key, float value)
-    {
-        super.alterCurrentData(key, value);
-    }
-    
-    @Override
-    public void alterCurrentData(int[] keys, float[] values)
-    {
-        super.alterCurrentData(keys, values);
-    }
-    
-    
-    public void zeroReadings() {}
 }
 
 
