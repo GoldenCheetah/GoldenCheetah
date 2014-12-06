@@ -486,7 +486,7 @@ AnomalyDialog::check()
     else rideEditor->checkAct->setEnabled(false);
 
     // redraw - even if no anomalies were found since
-    // some may have been highlighted previouslt. This is
+    // some may have been highlighted previously. This is
     // an expensive operation, but then so is the check()
     // function.
     rideEditor->model->forceRedraw();
@@ -501,7 +501,7 @@ RideEditor::eventFilter(QObject *object, QEvent *e)
     // not for the table?
     if (object != (QObject *)table) return false;
 
-    // what happenned?
+    // what happened?
     switch(e->type())
     {
         case QEvent::ContextMenu:
@@ -893,7 +893,7 @@ RideEditor::paste()
     ride->ride()->command->startLUW("Paste Cells");
     for (int i=0; i<cells.count(); i++) {
 
-        // just in case check booundary (i.e. truncate)
+        // just in case check boundary (i.e. truncate)
         if (selectedrow+i > ride->ride()->dataPoints().count()-1) break;
         for(int j=0; j<cells[i].count(); j++) {
 
@@ -921,7 +921,7 @@ RideEditor::getPaste(QVector<QVector<double> >&cells, QStringList &seps, QString
     regexpStr = "[";
     foreach (QString sep, seps) regexpStr += sep;
     regexpStr += "]";
-    QRegExp sep(regexpStr); // RegExp for seperators
+    QRegExp sep(regexpStr); // RegExp for separators
 
     QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
 
@@ -2157,7 +2157,7 @@ void
 PasteSpecialDialog::okClicked()
 {
     // headings has the headings for each column
-    // with "Ignore" set if we are to igmore it
+    // with "Ignore" set if we are to ignore it
     // cells contains all the actual data from the
     // buffer.
     // We have three modes; (1) insert means add new
@@ -2321,7 +2321,7 @@ PasteSpecialDialog::okClicked()
         if (source.columns > target.columns) {
             truncate = true;
         }
-        // partially fill columnss ?
+        // partially fill columns ?
         if (source.columns < target.columns) {
             partial = true;
             target.columns = source.columns;

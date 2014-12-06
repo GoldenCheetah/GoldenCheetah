@@ -176,6 +176,10 @@ ScatterWindow::ScatterWindow(Context *context) :
     connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
+    // comparing things
+    connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
+    connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
+
     // set colors
     configChanged();
 }
@@ -320,3 +324,18 @@ ScatterWindow::setData()
     }
     scatterPlot->setData(&settings);
 }
+
+void
+ScatterWindow::compareChanged()
+{
+    /* no stale mode ?
+    if (!amVisible()) {
+        return;
+    }*/
+
+    setData();
+    repaint();
+
+}
+
+

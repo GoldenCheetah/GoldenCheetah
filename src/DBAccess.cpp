@@ -79,7 +79,7 @@
 // 57  20  Jan 2014 Mark Liversedge    Added W' Expenditure for total energy spent above CP
 // 58  23  Jan 2014 Mark Liversedge    W' work rename and calculate without reference to WPrime class (speed)
 // 59  24  Jan 2014 Mark Liversedge    Added Maximum W' exp which is same as W'bal bur expressed as used not left
-// 60  05  Feb 2014 Mark Liversedge    Added Critical Power as a metric -- retreives from settings for now
+// 60  05  Feb 2014 Mark Liversedge    Added Critical Power as a metric -- retrieves from settings for now
 // 61  15  Feb 2014 Mark Liversedge    Fixed W' Work (for recintsecs not 1s!).
 // 62  06  Mar 2014 Mark Liversedge    Fixed Fatigue Index to find peak then watch for decay, primarily useful in sprint intervals
 // 63  06  Mar 2014 Mark Liversedge    Added Pacing Index AP as %age of Max Power
@@ -102,7 +102,7 @@
 // 80  13  Jul 2014 Mark Liversedge    W' work + Below CP work = Work
 // 81  16  Aug 2014 Joern Rischmueller Added 'Elevation Loss'
 // 82  23  Aug 2014 Mark Liversedge    Added W'bal Matches
-// 83  05  Sep 2014 Joern Rischmueler  Added 'Time Carrying' and 'Elevation Gain Carrying'
+// 83  05  Sep 2014 Joern Rischmueller Added 'Time Carrying' and 'Elevation Gain Carrying'
 // 84  08  Sep 2014 Mark Liversedge    Added HrPw Ratio
 // 85  09  Sep 2014 Mark Liversedge    Added HrNp Ratio
 // 86  26  Sep 2014 Mark Liversedge    Added isRun first class var
@@ -112,8 +112,10 @@
 // 90  08  Nov 2014 Mark Liversedge    Update data flags for Moxy and Garmin Running Dynamics
 // 91  16  Nov 2014 Damien Grauser     Do not include values if data not present in TimeInZone and HRTimeInZone
 // 92  21  Nov 2014 Mark Liversedge    Added Watts:RPE ratio
+// 93  26  Nov 2014 Mark Liversedge    Added Min, Max, Avg SmO2
+// 94  02  Dic 2014 Ale Martinez       Added xPace
 
-int DBSchemaVersion = 92;
+int DBSchemaVersion = 94;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {

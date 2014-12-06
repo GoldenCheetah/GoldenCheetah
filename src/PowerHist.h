@@ -100,7 +100,7 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
                               wattsCPZoneArray, wattsKgArray, nmArray,
                               hrArray, hrZoneArray, hrCPZoneArray,
                               kphArray, paceZoneArray, paceCPZoneArray,
-                              cadArray, gearArray, metricArray;
+                              cadArray, gearArray, smo2Array, metricArray;
 
         // storage for data counts in interval selected
         QVector<unsigned int> aPowerSelectedArray, wattsSelectedArray,
@@ -108,7 +108,7 @@ class HistData // each curve needs a lot of data (!? this may need refactoring, 
                               wattsKgSelectedArray, nmSelectedArray,
                               hrSelectedArray, hrZoneSelectedArray, hrCPZoneSelectedArray,
                               kphSelectedArray, paceZoneSelectedArray, paceCPZoneSelectedArray,
-                              cadSelectedArray, gearSelectedArray;
+                              cadSelectedArray, smo2SelectedArray, gearSelectedArray;
 };
 
 class PowerHist : public QwtPlot
@@ -305,8 +305,9 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones       = rideItem->zones;
-	int zone_range     = rideItem->zoneRange();
+	const Zones *zones = parent->context->athlete->zones();
+        int zone_range = -1;
+        if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
 	if (parent->shadeZones() && (zone_range >= 0)) {
 	    QList <int> zone_lows = zones->getZoneLows(zone_range);
@@ -367,8 +368,9 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones       = rideItem->zones;
-	int zone_range     = rideItem->zoneRange();
+	const Zones *zones = parent->context->athlete->zones();
+        int zone_range = -1;
+        if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
 	setZ(1.0 + zone_number / 100.0);
 
@@ -457,8 +459,9 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones       = parent->context->athlete->hrZones();
-	int zone_range     = rideItem->hrZoneRange();
+	const HrZones *zones = parent->context->athlete->hrZones();
+        int zone_range = -1;
+        if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
 	if (parent->shadeHRZones() && (zone_range >= 0)) {
 	    QList <int> zone_lows = zones->getZoneLows(zone_range);
@@ -507,8 +510,9 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones       = parent->context->athlete->hrZones();
-	int zone_range     = rideItem->hrZoneRange();
+	const HrZones *zones = parent->context->athlete->hrZones();
+        int zone_range = -1;
+        if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
 	setZ(1.0 + zone_number / 100.0);
 

@@ -39,6 +39,7 @@ class QwtPlotCurve;
 class Context;
 class RideItem;
 class QwtPlotPicker;
+class MUPlot;
 
 class CriticalPowerWindow : public GcChartWindow
 {
@@ -253,6 +254,7 @@ class CriticalPowerWindow : public GcChartWindow
     protected:
 
         friend class ::CPPlot;
+        friend class ::MUPlot;
 
         bool event(QEvent *event);
 

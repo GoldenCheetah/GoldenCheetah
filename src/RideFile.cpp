@@ -1317,7 +1317,7 @@ RideFile::getHeight()
         return height;
     }
 
-    // is withings upported for height?
+    // is withings supported for height?
 
     // global options
     height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT, height_default).toString().toDouble();
@@ -1376,12 +1376,12 @@ RideFile::parseRideFileName(const QString &name, QDateTime *dt)
 //
 
 void
-RideFile::recalculateDerivedSeries()
+RideFile::recalculateDerivedSeries(bool force)
 {
     // derived data is calculated from the data that is present
     // we should set to 0 where we cannot derive since we may
     // be called after data is deleted or added
-    if (dstale == false) return; // we're already up to date
+    if (!force && dstale == false) return; // we're already up to date
 
     //
     // NP Initialisation -- working variables
@@ -1779,7 +1779,7 @@ RideFile::resample(double newRecIntSecs, int interpolate)
                         }
                     }
 
-                    // lets not go backwards -- or two sampls at the same time
+                    // lets not go backwards -- or two samples at the same time
                     if ((lp && p->secs > lp->secs) || !lp) {
                         points << QPointF(p->secs - offset, p->value(series));
                         last = p->secs-offset;

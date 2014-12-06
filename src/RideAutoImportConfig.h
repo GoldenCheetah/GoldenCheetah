@@ -83,7 +83,7 @@ public:
     bool startDocument();
     bool endDocument();
     bool endElement( const QString&, const QString&, const QString &qName );
-    bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes );
+    bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes& );
     bool characters( const QString& str );
     QList<RideAutoImportRule> getRules();
 

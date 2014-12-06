@@ -111,10 +111,10 @@ class AllPlotBackground: public QwtPlotItem
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem) {
+        } else if (rideItem && parent->context->athlete->zones()) {
 
-            zones = rideItem->zones;
-            zone_range = rideItem->zoneRange();
+            zones = parent->context->athlete->zones();
+            zone_range = parent->context->athlete->zones()->whichRange(rideItem->dateTime.date());
 
         } else {
 
@@ -182,10 +182,10 @@ class AllPlotZoneLabel: public QwtPlotItem
                 if (zone_range == -1)
                     zone_range = zones->whichRange(QDate::currentDate());
 
-            } else if (rideItem) {
+            } else if (rideItem && parent->context->athlete->zones()) {
 
-                zones = rideItem->zones;
-                zone_range = rideItem->zoneRange();
+                zones = parent->context->athlete->zones();
+                zone_range = parent->context->athlete->zones()->whichRange(rideItem->dateTime.date());
 
             } else {
 
@@ -467,7 +467,7 @@ AllPlotObject::setColor(QColor color)
              << smo2Curve << thbCurve << o2hbCurve << hhbCurve;
 
 
-    // work through getting progresively lighter
+    // work through getting progressively lighter
     QPen pen;
     pen.setWidth(1.0);
     int alpha = 200;
@@ -1375,13 +1375,13 @@ void AllPlot::refreshZoneLabels()
     }
     zoneLabels.clear();
 
-    if (rideItem) {
-        int zone_range = rideItem->zoneRange();
-        const Zones *zones = rideItem->zones;
+    if (rideItem && context->athlete->zones()) {
+
+        int zone_range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
-            int num_zones = zones->numZones(zone_range);
+            int num_zones = context->athlete->zones()->numZones(zone_range);
             for (int z = 0; z < num_zones; z ++) {
                 AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
                 label->attach(this);
@@ -1585,7 +1585,7 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRTE.resize(rideTimeSecs + 1);
         objects->smoothLPS.resize(rideTimeSecs + 1);
         objects->smoothRPS.resize(rideTimeSecs + 1);
-        // do the smoothing by caculating the average of the "applysmooth" values left
+        // do the smoothing by calculating the average of the "applysmooth" values left
         // of the current data point - for points in time smaller than "applysmooth"
         // only the available datapoints left are used to build the average
         int i = 0;
@@ -2137,7 +2137,7 @@ AllPlot::refreshCalibrationMarkers()
         scope != RideFile::NP && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
     QColor color = GColor(CPOWER);
-    color.setAlpha(15); // almost invisble !
+    color.setAlpha(15); // almost invisible !
 
     if (rideItem && rideItem->ride()) {
         foreach(const RideFileCalibration &calibration, rideItem->ride()->calibrations()) {
@@ -3480,7 +3480,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         if (scope == RideFile::wprime) sd->setFactor(0.001f); // Kj
         if (scope == RideFile::thb || scope == RideFile::smo2 
             || scope == RideFile::o2hb || scope == RideFile::hhb) // Hb
-            sd->setDecimals(1);
+            sd->setDecimals(2);
 
         setAxisScaleDraw(QwtPlot::yLeft, sd);
 
@@ -4529,7 +4529,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     // we don't have a reference plot
     referencePlot = NULL;
 
-    // bsically clear out
+    // basically clear out
     //standard->wattsArray.clear();
     //standard->curveTitle.setLabel(QwtText(QString(""), QwtText::PlainText)); // default to no title
 
@@ -4725,7 +4725,7 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             // where 'high precision' time slice is an artefact
             // of double precision or slight timing anomalies
             // e.g. where realtime gives timestamps like
-            // 940.002 followed by 940.998 and were previouslt
+            // 940.002 followed by 940.998 and were previously
             // both rounded to 940s
             //
             // NOTE: this rounding mechanism is identical to that
@@ -5836,12 +5836,24 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
             xstring = t.toString("hh:mm:ss");
         }
 
+        // for speed curve add pace with units according to settings
+        // only when the activity is a run.
+        QString paceStr;
+        if (curve->title() == tr("Speed") && rideItem && rideItem->isRun()) {
+            bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+            QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
+            paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);
+        }
+
+        bool isHB= curve->title().text().contains("Hb");
+
         // output the tooltip
-        QString text = QString("%1 %2\n%3 %4")
-                        .arg(yvalue, 0, 'f', 1)
+        QString text = QString("%1 %2%5\n%3 %4")
+                        .arg(yvalue, 0, 'f', isHB ? 2 : 1)
                         .arg(this->axisTitle(curve->yAxis()).text())
                         .arg(xstring)
-                        .arg(this->axisTitle(curve->xAxis()).text());
+                        .arg(this->axisTitle(curve->xAxis()).text())
+                        .arg(paceStr);
 
         // set that text up
         tooltip->setText(text);
@@ -6118,6 +6130,9 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
             }
         }
     }
+
+    // turn off hover when mouse leaves
+    if (event->type() == QEvent::Leave) context->notifyIntervalHover(RideFileInterval());
 
     return false;
 }

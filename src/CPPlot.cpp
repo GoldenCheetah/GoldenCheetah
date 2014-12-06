@@ -329,7 +329,7 @@ CPPlot::initModel()
    }
 }
 
-// Plot the dashed line model curve according to the paramters
+// Plot the dashed line model curve according to the parameters
 // and will also plot the heat on the curve or below since it is
 // related to the model
 void

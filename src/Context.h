@@ -122,6 +122,11 @@ class Context : public QObject
         void notifyIntervalHover(RideFileInterval x) { emit intervalHover(x); }
         void notifyRideClean() { rideClean(ride); }
         void notifyRideDirty() { rideDirty(ride); }
+        void notifyMetadataFlush() { metadataFlush(); }
+
+        void notifyRefreshStart() { emit refreshStart(); }
+        void notifyRefreshEnd() { emit refreshEnd(); }
+        void notifyRefreshUpdate() { emit refreshUpdate(); }
 
         void notifyCompareIntervals(bool state);
         void notifyCompareIntervalsChanged();
@@ -139,6 +144,12 @@ class Context : public QObject
         void presetsChanged();
         void presetSelected(int);
 
+
+        // refreshing stats
+        void refreshStart();
+        void refreshEnd();
+        void refreshUpdate();
+
         void rideSelected(RideItem*);
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
@@ -147,6 +158,7 @@ class Context : public QObject
         void intervalHover(RideFileInterval);
         void intervalZoom(IntervalItem*);
         void zoomOut();
+        void metadataFlush();
         void rideDirty(RideItem*);
         void rideClean(RideItem*);
 

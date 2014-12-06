@@ -19,6 +19,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFile.h"
+#include "RideItem.h"
 #include "RideMetric.h"
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
@@ -57,8 +58,10 @@ IntervalSummaryWindow::~IntervalSummaryWindow() {
 void IntervalSummaryWindow::intervalSelected()
 {
     // if no ride available don't bother - just reset for color changes
+    RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
+
     if (context->athlete->intervalTreeWidget()->selectedItems().count() == 0 || 
-        context->currentRideItem() == NULL || context->currentRide() == NULL) {
+        rideItem == NULL || rideItem->ride() == NULL) {
         // no ride just update the colors
 	    QString html = GCColor::css();
         html += "<body></body>";
@@ -93,7 +96,7 @@ IntervalSummaryWindow::intervalHover(RideFileInterval x)
     // if we're not visible don't bother
     if (!isVisible()) return;
 
-    // we already have summries!
+    // we already have summaries!
     if (context->athlete->intervalWidget->selectedItems().count()) return;
 
     QString html = GCColor::css();
@@ -111,7 +114,7 @@ IntervalSummaryWindow::intervalHover(RideFileInterval x)
 
 void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 {
-	const RideFile* ride = context->currentRide();
+	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
 
     bool metricUnits = context->athlete->useMetricUnits;
 
@@ -185,7 +188,7 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 
 void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& html)
 {
-    const RideFile* ride = context->currentRide();
+	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
 
     bool metricUnits = context->athlete->useMetricUnits;
 

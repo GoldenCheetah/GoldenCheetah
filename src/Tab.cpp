@@ -20,9 +20,13 @@
 #include "Tab.h"
 #include "Views.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "MainWindow.h"
+#include "Colors.h"
+
+#include <QPaintEvent>
 
 Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -98,12 +102,12 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
-    // selects the latest ride in the list:
-    if (context->athlete->allRides->childCount() != 0)
-        context->athlete->treeWidget->setCurrentItem(context->athlete->allRides->child(context->athlete->allRides->childCount()-1));
+// for testing
+context->athlete->rideCache->refresh();
 
-    // Kick off - select a ride and switch to Analysis View
-    context->athlete->rideTreeWidgetSelectionChanged();
+    // selects the latest ride in the list:
+    if (context->athlete->rideCache->rides().count() != 0) 
+        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
 }
 
 Tab::~Tab()
@@ -252,3 +256,37 @@ Tab::rideSelected(RideItem*)
     context->notifyIntervalsChanged();
 }
 
+ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    setFixedHeight(1);
+    //hide();
+
+    connect(context, SIGNAL(refreshStart()), this, SLOT(show()));
+    connect(context, SIGNAL(refreshEnd()), this, SLOT(hide()));
+    connect(context, SIGNAL(refreshUpdate()), this, SLOT(repaint()));
+}
+
+void
+ProgressLine::paintEvent(QPaintEvent *)
+{
+
+    // nothing for test...
+    QColor translucentGray = GColor(CPLOTMARKER);
+    translucentGray.setAlpha(240);
+    QColor translucentWhite = GColor(CPLOTBACKGROUND);
+
+    // setup a painter and the area to paint
+    QPainter painter(this);
+
+    painter.save();
+    QRect all(0,0,width(),height());
+
+    // fill
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(all, translucentWhite);
+
+    // progressbar
+    QRectF progress(0, 0, (double(context->athlete->rideCache->progress()) / 100.0f) * double(width()), 1);
+    painter.fillRect(progress, translucentGray);
+    painter.restore();
+}

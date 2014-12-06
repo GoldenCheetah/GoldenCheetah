@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QWebFrame>
+#include <QScrollBar>
 
 bool
 GcUpgrade::upgradeConfirmedByUser(const QDir &home)
@@ -62,7 +63,7 @@ GcUpgrade::upgrade(const QDir &home)
     // Upgrade processing was introduced in Version 3 -- below must be performed
     // for athlete directories from prior to Version 3
     // and can essentially be used as a template for all major release
-    // upgrades as it delets old stuff and sets clean
+    // upgrades as it deletes old stuff and sets clean
 
     //----------------------------------------------------------------------
     // 3.0 upgrade processing
@@ -459,14 +460,14 @@ GcUpgrade::upgrade(const QDir &home)
                   .arg(QString::number(ok)).arg(newHome.activities().dirName()).arg(QString::number(fail)),2);
 
 
-        // 3.6 keep the .BAK files and store in /imports()
+        // 3.6 keep the .BAK files and store in /fileBackup()
         QStringList bakFiles;
         bakFiles << "*.bak";
         upgradeLog->append(tr("Start copying of: Activity files (.BAK)..."),3);
         ok = 0; fail = 0;
         foreach (QString bakFile, newHome.root().entryList(bakFiles, QDir::Files)) {
             bool success = moveFile(QString("%1/%2").arg(newHome.root().canonicalPath()).arg(bakFile),
-                     QString("%1/%2").arg(newHome.imports().canonicalPath()).arg(bakFile));
+                     QString("%1/%2").arg(newHome.fileBackup().canonicalPath()).arg(bakFile));
             if (success) {
                 ok++;
             } else {
@@ -476,7 +477,7 @@ GcUpgrade::upgrade(const QDir &home)
         }
         errorCount += fail;
         upgradeLog->append(QString(tr("%1 activity backup (.BAK) files moved to subdirectory: %2 - %3 failed" ))
-                  .arg(QString::number(ok)).arg(newHome.imports().dirName()).arg(QString::number(fail)),2);
+                  .arg(QString::number(ok)).arg(newHome.fileBackup().dirName()).arg(QString::number(fail)),2);
 
         // 3.6 now sort the rest of the files (extension checks are re-use)
         MediaHelper mediaFile;
@@ -501,7 +502,7 @@ GcUpgrade::upgrade(const QDir &home)
                   .arg(QString::number(ok)).arg(newHome.workouts().dirName()).arg(QString::number(fail)),2);
 
         // the conversion of all activities to .json is done in "lateUpgrade" - since the prerequisites
-        // on the "context" setup are not fullfilled at this early stage
+        // on the "context" setup are not fulfilled at this early stage
 
     }
 
@@ -556,7 +557,7 @@ GcUpgrade::upgradeLate(Context *context)
                         okConvert++;
                         upgradeLog->append(tr("-> Information: Activity %1 - Successfully converted to .JSON").arg(activitiesFileName));
 
-                        // copy source file to the /imports folder (only if conversion was successfull)
+                        // copy source file to the /imports folder (only if conversion was successful)
                         bool success = moveFile(QString("%1/%2").arg(context->athlete->home->root().canonicalPath()).arg(activitiesFileName),
                                                 QString("%1/%2").arg(context->athlete->home->imports().canonicalPath()).arg(activitiesFileName));
                         if (success) {
@@ -605,6 +606,10 @@ GcUpgrade::upgradeLate(Context *context)
                                           "will be done again each time you open the athlete, until the conversion was "
                                           "successful - and had no more errors.</center>")),2);
 
+            upgradeLog->append(QString(tr("<center><br>Latest information about possible upgrade problems and concepts to resolve them are available in the<br>"
+                                         "<a href= \"https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.11_Troubleshooting_Guide\" target=\"_blank\">"
+                                         "Upgrade v3.11 Troubleshooting Guide<a>")),1);
+
             // document that upgrade failed at least one time
             appsettings->setCValue(context->athlete->home->root().dirName(), GC_UPGRADE_311_FOLDER_SUCCESS, false);
 
@@ -639,7 +644,7 @@ GcUpgrade::moveFile(const QString &source, const QString &target) {
             // just log, but not critical for the upgrade since the copy worked
             upgradeLog->append(QString(tr("-> Information: Deletion of copied file %1 failed" )).arg(source));
         }
-        // even if remove failed, the copy was successfull - so GC is fine
+        // even if remove failed, the copy was successful - so GC is fine
         return true;
       }
 
@@ -691,7 +696,7 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
 {
 
     setWindowTitle(QString(tr("Athlete %1").arg(athlete)));
-    this->setMinimumWidth(500);
+    this->setMinimumWidth(550);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -722,11 +727,12 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "-> Configuration files: <samp>/config</samp><br>"
                      "-> Download files: <samp>/downloads</samp><br>"
                      "-> Import files: <samp>/imports</samp><br>"
+                     "-> Backups of Activity/Ride files: <samp>/bak</samp><br>"
                      "-> Workout related files: <samp>/workouts</samp><br>"
                      "-> Cache files: <samp>/cache</samp><br>"
                      "-> Calendar files: <samp>/calendar</samp><br>"
                      "-> Log files: <samp>/logs</samp><br>"
-                     "-> Temp files: <samp>/config</samp><br><br>"
+                     "-> Temp files: <samp>/temp</samp><br><br>"
                      "The upgrade process will create the new directory structure and move "
                      "the existing files to the new directories as needed. During the upgrade "
                      "all activity/ride files will be converted to GoldenCheetah's native "
@@ -740,18 +746,20 @@ GcUpgradeExecuteDialog::GcUpgradeExecuteDialog(QString athlete) : QDialog(NULL, 
                      "before proceeding with the upgrade. We can't take responsibility for "
                      "any loss of data during the process. </b> </center> <br>"
                      ));
+    scrollText = new QScrollArea();
+    scrollText->setWidget(text);
 
     toprow->addWidget(critical);
     toprow->addWidget(header);
     layout->addLayout(toprow);
-    layout->addWidget(text);
+    layout->addWidget(scrollText);
 
     QHBoxLayout *lastRow = new QHBoxLayout;
 
-    // create the buttons for the whole Dialog - but only make visible what is needed at the point in time
-    QPushButton *proceedButton = new QPushButton(tr("Proceed with Upgrade"), this);
+    proceedButton = new QPushButton(tr("Accept conditions and proceed with Upgrade"), this);
+    proceedButton->setEnabled(true);
     connect(proceedButton, SIGNAL(clicked()), this, SLOT(accept()));
-    QPushButton *abortButton = new QPushButton(tr("Abort Upgrade"), this);
+    abortButton = new QPushButton(tr("Abort Upgrade"), this);
     abortButton->setDefault(true);
     connect(abortButton, SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -794,7 +802,10 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
     report->setContentsMargins(0,0,0,0);
     report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    report->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    report->setContextMenuPolicy(Qt::NoContextMenu);
     report->setAcceptDrops(false);
+    connect( report, SIGNAL( linkClicked( QUrl ) ), this, SLOT( linkClickedSlot( QUrl ) ) );
 
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     report->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
@@ -848,6 +859,14 @@ GcUpgradeLogDialog::saveAs()
 }
 
 void
+GcUpgradeLogDialog::linkClickedSlot( QUrl url )
+{
+    QDesktopServices::openUrl( url );
+
+}
+
+
+void
 GcUpgradeLogDialog::append(QString text, int level) {
 
         switch (level) {
@@ -864,6 +883,7 @@ GcUpgradeLogDialog::append(QString text, int level) {
             reportText += QString("%1 <br>").arg(text);
         }
         report->page()->mainFrame()->setHtml(reportText);
+        report->page()->mainFrame()->setScrollBarValue(Qt::Vertical, report->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
         this->repaint();
         QApplication::processEvents();
 
@@ -871,6 +891,7 @@ GcUpgradeLogDialog::append(QString text, int level) {
 
 void
 GcUpgradeLogDialog::enableButtons() {
-    proceedButton->setDisabled(false);
     saveAsButton->setDisabled(false);
+    proceedButton->setDisabled(false);
+
 }

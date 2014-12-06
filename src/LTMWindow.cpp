@@ -358,7 +358,7 @@ LTMWindow::refreshCompare()
     }
 
     // now lets create them all again
-    // based upon the current setttings
+    // based upon the current settings
     // we create a plot for each curve
     // but where they are stacked we put
     // them all in the SAME plot
@@ -467,7 +467,7 @@ LTMWindow::refreshStackPlots()
     }
 
     // now lets create them all again
-    // based upon the current setttings
+    // based upon the current settings
     // we create a plot for each curve
     // but where they are stacked we put
     // them all in the SAME plot
@@ -868,7 +868,7 @@ LTMWindow::groupForDate(QDate date)
 void
 LTMWindow::pointClicked(QwtPlotCurve*curve, int index)
 {
-    // initialize date and time to sensefull boundaries
+    // initialize date and time to senseful boundaries
     QDate start = QDate(1900,1,1);
     QDate end   = QDate(2999,12,31);
     QTime time = QTime(0, 0, 0, 0);
@@ -1058,7 +1058,7 @@ LTMWindow::dataTable(bool html)
                                     // not the one we want
                                     if (model->code() != metricDetail.model) continue;
 
-                                    // set the paramters previously derived
+                                    // set the parameters previously derived
                                     model->loadParameters(est.parameters);
 
                                     // get the model estimate for our duration

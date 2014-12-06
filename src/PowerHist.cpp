@@ -161,6 +161,10 @@ PowerHist::configChanged()
             pen.setColor(GColor(CCADENCE).darker(200));
             brush_color = GColor(CCADENCE);
             break;
+        case RideFile::smo2:
+            pen.setColor(GColor(CSMO2).darker(200));
+            brush_color = GColor(CSMO2);
+            break;
         case RideFile::gear:
             pen.setColor(GColor(CGEAR).darker(200));
             brush_color = GColor(CGEAR);
@@ -283,8 +287,9 @@ PowerHist::refreshZoneLabels()
     if (!rideItem) return;
 
     if (series == RideFile::watts || series == RideFile::wattsKg) {
-        const Zones *zones = rideItem->zones;
-        int zone_range = rideItem->zoneRange();
+
+        const Zones *zones = context->athlete->zones();
+        int zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
@@ -315,8 +320,8 @@ PowerHist::refreshHRZoneLabels()
     if (!rideItem) return;
 
     if (series == RideFile::hr) {
-        const HrZones *zones       = context->athlete->hrZones();
-        int zone_range     = rideItem->hrZoneRange();
+        const HrZones *zones = context->athlete->hrZones();
+        int zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
@@ -478,6 +483,11 @@ PowerHist::recalcCompare()
 
             }
 
+        } else if (series == RideFile::smo2) {
+
+            array = &cid.smo2Array;
+            arrayLength = cid.smo2Array.size();
+
         } else if (series == RideFile::gear) {
 
             array = &cid.gearArray;
@@ -515,13 +525,13 @@ PowerHist::recalcCompare()
                 double low = high - round(binw/delta);
                 if (low==0 && !withz) low++;
                 parameterValue[i] = high*delta;
-                totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
+                totalTime[i]  = 1e-9;  // nonzero to accommodate log plot
                 while (low < high && low<arrayLength) {
                     totalTime[i] += dt * (*array)[low++];
                 }
             }
 
-            totalTime[i] = 1e-9;       // nonzero to accomodate log plot
+            totalTime[i] = 1e-9;       // nonzero to accommodate log plot
             parameterValue[i] = i * delta * binw;
             totalTime[0] = 1e-9;
             parameterValue[0] = 0;
@@ -571,13 +581,13 @@ PowerHist::recalcCompare()
             labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
             labelFont.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
-            // 0.625 = golden ratio for gaps betwen group of cols
+            // 0.625 = golden ratio for gaps between group of cols
             // 0.9 = 10% space between each col in group
 
             double width = (0.625 / ncols) * 0.90f;
             double jump = acol * (0.625 / ncols);
             
-            // we're not binning instead we are prettyfing the columnar
+            // we're not binning instead we are prettyfying the columnar
             // display in much the same way as the weekly summary workds
             // Each zone column will have 4 points
             QVector<double> xaxis (array->size() * 4);
@@ -870,15 +880,16 @@ PowerHist::recalc(bool force)
         curveSelected->setSamples(sx, sy);
 
         // zone scale draw
-        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && rideItem->zones) {
+        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && context->athlete->zones()) {
 
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
-                if (rideItem->zoneRange() >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
+                int zone_range = context->athlete->zones()->whichRange(rideItem->dateTime.date());
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(), zone_range));
+                if (zone_range >= 0)
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones()->numZones(zone_range), 1);
                 else
                     setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
             }
@@ -1053,6 +1064,11 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
             selectedArray = &standard.paceZoneSelectedArray;
         }
 
+    } else if (series == RideFile::smo2) {
+        array = &standard.smo2Array;
+        arrayLength = standard.smo2Array.size();
+        selectedArray = &standard.smo2SelectedArray;
+
     } else if (series == RideFile::gear) {
         array = &standard.gearArray;
         arrayLength = standard.gearArray.size();
@@ -1085,16 +1101,16 @@ PowerHist::binData(HistData &standard, QVector<double>&x, // x-axis for data
             double low = high - round(binw/delta);
             if (low==0 && !withz) low++;
             x[i] = high*delta;
-            y[i]  = 1e-9;  // nonzero to accomodate log plot
-            sy[i] = 1e-9;  // nonzero to accomodate log plot
+            y[i]  = 1e-9;  // nonzero to accommodate log plot
+            sy[i] = 1e-9;  // nonzero to accommodate log plot
             while (low < high && low<arrayLength) {
                 if (selectedArray && (*selectedArray).size()>low)
                     sy[i] += dt * (*selectedArray)[low];
                 y[i] += dt * (*array)[low++];
             }
         }
-        y[i] = 1e-9;       // nonzero to accomodate log plot
-        sy[i] = 1e-9;       // nonzero to accomodate log plot
+        y[i] = 1e-9;       // nonzero to accommodate log plot
+        sy[i] = 1e-9;       // nonzero to accommodate log plot
         x[i] = i * delta * binw;
         y[0] = 1e-9;
         sy[0] = 1e-9;
@@ -1255,6 +1271,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.paceZoneArray.resize(10);
     standard.paceCPZoneArray.resize(3);
     standard.gearArray.resize(0);
+    standard.smo2Array.resize(0);
     standard.cadArray.resize(0);
 
     // we do not use the selected array since it is
@@ -1269,6 +1286,7 @@ PowerHist::setData(RideFileCache *cache)
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
     standard.gearSelectedArray.resize(0);
+    standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
 
     longFromDouble(standard.wattsArray, cache->distributionArray(RideFile::watts));
@@ -1278,6 +1296,7 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(standard.nmArray, cache->distributionArray(RideFile::nm));
     longFromDouble(standard.cadArray, cache->distributionArray(RideFile::cad));
     longFromDouble(standard.gearArray, cache->distributionArray(RideFile::gear));
+    longFromDouble(standard.smo2Array, cache->distributionArray(RideFile::smo2));
     longFromDouble(standard.kphArray, cache->distributionArray(RideFile::kph));
 
     if (!context->athlete->useMetricUnits) {
@@ -1333,7 +1352,7 @@ PowerHist::intervalHover(RideFileInterval x)
 
         // set data
         HistData hoverData;
-        setArraysFromRide(rideItem->ride(), hoverData, rideItem->zones, x);
+        setArraysFromRide(rideItem->ride(), hoverData, context->athlete->zones(), x);
 
         // set curve
         QVector<double>x,y,sx,sy;
@@ -1397,6 +1416,7 @@ PowerHist::setDataFromCompare()
         add.paceZoneArray.resize(10);
         add.paceCPZoneArray.resize(3);
         add.gearArray.resize(0);
+        add.smo2Array.resize(0);
         add.cadArray.resize(0);
 
         longFromDouble(add.wattsArray, s->distributionArray(RideFile::watts));
@@ -1405,6 +1425,7 @@ PowerHist::setDataFromCompare()
         longFromDouble(add.hrArray, s->distributionArray(RideFile::hr));
         longFromDouble(add.nmArray, s->distributionArray(RideFile::nm));
         longFromDouble(add.gearArray, s->distributionArray(RideFile::gear));
+        longFromDouble(add.smo2Array, s->distributionArray(RideFile::smo2));
         longFromDouble(add.cadArray, s->distributionArray(RideFile::cad));
         longFromDouble(add.kphArray, s->distributionArray(RideFile::kph));
 
@@ -1669,7 +1690,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         // ignore out of bounds data
         if ((int)(v)<min || (int)(v)>max) continue;
 
-        // increment value, are intitialised to zero above
+        // increment value, are inititialised to zero above
         // there will be some loss of precision due to totalising
         // a double in an int, but frankly that should be minimal
         // since most values of note are integer based anyway.
@@ -1687,7 +1708,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
     // metrics across rides!
     curveSelected->hide();
 
-    // now set all the plot paramaters to match the data
+    // now set all the plot parameters to match the data
     source = Metric;
     zoned = false;
     rideItem = NULL;
@@ -1746,13 +1767,14 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                    (series == RideFile::nm && ride->areDataPresent()->nm) ||
                    (series == RideFile::kph && ride->areDataPresent()->kph) ||
                    (series == RideFile::gear && ride->areDataPresent()->gear) ||
+                   (series == RideFile::smo2 && ride->areDataPresent()->smo2) ||
                    (series == RideFile::cad && ride->areDataPresent()->cad) ||
                    (series == RideFile::aPower && ride->areDataPresent()->apower) ||
                    (series == RideFile::hr && ride->areDataPresent()->hr);
 
     if (ride && hasData) {
         //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
-        setArraysFromRide(ride, standard, rideItem->zones, RideFileInterval());
+        setArraysFromRide(ride, standard, context->athlete->zones(), RideFileInterval());
 
     } else {
 
@@ -1781,6 +1803,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     static const double kphDelta   = 0.1;
     static const double cadDelta   = 1.0;
     static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals section
+    static const double smo2Delta  = 1;
     static const int maxSize = 4096;
 
     // recording interval in minutes
@@ -1799,6 +1822,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.paceZoneArray.resize(0);
     standard.paceCPZoneArray.resize(0);
     standard.gearArray.resize(0);
+    standard.smo2Array.resize(0);
     standard.cadArray.resize(0);
 
     standard.wattsSelectedArray.resize(0);
@@ -1810,6 +1834,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     standard.hrZoneSelectedArray.resize(0);
     standard.kphSelectedArray.resize(0);
     standard.gearSelectedArray.resize(0);
+    standard.smo2SelectedArray.resize(0);
     standard.cadSelectedArray.resize(0);
 
     // unit conversion factor for imperial units for selected parameters
@@ -2020,6 +2045,19 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
             }
         }
 
+        int smo2Index = int(floor(p1->smo2 / smo2Delta));
+        if (smo2Index >= 0 && smo2Index < maxSize) {
+            if (smo2Index >= standard.smo2Array.size())
+                standard.smo2Array.resize(smo2Index + 1);
+            standard.smo2Array[smo2Index]++;
+
+            if (selected) {
+                if (smo2Index >= standard.smo2SelectedArray.size())
+                    standard.smo2SelectedArray.resize(smo2Index + 1);
+                standard.smo2SelectedArray[smo2Index]++;
+            }
+        }
+
         int gearIndex = int(floor(p1->gear / gearDelta));
         if (gearIndex >= 0 && gearIndex < maxSize) {
             if (gearIndex >= standard.gearArray.size())
@@ -2151,6 +2189,10 @@ PowerHist::setParameterAxisTitle()
 
         case RideFile::gear:
             axislabel = tr("Gear Ratio");
+            break;
+
+        case RideFile::smo2:
+            axislabel = tr("SmO2");
             break;
 
         default:

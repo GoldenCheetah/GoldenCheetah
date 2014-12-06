@@ -215,7 +215,7 @@ public:
 
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const {
 
-        return createIndex(sourceIndex.row(), sourceIndex.column(), (void *)NULL); // accomodate virtual column
+        return createIndex(sourceIndex.row(), sourceIndex.column(), (void *)NULL); // accommodate virtual column
     }
 
     // we override the standard version to make our virtual column zero

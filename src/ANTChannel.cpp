@@ -400,7 +400,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         float cadence = 2000.0 * 60 * (antMessage.eventCount - lastMessage.eventCount) / period;
                         float power = 3.14159 * nm_torque * cadence / 30;
 
-                        // ignore the occassional spikes (reed switch)
+                        // ignore the occasional spikes (reed switch)
                         if (power >= 0 && power < 2501 && cadence >=0 && cadence < 256) {
                             value2 = value = power;
                             is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
@@ -768,7 +768,7 @@ void ANTChannel::attemptTransition(int message_id)
         //qDebug()<<number<<"TRANSITION from unassigned";
 
         // assign and set channel id all in one
-        parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // recieve channel on network 1
+        parent->sendMessage(ANTMessage::assignChannel(number, CHANNEL_TYPE_RX, st->network)); // receive channel on network 1
 
         device_id=st->device_id;
         setId();
@@ -794,7 +794,7 @@ void ANTChannel::attemptTransition(int message_id)
     case ANT_SEARCH_TIMEOUT:
         //qDebug()<<number<<"TRANSITION from search timeout";
         if (previous_state==ANT_CHANNEL_ID) {
-            // continue down the intialization chain
+            // continue down the initialization chain
             //qDebug()<<"set channel period in timeout"<<st->period;
             parent->sendMessage(ANTMessage::setChannelPeriod(number, st->period));
         } else {
@@ -839,7 +839,7 @@ void ANTChannel::attemptTransition(int message_id)
 }
 
 // Calibrate... needs fixing in version 3.1
-// request the device on this channel calibrates itselt
+// request the device on this channel calibrates itself
 void ANTChannel::requestCalibrate() {
   parent->sendMessage(ANTMessage::requestCalibrate(number));
 }

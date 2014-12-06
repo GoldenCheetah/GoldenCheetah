@@ -154,6 +154,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     directoryWidget->setColumnWidth(2, 250);
 
     init(files, context);
+
 }
 
 
@@ -325,19 +326,26 @@ RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
     if (autoImportMode) directoryWidget->adjustSize();
     tableWidget->adjustSize();
 
-    // Refresh prior to running down the list & processing...
-    if (!isActiveWindow()) activateWindow();
-    this->show();
+    // set number of files / so that a caller of the constructor can decide what to do
+    numberOfFiles = files.count();
+}
 
+int
+RideImportWizard::getNumberOfFiles() {
+    return numberOfFiles;
 }
 
 int
 RideImportWizard::process()
 {
 
+    // Make visible and put in front prior to running down the list & processing...
+    if (!isActiveWindow()) activateWindow();
+    this->show();
+
     // set progress bar limits - for each file we
     // will make 5 passes over the files
-    //         1. checking it is a file ane readable
+    //         1. checking if a file is readable
     //         2. parsing it with the RideFileReader
     //         3. [optional] collect date/time information from user
     //         4. copy file into Library
@@ -522,7 +530,7 @@ RideImportWizard::process()
 
                    } else {
 
-                       // Cool, the date and time was extrcted from the source file
+                       // Cool, the date and time was extracted from the source file
                        blanks[i] = false;
                        tableWidget->item(i,1)->setText(ride->startTime().toString(tr("dd MMM yyyy")));
                        tableWidget->item(i,2)->setText(ride->startTime().toString("hh:mm:ss"));
@@ -607,7 +615,7 @@ RideImportWizard::process()
 
    if (needdates == 0) {
       // no need to wait for the user to input dates
-      // nd press save if all the dates are set
+      // and press save if all the dates are set
       // (i.e. they got set by the file importers already)
       // do nothing for now since we need to confirm dates
       // and confirm overwrite files rather than importing
@@ -892,29 +900,36 @@ RideImportWizard::abortClicked()
         QString activitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
 
         // file name for the copy to /imports directory
+        bool reimport = false;  // check if file is taken from /imports or /downloads - then no need to rename or copy
+        QString importsFulltarget = "";
+        QString importsTarget = "";
         QFileInfo importsFile (filenames[i]);
-        QString importsTarget = importsFile.baseName() + "_" + targetnosuffix + "." + importsFile.suffix();
-        QString importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
+        if (importsFile.canonicalFilePath() == (homeImports.canonicalPath() + "/" + targetnosuffix + "." + importsFile.suffix())) {
+            reimport = true;
+        } else {
+            reimport = false;
+            // add the GC file base name to create unique file names during import
+            // there should not be 2 ride files with exactly the same time stamp (as this is also not foreseen for the .json)
+            importsTarget = importsFile.baseName() + "_" + targetnosuffix + "." + importsFile.suffix();
+            importsFulltarget = homeImports.canonicalPath() + "/" + importsTarget;
+        }
 
-        // check if a ride at this point of time already exists in /activities AND
-        // if a source file with the same name already exists in /imports
-        // both are errors which shall block the import as "Dup-Files" errors
-        // The Dup-File status is decided by comparing "RideDateTime" for /activities
-        // and by comparing "OriginalName+RideDateTime" for the /imports
+
+        // check if a ride at this point of time already exists in /activities
         if (QFileInfo(activitiesFulltarget).exists()) {
             tableWidget->item(i,5)->setText(tr("Error - Activity file exists"));
-        } else if (QFileInfo(importsFulltarget).exists()) {
-            tableWidget->item(i,5)->setText(tr("Error - File already imported, but no activity found"));
         } else {
 
-            // First copy of source then create .JSON (in case of error the last error will be shown)
+            // First copy of source (if required) then create .JSON (in case of error the last error will be shown)
             // so start wih the less the less critical part first
 
-            // copy the source file to /imports with adjusted name
             tableWidget->item(i,5)->setText(tr("Saving file..."));
-            QFile source(filenames[i]);
-            if (!source.copy(importsFulltarget)) {
-                tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+            if (!reimport) {
+                // copy the source file to /imports with adjusted name
+                QFile source(filenames[i]);
+                if (!source.copy(importsFulltarget)) {
+                    tableWidget->item(i,5)->setText(tr("Error - copy of %1 to import directory failed").arg(importsTarget));
+                }
             }
 
             // serialize the file to .JSON

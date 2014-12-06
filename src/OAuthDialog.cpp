@@ -66,7 +66,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site) :
             reply = oauth_http_get(req_url,postarg);
             if (reply != NULL) {
 
-                // will split reply into paramters using strdup
+                // will split reply into parameters using strdup
                 rc = oauth_split_url_parameters(reply, &rv);
 
                 if (rc >= 3) {

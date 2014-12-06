@@ -76,7 +76,7 @@ void TPAthlete::getResponse(const QtSoapMessage &message)
 
             // lets take look at the payload as a DomDocument
             // I tried to use the QtSoapType routines to walk
-            // through the reponse tree but couldn't get them
+            // through the response tree but couldn't get them
             // to work. This code could be simplified if we
             // use the QtSoap routines instead.
             QDomDocument doc;
@@ -151,7 +151,7 @@ void TPWorkout::getResponse(const QtSoapMessage &message)
 
             // lets take look at the payload as a DomDocument
             // I tried to use the QtSoapType routines to walk
-            // through the reponse tree but couldn't get them
+            // through the response tree but couldn't get them
             // to work. This code could be simplified if we
             // use the QtSoap routines instead.
             QDomDocument doc;

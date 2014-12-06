@@ -31,6 +31,7 @@
 #include "TimeUtils.h"
 #include "IntervalItem.h"
 #include "GcOverlayWidget.h"
+#include "MUWidget.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -410,6 +411,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     gridLayout->addWidget(eiTitle, 5, 0);
     gridLayout->addWidget(eiValue, 5, 1);
 
+#ifdef GC_HAVE_MUMODEL
+    addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
+#endif
     addHelper(QString(tr("CP Model")), helper);
 
     if (rangemode) {
@@ -419,7 +423,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
         connect(context, SIGNAL(compareDateRangesStateChanged(bool)), SLOT(forceReplot()));
         connect(context, SIGNAL(compareDateRangesChanged()), SLOT(forceReplot()));
     } else {
-        // when working on a ride we can selecct intervals!
+        // when working on a ride we can select intervals!
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
         connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));  
@@ -550,7 +554,7 @@ void
 CriticalPowerWindow::modelChanged()
 {
     // we changed from/to a 2 or 3 parameter model
-    // so lets set some semsible defaults, these are
+    // so lets set some sensible defaults, these are
     // based on advice from our exercise physiologist friends
     // for best results in predicting both W' and CP and providing
     // a reasonable fit for durations < 2mins.

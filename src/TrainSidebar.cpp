@@ -25,6 +25,7 @@
 #include "Units.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
+#include "RideImportWizard.h"
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
@@ -891,7 +892,11 @@ void TrainSidebar::Start()       // when start button is pressed
             // setup file
             QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
 
-            QString fulltarget = context->athlete->home->activities().canonicalPath() + "/" + filename;
+            if (!context->athlete->home->records().exists())
+                context->athlete->home->createAllSubdirs();
+
+            QString fulltarget = context->athlete->home->records().canonicalPath() + "/" + filename;
+
             if (recordFile) delete recordFile;
             recordFile = new QFile(fulltarget);
             if (!recordFile->open(QFile::WriteOnly | QFile::Truncate)) {
@@ -901,7 +906,8 @@ void TrainSidebar::Start()       // when start button is pressed
                 // CSV File header
 
                 QTextStream recordFileStream(recordFile);
-                recordFileStream << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
+                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+
                 disk_timer->start(SAMPLERATE);  // start screen
             }
         }
@@ -993,7 +999,12 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             // add to the view - using basename ONLY
             QString name;
             name = recordFile->fileName();
-            context->athlete->addRide(QFileInfo(name).fileName(), true);
+
+            QList<QString> list;
+            list.append(name);
+
+            RideImportWizard *dialog = new RideImportWizard (list, context);
+            dialog->process(); // do it!
         }
     }
 
@@ -1247,29 +1258,44 @@ void TrainSidebar::warnnoConfig()
 //----------------------------------------------------------------------
 void TrainSidebar::diskUpdate()
 {
-    double  Minutes;
+    int  secs;
 
-    long Torq = 0, Altitude = 0;
+    long torq = 0, altitude = 0;
     QTextStream recordFileStream(recordFile);
 
     if (calibrating) return;
 
-    // convert from milliseconds to minutes
+    // convert from milliseconds to secondes
     total_msecs = session_elapsed_msec + session_time.elapsed();
-    Minutes = total_msecs;
-    Minutes /= 1000.00;
-    Minutes *= (1.0/60);
+    secs = total_msecs;
+    secs /= 1000.0;
 
-    // PowerAgent Format "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)"
-    recordFileStream    << Minutes
-                        << "," << Torq
-                        << "," << displaySpeed
-                        << "," << displayPower
-                        << "," << displayDistance
+    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+
+    recordFileStream    << secs
                         << "," << displayCadence
                         << "," << displayHeartRate
+                        << "," << displayDistance
+                        << "," << displaySpeed
+                        << "," << torq
+                        << "," << displayPower
+                        << "," << altitude
+                        << "," // lon
+                        << "," // lat
+                        << "," // headwind
+                        << "," // slope
+                        << "," // temp
                         << "," << (displayLap + displayWorkoutLap)
-                        << "," << Altitude
+                        << "," // lrbalance
+                        << "," // lte
+                        << "," // rte
+                        << "," // lps
+                        << "," // rps
+                        << "," // smo2
+                        << "," // thb
+                        << "," // o2hb
+                        << "," // hhb\n
+
                         << "," << "\n";
 }
 

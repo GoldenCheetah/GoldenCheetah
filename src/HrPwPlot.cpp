@@ -591,8 +591,9 @@ class HrPwPlotBackground: public QwtPlotItem
             if (! rideItem)
                 return;
 
-            const Zones *zones = rideItem->zones;
-            int zone_range     = rideItem->zoneRange();
+            int zone_range = -1;
+            const Zones *zones = parent->context->athlete->zones();
+            if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
             if (parent->isShadeZones() && zones && (zone_range >= 0)) {
                 QList <int> zone_lows = zones->getZoneLows(zone_range);
@@ -639,8 +640,9 @@ class HrPwPlotZoneLabel: public QwtPlotItem
             if (! rideItem)
                 return;
 
-            const Zones *zones = rideItem->zones;
-            int zone_range     = rideItem->zoneRange();
+            int zone_range = -1;
+            const Zones *zones = parent->context->athlete->zones();
+            if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
             // create new zone labels if we're shading
             if (parent->isShadeZones() && zones && (zone_range >= 0)) {
@@ -715,9 +717,11 @@ HrPwPlot::refreshZoneLabels() {
         bg = NULL;
     }
 
-    if (rideItem) {
-        int zone_range = rideItem->zoneRange();
-        const Zones *zones = rideItem->zones;
+    if (rideItem && context->athlete->zones()) {
+
+        int zone_range = -1;
+        const Zones *zones = context->athlete->zones();
+        if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zones && (zone_range >= 0)) {

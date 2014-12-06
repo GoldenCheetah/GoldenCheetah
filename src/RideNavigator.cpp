@@ -19,6 +19,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Colors.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
@@ -46,6 +47,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     fontHeight = QFontMetrics(QFont()).height();
     ColorEngine ce(context);
     reverseColor = ce.reverseColor;
+    currentItem = NULL;
 
     init = false;
 
@@ -114,19 +116,23 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
 
     // refresh when config changes (metric/imperial?)
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(context->athlete->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
-    // selection of a ride by double clicking it, we need to update the ride list
-    connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(selectRide(QModelIndex)));
-    connect(tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(cursorRide()));
+
     // user selected a ride on the ride list, we should reflect that too..
+    connect(tableView, SIGNAL(rowSelected(QItemSelection)), this, SLOT(selectionChanged(QItemSelection)));
+
+    // user hit return or double clicked a ride !
+    connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(selectRide(QModelIndex)));
+
     // user moved columns
     connect(tableView->header(), SIGNAL(sectionMoved(int,int,int)), this, SLOT(columnsChanged()));
     connect(tableView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(columnsResized(int, int, int)));
+
     // user sorted by column
-    connect(tableView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(selectRow()));
+    connect(tableView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(cursorRide()));
     connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
 
@@ -193,7 +199,7 @@ RideNavigator::refresh()
     active=false;
 
     setWidth(geometry().width());
-    rideTreeSelectionChanged();
+    cursorRide();
 }
 
 void
@@ -321,7 +327,7 @@ RideNavigator::resetView()
     resizeEvent(NULL);
 
     // Select the current ride
-    rideTreeSelectionChanged();
+    cursorRide();
 
     columnsChanged();
 }
@@ -401,7 +407,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
     // not for the table?
     if (object != (QObject *)tableView) return false;
 
-    // what happenned?
+    // what happnned?
     switch(e->type())
     {
         case QEvent::ContextMenu:
@@ -536,7 +542,7 @@ RideNavigator::setGroupByColumn()
 
     // reselect current ride - since selectionmodel
     // is changed by setGroupBy()
-    rideTreeSelectionChanged();
+    cursorRide();
 }
 
 void
@@ -609,7 +615,7 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
         x -= tableView->verticalScrollBar()->width() + 0 ;
 #endif
 
-    // take the margins into accopunt top
+    // take the margins into account top
     x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
 
     // ** NOTE **
@@ -916,74 +922,87 @@ RideNavigator::showColumnChooser()
     selector->show();
 }
 
-
-// user double clicked a ride, we need to update the main window ride list
+// user selected a different ride somewhere else, we need to align with that
 void
-RideNavigator::selectRide(const QModelIndex &index)
+RideNavigator::setRide(RideItem*rideItem)
 {
-    QModelIndex fileIndex = tableView->model()->index(index.row(), 2, index.parent()); // column 2 for filename ?
+    if (currentItem == rideItem) return;
 
-    QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
-    context->athlete->selectRideFile(filename);
-}
+    for (int i=0; i<tableView->model()->rowCount(); i++) {
 
-// user cursor moved to ride
-void
-RideNavigator::cursorRide()
-{
-    if (active ==  true) return;
-    else active = true;
-    selectRide(tableView->currentIndex());
-    active = false;
-}
+        QModelIndex group = tableView->model()->index(i,0,QModelIndex());
+        for (int j=0; j<tableView->model()->rowCount(group); j++) {
 
-// fixup selection lost when columns sorted etc
-void
-RideNavigator::selectRow()
-{
-    // this is fugly and either a bug in QtreeView sorting
-    // or a bug in our QAbstractProxyModel.
-    rideTreeSelectionChanged(); // reset from ridelist
-}
+            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
+            if (fileName == rideItem->fileName) {
+                // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
+                QItemSelection row(tableView->model()->index(j,0,group),
+                tableView->model()->index(j,tableView->model()->columnCount()-1, group));
+                tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
+                tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
+                tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
 
-// the main window ride list changed, we need to reflect it
-void
-RideNavigator::rideTreeSelectionChanged()
-{
-    if (active == true) return;
-    else active = true;
-
-    QTreeWidgetItem *which;
-    if (context->athlete->rideTreeWidget()->selectedItems().count())
-        which = context->athlete->rideTreeWidget()->selectedItems().first();
-    else // no rides slected
-        which = NULL;
-
-    if (which && which->type() == RIDE_TYPE) {
-        RideItem *rideItem = static_cast<RideItem *>(which);
-
-        // now find rideItem->fileName in the model
-        // and then select it in the view!
-        for (int i=0; i<tableView->model()->rowCount(); i++) {
-
-            QModelIndex group = tableView->model()->index(i,0,QModelIndex());
-            for (int j=0; j<tableView->model()->rowCount(group); j++) {
-
-                QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
-                if (fileName == rideItem->fileName) {
-                    // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
-                    QItemSelection row(tableView->model()->index(j,0,group),
-                                       tableView->model()->index(j,tableView->model()->columnCount()-1, group));
-                    tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-                    tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
-                    tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
-                    active = false;
-                    return;
-                }
+                currentItem = rideItem;
+                repaint();
+                active = false;
+                return;
             }
         }
     }
-    active = false;
+}
+
+void
+RideNavigator::selectionChanged(QItemSelection selected)
+{
+    QModelIndex ref = selected.indexes().first();
+    QModelIndex fileIndex = tableView->model()->index(ref.row(), 2, ref.parent());
+    QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
+
+    // lets make sure we know what we've selected, so we don't
+    // select it twice
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+       if (item->fileName == filename) {
+           currentItem = item;
+           break;
+       }
+    }
+
+    // lets notify others
+    context->athlete->selectRideFile(filename);
+
+}
+
+void
+RideNavigator::selectRide(const QModelIndex &index)
+{
+    // we don't use this at present, but hitting return
+    // or double clicking a ride will cause this to get called....
+    QModelIndex fileIndex = tableView->model()->index(index.row(), 2, index.parent()); // column 2 for filename ?
+    QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
+
+    // do nothing .. but maybe later do something ?
+    //context->athlete->selectRideFile(filename);
+}
+
+void
+RideNavigator::cursorRide()
+{
+    if (currentItem == NULL) return;
+
+    // find our ride and scroll to it
+    for (int i=0; i<tableView->model()->rowCount(); i++) {
+
+        QModelIndex group = tableView->model()->index(i,0,QModelIndex());
+        for (int j=0; j<tableView->model()->rowCount(group); j++) {
+
+            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
+            if (fileName == currentItem->fileName) {
+                // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
+                tableView->scrollTo(tableView->model()->index(j,3,group));
+                return;
+            }
+        }
+    }
 }
 
 // Drag and drop columns from the chooser...
@@ -1053,7 +1072,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     const RideMetric *m;
     QString value;
 
-    // are we a selected cell ? need to paint acordingly
+    // are we a selected cell ? need to paint accordingly
     //bool selected = false;
     //if (rideNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
         //if (rideNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
@@ -1067,7 +1086,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         double metricValue = index.model()->data(index, Qt::DisplayRole).toDouble();
 
         if (metricValue) {
-            // metric / imperial converstion
+            // metric / imperial conversion
             metricValue *= (rideNavigator->context->athlete->useMetricUnits) ? 1 : m->conversion();
             metricValue += (rideNavigator->context->athlete->useMetricUnits) ? 0 : m->conversionSum();
 

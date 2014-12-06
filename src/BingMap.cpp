@@ -81,9 +81,15 @@ BingMap::rideSelected()
     // Route metadata ...
     setSubTitle(ride->ride()->getTag("Route", tr("Route")));
 
-    range =ride->zoneRange();
-    if(range < 0) rideCP = 300;  // default cp to 300 watts
-    else rideCP = ride->zones->getCP(range);
+    range=-1;
+    rideCP=300;
+
+    if (context->athlete->zones()) {
+
+        // get the right range and CP
+        range = context->athlete->zones()->whichRange(ride->dateTime.date());
+        if (range >= 0) rideCP = context->athlete->zones()->getCP(range);
+    }
 
     loadRide();
 }
@@ -339,7 +345,7 @@ BingMap::drawShadedRoute()
 }
 
 //
-// Static helper - havervine formaula for calculating the distance
+// Static helper - havervine formula for calculating the distance
 //                 between 2 geo co-ordinates
 //
 static const double DEG_TO_RAD = 0.017453292519943295769236907684886;

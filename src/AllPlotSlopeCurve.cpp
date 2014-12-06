@@ -164,7 +164,7 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int,
             points[0].ry() = refY;
             points[1].rx() = xi;
             points[1].ry() = yi;
-            // first point for slope/mperh calcuation
+            // first point for slope/mperh calculation
             QPointF calcPoint;
             calcPoint.rx() = sample.x();
             calcPoint.ry() = sample.y();
@@ -182,7 +182,7 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int,
             points[3].ry() = refY;
             // append to list
             polygons.append(polygon);
-            // next point for slope/mperh calcuation
+            // next point for slope/mperh calculation
             QPointF calcPoint;
             calcPoint.rx() = sample.x();
             calcPoint.ry() = sample.y();

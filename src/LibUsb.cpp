@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Darren Hague & Eric Brandt
- *               Modified to suport Linux and OSX by Mark Liversedge
+ *               Modified to support Linux and OSX by Mark Liversedge
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -170,8 +170,8 @@ int LibUsb::write(char *buf, int bytes)
         rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
     } else {
         // we use a non-interrupted write on Linux/Mac since the interrupt
-        // write block size is incorectly implemented in the version of
-        // libusb we build with. It is no less efficent.
+        // write block size is incorrectly implemented in the version of
+        // libusb we build with. It is no less efficient.
         rc = usb_bulk_write(device, writeEndpoint, buf, bytes, 125);
     }
 

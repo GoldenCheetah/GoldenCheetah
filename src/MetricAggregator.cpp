@@ -42,7 +42,7 @@
 
 #include "GProgressDialog.h"
 
-MetricAggregator::MetricAggregator(Context *context) : QObject(context), context(context), first(true)
+MetricAggregator::MetricAggregator(Context *context) : QObject(context), context(context), first(true), refreshing(false)
 {
     colorEngine = new ColorEngine(context);
     dbaccess = new DBAccess(context);
@@ -93,7 +93,11 @@ MetricAggregator::allActivityFilenames()
 void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 {
     // only if we have established a connection to the database
-    if (dbaccess == NULL || context->athlete->isclean==true) return;
+    if (refreshing || dbaccess == NULL || context->athlete->isclean==true) return;
+    refreshing = true;
+
+    //trying to trace source of multiple update bug
+    //qDebug()<<"refresh metrics"<<QTime::currentTime();
 
     // first check db structure is still up to date
     // this is because metadata.xml may add new fields
@@ -130,7 +134,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     // begin LUW -- byproduct of turning off sync (nosync)
     dbaccess->connection().transaction();
 
-    // Delete statistics for non-existant ride files
+    // Delete statistics for non-existent ride files
     QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
         if (QFile(context->athlete->home->activities().canonicalPath() + "/" + d.key()).exists() == false) {
@@ -176,9 +180,10 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         unsigned long fingerprint = current.fingerprint;
 
         RideFile *ride = NULL;
-        bool updateForRide = false;
-
         processed++;
+#ifdef GC_HAVE_INTERVALS
+        bool updateForRide = false;
+#endif
 
         // create the dialog if we need to show progress for long running uodate
         long elapsedtime = elapsed.elapsed();
@@ -218,7 +223,6 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                 zoneFingerPrint != fingerprint ||
                 (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
 
-                updateForRide = true;
                 // log
                 out << "Opening ride: " << name << "\r\n";
 
@@ -235,10 +239,22 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
                     importRide(context->athlete->home->activities(), ride, name, zoneFingerPrint, (dbTimeStamp > 0));
 
                 }
+
+#ifdef GC_HAVE_INTERVALS
+                updateForRide = true;
+#endif
                 updates++;
             }
         }
 
+        // update cache (will check timestamps itself)
+        // if ride wasn't opened it will do it itself
+        // we only want to check so passing check=true
+        // because we don't actually want the results now
+        // it will also check the file CRC as well as timestamps
+        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + name, ride, true);
+
+#ifdef GC_HAVE_INTERVALS
         QDateTime _rideStartTime;
         if (ride != NULL) {
             _rideStartTime = ride->startTime();
@@ -298,12 +314,10 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
              }
         }
 
-        // update cache (will check timestamps itself)
-        // if ride wasn't opened it will do it itself
-        // we only want to check so passing check=true
-        // because we don't actually want the results now
-        // it will also check the file CRC as well as timestamps
-        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + name, ride, true);
+        // now do intervals
+        refreshBestIntervals();
+
+#endif
 
         // free memory - if needed
         if (ride) delete ride;
@@ -330,8 +344,6 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 #endif
     context->athlete->isclean = true;
 
-    refreshBestIntervals();
-
     // clear out the estimates if something changed!
     if (updates) context->athlete->PDEstimates.clear();
 
@@ -345,9 +357,12 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
     out << "METRIC REFRESH ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
     log.close();
 
+    // clear state
     first = false;
+    refreshing = false;
 }
 
+#ifdef GC_HAVE_INTERVALS
 bool greaterThan(const SummaryBest &s1, const SummaryBest &s2)
 {
      return s1.nvalue > s2.nvalue;
@@ -364,7 +379,10 @@ MetricAggregator::refreshBestIntervals()
     // Remove old interval
     dbaccess->deleteIntervalsForTypeAndGroupName("Best", "Best 20min");
 
-    // get all fields...
+    //                   XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
+    // get all fields... XXX XXX XXX XXX XXX THIS IS BAD -- DO NOT QUERY THE DB DURING A REFRESH --  XXX XXX XXX XXX XXX 
+    //                   XXX XXX XXX XXX XXX BECAUSE IT WILL TRY AND REFRESH DATA BEFORE QUERYING    XXX XXX XXX XXX XXX
+    //                   XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
     QList<SummaryMetrics> allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
 
     QList<SummaryBest> bests;
@@ -436,6 +454,7 @@ MetricAggregator::refreshBestIntervals()
 
     // END Best
 }
+#endif
 
 
 
@@ -454,11 +473,11 @@ void MetricAggregator::addRide(RideItem*ride)
 }
 
 void MetricAggregator::update() {
-    context->athlete->isclean = false;
+    context->athlete->isclean = false; // force an update
     refreshMetrics();
 }
 
-bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
+bool MetricAggregator::importRide(QDir /* no longer used ? */, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
 {
     SummaryMetrics summaryMetric;
 

@@ -27,12 +27,6 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     isCompareIntervals = isCompareDateRanges = false;
 }
 
-const RideFile *
-Context::currentRide()
-{
-    return athlete->currentRide();
-}
-
 void 
 Context::notifyCompareIntervals(bool state) 
 { 
@@ -62,3 +56,10 @@ Context::notifyCompareDateRangesChanged()
         emit compareDateRangesChanged(); 
     }
 }
+
+void
+Context::notifyConfigChanged()
+{
+    configChanged();
+}
+

@@ -56,7 +56,7 @@ ExtendedCriticalPower::deriveExtendedCP_2_3_Parameters(RideFileCache *bests, Rid
     const double t7 = laeI1;
     const double t8 = laeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
 
     // find the indexes associated with the bounds
@@ -304,7 +304,7 @@ ExtendedCriticalPower::deriveExtendedCP_4_3_Parameters(bool usebest, RideFileCac
     const double t7 = laeI1;
     const double t8 = laeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
 
     // find the indexes associated with the bounds
@@ -858,7 +858,7 @@ ExtendedCriticalPower::deriveExtendedCP_5_3_Parameters(bool usebest, RideFileCac
     const double t7 = laeI1;
     const double t8 = laeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
 
     // find the indexes associated with the bounds
@@ -1373,7 +1373,7 @@ ExtendedCriticalPower::deriveExtendedCP_6_3_Parameters(bool usebest, RideFileCac
     const double t7 = laeI1;
     const double t8 = laeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
 
     // find the indexes associated with the bounds
@@ -1793,7 +1793,7 @@ ExtendedCriticalPower::deriveDanVeloclinicCP_Parameters(bool usebest, RideFileCa
     const double t7 = laeI1;
     const double t8 = laeI2;
 
-    // bounds of these time valus in the data
+    // bounds of these time values in the data
     int i1, i2, i3, i4, i5, i6, i7, i8;
 
     // find the indexes associated with the bounds

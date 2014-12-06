@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ *           (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,23 +21,18 @@
 #define _GC_RideItem_h 1
 #include "GoldenCheetah.h"
 
-#include <QtGui>
-#include <QTreeWidgetItem>
 #include "RideMetric.h"
 
+#include <QString>
+#include <QMap>
+#include <QVector>
+
 class RideFile;
-class RideEditor;
 class Context;
-class Zones;
-class HrZones;
 
-// Because we have subclassed QTreeWidgetItem we
-// need to use our own type, this MUST be greater than
-// QTreeWidgetItem::UserType according to the docs
-#define FOLDER_TYPE 0
-#define RIDE_TYPE (QTreeWidgetItem::UserType+1)
+Q_DECLARE_METATYPE(RideItem*)
 
-class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
+class RideItem : public QObject
 {
 
     Q_OBJECT
@@ -45,12 +41,17 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
 
     protected:
 
-        QVector<double> time_in_zone;
-        QVector<double> time_in_hr_zone;
+        // ridefile
         RideFile *ride_;
+
+        // precomputed metrics
+        QVector<double> metrics_;
+
+        // metadata (used by navigator)
+        QMap<QString,QString> metadata_;
+
         QStringList errors_;
         Context *context; // to notify widgets when date/time changes
-        bool isdirty;
 
     public slots:
         void modified();
@@ -65,44 +66,48 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
 
     public:
 
-        bool isedit; // is being edited at the moment
+        bool isdirty;     // ride data has changed and needs saving
+        bool isstale;     // metric data is out of date and needs recomputing
+        bool isedit;      // is being edited at the moment
 
+        // get at the data
         QString path;
         QString fileName;
         QDateTime dateTime;
+
+        // context the item was updated to
+        unsigned long fingerprint; // zones
+        unsigned long crc, timestamp; // file content
+        int dbversion; // metric version
+
+        // access to the cached data !
+        RideFile *ride(bool open=true);
+        QVector<double> &metrics() { return metrics_; }
+        QMap<QString, QString> &metadata() { return metadata_; }
+        const QStringList errors() { return errors_; }
+
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can
         // traverse currently open rides when config changes
-        RideFile *ride(bool open=true);
-        const QStringList errors() { return errors_; }
-        const Zones *zones;
-        const HrZones *hrZones;
+        void close();
+        bool isOpen();
 
+        // create and destroy
         RideItem(RideFile *ride, Context *context);
-        RideItem(int type, QString path,
-                 QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, const HrZones *hrZones, Context *context);
+        RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
+        RideItem(RideFile *ride, QDateTime &dateTime, Context *context);
 
-        RideItem(int type, RideFile *ride, const QDateTime &dateTime,
-                 const Zones *zones, const HrZones *hrZones, Context *context);
-
+        // state
         void setDirty(bool);
         bool isDirty() { return isdirty; }
+        bool checkStale(); // check if we need to refresh
+        bool isStale() { return isstale; }
         bool isRun() { return ride_ ? ride_->isRun() : false; }
+
+        // get/set
         void setRide(RideFile *);
         void setFileName(QString, QString);
         void setStartTime(QDateTime);
-        void freeMemory();
-
-        int zoneRange();
-        int hrZoneRange();
-        int numZones();
-
-        int numHrZones();
-#if 0
-        double timeInZone(int zone);
-        double timeInHrZone(int zone);
-#endif
 };
-Q_DECLARE_METATYPE(RideItem*)
+
 #endif // _GC_RideItem_h

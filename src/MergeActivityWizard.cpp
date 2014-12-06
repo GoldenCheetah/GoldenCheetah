@@ -19,6 +19,7 @@
 
 #include "MergeActivityWizard.h"
 #include "Context.h"
+#include "RideCache.h"
 #include "MainWindow.h"
 
 // minimum R-squared fit when trying to find offsets to
@@ -108,7 +109,7 @@ MergeActivityWizard::setRide(RideFile **here, RideFile *with)
 void 
 MergeActivityWizard::analyse()
 {
-    // looking at the paramters determine the offset
+    // looking at the parameters determine the offset
     // default to align left if all else fails !
     offset1 = offset2 = 0;
 
@@ -661,11 +662,7 @@ MergeChoose::MergeChoose(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     files->setIndentation(0);
 
     // populate with each ride in the ridelist
-    const QTreeWidgetItem *allRides = wizard->context->athlete->allRideItems();
-
-    for (int i=allRides->childCount()-1; i>=0; i--) {
-
-        RideItem *rideItem = static_cast<RideItem*>(allRides->child(i));
+    foreach (RideItem *rideItem, wizard->context->athlete->rideCache->rides()) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
@@ -1165,9 +1162,8 @@ MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), w
 
     QLabel *label = new QLabel(tr("Press Finish to update the current ride with "
                                " the combined data.\n\n"
-                               "The changes will not be saved until you save them "
-                               " so you can check and revert or save.\n\n"
-                               "If you continue the ride will be updated, if you "
+                               "The changes will be saved and cannot be undone.\n\n"
+                               "If you press continue the ride will be saved, if you "
                                "do not want to continue either go back and change "
                                "the settings or press cancel to abort."));
     label->setWordWrap(true);
@@ -1179,9 +1175,11 @@ MergeConfirm::MergeConfirm(MergeActivityWizard *parent) : QWizardPage(parent), w
 bool
 MergeConfirm::validatePage()
 {
-    // We are done -- update BUT DOESNT SAVE
-    //                user can now check !
+    // We are done -- recalculate derived series, save and mark done
+    wizard->combined->recalculateDerivedSeries(true);
     wizard->current->setRide(wizard->combined);
-    wizard->context->notifyRideDirty();
+    wizard->context->mainWindow->saveSilent(wizard->context, wizard->current);
+    wizard->current->setDirty(false); // lose changes
+
     return true;
 }

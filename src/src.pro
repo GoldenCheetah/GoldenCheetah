@@ -365,6 +365,9 @@ HEADERS += \
         MetadataWindow.h \
         MetricAggregator.h \
         MoxyDevice.h \
+        MUPlot.h \
+        MUPool.h \
+        MUWidget.h \
         NewCyclistDialog.h \
         NullController.h \
         PaceZones.h \
@@ -387,6 +390,7 @@ HEADERS += \
         ComputrainerController.h \
         RealtimePlot.h \
         RideAutoImportConfig.h \
+        RideCache.h \
         RideEditor.h \
         RideFile.h \
         RideFileCache.h \
@@ -584,6 +588,8 @@ SOURCES += \
         MetadataWindow.cpp \
         MetricAggregator.cpp \
         MoxyDevice.cpp \
+        MUPlot.cpp \
+        MUWidget.cpp \
         NewCyclistDialog.cpp \
         NullController.cpp \
         PaceTimeInZone.cpp \
@@ -608,6 +614,7 @@ SOURCES += \
         RealtimePlotWindow.cpp \
         ReferenceLineDialog.cpp \
         RideAutoImportConfig.cpp \
+        RideCache.cpp \
         RideEditor.cpp \
         RideFile.cpp \
         RideFileCache.cpp \

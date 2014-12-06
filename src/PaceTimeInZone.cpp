@@ -45,6 +45,7 @@ class PaceZoneTime : public RideMetric {
         setPrecision(0);
         setConversion(1.0);
     }
+    bool isTime() const { return true; }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
     void compute(const RideFile *ride, const Zones *, int ,
                  const HrZones *, int,

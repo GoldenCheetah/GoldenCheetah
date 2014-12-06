@@ -22,6 +22,9 @@
 
 #include "RideFile.h"
 
+enum csvtypes { generic, gc, powertap, joule, ergomo, motoactv, ibike, moxy};
+typedef enum csvtypes CsvType;
+
 struct CsvFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
     bool writeRideFile(Context *context, const RideFile *ride, QFile &file) const;

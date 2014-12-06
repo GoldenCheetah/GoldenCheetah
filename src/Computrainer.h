@@ -171,7 +171,7 @@ private:
     volatile double devicePower;            // current output power in Watts
     volatile double deviceHeartRate;        // current heartrate in BPM
     volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speef in KPH
+    volatile double deviceSpeed;            // current speed in KPH
     volatile double deviceRRC;              // calibrated Rolling Resistance
     volatile bool   deviceCalibrated;       // is it calibrated?
     volatile uint8_t spinScan[24];           // SS values only in SS_MODE

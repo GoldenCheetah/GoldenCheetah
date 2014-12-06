@@ -128,7 +128,6 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(context->athlete->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
     // selection of a ride by double clicking it, we need to update the ride list
     connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(selectRide(QModelIndex)));
     connect(tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(cursorRide()));
@@ -270,7 +269,6 @@ IntervalNavigator::refresh()
     active=false;
 
     setWidth(geometry().width());
-    rideTreeSelectionChanged();
 }
 
 void
@@ -399,9 +397,6 @@ IntervalNavigator::resetView()
 
     resizeEvent(NULL);
 
-    // Select the current ride
-    rideTreeSelectionChanged();
-
     columnsChanged();
 }
 
@@ -485,7 +480,7 @@ IntervalNavigator::eventFilter(QObject *object, QEvent *e)
     // not for the table?
     if (object != (QObject *)tableView) return false;
 
-    // what happenned?
+    // what happened?
     switch(e->type())
     {
         case QEvent::ContextMenu:
@@ -613,9 +608,6 @@ IntervalNavigator::setGroupByColumn()
     // now show em
     tableView->expandAll();
 
-    // reselect current ride - since selectionmodel
-    // is changed by setGroupBy()
-    rideTreeSelectionChanged();
 }
 
 void
@@ -688,7 +680,7 @@ IntervalNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int old
         x -= tableView->verticalScrollBar()->width() + 0 ;
 #endif
 
-    // take the margins into accopunt top
+    // take the margins into account top
     x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
 
     // ** NOTE **
@@ -880,7 +872,7 @@ IntervalNavigator::selectRide(const QModelIndex &index)
     fileIndex = tableView->model()->index(index.row(), 11, index.parent()); // column 11 for stop ?
     int stopInterval = tableView->model()->data(fileIndex, Qt::DisplayRole).toInt();
 
-    const RideFile* ride = context->currentRide();
+    const RideFile *ride = context->ride ? context->ride->ride() : NULL;
 
     RideFile* f = new RideFile(const_cast<RideFile*>(ride));
     int start = ride->timeIndex(startInterval);
@@ -903,7 +895,7 @@ IntervalNavigator::selectRide(const QModelIndex &index)
     f->clearIntervals();
     f->addInterval(start, end, "1");
 
-    RideItem* rideItem = new RideItem(RIDE_TYPE, f, date, context->rideItem()->zones, context->rideItem()->hrZones, context );
+    RideItem* rideItem = new RideItem(f, date, context );
 
     // emit signal!
     context->notifyRideSelected(rideItem);
@@ -925,47 +917,7 @@ IntervalNavigator::selectRow()
 {
     // this is fugly and either a bug in QtreeView sorting
     // or a bug in our QAbstractProxyModel.
-    rideTreeSelectionChanged(); // reset from ridelist
-}
-
-// the main window ride list changed, we need to reflect it
-void
-IntervalNavigator::rideTreeSelectionChanged()
-{
-    if (active == true) return;
-    else active = true;
-
-    QTreeWidgetItem *which;
-    if (context->athlete->rideTreeWidget()->selectedItems().count())
-        which = context->athlete->rideTreeWidget()->selectedItems().first();
-    else // no rides slected
-        which = NULL;
-
-    if (which && which->type() == RIDE_TYPE) {
-        RideItem *rideItem = static_cast<RideItem *>(which);
-
-        // now find rideItem->fileName in the model
-        // and then select it in the view!
-        for (int i=0; i<tableView->model()->rowCount(); i++) {
-
-            QModelIndex group = tableView->model()->index(i,0,QModelIndex());
-            for (int j=0; j<tableView->model()->rowCount(group); j++) {
-
-                QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
-                if (fileName == rideItem->fileName) {
-                    // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
-                    QItemSelection row(tableView->model()->index(j,0,group),
-                                       tableView->model()->index(j,tableView->model()->columnCount()-1, group));
-                    tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-                    tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
-                    tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
-                    active = false;
-                    return;
-                }
-            }
-        }
-    }
-    active = false;
+    // XXX need to work this out for first show XXX
 }
 
 // Drag and drop columns from the chooser...
@@ -1035,7 +987,7 @@ void IntervalNavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionV
     const RideMetric *m;
     QString value;
 
-    // are we a selected cell ? need to paint acordingly
+    // are we a selected cell ? need to paint accordingly
     //bool selected = false;
     //if (IntervalNavigator->tableView->selectionModel()->selectedIndexes().count()) { // zero if no rides in list
         //if (IntervalNavigator->tableView->selectionModel()->selectedIndexes().value(0).row() == index.row())
@@ -1049,7 +1001,7 @@ void IntervalNavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionV
         double metricValue = index.model()->data(index, Qt::DisplayRole).toDouble();
 
         if (metricValue) {
-            // metric / imperial converstion
+            // metric / imperial conversion
             metricValue *= (intervalNavigator->context->athlete->useMetricUnits) ? 1 : m->conversion();
             metricValue += (intervalNavigator->context->athlete->useMetricUnits) ? 0 : m->conversionSum();
 

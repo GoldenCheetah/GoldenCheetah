@@ -32,7 +32,9 @@ class SummaryBest
     double nvalue;
     QString value; // formatted value
     QDate date;
+#ifdef GC_HAVE_INTERVALS
     QString fileName;
+#endif
 
     // for qsort
     bool operator< (SummaryBest right) const { return (nvalue < right.nvalue); }

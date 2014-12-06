@@ -160,7 +160,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     // 4.6 - 4.9 all the same
     out.setVersion(QDataStream::Qt_4_6);
 
-    // all the baisc fields first
+    // all the basic fields first
     out<<settings.name;
     out<<settings.title;
     out<<settings.start;

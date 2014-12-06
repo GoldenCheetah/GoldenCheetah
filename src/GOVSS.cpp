@@ -19,6 +19,7 @@
 
 #include "RideMetric.h"
 #include "PaceZones.h"
+#include "Units.h"
 #include <math.h>
 #include <algorithm>
 #include <QApplication>
@@ -32,8 +33,8 @@
 
 // Running Power based on speed and slope
 static inline double running_power( double weight, double height,
-                                    double speed, double slope,
-                                    double distance) {
+                                    double speed, double slope=0.0,
+                                    double distance=0.0) {
     // Aero contribution - probably needs refinement
     double cAero = 0.25*0.01*pow(speed, 2)*pow(height,-3);
     // Energy Cost of Running according to slope
@@ -45,7 +46,7 @@ static inline double running_power( double weight, double height,
     return (cAero + cSlope*eff*(1 - 0.5*speed/8.33) + cKin)*weight*speed;
 }
 
-// Lactate Normalized Power, used for GOVSS calculation
+// Lactate Normalized Power, used for GOVSS and xPace calculation
 class LNP : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(LNP)
     double lnp;
@@ -78,7 +79,7 @@ class LNP : public RideMetric {
         // unconst naughty boy, get athlete's data
         RideFile *uride = const_cast<RideFile*>(ride);
         double weight = uride->getWeight();
-        double height = uride->getWeight();
+        double height = uride->getHeight();
 
         int rollingwindowsize120 = 120 / ride->recIntSecs();
         int rollingwindowsize30 = 30 / ride->recIntSecs();
@@ -117,7 +118,7 @@ class LNP : public RideMetric {
                 double slope120 = sumSlope/std::min(count+1, rollingwindowsize120); // slope rolling average
 
                 // running power based on 120sec averages
-                double watts = running_power(weight, height, speed120, slope120, 0.0);// sumSpeed*ride->recIntSecs()); KE contribution disabled
+                double watts = running_power(weight, height, speed120, slope120); // sumSpeed*ride->recIntSecs()); KE contribution disabled
 
                 sumPower += watts;
                 sumPower -= rollingPower[index30];
@@ -142,6 +143,65 @@ class LNP : public RideMetric {
         setCount(secs);
     }
     RideMetric *clone() const { return new LNP(*this); }
+};
+
+// xPace: constant Pace which, on flat surface, gives same Lactate Normalized Power
+class XPace : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(XPace)
+    double xPace;
+
+    public:
+
+    XPace() : xPace(0.0)
+    {
+        setSymbol("xPace");
+        setInternalName("xPace");
+    }
+    void initialize() {
+        setName(tr("xPace"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("min/km"));
+        setImperialUnits(tr("min/mile"));
+        setPrecision(1);
+        setConversion(KM_PER_MILE);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const Context *) {
+        // xPace only makes sense for running
+        if (!ride->isRun()) return;
+
+        // unconst naughty boy, get athlete's data
+        RideFile *uride = const_cast<RideFile*>(ride);
+        double weight = uride->getWeight();
+        double height = uride->getHeight();
+
+        assert(deps.contains("govss_lnp"));
+        LNP *lnp = dynamic_cast<LNP*>(deps.value("govss_lnp"));
+        assert(lnp);
+        double lnp_watts = lnp->value(true);
+
+        // search for speed which gives flat power within 0.001watt of LNP
+        // up to around 10 iterations for speed within 0.01m/s or ~1sec/km
+        double low = 0.0, high = 10.0, speed;
+        if (lnp_watts <= 0.0) speed = low;
+        else if (lnp_watts >= running_power(weight, height, high)) speed = high;
+        else do {
+            speed = (low + high)/2.0;
+            double watts = running_power(weight, height, speed);
+            if (abs(watts - lnp_watts) < 0.001) break;
+            else if (watts < lnp_watts) low = speed;
+            else if (watts > lnp_watts) high = speed;
+        } while (high - low > 0.01);
+        // divide by zero or stupidly low pace
+        if (speed > 0.01) xPace = (1000.0/60.0) / speed;
+        else xPace = 0.0;
+
+        setValue(xPace);
+    }
+
+    RideMetric *clone() const { return new XPace(*this); }
 };
 
 // Running Threshold Power based on CV, used for GOVSS calculation
@@ -186,7 +246,7 @@ class RTP : public RideMetric {
             cv = zones->getCV(zoneRange);
         
         // Running power at cv on flat surface
-        double watts = running_power(weight, height, cv/3.6, 0.0, 0.0); //120*cv/3.6); KE contribution disabled
+        double watts = running_power(weight, height, cv/3.6); //120*cv/3.6); KE contribution disabled
 
         setValue(watts);
     }
@@ -285,6 +345,7 @@ static bool addAllGOVSS() {
     RideMetricFactory::instance().addMetric(RTP());
     QVector<QString> deps;
     deps.append("govss_lnp");
+    RideMetricFactory::instance().addMetric(XPace(), &deps);
     deps.append("govss_rtp");
     RideMetricFactory::instance().addMetric(IWF(), &deps);
     deps.append("govss_iwf");

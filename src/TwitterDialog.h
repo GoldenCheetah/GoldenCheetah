@@ -32,7 +32,7 @@
 #include "MainWindow.h"
 #include "RideItem.h"
 
-// acccess to metrics
+// access to metrics
 #include "RideMetric.h"
 #include "MetricAggregator.h"
 #include "DBAccess.h"

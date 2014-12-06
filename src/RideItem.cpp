@@ -16,33 +16,43 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <QTreeWidgetItem>
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "RideFile.h"
 #include "Context.h"
-#include "Context.h"
+#include "DBAccess.h" // only for DBSchemaVersion
 #include "Zones.h"
 #include "HrZones.h"
+#include "PaceZones.h"
 #include <math.h>
 
-RideItem::RideItem(RideFile *ride, Context *context) :
-    QTreeWidgetItem(0), ride_(ride), context(context), isdirty(false), isedit(false), path(""), fileName(""),
-    zones(NULL), hrZones(NULL) { }
+// used to create a temporary ride item that is not in the cache and just
+// used to enable using the same calling semantics in things like the
+// merge wizard and interval navigator
+RideItem::RideItem(RideFile *ride, Context *context) 
+    : 
+    ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    fingerprint(0), crc(0), timestamp(0), dbversion(0) {}
 
-RideItem::RideItem(int type,
-                   QString path, QString fileName, const QDateTime &dateTime,
-                   const Zones *zones, const HrZones *hrZones, Context *context) :
-    QTreeWidgetItem(type), ride_(NULL), context(context), isdirty(false), isedit(false), path(path), fileName(fileName),
-    dateTime(dateTime), zones(zones), hrZones(hrZones)
-{ }
+RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
+    :
+    ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
+    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0) {}
 
-RideItem::RideItem(int type,
-                   RideFile *ride, const QDateTime &dateTime,
-                   const Zones *zones, const HrZones *hrZones, Context *context) :
-    QTreeWidgetItem(type), ride_(ride), context(context), isdirty(true), isedit(false),
-    dateTime(dateTime), zones(zones), hrZones(hrZones)
-{ }
+// Create a new RideItem destined for the ride cache and used for caching
+// pre-computed metrics and storing ride metadata
+RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
+    :
+    ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
+    fingerprint(0), crc(0), timestamp(0), dbversion(0)
+{
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+
+    // ressize and initialize so we can store metric values at
+    // RideMetric::index offsets into the metrics_ qvector
+    metrics_.fill(0, factory.metricCount());
+}
 
 RideFile *RideItem::ride(bool open)
 {
@@ -72,9 +82,24 @@ RideItem::setRide(RideFile *overwrite)
 {
     RideFile *old = ride_;
     ride_ = overwrite; // overwrite
+
+    // connect up to new one
+    connect(ride_, SIGNAL(modified()), this, SLOT(modified()));
+    connect(ride_, SIGNAL(saved()), this, SLOT(saved()));
+    connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
+
+    // don't bother with the old one any more
+    disconnect(old);
+
+    // update status
     setDirty(true);
     notifyRideDataChanged();
-    delete old; // now wipe it once referrers had chance to change
+
+    //XXX SORRY ! memory leak XXX
+    //XXX delete old; // now wipe it once referrers had chance to change
+    //XXX this is only used by MergeActivityWizard and causes issues
+    //XXX because the data is accessed in separate threads (Wizard is a dialog)
+    //XXX because it is such an edge case (Merge) we will leave it for now
 }
 
 void
@@ -116,23 +141,9 @@ RideItem::setDirty(bool val)
 
     if (isdirty == true) {
 
-        // show ride in bold on the list view
-        for (int i=0; i<3; i++) {
-            QFont current = font(i);
-            current.setWeight(QFont::Black);
-            setFont(i, current);
-        }
-
         context->notifyRideDirty();
 
     } else {
-
-        // show ride in normal on the list view
-        for (int i=0; i<3; i++) {
-            QFont current = font(i);
-            current.setWeight(QFont::Normal);
-            setFont(i, current);
-        }
 
         context->notifyRideClean();
     }
@@ -146,31 +157,14 @@ RideItem::setFileName(QString path, QString fileName)
     this->fileName = fileName;
 }
 
-int RideItem::zoneRange()
+bool
+RideItem::isOpen()
 {
-    if (zones) return zones->whichRange(dateTime.date());
-    else return -1;
-}
-
-int RideItem::hrZoneRange()
-{
-    if (hrZones) return hrZones->whichRange(dateTime.date());
-    else return -1;
-}
-int RideItem::numZones()
-{
-    int zone_range = zoneRange();
-    return (zone_range >= 0) ? zones->numZones(zone_range) : 0;
-}
-
-int RideItem::numHrZones()
-{
-    int hr_zone_range = hrZoneRange();
-    return (hr_zone_range >= 0) ? hrZones->numZones(hr_zone_range) : 0;
+    return ride_ != NULL;
 }
 
 void
-RideItem::freeMemory()
+RideItem::close()
 {
     if (ride_) {
         delete ride_;
@@ -182,10 +176,58 @@ void
 RideItem::setStartTime(QDateTime newDateTime)
 {
     dateTime = newDateTime;
-    setText(0, dateTime.toString(tr("ddd")));
-    setText(1, dateTime.toString(tr("MMM d, yyyy")));
-    setText(2, dateTime.toString("hh:mm"));
-
     ride()->setStartTime(newDateTime);
-    context->notifyRideSelected(this);
+}
+
+// check if we need to be refreshed
+bool
+RideItem::checkStale()
+{
+    // if we're marked stale already then just return that !
+    if (isstale) return true;
+
+    // is db version different ?
+    if (dbversion != DBSchemaVersion) {
+
+        isstale = true;
+
+    } else {
+
+        // or have cp / zones have changed ?
+        // note we now get the fingerprint from the zone range
+        // and not the entire config so that if you add a new
+        // range (e.g. set CP from today) but none of the other
+        // ranges change then there is no need to recompute the
+        // metrics for older rides !
+
+        // get the new zone configuration fingerprint that applies for the ride date
+        unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+                      + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                      + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+
+        if (fingerprint != rfingerprint) {
+
+            isstale = true;
+
+        } else {
+
+            // or has file content changed ?
+            QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + fileName;
+            QFile file(fullPath);
+
+            // has timestamp changed ?
+            if (timestamp < QFileInfo(file).lastModified().toTime_t()) {
+
+                // if timestamp has changed then check crc
+                unsigned long fcrc = DBAccess::computeFileCRC(fullPath);
+
+                if (crc == 0 || crc != fcrc) {
+                    crc = fcrc; // update as expensive to calculate
+                    isstale = true;
+                }
+            }
+        }
+    }
+
+    return isstale;
 }

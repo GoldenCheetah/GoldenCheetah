@@ -95,7 +95,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     myComputrainer->getTelemetry(Power, HeartRate, Cadence, Speed,
                         RRC, calibration, Buttons, ss, Status);
 
-	// Check CT if F3 has been pressed for Calibration mode FIRST befoire we do anything else
+	// Check CT if F3 has been pressed for Calibration mode FIRST before we do anything else
     if (Buttons&CT_F3) {
         parent->Calibrate();
     }
@@ -128,7 +128,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     // ADJUST LOAD & GRADIENT
     Load = myComputrainer->getLoad();
     Gradient = myComputrainer->getGradient();
-	// the calls to the parent will determine which mode we are on (ERG/SPIN) and adjust load/slop appropiately
+	// the calls to the parent will determine which mode we are on (ERG/SPIN) and adjust load/slop appropriately
     if ((Buttons&CT_PLUS) && !(Buttons&CT_F3)) {
             parent->Higher();
     }

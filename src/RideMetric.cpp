@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "TimeUtils.h"
 #include "Zones.h"
 #include "HrZones.h"
 
@@ -66,4 +67,11 @@ RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Z
     foreach (QString symbol, done.keys())
         delete done.value(symbol);
     return result;
+}
+
+QString 
+RideMetric::toString(bool useMetricUnits)
+{
+    if (isTime()) return time_to_string(value(useMetricUnits));
+    return QString("%1").arg(value(useMetricUnits), 0, 'f', precision());
 }

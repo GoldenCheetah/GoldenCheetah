@@ -558,7 +558,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->setContentsMargins(0,0,0,0);
 
     // allPlotStack contains the allPlot and the stack by series
-    // because both want the optional fullplot at the botton
+    // because both want the optional fullplot at the bottom
     allPlotStack = new QStackedWidget(this);
     allPlotStack->addWidget(allStack);
     allPlotStack->addWidget(seriesstackFrame);
@@ -855,7 +855,7 @@ AllPlotWindow::compareChanged()
             if (po->maxKM > maxKM) maxKM = po->maxKM;
             if (po->maxSECS > maxSECS) maxSECS = po->maxSECS;
 
-            // prettify / hide unneccessary guff
+            // prettify / hide unnecessary guff
             po->setColor(ci.color);
             po->hideUnwanted();
 
@@ -1094,7 +1094,7 @@ AllPlotWindow::compareChanged()
         rideSelected();
     }
 
-    // were not stale anymore
+    // we're not stale anymore
     compareStale = false;
 
     // set the widgets straight
@@ -1137,7 +1137,7 @@ AllPlotWindow::redrawAllPlot()
 void
 AllPlotWindow::redrawFullPlot()
 {
-    // always peformed sincethe data is used
+    // always performed since the data is used
     // by both the stack plots and the allplot
     RideItem *ride = current;
 
@@ -2773,8 +2773,8 @@ AllPlotWindow::setSmoothing(int value)
     // Compare has LOTS of rides to smooth...
     if (context->isCompareIntervals) {
 
-        // no zero smoothin when comparing -- we need the
-        // arrays to be intitialised for all series
+        // no zero smoothing when comparing -- we need the
+        // arrays to be initialised for all series
         if (value < 1) value = 1;
         fullPlot->setSmoothing(value);
 

@@ -2493,7 +2493,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                     // not the one we want
                     if (model->code() != metricDetail.model) continue;
 
-                    // set the paramters previously derived
+                    // set the parameters previously derived
                     model->loadParameters(est.parameters);
 
                     // get the model estimate for our duration
@@ -2838,7 +2838,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 void
 LTMPlot::pointClicked(QwtPlotCurve *curve, int index)
 {
-    // do nothin on a compare chart
+    // do nothing on a compare chart
     if (parent->isCompare()) return;
 
     if (index >= 0 && curve != highlighter) {

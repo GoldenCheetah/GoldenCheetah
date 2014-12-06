@@ -92,6 +92,9 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     chartbar = new ChartBar(context);
     tabLayout->addWidget(chartbar);
+#ifdef WANT_RIDECACHE
+    tabLayout->addWidget(new ProgressLine(this, context));
+#endif
     tabLayout->addWidget(tabbed);
     style->addWidget(tabArea);
 
@@ -417,7 +420,7 @@ HomeWindow::styleChanged(int id)
 void
 HomeWindow::dragEnterEvent(QDragEnterEvent *)
 {
-#if 0 // drah and drop chart no longer part of the UX
+#if 0 // draw and drop chart no longer part of the UX
     if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
         event->accept();
         dropPending = true;
@@ -1081,7 +1084,7 @@ void GcWindowDialog::okClicked()
 {
     // give back to owner so we can re-use
     // note that in reject they are not and will
-    // get deleted (this has been verfied with
+    // get deleted (this has been verified with
     // some debug statements in ~GcWindow).
 
     // set its title property and geometry factors
@@ -1143,7 +1146,7 @@ static QString unprotect(QString buffer)
     // html special chars are automatically handled
     // NOTE: other special characters will not work
     // cross-platform but will work locally, so not a biggie
-    // i.e. if thedefault charts.xml has a special character
+    // i.e. if the default charts.xml has a special character
     // in it it should be added here
     return s;
 }
@@ -1332,7 +1335,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         if (type == "int") chart->setProperty(name.toLatin1(), QVariant(value.toInt()));
         if (type == "double") chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
 
-        // deprecate dateRange asa chart propert THAT IS DSAVED IN STATE
+        // deprecate dateRange asa chart property THAT IS DSAVED IN STATE
         if (type == "QString" && name != "dateRange") chart->setProperty(name.toLatin1(), QVariant(QString(value)));
         if (type == "QDate") chart->setProperty(name.toLatin1(), QVariant(QDate::fromString(value)));
         if (type == "bool") chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));

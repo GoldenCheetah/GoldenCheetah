@@ -54,7 +54,7 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
     usedMinimumSegmentSize = usedMinimumGap = -1;
 
     // set initial intervals list, will be adjusted
-    // if the user modifies the default paramters
+    // if the user modifies the default parameters
     intervals = new QTreeWidget;
     intervals->headerItem()->setText(0, tr(""));
     intervals->headerItem()->setText(1, tr("Start"));
@@ -402,7 +402,7 @@ SplitActivityWizard::setFilesList()
 QString
 SplitActivityWizard::hasBackup(QString filename)
 {
-    QString backupFilename = context->athlete->home->activities().canonicalPath() + "/" + filename + ".bak";
+    QString backupFilename = context->athlete->home->fileBackup().canonicalPath() + "/" + filename + ".bak";
 
     if (QFile(backupFilename).exists()) {
 
@@ -503,7 +503,7 @@ SplitKeep::SplitKeep(SplitActivityWizard *parent) : QWizardPage(parent), wizard(
     connect(keepOriginal, SIGNAL(stateChanged(int)), this, SLOT(keepOriginalChanged()));
 }
 
-// paramters
+// parameters
 SplitParameters::SplitParameters(SplitActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Split Parameters"));

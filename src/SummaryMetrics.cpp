@@ -73,7 +73,7 @@ SummaryMetrics::getForSymbol(QString symbol, bool metric) const
 QString
 SummaryMetrics::getStringForSymbol(QString symbol, bool UseMetric) const
 {
-    // get the value honoouring metric/imperial and with the right
+    // get the value honouring metric/imperial and with the right
     // number of decimal places.
 
     const RideMetric *m = metricForSymbol(symbol);

@@ -157,7 +157,7 @@ RouteSegment::searchRouteInRide(RideFile* ride, bool freememory, QTextStream* ou
                 // Valid GPS value
                 if (start == -1) {
                     diverge = 0;
-                    // Calcul distance to route point
+                    // Calculate distance to route point
                     double _dist = distance(routepoint.lat, routepoint.lon, point->lat, point->lon) ;
                     minimumdistance = _dist;
 
@@ -242,7 +242,7 @@ RouteSegment::searchRouteInRide(RideFile* ride, bool freememory, QTextStream* ou
         } else {
             if (n == this->getPoints().count()-1){
                 // OK
-                //Add the interval and continu search
+                //Add the interval and continue search
                 *out << "    >>> Route identified in ride: " << name << " start: " << start << " stop: " << stop << " (distance " << precision << "km)\r\n";
                 this->addRideForRideFile(ride, start, stop, precision);
                 candidate = true;
