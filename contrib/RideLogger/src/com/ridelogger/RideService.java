@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
+import com.dsi.ant.plugins.utility.log.LogAnt;
 import com.ridelogger.formats.BaseFormat;
 import com.ridelogger.formats.JsonFormat;
 import com.ridelogger.listners.Base;
@@ -222,6 +223,8 @@ public class RideService extends Service
             fileFormat = new JsonFormat(this);
             fileFormat.createFile();
             fileFormat.writeHeader();
+            
+            LogAnt.setDebugLevel(LogAnt.DebugLevel.NONE, this);
             
             final Set<String> pairedAnts = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
             

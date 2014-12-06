@@ -11,6 +11,7 @@ import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
+import com.dsi.ant.plugins.utility.log.LogAnt;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -167,6 +168,8 @@ public class SettingsActivity extends PreferenceActivity {
             MultiDeviceSearch.RssiCallback           mRssiCallback;
             
             updateList(foundDevices);
+            
+            LogAnt.setDebugLevel(LogAnt.DebugLevel.NONE, this.getActivity());
             
             mCallback = new MultiDeviceSearch.SearchCallbacks(){
                 public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
