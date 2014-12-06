@@ -4,8 +4,6 @@ import com.dsi.ant.plugins.antplus.pcc.defines.DeviceState;
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IDeviceStateChangeReceiver;
 import com.dsi.ant.plugins.antplus.pccbase.AntPluginPcc.IPluginAccessResultReceiver;
-import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
-
 import com.ridelogger.RideService;
 
 
@@ -14,19 +12,22 @@ import com.ridelogger.RideService;
  * @author Chet Henry
  * Listen to and log Ant+ events base class
  */
-public class Ant extends Base<Object>
+public abstract class Ant extends Base<Object>
 {
-    public PccReleaseHandle<?>            releaseHandle;    //Handle class
-    public IPluginAccessResultReceiver<?> mResultReceiver;  //Receiver class
+    protected PccReleaseHandle<?>            releaseHandle;    //Handle class
+    public    IPluginAccessResultReceiver<?> mResultReceiver;  //Receiver class
+    protected int                            deviceNumber = 0;
+    
     
     //setup listeners and logging 
-    public Ant(MultiDeviceSearchResult result, RideService mContext)
+    public Ant(int pDeviceNumber, RideService mContext)
     {
         super(mContext);
+        deviceNumber = pDeviceNumber;
     }
     
     
-    IDeviceStateChangeReceiver mDeviceStateChangeReceiver = new IDeviceStateChangeReceiver()
+    public IDeviceStateChangeReceiver mDeviceStateChangeReceiver = new IDeviceStateChangeReceiver()
     {
         @Override
         public void onDeviceStateChange(final DeviceState newDeviceState){
@@ -36,7 +37,11 @@ public class Ant extends Base<Object>
             }
         }
     };
+    
+    
+    abstract protected void requestAccess();
 
+    
     @Override
     public void onDestroy()
     {

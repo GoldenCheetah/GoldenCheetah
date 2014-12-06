@@ -2,16 +2,12 @@ package com.ridelogger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
-import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
-import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
-import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
 import com.ridelogger.formats.BaseFormat;
 import com.ridelogger.formats.JsonFormat;
 import com.ridelogger.listners.Base;
@@ -110,7 +106,6 @@ public class RideService extends Service
     private boolean            rideStarted   = false;                              //have we started logging the ride
     private int                sensor_index  = 0;                                  //current index of sensors
     private String             emergencyNumbuer;                                   //the number to send the messages to
-    private MultiDeviceSearch  mSearch;                                            //Ant+ device search class to init connections    
     private Timer              timer;                                              //timer class to control the periodic messages
     private Timer              timerUI;                                            //timer class to control the periodic messages
     private Base<?>[]          sensors;                                            //list of sensors tracking
@@ -229,47 +224,51 @@ public class RideService extends Service
             fileFormat.writeHeader();
             
             final Set<String> pairedAnts = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
-            if(pairedAnts != null) {
+            
+            if(pairedAnts != null && !pairedAnts.isEmpty()){
                 sensors = new Base<?>[pairedAnts.size() + 2];
+                for(String deviceNumber: pairedAnts) {
+                    DeviceType deviceType =  DeviceType.getValueFromInt(settings.getInt(deviceNumber, 0));
+                    switch (deviceType) {
+                        case BIKE_CADENCE:
+                            break;
+                        case BIKE_POWER:
+                            sensors[sensor_index++] = new Power(Integer.valueOf(deviceNumber), this);
+                            break;
+                        case BIKE_SPD:
+                            break;
+                        case BIKE_SPDCAD:
+                            break;
+                        case BLOOD_PRESSURE:
+                            break;
+                        case ENVIRONMENT:
+                            break;
+                        case WEIGHT_SCALE:
+                            break;
+                        case HEARTRATE:
+                            sensors[sensor_index++] = new HeartRate(Integer.valueOf(deviceNumber), this);            
+                            break;
+                        case STRIDE_SDM:
+                            break;
+                        case FITNESS_EQUIPMENT:
+                            break;
+                        case GEOCACHE:
+                        case CONTROLLABLE_DEVICE:
+                            break;
+                        case UNKNOWN:
+                            break;
+                        default:
+                            break;
+                    }
+                }
             } else {
-                sensors = new Base<?>[2];
+                sensors = new Base<?>[4];
+                sensors[sensor_index++] = new HeartRate(0, this);
+                sensors[sensor_index++] = new Power(0, this);
             }
             
             sensors[sensor_index++] = new Gps(this);
             sensors[sensor_index++] = new Sensors(this);
-            
-            if(pairedAnts != null && !pairedAnts.isEmpty()){
-                // start the multi-device search
-                mSearch = new MultiDeviceSearch(
-                        this,
-                        EnumSet.allOf(DeviceType.class),
-                        new MultiDeviceSearch.SearchCallbacks() {
-                            public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
-                            {
-                                if (!deviceFound.isAlreadyConnected())  {
-                                    if(pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))) {
-                                        launchConnection(deviceFound);
-                                        pairedAnts.remove(Integer.toString(deviceFound.getAntDeviceNumber()));
-                                    }
-                                }
-                                
-                                if(pairedAnts.isEmpty()) {
-                                    mSearch.close();
-                                    mSearch = null;
-                                }
-                            }
-        
-                            @Override
-                            public void onSearchStopped(RequestAccessResult arg0) {
-                                mSearch = null;
-                            }
-                        },
-                        new MultiDeviceSearch.RssiCallback() {
-                            @Override
-                            public void onRssiUpdate(final int resultId, final int rssi){}
-                        }
-                );
-            }
         }
         rideStarted = true;
         
@@ -392,11 +391,6 @@ public class RideService extends Service
                 sensor.onDestroy();
             }
         }
-
-        //stop the Ant+ search
-        if(mSearch != null) {
-            mSearch.close();
-        }
         
         //stop the phoneHome timer if we need to.
         if(timer != null) {
@@ -414,42 +408,6 @@ public class RideService extends Service
         rideStarted = false;
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(notifyID);
-    }
-    
-    
-    //launch ant+ connection
-    public void launchConnection(MultiDeviceSearchResult result) {
-        switch (result.getAntDeviceType()) {
-            case BIKE_CADENCE:
-                break;
-            case BIKE_POWER:
-                sensors[sensor_index++] = new Power(result, this);
-                break;
-            case BIKE_SPD:
-                break;
-            case BIKE_SPDCAD:
-                break;
-            case BLOOD_PRESSURE:
-                break;
-            case ENVIRONMENT:
-                break;
-            case WEIGHT_SCALE:
-                break;
-            case HEARTRATE:
-                sensors[sensor_index++] = new HeartRate(result, this);            
-                break;
-            case STRIDE_SDM:
-                break;
-            case FITNESS_EQUIPMENT:
-                break;
-            case GEOCACHE:
-            case CONTROLLABLE_DEVICE:
-                break;
-            case UNKNOWN:
-                break;
-            default:
-                break;
-        }
     }
 }
 
