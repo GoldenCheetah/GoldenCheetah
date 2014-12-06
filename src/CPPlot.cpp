@@ -337,7 +337,7 @@ CPPlot::plotModel()
 {
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
-    if (model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg)) {
+    if (model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg && rideSeries != RideFile::kph)) {
         if (modelCurve) {
             modelCurve->detach();
             delete modelCurve;
@@ -361,7 +361,7 @@ CPPlot::plotModel()
     }
 
     // we don't want a model
-    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts) return;
+    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts && rideSeries != RideFile::kph) return;
 
     // we don't have any bests yet?
     if (bestsCache == NULL) return;
@@ -405,18 +405,26 @@ CPPlot::plotModel()
             // update the model paramters display
             CriticalPowerWindow *cpw = static_cast<CriticalPowerWindow*>(parent);
 
-            // update the helper widget -- either as watts or w/kg
+            // update the helper widget -- either as watts, w/kg or kph
 
             if (rideSeries == RideFile::watts) {
 
+                // Reset Rank
+                cpw->titleRank->setText(tr("Rank"));
+
                 //WPrime
+                cpw->wprimeTitle->setText(tr("W'"));
                 if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 kJ")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
                 else cpw->wprimeValue->setText(tr("n/a"));
 
                 //CP
+                cpw->cpTitle->setText(tr("CP"));
                 cpw->cpValue->setText(QString(tr("%1 w")).arg(pdModel->CP(), 0, 'f', 0));
+                cpw->cpRank->setText(tr("n/a"));
 
                 //FTP and FTP ranking
+                cpw->titleRank->setText(tr("Rank"));
+                cpw->ftpTitle->setText(tr("FTP"));
                 if (pdModel->hasFTP()) {
                     cpw->ftpValue->setText(QString(tr("%1 w")).arg(pdModel->FTP(), 0, 'f', 0));
 
@@ -434,6 +442,7 @@ CPPlot::plotModel()
                 }
 
                 // P-MAX and P-MAX ranking
+                cpw->pmaxTitle->setText(tr("Pmax"));
                 if (pdModel->hasPMax()) {
                     cpw->pmaxValue->setText(QString(tr("%1 w")).arg(pdModel->PMax(), 0, 'f', 0));
 
@@ -454,16 +463,23 @@ CPPlot::plotModel()
                     cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
                 }
 
-            } else {
+            } else if (rideSeries == RideFile::wattsKg) {
+
+                // Reset Rank
+                cpw->titleRank->setText(tr("Rank"));
 
                 //WPrime
+                cpw->wprimeTitle->setText(tr("W'"));
                 if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 J/kg")).arg(pdModel->WPrime(), 0, 'f', 0));
                 else cpw->wprimeValue->setText(tr("n/a"));
 
                 //CP
+                cpw->cpTitle->setText(tr("CP"));
                 cpw->cpValue->setText(QString(tr("%1 w/kg")).arg(pdModel->CP(), 0, 'f', 2));
+                cpw->cpRank->setText(tr("n/a"));
 
                 //FTP and FTP ranking
+                cpw->ftpTitle->setText(tr("FTP"));
                 if (pdModel->hasFTP()) {
                     cpw->ftpValue->setText(QString(tr("%1 w/kg")).arg(pdModel->FTP(), 0, 'f', 2));
 
@@ -480,6 +496,7 @@ CPPlot::plotModel()
                 }
 
                 // P-MAX and P-MAX ranking
+                cpw->pmaxTitle->setText(tr("Pmax"));
                 if (pdModel->hasPMax()) {
                     cpw->pmaxValue->setText(QString(tr("%1 w/kg")).arg(pdModel->PMax(), 0, 'f', 2));
 
@@ -489,6 +506,51 @@ CPPlot::plotModel()
                         cpw->pmaxRank->setText(QString("%1").arg(_pMaxLevel));
                     else
                         cpw->pmaxRank->setText(tr("n/a"));
+                } else  {
+                    cpw->pmaxValue->setText(tr("n/a"));
+                    cpw->pmaxRank->setText(tr("n/a"));
+                }
+
+                // Endurance Index
+                if (pdModel->hasWPrime() && pdModel->WPrime() && pdModel->hasCP() && pdModel->CP()) {
+                    cpw->eiValue->setText(QString("%1").arg(pdModel->WPrime() / pdModel->CP(), 0, 'f', 0));
+                }
+
+            } else if (rideSeries == RideFile::kph) {
+
+                // Rank field is reused for pace
+                bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
+                QString paceunit = metricPace ? tr("min/km") : tr("min/mi");
+                cpw->titleRank->setText(paceunit);
+
+                //DPrime
+                cpw->wprimeTitle->setText(tr("D'"));
+                if (pdModel->hasWPrime()) cpw->wprimeValue->setText(QString(tr("%1 km")).arg(pdModel->WPrime() / 1000.0, 0, 'f', 1));
+                else cpw->wprimeValue->setText(tr("n/a"));
+
+                //CV
+                cpw->cpTitle->setText(tr("CV"));
+                cpw->cpValue->setText(QString(tr("%1 kph")).arg(pdModel->CP(), 0, 'f', 1));
+                cpw->cpRank->setText(kphToPace(pdModel->CP(), metricPace));
+
+                //FTP
+                cpw->ftpTitle->setText(tr("FTV"));
+                if (pdModel->hasFTP()) {
+                    cpw->ftpValue->setText(QString(tr("%1 kph")).arg(pdModel->FTP(), 0, 'f', 1));
+                    cpw->ftpRank->setText(kphToPace(pdModel->FTP(), metricPace));
+
+                } else {
+
+                    cpw->ftpValue->setText(tr("n/a"));
+                    cpw->ftpRank->setText(tr("n/a"));
+                }
+
+                // V-MAX
+                cpw->pmaxTitle->setText(tr("Vmax"));
+                if (pdModel->hasPMax()) {
+                    cpw->pmaxValue->setText(QString(tr("%1 kph")).arg(pdModel->PMax(), 0, 'f', 1));
+                    cpw->pmaxRank->setText(kphToPace(pdModel->PMax(), metricPace));
+
                 } else  {
                     cpw->pmaxValue->setText(tr("n/a"));
                     cpw->pmaxRank->setText(tr("n/a"));
@@ -598,12 +660,12 @@ CPPlot::plotModel(QVector<double> vector, QColor plotColor, PDModel *baseline)
 {
     // first lets clear any curves we shouldn't be displaying
     // no model curve if not power !
-    if (!context->isCompareDateRanges || model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg)) {
+    if (!context->isCompareDateRanges || model == 0 || (rideSeries != RideFile::watts && rideSeries != RideFile::wattsKg && rideSeries != RideFile::kph)) {
         return;
     }
 
     // we don't want a model
-    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts) return;
+    if (rideSeries != RideFile::wattsKg && rideSeries != RideFile::watts && rideSeries != RideFile::kph) return;
 
     PDModel *pdmodel = NULL; // synthetic data provider for curve
 
@@ -849,7 +911,7 @@ CPPlot::plotBests()
 
             // when plotting power bests AND a model we draw bests as dots
             // but only if in 'plain' mode .. not doing a rainbow curve.
-            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts) && model) {
+            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts && rideSeries == RideFile::kph) && model) {
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
@@ -864,7 +926,7 @@ CPPlot::plotBests()
             line.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
 
             curve->setPen(line);
-            if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
+            if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)
                 curve->setBrush(Qt::NoBrush);
             else
                 curve->setBrush(QBrush(fill));
@@ -1421,7 +1483,7 @@ CPPlot::exportBests(QString filename)
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return; // couldn't open file
 
     // do we want to export the model estimate too ?
-    bool expmodel = (model && pdModel && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts));
+    bool expmodel = (model && pdModel && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::kph));
 
     // open stream and write header
     QTextStream stream(&f);
@@ -1885,7 +1947,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         CompareDateRange range = compareDateRanges.at(0);
         baseline = range.rideFileCache()->meanMaxArray(rideSeries);
 
-        if (model && (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)) {
+        if (model && (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)) {
 
             // get a model
             switch (model) {
@@ -1950,7 +2012,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 if (showBest) plotCache(deltaArray, range.color);
 
                 // and plot a model too -- its neat to compare them...
-                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg) {
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph) {
                     plotModel(cache->meanMaxArray(rideSeries), range.color, baselineModel);
                 }
 
@@ -1971,7 +2033,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 if (showBest) plotCache(cache->meanMaxArray(rideSeries), range.color);
 
                 // and plot a model too -- its neat to compare them...
-                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg)
+                if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)
                     plotModel(cache->meanMaxArray(rideSeries), range.color, NULL);
 
                 int xCount = 0;

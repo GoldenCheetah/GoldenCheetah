@@ -108,7 +108,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     QWidget *modelWidget = new QWidget(this);
     modelWidget->setContentsMargins(0,0,0,0);
-    settingsTabs->addTab(modelWidget, tr("CP Model"));
+    settingsTabs->addTab(modelWidget, tr("CP/CV Model"));
 
     QFormLayout *mcl = new QFormLayout(modelWidget);;
     mcl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -210,7 +210,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     modelCombo->addItem(tr("Multicomponent"));
     modelCombo->setCurrentIndex(1);
 
-    mcl->addRow(new QLabel(tr("CP Model")), modelCombo);
+    mcl->addRow(new QLabel(tr("CP/CV Model")), modelCombo);
 
     mcl->addRow(new QLabel(tr(" ")));
     intervalLabel = new QLabel(tr("Search Interval"));
@@ -414,7 +414,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 #ifdef GC_HAVE_MUMODEL
     addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
 #endif
-    addHelper(QString(tr("CP Model")), helper);
+    addHelper(QString(tr("CP/CV Model")), helper);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
@@ -713,7 +713,7 @@ CriticalPowerWindow::modelParametersChanged()
     // need a helper any more ?
     if (seriesCombo->currentIndex() >= 0) {
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
-        if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
     }
 
@@ -770,7 +770,7 @@ CriticalPowerWindow::forceReplot()
 
         // show helper if we're showing power
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
-        if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
 
         // these are allowed outside of compare mode
@@ -1146,7 +1146,7 @@ CriticalPowerWindow::setSeries(int index)
 
         // need a helper any more ?
         CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(index).toInt());
-        if ((series == watts || series == wattsKg) && modelCombo->currentIndex() >= 1) helperWidget()->show();
+        if ((series == watts || series == wattsKg || series == kph) && modelCombo->currentIndex() >= 1) helperWidget()->show();
         else helperWidget()->hide();
 
         if (rangemode) {
