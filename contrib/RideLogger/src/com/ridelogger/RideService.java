@@ -1,15 +1,8 @@
 package com.ridelogger;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -19,6 +12,8 @@ import com.dsi.ant.plugins.antplus.pcc.defines.DeviceType;
 import com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.MultiDeviceSearchResult;
+import com.ridelogger.formats.BaseFormat;
+import com.ridelogger.formats.JsonFormat;
 import com.ridelogger.listners.Base;
 import com.ridelogger.listners.Gps;
 import com.ridelogger.listners.HeartRate;
@@ -107,56 +102,20 @@ public class RideService extends Service
         "press",
         "lux"
     };
-        
-    public float[]            currentValues = new float[RideService.KEYS.length]; //float array of current values
-    public GzipWriter         buf;                           //writes to log file buffered
-    public long               startTime;                     //start time of the ride
-    private boolean           rideStarted   = false;         //have we started logging the ride
-    private Set<String>       pairedAnts;                    //list of ant devices to pair with
-    private Timer             timer;                         //timer class to control the periodic messages
-    private Timer             timerUI;                       //timer class to control the periodic messages
-    private String            emergencyNumbuer;              //the number to send the messages to
 
-                                        
-    private Base<?>[] sensors;
-    private int sensor_index = 0;
-    MultiDeviceSearch                     mSearch;   //Ant+ device search class to init connections    
-    
-    
-    final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
-    Messenger replyTo;
-    
-    class IncomingHandler extends Handler { // Handler of incoming messages from clients.
-        @Override
-        public void handleMessage(Message msg) {
-            if(timerUI != null) {
-                timerUI.cancel();
-                timerUI = null;
-            }
-            
-            timerUI = new Timer();
-            
-            if(msg.replyTo != null) {
-                replyTo = msg.replyTo;
-                timerUI.scheduleAtFixedRate(
-                    new TimerTask() {              
-                        @Override  
-                        public void run() {                    
-                            Message msg = Message.obtain(null, 2, 0, 0);
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("currentValues", currentValues);
-                            msg.setData(bundle);
-                            try {
-                                replyTo.send(msg);
-                            } catch (RemoteException e) { }
-                        }
-                    },
-                    1000, 
-                    1000
-                ); //every second update the screen
-            }
-        }
-    }
+    public GzipWriter          buf;                                                //writes to log file buffered
+    public long                startTime;                                          //start time of the ride
+    public float[]             currentValues = new float[RideService.KEYS.length]; //float array of current values
+    private Messenger          mMessenger    = null;                               //class to send back current values if needed
+    private boolean            rideStarted   = false;                              //have we started logging the ride
+    private int                sensor_index  = 0;                                  //current index of sensors
+    private String             emergencyNumbuer;                                   //the number to send the messages to
+    private MultiDeviceSearch  mSearch;                                            //Ant+ device search class to init connections    
+    private Timer              timer;                                              //timer class to control the periodic messages
+    private Timer              timerUI;                                            //timer class to control the periodic messages
+    private Base<?>[]          sensors;                                            //list of sensors tracking
+    public BaseFormat<?>       fileFormat;
+
     
     /**
      * starts the ride on service start
@@ -173,6 +132,39 @@ public class RideService extends Service
      */
     @Override
     public IBinder onBind(Intent arg0) {
+        mMessenger = new Messenger(new Handler() { // Handler of incoming messages from clients.
+            Messenger replyTo;
+            @Override
+            public void handleMessage(Message msg) {
+                if(timerUI != null) {
+                    timerUI.cancel();
+                    timerUI = null;
+                }
+                
+                timerUI = new Timer();
+                
+                if(msg.replyTo != null) {
+                    replyTo = msg.replyTo;
+                    timerUI.scheduleAtFixedRate(
+                        new TimerTask() {              
+                            @Override  
+                            public void run() {                    
+                                Message msg = Message.obtain(null, 2, 0, 0);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("currentValues", currentValues);
+                                msg.setData(bundle);
+                                try {
+                                    replyTo.send(msg);
+                                } catch (RemoteException e) {}
+                            }
+                        },
+                        1000, 
+                        1000
+                    ); //every second update the screen
+                }
+            }
+        }); // Target we publish for clients to send messages to IncomingHandler.
+        
         return mMessenger.getBinder();
     }
     
@@ -186,6 +178,8 @@ public class RideService extends Service
             timerUI.cancel();
             timerUI = null;
         }
+        
+        mMessenger = null;
         
         return true;
     }
@@ -206,116 +200,76 @@ public class RideService extends Service
     protected void startRide() {
         if(rideStarted) return;
         
-        startTime     = System.currentTimeMillis();
-        final String fileName      = "ride-" + startTime + ".json.gz";
+        SharedPreferences settings  = PreferenceManager.getDefaultSharedPreferences(this);
+        emergencyNumbuer            = settings.getString(getString(R.string.PREF_EMERGENCY_NUMBER), "");
+        currentValues[SECS]         = (float) 0.0;
         
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+        startTime                   = System.currentTimeMillis();
         
-        String utc   = f.format(new Date(startTime));
         
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(startTime);
+        Date startDate              = new Date(startTime);        
         
-        String month     = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US);
-        String weekDay   = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US);
-        String year      = Integer.toString(cal.get(Calendar.YEAR));
+        SimpleDateFormat startTimef = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat filef      = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        SimpleDateFormat month      = new SimpleDateFormat("MMMMM");
+        SimpleDateFormat year       = new SimpleDateFormat("yyyy");
+        SimpleDateFormat day        = new SimpleDateFormat("EEEEE");
         
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        emergencyNumbuer           = settings.getString(getString(R.string.PREF_EMERGENCY_NUMBER), "");
-        pairedAnts                 = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
-         
-        currentValues[SECS] = (float) 0.0;
+        startTimef.setTimeZone(TimeZone.getTimeZone("UTC"));
+        filef.setTimeZone(TimeZone.getTimeZone("UTC"));     
+        month.setTimeZone(TimeZone.getTimeZone("UTC"));     
+        year.setTimeZone(TimeZone.getTimeZone("UTC"));      
+        day.setTimeZone(TimeZone.getTimeZone("UTC"));       
         
-        String rideHeadder = "{" +
-            "\"RIDE\":{" +
-                "\"STARTTIME\":\"" + utc + " UTC\"," +
-                "\"RECINTSECS\":1," +
-                "\"DEVICETYPE\":\"Android\"," +
-                "\"IDENTIFIER\":\"\"," +
-                "\"TAGS\":{" +
-                    "\"Athlete\":\"" + settings.getString(getString(R.string.PREF_RIDER_NAME), "") + "\"," +
-                    "\"Calendar Text\":\"Auto Recored Android Ride\"," +
-                    "\"Change History\":\"\"," +
-                    "\"Data\":\"\"," +
-                    "\"Device\":\"\"," +
-                    "\"Device Info\":\"\"," +
-                    "\"File Format\":\"\"," +
-                    "\"Filename\":\"\"," +
-                    "\"Month\":\"" + month +"\"," +
-                    "\"Notes\":\"\"," +
-                    "\"Objective\":\"\"," +
-                    "\"Sport\":\"Bike\"," +
-                    "\"Weekday\":\"" + weekDay + "\"," +
-                    "\"Workout Code\":\"\"," +
-                    "\"Year\":\"" + year + "\"" +
-                "}," +
-                "\"SAMPLES\":[{\"SECS\":0}";
+        final String fileName       = filef.format(startDate) + ".json.gz";
+
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = new File(
-                Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOCUMENTS
-                ), 
-                "Rides"
-            );
+            fileFormat = new JsonFormat(this);
+            fileFormat.createFile();
+            fileFormat.writeHeader();
             
-            File file = new File(
-                Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOCUMENTS
-                ) + "/Rides", 
-                fileName
-            );
+            final Set<String> pairedAnts = settings.getStringSet(getString(R.string.PREF_PAIRED_ANTS), null);
+            if(pairedAnts != null) {
+                sensors = new Base<?>[pairedAnts.size() + 2];
+            } else {
+                sensors = new Base<?>[2];
+            }
             
+            sensors[sensor_index++] = new Gps(this);
+            sensors[sensor_index++] = new Sensors(this);
             
-            try {
-                dir.mkdirs();
-                file.createNewFile();
-                file.setReadable(true);
-                file.setWritable(true);
-                
-                OutputStream bufWriter = new BufferedOutputStream(new FileOutputStream(file));
-                buf = new GzipWriter(bufWriter);
-                
-                buf.write(rideHeadder);
-                
-                if(pairedAnts != null) {
-                    sensors = new Base<?>[pairedAnts.size() + 2];
-                } else {
-                    sensors = new Base<?>[2];
-                }
-                
-                sensors[sensor_index++] = new Gps(this);
-                sensors[sensor_index++] = new Sensors(this);
-                
-                
-                
-                if(pairedAnts != null && !pairedAnts.isEmpty()){
-                    MultiDeviceSearch.SearchCallbacks mCallback = new MultiDeviceSearch.SearchCallbacks(){
-                        public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
-                        {
-                            if (!deviceFound.isAlreadyConnected())  {
-                                if(pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))) {
-                                    launchConnection(deviceFound);
+            if(pairedAnts != null && !pairedAnts.isEmpty()){
+                // start the multi-device search
+                mSearch = new MultiDeviceSearch(
+                        this,
+                        EnumSet.allOf(DeviceType.class),
+                        new MultiDeviceSearch.SearchCallbacks() {
+                            public void onDeviceFound(final MultiDeviceSearchResult deviceFound)
+                            {
+                                if (!deviceFound.isAlreadyConnected())  {
+                                    if(pairedAnts == null || pairedAnts.contains(Integer.toString(deviceFound.getAntDeviceNumber()))) {
+                                        launchConnection(deviceFound);
+                                        pairedAnts.remove(Integer.toString(deviceFound.getAntDeviceNumber()));
+                                    }
+                                }
+                                
+                                if(pairedAnts.isEmpty()) {
+                                    mSearch.close();
+                                    mSearch = null;
                                 }
                             }
+        
+                            @Override
+                            public void onSearchStopped(RequestAccessResult arg0) {
+                                mSearch = null;
+                            }
+                        },
+                        new MultiDeviceSearch.RssiCallback() {
+                            @Override
+                            public void onRssiUpdate(final int resultId, final int rssi){}
                         }
-    
-                        @Override
-                        public void onSearchStopped(RequestAccessResult arg0) {
-                            mSearch = null;
-                        }
-                    };
-                    
-                    MultiDeviceSearch.RssiCallback mRssiCallback = new MultiDeviceSearch.RssiCallback() {
-                        @Override
-                        public void onRssiUpdate(final int resultId, final int rssi){}
-                    };
-    
-                    // start the multi-device search
-                    mSearch = new MultiDeviceSearch(this, EnumSet.allOf(DeviceType.class), mCallback, mRssiCallback);
-                }
-            } catch (IOException e) {}
-             
+                );
+            }
         }
         rideStarted = true;
         
@@ -428,7 +382,10 @@ public class RideService extends Service
     protected void stopRide() {
         if(!rideStarted) return;
         
-        phoneStop();
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        if(settings.getBoolean(getString(R.string.PREF_PHONE_HOME), false)) {
+            phoneStop();
+        }
 
         for(Base<?> sensor: sensors) {
             if(sensor != null) {
@@ -452,10 +409,7 @@ public class RideService extends Service
             timerUI = null;
         }
         
-        try {
-            buf.write("]}}");
-            buf.close();
-        } catch (IOException e) {}
+        fileFormat.writeFooter();
         
         rideStarted = false;
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

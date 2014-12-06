@@ -44,19 +44,6 @@ public class Ant extends Base<Object>
             releaseHandle.close();
         }
     }
-    
-    @Override
-    public void writeData(int key, float value)
-    {
-        super.writeData(key, value);
-    }
-    
-    
-    @Override
-    public void writeData(int[] keys, float[] values)
-    {
-        super.writeData(keys, values);
-    }
 
 
     @Override

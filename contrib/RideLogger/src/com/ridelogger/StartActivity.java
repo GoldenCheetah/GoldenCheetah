@@ -24,7 +24,7 @@ public class StartActivity extends FragmentActivity
     private MenuItem stopMenu;
     
     private ServiceConnection mConnection;
-    CurrentValuesAdapter currentValuesAdapter;
+    static CurrentValuesAdapter currentValuesAdapter;
 
     
     @Override
@@ -106,6 +106,13 @@ public class StartActivity extends FragmentActivity
         finish();
     }
     
+    static final Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg_internal) {
+            updateValues(msg_internal.getData());
+        }
+    };
+    
     
     /**
      * tell the service to start sending us messages with current values
@@ -119,12 +126,7 @@ public class StartActivity extends FragmentActivity
                     Messenger mService = new Messenger(service);
                     try {
                         Message msg = Message.obtain();
-                        msg.replyTo = new Messenger(new Handler(){
-                            @Override
-                            public void handleMessage(Message msg_internal) {
-                                updateValues(msg_internal.getData());
-                            }
-                        });
+                        msg.replyTo = new Messenger(mHandler);
                         
                         mService.send(msg);
                     } catch (RemoteException e) {
@@ -156,7 +158,7 @@ public class StartActivity extends FragmentActivity
      * update the text fields with current values
      * @param bundle 
      */
-    private void updateValues(Bundle bundle) {
+    private static void updateValues(Bundle bundle) {
         currentValuesAdapter.update((float[]) bundle.getSerializable("currentValues"));       
     }
     

@@ -1,9 +1,6 @@
 package com.ridelogger.listners;
 
-import com.ridelogger.GzipWriter;
 import com.ridelogger.RideService;
-
-import java.io.IOException;
 
 /**
  * Base
@@ -11,71 +8,11 @@ import java.io.IOException;
  * Base sensor class that has methods to time stamp are write to buffer
  */
 public class Base<T>
-{
-    public GzipWriter  buf;
-    public long        startTime;
-    
+{    
     public RideService context;
         
     public Base(RideService mContext) {
         context       = mContext;
-        buf           = context.buf; //shared file buffer object
-    }
-    
-    
-    public void writeData(int key, float value)
-    {
-        if(context.currentValues[key] != value) {
-            context.currentValues[RideService.SECS] = getTs();
-            context.currentValues[key]              = value;
-
-            try {
-                synchronized (buf) {
-                    buf.write(",{");
-                    
-                    buf.write("\"");
-                    buf.write((String) RideService.KEYS[RideService.SECS]);
-                    buf.write("\":");
-                    buf.write(String.format("%f", context.currentValues[RideService.SECS]));
-                    
-                    buf.write(",\"");
-                    buf.write((String) RideService.KEYS[key]);
-                    buf.write("\":");
-                    buf.write(String.format("%f", value));
-                    
-                    buf.write("}");
-                }
-            } catch (IOException e) {}
-        }
-    }
-    
-    
-    public void writeData(int[] keys, float[] values)
-    {
-        context.currentValues[RideService.SECS] = getTs();
-
-        try {
-            synchronized (buf) {
-                buf.write(",{");
-                
-                buf.write("\"");
-                buf.write((String) RideService.KEYS[RideService.SECS]);
-                buf.write("\":");
-                buf.write(String.format("%f", context.currentValues[RideService.SECS]));
-                
-                int i = 0;
-                for (int key : keys) {
-                    context.currentValues[key] = values[i];
-                    buf.write(",\"");
-                    buf.write((String) RideService.KEYS[key]);
-                    buf.write("\":");
-                    buf.write(String.format("%f", context.currentValues[i]));
-                    i++;
-                }
-
-                buf.write("}");
-            }
-        } catch (IOException e) {}
     }
 
 
@@ -84,7 +21,7 @@ public class Base<T>
         synchronized (context.currentValues) {
             context.currentValues[RideService.SECS] = getTs();
             context.currentValues[key] = value;
-            writeCurrentData();
+            context.fileFormat.writeValues();
         }
     }
 
@@ -100,31 +37,8 @@ public class Base<T>
                 i++;
             }
             
-            writeCurrentData();
+            context.fileFormat.writeValues();
         }
-    }
-    
-    
-    public void writeCurrentData()
-    {
-        try {
-            synchronized (buf) {
-                buf.write(",{");
-                buf.write("\"");
-                buf.write((String) RideService.KEYS[0]);
-                buf.write("\":");
-                buf.write(String.format("%f", context.currentValues[0]));
-                
-                for (int i = 1; i < context.currentValues.length; i++) {
-                    buf.write(",\"");
-                    buf.write((String) RideService.KEYS[i]);
-                    buf.write("\":");
-                    buf.write(String.format("%f", context.currentValues[i]));
-                }
-
-                buf.write("}");
-            }
-        } catch (IOException e) {}
     }
     
     
