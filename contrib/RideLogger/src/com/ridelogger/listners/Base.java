@@ -50,6 +50,9 @@ public class Base<T>
     
     //Clean up my listeners here
     public void onDestroy() {}
+    
+    //zero any of my values
+    public void zeroReadings() {}
 }
 
 

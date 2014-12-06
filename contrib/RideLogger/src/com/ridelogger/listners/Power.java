@@ -2,6 +2,7 @@ package com.ridelogger.listners;
 import android.preference.PreferenceManager;
 
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc;
+import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.CalculatedWheelDistanceReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.CalculatedWheelSpeedReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.DataSource;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedCrankCadenceReceiver;
@@ -81,7 +82,7 @@ public class Power extends Ant
                     }
                 );
 
-                /*result.subscribeCalculatedWheelDistanceEvent(
+                result.subscribeCalculatedWheelDistanceEvent(
                     new CalculatedWheelDistanceReceiver(wheelCircumferenceInMeters) {
                         @Override
                         public void onNewCalculatedWheelDistance(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final BigDecimal calculatedWheelDistance) 
@@ -89,14 +90,14 @@ public class Power extends Ant
                             alterCurrentData(RideService.KM, calculatedWheelDistance.floatValue());
                         }
                     }
-                );*/
+                );
 
                 result.subscribeInstantaneousCadenceEvent(
                     new IInstantaneousCadenceReceiver() {
                         @Override
                         public void onNewInstantaneousCadence(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final DataSource dataSource, final int instantaneousCadence)
                         {
-                            alterCurrentData(RideService.CAD, instantaneousCadence);
+                            alterCurrentData(RideService.CAD, (float) instantaneousCadence);
                         }
                     }
                 );
@@ -106,7 +107,7 @@ public class Power extends Ant
                         @Override
                         public void onNewRawPowerOnlyData(final long estTimestamp, final EnumSet<EventFlag> eventFlags, final long powerOnlyUpdateEventCount, final int instantaneousPower, final long accumulatedPower)
                         {
-                            alterCurrentData(RideService.WATTS, instantaneousPower);
+                            alterCurrentData(RideService.WATTS, (float) instantaneousPower);
                         }
                     }
                 );
