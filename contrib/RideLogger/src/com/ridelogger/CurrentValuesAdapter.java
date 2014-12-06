@@ -170,7 +170,7 @@ public class CurrentValuesAdapter extends BaseAdapter {
         tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
         tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-        tv.setText(String.format("%.1f", 0.0));
+        tv.setText(values[key]);
         tv.setId(key + 1);
         return tv;
     }
