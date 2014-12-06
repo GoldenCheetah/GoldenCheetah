@@ -181,8 +181,10 @@ public class Power extends Ant
                            }
                        }
                    );*/
-               } else if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SEARCH_TIMEOUT) {
-                   requestAccess();
+               } else if(resultCode == com.dsi.ant.plugins.antplus.pcc.defines.RequestAccessResult.SEARCH_TIMEOUT) {                   
+                   if(deviceNumber != 0) {
+                       requestAccess();
+                   }
                }
            }
        };
