@@ -886,19 +886,14 @@ HrZones::getFingerprint(QDate forDate) const
     int i = whichRange(forDate);
     if (i >= 0) {
 
-        // from
-        x += ranges[i].begin.toJulianDay();
-
-        // to
-        x += ranges[i].end.toJulianDay();
-
-        // CP
+        // zone parameters...
         x += ranges[i].lt;
+        x += ranges[i].restHr;
+        x += ranges[i].maxHr;
 
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += ranges[i].zones[j].lo;
-
         }
     }
     QByteArray ba = QByteArray::number(x);

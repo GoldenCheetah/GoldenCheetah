@@ -933,18 +933,12 @@ PaceZones::getFingerprint(QDate forDate) const
     int i = whichRange(forDate);
     if (i>=0) {
 
-        // from
-        x += ranges[i].begin.toJulianDay();
-
-        // to
-        x += ranges[i].end.toJulianDay();
-
         // CV
-        x += ranges[i].cv;
+        x += int(double(100.0f * ranges[i].cv));
 
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
-            x += ranges[i].zones[j].lo;
+            x += int(double(100.0f * ranges[i].zones[j].lo));
         }
     }
     QByteArray ba = QByteArray::number(x);

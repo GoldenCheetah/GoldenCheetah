@@ -104,6 +104,9 @@ class RideItem : public QObject
         bool isStale() { return isstale; }
         bool isRun() { return ride_ ? ride_->isRun() : false; }
 
+        // refresh when stale
+        void refresh();
+
         // get/set
         void setRide(RideFile *);
         void setFileName(QString, QString);

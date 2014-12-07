@@ -33,7 +33,11 @@ RideCache::RideCache(Context *context) : context(context)
 {
     progress_ = 100;
     exiting = false;
-    configChanged();
+
+    // get the new zone configuration fingerprint
+    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
+                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
+                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint());
 
     // set the list
     // populate ride list
@@ -215,17 +219,18 @@ RideCache::refresh()
     // already on it !
     if (isRunning()) return;
 
-
-    bool stale = false;
+    // how many need refreshing ?
+    int staleCount = 0;
 
     foreach(RideItem *item, rides_) {
 
         // ok set stale so we refresh
-        if (item->checkStale()) stale = true;
+        if (item->checkStale()) 
+            staleCount++;
     }
 
     // start if there is work to do
-    if (stale) start();
+    if (staleCount) start();
 }
 
 void RideCache::run()
@@ -240,18 +245,10 @@ void RideCache::run()
         // run through each ride and refresh cache if needed
         foreach(RideItem *item, rides()) {
 
-            // lets update metrics and meta etc
-            // XXX NO REFRESH CODE YET XXX
-            // XXX SIMULATE WITH A SLEEP XXX
+            // whilst we simulate
             msleep(10);
 
-            // now clear stale flag
-            item->isstale = false;
-
-            // update fingerprints etc, crc done above
-            item->fingerprint = fingerprint;
-            item->dbversion = DBSchemaVersion;
-            item->timestamp = QDateTime::currentDateTime().toTime_t();
+            if (item->isstale) item->refresh();
 
             // update progress
             progress_ = 100.0f * ((rides_.indexOf(item)+1) / double(rides_.count()));
