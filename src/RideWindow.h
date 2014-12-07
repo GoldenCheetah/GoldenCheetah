@@ -190,7 +190,7 @@ public:
     double getDistance() { return rfp.km; }
     void setDistance(double d) { rfp.km = d;}
 
-    Q_PROPERTY(double distance READ getDistance WRITE setDistance);
+    Q_PROPERTY(double lon READ getLon WRITE setLon);
     double getLon() { return rfp.lon; }
     void setLon(double l) { rfp.lon = l;}
 
