@@ -258,8 +258,8 @@ Tab::rideSelected(RideItem*)
 
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
-    setFixedHeight(1);
-    //hide();
+    setFixedHeight(2);
+    hide();
 
     connect(context, SIGNAL(refreshStart()), this, SLOT(show()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(hide()));
@@ -286,7 +286,7 @@ ProgressLine::paintEvent(QPaintEvent *)
     painter.fillRect(all, translucentWhite);
 
     // progressbar
-    QRectF progress(0, 0, (double(context->athlete->rideCache->progress()) / 100.0f) * double(width()), 1);
+    QRectF progress(0, 0, (double(context->athlete->rideCache->progress()) / 100.0f) * double(width()), height());
     painter.fillRect(progress, translucentGray);
     painter.restore();
 }

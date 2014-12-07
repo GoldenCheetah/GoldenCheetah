@@ -231,3 +231,23 @@ RideItem::checkStale()
 
     return isstale;
 }
+
+void
+RideItem::refresh()
+{
+    if (!isstale) return;
+
+    // refresh metrics etc
+    // XXX todo
+
+    // update current state
+    isstale = false;
+
+    // update fingerprints etc, crc done above
+    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+
+    dbversion = DBSchemaVersion;
+    timestamp = QDateTime::currentDateTime().toTime_t();
+}

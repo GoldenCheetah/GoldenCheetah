@@ -951,12 +951,6 @@ Zones::getFingerprint(Context *context, QDate forDate) const
     int i = whichRange(forDate);
     if (i >= 0) {
 
-        // from
-        x += ranges[i].begin.toJulianDay();
-
-        // to
-        x += ranges[i].end.toJulianDay();
-
         // CP
         x += ranges[i].cp;
 
