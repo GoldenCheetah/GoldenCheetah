@@ -911,7 +911,7 @@ CPPlot::plotBests()
 
             // when plotting power bests AND a model we draw bests as dots
             // but only if in 'plain' mode .. not doing a rainbow curve.
-            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts && rideSeries == RideFile::kph) && model) {
+            if ((rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts || rideSeries == RideFile::kph) && model) {
 
                 QwtSymbol *sym = new QwtSymbol;
                 sym->setStyle(QwtSymbol::Ellipse);
