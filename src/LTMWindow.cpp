@@ -277,7 +277,6 @@ LTMWindow::presetSelected(int index)
         settings.ltmTool = ltmTool;
         settings.data = &results;
         settings.bests = &bestsresults;
-        settings.measures = &measures;
         settings.groupBy = groupBy;
         settings.legend = legend;
         settings.events = events;
@@ -598,8 +597,6 @@ LTMWindow::refresh()
     if (amVisible() == true && context->athlete->metricDB != NULL) {
         results.clear(); // clear any old data
         results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
-        measures.clear(); // clear any old data
-        measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
         bestsresults.clear();
         bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
         refreshPlot();
@@ -620,7 +617,6 @@ LTMWindow::dateRangeChanged(DateRange range)
     if (amVisible() || dirty || range.from != plotted.from || range.to  != plotted.to) {
 
          settings.data = &results;
-         settings.measures = &measures;
          settings.bests = &bestsresults;
 
         // we let all the state get updated, but lets not actually plot
@@ -671,7 +667,6 @@ LTMWindow::filterChanged()
     settings.title = myDateRange.name;
     settings.data = &results;
     settings.bests = &bestsresults;
-    settings.measures = &measures;
 
     // if we want weeks and start is not a monday go back to the monday
     int dow = settings.start.date().dayOfWeek();
@@ -681,8 +676,6 @@ LTMWindow::filterChanged()
     // we need to get data again and apply filter
     results.clear(); // clear any old data
     results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
-    measures.clear(); // clear any old data
-    measures = context->athlete->metricDB->getAllMeasuresFor(settings.start, settings.end);
     bestsresults.clear();
     bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
 
@@ -706,7 +699,6 @@ LTMWindow::filterChanged()
         bestsresults = filteredbestsresults;
 
         settings.data = &results;
-        settings.measures = &measures;
         settings.bests = &bestsresults;
     }
 
@@ -729,7 +721,6 @@ LTMWindow::filterChanged()
         bestsresults = filteredbestsresults;
 
         settings.data = &results;
-        settings.measures = &measures;
         settings.bests = &bestsresults;
     }
 
@@ -834,7 +825,6 @@ LTMWindow::applyClicked()
         settings.ltmTool = ltmTool;
         settings.data = &results;
         settings.bests = &bestsresults;
-        settings.measures = &measures;
         settings.groupBy = groupBy;
         settings.legend = legend;
         settings.events = events;
@@ -995,8 +985,6 @@ LTMWindow::dataTable(bool html)
         QList<SummaryMetrics> PMCdata;
         if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
             data = settings.data;
-        } else if (metricDetail.type == METRIC_MEASURE) {
-            data = settings.measures;
         } else if (metricDetail.type == METRIC_PM) {
             // PMC fixup later
             ltmPlot->createPMCCurveData(context, &settings, metricDetail, PMCdata);
@@ -1098,9 +1086,7 @@ LTMWindow::dataTable(bool html)
 
             // value for day -- measures are stored differently
             double value;
-            if (metricDetail.type == METRIC_MEASURE)
-                value = rideMetrics.getText(metricDetail.symbol, "0.0").toDouble();
-            else if (metricDetail.type == METRIC_BEST)
+            if (metricDetail.type == METRIC_BEST)
                 value = rideMetrics.getForSymbol(metricDetail.bestSymbol);
             else
                 value = rideMetrics.getForSymbol(metricDetail.symbol);
@@ -1129,7 +1115,7 @@ LTMWindow::dataTable(bool html)
 
             if (value || wantZero) {
                 unsigned long seconds = rideMetrics.getForSymbol("workout_time");
-                if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_MEASURE) seconds = 1;
+                if (metricDetail.type == METRIC_BEST) seconds = 1;
                 if (n < a.x.size() && currentDay > lastDay) {
                     if (lastDay && wantZero) {
                         while (n<(a.x.size()-1) && lastDay<currentDay) {

@@ -26,6 +26,9 @@
 #include <QNetworkReply>
 #include <QHeaderView>
 
+// for WithingsReading
+#include "WithingsParser.h"
+
 class MetricAggregator;
 class Zones;
 class HrZones;
@@ -34,7 +37,6 @@ class RideFile;
 class ErgFile;
 class RideMetadata;
 class WithingsDownload;
-class ZeoDownload;
 class CalendarDownload;
 class ICalendar;
 class CalDAV;
@@ -70,6 +72,9 @@ class Athlete : public QObject
         AthleteDirectoryStructure *home;
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
 
+        // metadata definitions
+        RideMetadata *rideMetadata_;
+
         // zones
         const Zones *zones() const { return zones_; }
         const HrZones *hrZones() const { return hrzones_; }
@@ -79,21 +84,29 @@ class Athlete : public QObject
         PaceZones *pacezones_;
         void setCriticalPower(int cp);
 
+        // SQL tables are going soon
         bool isclean;
         MetricAggregator *metricDB;
         QSqlTableModel *sqlModel;
         QSqlTableModel *sqlRouteIntervalsModel;
         QSqlTableModel *sqlBestIntervalsModel;
-        RideMetadata *rideMetadata_;
+
+        // Data
         Seasons *seasons;
         QList<PDEstimate> PDEstimates;
         Routes *routes;
         QList<RideFileCache*> cpxCache;
+        RideCache *rideCache;
+        QList<WithingsReading> withings_;
+
+        // athlete measures
+        // note ride can override if passed
+        double getWeight(QDate date, RideFile *ride=NULL);
+        double getHeight(RideFile *ride=NULL);
 
         // athlete's calendar
         CalendarDownload *calendarDownload;
         WithingsDownload *withingsDownload;
-        ZeoDownload *zeoDownload;
 #ifdef GC_HAVE_ICAL
         ICalendar *rideCalendar;
         CalDAV *davCalendar;
@@ -116,8 +129,12 @@ class Athlete : public QObject
 #endif
         Context *context;
 
+        // work with withings data
+        void setWithings(QList<WithingsReading>&x);
+        QList<WithingsReading>& withings() { return withings_; }
+        double getWithingsWeight(QDate date);
+
         // ride collection
-        RideCache *rideCache;
         void selectRideFile(QString);
         void addRide(QString name, bool bSelect=true);
         void removeCurrentRide();

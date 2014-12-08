@@ -79,12 +79,14 @@ class RideItem : public QObject
         unsigned long fingerprint; // zones
         unsigned long crc, timestamp; // file content
         int dbversion; // metric version
+        double weight; // what weight was used ?
 
         // access to the cached data !
         RideFile *ride(bool open=true);
         QVector<double> &metrics() { return metrics_; }
         QMap<QString, QString> &metadata() { return metadata_; }
         const QStringList errors() { return errors_; }
+        double getWeight();
 
         // ride() will open the ride if it isn't already when open=true
         // if we pass false then it will just return ride_ so we can

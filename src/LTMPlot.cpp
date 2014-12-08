@@ -1273,7 +1273,6 @@ LTMPlot::setCompareData(LTMSettings *set)
         // set the settings data source to the compare date range 
         // QList<SummaryMetrics> metrics, measures;
         settings->data = &cd.metrics;
-        settings->measures = &cd.measures;
 
         // we need to do this for each date range as they are dependant
         // on the metrics chosen and can't be pre-cached
@@ -2312,8 +2311,6 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     QList<SummaryMetrics> PMCdata;
     if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         data = settings->data;
-    } else if (metricDetail.type == METRIC_MEASURE) {
-        data = settings->measures;
     } else if (metricDetail.type == METRIC_PM) {
         createPMCCurveData(context, settings, metricDetail, PMCdata);
         data = &PMCdata;
@@ -2341,9 +2338,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 
         // value for day -- measures are stored differently
         double value;
-        if (metricDetail.type == METRIC_MEASURE)
-            value = rideMetrics.getText(metricDetail.symbol, "0.0").toDouble();
-        else if (metricDetail.type == METRIC_BEST)
+        if (metricDetail.type == METRIC_BEST)
             value = rideMetrics.getForSymbol(metricDetail.bestSymbol);
         else
             value = rideMetrics.getForSymbol(metricDetail.symbol);
@@ -2372,7 +2367,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 
         if (value || wantZero) {
             unsigned long seconds = rideMetrics.getForSymbol("workout_time");
-            if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_MEASURE) seconds = 1;
+            if (metricDetail.type == METRIC_BEST) seconds = 1;
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
                     while (lastDay<currentDay) {

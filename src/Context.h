@@ -78,6 +78,8 @@ class Context : public QObject
         bool isCompareDateRanges;
         QList<CompareDateRange> compareDateRanges;
 
+    public slots:
+
         // *********************************************
         // APPLICATION EVENTS
         // *********************************************

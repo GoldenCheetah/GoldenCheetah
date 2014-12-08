@@ -54,7 +54,6 @@ class DBAccess
         // get schema version
         int getDBVersion();
         static unsigned int computeFileCRC(QString); 
-        QList<FieldDefinition> &getMetadataFields() { return mfieldDefinitions; }
 
         // create and drop connections
 	    DBAccess(Context *context);
@@ -67,24 +66,15 @@ class DBAccess
         // Create/Delete Intervals
         bool importInterval(SummaryMetrics *summaryMetrics, IntervalItem *interval, QString type, QString groupName, QColor color, unsigned long fingerprint, bool modify);
 
-
-        // Create/Delete Measures
-        bool importMeasure(SummaryMetrics *summaryMetrics);
-
         // Query Records
+        bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
+        SummaryMetrics getRideMetrics(QString filename); // for a filename
+
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
         QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
             return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
         }
         QList<QString> getDistinctValues(FieldDefinition field);
-
-        bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
-        QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
-        QList<SummaryMetrics> getAllMeasuresFor(DateRange dr) { 
-            return getAllMeasuresFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
-        }
-
-        SummaryMetrics getRideMetrics(QString filename); // for a filename
 
         bool getInterval(QString filename, QString type, QString groupName, int start, SummaryMetrics &summaryMetrics, QColor&color);
         bool getIntervalForRide(QString);
@@ -101,8 +91,6 @@ class DBAccess
         QString sessionid;
 
         SpecialFields msp;
-        QList<FieldDefinition> mfieldDefinitions;
-        QList<KeywordDefinition> mkeywordDefinitions; //NOTE: not used in measures.xml
         QString mcolorfield;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
@@ -112,8 +100,6 @@ class DBAccess
         bool dropMetricTable();
         bool createIntervalMetricsTable();
         bool dropIntervalMetricTable();
-        bool createMeasuresTable();
-        bool dropMeasuresTable();
 	    void initDatabase(QDir home);
 };
 #endif

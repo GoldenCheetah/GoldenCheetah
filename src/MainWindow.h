@@ -160,7 +160,6 @@ class MainWindow : public QMainWindow
 
         // Measures View
         void downloadMeasures();
-        void downloadMeasuresFromZeo();
 
         // Activity Collection
         void addIntervals(); // pass thru to tab

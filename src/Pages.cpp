@@ -565,37 +565,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     grid->addWidget(wiPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     //////////////////////////////////////////////////
-    // Zeo Sleep Data
-
-    QLabel *zeo = new QLabel(tr("Zeo Sleep Data"));
-    zeo->setFont(current);
-
-    QLabel *zeourlLabel = new QLabel(tr("Website"));
-    QLabel *zeouserLabel = new QLabel(tr("User"));
-    QLabel *zeopassLabel = new QLabel(tr("Password"));
-
-    zeoURL = new QLineEdit(this);
-    zeoURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080/").toString());
-
-    zeoUser = new QLineEdit(this);
-    zeoUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_ZEOUSER, "").toString());
-
-    zeoPass = new QLineEdit(this);
-    zeoPass->setEchoMode(QLineEdit::Password);
-    zeoPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_ZEOPASS, "").toString());
-
-    grid->addWidget(zeo, ++row, 0);
-
-    grid->addWidget(zeourlLabel, ++row, 0);
-    grid->addWidget(zeoURL, row, 1, 0);
-
-    grid->addWidget(zeouserLabel, ++row, 0);
-    grid->addWidget(zeoUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(zeopassLabel, ++row, 0);
-    grid->addWidget(zeoPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //////////////////////////////////////////////////
     // Web Calendar
 
     QLabel *webcal = new QLabel(tr("Web Calendar"));
@@ -806,9 +775,6 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WIKEY, wiPass->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_ZEOURL, zeoURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_ZEOUSER, zeoUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_ZEOPASS, zeoPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_WEBCAL_URL, webcalURL->text());
 
     // escape the at character

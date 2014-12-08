@@ -572,12 +572,6 @@ bool MetricAggregator::importInterval(IntervalItem *interval, QString type, QStr
     return true;
 }
 
-void
-MetricAggregator::importMeasure(SummaryMetrics *sm)
-{
-    dbaccess->importMeasure(sm);
-}
-
 /*----------------------------------------------------------------------
  * Query functions are wrappers around DBAccess functions
  *----------------------------------------------------------------------*/
@@ -668,25 +662,6 @@ MetricAggregator::getAllMetricsFor(QString filename)
     dbaccess->getRide(filename, results, color);
     dbaccess->connection().commit();
     return results;
-}
-
-QList<SummaryMetrics>
-MetricAggregator::getAllMeasuresFor(DateRange dr)
-{
-    return getAllMeasuresFor(QDateTime(dr.from, QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
-}
-
-QList<SummaryMetrics>
-MetricAggregator::getAllMeasuresFor(QDateTime start, QDateTime end)
-{
-    QList<SummaryMetrics> empty;
-
-    // only if we have established a connection to the database
-    if (dbaccess == NULL) {
-        qDebug()<<"lost db connection?";
-        return empty;
-    }
-    return dbaccess->getAllMeasuresFor(start, end);
 }
 
 SummaryMetrics

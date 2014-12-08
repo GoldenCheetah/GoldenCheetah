@@ -60,7 +60,6 @@
 #include "TwitterDialog.h"
 #include "ShareDialog.h"
 #include "WithingsDownload.h"
-#include "ZeoDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
@@ -588,8 +587,6 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Get &Withings Data..."), this,
                         SLOT (downloadMeasures()));
-    optionsMenu->addAction(tr("Get &Zeo Data..."), this,
-                        SLOT (downloadMeasuresFromZeo()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
@@ -1886,12 +1883,6 @@ void
 MainWindow::downloadMeasures()
 {
     currentTab->context->athlete->withingsDownload->download();
-}
-
-void
-MainWindow::downloadMeasuresFromZeo()
-{
-    currentTab->context->athlete->zeoDownload->download();
 }
 
 void

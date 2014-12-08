@@ -1267,68 +1267,6 @@ RideFile::emitModified()
     emit modified();
 }
 
-void
-RideFile::setWeight(double x)
-{
-    weight_ = x;
-}
-
-double
-RideFile::getWeight()
-{
-    if (weight_) return weight_; // cached value
-
-    // ride
-    if ((weight_ = getTag("Weight", "0.0").toDouble()) > 0) {
-        return weight_;
-    }
-
-    // withings?
-    QList<SummaryMetrics> measures = context->athlete->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
-    int i = measures.count()-1;
-    if (i) {
-        while (i>=0) {
-            if ((weight_ = measures[i].getText("Weight_m", "0.0").toDouble()) > 0) {
-               return weight_;
-            }
-            i--;
-        }
-    }
-
-
-    // global options
-    weight_ = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
-
-    // if set to zero in global options then override it.
-    // it must not be zero!!!
-    if (weight_ <= 0.00) weight_ = 75.00;
-
-    return weight_;
-}
-
-double
-RideFile::getHeight()
-{
-    double const height_default = (this->getWeight()+100.0)/98.43; // default to Stillman Average
-    double height = height_default;
-
-    // ride
-    if ((height = getTag("Height", "0.0").toDouble()) > 0) {
-        return height;
-    }
-
-    // is withings supported for height?
-
-    // global options
-    height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT, height_default).toString().toDouble();
-
-    // if set to zero in global options then override it.
-    // it must not be zero!!!
-    if (height <= 0.00) height = height_default;
-
-    return height;
-}
-
 void RideFile::appendReference(const RideFilePoint &point)
 {
     referencePoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,
@@ -1917,4 +1855,16 @@ RideFile::resample(double newRecIntSecs, int interpolate)
 
         return returning;
     }
+}
+
+double 
+RideFile::getWeight()
+{
+    return context->athlete->getWeight(startTime_.date(), this);
+}
+
+double 
+RideFile::getHeight()
+{
+    return context->athlete->getHeight(this);
 }

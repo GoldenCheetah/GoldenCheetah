@@ -27,9 +27,14 @@
 #include <QVector>
 #include <QThread>
 
-class Context;
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QtConcurrent>
 
-class RideCache : public QThread
+class Context;
+class RideCacheBackgroundRefresh;
+
+class RideCache : public QObject
 {
     Q_OBJECT
 
@@ -39,7 +44,7 @@ class RideCache : public QThread
         ~RideCache();
 
         // the ride list
-	QVector<RideItem*>&rides() { return rides_; } 
+	    QVector<RideItem*>&rides() { return rides_; } 
 
         // add/remove a ride to the list
         void addRide(QString name, bool dosignal);
@@ -50,26 +55,30 @@ class RideCache : public QThread
         void save();
 
         // the background refresher !
-        void refresh(); // calls start() and doesn't wait
+        void refresh();
         double progress() { return progress_; }
-
-        // the thread code that gets run to refresh
-        void run();
 
     public slots:
 
         // user updated options/preferences
         void configChanged();
 
+        // background refresh progress update
+        void progressing(int);
+
     protected:
 
-    private:
+        friend class ::RideCacheBackgroundRefresh;
 
         Context *context;
         QVector<RideItem*> rides_;
         bool exiting;
-	double progress_; // percent
+	    double progress_; // percent
         unsigned long fingerprint; // zone configuration fingerprint
+
+        QFuture<void> future;
+        QFutureWatcher<void> watcher;
+
 };
 
 #endif // _GC_RideCache_h

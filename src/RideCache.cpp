@@ -18,6 +18,7 @@
 
 #include "RideCache.h"
 
+#include <QtConcurrent>
 #include "DBAccess.h"
 
 #include "Context.h"
@@ -28,6 +29,8 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+
+#include "unistd.h"
 
 RideCache::RideCache(Context *context) : context(context)
 {
@@ -52,13 +55,19 @@ RideCache::RideCache(Context *context) : context(context)
         }
     }
 
-
     // load the store - will unstale once cache restored
     load();
 
+    // now refresh just in case.
+    refresh();
+
     // do we have any stale items ?
-    //XXX moved to tab during testing XXX refresh();
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+
+    // future watching
+    connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
+    connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
+    connect(&watcher, SIGNAL(progressValueChanged(int)), this, SLOT(progressing(int)));
 }
 
 RideCache::~RideCache()
@@ -114,8 +123,10 @@ RideCache::addRide(QString name, bool dosignal)
 
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
 
+#ifdef GC_HAVE_INTERVALS
     //Search routes
     context->athlete->routes->searchRoutesInRide(last->ride());
+#endif
 
     // notify everyone to select it
     context->ride = last;
@@ -211,13 +222,31 @@ RideCache::removeCurrentRide()
 void RideCache::load() {}
 void RideCache::save() {}
 
+void
+itemRefresh(RideItem *&item)
+{
+    // need parser to be reentrant !item->refresh();
+    if (item->isstale) {
+        item->refresh();
+usleep(200000);
+    }
+    item->isstale=false;
+}
+
+void
+RideCache::progressing(int value)
+{
+    // we're working away, notfy everyone where we got
+    progress_ = 100.0f * (double(value) / double(watcher.progressMaximum()));
+    context->notifyRefreshUpdate();
+}
+
 // check if we need to refresh the metrics then start the thread if needed
 void
 RideCache::refresh()
 {
-
     // already on it !
-    if (isRunning()) return;
+    if (future.isRunning()) return;
 
     // how many need refreshing ?
     int staleCount = 0;
@@ -230,46 +259,9 @@ RideCache::refresh()
     }
 
     // start if there is work to do
-    if (staleCount) start();
-}
-
-void RideCache::run()
-{
-
-    bool haveStale = true;
-
-    do {
-
-        context->notifyRefreshStart();
-
-        // run through each ride and refresh cache if needed
-        foreach(RideItem *item, rides()) {
-
-            // whilst we simulate
-            msleep(10);
-
-            if (item->isstale) item->refresh();
-
-            // update progress
-            progress_ = 100.0f * ((rides_.indexOf(item)+1) / double(rides_.count()));
-
-            // update progress bar
-            context->notifyRefreshUpdate();
-            QApplication::processEvents();
-        }
-
-        context->notifyRefreshEnd();
-
-        // trap any changes after we swept through
-        haveStale=false;
-        if (!exiting) {
-            foreach(RideItem *item, rides_) {
-                if (item->isstale) {
-                    haveStale = true;
-                    break;
-                }
-            }
-        }
-
-    } while (!exiting && haveStale);
+    // and future watcher can notify of updates
+    if (staleCount)  {
+        future = QtConcurrent::map(rides_, itemRefresh);
+        watcher.setFuture(future);
+    }
 }

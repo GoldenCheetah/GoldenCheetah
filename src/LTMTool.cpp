@@ -241,6 +241,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
         }
     }
 
+#if 0
     // measures
     QList<FieldDefinition> measureDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
@@ -269,7 +270,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
             metrics.append(measure);
         }
     }
-
+#endif
     // sort the list
     qSort(metrics);
 

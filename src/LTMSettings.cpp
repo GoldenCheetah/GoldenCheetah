@@ -318,9 +318,17 @@ while(counter-- && !in.atEnd()) {
         if (version >= 11) {
             in >> m.wpk;
         }
-        // get a metric pointer (if it exists)
-        m.metric = factory.rideMetric(m.symbol);
-        settings.metrics.append(m);
+
+        bool keep=true;
+        // check for deprecated things and set keep=false if
+        // we don't support this any more !
+        if (m.type == METRIC_MEASURE) keep = false;
+        // more keep checks could be added here
+        if (keep) {
+            // get a metric pointer (if it exists)
+            m.metric = factory.rideMetric(m.symbol);
+            settings.metrics.append(m);
+        }
     }
     if (version >= 4) in >> settings.showData;
     if (version >= 6) {
