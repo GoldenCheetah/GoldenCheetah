@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
 #include "LTMOutliers.h"
@@ -328,9 +329,21 @@ class AthleteWeight : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const Context *) {
+                 const Context *context) {
 
-        setValue(const_cast<RideFile*>(ride)->getWeight());
+        // withings first
+        double weight = context->athlete->getWithingsWeight(ride->startTime().date());
+
+        // from metadata
+        if (!weight) weight = ride->getTag("Weight", "0.0").toDouble();
+
+        // global options
+        if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+
+        // No weight default is weird, we'll set to 80kg
+        if (weight <= 0.00) weight = 80.00;
+
+        setValue(weight);
     }
 
     RideMetric *clone() const { return new AthleteWeight(*this); }

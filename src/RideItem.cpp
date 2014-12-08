@@ -24,6 +24,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+#include "Settings.h"
 #include <math.h>
 
 // used to create a temporary ride item that is not in the cache and just
@@ -32,19 +33,19 @@
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    fingerprint(0), crc(0), timestamp(0), dbversion(0) {}
+    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {}
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
     ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
-    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0) {}
+    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {}
 
 // Create a new RideItem destined for the ride cache and used for caching
 // pre-computed metrics and storing ride metadata
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
     ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
-    fingerprint(0), crc(0), timestamp(0), dbversion(0)
+    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0)
 {
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -186,44 +187,53 @@ RideItem::checkStale()
     // if we're marked stale already then just return that !
     if (isstale) return true;
 
-    // is db version different ?
+    // upgraded metrics
     if (dbversion != DBSchemaVersion) {
 
         isstale = true;
 
     } else {
 
-        // or have cp / zones have changed ?
-        // note we now get the fingerprint from the zone range
-        // and not the entire config so that if you add a new
-        // range (e.g. set CP from today) but none of the other
-        // ranges change then there is no need to recompute the
-        // metrics for older rides !
-
-        // get the new zone configuration fingerprint that applies for the ride date
-        unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
-                      + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
-                      + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
-
-        if (fingerprint != rfingerprint) {
+        // has weight changed?
+        double priorWeight = weight;
+        if (priorWeight != getWeight()) {
 
             isstale = true;
 
         } else {
 
-            // or has file content changed ?
-            QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + fileName;
-            QFile file(fullPath);
+            // or have cp / zones have changed ?
+            // note we now get the fingerprint from the zone range
+            // and not the entire config so that if you add a new
+            // range (e.g. set CP from today) but none of the other
+            // ranges change then there is no need to recompute the
+            // metrics for older rides !
 
-            // has timestamp changed ?
-            if (timestamp < QFileInfo(file).lastModified().toTime_t()) {
+            // get the new zone configuration fingerprint that applies for the ride date
+            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+                        + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                        + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
 
-                // if timestamp has changed then check crc
-                unsigned long fcrc = DBAccess::computeFileCRC(fullPath);
+            if (fingerprint != rfingerprint) {
 
-                if (crc == 0 || crc != fcrc) {
-                    crc = fcrc; // update as expensive to calculate
-                    isstale = true;
+                isstale = true;
+
+            } else {
+
+                // or has file content changed ?
+                QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + fileName;
+                QFile file(fullPath);
+
+                // has timestamp changed ?
+                if (timestamp < QFileInfo(file).lastModified().toTime_t()) {
+
+                    // if timestamp has changed then check crc
+                    unsigned long fcrc = DBAccess::computeFileCRC(fullPath);
+
+                    if (crc == 0 || crc != fcrc) {
+                        crc = fcrc; // update as expensive to calculate
+                        isstale = true;
+                    }
                 }
             }
         }
@@ -237,17 +247,60 @@ RideItem::refresh()
 {
     if (!isstale) return;
 
-    // refresh metrics etc
-    // XXX todo
+    // if already open no need to close
+    bool doclose = false;
+    if (!isOpen()) doclose = true;
 
-    // update current state
-    isstale = false;
+    // open ride file will extract details too, but only if not
+    // already open, so we refresh anyway
+    RideFile *f = ride();
+    if (f) {
 
-    // update fingerprints etc, crc done above
-    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
-                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
-                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+        // get the metadata & metric overrides
+        metadata_ = f->tags();
 
-    dbversion = DBSchemaVersion;
-    timestamp = QDateTime::currentDateTime().toTime_t();
+        // get weight that applies to the date
+        getWeight();
+
+        // refresh metrics etc
+        // XXX todo XXX
+
+        // update current state
+        isstale = false;
+
+        // update fingerprints etc, crc done above
+        fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+                    + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
+                    + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
+
+        dbversion = DBSchemaVersion;
+        timestamp = QDateTime::currentDateTime().toTime_t();
+
+        // close if we opened it
+        if (doclose) {
+            close();
+        }
+
+    } else {
+        qDebug()<<"** FILE READ ERROR: "<<fileName;
+        isstale = false;
+    }
+}
+
+double
+RideItem::getWeight()
+{
+    // withings first
+    weight = context->athlete->getWithingsWeight(dateTime.date());
+
+    // from metadata
+    if (!weight) weight = metadata_.value("Weight", "0.0").toDouble();
+
+    // global options
+    if (!weight) weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+
+    // No weight default is weird, we'll set to 80kg
+    if (weight <= 0.00) weight = 80.00;
+
+    return weight;
 }

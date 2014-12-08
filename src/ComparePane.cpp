@@ -780,7 +780,7 @@ ComparePane::dropEvent(QDropEvent *event)
             // FROM THE SOURCE CONTEXT
             // WE DON'T FETCH BESTS -- THEY NEED TO BE DONE AS NEEDED
             add.metrics = sourceContext->athlete->metricDB->getAllMetricsFor(QDateTime(add.start, QTime()),QDateTime(add.end, QTime()));
-            add.measures = sourceContext->athlete->metricDB->getAllMeasuresFor(QDateTime(add.start, QTime()),QDateTime(add.end, QTime()));
+            /* XXX measures deprecated add.measures = sourceContext->athlete->metricDB->getAllMeasuresFor(QDateTime(add.start, QTime()),QDateTime(add.end, QTime())); XXX */
 
             // just use standard colors and cycle round
             // we will of course repeat, but the user can

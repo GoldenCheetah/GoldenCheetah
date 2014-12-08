@@ -34,11 +34,73 @@
 // anyway. And yyunput() isn't needed for our
 // parser, we read in one pass with no swanky
 // interactions
+#define YYSTYPE QString
+
+// Un-Escape special characters (JSON compliance)
+static QString unprotect(char *string)
+{
+    // sending UTF-8 to FLEX demands symetric conversion back to QString
+    QString string2 = QString::fromUtf8(string);
+
+    // this is a lexer string so it will be enclosed
+    // in quotes. Lets strip those first
+    QString s = string2.mid(1,string2.length()-2);
+
+    // does it end with a space (to avoid token conflict) ?
+    if (s.endsWith(" ")) s = s.mid(0, s.length()-1);
+
+    // now un-escape the control characters
+    s.replace("\\t", "\t");  // tab
+    s.replace("\\n", "\n");  // newline
+    s.replace("\\r", "\r");  // carriage-return
+    s.replace("\\b", "\b");  // backspace
+    s.replace("\\f", "\f");  // formfeed
+    s.replace("\\/", "/");   // solidus
+    s.replace("\\\"", "\""); // quote
+    s.replace("\\\\", "\\"); // backslash
+
+    return s;
+}
+
+// we reimplement these to remove compiler warnings
+// about unused parameter (scanner) in the default
+// implementations, which may freak out developers
+void *JsonRideFilealloc (yy_size_t  size , yyscan_t /*scanner*/)
+{
+	return (void *) malloc( size );
+}
+
+void *JsonRideFilerealloc  (void * ptr, yy_size_t  size , yyscan_t /*scanner*/)
+{
+	/* The cast to (char *) in the following accommodates both
+	 * implementations that use char* generic pointers, and those
+	 * that use void* generic pointers.  It works with the latter
+	 * because both ANSI C and C++ allow castless assignment from
+	 * any pointer type to void*, and deal with argument conversions
+	 * as though doing an assignment.
+	 */
+	return (void *) realloc( (char *) ptr, size );
+}
+
+void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
+{
+	free( (char *) ptr );	/* see JsonRideFilerealloc() for (char *) cast */
+}
+
+// replace this too, as a) it exits (!!) 
+// cannot shutup compiler warning on yy_fatal_error function tho :(
+#define YY_FATAL_ERROR(msg) qDebug()<<msg;
 
 %}
+%option noyyalloc
+%option noyyrealloc
+%option noyyfree
 %option noyywrap
 %option nounput
 %option noinput
+%option reentrant
+%option bison-bridge
+
 %%
 \"RIDE\"            return RIDE;
 \"STARTTIME\"       return STARTTIME;
@@ -78,24 +140,25 @@
 \"RCON\"            return RCON;
 \"RVERT\"           return RVERT;
 \"RCAD\"            return RCAD;
-[-+]?[0-9]+            return JS_INTEGER;
-[-+]?[0-9]+e-[0-9]+    return JS_FLOAT;
-[-+]?[0-9]+\.[-+e0-9]*  return JS_FLOAT;
-\"([^\"]|\\\")*\"   return JS_STRING;  /* contains non-quotes or escaped-quotes */
-[ \n\t\r]           ;               /* we just ignore whitespace */
-.                   return JsonRideFiletext[0]; /* any other character, typically :, { or } */
+[-+]?[0-9]+                     { *yylval = QString::fromUtf8(yytext); return JS_INTEGER; }
+[-+]?[0-9]+e-[0-9]+             { *yylval = QString::fromUtf8(yytext); return JS_FLOAT;   }
+[-+]?[0-9]+\.[-+e0-9]*          { *yylval = QString::fromUtf8(yytext); return JS_FLOAT;   }
+
+\"([^\"]|\\\")*\"               { *yylval = unprotect(yytext); return JS_STRING;  } /* contains non-quotes or escaped-quotes */
+[ \n\t\r]                       ;               /* we just ignore whitespace */
+.                               return yytext[0]; /* any other character, typically :, { or } */
 %%
 
 // Older versions of flex (prior to 2.5.9) do not have the destroy function
 // Or We're not using GNU flex then we also won't have a destroy function
 #if !defined(FLEX_SCANNER) || (YY_FLEX_SUBMINOR_VERSION < 9)
-int JsonRideFilelex_destroy(void) { return 0; }
+int JsonRideFilelex_destroy(void*) { return 0; }
 #endif
 
-void JsonRideFile_setString(QString p)
+void JsonRideFile_setString(QString p, void *scanner)
 {
     // internally work with UTF-8 encoding
     // this works for FLEX, since the multi-byte characters only appear WITHIN a "String",
     // but not as part of the grammar - this is important since a char in UTF-8 can have up to 4 bytes
-    JsonRideFile_scan_string(p.toUtf8().data());
+    JsonRideFile_scan_string(p.toUtf8().data(), scanner);
 }

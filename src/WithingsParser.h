@@ -48,6 +48,11 @@ public:
             leankg,         // lean mass in Kilograms
             fatpercent,     // body fat as a percentage of weight
             sizemeter;      // height ?
+
+    // used by qSort()
+    bool operator< (WithingsReading right) const {
+        return (when < right.when);
+    }
 };
 
 class WithingsParser

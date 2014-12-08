@@ -67,7 +67,6 @@ class MetricAggregator : public QObject
     public slots:
         void update();
         void addRide(RideItem*);
-        void importMeasure(SummaryMetrics *sm);
 
     private:
         Context *context;

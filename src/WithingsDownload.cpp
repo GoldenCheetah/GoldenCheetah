@@ -50,8 +50,29 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
 {
     QString text = reply->readAll();
     QStringList errors;
+
+    // now save data away
+    QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
+    if (withingsJSON.open(QFile::WriteOnly)) {
+
+        QTextStream stream(&withingsJSON);
+        stream << text;
+        withingsJSON.close();
+    }
+
+    // parse it
     parser->parse(text, errors);
 
+    int allMeasures = context->athlete->withings().count();
+    int newMeasures = parser->readings().count() - allMeasures;
+
+    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
+    QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
+
+    // store in athlete
+    context->athlete->setWithings(parser->readings());
+
+#if 0
     //main->metricDB->db()->connection().transaction();
     newMeasures = 0;
     allMeasures = parser->readings().count();
@@ -97,6 +118,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
         context->athlete->isclean = false;
         context->athlete->metricDB->refreshMetrics(olderDate);
     }
+#endif
     return;
 }
 

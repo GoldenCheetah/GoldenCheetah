@@ -31,7 +31,6 @@
 #include "PaceZones.h"
 #include "MetricAggregator.h"
 #include "WithingsDownload.h"
-#include "ZeoDownload.h"
 #include "CalendarDownload.h"
 #include "ErgDB.h"
 #ifdef GC_HAVE_ICAL
@@ -144,6 +143,21 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     lucene = new Lucene(context, context); // before metricDB attempts to refresh
 #endif
 
+    // get withings in if there is a cache, before metricDB (but it goes soon)
+    QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
+    if (withingsJSON.exists() && withingsJSON.open(QFile::ReadOnly)) {
+
+        QString text;
+        QStringList errors;
+        QTextStream stream(&withingsJSON);
+        text = stream.readAll();
+        withingsJSON.close();
+
+        WithingsParser parser;
+        parser.parse(text, errors);
+        if (errors.count() == 0) setWithings(parser.readings());
+    }
+
     // metrics DB
     metricDB = new MetricAggregator(context); // just to catch config updates!
     metricDB->refreshMetrics();
@@ -165,7 +179,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Downloaders
     withingsDownload = new WithingsDownload(context);
-    zeoDownload      = new ZeoDownload(context);
     calendarDownload = new CalendarDownload(context);
 
     // Calendar
@@ -221,7 +234,6 @@ Athlete::~Athlete()
                                                // have not been reflected in the charts.xml file
 
     delete withingsDownload;
-    delete zeoDownload;
     delete calendarDownload;
 
 #ifdef GC_HAVE_ICAL
@@ -400,6 +412,7 @@ Athlete::configChanged()
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
+/*XXX not sure about this
     // forget all the cached weight values in case weight changed
     foreach (RideItem *rideItem, rideCache->rides()) {
         if (rideItem->ride(false)) {
@@ -407,6 +420,7 @@ Athlete::configChanged()
             rideItem->ride(false)->getWeight();
         }
     }
+XXX */
 }
 
 void
@@ -485,4 +499,67 @@ AthleteDirectoryStructure::subDirsExist() {
             logs().exists() &&
             temp().exists()
             );
+}
+
+// working with withings data
+void 
+Athlete::setWithings(QList<WithingsReading>&x)
+{
+    withings_ = x;
+    qSort(withings_); // date order
+}
+
+double 
+Athlete::getWithingsWeight(QDate date)
+{
+    if (withings_.count() == 0) return 0;
+
+    double lastWeight=0.0f;
+    foreach(WithingsReading x, withings_) {
+        if (x.when.date() < date) lastWeight = x.weightkg;
+        if (x.when.date() > date) break;
+    }
+    return lastWeight;
+}
+
+double
+Athlete::getWeight(QDate date, RideFile *ride)
+{
+    double weight;
+
+    // withings first
+    weight = getWithingsWeight(date);
+
+    // ride (if available)
+    if (!weight && ride)
+        weight = ride->getTag("Weight", "0.0").toDouble();
+
+    // global options
+    if (!weight)
+        weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+
+    // No weight default is weird, we'll set to 80kg
+    if (weight <= 0.00) weight = 80.00;
+
+    return weight;
+}
+
+double
+Athlete::getHeight(RideFile *ride)
+{
+    double height = 0;
+
+    // ride if present?
+    if (ride) height = ride->getTag("Height", "0.0").toDouble();
+
+    // global options ?
+    if (!height) height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT, 0.0f).toString().toDouble();
+
+    // from weight via Stillman Average?
+    if (!height && ride) height = (getWeight(ride->startTime().date(), ride)+100.0)/98.43;
+
+    // it must not be zero!!!
+    if (!height) height = 1.7526f; // 5'9" is average male height
+
+    return height;
 }

@@ -113,14 +113,13 @@
 // 91  16  Nov 2014 Damien Grauser     Do not include values if data not present in TimeInZone and HRTimeInZone
 // 92  21  Nov 2014 Mark Liversedge    Added Watts:RPE ratio
 // 93  26  Nov 2014 Mark Liversedge    Added Min, Max, Avg SmO2
-// 94  02  Dic 2014 Ale Martinez       Added xPace
+// 94  02  Dec 2014 Ale Martinez       Added xPace
+// 95  08  Dec 2014 Ale Martinez       Deprecated Measures table
 
-int DBSchemaVersion = 94;
+int DBSchemaVersion = 95;
 
 DBAccess::DBAccess(Context* context) : context(context), db(NULL)
 {
-    // check we have one and use built in if not there
-    RideMetadata::readXML(":/xml/measures.xml", mkeywordDefinitions, mfieldDefinitions, mcolorfield);
     initDatabase(context->athlete->home->cache());
 }
 
@@ -342,70 +341,6 @@ bool DBAccess::dropIntervalMetricTable()
     return rc;
 }
 
-bool DBAccess::createMeasuresTable()
-{
-    QSqlQuery query(db->database(sessionid));
-    bool rc;
-    bool createTables = true;
-
-    // does the table exist?
-    rc = query.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
-    if (rc) {
-        while (query.next()) {
-
-            QString table = query.value(0).toString();
-            if (table == "measures") {
-                createTables = false;
-                break;
-            }
-        }
-    }
-    // we need to create it!
-    if (rc && createTables) {
-
-        QString createMeasuresTable = "create table measures (timestamp integer primary key,"
-                                      "measure_date date";
-
-        // And all the metadata texts
-        foreach(FieldDefinition field, mfieldDefinitions)
-            if (field.type < 3 || field.type == 7) createMeasuresTable += QString(", Z%1 varchar").arg(context->specialFields.makeTechName(field.name));
-
-        // And all the metadata measures
-        foreach(FieldDefinition field, mfieldDefinitions)
-            if (field.type == 3 || field.type == 4)
-                createMeasuresTable += QString(", Z%1 double").arg(context->specialFields.makeTechName(field.name));
-
-        createMeasuresTable += " )";
-
-        rc = query.exec(createMeasuresTable);
-        //if (!rc) qDebug()<<"create table failed!"  << query.lastError();
-
-        // add row to version database
-        //QString measuresXML =  QString(home.absolutePath()) + "/measures.xml";
-        int measurescrcnow = 0; //computeFileCRC(measuresXML); //no crc since we don't allow definition
-        QDateTime timestamp = QDateTime::currentDateTime();
-
-        // wipe current version row
-        rc = query.exec("DELETE FROM version where table_name = \"measures\";");
-
-        // add row to version table
-        query.prepare("INSERT INTO version (table_name, schema_version, creation_date, metadata_crc ) values (?,?,?,?)");
-        query.addBindValue("measures");
-	    query.addBindValue(DBSchemaVersion);
-	    query.addBindValue(timestamp.toTime_t());
-	    query.addBindValue(measurescrcnow);
-        rc = query.exec();
-    }
-    return rc;
-}
-
-bool DBAccess::dropMeasuresTable()
-{
-    QSqlQuery query("DROP TABLE measures", db->database(sessionid));
-    bool rc = query.exec();
-    return rc;
-}
-
 bool DBAccess::createDatabase()
 {
     // check schema version and if missing recreate database
@@ -413,9 +348,6 @@ bool DBAccess::createDatabase()
 
     // Ride metrics
 	createMetricsTable();
-
-    // Athlete measures
-    createMeasuresTable();
 
     return true;
 }
@@ -426,10 +358,6 @@ void DBAccess::checkDBVersion()
     // get a CRC for metadata.xml
     QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
     int metadatacrcnow = computeFileCRC(metadataXML);
-
-    // get a CRC for measures.xml
-    //QString measuresXML =  QString(home.absolutePath()) + "/measures.xml";
-    int measurescrcnow = 0; //computeFileCRC(measuresXML);// we don't allow user to edit
 
     // can we get a version number?
     QSqlQuery query("SELECT table_name, schema_version, creation_date, metadata_crc from version;", db->database(sessionid));
@@ -450,13 +378,10 @@ void DBAccess::checkDBVersion()
         // wipe away whatever (if anything is there)
         dropMetricTable();
         dropIntervalMetricTable();
-        dropMeasuresTable();
 
         // create afresh
         createMetricsTable();
         createIntervalMetricsTable();
-        createMeasuresTable();
-
         return;
     }
 
@@ -464,7 +389,6 @@ void DBAccess::checkDBVersion()
     // tne current version / crc
     bool dropMetric = true;
     bool dropIntervalMetric = true;
-    bool dropMeasures = true;
 
     while (query.next()) {
 
@@ -485,11 +409,6 @@ void DBAccess::checkDBVersion()
             }
         }
 
-        if (table_name == "measures") {
-            if (crc == measurescrcnow) {
-                dropMeasures = false;
-            }
-        }
     }
     query.finish();
 
@@ -504,13 +423,6 @@ void DBAccess::checkDBVersion()
     if (dropIntervalMetric) {
         dropIntervalMetricTable();
         createIntervalMetricsTable();
-    }
-
-    // "measures" table, is it up-to-date? - export - recreate - import ....
-    // gets wiped away for now, will fix as part of v3.1
-    if (dropMeasures) {
-        dropMeasuresTable();
-        createMeasuresTable();
     }
 }
 
@@ -822,112 +734,6 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
         }
     }
     return summaryMetrics;
-}
-
-/*----------------------------------------------------------------------
- * CRUD routines for Measures table
- *----------------------------------------------------------------------*/
-bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
-{
-	QSqlQuery query(db->database(sessionid));
-
-    // construct an insert statement
-    QString insertStatement = "insert into measures (timestamp, measure_date";
-
-    // And all the metadata texts
-    foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type < 3 || field.type == 7) {
-            insertStatement += QString(", Z%1 ").arg(msp.makeTechName(field.name));
-        }
-    }
-        // And all the metadata metrics
-    foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type == 3 || field.type == 4) {
-            insertStatement += QString(", Z%1 ").arg(msp.makeTechName(field.name));
-        }
-    }
-
-    insertStatement += " ) values (?,?"; // timestamp, measure_date
-
-    foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type < 5 || field.type == 7) {
-            insertStatement += ",?";
-        }
-    }
-    insertStatement += ")";
-
-	query.prepare(insertStatement);
-
-    // timestamp and date
-    query.addBindValue(summaryMetrics->getDateTime().toTime_t());
-    query.addBindValue(summaryMetrics->getDateTime().date());
-
-    // And all the text measures
-    foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type < 3 || field.type == 7) {
-            query.addBindValue(summaryMetrics->getText(field.name, ""));
-        }
-    }
-    // And all the numeric measures
-    foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type == 3 || field.type == 4) {
-            query.addBindValue(summaryMetrics->getText(field.name, "nan").toDouble());
-        }
-    }
-    // go do it!
-	bool rc = query.exec();
-
-    //if(!rc) qDebug() << query.lastError();
-
-	return rc;
-}
-
-QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end)
-{
-    QList<SummaryMetrics> measures;
-
-    // null date range fetches all, but not currently used by application code
-    // since it relies too heavily on the results of the QDateTime constructor
-    if (start == QDateTime()) start = QDateTime::currentDateTime().addYears(-10);
-    if (end == QDateTime()) end = QDateTime::currentDateTime().addYears(+10);
-
-    // construct the select statement
-    QString selectStatement = "SELECT timestamp, measure_date";
-    foreach(FieldDefinition field, mfieldDefinitions) {
-        if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
-            selectStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
-        }
-    }
-    selectStatement += " FROM measures where DATE(measure_date) >=DATE(:start) AND DATE(measure_date) <=DATE(:end) "
-                       " ORDER BY measure_date;";
-
-    // execute the select statement
-    QSqlQuery query(selectStatement, db->database(sessionid));
-    query.prepare(selectStatement);
-    query.bindValue(":start", start.date());
-    query.bindValue(":end", end.date());
-    query.exec();
-    while(query.next())
-    {
-        SummaryMetrics add;
-
-        // filename and date
-        add.setDateTime(query.value(1).toDateTime());
-        // the values
-        int i=2;
-        foreach(FieldDefinition field, mfieldDefinitions) {
-            QString symbol = QString("%1_m").arg(field.name);
-            if (field.type == 3 || field.type == 4) {
-                add.setText(symbol, query.value(i).toString());
-                i++;
-            } else if (field.type < 3 || field.type == 7) {
-                add.setText(symbol, query.value(i).toString());
-                i++;
-            }
-        }
-        measures << add;
-    }
-    return measures;
 }
 
 /*----------------------------------------------------------------------

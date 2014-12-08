@@ -53,7 +53,7 @@ class RideMetric;
 #define METRIC_DB        1
 #define METRIC_PM        2
 #define METRIC_META      3
-#define METRIC_MEASURE   4
+#define METRIC_MEASURE   4 // DEPRECATED DO NOT USE
 #define METRIC_BEST      5
 #define METRIC_ESTIMATE  6
 
@@ -148,7 +148,7 @@ class LTMSettings {
         LTMSettings() {
             // we need to register the stream operators
             qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
-            data = measures = bests = NULL;
+            data = bests = NULL;
             ltmTool = NULL;
         }
 
@@ -169,7 +169,6 @@ class LTMSettings {
 
         QList<MetricDetail> metrics;
         QList<SummaryMetrics> *data;
-        QList<SummaryMetrics> *measures;
         QList<SummaryMetrics> *bests;
 
         LTMTool *ltmTool;

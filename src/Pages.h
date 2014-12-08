@@ -193,10 +193,6 @@ class CredentialsPage : public QScrollArea
         QLineEdit *wiUser;
         QLineEdit *wiPass;
 
-        QLineEdit *zeoURL; // url for myzeo
-        QLineEdit *zeoUser;
-        QLineEdit *zeoPass;
-
         QLineEdit *webcalURL; // url for webcal calendar (read only, TP.com, Google Calendar)
 
         QLineEdit *dvURL; // url for calDAV calendar (read/write, e.g. Google, Hotmail)

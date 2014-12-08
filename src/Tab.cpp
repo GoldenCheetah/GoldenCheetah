@@ -102,9 +102,6 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
-// for testing
-context->athlete->rideCache->refresh();
-
     // selects the latest ride in the list:
     if (context->athlete->rideCache->rides().count() != 0) 
         context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
@@ -259,7 +256,7 @@ Tab::rideSelected(RideItem*)
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     setFixedHeight(2);
-    hide();
+    //hide();
 
     connect(context, SIGNAL(refreshStart()), this, SLOT(show()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(hide()));

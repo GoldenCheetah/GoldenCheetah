@@ -228,9 +228,8 @@ class RideFile : public QObject // QObject to emit signals
         void setTag(QString name, QString value) { tags_.insert(name, value); }
 
         Context *context;
-        double getWeight();
-        void setWeight(double x);
-        double getHeight();
+        double getWeight(); // legacy - moved to Athlete::getWeight
+        double getHeight(); // legacy - moved to Athlete::getHeight
  
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 
