@@ -188,7 +188,7 @@ class RideMetricFactory {
     static RideMetricFactory *_instance;
     static QVector<QString> noDeps;
 
-    QVector<QString> metricNames;
+    QStringList metricNames;
     QVector<RideMetric::MetricType> metricTypes;
     QHash<QString,RideMetric*> metrics;
     QHash<QString,QVector<QString>*> dependencyMap;
@@ -222,6 +222,7 @@ class RideMetricFactory {
             metrics[metricName]->initialize();
     }
 
+    const QStringList &allMetrics() const { return metricNames; }
     const QString &metricName(int i) const { return metricNames[i]; }
     const RideMetric::MetricType &metricType(int i) const { return metricTypes[i]; }
     const RideMetric *rideMetric(QString name) const { return metrics.value(name, NULL); }
