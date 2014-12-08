@@ -72,53 +72,12 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     // store in athlete
     context->athlete->setWithings(parser->readings());
 
-#if 0
-    //main->metricDB->db()->connection().transaction();
-    newMeasures = 0;
-    allMeasures = parser->readings().count();
-    QDateTime olderDate;
-
-    // get list of what we have
-    QList<SummaryMetrics> list = context->athlete->metricDB->getAllMeasuresFor(QDateTime(QDate(1900,01,01), QTime(0,0,0)),QDateTime::currentDateTime());
-
-    // start  a transaction
-    context->athlete->metricDB->db()->connection().transaction();
-
-    foreach (WithingsReading x, parser->readings()) {
-
-        // do we have it already ?
-        bool have = false;
-        foreach(SummaryMetrics m, list) {
-            if (m.getDateTime().date() == x.when.date()) have = true;
-        }
-
-        if (!have) {
-            newMeasures ++;
-            SummaryMetrics add;
-            add.setDateTime(x.when);
-            add.setText("Weight", QString("%1").arg(x.weightkg));
-            add.setText("Height", QString("%1").arg(x.sizemeter));
-            add.setText("Lean Mass", QString("%1").arg(x.leankg));
-            add.setText("Fat Mass", QString("%1").arg(x.fatkg));
-            add.setText("Fat Ratio", QString("%1").arg(x.fatpercent));
-
-            context->athlete->metricDB->importMeasure(&add);
-
-            if (olderDate.isNull() || x.when.date() <olderDate.date()) olderDate = x.when;
-        }
-    }
-
-    // commit the transaction
-    context->athlete->metricDB->db()->connection().transaction();
-
-    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
-    QMessageBox::information(context->mainWindow, tr("Withings Data Download"), status);
-
+    // hacky for now, just refresh for all dates where we have withings data
+    // will go with SQL shortly.
     if (newMeasures) {
         context->athlete->isclean = false;
-        context->athlete->metricDB->refreshMetrics(olderDate);
+        context->athlete->metricDB->refreshMetrics(context->athlete->withings().first().when);
     }
-#endif
     return;
 }
 
