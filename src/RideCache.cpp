@@ -262,7 +262,7 @@ void RideCache::save()
             firstRide = false;
 
             // basic ride information
-            stream << "\t\t\{\n";
+            stream << "\t{\n";
             stream << "\t\t\"filename\":\"" <<item->fileName <<"\",\n";
             stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
             stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
