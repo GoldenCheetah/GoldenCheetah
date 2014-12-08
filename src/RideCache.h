@@ -29,7 +29,11 @@
 
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QtConcurrent>
+#if QT_VERSION > 0x050000
+# include <QtConcurrent>
+#else
+# include <QtConcurrentRun>
+#endif
 
 class Context;
 class RideCacheBackgroundRefresh;

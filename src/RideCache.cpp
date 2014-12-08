@@ -18,7 +18,6 @@
 
 #include "RideCache.h"
 
-#include <QtConcurrent>
 #include "DBAccess.h"
 
 #include "Context.h"
