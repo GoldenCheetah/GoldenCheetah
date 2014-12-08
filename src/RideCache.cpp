@@ -250,6 +250,9 @@ void RideCache::save()
 
         // ok, lets write out the cache
         QTextStream stream(&rideDB);
+        stream.setCodec("UTF-8");
+        stream.setGenerateByteOrderMark(true);
+
         stream << "{" ;
         stream << "\n  \"VERSION\":\"1.0\",";
         stream << "\n  \"RIDES\":[\n";
