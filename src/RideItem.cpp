@@ -47,12 +47,6 @@ RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
     fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0)
 {
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-
-    // ressize and initialize so we can store metric values at
-    // RideMetric::index offsets into the metrics_ qvector
-    metrics_.fill(0, factory.metricCount());
 }
 
 RideFile *RideItem::ride(bool open)
@@ -63,6 +57,10 @@ RideFile *RideItem::ride(bool open)
     QFile file(path + "/" + fileName);
     ride_ = RideFileFactory::instance().openRideFile(context, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
+
+    // forced refresh into cache
+    isstale=true;
+    refresh();
 
     setDirty(false); // we're gonna use on-disk so by
                      // definition it is clean - but do it *after*
@@ -263,7 +261,21 @@ RideItem::refresh()
         getWeight();
 
         // refresh metrics etc
-        // XXX todo XXX
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        QHash<QString,RideMetricPtr> computed= RideMetric::computeMetrics(context, f, context->athlete->zones(), 
+                                               context->athlete->hrZones(), factory.allMetrics());
+
+
+        // ressize and initialize so we can store metric values at
+        // RideMetric::index offsets into the metrics_ qvector
+        metrics_.fill(0, factory.metricCount());
+
+        // snaffle away all the computed values into the array
+        QHashIterator<QString, RideMetricPtr> i(computed);
+        while (i.hasNext()) {
+            i.next();
+            metrics_[i.value()->index()] = i.value()->value(true);
+        }
 
         // update current state
         isstale = false;
