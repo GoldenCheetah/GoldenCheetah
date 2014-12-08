@@ -30,8 +30,6 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
-#include "unistd.h"
-
 RideCache::RideCache(Context *context) : context(context)
 {
     progress_ = 100;
@@ -226,11 +224,7 @@ void
 itemRefresh(RideItem *&item)
 {
     // need parser to be reentrant !item->refresh();
-    if (item->isstale) {
-        item->refresh();
-usleep(200000);
-    }
-    item->isstale=false;
+    if (item->isstale) item->refresh();
 }
 
 void
