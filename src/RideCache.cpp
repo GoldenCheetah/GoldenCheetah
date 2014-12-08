@@ -29,6 +29,8 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 
+#include "JsonRideFile.h" // for DATETIME_FORMAT
+
 RideCache::RideCache(Context *context) : context(context)
 {
     progress_ = 100;
@@ -217,7 +219,100 @@ RideCache::removeCurrentRide()
 
 // work with "rideDB.json" XXX not implemented yet
 void RideCache::load() {}
-void RideCache::save() {}
+
+// Escape special characters (JSON compliance)
+static QString protect(const QString string)
+{
+    QString s = string;
+    s.replace("\\", "\\\\"); // backslash
+    s.replace("\"", "\\\""); // quote
+    s.replace("\t", "\\t");  // tab
+    s.replace("\n", "\\n");  // newline
+    s.replace("\r", "\\r");  // carriage-return
+    s.replace("\b", "\\b");  // backspace
+    s.replace("\f", "\\f");  // formfeed
+    s.replace("/", "\\/");   // solidus
+
+    // add a trailing space to avoid conflicting with GC special tokens
+    s += " "; 
+
+    return s;
+}
+// save cache to disk, "cache/rideDB.json"
+void RideCache::save()
+{
+
+    // now save data away
+    QFile rideDB(QString("%1/rideDB.json").arg(context->athlete->home->cache().canonicalPath()));
+    if (rideDB.open(QFile::WriteOnly)) {
+
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+
+        // ok, lets write out the cache
+        QTextStream stream(&rideDB);
+        stream << "{" ;
+        stream << "\n  \"VERSION\":\"1.0\",";
+        stream << "\n  \"RIDES\":[\n";
+
+        bool firstRide = true;
+        foreach(RideItem *item, rides()) {
+
+            // comma separate each ride
+            if (!firstRide) stream << ",\n";
+            firstRide = false;
+
+            // basic ride information
+            stream << "\t\t\{\n";
+            stream << "\t\t\"filename\":\"" <<item->fileName <<"\",\n";
+            stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
+            stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
+            stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
+            stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
+            stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+            stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+
+            // pre-computed metrics
+            stream << "\n\t\t\"METRICS\":{\n";
+
+            bool firstMetric = true;
+            for(int i=0; i<factory.metricCount(); i++) {
+                QString name = factory.metricName(i);
+                int index = factory.rideMetric(name)->index();
+
+                if (!firstMetric) stream << ",\n";
+                firstMetric = false;
+
+                stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
+            }
+            stream << "\n\t\t}";
+
+            // pre-loaded metadata
+            if (item->metadata().count()) {
+
+                stream << ",\n\t\t\"TAGS\":{\n";
+
+                QMap<QString,QString>::const_iterator i;
+                for (i=item->metadata().constBegin(); i != item->metadata().constEnd(); i++) {
+
+                    stream << "\t\t\t\"" << i.key() << "\":\"" << protect(i.value()) << "\"";
+                    if (i+1 != item->metadata().constEnd()) stream << ",\n";
+                    else stream << "\n";
+                }
+
+                // end of the tags
+                stream << "\n\t\t}";
+
+            }
+
+            // end of the ride
+            stream << "\n\t}";
+        }
+
+        stream << "\n  ]\n}";
+
+        rideDB.close();
+    }
+}
 
 void
 itemRefresh(RideItem *&item)
