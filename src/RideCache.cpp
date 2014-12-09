@@ -121,7 +121,7 @@ RideCache::addRide(QString name, bool dosignal)
     qSort(rides_); // sort by date
 
     // refresh metrics for *this ride only* 
-    // XXX not implemented yet XXX
+    last->refresh();
 
     if (dosignal) context->notifyRideAdded(last); // here so emitted BEFORE rideSelected is emitted!
 
