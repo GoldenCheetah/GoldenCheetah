@@ -51,15 +51,6 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     QString text = reply->readAll();
     QStringList errors;
 
-    // now save data away
-    QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
-    if (withingsJSON.open(QFile::WriteOnly)) {
-
-        QTextStream stream(&withingsJSON);
-        stream << text;
-        withingsJSON.close();
-    }
-
     // parse it
     parser->parse(text, errors);
 
@@ -75,6 +66,18 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     // hacky for now, just refresh for all dates where we have withings data
     // will go with SQL shortly.
     if (newMeasures) {
+
+        // now save data away if we actually got something !
+        // doing it here means we don't overwrite previous responses
+        // when we fail to get any data (e.g. errors / network problems)
+        QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
+        if (withingsJSON.open(QFile::WriteOnly)) {
+
+            QTextStream stream(&withingsJSON);
+            stream << text;
+            withingsJSON.close();
+        }
+
         context->athlete->isclean = false;
         context->athlete->metricDB->refreshMetrics(context->athlete->withings().first().when);
     }
