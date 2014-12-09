@@ -78,8 +78,10 @@ class GeneralPage : public QWidget
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
         QComboBox *wheelSizeCombo;
+        QComboBox *tireSizeCombo;
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
+        QLineEdit *wheelSizeEdit;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
@@ -100,6 +102,9 @@ class GeneralPage : public QWidget
         QCheckBox *showSBToday;
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
+
+    private slots:
+        void calcWheelSize();
 };
 
 class RiderPage : public QWidget
