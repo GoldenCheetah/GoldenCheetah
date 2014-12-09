@@ -65,7 +65,7 @@ Lucene::~Lucene()
 {
 }
 
-bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long, bool)
+bool Lucene::importRide(RideFile *ride)
 {
     // create a document
     Document doc;
@@ -73,22 +73,21 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     // add Filename special field (unique)
     std::wstring cname = ride->getTag("Filename","").toStdWString();
     Field *fadd = new Field(_T("Filename"), cname.c_str(), Field::STORE_YES | Field::INDEX_UNTOKENIZED);
-    doc.add( *fadd );
+    doc.add(*fadd);
 
     QString alltexts;
 
     // And all the metadata texts individually
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    QMapIterator<QString,QString> iterate(ride->tags());
+    while (iterate.hasNext()) {
+        iterate.next();
 
-        if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
+        std::wstring name = iterate.key().toStdWString();
+        std::wstring value = iterate.value().toStdWString();
 
-            std::wstring name = context->specialFields.makeTechName(field.name).toStdWString();
-            std::wstring value = ride->getTag(field.name,"").toStdWString();
-
-            alltexts += ride->getTag(field.name,"") + " ";
-            Field *add = new Field(name.c_str(), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED);
-            doc.add( *add );
-        }
+        alltexts += iterate.value() + " ";
+        Field *add = new Field(name.c_str(), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED);
+        doc.add( *add );
     }
 
     // add a catchall text which is concat of all text fields
