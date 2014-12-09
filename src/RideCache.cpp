@@ -73,6 +73,9 @@ RideCache::~RideCache()
 {
     exiting = true;
 
+    // cancel any refresh that may be running
+    cancel();
+
     // save to store
     save();
 }
@@ -260,6 +263,10 @@ void RideCache::save()
         bool firstRide = true;
         foreach(RideItem *item, rides()) {
 
+            // skip if not loaded/refreshed, a special case
+            // if saving during an initial refresh
+            if (item->metrics().count() == 0) continue;
+
             // comma separate each ride
             if (!firstRide) stream << ",\n";
             firstRide = false;
@@ -330,6 +337,16 @@ RideCache::progressing(int value)
     // we're working away, notfy everyone where we got
     progress_ = 100.0f * (double(value) / double(watcher.progressMaximum()));
     context->notifyRefreshUpdate();
+}
+
+// cancel the refresh map, we're about to exit !
+void
+RideCache::cancel()
+{
+    if (future.isRunning()) {
+        future.cancel();
+        future.waitForFinished();
+    }
 }
 
 // check if we need to refresh the metrics then start the thread if needed
