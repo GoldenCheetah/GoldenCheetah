@@ -36,6 +36,8 @@
 #include "OAuthDialog.h"
 #include "RideAutoImportConfig.h"
 
+#define PI M_PI
+
 //
 // Main Config Page - tabs for each sub-page
 //
@@ -128,21 +130,45 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
 
     wheelSizeCombo = new QComboBox();
-    wheelSizeCombo->addItem(tr("Road/Cross (700C/622)")); // 2100mm
-    wheelSizeCombo->addItem(tr("Tri/TT (650C)")); // 1960mm
-    wheelSizeCombo->addItem(tr("Mountain (26\")")); // 1985mm
-    wheelSizeCombo->addItem(tr("BMX (20\")")); // 1750mm
+    wheelSizeCombo->addItem(tr("--"));
+    wheelSizeCombo->addItem(tr("700c/29er"));
+    wheelSizeCombo->addItem(tr("650b/27.5\""));
+    wheelSizeCombo->addItem(tr("650c"));
+    wheelSizeCombo->addItem(tr("26\""));
 
-    switch (wheelSize) {
-    default:
-    case 2100 : wheelSizeCombo->setCurrentIndex(0); break;
-    case 1960 : wheelSizeCombo->setCurrentIndex(1); break;
-    case 1985 : wheelSizeCombo->setCurrentIndex(2); break;
-    case 1750 : wheelSizeCombo->setCurrentIndex(3); break;
-    }
+    tireSizeCombo = new QComboBox();
+    tireSizeCombo->addItem(tr("--"));
+    tireSizeCombo->addItem(tr("20mm"));
+    tireSizeCombo->addItem(tr("23mm"));
+    tireSizeCombo->addItem(tr("25mm"));
+    tireSizeCombo->addItem(tr("28mm"));
+    tireSizeCombo->addItem(tr("1.00\""));
+    tireSizeCombo->addItem(tr("1.50\""));
+    tireSizeCombo->addItem(tr("1.75\""));
+    tireSizeCombo->addItem(tr("1.90\""));
+    tireSizeCombo->addItem(tr("1.95\""));
+    tireSizeCombo->addItem(tr("2.00\""));
+    tireSizeCombo->addItem(tr("2.10\""));
+    tireSizeCombo->addItem(tr("2.125\""));
+
+    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
+    wheelSizeEdit->setInputMask("0000");
+    wheelSizeEdit->setFixedWidth(40);
+
+    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
+
+    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
+    wheelSizeLayout->addWidget(wheelSizeCombo);
+    wheelSizeLayout->addWidget(tireSizeCombo);
+    wheelSizeLayout->addWidget(wheelSizeEdit);
+    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
+
+    connect(wheelSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
 
     configLayout->addWidget(wheelSizeLabel, 2,0, Qt::AlignRight);
-    configLayout->addWidget(wheelSizeCombo, 2,1, Qt::AlignLeft);
+    configLayout->addLayout(wheelSizeLayout, 2,1, Qt::AlignLeft);
+
 
     //
     // Garmin crap
@@ -253,6 +279,75 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 }
 
 void
+GeneralPage::calcWheelSize()
+{
+    if (wheelSizeCombo->currentIndex()>0) {
+        float rim = 0;
+        switch (wheelSizeCombo->currentIndex()) {
+            case 1: // 700c/29er
+                rim = 622;
+                break;
+            case 2: // 650b/27.5"
+                rim = 584;
+                break;
+            case 3: // 650c
+                rim = 571;
+                break;
+            case 4: // 26"
+                rim = 559;
+                break;
+            default:
+                break;
+        }
+        float tire = 0;
+        switch (tireSizeCombo->currentIndex()) {
+            case 1: // 20mm
+                tire = 40;
+                break;
+            case 2: // 23mm
+                tire = 46;
+                break;
+            case 3: // 25mm
+                tire = 50;
+                break;
+            case 4: // 28mm
+                tire = 56;
+                break;
+            case 5: // 1.00"
+                tire = 50.8;
+                break;
+            case 6: // 1.50"
+                tire = 76.2;
+                break;
+            case 7: // 1.75"
+                tire = 88.9;
+                break;
+            case 8: // 1.90"
+                tire = 96.5;
+                break;
+            case 9: // 1.95"
+                tire = 99;
+                break;
+            case 10: // 2.00"
+                tire = 101.6;
+                break;
+            case 11: // 2.10"
+                tire = 106.7;
+                break;
+            case 12: // 2.125"
+                tire = 108;
+                break;
+            default:
+                break;
+        }
+
+        if (rim>0 && tire>0)
+            wheelSizeEdit->setText(QString("%1").arg(int((rim+tire) * PI)));
+   }
+
+}
+
+void
 GeneralPage::saveClicked()
 {
     // Language
@@ -267,11 +362,7 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_CRANKLENGTH, crankLengthCombo->currentText());
 
     // save wheel size
-    static const int wheelSizes[] = {
-        2100, 1960, 1985, 1750
-    };
-
-    appsettings->setValue(GC_WHEELSIZE, wheelSizes[wheelSizeCombo->currentIndex()]);
+    appsettings->setValue(GC_WHEELSIZE, wheelSizeEdit->text().toInt());
 
     // Bike score estimation
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
