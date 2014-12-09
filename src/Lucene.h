@@ -47,7 +47,7 @@ public:
     ~Lucene();
 
     // Create/Delete Metrics
-	bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long, bool);
+	bool importRide(RideFile *ride);
     bool deleteRide(QString);
     void optimise(); // for optimising the index once updated
 

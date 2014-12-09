@@ -515,7 +515,7 @@ bool MetricAggregator::importRide(QDir /* no longer used ? */, RideFile *ride, Q
 
     dbaccess->importRide(&summaryMetric, ride, color, fingerprint, modify);
 #ifdef GC_HAVE_LUCENE
-    context->athlete->lucene->importRide(&summaryMetric, ride, color, fingerprint, modify);
+    context->athlete->lucene->importRide(ride);
 #endif
 
     return true;
