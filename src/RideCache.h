@@ -70,6 +70,8 @@ class RideCache : public QObject
         // background refresh progress update
         void progressing(int);
 
+        // cancel background processing because about to exit
+        void cancel();
     protected:
 
         friend class ::RideCacheBackgroundRefresh;
