@@ -326,6 +326,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
                      && settings->ignore && (xv == 0.0f || int(yv) == 0)) continue;
                 if ((settings->y == MODEL_GEAR)
                      && settings->ignore && (int(xv) == 0 || yv == 0.0f)) continue;
+                if ((settings->x == MODEL_TEMP)
+                     && (xv == RideFile::NoTemp)) continue;
+                if ((settings->y == MODEL_TEMP)
+                     && (yv == RideFile::NoTemp)) continue;
 
                 // add it
                 x <<xv;
@@ -418,6 +422,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     curve2->setZ(-1);
                     curve2->attach(this);
 
+                    if (settings->trendLine>0)  {
+                        addTrendLine(x, y, points, Qt::cyan);
+                    }
+
                 } else {
 
                     QwtSymbol *sym = new QwtSymbol;
@@ -433,6 +441,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
                     curve->setSamples(x.constData(), y.constData(), points);
                     curve->setZ(-1);
                     curve->attach(this);
+
+                    if (settings->trendLine>0)  {
+                        addTrendLine(x, y, points, Qt::red);
+                    }
                 }
             }
         }
