@@ -30,15 +30,28 @@
 // used to create a temporary ride item that is not in the cache and just
 // used to enable using the same calling semantics in things like the
 // merge wizard and interval navigator
+RideItem::RideItem() 
+    : 
+    ride_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {
+    metrics_.fill(0, RideMetricFactory::instance().metricCount());
+}
+
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {}
+    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+{
+    metrics_.fill(0, RideMetricFactory::instance().metricCount());
+}
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
     ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
-    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {}
+    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+{
+    metrics_.fill(0, RideMetricFactory::instance().metricCount());
+}
 
 // Create a new RideItem destined for the ride cache and used for caching
 // pre-computed metrics and storing ride metadata
@@ -47,6 +60,28 @@ RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
     fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0)
 {
+    metrics_.fill(0, RideMetricFactory::instance().metricCount());
+}
+
+void
+RideItem::setFrom(RideItem&here)
+{
+    ride_ = NULL;
+    metrics_ = here.metrics_;
+	metadata_ = here.metadata_;
+	errors_ = here.errors_;
+	context = here.context;
+	isdirty = here.isdirty;
+	isstale = here.isstale;
+	isedit = here.isedit;
+	path = here.path;
+	fileName = here.fileName;
+	dateTime = here.dateTime;
+	fingerprint = here.fingerprint;
+	crc = here.crc;
+	timestamp = here.timestamp;
+	dbversion = here.dbversion;
+	weight = here.weight;
 }
 
 RideFile *RideItem::ride(bool open)
@@ -193,9 +228,12 @@ RideItem::checkStale()
     } else {
 
         // has weight changed?
-        double priorWeight = weight;
-        if (priorWeight != getWeight()) {
+        unsigned long prior  = 1000.0f * weight;
+        unsigned long now = 1000.0f * getWeight();
 
+        if (prior != now) {
+
+            weight = getWeight();
             isstale = true;
 
         } else {

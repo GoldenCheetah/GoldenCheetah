@@ -220,9 +220,6 @@ RideCache::removeCurrentRide()
     context->notifyRideSelected(select);
 }
 
-// work with "rideDB.json" XXX not implemented yet
-void RideCache::load() {}
-
 // Escape special characters (JSON compliance)
 static QString protect(const QString string)
 {
@@ -241,6 +238,12 @@ static QString protect(const QString string)
 
     return s;
 }
+
+// NOTE:
+// We use a bison parser to reduce memory
+// overhead and (believe it or not) simplicity
+// RideCache::load() -- see RideDB.y
+
 // save cache to disk, "cache/rideDB.json"
 void RideCache::save()
 {

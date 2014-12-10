@@ -28,6 +28,7 @@
 #include <QVector>
 
 class RideFile;
+class RideCache;
 class Context;
 
 Q_DECLARE_METATYPE(RideItem*)
@@ -40,6 +41,8 @@ class RideItem : public QObject
 
 
     protected:
+
+        friend class ::RideCache;
 
         // ridefile
         RideFile *ride_;
@@ -70,6 +73,9 @@ class RideItem : public QObject
         bool isstale;     // metric data is out of date and needs recomputing
         bool isedit;      // is being edited at the moment
 
+        // set from another, e.g. during load of rideDB.json
+        void setFrom(RideItem&);
+
         // get at the data
         QString path;
         QString fileName;
@@ -95,6 +101,7 @@ class RideItem : public QObject
         bool isOpen();
 
         // create and destroy
+        RideItem();
         RideItem(RideFile *ride, Context *context);
         RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
         RideItem(RideFile *ride, QDateTime &dateTime, Context *context);

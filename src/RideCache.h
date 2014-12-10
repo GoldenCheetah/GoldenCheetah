@@ -72,6 +72,7 @@ class RideCache : public QObject
 
         // cancel background processing because about to exit
         void cancel();
+
     protected:
 
         friend class ::RideCacheBackgroundRefresh;
