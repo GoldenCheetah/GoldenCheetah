@@ -3,4 +3,95 @@
 <resources>
     <string name="app_name">Ride Logger</string>
     <string name="service_name">Logging Ride</string>
+    
+    <string name="emergency_contact_dialog_title">Emergency Contact</string>
+    <string name="emergency_contact_dialog_note">Should a text messesage be sent on ride start and periodically to let your emergency contact know you are alright?</string>
+
+    <string name="sms_period_dialog_title">Emergency Contact SMS Period</string>
+    <string name="sms_period_dialog_note">Period in Minutes:</string>
+    
+    <string name="crash_detection_dialog_title">Crash Detection</string>
+    <string name="crash_detection_dialog_note">Should a text messesage be sent on crash detction to your emergency contact?</string>
+    
+    <string name="emergency_contact_number_dialog_title">Emergency Contact Number</string>
+    <string name="emergency_contact_number_dialog_note">Emergency phone number to update position on crash detection</string>
+    
+    <string name="ant_setup_title">Set Ant+</string>
+    <string name="ant_setup_note">Pair your Ant+ devices now?</string>
+    
+    <string name="ant_pair_dialog_title">Select Ant Devices</string>
+    <string name="ant_pair_dialog_button_note">Pair</string>    
+  
+    <string name="gc_rider_name_dialog_title">Enter Rider Name</string>
+    <string name="gc_rider_name_dialog_note">What is your Golder Cheata Rider Name?</string>
+  
+    <string name="save_setting_button">Next</string>
+    <string name="skip_setting_button">Skip</string>
+    
+    <string name="boolean_dialog_yes">Yes</string>
+    <string name="boolean_dialog_no">No</string>
+    
+    <string name="starting_ride">Starting Ride!</string>
+    <string name="stopping_ride">Stoping Ride!</string>
+    
+    <string name="ride_on">Ride On</string>
+    <string name="building_ride">Building ride: </string>
+    
+    <string name="click_to_stop"> Click to stop ride.</string>
+
+    <string name="ride_start_title">Start Ride</string>
+    <string name="ride_start_note">Make sure locations is turned on.  Internet connection is NOT required.</string>
+  
+    <string name="start">Start Logging</string>
+    <string name="edit_settings">Settings</string>
+    
+    <string name="ride_stop_title">Ride in Progress</string>
+    <string name="ride_stop_note">Would you like to stop the ride or view current values.</string>
+  
+    <string name="stop">Stop Logging</string>
+    <string name="view">View</string>
+    
+    <string name="crash_warning">WARNING CRASH!</string>
+    <string name="crash_confirm">CRASH CONFIRMED!</string>
+    <string name="crash_unknow_location">Unknow location.</string>
+    <string name="crash_magnitude">Mag</string>
+    
+    <string name="ride_start_sms">I\'m starting my ride.</string>
+    <string name="ride_stop_sms">I have finished my ride.</string>
+    <string name="riding_ok_sms">I\'m ok.</string>
+    
+    <string name="setting_title">Settings</string>
+    
+    <string name="setting_general_title">General</string>
+    <string name="setting_general_note">Settings</string>
+    
+    <string name="setting_ant_title">Ant+</string>
+    <string name="setting_ant_note">Setup your Ant+ Devices</string>
+    
+    <string name="searching_for_ants">Searching for Ant+ Devices...</string>
+    <string name="found_ants">Found Ant+ Devices, Press to Pair.</string>
+    <string name="no_found_ants">Nothing found to pair.</string>
+    
+    <string name="setting_sensors_title">Display Sensors</string>
+    <string name="setting_sensors_note">List of Sensors Display</string>
+    
+    <string name="setting_wheel_size">Wheel Circumference in Meters</string>
+
+    <string name="imperial_units_title">Imperial Units</string>
+    <string name="imperial_units_note">Show Measurements in Imperial Units</string>
+    
+    <string name="setting_size_title">Display Text Size</string>
+    
+    <string name="PREFS_NAME">RideLogger</string>      
+    <string name="PREF_RIDER_NAME">RiderName</string>       
+    <string name="PREF_EMERGENCY_NUMBER">EmergencyNumbuer</string>
+    <string name="PREF_DETECT_CRASH">DetectCrash</string>     
+    <string name="PREF_PHONE_HOME">PhoneHome</string>       
+    <string name="PREF_PAIRED_ANTS">PairedAnts</string>      
+    <string name="PREF_PHONE_HOME_PERIOD">PhoneHomePeriod</string>
+    <string name="PREF_TRACKING_SENSORS">TrackingSensors</string>
+    <string name="PREF_TRACKING_SIZE">TrackingSize</string>
+    <string name="PREF_TRACKING_IMPERIAL_UNITS">TrackingImperialUnits</string>
+    <string name="PREF_WHEEL_SIZE">WheelSize</string>
+    
 </resources>

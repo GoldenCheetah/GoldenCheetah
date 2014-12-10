@@ -1,17 +1,18 @@
 package com.ridelogger.listners;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.ridelogger.R;
 import com.ridelogger.RideService;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.preference.PreferenceManager;
 
 /**
  * Sensors
@@ -21,12 +22,6 @@ import android.hardware.SensorManager;
 public class Sensors extends Base<Object>
 {
     public static final double  CRASHMAGNITUDE = 30.0;
-    private SensorManager       mSensorManager;    
-    private Sensor              mLight;
-    private Sensor              mAccel;
-    private Sensor              mPress;
-    private Sensor              mTemp;
-    private Sensor              mField;
     
     private SensorEventListener luxListner;
     private SensorEventListener accelListner;
@@ -38,13 +33,13 @@ public class Sensors extends Base<Object>
     {
         super(mContext);
         
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         
-        mLight         = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        mAccel         = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mPress         = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-        mTemp          = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-        mField         = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        Sensor mLight         = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        Sensor mAccel         = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        Sensor mPress         = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+        Sensor mTemp          = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        Sensor mField         = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
           
         if(mLight != null) {
           luxListner = new SensorEventListener() {
@@ -55,30 +50,34 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("lux",  reduceNumberToString(event.values[0]));
+                  alterCurrentData(RideService.lux,  event.values[0]);
               }
             };
             
             mSensorManager.registerListener(luxListner,   mLight, 3000000);
         }
+        
         if(mAccel != null) {
-            accelListner = new SensorEventListener() {
-                private boolean crashed = false;
-                private Timer   timer   = new Timer();
-                private double[] St     = new double[3];
-    
-                @Override
-                public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
-                  
-                @Override
-                public final void onSensorChanged(SensorEvent event) {                
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("ms2x", reduceNumberToString(event.values[0]));
-                    map.put("ms2y", reduceNumberToString(event.values[1]));
-                    map.put("ms2z", reduceNumberToString(event.values[2]));
-                    alterCurrentData(map);
-                    
-                    if(context.detectCrash) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+            if(settings.getBoolean(context.getString(R.string.PREF_DETECT_CRASH), false)) {
+                accelListner = new SensorEventListener() {
+                    private boolean crashed = false;
+                    private Timer   timer   = new Timer();
+                    private double[] St     = new double[3];
+        
+                    @Override
+                    public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
+                      
+                    @Override
+                    public final void onSensorChanged(SensorEvent event) {                
+                        int[] keys = {
+                                RideService.ms2x,
+                                RideService.ms2y,
+                                RideService.ms2z
+                        };
+
+                        alterCurrentData(keys, event.values);
+                        
                         if(St.length == 0) {
                             St[0] = event.values[0];
                             St[1] = event.values[1];
@@ -94,40 +93,59 @@ public class Sensors extends Base<Object>
                         if(amag > CRASHMAGNITUDE && !crashed) {
                             crashed = true;
                             context.phoneCrash(amag);
-                            timer.schedule(
-                                new TimerTask() {              
-                                    @Override  
-                                    public void run() {
-                                        crashed = false;
-                                    }  
-                                }, 
-                                180000
-                            ); //in three min reset
-                            
-                            if(context.currentValues.containsKey("KPH")) {
+
+                            if(!Float.isNaN(context.currentValues[RideService.KPH])) {
                                 timer.schedule(
                                     new TimerTask() {              
                                         @Override  
                                         public void run() {
                                             //if we are traveling less then 1km/h at 5 seconds after crash detection
                                             // confirm the crash
-                                            if(1.0 > Double.parseDouble(context.currentValues.get("KPH"))) {
+                                            if(1.0 > context.currentValues[RideService.KPH]) {
                                                 context.phoneCrashConfirm();
+                                            } else {
+                                                crashed = false;
+                                                context.phoneHome();
                                             }
                                         }  
                                     }, 
                                     5000
                                 ); //in five sec reset
+                            } else {
+                                timer.schedule(
+                                    new TimerTask() {              
+                                        @Override  
+                                        public void run() {
+                                            crashed = false;
+                                        }  
+                                    }, 
+                                    180000
+                                ); //in three min reset
                             }
                         }
                     }
-                }
-            };
-            
-            
-            
+                };
+            } else {
+                accelListner = new SensorEventListener() {
+                    @Override
+                    public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
+                      
+                    @Override
+                    public final void onSensorChanged(SensorEvent event) {                                        
+                        int[] keys = {
+                                RideService.ms2x,
+                                RideService.ms2y,
+                                RideService.ms2z
+                        };
+                        
+                        alterCurrentData(keys, event.values);
+                    }
+                };
+            }
+
             mSensorManager.registerListener(accelListner, mAccel, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        
         if(mPress != null) {
             pressListner = new SensorEventListener() {
               @Override
@@ -137,12 +155,13 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("press",  reduceNumberToString(event.values[0]));
+                  alterCurrentData(RideService.press,  event.values[0]);
               }
             };
             
             mSensorManager.registerListener(pressListner, mPress, 3000000);
         }
+        
         if(mTemp != null) {
             tempListner = new SensorEventListener() {
               @Override
@@ -152,24 +171,27 @@ public class Sensors extends Base<Object>
               public final void onSensorChanged(SensorEvent event) {
                   // The light sensor returns a single value.
                   // Many sensors return 3 values, one for each axis.
-                  alterCurrentData("temp",  reduceNumberToString(event.values[0]));
+                  alterCurrentData(RideService.temp,  event.values[0]);
               }
             };
             
             mSensorManager.registerListener(tempListner,  mTemp,  3000000);
         }
+        
         if(mField != null) {
             fieldListner = new SensorEventListener() {
               @Override
               public final void onAccuracyChanged(Sensor sensor, int accuracy) {}
               
               @Override
-              public final void onSensorChanged(SensorEvent event) {
-                  Map<String, String> map = new HashMap<String, String>();
-                  map.put("uTx", reduceNumberToString(event.values[0]));
-                  map.put("uTy", reduceNumberToString(event.values[1]));
-                  map.put("uTz", reduceNumberToString(event.values[2]));
-                  alterCurrentData(map);
+              public final void onSensorChanged(SensorEvent event) {                  
+                  int[] keys = {
+                          RideService.uTx,
+                          RideService.uTy,
+                          RideService.uTz
+                  };
+                  
+                  alterCurrentData(keys, event.values);
               }
             };
             
@@ -180,6 +202,7 @@ public class Sensors extends Base<Object>
     @Override
     public void onDestroy()
     {
+        SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         if(luxListner != null) {
             mSensorManager.unregisterListener(luxListner);
         }
