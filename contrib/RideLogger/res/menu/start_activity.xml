@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item android:id="@+id/Start"
+          android:title="@string/start" />
+    <item android:id="@+id/Stop"
+          android:title="@string/stop" />
+    <item android:id="@+id/Settings"
+          android:title="@string/edit_settings"
+          android:showAsAction="never" />
+</menu>

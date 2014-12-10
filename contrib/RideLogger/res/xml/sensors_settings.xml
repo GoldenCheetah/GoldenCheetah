@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+        <PreferenceCategory
+            android:title="@string/PREFS_NAME">
+
+        <MultiSelectListPreference
+            android:key="@string/PREF_TRACKING_SENSORS"
+            android:title="@string/setting_sensors_title"
+            android:summary="@string/setting_sensors_note"
+            />
+        <CheckBoxPreference 
+            android:key="@string/PREF_TRACKING_IMPERIAL_UNITS"
+            android:title="@string/imperial_units_title"
+            android:summary="@string/imperial_units_note"
+            />
+        
+        <EditTextPreference 
+            android:key="@string/PREF_TRACKING_SIZE"
+            android:title="@string/setting_size_title"
+            android:defaultValue="20"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

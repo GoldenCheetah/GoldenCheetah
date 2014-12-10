@@ -1,14 +1,12 @@
 package com.ridelogger.listners;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ridelogger.RideService;
 
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+
 import android.os.Bundle;
 
 /**
@@ -27,14 +25,25 @@ public class Gps extends Base<Gps>
         //listen to gps events and log them
         LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("ALTITUDE", reduceNumberToString(location.getAltitude()) );
-                    map.put("KPH",      reduceNumberToString(location.getSpeed())    );
-                    map.put("bearing",  reduceNumberToString(location.getBearing())  );
-                    map.put("gpsa",     reduceNumberToString(location.getAccuracy()) );
-                    map.put("LAT",      reduceNumberToString(location.getLatitude()) );
-                    map.put("LON",      reduceNumberToString(location.getLongitude()));
-                    alterCurrentData(map);
+                    int[] keys = {
+                            RideService.ALTITUDE,
+                            RideService.KPH,
+                            RideService.bearing,
+                            RideService.gpsa,
+                            RideService.LAT,
+                            RideService.LON
+                    };
+                    
+                    float[] values = {
+                            (float) location.getAltitude(),
+                            location.getSpeed(),    
+                            location.getBearing(),  
+                            location.getAccuracy(), 
+                            (float) location.getLatitude(), 
+                            (float) location.getLongitude()
+                    };
+                    
+                    alterCurrentData(keys, values);
                 }
             
                 @Override
