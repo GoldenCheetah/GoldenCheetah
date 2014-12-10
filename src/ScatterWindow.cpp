@@ -189,7 +189,6 @@ ScatterWindow::ScatterWindow(Context *context) :
     connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrame()));
     connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
     connect(compareMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setCompareMode(int)));
-    connect(compareMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setXAxisFromReference(int)));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // comparing things
