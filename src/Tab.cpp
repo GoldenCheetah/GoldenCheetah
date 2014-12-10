@@ -256,7 +256,7 @@ Tab::rideSelected(RideItem*)
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
     setFixedHeight(2);
-    //hide();
+    hide();
 
     connect(context, SIGNAL(refreshStart()), this, SLOT(show()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(hide()));

@@ -460,8 +460,8 @@ HEADERS += \
         ZoneScaleDraw.h \
         ../qtsolutions/json/mvjson.h
 
-LEXSOURCES  += JsonRideFile.l WithingsParser.l
-YACCSOURCES += JsonRideFile.y WithingsParser.y
+LEXSOURCES  += JsonRideFile.l WithingsParser.l RideDB.l
+YACCSOURCES += JsonRideFile.y WithingsParser.y RideDB.y
 
 #-t turns on debug, use with caution
 #QMAKE_YACCFLAGS = -t -d
