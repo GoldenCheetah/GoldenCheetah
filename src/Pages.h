@@ -77,7 +77,7 @@ class GeneralPage : public QWidget
         QComboBox *langCombo;
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
-        QComboBox *wheelSizeCombo;
+        QComboBox *rimSizeCombo;
         QComboBox *tireSizeCombo;
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
@@ -105,6 +105,7 @@ class GeneralPage : public QWidget
 
     private slots:
         void calcWheelSize();
+        void resetWheelSize();
 };
 
 class RiderPage : public QWidget

@@ -216,11 +216,16 @@ class AddFinal : public QWizardPage
 
         QLineEdit *name;
         QComboBox *virtualPower;
-        QComboBox *wheelSize;
+        QComboBox *rimSizeCombo;
+        QComboBox *tireSizeCombo;
+        QLineEdit *wheelSizeEdit;
         QLineEdit *port;
         QLineEdit *profile;
         QGroupBox *selectDefault;
         QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
+
+    private slots:
+        void calcWheelSize();
 
 };
 
