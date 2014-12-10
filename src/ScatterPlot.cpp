@@ -322,6 +322,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
                 if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
                      && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
+                if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
+                     && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
                 if ((settings->x == MODEL_GEAR)
                      && settings->ignore && (xv == 0.0f || int(yv) == 0)) continue;
                 if ((settings->y == MODEL_GEAR)
@@ -330,6 +332,10 @@ void ScatterPlot::setData (ScatterSettings *settings)
                      && (xv == RideFile::NoTemp)) continue;
                 if ((settings->y == MODEL_TEMP)
                      && (yv == RideFile::NoTemp)) continue;
+                if ((settings->x == MODEL_LRBALANCE)
+                     && settings->ignore && (xv == 100)) continue;
+                if ((settings->y == MODEL_LRBALANCE)
+                     && settings->ignore && (yv == 100)) continue;
 
                 // add it
                 x <<xv;
