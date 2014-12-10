@@ -1095,7 +1095,6 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
 
     QFormLayout *form2layout = new QFormLayout;
     form2layout->addRow(new QLabel(tr("Virtual"), this), (virtualPower=new QComboBox(this)));
-    form2layout->addRow(new QLabel(tr("Wheel Size"), this), (wheelSize=new QComboBox(this)));
 
     // NOTE: These must correspond to the code in RealtimeController.cpp that
     //       post-processes inbound telemetry.
@@ -1143,10 +1142,35 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem(tr("Power - Elite Supercrono Powermag (8)"));
     virtualPower->addItem(tr("Power - Elite Qubo Power Fluid"));
 
-    wheelSize->addItem(tr("Road/Cross (700C/622)")); // 2100mm
-    wheelSize->addItem(tr("Tri/TT (650C)")); // 1960mm
-    wheelSize->addItem(tr("Mountain (26\")")); // 1985mm
-    wheelSize->addItem(tr("BMX (20\")")); // 1750mm
+    //
+    // Wheel size
+    //
+    int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
+
+    rimSizeCombo = new QComboBox();
+    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
+
+    tireSizeCombo = new QComboBox();
+    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
+
+
+    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
+    wheelSizeEdit->setInputMask("0000");
+    wheelSizeEdit->setFixedWidth(40);
+
+    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
+
+    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
+    wheelSizeLayout->addWidget(rimSizeCombo);
+    wheelSizeLayout->addWidget(tireSizeCombo);
+    wheelSizeLayout->addWidget(wheelSizeEdit);
+    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
+
+    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
+    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
+
+    form2layout->addRow(new QLabel(tr("Wheel Size"), this), wheelSizeLayout);
 
     hlayout->addLayout(form2layout);
     layout->addStretch();
@@ -1173,6 +1197,22 @@ AddFinal::initializePage()
     virtualPower->setCurrentIndex(0);
 }
 
+void
+AddFinal::calcWheelSize()
+{
+   int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
+   if (diameter>0)
+       wheelSizeEdit->setText(QString("%1").arg(diameter));
+
+}
+
+void
+AddFinal::resetWheelSize()
+{
+   rimSizeCombo->setCurrentIndex(0);
+   tireSizeCombo->setCurrentIndex(0);
+}
+
 bool
 AddFinal::validatePage()
 {
@@ -1192,15 +1232,7 @@ AddFinal::validatePage()
                                      QString(defRPM->isChecked() ? "C" : "") +
                                      QString(defKPH->isChecked() ? "S" : "");
         add.postProcess = virtualPower->currentIndex();
-
-        switch (wheelSize->currentIndex()) {
-
-            default:
-            case 0: add.wheelSize = 2100 ; break;
-            case 1: add.wheelSize = 1960 ; break;
-            case 2: add.wheelSize = 1985 ; break;
-            case 3: add.wheelSize = 1750 ; break;
-        }
+        add.wheelSize = wheelSizeEdit->text().toInt();
 
         QList<DeviceConfiguration> list = all.getList();
         list.insert(0, add);

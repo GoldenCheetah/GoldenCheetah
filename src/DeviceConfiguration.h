@@ -64,4 +64,14 @@ class DeviceConfigurations
 
 };
 
+class WheelSize
+{
+    public:
+        const static QStringList RIM_SIZES;
+        const static QStringList TIRE_SIZES;
+
+        static int         calcPerimeter(int rimSizeIndex, int tireSizeIndex);
+
+};
+
 #endif
