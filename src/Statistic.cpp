@@ -40,7 +40,7 @@ Statistic::Statistic(double *xdata, double *ydata, int count) :
     for (int i = 0; i < count; i++) {
 
         // ignore zero points
-        if (ydata[i] == 0.00) continue;
+        //if (ydata[i] == 0.00) continue;
 
         points++;
         sumX += xdata[i];
