@@ -226,6 +226,7 @@ class AddFinal : public QWizardPage
 
     private slots:
         void calcWheelSize();
+        void resetWheelSize();
 
 };
 
