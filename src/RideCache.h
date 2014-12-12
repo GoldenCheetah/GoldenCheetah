@@ -48,6 +48,7 @@ class RideCache : public QObject
         ~RideCache();
 
         // query the cache
+        RideItem *getRide(QString filename);
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
 

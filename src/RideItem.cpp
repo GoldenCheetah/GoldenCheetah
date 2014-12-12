@@ -93,8 +93,7 @@ RideFile *RideItem::ride(bool open)
     ride_ = RideFileFactory::instance().openRideFile(context, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
 
-    // forced refresh into cache
-    isstale=true;
+    // refresh if stale..
     refresh();
 
     setDirty(false); // we're gonna use on-disk so by
@@ -353,4 +352,16 @@ RideItem::getWeight()
     if (weight <= 0.00) weight = 80.00;
 
     return weight;
+}
+
+double
+RideItem::getForSymbol(QString name)
+{
+    if (metrics_.size()) {
+        // return the precomputed metric value
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        const RideMetric *m = factory.rideMetric(name);
+        if (m) return metrics_[m->index()];
+    }
+    return 0.0f;
 }

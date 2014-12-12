@@ -454,41 +454,7 @@ RideSummaryWindow::htmlSummary()
     // been edited. Otherwise we need to re-compute every time.
     // this is only for ride summary, when showing for a date range
     // we already have a summary metrics array
-    SummaryMetrics metrics;
     RideMetricFactory &factory = RideMetricFactory::instance();
-
-    if (ridesummary) {
-        if (rideItem->isDirty()) {
-            // make a list if the metrics we want computed
-            // instead of calculating them all, just do the
-            // ones we display
-            QStringList worklist;
-            worklist += totalColumn;
-            worklist += averageColumn;
-            worklist += maximumColumn;
-            worklist += metricColumn;
-            worklist += timeInZones;
-            worklist += paceTimeInZones;
-            worklist += timeInZonesHR;
-            // computeMetrics expects unique keys, no duplicates
-            worklist.removeDuplicates();
-
-            // go calculate them then...
-            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, ride, context->athlete->zones(), context->athlete->hrZones(), worklist);
-            for(int i = 0; i < worklist.count(); ++i) {
-                if (worklist[i] != "") {
-                    RideMetricPtr m = computed.value(worklist[i]);
-                    if (m) metrics.setForSymbol(worklist[i], m->value(true));
-                    else metrics.setForSymbol(worklist[i], 0.00);
-                }
-            }
-        } else {
-
-            // just use the metricDB versions, nice 'n fast
-            metrics = context->athlete->metricDB->getRideMetrics(rideItem->fileName);
-        }
-    }
-
 
     //
     // 3 top columns - total, average, maximums and metrics for entire ride
@@ -530,7 +496,7 @@ RideSummaryWindow::htmlSummary()
                  s = s.arg(""); // no units
 
                  // get the value - from metrics or from data array
-                 if (ridesummary) s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
+                 if (ridesummary) s = s.arg(time_to_string(rideItem->getForSymbol(symbol)));
                  else {
                       QStringList filterList = filters;
                       if (context->ishomefiltered) {
@@ -554,7 +520,7 @@ RideSummaryWindow::htmlSummary()
 
                  // when summarising a ride temperature is -255 when not present, when aggregating its 0.0
                  if ((symbol == "average_temp" || symbol == "max_temp") && ridesummary 
-                     && metrics.getForSymbol(symbol) == RideFile::NoTemp) {
+                     && rideItem->getForSymbol(symbol) == RideFile::NoTemp) {
 
                     s = s.arg(ride->getTag("Temperature", "-"));
 
@@ -563,7 +529,7 @@ RideSummaryWindow::htmlSummary()
                     double pace;
                     bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
 
-                    if (ridesummary) pace  = metrics.getForSymbol(symbol) * (metricPace ? 1 : m->conversion()) + (metricPace ? 0 : m->conversionSum());
+                    if (ridesummary) pace  = rideItem->getForSymbol(symbol) * (metricPace ? 1 : m->conversion()) + (metricPace ? 0 : m->conversionSum());
                     else {
                       QStringList filterList = filters;
                       if (context->ishomefiltered) {
@@ -585,11 +551,11 @@ RideSummaryWindow::htmlSummary()
 
                     // get the value - from metrics or from data array
                     if (ridesummary) {
-                            QString v = QString("%1").arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
+                            QString v = QString("%1").arg(rideItem->getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
                                 + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
 
                             // W' over 100% is not a good thing!
-                            if (symbol == "skiba_wprime_max" && metrics.getForSymbol(symbol) > 100) {
+                            if (symbol == "skiba_wprime_max" && rideItem->getForSymbol(symbol) > 100) {
                                 v = QString("<font color=\"red\">%1<font color=\"black\">").arg(v);
                             }
                             s = s.arg(v);
@@ -763,7 +729,7 @@ RideSummaryWindow::htmlSummary()
                     for (int i = 0; i < numzones; ++i) {
 
                         // if using metrics or data
-                        if (ridesummary) time_in_zone[i] = metrics.getForSymbol(paceTimeInZones[i]);
+                        if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(paceTimeInZones[i]);
                         else { // *** THIS IS NOT RELEVANT YET -- NO SUMMARISING FOR SEASONS ***
                             QStringList filterList = filters;
                             if (context->ishomefiltered) {
@@ -807,7 +773,7 @@ RideSummaryWindow::htmlSummary()
             for (int i = 0; i < numzones; ++i) {
 
                 // if using metrics or data
-                if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
+                if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(timeInZones[i]);
                 else {
                     QStringList filterList = filters;
                     if (context->ishomefiltered) {
@@ -856,7 +822,7 @@ RideSummaryWindow::htmlSummary()
         for (int i = 0; i < numhrzones; ++i) {
 
             // if using metrics or data
-            if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
+            if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(timeInZonesHR[i]);
             else {
                 QStringList filterList = filters;
                 if (context->ishomefiltered) {
