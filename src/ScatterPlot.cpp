@@ -855,7 +855,7 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
 void
 ScatterPlot::smooth(QVector<double> &xval, QVector<double> &yval, int count, int applySmooth)
 {
-    if (applySmooth<2)
+    if (applySmooth<2 || count < applySmooth)
         return;
 
     QVector<double> smoothX(count);
