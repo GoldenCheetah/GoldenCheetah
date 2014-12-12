@@ -126,6 +126,9 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "crc") jc->item.crc = $3.toULongLong();
                                                                      else if ($1 == "timestamp") jc->item.timestamp = $3.toULongLong();
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
+                                                                     else if ($1 == "color") jc->item.color = QColor($3);
+                                                                     else if ($1 == "isRun") jc->item.isRun = $3.toInt();
+                                                                     else if ($1 == "present") jc->item.present = $3;
                                                                      else if ($1 == "weight") jc->item.weight = $3.toDouble();
                                                                      else if ($1 == "date") {
                                                                          QDateTime aslocal = QDateTime::fromString($3, DATETIME_FORMAT);

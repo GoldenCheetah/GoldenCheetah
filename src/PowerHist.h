@@ -597,7 +597,7 @@ public:
 	RideItem *rideItem = parent->rideItem;
 
     // only for running activities
-	if (! rideItem || ! rideItem->isRun())
+	if (! rideItem || ! rideItem->isRun)
 	    return;
 
 	const PaceZones *zones = parent->context->athlete->paceZones();
@@ -650,7 +650,7 @@ public:
 	RideItem *rideItem = parent->rideItem;
 
     // only for running activities
-	if (! rideItem || ! rideItem->isRun())
+	if (! rideItem || ! rideItem->isRun)
 	    return;
 
 	const PaceZones *zones = parent->context->athlete->paceZones();

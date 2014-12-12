@@ -25,6 +25,7 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 #include "Settings.h"
+#include "Colors.h" // for ColorEngine
 #include <math.h>
 
 // used to create a temporary ride item that is not in the cache and just
@@ -33,14 +34,14 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {
+    color(QColor(1,1,1)), isRun(false), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    color(QColor(1,1,1)), isRun(false), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -48,7 +49,8 @@ RideItem::RideItem(RideFile *ride, Context *context)
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
     ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
-    fileName(fileName), dateTime(dateTime), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), fingerprint(0), 
+    crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -296,6 +298,11 @@ RideItem::refresh()
 
         // get weight that applies to the date
         getWeight();
+
+        // first class stuff
+        isRun = f->isRun();
+        color = context->athlete->colorEngine->colorFor(f->getTag(context->athlete->rideMetadata()->getColorField(), ""));
+        present = f->getTag("Data", "");
 
         // refresh metrics etc
         const RideMetricFactory &factory = RideMetricFactory::instance();
