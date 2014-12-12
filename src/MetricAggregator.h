@@ -47,7 +47,6 @@ class MetricAggregator : public QObject
 
         void refreshMetrics();
         void refreshMetrics(QDateTime forceAfterThisDate);
-        void refreshCPModelMetrics(bool bg=false); // metrics derived from model
 
         DBAccess *db() { return dbaccess; }
         //SummaryMetrics getAllMetricsFor(QString filename); // for a single ride
@@ -56,7 +55,6 @@ class MetricAggregator : public QObject
 
     signals:
         void dataChanged(); // when metricDB table changed
-        void modelProgress(int, int); // let others know when we're refreshing the model estimates
 
     public slots:
         void update();

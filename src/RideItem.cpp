@@ -83,6 +83,9 @@ RideItem::setFrom(RideItem&here)
 	crc = here.crc;
 	timestamp = here.timestamp;
 	dbversion = here.dbversion;
+	color = here.color;
+	present = here.present;
+    isRun = here.isRun;
 	weight = here.weight;
 }
 

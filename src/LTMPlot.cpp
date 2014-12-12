@@ -27,6 +27,7 @@
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
 #include "RideMetric.h"
+#include "RideCache.h"
 #include "RideFileCache.h"
 #include "Settings.h"
 #include "Colors.h"
@@ -2428,7 +2429,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
                                               QVector<double>&x,QVector<double>&y,int&n)
 {
     // lets refresh the model data if we don't have any
-    if (context->athlete->PDEstimates.count() == 0) context->athlete->metricDB->refreshCPModelMetrics(); 
+    if (context->athlete->PDEstimates.count() == 0) context->athlete->rideCache->refreshCPModelMetrics(); 
 
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)

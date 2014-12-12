@@ -24,6 +24,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "RideFileCache.h"
 #include "SummaryMetrics.h"
 #include "Settings.h"
@@ -999,7 +1000,7 @@ LTMWindow::dataTable(bool html)
 
             // lets refresh the model data if we don't have any
             if (context->athlete->PDEstimates.count() == 0) 
-                context->athlete->metricDB->refreshCPModelMetrics(); 
+                context->athlete->rideCache->refreshCPModelMetrics(); 
 
             // lets nip through all the rides and add in the estimate
             // that applied for that date

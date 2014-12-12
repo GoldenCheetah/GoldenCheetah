@@ -22,6 +22,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include "RideMetric.h"
+#include "RideCache.h"
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Units.h"
@@ -107,7 +108,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     }
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
-    connect(context->athlete->metricDB, SIGNAL(modelProgress(int,int)), this, SLOT(modelProgress(int,int)));
+    connect(context->athlete->rideCache, SIGNAL(modelProgress(int,int)), this, SLOT(modelProgress(int,int)));
 
     setChartLayout(vlayout);
     configChanged(); // set colors
@@ -1215,7 +1216,7 @@ RideSummaryWindow::getPDEstimates()
     // refresh if needed
     if (context->athlete->PDEstimates.count() == 0) {
         ping = true;
-        context->athlete->metricDB->refreshCPModelMetrics(true); //true = bg ...
+        context->athlete->rideCache->refreshCPModelMetrics(); //true = bg ...
     }
 
     for (int i=0; i<2; i++) {
