@@ -424,3 +424,13 @@ RideCache::refresh()
         watcher.setFuture(future);
     }
 }
+
+QList<QDateTime> 
+RideCache::getAllDates()
+{
+    QList<QDateTime> returning;
+    foreach(RideItem *item, rides()) {
+        returning << item->dateTime;
+    }
+    return returning;
+}

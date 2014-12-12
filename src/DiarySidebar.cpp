@@ -18,6 +18,7 @@
 
 #include "DiarySidebar.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "Context.h"
 #include "GcWindowLayout.h"
 #include "Settings.h"
@@ -685,7 +686,7 @@ GcMiniCalendar::dayClicked(int i)
 void
 GcMiniCalendar::previous()
 {
-    QList<QDateTime> allDates = context->athlete->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
     qSort(allDates);
 
     // begin of month
@@ -719,7 +720,7 @@ GcMiniCalendar::previous()
 void
 GcMiniCalendar::next()
 {
-    QList<QDateTime> allDates = context->athlete->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
     qSort(allDates);
 
     // end of month

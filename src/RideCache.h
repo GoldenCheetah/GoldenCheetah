@@ -47,6 +47,9 @@ class RideCache : public QObject
         RideCache(Context *context);
         ~RideCache();
 
+        // query the cache
+	    QList<QDateTime> getAllDates();
+
         // is running ?
         bool isRunning() { return future.isRunning(); }
 

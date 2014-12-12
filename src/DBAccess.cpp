@@ -543,20 +543,6 @@ DBAccess::deleteRide(QString name)
     return query.exec();
 }
 
-QList<QDateTime> DBAccess::getAllDates()
-{
-    QSqlQuery query("SELECT ride_date from metrics ORDER BY ride_date;", db->database(sessionid));
-    QList<QDateTime> dates;
-
-    query.exec();
-    while(query.next())
-    {
-        QDateTime date = query.value(0).toDateTime();
-        dates << date;
-    }
-    return dates;
-}
-
 bool
 DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color)
 {
