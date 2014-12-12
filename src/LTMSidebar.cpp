@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "Settings.h"
 #include "Units.h"
 
@@ -636,7 +637,7 @@ LTMSidebar::autoFilterChanged()
             // update the values available in the tree
             foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
                 if (sp.displayName(field.name) == action->text()) {
-                    foreach (QString value, context->athlete->metricDB->db()->getDistinctValues(field)) {
+                    foreach (QString value, context->athlete->rideCache->getDistinctValues(field.name)) {
                         if (value == "") value = tr("(blank)");
                         QTreeWidgetItem *add = new QTreeWidgetItem(tree->invisibleRootItem(), 0);
 
@@ -796,7 +797,7 @@ LTMSidebar::autoFilterRefresh()
         // update the values available in the tree
         foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
             if (field.name == fieldname) {
-                foreach (QString value, context->athlete->metricDB->db()->getDistinctValues(field)) {
+                foreach (QString value, context->athlete->rideCache->getDistinctValues(field.name)) {
                     if (value == "") value = tr("(blank)");
                     QTreeWidgetItem *add = new QTreeWidgetItem(tree->invisibleRootItem(), 0);
 

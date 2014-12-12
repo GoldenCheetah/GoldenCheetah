@@ -444,3 +444,28 @@ RideCache::getAllFilenames()
     }
     return returning;
 }
+
+QHash<QString,int>
+RideCache::getRankedValues(QString field)
+{
+    QHash<QString, int> returning;
+    foreach(RideItem *item, rides()) {
+        QString value = item->metadata().value(field, "");
+        if (value != "") {
+            int count = returning.value(value,0);
+            returning.insert(value,count);
+        }
+    }    
+}
+
+QStringList
+RideCache::getDistinctValues(QString field)
+{
+    QStringList returning;
+    QHashIterator<QString,int> i(getRankedValues(field));
+    while(i.hasNext()) {
+        i.next();
+        returning << i.key();
+    }
+    return returning;
+}

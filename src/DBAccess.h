@@ -74,7 +74,6 @@ class DBAccess
         QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
             return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
         }
-        QList<QString> getDistinctValues(FieldDefinition field);
 
         bool getInterval(QString filename, QString type, QString groupName, int start, SummaryMetrics &summaryMetrics, QColor&color);
         bool getIntervalForRide(QString);

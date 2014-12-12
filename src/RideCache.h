@@ -51,6 +51,10 @@ class RideCache : public QObject
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
 
+        // metadata
+        QHash<QString,int> getRankedValues(QString name); // metadata
+        QStringList getDistinctValues(QString name); // metadata
+
         // is running ?
         bool isRunning() { return future.isRunning(); }
 
