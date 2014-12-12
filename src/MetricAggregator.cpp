@@ -575,45 +575,6 @@ bool MetricAggregator::importInterval(IntervalItem *interval, QString type, QStr
 /*----------------------------------------------------------------------
  * Query functions are wrappers around DBAccess functions
  *----------------------------------------------------------------------*/
-void
-MetricAggregator::writeAsCSV(QString filename)
-{
-    // write all metrics as a CSV file
-    QList<SummaryMetrics> all = getAllMetricsFor(QDateTime(), QDateTime());
-
-    // write headings
-    if (!all.count()) return; // no dice
-
-    // open file.. truncate if exists already
-    QFile file(filename);
-    file.open(QFile::WriteOnly);
-    file.resize(0);
-    QTextStream out(&file);
-
-    // write headings
-    out<<"date, time, filename,";
-    QMapIterator<QString, double>i(all[0].values());
-    while (i.hasNext()) {
-        i.next();
-        out<<i.key()<<",";
-    }
-    out<<"\n";
-
-    // write values
-    foreach(SummaryMetrics x, all) {
-        out<<x.getRideDate().date().toString("MM/dd/yy")<<","
-           <<x.getRideDate().time().toString()<<","
-           <<x.getFileName()<<",";
-
-        QMapIterator<QString, double>i(x.values());
-        while (i.hasNext()) {
-            i.next();
-            out<<i.value()<<",";
-        }
-        out<<"\n";
-    }
-    file.close();
-}
 
 QList<SummaryMetrics>
 MetricAggregator::getAllMetricsFor(DateRange dr)

@@ -34,6 +34,7 @@
 #include "Athlete.h"
 
 #include "Colors.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
@@ -1686,10 +1687,19 @@ MainWindow::switchTab(int index)
 void
 MainWindow::exportMetrics()
 {
-    QString fileName = QFileDialog::getSaveFileName( this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
-    if (fileName.length() == 0)
+    // if the refresh process is running, try again when its completed
+    if (currentTab->context->athlete->rideCache->isRunning()) {
+        QMessageBox::warning(this, tr("Refresh in Progress"), 
+        "A metric refresh is currently running, please try again once that has completed.");
         return;
-    currentTab->context->athlete->metricDB->writeAsCSV(fileName);
+    }
+
+    // all good lets choose a file
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
+    if (fileName.length() == 0) return;
+
+    // export
+    currentTab->context->athlete->rideCache->writeAsCSV(fileName);
 }
 
 /*----------------------------------------------------------------------

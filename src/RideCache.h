@@ -47,6 +47,9 @@ class RideCache : public QObject
         RideCache(Context *context);
         ~RideCache();
 
+        // is running ?
+        bool isRunning() { return future.isRunning(); }
+
         // the ride list
 	    QVector<RideItem*>&rides() { return rides_; } 
 
@@ -57,6 +60,9 @@ class RideCache : public QObject
         // restore / dump cache to disk (json)
         void load();
         void save();
+
+        // export metrics in CSV format
+        void writeAsCSV(QString filename);
 
         // the background refresher !
         void refresh();
