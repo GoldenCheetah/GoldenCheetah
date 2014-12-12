@@ -598,25 +598,6 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
     return found;
 }
 
-QList<QString> DBAccess::getDistinctValues(FieldDefinition field)
-{
-    QStringList returning;
-
-    // what are we querying?
-    QString fieldname = QString("Z%1").arg(context->specialFields.makeTechName(field.name));
-
-    QString selectStatement = QString("SELECT DISTINCT(%1) FROM METRICS ORDER BY %1;").arg(fieldname);
-
-    QSqlQuery query(db->database(sessionid));
-    query.prepare(selectStatement);
-    query.exec();
-
-    while(query.next()) {
-        returning << query.value(0).toString();
-    }
-    return returning;
-}
-
 QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
 {
     QList<SummaryMetrics> metrics;
