@@ -133,8 +133,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // seconds step of the upgrade - now everything of configuration needed should be in place in Context
     v3.upgradeLate(context);
 
+#ifdef GC_HAVE_INTERVALS
     // Routes
     routes = new Routes(context, home->config());
+#endif
 
     // Search / filter
 #ifdef GC_HAVE_LUCENE

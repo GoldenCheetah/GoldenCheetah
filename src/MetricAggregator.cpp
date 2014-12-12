@@ -352,6 +352,57 @@ bool greaterThan(const SummaryBest &s1, const SummaryBest &s2)
      return s1.nvalue > s2.nvalue;
 }
 
+bool MetricAggregator::importInterval(IntervalItem *interval, QString type, QString group, unsigned long fingerprint, bool modify)
+{
+    SummaryMetrics summaryMetric;
+
+    const RideFile* ride = interval->ride;
+
+    RideFile subride(const_cast<RideFile*>(ride));
+    int start = ride->timeIndex(interval->start);
+    int end = ride->timeIndex(interval->stop);
+    for (int i = start; i <= end; ++i) {
+        const RideFilePoint *p = ride->dataPoints()[i];
+        subride.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance,
+                      p->lte, p->rte, p->lps, p->rps, p->smo2, p->thb,
+                      p->rvert, p->rcad, p->rcontact, 0);
+
+        // derived data
+        RideFilePoint *l = subride.dataPoints().last();
+        l->np = p->np;
+        l->xp = p->xp;
+        l->apower = p->apower;
+    }
+
+    summaryMetric.setFileName(ride->getTag("Filename",""));
+    summaryMetric.setRideDate(ride->startTime());
+    summaryMetric.setId(ride->id());
+    summaryMetric.setIsRun(ride->isRun());
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QStringList metrics;
+
+    for (int i = 0; i < factory.metricCount(); ++i)
+        metrics << factory.metricName(i);
+
+    // compute all the metrics
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, &subride, context->athlete->zones(), context->athlete->hrZones(), metrics);
+
+    // get metrics into summaryMetric QMap
+    for(int i = 0; i < factory.metricCount(); ++i) {
+        // check for override
+        summaryMetric.setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
+    }
+
+    // what color will this ride be?
+    QColor color = colorEngine->colorFor(ride->getTag(context->athlete->rideMetadata()->getColorField(), ""));
+
+    dbaccess->importInterval(&summaryMetric, interval, type, group, color, fingerprint, modify);
+
+    return true;
+}
+
 void
 MetricAggregator::refreshBestIntervals()
 {
@@ -501,57 +552,6 @@ bool MetricAggregator::importRide(QDir /* no longer used ? */, RideFile *ride, Q
 #ifdef GC_HAVE_LUCENE
     context->athlete->lucene->importRide(ride);
 #endif
-
-    return true;
-}
-
-bool MetricAggregator::importInterval(IntervalItem *interval, QString type, QString group, unsigned long fingerprint, bool modify)
-{
-    SummaryMetrics summaryMetric;
-
-    const RideFile* ride = interval->ride;
-
-    RideFile subride(const_cast<RideFile*>(ride));
-    int start = ride->timeIndex(interval->start);
-    int end = ride->timeIndex(interval->stop);
-    for (int i = start; i <= end; ++i) {
-        const RideFilePoint *p = ride->dataPoints()[i];
-        subride.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                      p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance,
-                      p->lte, p->rte, p->lps, p->rps, p->smo2, p->thb,
-                      p->rvert, p->rcad, p->rcontact, 0);
-
-        // derived data
-        RideFilePoint *l = subride.dataPoints().last();
-        l->np = p->np;
-        l->xp = p->xp;
-        l->apower = p->apower;
-    }
-
-    summaryMetric.setFileName(ride->getTag("Filename",""));
-    summaryMetric.setRideDate(ride->startTime());
-    summaryMetric.setId(ride->id());
-    summaryMetric.setIsRun(ride->isRun());
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    QStringList metrics;
-
-    for (int i = 0; i < factory.metricCount(); ++i)
-        metrics << factory.metricName(i);
-
-    // compute all the metrics
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, &subride, context->athlete->zones(), context->athlete->hrZones(), metrics);
-
-    // get metrics into summaryMetric QMap
-    for(int i = 0; i < factory.metricCount(); ++i) {
-        // check for override
-        summaryMetric.setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
-    }
-
-    // what color will this ride be?
-    QColor color = colorEngine->colorFor(ride->getTag(context->athlete->rideMetadata()->getColorField(), ""));
-
-    dbaccess->importInterval(&summaryMetric, interval, type, group, color, fingerprint, modify);
 
     return true;
 }

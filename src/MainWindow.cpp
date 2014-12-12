@@ -652,7 +652,9 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Rides"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
+#ifdef GC_HAVE_INTERVALS
     viewMenu->addAction(tr("Intervals"), this, SLOT(selectInterval()));
+#endif
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
 #ifdef GC_HAVE_ICAL
     viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
