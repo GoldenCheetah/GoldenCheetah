@@ -49,7 +49,6 @@ class MetricAggregator : public QObject
         void refreshMetrics(QDateTime forceAfterThisDate);
         void refreshCPModelMetrics(bool bg=false); // metrics derived from model
 
-        void getFirstLast(QDate &, QDate &);
         DBAccess *db() { return dbaccess; }
         //SummaryMetrics getAllMetricsFor(QString filename); // for a single ride
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
