@@ -185,60 +185,34 @@ QString TwitterDialog::getTwitterMessage()
 
     RideItem *ride = const_cast<RideItem*>(context->currentRideItem());
 
-    SummaryMetrics metrics = context->athlete->metricDB->getRideMetrics(ride->fileName);
-    if(workoutTimeChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Duration: %1 ")).arg(metricToString(factory.rideMetric("workout_time"), metrics, context->athlete->useMetricUnits)));
-    }
+    struct {
+        QString name;
+        QCheckBox *chk;
+        QString words;
+    } worklist[] = {
+        { "workout_time", workoutTimeChk, tr("Duration: %1 ") },
+        { "time_riding", timeRidingChk, tr("Time Riding: %1 ") },
+        { "total_distance", totalDistanceChk, tr("Distance: %1 ") },
+        { "elevation_gain", elevationGainChk, tr("Climbing: %1 ") },
+        { "total_work", totalWorkChk, tr("Work: %1 ") },
+        { "average_speed", averageSpeedChk, tr("Avg Speed: %1 ") },
+        { "average_power", averagePowerChk, tr("Avg Power: %1 ") },
+        { "average_hr", averageHRMChk, tr("Avg HR: %1 ") },
+        { "average_cad", averageCadenceChk, tr("Avg Cadence: %1 ") },
+        { "max_power", maxPowerChk, tr("Max Power: %1 ") },
+        { "max_heartrate", maxHRMChk, tr("Max HR: %1 ") },
+        { "", NULL, "" }
+    };
 
-    if(timeRidingChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Time Riding: %1 ")).arg(metricToString(factory.rideMetric("time_riding"), metrics, context->athlete->useMetricUnits)));
-    }
+    // construct the string
+    for (int i=0; worklist[i].chk != NULL; i++) {
 
-    if(totalDistanceChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Distance: %1 ")).arg(metricToString(factory.rideMetric("total_distance"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(elevationGainChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Climbing: %1 ")).arg(metricToString(factory.rideMetric("elevation_gain"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(totalWorkChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Work: %1 ")).arg(metricToString(factory.rideMetric("total_work"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(averageSpeedChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Avg Speed: %1 ")).arg(metricToString(factory.rideMetric("average_speed"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(averagePowerChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Avg Power: %1 ")).arg(metricToString(factory.rideMetric("average_power"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(averageHRMChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Avg HR: %1 ")).arg(metricToString(factory.rideMetric("average_hr"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(averageCadenceChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Avg Cadence: %1 ")).arg(metricToString(factory.rideMetric("average_cad"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(maxPowerChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Max Power: %1 ")).arg(metricToString(factory.rideMetric("max_power"), metrics, context->athlete->useMetricUnits)));
-    }
-
-    if(maxHRMChk->isChecked())
-    {
-        twitterMesg.append(QString(tr("Max HR: %1 ")).arg(metricToString(factory.rideMetric("max_heartrate"), metrics, context->athlete->useMetricUnits)));
+        if(worklist[i].chk->isChecked()) {
+            double value = ride->getForSymbol(worklist[i].name);
+            RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(worklist[i].name));
+            m->setValue(value);
+            twitterMesg.append(QString(worklist[i].words).arg(m->toString(context->athlete->useMetricUnits)));
+        }
     }
 
     QString msg = twitterMessageEdit->text();
