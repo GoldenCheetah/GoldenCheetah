@@ -9012,7 +9012,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../HomeWindow.cpp" line="1407"/>
         <source>Tracker</source>
-        <translation>Rastreador</translation>
+        <translation>Seguimiento</translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="1408"/>
