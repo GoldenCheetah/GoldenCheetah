@@ -587,43 +587,6 @@ MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
     return results;
 }
 
-SummaryMetrics
-MetricAggregator::getAllMetricsFor(QString filename)
-{
-    if (context->athlete->isclean == false) refreshMetrics(); // get them up-to-date
-
-    SummaryMetrics results;
-    QColor color; // ignored for now...
-
-    // only if we have established a connection to the database
-    if (dbaccess == NULL) {
-        qDebug()<<"lost db connection?";
-        return results;
-    }
-
-    // apparently using transactions for queries
-    // can improve performance!
-    dbaccess->connection().transaction();
-    dbaccess->getRide(filename, results, color);
-    dbaccess->connection().commit();
-    return results;
-}
-
-SummaryMetrics
-MetricAggregator::getRideMetrics(QString filename)
-{
-    if (context->athlete->isclean == false) refreshMetrics(); // get them up-to-date
-
-    SummaryMetrics empty;
-
-    // only if we have established a connection to the database
-    if (dbaccess == NULL) {
-        qDebug()<<"lost db connection?";
-        return empty;
-    }
-    return dbaccess->getRideMetrics(filename);
-}
-
 void
 MetricAggregator::refreshCPModelMetrics(bool bg)
 {

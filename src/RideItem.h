@@ -76,6 +76,9 @@ class RideItem : public QObject
         // set from another, e.g. during load of rideDB.json
         void setFrom(RideItem&);
 
+        // access the metric value
+        double getForSymbol(QString name);
+
         // get at the data
         QString path;
         QString fileName;

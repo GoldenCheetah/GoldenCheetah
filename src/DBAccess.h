@@ -66,10 +66,6 @@ class DBAccess
         // Create/Delete Intervals
         bool importInterval(SummaryMetrics *summaryMetrics, IntervalItem *interval, QString type, QString groupName, QColor color, unsigned long fingerprint, bool modify);
 
-        // Query Records
-        bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
-        SummaryMetrics getRideMetrics(QString filename); // for a filename
-
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
         QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
             return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));

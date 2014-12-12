@@ -445,6 +445,15 @@ RideCache::getAllFilenames()
     return returning;
 }
 
+RideItem *
+RideCache::getRide(QString filename)
+{
+    foreach(RideItem *item, rides())
+        if (item->fileName == filename)
+            return item;
+    return NULL;
+}
+
 QHash<QString,int>
 RideCache::getRankedValues(QString field)
 {
@@ -456,6 +465,7 @@ RideCache::getRankedValues(QString field)
             returning.insert(value,count);
         }
     }    
+    return returning;
 }
 
 QStringList

@@ -543,61 +543,6 @@ DBAccess::deleteRide(QString name)
     return query.exec();
 }
 
-bool
-DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color)
-{
-    // lookup a ride by filename returning true/false if found
-    bool found = false;
-
-    // construct the select statement
-    QString selectStatement = "SELECT filename, identifier, ride_date, isRun, color";
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i=0; i<factory.metricCount(); i++)
-        selectStatement += QString(", X%1 ").arg(factory.metricName(i));
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-        if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
-            selectStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
-        }
-    }
-    selectStatement += " FROM metrics where filename = :name;";
-
-    // execute the select statement
-    QSqlQuery query(selectStatement, db->database(sessionid));
-    query.bindValue(":start", filename);
-    query.exec();
-
-    while(query.next())
-    {
-        found = true;
-
-        // filename and date
-        summaryMetrics.setFileName(query.value(0).toString());
-        summaryMetrics.setId(query.value(1).toString());
-        summaryMetrics.setRideDate(query.value(2).toDateTime());
-        summaryMetrics.setIsRun(query.value(3).toInt());
-        color = QColor(query.value(4).toString());
-
-        // the values
-        int i=0;
-        for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+5).toDouble());
-
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-            if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
-                QString underscored = field.name;
-                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+4).toDouble());
-                i++;
-            } else if (!context->specialFields.isMetric(field.name) && field.type < 3) {
-                QString underscored = field.name;
-                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+4).toString());
-                i++;
-            }
-        }
-    }
-    query.finish();
-    return found;
-}
-
 QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
 {
     QList<SummaryMetrics> metrics;
@@ -654,53 +599,6 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
         metrics << summaryMetrics;
     }
     return metrics;
-}
-
-SummaryMetrics DBAccess::getRideMetrics(QString filename)
-{
-    SummaryMetrics summaryMetrics;
-
-    // construct the select statement
-    QString selectStatement = "SELECT filename, identifier, isRun";
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i=0; i<factory.metricCount(); i++)
-        selectStatement += QString(", X%1 ").arg(factory.metricName(i));
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-        if (!context->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
-            selectStatement += QString(", Z%1 ").arg(context->specialFields.makeTechName(field.name));
-        }
-    }
-    selectStatement += " FROM metrics WHERE filename = :filename ;";
-
-    // execute the select statement
-    QSqlQuery query(db->database(sessionid));
-    query.prepare(selectStatement);
-    query.bindValue(":filename", QVariant(filename));
-
-    query.exec();
-    while(query.next())
-    {
-        // filename and date
-        summaryMetrics.setFileName(query.value(0).toString());
-        summaryMetrics.setId(query.value(1).toString());
-        summaryMetrics.setIsRun(query.value(2).toInt());
-        // the values
-        int i=0;
-        for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+3).toDouble());
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
-            if (!context->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
-                QString underscored = field.name;
-                summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+3).toDouble());
-                i++;
-            } else if (!context->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
-                QString underscored = field.name;
-                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
-                i++;
-            }
-        }
-    }
-    return summaryMetrics;
 }
 
 /*----------------------------------------------------------------------
