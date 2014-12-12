@@ -49,6 +49,7 @@ class RideCache : public QObject
 
         // query the cache
 	    QList<QDateTime> getAllDates();
+        QStringList getAllFilenames();
 
         // is running ?
         bool isRunning() { return future.isRunning(); }

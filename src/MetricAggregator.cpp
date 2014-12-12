@@ -72,22 +72,6 @@ void MetricAggregator::refreshMetrics()
 {
     refreshMetrics(QDateTime());
 }
-QStringList
-MetricAggregator::allActivityFilenames()
-{
-    QStringList returning;
-
-    // get a Hash map of statistic records and timestamps
-    QSqlQuery query(dbaccess->connection());
-    bool rc = query.exec("SELECT filename FROM metrics ORDER BY ride_date;");
-    while (rc && query.next()) {
-        QString filename = query.value(0).toString();
-        returning << filename;
-    }
-
-    return returning;
-}
-
 
 // Refresh not up to date metrics and metrics after date
 void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)

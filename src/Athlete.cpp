@@ -133,7 +133,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // seconds step of the upgrade - now everything of configuration needed should be in place in Context
     v3.upgradeLate(context);
 
-
     // Routes
     routes = new Routes(context, home->config());
 
@@ -157,6 +156,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         parser.parse(text, errors);
         if (errors.count() == 0) setWithings(parser.readings());
     }
+
+    // now most dependencies are in get cache
+    // must be before metricDB as we transition it out...
+    rideCache = new RideCache(context);
 
     // metrics DB
     metricDB = new MetricAggregator(context); // just to catch config updates!
@@ -203,8 +206,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     allIntervals = context->athlete->intervalWidget->invisibleRootItem();
     allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allIntervals->setText(0, tr("Intervals"));
-
-    rideCache = new RideCache(context);
 
     // trap signals
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -411,16 +412,6 @@ Athlete::configChanged()
 
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
-
-/*XXX not sure about this
-    // forget all the cached weight values in case weight changed
-    foreach (RideItem *rideItem, rideCache->rides()) {
-        if (rideItem->ride(false)) {
-            rideItem->ride(false)->setWeight(0);
-            rideItem->ride(false)->getWeight();
-        }
-    }
-XXX */
 }
 
 void

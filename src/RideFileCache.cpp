@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
@@ -1851,7 +1852,7 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
     if (worklist.count() == 0) return results; // no work to do
 
     // get a list of rides & iterate over them
-    foreach(QString filename, context->athlete->metricDB->allActivityFilenames()) {
+    foreach(QString filename, context->athlete->rideCache->getAllFilenames()) {
 
         QDateTime datetime;
         QRegExp rx ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
