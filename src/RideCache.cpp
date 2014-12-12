@@ -434,3 +434,13 @@ RideCache::getAllDates()
     }
     return returning;
 }
+
+QStringList 
+RideCache::getAllFilenames()
+{
+    QStringList returning;
+    foreach(RideItem *item, rides()) {
+        returning << item->fileName;
+    }
+    return returning;
+}

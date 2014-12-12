@@ -57,7 +57,6 @@ class MetricAggregator : public QObject
         QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
         QList<SummaryMetrics> getAllMeasuresFor(DateRange);
         SummaryMetrics getRideMetrics(QString filename);
-        QStringList allActivityFilenames();
 
     signals:
         void dataChanged(); // when metricDB table changed
