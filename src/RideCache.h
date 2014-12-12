@@ -23,6 +23,7 @@
 #include "MainWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
+#include "PDModel.h"
 
 #include <QVector>
 #include <QThread>
@@ -77,6 +78,9 @@ class RideCache : public QObject
         void refresh();
         double progress() { return progress_; }
 
+        // PD Model refreshing (temporary move)
+        void refreshCPModelMetrics();
+
     public slots:
 
         // user updated options/preferences
@@ -87,6 +91,9 @@ class RideCache : public QObject
 
         // cancel background processing because about to exit
         void cancel();
+
+    signals:
+        void modelProgress(int, int); // let others know when we're refreshing the model estimates
 
     protected:
 
