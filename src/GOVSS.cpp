@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
- * Based on Coggan.cpp modified by Alejandro Martinez (amtriathlon@gmail.com)
+ *               2014 Alejandro Martinez (amtriathlon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -28,22 +28,27 @@
 // "Calculation of Power Output and Quantification of Training Stress in
 // Distance Runners: The Development of the GOVSS Algorithm", by Phil Skiba:
 // http://www.physfarm.com/govss.pdf
-// Additional details are taken from a spreadsheet published by Dr. Skiba:
-// GOVSSCalculatorVer10 (creation date 4-mar-2006)
+// Additional details were taken from a spreadsheet published by Dr. Skiba:
+// GOVSSCalculatorVer10 (creation date 4-mar-2006) and cited references.
 
 // Running Power based on speed and slope
 static inline double running_power( double weight, double height,
                                     double speed, double slope=0.0,
-                                    double distance=0.0) {
-    // Aero contribution - probably needs refinement
-    double cAero = 0.25*0.01*pow(speed, 2)*pow(height,-3);
-    // Energy Cost of Running according to slope
+                                    double distance=0.0, double initial_speed=0.0) {
+    // Aero contribution (Arsac 2001): 0.5 * rho * Cd * Af * V^2, rho = 1.2, Cd = 0.9
+    double Af = (0.2025*pow(height, 0.725)*pow(weight, 0.425))*0.266; // Frontal Area
+    double cAero = 0.5*1.2*0.9*Af*pow(speed, 2);
+
+    // Kinetic Energy contribution (Arsac 2001): 0.5 * (V^2-V0^2) / d
+    double cKin = distance ? 0.5*(pow(speed,2)-pow(initial_speed,2))/distance : 0.0;
+
+    // Energy Cost of Running according to slope (Minetti 2002)
     double cSlope = 155.4*pow(slope,5) - 30.4*pow(slope,4) - 43.3*pow(slope,3) + 46.3*pow(slope,2) + 19.5*slope + 3.6;
-    // Efficiency
-    double eff = 0.25 + 0.054 * speed;
-    // Kinetic Energy contribution doesn't seem to be right, it is not used.
-    double cKin = distance ? pow(speed,2)/distance : 0.0;
-    return (cAero + cSlope*eff*(1 - 0.5*speed/8.33) + cKin)*weight*speed;
+
+    // Efficiency (Skiba's govss.pdf and spreadsheet)
+    double eff = (0.25 + 0.054*speed)*(1 - 0.5*speed/8.33);
+
+    return (cAero + cKin + cSlope*eff*weight)*speed;
 }
 
 // Lactate Normalized Power, used for GOVSS and xPace calculation
@@ -100,6 +105,7 @@ class LNP : public RideMetric {
             double sumSpeed = 0.0;
             double sumSlope = 0.0;
             double sumPower = 0.0;
+            double initial_speed = 0.0;
 
             // loop over the data and convert to a rolling
             // average for the given windowsize
@@ -118,7 +124,8 @@ class LNP : public RideMetric {
                 double slope120 = sumSlope/std::min(count+1, rollingwindowsize120); // slope rolling average
 
                 // running power based on 120sec averages
-                double watts = running_power(weight, height, speed120, slope120); // sumSpeed*ride->recIntSecs()); KE contribution disabled
+                double watts = running_power(weight, height, speed120, slope120, speed120*ride->recIntSecs(), initial_speed);
+                initial_speed = speed120;
 
                 sumPower += watts;
                 sumPower -= rollingPower[index30];
@@ -185,8 +192,10 @@ class XPace : public RideMetric {
         // search for speed which gives flat power within 0.001watt of LNP
         // up to around 10 iterations for speed within 0.01m/s or ~1sec/km
         double low = 0.0, high = 10.0, speed;
-        if (lnp_watts <= 0.0) speed = low;
-        else if (lnp_watts >= running_power(weight, height, high)) speed = high;
+        if (lnp_watts <= 0.0)
+            speed = low;
+        else if (lnp_watts >= running_power(weight, height, high))
+            speed = high;
         else do {
             speed = (low + high)/2.0;
             double watts = running_power(weight, height, speed);
@@ -245,8 +254,8 @@ class RTP : public RideMetric {
         if (!cv && zones && zoneRange >= 0) 
             cv = zones->getCV(zoneRange);
         
-        // Running power at cv on flat surface
-        double watts = running_power(weight, height, cv/3.6); //120*cv/3.6); KE contribution disabled
+        // Running power at cv constant speed on flat surface
+        double watts = running_power(weight, height, cv/3.6);
 
         setValue(watts);
     }
