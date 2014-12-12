@@ -260,6 +260,7 @@ ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent),
 
     connect(context, SIGNAL(refreshStart()), this, SLOT(show()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(hide()));
+    connect(context, SIGNAL(refreshUpdate()), this, SLOT(show())); // we might miss 1st one
     connect(context, SIGNAL(refreshUpdate()), this, SLOT(repaint()));
 }
 
