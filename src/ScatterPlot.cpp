@@ -411,6 +411,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
             // setup the framing curve
             if (intervals.count() == 0 || settings->frame) {
+                smooth(x, y, points, settings->smoothing);
 
                 if (side) {
 
@@ -465,7 +466,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 int i=0;
                 if (settings->compareMode > 0)
                     i++;
-                for (i; i< context->compareIntervals.count(); i++) {
+                for (; i< context->compareIntervals.count(); i++) {
                     CompareInterval interval = context->compareIntervals.at(i);
 
                     if (interval.checked == false)
@@ -507,6 +508,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
                             nbPoints++;
                         }
                     }
+
+                    smooth(xval, yval, nbPoints, settings->smoothing);
 
                     QColor intervalColor = interval.color;
                     // left / right are darker lighter
@@ -850,8 +853,63 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
 }
 
 void
-ScatterPlot::smooth(QVector<double> *xval, QVector<double> *yval, int *count, double recInterval, int applySmooth)
+ScatterPlot::smooth(QVector<double> &xval, QVector<double> &yval, int count, int applySmooth)
 {
+    if (applySmooth<2)
+        return;
+
+    QVector<double> smoothX(count);
+    QVector<double> smoothY(count);
+
+    for (int i=0; i<count; i++) {
+        smoothX[i] = xval.value(i);
+        smoothY[i] = yval.value(i);
+    }
+
+    // initialise rolling average
+    double rXtot = 0;
+    double rYtot = 0;
+
+    for (int i=applySmooth; i>0 && count-i >=0; i--) {
+        rXtot += smoothX[count-i];
+        rYtot += smoothY[count-i];
+    }
+
+    // now run backwards setting the rolling average
+    for (int i=count-1; i>=applySmooth; i--) {
+        int hereX = smoothX[i];
+        smoothX[i] = rXtot / applySmooth;
+        rXtot -= hereX;
+        rXtot += smoothX[i-applySmooth];
+
+        int hereY = smoothY[i];
+        smoothY[i] = rYtot / applySmooth;
+        rYtot -= hereY;
+        rYtot += smoothY[i-applySmooth];
+    }
+
+    // Finish with smaller rolling average
+    for (int i=applySmooth-1; i>0; i--) {
+        int hereX = smoothX[i];
+        smoothX[i] = rXtot / (i+2);
+        rXtot -= hereX;
+
+        int hereY = smoothY[i];
+        smoothY[i] = rYtot / (i+2);
+        rYtot -= hereY;
+    }
+
+    xval = smoothX;
+    yval = smoothY;
+}
+
+void
+ScatterPlot::resample(QVector<double> &xval, QVector<double> &yval, int &count, double recInterval, int applySmooth)
+{
+    if (recInterval >= applySmooth)
+        return;
+
+
     int newcount=0;
     QVector<double> newxval;
     QVector<double> newyval;
@@ -862,17 +920,17 @@ ScatterPlot::smooth(QVector<double> *xval, QVector<double> *yval, int *count, do
 
         int j=0;
 
-        for (int i = 0; i < *count; i++) {
+        for (int i = 0; i < count; i++) {
             j++;
 
             if (j<applySmooth) {
-                totalX += xval->at(i)*recInterval;
-                totalY += yval->at(i)*recInterval;
+                totalX += xval.at(i)*recInterval;
+                totalY += yval.at(i)*recInterval;
             }
             else {
                 double part = recInterval-j+applySmooth;
-                totalX += xval->at(i)*part;
-                totalY += yval->at(i)*part;
+                totalX += xval.at(i)*part;
+                totalY += yval.at(i)*part;
 
                 double smoothX = totalX/applySmooth;
                 double smoothY = totalY/applySmooth;
@@ -882,13 +940,14 @@ ScatterPlot::smooth(QVector<double> *xval, QVector<double> *yval, int *count, do
                 newcount++;
 
                 j=0;
-                totalX = xval->at(i)*(recInterval-part);
-                totalY = yval->at(i)*(recInterval-part);
+                totalX = xval.at(i)*(recInterval-part);
+                totalY = yval.at(i)*(recInterval-part);
             }
         }
     }
 
-    count = &newcount;
-    xval = &newxval;
-    yval = &newyval;
+    count = newcount;
+    xval = newxval;
+    yval = newyval;
 }
+

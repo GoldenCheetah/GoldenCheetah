@@ -109,7 +109,8 @@ class ScatterPlot : public QwtPlot
 
         void addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoints, QColor intervalColor);
 
-        void smooth(QVector<double> *xval, QVector<double> *yval, int *count, double recInterval, int applySmooth);
+        void smooth(QVector<double> &xval, QVector<double> &yval, int count, int applySmooth);
+        void resample(QVector<double> &xval, QVector<double> &yval, int &count, double recInterval, int applySmooth);
 
         // save the settings
         RideItem *ride; // what we plotting?
