@@ -79,10 +79,13 @@ class RideItem : public QObject
         // access the metric value
         double getForSymbol(QString name);
 
-        // get at the data
+        // get at the first class data
         QString path;
         QString fileName;
         QDateTime dateTime;
+        QString present;
+        QColor color;
+        bool isRun;
 
         // context the item was updated to
         unsigned long fingerprint; // zones
@@ -114,7 +117,6 @@ class RideItem : public QObject
         bool isDirty() { return isdirty; }
         bool checkStale(); // check if we need to refresh
         bool isStale() { return isstale; }
-        bool isRun() { return ride_ ? ride_->isRun() : false; }
 
         // refresh when stale
         void refresh();

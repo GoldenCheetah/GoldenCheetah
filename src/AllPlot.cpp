@@ -5839,7 +5839,7 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         // for speed curve add pace with units according to settings
         // only when the activity is a run.
         QString paceStr;
-        if (curve->title() == tr("Speed") && rideItem && rideItem->isRun()) {
+        if (curve->title() == tr("Speed") && rideItem && rideItem->isRun) {
             bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
             QString paceunit = metricPace ? tr("min/km") : tr("min/mile");
             paceStr = tr("\n%1 %2").arg(context->athlete->useMetricUnits ? kphToPace(yvalue, metricPace) : mphToPace(yvalue, metricPace)).arg(paceunit);

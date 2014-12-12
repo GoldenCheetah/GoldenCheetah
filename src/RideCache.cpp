@@ -282,6 +282,9 @@ void RideCache::save()
             stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
             stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
             stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+            stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
+            stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
+            stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
             stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
             // pre-computed metrics

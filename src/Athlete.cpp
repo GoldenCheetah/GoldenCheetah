@@ -126,6 +126,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     metricDB = NULL; // warn metadata we haven't got there yet !
     rideMetadata_ = new RideMetadata(context,true);
     rideMetadata_->hide();
+    colorEngine = new ColorEngine(context);
 
     // Date Ranges
     seasons = new Seasons(home->config());
@@ -257,6 +258,7 @@ Athlete::~Athlete()
     delete seasons;
 
     delete rideMetadata_;
+    delete colorEngine;
     delete zones_;
     delete hrzones_;
 }

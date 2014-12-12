@@ -56,6 +56,7 @@ class AthleteDirectoryStructure;
 class RideAutoImportConfig;
 class RideCache;
 class Context;
+class ColorEngine;
 
 class Athlete : public QObject
 {
@@ -74,6 +75,7 @@ class Athlete : public QObject
 
         // metadata definitions
         RideMetadata *rideMetadata_;
+        ColorEngine *colorEngine;
 
         // zones
         const Zones *zones() const { return zones_; }
