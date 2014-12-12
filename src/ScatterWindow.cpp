@@ -104,7 +104,7 @@ ScatterWindow::ScatterWindow(Context *context) :
     rIgnore->setChecked(true);
     rIgnore->hide();
     rFrameInterval = new QCheckBox(tr("Frame intervals"));
-    rFrameInterval->setChecked(true); 
+    rFrameInterval->setChecked(true);
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -145,6 +145,25 @@ ScatterWindow::ScatterWindow(Context *context) :
     ySelector->setCurrentIndex(2); // heartrate
     rySelector->setValue(2);
     cl->addRow(yLabel, ySelector);
+
+    QLabel *smoothLabel = new QLabel(tr("Smooth"), this);
+    smoothLineEdit = new QLineEdit(this);
+    smoothLineEdit->setFixedWidth(40);
+
+    smoothSlider = new QSlider(Qt::Horizontal, this);
+    smoothSlider->setTickPosition(QSlider::TicksBelow);
+    smoothSlider->setTickInterval(10);
+    smoothSlider->setMinimum(1);
+    smoothSlider->setMaximum(60);
+    smoothLineEdit->setValidator(new QIntValidator(smoothSlider->minimum(),
+                                                   smoothSlider->maximum(),
+                                                   smoothLineEdit));
+    smoothSlider->setValue(0);
+
+    QHBoxLayout *smoothLayout = new QHBoxLayout;
+    smoothLayout->addWidget(smoothLineEdit);
+    smoothLayout->addWidget(smoothSlider);
+    cl->addRow(smoothLabel, smoothLayout);
 
     // selectors
     ignore = new QCheckBox(tr("Ignore Zero"));
@@ -189,6 +208,8 @@ ScatterWindow::ScatterWindow(Context *context) :
     connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrame()));
     connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
     connect(compareMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setCompareMode(int)));
+    connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
+    connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // comparing things
@@ -288,6 +309,25 @@ ScatterWindow::setTrendLine(int value)
 }
 
 void
+ScatterWindow::setSmoothingFromSlider()
+{
+    smoothLineEdit->setText(QString("%1").arg(smoothSlider->value()));
+
+    settings.smoothing = smoothSlider->value();
+    setData();
+}
+
+void
+ScatterWindow::setSmoothingFromLineEdit()
+{
+    int value = smoothLineEdit->text().toInt();
+
+    smoothSlider->setValue(value);
+    settings.smoothing = value;
+    setData();
+}
+
+void
 ScatterWindow::intervalSelected()
 {
     if (!amVisible())
@@ -334,6 +374,7 @@ ScatterWindow::setData()
     settings.frame = frame->isChecked();
     settings.compareMode = compareMode->currentIndex();
     settings.trendLine = trendLine->currentIndex();
+    settings.smoothing = smoothSlider->value();
 
     /* Not a blank state ? Just no data and we can change series ?
     if ((setting.x == MODEL_POWER || setting.y == MODEL_POWER ) && !ride->ride()->isDataPresent(RideFile::watts))
