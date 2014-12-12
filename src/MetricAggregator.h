@@ -54,8 +54,6 @@ class MetricAggregator : public QObject
         SummaryMetrics getAllMetricsFor(QString filename); // for a single ride
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
         QList<SummaryMetrics> getAllMetricsFor(DateRange);
-        QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
-        QList<SummaryMetrics> getAllMeasuresFor(DateRange);
         SummaryMetrics getRideMetrics(QString filename);
 
     signals:
