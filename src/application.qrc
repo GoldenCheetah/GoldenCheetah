@@ -21,7 +21,6 @@
         <file>images/toolbar/main/diary.png</file>
         <file>images/toolbar/main/help.png</file>
         <file>images/toolbar/main/home.png</file>
-        <file>images/toolbar/main/measures.png</file>
         <file>images/toolbar/main/train.png</file>
         <file>images/toolbar/clear.png</file>
         <file>images/toolbar/search.png</file>
@@ -87,7 +86,6 @@
         <file>translations/gc_pt.qm</file>
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
-        <file>xml/measures.xml</file>
         <file>xml/train-layout.xml</file>
         <file>xml/diary-layout.xml</file>
         <file>xml/analysis-layout.xml</file>

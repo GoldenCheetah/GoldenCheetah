@@ -37,7 +37,7 @@ class CompareDateRange
         Context *context;
         QString name;
         QColor color;
-        QList<SummaryMetrics> metrics, measures;
+        QList<SummaryMetrics> metrics;
         QDate start, end;
         int days;
         Context *sourceContext;

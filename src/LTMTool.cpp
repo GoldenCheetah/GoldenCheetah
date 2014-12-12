@@ -241,36 +241,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
         }
     }
 
-#if 0
-    // measures
-    QList<FieldDefinition> measureDefinitions;
-    QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
-    QString filename = context->athlete->home->config().absolutePath()+"/measures.xml";
-    QString colorfield;
-    if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions, colorfield);
-
-    foreach (FieldDefinition field, measureDefinitions) {
-        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
-            MetricDetail measure;
-            measure.type = METRIC_MEASURE;
-            QString underscored = field.name;
-            measure.symbol = QString("%1_m").arg(field.name); // we don't bother with '_' for measures
-            measure.metric = NULL; // not a factory metric
-            measure.penColor = QColor(Qt::blue);
-            measure.curveStyle = QwtPlotCurve::Lines;
-            measure.symbolStyle = QwtSymbol::NoSymbol;
-            measure.smooth = false;
-            measure.trendtype = 0;
-            measure.topN = 1;
-            measure.uname = "";
-            measure.name = QString("%1 (m)").arg(sp.displayName(field.name));
-            measure.units = "";
-            measure.uunits = "";
-            metrics.append(measure);
-        }
-    }
-#endif
     // sort the list
     qSort(metrics);
 

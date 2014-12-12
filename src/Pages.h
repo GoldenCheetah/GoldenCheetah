@@ -51,7 +51,6 @@ class SummaryMetricsPage;
 class MetadataPage;
 class KeywordsPage;
 class FieldsPage;
-class MeasuresPage;
 class Colors;
 class RiderPage;
 class SeasonsPage;
@@ -863,36 +862,6 @@ class SeasonsPage : public QWidget
         QPushButton *addButton, *renameButton, *deleteButton;
 
         QList<Season> array;
-};
-
-class MeasuresPage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        MeasuresPage(Context *context);
-        void getDefinitions(QList<FieldDefinition>&);
-
-    public slots:
-        void addClicked();
-        void upClicked();
-        void downClicked();
-        void renameClicked();
-        void deleteClicked();
-        void saveClicked();
-
-    private:
-
-        Context *context;
-        QTreeWidget *fields;
-#ifndef Q_OS_MAC
-        QToolButton *upButton, *downButton;
-#else
-        QPushButton *upButton, *downButton;
-#endif
-        QPushButton *addButton, *renameButton, *deleteButton;
 };
 
 class AutoImportPage : public QWidget
