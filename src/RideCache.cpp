@@ -327,6 +327,54 @@ void RideCache::save()
     }
 }
 
+// export metrics to csv, for users to play with R, Matlab, Excel etc
+void
+RideCache::writeAsCSV(QString filename)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QVector<const RideMetric *> indexed(factory.metricCount());
+
+    // get metrics indexed in same order as the array
+    foreach(QString name, factory.allMetrics()) {
+
+        const RideMetric *m = factory.rideMetric(name);
+        indexed[m->index()] = m;
+    }
+
+    // open file.. truncate if exists already
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    file.resize(0);
+    QTextStream out(&file);
+
+    // write headings
+    out<<"date, time, filename";
+    foreach(const RideMetric *m, indexed) {
+        if (m->name().startsWith("BikeScore"))
+            out <<", BikeScore";
+        else
+            out <<", " <<m->name();
+    }
+    out<<"\n";
+
+    // write values
+    foreach(RideItem *item, rides()) {
+
+        // date, time, filename
+        out << item->dateTime.date().toString("MM/dd/yy");
+        out << "," << item->dateTime.time().toString("hh:mm:ss");
+        out << "," << item->fileName;
+
+        // values
+        foreach(double value, item->metrics()) {
+            out << "," << QString("%1").arg(value, 'f').simplified();
+        }
+
+        out<<"\n";
+    }
+    file.close();
+}
+
 void
 itemRefresh(RideItem *&item)
 {

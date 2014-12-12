@@ -57,7 +57,6 @@ class MetricAggregator : public QObject
         QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
         QList<SummaryMetrics> getAllMeasuresFor(DateRange);
         SummaryMetrics getRideMetrics(QString filename);
-        void writeAsCSV(QString filename); // export all...
         QStringList allActivityFilenames();
 
     signals:
