@@ -1271,7 +1271,6 @@ LTMPlot::setCompareData(LTMSettings *set)
         //XXX BROKEN XXX LTMTool::translateMetrics(context, settings);
 
         // set the settings data source to the compare date range 
-        // QList<SummaryMetrics> metrics, measures;
         settings->data = &cd.metrics;
 
         // we need to do this for each date range as they are dependant
@@ -2336,7 +2335,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
         // day we are on
         int currentDay = groupForDate(rideMetrics.getRideDate().date(), settings->groupBy);
 
-        // value for day -- measures are stored differently
+        // value for day
         double value;
         if (metricDetail.type == METRIC_BEST)
             value = rideMetrics.getForSymbol(metricDetail.bestSymbol);
