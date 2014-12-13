@@ -18,6 +18,7 @@
 
 #include "ScatterWindow.h"
 #include "ScatterPlot.h"
+#include "GcOverlayWidget.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Colors.h"
@@ -192,6 +193,13 @@ ScatterWindow::ScatterWindow(Context *context) :
     cl->addRow(new QLabel(tr("Trend line")), trendLine);
     trendLine->setCurrentIndex(0);
 
+    // the model helper -- showing model parameters etc
+    QWidget *helper = new QWidget(this);
+    helper->setAutoFillBackground(true);
+
+    addHelper(QString(tr("Trend")), helper);
+    helperWidget()->hide();
+
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -208,6 +216,7 @@ ScatterWindow::ScatterWindow(Context *context) :
     connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrame()));
     connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
     connect(compareMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setCompareMode(int)));
+    connect(trendLine, SIGNAL(currentIndexChanged(int)), this, SLOT(setTrendLine(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -305,6 +314,14 @@ ScatterWindow::setTrendLine(int value)
 {
     trendLine->setCurrentIndex(value);
     settings.trendLine = value;
+
+    // need a helper any more ?
+    if (value > 0) {
+        helperWidget()->hide(); //show();
+    } else {
+        helperWidget()->hide();
+    }
+
     setData();
 }
 
@@ -410,6 +427,28 @@ ScatterWindow::compareChanged()
     setData();
     repaint();
 
+}
+
+bool
+ScatterWindow::event(QEvent *event)
+{
+    // nasty nasty nasty hack to move widgets as soon as the widget geometry
+    // is set properly by the layout system, by default the width is 100 and
+    // we wait for it to be set properly then put our helper widget on the RHS
+    if (event->type() == QEvent::Resize && geometry().width() != 100) {
+
+        // put somewhere nice on first show
+        if (firstShow) {
+            firstShow = false;
+            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+        }
+
+        // if off the screen move on screen
+        if (helperWidget()->geometry().x() > geometry().width()) {
+            helperWidget()->move(mainWidget()->geometry().width()-275, 50);
+        }
+    }
+    return QWidget::event(event);
 }
 
 

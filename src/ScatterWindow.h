@@ -158,6 +158,9 @@ class ScatterWindow : public GcChartWindow
 
         RideItem *current;
 
+        bool firstShow;
+        bool event(QEvent *event);
+
     private:
         // reveal controls
         QxtStringSpinBox    *rxSelector,

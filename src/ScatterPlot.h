@@ -112,6 +112,8 @@ class ScatterPlot : public QwtPlot
         void smooth(QVector<double> &xval, QVector<double> &yval, int count, int applySmooth);
         void resample(QVector<double> &xval, QVector<double> &yval, int &count, double recInterval, int applySmooth);
 
+        bool skipValues(double xv, double yv, ScatterSettings *settings);
+
         // save the settings
         RideItem *ride; // what we plotting?
         int xseries,yseries;  // which channels to use
