@@ -1129,10 +1129,12 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     }
 
     // normal render
+    bool isnormal=false;
     QString calendarText = rideNavigator->tableView->model()->data(index, Qt::UserRole).toString();
     QColor userColor = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>().color();
     if (userColor == QColor(1,1,1)) {
         rideBG = false; // default so don't swap round...
+        isnormal = true; // just default so no bg or box
         userColor = GColor(CPLOTMARKER);
     }
 
@@ -1222,9 +1224,9 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->setPen(isColor);
 
 #if (defined (Q_OS_MAC) && (QT_VERSION >= 0x050000)) // on QT5 the scrollbars have no width
-            if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+            if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
 #else
-            if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && userColor != GColor(CPLOTMARKER)) {
+            if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
 #endif
                 painter->fillRect(high, userColor);
             } else {
