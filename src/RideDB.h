@@ -29,5 +29,12 @@
 #include <QString>
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 
+// change history
+// version  date       who                     what
+// 1.0      Dec 2014   Mark Liversedge         initial version
+// 1.1      12 Dec 14  Mark Liversedge         added color, isRun and present
+
+#define RIDEDB_VERSION "1.1"
+
 #endif
 

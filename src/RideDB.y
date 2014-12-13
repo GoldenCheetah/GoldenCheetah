@@ -36,6 +36,9 @@ struct RideDBContext {
     QString JsonString;
     QString key, value;
     QStringList errors;
+
+    // is cache/rideDB.json an older version ?
+    bool old;
 };
 
 #define YYSTYPE QString
@@ -75,7 +78,12 @@ elements: element
 element: version
         | RIDES ':' '[' ride_list ']';
 
-version: VERSION ':' string                                     { /* V1.0 we don't do anything for this version */; }
+version: VERSION ':' string                                     {
+                                                                    if ($3 != RIDEDB_VERSION) {
+                                                                        jc->old=true; 
+                                                                        jc->item.isstale=true; // force refresh after load
+                                                                    }
+                                                                }
 
 ride_list: ride
         | ride_list ',' ride
@@ -195,6 +203,7 @@ RideCache::load()
         // create scanner context for reentrant parsing
         RideDBContext *jc = new RideDBContext;
         jc->cache = this;
+        jc->old = false;
 
         // clean item
         jc->item.path = context->athlete->home->activities().canonicalPath();
@@ -226,3 +235,109 @@ RideCache::load()
         return;
     }
 }
+
+// Escape special characters (JSON compliance)
+static QString protect(const QString string)
+{
+    QString s = string;
+    s.replace("\\", "\\\\"); // backslash
+    s.replace("\"", "\\\""); // quote
+    s.replace("\t", "\\t");  // tab
+    s.replace("\n", "\\n");  // newline
+    s.replace("\r", "\\r");  // carriage-return
+    s.replace("\b", "\\b");  // backspace
+    s.replace("\f", "\\f");  // formfeed
+    s.replace("/", "\\/");   // solidus
+
+    // add a trailing space to avoid conflicting with GC special tokens
+    s += " "; 
+
+    return s;
+}
+
+// save cache to disk, "cache/rideDB.json"
+void RideCache::save()
+{
+
+    // now save data away
+    QFile rideDB(QString("%1/rideDB.json").arg(context->athlete->home->cache().canonicalPath()));
+    if (rideDB.open(QFile::WriteOnly)) {
+
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+
+        // ok, lets write out the cache
+        QTextStream stream(&rideDB);
+        stream.setCodec("UTF-8");
+        stream.setGenerateByteOrderMark(true);
+
+        stream << "{" ;
+        stream << QString("\n  \"VERSION\":\"%1\",").arg(RIDEDB_VERSION);
+        stream << "\n  \"RIDES\":[\n";
+
+        bool firstRide = true;
+        foreach(RideItem *item, rides()) {
+
+            // skip if not loaded/refreshed, a special case
+            // if saving during an initial refresh
+            if (item->metrics().count() == 0) continue;
+
+            // comma separate each ride
+            if (!firstRide) stream << ",\n";
+            firstRide = false;
+
+            // basic ride information
+            stream << "\t{\n";
+            stream << "\t\t\"filename\":\"" <<item->fileName <<"\",\n";
+            stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
+            stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
+            stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
+            stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
+            stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
+            stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
+            stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
+            stream << "\t\t\"isRun\":\"" <<item->isRun <<"\",\n";
+            stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
+
+            // pre-computed metrics
+            stream << "\n\t\t\"METRICS\":{\n";
+
+            bool firstMetric = true;
+            for(int i=0; i<factory.metricCount(); i++) {
+                QString name = factory.metricName(i);
+                int index = factory.rideMetric(name)->index();
+
+                if (!firstMetric) stream << ",\n";
+                firstMetric = false;
+
+                stream << "\t\t\t\"" << name << "\":\"" << QString("%1").arg(item->metrics()[index], 0, 'f', 5) <<"\"";
+            }
+            stream << "\n\t\t}";
+
+            // pre-loaded metadata
+            if (item->metadata().count()) {
+
+                stream << ",\n\t\t\"TAGS\":{\n";
+
+                QMap<QString,QString>::const_iterator i;
+                for (i=item->metadata().constBegin(); i != item->metadata().constEnd(); i++) {
+
+                    stream << "\t\t\t\"" << i.key() << "\":\"" << protect(i.value()) << "\"";
+                    if (i+1 != item->metadata().constEnd()) stream << ",\n";
+                    else stream << "\n";
+                }
+
+                // end of the tags
+                stream << "\n\t\t}";
+
+            }
+
+            // end of the ride
+            stream << "\n\t}";
+        }
+
+        stream << "\n  ]\n}";
+
+        rideDB.close();
+    }
+}
+
