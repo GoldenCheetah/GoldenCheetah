@@ -319,23 +319,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
                 double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
 
-                // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
-                if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
-                     && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
-                if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
-                     && settings->ignore && (int(xv) == 0 || int(yv) == 0)) continue;
-                if ((settings->x == MODEL_GEAR)
-                     && settings->ignore && (xv == 0.0f || int(yv) == 0)) continue;
-                if ((settings->y == MODEL_GEAR)
-                     && settings->ignore && (int(xv) == 0 || yv == 0.0f)) continue;
-                if ((settings->x == MODEL_TEMP)
-                     && (xv == RideFile::NoTemp)) continue;
-                if ((settings->y == MODEL_TEMP)
-                     && (yv == RideFile::NoTemp)) continue;
-                if ((settings->x == MODEL_LRBALANCE)
-                     && settings->ignore && (xv == 100)) continue;
-                if ((settings->y == MODEL_LRBALANCE)
-                     && settings->ignore && (yv == 100)) continue;
+                // skip values ? Like zeroes...
+                if (skipValues(xv, yv, settings))
+                    continue;
 
                 // add it
                 x <<xv;
@@ -496,6 +482,11 @@ void ScatterPlot::setData (ScatterSettings *settings)
                             x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
                             y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
                         }
+
+
+                        // skip values ?
+                        if (skipValues(x, y, settings))
+                            continue;
 
                         if (y > maxY) maxY = y;
                         if (y < minY) minY = y;
@@ -951,3 +942,24 @@ ScatterPlot::resample(QVector<double> &xval, QVector<double> &yval, int &count, 
     yval = newyval;
 }
 
+bool
+ScatterPlot::skipValues(double xv, double yv, ScatterSettings *settings) {
+
+    // skip zeroes? - special logic for Model Gear, since there value between 0.01 and 1 happen and are relevant
+    if ((settings->x != MODEL_GEAR && settings->y != MODEL_GEAR)
+         && settings->ignore && (int(xv) == 0 || int(yv) == 0)) return true;
+
+    // Model Gear
+    if ((settings->x == MODEL_GEAR)
+         && settings->ignore && (xv == 0.0f || int(yv) == 0)) return true;
+    if ((settings->y == MODEL_GEAR)
+         && settings->ignore && (int(xv) == 0 || yv == 0.0f)) return true;
+
+    // Temp 0 values are relevant
+    if ((settings->x == MODEL_TEMP && xv == RideFile::NoTemp) || (settings->y == MODEL_TEMP && yv == RideFile::NoTemp)) return true;
+
+    // LR Balance : if skip 0% skip also 100%
+    if ((settings->x == MODEL_LRBALANCE && settings->ignore && xv == 100) || (settings->y == MODEL_LRBALANCE && settings->ignore && yv == 100)) return true;
+
+    return false;
+}
