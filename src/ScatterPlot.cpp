@@ -493,11 +493,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
                         if (x > maxX) maxX = x;
                         if (x < minX) minX = x;
 
-                        if (!(settings->ignore && (x == 0 && y ==0))) {
-                            xval.append(x);
-                            yval.append(y);
-                            nbPoints++;
-                        }
+                        xval.append(x);
+                        yval.append(y);
+                        nbPoints++;
                     }
 
                     smooth(xval, yval, nbPoints, settings->smoothing);
