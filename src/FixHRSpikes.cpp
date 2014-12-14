@@ -23,6 +23,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
 
@@ -41,6 +42,9 @@ class FixHRSpikesConfig : public DataProcessorConfig
 
     public:
         FixHRSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
+
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixHRSpikes));
 
             layout = new QHBoxLayout(this);
 

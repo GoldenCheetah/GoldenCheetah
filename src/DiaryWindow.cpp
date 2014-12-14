@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "TabView.h"
+#include "HelpWhatsThis.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
     GcWindow(context), context(context), active(false)
@@ -77,6 +78,9 @@ DiaryWindow::DiaryWindow(Context *context) :
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);
     monthlyView->setFrameStyle(QFrame::NoFrame);
+
+    HelpWhatsThis *helpView = new HelpWhatsThis(monthlyView);
+    monthlyView->setWhatsThis(helpView->getWhatsThisText(HelpWhatsThis::ChartDiary_Calendar));
 
     allViews = new QStackedWidget(this);
     allViews->addWidget(monthlyView);

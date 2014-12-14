@@ -19,6 +19,7 @@
 #include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
 
@@ -31,7 +32,11 @@ class FixGPSConfig : public DataProcessorConfig
     protected:
     public:
         // there is no config
-        FixGPSConfig(QWidget *parent) : DataProcessorConfig(parent) {}
+        FixGPSConfig(QWidget *parent) : DataProcessorConfig(parent) {
+
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixGPSErrors));
+        }
 
         QString explain() {
             return(QString(tr("Remove GPS errors and interpolate positional "

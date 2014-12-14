@@ -25,6 +25,7 @@
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
 #include "Colors.h" // for MILES_PER_KM
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -58,6 +59,8 @@ ModelWindow::ModelWindow(Context *context) :
     GcChartWindow(context), context(context), ride(NULL), current(NULL)
 {
     QWidget *c = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_3D));
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 
@@ -72,6 +75,9 @@ ModelWindow::ModelWindow(Context *context) :
     mainLayout->addWidget(zpane);
     mainLayout->addWidget(modelPlot);
     setChartLayout(mainLayout);
+
+    HelpWhatsThis *help = new HelpWhatsThis(modelPlot);
+    modelPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_3D));
 
     // preset Values
     presetLabel = new QLabel(tr("Analyse"), this);

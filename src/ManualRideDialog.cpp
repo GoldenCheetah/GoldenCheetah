@@ -25,6 +25,7 @@
 #include <QtGui>
 #include <math.h>
 #include "Units.h"
+#include "HelpWhatsThis.h"
 
 #include "MetricAggregator.h"
 
@@ -118,6 +119,8 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Manual Ride Entry"));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Manual));
 #ifdef Q_OS_MAC
     setFixedSize(610,415);
 #else

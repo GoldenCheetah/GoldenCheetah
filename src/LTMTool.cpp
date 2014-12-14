@@ -22,8 +22,10 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <QApplication>
 #include <QtGui>
+
 
 // charts.xml support
 #include "LTMChartParser.h"
@@ -54,11 +56,16 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     QWidget *basicsettings = new QWidget(this);
     mainLayout->addWidget(basicsettings);
+    HelpWhatsThis *basicHelp = new HelpWhatsThis(basicsettings);
+    basicsettings->setWhatsThis(basicHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Basic));
+
     QFormLayout *basicsettingsLayout = new QFormLayout(basicsettings);
     basicsettingsLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
 #ifdef GC_HAVE_LUCENE
     searchBox = new SearchFilterBox(this, context);
+    HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
+    searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
 
@@ -69,6 +76,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     // Basic Controls
     QWidget *basic = new QWidget(this);
     basic->setContentsMargins(0,0,0,0);
+    HelpWhatsThis *presetHelp = new HelpWhatsThis(basic);
+    basic->setWhatsThis(presetHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Preset));
     QVBoxLayout *basicLayout = new QVBoxLayout(basic);
     basicLayout->setContentsMargins(0,0,0,0);
     basicLayout->setSpacing(5);
@@ -80,6 +89,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 #endif
 
     dateSetting = new DateSettingsEdit(this);
+    HelpWhatsThis *dateSettingHelp = new HelpWhatsThis(dateSetting);
+    dateSetting->setWhatsThis(dateSettingHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_DateRange));
     basicsettingsLayout->addRow(new QLabel(tr("Date range")), dateSetting);
     basicsettingsLayout->addRow(new QLabel(tr(""))); // spacing
 
@@ -247,6 +258,8 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     // custom widget
     QWidget *custom = new QWidget(this);
     custom->setContentsMargins(20,20,20,20);
+    HelpWhatsThis *curvesHelp = new HelpWhatsThis(custom);
+    custom->setWhatsThis(curvesHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Config_Curves));
     QVBoxLayout *customLayout = new QVBoxLayout(custom);
     customLayout->setContentsMargins(0,0,0,0);
     customLayout->setSpacing(5);

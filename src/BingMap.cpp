@@ -28,12 +28,14 @@
 #include "Colors.h"
 #include "Units.h"
 #include "TimeUtils.h"
+#include "HelpWhatsThis.h"
 
 #include <QDebug>
 
 BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), range(-1), current(NULL)
 {
     setControls(NULL);
+
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout();
     layout->setSpacing(0);
@@ -46,6 +48,9 @@ BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), r
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
+
+    HelpWhatsThis *help = new HelpWhatsThis(view);
+    view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
 
     webBridge = new BWebBridge(context, this);
 

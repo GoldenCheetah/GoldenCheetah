@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "GcWindowLayout.h"
 #include "Settings.h"
+#include "HelpWhatsThis.h"
 #include <QWebSettings>
 #include <QWebFrame>
 #include "TimeUtils.h"
@@ -59,6 +60,9 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     layout->setContentsMargins(0,0,0,0);
     calendarItem->addWidget(calWidget);
 
+    HelpWhatsThis *helpCalendarItem = new HelpWhatsThis(calendarItem);
+    calendarItem->setWhatsThis(helpCalendarItem->getWhatsThisText(HelpWhatsThis::SideBarDiaryView_Calendar));
+
     // summary widget
     summaryWidget = new QWidget(this);
     summaryWidget->setContentsMargins(0,0,0,0);
@@ -68,6 +72,9 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     slayout->setSpacing(0);
     slayout->setContentsMargins(0,0,0,0);
     summaryItem->addWidget(summaryWidget);
+
+    HelpWhatsThis *helpSummaryItem = new HelpWhatsThis(summaryItem);
+    summaryItem->setWhatsThis(helpSummaryItem->getWhatsThisText(HelpWhatsThis::SideBarDiaryView_Summary));
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);

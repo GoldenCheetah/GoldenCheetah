@@ -32,6 +32,7 @@
 #include "TcxRideFile.h"
 #include "MetricAggregator.h"
 #include "RideAutoImportConfig.h"
+#include "HelpWhatsThis.h"
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
@@ -161,6 +162,10 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
 void
 RideImportWizard::init(QList<QString> files, Context * /*mainWindow*/)
 {
+
+    // setup Help
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Import));
 
     // initialise dialog box
     tableWidget = new QTableWidget(files.count(), 6, this);
