@@ -332,6 +332,7 @@ HEADERS += \
         GpxParser.h \
         GpxRideFile.h \
         HelpWindow.h \
+        HelpWhatsThis.h \
         HistogramWindow.h \
         HomeWindow.h \
         HrZones.h \
@@ -555,6 +556,7 @@ SOURCES += \
         GpxParser.cpp \
         GpxRideFile.cpp \
         HelpWindow.cpp \
+        HelpWhatsThis.cpp \
         HistogramWindow.cpp \
         HomeWindow.cpp \
         HrTimeInZone.cpp \

@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <QtGui>
 
 // metadata support
@@ -50,6 +51,9 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     calendarWidget = new GcMultiCalendar(context);
     calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
     calendarItem->addWidget(calendarWidget);
+
+    HelpWhatsThis *helpCalendar = new HelpWhatsThis(calendarWidget);
+    calendarWidget->setWhatsThis(helpCalendar->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Calendar));
 
     // Activity History
     rideNavigator = new RideNavigator(context, true);
@@ -84,6 +88,9 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(context);
 
+    HelpWhatsThis *helpSummaryWindow = new HelpWhatsThis(intervalSummaryWindow);
+    intervalSummaryWindow->setWhatsThis(helpSummaryWindow->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Intervals));
+
     intervalSplitter = new QSplitter(this);
     intervalSplitter->setHandleWidth(1);
     intervalSplitter->setOrientation(Qt::Vertical);
@@ -93,6 +100,9 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     intervalSplitter->setFrameStyle(QFrame::NoFrame);
     intervalSplitter->setCollapsible(0, false);
     intervalSplitter->setCollapsible(1, false);
+
+    HelpWhatsThis *helpIntervalSplitter = new HelpWhatsThis(intervalSplitter);
+    intervalSplitter->setWhatsThis(helpIntervalSplitter->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Intervals));
 
     intervalItem = new GcSplitterItem(tr("Intervals"), iconFromPNG(":images/mac/stop.png"), this);
     QAction *moreIntervalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);

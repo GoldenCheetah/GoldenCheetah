@@ -26,6 +26,7 @@
 #include "Units.h"
 #include "VeloHeroUploader.h"
 #include "TrainingstagebuchUploader.h"
+#include "HelpWhatsThis.h"
 
 // access to metrics
 #include "MetricAggregator.h"
@@ -89,6 +90,8 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     context(context)
 {
     setWindowTitle(tr("Share your ride"));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Share));
 
     // make the dialog a resonable size
     setMinimumWidth(550);

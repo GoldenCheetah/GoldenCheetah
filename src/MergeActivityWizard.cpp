@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "RideCache.h"
 #include "MainWindow.h"
+#include "HelpWhatsThis.h"
 
 // minimum R-squared fit when trying to find offsets to
 // merge ride files. Lower numbers mean happier to take
@@ -59,6 +60,9 @@ MergeActivityWizard::MergeActivityWizard(Context *context) : QWizard(context->ma
     setWizardStyle(QWizard::ModernStyle);
 #endif
     setWindowTitle(tr("Combine Activities"));
+
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_CombineRides));
 
     setFixedHeight(530);
     setFixedWidth(550);

@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "HelpWhatsThis.h"
 
 // Minimum gap in recording to find a natural break to split
 static const double defaultMinimumGap = 1; // 1 minute
@@ -43,6 +44,10 @@ SplitActivityWizard::SplitActivityWizard(Context *context) : QWizard(context->ma
 
     // title
     setWindowTitle(tr("Split Ride"));
+
+    // help
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_SplitRide));
 
     // set ride - unconst since we will wipe it away eventually
     rideItem = const_cast<RideItem*>(context->currentRideItem());

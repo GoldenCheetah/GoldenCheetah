@@ -32,6 +32,7 @@
 #include "IntervalItem.h"
 #include "GcOverlayWidget.h"
 #include "MUWidget.h"
+#include "HelpWhatsThis.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
@@ -91,6 +92,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     cpPlot = new CPPlot(this, context, rangemode);
     mainLayout->addWidget(cpPlot);
+    HelpWhatsThis *help = new HelpWhatsThis(cpPlot);
+    if (rangemode) cpPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM));
+    else cpPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM));
 
     //
     // Chart settings
@@ -98,10 +102,17 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     // controls widget and layout
     QTabWidget *settingsTabs = new QTabWidget(this);
+    HelpWhatsThis *helpTabs = new HelpWhatsThis(settingsTabs);
+    if (rangemode) settingsTabs->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM));
+    else settingsTabs->setWhatsThis(helpTabs->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM));
+
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
     settingsTabs->addTab(settingsWidget, tr("Basic"));
+    HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
+    if (rangemode) settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM_Config_Settings));
+    else settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
     QFormLayout *cl = new QFormLayout(settingsWidget);;
     cl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -109,6 +120,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QWidget *modelWidget = new QWidget(this);
     modelWidget->setContentsMargins(0,0,0,0);
     settingsTabs->addTab(modelWidget, tr("CP/CV Model"));
+    HelpWhatsThis *helpModel = new HelpWhatsThis(modelWidget);
+    if (rangemode) modelWidget->setWhatsThis(helpModel->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM_Config_Model));
+    else modelWidget->setWhatsThis(helpModel->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Model));
 
     QFormLayout *mcl = new QFormLayout(modelWidget);;
     mcl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
@@ -129,6 +143,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(filterChanged()));
     cl->addRow(new QLabel(tr("Filter")), searchBox);
     cl->addWidget(new QLabel("")); //spacing
+    HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
+    searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 #endif
 
     // series
@@ -147,6 +163,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     }
     cl->addRow(label2, cComboSeason);
     dateSetting = new DateSettingsEdit(this);
+    HelpWhatsThis *dateSettingHelp = new HelpWhatsThis(dateSetting);
+    dateSetting->setWhatsThis(dateSettingHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_DateRange));
     cl->addRow(label, dateSetting);
     if (rangemode == false) {
         dateSetting->hide();

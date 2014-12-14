@@ -25,6 +25,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "TabView.h"
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -92,6 +93,8 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     toolbar->addAction(saveAct);
 
     toolbar->addSeparator();
+    HelpWhatsThis *helpToolbar = new HelpWhatsThis(toolbar);
+    toolbar->setWhatsThis(helpToolbar->getWhatsThisText(HelpWhatsThis::ChartRides_Editor));
 
     // undo and redo deliberately at a distance from the
     // save icon, since accidentally hitting the wrong
@@ -134,6 +137,9 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     table->setSelectionMode(QAbstractItemView::ContiguousSelection);
     table->installEventFilter(this);
+
+    HelpWhatsThis *helpTable = new HelpWhatsThis(table);
+    table->setWhatsThis(helpTable->getWhatsThisText(HelpWhatsThis::ChartRides_Editor));
 
     // prettify (and make anomalies more visible)
     table->setGridStyle(Qt::NoPen);

@@ -25,6 +25,7 @@
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
 #include "TabView.h"
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -73,6 +74,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     if (!mainwindow) {
         searchFilterBox = new SearchFilterBox(this, context, false);
         mainLayout->addWidget(searchFilterBox);
+        HelpWhatsThis *searchHelp = new HelpWhatsThis(searchFilterBox);
+        searchFilterBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
     }
 #endif
 
@@ -106,6 +109,12 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->setFrameStyle(QFrame::NoFrame);
     tableView->setAcceptDrops(true);
     tableView->setColumnWidth(1, 100);
+
+    HelpWhatsThis *helpTableView = new HelpWhatsThis(tableView);
+    if (mainwindow)
+        tableView->setWhatsThis(helpTableView->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Rides));
+    else
+        tableView->setWhatsThis(helpTableView->getWhatsThisText(HelpWhatsThis::ChartDiary_Navigator));
 
     // good to go
     tableView->show();

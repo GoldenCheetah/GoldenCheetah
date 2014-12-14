@@ -24,6 +24,7 @@
 #include "IntervalNavigatorProxy.h"
 #include "SearchFilterBox.h"
 #include "TabView.h"
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -81,6 +82,8 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     if (!mainwindow) {
         searchFilterBox = new SearchFilterBox(this, context, false);
         mainLayout->addWidget(searchFilterBox);
+        HelpWhatsThis *searchHelp = new HelpWhatsThis(searchFilterBox);
+        searchFilterBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
     }
 #endif
 

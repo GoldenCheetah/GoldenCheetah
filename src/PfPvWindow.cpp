@@ -24,6 +24,7 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "HelpWhatsThis.h"
 #include <QtGui>
 
 #define PI M_PI
@@ -75,6 +76,8 @@ PfPvWindow::PfPvWindow(Context *context) :
     GcChartWindow(context), context(context), current(NULL), compareStale(true)
 {
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_PFvV));
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
@@ -116,6 +119,8 @@ PfPvWindow::PfPvWindow(Context *context) :
     QVBoxLayout *vlayout = new QVBoxLayout;
     pfPvPlot = new PfPvPlot(context);
     vlayout->addWidget(pfPvPlot);
+    HelpWhatsThis *help = new HelpWhatsThis(pfPvPlot);
+    pfPvPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_PFvV));
 
     setChartLayout(vlayout);
     setAutoFillBackground(true);

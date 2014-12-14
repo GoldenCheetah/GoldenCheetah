@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 
 #include <QApplication>
 #include <QWebView>
@@ -87,7 +88,10 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
 #endif
     seasonsWidget->addWidget(dateRangeTree);
 
-    // events
+    HelpWhatsThis *helpDateRange = new HelpWhatsThis(dateRangeTree);
+    dateRangeTree->setWhatsThis(helpDateRange->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_DateRanges));
+
+     // events
     eventsWidget = new GcSplitterItem(tr("Events"), iconFromPNG(":images/sidebar/bookmark.png"), this);
     QAction *moreEventAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     eventsWidget->addAction(moreEventAct);
@@ -113,7 +117,11 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     cde = QStyleFactory::create(OS_STYLE);
     eventTree->verticalScrollBar()->setStyle(cde);
 #endif
+
     eventsWidget->addWidget(eventTree);
+
+    HelpWhatsThis *helpEventsTree = new HelpWhatsThis(eventTree);
+    eventTree->setWhatsThis(helpEventsTree->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Events));
 
     // charts
     chartsWidget = new GcSplitterItem(tr("Charts"), iconFromPNG(":images/sidebar/charts.png"), this);
@@ -143,6 +151,9 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     chartTree->verticalScrollBar()->setStyle(cde);
 #endif
     chartsWidget->addWidget(chartTree);
+
+    HelpWhatsThis *helpChartsTree = new HelpWhatsThis(chartTree);
+    chartTree->setWhatsThis(helpChartsTree->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Charts));
 
     // setup for first time
     presetsChanged();
@@ -180,6 +191,10 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     // we cast the filter tree and this because we use the same constructor XXX fix this!!!
     filterSplitter = new GcSubSplitter(Qt::Vertical, (GcSplitterControl*)filterTree, (GcSplitter*)this, true);
     filtersWidget->addWidget(filterSplitter);
+
+    HelpWhatsThis *helpFilterTree = new HelpWhatsThis(filterTree);
+    filterTree->setWhatsThis(helpFilterTree->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Filter));
+
 #endif
 
     seasons = context->athlete->seasons;
@@ -207,6 +222,9 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     summary->setAcceptDrops(false);
 
     summaryWidget->addWidget(summary);
+
+    HelpWhatsThis *helpSummary = new HelpWhatsThis(summary);
+    summary->setWhatsThis(helpSummary->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Summary));
 
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
@@ -631,6 +649,9 @@ LTMSidebar::autoFilterChanged()
 #endif
             item->addWidget(tree);
             filterSplitter->addWidget(item);
+
+            HelpWhatsThis *helpFilterTree = new HelpWhatsThis(tree);
+            tree->setWhatsThis(helpFilterTree->getWhatsThisText(HelpWhatsThis::SideBarTrendsView_Filter));
 
             // Convert field names for Internal to Display (to work with the translated values)
             SpecialFields sp;

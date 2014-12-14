@@ -19,6 +19,7 @@
 #include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
 #include <QNetworkAccessManager>
@@ -42,7 +43,11 @@ class FixElevationConfig : public DataProcessorConfig
     protected:
     public:
         // there is no config
-        FixElevationConfig(QWidget *parent) : DataProcessorConfig(parent) {}
+        FixElevationConfig(QWidget *parent) : DataProcessorConfig(parent) {
+
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixElevationErrors));
+        }
 
         QString explain() {
             return(QString(tr("Fix or add elevation data. If elevation data is "
