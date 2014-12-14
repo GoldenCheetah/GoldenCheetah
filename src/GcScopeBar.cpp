@@ -21,6 +21,7 @@
 #include "DiarySidebar.h"
 #include "Context.h"
 #include "QtMacButton.h"
+#include "HelpWhatsThis.h"
 
 GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -78,10 +79,17 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     layout->addWidget(home);
     connect(home, SIGNAL(clicked(bool)), this, SLOT(clickedHome()));
 
+    HelpWhatsThis *helpHome = new HelpWhatsThis(home);
+    home->setWhatsThis(helpHome->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
+
 #ifdef GC_HAVE_ICAL
     diary->setText(tr("Diary"));
     layout->addWidget(diary);
     connect(diary, SIGNAL(clicked(bool)), this, SLOT(clickedDiary()));
+
+    HelpWhatsThis *helpDiary = new HelpWhatsThis(diary);
+    diary->setWhatsThis(helpDiary->getWhatsThisText(HelpWhatsThis::ScopeBar_Diary));
+
 #endif
 
     anal->setText(tr("Rides"));
@@ -90,16 +98,29 @@ GcScopeBar::GcScopeBar(Context *context) : QWidget(context->mainWindow), context
     layout->addWidget(anal);
     connect(anal, SIGNAL(clicked(bool)), this, SLOT(clickedAnal()));
 
+    HelpWhatsThis *helpAnal = new HelpWhatsThis(anal);
+    anal->setWhatsThis(helpAnal->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
+
+
 #ifdef GC_HAVE_INTERVALS
     interval->setText(tr("Intervals"));
     interval->setWidth(70);
     layout->addWidget(interval);
     connect(interval, SIGNAL(clicked(bool)), this, SLOT(clickedInterval()));
+
+    HelpWhatsThis *helpIntervals = new HelpWhatsThis(interval);
+    interval->setWhatsThis(helpIntervals->getWhatsThisText(HelpWhatsThis::ScopeBar_Intervals));
+
+
 #endif
 
     train->setText(tr("Train"));
     layout->addWidget(train);
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
+
+    HelpWhatsThis *helpTrain = new HelpWhatsThis(train);
+    train->setWhatsThis(helpTrain->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
+
 
     //layout->addWidget(traintool); //XXX!!! eek
 

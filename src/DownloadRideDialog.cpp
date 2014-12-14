@@ -24,6 +24,7 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "JsonRideFile.h"
+#include "HelpWhatsThis.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
@@ -34,6 +35,9 @@ DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Download Ride Data"));
+
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_Download));
 
     deviceCombo = new QComboBox(this);
     QList<QString> deviceTypes = Devices::typeNames();

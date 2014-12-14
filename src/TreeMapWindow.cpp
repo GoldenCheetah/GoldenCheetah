@@ -27,6 +27,7 @@
 #include "Settings.h"
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -47,8 +48,13 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     mainLayout->setContentsMargins(0,0,0,0);
     setLayout(mainLayout);
 
+    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(ltmPlot);
+    ltmPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
+
     // the controls
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 

@@ -30,6 +30,7 @@
 #include "Colors.h"
 #include "Units.h"
 #include "TimeUtils.h"
+#include "HelpWhatsThis.h"
 
 // overlay helper
 #include "TabView.h"
@@ -41,6 +42,7 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
                                                        range(-1), current(NULL), firstShow(true)
 {
     setControls(NULL);
+
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout();
     layout->setSpacing(0);
@@ -54,6 +56,9 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
+
+    HelpWhatsThis *help = new HelpWhatsThis(view);
+    view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
 
     webBridge = new WebBridge(context, this);
 

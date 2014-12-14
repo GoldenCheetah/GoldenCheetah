@@ -55,6 +55,9 @@
 // tooltip
 #include "LTMWindow.h"
 
+// help
+#include "HelpWhatsThis.h"
+
 // overlay helper
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
@@ -67,6 +70,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // basic setup
     setContentsMargins(0,0,0,0);
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
     setControls(c);
     QVBoxLayout *clv = new QVBoxLayout(c);
 
@@ -87,6 +92,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     basicControls->addStretch();
     st->addTab(basic, tr("Basic"));
 
+    HelpWhatsThis *basicHelp = new HelpWhatsThis(basic);
+    basic->setWhatsThis(basicHelp->getWhatsThisText(HelpWhatsThis::ChartRides_Performance_Config_Basic));
+
     // data series
     QWidget *series = new QWidget(this); // data series selection
     QHBoxLayout *seriesControls = new QHBoxLayout(series);
@@ -94,8 +102,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     QFormLayout *seriesRight = new QFormLayout(); // ride side series
     seriesControls->addLayout(seriesLeft);
     seriesControls->addLayout(seriesRight); // ack I swapped them around !
-
     st->addTab(series, tr("Curves"));
+
+    HelpWhatsThis *seriesHelp = new HelpWhatsThis(series);
+    series->setWhatsThis(seriesHelp->getWhatsThisText(HelpWhatsThis::ChartRides_Performance_Config_Series));
 
     // Main layout
     //QGridLayout *mainLayout = new QGridLayout();
@@ -360,6 +370,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allStack->addWidget(allPlot);
     allStack->setCurrentIndex(0);
 
+    HelpWhatsThis *help = new HelpWhatsThis(allPlot);
+    allPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
+
     // sort out default values
     smoothSlider->setValue(allPlot->smooth);
     smoothLineEdit->setText(QString("%1").arg(allPlot->smooth));
@@ -557,12 +570,18 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->setWantAxis(false);
     fullPlot->setContentsMargins(0,0,0,0);
 
+    HelpWhatsThis *helpFull = new HelpWhatsThis(fullPlot);
+    fullPlot->setWhatsThis(helpFull->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
+
     // allPlotStack contains the allPlot and the stack by series
     // because both want the optional fullplot at the bottom
     allPlotStack = new QStackedWidget(this);
     allPlotStack->addWidget(allStack);
     allPlotStack->addWidget(seriesstackFrame);
     allPlotStack->setCurrentIndex(0);
+
+    HelpWhatsThis *helpStack = new HelpWhatsThis(allPlotStack);
+    allPlotStack->setWhatsThis(helpStack->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
 
     allPlotLayout->addWidget(allPlotStack);
     allPlotFrame->setLayout(allPlotLayout);

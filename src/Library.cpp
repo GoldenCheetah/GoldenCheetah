@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "LibraryParser.h"
 #include "TrainDB.h"
+#include "HelpWhatsThis.h"
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -210,6 +211,8 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Search for Workouts and Media"));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_ScanDisk_WorkoutVideo));
     setMinimumWidth(600);
 
     searcher = NULL;

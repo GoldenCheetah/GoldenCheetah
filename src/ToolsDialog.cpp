@@ -17,6 +17,7 @@
  */
 
 #include "ToolsDialog.h"
+#include "HelpWhatsThis.h"
 #include <QtGui>
 
 typedef QDoubleSpinBox* QDoubleSpinBoxPtr;
@@ -60,6 +61,10 @@ QHBoxLayout *setupMinsSecs(ToolsDialog *dialog,
 ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowTitle(tr("Critical Power Estimator"));
+
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CP_EST));
+
     setAttribute(Qt::WA_DeleteOnClose);
 
     setFixedSize(300, 240);

@@ -20,6 +20,7 @@
 #include "LTMOutliers.h"
 #include "Settings.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
 
@@ -37,6 +38,9 @@ class FixDeriveTorqueConfig : public DataProcessorConfig
 
     public:
         FixDeriveTorqueConfig(QWidget *parent) : DataProcessorConfig(parent) {
+
+            HelpWhatsThis *help = new HelpWhatsThis(parent);
+            parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_AddTorqueValues));
 
             //layout = new QHBoxLayout(this);
 

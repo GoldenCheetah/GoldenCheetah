@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Colors.h"
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -122,6 +123,8 @@ ScatterWindow::ScatterWindow(Context *context) :
     setRevealLayout(r);
 
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_2D));
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 
@@ -129,6 +132,8 @@ ScatterWindow::ScatterWindow(Context *context) :
     scatterPlot= new ScatterPlot(context);
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->addWidget(scatterPlot);
+    HelpWhatsThis *help = new HelpWhatsThis(scatterPlot);
+    scatterPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_2D));
 
     setChartLayout(vlayout);
 

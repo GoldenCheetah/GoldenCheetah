@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "HelpWhatsThis.h"
 
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
@@ -748,6 +749,9 @@ void ImportPage::SaveWorkout()
 
 WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CreateWorkout));
+
     hackContext = context;
     setPage(WW_WorkoutTypePage, new WorkoutTypePage());
     setPage(WW_AbsWattagePage, new AbsWattagePage());

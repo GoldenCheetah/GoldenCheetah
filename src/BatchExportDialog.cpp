@@ -22,12 +22,15 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "HelpWhatsThis.h"
 
 BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!
     setWindowTitle(tr("Ride Batch Export"));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_BatchExport));
 
     // make the dialog a resonable size
     setMinimumWidth(550);

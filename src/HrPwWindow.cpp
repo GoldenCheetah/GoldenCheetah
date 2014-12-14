@@ -23,6 +23,7 @@
 #include "HrPwPlot.h"
 #include "SmallPlot.h"
 #include "RideItem.h"
+#include "HelpWhatsThis.h"
 #include <math.h>
 #include <stdlib.h>
 #include <QVector>
@@ -86,6 +87,8 @@ HrPwWindow::HrPwWindow(Context *context) :
     // main plot
     hrPwPlot = new HrPwPlot(context, this);
 
+    HelpWhatsThis *help = new HelpWhatsThis(hrPwPlot);
+    hrPwPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_HRvsPw));
 
     // tooltip on hover over point
     hrPwPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -122,6 +125,8 @@ HrPwWindow::HrPwWindow(Context *context) :
     // the controls
     //
     QWidget *c = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_HRvsPw));
     setControls(c);
     QFormLayout *cl = new QFormLayout(c);
 

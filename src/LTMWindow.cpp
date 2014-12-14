@@ -30,6 +30,7 @@
 #include "Settings.h"
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
+#include "HelpWhatsThis.h"
 
 #include <QtGui>
 #include <QString>
@@ -116,6 +117,9 @@ LTMWindow::LTMWindow(Context *context) :
     mainLayout->addWidget(stackWidget);
     setChartLayout(mainLayout);
 
+    HelpWhatsThis *helpStack = new HelpWhatsThis(stackWidget);
+    stackWidget->setWhatsThis(helpStack->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends));
+
     // reveal controls
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
@@ -153,6 +157,8 @@ LTMWindow::LTMWindow(Context *context) :
     // the controls
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends));
     QVBoxLayout *cl = new QVBoxLayout(c);
     cl->setContentsMargins(0,0,0,0);
     cl->setSpacing(0);

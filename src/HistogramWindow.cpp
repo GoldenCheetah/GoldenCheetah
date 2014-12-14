@@ -18,6 +18,7 @@
  */
 
 #include "HistogramWindow.h"
+#include "HelpWhatsThis.h"
 
 // predefined deltas for each series
 static const double wattsDelta = 1.0;
@@ -43,8 +44,12 @@ static const int gearDigits  = 2;
 //
 HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWindow(context), context(context), stale(true), source(NULL), active(false), bactive(false), rangemode(rangemode), compareStale(false), useCustom(false), useToToday(false), precision(99)
 {
+
     QWidget *c = new QWidget;
     c->setContentsMargins(0,0,0,0);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    if (rangemode) c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrends_Distribution));
+    else c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Histogram));
     QFormLayout *cl = new QFormLayout(c);
     cl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     cl->setSpacing(5);
@@ -87,6 +92,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     powerHist = new PowerHist(context, rangemode);
     vlayout->addWidget(powerHist);
 
+    HelpWhatsThis *help = new HelpWhatsThis(powerHist);
+    if (rangemode) powerHist->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_Distribution));
+    else powerHist->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Histogram));
+
     setChartLayout(vlayout);
 
 #ifdef GC_HAVE_LUCENE
@@ -100,10 +109,14 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         cl->addRow(new QLabel(tr("Filter")), searchBox);
         cl->addWidget(new QLabel(""));
     }
+    HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
+    searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 #endif
 
     // date selection
     dateSetting = new DateSettingsEdit(this);
+    HelpWhatsThis *dateSettingHelp = new HelpWhatsThis(dateSetting);
+    dateSetting->setWhatsThis(dateSettingHelp->getWhatsThisText(HelpWhatsThis::ChartTrends_DateRange));
 
     if (rangemode) {
 
