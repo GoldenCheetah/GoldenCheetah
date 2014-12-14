@@ -31,6 +31,7 @@
 #include "PDModel.h"
 #include "MetricAggregator.h"
 #include "DBAccess.h"
+#include "HelpWhatsThis.h"
 #include <QtGui>
 #include <QtXml/QtXml>
 #include <math.h>
@@ -51,6 +52,8 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 
         QWidget *c = new QWidget;
         c->setContentsMargins(0,0,0,0);
+        HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+        c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_Summary_Config));
         QFormLayout *cl = new QFormLayout(c);
         cl->setContentsMargins(0,0,0,0);
         cl->setSpacing(0);
@@ -59,6 +62,8 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 #ifdef GC_HAVE_LUCENE
         // filter / searchbox
         searchBox = new SearchFilterBox(this, context);
+        HelpWhatsThis *searchHelp = new HelpWhatsThis(searchBox);
+        searchBox->setWhatsThis(searchHelp->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
         connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
         connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
         cl->addRow(new QLabel(tr("Filter")), searchBox);
@@ -79,6 +84,10 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     rideSummary->page()->view()->setContentsMargins(0,0,0,0);
     rideSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     rideSummary->setAcceptDrops(false);
+
+    HelpWhatsThis *help = new HelpWhatsThis(rideSummary);
+    if (ridesummary) rideSummary->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Summary));
+    else rideSummary->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Summary));
 
     vlayout->addWidget(rideSummary);
 

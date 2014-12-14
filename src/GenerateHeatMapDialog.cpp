@@ -22,12 +22,15 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "HelpWhatsThis.h"
 
 GenerateHeatMapDialog::GenerateHeatMapDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!
     setWindowTitle(tr("Ride Heat Map Generator"));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_CreateHeatMap));
 
     // make the dialog a resonable size
     setMinimumWidth(550);

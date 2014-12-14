@@ -24,6 +24,7 @@
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Colors.h"
+#include "HelpWhatsThis.h"
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
@@ -37,6 +38,9 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Plot:
   aerolab = new Aerolab(this, context);
+
+  HelpWhatsThis *help = new HelpWhatsThis(aerolab);
+  aerolab->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Aerolab));
 
   // Left controls layout:
   QVBoxLayout *leftControls  =  new QVBoxLayout;

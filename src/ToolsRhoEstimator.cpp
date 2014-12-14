@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "Units.h"
+#include "HelpWhatsThis.h"
 #include <QtGui>
 #include <sstream>
 #include <cmath>
@@ -33,6 +34,8 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
 
   // Set the main window title.
   setWindowTitle(tr("Air Density (Rho) Estimator"));
+  HelpWhatsThis *help = new HelpWhatsThis(this);
+  this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_AirDens_EST));
   setAttribute(Qt::WA_DeleteOnClose);
 
   // Create the main layout box.
