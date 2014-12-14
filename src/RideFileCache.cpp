@@ -722,6 +722,19 @@ RideFileCache::refreshCache()
     }
 }
 
+// if you already have a cache open and want
+// to refresh it from in-memory data then refresh()
+// does that
+void RideFileCache::refresh(RideFile *file)
+{
+    // set and refresh
+    if (file == NULL && ride == NULL) return;
+    if (file) ride = file;
+
+    // just call compute!
+    compute();
+}
+
 // this function is a candidate for supporting
 // threaded calculations, each of the computes
 // in here could go in its own thread. Users

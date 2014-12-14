@@ -136,7 +136,7 @@ class CPPlot : public QwtPlot
 
         // Data and State
         Context *context;
-        RideFileCache *rideCache, *bestsCache;
+        RideFileCache *bestsCache;
         int dateCP;
         double dateCV;
 

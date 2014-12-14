@@ -152,6 +152,9 @@ class RideFileCache
         // across a date range. This is used to provide aggregated data.
         RideFileCache(Context *context, QDate start, QDate end, bool filter = false, QStringList files = QStringList(), bool onhome = true);
 
+        // once a cache is loaded we can refresh from in-memory if needed
+        void refresh(RideFile*ride = NULL);
+
         // Just get mean max values for power & wpk for a ride
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to);
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QString filename);

@@ -28,6 +28,7 @@
 #include <QVector>
 
 class RideFile;
+class RideFileCache;
 class RideCache;
 class Context;
 
@@ -46,6 +47,7 @@ class RideItem : public QObject
 
         // ridefile
         RideFile *ride_;
+        RideFileCache *fileCache_;
 
         // precomputed metrics
         QVector<double> metrics_;
@@ -95,6 +97,7 @@ class RideItem : public QObject
 
         // access to the cached data !
         RideFile *ride(bool open=true);
+        RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
         QMap<QString, QString> &metadata() { return metadata_; }
         const QStringList errors() { return errors_; }

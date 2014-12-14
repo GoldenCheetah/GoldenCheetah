@@ -55,7 +55,7 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     model(0), modelVariant(0),
 
     // state
-    context(context), rideCache(NULL), bestsCache(NULL), rideSeries(RideFile::watts), 
+    context(context), bestsCache(NULL), rideSeries(RideFile::watts), 
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
     showBest(true), showPercent(false), showHeat(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
@@ -1198,14 +1198,14 @@ CPPlot::plotRide(RideItem *rideItem)
     if (rideCurve) return;
 
     // there is not data to plot!
-    if (rideCache->meanMaxArray(rideSeries).size() == 0) return;
+    if (rideItem->fileCache()->meanMaxArray(rideSeries).size() == 0) return;
 
     // check what we do have to plot
     int maxNonZero = 0;
-    QVector<double> timeArray(rideCache->meanMaxArray(rideSeries).size());
-    for (int i = 0; i < rideCache->meanMaxArray(rideSeries).size(); ++i) {
+    QVector<double> timeArray(rideItem->fileCache()->meanMaxArray(rideSeries).size());
+    for (int i = 0; i < rideItem->fileCache()->meanMaxArray(rideSeries).size(); ++i) {
         timeArray[i] = i / 60.0;
-        if (rideCache->meanMaxArray(rideSeries)[i] > 0) maxNonZero = i;
+        if (rideItem->fileCache()->meanMaxArray(rideSeries)[i] > 0) maxNonZero = i;
     }
 
     // do we have nonzero data to plot ?
@@ -1231,9 +1231,9 @@ CPPlot::plotRide(RideItem *rideItem)
 
         // WORK
 
-        QVector<double> energyArray(rideCache->meanMaxArray(RideFile::watts).size());
+        QVector<double> energyArray(rideItem->fileCache()->meanMaxArray(RideFile::watts).size());
         for (int i = 0; i <= maxNonZero; ++i) {
-            energyArray[i] = timeArray[i] * rideCache->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
+            energyArray[i] = timeArray[i] * rideItem->fileCache()->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
         }
         rideCurve->setSamples(timeArray.data() + 1, energyArray.constData() + 1,
                               maxNonZero > 0 ? maxNonZero-1 : 0);
@@ -1242,11 +1242,11 @@ CPPlot::plotRide(RideItem *rideItem)
 
         // Veloclinic plot
 
-        QVector<double> array(rideCache->meanMaxArray(RideFile::watts).size());
+        QVector<double> array(rideItem->fileCache()->meanMaxArray(RideFile::watts).size());
         for (int i = 0; i <= maxNonZero; ++i) {
-            array[i] =  (rideCache->meanMaxArray(rideSeries)[i]<pdModel->CP()?0:(rideCache->meanMaxArray(rideSeries)[i]-pdModel->CP()) * timeArray[i] * 60.0);
+            array[i] =  (rideItem->fileCache()->meanMaxArray(rideSeries)[i]<pdModel->CP()?0:(rideItem->fileCache()->meanMaxArray(rideSeries)[i]-pdModel->CP()) * timeArray[i] * 60.0);
         }
-        rideCurve->setSamples(rideCache->meanMaxArray(rideSeries).constData()  + 1, array.constData() + 1,
+        rideCurve->setSamples(rideItem->fileCache()->meanMaxArray(rideSeries).constData()  + 1, array.constData() + 1,
                               maxNonZero > 0 ? maxNonZero-1 : 0);
     } else  {
 
@@ -1260,10 +1260,10 @@ CPPlot::plotRide(RideItem *rideItem)
             QVector<double> samples(timeArray.size());
 
             // percentify from the cache
-            for(int i=0; i <samples.size() && i < rideCache->meanMaxArray(rideSeries).size() &&
+            for(int i=0; i <samples.size() && i < rideItem->fileCache()->meanMaxArray(rideSeries).size() &&
                     i <bestsCache->meanMaxArray(rideSeries).size(); i++) {
 
-                samples[i] = rideCache->meanMaxArray(rideSeries)[i] /
+                samples[i] = rideItem->fileCache()->meanMaxArray(rideSeries)[i] /
                              bestsCache->meanMaxArray(rideSeries)[i] * 100.00f;
             }
             rideCurve->setSamples(timeArray.data() + 1, samples.data() + 1,
@@ -1284,7 +1284,7 @@ CPPlot::plotRide(RideItem *rideItem)
 
             // JUST A NORMAL CURVE
             rideCurve->setYAxis(yLeft);
-            rideCurve->setSamples(timeArray.data() + 1, rideCache->meanMaxArray(rideSeries).constData() + 1,
+            rideCurve->setSamples(timeArray.data() + 1, rideItem->fileCache()->meanMaxArray(rideSeries).constData() + 1,
                                   maxNonZero > 0 ? maxNonZero-1 : 0);
 
             // Set the YAxis Title if Heat is active
@@ -1323,10 +1323,6 @@ CPPlot::setRide(RideItem *rideItem)
         delete rideCurve;
         rideCurve = NULL;
     }
-    if (rideCache) {
-        delete rideCache;
-        rideCache = NULL;
-    }
     // clear any centile and interval curves
     // since they will be for an old ride
     foreach(QwtPlotCurve *c, centileCurves) {
@@ -1356,7 +1352,6 @@ CPPlot::setRide(RideItem *rideItem)
             {
                 // MEANMAX
                 // Plot as normal or percent
-                rideCache = new RideFileCache(context, context->athlete->home->cache().canonicalPath() + "/" + rideItem->fileName);
                 plotRide(rideItem);
                 refreshReferenceLines(rideItem);
             }
