@@ -19,6 +19,7 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "Context.h"
 #include "DBAccess.h" // only for DBSchemaVersion
 #include "Zones.h"
@@ -33,14 +34,14 @@
 // merge wizard and interval navigator
 RideItem::RideItem() 
     : 
-    ride_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
     color(QColor(1,1,1)), isRun(false), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
-    ride_(ride), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
     color(QColor(1,1,1)), isRun(false), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
@@ -48,7 +49,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
-    ride_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
+    ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
     fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), fingerprint(0), 
     crc(0), timestamp(0), dbversion(0), weight(0) 
 {
@@ -59,16 +60,17 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
 // pre-computed metrics and storing ride metadata
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
-    ride_(ride), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
+    ride_(ride), fileCache_(NULL), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
     fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 void
-RideItem::setFrom(RideItem&here)
+RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 {
     ride_ = NULL;
+    fileCache_ = NULL;
     metrics_ = here.metrics_;
 	metadata_ = here.metadata_;
 	errors_ = here.errors_;
@@ -115,6 +117,16 @@ RideFile *RideItem::ride(bool open)
     return ride_;
 }
 
+RideFileCache *
+RideItem::fileCache()
+{
+    if (!fileCache_) {
+        fileCache_ = new RideFileCache(context, fileName, ride());
+        if (isDirty()) fileCache_->refresh(ride()); // refresh from what we have now !
+    }
+    return fileCache_;
+}
+
 void
 RideItem::setRide(RideFile *overwrite)
 {
@@ -143,12 +155,23 @@ RideItem::setRide(RideFile *overwrite)
 void
 RideItem::notifyRideDataChanged()
 {
+    // refresh the cache
+    if (fileCache_) fileCache_->refresh(ride());
+
+    // refresh the metrics
+    isstale=true;
+    refresh();
+
     emit rideDataChanged();
 }
 
 void
 RideItem::notifyRideMetadataChanged()
 {
+    // refresh the metrics
+    isstale=true;
+    refresh();
+
     emit rideMetadataChanged();
 }
 
