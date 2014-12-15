@@ -325,12 +325,65 @@ RideCache::refresh()
     }
 }
 
+class RollingBests {
+    private:
+
+        // buffer of best values; Watts or Watts/KG
+        // is a double to handle both use cases
+        QVector<QVector<float> > buffer;
+
+        // current location in circular buffer
+        int index;
+
+    public:
+
+        // iniitalise with circular buffer size
+        RollingBests(int size) {
+            index=1;
+            buffer.resize(size);
+        }
+
+        // add a new weeks worth of data, losing
+        // whatever is at the back of the buffer
+        void addBests(QVector<float> array) {
+            buffer[index++] = array;
+            if (index >= buffer.count()) index=0;
+        }
+
+        // get an aggregate of all the bests
+        // currently in the circular buffer
+        QVector<float> aggregate() {
+
+            QVector<float> returning;
+
+            // set return buffer size
+            int size=0;
+            for(int i=0; i<buffer.count(); i++)
+                if (buffer[i].size() > size)
+                    size = buffer[i].size();
+
+            // initialise return values
+            returning.fill(0.0f, size);
+
+            // get largest values
+            for(int i=0; i<buffer.count(); i++) 
+                for (int j=0; j<buffer[i].count(); j++)
+                    if(buffer[i].at(j) > returning[j])
+                        returning[j] = buffer[i].at(j);
+
+            // return the aggregate
+            return returning;
+        }
+};
+
 void
 RideCache::refreshCPModelMetrics()
 {
     // this needs to be done once all the other metrics
     // Calculate a *monthly* estimate of CP, W' etc using
-    // bests data from the previous 3 months
+    // bests data from the previous 12 weeks
+    RollingBests bests(12);
+    RollingBests bestsWPK(12);
 
     // clear any previous calculations
     context->athlete->PDEstimates.clear(); 
@@ -365,22 +418,6 @@ RideCache::refreshCPModelMetrics()
         return;
     }
 
-    // run through each month with a rolling bests
-    int year = from.year();
-    int month = from.month();
-    int lastYear = to.year();
-    int lastMonth = to.month();
-    int count = 0;
-
-    // lets make sure we don't run wild when there is bad
-    // ride dates etc -- ignore data before 1990 and after 
-    // next year. This is belt and braces really
-    if (year < 1990) year = 1990;
-    if (lastYear > QDate::currentDate().year()+1) lastYear = QDate::currentDate().year()+1;
-
-    QList< QVector<float> > months;
-    QList< QVector<float> > monthsKG;
-
     // set up the models we support
     CP2Model p2model(context);
     CP3Model p3model(context);
@@ -394,123 +431,70 @@ RideCache::refreshCPModelMetrics()
     models << &extmodel;
 
 
-    // loop through
-    while (year < lastYear || (year == lastYear && month <= lastMonth)) {
+    // run backwards stopping when date is at 1990 or first ride date with data
+    QDate date = from.addDays(-84);
+    while (date < to.addDays(7)) {
 
-        QDate firstOfMonth = QDate(year, month, 01);
-        QDate lastOfMonth = firstOfMonth.addMonths(1).addDays(-1);
+        QDate begin = date;
+        QDate end = date.addDays(7);
 
         // let others know where we got to...
-        emit modelProgress(year, month);
+        emit modelProgress(date.year(), date.month());
 
         // months is a rolling 3 months sets of bests
         QVector<float> wpk; // for getting the wpk values
-        months << RideFileCache::meanMaxPowerFor(context, wpk, firstOfMonth, lastOfMonth);
-        monthsKG << wpk;
+        bests.addBests(RideFileCache::meanMaxPowerFor(context, wpk, begin, end));
+        bestsWPK.addBests(wpk);
 
-        if (months.count() > 2) {
-            months.removeFirst();
-            monthsKG.removeFirst();
+        // we now have the data
+        foreach(PDModel *model, models) {
+
+            PDEstimate add;
+
+            // set the data
+            model->setData(bests.aggregate());
+            model->saveParameters(add.parameters); // save the computed parms
+
+            add.wpk = false;
+            add.from = begin;
+            add.to = end;
+            add.model = model->code();
+            add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
+            add.CP = model->hasCP() ? model->CP() : 0;
+            add.PMax = model->hasPMax() ? model->PMax() : 0;
+            add.FTP = model->hasFTP() ? model->FTP() : 0;
+
+            if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
+
+            // so long as the model derived values are sensible ...
+            if (add.WPrime > 1000 && add.CP > 100 && add.PMax > 100 && add.FTP > 100)
+                context->athlete->PDEstimates << add;
+
+            //qDebug()<<add.to<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
+
+            // set the wpk data
+            model->setData(bestsWPK.aggregate());
+            model->saveParameters(add.parameters); // save the computed parms
+
+            add.wpk = true;
+            add.from = begin;
+            add.to = end;
+            add.model = model->code();
+            add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
+            add.CP = model->hasCP() ? model->CP() : 0;
+            add.PMax = model->hasPMax() ? model->PMax() : 0;
+            add.FTP = model->hasFTP() ? model->FTP() : 0;
+            if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
+
+            // so long as the model derived values are sensible ...
+            if (add.WPrime > 100.0f && add.CP > 1.0f && add.PMax > 1.0f && add.FTP > 1.0f)
+                context->athlete->PDEstimates << add;
+
+            //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
         }
 
-        // create a rolling merge of all those months
-        QVector<float> rollingBests = months[0];
-        QVector<float> rollingBestsKG = monthsKG[0];
-
-        switch(months.count()) {
-            case 1 : // first time through we are done!
-                break;
-
-            case 2 : // second time through just apply month(1)
-                {
-                    // watts
-                    if (months[1].size() > rollingBests.size()) rollingBests.resize(months[1].size());
-                    for (int i=0; i<months[1].size(); i++)
-                        if (months[1][i] > rollingBests[i]) rollingBests[i] = months[1][i];
-
-                    // wattsKG
-                    if (monthsKG[1].size() > rollingBestsKG.size()) rollingBestsKG.resize(monthsKG[1].size());
-                    for (int i=0; i<monthsKG[1].size(); i++)
-                        if (monthsKG[1][i] > rollingBestsKG[i]) rollingBestsKG[i] = monthsKG[1][i];
-                }
-                break;
-
-            case 3 : // third time through resize to largest and compare to 1 and 2 XXX not used as limits to 2 month window
-                {
-
-                    // watts
-                    if (months[1].size() > rollingBests.size()) rollingBests.resize(months[1].size());
-                    if (months[2].size() > rollingBests.size()) rollingBests.resize(months[2].size());
-                    for (int i=0; i<months[1].size(); i++) if (months[1][i] > rollingBests[i]) rollingBests[i] = months[1][i];
-                    for (int i=0; i<months[2].size(); i++) if (months[2][i] > rollingBests[i]) rollingBests[i] = months[2][i];
-
-                    // wattsKG
-                    if (monthsKG[1].size() > rollingBestsKG.size()) rollingBestsKG.resize(monthsKG[1].size());
-                    if (monthsKG[2].size() > rollingBestsKG.size()) rollingBestsKG.resize(monthsKG[2].size());
-                    for (int i=0; i<monthsKG[1].size(); i++) if (monthsKG[1][i] > rollingBestsKG[i]) rollingBestsKG[i] = monthsKG[1][i];
-                    for (int i=0; i<monthsKG[2].size(); i++) if (monthsKG[2][i] > rollingBestsKG[i]) rollingBestsKG[i] = monthsKG[2][i];
-                }
-        }
-
-        // got some data lets rock
-        if (rollingBests.size()) {
-
-            // we now have the data
-            foreach(PDModel *model, models) {
-
-                PDEstimate add;
-
-                // set the data
-                model->setData(rollingBests);
-                model->saveParameters(add.parameters); // save the computed parms
-
-                add.wpk = false;
-                add.from = firstOfMonth;
-                add.to = lastOfMonth;
-                add.model = model->code();
-                add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
-                add.CP = model->hasCP() ? model->CP() : 0;
-                add.PMax = model->hasPMax() ? model->PMax() : 0;
-                add.FTP = model->hasFTP() ? model->FTP() : 0;
-
-                if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
-
-                // so long as the model derived values are sensible ...
-                if (add.WPrime > 1000 && add.CP > 100 && add.PMax > 100 && add.FTP > 100)
-                    context->athlete->PDEstimates << add;
-
-                //qDebug()<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
-
-                // set the wpk data
-                model->setData(rollingBestsKG);
-                model->saveParameters(add.parameters); // save the computed parms
-
-                add.wpk = true;
-                add.from = firstOfMonth;
-                add.to = lastOfMonth;
-                add.model = model->code();
-                add.WPrime = model->hasWPrime() ? model->WPrime() : 0;
-                add.CP = model->hasCP() ? model->CP() : 0;
-                add.PMax = model->hasPMax() ? model->PMax() : 0;
-                add.FTP = model->hasFTP() ? model->FTP() : 0;
-                if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
-
-                // so long as the model derived values are sensible ...
-                if (add.WPrime > 100.0f && add.CP > 1.0f && add.PMax > 1.0f && add.FTP > 1.0f)
-                    context->athlete->PDEstimates << add;
-
-                //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
-            }
-        }
-
-        // move onto the next month
-        count++;
-        if (month == 12) {
-            year ++;
-            month = 1;
-        } else {
-            month ++;
-        }
+        // go back a week
+        date = date.addDays(7);
     }
 
     // add a dummy entry if we have no estimates to stop constantly trying to refresh
