@@ -24,7 +24,7 @@
 #include <QWhatsThisClickedEvent>
 #include <QWidget>
 #include <QAction>
-
+#include <QUrl>
 
 class HelpWhatsThis : public QObject
 {
