@@ -1,9 +1,29 @@
+/*
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+
+#include "StressCalculator.h"
 
 #include "Athlete.h"
-#include "StressCalculator.h"
-#include "MetricAggregator.h"
+#include "RideCache.h"
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "Season.h"
 #include "Context.h"
 
 #include <stdio.h>
@@ -67,16 +87,16 @@ double StressCalculator::min(void) {
 void StressCalculator::calculateStress(Context *context, QString, const QString &metric, bool isfilter, QStringList filter, bool onhome)
 {
     // get all metric data from the year 1900 - 3000
-    QList<SummaryMetrics> results;
+    QVector<RideItem*> results;
 
     // get metrics
-    results = context->athlete->metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
+    results = context->athlete->rideCache->rides();
 
     if (isfilter) {
         // remove any we don't have filtered
-        QList<SummaryMetrics> filteredresults;
-        foreach (SummaryMetrics x, results) {
-            if (filter.contains(x.getFileName()))
+        QVector<RideItem*> filteredresults;
+        foreach (RideItem *x, results) {
+            if (filter.contains(x->fileName))
                 filteredresults << x;
         }
         results = filteredresults;
@@ -85,9 +105,9 @@ void StressCalculator::calculateStress(Context *context, QString, const QString 
     if (onhome && context->ishomefiltered) {
 
         // remove any we don't have filtered
-        QList<SummaryMetrics> filteredresults;
-        foreach (SummaryMetrics x, results) {
-            if (context->homeFilters.contains(x.getFileName()))
+        QVector<RideItem*> filteredresults;
+        foreach (RideItem *x, results) {
+            if (context->homeFilters.contains(x->fileName))
                 filteredresults << x;
         }
         results = filteredresults;
@@ -96,9 +116,9 @@ void StressCalculator::calculateStress(Context *context, QString, const QString 
     // and honour the global one too!
     if (context->isfiltered) {
         // remove any we don't have filtered
-        QList<SummaryMetrics> filteredresults;
-        foreach (SummaryMetrics x, results) {
-            if (context->filters.contains(x.getFileName()))
+        QVector<RideItem*> filteredresults;
+        foreach (RideItem *x, results) {
+            if (context->filters.contains(x->fileName))
                 filteredresults << x;
         }
         results = filteredresults;
@@ -110,8 +130,8 @@ void StressCalculator::calculateStress(Context *context, QString, const QString 
     // remember the date range required so we can truncate afterwards
     QDateTime startDateNeeded = startDate;
     QDateTime endDateNeeded   = endDate;
-    startDate = startDate < results[0].getRideDate() ? startDate : results[0].getRideDate();
-    endDate   = endDate > results[results.count()-1].getRideDate() ? endDate : results[results.count()-1].getRideDate();
+    startDate = startDate < results[0]->dateTime ? startDate : results[0]->dateTime;
+    endDate   = endDate > results[results.count()-1]->dateTime ? endDate : results[results.count()-1]->dateTime;
 
     // but we need to also take into account the earliest
     // start date for any season -- since it may be seeded
@@ -143,7 +163,7 @@ void StressCalculator::calculateStress(Context *context, QString, const QString 
 
     
     for (int i=0; i<results.count(); i++)
-        addRideData(results[i].getForSymbol(metric), results[i].getRideDate());
+        addRideData(results[i]->getForSymbol(metric), results[i]->dateTime);
 
     // ensure the last day is covered ...
     addRideData(0.0, endDate);
