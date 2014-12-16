@@ -26,7 +26,8 @@
 #include <QTextEdit>
 #include <QDialog>
 #include <QGroupBox>
-#include <qdatetimeedit.h>
+#include <QLabel>
+#include <QMessageBox>
 
 class Context;
 
