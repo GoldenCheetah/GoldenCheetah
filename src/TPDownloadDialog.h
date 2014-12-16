@@ -22,14 +22,19 @@
 
 #include <QtGui>
 #include <QDialog>
+#include <QCheckBox>
 #include <QHeaderView>
 #include <QProgressBar>
 #include <QMessageBox>
+#include <QTreeWidget>
+#include <QTabWidget>
+#include <QLabel>
 
+#include "RideCache.h"
+#include "RideItem.h"
 #include "RideFile.h"
 #include "TPDownload.h"
 #include "TPUpload.h"
-#include "MetricAggregator.h"
 
 class Context;
 
@@ -69,7 +74,6 @@ class TPDownloadDialog : public QDialog
         TPUpload *uploader;
         TPAthlete *athleter;
         TPWorkout *workouter;
-        QList<SummaryMetrics> rideMetrics;
 
         bool downloading;
         bool sync;
