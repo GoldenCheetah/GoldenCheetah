@@ -31,12 +31,7 @@
 #include <QtGui>
 #include "MainWindow.h"
 #include "RideItem.h"
-
-// access to metrics
 #include "RideMetric.h"
-#include "MetricAggregator.h"
-#include "DBAccess.h"
-
 #include "Context.h"
 
 #ifdef GC_HAVE_LIBOAUTH

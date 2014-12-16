@@ -25,7 +25,6 @@
 #include "RideEditor.h"
 #include "RideMetadata.h"
 #include "MetricAggregator.h"
-#include "SummaryMetrics.h"
 #include "Settings.h"
 #include "Units.h"
 #include <QtXml/QtXml>

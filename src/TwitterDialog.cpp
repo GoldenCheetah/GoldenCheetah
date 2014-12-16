@@ -165,19 +165,6 @@ TwitterDialog::tweetCurrentRide()
 
 }
 
-QString TwitterDialog::metricToString(const RideMetric *m, SummaryMetrics &metrics, bool metricUnits)
-{
-    QString s = "%1%2";
-    if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds")) {
-        s = s.arg(time_to_string(metrics.getForSymbol(m->symbol())));
-        s = s.arg(""); // no units
-    } else {
-        s = s.arg(metrics.getForSymbol(m->symbol()) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision() + (metricUnits ? 0 : m->conversionSum()));
-        s = s.arg(m->units(metricUnits));
-    }
-    return s;
-}
-
 QString TwitterDialog::getTwitterMessage()
 {
     RideMetricFactory &factory = RideMetricFactory::instance();
