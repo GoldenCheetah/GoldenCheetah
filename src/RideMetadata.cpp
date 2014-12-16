@@ -245,7 +245,7 @@ RideMetadata::configUpdate()
     // read metadata.xml
     QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
-    readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
+    readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
     // wipe existing tabs
     QMapIterator<QString, Form*> d(tabList);
@@ -256,6 +256,7 @@ RideMetadata::configUpdate()
            delete d.value();
     }
     tabList.clear();
+    formFields.empty();
 
 
     // create forms and populate with fields
@@ -295,6 +296,18 @@ RideMetadata::configUpdate()
 
     metadataChanged(); // re-read the values!
 }
+
+void
+RideMetadata::addFormField(FormField *f)
+{
+    formFields.append(f);
+}
+
+QVector<FormField *> RideMetadata::getFormFields()
+{
+    return formFields;
+}
+
 
 /*----------------------------------------------------------------------
  * Forms (one per tab)
@@ -357,6 +370,7 @@ Form::addField(FieldDefinition &x)
 {
     FormField *p = new FormField(x, meta);
     fields.append(p);
+    meta->addFormField(p);
 }
 
 void
@@ -716,6 +730,9 @@ FormField::editFinished()
         }
     }
 
+    // default values
+    setLinkedDefault(text);
+
     // Construct the summary text used on the calendar
     QString calendarText;
     foreach (FieldDefinition field, meta->getFields()) {
@@ -728,6 +745,29 @@ FormField::editFinished()
 
     // rideFile is now dirty!
     ourRideItem->setDirty(true);
+}
+
+void
+FormField::setLinkedDefault(QString text)
+{
+    foreach (DefaultDefinition adefault, meta->getDefaults()) {
+        if (adefault.field == definition.name && adefault.value == text) {
+            qDebug() << "Default for" << adefault.linkedField << ":" << adefault.linkedValue;
+
+            if (ourRideItem->ride()->getTag(adefault.linkedField, "") == "")
+                ourRideItem->ride()->setTag(adefault.linkedField, adefault.linkedValue);
+
+            foreach (FormField *formField, meta->getFormFields()) {
+                if (formField->definition.name == adefault.linkedField) {
+                    formField->metadataChanged();
+                    formField->setLinkedDefault(adefault.linkedValue);
+                }
+            }
+
+
+        }
+
+    }
 }
 
 void
@@ -914,7 +954,7 @@ static QString xmlprotect(QString string)
 }
 
 void
-RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QString colorfield)
+RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QString colorfield, QList<DefaultDefinition>defaultDefinitions)
 {
     // open file - truncate contents
     QFile file(filename);
@@ -949,7 +989,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     out <<"\t</keywords>\n";
 
     //
-    // Last we write out the field definitions
+    // we write out the field definitions
     //
     out << "\t<fields>\n";
     // write out to file
@@ -964,6 +1004,23 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t</field>\n");
     }
     out <<"\t</fields>\n";
+
+    //
+    // Last we write out the default definitions
+    //
+    out << "\t<defaults>\n";
+    // write out to file
+    foreach (DefaultDefinition adefault, defaultDefinitions) {
+        // chart name
+        out<<QString("\t\t<default>\n");
+        out<<QString("\t\t\t<defaultfield>\"%1\"</defaultfield>\n").arg(xmlprotect(adefault.field));
+        out<<QString("\t\t\t<defaultvalue>\"%1\"</defaultvalue>\n").arg(xmlprotect(adefault.value));
+        out<<QString("\t\t\t<defaultlinkedfield>\"%1\"</defaultlinkedfield>\n").arg(xmlprotect(adefault.linkedField));
+        out<<QString("\t\t\t<defaultlinkedvalue>\"%1\"</defaultlinkedvalue>\n").arg(xmlprotect(adefault.linkedValue));
+        out<<QString("\t\t</default>\n");
+    }
+    out <<"\t</defaults>\n";
+
 
     // end document
     out << "</metadata>\n";
@@ -991,7 +1048,7 @@ static QString unprotect(QString buffer)
 }
 
 void
-RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions, QString &colorfield)
+RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions, QString &colorfield, QList<DefaultDefinition> &defaultDefinitions)
 {
     QFile metadataFile(filename);
     QXmlInputSource source( &metadataFile );
@@ -1006,6 +1063,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     keywordDefinitions = handler.getKeywords();
     fieldDefinitions = handler.getFields();
     colorfield = handler.getColorField();
+    defaultDefinitions = handler.getDefaults();
 
     // backwards compatible
     if (colorfield == "") colorfield = "Calendar Text";
@@ -1069,6 +1127,10 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     } else if(qName == "fieldvalues") {
         field.values = unprotect(buffer).split(",", QString::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
+    else if(qName == "defaultfield") adefault.field =  unprotect(buffer);
+    else if(qName == "defaultvalue") adefault.value =  unprotect(buffer);
+    else if(qName == "defaultlinkedfield") adefault.linkedField =  unprotect(buffer);
+    else if(qName == "defaultlinkedvalue") adefault.linkedValue =  unprotect(buffer);
 
     //
     // Complex Elements
@@ -1079,6 +1141,8 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         fieldDefinitions.append(field);
     else if (qName == "colorfield")
         colorfield = unprotect(buffer);
+    else if (qName == "default") // <default></default> block
+        defaultDefinitions.append(adefault);
 
     return true;
 }
@@ -1103,6 +1167,10 @@ bool MetadataXMLParser::startElement( const QString&, const QString&, const QStr
             if (attrs.qName(i) == "blue") blue=attrs.value(i).toInt();
         }
     }
+    else if (name == "defaults")
+        defaultDefinitions.clear();
+    else if (name == "default")
+        adefault = DefaultDefinition();
 
     return true;
 }

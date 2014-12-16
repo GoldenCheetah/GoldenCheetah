@@ -62,7 +62,7 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";
     QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
+    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
     //title = new QLabel(this);
     //QFont font;
