@@ -123,7 +123,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     translateDefaultCharts(presets);
 
     // Metadata
-    metricDB = NULL; // warn metadata we haven't got there yet !
+    rideCache = NULL; // let metadata know we don't have a ridecache yet
     rideMetadata_ = new RideMetadata(context,true);
     rideMetadata_->hide();
     colorEngine = new ColorEngine(context);

@@ -17,10 +17,10 @@
  */
 
 #include "RideMetadata.h"
-#include "MetricAggregator.h"
 #include "SpecialFields.h"
 
 #include "MainWindow.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -827,14 +827,11 @@ FormField::metadataChanged()
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
         { 
-            if (meta->context->athlete->metricDB && completer && 
+            if (meta->context->athlete->rideCache && completer && 
                 definition.values.count() == 1 && definition.values.at(0) == "*") {
 
                 // set completer if needed for wildcard matching
-                QStringList values;
-                QSqlQuery query(meta->context->athlete->metricDB->db()->connection());
-                bool rc = query.exec(QString("SELECT Z%1 FROM metrics;").arg(meta->context->specialFields.makeTechName(definition.name)));
-                while (rc && query.next()) values << query.value(0).toString();
+                QStringList values = meta->context->athlete->rideCache->getDistinctValues(definition.name);
 
                 delete completer;
                 completer = new QCompleter(values, this);
