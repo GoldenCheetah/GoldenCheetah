@@ -2190,16 +2190,21 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     keywordDefinitions = context->athlete->rideMetadata()->getKeywords();
     fieldDefinitions = context->athlete->rideMetadata()->getFields();
     colorfield = context->athlete->rideMetadata()->getColorField();
+    defaultDefinitions = context->athlete->rideMetadata()->getDefaults();
 
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
+    defaultsPage = new DefaultsPage(this, defaultDefinitions);
     processorPage = new ProcessorPage(context);
+
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Notes Keywords"));
+    tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processing"));
+
 
     // refresh the keywords combo when change tabs .. will do more often than
     // needed but better that than less often than needed
@@ -2214,12 +2219,13 @@ MetadataPage::saveClicked()
     // get current state
     fieldsPage->getDefinitions(fieldDefinitions);
     keywordsPage->getDefinitions(keywordDefinitions);
+    defaultsPage->getDefinitions(defaultDefinitions);
 
     // save settings
     appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
 
     // write to metadata.xml
-    RideMetadata::serialize(context->athlete->home->config().canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
+    RideMetadata::serialize(context->athlete->home->config().canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
     // save processors config
     processorPage->saveClicked();
@@ -2746,6 +2752,159 @@ ProcessorPage::saveClicked()
                         "Auto" : "Manual";
         appsettings->setValue(configsetting, apply);
         ((DataProcessorConfig*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 2)))->saveConfig();
+    }
+}
+
+//
+// Default values page
+//
+DefaultsPage::DefaultsPage(QWidget *parent, QList<DefaultDefinition>defaultDefinitions) : QWidget(parent)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
+    upButton = new QToolButton(this);
+    downButton = new QToolButton(this);
+    upButton->setArrowType(Qt::UpArrow);
+    downButton->setArrowType(Qt::DownArrow);
+    upButton->setFixedSize(20,20);
+    downButton->setFixedSize(20,20);
+    addButton->setFixedSize(20,20);
+    deleteButton->setFixedSize(20,20);
+#else
+    addButton->setText(tr("Add"));
+    deleteButton->setText(tr("Delete"));
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+#endif
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2);
+    actionButtons->addWidget(upButton);
+    actionButtons->addWidget(downButton);
+    actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+
+    defaults = new QTreeWidget;
+    defaults->headerItem()->setText(0, tr("Field"));
+    defaults->headerItem()->setText(1, tr("Value"));
+    defaults->headerItem()->setText(2, tr("Linked field"));
+    defaults->headerItem()->setText(3, tr("Default Value"));
+    defaults->setColumnWidth(0,80);
+    defaults->setColumnWidth(1,100);
+    defaults->setColumnWidth(2,80);
+    defaults->setColumnWidth(3,100);
+    defaults->setColumnCount(4);
+    defaults->setSelectionMode(QAbstractItemView::SingleSelection);
+    defaults->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    //defaults->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
+    defaults->setIndentation(0);
+
+    SpecialFields specials;
+    foreach(DefaultDefinition adefault, defaultDefinitions) {
+        QTreeWidgetItem *add;
+
+        add = new QTreeWidgetItem(defaults->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // field name
+        add->setText(1, specials.displayName(adefault.field));
+        // value
+        add->setText(2, adefault.value);
+        // Linked field
+        add->setText(3, adefault.linkedField);
+        // Default Value
+        add->setText(4, adefault.linkedValue);
+    }
+    defaults->setCurrentItem(defaults->invisibleRootItem()->child(0));
+
+    mainLayout->addWidget(defaults, 0,0);
+    mainLayout->addLayout(actionButtons, 1,0);
+
+    // connect up slots
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+DefaultsPage::upClicked()
+{
+    if (defaults->currentItem()) {
+        int index = defaults->invisibleRootItem()->indexOfChild(defaults->currentItem());
+        if (index == 0) return; // its at the top already
+
+        QTreeWidgetItem* moved = defaults->invisibleRootItem()->takeChild(index);
+        defaults->invisibleRootItem()->insertChild(index-1, moved);
+        defaults->setCurrentItem(moved);
+    }
+}
+
+void
+DefaultsPage::downClicked()
+{
+    if (defaults->currentItem()) {
+        int index = defaults->invisibleRootItem()->indexOfChild(defaults->currentItem());
+        if (index == (defaults->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+
+        QTreeWidgetItem* moved = defaults->invisibleRootItem()->takeChild(index);
+        defaults->invisibleRootItem()->insertChild(index+1, moved);
+        defaults->setCurrentItem(moved);
+    }
+}
+
+void
+DefaultsPage::addClicked()
+{
+    int index = defaults->invisibleRootItem()->indexOfChild(defaults->currentItem());
+    if (index < 0) index = 0;
+    QTreeWidgetItem *add;
+
+    add = new QTreeWidgetItem;
+    defaults->invisibleRootItem()->insertChild(index, add);
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    // field
+    QString text = tr("New");
+    for (int i=0; defaults->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString(tr("New (%1)")).arg(i+1);
+    }
+    add->setText(0, text);
+}
+
+void
+DefaultsPage::deleteClicked()
+{
+    if (defaults->currentItem()) {
+        int index = defaults->invisibleRootItem()->indexOfChild(defaults->currentItem());
+
+        // zap!
+        delete defaults->invisibleRootItem()->takeChild(index);
+    }
+}
+
+void
+DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
+{
+    SpecialFields sp;
+
+    // clear current just in case
+    defaultList.clear();
+
+    for (int idx =0; idx < defaults->invisibleRootItem()->childCount(); idx++) {
+
+        DefaultDefinition add;
+        QTreeWidgetItem *item = defaults->invisibleRootItem()->child(idx);
+
+        add.field = sp.internalName(item->text(0));
+        add.value = item->text(1);
+        add.linkedField = sp.internalName(item->text(2));
+        add.linkedValue = item->text(3);
+
+        defaultList.append(add);
     }
 }
 

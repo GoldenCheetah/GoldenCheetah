@@ -176,6 +176,7 @@ class TreeMapWindow : public GcWindow
         DateRange custom; // custom date range supplied
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
+        QList<DefaultDefinition>   defaultDefinitions;
         QList<SummaryMetrics> results;
 
         // Widgets

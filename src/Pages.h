@@ -526,6 +526,36 @@ class ProcessorPage : public QWidget
 
 };
 
+class DefaultsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+
+        DefaultsPage(QWidget *parent, QList<DefaultDefinition>);
+        void getDefinitions(QList<DefaultDefinition>&);
+
+    public slots:
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void deleteClicked();
+
+    protected:
+
+        QTreeWidget *defaults;
+
+#ifndef Q_OS_MAC
+        QToolButton *upButton, *downButton;
+#else
+        QPushButton *upButton, *downButton;
+#endif
+        QPushButton *addButton, *deleteButton;
+
+};
+
 class MetadataPage : public QWidget
 {
     Q_OBJECT
@@ -550,10 +580,12 @@ class MetadataPage : public QWidget
         KeywordsPage *keywordsPage;
         FieldsPage *fieldsPage;
         ProcessorPage *processorPage;
+        DefaultsPage *defaultsPage;
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
+        QList<DefaultDefinition>  defaultDefinitions;
         QString colorfield;
 };
 

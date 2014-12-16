@@ -216,9 +216,10 @@ GcUpgrade::upgrade(const QDir &home)
             QList<KeywordDefinition> keywordDefinitions;
             QList<FieldDefinition>   fieldDefinitions;
             QString colorfield;
+            QList<DefaultDefinition> defaultDefinitions;
 
             // read em in
-            RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
+            RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
             bool updated=false;
 
@@ -298,7 +299,7 @@ GcUpgrade::upgrade(const QDir &home)
 
             if (updated) {
                 // write a new updated version
-                RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield);
+                RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
             }
         }
 

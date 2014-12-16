@@ -81,6 +81,8 @@ class FormField : public QWidget
         QWidget *widget;            // updating widget
         QCompleter *completer;      // for completion
 
+        void setLinkedDefault(QString text);    // set linked fields with default value
+
     public slots:
         void dataChanged();         // from the widget - we changed something
         void editFinished();        // from the widget - we finished editing this field
@@ -119,6 +121,20 @@ class Form : public QScrollArea
 
 };
 
+class DefaultDefinition
+{
+    public:
+        QString field;
+        QString value;
+        QString linkedField;
+        QString linkedValue;
+
+
+    DefaultDefinition() : field(""), value(""), linkedField(""), linkedValue("") {}
+    DefaultDefinition(QString field, QString value, QString linkedField, QString linkedValue)
+                      : field(field), value(value), linkedField(linkedField), linkedValue(linkedValue) {}
+};
+
 class RideMetadata : public QWidget
 {
     Q_OBJECT
@@ -128,16 +144,20 @@ class RideMetadata : public QWidget
 
     public:
         RideMetadata(Context *, bool singlecolumn = false);
-        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QString colofield);
-        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QString &colorfield);
+        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QString colofield, QList<DefaultDefinition>defaultDefinitions);
+        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QString &colorfield, QList<DefaultDefinition>&defaultDefinitions);
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
+        QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
 
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }
 
         void setRideItem(RideItem *x);
         RideItem *rideItem() const;
+
+        void addFormField(FormField *f);
+        QVector<FormField*> getFormFields();
 
         bool singlecolumn;
         SpecialFields sp;
@@ -146,6 +166,7 @@ class RideMetadata : public QWidget
         SpecialTabs specialTabs;
 
         QPalette palette; // to be applied to all widgets
+
 
     public slots:
         void configUpdate();
@@ -164,6 +185,9 @@ class RideMetadata : public QWidget
     QStringList keywordList; // for completer
     QList<KeywordDefinition> keywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
+    QList<DefaultDefinition>   defaultDefinitions;
+
+    QVector<FormField*>   formFields;
 
     QString colorfield;
 };
@@ -181,6 +205,7 @@ public:
     QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
     QList<FieldDefinition> getFields() { return fieldDefinitions; }
     QString getColorField() { return colorfield; }
+    QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
 
 protected:
     QString buffer;
@@ -189,10 +214,12 @@ protected:
     QList<KeywordDefinition> keywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
     QString colorfield;
+    QList<DefaultDefinition>   defaultDefinitions;
 
     // whilst parsing elements are stored here
     KeywordDefinition keyword;
     FieldDefinition   field;
+    DefaultDefinition   adefault;
     int red, green, blue;
 };
 
