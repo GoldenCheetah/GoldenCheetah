@@ -22,6 +22,7 @@
 
 #include "Context.h"
 #include "SpecialFields.h"
+
 #include <QWidget>
 #include <QLabel>
 #include <QCheckBox>
