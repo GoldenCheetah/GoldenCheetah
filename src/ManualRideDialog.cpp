@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Eric Murray (ericm@lne.com)
+ * Copyright (c) 2014 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,6 +20,8 @@
 #include "ManualRideDialog.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
+#include "RideItem.h"
 #include "Settings.h"
 #include <string.h>
 #include <errno.h>
@@ -26,8 +29,6 @@
 #include <math.h>
 #include "Units.h"
 #include "HelpWhatsThis.h"
-
-#include "MetricAggregator.h"
 
 //
 // Get the estimate factors
@@ -42,11 +43,8 @@ ManualRideDialog::deriveFactors()
     // working variables
     timeKJ = distanceKJ = timeTSS = distanceTSS = timeBS = distanceBS = timeDP = distanceDP = 0.0;
 
-    // whats the most recent ride?
-    QList<SummaryMetrics> metrics = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
-
     // do we have any rides?
-    if (metrics.count()) {
+    if (context->athlete->rideCache->rides().count()) {
 
         // last 'n' days calculation
         double seconds, distance, bs, dp, tss, kj;
@@ -58,32 +56,32 @@ ManualRideDialog::deriveFactors()
         totalseconds = totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
 
         // just use the metricDB versions, nice 'n fast
-        foreach (SummaryMetrics metric, context->athlete->metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
+        foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
             // skip those with no time or distance values (not comparing doubles)
-            if (metric.getForSymbol("time_riding") == 0 || metric.getForSymbol("total_distance") == 0) continue;
+            if (ride->getForSymbol("time_riding") == 0 || ride->getForSymbol("total_distance") == 0) continue;
 
             // how many days ago was it?
-            int days =  metric.getRideDate().daysTo(QDateTime::currentDateTime());
+            int days =  ride->dateTime.daysTo(QDateTime::currentDateTime());
 
             // only use rides in last 'n' days
             if (days >= 0 && days < daysago) {
 
-                bs += metric.getForSymbol("skiba_bike_score");
-                seconds += metric.getForSymbol("time_riding");
-                distance += metric.getForSymbol("total_distance");
-                dp += metric.getForSymbol("daniels_points");
-                tss += metric.getForSymbol("coggan_tss");
-                kj += metric.getForSymbol("total_work");
+                bs += ride->getForSymbol("skiba_bike_score");
+                seconds += ride->getForSymbol("time_riding");
+                distance += ride->getForSymbol("total_distance");
+                dp += ride->getForSymbol("daniels_points");
+                tss += ride->getForSymbol("coggan_tss");
+                kj += ride->getForSymbol("total_work");
 
                 rides++;
             } 
-            totalbs += metric.getForSymbol("skiba_bike_score");
-            totalseconds += metric.getForSymbol("time_riding");
-            totaldistance += metric.getForSymbol("total_distance");
-            totaldp += metric.getForSymbol("daniels_points");
-            totaltss += metric.getForSymbol("coggan_tss");
-            totalkj += metric.getForSymbol("total_work");
+            totalbs += ride->getForSymbol("skiba_bike_score");
+            totalseconds += ride->getForSymbol("time_riding");
+            totaldistance += ride->getForSymbol("total_distance");
+            totaldp += ride->getForSymbol("daniels_points");
+            totaltss += ride->getForSymbol("coggan_tss");
+            totalkj += ride->getForSymbol("total_work");
 
         }
 
