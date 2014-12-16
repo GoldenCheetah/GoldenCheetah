@@ -245,19 +245,15 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
         //treeRoot->print(treeRoot);
         emit parseGood();
 
-        // get all fields...
-        QList<SummaryMetrics> allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
-
+        // clear current filter list
         filenames.clear();
 
-        for (int i=0; i<allRides.count(); i++) {
+        // get all fields...
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            QString f= allRides.at(i).getFileName();
-            double result = treeRoot->eval(this, treeRoot, allRides.at(i), f);
-            if (result) {
-                filenames << f;
-            }
+            if(treeRoot->eval(this, treeRoot, item))
+                filenames << item->fileName;
         }
         emit results(filenames);
         if (list) *list = filenames;
@@ -307,7 +303,7 @@ void DataFilter::configUpdate()
 
 }
 
-double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
+double Leaf::eval(DataFilter *df, Leaf *leaf, RideItem *m)
 {
     switch(leaf->type) {
 
@@ -315,13 +311,13 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
     {
         switch (leaf->op) {
             case AND :
-                return (eval(df, leaf->lvalue.l, m, f) && eval(df, leaf->rvalue.l, m, f));
+                return (eval(df, leaf->lvalue.l, m) && eval(df, leaf->rvalue.l, m));
 
             case OR :
-                return (eval(df, leaf->lvalue.l, m, f) || eval(df, leaf->rvalue.l, m, f));
+                return (eval(df, leaf->lvalue.l, m) || eval(df, leaf->rvalue.l, m));
 
             default : // parenthesis
-                return (eval(df, leaf->lvalue.l, m, f));
+                return (eval(df, leaf->lvalue.l, m));
         }
     }
     break;
@@ -336,7 +332,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
             default:
             case Leaf::Function :
             {
-                duration = eval(df, leaf->lvalue.l, m, f); // duration
+                duration = eval(df, leaf->lvalue.l, m); // duration
             }
             break;
 
@@ -346,7 +342,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
                 // get symbol value
                 if (df->lookupType.value(*(leaf->lvalue.l->lvalue.n)) == true) {
                     // numeric
-                    duration = m.getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                    duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
                 } else {
                     duration = 0;
                 }
@@ -369,10 +365,10 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
         }
 
         if (leaf->function == "best")
-            return RideFileCache::best(df->context, f, leaf->seriesType, duration);
+            return RideFileCache::best(df->context, m->fileName, leaf->seriesType, duration);
 
         if (leaf->function == "tiz") // duration is really zone number
-            return RideFileCache::tiz(df->context, f, leaf->seriesType, duration); 
+            return RideFileCache::tiz(df->context, m->fileName, leaf->seriesType, duration); 
 
         // unknown function!?
         return 0 ;
@@ -392,7 +388,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
             default:
             case Leaf::Function :
             {
-                lhsdouble = eval(df, leaf->lvalue.l, m, f); // duration
+                lhsdouble = eval(df, leaf->lvalue.l, m); // duration
                 lhsisNumber=true;
             }
             break;
@@ -404,22 +400,22 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
 
                 // is it isRun ?
                 if (symbol == "isRun") {
-                    lhsdouble = m.isRun() ? 1 : 0;
+                    lhsdouble = m->isRun ? 1 : 0;
                     lhsisNumber = true;
 
                 } else if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.l->lvalue.n))) == true) {
                     // get symbol value
                     // check metadata string to number first ...
-                    QString meta = m.getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "unknown");
+                    QString meta = m->getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "unknown");
                     if (meta == "unknown")
-                        lhsdouble = m.getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                        lhsdouble = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
                     else
                         lhsdouble = meta.toDouble();
 
                     //qDebug()<<"symbol" << *(leaf->lvalue.l->lvalue.n) << "is" << lhsdouble << "via" << rename;
                 } else {
                     // string
-                    lhsstring = m.getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "");
+                    lhsstring = m->getText(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), "");
                     //qDebug()<<"symbol" << *(leaf->lvalue.l->lvalue.n) << "is" << lhsstring << "via" << rename;
                 }
             }
@@ -449,7 +445,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
             default:
             case Leaf::Function :
             {
-                rhsdouble = eval(df, leaf->rvalue.l, m, f);
+                rhsdouble = eval(df, leaf->rvalue.l, m);
                 rhsisNumber=true;
             }
             break;
@@ -461,21 +457,21 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m, QString f)
                 // is it isRun ?
                 if (symbol == "isRun") {
 
-                    rhsdouble = m.isRun() ? 1 : 0;
+                    rhsdouble = m->isRun ? 1 : 0;
                     rhsisNumber = true;
 
                 // get symbol value
                 } else if ((rhsisNumber=df->lookupType.value(*(leaf->rvalue.l->lvalue.n))) == true) {
                     // numeric
-                    QString meta = m.getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "unknown");
+                    QString meta = m->getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "unknown");
                     if (meta == "unknown")
-                        rhsdouble = m.getForSymbol(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""));
+                        rhsdouble = m->getForSymbol(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""));
                     else
                         rhsdouble = meta.toDouble();
                     //qDebug()<<"symbol" << *(leaf->rvalue.l->lvalue.n) << "is" << rhsdouble << "via" << rename;
                 } else {
                     // string
-                    rhsstring = m.getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "notfound");
+                    rhsstring = m->getText(rename=df->lookupMap.value(*(leaf->rvalue.l->lvalue.n),""), "notfound");
                     //qDebug()<<"symbol" << *(leaf->rvalue.l->lvalue.n) << "is" << rhsstring << "via" << rename;
                 }
             }

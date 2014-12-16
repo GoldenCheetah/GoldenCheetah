@@ -81,6 +81,9 @@ class RideItem : public QObject
         // access the metric value
         double getForSymbol(QString name);
 
+        // access the metadata
+        QString getText(QString name, QString fallback) { return metadata_.value(name, fallback); }
+
         // get at the first class data
         QString path;
         QString fileName;
