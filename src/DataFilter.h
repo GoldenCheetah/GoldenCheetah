@@ -21,12 +21,13 @@
 #include <QDebug>
 #include <QList>
 #include <QStringList>
+#include "RideCache.h"
+#include "RideItem.h"
 #include "RideFile.h" //for SeriesType
 
 class Context;
 class RideMetric;
 class FieldDefinition;
-class SummaryMetrics;
 class DataFilter;
 
 class Leaf {
@@ -35,8 +36,8 @@ class Leaf {
 
         Leaf() : type(none),op(0),series(NULL) { }
 
-        // evaluate against a SummaryMetric
-        double eval(DataFilter *df, Leaf *, SummaryMetrics, QString filename);
+        // evaluate against a RideItem
+        double eval(DataFilter *df, Leaf *, RideItem *m);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
