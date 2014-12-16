@@ -20,6 +20,7 @@
 
 #include "Athlete.h"
 #include "MainWindow.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RouteParser.h"
@@ -271,8 +272,9 @@ RouteSegment::searchRouteInAllRides(Context* context)
 
     out << "SEARCH NEW ROUTE STARTS: " << QDateTime::currentDateTime().toString() + "\r\n";
 
-
-    QStringList filenames = RideFileFactory::instance().listRideFiles(context->athlete->home->activities());
+    QStringList filenames;
+    foreach(RideItem *item, context->athlete->rideCache->rides())
+        filenames << item->fileName;
     QStringListIterator iterator(filenames);
     QStringList errors;
 

@@ -23,6 +23,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include <assert.h>
@@ -55,12 +56,11 @@ RouteItem::RouteItem(RouteSegment *route, const RouteRide *routeRide,
     setTextAlignment(2, Qt::AlignRight);
 
     QDateTime dt;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
-    while (i.hasNext()) {
-        QString name = i.next(), notesFileName;
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
-        if ((route->parseRideFileName(context, name, &notesFileName, &dt)) && (dt == routeRide->startTime)) { //
-            fileName = name;
+        //XXX what is this code trying to do ??? XXX
+        if ((route->parseRideFileName(context, item->fileName, &notesFileName, &dt)) && (dt == routeRide->startTime)) { //
+            fileName = item->fileName;
         }
     }
 }

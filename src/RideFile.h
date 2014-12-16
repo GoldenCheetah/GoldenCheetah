@@ -359,6 +359,8 @@ struct RideFileReader {
     virtual bool writeRideFile(Context *, const RideFile *, QFile &) const { return false; }
 };
 
+class MetricAggregator;
+class RideCache;
 class RideFileFactory {
 
     private:
@@ -369,6 +371,18 @@ class RideFileFactory {
 
         RideFileFactory() {}
 
+    protected:
+
+        friend class ::MetricAggregator;
+        friend class ::RideCache;
+
+        // will become private as code should work with
+        // in memory representation not on disk .. but as we
+        // migrate will add friends in here.
+        // NOTE: DO NOT USE THIS, USE THE athlete->rideCache
+        //       TO GET ACCESS TO THE RIDE LIST AND RIDE DATA
+        QStringList listRideFiles(const QDir &dir) const;
+
     public:
 
         static RideFileFactory &instance();
@@ -377,7 +391,6 @@ class RideFileFactory {
                            RideFileReader *reader);
         RideFile *openRideFile(Context *context, QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
         bool writeRideFile(Context *context, const RideFile *ride, QFile &file, QString format) const;
-        QStringList listRideFiles(const QDir &dir) const;
         QStringList suffixes() const;
         QStringList writeSuffixes() const;
         QString description(const QString &suffix) const {
