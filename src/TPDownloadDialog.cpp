@@ -20,12 +20,9 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "RideCache.h"
 #include "PwxRideFile.h"
 #include "JsonRideFile.h"
-#include "RideFile.h"
 #include "Settings.h"
-#include "MetricAggregator.h"
 #include "Units.h"
 
 TPDownloadDialog::TPDownloadDialog(Context *context) : QDialog(context->mainWindow, Qt::Dialog), context(context), downloading(false), aborted(false)
@@ -297,9 +294,6 @@ TPDownloadDialog::refreshClicked()
         delete curr;
     }
 
-    // First lets get the ride metrics - if they refresh it takes a while...
-    rideMetrics = context->athlete->metricDB->getAllMetricsFor(QDateTime(from->date()), QDateTime(to->date()));
-
     // First lets kick off a download of ridefile lookups
     // since that can take a while
     workouter->list(
@@ -435,7 +429,9 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
     //
     // Now setup the upload list
     //
-    for(int i=0; i<rideMetrics.count(); i++) {
+    for(int i=0; i<context->athlete->rideCache->rides().count(); i++) {
+
+        RideItem *ride = context->athlete->rideCache->rides().at(i);
         QTreeWidgetItem *add;
 
         add = new QTreeWidgetItem(rideListUp->invisibleRootItem());
@@ -445,17 +441,14 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
         connect (check, SIGNAL(stateChanged(int)), this, SLOT(refreshUpCount()));
         rideListUp->setItemWidget(add, 0, check);
 
-        add->setText(1, rideMetrics[i].getFileName());
+        add->setText(1, ride->fileName);
         add->setTextAlignment(1, Qt::AlignLeft);
-
-        QDateTime ridedatetime = rideMetrics[i].getRideDate();
-
-        add->setText(2, ridedatetime.toString("MMM d, yyyy"));
+        add->setText(2, ride->dateTime.toString("MMM d, yyyy"));
         add->setTextAlignment(2, Qt::AlignLeft);
-        add->setText(3, ridedatetime.toString("hh:mm:ss"));
+        add->setText(3, ride->dateTime.toString("hh:mm:ss"));
         add->setTextAlignment(3, Qt::AlignCenter);
 
-        long secs = rideMetrics[i].getForSymbol("workout_time");
+        long secs = ride->getForSymbol("workout_time");
         QChar zero = QLatin1Char ( '0' );
         QString duration = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
                                           .arg(secs%3600/60,2,10,zero)
@@ -463,7 +456,7 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
         add->setText(4, duration);
         add->setTextAlignment(4, Qt::AlignCenter);
 
-        double distance = rideMetrics[i].getForSymbol("total_distance");
+        double distance = ride->getForSymbol("total_distance");
         add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
         add->setTextAlignment(5, Qt::AlignRight);
 
@@ -475,12 +468,12 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
         add->setTextAlignment(6, Qt::AlignCenter);
 
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
-                           .arg ( ridedatetime.date().year(), 4, 10, zero )
-                           .arg ( ridedatetime.date().month(), 2, 10, zero )
-                           .arg ( ridedatetime.date().day(), 2, 10, zero )
-                           .arg ( ridedatetime.time().hour(), 2, 10, zero )
-                           .arg ( ridedatetime.time().minute(), 2, 10, zero )
-                           .arg ( ridedatetime.time().second(), 2, 10, zero );
+                           .arg ( ride->dateTime.date().year(), 4, 10, zero )
+                           .arg ( ride->dateTime.date().month(), 2, 10, zero )
+                           .arg ( ride->dateTime.date().day(), 2, 10, zero )
+                           .arg ( ride->dateTime.time().hour(), 2, 10, zero )
+                           .arg ( ride->dateTime.time().minute(), 2, 10, zero )
+                           .arg ( ride->dateTime.time().second(), 2, 10, zero );
 
         // check if on TP.com already
         if (uploadFiles.contains(targetnosuffix.mid(0,14))) exists->setChecked(Qt::Checked);
@@ -494,11 +487,11 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
             connect (check, SIGNAL(stateChanged(int)), this, SLOT(refreshSyncCount()));
             rideListSync->setItemWidget(sync, 0, check);
 
-            sync->setText(1, rideMetrics[i].getFileName());
+            sync->setText(1, ride->fileName);
             sync->setTextAlignment(1, Qt::AlignCenter);
-            sync->setText(2, ridedatetime.toString("MMM d, yyyy"));
+            sync->setText(2, ride->dateTime.toString("MMM d, yyyy"));
             sync->setTextAlignment(2, Qt::AlignLeft);
-            sync->setText(3, ridedatetime.toString("hh:mm:ss"));
+            sync->setText(3, ride->dateTime.toString("hh:mm:ss"));
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
