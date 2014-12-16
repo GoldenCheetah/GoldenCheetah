@@ -93,4 +93,38 @@ class DataFilter : public QObject
         QStringList filenames;
 };
 
+class FilterSet
+{
+    // used to collect filters and apply if needed
+    QVector<QStringList> filters_;
+
+    public:
+
+        // create one with a set
+        FilterSet(bool on, QStringList list) {
+            if (on) filters_ << list;
+        }
+
+        // create an empty set
+        FilterSet() {}
+
+        // add a new filter
+        void addFilter(bool on, QStringList list) {
+            if (on) filters_ << list;
+        }
+
+        // clear the filter set
+        void clear() {
+            filters_.clear();
+        }
+
+        // does the name in question pass the filter set ?
+        bool pass(QString name) {
+            foreach(QStringList list, filters_)
+                if (!list.contains(name))
+                    return false;
+            return true;
+        }
+};
+
 extern int DataFilterdebug;
