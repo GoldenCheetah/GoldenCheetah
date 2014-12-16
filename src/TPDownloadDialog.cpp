@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "PwxRideFile.h"
 #include "JsonRideFile.h"
 #include "RideFile.h"
@@ -311,8 +312,10 @@ TPDownloadDialog::refreshClicked()
     // Whilst we wait for the results lets fill the map of existing rideFiles
     // (but ignore seconds since they aren't reliable)
     rideFiles.clear();
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(context->athlete->home->activities()));
-    for (i.toFront(); i.hasNext();) rideFiles << QFileInfo(i.next()).baseName().mid(0,14);
+
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+        rideFiles << QFileInfo(item->fileName).baseName().mid(0,14);
+    }
 
 }
 

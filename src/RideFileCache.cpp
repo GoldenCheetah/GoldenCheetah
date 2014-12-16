@@ -252,16 +252,15 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
     bool first = true;
 
     // look at all the rides
-    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(context->athlete->home->activities())) {
-        QDate rideDate = dateFromFileName(rideFileName);
+    foreach (RideItem *item, context->athlete->rideCache->rides()) {
 
-        if (rideDate < from || rideDate > to) continue; // not one we want
+        if (item->dateTime.date() < from || item->dateTime.date() > to) continue; // not one we want
 
         // get the power data
         if (first == true) {
 
             // first time through the whole thing is going to be best
-            returning =  meanMaxPowerFor(context, returningwpk, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
+            returning =  meanMaxPowerFor(context, returningwpk, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
             first = false;
 
         } else {
@@ -269,7 +268,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
             QVector<float> thiswpk;
 
             // next time through we should only pick out better times
-            QVector<float> ridebest = meanMaxPowerFor(context, thiswpk, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
+            QVector<float> ridebest = meanMaxPowerFor(context, thiswpk, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
 
             // do we need to increase the returning array?
             if (returning.size() < ridebest.size()) returning.resize(ridebest.size());
@@ -1440,17 +1439,19 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
 
     // Iterate over the ride files (not the cpx files since they /might/ not
     // exist, or /might/ be out of date.
-    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(context->athlete->home->activities())) {
-        QDate rideDate = dateFromFileName(rideFileName);
-        if (((filter == true && files.contains(rideFileName)) || filter == false) &&
+    foreach (RideItem *item, context->athlete->rideCache->rides()) {
+
+        QDate rideDate = item->dateTime.date();
+
+        if (((filter == true && files.contains(item->fileName)) || filter == false) &&
             rideDate >= start && rideDate <= end) {
 
             // skip globally filtered values
-            if (context->isfiltered && !context->filters.contains(rideFileName)) continue;
-            if (onhome && context->ishomefiltered && !context->homeFilters.contains(rideFileName)) continue;
+            if (context->isfiltered && !context->filters.contains(item->fileName)) continue;
+            if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
 
             // lets aggregate
             meanMaxAggregate(wattsMeanMaxDouble, rideCache.wattsMeanMaxDouble, wattsMeanMaxDate, rideDate);
@@ -1523,18 +1524,19 @@ QVector<float> &RideFileCache::heatMeanMaxArray()
 
     // ok, we need to iterate again and compute heat based upon
     // how close to the absolute best we've got
-    foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(context->athlete->home->activities())) {
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
-        QDate rideDate = dateFromFileName(rideFileName);
-        if (((filter == true && files.contains(rideFileName)) || filter == false) &&
+        QDate rideDate = item->dateTime.date();
+
+        if (((filter == true && files.contains(item->fileName)) || filter == false) &&
             rideDate >= start && rideDate <= end) {
 
             // skip globally filtered values
-            if (context->isfiltered && !context->filters.contains(rideFileName)) continue;
-            if (onhome && context->ishomefiltered && !context->homeFilters.contains(rideFileName)) continue;
+            if (context->isfiltered && !context->filters.contains(item->fileName)) continue;
+            if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
 
             // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + rideFileName);
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
 
             for(int i=0; i<rideCache.wattsMeanMaxDouble.count() && i<wattsMeanMaxDouble.count(); i++) {
 
