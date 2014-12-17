@@ -50,6 +50,7 @@ LTMWindow::LTMWindow(Context *context) :
 {
     useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
+    lastRefresh = QTime::currentTime().addSecs(-10);
 
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -206,6 +207,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
     connect(ltmTool, SIGNAL(curvesChanged()), this, SLOT(refresh()));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(refreshUpdate()), this, SLOT(refreshUpdate()));
+    connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
 
     // comparing things
     connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));
@@ -293,6 +296,15 @@ LTMWindow::presetSelected(int index)
         settings.end = end;
 
         ltmTool->applySettings();
+        refresh();
+    }
+}
+
+void
+LTMWindow::refreshUpdate()
+{
+    if (isVisible() && lastRefresh.secsTo(QTime::currentTime()) > 5) {
+        lastRefresh = QTime::currentTime();
         refresh();
     }
 }
