@@ -198,6 +198,7 @@ class LTMWindow : public GcChartWindow
         void zoomSliderChanged();
         void showLegendClicked(int);
         void applyClicked();
+        void refreshUpdate();
         void refresh();
         void pointClicked(QwtPlotCurve*, int);
         int groupForDate(QDate);
@@ -264,6 +265,8 @@ class LTMWindow : public GcChartWindow
         QxtStringSpinBox    *rGroupBy;
         QCheckBox           *rData,
                             *rStack;
+
+        QTime lastRefresh;
 };
 
 #endif // _GC_LTMWindow_h
