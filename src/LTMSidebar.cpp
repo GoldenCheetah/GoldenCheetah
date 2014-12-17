@@ -835,7 +835,6 @@ void
 LTMSidebar::autoFilterSelectionChanged()
 {
     // only fetch when we know we need to filter ..
-    QList<SummaryMetrics> allRides;
     QSet<QString> matched;
 
     // assume nothing to do...
@@ -853,29 +852,26 @@ LTMSidebar::autoFilterSelectionChanged()
             // we have a selection!
             if (isautofilter == false) {
                 isautofilter = true;
-                allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
-                foreach(SummaryMetrics x, allRides) matched << x.getFileName();
+                foreach(RideItem *x, context->athlete->rideCache->rides()) matched << x->fileName;
             }
 
-            // translate fields back from Display Name to internal Name !
-            SpecialFields sp;
-
             // what is the field?
-            QString fieldname = sp.internalName(item->splitterHandle->title());
+            QString fieldname = item->splitterHandle->title();
 
             // what values are highlighted
             QStringList values;
-            foreach (QTreeWidgetItem *wi, tree->selectedItems()) values << sp.internalName(wi->text(0));
+            foreach (QTreeWidgetItem *wi, tree->selectedItems()) 
+                values << wi->text(0);
 
             // get a set of filenames that match
             QSet<QString> matches;
-            foreach(SummaryMetrics x, allRides) {
+            foreach(RideItem *x, context->athlete->rideCache->rides()) {
 
                 // we use XXX___XXX___XXX because it is not likely to exist
-                QString value = x.getText(fieldname, "XXX___XXX___XXX");
+                QString value = x->getText(fieldname, "XXX___XXX___XXX");
                 if (value == "") value = tr("(blank)"); // match blanks!
 
-                if (values.contains(value)) matches << x.getFileName();
+                if (values.contains(value)) matches << x->fileName;
             }
 
             // now remove items from the matched list that
