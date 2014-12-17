@@ -235,8 +235,10 @@ TreeMapWindow::refresh()
 
         // set the specification
         FilterSet fs;
+#ifdef GC_HAVE_LUCENE
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+#endif
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(dr);
 

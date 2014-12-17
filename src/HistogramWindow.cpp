@@ -998,9 +998,11 @@ HistogramWindow::updateChart()
                 }
 
                 FilterSet fs;
+#ifdef GC_HAVE_LUCENE
                 fs.addFilter(isfiltered, files);
                 fs.addFilter(context->isfiltered, context->filters);
                 fs.addFilter(context->ishomefiltered, context->homeFilters);
+#endif
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
