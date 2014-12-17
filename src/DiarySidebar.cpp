@@ -17,15 +17,20 @@
  */
 
 #include "DiarySidebar.h"
+
+#include "Context.h"
 #include "Athlete.h"
 #include "RideCache.h"
-#include "Context.h"
+#include "TimeUtils.h"
+#include "Specification.h"
+#include "RideItem.h"
+
 #include "GcWindowLayout.h"
 #include "Settings.h"
 #include "HelpWhatsThis.h"
+
 #include <QWebSettings>
 #include <QWebFrame>
-#include "TimeUtils.h"
 
 //********************************************************************************
 // CALENDAR SIDEBAR (DiarySidebar)
@@ -321,8 +326,8 @@ DiarySidebar::setSummary()
         from = newFrom;
         to = newTo;
 
-        // lets get the metrics
-        QList<SummaryMetrics>results = context->athlete->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
+        Specification spec;
+        spec.setDateRange(DateRange(from, to));
 
         // foreach of the metrics get an aggregated value
         // header of summary
@@ -375,7 +380,7 @@ DiarySidebar::setSummary()
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
                 QStringList empty; // usually for filters, but we don't do that
-                QString value = SummaryMetrics::getAggregated(context, metricname, results, empty, false, useMetricUnits);
+                QString value = context->athlete->rideCache->getAggregate(metricname, spec, useMetricUnits);
 
 
                 // Maximum Max and Average Average looks nasty, remove from name for display
