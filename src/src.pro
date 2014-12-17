@@ -421,6 +421,7 @@ HEADERS += \
         Settings.h \
         ShareDialog.h \
         SpecialFields.h \
+        Specification.h \
         SpinScanPlot.h \
         SpinScanPolarPlot.h \
         SpinScanPlotWindow.h \
@@ -644,6 +645,7 @@ SOURCES += \
         ShareDialog.cpp \
         SmallPlot.cpp \
         SpecialFields.cpp \
+        Specification.cpp \
         SpinScanPlot.cpp \
         SpinScanPolarPlot.cpp \
         SpinScanPlotWindow.cpp \
