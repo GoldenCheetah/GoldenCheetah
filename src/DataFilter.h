@@ -16,16 +16,19 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef _GC_DataFilter_h
+#define _GC_DataFilter_h
+
 #include <QString>
 #include <QObject>
 #include <QDebug>
 #include <QList>
 #include <QStringList>
 #include "RideCache.h"
-#include "RideItem.h"
 #include "RideFile.h" //for SeriesType
 
 class Context;
+class RideItem;
 class RideMetric;
 class FieldDefinition;
 class DataFilter;
@@ -93,38 +96,5 @@ class DataFilter : public QObject
         QStringList filenames;
 };
 
-class FilterSet
-{
-    // used to collect filters and apply if needed
-    QVector<QStringList> filters_;
-
-    public:
-
-        // create one with a set
-        FilterSet(bool on, QStringList list) {
-            if (on) filters_ << list;
-        }
-
-        // create an empty set
-        FilterSet() {}
-
-        // add a new filter
-        void addFilter(bool on, QStringList list) {
-            if (on) filters_ << list;
-        }
-
-        // clear the filter set
-        void clear() {
-            filters_.clear();
-        }
-
-        // does the name in question pass the filter set ?
-        bool pass(QString name) {
-            foreach(QStringList list, filters_)
-                if (!list.contains(name))
-                    return false;
-            return true;
-        }
-};
-
 extern int DataFilterdebug;
+#endif

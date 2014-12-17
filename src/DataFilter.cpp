@@ -19,6 +19,7 @@
 #include "DataFilter.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideFileCache.h"
 #include <QDebug>
