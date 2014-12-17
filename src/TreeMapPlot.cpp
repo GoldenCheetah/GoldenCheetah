@@ -20,8 +20,7 @@
 #include "TreeMapPlot.h"
 #include "LTMTool.h"
 #include "TreeMapWindow.h"
-#include "MetricAggregator.h"
-#include "SummaryMetrics.h"
+#include "RideCache.h"
 #include "RideMetric.h"
 #include "Settings.h"
 #include "Colors.h"
@@ -65,15 +64,14 @@ TreeMapPlot::setData(TMSettings *settings)
 {
     root->clear();
 
-    foreach (SummaryMetrics rideMetrics, *(settings->data)) {
+    foreach (RideItem *item, context->athlete->rideCache->rides()) {
 
         // don't plot if filtered
-        if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
-        if (context->ishomefiltered && !context->homeFilters.contains(rideMetrics.getFileName())) continue;
+        if (!settings->specification.pass(item)) continue;
 
-        double value = rideMetrics.getForSymbol(settings->symbol);
-        QString text1 = rideMetrics.getText(settings->field1, tr("(unknown)"));
-        QString text2 = rideMetrics.getText(settings->field2, tr("(unknown)"));
+        double value = item->getForSymbol(settings->symbol);
+        QString text1 = item->getText(settings->field1, tr("(unknown)"));
+        QString text2 = item->getText(settings->field2, tr("(unknown)"));
         if (text1 == "") text1 = tr("(unknown)");
         if (text2 == "") text2 = tr("(unknown)");
 

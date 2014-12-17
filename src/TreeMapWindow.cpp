@@ -21,9 +21,7 @@
 #include "TreeMapPlot.h"
 #include "LTMSettings.h"
 #include "Context.h"
-#include "Context.h"
 #include "Athlete.h"
-#include "SummaryMetrics.h"
 #include "Settings.h"
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
@@ -220,26 +218,31 @@ TreeMapWindow::refresh()
             }
         }
 
+        DateRange dr;
+
         if (useCustom) {
-            settings.from = custom.from;
-            settings.to = custom.to;
+            dr.from = custom.from;
+            dr.to = custom.to;
         } else if (useToToday) {
             QDate today = QDate::currentDate();
-            settings.from = myDateRange.from;
-            settings.to = myDateRange.to > today ? today : myDateRange.to;
+            dr.from = myDateRange.from;
+            dr.to = myDateRange.to > today ? today : myDateRange.to;
         } else {
-            settings.from = myDateRange.from;
-            settings.to = myDateRange.to;
+            dr.from = myDateRange.from;
+            dr.to = myDateRange.to;
         }
+
+        // set the specification
+        FilterSet fs;
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        settings.specification.setFilterSet(fs);
+        settings.specification.setDateRange(dr);
+
+        // and the fields to use
         SpecialFields sp;
         settings.field1 = sp.internalName(field1->currentText());
         settings.field2 = sp.internalName(field2->currentText());
-        settings.data = &results;
-
-        // get the data
-        results.clear(); // clear any old data
-        results = context->athlete->metricDB->getAllMetricsFor(QDateTime(settings.from, QTime(0,0,0)),
-                                                   QDateTime(settings.to, QTime(0,0,0)));
 
         refreshPlot();
     }

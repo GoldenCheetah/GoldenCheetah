@@ -22,7 +22,6 @@
 
 #include <QtGui>
 
-#include "MetricAggregator.h"
 #include "TreeMapWindow.h"
 #include "Context.h"
 
