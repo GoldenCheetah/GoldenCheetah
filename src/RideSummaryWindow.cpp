@@ -337,10 +337,11 @@ RideSummaryWindow::refresh()
             }
 
             FilterSet fs;
+#ifdef GC_HAVE_LUCENE
             fs.addFilter(filtered, filters);
             fs.addFilter(context->isfiltered, context->filters);
             fs.addFilter(context->ishomefiltered, context->homeFilters);
-
+#endif
             specification.setFilterSet(fs);
         }
         rideSummary->page()->mainFrame()->setHtml(htmlSummary());
