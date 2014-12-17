@@ -70,7 +70,7 @@ RideMetric::computeMetrics(const Context *context, const RideFile *ride, const Z
 }
 
 QString 
-RideMetric::toString(bool useMetricUnits)
+RideMetric::toString(bool useMetricUnits) const
 {
     if (isTime()) return time_to_string(value(useMetricUnits));
     return QString("%1").arg(value(useMetricUnits), 0, 'f', precision());

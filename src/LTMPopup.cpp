@@ -19,6 +19,8 @@
 #include "LTMPopup.h"
 #include "MainWindow.h"
 #include "Athlete.h"
+#include "Specification.h"
+#include "RideCache.h"
 
 LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -108,7 +110,7 @@ LTMPopup::setTitle(QString s)
 }
 
 void
-LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString title)
+LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
 {
     // create the ride list
     int count = 0;
@@ -129,15 +131,15 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
     rides->setHorizontalHeaderItem(1,h);
 
     // now add rows to the table for each entry
-    foreach(SummaryMetrics x, data) {
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
-        QDateTime rideDate = x.getRideDate();
+        if (!spec.pass(item)) continue;
 
-        // we'll select it for summary aggregation
-        selected << x;
+        // what rides were selected ?
+        selected << item->fileName;
 
         // date/time
-        QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
+        QTableWidgetItem *t = new QTableWidgetItem(item->dateTime.toString(tr("ddd, dd MMM yy hh:mmA")));
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         t->setTextAlignment(Qt::AlignHCenter);
         rides->setRowCount(count+1);
@@ -145,12 +147,14 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
         rides->setRowHeight(count, 14);
 
         // metrics
-        QString value = x.getStringForSymbol(metric->symbol(), context->athlete->useMetricUnits);
+        double d = item->getForSymbol(metric->symbol());
+        const_cast<RideMetric *>(metric)->setValue(d);
+        QString value = metric->toString(context->athlete->useMetricUnits);
+
         h = new QTableWidgetItem(value,QTableWidgetItem::Type);
         h->setFlags(t->flags() & (~Qt::ItemIsEditable));
         h->setTextAlignment(Qt::AlignHCenter);
         rides->setItem(count, 1, h);
-
 
         count++;
     }
@@ -184,8 +188,9 @@ LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString t
 }
 
 void
-LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
+LTMPopup::setData(LTMSettings &, QDate, QDate, QTime)
 {
+#if 0 // DISABLED IN LTM WINDOW UNTIL IT IS MIGRATED TO RIDECACHE
     // set the title
     QString _title;
     switch (settings.groupBy) {
@@ -342,12 +347,12 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
     if (nonRideMetrics) _title += QString(tr(" / non ride-related metrics skipped"));
 
     setTitle(_title);
-
     rideSelected();
+#endif
 }
 
 QString
-LTMPopup::setSummaryHTML(SummaryMetrics &results)
+LTMPopup::setSummaryHTML(RideItem *item)
 {
     // where we construct the text
     QString summaryText("");
@@ -435,12 +440,13 @@ LTMPopup::setSummaryHTML(SummaryMetrics &results)
 
         const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
-        QStringList empty; // filter list not used at present
-        QList<SummaryMetrics> resultList1;
-        resultList1 << results;
-
-        // use getAggregated even if it's only 1 file to have consistent value treatment
-        QString value = SummaryMetrics::getAggregated(context, metricname, resultList1, empty, false, context->athlete->useMetricUnits);
+        // use getAggregate even if it's only 1 file to have consistent value treatment
+        double d = item->getForSymbol(metricname, true);
+        QString value;
+        if (metric) {
+            const_cast<RideMetric*>(metric)->setValue(d);
+            value = metric->toString(context->athlete->useMetricUnits);
+        }
 
         // Maximum Max and Average Average looks nasty, remove from name for display
         QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
@@ -475,21 +481,30 @@ LTMPopup::setSummaryHTML(SummaryMetrics &results)
 
 
    return summaryText;
-
 }
 
 void
 LTMPopup::rideSelected()
 {
+    // which ride is selected
     int index = 0;
-    foreach (QTableWidgetItem *item, rides->selectedItems())
-        index = item->row();
+    if (rides->selectedItems().count())
+        index = rides->selectedItems().first()->row();
 
+    // do we have any rides and is the index within bounds
     if (selected.count() > index) {
 
-        // update summary
-        metrics->setText(setSummaryHTML(selected[index]));
-        notes->setText(selected[index].getText("Notes", ""));
+        RideItem *have = context->athlete->rideCache->getRide(selected[index]);
+
+        if (have) {
+
+            // update summary
+            metrics->setText(""); //! stop crash (?)
+            metrics->setText(setSummaryHTML(have));
+
+            notes->setText(""); //! stop crash (?)
+            notes->setText(have->getText("Notes", ""));
+        }
     }
     resizeEvent(NULL);
 }

@@ -72,6 +72,9 @@ class Specification
         void setDateRange(DateRange dr);
         void setFilterSet(FilterSet fs);
 
+        DateRange dateRange() { return dr; }
+        FilterSet filterSet() { return fs; }
+
     private:
         DateRange dr;
         FilterSet fs;
