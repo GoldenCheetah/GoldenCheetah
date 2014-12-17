@@ -388,13 +388,20 @@ RideItem::getWeight()
 }
 
 double
-RideItem::getForSymbol(QString name)
+RideItem::getForSymbol(QString name, bool useMetricUnits)
 {
     if (metrics_.size()) {
         // return the precomputed metric value
         const RideMetricFactory &factory = RideMetricFactory::instance();
         const RideMetric *m = factory.rideMetric(name);
-        if (m) return metrics_[m->index()];
+        if (m) {
+            if (useMetricUnits) return metrics_[m->index()];
+            else {
+                // little hack to set/get for conversion
+                const_cast<RideMetric*>(m)->setValue(metrics_[m->index()]);
+                return m->value(useMetricUnits);
+            }
+        }
     }
     return 0.0f;
 }

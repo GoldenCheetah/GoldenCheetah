@@ -79,7 +79,7 @@ class RideItem : public QObject
         void setFrom(RideItem&);
 
         // access the metric value
-        double getForSymbol(QString name);
+        double getForSymbol(QString name, bool useMetricUnits=true);
 
         // access the metadata
         QString getText(QString name, QString fallback) { return metadata_.value(name, fallback); }

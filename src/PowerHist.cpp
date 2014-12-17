@@ -21,11 +21,11 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
-#include "SummaryMetrics.h"
 #include "Settings.h"
 #include "Zones.h"
 #include "HrZones.h"
@@ -1561,8 +1561,16 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
         // set the data even if not checked
         HistData add;
 
+        // set the specification
+        FilterSet fs;
+        fs.addFilter(context->isfiltered, context->filters);
+        fs.addFilter(context->ishomefiltered, context->homeFilters);
+        Specification spec;
+        spec.setDateRange(DateRange(cd.start,cd.end));
+        spec.setFilterSet(fs);
+
         // set it from the metric
-        setData(cd.metrics,  totalMetric, distMetric, false, QStringList(), &add);
+        setData(spec,  totalMetric, distMetric, &add);
 
         // add to the list
         compareData << add;
@@ -1602,8 +1610,7 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
 }
 
 void 
-PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
-                     bool isFiltered, QStringList files, HistData *data)
+PowerHist::setData(Specification specification, QString totalMetric, QString distMetric, HistData *data)
 {
     // what metrics are we plotting?
     source = Metric;
@@ -1622,16 +1629,13 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE BELOW
     // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
-    foreach(SummaryMetrics x, results) { 
+    foreach(RideItem *x, context->athlete->rideCache->rides()) { 
 
-        // skip filtered values
-        if (isFiltered && !files.contains(x.getFileName())) continue;
-
-        // and global filter too
-        if (context->isfiltered && !context->filters.contains(x.getFileName())) continue;
+        // not passed
+        if (!specification.pass(x)) continue;
 
         // get computed value
-        double v = x.getForSymbol(distMetric, context->athlete->useMetricUnits);
+        double v = x->getForSymbol(distMetric, context->athlete->useMetricUnits);
 
         // ignore no temp files
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NoTemp) continue;
@@ -1663,16 +1667,13 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
 
     // LOOP THRU VALUES -- REPEATED WITH CUT AND PASTE ABOVE
     // SO PLEASE MAKE SAME CHANGES TWICE (SORRY)
-    foreach(SummaryMetrics x, results) { 
+    foreach(RideItem *x, context->athlete->rideCache->rides()) { 
 
-        // skip filtered values
-        if (isFiltered && !files.contains(x.getFileName())) continue;
-
-        // and global filter too
-        if (context->isfiltered && !context->filters.contains(x.getFileName())) continue;
+        // does it match
+        if (!specification.pass(x)) continue;
 
         // get computed value
-        double v = x.getForSymbol(distMetric, context->athlete->useMetricUnits);
+        double v = x->getForSymbol(distMetric, context->athlete->useMetricUnits);
 
         // ignore no temp files
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NoTemp) continue;
@@ -1694,7 +1695,7 @@ PowerHist::setData(QList<SummaryMetrics>&results, QString totalMetric, QString d
         // there will be some loss of precision due to totalising
         // a double in an int, but frankly that should be minimal
         // since most values of note are integer based anyway.
-        double t = x.getForSymbol(totalMetric, context->athlete->useMetricUnits);
+        double t = x->getForSymbol(totalMetric, context->athlete->useMetricUnits);
 
         // totalise in minutes
         if (tm->units(context->athlete->useMetricUnits) == "seconds" ||
