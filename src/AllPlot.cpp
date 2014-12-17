@@ -5780,12 +5780,31 @@ double IntervalPlotData::x(size_t i) const
     IntervalItem *current = intervalNum(interval);
     if (current == NULL) return 0; // out of bounds !?
 
+    // overlap at right ?
+    double right = allPlot->bydist ? multiplier * current->stopKM : current->stop/60;
+
+    if (i%4 == 2 || i%4 == 3) {
+        for (int n=1; n<=intervalCount(); n++) {
+            IntervalItem *other = intervalNum(n);
+            if (other != current) {
+                if (other->start < current->stop && other->stop > current->stop) {
+                    if (other->start < current->start) {
+                        right = allPlot->bydist ? multiplier * current->startKM : current->start/60;
+                    } else  {
+                        right = allPlot->bydist ? multiplier * other->startKM : other->start/60;
+                    }
+                }
+            }
+        }
+    }
+
+
     // which point are we returning?
     switch (i%4) {
-    case 0 : return allPlot->bydist ? multiplier * current->startKM : current->start/60; // bottom left
-    case 1 : return allPlot->bydist ? multiplier * current->startKM : current->start/60; // top left
-    case 2 : return allPlot->bydist ? multiplier * current->stopKM : current->stop/60; // bottom right
-    case 3 : return allPlot->bydist ? multiplier * current->stopKM : current->stop/60; // bottom right
+        case 0 : return allPlot->bydist ? multiplier * current->startKM : current->start/60; // bottom left
+        case 1 : return allPlot->bydist ? multiplier * current->startKM : current->start/60; // top left
+        case 2 : return right; // top right
+        case 3 : return right; // bottom right
     }
     return 0; // shouldn't get here, but keeps compiler happy
 }
@@ -5795,11 +5814,11 @@ double IntervalPlotData::y(size_t i) const
 {
     // which point are we returning?
     switch (i%4) {
-    case 0 : return -20; // bottom left
-    case 1 : return 100; // top left - set to out of bound value
-    case 2 : return 100; // top right - set to out of bound value
-    case 3 : return -20;  // bottom right
-    }
+        case 0 : return -20; // bottom left
+        case 1 : return 100; // top left - set to out of bound value
+        case 2 : return 100; // top right - set to out of bound value
+        case 3 : return -20;  // bottom right
+        }
     return 0;
 }
 

@@ -752,7 +752,7 @@ FormField::setLinkedDefault(QString text)
 {
     foreach (DefaultDefinition adefault, meta->getDefaults()) {
         if (adefault.field == definition.name && adefault.value == text) {
-            qDebug() << "Default for" << adefault.linkedField << ":" << adefault.linkedValue;
+            //qDebug() << "Default for" << adefault.linkedField << ":" << adefault.linkedValue;
 
             if (ourRideItem->ride()->getTag(adefault.linkedField, "") == "")
                 ourRideItem->ride()->setTag(adefault.linkedField, adefault.linkedValue);
