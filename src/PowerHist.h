@@ -27,6 +27,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
+#include "Specification.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
@@ -54,7 +55,6 @@ class PaceHistBackground;
 class PaceHistZoneLabel;
 class LTMCanvasPicker;
 class ZoneScaleDraw;
-class SummaryMetrics;
 
 class penTooltip: public QwtPlotZoomer
 {
@@ -154,8 +154,7 @@ class PowerHist : public QwtPlot
         void setData(RideFileCache *source);
 
         // set data from metrics
-        void setData(QList<SummaryMetrics>&results, QString totalMetric, QString distMetric,
-                     bool isFiltered, QStringList files, HistData *data);
+        void setData(Specification spec, QString totalMetric, QString distMetric, HistData *data);
 
         void setlnY(bool value);
         void setWithZeros(bool value);

@@ -18,6 +18,7 @@
  */
 
 #include "HistogramWindow.h"
+#include "Specification.h"
 #include "HelpWhatsThis.h"
 
 // predefined deltas for each series
@@ -1005,24 +1006,19 @@ HistogramWindow::updateChart()
                     // remember the last lot we collected
                     last = use;
 
-                    // plotting a metric, reread the metrics for the selected date range
-                    results = context->athlete->metricDB->getAllMetricsFor(use);
-
                 }
 
-                if (results.count() == 0) setIsBlank(true);
-                else setIsBlank(false);
+                FilterSet fs;
+                fs.addFilter(isfiltered, files);
+                fs.addFilter(context->isfiltered, context->filters);
+                fs.addFilter(context->ishomefiltered, context->homeFilters);
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
                 powerHist->setSeries(RideFile::none);
                 powerHist->setDelta(getDelta());
                 powerHist->setDigits(getDigits());
-#ifdef GC_HAVE_LUCENE
-                powerHist->setData(results, totalMetric(), distMetric(), isfiltered, files, &powerHist->standard);
-#else
-                powerHist->setData(results, totalMetric(), distMetric(), false, QStringList(), &powerHist->standard);
-#endif
+                powerHist->setData(Specification(use,fs), totalMetric(), distMetric(), &powerHist->standard);
                 powerHist->setColor(colorButton->getColor());
 
             }
