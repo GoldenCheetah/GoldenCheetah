@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
 
@@ -47,12 +48,15 @@
 #include "Lucene.h"
 #endif
 
+// ride cache
+#include "RideCache.h"
+#include "RideItem.h"
+#include "Specification.h"
+
 // metadata support
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-#include "MetricAggregator.h"
-#include "SummaryMetrics.h"
 
 LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context(context), active(false),
                                            isqueryfilter(false), isautofilter(false)
@@ -246,9 +250,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
-#ifdef GC_HAVE_LUCENE
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(autoFilterRefresh()));
-#endif
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
@@ -297,7 +298,6 @@ LTMSidebar::configChanged()
 #ifdef GC_HAVE_LUCENE
     filtersWidget->setStyleSheet(GCColor::stylesheet());
 #endif
-
     setAutoFilterMenu();
 
     // set or reset the autofilter widgets
@@ -1199,8 +1199,8 @@ LTMSidebar::setSummary(DateRange dateRange)
         from = newFrom;
         to = newTo;
 
-        // lets get the metrics
-        QList<SummaryMetrics>results = context->athlete->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
+        Specification spec;
+        spec.setDateRange(DateRange(from,to));
 
         // foreach of the metrics get an aggregated value
         // header of summary
@@ -1253,7 +1253,7 @@ LTMSidebar::setSummary(DateRange dateRange)
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
                 QStringList empty; // filter list not used at present
-                QString value = SummaryMetrics::getAggregated(context, metricname, results, empty, false, context->athlete->useMetricUnits);
+                QString value = context->athlete->rideCache->getAggregate(metricname, spec, context->athlete->useMetricUnits);
 
                 // Maximum Max and Average Average looks nasty, remove from name for display
                 QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
