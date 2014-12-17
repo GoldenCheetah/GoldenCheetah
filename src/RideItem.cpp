@@ -405,3 +405,23 @@ RideItem::getForSymbol(QString name, bool useMetricUnits)
     }
     return 0.0f;
 }
+
+QString
+RideItem::getStringForSymbol(QString name, bool useMetricUnits)
+{
+    QString returning("-");
+
+    if (metrics_.size()) {
+        // return the precomputed metric value
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        const RideMetric *m = factory.rideMetric(name);
+        if (m) {
+
+            double value = metrics_[m->index()];
+            if (isinf(value) || isnan(value)) value=0;
+            const_cast<RideMetric*>(m)->setValue(value);
+            returning = m->toString(useMetricUnits);
+        }
+    }
+    return returning;
+}

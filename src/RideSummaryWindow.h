@@ -30,7 +30,6 @@
 #include <QtConcurrent>
 #endif
 
-#include "SummaryMetrics.h"
 #include "RideFileCache.h"
 #include "ExtendedCriticalPower.h"
 
@@ -38,6 +37,7 @@
 #include "SearchFilterBox.h"
 #endif
 
+#include "Specification.h"
 
 class RideSummaryWindow : public GcChartWindow
 {
@@ -131,7 +131,7 @@ class RideSummaryWindow : public GcChartWindow
         RideItem *_connected;
         bool ridesummary; // do we summarise ride or daterange?
 
-        QList<SummaryMetrics> data; // when in date range mode
+        Specification specification;
         DateRange current;
 
         DateSettingsEdit *dateSetting;

@@ -17,22 +17,29 @@
  */
 
 #include "RideSummaryWindow.h"
+
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFile.h"
+#include "RideCache.h"
 #include "RideItem.h"
 #include "RideMetric.h"
-#include "RideCache.h"
+
 #include "Settings.h"
+#include "Colors.h"
 #include "TimeUtils.h"
 #include "Units.h"
+
 #include "Zones.h"
+#include "HrZones.h"
 #include "PaceZones.h"
+
 #include "PDModel.h"
-#include "MetricAggregator.h"
-#include "DBAccess.h"
 #include "HelpWhatsThis.h"
+
 #include <QtGui>
+#include <QLabel>
+
 #include <QtXml/QtXml>
 #include <math.h>
 
@@ -328,6 +335,13 @@ RideSummaryWindow::refresh()
                         " - " +
                         myDateRange.to.toString(tr("dddd MMMM d yyyy")));
             }
+
+            FilterSet fs;
+            fs.addFilter(filtered, filters);
+            fs.addFilter(context->isfiltered, context->filters);
+            fs.addFilter(context->ishomefiltered, context->homeFilters);
+
+            specification.setFilterSet(fs);
         }
         rideSummary->page()->mainFrame()->setHtml(htmlSummary());
 
@@ -405,14 +419,14 @@ RideSummaryWindow::htmlSummary()
 
     // show average and max temp if it is available (in ride summary mode)
     if ((ridesummary && (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-")) ||
-       (!ridesummary && SummaryMetrics::getAggregated(context, "average_temp", data, QStringList(), false, true) != "-")) {
+       (!ridesummary && context->athlete->rideCache->getAggregate("average_temp", specification, true) != "-")) {
         averageColumn << "average_temp";
         maximumColumn << "max_temp";
     }
 
     // if o2 data is available show the average and max
     if ((ridesummary && ride->areDataPresent()->smo2) || 
-       (!ridesummary && SummaryMetrics::getAggregated(context, "average_smo2", data, QStringList(), false, true) != "-")) {
+       (!ridesummary && context->athlete->rideCache->getAggregate("average_smo2", specification, true) != "-")) {
         averageColumn << "average_smo2";
         maximumColumn << "max_smo2";
     }
@@ -519,7 +533,8 @@ RideSummaryWindow::htmlSummary()
                               filterList = context->homeFilters;
                           }
                       }
-                      s = s.arg(SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, useMetricUnits));            }
+                      s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
+                }
 
              } else {
                  if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
@@ -552,7 +567,7 @@ RideSummaryWindow::htmlSummary()
                               filterList = context->homeFilters;
                           }
                       }
-                      pace = SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, metricPace).toDouble();
+                      pace = context->athlete->rideCache->getAggregate(symbol, specification, metricPace).toDouble();
                     }
 
                     s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
@@ -582,7 +597,7 @@ RideSummaryWindow::htmlSummary()
                               filterList = context->homeFilters;
                           }
                       }
-                      s = s.arg(SummaryMetrics::getAggregated(context, symbol, data, filterList, context->ishomefiltered || filtered, useMetricUnits));
+                      s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
                    }
                  }
             }
@@ -686,7 +701,7 @@ RideSummaryWindow::htmlSummary()
                     filterList = context->homeFilters;
                 }
             }
-            QList<SummaryBest> bests = SummaryMetrics::getBests(context, bestsColumn[i], 10, data, filterList, context->ishomefiltered || filtered, useMetricUnits);
+            QList<SummaryBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
 
             int pos=1;
             foreach(SummaryBest best, bests) {
@@ -751,7 +766,7 @@ RideSummaryWindow::htmlSummary()
                                     filterList = context->homeFilters;
                                 }
                             }
-                            time_in_zone[i] = SummaryMetrics::getAggregated(context, paceTimeInZones[i], data, filterList, context->ishomefiltered || filtered, useMetricUnits, true).toDouble();
+                            time_in_zone[i] = context->athlete->rideCache->getAggregate(paceTimeInZones[i], specification, useMetricUnits, true).toDouble();
                         }
                     }
         
@@ -796,7 +811,7 @@ RideSummaryWindow::htmlSummary()
                             filterList = context->homeFilters;
                         }
                     }
-                    time_in_zone[i] = SummaryMetrics::getAggregated(context, timeInZones[i], data, filterList, context->ishomefiltered || filtered, useMetricUnits, true).toDouble();
+                    time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZones[i], specification, useMetricUnits, true).toDouble();
                 }
             }
             summary += tr("<h3>Power Zones</h3>");
@@ -845,7 +860,7 @@ RideSummaryWindow::htmlSummary()
                         filterList = context->homeFilters;
                     }
                 }
-                time_in_zone[i] = SummaryMetrics::getAggregated(context, timeInZonesHR[i], data, filterList, context->ishomefiltered || filtered, useMetricUnits, true).toDouble();
+                time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesHR[i], specification, useMetricUnits, true).toDouble();
             }
         }
 
@@ -965,35 +980,25 @@ RideSummaryWindow::htmlSummary()
         int rides = 0;
         int totalruns = 0;
         int totalrides = 0;
-        if (context->ishomefiltered || context->isfiltered || filtered) {
 
-            foreach (SummaryMetrics activity, data) {
-                if (activity.isRun()) {
-                    totalruns++;
-                } else {
-                    totalrides++;
-                }
-                if (filtered && !filters.contains(activity.getFileName())) continue;
-                if (context->isfiltered && !context->filters.contains(activity.getFileName())) continue;
-                if (context->ishomefiltered && !context->homeFilters.contains(activity.getFileName())) continue;
-                if (activity.isRun()) {
-                    runs++;
-                } else {
-                    rides++;
-                }
-                activities++;
+        foreach (RideItem *item, context->athlete->rideCache->rides()) {
+
+            // get totals regardless of filter
+            if (item->isRun) {
+                totalruns++;
+            } else {
+                totalrides++;
             }
 
-        } else {
-            activities = data.count();
-            foreach (SummaryMetrics activity, data) {
-               if (activity.isRun()) {
-                    runs++;
-                } else {
-                    rides++;
-                }
-            }
+            if (!specification.pass(item)) continue;
 
+            // how many of each after filter
+            if (item->isRun) {
+                runs++;
+            } else {
+                rides++;
+            }
+            activities++;
         }
 
         // some people have a LOT of metrics, so we only show so many since
@@ -1064,14 +1069,12 @@ RideSummaryWindow::htmlSummary()
 
         // activities 1 per row
         bool even = false;
-        foreach (SummaryMetrics rideMetrics, data) {
+        foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
             // apply the filter if there is one active
-            if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
-            if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
-            if (context->ishomefiltered && !context->homeFilters.contains(rideMetrics.getFileName())) continue;
+            if (!specification.pass(ride)) continue;
 
-            if (rideMetrics.isRun()) continue;
+            if (ride->isRun) continue;
 
             if (even) summary += "<tr>";
             else {
@@ -1081,20 +1084,20 @@ RideSummaryWindow::htmlSummary()
 
             // date of ride
             summary += QString("<td align=\"center\">%1</td>")
-                       .arg(rideMetrics.getRideDate().date().toString(tr("dd MMM yyyy")));
+                       .arg(ride->dateTime.date().toString(tr("dd MMM yyyy")));
 
             for (j = 0; j< totalCols; ++j) {
                 QString symbol = rtotalColumn[j];
 
                 // get this value
-                QString value = rideMetrics.getStringForSymbol(symbol,useMetricUnits);
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
             for (j = 0; j< metricCols; ++j) {
                 QString symbol = metricColumn[j];
 
                 // get this value
-                QString value = rideMetrics.getStringForSymbol(symbol,useMetricUnits);
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
             summary += "</tr>";
@@ -1160,14 +1163,12 @@ RideSummaryWindow::htmlSummary()
 
         // activities 1 per row
         even = false;
-        foreach (SummaryMetrics rideMetrics, data) {
+        foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
             // apply the filter if there is one active
-            if (filtered && !filters.contains(rideMetrics.getFileName())) continue;
-            if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
-            if (context->ishomefiltered && !context->homeFilters.contains(rideMetrics.getFileName())) continue;
+            if (!specification.pass(ride)) continue;
 
-            if (!rideMetrics.isRun()) continue;
+            if (!ride->isRun) continue;
 
             if (even) summary += "<tr>";
             else {
@@ -1177,20 +1178,20 @@ RideSummaryWindow::htmlSummary()
 
             // date of ride
             summary += QString("<td align=\"center\">%1</td>")
-                       .arg(rideMetrics.getRideDate().date().toString(tr("dd MMM yyyy")));
+                       .arg(ride->dateTime.date().toString(tr("dd MMM yyyy")));
 
             for (j = 0; j< totalCols; ++j) {
                 QString symbol = rtotalColumn[j];
 
                 // get this value
-                QString value = rideMetrics.getStringForSymbol(symbol,useMetricUnits);
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
             for (j = 0; j< metricCols; ++j) {
                 QString symbol = metricColumn[j];
 
                 // get this value
-                QString value = rideMetrics.getStringForSymbol(symbol,useMetricUnits);
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
                 summary += QString("<td align=\"center\">%1</td>").arg(value);
             }
             summary += "</tr>";
@@ -2007,8 +2008,6 @@ RideSummaryWindow::useThruToday()
 }
 void RideSummaryWindow::dateRangeChanged(DateRange dr)
 {
-    if (!amVisible()) return;
-
     // range didnt change ignore it...
     if (dr.from == current.from && dr.to == current.to) return;
     else current = dr;
@@ -2020,15 +2019,18 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
     }
 
     if (useCustom) {
-        data = context->athlete->metricDB->getAllMetricsFor(custom);
+        current = custom;
     } else if (useToToday) {
 
-        DateRange use = myDateRange;
+        current = myDateRange;
         QDate today = QDate::currentDate();
-        if (use.to > today) use.to = today;
-        data = context->athlete->metricDB->getAllMetricsFor(use);
+        if (current.to > today) current.to = today;
 
-    } else data = context->athlete->metricDB->getAllMetricsFor(myDateRange);
+    } else current = myDateRange;
+
+    specification.setDateRange(current);
+
+    if (!amVisible()) return;
 
     refresh();
 }
