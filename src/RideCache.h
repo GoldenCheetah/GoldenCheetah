@@ -57,6 +57,9 @@ class RideCache : public QObject
         // get an aggregate applying the passed spec
         QString getAggregate(QString name, Specification spec, bool useMetricUnits, bool nofmt=false);
 
+        // get top n bests
+        QList<SummaryBest> getBests(QString symbol, int n, Specification specification, bool useMetricUnits=true);
+
         // metadata
         QHash<QString,int> getRankedValues(QString name); // metadata
         QStringList getDistinctValues(QString name); // metadata

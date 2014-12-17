@@ -412,6 +412,48 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
     return result;
 }
 
+bool rideCachesummaryBestGreaterThan(const SummaryBest &s1, const SummaryBest &s2)
+{
+     return s1.nvalue > s2.nvalue;
+}
+
+QList<SummaryBest> 
+RideCache::getBests(QString symbol, int n, Specification specification, bool useMetricUnits)
+{
+    QList<SummaryBest> results;
+
+    // get the metric details, so we can convert etc
+    const RideMetric *metric = RideMetricFactory::instance().rideMetric(symbol);
+    if (!metric) return results;
+
+    // loop through and aggregate
+    foreach (RideItem *ride, rides_) {
+
+        // skip filtered rides
+        if (!specification.pass(ride)) continue;
+
+        // get this value
+        SummaryBest add;
+        add.nvalue = ride->getForSymbol(symbol, true);
+        add.date = ride->dateTime.date();
+
+        const_cast<RideMetric*>(metric)->setValue(add.nvalue);
+        add.value = metric->toString(useMetricUnits);
+
+        // nil values are not needed
+        if (add.nvalue < 0 || add.nvalue > 0) results << add;
+    }
+
+    // now sort
+    qStableSort(results.begin(), results.end(), rideCachesummaryBestGreaterThan);
+
+    // truncate
+    if (results.count() > n) results.erase(results.begin()+n,results.end());
+
+    // return the array with the right number of entries in #1 - n order
+    return results;
+}
+
 class RollingBests {
     private:
 
