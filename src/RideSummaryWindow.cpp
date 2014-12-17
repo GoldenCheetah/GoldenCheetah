@@ -1397,7 +1397,7 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // SUMMARISING INTERVALS SO ALWAYS COMPUTE METRICS ON DEMAND
         //
-        QList<SummaryMetrics> intervalMetrics;
+        QList<RideItem*> intervalMetrics;
 
         QStringList worklist;
         worklist += totalColumn;
@@ -1413,7 +1413,7 @@ RideSummaryWindow::htmlCompareSummary() const
         RideMetricFactory &factory = RideMetricFactory::instance();
         for (int j=0; j<context->compareIntervals.count(); j++) {
 
-            SummaryMetrics metrics;
+            RideItem *metrics = new RideItem;
 
             // calculate using the source context of course!
             QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(
@@ -1423,13 +1423,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                                      context->compareIntervals.at(j).sourceContext->athlete->hrZones(), 
                                                      worklist);
 
-            for(int i = 0; i < worklist.count(); ++i) {
-                if (worklist[i] != "") {
-                    RideMetricPtr m = computed.value(worklist[i]);
-                    if (m) metrics.setForSymbol(worklist[i], m->value(true));
-                    else metrics.setForSymbol(worklist[i], 0.00);
-                }
-            }
+            metrics->setFrom(computed);
             intervalMetrics << metrics;
         }
 
@@ -1488,7 +1482,7 @@ RideSummaryWindow::htmlCompareSummary() const
             // then one row for each interval
             int counter = 0;
             int rows = 0;
-            foreach (SummaryMetrics metrics, intervalMetrics) {
+            foreach (RideItem *metrics, intervalMetrics) {
 
                 // skip if isn't checked
                 if (!context->compareIntervals[counter].isChecked()) {
@@ -1509,7 +1503,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     const RideMetric *m = factory.rideMetric(symbol);
 
                     // get value and convert if needed (use local context for units)
-                    double value = metrics.getForSymbol(symbol) 
+                    double value = metrics->getForSymbol(symbol) 
                                 * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
                                 + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
 
@@ -1526,7 +1520,7 @@ RideSummaryWindow::htmlCompareSummary() const
                     if (counter) {
 
                         // calculate me vs the original
-                        double value0 = intervalMetrics[0].getForSymbol(symbol) 
+                        double value0 = intervalMetrics[0]->getForSymbol(symbol) 
                                 * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
                                 + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
 
@@ -1584,7 +1578,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 // now the summary
                 int counter = 0;
                 int rows = 0;
-                foreach (SummaryMetrics metrics, intervalMetrics) {
+                foreach (RideItem *metrics, intervalMetrics) {
 
                     // only ones that are checked
                     if (!context->compareIntervals[counter].isChecked()) {
@@ -1601,8 +1595,8 @@ RideSummaryWindow::htmlCompareSummary() const
                     int idx=0;
                     foreach (ZoneInfo zone, zones) {
 
-                        int timeZone = metrics.getForSymbol(timeInZones[idx]);
-                        int dt = timeZone - intervalMetrics[0].getForSymbol(timeInZones[idx]);
+                        int timeZone = metrics->getForSymbol(timeInZones[idx]);
+                        int dt = timeZone - intervalMetrics[0]->getForSymbol(timeInZones[idx]);
                         idx++;
 
                         // time and then +time
@@ -1656,7 +1650,7 @@ RideSummaryWindow::htmlCompareSummary() const
                 // now the summary
                 int counter = 0;
                 int rows = 0;
-                foreach (SummaryMetrics metrics, intervalMetrics) {
+                foreach (RideItem *metrics, intervalMetrics) {
 
                     // skip if not checked
                     if (!context->compareIntervals[counter].isChecked()) {
@@ -1673,8 +1667,8 @@ RideSummaryWindow::htmlCompareSummary() const
                     int idx=0;
                     foreach (HrZoneInfo zone, zones) {
 
-                        int timeZone = metrics.getForSymbol(timeInZonesHR[idx]);
-                        int dt = timeZone - intervalMetrics[0].getForSymbol(timeInZonesHR[idx]);
+                        int timeZone = metrics->getForSymbol(timeInZonesHR[idx]);
+                        int dt = timeZone - intervalMetrics[0]->getForSymbol(timeInZonesHR[idx]);
                         idx++;
 
                         // time and then +time
@@ -1778,8 +1772,8 @@ RideSummaryWindow::htmlCompareSummary() const
                     const RideMetric *m = factory.rideMetric(symbol);
 
                     // get value and convert if needed (use local context for units)
-                    double value = SummaryMetrics::getAggregated(context, symbol, dr.metrics, QStringList(), false,
-                                                  context->athlete->useMetricUnits, true).toDouble();
+                    double value = dr.context->athlete->rideCache->getAggregate(symbol, dr.specification,
+                                                                                 context->athlete->useMetricUnits, true).toDouble();
 
                     // use right precision
                     QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
@@ -1794,9 +1788,9 @@ RideSummaryWindow::htmlCompareSummary() const
                     if (counter) {
 
                         // calculate me vs the original
-                        double value0 = SummaryMetrics::getAggregated(context, symbol, 
-                                                  context->compareDateRanges[0].metrics, QStringList(), false,
-                                                  context->athlete->useMetricUnits, true).toDouble();
+                        double value0 = context->compareDateRanges[0].context->athlete->rideCache->getAggregate(symbol,
+                                                                                 context->compareDateRanges[0].specification,
+                                                                                 context->athlete->useMetricUnits, true).toDouble();
 
                         value -= value0; // delta
 
@@ -1865,12 +1859,13 @@ RideSummaryWindow::htmlCompareSummary() const
                     int idx=0;
                     foreach (ZoneInfo zone, zones) {
 
-                        int timeZone = SummaryMetrics::getAggregated(context, timeInZones[idx], dr.metrics, QStringList(), false,
-                                                                     context->athlete->useMetricUnits, true).toInt();
+                        int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZones[idx], dr.specification,
+                                                                                 context->athlete->useMetricUnits, true).toDouble();
 
-                        int dt = timeZone - SummaryMetrics::getAggregated(context, timeInZones[idx], 
-                                                                          context->compareDateRanges[0].metrics, QStringList(), false,
-                                                                          context->athlete->useMetricUnits, true).toInt();
+                        int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZones[idx],
+                                                                        context->compareDateRanges[0].specification,
+                                                                        context->athlete->useMetricUnits, true).toDouble();
+
                         idx++;
 
                         // time and then +time
@@ -1937,12 +1932,12 @@ RideSummaryWindow::htmlCompareSummary() const
                     int idx=0;
                     foreach (HrZoneInfo zone, zones) {
 
-                        int timeZone = SummaryMetrics::getAggregated(context, timeInZonesHR[idx], dr.metrics, QStringList(), false,
-                                                                     context->athlete->useMetricUnits, true).toInt();
+                        int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesHR[idx], dr.specification,
+                                                                                 context->athlete->useMetricUnits, true).toDouble();
 
-                        int dt = timeZone - SummaryMetrics::getAggregated(context, timeInZonesHR[idx], 
-                                                                          context->compareDateRanges[0].metrics, QStringList(), false,
-                                                                          context->athlete->useMetricUnits, true).toInt();
+                        int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesHR[idx],
+                                                                        context->compareDateRanges[0].specification,
+                                                                        context->athlete->useMetricUnits, true).toDouble();
                         idx++;
 
                         // time and then +time

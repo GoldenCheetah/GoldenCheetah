@@ -78,6 +78,9 @@ class RideItem : public QObject
         // set from another, e.g. during load of rideDB.json
         void setFrom(RideItem&);
 
+        // set metric values e.g. when working with intervals
+        void setFrom(QHash<QString, RideMetricPtr>);
+
         // access the metric value
         double getForSymbol(QString name, bool useMetricUnits=true);
 
