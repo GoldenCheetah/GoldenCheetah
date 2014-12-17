@@ -23,12 +23,12 @@
 #include <QtGui>
 #include <QTimer>
 #include "Context.h"
-#include "MetricAggregator.h"
 #include "RideMetadata.h"
 #include "Season.h"
 #include "LTMPopup.h"
 #include "GcPane.h"
 #include "SpecialFields.h"
+#include "Specification.h"
 
 #include <math.h>
 
@@ -40,8 +40,7 @@ class TMSettings
     public:
         QString symbol;
         QString field1, field2;
-        QDate from, to;
-        QList<SummaryMetrics> *data;
+        Specification specification;
 };
 
 class TreeMapPlot;
