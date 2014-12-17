@@ -38,6 +38,7 @@
 
 class Context;
 class RideCacheBackgroundRefresh;
+class Specification;
 
 class RideCache : public QObject
 {
@@ -52,6 +53,9 @@ class RideCache : public QObject
         RideItem *getRide(QString filename);
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
+
+        // get an aggregate applying the passed spec
+        QString getAggregate(QString name, Specification spec, bool useMetricUnits, bool nofmt=false);
 
         // metadata
         QHash<QString,int> getRankedValues(QString name); // metadata

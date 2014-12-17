@@ -37,6 +37,7 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 
+class Specification;
 class LTMPopup : public QWidget
 {
     Q_OBJECT
@@ -52,7 +53,7 @@ class LTMPopup : public QWidget
         void setData(LTMSettings &settings, QDate start, QDate end, QTime time);
 
         // when called from a TreeMap chart
-        void setData(QList<SummaryMetrics>data, const RideMetric *metric, QString title);
+        void setData(Specification spec, const RideMetric *metric, QString title);
 
     signals:
 
@@ -69,11 +70,9 @@ class LTMPopup : public QWidget
         QTextEdit *metrics;
         QTextEdit *notes;
 
-        QList<SummaryMetrics> selected;
-
-        // builds HTML text for the selected ride
-        QString setSummaryHTML(SummaryMetrics &results);
-
+        // builds HTML text for the selected ride(s)
+        QString setSummaryHTML(RideItem*);
+        QStringList selected; // filenames
 };
 
 // some geometry stuff to make Mac displays nice

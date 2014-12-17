@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFileCache.h"
+#include "Specification.h"
 
 #include "Route.h"
 #include "RouteWindow.h"
@@ -323,6 +324,92 @@ RideCache::refresh()
         future = QtConcurrent::map(rides_, itemRefresh);
         watcher.setFuture(future);
     }
+}
+
+QString
+RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, bool nofmt)
+{
+    // get the metric details, so we can convert etc
+    const RideMetric *metric = RideMetricFactory::instance().rideMetric(name);
+    if (!metric) return QString("%1 unknown").arg(name);
+
+    // what we will return
+    double rvalue = 0;
+    double rcount = 0; // using double to avoid rounding issues with int when dividing
+
+    // loop through and aggregate
+    foreach (RideItem *item, rides()) {
+
+        // skip filtered rides
+        if (!spec.pass(item)) continue;
+
+        // get this value
+        double value = item->getForSymbol(name);
+        double count = item->getForSymbol("workout_time"); // for averaging
+
+        // check values are bounded, just in case
+        if (isnan(value) || isinf(value)) value = 0;
+
+        // imperial / metric conversion
+        if (useMetricUnits == false) {
+            value *= metric->conversion();
+            value += metric->conversionSum();
+        }
+
+        // do we aggregate zero values ?
+        bool aggZero = metric->aggregateZero();
+
+        // set aggZero to false and value to zero if is temperature and -255
+        if (metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+            value = 0;
+            aggZero = false;
+        }
+
+        switch (metric->type()) {
+        case RideMetric::Total:
+            rvalue += value;
+            break;
+        case RideMetric::Average:
+            {
+            // average should be calculated taking into account
+            // the duration of the ride, otherwise high value but
+            // short rides will skew the overall average
+            if (value || aggZero) {
+                rvalue += value*count;
+                rcount += count;
+            }
+            break;
+            }
+        case RideMetric::Low:
+            {
+            if (value < rvalue) rvalue = value;
+            break;
+            }
+        case RideMetric::Peak:
+            {
+            if (value > rvalue) rvalue = value;
+            break;
+            }
+        }
+    }
+
+    // now compute the average
+    if (metric->type() == RideMetric::Average) {
+        if (rcount) rvalue = rvalue / rcount;
+    }
+
+    // Format appropriately
+    QString result;
+    if (metric->units(useMetricUnits) == "seconds" ||
+        metric->units(useMetricUnits) == tr("seconds")) {
+        if (nofmt) result = QString("%1").arg(rvalue);
+        else result = time_to_string(rvalue);
+
+    } else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
+
+    // 0 temp from aggregate means no values 
+    if ((metric->symbol() == "average_temp" || metric->symbol() == "max_temp") && result == "0.0") result = "-";
+    return result;
 }
 
 class RollingBests {

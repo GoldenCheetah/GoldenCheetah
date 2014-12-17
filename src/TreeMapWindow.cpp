@@ -22,6 +22,7 @@
 #include "LTMSettings.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include "Settings.h"
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
@@ -270,27 +271,40 @@ TreeMapWindow::fieldSelected(int)
 void
 TreeMapWindow::cellClicked(QString f1, QString f2)
 {
-    QList<SummaryMetrics> cell;
+    QStringList match;
 
     // create a list of activities in this cell
     int count = 0;
-    foreach(SummaryMetrics x, results) {
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+        // honour the settings
+        if (!settings.specification.pass(item)) continue;
+
         // text may either not exists, then "unknown" or just be "" but f1, f2 don't know ""
-        QString x1 = x.getText(settings.field1, tr("(unknown)"));
-        QString x2 = x.getText(settings.field2, tr("(unknown)"));
+        QString x1 = item->getText(settings.field1, tr("(unknown)"));
+        QString x2 = item->getText(settings.field2, tr("(unknown)"));
         if (x1 == "") x1 = tr("(unknown)");
         if (x2 == "") x2 = tr("(unknown)");
-        // now we can compare and append
+
+        // match !
         if (x1 == f1 && x2 == f2) {
-            cell.append(x);
+            match << item->fileName;
             count++;
         }
     }
 
+    // create a specification for ours
+    Specification spec;
+    spec.setDateRange(settings.specification.dateRange());
+    FilterSet fs = settings.specification.filterSet();
+    fs.addFilter(true, match);
+    spec.setFilterSet(fs);
+
+    // and the metric to display
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *metric = factory.rideMetric(settings.symbol);
 
-    ltmPopup->setData(cell, metric, QString(tr("%1 ride%2")).arg(count).arg(count == 1 ? "" : tr("s")));
+    ltmPopup->setData(spec, metric, QString(tr("%1 ride%2")).arg(count).arg(count == 1 ? "" : tr("s")));
     popup->show();
 
 }
