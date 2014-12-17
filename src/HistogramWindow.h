@@ -193,7 +193,6 @@ class HistogramWindow : public GcChartWindow
         void updateChart();
 
         void treeSelectionChanged();
-        void treeSelectionTimeout();
 
     private:
 
@@ -264,7 +263,6 @@ class HistogramWindow : public GcChartWindow
         // scrolls up and down metric/total treewidget. This is
         // to have a slight lag before redrawing since it is expensive
         // and users are likely to move up and down with the arrow keys
-        QTimer *lagger;
         ColorButton *colorButton;
         QList<SummaryMetrics> results;
         DateRange last;

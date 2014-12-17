@@ -301,10 +301,6 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         connect(distMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
         connect(totalMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
 
-        lagger = new QTimer;
-        lagger->setSingleShot(true);
-        connect(lagger, SIGNAL(timeout()), this, SLOT(treeSelectionTimeout()));
-
         // comparing things
         connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));
         connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(compareChanged()));
@@ -649,7 +645,7 @@ HistogramWindow::switchMode()
         colorButton->show();
 
         // select the series.. (but without the half second delay)
-        treeSelectionTimeout();
+        treeSelectionChanged();
     }
 
     stale = true;
@@ -662,13 +658,6 @@ HistogramWindow::switchMode()
 //
 void
 HistogramWindow::treeSelectionChanged()
-{
-    stale = true;
-    lagger->start(500);
-}
-
-void
-HistogramWindow::treeSelectionTimeout()
 {
     // new metric chosen, so set up all the bin width, line edit
     // delta, precision etc
