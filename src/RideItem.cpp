@@ -66,6 +66,7 @@ RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
+// clone a ride item
 void
 RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 {
@@ -89,6 +90,17 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 	present = here.present;
     isRun = here.isRun;
 	weight = here.weight;
+}
+
+// set the metric array
+void
+RideItem::setFrom(QHash<QString, RideMetricPtr> computed)
+{
+    QHashIterator<QString, RideMetricPtr> i(computed);
+    while (i.hasNext()) {
+        i.next();
+        metrics_[i.value()->index()] = i.value()->value(true);
+    }
 }
 
 RideFile *RideItem::ride(bool open)

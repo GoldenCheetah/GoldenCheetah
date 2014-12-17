@@ -776,6 +776,9 @@ ComparePane::dropEvent(QDropEvent *event)
             stream >> add.end;
             stream >> add.days;
 
+            // for now the specification is just a date range
+            add.specification.setDateRange(DateRange(add.start,add.end));
+
             // get summary metrics for the season
             // FROM THE SOURCE CONTEXT
             // WE DON'T FETCH BESTS -- THEY NEED TO BE DONE AS NEEDED
