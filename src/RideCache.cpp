@@ -288,7 +288,10 @@ RideCache::progressing(int value)
 {
     // we're working away, notfy everyone where we got
     progress_ = 100.0f * (double(value) / double(watcher.progressMaximum()));
-    context->notifyRefreshUpdate();
+    if (value) {
+        QDate here = reverse_.at(value-1)->dateTime.date();
+        context->notifyRefreshUpdate(here);
+    }
 }
 
 // cancel the refresh map, we're about to exit !
