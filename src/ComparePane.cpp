@@ -18,17 +18,21 @@
 
 #include "ComparePane.h"
 #include "Settings.h"
+#include "Colors.h"
+#include "RideCache.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
 #include "RideMetric.h"
-#include "SummaryMetrics.h"
-#include "MetricAggregator.h"
 #include "ColorButton.h"
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Zones.h"
 
+#include "MetricAggregator.h"
+#include "SummaryMetrics.h"
+
 #include <QCheckBox>
+#include <QTextEdit>
 
 //
 // A selection of distinct colours, user can adjust also
@@ -454,8 +458,7 @@ ComparePane::refreshTable()
             // metrics
             for(int i = 0; i < worklist.count(); i++) {
 
-                QString value = SummaryMetrics::getAggregated(x.sourceContext, worklist[i], 
-                                                              x.metrics, QStringList(), false, context->athlete->useMetricUnits);
+                QString value = x.sourceContext->athlete->rideCache->getAggregate(worklist[i], x.specification, context->athlete->useMetricUnits);
 
                 // add to the table
                 t = new CTableWidgetItem;
