@@ -743,6 +743,13 @@ LTMWindow::filterChanged()
         settings.bests = &bestsresults;
     }
 
+    // Set the specification
+    FilterSet fs;
+    fs.addFilter(context->ishomefiltered, context->homeFilters);
+    fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+    settings.specification.setFilterSet(fs);
+    settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
+
     refreshPlot();
 
     repaint(); // just for the title..
