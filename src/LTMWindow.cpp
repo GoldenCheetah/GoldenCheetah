@@ -207,7 +207,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
     connect(ltmTool, SIGNAL(curvesChanged()), this, SLOT(refresh()));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
-    connect(context, SIGNAL(refreshUpdate()), this, SLOT(refreshUpdate()));
+    connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
 
     // comparing things
@@ -301,9 +301,9 @@ LTMWindow::presetSelected(int index)
 }
 
 void
-LTMWindow::refreshUpdate()
+LTMWindow::refreshUpdate(QDate here)
 {
-    if (isVisible() && lastRefresh.secsTo(QTime::currentTime()) > 5) {
+    if (isVisible() && here > settings.start.date() && lastRefresh.secsTo(QTime::currentTime()) > 5) {
         lastRefresh = QTime::currentTime();
         refresh();
     }

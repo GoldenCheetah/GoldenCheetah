@@ -198,7 +198,7 @@ class LTMWindow : public GcChartWindow
         void zoomSliderChanged();
         void showLegendClicked(int);
         void applyClicked();
-        void refreshUpdate();
+        void refreshUpdate(QDate);
         void refresh();
         void pointClicked(QwtPlotCurve*, int);
         int groupForDate(QDate);

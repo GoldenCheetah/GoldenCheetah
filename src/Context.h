@@ -128,7 +128,7 @@ class Context : public QObject
 
         void notifyRefreshStart() { emit refreshStart(); }
         void notifyRefreshEnd() { emit refreshEnd(); }
-        void notifyRefreshUpdate() { emit refreshUpdate(); }
+        void notifyRefreshUpdate(QDate date) { emit refreshUpdate(date); }
 
         void notifyCompareIntervals(bool state);
         void notifyCompareIntervalsChanged();
@@ -150,7 +150,7 @@ class Context : public QObject
         // refreshing stats
         void refreshStart();
         void refreshEnd();
-        void refreshUpdate();
+        void refreshUpdate(QDate);
 
         void rideSelected(RideItem*);
         void rideAdded(RideItem *);
