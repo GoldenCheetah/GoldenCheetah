@@ -137,6 +137,10 @@ class RideItem : public QObject
         void setRide(RideFile *);
         void setFileName(QString, QString);
         void setStartTime(QDateTime);
+
+        // sorting
+        bool operator<(RideItem right) const { return dateTime < right.dateTime; }
+        bool operator>(RideItem right) const { return dateTime < right.dateTime; }
 };
 
 #endif // _GC_RideItem_h
