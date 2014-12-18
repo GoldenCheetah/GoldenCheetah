@@ -702,10 +702,10 @@ RideSummaryWindow::htmlSummary()
                     filterList = context->homeFilters;
                 }
             }
-            QList<SummaryBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
+            QList<AthleteBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
 
             int pos=1;
-            foreach(SummaryBest best, bests) {
+            foreach(AthleteBest best, bests) {
 
                 // alternating shading
                 if (pos%2) summary += "<tr bgcolor='" + altColor.name() + "'";

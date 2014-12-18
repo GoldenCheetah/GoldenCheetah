@@ -347,7 +347,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 }
 
 #ifdef GC_HAVE_INTERVALS
-bool greaterThan(const SummaryBest &s1, const SummaryBest &s2)
+bool greaterThan(const AthleteBest &s1, const AthleteBest &s2)
 {
      return s1.nvalue > s2.nvalue;
 }
@@ -420,7 +420,7 @@ MetricAggregator::refreshBestIntervals()
     //                   XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
     QList<SummaryMetrics> allRides = context->athlete->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
 
-    QList<SummaryBest> bests;
+    QList<AthleteBest> bests;
 
     // get the metric details, so we can convert etc
     const RideMetric *metric = RideMetricFactory::instance().rideMetric(symbol);
@@ -430,7 +430,7 @@ MetricAggregator::refreshBestIntervals()
     foreach (SummaryMetrics rideMetrics, allRides) {
 
         // get this value
-        SummaryBest add;
+        AthleteBest add;
         add.nvalue = rideMetrics.getForSymbol(symbol);
         add.date = rideMetrics.getRideDate().date();
         add.fileName = rideMetrics.getFileName();
@@ -454,7 +454,7 @@ MetricAggregator::refreshBestIntervals()
 
 
     int pos=1;
-    foreach(SummaryBest best, bests) {
+    foreach(AthleteBest best, bests) {
         /*qDebug() << QString("%1. %2W le %3")
                    .arg(pos)
                    .arg(best.value)
