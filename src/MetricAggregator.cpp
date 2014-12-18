@@ -491,8 +491,6 @@ MetricAggregator::refreshBestIntervals()
 }
 #endif
 
-
-
 /*----------------------------------------------------------------------
  * Calculate the metrics for a ride file using the metrics factory
  *----------------------------------------------------------------------*/
@@ -555,35 +553,3 @@ bool MetricAggregator::importRide(QDir /* no longer used ? */, RideFile *ride, Q
 
     return true;
 }
-
-/*----------------------------------------------------------------------
- * Query functions are wrappers around DBAccess functions
- *----------------------------------------------------------------------*/
-
-QList<SummaryMetrics>
-MetricAggregator::getAllMetricsFor(DateRange dr)
-{
-    return getAllMetricsFor(QDateTime(dr.from, QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
-}
-
-QList<SummaryMetrics>
-MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
-{
-    if (context->athlete->isclean == false) refreshMetrics(); // get them up-to-date
-
-    QList<SummaryMetrics> empty;
-
-    // only if we have established a connection to the database
-    if (dbaccess == NULL) {
-        qDebug()<<"lost db connection?";
-        return empty;
-    }
-
-    // apparently using transactions for queries
-    // can improve performance!
-    dbaccess->connection().transaction();
-    QList<SummaryMetrics> results = dbaccess->getAllMetricsFor(start, end);
-    dbaccess->connection().commit();
-    return results;
-}
-

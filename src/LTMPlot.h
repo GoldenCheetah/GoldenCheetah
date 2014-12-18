@@ -35,6 +35,7 @@
 
 #include "Context.h"
 
+class SummaryMetrics; // for PMC curves, going soon XXX
 class LTMPlotBackground;
 class LTMWindow;
 class LTMPlotZoneLabel;

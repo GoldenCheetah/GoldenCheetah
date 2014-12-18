@@ -22,7 +22,6 @@
 class Context;
 class RideFileCache;
 
-#include "SummaryMetrics.h"
 #include "Specification.h"
 
 #include <QColor>
@@ -39,7 +38,6 @@ class CompareDateRange
         QString name;
         QColor color;
         Specification specification;
-        QList<SummaryMetrics> metrics; //XXX soon to be deprecated
         QDate start, end;
         int days;
         Context *sourceContext;

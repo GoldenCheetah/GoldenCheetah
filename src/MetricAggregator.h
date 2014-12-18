@@ -49,9 +49,6 @@ class MetricAggregator : public QObject
         void refreshMetrics(QDateTime forceAfterThisDate);
 
         DBAccess *db() { return dbaccess; }
-        //SummaryMetrics getAllMetricsFor(QString filename); // for a single ride
-        QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
-        QList<SummaryMetrics> getAllMetricsFor(DateRange);
 
     signals:
         void dataChanged(); // when metricDB table changed

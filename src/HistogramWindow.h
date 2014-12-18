@@ -24,7 +24,6 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MetricAggregator.h"
-#include "SummaryMetrics.h"
 #include "ChartSettings.h"
 #include "ColorButton.h"
 #include "PowerHist.h"
@@ -35,7 +34,6 @@
 
 #include "Zones.h"
 #include "HrZones.h"
-#include "SummaryMetrics.h"
 
 #include "Season.h"
 #include "SeasonParser.h"
@@ -264,7 +262,6 @@ class HistogramWindow : public GcChartWindow
         // to have a slight lag before redrawing since it is expensive
         // and users are likely to move up and down with the arrow keys
         ColorButton *colorButton;
-        QList<SummaryMetrics> results;
         DateRange last;
 };
 

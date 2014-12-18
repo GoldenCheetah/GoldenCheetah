@@ -28,9 +28,6 @@
 #include "Units.h"
 #include "Zones.h"
 
-#include "MetricAggregator.h"
-#include "SummaryMetrics.h"
-
 #include <QCheckBox>
 #include <QTextEdit>
 
@@ -247,17 +244,11 @@ ComparePane::refreshTable()
         foreach(CompareInterval x, context->compareIntervals) {
 
             // compute the metrics for this ride
-            SummaryMetrics metrics;
+            RideItem metrics;
             QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(context, x.data,
                                                      context->athlete->zones(), context->athlete->hrZones(), worklist);
 
-            for(int i = 0; i < worklist.count(); i++) {
-                if (worklist[i] != "") {
-                    RideMetricPtr m = computed.value(worklist[i]);
-                    if (m) metrics.setForSymbol(worklist[i], m->value(true));
-                    else metrics.setForSymbol(worklist[i], 0.00);
-                }
-            }
+            metrics.setFrom(computed);
 
             // First few cols always the same
             // check - color - athlete - date - time
@@ -781,11 +772,6 @@ ComparePane::dropEvent(QDropEvent *event)
 
             // for now the specification is just a date range
             add.specification.setDateRange(DateRange(add.start,add.end));
-
-            // get summary metrics for the season
-            // FROM THE SOURCE CONTEXT
-            // WE DON'T FETCH BESTS -- THEY NEED TO BE DONE AS NEEDED
-            add.metrics = sourceContext->athlete->metricDB->getAllMetricsFor(QDateTime(add.start, QTime()),QDateTime(add.end, QTime()));
 
             // just use standard colors and cycle round
             // we will of course repeat, but the user can

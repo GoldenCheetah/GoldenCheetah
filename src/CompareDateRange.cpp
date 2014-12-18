@@ -21,7 +21,6 @@
 #include "Context.h"
 #include "RideFileCache.h"
 #include "Season.h"
-#include "SummaryMetrics.h"
 #include <QColor>
 
 RideFileCache *
