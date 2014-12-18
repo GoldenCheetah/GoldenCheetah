@@ -26,20 +26,6 @@
 #include <QApplication>
 
 class Context;
-class SummaryBest
-{
-    public:
-    double nvalue;
-    QString value; // formatted value
-    QDate date;
-#ifdef GC_HAVE_INTERVALS
-    QString fileName;
-#endif
-
-    // for qsort
-    bool operator< (SummaryBest right) const { return (nvalue < right.nvalue); }
-};
-
 class SummaryMetrics
 {
     Q_DECLARE_TR_FUNCTIONS(SummaryMetrics)
@@ -90,7 +76,7 @@ class SummaryMetrics
         //                             bool useMetricUnits, bool nofmt = false);
 
         // get an ordered list pf bests for that symbol
-        //static QList<SummaryBest> getBests(Context *context, QString symbol, int n, 
+        //static QList<AthleteBest> getBests(Context *context, QString symbol, int n, 
         //                                    const QList<SummaryMetrics> &results, 
         //                                    const QStringList &filters, bool filtered, 
         //                                    bool useMetricUnits);

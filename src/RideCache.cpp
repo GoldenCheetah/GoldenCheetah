@@ -422,15 +422,15 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
     return result;
 }
 
-bool rideCachesummaryBestGreaterThan(const SummaryBest &s1, const SummaryBest &s2)
+bool rideCachesummaryBestGreaterThan(const AthleteBest &s1, const AthleteBest &s2)
 {
      return s1.nvalue > s2.nvalue;
 }
 
-QList<SummaryBest> 
+QList<AthleteBest> 
 RideCache::getBests(QString symbol, int n, Specification specification, bool useMetricUnits)
 {
-    QList<SummaryBest> results;
+    QList<AthleteBest> results;
 
     // get the metric details, so we can convert etc
     const RideMetric *metric = RideMetricFactory::instance().rideMetric(symbol);
@@ -443,7 +443,7 @@ RideCache::getBests(QString symbol, int n, Specification specification, bool use
         if (!specification.pass(ride)) continue;
 
         // get this value
-        SummaryBest add;
+        AthleteBest add;
         add.nvalue = ride->getForSymbol(symbol, true);
         add.date = ride->dateTime.date();
 

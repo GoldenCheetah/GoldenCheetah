@@ -39,6 +39,7 @@
 class Context;
 class RideCacheBackgroundRefresh;
 class Specification;
+class AthleteBest;
 
 class RideCache : public QObject
 {
@@ -58,7 +59,7 @@ class RideCache : public QObject
         QString getAggregate(QString name, Specification spec, bool useMetricUnits, bool nofmt=false);
 
         // get top n bests
-        QList<SummaryBest> getBests(QString symbol, int n, Specification specification, bool useMetricUnits=true);
+        QList<AthleteBest> getBests(QString symbol, int n, Specification specification, bool useMetricUnits=true);
 
         // metadata
         QHash<QString,int> getRankedValues(QString name); // metadata
@@ -115,6 +116,20 @@ class RideCache : public QObject
         QFuture<void> future;
         QFutureWatcher<void> watcher;
 
+};
+
+class AthleteBest
+{
+    public:
+    double nvalue;
+    QString value; // formatted value
+    QDate date;
+#ifdef GC_HAVE_INTERVALS
+    QString fileName;
+#endif
+
+    // for qsort
+    bool operator< (AthleteBest right) const { return (nvalue < right.nvalue); }
 };
 
 #endif // _GC_RideCache_h
