@@ -38,7 +38,6 @@
 
 class LTMTool;
 class LTMSettings;
-class SummaryMetrics;
 class Context;
 class RideMetric;
 class RideBest;

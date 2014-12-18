@@ -176,7 +176,6 @@ class TreeMapWindow : public GcWindow
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
         QList<DefaultDefinition>   defaultDefinitions;
-        QList<SummaryMetrics> results;
 
         // Widgets
         QVBoxLayout *mainLayout;

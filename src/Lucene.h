@@ -25,7 +25,6 @@
 
 #include "Context.h"
 #include "RideMetadata.h"
-#include "SummaryMetrics.h"
 #include "RideFile.h"
 
 #include "CLucene.h"

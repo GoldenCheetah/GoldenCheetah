@@ -77,7 +77,6 @@ private:
 
      RideItem *ride;
      QString getTwitterMessage();
-     QString metricToString(const RideMetric *m, SummaryMetrics &metrics, bool metricUnits);
 };
 
 #endif // TWITTERDIALOG_H
