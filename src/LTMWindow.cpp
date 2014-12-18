@@ -26,7 +26,6 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "RideFileCache.h"
-#include "SummaryMetrics.h"
 #include "Settings.h"
 #include "math.h"
 #include "Units.h" // for MILES_PER_KM
@@ -176,7 +175,6 @@ LTMWindow::LTMWindow(Context *context) :
 
     // initialise
     settings.ltmTool = ltmTool;
-    settings.data = NULL;
     settings.groupBy = LTM_DAY;
     settings.legend = ltmTool->showLegend->isChecked();
     settings.events = ltmTool->showEvents->isChecked();
@@ -285,7 +283,6 @@ LTMWindow::presetSelected(int index)
 
         // now get back the local chart setup
         settings.ltmTool = ltmTool;
-        settings.data = &results;
         settings.bests = &bestsresults;
         settings.groupBy = groupBy;
         settings.legend = legend;
@@ -613,11 +610,11 @@ LTMWindow::refresh()
     if (isCompare()) return; 
 
     // refresh for changes to ridefiles / zones
-    if (amVisible() == true && context->athlete->metricDB != NULL) {
-        results.clear(); // clear any old data
-        results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
+    if (amVisible() == true) {
+
         bestsresults.clear();
-        bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
+        bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.specification);
+
         refreshPlot();
         repaint(); // title changes color when filters change
 
@@ -635,7 +632,6 @@ LTMWindow::dateRangeChanged(DateRange range)
     // we already plotted that date range
     if (amVisible() || dirty || range.from != plotted.from || range.to  != plotted.to) {
 
-         settings.data = &results;
          settings.bests = &bestsresults;
 
         // we let all the state get updated, but lets not actually plot
@@ -684,64 +680,6 @@ LTMWindow::filterChanged()
 
     }
     settings.title = myDateRange.name;
-    settings.data = &results;
-    settings.bests = &bestsresults;
-
-    // if we want weeks and start is not a monday go back to the monday
-    int dow = settings.start.date().dayOfWeek();
-    if (settings.groupBy == LTM_WEEK && dow >1 && settings.start != QDateTime(QDate(), QTime(0,0)))
-        settings.start = settings.start.addDays(-1*(dow-1));
-
-    // we need to get data again and apply filter
-    results.clear(); // clear any old data
-    results = context->athlete->metricDB->getAllMetricsFor(settings.start, settings.end);
-    bestsresults.clear();
-    bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.start, settings.end);
-
-    // loop through results removing any not in stringlist..
-    if (ltmTool->isFiltered()) {
-
-        // metrics filtering
-        QList<SummaryMetrics> filteredresults;
-        foreach (SummaryMetrics x, results) {
-            if (ltmTool->filters().contains(x.getFileName()))
-                filteredresults << x;
-        }
-        results = filteredresults;
-
-        // metrics filtering
-        QList<SummaryMetrics> filteredbestsresults;
-        foreach (SummaryMetrics x, bestsresults) {
-            if (ltmTool->filters().contains(x.getFileName()))
-                filteredbestsresults << x;
-        }
-        bestsresults = filteredbestsresults;
-
-        settings.data = &results;
-        settings.bests = &bestsresults;
-    }
-
-    if (context->ishomefiltered) {
-
-        // metrics filtering
-        QList<SummaryMetrics> filteredresults;
-        foreach (SummaryMetrics x, results) {
-            if (context->homeFilters.contains(x.getFileName()))
-                filteredresults << x;
-        }
-        results = filteredresults;
-
-        // metrics filtering
-        QList<SummaryMetrics> filteredbestsresults;
-        foreach (SummaryMetrics x, bestsresults) {
-            if (context->homeFilters.contains(x.getFileName()))
-                filteredbestsresults << x;
-        }
-        bestsresults = filteredbestsresults;
-
-        settings.data = &results;
-        settings.bests = &bestsresults;
-    }
 
     // Set the specification
     FilterSet fs;
@@ -749,6 +687,16 @@ LTMWindow::filterChanged()
     fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
     settings.specification.setFilterSet(fs);
     settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
+
+    // if we want weeks and start is not a monday go back to the monday
+    int dow = settings.start.date().dayOfWeek();
+    if (settings.groupBy == LTM_WEEK && dow >1 && settings.start != QDateTime(QDate(), QTime(0,0)))
+        settings.start = settings.start.addDays(-1*(dow-1));
+
+    // we need to get data again and apply filter
+    bestsresults.clear();
+    bestsresults = RideFileCache::getAllBestsFor(context, settings.metrics, settings.specification);
+    settings.bests = &bestsresults;
 
     refreshPlot();
 
@@ -849,7 +797,6 @@ LTMWindow::applyClicked()
 
         // now get back the local chart setup
         settings.ltmTool = ltmTool;
-        settings.data = &results;
         settings.bests = &bestsresults;
         settings.groupBy = groupBy;
         settings.legend = legend;
@@ -929,15 +876,18 @@ QString
 LTMWindow::dataTable(bool html)
 {
     // truncate date range to the actual data when not set to any date
-    if (settings.data != NULL && (*settings.data).count() != 0) {
+    if (context->athlete->rideCache->rides().count()) {
+
+        QDateTime first = context->athlete->rideCache->rides().first()->dateTime;
+        QDateTime last = context->athlete->rideCache->rides().last()->dateTime;
 
         // end
         if (settings.end == QDateTime() || settings.end.date() > QDate::currentDate().addYears(40))
-                settings.end = (*settings.data).last().getRideDate();
+                settings.end = last;
 
         // start
         if (settings.start == QDateTime() || settings.start.date() < QDate::currentDate().addYears(-40))
-            settings.start = (*settings.data).first().getRideDate();
+            settings.start = first;
     }
 
     // need to redo this
@@ -981,6 +931,7 @@ LTMWindow::dataTable(bool html)
         summary += "</h3><p>";
     }
 
+#if 0
     //
     // STEP1: AGGREGATE DATA INTO GROUPBY FOR EACH METRIC
     //        This is essentially a refactored version of createCurveData
@@ -1321,7 +1272,7 @@ LTMWindow::dataTable(bool html)
         // close table on html page
         if (html) summary += "</table>";
     }
-
+#endif
     // all done !
     if (html) summary += "</center>";
 

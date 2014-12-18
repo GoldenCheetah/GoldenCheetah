@@ -24,8 +24,6 @@
 #include "LTMTrend2.h"
 #include "LTMOutliers.h"
 #include "LTMWindow.h"
-#include "MetricAggregator.h"
-#include "SummaryMetrics.h"
 #include "RideMetric.h"
 #include "RideCache.h"
 #include "RideFileCache.h"
@@ -219,23 +217,25 @@ LTMPlot::setData(LTMSettings *set)
     //XXX BROKEN XXX LTMTool::translateMetrics(context, settings);
 
     // crop dates to at least within a year of the data available, but only if we have some data
-    if (settings->data != NULL && (*settings->data).count() != 0) {
+    if (context->athlete->rideCache->rides().count()) {
+
+        QDateTime first = context->athlete->rideCache->rides().first()->dateTime;
+        QDateTime last = context->athlete->rideCache->rides().last()->dateTime;
+
         // if dates are null we need to set them from the available data
 
         // end
-        if (settings->end == QDateTime() ||
-            settings->end > (*settings->data).last().getRideDate().addDays(365)) {
+        if (settings->end == QDateTime() || settings->end > last.addDays(365)) {
             if (settings->end < QDateTime::currentDateTime()) {
                 settings->end = QDateTime::currentDateTime();
             } else {
-                settings->end = (*settings->data).last().getRideDate();
+                settings->end = last;
             }
         }
 
         // start
-        if (settings->start == QDateTime() ||
-            settings->start < (*settings->data).first().getRideDate().addDays(-365)) {
-            settings->start = (*settings->data).first().getRideDate();
+        if (settings->start == QDateTime() || settings->start < first.addDays(-365)) {
+            settings->start = first;
         }
     }
 
@@ -290,7 +290,7 @@ LTMPlot::setData(LTMSettings *set)
     for (int i=0; i<10; i++) minY[i]=0, maxY[i]=0;
 
     // no data to display so that all folks
-    if (settings->data == NULL || (*settings->data).count() == 0) {
+    if (context->athlete->rideCache->rides().count() == 0) {
 
         // tidy up the bottom axis
         maxX = groupForDate(settings->end.date(), settings->groupBy) -
@@ -1265,43 +1265,43 @@ LTMPlot::setCompareData(LTMSettings *set)
         if (cogganPMC) { delete cogganPMC; cogganPMC=NULL; }
         if (skibaPMC) { delete skibaPMC; skibaPMC=NULL; }
 
+        // no data to display so that all folks
+        if (context->athlete->rideCache->rides().count() == 0) continue;
+
+        QDateTime first = context->athlete->rideCache->rides().first()->dateTime;
+        QDateTime last = context->athlete->rideCache->rides().last()->dateTime;
+
+        // end
+        if (settings->end == QDateTime() ||
+            settings->end > last.addDays(365)) {
+            if (settings->end < QDateTime::currentDateTime()) {
+                settings->end = QDateTime::currentDateTime();
+            } else {
+                settings->end = last;
+            }
+        }
+
+        // start
+        if (settings->start == QDateTime() ||
+            settings->start < first.addDays(-365)) {
+            settings->start = first;
+        }
+
+
         settings->start = QDateTime(cd.start, QTime());
         settings->end = QDateTime(cd.end, QTime());
 
         // For each metric in chart, translate units and name if default uname
         //XXX BROKEN XXX LTMTool::translateMetrics(context, settings);
 
-        // set the settings data source to the compare date range 
-        settings->data = &cd.metrics;
-
         // we need to do this for each date range as they are dependant
         // on the metrics chosen and can't be pre-cached
-        QList<SummaryMetrics> herebests;
-        herebests = RideFileCache::getAllBestsFor(cd.sourceContext, settings->metrics, settings->start, settings->end);
+        settings->specification.setDateRange(DateRange(cd.start, cd.end));
+
+        // bests...
+        QList<RideBest> herebests;
+        herebests = RideFileCache::getAllBestsFor(cd.sourceContext, settings->metrics, settings->specification);
         settings->bests = &herebests;
-
-        // no data to display so that all folks
-        if (settings->data == NULL || (*settings->data).count() == 0) continue;
-
-        // crop dates to at least within a year of the data available, but only if we have some data
-        if (settings->data != NULL && (*settings->data).count() != 0) {
-
-            // end
-            if (settings->end == QDateTime() ||
-                settings->end > (*settings->data).last().getRideDate().addDays(365)) {
-                if (settings->end < QDateTime::currentDateTime()) {
-                    settings->end = QDateTime::currentDateTime();
-                } else {
-                    settings->end = (*settings->data).last().getRideDate();
-                }
-            }
-
-            // start
-            if (settings->start == QDateTime() ||
-                settings->start < (*settings->data).first().getRideDate().addDays(-365)) {
-                settings->start = (*settings->data).first().getRideDate();
-            }
-        }
 
         switch (settings->groupBy) {
             case LTM_TOD:
@@ -1569,7 +1569,7 @@ LTMPlot::setCompareData(LTMSettings *set)
 
             QVector<double> xdata, ydata;
 
-            int count;
+            int count=0;
             if (settings->groupBy != LTM_TOD)
                 createCurveData(cd.sourceContext, settings, metricDetail, xdata, ydata, count);
             else
@@ -2315,12 +2315,14 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
         createPMCCurveData(context, settings, metricDetail, PMCdata);
         data = &PMCdata;
     } else if (metricDetail.type == METRIC_BEST) {
-        data = settings->bests;
+        createBestsData(context,settings,metricDetail,x,y,n);
+        return;
     } else if (metricDetail.type == METRIC_ESTIMATE) {
         createEstimateData(context, settings, metricDetail, x,y,n);
         return;
     }
 
+    // XXXXX IF YOU GET HERE ITS PMC DATA THIS IS GOING TO CHANGE NEXT XXXXX
     n=-1;
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
@@ -2494,6 +2496,105 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                     n++;
                 }
 
+                // first time thru
+                if (n<0) n=0;
+
+                y[n] = value;
+                x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
+
+                // only increment counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy = seconds; 
+
+            } else {
+                // sum totals, average averages and choose best for Peaks
+                int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
+
+                if (metricDetail.uunits == "Ramp" ||
+                    metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
+
+                if (metricDetail.type == METRIC_BEST) type = RideMetric::Peak;
+
+                // first time thru
+                if (n<0) n=0;
+
+                switch (type) {
+                case RideMetric::Total:
+                    y[n] += value;
+                    break;
+                case RideMetric::Average:
+                    {
+                    // average should be calculated taking into account
+                    // the duration of the ride, otherwise high value but
+                    // short rides will skew the overall average
+                    if (value || aggZero) y[n] = ((y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
+                    break;
+                    }
+                case RideMetric::Low:
+                    if (value < y[n]) y[n] = value;
+                    break;
+                case RideMetric::Peak:
+                    if (value > y[n]) y[n] = value;
+                    break;
+                }
+                secondsPerGroupBy += seconds; // increment for same group
+            }
+            lastDay = currentDay;
+        }
+    }
+}
+
+void
+LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n)
+{
+    // resize the curve array to maximum possible size
+    int maxdays = groupForDate(settings->end.date(), settings->groupBy)
+                    - groupForDate(settings->start.date(), settings->groupBy);
+
+    x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+    y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
+
+    // do we aggregate ?
+    bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
+
+    n=-1;
+    int lastDay=0;
+    unsigned long secondsPerGroupBy=0;
+    bool wantZero = metricDetail.curveStyle == QwtPlotCurve::Steps;
+
+    foreach (RideBest best, *(settings->bests)) { 
+
+        // filter has already been applied
+
+        // day we are on
+        int currentDay = groupForDate(best.getRideDate().date(), settings->groupBy);
+
+        // value for day
+        double value;
+        value = best.getForSymbol(metricDetail.bestSymbol);
+
+        // check values are bounded to stop QWT going berserk
+        if (isnan(value) || isinf(value)) value = 0;
+
+        // set aggZero to false and value to zero if is temperature and -255
+        if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
+            value = 0;
+            aggZero = false;
+        }
+
+        if (value || wantZero) {
+            unsigned long seconds = 1;
+            if (currentDay > lastDay) {
+                if (lastDay && wantZero) {
+                    while (lastDay<currentDay) {
+                        lastDay++;
+                        n++;
+                        x[n]=lastDay - groupForDate(settings->start.date(), settings->groupBy);
+                        y[n]=0;
+                    }
+                } else {
+                    n++;
+                }
+
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
@@ -2537,7 +2638,6 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
         }
     }
 }
-
 void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n)

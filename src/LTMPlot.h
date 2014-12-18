@@ -32,7 +32,6 @@
 #include "AllPlot.h" // for curve colors widget
 #include "LTMSettings.h"
 #include "LTMCanvasPicker.h"
-#include "MetricAggregator.h"
 
 #include "Context.h"
 
@@ -121,6 +120,9 @@ class LTMPlot : public QwtPlot
 
         // create curve data from metadata or metric (from ridecache)
         void createMetricData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+
+        // create curve data from bests (from ridefile cache)
+        void createBestsData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
 
         // create a curve based upon TOD
         void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);

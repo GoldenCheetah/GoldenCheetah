@@ -26,7 +26,6 @@
 #include <QWebView>
 #include <QTimer>
 #include "Context.h"
-#include "MetricAggregator.h"
 #include "Season.h"
 #include "LTMPlot.h"
 #include "LTMPopup.h"
@@ -238,9 +237,7 @@ class LTMWindow : public GcChartWindow
         bool compareDirty;
 
         LTMSettings settings; // all the plot settings
-        QList<SummaryMetrics> results;
-        QList<SummaryMetrics> measures;
-        QList<SummaryMetrics> bestsresults;
+        QList<RideBest> bestsresults;
 
         // when one curve per plot we split the settings
         QScrollArea *plotArea;

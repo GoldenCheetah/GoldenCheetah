@@ -41,6 +41,7 @@ class LTMSettings;
 class SummaryMetrics;
 class Context;
 class RideMetric;
+class RideBest;
 
 // group by settings
 #define LTM_DAY     1
@@ -149,7 +150,7 @@ class LTMSettings {
         LTMSettings() {
             // we need to register the stream operators
             qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
-            data = bests = NULL;
+            bests = NULL;
             ltmTool = NULL;
         }
 
@@ -170,8 +171,7 @@ class LTMSettings {
 
         Specification specification;
         QList<MetricDetail> metrics;
-        QList<SummaryMetrics> *data;
-        QList<SummaryMetrics> *bests;
+        QList<RideBest> *bests;
 
         LTMTool *ltmTool;
         QString field1, field2;
