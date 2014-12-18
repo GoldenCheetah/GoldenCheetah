@@ -300,6 +300,11 @@ RideCache::cancel()
         future.waitForFinished();
     }
 }
+// for reverse sorting
+bool rideCacheGreaterThan(const RideItem *a, const RideItem *b)
+{
+    return a->dateTime > b->dateTime;
+}
 
 // check if we need to refresh the metrics then start the thread if needed
 void
@@ -322,7 +327,7 @@ RideCache::refresh()
     // and future watcher can notify of updates
     if (staleCount)  {
         reverse_ = rides_;
-        qSort(reverse_.begin(), reverse_.end(), qGreater<RideItem*>());
+        qSort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
         future = QtConcurrent::map(reverse_, itemRefresh);
         watcher.setFuture(future);
     }
