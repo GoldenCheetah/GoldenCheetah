@@ -26,8 +26,10 @@
 
 class Context;
 class RideFile;
+class RideBest;
 class SummaryMetrics;
 class MetricDetail;
+class Specification;
 
 #include "GoldenCheetah.h"
 
@@ -172,7 +174,7 @@ class RideFileCache
 
         // get all the bests passed and return a list of summary metrics, like the DBAccess
         // function but using CPX files as the source
-        static QList<SummaryMetrics> getAllBestsFor(Context *context, QList<MetricDetail>, QDateTime from, QDateTime to);
+        static QList<RideBest> getAllBestsFor(Context *context, QList<MetricDetail>, Specification spec);
 
         static int decimalsFor(RideFile::SeriesType series);
 
@@ -324,6 +326,30 @@ class RideFileCache
         QVector<float> hrCPTimeInZone;   // time in zone in seconds for polarized zones
         QVector<float> paceTimeInZone;      // time in zone in seconds
         QVector<float> paceCPTimeInZone;   // time in zone in seconds for polarized zones
+};
+
+// Ride Bests in an associative array
+// used to plot peak x seconds on LTM
+
+class RideBest
+{
+	public:
+        // filename
+	    QString getFileName() const { return fileName; }
+        void    setFileName(QString fileName) { this->fileName = fileName; }
+
+        // ride date
+        QDateTime getRideDate() const { return rideDate; }
+        void setRideDate(QDateTime rideDate) { this->rideDate = rideDate; }
+
+        // metric values
+        void setForSymbol(QString symbol, double v) { value.insert(symbol, v); }
+        double getForSymbol(QString symbol, bool metric=true) const;
+
+	private:
+	    QString fileName;
+        QDateTime rideDate;
+        QMap<QString, double> value;
 };
 
 // Working structured inherited from CPPlot.cpp

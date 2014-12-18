@@ -136,16 +136,6 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     }
 }
 
-// get the date from the ride file name
-static QDate dateFromFileName(const QString filename) {
-    QRegExp rx("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\..*$");
-    if (rx.exactMatch(filename)) {
-        QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(), rx.cap(3).toInt());
-        if (date.isValid()) return date;
-    }
-    return QDate(); // nil date
-}
-
 // returns offset from end of head
 static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
 {
@@ -1852,10 +1842,10 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
 // like the metric code works.
 // 
 //
-QList<SummaryMetrics>
-RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDateTime from, QDateTime to)
+QList<RideBest>
+RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, Specification specification)
 {
-    QList<SummaryMetrics> results;
+    QList<RideBest> results;
     QList<MetricDetail> worklist;
 
     // lets get a worklist
@@ -1867,44 +1857,34 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
     if (worklist.count() == 0) return results; // no work to do
 
     // get a list of rides & iterate over them
-    foreach(QString filename, context->athlete->rideCache->getAllFilenames()) {
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
 
-        QDateTime datetime;
-        QRegExp rx ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
+        if (!specification.pass(ride)) continue;
 
-        if (rx.exactMatch(filename)) {
+        // get the ride cache name
 
-            QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
-            QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
-            datetime = QDateTime(date,time);
-
-        } else continue;
-
-        // is it in range?
-        if (datetime < from || datetime > to) continue;
-
-        // CPX filename
-        QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + filename);
+        // CPX ?
+        QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + ride->fileName);
         QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
         RideFileCacheHeader head;
         QFile cacheFile(cacheFileName);
 
-        // open
+        // open ok ?
         if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == false) continue;
 
         // get header
         QDataStream inFile(&cacheFile);
         inFile.readRawData((char *) &head, sizeof(head));
 
-        // out of date 
+        // out of date - just skip
         if (head.version != RideFileCacheVersion) {
             cacheFile.close();
             continue;
         }
 
-        SummaryMetrics add;
-        add.setFileName(filename);
-        add.setRideDate(datetime);
+        RideBest add;
+        add.setFileName(ride->fileName);
+        add.setRideDate(ride->dateTime);
 
         // work through the worklist adding each best
         foreach (MetricDetail workitem, worklist) {
@@ -1939,4 +1919,24 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, QDa
 
     // all done, return results
     return results;
+}
+
+static
+const RideMetric *metricForSymbol(QString symbol)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    return factory.rideMetric(symbol);
+}
+
+double
+RideBest::getForSymbol(QString symbol, bool metric) const
+{
+    if (metric) return value.value(symbol, 0.0);
+    else {
+        const RideMetric *m = metricForSymbol(symbol);
+        double metricValue = value.value(symbol, 0.0);
+        metricValue *= m->conversion();
+        metricValue += m->conversionSum();
+        return metricValue;
+    }
 }
