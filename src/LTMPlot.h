@@ -115,9 +115,19 @@ class LTMPlot : public QwtPlot
 
         int groupForDate(QDate , int);
         void createCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+
+        // create curve data from estimate
         void createEstimateData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+
+        // create curve data from metadata or metric (from ridecache)
+        void createMetricData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+
+        // create a curve based upon TOD
         void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+
+        // create an aggregate
         void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a
+
         QwtAxisId chooseYAxis(QString);
         void refreshZoneLabels(QwtAxisId);
         void refreshMarkers(LTMSettings *, QDate from, QDate to, int groupby, QColor color);

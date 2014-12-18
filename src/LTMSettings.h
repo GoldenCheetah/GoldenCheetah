@@ -34,6 +34,7 @@
 #include <qwt_symbol.h>
 
 #include "RideFile.h" // for SeriesType
+#include "Specification.h" // for SeriesType
 
 class LTMTool;
 class LTMSettings;
@@ -167,6 +168,7 @@ class LTMSettings {
         bool stack;
         int stackWidth;
 
+        Specification specification;
         QList<MetricDetail> metrics;
         QList<SummaryMetrics> *data;
         QList<SummaryMetrics> *bests;

@@ -2232,12 +2232,11 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
 
     for (int i=0; i<(24); i++) x[i]=i;
 
-    foreach (SummaryMetrics rideMetrics, *(settings->data)) {
+    foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
-        // filter out unwanted rides
-        if (context->isfiltered && !context->filters.contains(rideMetrics.getFileName())) continue;
+        if (!settings->specification.pass(ride)) continue;
 
-        double value = rideMetrics.getForSymbol(metricDetail.symbol);
+        double value = ride->getForSymbol(metricDetail.symbol);
 
         // check values are bounded to stop QWT going berserk
         if (isnan(value) || isinf(value)) value = 0;
@@ -2255,7 +2254,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
                 metricDetail.metric->units(true) == tr("seconds")) value /= 3600;
         }
 
-        int array = rideMetrics.getRideDate().time().hour();
+        int array = ride->dateTime.time().hour();
         int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
         bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
 
