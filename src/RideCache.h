@@ -107,7 +107,7 @@ class RideCache : public QObject
         friend class ::RideCacheBackgroundRefresh;
 
         Context *context;
-        QVector<RideItem*> rides_;
+        QVector<RideItem*> rides_, reverse_;
         bool exiting;
 	    double progress_; // percent
         unsigned long fingerprint; // zone configuration fingerprint

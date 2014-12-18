@@ -321,7 +321,9 @@ RideCache::refresh()
     // start if there is work to do
     // and future watcher can notify of updates
     if (staleCount)  {
-        future = QtConcurrent::map(rides_, itemRefresh);
+        reverse_ = rides_;
+        qSort(reverse_.begin(), reverse_.end(), qGreater<RideItem*>());
+        future = QtConcurrent::map(reverse_, itemRefresh);
         watcher.setFuture(future);
     }
 }
