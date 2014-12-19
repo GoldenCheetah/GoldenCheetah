@@ -249,7 +249,7 @@ RideSummaryWindow::metadataChanged()
 void
 RideSummaryWindow::refresh()
 {
-    if (!force && !amVisible()) return; // only if you can see me!
+    if (!amVisible()) return; // only if you can see me!
 
     if (isCompare()) { // COMPARE MODE
 
@@ -2004,6 +2004,8 @@ RideSummaryWindow::useThruToday()
 }
 void RideSummaryWindow::dateRangeChanged(DateRange dr)
 {
+    if (!amVisible()) return;
+
     // range didnt change ignore it...
     if (dr.from == current.from && dr.to == current.to) return;
     else current = dr;
@@ -2025,8 +2027,6 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
     } else current = myDateRange;
 
     specification.setDateRange(current);
-
-    if (!amVisible()) return;
 
     refresh();
 }
