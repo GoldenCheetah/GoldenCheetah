@@ -393,37 +393,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 
 
     //////////////////////////////////////////////////
-    // Golden Cheetah Racing
-
-    QLabel *gc = new QLabel(tr("Golden Cheetah Racing"));
-    gc->setFont(current);
-
-    QLabel *gcurlLabel = new QLabel(tr("Website"));
-    QLabel *gcuserLabel = new QLabel(tr("Username"));
-    QLabel *gcpassLabel = new QLabel(tr("Password"));
-
-    gcURL = new QLineEdit(this);
-    gcURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCURL, "http://race.goldencheetah.org").toString());
-
-    gcUser = new QLineEdit(this);
-    gcUser->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCUSER, "").toString());
-
-    gcPass = new QLineEdit(this);
-    gcPass->setEchoMode(QLineEdit::Password);
-    gcPass->setText(appsettings->cvalue(context->athlete->cyclist, GC_GCPASS, "").toString());
-
-    grid->addWidget(gc, ++row, 0);
-
-    grid->addWidget(gcurlLabel, ++row, 0);
-    grid->addWidget(gcURL, row, 1, 0);
-
-    grid->addWidget(gcuserLabel, ++row, 0);
-    grid->addWidget(gcUser, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->addWidget(gcpassLabel, ++row, 0);
-    grid->addWidget(gcPass, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    //////////////////////////////////////////////////
     // Twitter
 
 #ifdef GC_HAVE_LIBOAUTH
@@ -778,9 +747,6 @@ void CredentialsPage::authoriseCyclingAnalytics()
 void
 CredentialsPage::saveClicked()
 {
-    appsettings->setCValue(context->athlete->cyclist, GC_GCURL, gcURL->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_GCUSER, gcUser->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_GCPASS, gcPass->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPURL, tpURL->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPUSER, tpUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_TPPASS, tpPass->text());
