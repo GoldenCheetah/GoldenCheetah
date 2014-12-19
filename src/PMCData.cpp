@@ -38,6 +38,7 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
     refresh();
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(invalidate()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(invalidate()));
+    connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(invalidate()));
 }
 
 void PMCData::invalidate()

@@ -119,7 +119,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     QWidget *modelWidget = new QWidget(this);
     modelWidget->setContentsMargins(0,0,0,0);
-    settingsTabs->addTab(modelWidget, tr("CP/CV Model"));
+    settingsTabs->addTab(modelWidget, tr("Model"));
     HelpWhatsThis *helpModel = new HelpWhatsThis(modelWidget);
     if (rangemode) modelWidget->setWhatsThis(helpModel->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM_Config_Model));
     else modelWidget->setWhatsThis(helpModel->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Model));
