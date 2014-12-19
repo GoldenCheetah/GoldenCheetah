@@ -204,7 +204,7 @@ LTMWindow::LTMWindow(Context *context) :
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
     connect(ltmTool, SIGNAL(curvesChanged()), this, SLOT(refresh()));
-    connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
 
@@ -683,6 +683,7 @@ LTMWindow::filterChanged()
 
     // Set the specification
     FilterSet fs;
+    fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
     fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
     settings.specification.setFilterSet(fs);
@@ -889,9 +890,6 @@ LTMWindow::dataTable(bool html)
         if (settings.start == QDateTime() || settings.start.date() < QDate::currentDate().addYears(-40))
             settings.start = first;
     }
-
-    // need to redo this
-    ltmPlot->resetPMC();
 
     // now set to new (avoids a weird crash)
     QString summary;

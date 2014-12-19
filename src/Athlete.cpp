@@ -32,6 +32,7 @@
 #include "MetricAggregator.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
+#include "PMCData.h"
 #include "ErgDB.h"
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
@@ -557,4 +558,24 @@ Athlete::getHeight(RideFile *ride)
     if (!height) height = 1.7526f; // 5'9" is average male height
 
     return height;
+}
+
+// working with PMC data series
+PMCData *
+Athlete::getPMCFor(QString metricName, int stsdays, int ltsdays)
+{
+    PMCData *returning = NULL;
+
+    // if we don't already have one, create it
+    returning = pmcData.value(metricName, NULL);
+    if (!returning) {
+
+        // specification is blank and passes for all
+        returning = new PMCData(context, Specification(), metricName, stsdays, ltsdays);
+
+        // add to our collection
+        pmcData.insert(metricName, returning);
+    }
+
+    return returning;
 }

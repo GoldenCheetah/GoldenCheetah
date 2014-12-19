@@ -25,10 +25,7 @@
 #include "Settings.h"
 #include "Colors.h"
 
-#include "StressCalculator.h" // for LTS/STS calculation
-
 #include <QSettings>
-
 #include <math.h> // for isinf() isnan()
 
 // Treemap sorter - reversed to do descending
