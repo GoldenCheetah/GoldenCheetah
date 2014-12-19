@@ -24,6 +24,7 @@
 #include "RideCache.h"
 #include "RideItem.h"
 #include "RideMetric.h"
+#include "PMCData.h"
 
 #include "Settings.h"
 #include "Colors.h"
@@ -491,13 +492,24 @@ RideSummaryWindow::htmlSummary()
         summary = summary.arg(90 / (columnNames.count() + (ridesummary ? 0 : 1)));
         summary = summary.arg(columnNames[i]);
 
+        bool addPMC = false; // lets add some PMC metrics
+
         QStringList metricsList;
         switch (i) {
             case 0: metricsList = totalColumn; break;
             case 1: metricsList = averageColumn; break;
             case 2: metricsList = maximumColumn; break;
             default: 
-            case 3: metricsList = metricColumn; break;
+            case 3: metricsList = metricColumn; addPMC=true; break;
+        }
+
+        if (addPMC) {
+
+            // get the Coggan PMC and add values for date of ride
+            PMCData *pmc = context->athlete->getPMCFor("coggan_tss");
+            summary += QString(tr("<tr><td>CTL:</td><td align=\"right\">%1</td></tr>").arg((int)pmc->lts(rideItem->dateTime.date())));
+            summary += QString(tr("<tr><td>ATL:</td><td align=\"right\">%1</td></tr>").arg((int)pmc->sts(rideItem->dateTime.date())));
+            summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%1</td></tr>").arg((int)pmc->sb(rideItem->dateTime.date())));
         }
         for (int j = 0; j< metricsList.count(); ++j) {
             QString symbol = metricsList[j];
