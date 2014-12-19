@@ -102,6 +102,26 @@ RideFile::~RideFile()
     //!!! if (data) delete data; // need a mechanism to notify the editor
 }
 
+unsigned int
+RideFile::computeFileCRC(QString filename)
+{
+    QFile file(filename);
+    QFileInfo fileinfo(file);
+
+    // open file
+    if (!file.open(QFile::ReadOnly)) return 0;
+
+    // allocate space
+    QScopedArrayPointer<char> data(new char[file.size()]);
+
+    // read entire file into memory
+    QDataStream *rawstream(new QDataStream(&file));
+    rawstream->readRawData(&data[0], file.size());
+    file.close();
+
+    return qChecksum(&data[0], file.size());
+}
+
 WPrime *
 RideFile::wprimeData()
 {

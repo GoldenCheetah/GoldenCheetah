@@ -203,7 +203,7 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 
             // but still update if we're doing this because settings changed not the ride!
             QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + name;
-            if ((crc == 0 || crc != DBAccess::computeFileCRC(fullPath)) ||
+            if ((crc == 0 || crc != RideFile::computeFileCRC(fullPath)) ||
                 zoneFingerPrint != fingerprint ||
                 (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
 

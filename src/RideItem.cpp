@@ -303,7 +303,7 @@ RideItem::checkStale()
                 if (timestamp < QFileInfo(file).lastModified().toTime_t()) {
 
                     // if timestamp has changed then check crc
-                    unsigned long fcrc = DBAccess::computeFileCRC(fullPath);
+                    unsigned long fcrc = RideFile::computeFileCRC(fullPath);
 
                     if (crc == 0 || crc != fcrc) {
                         crc = fcrc; // update as expensive to calculate
