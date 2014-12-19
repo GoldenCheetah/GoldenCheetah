@@ -166,10 +166,6 @@ class CredentialsPage : public QScrollArea
         QComboBox *tpType;
         QPushButton *tpTest;
 
-        QLineEdit *gcURL; // url for gc racing (not available yet)
-        QLineEdit *gcUser;
-        QLineEdit *gcPass;
-
 #ifdef GC_HAVE_LIBOAUTH
         QLineEdit *twitterURL; // url for twitter.com
         QPushButton *twitterAuthorise;
