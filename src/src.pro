@@ -433,7 +433,7 @@ HEADERS += \
         SrdRideFile.h \
         SrmRideFile.h \
         Statistic.h \
-        StressCalculator.h \
+        PMCData.h \
         SummaryMetrics.h \
         SummaryWindow.h \
         SyncRideFile.h \
@@ -657,7 +657,7 @@ SOURCES += \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
         Statistic.cpp \
-        StressCalculator.cpp \
+        PMCData.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \
         SyncRideFile.cpp \

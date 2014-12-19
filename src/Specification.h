@@ -27,6 +27,7 @@ class RideItem;
 
 class FilterSet
 {
+
     // used to collect filters and apply if needed
     QVector<QStringList> filters_;
 
@@ -57,6 +58,8 @@ class FilterSet
                     return false;
             return true;
         }
+
+        int count() { return filters_.count(); }
 };
 
 class Specification
@@ -74,6 +77,7 @@ class Specification
 
         DateRange dateRange() { return dr; }
         FilterSet filterSet() { return fs; }
+        bool isFiltered() { return (fs.count() > 0); }
 
     private:
         DateRange dr;

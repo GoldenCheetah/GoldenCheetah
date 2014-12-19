@@ -50,6 +50,7 @@ class IntervalItem;
 class IntervalTreeView;
 class QSqlTableModel;
 class PDEstimate;
+class PMCData;
 class LTMSettings;
 class Routes;
 class AthleteDirectoryStructure;
@@ -100,6 +101,10 @@ class Athlete : public QObject
         QList<RideFileCache*> cpxCache;
         RideCache *rideCache;
         QList<WithingsReading> withings_;
+
+        // PMC Data
+        PMCData *getPMCFor(QString metricName, int stsDays = 7, int ltsDays = 42); // no Specification used!
+        QMap<QString, PMCData*> pmcData; // all the different PMC series
 
         // athlete measures
         // note ride can override if passed
