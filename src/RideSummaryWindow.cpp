@@ -503,7 +503,7 @@ RideSummaryWindow::htmlSummary()
             case 3: metricsList = metricColumn; addPMC=true; break;
         }
 
-        if (addPMC) {
+        if (ridesummary && addPMC) {
 
             // get the Coggan PMC and add values for date of ride
             PMCData *pmc = context->athlete->getPMCFor("coggan_tss");
@@ -716,6 +716,9 @@ RideSummaryWindow::htmlSummary()
             }
             QList<AthleteBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
 
+            // show tsb when recorded
+            PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
+
             int pos=1;
             foreach(AthleteBest best, bests) {
 
@@ -729,10 +732,11 @@ RideSummaryWindow::htmlSummary()
                 }
                 summary += " >";
 
-                summary += QString("<td align=\"center\">%1.</td><td align=\"center\">%2</td><td align=\"center\">%3</td></tr>")
+                summary += QString("<td align=\"center\">%1.</td><td align=\"center\">%2</td><td align=\"center\">%3</td><td align=\"center\">(%4)</td></tr>")
                            .arg(pos++)
                            .arg(best.value)
-                           .arg(best.date.toString(tr("d MMM yyyy")));
+                           .arg(best.date.toString(tr("d MMM yyyy")))
+                           .arg((int)pmcData->sb(best.date));
             }
 
             // close that column
