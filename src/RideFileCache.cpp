@@ -24,8 +24,6 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"
-#include "MetricAggregator.h"
-#include "SummaryMetrics.h"
 #include "LTMSettings.h" // getAllBestsFor needs this
 
 #include <math.h> // for pow()
@@ -98,7 +96,7 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
 
             // its more recent -or- the crc is the same
             if (rideFileInfo.lastModified() <= cacheFileInfo.lastModified() ||
-                head.crc == DBAccess::computeFileCRC(rideFileName)) {
+                head.crc == RideFile::computeFileCRC(rideFileName)) {
  
                 // it is the same ?
                 if (head.version == RideFileCacheVersion) {
@@ -662,7 +660,7 @@ RideFileCache::refreshCache()
     static bool writeerror=false;
 
     // set head crc
-    crc = DBAccess::computeFileCRC(rideFileName);
+    crc = RideFile::computeFileCRC(rideFileName);
 
     // update cache!
     QFile cacheFile(cacheFileName);
@@ -1830,7 +1828,7 @@ RideFileCache::tiz(Context *context, QString filename, RideFile::SeriesType seri
 }
 
 // get best values (as passed in the list of MetricDetails between the dates specified
-// and return as an array of SummaryMetrics.
+// and return as an array of RideBests)
 //
 // this is to 're-use' the metric api (especially in the LTM code) for passing back multiple
 // bests across multiple rides in one object. We do this so we can optimise the read/seek across

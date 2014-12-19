@@ -53,7 +53,6 @@ class DBAccess
 
         // get schema version
         int getDBVersion();
-        static unsigned int computeFileCRC(QString); 
 
         // create and drop connections
 	    DBAccess(Context *context);

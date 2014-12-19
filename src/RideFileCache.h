@@ -27,7 +27,6 @@
 class Context;
 class RideFile;
 class RideBest;
-class SummaryMetrics;
 class MetricDetail;
 class Specification;
 

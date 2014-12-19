@@ -160,25 +160,6 @@ DBAccess::initDatabase(QDir home)
     }
 }
 
-unsigned int
-DBAccess::computeFileCRC(QString filename)
-{
-    QFile file(filename);
-    QFileInfo fileinfo(file);
-
-    // open file
-    if (!file.open(QFile::ReadOnly)) return 0;
-
-    // allocate space
-    QScopedArrayPointer<char> data(new char[file.size()]);
-
-    // read entire file into memory
-    QDataStream *rawstream(new QDataStream(&file));
-    rawstream->readRawData(&data[0], file.size());
-    file.close();
-
-    return qChecksum(&data[0], file.size());
-}
 
 bool DBAccess::createMetricsTable()
 {
@@ -236,7 +217,7 @@ bool DBAccess::createMetricsTable()
 
         // add row to version database
         QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
-        int metadatacrcnow = computeFileCRC(metadataXML);
+        int metadatacrcnow = RideFile::computeFileCRC(metadataXML);
         QDateTime timestamp = QDateTime::currentDateTime();
 
         // wipe current version row
@@ -318,7 +299,7 @@ bool DBAccess::createIntervalMetricsTable()
 
         // add row to version database
         QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
-        int metadatacrcnow = computeFileCRC(metadataXML);
+        int metadatacrcnow = RideFile::computeFileCRC(metadataXML);
         QDateTime timestamp = QDateTime::currentDateTime();
 
         // wipe current version row
@@ -357,7 +338,7 @@ void DBAccess::checkDBVersion()
 
     // get a CRC for metadata.xml
     QString metadataXML =  QString(context->athlete->home->config().absolutePath()) + "/metadata.xml";
-    int metadatacrcnow = computeFileCRC(metadataXML);
+    int metadatacrcnow = RideFile::computeFileCRC(metadataXML);
 
     // can we get a version number?
     QSqlQuery query("SELECT table_name, schema_version, creation_date, metadata_crc from version;", db->database(sessionid));
@@ -494,7 +475,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + summaryMetrics->getFileName();
 	query.addBindValue(summaryMetrics->getFileName());
 	query.addBindValue(summaryMetrics->getId());
-	query.addBindValue((int)computeFileCRC(fullPath));
+	query.addBindValue((int)RideFile::computeFileCRC(fullPath));
 	query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
     query.addBindValue(summaryMetrics->isRun());
@@ -658,7 +639,7 @@ bool DBAccess::importInterval(SummaryMetrics *summaryMetrics, IntervalItem *inte
     QString fullPath =  QString(context->athlete->home->activities().absolutePath()) + "/" + summaryMetrics->getFileName();
     query.addBindValue(summaryMetrics->getFileName()+"-"+interval->displaySequence);
     query.addBindValue(summaryMetrics->getFileName());
-    query.addBindValue((int)computeFileCRC(fullPath));
+    query.addBindValue((int)RideFile::computeFileCRC(fullPath));
     query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
     query.addBindValue(type); // type

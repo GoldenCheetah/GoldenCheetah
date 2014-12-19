@@ -117,6 +117,9 @@ class RideFile : public QObject // QObject to emit signals
         friend class MainWindow; // tells us we were modified
         friend class Context; // tells us we were saved
 
+        // utility
+        static unsigned int computeFileCRC(QString); 
+
         // Constructor / Destructor
         RideFile();
         RideFile(RideFile*);
