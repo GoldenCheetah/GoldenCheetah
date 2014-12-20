@@ -1297,21 +1297,21 @@ RideSummaryWindow::getPDEstimates()
         double divisor = wpk ? 1.0f : 1000.00f;
 
         if (!lowWPrime && !highWPrime) WPrimeString = tr("N/A");
-        else if (lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/divisor, 0, 'f',  wpk ? 0 : 1).arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
+        else if (!ridesummary && lowWPrime != highWPrime) WPrimeString = QString ("%1 - %2").arg(lowWPrime/divisor, 0, 'f',  wpk ? 0 : 1).arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
         else WPrimeString = QString("%1").arg(highWPrime/divisor, 0, 'f', wpk ? 0 : 1);
 
         if (!lowCP && !highCP) CPString = tr("N/A");
-        else if (lowCP != highCP) CPString = QString ("%1 - %2").arg(lowCP, 0, 'f', wpk ? 2 : 0)
+        else if (!ridesummary && lowCP != highCP) CPString = QString ("%1 - %2").arg(lowCP, 0, 'f', wpk ? 2 : 0)
                                                                 .arg(highCP, 0, 'f', wpk ? 2 : 0);
         else CPString = QString("%1").arg(highCP, 0, 'f', wpk ? 2 : 0);
 
         if (!lowFTP && !highFTP) FTPString = tr("N/A");
-        else if (lowFTP != highFTP) FTPString = QString ("%1 - %2").arg(lowFTP, 0, 'f', wpk ? 2 : 0)
+        else if (!ridesummary && lowFTP != highFTP) FTPString = QString ("%1 - %2").arg(lowFTP, 0, 'f', wpk ? 2 : 0)
                                                                    .arg(highFTP, 0, 'f', wpk ? 2 : 0);
         else FTPString = QString("%1").arg(highFTP, 0, 'f', wpk ? 2 : 0);
 
         if (!lowPMax && !highPMax) PMaxString = tr("N/A");
-        else if (lowPMax != highPMax) PMaxString = QString ("%1 - %2").arg(lowPMax, 0, 'f', wpk ? 2 : 0)
+        else if (!ridesummary && lowPMax != highPMax) PMaxString = QString ("%1 - %2").arg(lowPMax, 0, 'f', wpk ? 2 : 0)
                                                                       .arg(highPMax, 0, 'f', wpk ? 2 : 0);
         else PMaxString = QString("%1").arg(highPMax, 0, 'f', wpk ? 2 : 0);
 
