@@ -512,7 +512,7 @@ Athlete::getWithingsWeight(QDate date)
 
     double lastWeight=0.0f;
     foreach(WithingsReading x, withings_) {
-        if (x.when.date() < date) lastWeight = x.weightkg;
+        if (x.when.date() <= date) lastWeight = x.weightkg;
         if (x.when.date() > date) break;
     }
     return lastWeight;
