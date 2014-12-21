@@ -54,7 +54,7 @@ extern Leaf *root; // root node for parsed statement
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
-%token <function> BEST TIZ
+%token <function> BEST TIZ STS LTS SB
 
 // comparative operators
 %token <op> EQ NEQ LT LTE GT GTE 
@@ -163,6 +163,19 @@ value : symbol                      { $$ = $1; }
                                         $$->function = QString($1);
                                         $$->series = $3;
                                         $$->lvalue.l = $5;
+                                      }
+
+      | LTS '(' symbol ')'            { $$ = new Leaf(); $$->type = Leaf::Function;
+                                        $$->function = QString($1);
+                                        $$->series = $3;
+                                      }
+      | STS '(' symbol ')'            { $$ = new Leaf(); $$->type = Leaf::Function;
+                                        $$->function = QString($1);
+                                        $$->series = $3;
+                                      }
+      | SB '(' symbol ')'             { $$ = new Leaf(); $$->type = Leaf::Function;
+                                        $$->function = QString($1);
+                                        $$->series = $3;
                                       }
       ;
 

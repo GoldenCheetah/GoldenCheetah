@@ -22,6 +22,7 @@
 #include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideFileCache.h"
+#include "PMCData.h"
 #include <QDebug>
 
 #include "DataFilter_yacc.h"
@@ -161,14 +162,24 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
             QString symbol = *(leaf->series->lvalue.n); 
 
-            if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) 
-                DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
+            if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb") {
 
-            if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) 
-                DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+                // does the symbol exist though ?
+                QString lookup = df->lookupMap.value(symbol, "");
+                if (lookup == "") DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
 
-            // now set the series type
-            leaf->seriesType = nameToSeries(symbol);
+            } else {
+
+                if (leaf->function == "best" && !bestValidSymbols.exactMatch(symbol)) 
+                    DataFiltererrors << QString(QObject::tr("invalid data series for best(): %1")).arg(symbol);
+
+                if (leaf->function == "tiz" && !tizValidSymbols.exactMatch(symbol)) 
+                    DataFiltererrors << QString(QObject::tr("invalid data series for tiz(): %1")).arg(symbol);
+
+                // now set the series type
+                leaf->seriesType = nameToSeries(symbol);
+            }
+
         }
         break;
 
@@ -253,7 +264,7 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
         foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
             // evaluate each ride...
-            if(treeRoot->eval(this, treeRoot, item))
+            if(treeRoot->eval(context, this, treeRoot, item))
                 filenames << item->fileName;
         }
         emit results(filenames);
@@ -304,7 +315,7 @@ void DataFilter::configUpdate()
 
 }
 
-double Leaf::eval(DataFilter *df, Leaf *leaf, RideItem *m)
+double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
 {
     switch(leaf->type) {
 
@@ -312,13 +323,13 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, RideItem *m)
     {
         switch (leaf->op) {
             case AND :
-                return (eval(df, leaf->lvalue.l, m) && eval(df, leaf->rvalue.l, m));
+                return (eval(context, df, leaf->lvalue.l, m) && eval(context, df, leaf->rvalue.l, m));
 
             case OR :
-                return (eval(df, leaf->lvalue.l, m) || eval(df, leaf->rvalue.l, m));
+                return (eval(context, df, leaf->lvalue.l, m) || eval(context, df, leaf->rvalue.l, m));
 
             default : // parenthesis
-                return (eval(df, leaf->lvalue.l, m));
+                return (eval(context, df, leaf->lvalue.l, m));
         }
     }
     break;
@@ -327,13 +338,27 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, RideItem *m)
     {
         double duration;
 
+        // pmc data ...
+        if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb") {
+
+                // get metric technical name
+                QString symbol = *(leaf->series->lvalue.n); 
+                QString lookup = df->lookupMap.value(symbol, "");
+                PMCData *pmcData = context->athlete->getPMCFor(lookup);
+
+                if (leaf->function == "sts") return pmcData->sts(m->dateTime.date());
+                if (leaf->function == "lts") return pmcData->lts(m->dateTime.date());
+                if (leaf->function == "sb") return pmcData->sb(m->dateTime.date());
+        }
+
+
         // GET LHS VALUE
         switch (leaf->lvalue.l->type) {
 
             default:
             case Leaf::Function :
             {
-                duration = eval(df, leaf->lvalue.l, m); // duration
+                duration = eval(context, df, leaf->lvalue.l, m); // duration
             }
             break;
 
@@ -389,7 +414,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, RideItem *m)
             default:
             case Leaf::Function :
             {
-                lhsdouble = eval(df, leaf->lvalue.l, m); // duration
+                lhsdouble = eval(context, df, leaf->lvalue.l, m); // duration
                 lhsisNumber=true;
             }
             break;
@@ -446,7 +471,7 @@ double Leaf::eval(DataFilter *df, Leaf *leaf, RideItem *m)
             default:
             case Leaf::Function :
             {
-                rhsdouble = eval(df, leaf->rvalue.l, m);
+                rhsdouble = eval(context, df, leaf->rvalue.l, m);
                 rhsisNumber=true;
             }
             break;

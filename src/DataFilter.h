@@ -40,7 +40,7 @@ class Leaf {
         Leaf() : type(none),op(0),series(NULL) { }
 
         // evaluate against a RideItem
-        double eval(DataFilter *df, Leaf *, RideItem *m);
+        double eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
