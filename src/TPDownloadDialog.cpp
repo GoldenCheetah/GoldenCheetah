@@ -36,6 +36,7 @@ TPDownloadDialog::TPDownloadDialog(Context *context) : QDialog(context->mainWind
                   appsettings->cvalue(context->athlete->cyclist, GC_TPUSER, "null").toString(),
                   appsettings->cvalue(context->athlete->cyclist, GC_TPPASS, "null").toString());
 
+    setMinimumSize(650,450);
     QWidget::hide(); // don't show just yet...
     QApplication::processEvents();
 }
