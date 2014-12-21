@@ -369,6 +369,7 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
+qDebug()<<"lap"<<interval<<"has time="<<time<<"and start"<<this_start_time;
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start

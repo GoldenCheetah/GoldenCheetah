@@ -212,8 +212,8 @@ RideCache::removeCurrentRide()
     context->notifyRideDeleted(todelete);
 
     // ..but before MEMORY cleared
-    todelete->close();
-    delete todelete;
+    // todelete->close(); // <<< pointHover crash in AllPlot
+    todelete->deleteLater();
 
     // now we can update
     context->mainWindow->setUpdatesEnabled(true);
