@@ -142,6 +142,7 @@ void PMCData::refresh()
 
         // seed with score for this one
         int offset = start_.daysTo(item->dateTime.date());
+        if (offset > 0 && offset < stress_.count())
         stress_[offset] += item->getForSymbol(metricName_);
     }
 
