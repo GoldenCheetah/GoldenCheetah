@@ -124,6 +124,8 @@ class RideItem : public QObject
         RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context);
         RideItem(RideFile *ride, QDateTime &dateTime, Context *context);
 
+        ~RideItem();
+
         // state
         void setDirty(bool);
         bool isDirty() { return isdirty; }

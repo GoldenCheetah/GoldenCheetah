@@ -129,6 +129,13 @@ RideFile *RideItem::ride(bool open)
     return ride_;
 }
 
+RideItem::~RideItem()
+{
+    //qDebug()<<"deleting:"<<fileName;
+    if (isOpen()) close();
+    if (fileCache_) delete fileCache_;
+}
+
 RideFileCache *
 RideItem::fileCache()
 {
