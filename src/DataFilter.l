@@ -44,8 +44,11 @@
 [Ee][Nn][Dd][Ss][Ww][Ii][Tt][Hh]            DataFilterlval.op = ENDSWITH; return ENDSWITH;
 [Cc][Oo][Nn][Tt][Aa][Ii][Nn][Ss]            DataFilterlval.op = CONTAINS; return CONTAINS;
 
-[Bb][Ee][Ss][Tt]                          strcpy(DataFilterlval.function, "best"); return BEST;
+[Bb][Ee][Ss][Tt]                           strcpy(DataFilterlval.function, "best"); return BEST;
 [Tt][Ii][Zz]                               strcpy(DataFilterlval.function, "tiz"); return TIZ;
+[Ll][Tt][Ss]                               strcpy(DataFilterlval.function, "lts"); return LTS;
+[Ss][Tt][Ss]                               strcpy(DataFilterlval.function, "sts"); return STS;
+[Ss][Bb]                                   strcpy(DataFilterlval.function, "sb"); return SB;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;
