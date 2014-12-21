@@ -88,6 +88,14 @@ void Leaf::print(Leaf *leaf, int level)
     }
 }
 
+static bool isCoggan(QString symbol)
+{
+    if (!symbol.compare("ctl", Qt::CaseInsensitive)) return true;
+    if (!symbol.compare("tsb", Qt::CaseInsensitive)) return true;
+    if (!symbol.compare("atl", Qt::CaseInsensitive)) return true;
+    return false;
+}
+
 bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
 {
     switch(leaf->type) {
@@ -98,6 +106,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
         {
             QString symbol = *(leaf->lvalue.n);
             if (symbol == "isRun") return true;
+            if (isCoggan(symbol)) return true;
             else return df->lookupType.value(symbol, false);
         }
         break;
@@ -149,7 +158,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             if (lookup == "") {
 
                 // isRun isa special, we may add more later (e.g. date)
-                if (symbol != "isRun") 
+                if (symbol != "isRun" && !isCoggan(symbol))
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
             }
         }
@@ -429,6 +438,14 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                     lhsdouble = m->isRun ? 1 : 0;
                     lhsisNumber = true;
 
+                } else if (isCoggan(symbol)) {
+                    // a coggan PMC metric
+                    PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
+                    if (!symbol.compare("ctl", Qt::CaseInsensitive)) lhsdouble = pmcData->lts(m->dateTime.date());
+                    if (!symbol.compare("atl", Qt::CaseInsensitive)) lhsdouble = pmcData->sts(m->dateTime.date());
+                    if (!symbol.compare("tsb", Qt::CaseInsensitive)) lhsdouble = pmcData->sb(m->dateTime.date());
+                    lhsisNumber = true;
+
                 } else if ((lhsisNumber = df->lookupType.value(*(leaf->lvalue.l->lvalue.n))) == true) {
                     // get symbol value
                     // check metadata string to number first ...
@@ -484,6 +501,15 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 if (symbol == "isRun") {
 
                     rhsdouble = m->isRun ? 1 : 0;
+                    rhsisNumber = true;
+
+                } else if (isCoggan(symbol)) {
+ 
+                    // a coggan PMC metric
+                    PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
+                    if (!symbol.compare("ctl", Qt::CaseInsensitive)) rhsdouble = pmcData->lts(m->dateTime.date());
+                    if (!symbol.compare("atl", Qt::CaseInsensitive)) rhsdouble = pmcData->sts(m->dateTime.date());
+                    if (!symbol.compare("tsb", Qt::CaseInsensitive)) rhsdouble = pmcData->sb(m->dateTime.date());
                     rhsisNumber = true;
 
                 // get symbol value
