@@ -2663,7 +2663,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
 
     // iterate over it and create curve...
-    n=0;
+    n=-1;
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
     bool wantZero = true;
@@ -2707,7 +2707,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                     metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
                 // first time thru
-                //if (n<0) n++;
+                if (n<0) n++;
 
                 switch (type) {
                 case RideMetric::Total:
