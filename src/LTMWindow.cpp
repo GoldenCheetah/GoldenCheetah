@@ -873,6 +873,13 @@ LTMWindow::refreshDataTable()
 	dataSummary->page()->mainFrame()->setHtml(summary);
 }
 
+// for storing curve data without using a curve
+class TableCurveData {
+    public:
+        QVector<double> x,y;
+        int n;
+};
+
 QString
 LTMWindow::dataTable(bool html)
 {
@@ -929,224 +936,29 @@ LTMWindow::dataTable(bool html)
         summary += "</h3><p>";
     }
 
-#if 0
     //
     // STEP1: AGGREGATE DATA INTO GROUPBY FOR EACH METRIC
-    //        This is essentially a refactored version of createCurveData
-    //        from LTMPlot, but updated to produce aggregates for all metrics
-    //        at once, so we can embed into an HTML table
-    //
-    QList<GroupedData> aggregates;
+    //        This is performed by reusing the existing code in
+    //        LTMPlot for creating curve data, but storing it
+    //        in columns and forceing zero values
+    QList<TableCurveData> columns;
+    bool first=true;
+    int rows = 0;
 
-    // for estimates we take the metric data and augment
-    // it with the estimate that applies for that date
-    QList<SummaryMetrics> estimates = *(settings.data);
+    // create curve data for each metric detail to iterate over
+    foreach(MetricDetail metricDetail, settings.metrics) {
+        TableCurveData add;
 
-    foreach (MetricDetail metricDetail, settings.metrics) {
+        ltmPlot->settings=&settings; // for stack mode ltmPlot isn't set
+        ltmPlot->createCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
 
-        // do we aggregate zero values ?
-        bool aggZero = metricDetail.metric ? metricDetail.metric->aggregateZero() : false;
+        columns << add;
 
-        QList<SummaryMetrics> *data = NULL; // source data (metrics, bests etc)
-        GroupedData a; // aggregated data
-
-        // resize the curve array to maximum possible size
-        a.maxdays = groupForDate(settings.end.date()) - groupForDate(settings.start.date());
-        a.x.resize(a.maxdays+1);
-        a.y.resize(a.maxdays+1);
-
-
-        // set source for data
-        QList<SummaryMetrics> PMCdata;
-        if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
-            data = settings.data;
-        } else if (metricDetail.type == METRIC_PM) {
-            // PMC fixup later
-            ltmPlot->createPMCCurveData(context, &settings, metricDetail, PMCdata);
-            data = &PMCdata;
-        } else if (metricDetail.type == METRIC_BEST) {
-            data = settings.bests;
-        } else if (metricDetail.type == METRIC_ESTIMATE) {
-
-            // WE BASICALLY TAKE A COPY OF THE RIDE METRICS AND
-            // ADD IN THE ESTIMATE FOR THAT DAY -- SO YOU ONLY
-            // GET ESTIMATES FOR DAYS WITH RIDES
-
-            // lets refresh the model data if we don't have any
-            if (context->athlete->PDEstimates.count() == 0) 
-                context->athlete->rideCache->refreshCPModelMetrics(); 
-
-            // lets nip through all the rides and add in the estimate
-            // that applied for that date
-            data = &estimates;
-
-            // update each ride by adding the estimate for that day
-            for (int i=0; i<estimates.count(); i++) {
-
-                // get the date
-                QDate date = estimates[i].getRideDate().date();
-
-                // get the value
-                double value = 0;
-                foreach(PDEstimate est, context->athlete->PDEstimates) {
-
-                    // ooh this is a match!
-                    if (date >= est.from && date <= est.to && est.wpk == metricDetail.wpk 
-                         && est.model == metricDetail.model) {
-
-                        switch(metricDetail.estimate) {
-                        case ESTIMATE_WPRIME :
-                            value = est.WPrime;
-                            break;
-
-                        case ESTIMATE_CP :
-                            value = est.CP;
-                            break;
-
-                        case ESTIMATE_FTP :
-                            value = est.FTP;
-                            break;
-
-                        case ESTIMATE_PMAX :
-                            value = est.PMax;
-                            break;
-
-                        case ESTIMATE_BEST :
-                            {
-                                value = 0;
-
-                                // we need to find the model 
-                                foreach(PDModel *model, ltmPlot->models) {
-
-                                    // not the one we want
-                                    if (model->code() != metricDetail.model) continue;
-
-                                    // set the parameters previously derived
-                                    model->loadParameters(est.parameters);
-
-                                    // get the model estimate for our duration
-                                    value = model->y(metricDetail.estimateDuration * metricDetail.estimateDuration_units);
-                                }
-                            }
-                            break;
-
-                        case ESTIMATE_EI :
-                            value = est.EI;
-                            break;
-                        }
-                        break;
-                    }
-                }
-
-                // insert the value for this symbol
-                estimates[i].setForSymbol(metricDetail.symbol, value);
-            }
-        }
-
-        // initialise before looping through the data for this metric
-        int n=-1;
-        int lastDay=groupForDate(settings.start.date());
-        unsigned long secondsPerGroupBy=0;
-        bool wantZero = true;
-
-        foreach (SummaryMetrics rideMetrics, *data) { 
-
-            // filter out unwanted rides but not for PMC type metrics
-            // because that needs to be done in the stress calculator
-            if (metricDetail.type != METRIC_PM && context->isfiltered && 
-                !context->filters.contains(rideMetrics.getFileName())) continue;
-
-            // day we are on
-            int currentDay = groupForDate(rideMetrics.getRideDate().date());
-
-            // value for day -- measures are stored differently
-            double value;
-            if (metricDetail.type == METRIC_BEST)
-                value = rideMetrics.getForSymbol(metricDetail.bestSymbol);
-            else
-                value = rideMetrics.getForSymbol(metricDetail.symbol);
-
-            // check values are bounded to stop QWT going berserk
-            if (isnan(value) || isinf(value)) value = 0;
-
-            // set aggZero to false and value to zero if is temperature and -255
-            if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
-                value = 0;
-                aggZero = false;
-            }
-
-            // Special computed metrics (LTS/STS) have a null metric pointer
-            if (metricDetail.type != METRIC_BEST && metricDetail.metric) {
-                // convert from stored metric value to imperial
-                if (context->athlete->useMetricUnits == false) {
-                    value *= metricDetail.metric->conversion();
-                    value += metricDetail.metric->conversionSum();
-                }
-
-            // convert seconds to hours
-            if (metricDetail.metric->units(true) == "seconds" ||
-                metricDetail.metric->units(true) == tr("seconds")) value /= 3600;
-            }
-
-            if (value || wantZero) {
-                unsigned long seconds = rideMetrics.getForSymbol("workout_time");
-                if (metricDetail.type == METRIC_BEST) seconds = 1;
-                if (n < a.x.size() && currentDay > lastDay) {
-                    if (lastDay && wantZero) {
-                        while (n<(a.x.size()-1) && lastDay<currentDay) {
-                            lastDay++;
-                            n++;
-                            a.x[n]=lastDay - groupForDate(settings.start.date());
-                            a.y[n]=0;
-                        }
-                    } else {
-                        n++;
-                    }
-
-                    a.y[n] = value;
-                    a.x[n] = currentDay - groupForDate(settings.start.date());
-
-                    if (value || aggZero) secondsPerGroupBy = seconds; // reset for new group
-
-                } else {
-                    // sum totals, average averages and choose best for Peaks
-                    int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
-
-                    if (metricDetail.uunits == "Ramp" ||
-                        metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
-
-                    if (metricDetail.type == METRIC_BEST) type = RideMetric::Peak;
-
-                    // just in case
-                    if (n < 0) n=0;
-
-                    switch (type) {
-                    case RideMetric::Total:
-                        a.y[n] += value;
-                        break;
-                    case RideMetric::Average:
-                        {
-                        // average should be calculated taking into account
-                        // the duration of the ride, otherwise high value but
-                        // short rides will skew the overall average
-                        if (value || aggZero) a.y[n] = ((a.y[n]*secondsPerGroupBy)+(seconds*value)) / (secondsPerGroupBy+seconds);
-                        break;
-                        }
-                    case RideMetric::Low:
-                        if (value < a.y[n]) a.y[n] = value;
-                        break;
-                    case RideMetric::Peak:
-                        if (value > a.y[n]) a.y[n] = value;
-                        break;
-                    }
-                    secondsPerGroupBy += seconds; // increment for same group
-                }
-                lastDay = currentDay;
-            }
-        }
-
-        // save to our list
-        aggregates << a;
+        // truncate to shortest set of rows available as 
+        // we dont pad with zeroes in the data table
+        if (first) rows=add.n;
+        else if (add.n < rows) rows=add.n;
+        first=false;
     }
 
     //
@@ -1154,15 +966,7 @@ LTMWindow::dataTable(bool html)
     //         But note there will be no data if there are no curves of if there
     //         is no date range selected of no data anyway!
     //
-    if (aggregates.count()) {
-
-        // fill in the remainder if data doesn't extend to
-        // the period we are summarising
-        if (settings.groupBy != LTM_ALL) {
-            for (int n=0; n < aggregates[0].x.count(); n++) {
-                aggregates[0].x[n] = n;
-            }
-        }
+    if (rows) {
 
         // formatting ...
         LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
@@ -1211,16 +1015,15 @@ LTMWindow::dataTable(bool html)
             summary += "\n";
         }
 
-        int row=0;
-        for(int i=0; i<aggregates[0].y.count(); i++) {
+        for(int row=0; row<rows; row++) {
 
             // in day mode we don't list all the zeroes .. its too many!
             bool nonzero = false;
             if (settings.groupBy == LTM_DAY) {
 
                 // nonzeros?
-                for(int j=0; j<aggregates.count(); j++) 
-                    if (int(aggregates[j].y[i])) nonzero = true;
+                for(int j=0; j<columns.count(); j++) 
+                    if (int(columns[j].y[row])) nonzero = true;
 
                 // skip all zeroes if day mode
                 if (nonzero == false) continue;
@@ -1230,16 +1033,15 @@ LTMWindow::dataTable(bool html)
             if (html) {
                 if (row%2) summary += "<tr bgcolor='" + altColor.name() + "'>";
                 else summary += "<tr>";
-                row++;
             }
 
             // First column, date / month year etc
             if (html) summary += "<td align=\"center\" valign=\"top\">%1</td>";
             else summary += "%1";
-            summary = summary.arg(lsd.label(aggregates[0].x[i]+0.5).text().replace("\n", " "));
+            summary = summary.arg(lsd.label(columns[0].x[row]+0.5).text().replace("\n", " "));
 
             // Remaining columns - each metric value
-            for(int j=0; j<aggregates.count(); j++) {
+            for(int j=0; j<columns.count(); j++) {
                 if (html) summary += "<td align=\"center\" valign=\"top\">%1</td>";
                 else summary += ", %1";
 
@@ -1252,13 +1054,13 @@ LTMWindow::dataTable(bool html)
                     if (settings.metrics[j].uunits == "seconds" || settings.metrics[j].uunits == tr("seconds")) precision=1;
 
                     // we have a metric so lets be precise ...
-                    QString v = QString("%1").arg(aggregates[j].y[i], 0, 'f', precision);
+                    QString v = QString("%1").arg(columns[j].y[row], 0, 'f', precision);
 
                     summary = summary.arg(v);
 
                 } else {
                     // no precision
-                    summary = summary.arg(QString("%1").arg(aggregates[j].y[i], 0, 'f', 0));
+                    summary = summary.arg(QString("%1").arg(columns[j].y[row], 0, 'f', 0));
                 }
             }
 
@@ -1270,7 +1072,7 @@ LTMWindow::dataTable(bool html)
         // close table on html page
         if (html) summary += "</table>";
     }
-#endif
+
     // all done !
     if (html) summary += "</center>";
 
