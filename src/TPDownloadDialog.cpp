@@ -308,8 +308,11 @@ TPDownloadDialog::refreshClicked()
     // (but ignore seconds since they aren't reliable)
     rideFiles.clear();
 
+    Specification specification;
+    specification.setDateRange(DateRange(from->date(), to->date()));
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
-        rideFiles << QFileInfo(item->fileName).baseName().mid(0,14);
+        if (specification.pass(item))
+            rideFiles << QFileInfo(item->fileName).baseName().mid(0,14);
     }
 
 }
@@ -430,9 +433,13 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
     //
     // Now setup the upload list
     //
+    Specification specification;
+    specification.setDateRange(DateRange(from->date(), to->date()));
     for(int i=0; i<context->athlete->rideCache->rides().count(); i++) {
 
         RideItem *ride = context->athlete->rideCache->rides().at(i);
+        if (!specification.pass(ride)) continue;
+
         QTreeWidgetItem *add;
 
         add = new QTreeWidgetItem(rideListUp->invisibleRootItem());
