@@ -693,9 +693,9 @@ RideSummaryWindow::htmlSummary()
         summary += tr("<h3>Athlete Bests</h3>\n");
 
         // best headings
-        summary += "<table border=0 cellspacing=10 width=\"90%%\"><tr>";
+        summary += "<table border=0 cellspacing=10 width=\"95%%\"><tr>";
         for (int i = 0; i < bestsColumn.count(); ++i) {
-        summary += "<td align=\"center\" valign=\"top\"><table width=\"100%%\">"
+        summary += "<td align=\"center\" valign=\"top\"><table width=\"95%%\">"
             "<tr><td align=\"center\" colspan=3><h4>%1<h4></td></tr>";
 
             //summary = summary.arg(90 / bestsColumn.count());
@@ -900,7 +900,7 @@ RideSummaryWindow::htmlSummary()
                 s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
             QStringList intervalMetrics = s.split(",");
             summary += "<p><h3>"+tr("Intervals")+"</h3>\n<p>\n";
-            summary += "<table align=\"center\" width=\"90%\" ";
+            summary += "<table align=\"center\" width=\"95%\" ";
             summary += "cellspacing=0 border=0>";
             bool even = false;
             foreach (RideFileInterval interval, ride->intervals()) {
