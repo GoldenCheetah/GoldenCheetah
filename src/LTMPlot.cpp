@@ -2642,7 +2642,13 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     PMCData *localPMC = NULL;
 
     // create local PMC if filtered
-    if (settings->specification.isFiltered()) localPMC = new PMCData(context, settings->specification, scoreType);
+    if (settings->specification.isFiltered()) {
+
+        // don't filter for date range!!
+        Specification allDates = settings->specification;
+        allDates.setDateRange(DateRange(QDate(),QDate()));
+        localPMC = new PMCData(context, allDates, scoreType);
+    }
 
     // use global one if not filtered
     if (!localPMC) athletePMC = context->athlete->getPMCFor(scoreType);
