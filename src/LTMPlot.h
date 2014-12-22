@@ -111,22 +111,22 @@ class LTMPlot : public QwtPlot
         QVector< QVector<double>* > stackY;
 
         int groupForDate(QDate , int);
-        void createCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create curve data from PMCData
-        void createPMCData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createPMCData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create curve data from estimate
-        void createEstimateData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createEstimateData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create curve data from metadata or metric (from ridecache)
-        void createMetricData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createMetricData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create curve data from bests (from ridefile cache)
-        void createBestsData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createBestsData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create a curve based upon TOD
-        void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&);
+        void createTODCurveData(Context *,LTMSettings *, MetricDetail, QVector<double>&, QVector<double>&, int&, bool=false);
 
         // create an aggregate
         void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a

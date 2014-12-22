@@ -2207,7 +2207,7 @@ LTMPlot::setMaxX(int x)
 }
 
 void
-LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n)
+LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n,bool)
 {
     y.clear();
     x.clear();
@@ -2277,20 +2277,20 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
 }
 
 void
-LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n)
+LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
 {
     // create curves depending on type ...
     if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
-        createMetricData(context, settings, metricDetail, x,y,n);
+        createMetricData(context, settings, metricDetail, x,y,n, forceZero);
         return;
     } else if (metricDetail.type == METRIC_PM) {
-        createPMCData(context, settings, metricDetail, x,y,n);
+        createPMCData(context, settings, metricDetail, x,y,n, forceZero);
         return;
     } else if (metricDetail.type == METRIC_BEST) {
-        createBestsData(context,settings,metricDetail,x,y,n);
+        createBestsData(context,settings,metricDetail,x,y,n, forceZero);
         return;
     } else if (metricDetail.type == METRIC_ESTIMATE) {
-        createEstimateData(context, settings, metricDetail, x,y,n);
+        createEstimateData(context, settings, metricDetail, x,y,n, forceZero);
         return;
     }
 
@@ -2298,7 +2298,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 
 void
 LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
-                                              QVector<double>&x,QVector<double>&y,int&n)
+                                              QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
 {
 
     // resize the curve array to maximum possible size
@@ -2314,7 +2314,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
     n=-1;
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
-    bool wantZero = metricDetail.curveStyle == QwtPlotCurve::Steps;
+    bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
 
     foreach (RideItem *ride, context->athlete->rideCache->rides()) { 
 
@@ -2414,7 +2414,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 }
 
 void
-LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n)
+LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool forceZero)
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
@@ -2429,7 +2429,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
     n=-1;
     int lastDay=0;
     unsigned long secondsPerGroupBy=0;
-    bool wantZero = metricDetail.curveStyle == QwtPlotCurve::Steps;
+    bool wantZero = forceZero ? 1 : (metricDetail.curveStyle == QwtPlotCurve::Steps);
 
     foreach (RideBest best, *(settings->bests)) { 
 
@@ -2508,9 +2508,10 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
         }
     }
 }
+
 void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
-                                              QVector<double>&x,QVector<double>&y,int&n)
+                                              QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     // lets refresh the model data if we don't have any
     if (context->athlete->PDEstimates.count() == 0) context->athlete->rideCache->refreshCPModelMetrics(); 
@@ -2608,7 +2609,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
 void
 LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
-                                              QVector<double>&x,QVector<double>&y,int&n)
+                                              QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     QString scoreType;
 
