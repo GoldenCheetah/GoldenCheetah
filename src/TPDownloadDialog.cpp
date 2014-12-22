@@ -70,6 +70,7 @@ TPDownloadDialog::completedAthlete(QString errorStr, QList<QMap<QString, QString
     tabs->addTab(download, tr("Download"));
     tabs->addTab(upload, tr("Upload"));
     tabs->addTab(sync, tr("Synchronize"));
+    tabs->setCurrentIndex(2);
     QVBoxLayout *downloadLayout = new QVBoxLayout(download);
     QVBoxLayout *uploadLayout = new QVBoxLayout(upload);
     QVBoxLayout *syncLayout = new QVBoxLayout(sync);
