@@ -21,6 +21,7 @@
 #include "Athlete.h"
 #include "Specification.h"
 #include "RideCache.h"
+#include "RideFileCache.h" // for RideBest
 
 LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -188,9 +189,8 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
 }
 
 void
-LTMPopup::setData(LTMSettings &, QDate, QDate, QTime)
+LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
 {
-#if 0 // DISABLED IN LTM WINDOW UNTIL IT IS MIGRATED TO RIDECACHE
     // set the title
     QString _title;
     switch (settings.groupBy) {
@@ -269,19 +269,20 @@ LTMPopup::setData(LTMSettings &, QDate, QDate, QTime)
 
     // Summary Metrics.data is always available and thus perfect find the rides eligible for the list
     int i = 0;
-    foreach(SummaryMetrics data, (*settings.data)) {
-        QDateTime rideDate = data.getRideDate();
+    foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+        if (!settings.specification.pass(item)) continue;
+
+        QDate rideDate = item->dateTime.date();
 
           // check either RideDate (for all Date related groupBy's) or RideTime (for LTM_TOD only)
-          if (((settings.groupBy != LTM_TOD) && (rideDate.date() >= start && rideDate.date() <= end))
-            ||((settings.groupBy == LTM_TOD) && (rideDate.time() >= time && rideDate.time() <= end_time))) {
-
-              // apply filters
-             if (context->isfiltered && !context->filters.contains(data.getFileName())) continue;
-             if (context->ishomefiltered && !context->homeFilters.contains(data.getFileName())) continue;
+          if (((settings.groupBy != LTM_TOD) && (rideDate >= start && rideDate <= end))
+            ||
+            // group by time of day ?
+            ((settings.groupBy == LTM_TOD) && (item->dateTime.time() >= time && item->dateTime.time() <= end_time))) {
 
              // we'll select it for summary display
-             selected << data;
+             selected << item->fileName;
 
              // date/time
              QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString(tr("ddd, dd MMM yy hh:mmA")));
@@ -297,10 +298,15 @@ LTMPopup::setData(LTMSettings &, QDate, QDate, QTime)
              foreach(MetricDetail d, settings.metrics) {
                  QString value;
                  if (d.type == METRIC_DB || d.type == METRIC_META) {
-                     value = data.getStringForSymbol(d.symbol, context->athlete->useMetricUnits);
+
+                     // get the value to show as a string
+                     value = item->getStringForSymbol(d.symbol, context->athlete->useMetricUnits);
+
                  } else if (d.type == METRIC_BEST) {
+
                      // bests are only available if a METRIC_BEST exists
-                     SummaryMetrics bests = settings.bests->at(i);
+                     RideBest bests = settings.bests->at(i);
+
                      // and are not considered as standard metrics for rounding, so do it here with precision 0
                      double v = bests.getForSymbol(d.bestSymbol);
                      value = QString("%1").arg(v, 0, 'f', 0);
@@ -348,7 +354,6 @@ LTMPopup::setData(LTMSettings &, QDate, QDate, QTime)
 
     setTitle(_title);
     rideSelected();
-#endif
 }
 
 QString
