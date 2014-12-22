@@ -1070,8 +1070,7 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
 
     // now auto append special fields, in case
     // the user wiped them or we have introduced
-    // them in this release. This is to ensure
-    // they get written to metricDB
+    // them in this release.
     bool hasCalendarText = false;
     bool hasData = false;
 

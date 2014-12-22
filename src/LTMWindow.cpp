@@ -658,7 +658,7 @@ LTMWindow::filterChanged()
     // ignore in compare mode
     if (isCompare()) return;
 
-    if (amVisible() == false || context->athlete->metricDB == NULL) return;
+    if (amVisible() == false) return;
 
     if (useCustom) {
 
