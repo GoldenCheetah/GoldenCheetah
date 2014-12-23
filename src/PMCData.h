@@ -58,6 +58,12 @@ class PMCData : public QObject {
         QDate &end() { return end_; }
         int &days() { return days_; }
 
+        // get arrays
+        QVector<double> &stress() { return stress_; }
+        QVector<double> &lts() { return lts_; }
+        QVector<double> &sts() { return sts_; }
+        QVector<double> &sb() { return sb_; }
+
         // index into the arrays
         int indexOf(QDate) ;
 
