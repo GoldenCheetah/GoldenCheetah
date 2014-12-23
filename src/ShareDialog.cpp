@@ -107,7 +107,6 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
 
     QString err;
 
-#ifdef GC_HAVE_LIBOAUTH
     stravaUploader = new StravaUploader(context, ride, this);
     stravaChk = new QCheckBox(tr("Strava"));
     if( ! stravaUploader->canUpload( err ) ){
@@ -116,7 +115,6 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
         stravaChk->setChecked( true );
     }
     vbox1->addWidget(stravaChk,0,col++);
-#endif
 
     rideWithGpsUploader = new RideWithGpsUploader(context, ride, this);
     rideWithGPSChk = new QCheckBox(tr("Ride With GPS"));
@@ -127,7 +125,6 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
     }
     vbox1->addWidget(rideWithGPSChk,0,col++);
 
-#ifdef GC_HAVE_LIBOAUTH
     cyclingAnalyticsUploader = new CyclingAnalyticsUploader(context, ride, this);
     cyclingAnalyticsChk = new QCheckBox(tr("Cycling Analytics"));
     if( ! cyclingAnalyticsUploader->canUpload( err ) ){
@@ -136,7 +133,6 @@ ShareDialog::ShareDialog(Context *context, RideItem *item) :
         cyclingAnalyticsChk->setChecked( true );
     }
     vbox1->addWidget(cyclingAnalyticsChk,0,col++);
-#endif
 
     selfLoopsUploader = new SelfLoopsUploader(context, ride, this);
     selfLoopsChk = new QCheckBox(tr("Selfloops"));
@@ -279,9 +275,7 @@ ShareDialog::upload()
 
     if ( !rideWithGPSChk->isChecked() && !selfLoopsChk->isChecked()
         && !veloHeroChk->isChecked() && !trainingstagebuchChk->isChecked()
-#ifdef GC_HAVE_LIBOAUTH
         && !stravaChk->isChecked() && !cyclingAnalyticsChk->isChecked()
-#endif
         //&& !garminChk->isChecked()
         ) {
         QMessageBox aMsgBox;
@@ -297,19 +291,15 @@ ShareDialog::upload()
     progressLabel->setText("");
     errorLabel->setText("");
 
-#ifdef GC_HAVE_LIBOAUTH
     if (stravaChk->isChecked()) {
         shareSiteCount ++;
     }
-#endif
     if (rideWithGPSChk->isChecked()) {
         shareSiteCount ++;
     }
-#ifdef GC_HAVE_LIBOAUTH
     if (cyclingAnalyticsChk->isChecked()) {
         shareSiteCount ++;
     }
-#endif
     if (selfLoopsChk->isChecked()) {
         shareSiteCount ++;
     }
@@ -323,19 +313,15 @@ ShareDialog::upload()
     //    shareSiteCount ++;
     //}
 
-#ifdef GC_HAVE_LIBOAUTH
     if (stravaChk->isEnabled() && stravaChk->isChecked()) {
         doUploader( stravaUploader );
     }
-#endif
     if (rideWithGPSChk->isEnabled() && rideWithGPSChk->isChecked()) {
         doUploader( rideWithGpsUploader );
     }
-#ifdef GC_HAVE_LIBOAUTH
     if (cyclingAnalyticsChk->isEnabled() && cyclingAnalyticsChk->isChecked()) {
         doUploader( cyclingAnalyticsUploader );
     }
-#endif
     if (selfLoopsChk->isEnabled() && selfLoopsChk->isChecked()) {
         doUploader( selfLoopsUploader );
     }
@@ -403,7 +389,6 @@ ShareDialog::doUploader( ShareDialogUploader *uploader )
     uploader->upload();
 }
 
-#ifdef GC_HAVE_LIBOAUTH
 StravaUploader::StravaUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader( tr("Strava"), context, ride, parent)
 {
@@ -662,7 +647,6 @@ StravaUploader::requestVerifyUploadFinished(QNetworkReply *reply)
         uploadSuccessful = true;
     }
 }
-#endif // GC_HAVE_LIBOAUTH for strava
 
 RideWithGpsUploader::RideWithGpsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader( tr("Ride With GPS"), context, ride, parent)
@@ -847,8 +831,6 @@ RideWithGpsUploader::requestUploadRideWithGPSFinished(QNetworkReply *reply)
     }
 }
 
-#ifdef GC_HAVE_LIBOAUTH
-
 CyclingAnalyticsUploader::CyclingAnalyticsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("CyclingAnalytics"), context, ride, parent)
 {
@@ -997,7 +979,6 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalyticsFinished(QNetworkReply *r
         uploadSuccessful = true;
     }
 }
-#endif // GC_HAVE_LIBOAUTH for cyclingAnalytics
 
 SelfLoopsUploader::SelfLoopsUploader(Context *context, RideItem *ride, ShareDialog *parent) :
     ShareDialogUploader(tr("SelfLoops"),context, ride, parent)

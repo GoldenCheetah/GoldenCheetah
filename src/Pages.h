@@ -33,12 +33,6 @@
 #include "SeasonParser.h"
 #include "RideAutoImportConfig.h"
 
-#ifdef GC_HAVE_LIBOAUTH
-extern "C" {
-#include <oauth.h>
-}
-#endif
-
 class QGroupBox;
 class QHBoxLayout;
 class QVBoxLayout;
@@ -151,11 +145,11 @@ class CredentialsPage : public QScrollArea
         void saveClicked();
 
     public slots:
-#ifdef GC_HAVE_LIBOAUTH
+#ifdef GC_HAVE_KQOAUTH
         void authoriseTwitter();
+#endif
         void authoriseStrava();
         void authoriseCyclingAnalytics();
-#endif
 
     private:
         Context *context;
@@ -166,17 +160,13 @@ class CredentialsPage : public QScrollArea
         QComboBox *tpType;
         QPushButton *tpTest;
 
-#ifdef GC_HAVE_LIBOAUTH
+#ifdef GC_HAVE_KQOAUTH
         QLineEdit *twitterURL; // url for twitter.com
         QPushButton *twitterAuthorise;
-        QLineEdit *twitterPIN;
-        char *t_key, *t_secret;
+#endif
 
         QPushButton *stravaAuthorise, *stravaAuthorised, *twitterAuthorised;
-        char *s_id, *s_secret;
-
         QPushButton *cyclingAnalyticsAuthorise, *cyclingAnalyticsAuthorised;
-#endif
 
         QLineEdit *rideWithGPSUser;
         QLineEdit *rideWithGPSPass;

@@ -59,7 +59,9 @@
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
 #include "BatchExportDialog.h"
+#ifdef GC_HAVE_KQOAUTH
 #include "TwitterDialog.h"
+#endif
 #include "ShareDialog.h"
 #include "WithingsDownload.h"
 #include "WorkoutWizard.h"
@@ -600,7 +602,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Synchronise TrainingPeaks..."), this, SLOT(downloadTP()), tr(""));
 #endif
 
-#ifdef GC_HAVE_LIBOAUTH
+#ifdef GC_HAVE_KQOAUTH
     tweetAction = new QAction(tr("Tweet Ride"), this);
     connect(tweetAction, SIGNAL(triggered(bool)), this, SLOT(tweetRide()));
     rideMenu->addAction(tweetAction);
@@ -752,6 +754,7 @@ MainWindow::MainWindow(const QDir &home)
 
     init = true;
 }
+
 
 /*----------------------------------------------------------------------
  * GUI
@@ -1757,7 +1760,7 @@ MainWindow::exportMetrics()
 /*----------------------------------------------------------------------
  * Twitter
  *--------------------------------------------------------------------*/
-#ifdef GC_HAVE_LIBOAUTH
+#ifdef GC_HAVE_KQOAUTH
 void
 MainWindow::tweetRide()
 {

@@ -20,6 +20,9 @@
 #define OAUTHDIALOG_H
 #include "GoldenCheetah.h"
 #include "Pages.h"
+#ifdef GC_HAVE_KQOAUTH
+#include <kqoauthmanager.h>
+#endif
 #include <QObject>
 #include <QtGui>
 #include <QWidget>
@@ -49,15 +52,21 @@ public:
 
     OAuthDialog(Context *context, OAuthSite site);
 
-
-
-
-
-signals:
-
 private slots:
+
+    // Strava/Cyclinganalytics
     void urlChanged(const QUrl& url);
-    void loadFinished();
+    void networkRequestFinished(QNetworkReply *reply);
+
+#ifdef GC_HAVE_KQOAUTH
+    // Twitter OAUTH
+    void onTemporaryTokenReceived(QString, QString);
+    void onAuthorizationReceived(QString, QString);
+    void onAccessTokenReceived(QString token, QString tokenSecret);
+    void onAuthorizedRequestDone();
+    void onRequestReady(QByteArray response);
+    void onAuthorizationPageRequested (QUrl pageUrl);
+#endif
 
 
 private:
@@ -66,13 +75,14 @@ private:
 
     QVBoxLayout *layout;
     QWebView *view;
+    QNetworkAccessManager* manager;
 
     QUrl url;
 
-    bool requestToken;
-    bool requestAuth;
-
-    char *t_key, *t_secret;
+#ifdef GC_HAVE_KQOAUTH
+    KQOAuthManager *oauthManager;
+    KQOAuthRequest *oauthRequest;
+#endif
 
 };
 

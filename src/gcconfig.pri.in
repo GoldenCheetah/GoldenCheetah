@@ -57,19 +57,21 @@
 #D2XX_INCLUDE = 
 #D2XX_LIBS    =
 
-# If you want Twitter support you must install liboauth
-#     http://liboauth.sourceforge.net/
+# If you want Twitter support you must install a QT OAUTH library kQoAUTH
+#     http://github.com/kypeli/kQOAuth (Version >= 0.98 - tested with 0.98))
 # Set path to the root of the OAUTH installation
-# If you installed in /usr/local/oauth then set
-# LIBOAUTH_INSTALL = /usr/local/oauth
+# If you installed in /usr/local/kqoauth then set
+# KQOAUTH_INSTALL = /usr/local/kqoauth
 # This will automatically set:
-# LIBOAUTH_INCLUDE = $${LIBOAUTH_INSTALL}/include 
-# LIBOAUTH_LIBS    = $${LIBOAUTH_INSTALL}/lib/liboauth.a -lcurl -lcrypto -lz
+# KQOAUTH_INCLUDE = $${KQOAUTH_INSTALL}/src
+# KQOAUTH_LIBS    = $${KQOAUTH_INSTALL}/lib/libkqoauthd0.a   // if in DEBUG mode
+# KQOAUTH_LIBS    = $${KQOAUTH_INSTALL}/lib/libkqoauth0.a    // if in RELEASE mode
 # You may override the INCLUDE and LIB files if you like.
-# You *must* define LIBOAUTH_INSTALL to use this feature.
-#LIBOAUTH_INSTALL = 
-#LIBOAUTH_INCLUDE = 
-#LIBOAUTH_LIBS    = 
+# You *must* define KQOAUTH_INSTALL to use this feature.
+
+#KQOAUTH_INSTALL = 
+#KQOAUTH_INCLUDE =
+#KQOAUTH_LIBS =
 
 # If you want 3D plotting, you need to install qwtplot3d
 #     http://qwtplot3d.sourceforge.net/

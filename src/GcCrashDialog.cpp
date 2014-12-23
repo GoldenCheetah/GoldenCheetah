@@ -52,8 +52,8 @@
 #include "srmio.h"
 #endif
 
-#ifdef GC_HAVE_LIBOAUTH
-#include <oauth.h>
+#ifdef GC_HAVE_KQOAUTH
+#include "kqoauthmanager.h"
 #endif
 
 #ifdef GC_HAVE_LUCENE
@@ -174,8 +174,12 @@ QString GcCrashDialog::versionHTML()
     // -- LIBOAUTH ----
     QString oauth = "none";
 
-    #ifdef GC_HAVE_LIBOAUTH
-    oauth = LIBOAUTH_VERSION;
+    #ifdef GC_HAVE_KQOAUTH
+    #ifdef KQOAUTH_VERSION
+    oauth = KQOAUTH_VERSION;
+    #else
+    oauth = "yes";
+    #endif
     #endif
 
     // -- QWTPLOT3D ----
