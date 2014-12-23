@@ -34,10 +34,8 @@
 #include "RideMetric.h"
 #include "Context.h"
 
-#ifdef GC_HAVE_LIBOAUTH
-extern "C" {
-#include <oauth.h>
-}
+#ifdef GC_HAVE_KQOAUTH
+#include <kqoauthmanager.h>
 #endif
 
 class TwitterDialog : public QDialog
@@ -47,13 +45,20 @@ class TwitterDialog : public QDialog
 
 public:
      TwitterDialog(Context *context, RideItem *item);
+    ~TwitterDialog();
 
 signals:
+    void extraTokensReady(const QVariantMap &extraTokens);
+    void linkingFailed();
+    void linkingSucceeded();
+    void statusPosted();
 
 private slots:
     void onCheck(int state);
     void tweetMsgChange(QString);
     void tweetCurrentRide();
+    void onRequestReady(QByteArray);
+    void onAuthorizedRequestDone();
 
 private:
     Context *context;
@@ -77,6 +82,9 @@ private:
 
      RideItem *ride;
      QString getTwitterMessage();
+
+     KQOAuthManager *oauthManager;
+     KQOAuthRequest *oauthRequest;
 };
 
 #endif // TWITTERDIALOG_H

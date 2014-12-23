@@ -346,6 +346,8 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     QFont current;
     current.setWeight(QFont::Black);
 
+    QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
+
     //////////////////////////////////////////////////
     // TrainingPeaks
 
@@ -395,7 +397,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     //////////////////////////////////////////////////
     // Twitter
 
-#ifdef GC_HAVE_LIBOAUTH
+#ifdef GC_HAVE_KQOAUTH
     QLabel *twp = new QLabel(tr("Twitter"));
     twp->setFont(current);
 
@@ -406,7 +408,6 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     twitterURL = new QLineEdit(this);
     twitterURL->setText(appsettings->cvalue(context->athlete->cyclist, GC_TWURL, "http://www.twitter.com").toString());
     twitterAuthorise = new QPushButton(tr("Authorise"), this);
-    QPixmap passwords = QPixmap(":/images/toolbar/passwords.png");
 
     twitterAuthorised = new QPushButton(this);
     twitterAuthorised->setContentsMargins(0,0,0,0);
@@ -435,12 +436,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
     //////////////////////////////////////////////////
     // Strava
 
-#ifdef GC_HAVE_LIBOAUTH
     QLabel *str = new QLabel(tr("Strava"));
     str->setFont(current);
 
-    //QLabel *struserLabel = new QLabel(tr("Username"));
-    //QLabel *strpassLabel = new QLabel(tr("Password"));
     QLabel *strauthLabel = new QLabel(tr("Authorise"));
 
     stravaAuthorise = new QPushButton(tr("Authorise"), this);
@@ -466,12 +464,11 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         stravaAuthorised->hide(); // if no token no show
 
     connect(stravaAuthorise, SIGNAL(clicked()), this, SLOT(authoriseStrava()));
-#endif
 
     //////////////////////////////////////////////////
     // Cycling Analytics
 
-#ifdef GC_HAVE_LIBOAUTH
+
     QLabel *can = new QLabel(tr("Cycling Analytics"));
     can->setFont(current);
     QLabel *canauthLabel = new QLabel(tr("Authorise"));
@@ -498,7 +495,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
         cyclingAnalyticsAuthorised->hide();
 
     connect(cyclingAnalyticsAuthorise, SIGNAL(clicked()), this, SLOT(authoriseCyclingAnalytics()));
-#endif
+
 
     //////////////////////////////////////////////////
     // RideWithGPS
@@ -689,60 +686,33 @@ CredentialsPage::CredentialsPage(QWidget *parent, Context *context) : QScrollAre
 }
 
 
-#ifdef GC_HAVE_LIBOAUTH
+#ifdef GC_HAVE_KQOAUTH
 void CredentialsPage::authoriseTwitter()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::TWITTER);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
-    /*
-#ifdef GC_HAVE_LIBOAUTH
-    int rc;
-    char **rv = NULL;
-    QString token;
-    QString url = QString();
-    t_key = NULL;
-    t_secret = NULL;
 
-    const char *request_token_uri = "https://api.twitter.com/oauth/request_token";
-
-    char *req_url = NULL;
-    char *postarg = NULL;
-    char *reply   = NULL;
-    req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
-    reply = oauth_http_get(req_url,postarg);
-
-    rc = oauth_split_url_parameters(reply, &rv);
-    qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
-    token = QString(rv[1]);
-    t_key  =strdup(&(rv[1][12]));
-    t_secret =strdup(&(rv[2][19]));
-    url = QString("https://api.twitter.com/oauth/authorize?");
-    url.append(token);
-    QDesktopServices::openUrl(QUrl(url));
-    if(rv) free(rv);
-#endif
-    */
 }
 #endif
 
-#ifdef GC_HAVE_LIBOAUTH
+
 void CredentialsPage::authoriseStrava()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::STRAVA);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
 }
-#endif
 
-#ifdef GC_HAVE_LIBOAUTH
+
+
 void CredentialsPage::authoriseCyclingAnalytics()
 {
     OAuthDialog *oauthDialog = new OAuthDialog(context, OAuthDialog::CYCLING_ANALYTICS);
     oauthDialog->setWindowModality(Qt::ApplicationModal);
     oauthDialog->exec();
 }
-#endif
+
 
 void
 CredentialsPage::saveClicked()

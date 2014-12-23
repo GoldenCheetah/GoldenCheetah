@@ -20,8 +20,11 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
-#include <QUrl>
 #include "TimeUtils.h"
+#include <QUrl>
+#include <kqoauthmanager.h>
+#include <kqoauthrequest.h>
+
 
 TwitterDialog::TwitterDialog(Context *context, RideItem *item) :
     context(context)
@@ -92,7 +95,23 @@ TwitterDialog::TwitterDialog(Context *context, RideItem *item) :
     connect(maxPowerChk, SIGNAL(stateChanged(int)),  this, SLOT(onCheck(int)));
     connect(maxHRMChk, SIGNAL(stateChanged(int)),  this, SLOT(onCheck(int)));
     connect(twitterMessageEdit, SIGNAL(textChanged(QString)),  this, SLOT(tweetMsgChange(QString)));
+
+    oauthRequest = new KQOAuthRequest();
+    oauthManager = new KQOAuthManager();
+
+    connect(oauthManager, SIGNAL(requestReady(QByteArray)),
+            this, SLOT(onRequestReady(QByteArray)));
+    connect(oauthManager, SIGNAL(authorizedRequestDone()),
+            this, SLOT(onAuthorizedRequestDone()));
+
+
 }
+
+TwitterDialog::~TwitterDialog() {
+    delete oauthRequest;
+    delete oauthManager;
+}
+
 void
 TwitterDialog::tweetCurrentRide()
 {
@@ -100,10 +119,10 @@ TwitterDialog::tweetCurrentRide()
     QString strToken = appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_TOKEN).toString();
     QString strSecret = appsettings->cvalue(context->athlete->cyclist, GC_TWITTER_SECRET).toString();
 
-    QString s_token = QString(strToken);
-    QString s_secret = QString(strSecret);
-
-    if(s_token.isEmpty() || s_secret.isEmpty()) {
+    if(strToken.isEmpty() || strSecret.isEmpty() ||
+       strToken == "" || strToken == "0" ||
+       strSecret == "" || strSecret == "0" )
+    {
       #ifdef Q_OS_MACX
       #define GC_PREF tr("Golden Cheetah->Preferences")
       #else
@@ -115,55 +134,62 @@ TwitterDialog::tweetCurrentRide()
       return;
     }
 
-    char *postarg = NULL;
-
-    // This is for API 1.0
-    // QString qurl = "http://api.twitter.com/1/statuses/update.json?status=";
-    // This is for API 1.1
-    QString qurl = "https://api.twitter.com/1.1/statuses/update.json?status=";
-
     QString twitterMsg = getTwitterMessage();
 
     if(twitterMsg.length() > 140) {
-      QMessageBox tweetlengtherr(QMessageBox::Critical, tr("Tweet Length Error"), tr("Tweet must be 140 characters or fewer."));
+      QMessageBox tweetlengtherr(QMessageBox::Critical, tr("Tweet Length Error"), tr("Tweet must be 140 characters or less."));
       tweetlengtherr.exec();
       return;
     }
 
-    bool failed = true;
-    const QString strUrl = QUrl::toPercentEncoding(twitterMsg);
-    qurl.append(strUrl);
-    char *req_url = oauth_sign_url2(qurl.toLatin1(), &postarg, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, s_token.toLatin1(), s_secret.toLatin1());
-    char *strreply;
-    QString post_reply;
+    oauthRequest->initRequest(KQOAuthRequest::AuthorizedRequest, QUrl("https://api.twitter.com/1.1/statuses/update.json"));
 
-    if (req_url != NULL) {
-        strreply = oauth_http_post(req_url,postarg);
+    oauthRequest->setConsumerKey(GC_TWITTER_CONSUMER_KEY);
+    oauthRequest->setConsumerSecretKey(GC_TWITTER_CONSUMER_SECRET);
 
-        if (strreply != NULL) {
-            post_reply = QString(strreply);
+    // set the user token and secret
+    oauthRequest->setToken(strToken);
+    oauthRequest->setTokenSecret(strSecret);
 
-            if (post_reply.contains("created_at", Qt::CaseInsensitive)) {
+    KQOAuthParameters params;
+    params.insert("status", twitterMsg);
+    oauthRequest->setAdditionalParameters(params);
 
-                failed = false;
-            }
-        }
-        if (postarg) free(postarg);
-    }
-
-    // let user know it didn't work
-    if (failed) {
-        QMessageBox oautherr(QMessageBox::Critical, tr("Error Posting Tweet"), 
-            tr("There was an error connecting to Twitter.  Check your network connection and try again."));
-        oautherr.setDetailedText(post_reply); // probably blank
+    oauthManager->executeRequest(oauthRequest);
+    if (oauthManager->lastError() != KQOAuthManager::NoError) {
+        // handle errors
+        QString error = QString(tr("Internal error in OAuth request - NULL, invalid Endpoint or invalid request"));
+        QMessageBox oautherr(QMessageBox::Critical, tr("OAuth Error"), error);
         oautherr.exec();
-        return;
     }
-
-    // otherwise all done
-    accept();
 
 }
+
+
+void TwitterDialog::onAuthorizedRequestDone() {
+    // qDebug() << "Request sent to Twitter!";
+}
+
+
+void TwitterDialog::onRequestReady(QByteArray response) {
+    //qDebug() << "Response from the service: " << response;
+    QString r = response;
+    // check for errors first
+    if (r.contains("{\"errors\":", Qt::CaseInsensitive))
+    {
+        QMessageBox oautherr(QMessageBox::Critical, tr("Error Posting Tweet"),
+             tr("There was an error connecting to Twitter.  Check your network connection and try again."));
+             oautherr.setDetailedText(r); // probably blank
+        oautherr.exec();
+    } else if (r.contains("created_at", Qt::CaseInsensitive))
+    {
+        QMessageBox oauthsuccess(QMessageBox::Information, tr("Tweet sent"),
+             tr("Tweet successfully sent."));
+        oauthsuccess.exec();
+    }
+}
+
+
 
 QString TwitterDialog::getTwitterMessage()
 {
