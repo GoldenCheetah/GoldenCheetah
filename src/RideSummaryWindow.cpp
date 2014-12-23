@@ -503,14 +503,68 @@ RideSummaryWindow::htmlSummary()
             case 3: metricsList = metricColumn; addPMC=true; break;
         }
 
-        if (ridesummary && addPMC) {
+        if (addPMC) {
 
-            // get the Coggan PMC and add values for date of ride
+            // get the PMC data
             PMCData *pmc = context->athlete->getPMCFor("coggan_tss");
-            summary += QString(tr("<tr><td>CTL:</td><td align=\"right\">%1</td></tr>").arg((int)pmc->lts(rideItem->dateTime.date())));
-            summary += QString(tr("<tr><td>ATL:</td><td align=\"right\">%1</td></tr>").arg((int)pmc->sts(rideItem->dateTime.date())));
-            summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%1</td></tr>").arg((int)pmc->sb(rideItem->dateTime.date())));
-        }
+
+            if (ridesummary) {
+
+                // get the Coggan PMC and add values for date of ride
+                summary += QString(tr("<tr><td>CTL:</td><td align=\"right\">%1</td></tr>")
+                                   .arg((int)pmc->lts(rideItem->dateTime.date())));
+                summary += QString(tr("<tr><td>ATL:</td><td align=\"right\">%1</td></tr>")
+                                   .arg((int)pmc->sts(rideItem->dateTime.date())));
+                summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%1</td></tr>")
+                                   .arg((int)pmc->sb(rideItem->dateTime.date())));
+
+            } else {
+
+                // show min and max values for the date range
+                int start=pmc->indexOf(myDateRange.from);
+                int end=pmc->indexOf(myDateRange.to);
+                if (start == -1) start = 0;
+                if (end==-1) end = pmc->lts().count()-1;
+
+                int lowCTL=0, highCTL=0, lowATL=0, highATL=0, lowTSB=0, highTSB=0;
+                bool first=true;
+
+                for (int i=start; i<end; i++) {
+
+                    int ctl = pmc->lts()[i];
+                    int atl = pmc->sts()[i];
+                    int tsb = pmc->sb()[i];
+
+                    if (first) {
+
+                        // initialise
+                        lowCTL = highCTL = ctl;
+                        lowATL = highATL = atl;
+                        lowTSB = highTSB = tsb;
+                        first = false;
+
+                    } else {
+
+                        // lower/higher than we already got ?
+                        if (ctl < lowCTL) lowCTL=ctl;
+                        if (ctl > highCTL) highCTL=ctl;
+                        if (atl < lowATL) lowATL=atl;
+                        if (atl > highATL) highATL=atl;
+                        if (tsb < lowTSB) lowTSB=tsb;
+                        if (tsb > highTSB) highTSB=tsb;
+                    }
+                }
+
+                // show range for date period
+                summary += QString(tr("<tr><td>CTL:</td><td align=\"right\">%1 - %2 (%3)</td></tr>")
+                                   .arg(lowCTL).arg(highCTL).arg((int)pmc->lts(QDate::currentDate())));
+                summary += QString(tr("<tr><td>ATL:</td><td align=\"right\">%1 - %2 (%3)</td></tr>")
+                                   .arg(lowATL).arg(highATL).arg((int)pmc->sts(QDate::currentDate())));
+                summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%1 - %2 (%3)</td></tr>")
+                                   .arg(lowTSB).arg(highTSB).arg((int)pmc->sb(QDate::currentDate())));
+            }
+        } 
+
         for (int j = 0; j< metricsList.count(); ++j) {
             QString symbol = metricsList[j];
 
