@@ -577,6 +577,8 @@ RideSummaryWindow::htmlSummary()
                 summary += QString(tr("<tr><td>TSB:</td><td align=\"right\">%3 (%1 - %2)</td></tr>")
                                    .arg((int)lowTSB).arg((int)highTSB).arg((int)avgTSB));
             }
+            // spacer
+            summary += "<tr style=\"height: 3px;\"></tr>";
         } 
 
         for (int j = 0; j< metricsList.count(); ++j) {
