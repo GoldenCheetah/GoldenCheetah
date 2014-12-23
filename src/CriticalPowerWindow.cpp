@@ -228,7 +228,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     modelCombo->addItem(tr("Multicomponent"));
     modelCombo->setCurrentIndex(1);
 
-    mcl->addRow(new QLabel(tr("CP/CV Model")), modelCombo);
+    mcl->addRow(new QLabel(tr("Model")), modelCombo);
 
     mcl->addRow(new QLabel(tr(" ")));
     intervalLabel = new QLabel(tr("Search Interval"));
