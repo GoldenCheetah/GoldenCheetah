@@ -31,6 +31,9 @@
 #include "Colors.h"
 
 #include "PMCData.h" // for LTS/STS calculation
+#include "Zones.h"
+#include "HrZones.h"
+#include "PaceZones.h"
 
 #include <QSettings>
 

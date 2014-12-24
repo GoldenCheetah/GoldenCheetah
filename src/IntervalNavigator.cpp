@@ -55,10 +55,12 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
+#ifdef GC_HAVE_INTERVALS
     if (type == "Best")
         sqlModel = context->athlete->sqlBestIntervalsModel;
     else
         sqlModel= context->athlete->sqlRouteIntervalsModel;
+#endif
 
     //QString filter = QString("type='%1'").arg(type);
     //context->athlete->sqlIntervalsModel->setFilter(filter);
@@ -124,7 +126,7 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
 
 
     // refresh when database is updated
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
+    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -805,11 +807,8 @@ IntervalNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int old
 
 }
 
-
-
-
 //
-// This function is called for every row in the metricDB
+// This function is called for every row in the ride list
 // and wants to know what group string or 'name' you want
 // to put this row into. It is passed the heading value
 // as a string, and the row value for this column.

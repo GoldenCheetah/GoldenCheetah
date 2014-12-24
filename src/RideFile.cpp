@@ -24,9 +24,10 @@
 #include "DataProcessor.h"
 #include "RideEditor.h"
 #include "RideMetadata.h"
-#include "MetricAggregator.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
+
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>

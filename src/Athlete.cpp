@@ -20,6 +20,8 @@
 
 #include "MainWindow.h"
 #include "Context.h"
+#include "Season.h"
+#include "Colors.h"
 #include "RideMetadata.h"
 #include "RideCache.h"
 #include "RideFileCache.h"
@@ -28,8 +30,8 @@
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Zones.h"
+#include "HrZones.h"
 #include "PaceZones.h"
-#include "MetricAggregator.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
 #include "PMCData.h"
@@ -143,10 +145,10 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     // Search / filter
 #ifdef GC_HAVE_LUCENE
     namedSearches = new NamedSearches(this); // must be before navigator
-    lucene = new Lucene(context, context); // before metricDB attempts to refresh
+    lucene = new Lucene(context, context);
 #endif
 
-    // get withings in if there is a cache, before metricDB (but it goes soon)
+    // get withings in if there is a cache
     QFile withingsJSON(QString("%1/withings.json").arg(context->athlete->home->cache().canonicalPath()));
     if (withingsJSON.exists() && withingsJSON.open(QFile::ReadOnly)) {
 
@@ -161,12 +163,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         if (errors.count() == 0) setWithings(parser.readings());
     }
 
-    // metrics DB -- XXX going very soon
-    metricDB = new MetricAggregator(context); // just to catch config updates!
-    metricDB->refreshMetrics();
-
     // now most dependencies are in get cache
-    // must be before metricDB as we transition it out...
     rideCache = new RideCache(context);
 
 #ifdef GC_HAVE_INTERVALS
@@ -248,7 +245,6 @@ Athlete::~Athlete()
     delete sqlRouteIntervalsModel;
     delete sqlBestIntervalsModel;
 #endif
-    delete metricDB;
 
 #ifdef GC_HAVE_LUCENE
     delete namedSearches;

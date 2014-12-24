@@ -119,7 +119,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     resetView();
 
     // refresh when database is updated
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
+    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -756,7 +756,7 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
 
 //
-// This function is called for every row in the metricDB
+// This function is called for every row in the ridecache
 // and wants to know what group string or 'name' you want
 // to put this row into. It is passed the heading value
 // as a string, and the row value for this column.

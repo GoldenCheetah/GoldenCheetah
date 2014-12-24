@@ -21,15 +21,14 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
-#include "MetricAggregator.h"
 #include "RideMetadata.h"
-#include "DBAccess.h"
 #include "Context.h"
 #include "Settings.h"
 #include "Colors.h"
 
 #include <QSqlTableModel>
-#include <QTableView>
+#include <QItemDelegate>
+#include <QTreeView>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QDragMoveEvent>

@@ -20,7 +20,6 @@
 #include "BestIntervalDialog.h"
 #include "Zones.h"
 #include "Settings.h"
-#include "MetricAggregator.h"
 #include <math.h>
 #include <QApplication>
 

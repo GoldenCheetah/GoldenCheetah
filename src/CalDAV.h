@@ -40,7 +40,6 @@
 
 // GC Settings and Ride Metrics
 #include "Settings.h"
-#include "MetricAggregator.h"
 
 // update main ride calendar
 #include "ICalendar.h"

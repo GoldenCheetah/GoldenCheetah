@@ -26,7 +26,6 @@
 #include "Context.h"
 #include "Settings.h"
 #include "WithingsParser.h"
-#include "MetricAggregator.h"
 
 class WithingsDownload : public QObject
 {

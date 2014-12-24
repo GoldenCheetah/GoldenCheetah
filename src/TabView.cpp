@@ -25,7 +25,6 @@
 #include "HomeWindow.h"
 #include "GcWindowRegistry.h"
 #include "TrainDB.h"
-#include "MetricAggregator.h"
 #include "RideNavigator.h"
 #include "IntervalNavigator.h"
 #include "MainWindow.h"
@@ -340,7 +339,7 @@ TabView::setBlank(BlankStatePage *blank)
 
     // and when stuff happens lets check
     connect(blank, SIGNAL(closeClicked()), this, SLOT(checkBlank()));
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
+    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
     connect(context, SIGNAL(configChanged()), this, SLOT(checkBlank()));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
 

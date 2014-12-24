@@ -29,9 +29,7 @@
 #include "HelpWhatsThis.h"
 
 // access to metrics
-#include "MetricAggregator.h"
 #include "RideMetric.h"
-#include "DBAccess.h"
 #include "TcxRideFile.h"
 
 #include <zlib.h>

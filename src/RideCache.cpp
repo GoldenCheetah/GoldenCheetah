@@ -18,8 +18,6 @@
 
 #include "RideCache.h"
 
-#include "DBAccess.h"
-
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFileCache.h"

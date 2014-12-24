@@ -17,6 +17,7 @@
  */
 
 #include "Context.h"
+#include "Athlete.h"
 #include "TreeMapPlot.h"
 #include "LTMTool.h"
 #include "TreeMapWindow.h"
