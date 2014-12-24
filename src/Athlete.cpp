@@ -161,19 +161,15 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
         if (errors.count() == 0) setWithings(parser.readings());
     }
 
+    // metrics DB -- XXX going very soon
+    metricDB = new MetricAggregator(context); // just to catch config updates!
+    metricDB->refreshMetrics();
+
     // now most dependencies are in get cache
     // must be before metricDB as we transition it out...
     rideCache = new RideCache(context);
 
-    // metrics DB
-    metricDB = new MetricAggregator(context); // just to catch config updates!
-    metricDB->refreshMetrics();
-
-    // the model atop the metric DB
-    sqlModel = new QSqlTableModel(this, metricDB->db()->connection());
-    sqlModel->setTable("metrics");
-    sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-
+#ifdef GC_HAVE_INTERVALS
     sqlRouteIntervalsModel = new QSqlTableModel(this, metricDB->db()->connection());
     sqlRouteIntervalsModel->setTable("interval_metrics");
     sqlRouteIntervalsModel->setFilter("type='Route'");
@@ -183,6 +179,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     sqlBestIntervalsModel->setTable("interval_metrics");
     sqlBestIntervalsModel->setFilter("type='Best'");
     sqlBestIntervalsModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+#endif
 
     // Downloaders
     withingsDownload = new WithingsDownload(context);
@@ -246,10 +243,11 @@ Athlete::~Athlete()
     delete davCalendar;
 #endif
 
+#ifdef GC_HAVE_INTERVALS
     // close the db connection (but clear models first!)
-    delete sqlModel;
     delete sqlRouteIntervalsModel;
     delete sqlBestIntervalsModel;
+#endif
     delete metricDB;
 
 #ifdef GC_HAVE_LUCENE

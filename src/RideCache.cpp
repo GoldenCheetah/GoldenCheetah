@@ -23,6 +23,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideFileCache.h"
+#include "RideCacheModel.h"
 #include "Specification.h"
 
 #include "Route.h"
@@ -53,12 +54,19 @@ RideCache::RideCache(Context *context) : context(context)
         QDateTime dt;
         if (RideFile::parseRideFileName(name, &dt)) {
             last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+
+            connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
+            connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
+
             rides_ << last;
         }
     }
 
     // load the store - will unstale once cache restored
     load();
+
+    // set model once we have the basics
+    model_ = new RideCacheModel(context, this);
 
     // now refresh just in case.
     refresh();
@@ -100,6 +108,15 @@ RideCache::configChanged()
     if (prior != fingerprint) refresh();
 }
 
+void
+RideCache::itemChanged()
+{
+    // one of our kids changed, they grow up so fast.
+    // NOTE ONLY CONNECT THIS TO RIDEITEMS !!!
+    // BECAUSE IT IS ASSUMED BELOW THE SENDER IS A RIDEITEM
+    emit itemChanged(static_cast<RideItem*>(QObject::sender()));
+}
+
 // add a new ride
 void
 RideCache::addRide(QString name, bool dosignal)
@@ -110,6 +127,9 @@ RideCache::addRide(QString name, bool dosignal)
 
     // new ride item
     RideItem *last = new RideItem(context->athlete->home->activities().canonicalPath(), name, dt, context);
+
+    connect(last, SIGNAL(rideDataChanged()), this, SLOT(itemChanged()));
+    connect(last, SIGNAL(rideMetadataChanged()), this, SLOT(itemChanged()));
 
     // now add to the list, or replace if already there
     bool added = false;

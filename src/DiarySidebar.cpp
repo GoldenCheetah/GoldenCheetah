@@ -21,6 +21,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "RideCacheModel.h"
 #include "TimeUtils.h"
 #include "Specification.h"
 #include "RideItem.h"
@@ -448,7 +449,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     // get the model
     fieldDefinitions = context->athlete->rideMetadata()->getFields();
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
-    calendarModel->setSourceModel(context->athlete->sqlModel);
+    calendarModel->setSourceModel(context->athlete->rideCache->model());
 
     QHBoxLayout *line = new QHBoxLayout;
     line->setSpacing(0);

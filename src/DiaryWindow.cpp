@@ -19,6 +19,8 @@
 
 #include "DiaryWindow.h"
 #include "RideMetadata.h"
+#include "RideCache.h"
+#include "RideCacheModel.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "TabView.h"
@@ -62,7 +64,7 @@ DiaryWindow::DiaryWindow(Context *context) :
 
     // monthly view via QCalendarWidget
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
-    calendarModel->setSourceModel(context->athlete->sqlModel);
+    calendarModel->setSourceModel(context->athlete->rideCache->model());
 
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);

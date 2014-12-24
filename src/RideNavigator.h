@@ -88,6 +88,7 @@ class RideNavigator : public GcWindow
 
         void configChanged();
         void refresh();
+        void backgroundRefresh(); // keep up with bg refreshes
 
         void showEvent(QShowEvent *event);
 

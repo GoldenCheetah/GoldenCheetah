@@ -20,6 +20,7 @@
 #include "Context.h"
 #include "Colors.h"
 #include "RideCache.h"
+#include "RideCacheModel.h"
 #include "RideItem.h"
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
@@ -57,11 +58,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
-    context->athlete->sqlModel->select();
-    while (context->athlete->sqlModel->canFetchMore(QModelIndex())) context->athlete->sqlModel->fetchMore(QModelIndex());
-
     searchFilter = new SearchFilter(this);
-    searchFilter->setSourceModel(context->athlete->sqlModel); // filter out/in search results
+    searchFilter->setSourceModel(context->athlete->rideCache->model()); // filter out/in search results
 
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(searchFilter);
@@ -145,6 +143,11 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
 
+    // repaint etc when background refresh is working
+    connect(context, SIGNAL(refreshStart()), this, SLOT(backgroundRefresh()));
+    connect(context, SIGNAL(refreshEnd()), this, SLOT(backgroundRefresh()));
+    connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(backgroundRefresh())); // we might miss 1st one
+
 #ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
         connect(searchFilterBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
@@ -180,9 +183,9 @@ RideNavigator::configChanged()
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         else 
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        if (appsettings->value(this, GC_RIDEHEAD, true).toBool() == false)
-            tableView->header()->hide();
-        else 
+        //if (appsettings->value(this, GC_RIDEHEAD, true).toBool() == false)
+            //tableView->header()->hide();
+        //else 
             tableView->header()->show();
 
         tableView->header()->setStyleSheet(
@@ -201,14 +204,16 @@ RideNavigator::configChanged()
 void
 RideNavigator::refresh()
 {
-    context->athlete->sqlModel->select();
-    while (context->athlete->sqlModel->canFetchMore(QModelIndex()))
-        context->athlete->sqlModel->fetchMore(QModelIndex());
-
     active=false;
 
     setWidth(geometry().width());
     cursorRide();
+}
+
+void
+RideNavigator::backgroundRefresh()
+{
+    tableView->doItemsLayout();
 }
 
 void
@@ -289,6 +294,7 @@ RideNavigator::resetView()
     // setup the logical heading list
     for (int i=0; i<tableView->header()->count(); i++) {
         QString friendly, techname = sortModel->headerData(i, Qt::Horizontal).toString();
+
         if ((friendly = nameMap.value(techname, "unknown")) != "unknown") {
             sortModel->setHeaderData(i, Qt::Horizontal, friendly);
             logicalHeadings << friendly;
@@ -964,7 +970,7 @@ void
 RideNavigator::selectionChanged(QItemSelection selected)
 {
     QModelIndex ref = selected.indexes().first();
-    QModelIndex fileIndex = tableView->model()->index(ref.row(), 2, ref.parent());
+    QModelIndex fileIndex = tableView->model()->index(ref.row(), 3, ref.parent());
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
 
     // lets make sure we know what we've selected, so we don't
@@ -986,7 +992,7 @@ RideNavigator::selectRide(const QModelIndex &index)
 {
     // we don't use this at present, but hitting return
     // or double clicking a ride will cause this to get called....
-    QModelIndex fileIndex = tableView->model()->index(index.row(), 2, index.parent()); // column 2 for filename ?
+    QModelIndex fileIndex = tableView->model()->index(index.row(), 3, index.parent()); // column 2 for filename ?
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
 
     // do nothing .. but maybe later do something ?

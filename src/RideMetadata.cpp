@@ -727,6 +727,9 @@ FormField::editFinished()
 
             // just update the tags QMap!
             ourRideItem->ride()->setTag(definition.name, text);
+
+            // and update !
+            ourRideItem->notifyRideMetadataChanged();
         }
     }
 

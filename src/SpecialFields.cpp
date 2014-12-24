@@ -94,7 +94,7 @@ SpecialFields::isMetric(QString &name) const
 }
 
 QString
-SpecialFields::makeTechName(QString &name) const
+SpecialFields::makeTechName(QString name) const
 {
     // strip spaces and only keep alpha values - everything else
     // becomes an underscore
@@ -103,7 +103,7 @@ SpecialFields::makeTechName(QString &name) const
 }
 
 QString
-SpecialFields::metricSymbol(QString &name) const
+SpecialFields::metricSymbol(QString name) const
 {
     // return technical name for metric long name
     const RideMetric *metric = metricmap.value(name, NULL);
