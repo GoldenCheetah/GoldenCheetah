@@ -32,6 +32,8 @@ RideCacheModel::RideCacheModel(Context *context, RideCache *cache) : QAbstractTa
     connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(itemAddedOrRemoved()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(itemAddedOrRemoved()));
     connect(rideCache, SIGNAL(itemChanged(RideItem*)), this, SLOT(itemChanged(RideItem*)));
 }
 
@@ -80,7 +82,12 @@ RideCacheModel::data(const QModelIndex &index, int role) const
 
                 // is a metric
                 int i=index.column()-5;
-                return 0;
+
+                // unpack metric value into ridemetric and use it to get a stringified
+                // version using the right metric/imperial conversion
+                RideMetric *m = const_cast<RideMetric*>(factory->rideMetric(factory->metricName(i)));
+                m->setValue(rideCache->rides().at(index.row())->metrics_[m->index()]);
+                return m->toString(context->athlete->useMetricUnits);
 
             } else {
 
@@ -95,12 +102,19 @@ RideCacheModel::data(const QModelIndex &index, int role) const
 void
 RideCacheModel::itemChanged(RideItem *item)
 {
-qDebug()<<"ooh"<<item->fileName<<"changed";
     // ok so lets signal that
     int row = rideCache->rides().indexOf(item);
     if (row >= 0 && row <= rideCache->count()) {
         emit dataChanged(createIndex(row,0), createIndex(row,columns_-1));
     }
+}
+
+void 
+RideCacheModel::itemAddedOrRemoved()
+{
+    // reset the model
+    beginResetModel();
+    endResetModel();
 }
 
 bool 
@@ -129,6 +143,9 @@ RideCacheModel::headerData(int section, Qt::Orientation orientation, int role) c
 void 
 RideCacheModel::configChanged()
 {
+    // we are resetting
+    beginResetModel();
+
     // get field config
     metadata = context->athlete->rideMetadata()->getFields();
 
@@ -172,6 +189,10 @@ RideCacheModel::configChanged()
             break;
         }
     }
+
+    // all good
+    endResetModel();
+
     headerDataChanged (Qt::Horizontal, 0, columns_-1);
 }
 

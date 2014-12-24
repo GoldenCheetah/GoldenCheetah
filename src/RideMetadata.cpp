@@ -584,6 +584,8 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     // if save is being called flush all the values out ready to save as they are
     connect(meta->context, SIGNAL(metadataFlush()), this, SLOT(editFinished()));
+
+    active = false;
 }
 
 FormField::~FormField()
@@ -663,6 +665,7 @@ FormField::editFinished()
     case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
 
+    active = true;
 
     // Update special field
     if (definition.name == "Device") {
@@ -732,6 +735,7 @@ FormField::editFinished()
             ourRideItem->notifyRideMetadataChanged();
         }
     }
+    active = false; 
 
     // default values
     setLinkedDefault(text);
@@ -820,6 +824,8 @@ FormField::stateChanged(int state)
 void
 FormField::metadataChanged()
 {
+    if (active == true) return;
+
     active = true;
     edited = false;
     QString value;
