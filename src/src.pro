@@ -51,7 +51,8 @@ CONFIG(debug, debug|release) {
 !isEmpty( KQOAUTH_INSTALL ) {
     isEmpty( KQOAUTH_INCLUDE ) { KQOAUTH_INCLUDE += $${KQOAUTH_INSTALL}/src }
     isEmpty( KQOAUTH_LIBS ) {
-        KQOAUTH_LIBS = $${KQOAUTH_INSTALL}/lib/libkqoauth0.a
+        #KQOAUTH_LIBS = $${KQOAUTH_INSTALL}/lib/libkqoauth0.a
+        KQOAUTH_LIBS = -lkqoauth
     }
     INCLUDEPATH += $${KQOAUTH_INCLUDE}
     LIBS        += $${KQOAUTH_LIBS}
