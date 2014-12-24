@@ -30,6 +30,7 @@
 class RideFile;
 class RideFileCache;
 class RideCache;
+class RideCacheModel;
 class Context;
 
 Q_DECLARE_METATYPE(RideItem*)
@@ -44,6 +45,7 @@ class RideItem : public QObject
     protected:
 
         friend class ::RideCache;
+        friend class ::RideCacheModel;
 
         // ridefile
         RideFile *ride_;
