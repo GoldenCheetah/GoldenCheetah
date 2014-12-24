@@ -55,7 +55,7 @@ ManualRideDialog::deriveFactors()
         double totalseconds, totaldistance, totalbs, totaldp, totaltss, totalkj;
         totalseconds = totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
 
-        // just use the metricDB versions, nice 'n fast
+        // iterate over the ride cache
         foreach (RideItem *ride, context->athlete->rideCache->rides()) {
 
             // skip those with no time or distance values (not comparing doubles)

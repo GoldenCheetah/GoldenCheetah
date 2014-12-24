@@ -22,7 +22,6 @@
 #include "CriticalPowerWindow.h"
 #include "Settings.h"
 #include "SearchFilterBox.h"
-#include "MetricAggregator.h"
 #include "CPPlot.h"
 #include "Context.h"
 #include "Context.h"
@@ -476,7 +475,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
+    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));

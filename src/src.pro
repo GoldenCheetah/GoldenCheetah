@@ -300,7 +300,6 @@ HEADERS += \
         CriticalPowerWindow.h \
         CsvRideFile.h \
         DataProcessor.h \
-        DBAccess.h \
         DaysScaleDraw.h \
         Device.h \
         DeviceTypes.h \
@@ -367,7 +366,6 @@ HEADERS += \
         ManualRideFile.h \
         MergeActivityWizard.h \
         MetadataWindow.h \
-        MetricAggregator.h \
         MoxyDevice.h \
         MUPlot.h \
         MUPool.h \
@@ -439,7 +437,6 @@ HEADERS += \
         SrmRideFile.h \
         Statistic.h \
         PMCData.h \
-        SummaryMetrics.h \
         SummaryWindow.h \
         SyncRideFile.h \
         Tab.h \
@@ -519,7 +516,6 @@ SOURCES += \
         CsvRideFile.cpp \
         DanielsPoints.cpp \
         DataProcessor.cpp \
-        DBAccess.cpp \
         Device.cpp \
         DeviceTypes.cpp \
         DeviceConfiguration.cpp \
@@ -594,7 +590,6 @@ SOURCES += \
         ManualRideFile.cpp \
         MergeActivityWizard.cpp \
         MetadataWindow.cpp \
-        MetricAggregator.cpp \
         MoxyDevice.cpp \
         MUPlot.cpp \
         MUWidget.cpp \
@@ -665,7 +660,6 @@ SOURCES += \
         SrmRideFile.cpp \
         Statistic.cpp \
         PMCData.cpp \
-        SummaryMetrics.cpp \
         SummaryWindow.cpp \
         SyncRideFile.cpp \
         Tab.cpp \

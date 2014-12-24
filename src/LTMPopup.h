@@ -23,7 +23,6 @@
 #include "Context.h"
 #include "Settings.h"
 #include "LTMSettings.h"
-#include "MetricAggregator.h"
 #include "RideMetric.h"
 
 #include <QtGui>
@@ -33,6 +32,7 @@
 #include <QtGui>
 #include <QDialog>
 #include <QTextEdit>
+#include <QLabel>
 #include <QHeaderView>
 #include <QTableWidget>
 #include <QTableWidgetItem>

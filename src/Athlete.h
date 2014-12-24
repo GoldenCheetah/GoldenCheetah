@@ -29,7 +29,6 @@
 // for WithingsReading
 #include "WithingsParser.h"
 
-class MetricAggregator;
 class Zones;
 class HrZones;
 class PaceZones;
@@ -48,7 +47,6 @@ class RideFileCache;
 class RideItem;
 class IntervalItem;
 class IntervalTreeView;
-class QSqlTableModel;
 class PDEstimate;
 class PMCData;
 class LTMSettings;
@@ -89,10 +87,10 @@ class Athlete : public QObject
 
         // SQL tables are going soon
         bool isclean;
-        MetricAggregator *metricDB;
-        QSqlTableModel *sqlModel;
+#ifdef GC_HAVE_INTERVALS
         QSqlTableModel *sqlRouteIntervalsModel;
         QSqlTableModel *sqlBestIntervalsModel;
+#endif
 
         // Data
         Seasons *seasons;

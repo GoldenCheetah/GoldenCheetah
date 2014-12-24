@@ -22,9 +22,7 @@
 #include <QtGui>
 #include <QWebFrame>
 
-#include "DBAccess.h"
 #include "RideMetric.h"
-#include "MetricAggregator.h"
 #include <QtSql>
 #include <qwt_plot_curve.h>
 

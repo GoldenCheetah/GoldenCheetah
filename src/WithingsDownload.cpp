@@ -19,6 +19,7 @@
 #include "WithingsDownload.h"
 #include "MainWindow.h"
 #include "Athlete.h"
+#include <QMessageBox>
 
 WithingsDownload::WithingsDownload(Context *context) : context(context)
 {
@@ -79,7 +80,7 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
         }
 
         context->athlete->isclean = false;
-        context->athlete->metricDB->refreshMetrics(context->athlete->withings().first().when);
+        //XXXREFRESH context->athlete->metricDB->refreshMetrics(context->athlete->withings().first().when);
     }
     return;
 }

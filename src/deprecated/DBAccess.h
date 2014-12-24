@@ -35,8 +35,6 @@
 #include "SpecialFields.h"
 #include "RideMetadata.h"
 
-extern int DBSchemaVersion;
-
 class RideFile;
 class Zones;
 class RideMetric;

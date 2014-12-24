@@ -21,15 +21,13 @@
 #include "GoldenCheetah.h"
 
 #include "Context.h"
-#include "MetricAggregator.h"
 #include "RideMetadata.h"
-#include "DBAccess.h"
 #include "Context.h"
 #include "Settings.h"
 #include "Colors.h"
 
-#include <QSqlTableModel>
-#include <QTableView>
+#include <QTreeView>
+#include <QItemDelegate>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QDragMoveEvent>
@@ -218,8 +216,6 @@ public:
 
     // override stanard painter to use color config to paint background
     // and perform correct level of rounding for each column before displaying
-    // it will also override the values returned from metricDB with in-core values
-    // when the ride has been modified but not saved (i.e. data is dirty)
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     void setWidth(int x) { pwidth=x; }

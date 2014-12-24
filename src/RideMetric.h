@@ -30,6 +30,8 @@
 
 #include "RideFile.h"
 
+extern int DBSchemaVersion; // moved from old DBAccess
+
 class Zones;
 class HrZones;
 class Context;

@@ -20,8 +20,8 @@
 #include "RideMetric.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
+#include "RideMetadata.h"
 #include "Context.h"
-#include "DBAccess.h" // only for DBSchemaVersion
 #include "Zones.h"
 #include "HrZones.h"
 #include "PaceZones.h"

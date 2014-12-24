@@ -23,9 +23,9 @@
 
 #include "Context.h"
 #include "Athlete.h"
-#include "MetricAggregator.h"
 #include "ChartSettings.h"
 #include "ColorButton.h"
+#include "Colors.h"
 #include "PowerHist.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
@@ -43,6 +43,7 @@
 #endif
 
 #include <QtGui>
+#include <QCheckBox>
 #include <QFormLayout>
 #include <QTextEdit>
 #include <QHeaderView>

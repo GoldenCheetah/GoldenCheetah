@@ -28,7 +28,6 @@
 #include "Context.h"
 #include "Settings.h"
 /* #include "CalendarParser.h" */
-#include "MetricAggregator.h"
 
 class CalendarDownload : public QObject
 {
