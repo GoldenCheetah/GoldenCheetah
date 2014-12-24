@@ -173,7 +173,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         long elapsedtime = elapsed.elapsed();
         if ((!forceAfterThisDate.isNull() || first || elapsedtime > 6000) && bar == NULL) {
             bar = new GProgressDialog(title, 0, filenames.count(), context->mainWindow->init, context->mainWindow);
-            bar->show(); // lets hide until elapsed time is > 6 seconds
+            // bar->show(); // lets hide until elapsed time is > 6 seconds
+            bar->hide();
 
             // lets make sure it goes to the center!
             QApplication::processEvents();

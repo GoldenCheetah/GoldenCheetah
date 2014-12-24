@@ -40,6 +40,7 @@ class Context;
 class RideCacheBackgroundRefresh;
 class Specification;
 class AthleteBest;
+class RideCacheModel;
 
 class RideCache : public QObject
 {
@@ -50,7 +51,11 @@ class RideCache : public QObject
         RideCache(Context *context);
         ~RideCache();
 
+        // table model
+        RideCacheModel *model() { return model_; }
+
         // query the cache
+        int count() const { return rides_.count(); }
         RideItem *getRide(QString filename);
 	    QList<QDateTime> getAllDates();
         QStringList getAllFilenames();
@@ -100,8 +105,15 @@ class RideCache : public QObject
         // cancel background processing because about to exit
         void cancel();
 
+        // item telling us it changed
+        void itemChanged();
+
     signals:
+
         void modelProgress(int, int); // let others know when we're refreshing the model estimates
+
+        // us telling the world the item changed
+        void itemChanged(RideItem*);
 
     protected:
 
@@ -109,6 +121,7 @@ class RideCache : public QObject
 
         Context *context;
         QVector<RideItem*> rides_, reverse_;
+        RideCacheModel *model_;
         bool exiting;
 	    double progress_; // percent
         unsigned long fingerprint; // zone configuration fingerprint

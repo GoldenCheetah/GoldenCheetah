@@ -396,6 +396,7 @@ HEADERS += \
         RealtimePlot.h \
         RideAutoImportConfig.h \
         RideCache.h \
+        RideCacheModel.h \
         RideEditor.h \
         RideFile.h \
         RideFileCache.h \
@@ -623,6 +624,7 @@ SOURCES += \
         ReferenceLineDialog.cpp \
         RideAutoImportConfig.cpp \
         RideCache.cpp \
+        RideCacheModel.cpp \
         RideEditor.cpp \
         RideFile.cpp \
         RideFileCache.cpp \
