@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "TabView.h"
+#include "AllPlotInterval.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
 #include "RideFile.h"
@@ -177,6 +178,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull = new QCheckBox(tr("Full plot"), this);
     showFull->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showFull);
+
+    showInterval = new QCheckBox(tr("Intervals"), this);
+    showInterval->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showInterval);
 
     showHelp = new QCheckBox(tr("Overlay"), this);
     showHelp->setCheckState(Qt::Unchecked);
@@ -417,6 +422,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     allPlot->tooltip->setEnabled(true);
 
     allPlot->_canvasPicker = new LTMCanvasPicker(allPlot);
+
     connect(context, SIGNAL(intervalHover(RideFileInterval)), allPlot, SLOT(intervalHover(RideFileInterval)));
     connect(allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
@@ -573,6 +579,25 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     HelpWhatsThis *helpFull = new HelpWhatsThis(fullPlot);
     fullPlot->setWhatsThis(helpFull->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
 
+    intervalPlot = new AllPlotInterval(this, context);
+    intervalPlot->setFixedHeight(100);
+    intervalPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    static_cast<QwtPlotCanvas*>(intervalPlot->canvas())->setBorderRadius(0);
+    intervalPlot->setContentsMargins(0,0,0,0);
+
+    // tooltip on hover over point
+    /*intervalPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxis::yLeft,
+                               QwtPicker::VLineRubberBand,
+                               QwtPicker::AlwaysOn,
+                               intervalPlot->canvas(),
+                               "");
+    intervalPlot->tooltip->setRubberBand(QwtPicker::VLineRubberBand);
+    intervalPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
+    intervalPlot->tooltip->setTrackerPen(QColor(Qt::black));
+    intervalPlot->tooltip->setRubberBandPen(inv);
+    intervalPlot->tooltip->setEnabled(true);*/
+
+
     // allPlotStack contains the allPlot and the stack by series
     // because both want the optional fullplot at the bottom
     allPlotStack = new QStackedWidget(this);
@@ -585,6 +610,9 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     allPlotLayout->addWidget(allPlotStack);
     allPlotFrame->setLayout(allPlotLayout);
+
+    allPlotLayout->addWidget(intervalPlot);
+
 
     // controls...
     controlsLayout = new QGridLayout;
@@ -660,6 +688,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showTE, SIGNAL(stateChanged(int)), this, SLOT(setShowTE(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
+    connect(showInterval, SIGNAL(stateChanged(int)), this, SLOT(setShowInterval(int)));
     connect(showHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -1183,6 +1212,30 @@ AllPlotWindow::redrawFullPlot()
 }
 
 void
+AllPlotWindow::redrawIntervalPlot()
+{
+    // always performed since the data is used
+    // by both the stack plots and the allplot
+    RideItem *ride = current;
+
+    // null rides are possible on new cyclist
+    if (!ride) return;
+
+    static_cast<QwtPlotCanvas*>(intervalPlot->canvas())->setBorderRadius(0);
+
+    // use the ride to decide
+    if (intervalPlot->bydist)
+        intervalPlot->setAxisScale(QwtPlot::xBottom,
+        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+    else
+        intervalPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
+                                                ride->ride()->dataPoints().last()->secs/60);
+
+    intervalPlot->replot();
+}
+
+void
 AllPlotWindow::redrawStackPlot()
 {
     if (showStack->isChecked()) {
@@ -1323,6 +1376,7 @@ AllPlotWindow::rideSelected()
 
     // setup the charts to reflect current ride selection
     fullPlot->setDataFromRide(ride);
+    intervalPlot->setDataFromRide(ride);
 
 
     // Fixup supplied by Josef Gebel
@@ -1340,6 +1394,7 @@ AllPlotWindow::rideSelected()
     // to see if they are currently visible
     // and only redraw if neccessary
     redrawFullPlot();
+    redrawIntervalPlot();
     redrawAllPlot();
 
     // we need to reset the stacks as the ride has changed
@@ -2704,6 +2759,20 @@ AllPlotWindow::setShowFull(int value)
     else {
         fullPlot->hide();
         allPlotLayout->setStretch(1,0);
+    }
+}
+
+void
+AllPlotWindow::setShowInterval(int value)
+{
+    showInterval->setChecked(value);
+    if (showInterval->isChecked()) {
+        intervalPlot->show();
+        //allPlotLayout->setStretch(1,20);
+    }
+    else {
+        intervalPlot->hide();
+        //allPlotLayout->setStretch(1,0);
     }
 }
 
