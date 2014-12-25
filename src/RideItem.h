@@ -57,8 +57,11 @@ class RideItem : public QObject
         // metadata (used by navigator)
         QMap<QString,QString> metadata_;
 
+
         QStringList errors_;
         Context *context; // to notify widgets when date/time changes
+
+        unsigned long metaCRC();
 
     public slots:
         void modified();
@@ -102,7 +105,7 @@ class RideItem : public QObject
 
         // context the item was updated to
         unsigned long fingerprint; // zones
-        unsigned long crc, timestamp; // file content
+        unsigned long metacrc, crc, timestamp; // file content
         int dbversion; // metric version
         double weight; // what weight was used ?
 

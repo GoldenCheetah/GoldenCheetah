@@ -132,6 +132,7 @@ ride_tuple: string ':' string                                   {
                                                                      if ($1 == "filename") jc->item.fileName = $3;
                                                                      else if ($1 == "fingerprint") jc->item.fingerprint = $3.toULongLong();
                                                                      else if ($1 == "crc") jc->item.crc = $3.toULongLong();
+                                                                     else if ($1 == "metacrc") jc->item.metacrc = $3.toULongLong();
                                                                      else if ($1 == "timestamp") jc->item.timestamp = $3.toULongLong();
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
@@ -291,6 +292,7 @@ void RideCache::save()
             stream << "\t\t\"date\":\"" <<item->dateTime.toUTC().toString(DATETIME_FORMAT) << "\",\n";
             stream << "\t\t\"fingerprint\":\"" <<item->fingerprint <<"\",\n";
             stream << "\t\t\"crc\":\"" <<item->crc <<"\",\n";
+            stream << "\t\t\"metacrc\":\"" <<item->metacrc <<"\",\n";
             stream << "\t\t\"timestamp\":\"" <<item->timestamp <<"\",\n";
             stream << "\t\t\"dbversion\":\"" <<item->dbversion <<"\",\n";
             stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
