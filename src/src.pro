@@ -265,6 +265,7 @@ HEADERS += \
         Aerolab.h \
         AerolabWindow.h \
         AllPlot.h \
+        AllPlotInterval.h \
         AllPlotWindow.h \
         AllPlotSlopeCurve.h \
         AnalysisSidebar.h \
@@ -478,6 +479,7 @@ SOURCES += \
         Aerolab.cpp \
         AerolabWindow.cpp \
         AllPlot.cpp \
+        AllPlotInterval.cpp \
         AllPlotWindow.cpp \
         AllPlotSlopeCurve.cpp \
         AnalysisSidebar.cpp \
