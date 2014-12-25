@@ -1015,7 +1015,7 @@ LTMWindow::dataTable(bool html)
             summary += "\n";
         }
 
-        for(int row=0; row<rows; row++) {
+        for(int row=0; row<=rows; row++) {
 
             // in day mode we don't list all the zeroes .. its too many!
             bool nonzero = false;
