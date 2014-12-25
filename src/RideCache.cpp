@@ -33,6 +33,10 @@
 
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 
+// for sorting
+bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
+bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
+
 RideCache::RideCache(Context *context) : context(context)
 {
     progress_ = 100;
@@ -139,7 +143,7 @@ RideCache::addRide(QString name, bool dosignal)
     }
 
     if (!added) rides_ << last;
-    qSort(rides_); // sort by date
+    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
 
     // refresh metrics for *this ride only* 
     last->refresh();
@@ -320,11 +324,6 @@ RideCache::cancel()
         future.cancel();
         future.waitForFinished();
     }
-}
-// for reverse sorting
-bool rideCacheGreaterThan(const RideItem *a, const RideItem *b)
-{
-    return a->dateTime > b->dateTime;
 }
 
 // check if we need to refresh the metrics then start the thread if needed
