@@ -57,7 +57,7 @@
 #include <QStyleFactory>
 #endif
 
-#include <math.h> // isnan and isinf
+#include <cmath> // isnan and isinf
 #include "TrainDB.h"
 #include "Library.h"
 
@@ -1186,7 +1186,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 (3.*pow(2,0.3333333333333333)*ad*cdA));
 
             // just in case...
-            if (isnan(vs) || isinf(vs)) vs = 0.00f;
+            if (std::isnan(vs) || std::isinf(vs)) vs = 0.00f;
             rtData.setVirtualSpeed(vs);
 
             // W'bal on the fly

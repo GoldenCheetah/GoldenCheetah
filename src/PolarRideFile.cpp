@@ -21,7 +21,7 @@
 #include <QRegExp>
 #include <QTextStream>
 #include <algorithm> // for std::sort
-#include "math.h"
+#include "cmath"
 
 
 static int polarFileReaderRegistered =

@@ -18,7 +18,7 @@
  */
 
 #include "TimeUtils.h"
-#include <math.h>
+#include <cmath>
 #include <QRegExpValidator>
 #include <QFormLayout>
 #include <QLabel>

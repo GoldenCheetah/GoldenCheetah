@@ -20,7 +20,7 @@
 #include "Settings.h"
 #include "Zones.h"
 #include "HrZones.h"
-#include <math.h>
+#include <cmath>
 #include "Context.h"
 #include "Athlete.h"
 #include <QApplication>

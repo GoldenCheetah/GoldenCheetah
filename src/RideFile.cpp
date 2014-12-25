@@ -31,7 +31,7 @@
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
 #include <assert.h>
-#include <math.h>
+#include <cmath>
 #include <qwt_spline.h>
 
 #define mark() \
@@ -785,23 +785,23 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 {
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind, slope and temperature can be negative of course!
-    if (!isfinite(secs) || secs<0) secs=0;
-    if (!isfinite(cad) || cad<0) cad=0;
-    if (!isfinite(hr) || hr<0) hr=0;
-    if (!isfinite(km) || km<0) km=0;
-    if (!isfinite(kph) || kph<0) kph=0;
-    if (!isfinite(nm) || nm<0) nm=0;
-    if (!isfinite(watts) || watts<0) watts=0;
-    if (!isfinite(interval) || interval<0) interval=0;
-    if (!isfinite(lps) || lps<0) lps=0;
-    if (!isfinite(rps) || rps<0) rps=0;
-    if (!isfinite(lte) || lte<0) lte=0;
-    if (!isfinite(rte) || rte<0) rte=0;
-    if (!isfinite(smo2) || smo2<0) smo2=0;
-    if (!isfinite(thb) || thb<0) thb=0;
-    if (!isfinite(rvert) || rvert<0) rvert=0;
-    if (!isfinite(rcad) || rcad<0) rcad=0;
-    if (!isfinite(rcontact) || rcontact<0) rcontact=0;
+    if (!std::isfinite(secs) || secs<0) secs=0;
+    if (!std::isfinite(cad) || cad<0) cad=0;
+    if (!std::isfinite(hr) || hr<0) hr=0;
+    if (!std::isfinite(km) || km<0) km=0;
+    if (!std::isfinite(kph) || kph<0) kph=0;
+    if (!std::isfinite(nm) || nm<0) nm=0;
+    if (!std::isfinite(watts) || watts<0) watts=0;
+    if (!std::isfinite(interval) || interval<0) interval=0;
+    if (!std::isfinite(lps) || lps<0) lps=0;
+    if (!std::isfinite(rps) || rps<0) rps=0;
+    if (!std::isfinite(lte) || lte<0) lte=0;
+    if (!std::isfinite(rte) || rte<0) rte=0;
+    if (!std::isfinite(smo2) || smo2<0) smo2=0;
+    if (!std::isfinite(thb) || thb<0) thb=0;
+    if (!std::isfinite(rvert) || rvert<0) rvert=0;
+    if (!std::isfinite(rcad) || rcad<0) rcad=0;
+    if (!std::isfinite(rcontact) || rcontact<0) rcontact=0;
 
     // truncate alt out of bounds -- ? should do for all, but uncomfortable about
     //                                 setting an absolute max. At least We know the highest

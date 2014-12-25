@@ -22,7 +22,7 @@
 #include <QSet>
 #include <stdio.h>
 #include <stdint.h>
-#include <math.h>
+#include <cmath>
 
 
 static int syncFileReaderRegistered =

@@ -27,7 +27,7 @@
 #include <QFile>
 #include <QStringList>
 #include <assert.h>
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #ifdef WIN32
     #include <winsock.h>

@@ -20,7 +20,7 @@
 #include "RideFile.h"
 #include "Units.h"
 #include <QString>
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 
 bool

@@ -42,7 +42,7 @@
 #include <QLabel>
 
 #include <QtXml/QtXml>
-#include <math.h>
+#include <cmath>
 
 RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
      GcChartWindow(context), context(context), ridesummary(ridesummary), useCustom(false), useToToday(false), filtered(false), bestsCache(NULL), force(false)

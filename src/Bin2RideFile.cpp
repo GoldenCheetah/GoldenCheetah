@@ -17,7 +17,7 @@
  */
 
 #include "Bin2RideFile.h"
-#include <math.h>
+#include <cmath>
 
 #define START 0x210
 #define UNIT_VERSION 0x2000

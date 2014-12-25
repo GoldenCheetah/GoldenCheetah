@@ -26,7 +26,7 @@
 #include "WPrime.h"
 #include "HelpWhatsThis.h"
 #include <QMap>
-#include <math.h>
+#include <cmath>
 
 // helper function
 static void clearResultsTable(QTableWidget *);

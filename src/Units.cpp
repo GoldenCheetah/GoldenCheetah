@@ -17,7 +17,7 @@
  */
 
 #include "Units.h"
-#include <math.h>
+#include <cmath>
 
 QString kphToPace(double kph, bool metric)
 {

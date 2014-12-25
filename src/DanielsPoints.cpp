@@ -18,7 +18,7 @@
 
 #include "RideMetric.h"
 #include "Zones.h"
-#include <math.h>
+#include <cmath>
 #include <QApplication>
 
 // The idea: Fit a curve to the points system in Table 2.2 of "Daniel's Running

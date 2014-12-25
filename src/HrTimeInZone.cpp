@@ -20,7 +20,7 @@
 #include "RideMetric.h"
 #include "BestIntervalDialog.h"
 #include "HrZones.h"
-#include <math.h>
+#include <cmath>
 #include <QApplication>
 
 class HrZoneTime : public RideMetric {

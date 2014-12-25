@@ -20,7 +20,7 @@
 #include "RideMetric.h"
 #include "PaceZones.h"
 #include "Units.h"
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <QApplication>
 

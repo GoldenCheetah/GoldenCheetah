@@ -24,7 +24,7 @@
 #include "SmallPlot.h"
 #include "RideItem.h"
 #include "HelpWhatsThis.h"
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 #include <QVector>
 #include <QtGui>

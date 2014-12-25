@@ -21,7 +21,7 @@
 #define _GC_MUPlot_h 1
 #include "GoldenCheetah.h"
 #include "MUPool.h"
-#include <math.h> // for erf()
+#include <cmath> // for erf()
 
 #include "CriticalPowerWindow.h"
 

@@ -26,7 +26,7 @@
 #include "PaceZones.h"
 #include "LTMSettings.h" // getAllBestsFor needs this
 
-#include <math.h> // for pow()
+#include <cmath> // for pow()
 #include <QDebug>
 #include <QFileInfo>
 #include <QMessageBox>

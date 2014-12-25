@@ -1643,7 +1643,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NoTemp) continue;
 
         // clean up dodgy values
-        if (isnan(v) || isinf(v)) v = 0;
+        if (std::isnan(v) || std::isinf(v)) v = 0;
 
         // seconds to minutes
         if (m->units(context->athlete->useMetricUnits) == "seconds" ||
@@ -1681,7 +1681,7 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
         if ((distMetric == "average_temp" || distMetric == "max_temp") && v == RideFile::NoTemp) continue;
 
         // clean up dodgy values
-        if (isnan(v) || isinf(v)) v = 0;
+        if (std::isnan(v) || std::isinf(v)) v = 0;
 
         // seconds to minutes
         if (m->units(context->athlete->useMetricUnits) == "seconds" ||

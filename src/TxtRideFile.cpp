@@ -23,7 +23,7 @@
 #include <QVector>
 #include <QDebug>
 #include <algorithm> // for std::sort
-#include "math.h"
+#include "cmath"
 
 static int txtFileReaderRegistered =
     RideFileFactory::instance().registerReader(

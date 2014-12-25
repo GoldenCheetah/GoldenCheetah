@@ -28,7 +28,7 @@
 #include "Settings.h"
 #include "Colors.h" // for ColorEngine
 
-#include <math.h>
+#include <cmath>
 #include <QtAlgorithms>
 #include <QMap>
 #include <QMapIterator>
@@ -492,7 +492,7 @@ RideItem::getStringForSymbol(QString name, bool useMetricUnits)
         if (m) {
 
             double value = metrics_[m->index()];
-            if (isinf(value) || isnan(value)) value=0;
+            if (std::isinf(value) || std::isnan(value)) value=0;
             const_cast<RideMetric*>(m)->setValue(value);
             returning = m->toString(useMetricUnits);
         }

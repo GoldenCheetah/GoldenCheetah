@@ -46,7 +46,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_symbol.h>
 
-#include <math.h> // for isinf() isnan()
+#include <cmath> // for isinf() isnan()
 
 LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) : 
     bg(NULL), parent(parent), context(context), highlighter(NULL), first(first), isolation(false)
@@ -2228,7 +2228,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         double value = ride->getForSymbol(metricDetail.symbol);
 
         // check values are bounded to stop QWT going berserk
-        if (isnan(value) || isinf(value)) value = 0;
+        if (std::isnan(value) || std::isinf(value)) value = 0;
 
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
@@ -2335,7 +2335,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
             value = ride->getForSymbol(metricDetail.symbol);
 
         // check values are bounded to stop QWT going berserk
-        if (isnan(value) || isinf(value)) value = 0;
+        if (std::isnan(value) || std::isinf(value)) value = 0;
 
         // set aggZero to false and value to zero if is temperature and -255
         if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {
@@ -2446,7 +2446,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
         value = best.getForSymbol(metricDetail.bestSymbol);
 
         // check values are bounded to stop QWT going berserk
-        if (isnan(value) || isinf(value)) value = 0;
+        if (std::isnan(value) || std::isinf(value)) value = 0;
 
         // set aggZero to false and value to zero if is temperature and -255
         if (metricDetail.metric && metricDetail.metric->symbol() == "average_temp" && value == RideFile::NoTemp) {

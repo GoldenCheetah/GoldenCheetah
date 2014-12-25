@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <math.h>
+#include <cmath>
 #include <float.h>
 #include "LTMOutliers.h"
 

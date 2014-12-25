@@ -25,7 +25,7 @@
 
 #include "GpxParser.h"
 #include "TimeUtils.h"
-#include <math.h>
+#include <cmath>
 
 // use stc strtod to bypass Qt toDouble() issues
 #include <stdlib.h>

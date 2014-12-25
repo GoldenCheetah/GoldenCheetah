@@ -19,7 +19,7 @@
 #include "RideFile.h"
 #include "RideFileCommand.h"
 #include "RideEditor.h"
-#include <math.h>
+#include <cmath>
 #include <float.h>
 
 // comparing doubles is nasty

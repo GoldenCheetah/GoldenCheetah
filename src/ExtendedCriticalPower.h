@@ -24,7 +24,7 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "RideMetric.h"
-#include <math.h>
+#include <cmath>
 
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>

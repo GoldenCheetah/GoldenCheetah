@@ -18,7 +18,7 @@
 
 #include "RideMetric.h"
 #include "Zones.h"
-#include <math.h>
+#include <cmath>
 #include <QApplication>
 
 const double  bikeScoreN   = 4.0;

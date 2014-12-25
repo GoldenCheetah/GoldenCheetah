@@ -18,7 +18,7 @@
 
 #include "PowerTapDevice.h"
 #include "PowerTapUtil.h"
-#include <math.h>
+#include <cmath>
 #include "assert.h"
 
 #define PT_DEBUG false

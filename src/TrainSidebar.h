@@ -41,7 +41,7 @@
 #include <QFormLayout>
 #include <QSqlTableModel>
 
-#include "math.h" // for round()
+#include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
 
 // Status settings

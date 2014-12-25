@@ -35,7 +35,7 @@
 #include <stdint.h>    // for int8_t, int16_t, etc.
 #include <iostream>
 
-#include "math.h"
+#include "cmath"
 #include "Units.h"
 
 

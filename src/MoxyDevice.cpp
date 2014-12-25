@@ -22,7 +22,7 @@
 #include "Device.h"
 #include "RideFile.h"
 
-#include <math.h>
+#include <cmath>
 #include <errno.h>
 #include <string.h>
 

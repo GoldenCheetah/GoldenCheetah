@@ -24,7 +24,7 @@
 #include "BestIntervalDialog.h"
 #include "PaceZones.h"
 
-#include <math.h>
+#include <cmath>
 #include <QApplication>
 
 class PaceZoneTime : public RideMetric {

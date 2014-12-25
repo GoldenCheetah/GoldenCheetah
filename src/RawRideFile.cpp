@@ -20,7 +20,7 @@
 #include "RawRideFile.h"
 #include "PowerTapUtil.h"
 #include "Units.h"
-#include <math.h>
+#include <cmath>
 
 static int rawFileReaderRegistered =
     RideFileFactory::instance().registerReader(
