@@ -101,7 +101,18 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
     switch(leaf->type) {
     case Leaf::Float : return true;
     case Leaf::Integer : return true;
-    case Leaf::String : return false;
+    case Leaf::String : 
+        {
+            // strings that evaluate as a date
+            // will be returned as a number of days
+            // since 1900!
+            QString string = *(leaf->lvalue.s);
+            if (QDate::fromString(string, "yyyy/MM/dd").isValid())
+                return true;
+            else {
+                return false;
+            }
+        }
     case Leaf::Symbol : 
         {
             QString symbol = *(leaf->lvalue.n);
@@ -489,8 +500,15 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 break;
 
             case Leaf::String :
-                lhsisNumber = false;
-                lhsstring = *(leaf->lvalue.l->lvalue.s);
+                QString string = *(leaf->lvalue.l->lvalue.s);
+                QDate date = QDate::fromString(string, "yyyy/MM/dd");
+                if (date.isValid()) {
+                    lhsdouble = QDate(1900,01,01).daysTo(date);
+                    lhsisNumber = true;
+                } else {
+                    lhsstring = string;
+                    lhsisNumber = false;
+                }
                 break;
 
             break;
@@ -564,8 +582,15 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 break;
 
             case Leaf::String :
-                rhsisNumber = false;
-                rhsstring = *(leaf->rvalue.l->lvalue.s);
+                QString string = *(leaf->rvalue.l->lvalue.s);
+                QDate date = QDate::fromString(string, "yyyy/MM/dd");
+                if (date.isValid()) {
+                    rhsdouble = QDate(1900,01,01).daysTo(date);
+                    rhsisNumber = true;
+                } else {
+                    rhsstring = string;
+                    rhsisNumber = false;
+                }
                 break;
 
             break;
