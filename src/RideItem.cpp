@@ -27,7 +27,16 @@
 #include "PaceZones.h"
 #include "Settings.h"
 #include "Colors.h" // for ColorEngine
+
 #include <math.h>
+#include <QtAlgorithms>
+#include <QMap>
+#include <QMapIterator>
+#include <QByteArray>
+
+#ifdef GC_HAVE_LUCENE
+#include "Lucene.h"
+#endif
 
 // used to create a temporary ride item that is not in the cache and just
 // used to enable using the same calling semantics in things like the
@@ -35,14 +44,14 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) {
+    color(QColor(1,1,1)), isRun(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
-    color(QColor(1,1,1)), isRun(false), fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0) 
+    color(QColor(1,1,1)), isRun(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -51,7 +60,7 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
     :
     ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
     fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), fingerprint(0), 
-    crc(0), timestamp(0), dbversion(0), weight(0) 
+    metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -61,7 +70,7 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
     ride_(ride), fileCache_(NULL), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
-    fingerprint(0), crc(0), timestamp(0), dbversion(0), weight(0)
+    fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -83,7 +92,8 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 	fileName = here.fileName;
 	dateTime = here.dateTime;
 	fingerprint = here.fingerprint;
-	crc = here.crc;
+	metacrc = here.metacrc;
+    crc = here.crc;
 	timestamp = here.timestamp;
 	dbversion = here.dbversion;
 	color = here.color;
@@ -101,6 +111,21 @@ RideItem::setFrom(QHash<QString, RideMetricPtr> computed)
         i.next();
         metrics_[i.value()->index()] = i.value()->value(true);
     }
+}
+
+// calculate metadata crc
+unsigned long 
+RideItem::metaCRC()
+{
+    QMapIterator<QString,QString> i(metadata_);
+    QByteArray ba;
+    i.toFront();
+    while(i.hasNext()) {
+        i.next();
+        ba.append(i.key());
+        ba.append(i.value());
+    }
+    return qChecksum(ba, ba.length());
 }
 
 RideFile *RideItem::ride(bool open)
@@ -323,6 +348,12 @@ RideItem::checkStale()
 
     // still reckon its clean? what about the cache ?
     if (isstale == false) isstale = RideFileCache::checkStale(context, this);
+
+#ifdef GC_HAVE_LUCENE
+    // lucene metadata value ?
+    if (isstale == false && metacrc != metaCRC()) isstale = true;
+#endif
+
     return isstale;
 }
 
@@ -379,9 +410,19 @@ RideItem::refresh()
         dbversion = DBSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
 
-        // RideFile cache needs refreshing possibly ?
+        // RideFile cache needs refreshing possibly
         RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, ride_, true);
-        
+
+        // and Lucene search texts if they have changed since we
+        // last updated lucene for this ride item
+#ifdef GC_HAVE_LUCENE
+        unsigned long mc = metaCRC();
+        if (metacrc != mc) {
+            context->athlete->lucene->importRide(ride_);
+            metacrc = mc;
+        }
+#endif
+
         // close if we opened it
         if (doclose) {
             close();
