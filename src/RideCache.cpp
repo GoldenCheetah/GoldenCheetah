@@ -375,7 +375,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         double count = item->getForSymbol("workout_time"); // for averaging
 
         // check values are bounded, just in case
-        if (isnan(value) || isinf(value)) value = 0;
+        if (std::isnan(value) || std::isinf(value)) value = 0;
 
         // imperial / metric conversion
         if (useMetricUnits == false) {

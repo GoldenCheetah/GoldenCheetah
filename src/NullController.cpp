@@ -22,7 +22,7 @@
 #include "NullController.h"
 #include "RealtimeData.h"
 
-#include <math.h>
+#include <cmath>
 
 NullController::NullController(TrainSidebar *parent,
                                                  DeviceConfiguration *dc)

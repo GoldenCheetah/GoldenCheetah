@@ -18,7 +18,7 @@
 
 #include "RideMetric.h"
 #include "Zones.h"
-#include <math.h>
+#include <cmath>
 #include <QApplication>
 
 class NP : public RideMetric {

@@ -26,7 +26,7 @@
 #include <string.h>
 #include <errno.h>
 #include <QtGui>
-#include <math.h>
+#include <cmath>
 #include "Units.h"
 #include "HelpWhatsThis.h"
 

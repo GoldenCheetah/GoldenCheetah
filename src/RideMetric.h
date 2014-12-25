@@ -25,7 +25,7 @@
 #include <QVector>
 #include <QSharedPointer>
 #include <assert.h>
-#include <math.h>
+#include <cmath>
 #include <QDebug>
 
 #include "RideFile.h"

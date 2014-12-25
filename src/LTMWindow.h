@@ -34,7 +34,7 @@
 #include "LTMCanvasPicker.h"
 #include "GcPane.h"
 
-#include <math.h>
+#include <cmath>
 
 class QwtPlotPanner;
 class QwtPlotPicker;

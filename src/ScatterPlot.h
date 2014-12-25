@@ -29,7 +29,7 @@
 #include "RideItem.h"
 #include "RideFile.h"
 #include "Units.h"
-#include "math.h"
+#include "cmath"
 
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>

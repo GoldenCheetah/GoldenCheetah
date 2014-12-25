@@ -22,7 +22,7 @@
 #include "Settings.h"
 #include "LTMOutliers.h"
 #include "Units.h"
-#include "math.h"
+#include "cmath"
 #include <algorithm>
 #include <QVector>
 #include <QApplication>

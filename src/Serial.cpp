@@ -30,7 +30,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <math.h>
+#include <cmath>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>

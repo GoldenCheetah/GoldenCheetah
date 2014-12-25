@@ -27,7 +27,7 @@
 #include "Colors.h"
 
 #include <QSettings>
-#include <math.h> // for isinf() isnan()
+#include <cmath> // for isinf() isnan()
 
 // Treemap sorter - reversed to do descending
 bool TreeMapLessThan(const TreeMap *a, const TreeMap *b) {

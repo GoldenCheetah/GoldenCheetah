@@ -27,7 +27,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include <assert.h>
-#include <math.h>
+#include <cmath>
 
 /*RouteItem::RouteItem(RouteSegment *route, int type,
                    QString path, QString fileName, const QDateTime &dateTime,

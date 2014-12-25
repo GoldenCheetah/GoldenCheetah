@@ -24,7 +24,7 @@
 #include <QTextStream>
 #include <QVector>
 #include <algorithm> // for std::sort
-#include "math.h"
+#include "cmath"
 
 static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(

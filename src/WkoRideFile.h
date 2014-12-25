@@ -24,7 +24,7 @@
 #include "RideFile.h"
 #include <QDataStream>
 #include <string.h>
-#include <math.h>
+#include <cmath>
 #include <memory>
 #include <QtEndian>
 

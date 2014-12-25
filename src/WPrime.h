@@ -28,7 +28,7 @@
 #include <QVector>
 #include <QThread>
 #include <qwt_spline.h> // smoothing
-#include <math.h>
+#include <cmath>
 
 struct Match {
     int start, stop, secs;       // all in whole seconds

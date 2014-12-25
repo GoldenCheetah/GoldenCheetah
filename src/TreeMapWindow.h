@@ -30,7 +30,7 @@
 #include "SpecialFields.h"
 #include "Specification.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>

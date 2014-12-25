@@ -24,7 +24,7 @@
 #include "RideItem.h"
 #include "HelpWhatsThis.h"
 #include <QMap>
-#include <math.h>
+#include <cmath>
 
 BestIntervalDialog::BestIntervalDialog(Context *context) :
     context(context)

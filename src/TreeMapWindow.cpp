@@ -24,7 +24,7 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Settings.h"
-#include "math.h"
+#include "cmath"
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 

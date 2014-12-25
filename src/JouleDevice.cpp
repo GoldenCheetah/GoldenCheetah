@@ -20,7 +20,7 @@
 #include "DownloadRideDialog.h"
 #include "PowerTapUtil.h"
 #include "Device.h"
-#include <math.h>
+#include <cmath>
 #include <errno.h>
 //#include <termios.h>
 

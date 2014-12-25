@@ -24,7 +24,7 @@
 
 // use stc strtod to bypass Qt toDouble() issues
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 
 FitlogParser::FitlogParser (RideFile* rideFile, QList<RideFile*> *rides)
    : rideFile(rideFile), rides(rides)
