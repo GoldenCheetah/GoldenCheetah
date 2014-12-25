@@ -48,6 +48,7 @@ public:
     // Create/Delete Metrics
 	bool importRide(RideFile *ride);
     bool deleteRide(QString);
+    bool exists(QString);
     void optimise(); // for optimising the index once updated
 
     QStringList &files() { return filenames; }
