@@ -19,6 +19,7 @@
 #include "Lucene.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "RideItem.h"
 
 // stdc strings
 using namespace std;
@@ -132,6 +133,31 @@ bool Lucene::deleteRide(QString name)
         qDebug()<<"deleteDocuments clucene error!"<<e.what();
     }
     return true;
+}
+
+bool Lucene::exists(QString name)
+{
+    bool returning = false;
+    std::wstring cname = name.toStdWString();
+
+    try {
+
+        IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
+
+        Term check = Term(_T("Filename"), cname.c_str());
+        TermDocs *td = reader->termDocs(&check);
+        if (td->next()) returning = true;
+
+        td->close();
+        delete td;
+        reader->close();
+        delete reader;
+
+    } catch (CLuceneError &e) {
+        qDebug()<<"termDocs clucene error!"<<e.what();
+    }
+
+    return returning;
 }
 
 void Lucene::optimise()

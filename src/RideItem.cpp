@@ -351,7 +351,16 @@ RideItem::checkStale()
 
 #ifdef GC_HAVE_LUCENE
     // lucene metadata value ?
-    if (isstale == false && metacrc != metaCRC()) isstale = true;
+    if (isstale == false) {
+        // metadata has changed
+        if (metacrc != metaCRC()) isstale = true;
+
+        // ok, last lets check if its not in the index anyway!
+        else if (!context->athlete->lucene->exists(fileName)) {
+            metacrc = 0; // reset as not present
+            isstale = true;
+        }
+    }
 #endif
 
     return isstale;
