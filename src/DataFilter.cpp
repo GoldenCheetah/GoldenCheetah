@@ -106,7 +106,9 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
         {
             QString symbol = *(leaf->lvalue.n);
             if (symbol == "isRun") return true;
-            if (isCoggan(symbol)) return true;
+            else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
+            else if (isCoggan(symbol)) return true;
             else return df->lookupType.value(symbol, false);
         }
         break;
@@ -158,7 +160,9 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             if (lookup == "") {
 
                 // isRun isa special, we may add more later (e.g. date)
-                if (symbol != "isRun" && !isCoggan(symbol))
+                if (symbol.compare("Date", Qt::CaseInsensitive) && 
+                    symbol.compare("Today", Qt::CaseInsensitive) && 
+                    symbol != "isRun" && !isCoggan(symbol))
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
             }
         }
@@ -438,6 +442,16 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                     lhsdouble = m->isRun ? 1 : 0;
                     lhsisNumber = true;
 
+                } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
+
+                    lhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
+                    lhsisNumber = true;
+
+                } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
+
+                    lhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
+                    lhsisNumber = true;
+
                 } else if (isCoggan(symbol)) {
                     // a coggan PMC metric
                     PMCData *pmcData = context->athlete->getPMCFor("coggan_tss");
@@ -501,6 +515,16 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 if (symbol == "isRun") {
 
                     rhsdouble = m->isRun ? 1 : 0;
+                    rhsisNumber = true;
+
+                } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
+
+                    rhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
+                    rhsisNumber = true;
+
+                } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
+
+                    rhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
                     rhsisNumber = true;
 
                 } else if (isCoggan(symbol)) {
