@@ -156,6 +156,9 @@ class RideFileCache
         // once a cache is loaded we can refresh from in-memory if needed
         void refresh(RideFile*ride = NULL);
 
+        // are we stale ?
+        static bool checkStale(Context *context, RideItem*item);
+
         // Just get mean max values for power & wpk for a ride
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QDate from, QDate to);
         static QVector<float> meanMaxPowerFor(Context *context, QVector<float>&wpk, QString filename);

@@ -321,6 +321,8 @@ RideItem::checkStale()
         }
     }
 
+    // still reckon its clean? what about the cache ?
+    if (isstale == false) isstale = RideFileCache::checkStale(context, this);
     return isstale;
 }
 
@@ -377,6 +379,9 @@ RideItem::refresh()
         dbversion = DBSchemaVersion;
         timestamp = QDateTime::currentDateTime().toTime_t();
 
+        // RideFile cache needs refreshing possibly ?
+        RideFileCache updater(context, context->athlete->home->activities().canonicalPath() + "/" + fileName, ride_, true);
+        
         // close if we opened it
         if (doclose) {
             close();

@@ -134,6 +134,48 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     }
 }
 
+bool 
+RideFileCache::checkStale(Context *context, RideItem*item)
+{
+    // check if we're stale ?
+    // Get info for ride file and cache file
+    QString rideFileName = context->athlete->home->activities().canonicalPath() + "/" + item->fileName;
+    QFileInfo rideFileInfo(rideFileName);
+    QString cacheFileName = context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx";
+    QFileInfo cacheFileInfo(cacheFileName);
+
+    // is it up-to-date?
+    if (cacheFileInfo.exists() && cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
+
+        // we have a file, it is more recent than the ride file
+        // but is it the latest version?
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFileName);
+        if (cacheFile.open(QIODevice::ReadOnly) == true) {
+
+            // read the header
+            QDataStream inFile(&cacheFile);
+            inFile.readRawData((char *) &head, sizeof(head));
+            cacheFile.close();
+
+            // its more recent -or- the crc is the same
+            if (rideFileInfo.lastModified() <= cacheFileInfo.lastModified() ||
+                head.crc == RideFile::computeFileCRC(rideFileName)) {
+ 
+                // it is the same ?
+                if (head.version == RideFileCacheVersion) {
+
+                    // WE'RE GOOD
+                    return false;
+                }
+            }
+        }
+    }
+
+    // its stale !
+    return true;
+}
+
 // returns offset from end of head
 static long offsetForMeanMax(RideFileCacheHeader head, RideFile::SeriesType series)
 {
