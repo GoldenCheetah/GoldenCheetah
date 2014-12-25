@@ -431,7 +431,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 #ifdef GC_HAVE_MUMODEL
     addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
 #endif
-    addHelper(QString(tr("CP/CV Model")), helper);
+    addHelper(QString(tr("Model")), helper);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
