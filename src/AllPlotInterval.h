@@ -60,7 +60,7 @@ class AllPlotInterval : public QwtPlot
 
         void setDataFromRide(RideItem *_rideItem);
 
-        bool bydist;
+        bool bydist = false;
 
 
 

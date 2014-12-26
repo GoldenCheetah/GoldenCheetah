@@ -35,8 +35,8 @@
 class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
 {
     public:
-    AllPlotIntervalData(AllPlotInterval *plot, Context *context, int level, const RideFileInterval interval) :
-        plot(plot), context(context), level(level), interval(interval) {}
+    AllPlotIntervalData(AllPlotInterval *plot, Context *context, int level, int max, const RideFileInterval interval) :
+        plot(plot), context(context), level(level), max(max), interval(interval) {}
 
     double x(size_t i) const ;
     double ymin(size_t) const ;
@@ -51,6 +51,7 @@ class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
     AllPlotInterval *plot;
     Context *context;
     int level;
+    int max;
     const RideFileInterval interval;
 
     virtual QwtIntervalSample sample(size_t i) const;
@@ -103,7 +104,6 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     setAxisScale(QwtPlot::xBottom, 0, context->ride->ride(true)->maximumFor(RideFile::secs));
 
     setAxisVisible(yLeft, false);
-    setAxisScale(yLeft, 0, 10000);
 
     tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxis::yLeft,
                                    QwtPicker::NoRubberBand,
@@ -180,6 +180,9 @@ AllPlotInterval::sortIntervals()
             }
          }
     }
+
+    setFixedHeight(30+intervalLigns.count()*20);
+    setAxisScale(yLeft, 0, 3000*intervalLigns.count());
 }
 
 void
@@ -228,10 +231,10 @@ AllPlotInterval::refreshIntervalMarkers()
 
             mrk->setYAxis(yLeft);
             if (!bydist)
-                mrk->setValue(interval.start / 60.0, 7700-3000*(level));
+                mrk->setValue(interval.start / 60.0, 3000*intervalLigns.count()-2200-3000*level);
             else
                 mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
-                                rideItem->ride()->timeToDistance(interval.start), 7700-3000*(level));
+                                rideItem->ride()->timeToDistance(interval.start), 3000*intervalLigns.count()-2200-3000*level);
             mrk->setLabel(text);
 
             /*qDebug() << "width()" << width() << "widthMM()" << widthMM() << devicePixelRatio();
@@ -281,7 +284,8 @@ AllPlotInterval::refreshIntervalCurve()
             ihlbrush.setAlpha(128);
             intervalCurve->setBrush(ihlbrush);   // fill below the line
 
-            intervalCurve->setSamples(new AllPlotIntervalData(this, context, level, interval));
+            int max = 3000*intervalLigns.count();
+            intervalCurve->setSamples(new AllPlotIntervalData(this, context, level, max, interval));
 
             intervalCurve->attach(this);
             curves.insert(interval, intervalCurve);
@@ -368,7 +372,7 @@ AllPlotIntervalData::x(size_t i) const
 double
 AllPlotIntervalData::ymin(size_t) const
 {
-    return 8000-3000*(level);
+    return max-2000-3000*(level);
 }
 
 double
@@ -376,8 +380,8 @@ AllPlotIntervalData::ymax(size_t i) const
 {
     switch (i%4) {
         case 0 : return ymin(i); // bottom left
-        case 1 : return 10000-3000*(level); // top left
-        case 2 : return 10000-3000*(level); // top right
+        case 1 : return max-3000*(level); // top left
+        case 2 : return max-3000*(level); // top right
         case 3 : return ymin(i); // bottom right
     }
     return 0; // shouldn't get here, but keeps compiler happy
