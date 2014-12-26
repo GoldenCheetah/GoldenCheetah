@@ -101,8 +101,10 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtPlot::xBottom)->setPalette(pal);
-    enableAxis(xBottom, true);
-    setAxisVisible(xBottom, true);
+
+    enableAxis(xBottom, false);
+    setAxisVisible(xBottom, false);
+
     setAxisScale(QwtPlot::xBottom, 0, context->ride->ride(true)->maximumFor(RideFile::secs));
 
     setAxisVisible(yLeft, false);
@@ -137,7 +139,7 @@ AllPlotInterval::setDataFromRide(RideItem *_rideItem)
     rideItem = _rideItem;
     if (rideItem == NULL) return;
 
-    recalc();
+    refreshIntervals();
 }
 
 void
@@ -145,15 +147,7 @@ AllPlotInterval::refreshIntervals()
 {
     sortIntervals();
     refreshIntervalCurve();
-    refreshIntervalMarkers();
-}
-
-void
-AllPlotInterval::recalc()
-{
-    sortIntervals();
-    refreshIntervalCurve();
-    refreshIntervalMarkers();
+    //refreshIntervalMarkers();
 }
 
 // Compare two RideFileInterval on duration.
@@ -200,7 +194,7 @@ AllPlotInterval::sortIntervals()
          }
     }
 
-    setFixedHeight(30+intervalLigns.count()*20);
+    setFixedHeight(10+intervalLigns.count()*10);
     setAxisScale(yLeft, 0, 3000*intervalLigns.count());
 }
 
