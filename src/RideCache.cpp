@@ -698,20 +698,40 @@ RideCache::getRankedValues(QString field)
         QString value = item->metadata().value(field, "");
         if (value != "") {
             int count = returning.value(value,0);
-            returning.insert(value,count);
+            returning.insert(value,++count);
         }
     }    
     return returning;
 }
 
+class OrderedList {
+    public:
+        OrderedList(QString string, int rank) : string(string), rank(rank) {}
+        QString string;
+        int rank;
+};
+
+bool rideCacheOrderListGreaterThan(const OrderedList a, const OrderedList b) { return a.rank > b.rank; }
+
 QStringList
 RideCache::getDistinctValues(QString field)
 {
     QStringList returning;
+
+    // ranked
     QHashIterator<QString,int> i(getRankedValues(field));
+    QList<OrderedList> ranked;
     while(i.hasNext()) {
         i.next();
-        returning << i.key();
+        ranked << OrderedList(i.key(), i.value());
     }
+
+    // sort from big to small
+    qSort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
+
+    // extract ordered values
+    foreach(OrderedList x, ranked)
+        returning << x.string;
+
     return returning;
 }
