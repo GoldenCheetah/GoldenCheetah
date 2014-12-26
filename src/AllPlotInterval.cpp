@@ -148,7 +148,7 @@ AllPlotInterval::recalc()
 void
 AllPlotInterval::sortIntervals()
 {
-    QList<RideFileInterval> intervals = rideItem->ride(true)->intervals();
+    QList<RideFileInterval> intervals = rideItem->ride()->intervals();
     qSort(intervals.begin(), intervals.end(), intervalBiggerThan);
 
     intervalLigns.clear();
@@ -299,7 +299,7 @@ AllPlotInterval::refreshIntervalCurve()
 void
 AllPlotInterval::intervalsChanged()
 {
-    if (rideItem == NULL) return;
+    if (rideItem == NULL || !rideItem->isOpen()) return;
 
     recalc();
 }
