@@ -59,8 +59,7 @@ class AllPlotInterval : public QwtPlot
         AllPlotInterval(QWidget *parent, Context *context);
 
         void setDataFromRide(RideItem *_rideItem);
-
-        bool bydist = false;
+        bool bydist;
 
 
 

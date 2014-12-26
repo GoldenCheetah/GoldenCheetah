@@ -83,6 +83,7 @@ class TimeScaleDraw: public ScaleScaleDraw
 
 AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     QwtPlot(parent),
+    bydist(false),
     context(context)
 {
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
@@ -463,7 +464,6 @@ void
 AllPlotIntervalCanvasPicker::select(const QPoint &pos, bool clicked)
 {
     QwtPlotIntervalCurve *curve = NULL;
-    double dist = 10e10;
     int index = -1;
 
     const QwtPlotItemList& itmList = plot()->itemList();
