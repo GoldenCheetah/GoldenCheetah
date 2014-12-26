@@ -948,7 +948,7 @@ RideNavigator::setRide(RideItem*rideItem)
         QModelIndex group = tableView->model()->index(i,0,QModelIndex());
         for (int j=0; j<tableView->model()->rowCount(group); j++) {
 
-            QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
+            QString fileName = tableView->model()->data(tableView->model()->index(j,3, group), Qt::DisplayRole).toString();
             if (fileName == rideItem->fileName) {
                 // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
                 QItemSelection row(tableView->model()->index(j,0,group),
