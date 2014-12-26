@@ -123,7 +123,7 @@ bool
     {
         alt = buffer.toDouble();  // metric
     }
-    else if (qName == "gpxtpx:hr")
+    else if (qName == "gpxtpx:hr" || qName == "heartrate")
     {
         hr = buffer.toInt();
     }
@@ -135,7 +135,7 @@ bool
     {
         temp = buffer.toDouble();
     }
-    else if ((qName == "gpxdata:cadence") || (qName == "gpxtpx:cad"))
+    else if ((qName == "gpxdata:cadence") || (qName == "gpxtpx:cad") || qName == "cadence")
     {
         cad = buffer.toDouble();
     }
