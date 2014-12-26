@@ -5783,15 +5783,20 @@ double IntervalPlotData::x(size_t i) const
     // overlap at right ?
     double right = allPlot->bydist ? multiplier * current->stopKM : current->stop/60;
 
+
     if (i%4 == 2 || i%4 == 3) {
         for (int n=1; n<=intervalCount(); n++) {
             IntervalItem *other = intervalNum(n);
             if (other != current) {
                 if (other->start < current->stop && other->stop > current->stop) {
                     if (other->start < current->start) {
-                        right = allPlot->bydist ? multiplier * current->startKM : current->start/60;
+                        double _right = allPlot->bydist ? multiplier * current->startKM : current->start/60;
+                        if (_right<right)
+                            right = _right;
                     } else  {
-                        right = allPlot->bydist ? multiplier * other->startKM : other->start/60;
+                        double _right = allPlot->bydist ? multiplier * other->startKM : other->start/60;
+                        if (_right<right)
+                            right = _right;
                     }
                 }
             }
