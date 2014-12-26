@@ -58,14 +58,17 @@ class AllPlotInterval : public QwtPlot
 
         AllPlotInterval(QWidget *parent, Context *context);
 
+        void refreshIntervals();
+
         void setDataFromRide(RideItem *_rideItem);
+        void setByDistance(int id);
+
         bool bydist;
 
 
 
 
     public slots:
-        void intervalsChanged();
         void intervalHover(RideFileInterval chosen);
         void intervalCurveHover(QwtPlotIntervalCurve *); // for tooltip
         void intervalCurveClick(QwtPlotIntervalCurve *curve);
