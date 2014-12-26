@@ -604,20 +604,7 @@ RideSummaryWindow::htmlSummary()
 
                  // get the value - from metrics or from data array
                  if (ridesummary) s = s.arg(time_to_string(rideItem->getForSymbol(symbol)));
-                 else {
-                      QStringList filterList = filters;
-                      if (context->ishomefiltered) {
-                          if (filtered) {
-                              foreach (QString file, filters) {
-                                  if (context->homeFilters.contains(file)) 
-                                      filterList << file;
-                              }
-                          } else {
-                              filterList = context->homeFilters;
-                          }
-                      }
-                      s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
-                }
+                 else s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
 
              } else {
                  if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
@@ -638,21 +625,7 @@ RideSummaryWindow::htmlSummary()
                     bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
 
                     if (ridesummary) pace  = rideItem->getForSymbol(symbol) * (metricPace ? 1 : m->conversion()) + (metricPace ? 0 : m->conversionSum());
-                    else {
-                      QStringList filterList = filters;
-                      if (context->ishomefiltered) {
-                          if (filtered) {
-                              foreach (QString file, filters) {
-                                  if (context->homeFilters.contains(file)) 
-                                      filterList << file;
-                              }
-                          } else {
-                              filterList = context->homeFilters;
-                          }
-                      }
-                      pace = context->athlete->rideCache->getAggregate(symbol, specification, metricPace).toDouble();
-                    }
-
+                    else  pace = context->athlete->rideCache->getAggregate(symbol, specification, metricPace).toDouble();
                     s = s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
 
                  } else {
@@ -668,20 +641,7 @@ RideSummaryWindow::htmlSummary()
                             }
                             s = s.arg(v);
         
-                    } else {
-                      QStringList filterList = filters;
-                      if (context->ishomefiltered) {
-                          if (filtered) {
-                              foreach (QString file, filters) {
-                                  if (context->homeFilters.contains(file)) 
-                                      filterList << file;
-                              }
-                          } else {
-                              filterList = context->homeFilters;
-                          }
-                      }
-                      s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
-                   }
+                    } else s = s.arg(context->athlete->rideCache->getAggregate(symbol, specification, useMetricUnits));
                  }
             }
 
@@ -772,18 +732,6 @@ RideSummaryWindow::htmlSummary()
             const RideMetric *m = factory.rideMetric(bestsColumn[i]);
             summary = summary.arg(m->name());
 
-            // get top n
-            QStringList filterList = filters;
-            if (context->ishomefiltered) {
-                if (filtered) {
-                    foreach (QString file, filters) {
-                        if (context->homeFilters.contains(file)) 
-                            filterList << file;
-                    }
-                } else {
-                    filterList = context->homeFilters;
-                }
-            }
             QList<AthleteBest> bests = context->athlete->rideCache->getBests(bestsColumn[i], 10, specification, useMetricUnits);
 
             // show tsb when recorded
@@ -843,16 +791,6 @@ RideSummaryWindow::htmlSummary()
                         // if using metrics or data
                         if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(paceTimeInZones[i]);
                         else { // *** THIS IS NOT RELEVANT YET -- NO SUMMARISING FOR SEASONS ***
-                            QStringList filterList = filters;
-                            if (context->ishomefiltered) {
-                                if (filtered) {
-                                    foreach (QString file, filters) {
-                                        if (context->homeFilters.contains(file)) filterList << file;
-                                    }
-                                } else {
-                                    filterList = context->homeFilters;
-                                }
-                            }
                             time_in_zone[i] = context->athlete->rideCache->getAggregate(paceTimeInZones[i], specification, useMetricUnits, true).toDouble();
                         }
                     }
@@ -886,20 +824,7 @@ RideSummaryWindow::htmlSummary()
 
                 // if using metrics or data
                 if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(timeInZones[i]);
-                else {
-                    QStringList filterList = filters;
-                    if (context->ishomefiltered) {
-                        if (filtered) {
-                            foreach (QString file, filters) {
-                                if (context->homeFilters.contains(file)) 
-                                    filterList << file;
-                            }
-                        } else {
-                            filterList = context->homeFilters;
-                        }
-                    }
-                    time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZones[i], specification, useMetricUnits, true).toDouble();
-                }
+                else time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZones[i], specification, useMetricUnits, true).toDouble();
             }
             summary += tr("<h3>Power Zones</h3>");
             summary += context->athlete->zones()->summarize(range, time_in_zone, altColor); //aggregating
@@ -935,20 +860,7 @@ RideSummaryWindow::htmlSummary()
 
             // if using metrics or data
             if (ridesummary) time_in_zone[i] = rideItem->getForSymbol(timeInZonesHR[i]);
-            else {
-                QStringList filterList = filters;
-                if (context->ishomefiltered) {
-                    if (filtered) {
-                        foreach (QString file, filters) {
-                            if (context->homeFilters.contains(file)) 
-                                filterList << file;
-                        }
-                    } else {
-                        filterList = context->homeFilters;
-                    }
-                }
-                time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesHR[i], specification, useMetricUnits, true).toDouble();
-            }
+            else time_in_zone[i] = context->athlete->rideCache->getAggregate(timeInZonesHR[i], specification, useMetricUnits, true).toDouble();
         }
 
         summary += tr("<h3>Heart Rate Zones</h3>");
