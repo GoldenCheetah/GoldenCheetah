@@ -1154,9 +1154,15 @@ RideSummaryWindow::htmlSummary()
         }
         summary += "</tr>";
 
-        // activities 1 per row
+        // activities 1 per row - in reverse order
         bool even = false;
-        foreach (RideItem *ride, context->athlete->rideCache->rides()) {
+        
+        QVectorIterator<RideItem*> ridelist(context->athlete->rideCache->rides());
+        ridelist.toBack();
+
+        while (ridelist.hasPrevious()) {
+
+            RideItem *ride = ridelist.previous();
 
             // apply the filter if there is one active
             if (!specification.pass(ride)) continue;
@@ -1250,7 +1256,12 @@ RideSummaryWindow::htmlSummary()
 
         // activities 1 per row
         even = false;
-        foreach (RideItem *ride, context->athlete->rideCache->rides()) {
+
+        // iterate once again
+        ridelist.toBack();
+        while (ridelist.hasPrevious()) {
+
+            RideItem *ride = ridelist.previous();
 
             // apply the filter if there is one active
             if (!specification.pass(ride)) continue;
