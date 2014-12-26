@@ -66,6 +66,7 @@ class AllPlotInterval : public QwtPlot
 
 
     public slots:
+        void intervalsChanged();
         void intervalHover(RideFileInterval chosen);
         void intervalCurveHover(QwtPlotIntervalCurve *); // for tooltip
         void intervalCurveClick(QwtPlotIntervalCurve *curve);

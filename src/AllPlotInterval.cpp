@@ -113,6 +113,7 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
 
     canvasPicker = new AllPlotIntervalCanvasPicker(this);
 
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotIntervalCurve*, int)), this, SLOT(intervalCurveHover(QwtPlotIntervalCurve*)));
     connect(canvasPicker, SIGNAL(pointClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveClick(QwtPlotIntervalCurve*)));
@@ -124,7 +125,7 @@ void
 AllPlotInterval::setDataFromRide(RideItem *_rideItem)
 {
     rideItem = _rideItem;
-    if (_rideItem == NULL) return;
+    if (rideItem == NULL) return;
 
     recalc();
 }
@@ -146,7 +147,7 @@ AllPlotInterval::recalc()
 void
 AllPlotInterval::sortIntervals()
 {
-    QList<RideFileInterval> intervals = rideItem->ride()->intervals();
+    QList<RideFileInterval> intervals = rideItem->ride(true)->intervals();
     qSort(intervals.begin(), intervals.end(), intervalBiggerThan);
 
     intervalLigns.clear();
@@ -292,6 +293,14 @@ AllPlotInterval::refreshIntervalCurve()
         }
         level++;
     }
+}
+
+void
+AllPlotInterval::intervalsChanged()
+{
+    if (rideItem == NULL) return;
+
+    recalc();
 }
 
 void
