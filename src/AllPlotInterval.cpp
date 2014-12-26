@@ -35,8 +35,8 @@
 class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
 {
     public:
-    AllPlotIntervalData(AllPlotInterval *plot, Context *context, int level, int max, const RideFileInterval interval) :
-        plot(plot), context(context), level(level), max(max), interval(interval) {}
+    AllPlotIntervalData(AllPlotInterval *plot, Context *context, int level, int max, RideItem *rideItem, const RideFileInterval interval) :
+        plot(plot), context(context), level(level), max(max), rideItem(rideItem), interval(interval) {}
 
     double x(size_t i) const ;
     double ymin(size_t) const ;
@@ -48,6 +48,7 @@ class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
     IntervalItem *intervalNum(int n) const;
     int intervalCount() const;
 
+    RideItem *rideItem;
     AllPlotInterval *plot;
     Context *context;
     int level;
@@ -114,12 +115,20 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
 
     canvasPicker = new AllPlotIntervalCanvasPicker(this);
 
-    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotIntervalCurve*, int)), this, SLOT(intervalCurveHover(QwtPlotIntervalCurve*)));
     connect(canvasPicker, SIGNAL(pointClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveClick(QwtPlotIntervalCurve*)));
 
 
+}
+
+void
+AllPlotInterval::setByDistance(int id)
+{
+    bydist = (id == 1);
+    if (rideItem == NULL) return;
+
+    //recalc();
 }
 
 void
@@ -129,6 +138,14 @@ AllPlotInterval::setDataFromRide(RideItem *_rideItem)
     if (rideItem == NULL) return;
 
     recalc();
+}
+
+void
+AllPlotInterval::refreshIntervals()
+{
+    sortIntervals();
+    refreshIntervalCurve();
+    refreshIntervalMarkers();
 }
 
 void
@@ -287,21 +304,13 @@ AllPlotInterval::refreshIntervalCurve()
             intervalCurve->setBrush(ihlbrush);   // fill below the line
 
             int max = 3000*intervalLigns.count();
-            intervalCurve->setSamples(new AllPlotIntervalData(this, context, level, max, interval));
+            intervalCurve->setSamples(new AllPlotIntervalData(this, context, level, max, rideItem, interval));
 
             intervalCurve->attach(this);
             curves.insert(interval, intervalCurve);
         }
         level++;
     }
-}
-
-void
-AllPlotInterval::intervalsChanged()
-{
-    if (rideItem == NULL || !rideItem->isOpen()) return;
-
-    recalc();
 }
 
 void
@@ -370,10 +379,10 @@ AllPlotIntervalData::x(size_t i) const
 
     // which point are we returning?
     switch (i%4) {
-        case 0 : return plot->bydist ? multiplier * interval.start : interval.start/60; // bottom left
-        case 1 : return plot->bydist ? multiplier * interval.start : interval.start/60; // top left
-        case 2 : return plot->bydist ? multiplier * interval.stop : interval.stop/60; // top right
-        case 3 : return plot->bydist ? multiplier * interval.stop : interval.stop/60; // bottom right
+        case 0 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.start) : interval.start/60; // bottom left
+        case 1 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.start) : interval.start/60; // top left
+        case 2 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.stop) : interval.stop/60; // top right
+        case 3 : return plot->bydist ? multiplier * rideItem->ride()->timeToDistance(interval.stop) : interval.stop/60; // bottom right
     }
     return 0; // shouldn't get here, but keeps compiler happy
 }

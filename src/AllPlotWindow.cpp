@@ -1447,6 +1447,9 @@ AllPlotWindow::intervalsChanged()
     fullPlot->refreshIntervalMarkers();
     fullPlot->replot();
 
+    intervalPlot->refreshIntervals();
+    intervalPlot->replot();
+
     // allPlot of course
     allPlot->refreshIntervalMarkers();
     allPlot->replot();
@@ -2837,6 +2840,7 @@ AllPlotWindow::setByDistance(int value)
     }
 
     fullPlot->setByDistance(value);
+    intervalPlot->setByDistance(value);
     allPlot->setByDistance(value);
 
     // refresh controls, specifically spanSlider
