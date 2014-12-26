@@ -76,7 +76,6 @@ class AllPlotInterval : public QwtPlot
 
 
     protected:
-        void recalc();
         void sortIntervals();
         void refreshIntervalCurve();
         void refreshIntervalMarkers();
