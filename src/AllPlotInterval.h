@@ -76,9 +76,9 @@ class AllPlotInterval : public QwtPlot
 
 
     protected:
-        void sortIntervals();
+        void sortIntervals(QList<RideFileInterval> &intervals, QList<QList<RideFileInterval> > &intervalsGroups);
+        void placeIntervals();
         void refreshIntervalCurve();
-        void refreshIntervalMarkers();
 
         Context *context;
         RideItem *rideItem;
@@ -90,6 +90,7 @@ class AllPlotInterval : public QwtPlot
         QMap<RideFileInterval, QwtPlotIntervalCurve*>   curves;
 
     private:
+        void setColorForIntervalCurve(QwtPlotIntervalCurve *intervalCurve, const RideFileInterval &interval, bool selected);
 
         AllPlotIntervalCanvasPicker *canvasPicker; // allow point selection/hover
         LTMToolTip *tooltip;
