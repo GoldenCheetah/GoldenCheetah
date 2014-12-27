@@ -90,6 +90,9 @@ struct RideFileInterval
     bool operator< (RideFileInterval right) const { return start < right.start; }
     bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop; }
     bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
+
+    bool isPeak() const { return QRegExp("^(Peak *[0-9]*(s|min)|Entire workout|Find #[0-9]*) *\\([^)]*\\)$").exactMatch(name); }
+    bool isMatch() const { return QRegExp("^(Match ).*").exactMatch(name); }
 };
 
 struct RideFileCalibration
