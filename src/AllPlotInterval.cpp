@@ -85,7 +85,8 @@ class TimeScaleDraw: public ScaleScaleDraw
 AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     QwtPlot(parent),
     bydist(false),
-    context(context)
+    context(context),
+    groupMatch(false)
 {
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
@@ -167,7 +168,7 @@ AllPlotInterval::sortIntervals(QList<RideFileInterval> &intervals, QList< QList<
     for (int i=0; i<intervals.count(); i++) {
         RideFileInterval interval = intervals.at(i);
 
-        if (interval.isMatch()) {
+        if (groupMatch && interval.isMatch()) {
             matchesGroup.append(interval);
             intervals.removeOne(interval);
             //intervals.move(i, place++);
