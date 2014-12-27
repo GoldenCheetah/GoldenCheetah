@@ -194,7 +194,7 @@ AllPlotInterval::sortIntervals()
          }
     }
 
-    setFixedHeight(10+intervalLigns.count()*10);
+    setFixedHeight((1+intervalLigns.count())*10);
     setAxisScale(yLeft, 0, 3000*intervalLigns.count());
 }
 
@@ -295,6 +295,7 @@ AllPlotInterval::refreshIntervalCurve()
             intervalCurve->setPen(ihlPen);
             QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
             ihlbrush.setAlpha(128);
+            intervalCurve->setPen(ihlbrush);   // fill below the line
             intervalCurve->setBrush(ihlbrush);   // fill below the line
 
             int max = 3000*intervalLigns.count();
@@ -318,6 +319,7 @@ AllPlotInterval::intervalHover(RideFileInterval chosen)
         } else  {
             QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
             ihlbrush.setAlpha(128);
+            curves.value(interval)->setPen(ihlbrush);
             curves.value(interval)->setBrush(ihlbrush);
         }
     }
