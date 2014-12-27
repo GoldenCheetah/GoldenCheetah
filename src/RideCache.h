@@ -80,10 +80,6 @@ class RideCache : public QObject
         void addRide(QString name, bool dosignal);
         void removeCurrentRide();
 
-        // restore / dump cache to disk (json)
-        void load();
-        void save();
-
         // export metrics in CSV format
         void writeAsCSV(QString filename);
 
@@ -95,6 +91,10 @@ class RideCache : public QObject
         void refreshCPModelMetrics();
 
     public slots:
+
+        // restore / dump cache to disk (json)
+        void load();
+        void save();
 
         // user updated options/preferences
         void configChanged();

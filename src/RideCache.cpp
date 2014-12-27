@@ -77,6 +77,7 @@ RideCache::RideCache(Context *context) : context(context)
     connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // future watching
+    connect(&watcher, SIGNAL(finished()), this, SLOT(save()));
     connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
     connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
     connect(&watcher, SIGNAL(progressValueChanged(int)), this, SLOT(progressing(int)));
