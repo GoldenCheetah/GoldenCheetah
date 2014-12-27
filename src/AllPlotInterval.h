@@ -95,6 +95,8 @@ class AllPlotInterval : public QwtPlot
         AllPlotIntervalCanvasPicker *canvasPicker; // allow point selection/hover
         LTMToolTip *tooltip;
 
+        bool groupMatch;
+
 };
 
 
