@@ -122,6 +122,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     // right click menus...
     connect(rideNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
     connect(context->athlete->intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showIntervalMenu(const QPoint &)));
+    connect(context->athlete->intervalWidget,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(clickZoomInterval(QTreeWidgetItem*)));
 
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
@@ -585,6 +586,12 @@ AnalysisSidebar::editInterval()
         context->athlete->updateRideFileIntervals(); // will emit intervalChanged() signal
         context->athlete->intervalWidget->update();
     }
+}
+
+void
+AnalysisSidebar::clickZoomInterval(QTreeWidgetItem*item)
+{
+    context->notifyIntervalZoom((IntervalItem*)item);
 }
 
 void

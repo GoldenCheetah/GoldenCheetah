@@ -28,6 +28,10 @@
 #include "IntervalTreeView.h"
 #include "IntervalSummaryWindow.h"
 
+#include <QTreeWidgetItem>
+#include <QTreeWidget>
+#include <QWidget>
+
 class AnalysisSidebar : public QWidget
 {
     Q_OBJECT
@@ -73,6 +77,7 @@ class AnalysisSidebar : public QWidget
         void renameIntervalsSelected(void); // from menu popup -- rename a series
         void editIntervalSelected(); // from menu popup
         void deleteIntervalSelected(void); // from menu popup
+        void clickZoomInterval(QTreeWidgetItem*); // from treeview
         void zoomIntervalSelected(void); // from menu popup
         void zoomOut();
         void createRouteIntervalSelected(void); // from menu popup
