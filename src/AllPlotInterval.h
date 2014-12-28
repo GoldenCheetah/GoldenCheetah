@@ -37,12 +37,13 @@ public:
     virtual bool event(QEvent *);
 
 signals:
+    void pointDblClicked(QwtPlotIntervalCurve *, int);
     void pointClicked(QwtPlotIntervalCurve *, int);
     void pointHover(QwtPlotIntervalCurve *, int);
 
 private:
     QwtPlotCanvas *canvas;
-    void select(const QPoint &, bool);
+    void select(const QPoint &, bool, bool dblClicked);
     QwtPlot *plot() { return (QwtPlot *)parent(); }
     const QwtPlot *plot() const { return (QwtPlot *)parent(); }
     QwtPlotIntervalCurve *d_selectedCurve;
@@ -72,6 +73,7 @@ class AllPlotInterval : public QwtPlot
         void intervalHover(RideFileInterval chosen);
         void intervalCurveHover(QwtPlotIntervalCurve *); // for tooltip
         void intervalCurveClick(QwtPlotIntervalCurve *curve);
+        void intervalCurveDblClick(QwtPlotIntervalCurve *curve);
 
 
 

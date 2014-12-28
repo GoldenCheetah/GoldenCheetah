@@ -121,6 +121,7 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotIntervalCurve*, int)), this, SLOT(intervalCurveHover(QwtPlotIntervalCurve*)));
     connect(canvasPicker, SIGNAL(pointClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveClick(QwtPlotIntervalCurve*)));
+    connect(canvasPicker, SIGNAL(pointDblClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveDblClick(QwtPlotIntervalCurve*)));
 
 
 }
@@ -287,7 +288,10 @@ void
 AllPlotInterval::intervalHover(RideFileInterval chosen)
 {
     foreach(RideFileInterval interval, curves.keys()) {
-        if (chosen == interval || context->athlete->allIntervalItems()->child(rideItem->ride()->intervals().indexOf(interval))->isSelected()) {
+        if (chosen == interval ||
+                (rideItem->ride()->intervals().indexOf(interval) > -1 &&
+                 context->athlete->allIntervalItems()->child(rideItem->ride()->intervals().indexOf(interval)) != NULL &&
+                 context->athlete->allIntervalItems()->child(rideItem->ride()->intervals().indexOf(interval))->isSelected() )) {
             setColorForIntervalCurve(curves.value(interval), interval, true);
         } else  {
             setColorForIntervalCurve(curves.value(interval), interval, false);
@@ -327,6 +331,18 @@ AllPlotInterval::intervalCurveClick(QwtPlotIntervalCurve *curve) {
                     context->athlete->allIntervalItems()->child(i)->setSelected(false);
             }
         }
+    }
+}
+
+void
+AllPlotInterval::intervalCurveDblClick(QwtPlotIntervalCurve *curve) {
+    RideFileInterval interval = curves.key(curve);
+    int  idx = rideItem->ride()->intervals().indexOf(interval);
+
+
+    if (idx != -1) {
+        context->athlete->allIntervalItems()->child(idx)->setSelected(!context->athlete->allIntervalItems()->child(idx)->isSelected());
+        context->notifyIntervalZoom((IntervalItem *)context->athlete->allIntervalItems()->child(idx));
     }
 }
 
@@ -422,11 +438,14 @@ AllPlotIntervalCanvasPicker::eventFilter(QObject *object, QEvent *e)
         default:
             QApplication::postEvent(this, new QEvent(QEvent::User));
             break;
+        case QEvent::MouseButtonDblClick:
+            select(((QMouseEvent *)e)->pos(), true, true);
+            break;
         case QEvent::MouseButtonPress:
-            select(((QMouseEvent *)e)->pos(), true);
+            select(((QMouseEvent *)e)->pos(), true, false);
             break;
         case QEvent::MouseMove:
-            select(((QMouseEvent *)e)->pos(), false);
+            select(((QMouseEvent *)e)->pos(), false, false);
             break;
     }
     return QObject::eventFilter(object, e);
@@ -436,7 +455,7 @@ AllPlotIntervalCanvasPicker::eventFilter(QObject *object, QEvent *e)
 // deselect the selected point
 
 void
-AllPlotIntervalCanvasPicker::select(const QPoint &pos, bool clicked)
+AllPlotIntervalCanvasPicker::select(const QPoint &pos, bool clicked, bool dblClicked)
 {
     QwtPlotIntervalCurve *curve = NULL;
     int index = -1;
@@ -473,13 +492,17 @@ AllPlotIntervalCanvasPicker::select(const QPoint &pos, bool clicked)
         d_selectedCurve = curve;
         d_selectedPoint = index;
 
-        if (clicked)
+        if (dblClicked)
+            pointDblClicked(curve, index); // emit
+        else if (clicked)
             pointClicked(curve, index); // emit
         else
             pointHover(curve, index);  // emit
     } else {
         // didn't
-        if (clicked)
+        if (dblClicked)
+            pointDblClicked(NULL, index); // emit
+        else if (clicked)
             pointClicked(NULL, -1); // emit
         else
             pointHover(NULL, -1);  // emit
