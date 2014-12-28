@@ -102,11 +102,15 @@ bool Lucene::importRide(RideFile *ride)
     // now add to index
     try { 
 
+        mutex.lock();
+
         // now lets open using a mnodifier since the API is much simpler
         IndexWriter *writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
         writer->addDocument(&doc); 
         writer->close();
         delete writer;
+
+        mutex.unlock();
 
     } catch (CLuceneError &e) {
         qDebug()<<"add document clucene error!"<<e.what();
@@ -123,11 +127,15 @@ bool Lucene::deleteRide(QString name)
 
     try {
 
+        mutex.lock();
+
         IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
         Term del = Term(_T("Filename"), cname.c_str());
         reader->deleteDocuments(&del);
         reader->close();
         delete reader;
+
+        mutex.unlock();
 
     } catch (CLuceneError &e) {
         qDebug()<<"deleteDocuments clucene error!"<<e.what();
