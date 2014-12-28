@@ -86,9 +86,11 @@ struct RideFileInterval
     RideFileInterval(double start, double stop, QString name) :
         start(start), stop(stop), name(name) {}
 
-    // order bu start time
-    bool operator< (RideFileInterval right) const { return start < right.start || (start == right.start && stop < right.stop); }
-    bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop; }
+    // order bu start time (and stop+name for QMap)
+    bool operator< (RideFileInterval right) const { return start < right.start ||
+                                                        (start == right.start && stop < right.stop) ||
+                                                        (start == right.start && stop == right.stop && name < right.name); }
+    bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop && name == right.name; }
     bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
 
     bool isPeak() const { return QRegExp("^(Peak *[0-9]*(s|min)|Entire workout|Find #[0-9]*) *\\([^)]*\\)$").exactMatch(name); }
