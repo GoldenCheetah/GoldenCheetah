@@ -40,8 +40,10 @@ public slots:
     void intervalHover(RideFileInterval);
 
 protected:
-    void calcInterval(IntervalItem* interval, QString& html);
-    void calcInterval(RideFileInterval interval, QString& html);
+    void calcInterval(QList<IntervalItem*> intervals, QString& html); // summarise a list
+    void calcInterval(IntervalItem* interval, QString& html); // summarise a single interval
+    void calcInterval(RideFileInterval interval, QString& html); // summarise a single interval
+    void summary(RideFile &f, QString title, QString &html);
 
     Context *context;
 };

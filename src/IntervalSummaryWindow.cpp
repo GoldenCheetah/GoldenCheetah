@@ -69,6 +69,8 @@ void IntervalSummaryWindow::intervalSelected()
 	    return;
     }
 
+    // summary of currently selected
+    QList<IntervalItem*> list;
 	QString html = GCColor::css();
     html += "<body>";
     if (context->athlete->allIntervalItems() != NULL) {
@@ -76,11 +78,16 @@ void IntervalSummaryWindow::intervalSelected()
             IntervalItem *current = dynamic_cast<IntervalItem*>(context->athlete->allIntervalItems()->child(i));
             if (current != NULL) {
                 if (current->isSelected()) {
+                    list << current;
                     calcInterval(current, html);
                 }
             }
         }
     }
+
+    // summary of all intervals selected
+    if (list.count()>1) calcInterval(list, html);
+
     if (html == GCColor::css()+"<body>") {
     	html += "<i>" + tr("select an interval for summary info") + "</i>";
     }
@@ -112,11 +119,63 @@ IntervalSummaryWindow::intervalHover(RideFileInterval x)
     return;
 }
 
-void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
+static bool contains(const RideFile*ride, QList<IntervalItem*> intervals, int index)
+{
+    foreach(IntervalItem *item, intervals) {
+        int start = ride->timeIndex(item->start);
+        int end = ride->timeIndex(item->stop);
+
+        if (index >= start && index <= end) return true;
+    }
+    return false;
+}
+
+void IntervalSummaryWindow::calcInterval(QList<IntervalItem*> intervals, QString &html)
 {
 	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
 
-    bool metricUnits = context->athlete->useMetricUnits;
+    RideFile f(const_cast<RideFile*>(ride));
+
+    // for concatenating intervals
+    RideFilePoint *last = NULL;
+    double timeOff=0;
+    double distOff=0;
+
+    for (int i = 0; i < ride->dataPoints().count(); ++i) {
+
+        // append points for selected intervals
+        const RideFilePoint *p = ride->dataPoints()[i];
+        if (contains(ride, intervals, i)) {
+
+            f.appendPoint(p->secs-timeOff, p->cad, p->hr, p->km-distOff, p->kph, p->nm,
+                        p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, p->lrbalance, 
+                        p->lte, p->rte, p->lps, p->rps, p->smo2, p->thb, 
+                        p->rvert, p->rcad, p->rcontact, 0);
+
+            // derived data
+            last = f.dataPoints().last();
+            last->np = p->np;
+            last->xp = p->xp;
+            last->apower = p->apower;
+
+        } else {
+
+            if (last) {
+                timeOff = p->secs - last->secs;
+                distOff = p->km - last->km;
+            } else {
+                timeOff = p->secs;
+                distOff = p->km;
+            }
+        }
+    }
+
+    summary(f, QString("%1 intervals").arg(intervals.count()), html);
+}
+
+void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
+{
+	const RideFile* ride = context->ride ? context->ride->ride() : NULL;
 
     RideFile f(const_cast<RideFile*>(ride));
     int start = ride->timeIndex(interval->start);
@@ -134,6 +193,14 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
         l->xp = p->xp;
         l->apower = p->apower;
     }
+
+    summary(f, interval->text(0), html);
+}
+
+void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
+{
+    bool metricUnits = context->athlete->useMetricUnits;
+
     if (f.dataPoints().size() == 0) {
         // Interval empty, do not compute any metrics
         html += "<i>" + tr("empty interval") + "</tr>";
@@ -149,7 +216,7 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
     QHash<QString,RideMetricPtr> metrics =
         RideMetric::computeMetrics(context, &f, context->athlete->zones(), context->athlete->hrZones(), intervalMetrics);
 
-    html += "<b>" + interval->text(0) + "</b>";
+    html += "<b>" + name + "</b>";
     html += "<table align=\"center\" width=\"90%\" ";
     html += "cellspacing=0 border=0>";
 
