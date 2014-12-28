@@ -312,6 +312,9 @@ AllPlotInterval::intervalCurveHover(QwtPlotIntervalCurve *curve)
         context->notifyIntervalHover(interval);
         blockSignals(false);
 
+    } else {
+        context->notifyIntervalHover(RideFileInterval()); // clear
+
     }
 }
 
