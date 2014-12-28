@@ -2852,6 +2852,7 @@ AllPlotWindow::setByDistance(int value)
     redrawAllPlot();
     setupStackPlots();
     setupSeriesStackPlots();
+    redrawIntervalPlot();
 
     active = false;
 }
