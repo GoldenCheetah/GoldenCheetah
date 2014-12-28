@@ -888,6 +888,12 @@ AllPlotWindow::compareChanged()
         setIsBlank(false);
 
         //
+        // SETUP INTERVALPLOT FOR COMPARE MODE
+        //
+        // No interval plot in compare mode yet
+        intervalPlot->hide();
+
+        //
         // SETUP FULLPLOT FOR COMPARE MODE
         // 
         int maxKM=0, maxSECS=0;
@@ -1129,6 +1135,9 @@ AllPlotWindow::compareChanged()
         // ok, we're done
 
     } else {
+
+        if (showInterval->isChecked())
+            intervalPlot->show();
 
         // reset to normal view?
         fullPlot->standard->setVisible(true);
