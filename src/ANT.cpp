@@ -65,6 +65,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_MOXY_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Moxy", 'm', ":images/IconMoxy.png" },
   { true, ANTChannel::CHANNEL_TYPE_CONTROL, ANT_SPORT_CONTROL_PERIOD, ANT_SPORT_CONTROL_TYPE,
                 ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Remote Control", 'r', ":images/IconCadence.png" },
+  { true, ANTChannel::CHANNEL_TYPE_TACX_VORTEX, ANT_SPORT_TACX_VORTEX_PERIOD, ANT_SPORT_TACX_VORTEX_TYPE,
+                ANT_TACX_VORTEX_FREQUENCY, DEFAULT_NETWORK_NUMBER, "Tacx Vortex Smart", 'v', ":images/IconPower.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -863,9 +865,9 @@ int ANT::closePort()
 
 bool ANT::find()
 {
-#if defined GC_HAVE_LIBUSB
+#ifdef GC_HAVE_LIBUSB
     if (usb2->find() == true) return true;
-#ifdef WIN32
+#if defined(WIN32) && defined(GC_HAVE_USBXPRESS)
     if (USBXpress::find() == true) return true;
 #endif
 #endif
@@ -883,11 +885,15 @@ int ANT::openPort()
         usbMode = USB2;
         channels = 8;
         return rc;
-    } else if ((rc= USBXpress::open(&devicePort)) != -1) {
+    }
+#if defined(WIN32) && defined(GC_HAVE_USBXPRESS)
+    else if ((rc= USBXpress::open(&devicePort)) != -1) {
         usbMode = USB1;
         channels = 4;
         return rc;
-    } else {
+    }
+#endif
+    else {
         usbMode = USBNone;
         channels = 0;
         return -1;
@@ -963,9 +969,11 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 #ifdef WIN32
 #ifdef GC_HAVE_LIBUSB
     switch (usbMode) {
+#ifdef GC_HAVE_USBXPRESS
     case USB1:
         rc = USBXpress::write(&devicePort, bytes, size);
         break;
+#endif
     case USB2:
         rc = usb2->write((char *)bytes, size);
         break;
@@ -1010,9 +1018,11 @@ int ANT::rawRead(uint8_t bytes[], int size)
 #ifdef WIN32
 #ifdef GC_HAVE_LIBUSB
     switch (usbMode) {
+#ifdef GC_HAVE_USBXPRESS
     case USB1:
         return USBXpress::read(&devicePort, bytes, size);
         break;
+#endif
     case USB2:
         return usb2->read((char *)bytes, size);
         break;
