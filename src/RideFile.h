@@ -87,7 +87,7 @@ struct RideFileInterval
         start(start), stop(stop), name(name) {}
 
     // order bu start time
-    bool operator< (RideFileInterval right) const { return start < right.start; }
+    bool operator< (RideFileInterval right) const { return start < right.start || (start == right.start && stop < right.stop); }
     bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop; }
     bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
 
