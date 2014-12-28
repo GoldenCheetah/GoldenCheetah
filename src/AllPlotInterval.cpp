@@ -131,8 +131,9 @@ AllPlotInterval::setByDistance(int id)
 {
     bydist = (id == 1);
     if (rideItem == NULL) return;
+    if (intervalLigns.count() == 0) return;
 
-    //recalc();
+    refreshIntervals();
 }
 
 void
