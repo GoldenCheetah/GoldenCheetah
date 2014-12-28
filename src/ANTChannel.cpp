@@ -631,6 +631,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             }
             break;
 
+            // Tacx Vortex trainer
+            case CHANNEL_TYPE_TACX_VORTEX:
+            {
+
+            }
+            break;
+
            default:
              break; // unknown?
            }

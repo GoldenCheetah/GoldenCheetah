@@ -272,6 +272,12 @@ struct setChannelAtom {
 // 0x51-0x59 reserved.
 #define KICKR_SPINDOWN_RESULT          0x5A
 
+// Tacx Vortex data page types
+#define TACX_VORTEX_DATA_SPEED         0
+#define TACX_VORTEX_DATA_SERIAL        1
+#define TACX_VORTEX_DATA_VERSION       2
+#define TACX_VORTEX_DATA_CALIBRATION   3
+
 
 //======================================================================
 // Worker thread

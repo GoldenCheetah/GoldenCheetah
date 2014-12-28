@@ -505,6 +505,50 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 newsmo2 = 0.1f * double (((message[10] & 0xc0)>>6) + (message[11]<<2));
                 break;
 
+            case ANTChannel::CHANNEL_TYPE_TACX_VORTEX:
+            {
+                const uint8_t* const payload = message + 4;
+
+                switch (payload[0])
+                {
+                case TACX_VORTEX_DATA_SPEED:
+                    vortexUsingVirtualSpeed = (payload[1] >> 7) == 1;
+                    vortexPower = payload[2] | ((payload[1] & 7) << 8); // watts
+                    vortexSpeed = payload[4] | ((payload[3] & 3) << 8); // cm/s
+                    // 0, 1, 2, 3 = none, running, new, failed
+                    vortexCalibrationState = (payload[1] >> 5) & 3;
+                    // unclear if this is set to anything
+                    vortexCadence = payload[7];
+                    break;
+
+                case TACX_VORTEX_DATA_SERIAL:
+                    // unk0 .. unk2 make up the serial number of the trainer
+                    //uint8_t unk0 = payload[1];
+                    //uint8_t unk1 = payload[2];
+                    //uint32_t unk2 = payload[3] << 16 | payload[4] << 8 || payload[5];
+                    // various flags, only known one is for virtual speed used
+                    //uint8_t alarmStatus = payload[6] << 8 | payload[7];
+                    break;
+
+                case TACX_VORTEX_DATA_VERSION:
+                {
+                    //uint8_t major = payload[4];
+                    //uint8_t minor = payload[5];
+                    //uint8_t build = payload[6] << 8 | payload[7];
+                    break;
+                }
+
+                case TACX_VORTEX_DATA_CALIBRATION:
+                    // one byte for calibration, tacx treats this as signed
+                    vortexCalibration = payload[5];
+                    // duplicate of ANT deviceId, I think, necessary for issuing commands
+                    vortexId = payload[6] << 8 | payload[7];
+                    break;
+                }
+
+                break;
+            }
+
             default:
                 break;
             }
@@ -676,6 +720,16 @@ ANTMessage ANTMessage::open(const unsigned char channel)
 ANTMessage ANTMessage::close(const unsigned char channel)
 {
     return ANTMessage(1, ANT_CLOSE_CHANNEL, channel);
+}
+
+ANTMessage ANTMessage::tacxVortexSetState(const uint8_t channel, const uint16_t vortexId, const uint8_t calibration, const uint16_t targetPower)
+{
+    // notice that tacx seem to prefer big endian
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, 0x10, vortexId >> 8, vortexId & 0xFF,
+                      170, // POWER (or 85 for coupling?)
+                      126, // no calibration requested (255 is used for that)
+                      calibration, // unclear if we always need to send that along
+                      targetPower >> 8, targetPower & 0xFF);
 }
 
 // kickr broadcast commands, lifted largely from the Wahoo SDK example: KICKRDemo/WFAntBikePowerCodec.cs
