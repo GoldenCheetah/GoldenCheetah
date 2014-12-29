@@ -919,6 +919,22 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     DeviceTypes all;
     devices = all.getList();
 
+    // Power correction factor  GC_POWER_CORRECTION_FACTOR
+    QVariant powerCorrectionFactor = appsettings->value(this, GC_POWER_CORRECTION_FACTOR);
+    if (powerCorrectionFactor.isNull() || powerCorrectionFactor.toFloat() == 0.0)
+    	powerCorrectionFactor.setValue(1.0);  // default is 1.0, i.e. no scaling correction
+
+    QLabel *pcflabel = new QLabel(tr("vPower correction factor (1.0 = no correction):"));
+    pcfedit = new QLineEdit(QString::number(powerCorrectionFactor.toFloat(), 'f', 3),this);
+
+    // Power offset  GC_POWER_OFFSET
+    QVariant powerOffset = appsettings->value(this, GC_POWER_OFFSET);
+    if (powerOffset.isNull() || powerOffset.toFloat() == 0.0)
+    	powerOffset.setValue(0.0);  // default is 0, i.e. no offset correction
+
+    QLabel *pofflabel = new QLabel(tr("vPower offset (0 = no offset):"));
+    poffedit = new QLineEdit(powerOffset.toString(),this);
+
     addButton = new QPushButton(tr("+"),this);
     delButton = new QPushButton(tr("-"),this);
 
@@ -948,6 +964,14 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     multiCheck = new QCheckBox(tr("Allow multiple devices in Train View"), this);
     multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
 
+    QHBoxLayout *top = new QHBoxLayout;
+    top->setSpacing(2);
+    top->addWidget(pcflabel);
+    top->addWidget(pcfedit);
+    top->addWidget(pofflabel);
+    top->addWidget(poffedit);
+    mainLayout->addLayout(top);
+
     mainLayout->addWidget(deviceList);
     QHBoxLayout *bottom = new QHBoxLayout;
     bottom->setSpacing(2);
@@ -968,6 +992,8 @@ DevicePage::saveClicked()
     DeviceConfigurations all;
     all.writeConfig(deviceListModel->Configuration);
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
+    appsettings->setValue(GC_POWER_CORRECTION_FACTOR, pcfedit->text());
+    appsettings->setValue(GC_POWER_OFFSET, poffedit->text());
 }
 
 void

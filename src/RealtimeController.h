@@ -65,9 +65,15 @@ public:
     void processRealtimeData(RealtimeData &rtData);
     void processSetup();
 
+    double correctedPower(double watts);
+    static void setPowerCorrectionFactor(double powerCorrectionFactor);
+    static void setPowerOffset(double powerOffset);
+
 private:
     DeviceConfiguration *dc;
     DeviceConfiguration devConf;
+    static double powerCorrectionFactor;
+    static double powerOffset;
 };
 
 #endif // _GC_RealtimeController_h
