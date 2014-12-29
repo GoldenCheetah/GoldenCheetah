@@ -1074,7 +1074,6 @@ AllPlotWindow::compareChanged()
             connect(plot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), plot, SLOT(pointHover(QwtPlotCurve*, int)));
             // No x axis titles
             plot->bydist = fullPlot->bydist;
-            plot->showAltSlopeState = fullPlot->showAltSlopeState;
             if (x.one == RideFile::watts) plot->setShadeZones(showPower->currentIndex() == 0);
             else plot->setShadeZones(false);
             plot->setAxisVisible(QwtPlot::xBottom, true);
@@ -1091,6 +1090,8 @@ AllPlotWindow::compareChanged()
             // y-axis title and colour
             if (x.one == RideFile::alt && x.two == RideFile::slope) {
                 plot->setAxisTitle(QwtPlot::yLeft, tr("Alt/Slope"));
+                plot->showAltSlopeState = allPlot->showAltSlopeState;
+                plot->setAltSlopePlotStyle(allPlot->standard->altSlopeCurve);
                } else {
                 plot->setAxisTitle(QwtPlot::yLeft, RideFile::seriesName(x.one));
             }
@@ -2407,18 +2408,11 @@ AllPlotWindow::setShowAltSlope(int value)
 
     // compare mode selfcontained update
     if (isCompare()) {
-
-       // transfer changes of setting here (which is more than on/off) also to other plot settings
-       fullPlot->showAltSlopeState = value;
-       fullPlot->setAltSlopePlotStyle(fullPlot->standard->altSlopeCurve);
        allPlot->showAltSlopeState = value;
-       allPlot->setAltSlopePlotStyle(allPlot->standard->altSlopeCurve);
        compareChanged();
-       active = false;
        return;
     }
 
-    fullPlot->setShowAltSlope(value);
     allPlot->setShowAltSlope(value);
 
     foreach (AllPlot *plot, allPlots)
