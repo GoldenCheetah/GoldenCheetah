@@ -100,6 +100,8 @@ class ScatterWindow : public GcChartWindow
         void set_smoothing(int x) { smoothSlider->setValue(x); }
 
     public slots:
+
+        void forceReplot();
         void rideSelected();
         void intervalSelected();
         void setData();
@@ -135,6 +137,7 @@ class ScatterWindow : public GcChartWindow
 
         // Ride to plot - captured from rideSelected signal
         RideItem *ride;
+        bool stale;
 
         // layout
         ScatterPlot *scatterPlot;
