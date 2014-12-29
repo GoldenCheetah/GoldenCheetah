@@ -58,7 +58,7 @@ HelpWhatsThis::getWhatsThisText(GCHelp chapter) {
 QString
 HelpWhatsThis::getText(GCHelp chapter) {
 
-    QString text = "<center>%2<br><a href=\"https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_310_%1\" target=\"_blank\">" + tr("More Help") + "</a></center>";
+    QString text = "<center>%2<br><a href=\"https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_%1\" target=\"_blank\">" + tr("More Help") + "</a></center>";
 
     switch (chapter) {
 
@@ -67,209 +67,209 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     // Scope Bar
     case ScopeBar_Trends:
-        return text.arg("ScopeBar_Views#trends").arg("Trends");
+         return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number (e.g. date range of activities) like PMC, long term metrics view, ... and data summaries"));
     case ScopeBar_Diary:
-        return text.arg("ScopeBar_Views#diary").arg("Diary");
+         return text.arg("ScopeBar_Views#diary").arg(tr("Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types"));
     case ScopeBar_Rides:
-        return text.arg("ScopeBar_Views#rides").arg("Rides");
+         return text.arg("ScopeBar_Views#rides").arg(tr("Analysis of a single activity - specifically ride and run - with diagrams like ride plot, W'bal, ... and Chung's Aerolab"));
     case ScopeBar_Intervals:
         return text.arg("ScopeBar_Views#intervals").arg("Intervals");
     case ScopeBar_Train:
-        return text.arg("ScopeBar_Views#train").arg("Train");
+        return text.arg("ScopeBar_Views#train").arg(tr("Ride indoors, following pre-programmed workouts - with multi device and video playback support"));
 
     // Tool Bar
     case ToolBar_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-ride-from-device").arg("Download from Device");
+        return text.arg("First-Steps_Download-or-import#downloading-a-ride-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
     case ToolBar_Manual:
-        return text.arg("Menu%20Bar_Activity").arg("Manual ride/activity entry");
+        return text.arg("Menu%20Bar_Activity").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
     case ToolBar_ToggleSidebar:
-        return text.arg("Menu%20Bar_View").arg("Activates / De-activates the Sidebar");
+        return text.arg("Menu%20Bar_View").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
     case ToolBar_ToggleComparePane:
-        return text.arg("Compare-Pane_General").arg("Activates / De-activates the Compare Pane");
+        return text.arg("Compare-Pane_General").arg(tr("Activate / De-activate the Compare Pane - which allows to compare rides, intervals or date ranges - also across athletes"));
 
     // Menus
     case MenuBar_Athlete:
-        return text.arg("Menu%20Bar_Athlete").arg("Menu Bar - Athlete");
+        return text.arg("Menu%20Bar_Athlete").arg(tr("Athlete Management to open/close an existing or create a new athlete - either in a Tab or in a new Window"));
 
     case MenuBar_Activity:
-        return text.arg("Menu%20Bar_Activity").arg("Menu Bar - Activity");
+        return text.arg("Menu%20Bar_Activity").arg(tr("Main functions related to activities like Activity Creation, Sharing and Export, and Splitting or Combining Activities"));
     case MenuBar_Activity_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-ride-from-device").arg("Menu Bar - Download");
+        return text.arg("First-Steps_Download-or-import#downloading-a-ride-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
     case MenuBar_Activity_Import:
-        return text.arg("First-Steps_Download-or-import#importing-from-a-file").arg("Menu Bar - Import");
+        return text.arg("First-Steps_Download-or-import#importing-from-a-file").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
     case MenuBar_Activity_Manual:
-        return text.arg("Menu%20Bar_Activity").arg("Menu Bar - Manual");
+        return text.arg("Menu%20Bar_Activity").arg(tr("Manual creation of an activity where the most relevant data can be added in this dialog"));
     case MenuBar_Activity_Share:
-        return text.arg("Special%20Topics_Upload_Download%20to_from%20external%20web-sites#execution").arg("Menu Bar - Share");
+        return text.arg("Special%20Topics_Upload_Download%20to_from%20external%20web-sites#execution")
+                .arg(tr("Sharing an activity with other Ride related sites - only sites for which the authorization has been configured can be seleted for sharing here"));
     case MenuBar_Activity_BatchExport:
-        return text.arg("Menu%20Bar_Activity").arg("Menu Bar - Batch Export");
+        return text.arg("Menu%20Bar_Activity").arg(tr("Exports a (selectable) set of activties in one of the supported export formats"));
     case MenuBar_Activity_SplitRide:
-        return text.arg("Menu%20Bar_Activity").arg("Menu Bar - Split Ride");
+        return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity/ride into multiple rides based on configurable criteria"));
     case MenuBar_Activity_CombineRides:
-        return text.arg("Menu%20Bar_Activity").arg("Menu Bar - Combine Rides");
+        return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to combine data with the currently selected activity in multiple ways"));
 
     case MenuBar_Tools:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Tools");
+        return text.arg("Menu%20Bar_Tools").arg(tr("A set of functions related different features in GoldenCheetah - please check the details for more information"));
     case MenuBar_Tools_CP_EST:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - CP Estimation");
+        return text.arg("Menu%20Bar_Tools").arg(tr("Estimation of critical power using the Monod/Scherrer power model"));
     case MenuBar_Tools_AirDens_EST:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Air Density");
+        return text.arg("Menu%20Bar_Tools").arg(tr("Estimation of Air Density (Rho)"));
     case MenuBar_Tools_Download_ERGDB:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Download ERGDB");
+        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts for the ERGDB (online workout DB) for Train - Indoor Riding"));
     case MenuBar_Tools_CreateWorkout:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Create Workout");
+        return text.arg("Menu%20Bar_Tools").arg(tr("Creation of a new Workout for Train - Indoor Riding"));
     case MenuBar_Tools_ScanDisk_WorkoutVideo:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Scan Disk for Workouts/Videos");
+        return text.arg("Menu%20Bar_Tools").arg(tr("Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library"));
     case MenuBar_Tools_CreateHeatMap:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Create Heat Map");
+        return text.arg("Menu%20Bar_Tools")
+                .arg(tr("Creates a ride heat map using the selected rides and stored in the choosen folder - \"HeatMap.htm\". Opened in a Web-Browser the map shows where most activity took place."));
 
     case MenuBar_Edit:
-        return text.arg("Menu%20Bar_Edit").arg("Menu Bar - Edit");
+        return text.arg("Menu%20Bar_Edit").arg(tr("Wizards which fix, adjust, add series data of the current activity"));
     case MenuBar_Edit_AddTorqueValues:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Add Torque Values");
+        return text.arg("Menu%20Bar_Tools#tool-add-torque").arg(tr("Add Torque Values"));
     case MenuBar_Edit_AdjustPowerValues:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Adjust Power Values");
+        return text.arg("Menu%20Bar_Tools#tool-adjust-torque").arg(tr("Adjust Power Values"));
     case MenuBar_Edit_AdjustTorqueValues:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Adjust Torque Values");
+        return text.arg("Menu%20Bar_Tools#tool-adjust-power").arg(tr("Adjust Torque Values"));
     case MenuBar_Edit_EstimatePowerValues:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Estimate Power Values");
+        return text.arg("Menu%20Bar_Tools#tool-estimate-power").arg(tr("Estimate Power Values"));
     case MenuBar_Edit_FixElevationErrors:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Fix Elevation Errors");
+        return text.arg("Menu%20Bar_Tools#tool-fix-elevation-errors").arg(tr("Fix Elevation Errors"));
     case MenuBar_Edit_FixGapsInRecording:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Fix Gaps in Recording");
+        return text.arg("Menu%20Bar_Tools#tool-fix-gaps-in-recording").arg(tr("Fix Gaps in Recording"));
     case MenuBar_Edit_FixGPSErrors:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Fix GPS Errors");
+        return text.arg("Menu%20Bar_Tools#tool-fix-gps-errors").arg(tr("Fix GPS Errors"));
     case MenuBar_Edit_FixHRSpikes:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Fix HR Spikes");
+        return text.arg("Menu%20Bar_Tools#tool-fix-hr-spikes").arg(tr("Fix HR Spikes"));
     case MenuBar_Edit_FixPowerSpikes:
-        return text.arg("Menu%20Bar_Tools").arg("Menu Bar - Edit - Fix Power Spikes");
+        return text.arg("Menu%20Bar_Tools").arg(tr("Fix Power Spikes#tool-fix-power-spikes"));
 
     case MenuBar_View:
-        return text.arg("Menu%20Bar_View").arg("Menu Bar - View");
+        return text.arg("Menu%20Bar_View").arg(tr("Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings"));
     case MenuBar_Help:
-        return text.arg("Menu%20Bar_Help").arg("Menu Bar - Help");
+        return text.arg("Menu%20Bar_Help").arg(tr("Help options of GoldenCheetah"));
 
     // Charts
     case ChartTrends_MetricTrends:
-        return text.arg("ChartTypes_Trends#metric-trends").arg("Trends - LTM");
+        return text.arg("ChartTypes_Trends#metric-trends").arg(tr("Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates"));
     case ChartTrends_MetricTrends_Config_Basic:
-        return text.arg("ChartTypes_Trends#basic-settings").arg("Trends - Basic Settings");
+        return text.arg("ChartTypes_Trends#basic-settings").arg(tr("Date range, data grouping settings which apply to a single chart"));
     case ChartTrends_MetricTrends_Config_Preset:
-        return text.arg("ChartTypes_Trends#presets").arg("Trends - Presets");
+        return text.arg("ChartTypes_Trends#presets").arg(tr("Prefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments"));
     case ChartTrends_MetricTrends_Config_Curves:
-        return text.arg("ChartTypes_Trends#curves").arg("Trends - Curves");
+        return text.arg("ChartTypes_Trends#curves").arg(tr("Curves which are plotted for the specific chart - based on presets or individually added and modified here"));
 
     case ChartTrends_CollectionTreeMap:
-        return text.arg("ChartTypes_Trends#collection-tree-map").arg("Trends - Collection Tree Map");
+        return text.arg("ChartTypes_Trends#collection-tree-map").arg(tr("Tree map visulation of ride data by two selectable dimensions for a configurable metric"));
 
     case ChartTrends_Critical_MM:
-        return text.arg("ChartTypes_Trends#critical-mean-maximal").arg("Trends - Critical Mean Maximal");
+        return text.arg("ChartTypes_Trends#critical-mean-maximal").arg(tr("Critical Mean Maximal Power Curve"));
     case ChartTrends_Critical_MM_Config_Settings:
-        return text.arg("ChartTypes_Trends#critical-mean-maximal").arg("Trends - Critical Mean Maximal - Config - Settings");
+        return text.arg("ChartTypes_Trends#critical-mean-maximal").arg(tr("Basic configuration like date range, what series to use and how to plot"));
     case ChartTrends_Critical_MM_Config_Model:
-        return text.arg("ChartTypes_Trends#critical-mean-maximal").arg("Trends - Critical Mean Maximal - Config - Model");
+        return text.arg("ChartTypes_Trends#critical-mean-maximal").arg(tr("Configuration of the CP Model to be used to plot the curve"));
     case ChartTrends_Distribution:
-        return text.arg("ChartTypes_Trends#distribution").arg("Trends - Distribution");
+        return text.arg("ChartTypes_Trends#distribution").arg(tr("Distribution of ride data samples or ride metrics according time spent in a certain segment"));
      case ChartTrends_DateRange:
-        return text.arg("ChartTypes_Trends#date-range-selection").arg("Trends - Date Range");
+        return text.arg("ChartTypes_Trends#date-range-selection").arg(tr("Definition which date range is used for this particular chart"));
     case ChartDiary_Calendar:
-        return text.arg("ChartTypes_Diary#calendar").arg("Diary - Calendar");
+        return text.arg("ChartTypes_Diary#calendar").arg(tr("Calendar"));
     case ChartDiary_Navigator:
-        return text.arg("ChartTypes_Diary#navigator").arg("Diary - Navigator");
+        return text.arg("ChartTypes_Diary#navigator").arg(tr("Configurable activity log - with build in search capabilities"));
     case ChartRides_Summary:
-        return text.arg("ChartTypes_Rides#ride-summary").arg("Rides - Summary");
+        return text.arg("ChartTypes_Rides#ride-summary").arg(tr("Detailed information of a single ride - the metrics shown here are configurable"));
     case ChartRides_Details:
-        return text.arg("ChartTypes_Rides#details").arg("Rides - Details");
-    case ChartRides_Summary_Details:
-        return text.arg("ChartTypes_Rides#summary-and-details").arg("Rides - Summary/Details");
+        return text.arg("ChartTypes_Rides#details").arg("Configurable tabbed view of ride detail data, plus technical details and change log");
     case ChartRides_Editor:
-        return text.arg("ChartTypes_Rides#editor").arg("Rides - Editor");
+        return text.arg("ChartTypes_Rides#editor").arg(tr("Editor for activity/ride file data - allowing to change/correct data, find entries and find anomalies"));
 
     case ChartRides_Performance:
-        return text.arg("ChartTypes_Rides#performance").arg("Rides - Performance");
+        return text.arg("ChartTypes_Rides#performance").arg(tr("Plot of all activity/ride data series in various ways"));
     case ChartRides_Performance_Config_Basic:
-        return text.arg("ChartTypes_Rides#performance-basic").arg("Rides - Performance - Basic");
+        return text.arg("ChartTypes_Rides#performance-basic").arg(tr("Selection how the power data series is shown in the plot and general settings on the diagram structure"));
     case ChartRides_Performance_Config_Series:
-        return text.arg("ChartTypes_Rides#performance-series").arg("Rides - Performance - Series");
+        return text.arg("ChartTypes_Rides#performance-series").arg(tr("Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity/ride file"));
 
     case ChartRides_Critical_MM:
-        return text.arg("ChartTypes_Rides#critical-mean-maximals").arg("Rides - Critical Mean Maximals");
+        return text.arg("ChartTypes_Rides#critical-mean-maximals").arg(tr("Critical Mean Maximal Power Curve"));
     case ChartRides_Critical_MM_Config_Settings:
-        return text.arg("ChartTypes_Rides#critical-mean-maximal").arg("Rides - Critical Mean Maximal - Config - Settings");
+        return text.arg("ChartTypes_Rides#critical-mean-maximal").arg(tr("Basic configuration like date range, what series to use and how to plot"));
     case ChartRides_Critical_MM_Config_Model:
-        return text.arg("ChartTypes_Rides#critical-mean-maximal").arg("Rides - Critical Mean Maximal - Config - Model");
+        return text.arg("ChartTypes_Rides#critical-mean-maximal").arg(tr("Configuration of the CP Model to be used to plot the curve"));
 
     case ChartRides_Histogram:
-        return text.arg("ChartTypes_Rides#histogram").arg("Rides - Histogram");
+        return text.arg("ChartTypes_Rides#histogram").arg(tr("Distribution of ride data samples or ride metrics according time spent in a certain segment"));
     case ChartRides_PFvV:
-        return text.arg("ChartTypes_Rides#pedal-force-vs-velocity").arg("Rides - PFvsV");
+        return text.arg("ChartTypes_Rides#pedal-force-vs-velocity").arg(tr("Quadrant analysis of pedal velocity vs. effective pedal force"));
     case ChartRides_HRvsPw:
-        return text.arg("ChartTypes_Rides#heartrate-vs-power").arg("Rides - HRvsPw");
+        return text.arg("ChartTypes_Rides#heartrate-vs-power").arg(tr("Analysis of heartrate vs. power along the ride data"));
     case ChartRides_Map:
-        return text.arg("ChartTypes_Rides#google-map--bing-map").arg("Rides - Map");
+        return text.arg("ChartTypes_Rides#google-map--bing-map").arg(tr("Map of ride"));
     case ChartRides_2D:
-        return text.arg("ChartTypes_Rides#2d-plot").arg("Rides - 2d Plot");
+        return text.arg("ChartTypes_Rides#2d-plot").arg(tr("Configurable 2D scatter plot of the current ride"));
     case ChartRides_3D:
-        return text.arg("ChartTypes_Rides#3d-plot").arg("Rides - 3d Plot");
+        return text.arg("ChartTypes_Rides#3d-plot").arg(tr("Configurable 3D plot of the current ride"));
     case ChartRides_Aerolab:
-        return text.arg("ChartTypes_Rides#aerolab-chung-analysis").arg("Rides - Aerolab");
+        return text.arg("ChartTypes_Rides#aerolab-chung-analysis").arg(tr("Chung's Aerolab analysis"));
 
     case Chart_Summary:
-        return text.arg("ChartTypes_Trends#summary").arg("Summary");
+        return text.arg("ChartTypes_Trends#summary").arg(tr("Overview/summary of the selected data range - data shown in 'Athlete's Best' are configurable"));
     case Chart_Summary_Config:
-        return text.arg("ChartTypes_Trends#summary-config").arg("Summary Config");
+        return text.arg("ChartTypes_Trends#summary").arg(tr("Chart specific filter/search and date range settings"));
 
     // Sidebars
     case SideBarTrendsView_DateRanges:
-        return text.arg("Side-Bar_Trends-view#date-ranges").arg("Date Ranges");
+        return text.arg("Side-Bar_Trends-view#date-ranges").arg(tr("Predefined and configurable set of data ranges for selection of rides to be analysed"));
     case SideBarTrendsView_Events:
-        return text.arg("Side-Bar_Trends-view#events").arg("Events");
+        return text.arg("Side-Bar_Trends-view#events").arg(tr("Definition of points in time 'Events' which are marked explicitely on time related diagrams"));
     case SideBarTrendsView_Summary:
-        return text.arg("Side-Bar_Trends-view#summary").arg("Summary");
+        return text.arg("Side-Bar_Trends-view#summary").arg(tr("Simple summary view"));
     case SideBarTrendsView_Filter:
-        return text.arg("Side-Bar_Trends-view#filters").arg("Filters");
+        return text.arg("Side-Bar_Trends-view#filters").arg(tr("Powerful filter and search engine to determine the activities/rides which are considered in diagram"));
     case SideBarTrendsView_Charts:
-        return text.arg("Side-Bar_Trends-view#charts").arg("Charts");
+        return text.arg("Side-Bar_Trends-view#charts").arg(tr("Alternative access to the charts created for the main view"));
     case SideBarRidesView_Calendar:
-        return text.arg("Side-Bar_Rides-view#calendar").arg("Calendar");
+        return text.arg("Side-Bar_Rides-view#calendar").arg(tr("Calendar"));
     case SideBarRidesView_Rides:
-        return text.arg("Side-Bar_Rides-view#rides").arg("Rides");
+        return text.arg("Side-Bar_Rides-view#rides").arg(tr("Configurable list of activities/rides"));
     case SideBarRidesView_Intervals:
-        return text.arg("Side-Bar_Rides-view#intervals").arg("Intervals");
+        return text.arg("Side-Bar_Rides-view#intervals").arg(tr("Display the available and add new intervals using simple query methods"));
     case SideBarDiaryView_Calendar:
-        return text.arg("Side%20Bar_Diary%20view#calendar").arg("Calendar");
+        return text.arg("Side%20Bar_Diary%20view#calendar").arg(tr("Calendar"));
     case SideBarDiaryView_Summary:
-        return text.arg("Side%20Bar_Diary%20view#summary").arg("Summary");
+        return text.arg("Side%20Bar_Diary%20view#summary").arg(tr("Simple summary view"));
 
     // Cross Functions
     case SearchFilterBox:
-        return text.arg("Special-Topics_SearchFilter").arg("Entry field for Searching and Filtering of activities");
+        return text.arg("Special-Topics_SearchFilter").arg(tr("Entry field for sophisticated Searching and Filtering of activities/rides"));
     case FindIntervals:
-        return text.arg("Side-Bar_Rides-view#intervals").arg("Intervals");
+        return text.arg("Side-Bar_Rides-view#intervals").arg(tr("Adding intervals to a ride using simple query methods"));
 
     // Preferences
     case Preferences_General:
-        return text.arg("Preferences_General").arg("Preferences - General");
+        return text.arg("Preferences_General").arg(tr("General"));
     case Preferences_Athlete_About:
-        return text.arg("Preferences_Athlete").arg("Preferences - Athlete");
+        return text.arg("Preferences_Athlete").arg(tr("Athlete"));
     case Preferences_Athlete_TrainingZones_Power:
-        return text.arg("Preferences_Athlete_Training%20Zones").arg("Preferences - Training Zones");
+        return text.arg("Preferences_Athlete_Training%20Zones").arg(tr("Training Zones"));
     case Preferences_Athlete_TrainingZones_HR:
-        return text.arg("Preferences_Athlete_Training%20Zones").arg("Preferences - Training Zones");
+        return text.arg("Preferences_Athlete_Training%20Zones").arg(tr("Training Zones"));
     case Preferences_Athlete_TrainingZones_Pace:
-        return text.arg("Preferences_Athlete_Training%20Zones").arg("Preferences - Training Zones");
+        return text.arg("Preferences_Athlete_Training%20Zones").arg(tr("Training Zones"));
     case Preferences_Athlete_Autoimport:
-        return text.arg("Preferences_Athlete_Autoimport").arg("Preferences - Autoimport");
+        return text.arg("Preferences_Athlete_Autoimport").arg(tr("Autoimport"));
     case Preferences_Passwords:
-        return text.arg("Preferences_Passwords").arg("Preferences - Passwords");
+        return text.arg("Preferences_Passwords").arg(tr("Passwords"));
     case Preferences_Appearance:
-        return text.arg("Preferences_ppearance").arg("Preferences - Appearance");
+        return text.arg("Preferences_Appearance").arg(tr("Appearance"));
     case Preferences_DataFields:
-        return text.arg("Preferences_Data%20Fields").arg("Preferences - Data Fields");
+        return text.arg("Preferences_Data%20Fields").arg(tr("Data Fields"));
     case Preferences_Metrics:
-        return text.arg("Preferences_Metrics").arg("Preferences - Metrics");
+        return text.arg("Preferences_Metrics").arg(tr("Metrics"));
     case Preferences_TrainDevices:
-        return text.arg("Preferences_Train Devices").arg("Preferences - Train Devices");
+        return text.arg("Preferences_Train Devices").arg(tr("Train Devices"));
 
     }
 

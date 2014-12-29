@@ -29,6 +29,7 @@
 #include "Colors.h"
 #include "Units.h"
 #include "TabView.h"
+#include "HelpWhatsThis.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -52,6 +53,9 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
+
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Details));
 
     // setup the tabs widget
     tabs = new QTabWidget(this);
