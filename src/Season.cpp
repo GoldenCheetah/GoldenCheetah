@@ -397,6 +397,24 @@ Seasons::writeSeasons()
     seasonsChanged(); // signal!
 }
 
+Season 
+Seasons::seasonFor(QDate date)
+{
+    foreach(Season season, seasons)
+        if (date >= season.start && date <= season.end)
+            return season;
+
+    // if not found just return an all dates season
+    Season returning; // just retun an all dates
+    returning.setName(tr("All Dates"));
+    returning.setType(Season::temporary);
+    returning.setStart(QDate::currentDate().addYears(-50));
+    returning.setEnd(QDate::currentDate().addYears(50));
+    returning.setId(QUuid("{00000000-0000-0000-0000-000000000001}"));
+
+    return returning;
+}
+
 SeasonTreeView::SeasonTreeView(Context *context) : context(context)
 {
     setDragDropMode(QAbstractItemView::InternalMove);
