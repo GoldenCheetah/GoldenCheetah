@@ -1479,7 +1479,14 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
         default:
             break;
     }
-    if (!inLUW) anomalyTool->check(); // refresh the anomalies...
+
+    // check for anomalies
+    if (!inLUW) {
+        anomalyTool->check();
+
+        // let everyone know we changed some data
+        ride->notifyRideDataChanged();
+    }
 }
 
 void

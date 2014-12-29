@@ -117,7 +117,21 @@ RideCache::itemChanged()
     // one of our kids changed, they grow up so fast.
     // NOTE ONLY CONNECT THIS TO RIDEITEMS !!!
     // BECAUSE IT IS ASSUMED BELOW THE SENDER IS A RIDEITEM
-    emit itemChanged(static_cast<RideItem*>(QObject::sender()));
+    RideItem *item = static_cast<RideItem*>(QObject::sender());
+
+    // the model is particularly interested in ANY item that changes
+    emit itemChanged(item);
+
+    // current ride changed is more relevant for the charts lets notify
+    // them the ride they're showing has changed XXX note this is not
+    // yet implemented in the charts XXX
+    if (item == context->currentRideItem()) {
+
+        // in lieu of chart refresh code
+        qDebug()<<"RIDE CHANGED:"<<item->fileName;
+
+        context->notifyRideChanged(item);
+    }
 }
 
 // add a new ride
