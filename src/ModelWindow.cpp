@@ -172,7 +172,7 @@ ModelWindow::ModelWindow(Context *context) :
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors on first run
-    configChanged(qint32);
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
