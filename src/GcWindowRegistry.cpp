@@ -123,6 +123,7 @@ GcWindowRegistry::title(GcWinID id)
         if (GcWindows[i].relevance && GcWindows[i].id == id)
             return GcWindows[i].name;
     }
+    return QString("unknown");
 }
 
 QList<GcWinID> idsForType(int type)
