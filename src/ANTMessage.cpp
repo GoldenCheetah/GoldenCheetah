@@ -722,14 +722,37 @@ ANTMessage ANTMessage::close(const unsigned char channel)
     return ANTMessage(1, ANT_CLOSE_CHANNEL, channel);
 }
 
-ANTMessage ANTMessage::tacxVortexSetState(const uint8_t channel, const uint16_t vortexId, const uint8_t calibration, const uint16_t targetPower)
+ANTMessage ANTMessage::tacxVortexSetFCSerial(const uint8_t channel, const uint16_t setVortexId)
 {
-    // notice that tacx seem to prefer big endian
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, 0x10, setVortexId >> 8, setVortexId & 0xFF,
+                      0x55, // coupling request
+                      0x7F, 0, 0, 0);
+}
+
+ANTMessage ANTMessage::tacxVortexStartCalibration(const uint8_t channel, const uint16_t vortexId)
+{
     return ANTMessage(9, ANT_BROADCAST_DATA, channel, 0x10, vortexId >> 8, vortexId & 0xFF,
-                      170, // POWER (or 85 for coupling?)
-                      126, // no calibration requested (255 is used for that)
-                      calibration, // unclear if we always need to send that along
-                      targetPower >> 8, targetPower & 0xFF);
+                      0, 0xFF /* signals calibration start */, 0, 0, 0);
+}
+
+ANTMessage ANTMessage::tacxVortexStopCalibration(const uint8_t channel, const uint16_t vortexId)
+{
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, 0x10, vortexId >> 8, vortexId & 0xFF,
+                      0, 0x7F /* signals calibration stop */, 0, 0, 0);
+}
+
+ANTMessage ANTMessage::tacxVortexSetCalibrationValue(const uint8_t channel, const uint16_t vortexId, const uint8_t calibrationValue)
+{
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, 0x10, vortexId >> 8, vortexId & 0xFF,
+                      0, 0x7F, calibrationValue, 0, 0);
+}
+
+ANTMessage ANTMessage::tacxVortexSetPower(const uint8_t channel, const uint16_t vortexId, const uint16_t power)
+{
+    return ANTMessage(9, ANT_BROADCAST_DATA, channel, 0x10, vortexId >> 8, vortexId & 0xFF,
+                      0xAA, // power request
+                      0, 0, // no calibration related data
+                      power >> 8, power & 0xFF);
 }
 
 // kickr broadcast commands, lifted largely from the Wahoo SDK example: KICKRDemo/WFAntBikePowerCodec.cs

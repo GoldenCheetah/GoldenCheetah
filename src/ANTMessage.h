@@ -69,8 +69,11 @@ class ANTMessage {
         static ANTMessage close(const unsigned char channel);
 
         // tacx vortex command message is a single broadcast ant message
-        static ANTMessage tacxVortexSetState(const uint8_t channel, const uint16_t vortexId,
-                                             const uint8_t calibration, const uint16_t targetPower);
+        static ANTMessage tacxVortexSetFCSerial(const uint8_t channel, const uint16_t setVortexId);
+        static ANTMessage tacxVortexStartCalibration(const uint8_t channel, const uint16_t vortexId);
+        static ANTMessage tacxVortexStopCalibration(const uint8_t channel, const uint16_t vortexId);
+        static ANTMessage tacxVortexSetCalibrationValue(const uint8_t channel, const uint16_t vortexId, const uint8_t calibrationValue);
+        static ANTMessage tacxVortexSetPower(const uint8_t channel, const uint16_t vortexId, const uint16_t power);
 
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
