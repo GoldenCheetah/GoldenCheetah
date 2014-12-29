@@ -901,7 +901,7 @@ ModelPlot::ModelPlot(Context *context, QWidget *parent, ModelSettings *settings)
     resetViewPoint();
 
     // set colors
-    configChanged(qint32);
+    configChanged(CONFIG_APPEARANCE);
 
     updateData();
     updateGL();
