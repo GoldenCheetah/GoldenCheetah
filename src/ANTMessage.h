@@ -129,7 +129,7 @@ class ANTMessage {
         double tHb, oldsmo2, newsmo2; //moxy
         // tacx vortex fields - only what we care about now, for more check decoding
         uint16_t vortexId, vortexSpeed, vortexPower, vortexCadence;
-        uint8_t vortexCalibration, vortexCalibrationState;
+        uint8_t vortexCalibration, vortexCalibrationState, vortexPage;
         uint8_t vortexUsingVirtualSpeed;
 
     private:
