@@ -28,6 +28,7 @@
 #include "Pages.h"
 #include "Context.h"
 
+
 class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;
@@ -45,7 +46,7 @@ class GeneralConfig : public QWidget
         GeneralPage *generalPage;
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
 
     private:
         QDir home;
@@ -63,7 +64,7 @@ class AthleteConfig : public QWidget
         AthleteConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
     
     private:
         QDir home;
@@ -87,7 +88,7 @@ class AppearanceConfig : public QWidget
         AppearanceConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
     
     private:
         QDir home;
@@ -106,7 +107,7 @@ class PasswordConfig : public QWidget
         PasswordConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
     
     private:
         QDir home;
@@ -125,7 +126,7 @@ class DataConfig : public QWidget
         DataConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
     
     private:
         QDir home;
@@ -144,7 +145,7 @@ class MetricConfig : public QWidget
         MetricConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
     
     private:
         QDir home;
@@ -165,7 +166,7 @@ class DeviceConfig : public QWidget
         DeviceConfig(QDir home, Zones *zones, Context *context);
 
     public slots:
-        void saveClicked();
+        qint32 saveClicked();
     
     private:
         QDir home;
@@ -185,7 +186,7 @@ class ConfigDialog : public QMainWindow
 
     public slots:
         void changePage(int);
-        void saveClicked();
+        void saveClicked(); // collects state
         void closeClicked();
 
     private:

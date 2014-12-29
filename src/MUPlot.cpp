@@ -97,7 +97,7 @@ MUPlot::MUPlot(MUWidget *muw, CriticalPowerWindow *parent, Context *context)
     setAxisScaleDiv(xBottom,QwtScaleDiv(0.0f,1.0f,xtick));
 
     // now color everything we created
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 
     // set to a 2 Normal Model
     setModel(2);
@@ -110,7 +110,7 @@ MUPlot::MUPlot(MUWidget *muw, CriticalPowerWindow *parent, Context *context)
 
 // set colours mostly
 void
-MUPlot::configChanged()
+MUPlot::configChanged(qint32)
 {
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));

@@ -26,6 +26,31 @@
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
 
+// when config changes we need to notify widgets what changed
+// but there is so much config these days we need to be a little
+// more specific, not too specific since we would have a million
+// variations, but enough to let widgets ignore stuff and if they
+// need to react to very specific changes they should manage that
+// themselves.
+//
+// Context::notifyConfigChanged(x) and its signal configChanged(qint32)
+// are used to pass a state value around that contains the different
+// values or-ed together -- since it is possible to make changes
+// to different config and save it all at once.
+
+#define CONFIG_ATHLETE           0x1        // includes default weight, height etc
+#define CONFIG_ZONES             0x2 
+#define CONFIG_GENERAL           0x4        // includes default weight, w'bal formula, directories
+#define CONFIG_PASSWORDS         0x8
+#define CONFIG_APPEARANCE        0x10
+#define CONFIG_FIELDS            0x20       // metadata fields
+#define CONFIG_NOTECOLOR         0x40       // ride coloring from "notes" fields
+#define CONFIG_PROCESSING        0x80       // fix tools
+#define CONFIG_METRICS           0x100
+#define CONFIG_DEVICES           0x200
+#define CONFIG_SEASONS           0x400      // includes events and PMC constants
+#define CONFIG_UNITS             0x800      // metric / imperial
+
 class RideItem;
 class IntervalItem;
 class ErgFile;
@@ -83,9 +108,9 @@ class Context : public QObject
         // *********************************************
         // APPLICATION EVENTS
         // *********************************************
-        void notifyConfigChanged(); // used by ConfigDialog to notify Context *
-                                    // when config has changed - and to get a
-                                    // signal emitted to notify its children
+        void notifyConfigChanged(qint32); // used by ConfigDialog to notify Context *
+                                            // when config has changed - and to get a
+                                            // signal emitted to notify its children
 
         // preset charts
         void notifyPresetsChanged() { emit presetsChanged(); }
@@ -114,6 +139,7 @@ class Context : public QObject
         void notifyStop() { emit stop(); }
         void notifySeek(long x) { emit seek(x); }
 
+        void notifyWorkoutsChanged() { emit workoutsChanged(); }
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
         void notifyRideDeleted(RideItem *x) { ride=x; rideDeleted(x); }
@@ -142,7 +168,9 @@ class Context : public QObject
         void filterChanged();
         void homeFilterChanged();
 
-        void configChanged();
+        void configChanged(qint32);
+
+        void workoutsChanged(); // added or deleted a workout in train view
         void presetsChanged();
         void presetSelected(int);
 

@@ -74,7 +74,7 @@ RideCache::RideCache(Context *context) : context(context)
     refresh();
 
     // do we have any stale items ?
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // future watching
     connect(&watcher, SIGNAL(finished()), this, SLOT(save()));
@@ -95,7 +95,7 @@ RideCache::~RideCache()
 }
 
 void
-RideCache::configChanged()
+RideCache::configChanged(qint32)
 {
     // this is the overall config fingerprint, not for a specific
     // ride. We now refresh only when the zones change, and refresh

@@ -69,10 +69,10 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
 
     extraForm = new Form(this);
 
-    configUpdate();
+    configChanged(CONFIG_FIELDS | CONFIG_APPEARANCE);
 
     // watch for config changes
-    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // Extra tab is expensive to update so we only update if it
     // is visible. In this case we need to trigger refresh when the
@@ -215,7 +215,7 @@ RideMetadata::metadataChanged()
 }
 
 void
-RideMetadata::configUpdate()
+RideMetadata::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 

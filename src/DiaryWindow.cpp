@@ -93,16 +93,16 @@ DiaryWindow::DiaryWindow(Context *context) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(filterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(rideSelected()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
 
     // get colors sorted
-    configChanged();
+    configChanged(CONFIG_FIELDS | CONFIG_APPEARANCE);
 }
 
 void
-DiaryWindow::configChanged()
+DiaryWindow::configChanged(qint32)
 {
     // get config
     fieldDefinitions = context->athlete->rideMetadata()->getFields();

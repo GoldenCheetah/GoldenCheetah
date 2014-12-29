@@ -79,7 +79,7 @@ class PfPvPlot : public QwtPlot
         void showCompareIntervals();
 
     public slots:
-        void configChanged();
+        void configChanged(qint32);
         void intervalHover(RideFileInterval);
 
     signals:

@@ -214,13 +214,13 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
     sd->enableComponent(QwtScaleDraw::Backbone, false);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
 
     // lets watch the mouse move...
     new mouseTracker(this);
 
-    configChanged(); // use latest colors etc
+    configChanged(CONFIG_APPEARANCE | CONFIG_GENERAL); // use latest wheelsize/cranklength and colors
 }
 
 void ScatterPlot::setData (ScatterSettings *settings)
@@ -764,7 +764,7 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 }
 
 void
-ScatterPlot::configChanged()
+ScatterPlot::configChanged(qint32)
 {
     // setColors bg
     setCanvasBackground(GColor(CPLOTBACKGROUND));

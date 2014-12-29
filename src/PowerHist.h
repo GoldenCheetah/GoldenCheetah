@@ -161,7 +161,7 @@ class PowerHist : public QwtPlot
         void setZoned(bool value);
         void setCPZoned(bool value);
         void setSumY(bool value);
-        void configChanged();
+        void configChanged(qint32);
         void setAxisTitle(int axis, QString label);
         void setYMax();
         void setBinWidth(double value);

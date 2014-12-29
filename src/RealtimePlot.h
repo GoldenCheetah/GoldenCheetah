@@ -298,7 +298,7 @@ class RealtimePlot : public QwtPlot
     int smooth;
 
     public slots:
-    void configChanged();
+    void configChanged(qint32);
     void showPower(int state);
     void showPow30s(int state);
     void showHr(int state);

@@ -148,7 +148,7 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     //connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     //connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
     //connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
@@ -187,7 +187,7 @@ HomeWindow::addChartFromMenu(QAction*action)
 }
 
 void
-HomeWindow::configChanged()
+HomeWindow::configChanged(qint32)
 {
     // update scroll bar
 //#ifndef Q_OS_MAC

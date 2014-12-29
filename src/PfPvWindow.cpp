@@ -201,20 +201,20 @@ PfPvWindow::PfPvWindow(Context *context) :
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(context, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(configChanged(qint32)), pfPvPlot, SLOT(configChanged(qint32)));
 
     // comparing things
     connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
     connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
     // share current setting with Plot
     setGearRatioDisplayPfPvFromCheckBox();
 }
 
 void
-PfPvWindow::configChanged()
+PfPvWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
 }

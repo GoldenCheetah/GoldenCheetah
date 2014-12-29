@@ -244,7 +244,7 @@ class TreeMapPlot : public QWidget
         void setData(TMSettings *);
 
     public slots:
-        void configUpdate();
+        void configChanged(qint32);
         bool eventFilter(QObject *object, QEvent *e);
 
     signals:

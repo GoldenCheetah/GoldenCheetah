@@ -58,8 +58,8 @@ Context::notifyCompareDateRangesChanged()
 }
 
 void
-Context::notifyConfigChanged()
+Context::notifyConfigChanged(qint32 state)
 {
-    configChanged();
+    configChanged(state);
 }
 

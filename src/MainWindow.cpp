@@ -749,8 +749,8 @@ MainWindow::MainWindow(const QDir &home)
     installEventFilter(this);
 
     // catch config changes
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    configChanged();
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    configChanged(CONFIG_APPEARANCE);
 
     init = true;
 }
@@ -1883,7 +1883,7 @@ MainWindow::downloadTP()
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::configChanged()
+MainWindow::configChanged(qint32)
 {
 
 // Windows

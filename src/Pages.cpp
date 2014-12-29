@@ -277,7 +277,7 @@ GeneralPage::resetWheelSize()
    tireSizeCombo->setCurrentIndex(0);
 }
 
-void
+qint32
 GeneralPage::saveClicked()
 {
     // Language
@@ -314,6 +314,8 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_LTS_ACRONYM, appsettings->value(this, GC_LTS_ACRONYM,tr("LTS")));
     appsettings->setValue(GC_SB_NAME, appsettings->value(this, GC_SB_NAME,tr("Stress Balance")));
     appsettings->setValue(GC_SB_ACRONYM, appsettings->value(this, GC_SB_ACRONYM,tr("SB")));
+
+    return 0;
 }
 
 void
@@ -714,7 +716,7 @@ void CredentialsPage::authoriseCyclingAnalytics()
 }
 
 
-void
+qint32
 CredentialsPage::saveClicked()
 {
     appsettings->setCValue(context->athlete->cyclist, GC_TPURL, tpURL->text());
@@ -740,6 +742,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_DVURL, url);
     appsettings->setCValue(context->athlete->cyclist, GC_DVUSER, dvUser->text());
     appsettings->setCValue(context->athlete->cyclist, GC_DVPASS, dvPass->text());
+
+    return 0;
 }
 
 //
@@ -889,7 +893,7 @@ RiderPage::unitChanged(int currentIndex)
 }
 
 
-void
+qint32
 RiderPage::saveClicked()
 {
     appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
@@ -907,6 +911,7 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
+    return 0;
 }
 
 //
@@ -961,13 +966,15 @@ DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), con
     connect(delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
 }
 
-void
+qint32
 DevicePage::saveClicked()
 {
     // Save the device configuration...
     DeviceConfigurations all;
     all.writeConfig(deviceListModel->Configuration);
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
+
+    return 0;
 }
 
 void
@@ -1493,7 +1500,7 @@ ColorsPage::applyThemeClicked()
     }
 }
 
-void
+qint32
 ColorsPage::saveClicked()
 {
     // chrome style only has 2 types for now
@@ -1547,6 +1554,8 @@ ColorsPage::saveClicked()
     font.fromString(appsettings->value(this, GC_FONT_DEFAULT, QFont().toString()).toString());
     font.setPointSize(appsettings->value(this, GC_FONT_DEFAULT_SIZE, 13).toInt());
     QApplication::setFont(font);
+
+    return 0;
 }
 
 IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
@@ -1729,15 +1738,17 @@ IntervalMetricsPage::selectedChanged()
     leftButton->setEnabled(true);
 }
 
-void
+qint32
 IntervalMetricsPage::saveClicked()
 {
-    if (!changed)
-        return;
+    if (!changed) return 0;
+
     QStringList metrics;
     for (int i = 0; i < selectedList->count(); ++i)
         metrics << selectedList->item(i)->data(Qt::UserRole).toString();
     appsettings->setValue(GC_SETTINGS_INTERVAL_METRICS, metrics.join(","));
+
+    return 0;
 }
 
 BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
@@ -1920,15 +1931,17 @@ BestsMetricsPage::selectedChanged()
     leftButton->setEnabled(true);
 }
 
-void
+qint32
 BestsMetricsPage::saveClicked()
 {
-    if (!changed)
-        return;
+    if (!changed) return 0;
+
     QStringList metrics;
     for (int i = 0; i < selectedList->count(); ++i)
         metrics << selectedList->item(i)->data(Qt::UserRole).toString();
     appsettings->setValue(GC_SETTINGS_BESTS_METRICS, metrics.join(","));
+
+    return 0;
 }
 
 SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
@@ -2107,15 +2120,17 @@ SummaryMetricsPage::selectedChanged()
     leftButton->setEnabled(true);
 }
 
-void
+qint32
 SummaryMetricsPage::saveClicked()
 {
-    if (!changed)
-        return;
+    if (!changed) return 0;
+
     QStringList metrics;
     for (int i = 0; i < selectedList->count(); ++i)
         metrics << selectedList->item(i)->data(Qt::UserRole).toString();
     appsettings->setValue(GC_SETTINGS_SUMMARY_METRICS, metrics.join(","));
+
+    return 0;
 }
 
 MetadataPage::MetadataPage(Context *context) : context(context)
@@ -2149,7 +2164,7 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     layout->addWidget(tabs);
 }
 
-void
+qint32
 MetadataPage::saveClicked()
 {
     // get current state
@@ -2165,6 +2180,8 @@ MetadataPage::saveClicked()
 
     // save processors config
     processorPage->saveClicked();
+
+    return 0;
 }
 
 // little helper since we create/recreate combos
@@ -2676,7 +2693,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
     mainLayout->addWidget(processorTree, 0,0);
 }
 
-void
+qint32
 ProcessorPage::saveClicked()
 {
     // call each processor config widget's saveConfig() to
@@ -2689,6 +2706,8 @@ ProcessorPage::saveClicked()
         appsettings->setValue(configsetting, apply);
         ((DataProcessorConfig*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 2)))->saveConfig();
     }
+
+    return 0;
 }
 
 //
@@ -2869,11 +2888,18 @@ ZonePage::ZonePage(Context *context) : context(context)
     layout->addWidget(tabs);
 }
 
-void
+qint32
 ZonePage::saveClicked()
 {
+    // write
     zones.setScheme(schemePage->getScheme());
     zones.write(context->athlete->home->config());
+
+    // re-read Zones in case it changed
+    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/power.zones");
+    context->athlete->zones_->read(zonesFile);
+
+    return 0;
 }
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
@@ -3445,11 +3471,17 @@ HrZonePage::HrZonePage(Context *context) : context(context)
     layout->addWidget(tabs);
 }
 
-void
+qint32
 HrZonePage::saveClicked()
 {
     zones.setScheme(schemePage->getScheme());
     zones.write(context->athlete->home->config());
+
+    // reread HR zones
+    QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/hr.zones");
+    context->athlete->hrzones_->read(hrzonesFile);
+
+    return 0;
 }
 
 HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
@@ -4069,12 +4101,19 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     layout->addWidget(tabs);
 }
 
-void
+qint32
 PaceZonePage::saveClicked()
 {
+    // write it
     appsettings->setValue(GC_PACE, cvPage->metric->isChecked());
     zones.setScheme(schemePage->getScheme());
     zones.write(context->athlete->home->config());
+
+    // reread Pace zones
+    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/pace.zones");
+    context->athlete->pacezones_->read(pacezonesFile);
+
+    return 0;
 }
 
 PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
@@ -4850,7 +4889,7 @@ SeasonsPage::deleteClicked()
     }
 }
 
-void
+qint32
 SeasonsPage::saveClicked()
 {
     // get any edits to the names and dates
@@ -4872,6 +4911,8 @@ SeasonsPage::saveClicked()
 
     // re-read
     context->athlete->seasons->readSeasons();
+
+    return 0;
 }
 
 
@@ -5019,8 +5060,9 @@ AutoImportPage::deleteClicked()
     }
 }
 
-void
-AutoImportPage::saveClicked() {
+qint32
+AutoImportPage::saveClicked() 
+{
 
     rules.clear();
     for(int i=0; i<fields->invisibleRootItem()->childCount(); i++) {
@@ -5041,6 +5083,7 @@ AutoImportPage::saveClicked() {
     // re-read
     context->athlete->autoImportConfig->readConfig();
 
+    return 0;
 }
 
 void

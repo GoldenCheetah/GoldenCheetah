@@ -195,7 +195,7 @@ class MainWindow : public QMainWindow
         void saveGCState(Context *);
         void restoreGCState(Context *);
 
-        void configChanged();
+        void configChanged(qint32);
 
     private:
 

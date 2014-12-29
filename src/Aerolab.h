@@ -75,7 +75,7 @@ class Aerolab : public QwtPlot {
   void setAutoEoffset(int value);
   void setConstantAlt(int value);
   void setByDistance(int value);
-  void configChanged();
+  void configChanged(qint32);
 
   void pointHover( QwtPlotCurve *, int );
 

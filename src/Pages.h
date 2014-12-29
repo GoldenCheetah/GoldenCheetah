@@ -56,7 +56,7 @@ class GeneralPage : public QWidget
 
     public:
         GeneralPage(Context *context);
-        void saveClicked();
+        qint32 saveClicked();
 
         QString athleteWAS; // remember what we started with !
 
@@ -109,7 +109,7 @@ class RiderPage : public QWidget
 
     public:
         RiderPage(QWidget *parent, Context *context);
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
         void chooseAvatar();
@@ -142,7 +142,7 @@ class CredentialsPage : public QScrollArea
 
     public:
         CredentialsPage(QWidget *parent, Context *context);
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
 #ifdef GC_HAVE_KQOAUTH
@@ -229,7 +229,7 @@ class DevicePage : public QWidget
 
     public:
         DevicePage(QWidget *, Context *);
-        void saveClicked();
+        qint32 saveClicked();
 
         QTableView *deviceList;
 
@@ -274,7 +274,7 @@ class BestsMetricsPage : public QWidget
         void rightClicked();
         void availChanged();
         void selectedChanged();
-        void saveClicked();
+        qint32 saveClicked();
 
     protected:
 
@@ -312,7 +312,7 @@ class IntervalMetricsPage : public QWidget
         void rightClicked();
         void availChanged();
         void selectedChanged();
-        void saveClicked();
+        qint32 saveClicked();
 
     protected:
 
@@ -348,7 +348,7 @@ class SummaryMetricsPage : public QWidget
         void rightClicked();
         void availChanged();
         void selectedChanged();
-        void saveClicked();
+        qint32 saveClicked();
 
     protected:
 
@@ -414,7 +414,7 @@ class ColorsPage : public QWidget
 
     public:
         ColorsPage(QWidget *parent);
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
         void applyThemeClicked();
@@ -495,7 +495,7 @@ class ProcessorPage : public QWidget
     public:
 
         ProcessorPage(Context *context);
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
 
@@ -552,7 +552,7 @@ class MetadataPage : public QWidget
     public:
 
         MetadataPage(Context *);
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
 
@@ -587,7 +587,7 @@ class SchemePage : public QWidget
     public:
         SchemePage(ZonePage *parent);
         ZoneScheme getScheme();
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
         void addClicked();
@@ -641,7 +641,7 @@ class ZonePage : public QWidget
     public:
 
         ZonePage(Context *);
-        void saveClicked();
+        qint32 saveClicked();
 
         //ZoneScheme scheme;
         Zones zones;
@@ -675,7 +675,7 @@ class HrSchemePage : public QWidget
 public:
     HrSchemePage(HrZonePage *parent);
     HrZoneScheme getScheme();
-    void saveClicked();
+    qint32 saveClicked();
 
     public slots:
     void addClicked();
@@ -731,7 +731,7 @@ class HrZonePage : public QWidget
 public:
 
     HrZonePage(Context *);
-    void saveClicked();
+    qint32 saveClicked();
 
     //ZoneScheme scheme;
     HrZones zones;
@@ -765,7 +765,7 @@ class PaceSchemePage : public QWidget
     public:
         PaceSchemePage(PaceZonePage *parent);
         PaceZoneScheme getScheme();
-        void saveClicked();
+        qint32 saveClicked();
 
     public slots:
         void addClicked();
@@ -822,7 +822,7 @@ class PaceZonePage : public QWidget
     public:
 
         PaceZonePage(Context *);
-        void saveClicked();
+        qint32 saveClicked();
 
         PaceZones zones;
 
@@ -862,7 +862,7 @@ class SeasonsPage : public QWidget
         void renameClicked();
         void deleteClicked();
         void clearEdit();
-        void saveClicked();
+        qint32 saveClicked();
 
     private:
 
@@ -891,7 +891,7 @@ class AutoImportPage : public QWidget
     public:
 
         AutoImportPage(Context *);
-        void saveClicked();
+        qint32 saveClicked();
         void addRuleTypes(QComboBox *p);
 
     public slots:

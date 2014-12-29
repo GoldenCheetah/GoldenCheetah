@@ -72,7 +72,7 @@ class SpinScanPlot : public QwtPlot
     uint8_t *spinData;
 
     public slots:
-    void configChanged();
+    void configChanged(qint32);
 };
 
 

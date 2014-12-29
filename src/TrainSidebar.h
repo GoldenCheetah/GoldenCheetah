@@ -139,7 +139,7 @@ class TrainSidebar : public GcWindow
         void selectWorkout(QString fullpath);
 
     public slots:
-        void configChanged();
+        void configChanged(qint32);
         void deleteWorkouts(); // deletes selected workouts
         void deleteVideos(); // deletes selected workouts
 

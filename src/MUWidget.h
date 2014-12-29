@@ -39,7 +39,7 @@ class MUWidget : public QWidget
     public slots:
 
         // colors/appearance changed
-        void configChanged();
+        void configChanged(qint32);
 
     public:
 

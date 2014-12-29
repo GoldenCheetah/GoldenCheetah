@@ -209,7 +209,7 @@ class LTMWindow : public GcChartWindow
         void exportData();
         QString dataTable(bool html=true); // true as html, false as csv
 
-        void configChanged();
+        void configChanged(qint32);
 
     private:
         // passed from Context *

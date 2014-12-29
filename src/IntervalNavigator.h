@@ -85,7 +85,7 @@ class IntervalNavigator : public GcWindow
 
     public slots:
 
-        void configChanged();
+        void configChanged(qint32);
         void refresh();
 
         void showEvent(QShowEvent *event);

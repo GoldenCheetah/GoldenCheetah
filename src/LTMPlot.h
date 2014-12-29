@@ -59,7 +59,7 @@ class LTMPlot : public QwtPlot
     public slots:
         void pointHover(QwtPlotCurve*, int);
         void pointClicked(QwtPlotCurve*, int); // point clicked
-        void configUpdate();
+        void configChanged(qint32);
         bool eventFilter(QObject *, QEvent *);
 
     protected:

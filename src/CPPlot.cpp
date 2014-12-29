@@ -104,12 +104,12 @@ CPPlot::CPPlot(QWidget *parent, Context *context, bool rangemode) : QwtPlot(pare
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     // now color everything we created
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 // set colours mostly
 void
-CPPlot::configChanged()
+CPPlot::configChanged(qint32)
 {
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));

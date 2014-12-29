@@ -103,7 +103,7 @@ class ModelWindow : public GcChartWindow
 
     public slots:
 
-        void configChanged();
+        void configChanged(qint32);
         void rideSelected();
         void intervalSelected();
         void applyPreset(int);

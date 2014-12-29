@@ -454,7 +454,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
     connect(ridePlotStyleCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlotType(int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-    connect(context, SIGNAL(configChanged()), cpPlot, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), cpPlot, SLOT(configChanged(qint32)));
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
 
     // model updated?
@@ -474,7 +474,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     // redraw on config change -- this seems the simplest approach
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
@@ -500,11 +500,11 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     // set widgets and model parameters
     modelChanged();
 
-    configChanged(); // get colors set
+    configChanged(CONFIG_APPEARANCE); // get colors set
 }
 
 void
-CriticalPowerWindow::configChanged()
+CriticalPowerWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 

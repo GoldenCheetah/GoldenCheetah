@@ -97,7 +97,7 @@ class CPPlot : public QwtPlot
     public slots:
 
         // colors/appearance changed
-        void configChanged();
+        void configChanged(qint32);
 
         // the picker hovered over a point on the curve
         void pointHover(QwtPlotCurve *curve, int index);

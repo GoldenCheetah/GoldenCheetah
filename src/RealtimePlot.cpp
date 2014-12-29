@@ -24,6 +24,7 @@
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
 #include "RealtimePlot.h"
+#include "Context.h"
 #include "Colors.h"
 
 
@@ -359,7 +360,7 @@ RealtimePlot::RealtimePlot() :
 //    lodCurve->attach(this);
 //    lodCurve->setYAxis(QwtPlot::yLeft);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
-    configChanged(); // set colors
+    configChanged(CONFIG_APPEARANCE); // set colors
 }
 
 void
@@ -377,7 +378,7 @@ RealtimePlot::setAxisTitle(int axis, QString label)
 }
 
 void
-RealtimePlot::configChanged()
+RealtimePlot::configChanged(qint32)
 {
     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
 

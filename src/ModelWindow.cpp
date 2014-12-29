@@ -169,14 +169,14 @@ ModelWindow::ModelWindow(Context *context) :
     connect(binWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
     connect(zpane, SIGNAL(valueChanged(int)), this, SLOT(setZPane(int)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors on first run
-    configChanged();
+    configChanged(qint32);
 }
 
 void
-ModelWindow::configChanged()
+ModelWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 }

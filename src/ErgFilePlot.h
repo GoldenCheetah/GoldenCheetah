@@ -141,7 +141,7 @@ class ErgFilePlot : public QwtPlot
     public slots:
 
     void performancePlot(RealtimeData);
-    void configChanged();
+    void configChanged(qint32);
     void start();
 
     private:

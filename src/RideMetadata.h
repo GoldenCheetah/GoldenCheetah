@@ -169,7 +169,7 @@ class RideMetadata : public QWidget
 
 
     public slots:
-        void configUpdate();
+        void configChanged(qint32);
         void metadataChanged(); // when its changed elsewhere we need to refresh fields
         void setExtraTab();     // shows fields not configured but present in ride file
         void warnDateTime(QDateTime); // warn if file already exists after date/time changed

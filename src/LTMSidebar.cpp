@@ -206,7 +206,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     resetFilters(); // reset the filters list
 
     autoFilterMenu = new QMenu(tr("Autofilter"),this);
-    configChanged(); // will reset the metric tree and the autofilters
+    configChanged(CONFIG_APPEARANCE); // will reset the metric tree and the autofilters
 
     splitter = new GcSplitter(Qt::Vertical);
     splitter->addWidget(seasonsWidget); // goes alongside events
@@ -250,7 +250,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
 
     // GC signal
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
     connect(context->athlete, SIGNAL(namedSearchesChanged()), this, SLOT(resetFilters()));
 
@@ -259,7 +259,7 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     connect(chartTree,SIGNAL(itemSelectionChanged()), this, SLOT(presetTreeWidgetSelectionChanged()));
 
     // setup colors
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
@@ -290,7 +290,7 @@ LTMSidebar::presetTreeWidgetSelectionChanged()
 }
 
 void
-LTMSidebar::configChanged()
+LTMSidebar::configChanged(qint32)
 {
     seasonsWidget->setStyleSheet(GCColor::stylesheet());
     eventsWidget->setStyleSheet(GCColor::stylesheet());

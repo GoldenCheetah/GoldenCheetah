@@ -801,7 +801,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     axisWidget(QwtAxisId(QwtAxis::yRight, 2))->installEventFilter(this);
     axisWidget(QwtAxisId(QwtAxis::yRight, 3))->installEventFilter(this);
 
-    configChanged(); // set colors
+    configChanged(CONFIG_APPEARANCE); // set colors
 }
 
 AllPlot::~AllPlot()
@@ -819,7 +819,7 @@ AllPlot::~AllPlot()
 }
 
 void
-AllPlot::configChanged()
+AllPlot::configChanged(qint32)
 {
     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
     labelFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
@@ -2958,7 +2958,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     //replot();
 
     // set all the colors ?
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 
     // remember the curves and colors
     isolation = false;

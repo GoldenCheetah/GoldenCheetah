@@ -51,7 +51,7 @@ class RideCacheModel : public QAbstractTableModel
     public slots:
 
          // when updating metadata config
-        void configChanged();
+        void configChanged(qint32);
 
         // catch ridecache refreshes
         void refreshUpdate(QDate); 

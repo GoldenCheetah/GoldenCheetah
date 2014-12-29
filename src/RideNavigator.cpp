@@ -122,7 +122,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
@@ -159,7 +159,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     setAcceptDrops(true);
 
     // lets go
-    configChanged();
+    configChanged(CONFIG_APPEARANCE | CONFIG_NOTECOLOR);
 }
 
 RideNavigator::~RideNavigator()
@@ -169,7 +169,7 @@ RideNavigator::~RideNavigator()
 }
 
 void
-RideNavigator::configChanged()
+RideNavigator::configChanged(qint32)
 {
     ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();

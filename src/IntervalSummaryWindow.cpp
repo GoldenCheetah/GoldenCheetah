@@ -47,7 +47,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(intervalSelected()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(intervalSelected()));
 
     setHtml(GCColor::css() + "<body></body>");
 }

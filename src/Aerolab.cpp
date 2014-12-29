@@ -273,12 +273,12 @@ Aerolab::Aerolab(
   grid->enableX(false);
   grid->attach(this);
 
-  configChanged();
+  configChanged(CONFIG_APPEARANCE);
 }
 
 
 void
-Aerolab::configChanged()
+Aerolab::configChanged(qint32)
 {
 
   // set colors

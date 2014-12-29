@@ -143,7 +143,7 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh(void)));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh(void)));
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(refresh()));
 
     // user clicked on a cell in the plot
     connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));

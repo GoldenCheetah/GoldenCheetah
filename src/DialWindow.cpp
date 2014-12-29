@@ -79,7 +79,7 @@ DialWindow::DialWindow(Context *context) :
 
     // get updates..
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(seriesChanged()));
     connect(context, SIGNAL(stop()), this, SLOT(stop()));
     connect(context, SIGNAL(start()), this, SLOT(start()));
     connect(context, SIGNAL(newLap()), this, SLOT(onNewLap()));

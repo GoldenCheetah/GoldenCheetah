@@ -79,7 +79,7 @@ class DataFilter : public QObject
     public slots:
         QStringList parseFilter(QString query, QStringList *list=0);
         void clearFilter();
-        void configUpdate();
+        void configChanged(qint32);
 
         //void setData(); // set the file list from the current filter
 

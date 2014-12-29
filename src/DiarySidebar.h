@@ -89,7 +89,7 @@ class GcMiniCalendar : public QWidget
 
     public slots:
 
-        void configChanged();
+        void configChanged(qint32);
 
         void setRide(RideItem *ride);
         void refresh(); 
@@ -144,7 +144,7 @@ class GcMultiCalendar : public QScrollArea
         void setFilter(QStringList filter);
         void clearFilter();
         void showEvent(QShowEvent*);
-        void configChanged();
+        void configChanged(qint32);
 
     private:
         GcWindowLayout *layout;
@@ -172,7 +172,7 @@ class DiarySidebar : public QWidget // not a GcWindow - belongs on sidebar
         void refresh(); 
         void setSummary(); // set the summary at the bottom
 
-        void configChanged();
+        void configChanged(qint32);
         void filterChanged() { multiCalendar->filterChanged(); }
 
     signals:

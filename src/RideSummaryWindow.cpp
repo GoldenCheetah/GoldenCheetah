@@ -123,12 +123,12 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
         connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     }
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(this, SIGNAL(doRefresh()), this, SLOT(refresh()));
     connect(context->athlete->rideCache, SIGNAL(modelProgress(int,int)), this, SLOT(modelProgress(int,int)));
 
     setChartLayout(vlayout);
-    configChanged(); // set colors
+    configChanged(CONFIG_APPEARANCE | CONFIG_METRICS); // set colors
 }
 
 RideSummaryWindow::~RideSummaryWindow()
@@ -139,7 +139,7 @@ RideSummaryWindow::~RideSummaryWindow()
 }
 
 void
-RideSummaryWindow::configChanged()
+RideSummaryWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
 

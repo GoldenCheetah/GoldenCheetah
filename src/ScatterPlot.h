@@ -86,7 +86,7 @@ class ScatterPlot : public QwtPlot
     public slots:
         void intervalHover(RideFileInterval);
         void mouseMoved();
-        void configChanged();
+        void configChanged(qint32);
 
     protected:
 

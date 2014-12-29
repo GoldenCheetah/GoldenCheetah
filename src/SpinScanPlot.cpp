@@ -26,6 +26,7 @@
 #include "SpinScanPlot.h"
 #include <stdint.h>
 #include "Colors.h"
+#include "Context.h"
 
 // lazy way of mapping x-axis to point value, proly could work it out algorithmically,
 // but the irony is this is probably faster anyway since its a straight lookup.
@@ -86,7 +87,7 @@ SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent)
     rightSpinScanData = new SpinScanData(spinData, false);
 
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
-    configChanged(); // set colors
+    configChanged(CONFIG_APPEARANCE); // set colors
 }
 
 void
@@ -104,7 +105,7 @@ SpinScanPlot::setAxisTitle(int axis, QString label)
 }
 
 void
-SpinScanPlot::configChanged()
+SpinScanPlot::configChanged(qint32)
 {
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
 

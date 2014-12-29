@@ -214,13 +214,13 @@ LTMWindow::LTMWindow(Context *context) :
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 LTMWindow::~LTMWindow()
@@ -229,7 +229,7 @@ LTMWindow::~LTMWindow()
 }
 
 void
-LTMWindow::configChanged()
+LTMWindow::configChanged(qint32)
 {
 #ifndef Q_OS_MAC
     plotArea->setStyleSheet(TabView::ourStyleSheet());
