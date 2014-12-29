@@ -39,7 +39,7 @@
 #include <QDebug>
 
 GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), context(context), 
-                                                       range(-1), current(NULL), firstShow(true)
+                                                       range(-1), current(NULL), firstShow(true), stale(false)
 {
     setControls(NULL);
 
@@ -71,6 +71,7 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     //
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
+    connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
@@ -95,6 +96,13 @@ GoogleMapControl::configChanged(qint32)
 }
 
 void
+GoogleMapControl::forceReplot()
+{
+    stale=true;
+    rideSelected();
+}
+
+void
 GoogleMapControl::rideSelected()
 {
     RideItem * ride = myRideItem;
@@ -105,8 +113,13 @@ GoogleMapControl::rideSelected()
 
     // skip display if data already drawn or invalid
     if (myRideItem == NULL || !amVisible()) return;
-    if (ride == current || !ride || !ride->ride()) return;
-    else current = ride;
+
+    // nothing to plot
+    if (!ride || !ride->ride()) return;
+    else if (!stale && ride == current) return;
+    
+    // remember what we last plotted
+    current = ride;
 
     // Route metadata ...
     setSubTitle(ride->ride()->getTag("Route", tr("Route")));
@@ -114,6 +127,7 @@ GoogleMapControl::rideSelected()
     // default to ..
     range = -1;
     rideCP = 300;
+    stale = false;
 
     if (context->athlete->zones()) {
         range = context->athlete->zones()->whichRange(ride->dateTime.date());
