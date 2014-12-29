@@ -87,7 +87,7 @@ ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
 }
 
 ScatterWindow::ScatterWindow(Context *context) :
-    GcChartWindow(context), context(context), ride(NULL), current(NULL)
+    GcChartWindow(context), context(context), ride(NULL), current(NULL), stale(false)
 {
     //
     // reveal controls widget
@@ -208,6 +208,7 @@ ScatterWindow::ScatterWindow(Context *context) :
     // now connect up the widgets
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(xSelectorChanged(int)));
@@ -247,14 +248,20 @@ ScatterWindow::configChanged(qint32)
 }
 
 void
+ScatterWindow::forceReplot()
+{
+    stale=true;
+    rideSelected();
+}
+
+void
 ScatterWindow::rideSelected()
 {
-    if (!amVisible())
-        return;
+    if (!amVisible()) return;
 
     ride = myRideItem;
 
-    if (ride == current) return;
+    if (ride == current && !stale) return;
 
     if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
         current = NULL;
@@ -264,6 +271,8 @@ ScatterWindow::rideSelected()
         setIsBlank(false);
 
     current = ride;
+    stale = false;
+
     setData();
 }
 
