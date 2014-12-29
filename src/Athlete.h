@@ -85,8 +85,6 @@ class Athlete : public QObject
         PaceZones *pacezones_;
         void setCriticalPower(int cp);
 
-        // SQL tables are going soon
-        bool isclean;
 #ifdef GC_HAVE_INTERVALS
         QSqlTableModel *sqlRouteIntervalsModel;
         QSqlTableModel *sqlBestIntervalsModel;
@@ -131,6 +129,7 @@ class Athlete : public QObject
 #ifdef GC_HAVE_LUCENE
         Lucene *lucene;
         NamedSearches *namedSearches;
+        bool emptyindex; // when startup and index is missing
 #endif
         Context *context;
 

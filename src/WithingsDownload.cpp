@@ -79,7 +79,6 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
             withingsJSON.close();
         }
 
-        context->athlete->isclean = false;
         //XXXREFRESH context->athlete->metricDB->refreshMetrics(context->athlete->withings().first().when);
     }
     return;
