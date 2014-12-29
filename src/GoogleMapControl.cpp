@@ -74,10 +74,10 @@ GoogleMapControl::GoogleMapControl(Context *context) : GcChartWindow(context), c
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     first = true;
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 GoogleMapControl::~GoogleMapControl()
@@ -86,7 +86,7 @@ GoogleMapControl::~GoogleMapControl()
 }
 
 void 
-GoogleMapControl::configChanged()
+GoogleMapControl::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 #ifndef Q_OS_MAC

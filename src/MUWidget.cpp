@@ -135,7 +135,7 @@ MUWidget::MUWidget(CriticalPowerWindow *parent, Context *context)
     main->addLayout(rhs);
 
     // when config changes
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 
     connect(mass, SIGNAL(valueChanged(double)), muPlot, SLOT(setMUSet()));
     connect(tau0, SIGNAL(valueChanged(double)), muPlot, SLOT(setMUSet()));
@@ -149,7 +149,7 @@ MUWidget::MUWidget(CriticalPowerWindow *parent, Context *context)
 
 // set colours mostly
 void
-MUWidget::configChanged()
+MUWidget::configChanged(qint32)
 {
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));

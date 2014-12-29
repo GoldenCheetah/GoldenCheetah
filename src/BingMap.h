@@ -82,7 +82,7 @@ class BingMap : public GcChartWindow
 
     public slots:
 
-        void configChanged();
+        void configChanged(qint32);
         void rideSelected();
         void createMarkers();
         void drawShadedRoute();

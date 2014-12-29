@@ -129,7 +129,7 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     // refresh when config changes (metric/imperial?)
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
@@ -156,7 +156,7 @@ IntervalNavigator::IntervalNavigator(Context *context, QString type, bool mainwi
     setAcceptDrops(true);
 
     // lets go
-    configChanged();
+    configChanged(CONFIG_APPEARANCE | CONFIG_NOTECOLOR);
 }
 
 IntervalColumnChooser::IntervalColumnChooser(QList<QString>&logicalHeadings)
@@ -230,7 +230,7 @@ IntervalNavigator::~IntervalNavigator()
 }
 
 void
-IntervalNavigator::configChanged()
+IntervalNavigator::configChanged(qint32)
 {
     ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();

@@ -51,7 +51,7 @@ class ComparePane : public QWidget
 
         void clear(); // wipe away whatever is there
 
-        void configChanged();
+        void configChanged(qint32);
 
         void itemsWereSorted();
         void intervalButtonsChanged();

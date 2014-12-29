@@ -122,7 +122,7 @@ class ModelPlot : public SurfacePlot
         QHash<QString, double> inum;      // for selected intervals
 
     public slots:
-        void configChanged();
+        void configChanged(qint32);
 
     protected:
 

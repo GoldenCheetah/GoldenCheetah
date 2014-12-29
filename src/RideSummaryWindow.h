@@ -111,7 +111,7 @@ class RideSummaryWindow : public GcChartWindow
         void compareChanged();
 
         // config changed
-        void configChanged();
+        void configChanged(qint32);
 
         // model estimate progress updates
         void modelProgress(int year, int month);

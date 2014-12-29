@@ -59,16 +59,16 @@ BingMap::BingMap(Context *context) : GcChartWindow(context), context(context), r
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     first = true;
 
     // get the colors setup for first run
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-BingMap::configChanged()
+BingMap::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
     rideSelected();

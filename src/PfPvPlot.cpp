@@ -206,13 +206,13 @@ PfPvPlot::PfPvPlot(Context *context)
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false) shade_zones = false;
     else shade_zones = true;
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 
     recalc();
 }
 
 void
-PfPvPlot::configChanged()
+PfPvPlot::configChanged(qint32)
 {
     setCanvasBackground(GColor(CPLOTBACKGROUND));
 

@@ -901,14 +901,14 @@ ModelPlot::ModelPlot(Context *context, QWidget *parent, ModelSettings *settings)
     resetViewPoint();
 
     // set colors
-    configChanged();
+    configChanged(qint32);
 
     updateData();
     updateGL();
 }
 
 void
-ModelPlot::configChanged()
+ModelPlot::configChanged(qint32)
 {
     // setColors bg
     QColor rgba = GColor(CPLOTBACKGROUND);

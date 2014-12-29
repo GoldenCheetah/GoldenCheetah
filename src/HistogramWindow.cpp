@@ -329,7 +329,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(forceReplot()));
 
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
@@ -337,14 +337,14 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
 
     // set colors etc
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-HistogramWindow::configChanged()
+HistogramWindow::configChanged(qint32 state)
 {
     setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
-    powerHist->configChanged();
+    powerHist->configChanged(state);
 }
 
 bool

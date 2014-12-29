@@ -122,11 +122,11 @@ PowerHist::PowerHist(Context *context, bool rangemode) :
     setAxisMaxMinor(xBottom, 0);
     setAxisMaxMinor(yLeft, 0);
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-PowerHist::configChanged()
+PowerHist::configChanged(qint32)
 {
     // plot background
     setCanvasBackground(GColor(CPLOTBACKGROUND));
@@ -971,7 +971,7 @@ PowerHist::recalc(bool force)
     }
 
     setYMax();
-    configChanged(); // setup the curve colors to appropriate values
+    configChanged(CONFIG_APPEARANCE); // setup the curve colors to appropriate values
     updatePlot();
 }
 
@@ -2225,7 +2225,7 @@ PowerHist::setSeries(RideFile::SeriesType x)
 {
     // user selected a different series to plot
     series = x;
-    configChanged(); // set colors
+    configChanged(CONFIG_APPEARANCE); // set colors
     setParameterAxisTitle();
 }
 

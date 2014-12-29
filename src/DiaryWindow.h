@@ -59,7 +59,7 @@ class DiaryWindow : public GcWindow
 
     public slots:
         void rideSelected();
-        void configChanged();
+        void configChanged(qint32);
         void nextClicked();
         void prevClicked();
         void setDefaultView(int);

@@ -110,7 +110,7 @@ class TabView : public QWidget
 
         //void mediaSelected(QString filename);
         //void ergSelected(ErgFile *erg);
-        void configChanged();
+        void configChanged(qint32);
 
         void resizeEvent(QResizeEvent*);
 

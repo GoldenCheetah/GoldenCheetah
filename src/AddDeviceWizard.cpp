@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "ConfigDialog.h"
 
 // WIZARD FLOW
 //
@@ -1241,7 +1242,7 @@ AddFinal::validatePage()
         all.writeConfig(list);
 
         // tell everyone
-        wizard->context->notifyConfigChanged();
+        wizard->context->notifyConfigChanged(CONFIG_DEVICES);
  
         // shut down the controller, if it is there, since it will
         // still be connected to the device (in case we hit the back button)

@@ -117,7 +117,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     splitter->prepare(context->athlete->cyclist, "analysis");
 
     // GC signal
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // right click menus...
     connect(rideNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showActivityMenu(const QPoint &)));
@@ -126,7 +126,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
@@ -147,7 +147,7 @@ AnalysisSidebar::close()
 }
 
 void
-AnalysisSidebar::configChanged()
+AnalysisSidebar::configChanged(qint32)
 {
     //calendarWidget->setPalette(GCColor::palette());
     //intervalSummaryWindow->setPalette(GCColor::palette());

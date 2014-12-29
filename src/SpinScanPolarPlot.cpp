@@ -26,6 +26,7 @@
 #include "SpinScanPolarPlot.h"
 #include <stdint.h>
 #include "Colors.h"
+#include "Context.h"
 
 // to avoid excessive floating point operations when updating the display
 // this is a precomputed value for cos(i*15) * (PI / 180)
@@ -97,7 +98,7 @@ SpinScanPolarPlot::SpinScanPolarPlot(QWidget *parent, uint8_t *spinData) : QwtPl
     leftSpinScanPolarData = new SpinScanPolarData(spinData, true);
 
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
-    configChanged(); // set colors
+    configChanged(CONFIG_APPEARANCE); // set colors
 }
 
 void
@@ -115,7 +116,7 @@ SpinScanPolarPlot::setAxisTitle(int axis, QString label)
 }
 
 void
-SpinScanPolarPlot::configChanged()
+SpinScanPolarPlot::configChanged(qint32)
 {
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
 

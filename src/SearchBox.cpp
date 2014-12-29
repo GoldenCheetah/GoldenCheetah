@@ -77,14 +77,14 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     setDragEnabled(true);
     checkMenu();
     connect(this, SIGNAL(returnPressed()), this, SLOT(searchSubmit()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set colors and curviness
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-SearchBox::configChanged()
+SearchBox::configChanged(qint32)
 {
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     QColor color = QPalette().color(QPalette::Highlight);

@@ -73,7 +73,7 @@ public slots:
     void paintEvent (QPaintEvent *event);
     //void resizeEvent(QResizeEvent *);
     //bool eventFilter(QObject *object, QEvent *e); // trap resize
-    void configChanged();
+    void configChanged(qint32);
 
     // switch children
     void setCurrentIndex(int index);

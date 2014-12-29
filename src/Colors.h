@@ -134,7 +134,7 @@ class ColorEngine : public QObject
         QColor defaultColor, reverseColor;
 
     public slots:
-        void configUpdate();
+        void configChanged(qint32);
 
     private:
         QMap<QString, QColor> workoutCodes;

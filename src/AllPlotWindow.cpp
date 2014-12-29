@@ -715,7 +715,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
@@ -728,11 +728,11 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
     // set initial colors
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-AllPlotWindow::configChanged()
+AllPlotWindow::configChanged(qint32 state)
 {
     setUpdatesEnabled(false);
 
@@ -774,20 +774,20 @@ AllPlotWindow::configChanged()
 
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     fullPlot->setPalette(palette);
-    fullPlot->configChanged();
+    fullPlot->configChanged(state);
     fullPlot->update();
 
     // allPlot of course
     allPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     allPlot->setPalette(palette);
-    allPlot->configChanged();
+    allPlot->configChanged(state);
     allPlot->update();
 
     // and then the stacked plot
     foreach (AllPlot *plot, allPlots) {
         plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
         plot->setPalette(palette);
-        plot->configChanged();
+        plot->configChanged(state);
         plot->update();
     }
 
@@ -795,7 +795,7 @@ AllPlotWindow::configChanged()
     foreach (AllPlot *plot, seriesPlots) {
         plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
         plot->setPalette(palette);
-        plot->configChanged();
+        plot->configChanged(state);
         plot->update();
     }
 
@@ -803,7 +803,7 @@ AllPlotWindow::configChanged()
     foreach (AllPlot *plot, allComparePlots) {
         plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
         plot->setPalette(palette);
-        plot->configChanged();
+        plot->configChanged(state);
         plot->update();
     }
 

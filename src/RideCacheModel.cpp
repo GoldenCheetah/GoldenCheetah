@@ -26,9 +26,9 @@
 RideCacheModel::RideCacheModel(Context *context, RideCache *cache) : QAbstractTableModel(cache), context(context), rideCache(cache)
 {
     factory = &RideMetricFactory::instance();
-    configChanged();
+    configChanged(CONFIG_FIELDS | CONFIG_NOTECOLOR);
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
@@ -141,7 +141,7 @@ RideCacheModel::headerData(int section, Qt::Orientation orientation, int role) c
 
 // when updating metadata config
 void 
-RideCacheModel::configChanged()
+RideCacheModel::configChanged(qint32)
 {
     // we are resetting
     beginResetModel();

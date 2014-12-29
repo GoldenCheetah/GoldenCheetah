@@ -224,18 +224,18 @@ ScatterWindow::ScatterWindow(Context *context) :
     connect(trendLine, SIGNAL(currentIndexChanged(int)), this, SLOT(setTrendLine(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // comparing things
     connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));
     connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareChanged()));
 
     // set colors
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-ScatterWindow::configChanged()
+ScatterWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 

@@ -110,7 +110,7 @@ class PfPvWindow : public GcChartWindow
         void setrFrameIntervalsPfPvFromCheckBox();
         void setGearRatioDisplayPfPvFromCheckBox();
         void doubleClicked(int, int);
-        void configChanged();
+        void configChanged(qint32);
         void compareChanged();
 
     protected:

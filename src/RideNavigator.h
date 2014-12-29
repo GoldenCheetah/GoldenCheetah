@@ -84,7 +84,7 @@ class RideNavigator : public GcWindow
 
     public slots:
 
-        void configChanged();
+        void configChanged(qint32);
         void refresh();
         void backgroundRefresh(); // keep up with bg refreshes
 

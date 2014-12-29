@@ -36,7 +36,7 @@ class MetadataWindow : public GcChartWindow
     protected slots:
 
         void rideItemChanged();
-        void configChanged();
+        void configChanged(qint32);
 
     protected:
 

@@ -157,7 +157,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
@@ -169,11 +169,11 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     connect(anomalyTool->anomalyList, SIGNAL(itemSelectionChanged()), this, SLOT(anomalySelected()));
 
     // set initial color config
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-RideEditor::configChanged() 
+RideEditor::configChanged(qint32) 
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 

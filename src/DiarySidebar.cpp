@@ -122,14 +122,14 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     // refresh on these events...
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set up for current selections
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-DiarySidebar::configChanged()
+DiarySidebar::configChanged(qint32)
 {
     // GCColor stylesheet is too generic, we ONLY want to style the container
     // and NOT its children. This is why stylesheets on widgets is a stoopid idea
@@ -603,12 +603,12 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
 
     // set up for current selections - and watch for future changes
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    configChanged();
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-GcMiniCalendar::configChanged()
+GcMiniCalendar::configChanged(qint32)
 {
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
@@ -891,13 +891,13 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 
     connect(mini, SIGNAL(dateChanged(int,int)), this, SLOT(dateChanged(int,int)));
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
-    connect (context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect (context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-GcMultiCalendar::configChanged()
+GcMultiCalendar::configChanged(qint32)
 {
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);

@@ -355,7 +355,7 @@ intensity->hide(); //XXX!!! temporary
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
     connect(context, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
 #endif
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
@@ -398,7 +398,7 @@ intensity->hide(); //XXX!!! temporary
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
 
-    configChanged(); // will reset the workout tree
+    configChanged(CONFIG_APPEARANCE | CONFIG_DEVICES | CONFIG_ZONES); // will reset the workout tree
     setLabels();
 
 #ifndef Q_OS_MAC
@@ -501,7 +501,7 @@ TrainSidebar::mediaPopup()
 }
 
 void
-TrainSidebar::configChanged()
+TrainSidebar::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
@@ -1750,7 +1750,7 @@ TrainSidebar::deleteDevice()
     all.writeConfig(list);
 
     // tell everyone
-    context->notifyConfigChanged();
+    context->notifyConfigChanged(CONFIG_DEVICES);
 }
 
 // we have been told to select this video (usually because

@@ -97,7 +97,7 @@ class RideCache : public QObject
         void save();
 
         // user updated options/preferences
-        void configChanged();
+        void configChanged(qint32);
 
         // background refresh progress update
         void progressing(int);

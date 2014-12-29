@@ -37,7 +37,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
     connect(context, SIGNAL(start()), ergPlot, SLOT(start()));
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 void
@@ -58,7 +58,7 @@ WorkoutPlotWindow::setNow(long now)
 }
 
 void
-WorkoutPlotWindow::configChanged()
+WorkoutPlotWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
     repaint();

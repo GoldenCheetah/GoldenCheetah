@@ -180,7 +180,7 @@ class HistogramWindow : public GcChartWindow
         void compareChanged();
 
         // update on config
-        void configChanged();
+        void configChanged(qint32);
 
     protected slots:
 

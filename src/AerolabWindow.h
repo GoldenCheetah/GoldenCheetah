@@ -67,7 +67,7 @@ class AerolabWindow : public GcWindow {
   void rideSelected();
   void zoomChanged();
   void zoomInterval(IntervalItem *); // zoom into a specified interval
-  void configChanged();
+  void configChanged(qint32);
   void intervalSelected();
 
   protected slots:

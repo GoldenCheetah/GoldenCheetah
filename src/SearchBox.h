@@ -69,7 +69,7 @@ private slots:
     void setMenu();
     void addNamed();
 
-    void configChanged();
+    void configChanged(qint32);
 
 signals:
     // text search mode

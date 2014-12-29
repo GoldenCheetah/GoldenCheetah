@@ -160,14 +160,14 @@ ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : 
     table->setFrameStyle(QFrame::NoFrame);
     scrollArea->setWidget(table);
 
-    configChanged(); // set up ready to go...
+    configChanged(CONFIG_APPEARANCE | CONFIG_METRICS); // set up ready to go...
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(table->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(itemsWereSorted()));
 }
 
 void
-ComparePane::configChanged()
+ComparePane::configChanged(qint32)
 {
     // via standard style sheet
     table->setStyleSheet(GCColor::stylesheet());

@@ -70,7 +70,7 @@ class HrPwWindow : public GcChartWindow
 
     public slots:
         void rideSelected();
-        void configChanged();
+        void configChanged(qint32);
 
     protected slots:
         void setJoinLineFromCheckBox();

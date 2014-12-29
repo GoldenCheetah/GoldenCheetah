@@ -560,7 +560,7 @@ class AllPlot : public QwtPlot
         void setSmoothing(int value);
         void setByDistance(int value);
         void setWantAxis(bool x, bool y=false) { wantaxis = x; wantxaxis = y;}
-        void configChanged();
+        void configChanged(qint32);
 
         // for tooltip
         void pointHover(QwtPlotCurve*, int);

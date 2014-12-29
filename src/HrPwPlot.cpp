@@ -99,10 +99,10 @@ HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
 
     shade_zones = true;
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // setup colors on first run
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 struct DataPoint {
@@ -113,7 +113,7 @@ struct DataPoint {
 };
 
 void
-HrPwPlot::configChanged()
+HrPwPlot::configChanged(qint32)
 {
     // setColors bg
     setCanvasBackground(GColor(CPLOTBACKGROUND));

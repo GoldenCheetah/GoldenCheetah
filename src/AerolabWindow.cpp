@@ -253,8 +253,8 @@ AerolabWindow::AerolabWindow(Context *context) :
   connect(constantAlt, SIGNAL(stateChanged(int)), this, SLOT(setConstantAlt(int)));
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
-  connect(context, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
-  connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+  connect(context, SIGNAL(configChanged(qint32)), aerolab, SLOT(configChanged(qint32)));
+  connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
   connect(context, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
   connect(context, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
   connect(allZoomer, SIGNAL( zoomed(const QRectF) ), this, SLOT(zoomChanged()));
@@ -288,7 +288,7 @@ AerolabWindow::AerolabWindow(Context *context) :
              aerolab,                SLOT  ( pointHover( QwtPlotCurve*, int ) ) );
 
 
-  configChanged(); // pickup colors etc
+  configChanged(CONFIG_APPEARANCE); // pickup colors etc
 }
 
 void
@@ -300,7 +300,7 @@ AerolabWindow::zoomChanged()
 
 
 void
-AerolabWindow::configChanged()
+AerolabWindow::configChanged(qint32)
 {
   allZoomer->setRubberBandPen(GColor(CPLOTSELECT));
   setProperty("color", GColor(CPLOTBACKGROUND));

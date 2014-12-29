@@ -241,8 +241,8 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
 
 DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
 {
-    configUpdate();
-    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    configChanged(CONFIG_FIELDS);
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 QStringList DataFilter::parseFilter(QString query, QStringList *list)
@@ -307,7 +307,7 @@ void DataFilter::clearFilter()
     }
 }
 
-void DataFilter::configUpdate()
+void DataFilter::configChanged(qint32)
 {
     lookupMap.clear();
     lookupType.clear();

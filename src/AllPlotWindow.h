@@ -164,7 +164,7 @@ class AllPlotWindow : public GcChartWindow
         void intervalSelected();
         void zonesChanged();
         void intervalsChanged();
-        void configChanged();
+        void configChanged(qint32);
 
         // set properties
         void setSmoothingFromSlider();

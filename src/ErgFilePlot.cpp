@@ -250,11 +250,11 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     setAutoReplot(false);
 	setData(ergFile);
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
 void
-ErgFilePlot::configChanged()
+ErgFilePlot::configChanged(qint32)
 {
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
     replot();

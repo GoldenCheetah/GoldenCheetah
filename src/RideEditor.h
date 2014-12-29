@@ -118,7 +118,7 @@ class RideEditor : public GcChartWindow
         void endCommand(bool,RideCommand*);
 
         // GC signals
-        void configChanged();
+        void configChanged(qint32);
         void rideSelected();
         void intervalSelected();
         void rideDirty();

@@ -206,7 +206,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     allIntervals->setText(0, tr("Intervals"));
 
     // trap signals
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
@@ -376,39 +376,8 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
 }
 
 void
-Athlete::configChanged()
+Athlete::configChanged(qint32)
 {
-    // re-read Zones in case it changed
-    QFile zonesFile(home->config().canonicalPath() + "/power.zones");
-    if (zonesFile.exists()) {
-        if (!zones_->read(zonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("Zones File Error"),
-                                 zones_->errorString());
-        }
-       else if (! zones_->warningString().isEmpty())
-            QMessageBox::warning(context->mainWindow, tr("Reading Zones File"), zones_->warningString());
-    }
-
-    // reread HR zones
-    QFile hrzonesFile(home->config().canonicalPath() + "/hr.zones");
-    if (hrzonesFile.exists()) {
-        if (!hrzones_->read(hrzonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("HR Zones File Error"),
-                                 hrzones_->errorString());
-        }
-       else if (! hrzones_->warningString().isEmpty())
-            QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File"), hrzones_->warningString());
-    }
-
-    // reread Pace zones
-    QFile pacezonesFile(home->config().canonicalPath() + "/pace.zones");
-    if (pacezonesFile.exists()) {
-        if (!pacezones_->read(pacezonesFile)) {
-            QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"),
-                                 pacezones_->errorString());
-        }
-    }
-
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 }

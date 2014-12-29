@@ -49,7 +49,7 @@ class AnalysisSidebar : public QWidget
     public slots:
 
         // config etc
-        void configChanged();
+        void configChanged(qint32);
         void setRide(RideItem*);
 
         void filterChanged();

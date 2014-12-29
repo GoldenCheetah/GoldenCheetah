@@ -88,7 +88,7 @@ class LTMSidebar : public QWidget
         void filterNotify(); // merge/update when auto or query filter applied
 
         // config etc
-        void configChanged();
+        void configChanged(qint32);
         void resetSeasons(); // rebuild the seasons list if it changes
         void setAutoFilterMenu();
         void autoFilterRefresh(); // refresh the value lists

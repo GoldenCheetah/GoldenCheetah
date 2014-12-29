@@ -126,9 +126,9 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, bool first) :
 
     settings = NULL;
 
-    configUpdate(); // set basic colors
+    configChanged(CONFIG_APPEARANCE); // set basic colors
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_canvasPicker, SIGNAL(pointClicked(QwtPlotCurve*, int)), this, SLOT(pointClicked(QwtPlotCurve*, int)));
@@ -139,7 +139,7 @@ LTMPlot::~LTMPlot()
 }
 
 void
-LTMPlot::configUpdate()
+LTMPlot::configChanged(qint32)
 {
     // set basic plot colors
     setCanvasBackground(GColor(CPLOTBACKGROUND));
@@ -1168,7 +1168,7 @@ LTMPlot::setData(LTMSettings *set)
     //qDebug()<<"Final tidy.."<<timer.elapsed();
 
     // update colours etc for plot chrome
-    configUpdate();
+    configChanged(CONFIG_APPEARANCE);
 
     // plot
     replot();
@@ -2179,7 +2179,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     updateLegend();
 
     // update colours etc for plot chrome
-    configUpdate();
+    configChanged(CONFIG_APPEARANCE);
 
     // plot
     replot();

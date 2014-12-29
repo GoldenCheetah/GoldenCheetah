@@ -198,13 +198,16 @@ void ConfigDialog::closeClicked()
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::saveClicked()
 {
-    general->saveClicked();
-    athlete->saveClicked();
-    appearance->saveClicked();
-    password->saveClicked();
-    metric->saveClicked();
-    data->saveClicked();
-    device->saveClicked();
+    // what changed ?
+    qint32 changed = 0;
+
+    changed |= general->saveClicked();
+    changed |= athlete->saveClicked();
+    changed |= appearance->saveClicked();
+    changed |= password->saveClicked();
+    changed |= metric->saveClicked();
+    changed |= data->saveClicked();
+    changed |= device->saveClicked();
 
     hide();
 
@@ -249,7 +252,7 @@ void ConfigDialog::saveClicked()
     } 
 
     // we're done.
-    context->notifyConfigChanged();
+    context->notifyConfigChanged(changed);
     close();
 }
 
@@ -265,9 +268,9 @@ GeneralConfig::GeneralConfig(QDir home, Zones *zones, Context *context) :
     setContentsMargins(0,0,0,0);
 }
 
-void GeneralConfig::saveClicked()
+qint32 GeneralConfig::saveClicked()
 {
-    generalPage->saveClicked();
+    return generalPage->saveClicked();
 }
 
 // ATHLETE CONFIG
@@ -310,13 +313,17 @@ AthleteConfig::AthleteConfig(QDir home, Zones *zones, Context *context) :
     mainLayout->addWidget(tabs);
 }
 
-void AthleteConfig::saveClicked()
+qint32 AthleteConfig::saveClicked()
 {
-    athletePage->saveClicked();
-    zonePage->saveClicked();
-    hrZonePage->saveClicked();
-    paceZonePage->saveClicked();
-    autoImportPage->saveClicked();
+    qint32 state = 0;
+
+    state |= athletePage->saveClicked();
+    state |= zonePage->saveClicked();
+    state |= hrZonePage->saveClicked();
+    state |= paceZonePage->saveClicked();
+    state |= autoImportPage->saveClicked();
+
+    return state;
 }
 
 // APPEARANCE CONFIG
@@ -331,9 +338,9 @@ AppearanceConfig::AppearanceConfig(QDir home, Zones *zones, Context *context) :
     setContentsMargins(0,0,0,0);
 }
 
-void AppearanceConfig::saveClicked()
+qint32 AppearanceConfig::saveClicked()
 {
-    appearancePage->saveClicked();
+    return appearancePage->saveClicked();
 }
 
 // PASSWORD CONFIG
@@ -348,9 +355,9 @@ PasswordConfig::PasswordConfig(QDir home, Zones *zones, Context *context) :
     setContentsMargins(0,0,0,0);
 }
 
-void PasswordConfig::saveClicked()
+qint32 PasswordConfig::saveClicked()
 {
-    passwordPage->saveClicked();
+    return passwordPage->saveClicked();
 }
 
 // METADATA CONFIG
@@ -365,9 +372,9 @@ DataConfig::DataConfig(QDir home, Zones *zones, Context *context) :
     setContentsMargins(0,0,0,0);
 }
 
-void DataConfig::saveClicked()
+qint32 DataConfig::saveClicked()
 {
-    dataPage->saveClicked();
+    return dataPage->saveClicked();
 }
 
 // GENERAL CONFIG
@@ -392,11 +399,15 @@ MetricConfig::MetricConfig(QDir home, Zones *zones, Context *context) :
     mainLayout->addWidget(tabs);
 }
 
-void MetricConfig::saveClicked()
+qint32 MetricConfig::saveClicked()
 {
-    bestsPage->saveClicked();
-    summaryPage->saveClicked();
-    intervalsPage->saveClicked();
+    qint32 state = 0;
+
+    state |= bestsPage->saveClicked();
+    state |= summaryPage->saveClicked();
+    state |= intervalsPage->saveClicked();
+
+    return state;
 }
 
 // GENERAL CONFIG
@@ -411,7 +422,7 @@ DeviceConfig::DeviceConfig(QDir home, Zones *zones, Context *context) :
     setContentsMargins(0,0,0,0);
 }
 
-void DeviceConfig::saveClicked()
+qint32 DeviceConfig::saveClicked()
 {
-    devicePage->saveClicked();
+    return devicePage->saveClicked();
 }

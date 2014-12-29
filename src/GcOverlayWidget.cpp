@@ -99,14 +99,14 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     m_isEditing = true;
     installEventFilter(parent);
 
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // setup colors
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
-GcOverlayWidget::configChanged()
+GcOverlayWidget::configChanged(qint32)
 {
     if (GCColor::isFlat()) {
         titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));

@@ -112,7 +112,7 @@ IntervalSidebar::IntervalSidebar(Context *context) : QWidget(context->mainWindow
     splitter->prepare(context->athlete->cyclist, "interval");
 
     // GC signal
-    connect(context, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // right click menus...
     connect(routeNavigator,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showRouteMenu(const QPoint &)));
@@ -121,7 +121,7 @@ IntervalSidebar::IntervalSidebar(Context *context) : QWidget(context->mainWindow
 
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
 
-    configChanged();
+    configChanged(CONFIG_APPEARANCE);
 }
 
 void
@@ -135,7 +135,7 @@ IntervalSidebar::close()
 }
 
 void
-IntervalSidebar::configChanged()
+IntervalSidebar::configChanged(qint32)
 {
     routeNavigator->tableView->viewport()->setPalette(GCColor::palette());
     routeNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));

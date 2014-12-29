@@ -199,7 +199,7 @@ GCColor::GCColor(Context *context) : QObject(context)
 {
     setupColors();
     readConfig();
-    connect(context, SIGNAL(configChanged()), this, SLOT(readConfig()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(readConfig()));
 }
 
 // returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
@@ -289,11 +289,11 @@ GCColor::themes()
 
 ColorEngine::ColorEngine(Context* context) : QObject(context), defaultColor(QColor(Qt::white)), context(context)
 {
-    configUpdate();
-    connect(context, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+    configChanged(CONFIG_NOTECOLOR);
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
 
-void ColorEngine::configUpdate()
+void ColorEngine::configChanged(qint32)
 {
     // clear existing
     workoutCodes.clear();

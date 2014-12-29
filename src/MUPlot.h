@@ -69,7 +69,7 @@ class MUPlot : public QwtPlot, public QwtSyntheticPointData
     public slots:
 
         // colors/appearance changed
-        void configChanged();
+        void configChanged(qint32);
 
         // setup the model curve(s) with the model type passed
         // 0 = no model, 1 = normal distribution
