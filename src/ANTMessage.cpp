@@ -508,8 +508,9 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             case ANTChannel::CHANNEL_TYPE_TACX_VORTEX:
             {
                 const uint8_t* const payload = message + 4;
+                vortexPage = payload[0];
 
-                switch (payload[0])
+                switch (vortexPage)
                 {
                 case TACX_VORTEX_DATA_SPEED:
                     vortexUsingVirtualSpeed = (payload[1] >> 7) == 1;
