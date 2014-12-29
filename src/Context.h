@@ -140,9 +140,12 @@ class Context : public QObject
         void notifySeek(long x) { emit seek(x); }
 
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
+
         void notifyRideSelected(RideItem*x) { ride=x; rideSelected(x); }
         void notifyRideAdded(RideItem *x) { ride=x; rideAdded(x); }
         void notifyRideDeleted(RideItem *x) { ride=x; rideDeleted(x); }
+        void notifyRideChanged(RideItem *x) { rideChanged(x); }
+
         void notifyIntervalZoom(IntervalItem*x) { emit intervalZoom(x); }
         void notifyZoomOut() { emit zoomOut(); }
         void notifyIntervalSelected() { intervalSelected(); }
@@ -181,8 +184,12 @@ class Context : public QObject
         void refreshUpdate(QDate);
 
         void rideSelected(RideItem*);
+
+        // we added/deleted/changed an item
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
+        void rideChanged(RideItem *);
+
         void intervalSelected();
         void intervalsChanged();
         void intervalHover(RideFileInterval);

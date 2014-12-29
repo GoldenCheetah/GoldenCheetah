@@ -199,11 +199,13 @@ RideItem::setRide(RideFile *overwrite)
 void
 RideItem::notifyRideDataChanged()
 {
+    // refresh the metrics
+    isstale=true;
+
     // refresh the cache
     if (fileCache_) fileCache_->refresh(ride());
 
-    // refresh the metrics
-    isstale=true;
+    // refresh the data
     refresh();
 
     emit rideDataChanged();
