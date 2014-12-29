@@ -62,7 +62,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     this->context = context;
     context->athlete = this;
     cyclist = this->home->root().dirName();
+#ifdef GC_HAVE_LUCENE
     emptyindex = false;
+#endif
 
     // Recovering from a crash?
     if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
