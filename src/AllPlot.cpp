@@ -4087,7 +4087,6 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     ourASCurve->setSamples(array);
                     ourASCurve->setYAxis(yLeft);
                     ourASCurve->setBaseline(thereASCurve->baseline());
-//                    ourASCurve->setStyle(AllPlotSlopeCurve::SlopeDist3);
                     setAltSlopePlotStyle (ourASCurve);
 
                     if (ourASCurve->maxYValue() > MAXY) MAXY = ourASCurve->maxYValue();
