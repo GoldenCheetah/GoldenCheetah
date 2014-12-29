@@ -19,6 +19,7 @@
 #include "WithingsDownload.h"
 #include "MainWindow.h"
 #include "Athlete.h"
+#include "RideCache.h"
 #include <QMessageBox>
 
 WithingsDownload::WithingsDownload(Context *context) : context(context)
@@ -79,7 +80,8 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
             withingsJSON.close();
         }
 
-        //XXXREFRESH context->athlete->metricDB->refreshMetrics(context->athlete->withings().first().when);
+        // apply across the ride items
+        context->athlete->rideCache->refresh();
     }
     return;
 }

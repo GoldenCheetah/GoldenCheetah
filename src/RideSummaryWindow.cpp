@@ -103,6 +103,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     if (ridesummary) {
 
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
+        connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(refresh()));
         connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareChanged()));

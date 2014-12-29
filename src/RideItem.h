@@ -59,7 +59,6 @@ class RideItem : public QObject
 
 
         QStringList errors_;
-        Context *context; // to notify widgets when date/time changes
 
         unsigned long metaCRC();
 
@@ -76,6 +75,7 @@ class RideItem : public QObject
 
     public:
 
+        Context *context; // to notify widgets when date/time changes
         bool isdirty;     // ride data has changed and needs saving
         bool isstale;     // metric data is out of date and needs recomputing
         bool isedit;      // is being edited at the moment

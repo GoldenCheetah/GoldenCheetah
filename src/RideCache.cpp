@@ -128,7 +128,7 @@ RideCache::itemChanged()
     if (item == context->currentRideItem()) {
 
         // in lieu of chart refresh code
-        //qDebug()<<"RIDE CHANGED:"<<item->fileName;
+        qDebug()<<"RIDE CHANGED:"<<item->fileName;
 
         context->notifyRideChanged(item);
     }
@@ -317,7 +317,13 @@ void
 itemRefresh(RideItem *&item)
 {
     // need parser to be reentrant !item->refresh();
-    if (item->isstale) item->refresh();
+    if (item->isstale) {
+        item->refresh();
+
+        // and trap changes during refresh to current ride
+        if (item == item->context->currentRideItem())
+            item->context->notifyRideChanged(item);
+    }
 }
 
 void
