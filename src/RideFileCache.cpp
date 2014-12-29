@@ -423,35 +423,6 @@ RideFileCache::RideFileCache(RideFile *ride) :
 
     // calculate all the arrays
     compute();
-
-    // setup the doubles the users use
-    doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);
-    doubleArray(hrMeanMaxDouble, hrMeanMax, RideFile::hr);
-    doubleArray(cadMeanMaxDouble, cadMeanMax, RideFile::cad);
-    doubleArray(nmMeanMaxDouble, nmMeanMax, RideFile::nm);
-    doubleArray(kphMeanMaxDouble, kphMeanMax, RideFile::kph);
-    doubleArray(kphdMeanMaxDouble, kphdMeanMax, RideFile::kphd);
-    doubleArray(wattsdMeanMaxDouble, wattsdMeanMax, RideFile::wattsd);
-    doubleArray(caddMeanMaxDouble, caddMeanMax, RideFile::cadd);
-    doubleArray(nmdMeanMaxDouble, nmdMeanMax, RideFile::nmd);
-    doubleArray(hrdMeanMaxDouble, hrdMeanMax, RideFile::hrd);
-    doubleArray(npMeanMaxDouble, npMeanMax, RideFile::NP);
-    doubleArray(vamMeanMaxDouble, vamMeanMax, RideFile::vam);
-    doubleArray(xPowerMeanMaxDouble, xPowerMeanMax, RideFile::xPower);
-    doubleArray(wattsKgMeanMaxDouble, wattsKgMeanMax, RideFile::wattsKg);
-    doubleArray(aPowerMeanMaxDouble, aPowerMeanMax, RideFile::aPower);
-
-    doubleArrayForDistribution(wattsDistributionDouble, wattsDistribution);
-    doubleArrayForDistribution(hrDistributionDouble, hrDistribution);
-    doubleArrayForDistribution(cadDistributionDouble, cadDistribution);
-    doubleArrayForDistribution(gearDistributionDouble, gearDistribution);
-    doubleArrayForDistribution(nmDistributionDouble, nmDistribution);
-    doubleArrayForDistribution(kphDistributionDouble, kphDistribution);
-    doubleArrayForDistribution(xPowerDistributionDouble, xPowerDistribution);
-    doubleArrayForDistribution(npDistributionDouble, npDistribution);
-    doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
-    doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
-    doubleArrayForDistribution(smo2DistributionDouble, smo2Distribution);
 }
 
 int
@@ -818,6 +789,35 @@ void RideFileCache::RideFileCache::compute()
     thread13.wait();
     thread14.wait();
     thread15.wait();
+
+    // setup the doubles the users use
+    doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);
+    doubleArray(hrMeanMaxDouble, hrMeanMax, RideFile::hr);
+    doubleArray(cadMeanMaxDouble, cadMeanMax, RideFile::cad);
+    doubleArray(nmMeanMaxDouble, nmMeanMax, RideFile::nm);
+    doubleArray(kphMeanMaxDouble, kphMeanMax, RideFile::kph);
+    doubleArray(kphdMeanMaxDouble, kphdMeanMax, RideFile::kphd);
+    doubleArray(wattsdMeanMaxDouble, wattsdMeanMax, RideFile::wattsd);
+    doubleArray(caddMeanMaxDouble, caddMeanMax, RideFile::cadd);
+    doubleArray(nmdMeanMaxDouble, nmdMeanMax, RideFile::nmd);
+    doubleArray(hrdMeanMaxDouble, hrdMeanMax, RideFile::hrd);
+    doubleArray(npMeanMaxDouble, npMeanMax, RideFile::NP);
+    doubleArray(vamMeanMaxDouble, vamMeanMax, RideFile::vam);
+    doubleArray(xPowerMeanMaxDouble, xPowerMeanMax, RideFile::xPower);
+    doubleArray(wattsKgMeanMaxDouble, wattsKgMeanMax, RideFile::wattsKg);
+    doubleArray(aPowerMeanMaxDouble, aPowerMeanMax, RideFile::aPower);
+
+    doubleArrayForDistribution(wattsDistributionDouble, wattsDistribution);
+    doubleArrayForDistribution(hrDistributionDouble, hrDistribution);
+    doubleArrayForDistribution(cadDistributionDouble, cadDistribution);
+    doubleArrayForDistribution(gearDistributionDouble, gearDistribution);
+    doubleArrayForDistribution(nmDistributionDouble, nmDistribution);
+    doubleArrayForDistribution(kphDistributionDouble, kphDistribution);
+    doubleArrayForDistribution(xPowerDistributionDouble, xPowerDistribution);
+    doubleArrayForDistribution(npDistributionDouble, npDistribution);
+    doubleArrayForDistribution(wattsKgDistributionDouble, wattsKgDistribution);
+    doubleArrayForDistribution(aPowerDistributionDouble, aPowerDistribution);
+    doubleArrayForDistribution(smo2DistributionDouble, smo2Distribution);
 }
 
 //----------------------------------------------------------------------
@@ -1091,8 +1091,8 @@ MeanMaxComputer::run()
             first = false;
         }
 
-        // drag back to start at 0s
-        double psecs = p->secs - offset;
+        // drag back to start at 1s or whatever recIntSecs() is !
+        double psecs = p->secs - offset + ride->recIntSecs();
 
         // fill in any gaps in recording - use same dodgy rounding as before
         int count = (psecs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
