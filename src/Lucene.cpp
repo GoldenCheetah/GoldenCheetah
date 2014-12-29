@@ -49,6 +49,9 @@ Lucene::Lucene(QObject *parent, Context *context) : QObject(parent), context(con
 
         if (!indexExists) {
 
+            // ridecache will need to build the index !
+            context->athlete->emptyindex = true;
+
             IndexWriter *create = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, true);
 
             // lets flush to disk and reopen

@@ -344,6 +344,9 @@ RideCache::refresh()
             staleCount++;
     }
 
+    // reset emptyindex, we will have spotted that now
+    context->athlete->emptyindex= false;
+
     // start if there is work to do
     // and future watcher can notify of updates
     if (staleCount)  {

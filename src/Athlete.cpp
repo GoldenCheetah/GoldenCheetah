@@ -62,7 +62,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     this->context = context;
     context->athlete = this;
     cyclist = this->home->root().dirName();
-    isclean = false;
+    emptyindex = false;
 
     // Recovering from a crash?
     if(!appsettings->cvalue(cyclist, GC_SAFEEXIT, true).toBool()) {
@@ -125,6 +125,12 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     reader.readChartXML(context->athlete->home->config(), context->athlete->useMetricUnits, presets);
     translateDefaultCharts(presets);
 
+    // Search / filter
+#ifdef GC_HAVE_LUCENE
+    namedSearches = new NamedSearches(this); // must be before navigator
+    lucene = new Lucene(context, context);
+#endif
+
     // Metadata
     rideCache = NULL; // let metadata know we don't have a ridecache yet
     rideMetadata_ = new RideMetadata(context,true);
@@ -140,12 +146,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 #ifdef GC_HAVE_INTERVALS
     // Routes
     routes = new Routes(context, home->config());
-#endif
-
-    // Search / filter
-#ifdef GC_HAVE_LUCENE
-    namedSearches = new NamedSearches(this); // must be before navigator
-    lucene = new Lucene(context, context);
 #endif
 
     // get withings in if there is a cache
