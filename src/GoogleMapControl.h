@@ -100,6 +100,7 @@ class GoogleMapControl : public GcChartWindow
         bool first;
 
     public slots:
+        void forceReplot();
         void rideSelected();
         void createMarkers();
         void drawShadedRoute();
@@ -128,6 +129,7 @@ class GoogleMapControl : public GcChartWindow
 
     protected:
         bool event(QEvent *event);
+        bool stale;
 };
 
 #endif
