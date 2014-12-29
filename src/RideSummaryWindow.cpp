@@ -906,10 +906,12 @@ RideSummaryWindow::htmlSummary()
 
             Season rideSeason;
             bool wantRank=false;
+#ifdef GC_HAVE_RANKING
             if (!ride->isRun() && ride->areDataPresent()->watts == true) {
                 rideSeason = context->athlete->seasons->seasonFor(ride->startTime().date());
                 wantRank = true;
             }
+#endif
             bool firstRow = true;
             QString s;
             if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
