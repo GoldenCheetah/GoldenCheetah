@@ -171,6 +171,8 @@ class RideFileCache
 
         // get a single best or time in zone value from the cache file
         // intended to be very fast (using lseek to jump direct to the value requested
+        static int rank(Context *context, RideFile::SeriesType series, int duration, 
+                        double value, Specification spec, int &of);
         static double best(Context *context, QString fileName, RideFile::SeriesType series, int duration);
         static int tiz(Context *context, QString fileName, RideFile::SeriesType series, int zone);
 

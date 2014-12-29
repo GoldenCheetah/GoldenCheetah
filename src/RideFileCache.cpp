@@ -1794,6 +1794,34 @@ void RideFileCache::doubleArrayForDistribution(QVector<double> &into, QVector<fl
     return;
 }
 
+// get a list of all values for the spec, series and duration and see where the value ranks
+int RideFileCache::rank(Context *context, RideFile::SeriesType series, int duration, 
+         double value, Specification spec, int &of)
+{
+
+    QList<double> values;
+
+    foreach(RideItem*item, context->athlete->rideCache->rides()) {
+        if (!spec.pass(item)) continue;
+
+        // get the best for this one
+        values << RideFileCache::best(context, item->fileName, series, duration);
+    }
+
+    // sort the list
+    qSort(values.begin(), values.end(), qGreater<double>());
+
+    // get the ranking and count
+    of = values.count();
+
+    // where do we fit?
+    for (int i=0; i<values.count(); i++)
+        if (values.at(i) <= value)
+            return (i+1);
+
+    return values.count();
+}
+
 double 
 RideFileCache::best(Context *context, QString filename, RideFile::SeriesType series, int duration)
 {

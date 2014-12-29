@@ -25,6 +25,7 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "PMCData.h"
+#include "Season.h"
 
 #include "Settings.h"
 #include "Colors.h"
@@ -349,6 +350,34 @@ RideSummaryWindow::refresh()
 
         setUpdatesEnabled(true); // ready to update now
     }
+}
+
+static QString rankingString(int number)
+{
+    QString ext=""; 
+
+    switch(number%10) {
+
+        case 1:
+        {
+            if (number == 11 || number == 111) ext = "th";
+            else ext = "st";
+        }
+        break;
+
+        case 2:
+            if (number == 12 || number == 112) ext = "th";
+            else ext = "nd";
+            break;
+        case 3:
+            if (number == 13 || number == 113) ext = "th";
+            else ext = "rd";
+            break;
+        default:
+            ext = "th"; // default for 4th,5th,6th,7th,8th,9th 0th
+            break;
+    }
+    return QString("%1%2").arg(number).arg(ext);
 }
 
 QString
@@ -874,6 +903,13 @@ RideSummaryWindow::htmlSummary()
         // Interval Summary (recalculated on every refresh since they are not cached at present)
         //
         if (ride->intervals().size() > 0) {
+
+            Season rideSeason;
+            bool wantRank=false;
+            if (!ride->isRun() && ride->areDataPresent()->watts == true) {
+                rideSeason = context->athlete->seasons->seasonFor(ride->startTime().date());
+                wantRank = true;
+            }
             bool firstRow = true;
             QString s;
             if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
@@ -914,6 +950,9 @@ RideSummaryWindow::htmlSummary()
                 if (firstRow) {
                     summary += "<tr>";
                     summary += "<td align=\"center\" valign=\"bottom\">"+tr("Interval Name")+"</td>";
+                    if (wantRank) {
+                        summary += "<td align=\"center\" valign=\"bottom\">" + tr("Rank ") + rideSeason.name + "</td>";
+                    }
                     foreach (QString symbol, intervalMetrics) {
                         RideMetricPtr m = metrics.value(symbol);
                         if (!m) continue;
@@ -936,13 +975,47 @@ RideSummaryWindow::htmlSummary()
                     summary += "</tr>";
                     firstRow = false;
                 }
-                if (even)
-                    summary += "<tr>";
-                else {
-                    summary += "<tr bgcolor='" + altColor.name() + "'>";
-                }
+
+                // odd even coloring
+                if (even) summary += "<tr";
+                else summary += "<tr bgcolor='" + altColor.name() + "'";
                 even = !even;
+
+                // get the interval rank
+                int rank=0;
+                QString rankString="-";
+                if (wantRank) {
+
+                    if (f.dataPoints().count()) {
+
+                        int of;
+
+                        double duration=0;
+                        double total=0;
+                        foreach(RideFilePoint *p, f.dataPoints()) {
+                            total += f.recIntSecs() * p->watts;
+                            duration += f.recIntSecs();
+                        }
+                        double value = duration ? (total / duration) : 0;
+
+                        Specification spec;
+                        spec.setDateRange(DateRange(rideSeason.start, rideSeason.end));
+
+                        rank = RideFileCache::rank(context, RideFile::watts, duration, value, spec, of);
+
+                        rankString = rankingString(rank);
+
+                    } 
+                }
+
+                // top 3 efforts this season get color
+                if (wantRank && rank <= 3) summary += " id=\"sharp\" ";
+                summary += ">";
                 summary += "<td align=\"center\">" + interval.name + "</td>";
+
+                if (wantRank) summary += "<td align=\"center\">" + rankString + "</td>";
+
+
                 foreach (QString symbol, intervalMetrics) {
                     RideMetricPtr m = metrics.value(symbol);
                     if (!m) continue;
@@ -958,6 +1031,8 @@ RideSummaryWindow::htmlSummary()
                         summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision());
                     }
                 }
+
+
                 summary += "</tr>";
             }
             summary += "</table>";
