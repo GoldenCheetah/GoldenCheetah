@@ -715,6 +715,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context->athlete, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
@@ -1335,6 +1336,13 @@ AllPlotWindow::moveRight()
     spanSlider->setLowerValue(spanSlider->lowerValue()+delta);
     spanSlider->setUpperValue(spanSlider->upperValue()+delta);
     zoomChanged();
+}
+
+void
+AllPlotWindow::forceReplot()
+{
+    stale=true;
+    rideSelected();
 }
 
 void

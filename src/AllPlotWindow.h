@@ -160,6 +160,7 @@ class AllPlotWindow : public GcChartWindow
 
         // trap GC signals
         void rideSelected();
+        void forceReplot();
         void rideDeleted(RideItem *ride);
         void intervalSelected();
         void zonesChanged();
