@@ -257,8 +257,10 @@ RideSummaryWindow::refresh(QDate past)
     // to tell us to replot during the update.
     // if we're showing data new than past we can ignore
     // this because our data is up to date
-    if (!ridesummary && myDateRange.from < past)
+    if (!ridesummary && myDateRange.from < past && (lastupdate == QTime() || lastupdate.secsTo(QTime::currentTime()) > 5)) {
+        lastupdate = QTime::currentTime();
         refresh();
+    }
 }
 
 void
