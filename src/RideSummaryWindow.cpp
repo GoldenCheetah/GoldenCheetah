@@ -113,6 +113,7 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
 
         connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
         connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+        connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refresh(QDate)));
         connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
         connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
@@ -247,6 +248,17 @@ RideSummaryWindow::metadataChanged()
 {
     if (!isCompare() && isVisible()) refresh();
     refresh();
+}
+
+void
+RideSummaryWindow::refresh(QDate past)
+{
+    // as the background refresh occurs we get an update
+    // to tell us to replot during the update.
+    // if we're showing data new than past we can ignore
+    // this because our data is up to date
+    if (!ridesummary && myDateRange.from < past)
+        refresh();
 }
 
 void
