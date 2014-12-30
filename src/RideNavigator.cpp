@@ -118,9 +118,6 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     tableView->show();
     resetView();
 
-    // refresh when database is updated
-    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
-
     // refresh when config changes (metric/imperial?)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
