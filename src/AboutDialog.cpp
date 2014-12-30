@@ -169,6 +169,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Ron Alford");
     contributors.append("Satoru Kurashiki");
     contributors.append("Sean Rhea");
+    contributors.append("Stefan Schake");
     contributors.append("Steven Gribble");
     contributors.append("Thomas Weichmann");
     contributors.append("Tilman Schmiedeberg");
