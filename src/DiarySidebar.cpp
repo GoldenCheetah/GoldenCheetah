@@ -122,6 +122,8 @@ DiarySidebar::DiarySidebar(Context *context) : context(context)
     // refresh on these events...
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refresh()));
+    connect(context, SIGNAL(refreshEnd()), this, SLOT(refresh()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // set up for current selections
