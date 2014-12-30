@@ -139,6 +139,7 @@ class RideFileCache
         typedef enum cachetype CacheType;
         QDate start, end;
         unsigned int crc;
+        bool incomplete; // skipped over data
 
         // Construct from a ridefile or its filename
         // will reference cache if it exists, and create it
@@ -147,7 +148,7 @@ class RideFileCache
         // the calling class.
         // to save time you can pass the ride file if you already have it open
         // and if you don't want the data and just want to check pass check=true
-        RideFileCache(Context *context, QString filename, RideFile *ride =0, bool check = false);
+        RideFileCache(Context *context, QString filename, RideFile *ride =0, bool check = false, bool refresh = true);
 
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.

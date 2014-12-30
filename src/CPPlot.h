@@ -106,6 +106,10 @@ class CPPlot : public QwtPlot
         void clearFilter();
         void setFilter(QStringList);
 
+        // during a refresh we get a chance to replot
+        void refreshUpdate(QDate);
+        void refreshEnd();
+
     private:
 
         QWidget *parent;
@@ -139,6 +143,7 @@ class CPPlot : public QwtPlot
         RideFileCache *bestsCache;
         int dateCP;
         double dateCV;
+        QTime lastupdate;
 
         // settings
         RideFile::SeriesType rideSeries;

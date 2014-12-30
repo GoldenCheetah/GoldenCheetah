@@ -26,8 +26,17 @@
 RideFileCache *
 CompareDateRange::rideFileCache()
 {
-    if (cache) return cache;
-    else return (cache = new RideFileCache(sourceContext, start, end, false, QStringList(), true));
+    // refresh cache if incomplete, return otherwise
+    if (cache) {
+        if (cache->incomplete == false) return cache;
+        else {
+            delete cache;
+            cache = NULL;
+        }
+    }
+
+    // create one and set        
+    return (cache = new RideFileCache(sourceContext, start, end, false, QStringList(), true));
 }
 
 CompareDateRange::~CompareDateRange()

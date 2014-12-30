@@ -1185,6 +1185,30 @@ CPPlot::plotBests()
     zoomer->setZoomBase(false);
 }
 
+void
+CPPlot::refreshUpdate(QDate)
+{
+    // we don't need to lookat the date since we know if the data is incomplete
+    if (bestsCache && bestsCache->incomplete && (lastupdate == QTime() || lastupdate.secsTo(QTime::currentTime()) > 5)) {
+        lastupdate = QTime::currentTime();
+        clearCurves();
+        setRide(const_cast<RideItem*>(context->currentRideItem()));
+    }
+
+    // what about in compare season mode ?
+    if (rangemode && context->isCompareDateRanges && (lastupdate == QTime() || lastupdate.secsTo(QTime::currentTime()) > 5)) {
+        lastupdate = QTime::currentTime();
+        calculateForDateRanges(context->compareDateRanges);
+        return;
+    }
+}
+
+void
+CPPlot::refreshEnd()
+{
+    refreshUpdate(QDate());
+}
+
 // plot the currently selected ride
 void
 CPPlot::plotRide(RideItem *rideItem)
@@ -1939,8 +1963,7 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
     if (showDelta && compareDateRanges.count()) {
 
         // set the baseline data
-        CompareDateRange range = compareDateRanges.at(0);
-        baseline = range.rideFileCache()->meanMaxArray(rideSeries);
+        baseline = compareDateRanges[0].rideFileCache()->meanMaxArray(rideSeries);
 
         if (model && (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)) {
 
@@ -1978,11 +2001,9 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
     // prepare aggregates
     for (int j = 0; j < compareDateRanges.size(); ++j) {
 
-        CompareDateRange range = compareDateRanges.at(j);
+        if (compareDateRanges[j].isChecked())  {
 
-        if (range.isChecked())  {
-
-            RideFileCache *cache = range.rideFileCache();
+            RideFileCache *cache = compareDateRanges[j].rideFileCache();
 
             // create a delta array
             if (showDelta && cache) {
@@ -2004,11 +2025,11 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
                 deltaArray.resize(n-1);
 
                 // now plot using the delta series and NOT the cache
-                if (showBest) plotCache(deltaArray, range.color);
+                if (showBest) plotCache(deltaArray, compareDateRanges[j].color);
 
                 // and plot a model too -- its neat to compare them...
                 if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph) {
-                    plotModel(cache->meanMaxArray(rideSeries), range.color, baselineModel);
+                    plotModel(cache->meanMaxArray(rideSeries), compareDateRanges[j].color, baselineModel);
                 }
 
                 foreach(double v, deltaArray) {
@@ -2025,11 +2046,11 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
             if (!showDelta && cache->meanMaxArray(rideSeries).size()) {
 
                 // plot the bests if we want them
-                if (showBest) plotCache(cache->meanMaxArray(rideSeries), range.color);
+                if (showBest) plotCache(cache->meanMaxArray(rideSeries), compareDateRanges[j].color);
 
                 // and plot a model too -- its neat to compare them...
                 if (rideSeries == RideFile::watts || rideSeries == RideFile::wattsKg || rideSeries == RideFile::kph)
-                    plotModel(cache->meanMaxArray(rideSeries), range.color, NULL);
+                    plotModel(cache->meanMaxArray(rideSeries), compareDateRanges[j].color, NULL);
 
                 int xCount = 0;
                 double vamYMax = 0;
@@ -2117,8 +2138,7 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
     if (showDelta && compareIntervals.count()) {
 
         // set the baseline data
-        CompareInterval range = compareIntervals.at(0);
-        baseline = range.rideFileCache()->meanMaxArray(rideSeries);
+        baseline = compareIntervals[0].rideFileCache()->meanMaxArray(rideSeries);
     }
 
     double ymax = 0;
@@ -2128,7 +2148,7 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
 
     // prepare aggregates
     for (int i = 0; i < compareIntervals.size(); ++i) {
-        CompareInterval interval = compareIntervals.at(i);
+        CompareInterval &interval = compareIntervals[i];
 
         if (interval.isChecked())  {
 

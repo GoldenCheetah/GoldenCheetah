@@ -35,8 +35,8 @@
 static const int maxcache = 25; // lets max out at 25 caches
 
 // cache from ride
-RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passedride, bool check) :
-               context(context), rideFileName(fileName), ride(passedride)
+RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passedride, bool check, bool refresh) :
+               incomplete(false), context(context), rideFileName(fileName), ride(passedride)
 {
     // resize all the arrays to zero
     wattsMeanMax.resize(0);
@@ -110,27 +110,31 @@ RideFileCache::RideFileCache(Context *context, QString fileName, RideFile *passe
     }
 
     // NEED TO UPDATE!!
+    if (refresh) {
 
-    // not up-to-date we need to refresh from the ridefile
-    if (ride) {
-
-        // we got passed the ride - so update from that
-        refreshCache();
-
-    } else {
-
-        // we need to open it to update since we were not passed one
-        QStringList errors;
-        QFile file(rideFileName);
-
-        ride = RideFileFactory::instance().openRideFile(context, file, errors);
-
+        // not up-to-date we need to refresh from the ridefile
         if (ride) {
-            ride->getWeight(); // before threads are created
+
+            // we got passed the ride - so update from that
             refreshCache();
-            delete ride;
+
+        } else {
+
+            // we need to open it to update since we were not passed one
+            QStringList errors;
+            QFile file(rideFileName);
+
+            ride = RideFileFactory::instance().openRideFile(context, file, errors);
+
+            if (ride) {
+                ride->getWeight(); // before threads are created
+                refreshCache();
+                delete ride;
+            }
+            ride = 0;
         }
-        ride = 0;
+    } else {
+        incomplete = true; // data not available !
     }
 }
 
@@ -379,7 +383,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&w
 }
 
 RideFileCache::RideFileCache(RideFile *ride) :
-               context(ride->context), rideFileName(""), ride(ride)
+               incomplete(false), context(ride->context), rideFileName(""), ride(ride)
 {
     // resize all the arrays to zero
     wattsMeanMax.resize(0);
@@ -1403,7 +1407,7 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 }
 
 RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filter, QStringList files, bool onhome)
-               : start(start), end(end), context(context), rideFileName(""), ride(0) 
+               : start(start), end(end), incomplete(false), context(context), rideFileName(""), ride(0)
 {
 
     // remember parameters for getting heat
@@ -1480,47 +1484,53 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             if (context->isfiltered && !context->filters.contains(item->fileName)) continue;
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
 
-            // get its cached values (will refresh if needed...)
-            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName);
+            // get its cached values (will NOT! refresh if needed...)
+            // the true means it will check only
+            RideFileCache rideCache(context, context->athlete->home->activities().canonicalPath() + "/" + item->fileName, NULL, false, false);
+            if (rideCache.incomplete == true) {
+                // ack, data not available !
+                incomplete = true;
+            } else {
 
-            // lets aggregate
-            meanMaxAggregate(wattsMeanMaxDouble, rideCache.wattsMeanMaxDouble, wattsMeanMaxDate, rideDate);
-            meanMaxAggregate(hrMeanMaxDouble, rideCache.hrMeanMaxDouble, hrMeanMaxDate, rideDate);
-            meanMaxAggregate(cadMeanMaxDouble, rideCache.cadMeanMaxDouble, cadMeanMaxDate, rideDate);
-            meanMaxAggregate(nmMeanMaxDouble, rideCache.nmMeanMaxDouble, nmMeanMaxDate, rideDate);
-            meanMaxAggregate(kphMeanMaxDouble, rideCache.kphMeanMaxDouble, kphMeanMaxDate, rideDate);
-            meanMaxAggregate(kphdMeanMaxDouble, rideCache.kphdMeanMaxDouble, kphdMeanMaxDate, rideDate);
-            meanMaxAggregate(wattsdMeanMaxDouble, rideCache.wattsdMeanMaxDouble, wattsdMeanMaxDate, rideDate);
-            meanMaxAggregate(caddMeanMaxDouble, rideCache.caddMeanMaxDouble, caddMeanMaxDate, rideDate);
-            meanMaxAggregate(nmdMeanMaxDouble, rideCache.nmdMeanMaxDouble, nmdMeanMaxDate, rideDate);
-            meanMaxAggregate(hrdMeanMaxDouble, rideCache.hrdMeanMaxDouble, hrdMeanMaxDate, rideDate);
-            meanMaxAggregate(xPowerMeanMaxDouble, rideCache.xPowerMeanMaxDouble, xPowerMeanMaxDate, rideDate);
-            meanMaxAggregate(npMeanMaxDouble, rideCache.npMeanMaxDouble, npMeanMaxDate, rideDate);
-            meanMaxAggregate(vamMeanMaxDouble, rideCache.vamMeanMaxDouble, vamMeanMaxDate, rideDate);
-            meanMaxAggregate(wattsKgMeanMaxDouble, rideCache.wattsKgMeanMaxDouble, wattsKgMeanMaxDate, rideDate);
-            meanMaxAggregate(aPowerMeanMaxDouble, rideCache.aPowerMeanMaxDouble, aPowerMeanMaxDate, rideDate);
+                // lets aggregate
+                meanMaxAggregate(wattsMeanMaxDouble, rideCache.wattsMeanMaxDouble, wattsMeanMaxDate, rideDate);
+                meanMaxAggregate(hrMeanMaxDouble, rideCache.hrMeanMaxDouble, hrMeanMaxDate, rideDate);
+                meanMaxAggregate(cadMeanMaxDouble, rideCache.cadMeanMaxDouble, cadMeanMaxDate, rideDate);
+                meanMaxAggregate(nmMeanMaxDouble, rideCache.nmMeanMaxDouble, nmMeanMaxDate, rideDate);
+                meanMaxAggregate(kphMeanMaxDouble, rideCache.kphMeanMaxDouble, kphMeanMaxDate, rideDate);
+                meanMaxAggregate(kphdMeanMaxDouble, rideCache.kphdMeanMaxDouble, kphdMeanMaxDate, rideDate);
+                meanMaxAggregate(wattsdMeanMaxDouble, rideCache.wattsdMeanMaxDouble, wattsdMeanMaxDate, rideDate);
+                meanMaxAggregate(caddMeanMaxDouble, rideCache.caddMeanMaxDouble, caddMeanMaxDate, rideDate);
+                meanMaxAggregate(nmdMeanMaxDouble, rideCache.nmdMeanMaxDouble, nmdMeanMaxDate, rideDate);
+                meanMaxAggregate(hrdMeanMaxDouble, rideCache.hrdMeanMaxDouble, hrdMeanMaxDate, rideDate);
+                meanMaxAggregate(xPowerMeanMaxDouble, rideCache.xPowerMeanMaxDouble, xPowerMeanMaxDate, rideDate);
+                meanMaxAggregate(npMeanMaxDouble, rideCache.npMeanMaxDouble, npMeanMaxDate, rideDate);
+                meanMaxAggregate(vamMeanMaxDouble, rideCache.vamMeanMaxDouble, vamMeanMaxDate, rideDate);
+                meanMaxAggregate(wattsKgMeanMaxDouble, rideCache.wattsKgMeanMaxDouble, wattsKgMeanMaxDate, rideDate);
+                meanMaxAggregate(aPowerMeanMaxDouble, rideCache.aPowerMeanMaxDouble, aPowerMeanMaxDate, rideDate);
 
-            distAggregate(wattsDistributionDouble, rideCache.wattsDistributionDouble);
-            distAggregate(hrDistributionDouble, rideCache.hrDistributionDouble);
-            distAggregate(cadDistributionDouble, rideCache.cadDistributionDouble);
-            distAggregate(gearDistributionDouble, rideCache.gearDistributionDouble);
-            distAggregate(nmDistributionDouble, rideCache.nmDistributionDouble);
-            distAggregate(kphDistributionDouble, rideCache.kphDistributionDouble);
-            distAggregate(xPowerDistributionDouble, rideCache.xPowerDistributionDouble);
-            distAggregate(npDistributionDouble, rideCache.npDistributionDouble);
-            distAggregate(wattsKgDistributionDouble, rideCache.wattsKgDistributionDouble);
-            distAggregate(aPowerDistributionDouble, rideCache.aPowerDistributionDouble);
-            distAggregate(smo2DistributionDouble, rideCache.smo2DistributionDouble);
+                distAggregate(wattsDistributionDouble, rideCache.wattsDistributionDouble);
+                distAggregate(hrDistributionDouble, rideCache.hrDistributionDouble);
+                distAggregate(cadDistributionDouble, rideCache.cadDistributionDouble);
+                distAggregate(gearDistributionDouble, rideCache.gearDistributionDouble);
+                distAggregate(nmDistributionDouble, rideCache.nmDistributionDouble);
+                distAggregate(kphDistributionDouble, rideCache.kphDistributionDouble);
+                distAggregate(xPowerDistributionDouble, rideCache.xPowerDistributionDouble);
+                distAggregate(npDistributionDouble, rideCache.npDistributionDouble);
+                distAggregate(wattsKgDistributionDouble, rideCache.wattsKgDistributionDouble);
+                distAggregate(aPowerDistributionDouble, rideCache.aPowerDistributionDouble);
+                distAggregate(smo2DistributionDouble, rideCache.smo2DistributionDouble);
 
-            // cumulate timeinzones
-            for (int i=0; i<10; i++) {
-                paceTimeInZone[i] += rideCache.paceTimeInZone[i];
-                hrTimeInZone[i] += rideCache.hrTimeInZone[i];
-                wattsTimeInZone[i] += rideCache.wattsTimeInZone[i];
-                if (i<4) {
-                    paceCPTimeInZone[i] += rideCache.paceCPTimeInZone[i];
-                    hrCPTimeInZone[i] += rideCache.hrCPTimeInZone[i];
-                    wattsCPTimeInZone[i] += rideCache.wattsCPTimeInZone[i];
+                // cumulate timeinzones
+                for (int i=0; i<10; i++) {
+                    paceTimeInZone[i] += rideCache.paceTimeInZone[i];
+                    hrTimeInZone[i] += rideCache.hrTimeInZone[i];
+                    wattsTimeInZone[i] += rideCache.wattsTimeInZone[i];
+                    if (i<4) {
+                        paceCPTimeInZone[i] += rideCache.paceCPTimeInZone[i];
+                        hrCPTimeInZone[i] += rideCache.hrCPTimeInZone[i];
+                        wattsCPTimeInZone[i] += rideCache.wattsCPTimeInZone[i];
+                    }
                 }
             }
         }
@@ -1529,8 +1539,8 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
     // set the cursor back to normal
     context->mainWindow->setCursor(Qt::ArrowCursor);
 
-    // lets add to the cache for others to re-use -- but not if filtered
-    if (!context->isfiltered && (!context->ishomefiltered || !onhome) && !filter) {
+    // lets add to the cache for others to re-use -- but not if filtered or incomplete
+    if (incomplete == false && !context->isfiltered && (!context->ishomefiltered || !onhome) && !filter) {
 
         if (context->athlete->cpxCache.count() > maxcache) {
             delete(context->athlete->cpxCache.at(0));
@@ -1538,7 +1548,6 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
         }
         context->athlete->cpxCache.append(new RideFileCache(this));
     }
-
 }
 
 //
