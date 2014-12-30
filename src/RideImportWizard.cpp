@@ -819,7 +819,6 @@ RideImportWizard::abortClicked()
 
     if (label == tr("Abort")) {
         hide();
-        //XXXREFRESH context->athlete->metricDB->refreshMetrics();
         aborted=true; // terminated. I'll be back.
         return;
     }
@@ -827,7 +826,6 @@ RideImportWizard::abortClicked()
     if (label == tr("Finish")) {
        // phew. our work is done. -- lets force an update stats...
        hide();
-       //XXXREFRESH context->athlete->metricDB->refreshMetrics();
        done(0);
        return;
     }
