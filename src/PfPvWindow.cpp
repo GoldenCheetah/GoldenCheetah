@@ -73,7 +73,7 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
 }
 
 PfPvWindow::PfPvWindow(Context *context) :
-    GcChartWindow(context), context(context), current(NULL), compareStale(true)
+    GcChartWindow(context), context(context), current(NULL), compareStale(true), stale(false)
 {
     QWidget *c = new QWidget;
     HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
@@ -197,6 +197,7 @@ PfPvWindow::PfPvWindow(Context *context) :
 
     // GC signals
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(context, SIGNAL(intervalHover(RideFileInterval)), this, SLOT(intervalHover(RideFileInterval)));
@@ -226,6 +227,13 @@ PfPvWindow::isCompare() const
 }
 
 void
+PfPvWindow::forceReplot()
+{
+    stale= true;
+    rideSelected();
+}
+
+void
 PfPvWindow::rideSelected()
 {
     // we need to refresh for compare mode
@@ -250,11 +258,12 @@ PfPvWindow::rideSelected()
         setIsBlank(false);
     }
 
-    if (ride == current) return;
+    if (!stale && ride == current) return;
 
     pfPvPlot->setData(ride);
 
     current = ride;
+    stale = false;
 
     // update the QLabel widget with the CP value set in PfPvPlot::setData()
     qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
