@@ -98,6 +98,9 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devCo
     kickrDeviceID = 0;
     kickrChannel = -1;
 
+    // vortex
+    vortexID = vortexChannel = -1;
+
     // current and desired modes/load/gradients
     // set so first time through current != desired
     currentMode = 0;
@@ -255,6 +258,13 @@ ANT::setLoad(double load)
 
     // load has changed
     this->load = load;
+
+    // if we have a vortex trainer connected, relay the change in target power to the brake
+    if (vortexChannel != -1)
+    {
+        qDebug() << "setting vortex target power to " << load;
+        sendMessage(ANTMessage::tacxVortexSetPower(vortexChannel, vortexID, (int)load));
+    }
 }
 void
 ANT::setGradient(double gradient)
@@ -1099,4 +1109,10 @@ const char * ANT::deviceTypeDescription(int type)
         if (st->device_id==type) return st->descriptive_name;
     } while (++st, st->type != ANTChannel::CHANNEL_TYPE_GUARD);
     return "Unknown device type";
+}
+
+void ANT::setVortexData(int channel, int id)
+{
+    vortexChannel = channel;
+    vortexID = id;
 }

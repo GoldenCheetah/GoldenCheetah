@@ -634,7 +634,15 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
             // Tacx Vortex trainer
             case CHANNEL_TYPE_TACX_VORTEX:
             {
-
+                if (antMessage.vortexPage == TACX_VORTEX_DATA_CALIBRATION)
+                    parent->setVortexData(number, antMessage.vortexId);
+                else if (antMessage.vortexPage == TACX_VORTEX_DATA_SPEED)
+                {
+                    parent->setWatts(antMessage.vortexPower);
+                    // cadence is only supplied in some range, only set if valid value
+                    if (antMessage.vortexCadence)
+                        parent->setCadence(antMessage.vortexCadence);
+                }
             }
             break;
 
