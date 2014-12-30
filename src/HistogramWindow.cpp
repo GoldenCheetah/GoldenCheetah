@@ -308,6 +308,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     } else {
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+        connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
         connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
         connect(context, SIGNAL(intervalHover(RideFileInterval)), powerHist, SLOT(intervalHover(RideFileInterval)));
 
