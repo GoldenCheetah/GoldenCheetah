@@ -399,6 +399,8 @@ public:
     }
     void setHb(double smo2, double thb);
 
+    void setVortexData(int channel, int id);
+
 private:
 
     void run();
@@ -454,6 +456,9 @@ private:
     int kickrDeviceID;
     int kickrChannel;
 
+    // tacx vortex (we'll probably want to abstract this out cf. kickr)
+    int vortexID;
+    int vortexChannel;
 };
 
 #include "ANTMessage.h"
