@@ -92,6 +92,7 @@ class RideSummaryWindow : public GcChartWindow
     protected slots:
 
         void refresh();
+        void refresh(QDate);
         void rideSelected();
         void dateRangeChanged(DateRange);
         void rideItemChanged();
