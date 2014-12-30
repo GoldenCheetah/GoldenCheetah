@@ -153,6 +153,7 @@ class RideSummaryWindow : public GcChartWindow
         QString WPrimeStringWPK, CPStringWPK, FTPStringWPK, PMaxStringWPK;
 
         bool force; // to force a replot
+        QTime lastupdate;
 
         QFuture<void> future; // used by QtConcurrent
 };
