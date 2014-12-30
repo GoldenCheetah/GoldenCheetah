@@ -237,6 +237,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // SIGNALs to SLOTs:
   connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+  connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(rideSelected()));
   connect(crrSlider, SIGNAL(valueChanged(int)),this, SLOT(setCrrFromSlider()));
   connect(crrLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setCrrFromText(const QString)));
   connect(cdaSlider, SIGNAL(valueChanged(int)), this, SLOT(setCdaFromSlider()));
