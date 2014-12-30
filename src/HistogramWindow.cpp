@@ -301,6 +301,9 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         connect(distMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
         connect(totalMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
 
+        // replot when background refresh is progressing
+        connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
+
         // comparing things
         connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(compareChanged()));
         connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(compareChanged()));
@@ -894,6 +897,15 @@ HistogramWindow::setShade(int x)
 {
     rShade->setCheckState((Qt::CheckState)x);
     shadeZones->setCheckState((Qt::CheckState)x);
+}
+
+void
+HistogramWindow::refreshUpdate(QDate past)
+{
+    if (!rangemode || cfrom > past || (lastupdate != QTime() && lastupdate.secsTo(QTime::currentTime()) < 5)) return;
+    lastupdate = QTime::currentTime();
+    forceReplot();
+
 }
 
 void

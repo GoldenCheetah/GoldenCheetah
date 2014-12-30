@@ -150,6 +150,7 @@ class HistogramWindow : public GcChartWindow
 
     public slots:
 
+        void refreshUpdate(QDate);
         void rideSelected();
         void rideAddorRemove(RideItem*);
         void intervalSelected();
@@ -264,6 +265,7 @@ class HistogramWindow : public GcChartWindow
         // and users are likely to move up and down with the arrow keys
         ColorButton *colorButton;
         DateRange last;
+        QTime lastupdate;
 };
 
 #endif // _GC_HistogramWindow_h
