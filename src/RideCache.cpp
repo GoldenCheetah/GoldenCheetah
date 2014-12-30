@@ -33,6 +33,10 @@
 
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 
+#ifdef SLOW_REFRESH
+#include "unistd.h"
+#endif
+
 // for sorting
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
@@ -323,6 +327,10 @@ itemRefresh(RideItem *&item)
         // and trap changes during refresh to current ride
         if (item == item->context->currentRideItem())
             item->context->notifyRideChanged(item);
+
+#ifdef SLOW_REFRESH
+        sleep(1);
+#endif
     }
 }
 
