@@ -494,6 +494,10 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
+    // if refresh is in progress give CPPlot a chance to redraw when CPX updating
+    connect(context, SIGNAL(refreshUpdate(QDate)), cpPlot, SLOT(refreshUpdate(QDate)));
+    connect(context, SIGNAL(refreshEnd()), cpPlot, SLOT(refreshEnd()));
+
     // set date range for bests and model
     if (!rangemode) seasonSelected(cComboSeason->currentIndex());
 
