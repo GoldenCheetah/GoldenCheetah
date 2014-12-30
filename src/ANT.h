@@ -215,6 +215,7 @@ struct setChannelAtom {
 #define ANT_SPORT_CONTROL_PERIOD 8192
 #define ANT_SPORT_KICKR_PERIOD 2048
 #define ANT_SPORT_MOXY_PERIOD 8192
+#define ANT_SPORT_TACX_VORTEX_PERIOD 8192
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
 
@@ -225,6 +226,7 @@ struct setChannelAtom {
 #define ANT_SPORT_SandC_TYPE 0x79
 #define ANT_SPORT_MOXY_TYPE 0x1F
 #define ANT_SPORT_CONTROL_TYPE 0x10
+#define ANT_SPORT_TACX_VORTEX_TYPE 61
 #define ANT_FAST_QUARQ_TYPE_WAS 11 // before release 1.8
 #define ANT_FAST_QUARQ_TYPE 0x60
 #define ANT_QUARQ_TYPE 0x60
@@ -234,6 +236,7 @@ struct setChannelAtom {
 #define ANT_QUARQ_FREQUENCY 61
 #define ANT_KICKR_FREQUENCY 52
 #define ANT_MOXY_FREQUENCY 57
+#define ANT_TACX_VORTEX_FREQUENCY 66
 
 #define ANT_SPORT_CALIBRATION_MESSAGE                 0x01
 
@@ -268,6 +271,12 @@ struct setChannelAtom {
 #define KICKR_CONNECT_ANT_SENSOR       0x4F
 // 0x51-0x59 reserved.
 #define KICKR_SPINDOWN_RESULT          0x5A
+
+// Tacx Vortex data page types
+#define TACX_VORTEX_DATA_SPEED         0
+#define TACX_VORTEX_DATA_SERIAL        1
+#define TACX_VORTEX_DATA_VERSION       2
+#define TACX_VORTEX_DATA_CALIBRATION   3
 
 
 //======================================================================
@@ -390,6 +399,8 @@ public:
     }
     void setHb(double smo2, double thb);
 
+    void setVortexData(int channel, int id);
+
 private:
 
     void run();
@@ -445,6 +456,9 @@ private:
     int kickrDeviceID;
     int kickrChannel;
 
+    // tacx vortex (we'll probably want to abstract this out cf. kickr)
+    int vortexID;
+    int vortexChannel;
 };
 
 #include "ANTMessage.h"
