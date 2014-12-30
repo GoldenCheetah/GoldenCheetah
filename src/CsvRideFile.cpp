@@ -119,6 +119,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     QRegExp moxyCSV("FW Part Number:", Qt::CaseInsensitive);
     QRegExp gcCSV("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
+    QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
 
     int recInterval = 1;
 
@@ -136,7 +137,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
     int secsIndex, minutesIndex = -1;
 
-    while (!is.atEnd()) {
+    bool eof = false;
+    while (!is.atEnd() && !eof) {
         // the readLine() method doesn't handle old Macintosh CR line endings
         // this workaround will load the the entire file if it has CR endings
         // then split and loop through each line
@@ -229,6 +231,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                }
+               else if(freemotionCSV.indexIn(line) != -1) {
+                    csvType = freemotion;
+                    rideFile->setDeviceType("Freemotion Bike");
+                    rideFile->setFileFormat("Stages Data (csv)");
+                    unitsHeader = 3;
+                    ++lineno;
+                    continue;
+               }
                else {  // default
                     csvType = generic;
                     rideFile->setDeviceType("Unknow");
@@ -252,6 +262,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     recInterval = (int)line.section(',',4,4).toDouble();
                 }
             }
+
+            if (csvType == freemotion) {
+                if (lineno == 2) {
+                    if (line == "English")
+                        metric = false;
+                }
+            }
+
+
 
             if (csvType == joule && lineno == 2) {
                 // 6,2012-11-27 13:40:41,0,0,0,,55.8,788,227,1,Joule,18.018,,0,
@@ -372,6 +391,27 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     thb = line.section(',', 20, 20).toInt();
                     o2hb = line.section(',', 21, 21).toInt();
                     hhb = line.section(',', 22, 22).toInt();
+
+                } else if (csvType == freemotion) {
+                    qDebug() << line.section(',', 0, 0);
+                    if (line == "Ride_Totals") {
+                        eof = true;
+                        continue;
+                    }
+                    // Time,Miles,MPH,Watts,HR,RPM
+
+                    seconds = QTime::fromString(line.section(',', 0, 0), "m:s").msecsSinceStartOfDay ()/1000;
+                    minutes = seconds / 60.0f;
+                    cad = line.section(',', 5, 5).toDouble();
+                    hr = line.section(',', 4, 4).toDouble();
+                    km = line.section(',', 1, 1).toDouble();
+                    kph = line.section(',', 2, 2).toDouble();
+                    watts = line.section(',', 3, 3).toDouble();
+
+                    if (!metric) {
+                        km *= KM_PER_MILE;
+                        kph *= KM_PER_MILE;
+                    }
 
                } else if (csvType == ibike) {
                     // this must be iBike
