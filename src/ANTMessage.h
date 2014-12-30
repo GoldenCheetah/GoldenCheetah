@@ -68,6 +68,13 @@ class ANTMessage {
         static ANTMessage open(const unsigned char channel);
         static ANTMessage close(const unsigned char channel);
 
+        // tacx vortex command message is a single broadcast ant message
+        static ANTMessage tacxVortexSetFCSerial(const uint8_t channel, const uint16_t setVortexId);
+        static ANTMessage tacxVortexStartCalibration(const uint8_t channel, const uint16_t vortexId);
+        static ANTMessage tacxVortexStopCalibration(const uint8_t channel, const uint16_t vortexId);
+        static ANTMessage tacxVortexSetCalibrationValue(const uint8_t channel, const uint16_t vortexId, const uint8_t calibrationValue);
+        static ANTMessage tacxVortexSetPower(const uint8_t channel, const uint16_t vortexId, const uint16_t power);
+
         // kickr command channel messages all sent as broadcast data
         // over the command channel as type 0x4E
         static ANTMessage kickrErgMode(const unsigned char channel, ushort usDeviceId, ushort usWatts, bool bSimSpeed);
@@ -120,6 +127,10 @@ class ANTMessage {
         bool utcTimeRequired; // moxy
         uint8_t moxyCapabilities; //moxy
         double tHb, oldsmo2, newsmo2; //moxy
+        // tacx vortex fields - only what we care about now, for more check decoding
+        uint16_t vortexId, vortexSpeed, vortexPower, vortexCadence;
+        uint8_t vortexCalibration, vortexCalibrationState, vortexPage;
+        uint8_t vortexUsingVirtualSpeed;
 
     private:
         void init();
