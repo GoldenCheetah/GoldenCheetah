@@ -946,6 +946,38 @@ FormField::metadataChanged()
     active = false;
 }
 
+unsigned long
+FieldDefinition::fingerprint(QList<FieldDefinition> list)
+{
+    QByteArray ba;
+
+    foreach(FieldDefinition def, list) {
+
+        ba.append(def.tab);
+        ba.append(def.name);
+        ba.append(def.type);
+        ba.append(def.diary);
+        ba.append(def.values.join(""));
+    }
+
+    return qChecksum(ba, ba.length());
+}
+
+unsigned long
+KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
+{
+    QByteArray ba;
+
+    foreach(KeywordDefinition def, list) {
+
+        ba.append(def.name);
+        ba.append(def.color.name());
+        ba.append(def.tokens.join(""));
+    }
+
+    return qChecksum(ba, ba.length());
+}
+
 /*----------------------------------------------------------------------
  * Read / Write metadata.xml file
  *--------------------------------------------------------------------*/

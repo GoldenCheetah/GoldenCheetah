@@ -66,6 +66,8 @@ Context::notifyConfigChanged(qint32 state)
     //if (state & CONFIG_PMC) qDebug()<<"PMC constants changed!";
     //if (state & CONFIG_UNITS) qDebug()<<"Unit of Measure config changed!";
     //if (state & CONFIG_APPEARANCE) qDebug()<<"Appearance config changed!";
+    //if (state & CONFIG_NOTECOLOR) qDebug()<<"Note color config changed!";
+    //if (state & CONFIG_FIELDS) qDebug()<<"Metadata config changed!";
     configChanged(state);
 }
 

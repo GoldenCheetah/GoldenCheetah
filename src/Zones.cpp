@@ -942,7 +942,7 @@ Zones::getFingerprint() const
 
 // get fingerprint just for the range that applies on this date
 quint16
-Zones::getFingerprint(Context *context, QDate forDate) const
+Zones::getFingerprint(QDate forDate) const
 {
     quint64 x = 0;
 
@@ -964,6 +964,6 @@ Zones::getFingerprint(Context *context, QDate forDate) const
     QByteArray ba = QByteArray::number(x);
 
     // limits to only zones now as we sport weight separately
-    return qChecksum(ba, ba.length()) + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
+    return qChecksum(ba, ba.length());
 }
 

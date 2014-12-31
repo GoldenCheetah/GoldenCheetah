@@ -592,6 +592,12 @@ class MetadataPage : public QWidget
         QList<FieldDefinition>   fieldDefinitions;
         QList<DefaultDefinition>  defaultDefinitions;
         QString colorfield;
+
+        // initial values
+        struct {
+            unsigned long fieldFingerprint;
+            unsigned long keywordFingerprint;
+        } b4;
 };
 
 //
