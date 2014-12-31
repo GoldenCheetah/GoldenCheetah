@@ -61,6 +61,7 @@ void
 Context::notifyConfigChanged(qint32 state)
 {
     //if (state & CONFIG_ZONES) qDebug()<<"Zones config changed!";
+    //if (state & CONFIG_ATHLETE) qDebug()<<"Athlete config changed!";
     configChanged(state);
 }
 

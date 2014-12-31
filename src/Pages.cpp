@@ -852,6 +852,14 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     all->addLayout(grid);
     all->addStretch();
 
+    // save initial values for things we care about
+    // note we don't worry about age or sex at this point
+    // since they are not used, nor the W'bal tau used in
+    // the realtime code. This is limited to stuff we
+    // care about tracking as it is used by metrics
+    b4.height = height->value();
+    b4.weight = weight->value();
+
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
     connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
 }
@@ -911,7 +919,8 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
-    return 0;
+    if (b4.height != height->value() || b4.weight != weight->value()) return CONFIG_ATHLETE;
+    else return 0;
 }
 
 //
@@ -2875,7 +2884,7 @@ ZonePage::ZonePage(Context *context) : context(context)
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
-        b4Fingerprint = zones.getFingerprint(context); // remember original state
+        b4Fingerprint = zones.getFingerprint(); // remember original state
     }
 
     // setup maintenance pages using current config
@@ -2901,7 +2910,7 @@ ZonePage::saveClicked()
     context->athlete->zones_->read(zonesFile);
 
     // did we change ?
-    if (zones.getFingerprint(context) != b4Fingerprint) return CONFIG_ZONES;
+    if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
     else return 0;
 }
 
