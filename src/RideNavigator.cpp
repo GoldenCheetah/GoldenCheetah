@@ -1092,10 +1092,12 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     //}
 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
-        // format as a metric
 
         // get double from sqlmodel
         value = index.model()->data(index, Qt::DisplayRole).toString();
+
+        // get rid of 0 its ugly
+        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00") value="";
 
     } else {
         // is this the ride date/time ?
