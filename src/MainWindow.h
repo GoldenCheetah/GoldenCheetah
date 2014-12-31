@@ -90,6 +90,7 @@ class MainWindow : public QMainWindow
         void toggleFullScreen();
 #endif
         void aboutDialog();
+        void helpWindow();
         void helpView();
         void logBug();
         void support();
