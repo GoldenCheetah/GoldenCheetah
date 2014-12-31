@@ -1445,8 +1445,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     // save initial values
     b4.alias = antiAliased->isChecked();
+#ifndef Q_OS_MAC
     b4.scroll = rideScroll->isChecked();
     b4.head = rideHead->isChecked();
+#endif
     b4.line = lineWidth->value();
     b4.chrome = chromeCombo->currentIndex();
     b4.fingerprint = Colors::fingerprint(colorSet);
@@ -1614,8 +1616,10 @@ ColorsPage::saveClicked()
 
     // did we change anything ?
     if(b4.alias != antiAliased->isChecked() ||
+#ifndef Q_OS_MAC // not needed on mac
        b4.scroll != rideScroll->isChecked() ||
        b4.head != rideHead->isChecked() ||
+#endif
        b4.line != lineWidth->value() ||
        b4.chrome != chromeCombo->currentIndex() ||
        b4.fingerprint != Colors::fingerprint(colorSet))
