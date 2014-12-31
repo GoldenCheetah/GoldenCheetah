@@ -19,16 +19,42 @@
 #include "HelpWindow.h"
 #include "MainWindow.h"
 
-HelpWindow::HelpWindow(Context *context) : QDialog(context->mainWindow)
+HelpWindow::HelpWindow(Context *context) : context(context)
 {
-    setWindowTitle("Help");
+    setWindowTitle(tr("Help Overview"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
-    view = new QWebView();
+    // prepare the text
+    fillPage();
+
+    // layout the widget
     layout = new QVBoxLayout();
-    layout->addWidget(view);
+    layout->addWidget(textPage);
     setLayout(layout);
-    view->load(QUrl("http://bugs.goldencheetah.org/projects/goldencheetah/wiki"));
+
+}
+
+void
+HelpWindow::fillPage() {
+
+    textPage = new QLabel(this);
+    textPage->setContentsMargins(0,0,0,0);
+    textPage->setOpenExternalLinks(true);
+    textPage->setText(tr("<center>"
+                    "<img src=\":images/gc.png\" height=80>"
+                    "<h2>Help Options</h2>"
+                    "<b><tt>\"Shift\"+\"F1\"</tt></b><br>provides a context specific short description of a feature"
+                    " including the link to the Wiki page explaining more details<hr>"
+                    "<h3>Additional documentation and tutorials are available here:</h3>"
+                    "<br><a href=\"http://www.goldencheetah.org\">Golden Cheetah Website</a>"
+                    "<br><a href=\"http://www.goldencheetah.org/#section-tutorials\">Golden Cheetah Website - Video Tutorials</a>"
+                    "<br><a href=\"http://www.goldencheetah.org/#section-science\">Golden Cheetah Website - Science in Golden Cheetah</a>"
+                    "<br><a href=\"https://github.com/GoldenCheetah/GoldenCheetah/wiki\">Wiki Overview</a>"
+                    "<br><a href=\"https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_Main-Page_Users-Guide\">Wiki - User's Guide</a>"
+                    "<br><a href=\"https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ\">Wiki - Frequently Asked Questions</a>"
+
+                ));
+
 
 }

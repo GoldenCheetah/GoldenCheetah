@@ -22,27 +22,25 @@
 
 #include <QWidget>
 #include <QDialog>
-#include <QtWebKit>
-#include <QWebView>
+#include <QLabel>
 
 #include "Context.h"
 
 class HelpWindow : public QDialog
 {
-Q_OBJECT
-G_OBJECT
+    Q_OBJECT
+    G_OBJECT
 
+    public:
+        HelpWindow(Context *context);
 
- private:
-    Context *context;
-    QVBoxLayout *layout;
-    QWebView *view;
-    HelpWindow();  // default ctor
+    private:
+        Context *context;
+        QVBoxLayout *layout;
+        QLabel* textPage;
 
- protected:
+        void fillPage();
 
- public:
-    HelpWindow(Context *);
 };
 
 #endif
