@@ -99,7 +99,7 @@ class Athlete : public QObject
         QList<WithingsReading> withings_;
 
         // PMC Data
-        PMCData *getPMCFor(QString metricName, int stsDays = 7, int ltsDays = 42); // no Specification used!
+        PMCData *getPMCFor(QString metricName, int stsDays = -1, int ltsDays = -1); // no Specification used!
         QMap<QString, PMCData*> pmcData; // all the different PMC series
 
         // athlete measures

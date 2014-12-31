@@ -39,7 +39,7 @@ class PMCData : public QObject {
 
         // create a PMC data series for the athlete
         // for ALL date ranges
-        PMCData(Context *, Specification specification, QString metricName, int stsDays=7, int ltsDays=42);
+        PMCData(Context *, Specification specification, QString metricName, int stsDays=-1, int ltsDays=-1);
 
         // set parameters
         void setStsDays(int x) { stsDays_ = x; invalidate(); }
@@ -90,6 +90,7 @@ class PMCData : public QObject {
         QString metricName_;
         const RideMetric *metric_; // the input parameter
         int stsDays_, ltsDays_;
+        bool useDefaults;
 
         // data
         QDate start_, end_;
