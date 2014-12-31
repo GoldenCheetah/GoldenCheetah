@@ -202,6 +202,9 @@ RideItem::notifyRideDataChanged()
     // refresh the metrics
     isstale=true;
 
+    // force a recompute of derived data series
+    if (ride_) ride_->recalculateDerivedSeries(true);
+
     // refresh the cache
     if (fileCache_) fileCache_->refresh(ride());
 
