@@ -128,12 +128,8 @@ RideCache::itemChanged()
     emit itemChanged(item);
 
     // current ride changed is more relevant for the charts lets notify
-    // them the ride they're showing has changed XXX note this is not
-    // yet implemented in the charts XXX
+    // them the ride they're showing has changed 
     if (item == context->currentRideItem()) {
-
-        // in lieu of chart refresh code
-        qDebug()<<"RIDE CHANGED:"<<item->fileName;
 
         context->notifyRideChanged(item);
     }
