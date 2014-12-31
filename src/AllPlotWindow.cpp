@@ -833,6 +833,10 @@ AllPlotWindow::configChanged(qint32 state)
         redrawAllPlot();
         redrawStackPlot();
     }
+
+    // just force a replot if wbal changed
+    // and we are actually plotting wbal !
+    if (state & CONFIG_WBAL && showW->isChecked()) forceReplot();
 }
 
 bool

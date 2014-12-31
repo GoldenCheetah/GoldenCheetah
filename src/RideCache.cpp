@@ -101,6 +101,13 @@ RideCache::~RideCache()
 void
 RideCache::configChanged(qint32 what)
 {
+    // if the wbal formula changed invalidate all cached values
+    if (what & CONFIG_WBAL) {
+        foreach(RideItem *item, rides()) {
+            if (item->isOpen()) item->ride()->wstale=true;
+        }
+    }
+
     // if zones or weight has changed refresh metrics
     // will add more as they come
     qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_GENERAL;
