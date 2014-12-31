@@ -1095,25 +1095,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         // format as a metric
 
         // get double from sqlmodel
-        double metricValue = index.model()->data(index, Qt::DisplayRole).toDouble();
-
-        if (metricValue) {
-            // metric / imperial conversion
-            metricValue *= (rideNavigator->context->athlete->useMetricUnits) ? 1 : m->conversion();
-            metricValue += (rideNavigator->context->athlete->useMetricUnits) ? 0 : m->conversionSum();
-
-            // format with the right precision
-            if (m->units(true) == "seconds" || m->units(true) == tr("seconds")) {
-                value = QTime(0,0,0,0).addSecs(metricValue).toString("hh:mm:ss");
-            } else {
-                value = QString("%1").arg(metricValue, 0, 'f', m->precision());
-            }
-
-        } else {
-
-            // blank out zero values, they look ugly and are distracting
-            value = "";
-        }
+        value = index.model()->data(index, Qt::DisplayRole).toString();
 
     } else {
         // is this the ride date/time ?
