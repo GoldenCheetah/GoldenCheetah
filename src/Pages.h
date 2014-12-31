@@ -68,7 +68,6 @@ class GeneralPage : public QWidget
         Context *context;
 
         QComboBox *langCombo;
-        QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
         QComboBox *rimSizeCombo;
         QComboBox *tireSizeCombo;
@@ -83,7 +82,6 @@ class GeneralPage : public QWidget
         QPushButton *athleteBrowseButton;
 
         QLabel *langLabel;
-        QLabel *unitLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;
         QLabel *athleteLabel;
@@ -95,6 +93,14 @@ class GeneralPage : public QWidget
         QCheckBox *showSBToday;
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
+
+        struct {
+            int wheel;
+            int crank;
+            float hyst;
+            int wbal;
+            int lts,sts;
+        } b4;
 
     private slots:
         void calcWheelSize();
@@ -133,6 +139,7 @@ class RiderPage : public QWidget
         QPixmap     avatar;
 
     struct {
+        int unit;
         double weight;
         double height;
     } b4;

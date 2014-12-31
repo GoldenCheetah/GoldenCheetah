@@ -50,6 +50,7 @@
 #define CONFIG_DEVICES           0x200
 #define CONFIG_SEASONS           0x400      // includes events and PMC constants
 #define CONFIG_UNITS             0x800      // metric / imperial
+#define CONFIG_PMC               0x1000     // PMC constants
 
 class RideItem;
 class IntervalItem;

@@ -103,7 +103,10 @@ RideCache::configChanged(qint32 what)
 {
     // if zones or weight has changed refresh metrics
     // will add more as they come (XXX in development)
-    if (what & (CONFIG_ATHLETE | CONFIG_ZONES)) refresh();
+    if (what & (CONFIG_ATHLETE | // weight and height
+                CONFIG_ZONES |   // zones, cp etc
+                CONFIG_GENERAL)) // hysteresis, pmc constants
+        refresh();
 }
 
 void
