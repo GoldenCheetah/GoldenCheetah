@@ -466,6 +466,13 @@ class ColorsPage : public QWidget
         QTreeWidget *themes;
         const Colors *colorSet;
         QPushButton *applyTheme;
+
+        struct {
+            bool alias, scroll, head;
+            double line;
+            int chrome;
+            unsigned long fingerprint;
+        } b4;
 };
 
 class FieldsPage : public QWidget

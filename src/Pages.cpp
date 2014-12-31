@@ -1440,6 +1440,14 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     }
     connect(colorTab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
+
+    // save initial values
+    b4.alias = antiAliased->isChecked();
+    b4.scroll = rideScroll->isChecked();
+    b4.head = rideHead->isChecked();
+    b4.line = lineWidth->value();
+    b4.chrome = chromeCombo->currentIndex();
+    b4.fingerprint = Colors::fingerprint(colorSet);
 }
 
 void
@@ -1599,7 +1607,19 @@ ColorsPage::saveClicked()
     font.setPointSize(appsettings->value(this, GC_FONT_DEFAULT_SIZE, 13).toInt());
     QApplication::setFont(font);
 
-    return 0;
+    // reread into colorset so we can check for changes
+    GCColor::readConfig();
+
+    // did we change anything ?
+    if(b4.alias != antiAliased->isChecked() ||
+       b4.scroll != rideScroll->isChecked() ||
+       b4.head != rideHead->isChecked() ||
+       b4.line != lineWidth->value() ||
+       b4.chrome != chromeCombo->currentIndex() ||
+       b4.fingerprint != Colors::fingerprint(colorSet))
+        return CONFIG_APPEARANCE;
+    else
+        return 0;
 }
 
 IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
