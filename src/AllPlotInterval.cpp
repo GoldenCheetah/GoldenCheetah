@@ -105,9 +105,6 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
 
     enableAxis(xBottom, false);
     setAxisVisible(xBottom, false);
-
-    setAxisScale(QwtPlot::xBottom, 0, context->ride->ride(true)->maximumFor(RideFile::secs));
-
     setAxisVisible(yLeft, false);
 
     tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxis::yLeft,
@@ -142,6 +139,7 @@ AllPlotInterval::setDataFromRide(RideItem *_rideItem)
     rideItem = _rideItem;
     if (rideItem == NULL) return;
 
+    // set bottom scale to match the ride
     refreshIntervals();
 }
 
