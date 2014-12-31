@@ -293,6 +293,9 @@ RideItem::checkStale()
     // if we're marked stale already then just return that !
     if (isstale) return true;
 
+    // just change it .. its as quick to change as it is to check !
+    color = context->athlete->colorEngine->colorFor(getText(context->athlete->rideMetadata()->getColorField(), ""));
+
     // upgraded metrics
     if (dbversion != DBSchemaVersion) {
 
