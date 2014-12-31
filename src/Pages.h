@@ -645,6 +645,7 @@ class ZonePage : public QWidget
 
         //ZoneScheme scheme;
         Zones zones;
+        quint16 b4Fingerprint; // how did it start ?
 
         // Children talk to each other
         SchemePage *schemePage;
@@ -735,6 +736,7 @@ public:
 
     //ZoneScheme scheme;
     HrZones zones;
+    quint16 b4Fingerprint; // how did it start ?
 
     // Children talk to each other
     HrSchemePage *schemePage;
@@ -825,6 +827,7 @@ class PaceZonePage : public QWidget
         qint32 saveClicked();
 
         PaceZones zones;
+        quint16 b4Fingerprint; // how did it start ?
 
         // Children talk to each other
         PaceSchemePage *schemePage;
