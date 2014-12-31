@@ -50,20 +50,25 @@ class KeywordDefinition
         QString name;       // keyword for autocomplete
         QColor  color;      // color to highlight with
         QStringList tokens; // texts to find from notes
+
+        static unsigned long fingerprint(QList<KeywordDefinition>);
 };
 
 class FieldDefinition
 {
     public:
+
         QString tab,
                 name;
         int type;
         bool diary; // show in summary on diary page...
         QStringList values; // autocomplete 'defaults'
 
-    FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
-    FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
-                      : tab(tab), name(name), type(type), diary(diary), values(values) {}
+        static unsigned long fingerprint(QList<FieldDefinition>);
+
+        FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
+        FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
+                        : tab(tab), name(name), type(type), diary(diary), values(values) {}
 };
 
 class FormField : public QWidget

@@ -19,7 +19,6 @@
 #ifndef _Zones_h
 #define _Zones_h
 #include "GoldenCheetah.h"
-#include "Context.h"
 #include "Athlete.h"
 
 #include <QtCore>
@@ -199,7 +198,7 @@ class Zones : public QObject
         // this is the fingerprint for a specific DATE so that we
         // can be more granular -- did the zone config for the date of
         // a particular ride change ?
-        quint16 getFingerprint(Context *context, QDate date) const;
+        quint16 getFingerprint(QDate date) const;
 };
 
 QColor zoneColor(int zone, int num_zones);

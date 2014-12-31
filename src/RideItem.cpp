@@ -319,7 +319,7 @@ RideItem::checkStale()
             // metrics for older rides !
 
             // get the new zone configuration fingerprint that applies for the ride date
-            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
 
@@ -414,7 +414,7 @@ RideItem::refresh()
         isstale = false;
 
         // update fingerprints etc, crc done above
-        fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context, dateTime.date()))
+        fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint(dateTime.date()));
 

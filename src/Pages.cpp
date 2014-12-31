@@ -2226,6 +2226,10 @@ MetadataPage::MetadataPage(Context *context) : context(context)
     connect (tabs, SIGNAL(currentChanged(int)), keywordsPage, SLOT(pageSelected()));
 
     layout->addWidget(tabs);
+
+    // save initial values
+    b4.keywordFingerprint = KeywordDefinition::fingerprint(keywordDefinitions);
+    b4.fieldFingerprint = FieldDefinition::fingerprint(fieldDefinitions);
 }
 
 qint32
@@ -2245,7 +2249,15 @@ MetadataPage::saveClicked()
     // save processors config
     processorPage->saveClicked();
 
-    return 0;
+    qint32 state = 0;
+
+    if (b4.keywordFingerprint != KeywordDefinition::fingerprint(keywordDefinitions))
+        state += CONFIG_NOTECOLOR;
+
+    if (b4.fieldFingerprint != FieldDefinition::fingerprint(fieldDefinitions))
+        state += CONFIG_FIELDS;
+
+    return state;
 }
 
 // little helper since we create/recreate combos
