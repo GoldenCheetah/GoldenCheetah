@@ -79,6 +79,7 @@ class RideItem : public QObject
         bool isdirty;     // ride data has changed and needs saving
         bool isstale;     // metric data is out of date and needs recomputing
         bool isedit;      // is being edited at the moment
+        bool skipsave;    // on exit we don't save the state to force rebuild at startup
 
         // set from another, e.g. during load of rideDB.json
         void setFrom(RideItem&);

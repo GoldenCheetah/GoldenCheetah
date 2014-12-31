@@ -43,14 +43,14 @@
 // merge wizard and interval navigator
 RideItem::RideItem() 
     : 
-    ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
     color(QColor(1,1,1)), isRun(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
 }
 
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
-    ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(""), fileName(""),
+    ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
     color(QColor(1,1,1)), isRun(false), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
@@ -58,7 +58,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
 
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context) 
     :
-    ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), path(path), 
+    ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path), 
     fileName(fileName), dateTime(dateTime), color(QColor(1,1,1)), isRun(false), fingerprint(0), 
     metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0) 
 {
@@ -69,7 +69,7 @@ RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context 
 // pre-computed metrics and storing ride metadata
 RideItem::RideItem(RideFile *ride, QDateTime &dateTime, Context *context)
     :
-    ride_(ride), fileCache_(NULL), context(context), isdirty(true), isstale(true), isedit(false), dateTime(dateTime),
+    ride_(ride), fileCache_(NULL), context(context), isdirty(true), isstale(true), isedit(false), skipsave(false), dateTime(dateTime),
     fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
@@ -88,6 +88,7 @@ RideItem::setFrom(RideItem&here) // used when loading cache/rideDB.json
 	isdirty = here.isdirty;
 	isstale = here.isstale;
 	isedit = here.isedit;
+	skipsave = here.skipsave;
 	path = here.path;
 	fileName = here.fileName;
 	dateTime = here.dateTime;

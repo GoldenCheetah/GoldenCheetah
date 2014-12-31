@@ -282,6 +282,9 @@ void RideCache::save()
             // if saving during an initial refresh
             if (item->metrics().count() == 0) continue;
 
+            // don't save files with discarded changes at exit
+            if (item->skipsave == true) continue;
+
             // comma separate each ride
             if (!firstRide) stream << ",\n";
             firstRide = false;
