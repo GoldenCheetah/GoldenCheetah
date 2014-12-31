@@ -95,7 +95,6 @@ Q_OBJECT
 
                  ChartRides_Summary,
                  ChartRides_Details,
-                 ChartRides_Summary_Details,  //open
                  ChartRides_Editor,
                  ChartRides_Performance,
                  ChartRides_Performance_Config_Basic,
