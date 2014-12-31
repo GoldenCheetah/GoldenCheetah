@@ -241,6 +241,8 @@ void
 RideItem::reverted()
 {
     setDirty(false);
+    isstale=true;
+    refresh();
 }
 
 void

@@ -1353,8 +1353,12 @@ MainWindow::revertRide()
     currentTab->context->ride->ride(); // force re-load
 
     // in case reverted ride has different starttime
-    currentTab->context->ride->setStartTime(currentTab->context->ride->ride()->startTime()); // Note: this will also signal rideSelected()
+    currentTab->context->ride->setStartTime(currentTab->context->ride->ride()->startTime()); 
     currentTab->context->ride->ride()->emitReverted();
+
+    // and notify everyone we changed which also has the side
+    // effect of updating the cached values too
+    currentTab->context->notifyRideSelected(currentTab->context->ride);
 }
 
 void
