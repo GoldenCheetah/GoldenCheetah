@@ -29,6 +29,7 @@
 #include <QObject>
 
 class RideItem;
+class RideCache;
 class WPrime;
 class RideFile;
 struct RideFilePoint;
@@ -119,6 +120,7 @@ class RideFile : public QObject // QObject to emit signals
     public:
 
         friend class RideFileCommand; // tells us we were modified
+        friend class RideCache; // tells us if wbal is stale
         friend class MainWindow; // tells us we were modified
         friend class Context; // tells us we were saved
 
@@ -276,6 +278,7 @@ class RideFile : public QObject // QObject to emit signals
         void emitReverted();
         void emitModified();
 
+        bool wstale;
 
     private:
 
@@ -296,7 +299,6 @@ class RideFile : public QObject // QObject to emit signals
         QMap<QString,QString> tags_;
         EditorData *data;
         WPrime *wprime_;
-        bool wstale;
         double weight_; // cached to save calls to getWeight();
         double totalCount, totalTemp;
 
@@ -368,7 +370,6 @@ struct RideFileReader {
 };
 
 class MetricAggregator;
-class RideCache;
 class RideFileFactory {
 
     private:

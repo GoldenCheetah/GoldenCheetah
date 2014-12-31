@@ -327,9 +327,11 @@ GeneralPage::saveClicked()
     // general stuff changed ?
     if (b4.wheel != wheelSizeEdit->text().toInt() ||
         b4.crank != crankLengthCombo->currentIndex() ||
-        b4.hyst != hystedit->text().toFloat() ||
-        b4.wbal != wbalForm->currentIndex())
+        b4.hyst != hystedit->text().toFloat())
         state += CONFIG_GENERAL;
+
+    if (b4.wbal != wbalForm->currentIndex())
+        state += CONFIG_WBAL;
 
     // PMC constants changed ?
     if(b4.lts != perfManLTSavg->text().toInt() ||
