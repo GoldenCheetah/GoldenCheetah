@@ -35,6 +35,23 @@
 PMCData::PMCData(Context *context, Specification spec, QString metricName, int stsDays, int ltsDays) 
     : context(context), specification_(spec), metricName_(metricName), stsDays_(stsDays), ltsDays_(ltsDays), isstale(true)
 {
+    // get defaults if not passed
+    useDefaults = false;
+
+    if (ltsDays < 0) {
+        QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
+        if (lts.isNull() || lts.toInt() == 0) ltsDays_ = 42;
+        else ltsDays_ = lts.toInt();
+        useDefaults=true;
+    }
+    if (stsDays < 0) {
+        QVariant sts = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
+        if (sts.isNull() || sts.toInt() == 0) stsDays_ = 7;
+        else stsDays_ = sts.toInt();
+        useDefaults=true;
+    }
+
+
     refresh();
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(invalidate()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(invalidate()));
@@ -49,6 +66,18 @@ void PMCData::invalidate()
 void PMCData::refresh()
 {
     if (!isstale) return;
+
+    // we need to reread config if refreshing (it might have changed)
+    if (useDefaults) {
+
+        QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
+        if (lts.isNull() || lts.toInt() == 0) ltsDays_ = 42;
+        else ltsDays_ = lts.toInt();
+
+        QVariant sts = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
+        if (sts.isNull() || sts.toInt() == 0) stsDays_ = 7;
+        else stsDays_ = sts.toInt();
+    }
 
     QTime timer;
     timer.start();

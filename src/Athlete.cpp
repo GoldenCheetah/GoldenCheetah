@@ -378,10 +378,23 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
 }
 
 void
-Athlete::configChanged(qint32)
+Athlete::configChanged(qint32 state)
 {
-    QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
-    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
+    // change units
+    if (state & CONFIG_UNITS) {
+        QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
+        useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
+    }
+
+    // invalidate PMC data
+    if (state & (CONFIG_PMC | CONFIG_SEASONS)) {
+        QMapIterator<QString, PMCData *> pmcs(pmcData);
+        pmcs.toFront();
+        while(pmcs.hasNext()) {
+            pmcs.next();
+            pmcs.value()->invalidate();
+        }
+    }
 }
 
 void
