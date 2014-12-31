@@ -364,12 +364,14 @@ RideItem::checkStale()
         if (context->athlete->emptyindex == true) {
             metacrc = 0; // reset as index missing
             isstale = true;
-
-        // metadata has changed
-        } else if (metacrc != metaCRC()) isstale = true;
-
+        } 
     }
 #endif
+
+    // we need to mark stale for 2 reasons
+    // 1) lucene index needs updating
+    // 2) "special" fields may have changed (e.g. CP)
+    if (metacrc != metaCRC()) isstale = true;
 
     return isstale;
 }
