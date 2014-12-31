@@ -260,6 +260,13 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
+    // save away initial values
+    b4.wheel = wheelSize;
+    b4.crank = crankLengthCombo->currentIndex();
+    b4.hyst = elevationHysteresis.toFloat();
+    b4.wbal = wbalForm->currentIndex();
+    b4.lts = perfManLTSVal.toInt();
+    b4.sts = perfManSTSVal.toInt();
 }
 
 void
@@ -315,7 +322,21 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_SB_NAME, appsettings->value(this, GC_SB_NAME,tr("Stress Balance")));
     appsettings->setValue(GC_SB_ACRONYM, appsettings->value(this, GC_SB_ACRONYM,tr("SB")));
 
-    return 0;
+    qint32 state=0;
+
+    // general stuff changed ?
+    if (b4.wheel != wheelSizeEdit->text().toInt() ||
+        b4.crank != crankLengthCombo->currentIndex() ||
+        b4.hyst != hystedit->text().toFloat() ||
+        b4.wbal != wbalForm->currentIndex())
+        state += CONFIG_GENERAL;
+
+    // PMC constants changed ?
+    if(b4.lts != perfManLTSavg->text().toInt() ||
+        b4.sts != perfManSTSavg->text().toInt()) 
+        state += CONFIG_PMC;
+
+    return state;
 }
 
 void
@@ -857,8 +878,11 @@ RiderPage::RiderPage(QWidget *parent, Context *context) : QWidget(parent), conte
     // since they are not used, nor the W'bal tau used in
     // the realtime code. This is limited to stuff we
     // care about tracking as it is used by metrics
-    b4.height = height->value();
-    b4.weight = weight->value();
+    b4.unit = unitCombo->currentIndex();
+
+    // height and weight as stored (always metric)
+    b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
+    b4.weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
     connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
@@ -919,8 +943,19 @@ RiderPage::saveClicked()
     appsettings->setCValue(context->athlete->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
 
-    if (b4.height != height->value() || b4.weight != weight->value()) return CONFIG_ATHLETE;
-    else return 0;
+    qint32 state=0;
+
+    // units prefs changed?
+    if (b4.unit != unitCombo->currentIndex())
+        state += CONFIG_UNITS;
+
+    // default height or weight changed ?
+    if (b4.height != appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() ||
+        b4.weight != appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()) {
+        state += CONFIG_ATHLETE;
+    }
+
+    return state;
 }
 
 //
