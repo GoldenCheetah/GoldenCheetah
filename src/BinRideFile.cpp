@@ -22,6 +22,7 @@
 #include <QSet>
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 
 #define RECORD_TYPE__META 0
 #define RECORD_TYPE__RIDE_DATA 1

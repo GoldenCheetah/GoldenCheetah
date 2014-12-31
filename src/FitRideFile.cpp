@@ -25,6 +25,7 @@
 #include <QTime>
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 #include <limits>
 
 #define RECORD_TYPE 20
