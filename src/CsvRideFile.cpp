@@ -393,15 +393,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     hhb = line.section(',', 22, 22).toInt();
 
                 } else if (csvType == freemotion) {
-                    qDebug() << line.section(',', 0, 0);
                     if (line == "Ride_Totals") {
                         eof = true;
                         continue;
                     }
                     // Time,Miles,MPH,Watts,HR,RPM
 
-                    seconds = QTime::fromString(line.section(',', 0, 0), "m:s").msecsSinceStartOfDay ()/1000;
-                    minutes = seconds / 60.0f;
+                    seconds = QTime::fromString(line.section(',', 0, 0), "m:s").second();
+                    minutes = QTime::fromString(line.section(',', 0, 0), "m:s").minute() + seconds / 60.0f;
                     cad = line.section(',', 5, 5).toDouble();
                     hr = line.section(',', 4, 4).toDouble();
                     km = line.section(',', 1, 1).toDouble();
