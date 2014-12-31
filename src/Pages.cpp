@@ -2875,6 +2875,7 @@ ZonePage::ZonePage(Context *context) : context(context)
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
+        b4Fingerprint = zones.getFingerprint(context); // remember original state
     }
 
     // setup maintenance pages using current config
@@ -2899,7 +2900,9 @@ ZonePage::saveClicked()
     QFile zonesFile(context->athlete->home->config().canonicalPath() + "/power.zones");
     context->athlete->zones_->read(zonesFile);
 
-    return 0;
+    // did we change ?
+    if (zones.getFingerprint(context) != b4Fingerprint) return CONFIG_ZONES;
+    else return 0;
 }
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
@@ -3458,6 +3461,7 @@ HrZonePage::HrZonePage(Context *context) : context(context)
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
+        b4Fingerprint = zones.getFingerprint(); // remember original state
     }
 
     // setup maintenance pages using current config
@@ -3481,7 +3485,9 @@ HrZonePage::saveClicked()
     QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/hr.zones");
     context->athlete->hrzones_->read(hrzonesFile);
 
-    return 0;
+    // did we change ?
+    if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
+    else return 0;
 }
 
 HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
@@ -4088,6 +4094,7 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
+        b4Fingerprint = zones.getFingerprint(); // remember original state
     }
 
     // setup maintenance pages using current config
@@ -4113,7 +4120,9 @@ PaceZonePage::saveClicked()
     QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/pace.zones");
     context->athlete->pacezones_->read(pacezonesFile);
 
-    return 0;
+    // did we change ?
+    if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
+    else return 0;
 }
 
 PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)

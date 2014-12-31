@@ -60,6 +60,7 @@ Context::notifyCompareDateRangesChanged()
 void
 Context::notifyConfigChanged(qint32 state)
 {
+    //if (state & CONFIG_ZONES) qDebug()<<"Zones config changed!";
     configChanged(state);
 }
 
