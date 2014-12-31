@@ -22,6 +22,7 @@
 #include "Athlete.h"
 #include "RideMetadata.h"
 #include <QObject>
+#include <QByteArray>
 #include <QDir>
 #include "Settings.h"
 
@@ -42,6 +43,16 @@ static void copyArray(Colors source[], Colors target[])
 {
     for (int i=0; source[i].name != ""; i++)
         target[i] = source[i];
+}
+
+unsigned long Colors::fingerprint(const Colors *set)
+{
+    QByteArray ba;
+    while(set->name != "") {
+        ba.append(set->color.name());
+        set++;
+    }
+    return qChecksum(ba, ba.length());
 }
 
 // initialization called from constructor to enable translation
@@ -195,12 +206,6 @@ GCColor::defaultSizes(int width, int height)
     return defaultAppearance[0]; // shouldn't get here
 }
 
-GCColor::GCColor(Context *context) : QObject(context)
-{
-    setupColors();
-    readConfig();
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(readConfig()));
-}
 
 // returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
 double GCColor::luminance(QColor color)
@@ -247,7 +252,7 @@ GCColor::readConfig()
 {
     // read in config settings and populate the color table
     for (unsigned int i=0; ColorList[i].name != ""; i++) {
-        QString colortext = appsettings->value(this, ColorList[i].setting, "").toString();
+        QString colortext = appsettings->value(NULL, ColorList[i].setting, "").toString();
         if (colortext != "") {
             // color definitions are stored as "r:g:b"
             QStringList rgb = colortext.split(":");

@@ -20,8 +20,8 @@
 #define _GC_Colors_h 1
 #include "GoldenCheetah.h"
 
-#include <QObject>
 #include <QString>
+#include <QObject>
 #include <QColor>
 #include <QLabel>
 
@@ -51,6 +51,7 @@ extern SizeSettings defaultAppearance[];
 class Colors
 {
 public:
+        static unsigned long fingerprint(const Colors*set);
         QString name,
                 setting;
         QColor  color;
@@ -92,11 +93,8 @@ class ColorLabel : public QLabel
 class GCColor : public QObject
 {
     Q_OBJECT
-    G_OBJECT
 
-        void setupColors();
     public:
-        GCColor(Context *);
         static QColor getColor(int);
         static void setColor(int,QColor);
         static const Colors *colorSet();
@@ -116,9 +114,9 @@ class GCColor : public QObject
         static QString css();
         static QPalette palette();
         static QString stylesheet();
+        static void readConfig();
+        static void setupColors();
 
-    public slots:
-        void readConfig();
 };
 
 // return a color for a ride file

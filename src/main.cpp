@@ -25,6 +25,7 @@
 #include "MainWindow.h"
 #include "Settings.h"
 #include "TrainDB.h"
+#include "Colors.h"
 
 #include "GcUpgrade.h"
 
@@ -154,6 +155,9 @@ main(int argc, char *argv[])
     font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
     application->setFont(font); // set default font
 
+    // set default colors
+    GCColor::setupColors();
+    GCColor::readConfig();
 
     //
     // OPEN FIRST MAINWINDOW
