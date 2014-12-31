@@ -132,6 +132,11 @@ class RiderPage : public QWidget
         QPushButton *avatarButton;
         QPixmap     avatar;
 
+    struct {
+        double weight;
+        double height;
+    } b4;
+
 };
 
 class CredentialsPage : public QScrollArea

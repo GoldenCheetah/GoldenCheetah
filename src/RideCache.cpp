@@ -47,7 +47,7 @@ RideCache::RideCache(Context *context) : context(context)
     exiting = false;
 
     // get the new zone configuration fingerprint
-    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
+    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint())
                   + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
                   + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint());
 
@@ -99,20 +99,11 @@ RideCache::~RideCache()
 }
 
 void
-RideCache::configChanged(qint32)
+RideCache::configChanged(qint32 what)
 {
-    // this is the overall config fingerprint, not for a specific
-    // ride. We now refresh only when the zones change, and refresh
-    // a single ride only when the zones that apply to that ride change
-    unsigned long prior = fingerprint;
-
-    // get the new zone configuration fingerprint
-    fingerprint = static_cast<unsigned long>(context->athlete->zones()->getFingerprint(context))
-                  + static_cast<unsigned long>(context->athlete->paceZones()->getFingerprint())
-                  + static_cast<unsigned long>(context->athlete->hrZones()->getFingerprint());
-
-    // if zones etc changed then recalculate metrics
-    if (prior != fingerprint) refresh();
+    // if zones or weight has changed refresh metrics
+    // will add more as they come (XXX in development)
+    if (what & (CONFIG_ATHLETE | CONFIG_ZONES)) refresh();
 }
 
 void

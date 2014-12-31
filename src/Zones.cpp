@@ -913,7 +913,7 @@ int Zones::deleteRange(int rnum) {
 }
 
 quint16
-Zones::getFingerprint(Context *context) const
+Zones::getFingerprint() const
 {
     quint64 x = 0;
     for (int i=0; i<ranges.size(); i++) {
@@ -936,9 +936,8 @@ Zones::getFingerprint(Context *context) const
     }
     QByteArray ba = QByteArray::number(x);
 
-    // if default athlete weight changes everything needs to change !
-    double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "0.0").toDouble();
-    return qChecksum(ba, ba.length()) + weight + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
+    // we spot other things separately
+    return qChecksum(ba, ba.length());
 }
 
 // get fingerprint just for the range that applies on this date
@@ -964,8 +963,7 @@ Zones::getFingerprint(Context *context, QDate forDate) const
     }
     QByteArray ba = QByteArray::number(x);
 
-    // if default athlete weight changes everything needs to change !
-    double weight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT, "0.0").toDouble();
-    return qChecksum(ba, ba.length()) + weight + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
+    // limits to only zones now as we sport weight separately
+    return qChecksum(ba, ba.length()) + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
 }
 
