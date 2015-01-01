@@ -69,12 +69,14 @@ Leaf::isDynamic(Leaf *leaf)
                     break;
 
     case Leaf::Logical  : 
+                    if (leaf->op == 0) return leaf->isDynamic(leaf->lvalue.l);
     case Leaf::Operation :
     case Leaf::BinaryOperation : 
                     return leaf->isDynamic(leaf->lvalue.l) || leaf->isDynamic(leaf->rvalue.l);
                     break;
     case Leaf::Function : 
-                    return leaf->isDynamic(leaf->lvalue.l);
+                    if (leaf->lvalue.l) return leaf->isDynamic(leaf->lvalue.l);
+                    else return leaf->dynamic;
                     break;
         break;
 
@@ -92,6 +94,7 @@ void Leaf::print(Leaf *leaf, int level)
     case Leaf::Symbol : qDebug()<<"symbol"<<*leaf->lvalue.n; break;
     case Leaf::Logical  : qDebug()<<"lop"<<leaf->op;
                     leaf->print(leaf->lvalue.l, level+1);
+                    if (leaf->op) // nonzero ?
                     leaf->print(leaf->rvalue.l, level+1);
                     break;
     case Leaf::Operation : qDebug()<<"cop"<<leaf->op;
@@ -103,7 +106,7 @@ void Leaf::print(Leaf *leaf, int level)
                     leaf->print(leaf->rvalue.l, level+1);
                     break;
     case Leaf::Function : qDebug()<<"function"<<leaf->function<<"series="<<*(leaf->series->lvalue.n);
-                    leaf->print(leaf->lvalue.l, level+1);
+                    if (leaf->lvalue.l) leaf->print(leaf->lvalue.l, level+1);
                     break;
     default:
         break;
