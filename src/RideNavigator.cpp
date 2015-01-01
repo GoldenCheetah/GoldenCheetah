@@ -123,7 +123,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
 
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
 
     // user selected a ride on the ride list, we should reflect that too..
     connect(tableView, SIGNAL(rowSelected(QItemSelection)), this, SLOT(selectionChanged(QItemSelection)));
@@ -195,6 +195,13 @@ RideNavigator::configChanged(qint32)
 
 #endif
 
+    refresh();
+}
+
+void
+RideNavigator::rideDeleted(RideItem*item)
+{
+    if (currentItem == item) currentItem = NULL;
     refresh();
 }
 

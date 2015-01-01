@@ -60,7 +60,15 @@ class RideCacheModel : public QAbstractTableModel
 
         // and updates to ride items
         void itemChanged(RideItem *item);
-        void itemAddedOrRemoved();
+        void itemAdded(RideItem *item);
+
+        // model reset on add (if needed)
+        void beginReset();
+        void endReset();
+
+        // start / end remove
+        void startRemove(int);
+        void endRemove(int);
 
     private:
         Context *context;
