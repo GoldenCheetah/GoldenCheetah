@@ -475,7 +475,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(refreshRideSaved()));
+    connect(context, SIGNAL(rideSaved(RideItem*)), this, SLOT(refreshRideSaved(RideItem*)));
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
@@ -757,18 +757,24 @@ CriticalPowerWindow::modelParametersChanged()
 }
 
 void
-CriticalPowerWindow::refreshRideSaved()
+CriticalPowerWindow::refreshRideSaved(RideItem *item)
 {
-    const RideItem *current = context->rideItem();
-    if (!current) return;
+    if (!item) return;
 
     // if the saved ride is in the aggregated time period
-    QDate date = current->dateTime.date();
-    if (date >= cpPlot->startDate &&
+    QDate date = item->dateTime.date();
+
+    // in rangemode ?
+    if (rangemode && date >= cpPlot->startDate &&
         date <= cpPlot->endDate) {
 
         // force a redraw next time visible
         cpPlot->setDateRange(cpPlot->startDate, cpPlot->endDate);
+    }
+
+    if (!rangemode) {
+        // reset date range for bests and model
+        if (!rangemode) seasonSelected(cComboSeason->currentIndex());
     }
 }
 

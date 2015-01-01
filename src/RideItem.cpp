@@ -239,6 +239,9 @@ void
 RideItem::saved()
 {
     setDirty(false);
+    isstale=true;
+    refresh(); // update !
+    context->notifyRideSaved(this);
 }
 
 void
