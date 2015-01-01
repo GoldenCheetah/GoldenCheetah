@@ -113,6 +113,7 @@ static QString protect(const QString string)
 %token REFERENCES
 %token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP 
 %token LRBALANCE LTE RTE LPS RPS THB SMO2 RVERT RCAD RCON
+%token LPCO RPCO LTDC RTDC LBDC RBDC LTPPP RTPPP LBPPP RBPPP
 
 %start document
 %%
@@ -239,6 +240,11 @@ sample: '{' series_list '}'             { jc->JsonRide->appendPoint(jc->JsonPoin
                                                     jc->JsonPoint.slope, jc->JsonPoint.temp, jc->JsonPoint.lrbalance,
                                                     jc->JsonPoint.lte, jc->JsonPoint.rte,
                                                     jc->JsonPoint.lps, jc->JsonPoint.rps,
+                                                    jc->JsonPoint.lpco, jc->JsonPoint.rpco,
+                                                    jc->JsonPoint.ltdc, jc->JsonPoint.rtdc,
+                                                    jc->JsonPoint.lbdc, jc->JsonPoint.rbdc,
+                                                    jc->JsonPoint.ltppp, jc->JsonPoint.rtppp,
+                                                    jc->JsonPoint.lbppp, jc->JsonPoint.rbppp,
                                                     jc->JsonPoint.smo2, jc->JsonPoint.thb,
                                                     jc->JsonPoint.rvert, jc->JsonPoint.rcad, jc->JsonPoint.rcontact,
                                                     jc->JsonPoint.interval);
@@ -264,6 +270,16 @@ series: SECS ':' number                 { jc->JsonPoint.secs = jc->JsonNumber; }
         | RTE ':' number                { jc->JsonPoint.rte = jc->JsonNumber; }
         | LPS ':' number                { jc->JsonPoint.lps = jc->JsonNumber; }
         | RPS ':' number                { jc->JsonPoint.rps = jc->JsonNumber; }
+        | LPCO ':' number               { jc->JsonPoint.lpco = jc->JsonNumber; }
+        | RPCO ':' number               { jc->JsonPoint.rpco = jc->JsonNumber; }
+        | LTDC ':' number               { jc->JsonPoint.ltdc = jc->JsonNumber; }
+        | RTDC ':' number               { jc->JsonPoint.rtdc = jc->JsonNumber; }
+        | LBDC ':' number               { jc->JsonPoint.lbdc = jc->JsonNumber; }
+        | RBDC ':' number               { jc->JsonPoint.rbdc = jc->JsonNumber; }
+        | LTPPP ':' number              { jc->JsonPoint.ltppp = jc->JsonNumber; }
+        | RTPPP ':' number              { jc->JsonPoint.rtppp = jc->JsonNumber; }
+        | LBPPP ':' number              { jc->JsonPoint.lbppp = jc->JsonNumber; }
+        | RBPPP ':' number              { jc->JsonPoint.rbppp = jc->JsonNumber; }
         | SMO2 ':' number               { jc->JsonPoint.smo2 = jc->JsonNumber; }
         | THB ':' number                { jc->JsonPoint.thb = jc->JsonNumber; }
         | RVERT ':' number              { jc->JsonPoint.rvert = jc->JsonNumber; }
@@ -546,6 +562,16 @@ JsonFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file) cons
             if (ride->areDataPresent()->rte) out << ", \"RTE\":" << QString("%1").arg(p->rte);
             if (ride->areDataPresent()->lps) out << ", \"LPS\":" << QString("%1").arg(p->lps);
             if (ride->areDataPresent()->rps) out << ", \"RPS\":" << QString("%1").arg(p->rps);
+            if (ride->areDataPresent()->lpco) out << ", \"LPCO\":" << QString("%1").arg(p->lpco);
+            if (ride->areDataPresent()->rpco) out << ", \"RPCO\":" << QString("%1").arg(p->rpco);
+            if (ride->areDataPresent()->ltdc) out << ", \"LTDC\":" << QString("%1").arg(p->ltdc);
+            if (ride->areDataPresent()->rtdc) out << ", \"RTDC\":" << QString("%1").arg(p->rtdc);
+            if (ride->areDataPresent()->lbdc) out << ", \"LBDC\":" << QString("%1").arg(p->lbdc);
+            if (ride->areDataPresent()->rbdc) out << ", \"RBDC\":" << QString("%1").arg(p->rbdc);
+            if (ride->areDataPresent()->ltppp) out << ", \"LTPPP\":" << QString("%1").arg(p->ltppp);
+            if (ride->areDataPresent()->rtppp) out << ", \"RTPPP\":" << QString("%1").arg(p->rtppp);
+            if (ride->areDataPresent()->lbppp) out << ", \"LBPPP\":" << QString("%1").arg(p->lbppp);
+            if (ride->areDataPresent()->rbppp) out << ", \"RBPPP\":" << QString("%1").arg(p->rbppp);
             if (ride->areDataPresent()->smo2) out << ", \"SMO2\":" << QString("%1").arg(p->smo2);
             if (ride->areDataPresent()->thb) out << ", \"THB\":" << QString("%1").arg(p->thb);
             if (ride->areDataPresent()->rcad) out << ", \"RCAD\":" << QString("%1").arg(p->rcad);

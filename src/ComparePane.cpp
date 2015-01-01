@@ -717,7 +717,10 @@ ComparePane::dropEvent(QDropEvent *event)
 
                     add.data->appendPoint(p->secs - offset, p->cad, p->hr, p->km - offsetKM, p->kph, p->nm,
                                           p->watts, p->alt, p->lon, p->lat, p->headwind,
-                                          p->slope, p->temp, p->lrbalance, p->lte, p->rte, p->lps, p->rps, p->smo2, p->thb, p->rvert, p->rcad, p->rcontact, 0);
+                                          p->slope, p->temp,
+                                          p->lrbalance, p->lte, p->rte, p->lps, p->rps,
+                                          p->lpco, p->rpco, p->ltdc, p->rtdc, p->lbdc, p->rbdc, p->ltppp, p->rtppp, p->lbppp, p->rbppp,
+                                          p->smo2, p->thb, p->rvert, p->rcad, p->rcontact, 0);
 
                     // get derived data calculated
                     RideFilePoint *l = add.data->dataPoints().last();

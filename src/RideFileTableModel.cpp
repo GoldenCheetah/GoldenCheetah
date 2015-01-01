@@ -141,6 +141,38 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Right PS");
             headingsType << RideFile::rps;
         }
+        if (series == RideFile::lpco || ride->areDataPresent()->lpco) {
+            headings_ << tr("Left Platform Center Offset");
+            headingsType << RideFile::lpco;
+        }
+        if (series == RideFile::rpco || ride->areDataPresent()->rpco) {
+            headings_ << tr("Right Platform Center Offset");
+            headingsType << RideFile::rpco;
+        }
+        if (series == RideFile::ltdc || ride->areDataPresent()->ltdc) {
+            headings_ << tr("Left Top Dead Center");
+            headingsType << RideFile::ltdc;
+        }
+        if (series == RideFile::rtdc || ride->areDataPresent()->rtdc) {
+            headings_ << tr("Right Top Dead Center");
+            headingsType << RideFile::rtdc;
+        }
+        if (series == RideFile::lbdc || ride->areDataPresent()->lbdc) {
+            headings_ << tr("Left Bottom Dead Center");
+            headingsType << RideFile::lbdc;
+        }
+        if (series == RideFile::rbdc || ride->areDataPresent()->rbdc) {
+            headings_ << tr("Right Bottom Dead Center");
+            headingsType << RideFile::rbdc;
+        }
+        if (series == RideFile::ltppp || ride->areDataPresent()->ltppp) {
+            headings_ << tr("Left Peak Power Phase Start");
+            headingsType << RideFile::ltppp;
+        }
+        if (series == RideFile::rtppp || ride->areDataPresent()->rtppp) {
+            headings_ << tr("Right Peak Power Phase Start");
+            headingsType << RideFile::rtppp;
+        }
         if (series == RideFile::smo2 || ride->areDataPresent()->smo2) {
             headings_ << tr("SmO2");
             headingsType << RideFile::smo2;

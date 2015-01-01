@@ -488,7 +488,7 @@ struct BinFileReaderState
         int lat = 0;
 
         // the 0.0 values are L and R torque efficiency and pedal smoothness which are not available in this format
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temperature, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temperature, lrbalance, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
     }
 
     void decodeSparseData(const BinDefinition &def, const std::vector<int> values) {

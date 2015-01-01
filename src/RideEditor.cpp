@@ -231,6 +231,16 @@ RideEditor::whatColumns()
          << tr("Right TE")
          << tr("Left PS")
          << tr("Right PS")
+         << tr("Left Platform Center Offset")
+         << tr("Right Platform Center Offset")
+         << tr("Left Top Dead Center")
+         << tr("Right Top Dead Center")
+         << tr("Left Bottom Dead Center")
+         << tr("Right Bottom Dead Center")
+         << tr("Left Peak Power Phase Start")
+         << tr("Right Peak Power Phase Start")
+         << tr("Left Peak Power Phase End")
+         << tr("Right Peak Power Phase End")
          << tr("SmO2")
          << tr("tHb")
          << tr("Vertical Oscillation")
@@ -826,7 +836,17 @@ RideEditor::insColumn(QString name)
     if (name == tr("Left TE")) series = RideFile::lte;
     if (name == tr("Right TE")) series = RideFile::rte;
     if (name == tr("Left PS")) series = RideFile::lps;
-    if (name == tr("Right PS")) series = RideFile::rps;
+    if (name == tr("Right PS")) series = RideFile::rps;  
+    if (name == tr("Left Platform Center Offset")) series = RideFile::lpco;
+    if (name == tr("Right Platform Center Offset")) series = RideFile::rpco;
+    if (name == tr("Left Top Dead Center")) series = RideFile::ltdc;
+    if (name == tr("Right Top Dead Center")) series = RideFile::rtdc;
+    if (name == tr("Left Bottom Dead Center")) series = RideFile::lbdc;
+    if (name == tr("Right Bottom Dead Center")) series = RideFile::rbdc;
+    if (name == tr("Left Peak Power Phase Start")) series = RideFile::ltppp;
+    if (name == tr("Right Peak Power Phase Start")) series = RideFile::rtppp;
+    if (name == tr("Left Peak Power Phase End")) series = RideFile::lbppp;
+    if (name == tr("Right Peak Power Phase End")) series = RideFile::rbppp;
     if (name == tr("SmO2")) series = RideFile::smo2;
     if (name == tr("tHb")) series = RideFile::thb;
     if (name == tr("Vertical Oscillation")) series = RideFile::rvert;

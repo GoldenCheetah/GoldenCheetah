@@ -226,6 +226,18 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showPS->setCheckState(Qt::Unchecked);
     seriesRight->addRow(new QLabel(""), showPS);
 
+    showPCO = new QCheckBox(tr("Pedal Center Offset"), this);
+    showPCO->setCheckState(Qt::Unchecked);
+    seriesRight->addRow(new QLabel(""), showPCO);
+
+    showDC = new QCheckBox(tr("Power Phase (Death Center)"), this);
+    showDC->setCheckState(Qt::Unchecked);
+    seriesRight->addRow(new QLabel(""), showDC);
+
+    showPPP = new QCheckBox(tr("Peak Power Phase"), this);
+    showPPP->setCheckState(Qt::Unchecked);
+    seriesRight->addRow(new QLabel(""), showPPP);
+
     // running !
     seriesRight->addRow(new QLabel(""), new QLabel(""));
 
@@ -687,6 +699,10 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showBalance, SIGNAL(stateChanged(int)), this, SLOT(setShowBalance(int)));
     connect(showPS, SIGNAL(stateChanged(int)), this, SLOT(setShowPS(int)));
     connect(showTE, SIGNAL(stateChanged(int)), this, SLOT(setShowTE(int)));
+    connect(showPCO, SIGNAL(stateChanged(int)), this, SLOT(setShowPCO(int)));
+    connect(showDC, SIGNAL(stateChanged(int)), this, SLOT(setShowDC(int)));
+    connect(showPPP, SIGNAL(stateChanged(int)), this, SLOT(setShowPPP(int)));
+
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showInterval, SIGNAL(stateChanged(int)), this, SLOT(setShowInterval(int)));
@@ -1049,6 +1065,27 @@ AllPlotWindow::compareChanged()
         if (showAP->isChecked()) { s.one = RideFile::aPower; s.two = RideFile::none; wanted << s;};
         if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
         if (showBalance->isChecked()) { s.one = RideFile::lrbalance; s.two = RideFile::none; wanted << s;};
+
+        /*
+        if (showTE->isChecked()) {
+            s.one = RideFile::lte; s.two = RideFile::none; wanted << s;
+            s.one = RideFile::rte; s.two = RideFile::none; wanted << s;
+        }
+        if (showPS->isChecked()) {
+            s.one = RideFile::lps; s.two = RideFile::none; wanted << s;
+            s.one = RideFile::rps; s.two = RideFile::none; wanted << s;
+        }
+        if (showPCO->isChecked()) {
+            s.one = RideFile::lpco; s.two = RideFile::rpco; wanted << s;
+        }
+        if (showDC->isChecked()) {
+            s.one = RideFile::ltdc; s.two = RideFile::lbdc; wanted << s;
+            s.one = RideFile::rtdc; s.two = RideFile::rbdc; wanted << s;
+        }
+        if (showPPP->isChecked()) {
+            s.one = RideFile::ltppp; s.two = RideFile::lbppp; wanted << s;
+            s.one = RideFile::rtppp; s.two = RideFile::rbppp; wanted << s;
+        }*/
 
         // create blank and add to gui
         QPalette palette;
@@ -2758,6 +2795,69 @@ AllPlotWindow::setShowTE(int value)
 }
 
 void
+AllPlotWindow::setShowPCO(int value)
+{
+    showPCO->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showPCO->isEnabled()) ? true : false;
+
+    allPlot->setShowPCO(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowPCO(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+
+}
+
+void
+AllPlotWindow::setShowDC(int value)
+{
+    showDC->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showDC->isEnabled()) ? true : false;
+
+    allPlot->setShowDC(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowDC(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+
+}
+
+void
+AllPlotWindow::setShowPPP(int value)
+{
+    showPPP->setChecked(value);
+
+    // compare mode selfcontained update
+    if (isCompare()) {
+        compareChanged();
+        return;
+    }
+
+    bool checked = ( ( value == Qt::Checked ) && showPPP->isEnabled()) ? true : false;
+
+    allPlot->setShowPPP(checked);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowPPP(checked);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+
+}
+
+void
 AllPlotWindow::setShowHelp(int value)
 {
     rHelp->setChecked(value);
@@ -3151,7 +3251,8 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showtHb->isChecked() && rideItem->ride()->areDataPresent()->thb) { s.one = RideFile::thb; s.two = RideFile::none; serieslist << s; }
     if (showO2Hb->isChecked() && rideItem->ride()->areDataPresent()->o2hb) { s.one = RideFile::o2hb; s.two = RideFile::none; serieslist << s; }
     if (showHHb->isChecked() && rideItem->ride()->areDataPresent()->hhb) { s.one = RideFile::hhb; s.two = RideFile::none; serieslist << s; }
-    if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) { s.one = RideFile::kph; s.two = RideFile::none; serieslist << s; }
+    if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) addHeadwind=true; //serieslist << RideFile::headwind;
+    if (showSpeed->isChecked() && rideItem->ride()->areDataPresent()->kph) {s.one = RideFile::kph; s.two = (addHeadwind ? RideFile::headwind : RideFile::none); serieslist << s; }
     if (showAccel->isChecked() && rideItem->ride()->areDataPresent()->kph) { s.one = RideFile::kphd; s.two = RideFile::none; serieslist << s; }
     if (showCad->isChecked() && rideItem->ride()->areDataPresent()->cad) { s.one = RideFile::cad; s.two = RideFile::none; serieslist << s; }
     if (showCadD->isChecked() && rideItem->ride()->areDataPresent()->cad) { s.one = RideFile::cadd; s.two = RideFile::none; serieslist << s; }
@@ -3160,8 +3261,7 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showAlt->isChecked() && rideItem->ride()->areDataPresent()->alt) { s.one = RideFile::alt; s.two = RideFile::none; serieslist << s; }
     if (showAltSlope->currentIndex() > 0 && rideItem->ride()->areDataPresent()->alt) { s.one = RideFile::alt; s.two = RideFile::slope; serieslist << s; }
     if (showSlope->isChecked() && rideItem->ride()->areDataPresent()->slope) { s.one = RideFile::slope; s.two = RideFile::none; serieslist << s; }
-    if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) { s.one = RideFile::temp; s.two = RideFile::none; serieslist << s; }
-    if (showWind->isChecked() && rideItem->ride()->areDataPresent()->headwind) addHeadwind=true; //serieslist << RideFile::headwind;
+    if (showTemp->isChecked() && rideItem->ride()->areDataPresent()->temp) { s.one = RideFile::temp; s.two = RideFile::none; serieslist << s; } 
     if (showNP->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::NP; s.two = RideFile::none; serieslist << s; }
     if (showRV->isChecked() && rideItem->ride()->areDataPresent()->rvert) { s.one = RideFile::rvert; s.two = RideFile::none; serieslist << s; }
     if (showRCad->isChecked() && rideItem->ride()->areDataPresent()->rcad) { s.one = RideFile::rcad; s.two = RideFile::none; serieslist << s; }
@@ -3177,12 +3277,17 @@ AllPlotWindow::setupSeriesStackPlots()
          s.one = RideFile::rte; s.two = RideFile::none; serieslist << s; }
     if (showPS->isChecked() && rideItem->ride()->areDataPresent()->lps) { s.one = RideFile::lps; s.two = RideFile::none; serieslist << s;
          s.one = RideFile::rps; s.two = RideFile::none; serieslist << s; }
+    if (showPCO->isChecked() && rideItem->ride()->areDataPresent()->lpco) { s.one = RideFile::lpco; s.two = RideFile::rpco; serieslist << s;}
+    if (showDC->isChecked() && rideItem->ride()->areDataPresent()->ltdc) { s.one = RideFile::ltdc; s.two = RideFile::lbdc; serieslist << s;
+         s.one = RideFile::rtdc; s.two = RideFile::rbdc; serieslist << s; }
+    if (showPPP->isChecked() && rideItem->ride()->areDataPresent()->ltppp) { s.one = RideFile::ltppp; s.two = RideFile::lbppp; serieslist << s;
+         s.one = RideFile::rtppp; s.two = RideFile::rbppp; serieslist << s; }
 
     bool first = true;
     foreach(SeriesWanted x, serieslist) {
 
         // create that plot
-        AllPlot *_allPlot = new AllPlot(this, this, context, x.one, (addHeadwind && x.one == RideFile::kph ? RideFile::headwind : x.two), first);
+        AllPlot *_allPlot = new AllPlot(this, this, context, x.one, x.two, first);
         _allPlot->setAutoFillBackground(false);
         _allPlot->setPalette(palette);
         _allPlot->setPaintBrush(paintBrush->checkState());
@@ -3377,6 +3482,9 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShowAP((showAP->isEnabled()) ? ( showAP->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTE((showTE->isEnabled()) ? ( showTE->checkState() == Qt::Checked ) : false );
         _allPlot->setShowPS((showPS->isEnabled()) ? ( showPS->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowPCO((showPCO->isEnabled()) ? ( showPCO->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowDC((showDC->isEnabled()) ? ( showDC->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowPPP((showPPP->isEnabled()) ? ( showPPP->checkState() == Qt::Checked ) : false );
 
 	    _allPlot->replot();
     }

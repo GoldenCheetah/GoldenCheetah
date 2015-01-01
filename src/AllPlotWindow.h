@@ -83,6 +83,9 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showBalance READ isShowBalance WRITE setShowBalance USER true)
     Q_PROPERTY(int showTE READ isShowTE WRITE setShowTE USER true)
     Q_PROPERTY(int showPS READ isShowPS WRITE setShowPS USER true)
+    Q_PROPERTY(int showPCO READ isShowPCO WRITE setShowPCO USER true)
+    Q_PROPERTY(int showDC READ isShowDC WRITE setShowDC USER true)
+    Q_PROPERTY(int showPPP READ isShowPPP WRITE setShowPPP USER true)
     Q_PROPERTY(int showTemp READ isShowTemp WRITE setShowTemp USER true)
     Q_PROPERTY(int showW READ isShowW WRITE setShowW USER true)
 
@@ -141,6 +144,9 @@ class AllPlotWindow : public GcChartWindow
         int isShowHrD() const { return showHrD->checkState(); }
         int isShowTE() const { return showTE->checkState(); }
         int isShowPS() const { return showPS->checkState(); }
+        int isShowPCO() const { return showPCO->checkState(); }
+        int isShowDC() const { return showDC->checkState(); }
+        int isShowPPP() const { return showPPP->checkState(); }
         int isShowBalance() const { return showBalance->checkState(); }
         int isShowTemp() const { return showTemp->checkState(); }
         int isShowW() const { return showW->checkState(); }
@@ -196,6 +202,9 @@ class AllPlotWindow : public GcChartWindow
         void setShowBalance(int state);
         void setShowPS(int state);
         void setShowTE(int state);
+        void setShowPCO(int state);
+        void setShowDC(int state);
+        void setShowPPP(int state);
         void setShowRV(int state);
         void setShowRCad(int state);
         void setShowRGCT(int state);
@@ -313,6 +322,9 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showBalance;
         QCheckBox *showTE;
         QCheckBox *showPS;
+        QCheckBox *showPCO;
+        QCheckBox *showDC;
+        QCheckBox *showPPP;
         QCheckBox *showW;
         QCheckBox *showRV;
         QCheckBox *showRGCT;

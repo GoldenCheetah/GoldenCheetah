@@ -198,11 +198,22 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double rtedelta = (point->rte - last->rte) / (double) count;
                 double lpsdelta = (point->lps - last->lps) / (double) count;
                 double rpsdelta = (point->rps - last->rps) / (double) count;
+                double lpcodelta = (point->lpco - last->lpco) / (double) count;
+                double rpcodelta = (point->rpco - last->rpco) / (double) count;
+                double ltdcdelta = (point->ltdc - last->ltdc) / (double) count;
+                double rtdcdelta = (point->rtdc - last->rtdc) / (double) count;
+                double lbdcdelta = (point->lbdc - last->lbdc) / (double) count;
+                double rbdcdelta = (point->rbdc - last->rbdc) / (double) count;
+                double ltpppdelta = (point->ltppp - last->ltppp) / (double) count;
+                double rtpppdelta = (point->rtppp - last->rtppp) / (double) count;
+                double lbpppdelta = (point->lbppp - last->lbppp) / (double) count;
+                double rbpppdelta = (point->rbppp - last->rbppp) / (double) count;
                 double smo2delta = (point->smo2 - last->smo2) / (double) count;
                 double thbdelta = (point->thb - last->thb) / (double) count;
                 double rcontactdelta = (point->rcontact - last->rcontact) / (double) count;
                 double rcaddelta = (point->rcad - last->rcad) / (double) count;
                 double rvertdelta = (point->rvert - last->rvert) / (double) count;
+
 
                 // add the points
                 for(int i=0; i<count; i++) {
@@ -224,6 +235,16 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->rte + ((i+1)*rtedelta),
                                                            last->lps + ((i+1)*lpsdelta),
                                                            last->rps + ((i+1)*rpsdelta),
+                                                           last->lpco + ((i+1)*lpcodelta),
+                                                           last->rpco + ((i+1)*rpcodelta),
+                                                           last->ltdc + ((i+1)*ltdcdelta),
+                                                           last->rtdc + ((i+1)*rtdcdelta),
+                                                           last->lbdc + ((i+1)*lbdcdelta),
+                                                           last->rbdc + ((i+1)*rbdcdelta),
+                                                           last->ltppp + ((i+1)*ltpppdelta),
+                                                           last->rtppp + ((i+1)*rtpppdelta),
+                                                           last->lbppp + ((i+1)*lbpppdelta),
+                                                           last->rbppp + ((i+1)*rbpppdelta),
                                                            last->smo2 + ((i+1)*smo2delta),
                                                            last->thb + ((i+1)*thbdelta),
                                                            last->rvert + ((i+1)*rvertdelta),
@@ -260,6 +281,9 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0,
                                                            0.0, 0.0, 0.0, 0.0, //pedal torque / smoothness
+                                                           0.0, 0.0, // pedal platform offset
+                                                           0.0, 0.0, 0.0, 0.0, //pedal top and bottom death center
+                                                           0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                                            0.0, 0.0, // smO2 / thb
                                                            0.0, 0.0, 0.0, // running dynamics
                                                            last->interval);

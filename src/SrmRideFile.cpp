@@ -315,6 +315,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
         double nm = watts / 2.0 / PI / cad * 60.0;
         result->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, temp, 0.0, 
+                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
 
         ++blkidx;

@@ -423,7 +423,8 @@ void QwtPlotItem::hide()
     \param on Show if true, otherwise hide
     \sa isVisible(), show(), hide()
 */
-void QwtPlotItem::setVisible( bool on )
+void QwtPlotItem::
+setVisible( bool on )
 {
     if ( on != d_data->isVisible )
     {

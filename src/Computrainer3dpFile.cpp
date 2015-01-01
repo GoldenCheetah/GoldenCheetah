@@ -239,7 +239,10 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                                 (double) hr, km, speed, 0.0, watts,
                                 altitude, 0, 0, 0.0, 0.0, RideFile::NoTemp, 0.0,
                                 0.0, 0.0, 0.0, 0.0, // pedal torque eff / pedal smoothness
-                                0.0, 0.0,
+                                0.0, 0.0, // pedal platform offset
+                                0.0, 0.0, 0.0, 0.0, //pedal top and bottom death center
+                                0.0, 0.0, 0.0, 0.0, //pedal peak power phase
+                                0.0, 0.0, //  smO2 / thb
                                 0.0, 0.0, 0.0, // running dynamics
                                 0);
         }
@@ -294,6 +297,9 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
                                 RideFile::NoTemp, // temp
                                 0.0,
                                 0.0, 0.0, 0.0, 0.0, // pedal torque effectiveness / pedal smoothness
+                                0.0, 0.0, // pedal platform offset
+                                0.0, 0.0, 0.0, 0.0, //pedal top and bottom death center
+                                0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                 0.0, 0.0, // smO2 / tHb
                                 0.0, 0.0, 0.0, // running dynamics
                                 0);

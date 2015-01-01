@@ -71,7 +71,12 @@ time_cb(struct tm *, time_t since_epoch, void *context)
     state->rideFile->appendPoint(secs, 0.0, 0.0,
                                  state->last_miles * KM_PER_MILE, 0.0,
                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                 RideFile::NoTemp, 0.0, 0.0,0.0,0.0,0.0,0.0,0.0,
+                                 RideFile::NoTemp, 0.0,
+                                 0.0, 0.0, 0.0, 0.0,
+                                 0.0,0.0,
+                                 0.0, 0.0, 0.0, 0.0,
+                                 0.0, 0.0, 0.0, 0.0,
+                                 0.0,0.0,
                                  0.0,0.0,0.0, // running dynamic
                                  state->last_interval);
     state->last_secs = secs;
@@ -89,6 +94,9 @@ data_cb(double secs, double nm, double mph, double watts, double miles, double a
     state->rideFile->appendPoint(secs, cad, hr, miles * KM_PER_MILE,
                                  mph * KM_PER_MILE, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::NoTemp, 0.0, 
                                  0.0,0.0,0.0,0.0, // pedal smooth/te
+                                 0.0,0.0,
+                                 0.0,0.0,0.0,0.0,
+                                 0.0,0.0,0.0,0.0,
                                  0.0,0.0,
                                  0.0,0.0,0.0,
                                  interval);
