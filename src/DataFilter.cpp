@@ -119,6 +119,7 @@ bool Leaf::isNumber(DataFilter *df, Leaf *leaf)
             if (symbol == "isRun") return true;
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
             else if (isCoggan(symbol)) return true;
             else return df->lookupType.value(symbol, false);
         }
@@ -173,6 +174,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                 // isRun isa special, we may add more later (e.g. date)
                 if (symbol.compare("Date", Qt::CaseInsensitive) && 
                     symbol.compare("Today", Qt::CaseInsensitive) && 
+                    symbol.compare("Current", Qt::CaseInsensitive) && 
                     symbol != "isRun" && !isCoggan(symbol))
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
             }
@@ -453,6 +455,15 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                     lhsdouble = m->isRun ? 1 : 0;
                     lhsisNumber = true;
 
+                } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
+
+                    if (context->currentRideItem())
+                        lhsdouble = QDate(1900,01,01).
+                        daysTo(context->currentRideItem()->dateTime.date());
+                    else
+                        lhsdouble = 0;
+                    lhsisNumber = true;
+
                 } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
 
                     lhsdouble = QDate(1900,01,01).daysTo(QDate::currentDate());
@@ -533,6 +544,15 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 if (symbol == "isRun") {
 
                     rhsdouble = m->isRun ? 1 : 0;
+                    rhsisNumber = true;
+
+                } else if (!symbol.compare("Current", Qt::CaseInsensitive)) {
+
+                    if (context->currentRideItem())
+                        rhsdouble = QDate(1900,01,01).
+                        daysTo(context->currentRideItem()->dateTime.date());
+                    else
+                        rhsdouble = 0;
                     rhsisNumber = true;
 
                 } else if (!symbol.compare("Today", Qt::CaseInsensitive)) {
