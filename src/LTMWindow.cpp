@@ -214,6 +214,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
+    connect(context, SIGNAL(rideSaved(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
