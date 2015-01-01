@@ -337,6 +337,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(context, SIGNAL(rideSaved(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(forceReplot()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(forceReplot()));
 
@@ -774,6 +775,7 @@ void
 HistogramWindow::rideAddorRemove(RideItem *)
 {
     stale = true;
+    if (amVisible()) updateChart();
 }
 
 void
