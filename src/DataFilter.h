@@ -37,13 +37,14 @@ class Leaf {
 
     public:
 
-        Leaf() : type(none),op(0),series(NULL) { }
+        Leaf() : type(none),op(0),series(NULL),dynamic(false) { }
 
         // evaluate against a RideItem
         double eval(Context *context, DataFilter *df, Leaf *, RideItem *m);
 
         // tree traversal etc
         void print(Leaf *, int level);  // print leaf and all children
+        bool isDynamic(Leaf *);
         void validateFilter(DataFilter *, Leaf*); // validate
         bool isNumber(DataFilter *df, Leaf *leaf);
         void clear(Leaf*);
@@ -59,6 +60,7 @@ class Leaf {
         int op;
         QString function;
         Leaf *series; // is a symbol
+        bool dynamic;
         RideFile::SeriesType seriesType; // for ridefilecache
 };
 
@@ -72,6 +74,9 @@ class DataFilter : public QObject
         Context *context;
         QStringList &files() { return filenames; }
 
+        // needs to be reapplied as the ride selection changes
+        bool isdynamic;
+
         // used by Leaf
         QMap<QString,QString> lookupMap;
         QMap<QString,bool> lookupType; // true if a number, false if a string
@@ -80,6 +85,7 @@ class DataFilter : public QObject
         QStringList parseFilter(QString query, QStringList *list=0);
         void clearFilter();
         void configChanged(qint32);
+        void dynamicParse();
 
         //void setData(); // set the file list from the current filter
 
@@ -94,6 +100,7 @@ class DataFilter : public QObject
         QStringList errors;
 
         QStringList filenames;
+        QStringList *list;
 };
 
 extern int DataFilterdebug;

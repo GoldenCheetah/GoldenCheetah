@@ -46,6 +46,7 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     connect(searchbox, SIGNAL(submitFilter(QString)), datafilter, SLOT(parseFilter(QString)));
     connect(datafilter, SIGNAL(results(QStringList)), this, SIGNAL(searchResults(QStringList)));
     connect(searchbox, SIGNAL(clearFilter()), this, SIGNAL(searchClear()));
+    connect(searchbox, SIGNAL(clearFilter()), datafilter, SLOT(clearFilter()));
 
     // syntax check
     connect(datafilter, SIGNAL(parseGood()), searchbox, SLOT(setGood()));
