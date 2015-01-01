@@ -339,7 +339,8 @@ TabView::setBlank(BlankStatePage *blank)
 
     // and when stuff happens lets check
     connect(blank, SIGNAL(closeClicked()), this, SLOT(checkBlank()));
-    //XXXREFRESH connect(context->athlete->metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(checkBlank()));
+    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(checkBlank()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(checkBlank()));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlank()));
 

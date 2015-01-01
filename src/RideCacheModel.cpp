@@ -32,8 +32,7 @@ RideCacheModel::RideCacheModel(Context *context, RideCache *cache) : QAbstractTa
     connect(context, SIGNAL(refreshStart()), this, SLOT(refreshStart()));
     connect(context, SIGNAL(refreshEnd()), this, SLOT(refreshEnd()));
     connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
-    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(itemAddedOrRemoved()));
-    connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(itemAddedOrRemoved()));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(itemAdded(RideItem*)));
     connect(rideCache, SIGNAL(itemChanged(RideItem*)), this, SLOT(itemChanged(RideItem*)));
 }
 
@@ -61,6 +60,8 @@ RideCacheModel::flags(const QModelIndex &index) const
 QVariant 
 RideCacheModel::data(const QModelIndex &index, int role) const
 {
+    Q_UNUSED(role);
+
     if (!index.isValid() || index.row() < 0 || index.row() >= rideCache->count() ||
         index.column() < 0 || index.column() >= columns_) return QVariant();
 
@@ -109,12 +110,27 @@ RideCacheModel::itemChanged(RideItem *item)
     }
 }
 
+void RideCacheModel::beginReset() { beginResetModel(); }
+void RideCacheModel::endReset() { endResetModel(); }
+
 void 
-RideCacheModel::itemAddedOrRemoved()
+RideCacheModel::itemAdded(RideItem*)
 {
-    // reset the model
-    beginResetModel();
-    endResetModel();
+    // nothing to do now as the cache
+    // told us to begin/end reset model
+    // whilst it updated the ride list
+}
+
+void
+RideCacheModel::startRemove(int index)
+{
+    beginRemoveRows(createIndex(0,0), index, columns_-1);
+}
+
+void
+RideCacheModel::endRemove(int)
+{
+    endRemoveRows();
 }
 
 bool 

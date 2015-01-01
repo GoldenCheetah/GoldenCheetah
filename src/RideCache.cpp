@@ -158,8 +158,13 @@ RideCache::addRide(QString name, bool dosignal)
         }
     }
 
-    if (!added) rides_ << last;
-    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+    // add and sort, model needs to know !
+    if (!added) {
+        model_->beginReset();
+        rides_ << last;
+        qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+        model_->endReset();
+    }
 
     // refresh metrics for *this ride only* 
     last->refresh();
@@ -212,7 +217,10 @@ RideCache::removeCurrentRide()
     // remove from the cache, before deleting it this is so
     // any aggregating functions no longer see it, when recalculating
     // during aride deleted operation
+    // but model needs to know about this!
+    model_->startRemove(index);
     rides_.remove(index, 1);
+    model_->endRemove(index);
 
     // delete the file by renaming it
     QString strOldFileName = context->ride->fileName;

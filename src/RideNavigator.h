@@ -110,6 +110,9 @@ class RideNavigator : public GcWindow
         // bring it back in view
         void cursorRide();
 
+        // if current ride is deleted we need to invaldate
+        void rideDeleted(RideItem*);
+
         // user selection so line up
         void selectionChanged(QItemSelection);
         bool eventFilter(QObject *object, QEvent *e);
