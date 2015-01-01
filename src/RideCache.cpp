@@ -234,8 +234,8 @@ RideCache::removeCurrentRide()
     QFile::remove(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName);
 
     if (!file.rename(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName)) {
-        QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2")
-            .arg(strOldFileName).arg(strNewName));
+        QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2 in %3")
+            .arg(strOldFileName).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
     }
 
     // remove any other derived/additional files; notes, cpi etc (they can only exist in /cache )
