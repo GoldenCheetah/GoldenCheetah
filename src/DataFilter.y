@@ -168,14 +168,17 @@ value : symbol                      { $$ = $1; }
       | LTS '(' symbol ')'            { $$ = new Leaf(); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
+                                        $$->lvalue.l = NULL;
                                       }
       | STS '(' symbol ')'            { $$ = new Leaf(); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
+                                        $$->lvalue.l = NULL;
                                       }
       | SB '(' symbol ')'             { $$ = new Leaf(); $$->type = Leaf::Function;
                                         $$->function = QString($1);
                                         $$->series = $3;
+                                        $$->lvalue.l = NULL;
                                       }
       ;
 
