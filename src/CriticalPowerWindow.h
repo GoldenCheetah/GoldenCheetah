@@ -230,7 +230,7 @@ class CriticalPowerWindow : public GcChartWindow
         void useStandardRange();
         void useThruToday();
 
-        void refreshRideSaved();
+        void refreshRideSaved(RideItem*);
         void modelParametersChanged(); // we changed the intervals
         void modelChanged(); // we changed the model type 
 
