@@ -59,6 +59,29 @@ static RideFile::SeriesType nameToSeries(QString name)
 
 }
 
+bool
+Leaf::isDynamic(Leaf *leaf)
+{
+    switch(leaf->type) {
+    default:
+    case Leaf::Symbol : 
+                    return leaf->dynamic;
+                    break;
+
+    case Leaf::Logical  : 
+    case Leaf::Operation :
+    case Leaf::BinaryOperation : 
+                    return leaf->isDynamic(leaf->lvalue.l) || leaf->isDynamic(leaf->rvalue.l);
+                    break;
+    case Leaf::Function : 
+                    return leaf->isDynamic(leaf->lvalue.l);
+                    break;
+        break;
+
+    }
+    return false;
+}
+
 void Leaf::print(Leaf *leaf, int level)
 {
     qDebug()<<"LEVEL"<<level;
@@ -177,6 +200,9 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     symbol.compare("Current", Qt::CaseInsensitive) && 
                     symbol != "isRun" && !isCoggan(symbol))
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
+
+                if (symbol.compare("Current", Qt::CaseInsensitive))
+                    dynamic = true;
             }
         }
         break;
@@ -241,14 +267,19 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
     }
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), isdynamic(false), treeRoot(NULL)
 {
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
 }
 
 QStringList DataFilter::parseFilter(QString query, QStringList *list)
 {
+    // remember where we apply
+    this->list = list;
+    isdynamic=false;
+
     //DataFilterdebug = 2; // no debug -- needs bison -t in src.pro
     root = NULL;
 
@@ -279,6 +310,8 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
 
     } else { // yep! .. we have a winner!
 
+        isdynamic = treeRoot->isDynamic(treeRoot);
+
         // successfuly parsed, lets check semantics
         //treeRoot->print(treeRoot);
         emit parseGood();
@@ -301,12 +334,34 @@ QStringList DataFilter::parseFilter(QString query, QStringList *list)
     return errors;
 }
 
+void
+DataFilter::dynamicParse()
+{
+    if (isdynamic) {
+        // need to reapply on current state
+
+        // clear current filter list
+        filenames.clear();
+
+        // get all fields...
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
+
+            // evaluate each ride...
+            if(treeRoot->eval(context, this, treeRoot, item))
+                filenames << item->fileName;
+        }
+        emit results(filenames);
+        if (list) *list = filenames;
+    }
+}
+
 void DataFilter::clearFilter()
 {
     if (treeRoot) {
         treeRoot->clear(treeRoot);
         treeRoot = NULL;
     }
+    isdynamic = false;
 }
 
 void DataFilter::configChanged(qint32)
