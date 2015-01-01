@@ -121,6 +121,7 @@ class RideFile : public QObject // QObject to emit signals
 
         friend class RideFileCommand; // tells us we were modified
         friend class RideCache; // tells us if wbal is stale
+        friend class RideItem; // derived/wbal stale
         friend class MainWindow; // tells us we were modified
         friend class Context; // tells us we were saved
 

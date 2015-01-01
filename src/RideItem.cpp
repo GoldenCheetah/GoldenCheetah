@@ -204,10 +204,14 @@ RideItem::notifyRideDataChanged()
     isstale=true;
 
     // force a recompute of derived data series
-    if (ride_) ride_->recalculateDerivedSeries(true);
+    if (ride_) {
+        ride_->wstale = true;
+        ride_->recalculateDerivedSeries(true);
+    }
 
     // refresh the cache
     if (fileCache_) fileCache_->refresh(ride());
+
 
     // refresh the data
     refresh();
@@ -448,6 +452,11 @@ RideItem::refresh()
         // close if we opened it
         if (doclose) {
             close();
+        } else {
+
+            // if it is open then recompute
+            ride_->wstale = true;
+            ride_->recalculateDerivedSeries(true);
         }
 
     } else {
