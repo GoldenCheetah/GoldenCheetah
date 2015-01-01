@@ -57,7 +57,7 @@ LTMTrend::LTMTrend(double *xdata, double *ydata, int count) :
         double coefC = sqrt(coefD);
         double stdError = sqrt(sy / double(points - 2));
 
-        qDebug() << coefD << coefC << stdError << r;
+        //qDebug() << coefD << coefC << stdError << r;
     }
 }
 
