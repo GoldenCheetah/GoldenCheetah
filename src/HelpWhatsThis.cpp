@@ -67,7 +67,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     // Scope Bar
     case ScopeBar_Trends:
-         return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number (e.g. date range of activities) like PMC, long term metrics view, ... and data summaries"));
+         return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries"));
     case ScopeBar_Diary:
          return text.arg("ScopeBar_Views#diary").arg(tr("Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types"));
     case ScopeBar_Rides:
@@ -144,7 +144,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Edit_FixHRSpikes:
         return text.arg("Menu%20Bar_Tools#tool-fix-hr-spikes").arg(tr("Fix HR Spikes"));
     case MenuBar_Edit_FixPowerSpikes:
-        return text.arg("Menu%20Bar_Tools").arg(tr("Fix Power Spikes#tool-fix-power-spikes"));
+        return text.arg("Menu%20Bar_Toolss#tool-fix-power-spikes").arg(tr("Fix Power Spikes"));
 
     case MenuBar_View:
         return text.arg("Menu%20Bar_View").arg(tr("Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings"));
