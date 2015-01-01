@@ -647,6 +647,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->appendPoint(seconds, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat, 0.0,
                                           0.0, temp, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0, 0.0, interval);
                else if (csvType == moxy) {
 
@@ -656,10 +658,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
                                           smo2, thb, 0.0, 0.0, 0.0, interval);
                     rideFile->appendPoint((minutes * 60.0)+1, cad, hr, km, // dupe it so we have 1s recording easier to merge
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb, 0.0, 0.0, 0.0, interval);
 
@@ -667,6 +675,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
                                           headwind, slope, temp, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
+                                          0.0, 0.0,
+                                          0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb, 0.0, 0.0, 0.0, interval);
                }

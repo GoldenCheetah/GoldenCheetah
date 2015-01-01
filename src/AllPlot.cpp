@@ -422,6 +422,26 @@ AllPlotObject::AllPlotObject(AllPlot *plot) : plot(plot)
     rpsCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     rpsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
 
+    lpcoCurve = new QwtPlotCurve(tr("Left Pedal Center Offset"));
+    lpcoCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    lpcoCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
+    rpcoCurve = new QwtPlotCurve(tr("Right Pedal Center Offset"));
+    rpcoCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+    rpcoCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
+    ldcCurve = new QwtPlotIntervalCurve(tr("Left Pedal Power Phase"));
+    ldcCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
+    rdcCurve = new QwtPlotIntervalCurve(tr("Right Pedal Power Phase"));
+    rdcCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
+    lpppCurve = new QwtPlotIntervalCurve(tr("Left Peak Pedal Power Phase"));
+    lpppCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
+    rpppCurve = new QwtPlotIntervalCurve(tr("Right Peak Pedal Power Phase"));
+    rpppCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 3));
+
     wCurve = new QwtPlotCurve(tr("W' Balance (kJ)"));
     wCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     wCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 2));
@@ -462,6 +482,7 @@ AllPlotObject::setColor(QColor color)
              << wattsDCurve << cadDCurve << nmDCurve << hrDCurve
              << apCurve << cadCurve << tempCurve << hrCurve << torqueCurve << balanceLCurve
              << balanceRCurve << lteCurve << rteCurve << lpsCurve << rpsCurve
+             << lpcoCurve << rpcoCurve
              << altCurve << slopeCurve << altSlopeCurve
              << rvCurve << rcadCurve << rgctCurve << gearCurve 
              << smo2Curve << thbCurve << o2hbCurve << hhbCurve;
@@ -488,6 +509,14 @@ AllPlotObject::setColor(QColor color)
     // has to be different...
     windCurve->setPen(pen);
     if (antialias)windCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    ldcCurve->setPen(pen);
+    if (antialias)ldcCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    rdcCurve->setPen(pen);
+    if (antialias)rdcCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    lpppCurve->setPen(pen);
+    if (antialias)lpppCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    rpppCurve->setPen(pen);
+    if (antialias)rpppCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     // and alt needs a feint brush
     altCurve->setBrush(QBrush(altCurve->pen().color().lighter(150)));
@@ -533,6 +562,12 @@ AllPlotObject::~AllPlotObject()
     rteCurve->detach(); delete rteCurve;
     lpsCurve->detach(); delete lpsCurve;
     rpsCurve->detach(); delete rpsCurve;
+    lpcoCurve->detach(); delete lpcoCurve;
+    rpcoCurve->detach(); delete rpcoCurve;
+    ldcCurve->detach(); delete ldcCurve;
+    rdcCurve->detach(); delete rdcCurve;
+    lpppCurve->detach(); delete lpppCurve;
+    rpppCurve->detach(); delete rpppCurve;
 }
 
 void
@@ -575,6 +610,12 @@ AllPlotObject::setVisible(bool show)
         rteCurve->detach();
         lpsCurve->detach();
         rpsCurve->detach();
+        lpcoCurve->detach();
+        rpcoCurve->detach();
+        ldcCurve->detach();
+        rdcCurve->detach();
+        lpppCurve->detach();
+        rpppCurve->detach();
         balanceLCurve->detach();
         balanceRCurve->detach();
         intervalHighlighterCurve->detach();
@@ -626,6 +667,12 @@ AllPlotObject::setVisible(bool show)
         rteCurve->attach(plot);
         lpsCurve->attach(plot);
         rpsCurve->attach(plot);
+        lpcoCurve->attach(plot);
+        rpcoCurve->attach(plot);
+        ldcCurve->attach(plot);
+        rdcCurve->attach(plot);
+        lpppCurve->attach(plot);
+        rpppCurve->attach(plot);
         balanceLCurve->attach(plot);
         balanceRCurve->attach(plot);
 
@@ -683,6 +730,18 @@ AllPlotObject::hideUnwanted()
     if (!plot->showPS) {
             lpsCurve->detach();
             rpsCurve->detach();
+    }
+    if (!plot->showPCO) {
+            lpcoCurve->detach();
+            rpcoCurve->detach();
+    }
+    if (!plot->showDC) {
+            ldcCurve->detach();
+            rdcCurve->detach();
+    }
+    if (!plot->showPPP) {
+            lpppCurve->detach();
+            rpppCurve->detach();
     }
     if (!plot->showBalance) {
             balanceLCurve->detach();
@@ -860,6 +919,12 @@ AllPlot::configChanged(qint32)
         standard->rteCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->lpsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->rpsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->lpcoCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->rpcoCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->ldcCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->rdcCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->lpppCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        standard->rpppCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->balanceLCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->balanceRCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         standard->intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -976,6 +1041,24 @@ AllPlot::configChanged(qint32)
     QPen rpsPen = QPen(GColor(CRPS));
     rpsPen.setWidth(width);
     standard->rpsCurve->setPen(rpsPen);
+    QPen lpcoPen = QPen(GColor(CLPS));
+    lpcoPen.setWidth(width);
+    standard->lpcoCurve->setPen(lpcoPen);
+    QPen rpcoPen = QPen(GColor(CRPS));
+    rpcoPen.setWidth(width);
+    standard->rpcoCurve->setPen(rpcoPen);
+    QPen ldcPen = QPen(GColor(CLPS));
+    ldcPen.setWidth(width);
+    standard->ldcCurve->setPen(ldcPen);
+    QPen rdcPen = QPen(GColor(CRPS));
+    rdcPen.setWidth(width);
+    standard->rdcCurve->setPen(rdcPen);
+    QPen lpppPen = QPen(GColor(CLPS));
+    lpppPen.setWidth(width);
+    standard->lpppCurve->setPen(lpppPen);
+    QPen rpppPen = QPen(GColor(CRPS));
+    rpppPen.setWidth(width);
+    standard->rpppCurve->setPen(rpppPen);
     QPen wPen = QPen(GColor(CWBAL)); 
     wPen.setWidth(width); // don't thicken
     standard->wCurve->setPen(wPen);
@@ -1118,6 +1201,30 @@ AllPlot::configChanged(qint32)
         p.setAlpha(64);
         standard->rpsCurve->setBrush(QBrush(p));
 
+        p = standard->lpcoCurve->pen().color();
+        p.setAlpha(64);
+        standard->lpcoCurve->setBrush(QBrush(p));
+
+        p = standard->rpcoCurve->pen().color();
+        p.setAlpha(64);
+        standard->rpcoCurve->setBrush(QBrush(p));
+
+        p = standard->ldcCurve->pen().color();
+        p.setAlpha(64);
+        standard->ldcCurve->setBrush(QBrush(p));
+
+        p = standard->rdcCurve->pen().color();
+        p.setAlpha(64);
+        standard->rdcCurve->setBrush(QBrush(p));
+
+        p = standard->lpppCurve->pen().color();
+        p.setAlpha(64);
+        standard->lpppCurve->setBrush(QBrush(p));
+
+        p = standard->rpppCurve->pen().color();
+        p.setAlpha(64);
+        standard->rpppCurve->setBrush(QBrush(p));
+
         p = standard->slopeCurve->pen().color();
         p.setAlpha(64);
         standard->slopeCurve->setBrush(QBrush(p));
@@ -1163,6 +1270,12 @@ AllPlot::configChanged(qint32)
         standard->rteCurve->setBrush(Qt::NoBrush);
         standard->lpsCurve->setBrush(Qt::NoBrush);
         standard->rpsCurve->setBrush(Qt::NoBrush);
+        standard->lpcoCurve->setBrush(Qt::NoBrush);
+        standard->rpcoCurve->setBrush(Qt::NoBrush);
+        standard->ldcCurve->setBrush(Qt::NoBrush);
+        standard->rdcCurve->setBrush(Qt::NoBrush);
+        standard->lpppCurve->setBrush(Qt::NoBrush);
+        standard->rpppCurve->setBrush(Qt::NoBrush);
         standard->slopeCurve->setBrush(Qt::NoBrush);
         //standard->altSlopeCurve->setBrush((Qt::NoBrush));
         //standard->balanceLCurve->setBrush(Qt::NoBrush);
@@ -1335,16 +1448,19 @@ struct DataPoint {
     double time, hr, watts, atiss, antiss, np, rv, rcad, rgct,
            smo2, thb, o2hb, hhb, ap, xp, speed, cad, 
            alt, temp, wind, torque, lrbalance, lte, rte, lps, rps,
+           lpco, rpco, ltdc, rtdc, lbdc, rbdc, ltppp, rtppp, lbppp, rbppp,
            kphd, wattsd, cadd, nmd, hrd, slope;
 
     DataPoint(double t, double h, double w, double at, double an, double n, double rv, double rcad, double rgct,
               double smo2, double thb, double o2hb, double hhb, double l, double x, double s, double c,
               double a, double te, double wi, double tq, double lrb, double lte, double rte, double lps, double rps,
+              double lpco, double rpco, double ltdc, double rtdc, double lbdc, double rbdc, double ltppp, double rtppp, double lbppp, double rbppp,
               double kphd, double wattsd, double cadd, double nmd, double hrd, double sl) :
 
               time(t), hr(h), watts(w), atiss(at), antiss(an), np(n), rv(rv), rcad(rcad), rgct(rgct),
               smo2(smo2), thb(thb), o2hb(o2hb), hhb(hhb), ap(l), xp(x), speed(s), cad(c),
               alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb), lte(lte), rte(rte), lps(lps), rps(rps),
+              lpco(lpco), rpco(rpco), ltdc(ltdc), rtdc(rtdc), lbdc(lbdc), rbdc(rbdc), ltppp(ltppp), rtppp(rtppp), lbppp(lbppp), rbppp(rbppp),
               kphd(kphd), wattsd(wattsd), cadd(cadd), nmd(nmd), hrd(hrd), slope(sl) {}
 };
 
@@ -1501,6 +1617,12 @@ AllPlot::recalc(AllPlotObject *objects)
         if (!objects->rteArray.empty()) objects->rteCurve->setSamples(data, data);
         if (!objects->lpsArray.empty()) objects->lpsCurve->setSamples(data, data);
         if (!objects->rpsArray.empty()) objects->rpsCurve->setSamples(data, data);
+        if (!objects->lpcoArray.empty()) objects->lpcoCurve->setSamples(data, data);
+        if (!objects->rpcoArray.empty()) objects->rpcoCurve->setSamples(data, data);
+        if (!objects->ltdcArray.empty()) objects->ldcCurve->setSamples(new QwtIntervalSeriesData(intData));
+        if (!objects->rtdcArray.empty()) objects->rdcCurve->setSamples(new QwtIntervalSeriesData(intData));;
+        if (!objects->ltpppArray.empty()) objects->lpppCurve->setSamples(new QwtIntervalSeriesData(intData));
+        if (!objects->rtpppArray.empty()) objects->rpppCurve->setSamples(new QwtIntervalSeriesData(intData));
 
         return;
     }
@@ -1546,6 +1668,17 @@ AllPlot::recalc(AllPlotObject *objects)
         double totalRTE = 0.0;
         double totalLPS = 0.0;
         double totalRPS = 0.0;
+        double totalLPCO = 0.0;
+        double totalRPCO = 0.0;
+        double totalLTDC = 0.0;
+        double totalRTDC = 0.0;
+        double totalLBDC = 0.0;
+        double totalRBDC = 0.0;
+        double totalLTPPP = 0.0;
+        double totalRTPPP = 0.0;
+        double totalLBPPP = 0.0;
+        double totalRBPPP = 0.0;
+
 
         QList<DataPoint> list;
 
@@ -1585,6 +1718,13 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRTE.resize(rideTimeSecs + 1);
         objects->smoothLPS.resize(rideTimeSecs + 1);
         objects->smoothRPS.resize(rideTimeSecs + 1);
+        objects->smoothLPCO.resize(rideTimeSecs + 1);
+        objects->smoothRPCO.resize(rideTimeSecs + 1);
+        objects->smoothLDC.resize(rideTimeSecs + 1);
+        objects->smoothRDC.resize(rideTimeSecs + 1);
+        objects->smoothLPPP.resize(rideTimeSecs + 1);
+        objects->smoothRPPP.resize(rideTimeSecs + 1);
+
         // do the smoothing by calculating the average of the "applysmooth" values left
         // of the current data point - for points in time smaller than "applysmooth"
         // only the available datapoints left are used to build the average
@@ -1617,6 +1757,16 @@ AllPlot::recalc(AllPlotObject *objects)
                              (!objects->rteArray.empty() ? objects->rteArray[i] : 0),
                              (!objects->lpsArray.empty() ? objects->lpsArray[i] : 0),
                              (!objects->rpsArray.empty() ? objects->rpsArray[i] : 0),
+                             (!objects->lpcoArray.empty() ? objects->lpcoArray[i] : 0),
+                             (!objects->rpcoArray.empty() ? objects->rpcoArray[i] : 0),
+                             (!objects->ltdcArray.empty() ? objects->ltdcArray[i] : 0),
+                             (!objects->rtdcArray.empty() ? objects->rtdcArray[i] : 0),
+                             (!objects->lbdcArray.empty() ? objects->lbdcArray[i] : 0),
+                             (!objects->rbdcArray.empty() ? objects->rbdcArray[i] : 0),
+                             (!objects->ltpppArray.empty() ? objects->ltpppArray[i] : 0),
+                             (!objects->rtpppArray.empty() ? objects->rtpppArray[i] : 0),
+                             (!objects->lbpppArray.empty() ? objects->lbpppArray[i] : 0),
+                             (!objects->rbpppArray.empty() ? objects->rbpppArray[i] : 0),
                              (!objects->accelArray.empty() ? objects->accelArray[i] : 0),
                              (!objects->wattsDArray.empty() ? objects->wattsDArray[i] : 0),
                              (!objects->cadDArray.empty() ? objects->cadDArray[i] : 0),
@@ -1683,6 +1833,26 @@ AllPlot::recalc(AllPlotObject *objects)
                     totalLPS   += (objects->lpsArray[i]>0?objects->lpsArray[i]:0);
                 if (!objects->rpsArray.empty())
                     totalRPS   += (objects->rpsArray[i]>0?objects->rpsArray[i]:0);
+                if (!objects->lpcoArray.empty())
+                    totalLPCO   += objects->lpcoArray[i];
+                if (!objects->rpcoArray.empty())
+                    totalRPCO   += objects->rpcoArray[i];
+                if (!objects->ltdcArray.empty())
+                    totalLTDC   += (objects->ltdcArray[i]>0?objects->ltdcArray[i]:0);
+                if (!objects->rtdcArray.empty())
+                    totalRTDC   += (objects->rtdcArray[i]>0?objects->rtdcArray[i]:0);
+                if (!objects->lbdcArray.empty())
+                    totalLBDC   += (objects->lbdcArray[i]>0?objects->lbdcArray[i]:0);
+                if (!objects->rbdcArray.empty())
+                    totalRBDC   += (objects->rbdcArray[i]>0?objects->rbdcArray[i]:0);
+                if (!objects->ltpppArray.empty())
+                    totalLTPPP   += (objects->ltpppArray[i]>0?objects->ltpppArray[i]:0);
+                if (!objects->rtpppArray.empty())
+                    totalRTPPP   += (objects->rtpppArray[i]>0?objects->rtpppArray[i]:0);
+                if (!objects->lbpppArray.empty())
+                    totalLBPPP   += (objects->lbpppArray[i]>0?objects->lbpppArray[i]:0);
+                if (!objects->rbpppArray.empty())
+                    totalRBPPP   += (objects->rbpppArray[i]>0?objects->rbpppArray[i]:0);
 
                 totalDist   = objects->distanceArray[i];
                 list.append(dp);
@@ -1720,6 +1890,16 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalRTE   -= dp.rte;
                 totalLPS   -= dp.lps;
                 totalRPS   -= dp.rps;
+                totalLPCO  -= dp.lpco;
+                totalRPCO  -= dp.rpco;
+                totalLTDC   -= dp.ltdc;
+                totalRTDC   -= dp.rtdc;
+                totalLBDC   -= dp.lbdc;
+                totalRBDC   -= dp.rbdc;
+                totalLTPPP  -= dp.ltppp;
+                totalRTPPP  -= dp.rtppp;
+                totalLBPPP  -= dp.lbppp;
+                totalRBPPP  -= dp.rbppp;
                 totalBalance   -= (dp.lrbalance>0?dp.lrbalance:50);
                 list.removeFirst();
             }
@@ -1757,6 +1937,12 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRTE[secs] = 0.0;
                 objects->smoothLPS[secs] = 0.0;
                 objects->smoothRPS[secs] = 0.0;
+                objects->smoothLPCO[secs] = 0.0;
+                objects->smoothRPCO[secs] = 0.0;
+                objects->smoothLDC[secs] = QwtIntervalSample();
+                objects->smoothRDC[secs] = QwtIntervalSample();
+                objects->smoothLPPP[secs] = QwtIntervalSample();
+                objects->smoothRPPP[secs] = QwtIntervalSample();
                 objects->smoothBalanceL[secs] = 50;
                 objects->smoothBalanceR[secs] = 50;
             }
@@ -1807,6 +1993,12 @@ AllPlot::recalc(AllPlotObject *objects)
                 objects->smoothRTE[secs]    = totalRTE / list.size();
                 objects->smoothLPS[secs]    = totalLPS / list.size();
                 objects->smoothRPS[secs]    = totalRPS / list.size();
+                objects->smoothLPCO[secs]   = totalLPCO / list.size();
+                objects->smoothRPCO[secs]   = totalRPCO / list.size();
+                objects->smoothLDC[secs]    = QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(totalLTDC / list.size(), totalLBDC / list.size() ) );
+                objects->smoothRDC[secs]    = QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(totalRTDC / list.size(), totalRBDC / list.size() ) );
+                objects->smoothLPPP[secs]   = QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(totalLTPPP / list.size(), totalLBPPP / list.size() ) );
+                objects->smoothRPPP[secs]   = QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(totalRTPPP / list.size(), totalRBPPP / list.size() ) );
             }
             objects->smoothDistance[secs] = totalDist;
             objects->smoothTime[secs]  = secs / 60.0;
@@ -1856,6 +2048,12 @@ AllPlot::recalc(AllPlotObject *objects)
         objects->smoothRTE.resize(0);
         objects->smoothLPS.resize(0);
         objects->smoothRPS.resize(0);
+        objects->smoothLPCO.resize(0);
+        objects->smoothRPCO.resize(0);
+        objects->smoothLDC.resize(0);
+        objects->smoothRDC.resize(0);
+        objects->smoothLPPP.resize(0);
+        objects->smoothRPPP.resize(0);
         objects->smoothBalanceL.resize(0);
         objects->smoothBalanceR.resize(0);
 
@@ -1908,6 +2106,13 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothRTE.append(dp->rte);
             objects->smoothLPS.append(dp->lps);
             objects->smoothRPS.append(dp->rps);
+            objects->smoothLPCO.append(dp->lpco);
+            objects->smoothRPCO.append(dp->rpco);
+            objects->smoothLDC.append(QwtIntervalSample( bydist ? objects->smoothDistance.last() : objects->smoothTime.last(), QwtInterval(dp->ltdc , dp->rbdc ) ));
+            objects->smoothRDC.append(QwtIntervalSample( bydist ? objects->smoothDistance.last() : objects->smoothTime.last(), QwtInterval(dp->rtdc , dp->rbdc ) ));
+            objects->smoothLPPP.append(QwtIntervalSample( bydist ? objects->smoothDistance.last() : objects->smoothTime.last(), QwtInterval(dp->ltppp , dp->lbppp ) ));
+            objects->smoothRPPP.append(QwtIntervalSample( bydist ? objects->smoothDistance.last() : objects->smoothTime.last(), QwtInterval(dp->rtppp , dp->rbppp ) ));
+
 
             double head = dp->headwind * (context->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
             double speed = dp->kph * (context->athlete->useMetricUnits ? 1.0f : MILES_PER_KM);
@@ -2055,6 +2260,23 @@ AllPlot::recalc(AllPlotObject *objects)
                                              objects->smoothLPS.data() + startingIndex, totalPoints);
     if (!objects->rpsArray.empty()) objects->rpsCurve->setSamples(xaxis.data() + startingIndex, 
                                              objects->smoothRPS.data() + startingIndex, totalPoints);
+
+    if (!objects->lpcoArray.empty()) objects->lpcoCurve->setSamples(xaxis.data() + startingIndex,
+                                             objects->smoothLPCO.data() + startingIndex, totalPoints);
+    if (!objects->rpcoArray.empty()) objects->rpcoCurve->setSamples(xaxis.data() + startingIndex,
+                                             objects->smoothRPCO.data() + startingIndex, totalPoints);
+    if (!objects->ltdcArray.empty()) {
+        objects->ldcCurve->setSamples(new QwtIntervalSeriesData(objects->smoothLDC));
+    }
+    if (!objects->rtdcArray.empty()) {
+        objects->rdcCurve->setSamples(new QwtIntervalSeriesData(objects->smoothRDC));
+    }
+    if (!objects->ltpppArray.empty()) {
+        objects->lpppCurve->setSamples(new QwtIntervalSeriesData(objects->smoothLPPP));
+    }
+    if (!objects->rtpppArray.empty()) {
+        objects->rpppCurve->setSamples(new QwtIntervalSeriesData(objects->smoothRPPP));
+    }
 
     setAltSlopePlotStyle(objects->altSlopeCurve);
     setYMax();
@@ -2623,6 +2845,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothRTE = &plot->standard->smoothRTE[startidx];
     double *smoothLPS = &plot->standard->smoothLPS[startidx];
     double *smoothRPS = &plot->standard->smoothRPS[startidx];
+    double *smoothLPCO = &plot->standard->smoothLPCO[startidx];
+    double *smoothRPCO = &plot->standard->smoothRPCO[startidx];
+    QwtIntervalSample *smoothLDC = &plot->standard->smoothLDC[startidx];
+    QwtIntervalSample *smoothRDC = &plot->standard->smoothRDC[startidx];
+    QwtIntervalSample *smoothLPPP = &plot->standard->smoothLPPP[startidx];
+    QwtIntervalSample *smoothRPPP = &plot->standard->smoothRPPP[startidx];
 
     // deltas
     double *smoothAC = &plot->standard->smoothAccel[startidx];
@@ -2715,6 +2943,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->rpsCurve->detach();
     standard->balanceLCurve->detach();
     standard->balanceRCurve->detach();
+    standard->lpcoCurve->detach();
+    standard->rpcoCurve->detach();
+    standard->ldcCurve->detach();
+    standard->rdcCurve->detach();
+    standard->lpppCurve->detach();
+    standard->rpppCurve->detach();
 
     standard->wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
     standard->atissCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showATISS);
@@ -2752,6 +2986,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->rpsCurve->setVisible(rideItem->ride()->areDataPresent()->rps && showPS);
     standard->balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
     standard->balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
+    standard->lpcoCurve->setVisible(rideItem->ride()->areDataPresent()->lpco && showPCO);
+    standard->rpcoCurve->setVisible(rideItem->ride()->areDataPresent()->rpco && showPCO);
+    standard->ldcCurve->setVisible(rideItem->ride()->areDataPresent()->ltdc && showDC);
+    standard->rdcCurve->setVisible(rideItem->ride()->areDataPresent()->rtdc && showDC);
+    standard->lpppCurve->setVisible(rideItem->ride()->areDataPresent()->ltppp && showPPP);
+    standard->rpppCurve->setVisible(rideItem->ride()->areDataPresent()->rtppp && showPPP);
 
     if (showW) {
         standard->wCurve->setSamples(bydist ? plot->standard->wprimeDist.data() : plot->standard->wprimeTime.data(), 
@@ -2798,6 +3038,21 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     standard->rteCurve->setSamples(xaxis, smoothRTE, points);
     standard->lpsCurve->setSamples(xaxis, smoothLPS, points);
     standard->rpsCurve->setSamples(xaxis, smoothRPS, points);
+    standard->lpcoCurve->setSamples(xaxis, smoothLPCO, points);
+    standard->rpcoCurve->setSamples(xaxis, smoothRPCO, points);
+
+    QVector<QwtIntervalSample> tmpLDC(points);
+    memcpy(tmpLDC.data(), smoothLDC, (points) * sizeof(QwtIntervalSample));
+    standard->ldcCurve->setSamples(new QwtIntervalSeriesData(tmpLDC));
+    QVector<QwtIntervalSample> tmpRDC(points);
+    memcpy(tmpRDC.data(), smoothRDC, (points) * sizeof(QwtIntervalSample));
+    standard->rdcCurve->setSamples(new QwtIntervalSeriesData(tmpRDC));
+    QVector<QwtIntervalSample> tmpLPPP(points);
+    memcpy(tmpLPPP.data(), smoothLPPP, (points) * sizeof(QwtIntervalSample));
+    standard->lpppCurve->setSamples(new QwtIntervalSeriesData(tmpLPPP));
+    QVector<QwtIntervalSample> tmpRPPP(points);
+    memcpy(tmpRPPP.data(), smoothRPPP, (points) * sizeof(QwtIntervalSample));
+    standard->rpppCurve->setSamples(new QwtIntervalSeriesData(tmpRPPP));
 
     /*QVector<double> _time(stopidx-startidx);
     qMemCopy( _time.data(), xaxis, (stopidx-startidx) * sizeof( double ) );
@@ -2842,6 +3097,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setSymbol(standard->rteCurve, points);
     setSymbol(standard->lpsCurve, points);
     setSymbol(standard->rpsCurve, points);
+    setSymbol(standard->lpcoCurve, points);
+    setSymbol(standard->rpcoCurve, points);
 
     setAltSlopePlotStyle(standard->altSlopeCurve);
     setYMax();
@@ -2948,6 +3205,18 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         standard->lpsCurve->attach(this);
         standard->rpsCurve->attach(this);
     }
+    if (!plot->standard->smoothLPCO.empty()) {
+        standard->lpcoCurve->attach(this);
+        standard->rpcoCurve->attach(this);
+    }
+    if (!plot->standard->smoothLDC.empty()) {
+        standard->ldcCurve->attach(this);
+        standard->rdcCurve->attach(this);
+    }
+    if (!plot->standard->smoothLPPP.empty()) {
+        standard->lpppCurve->attach(this);
+        standard->rpppCurve->attach(this);
+    }
 
     refreshReferenceLines();
     refreshIntervalMarkers();
@@ -3016,6 +3285,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->rteCurve->detach();
     standard->lpsCurve->detach();
     standard->rpsCurve->detach();
+    standard->lpcoCurve->detach();
+    standard->rpcoCurve->detach();
+    standard->ldcCurve->detach();
+    standard->rdcCurve->detach();
+    standard->lpppCurve->detach();
+    standard->rpppCurve->detach();
 
     standard->wCurve->setVisible(false);
     standard->mCurve->setVisible(false);
@@ -3053,6 +3328,12 @@ AllPlot::setDataFromPlot(AllPlot *plot)
     standard->rteCurve->setVisible(false);
     standard->lpsCurve->setVisible(false);
     standard->rpsCurve->setVisible(false);
+    standard->lpcoCurve->setVisible(false);
+    standard->rpcoCurve->setVisible(false);
+    standard->ldcCurve->setVisible(false);
+    standard->rdcCurve->setVisible(false);
+    standard->lpppCurve->setVisible(false);
+    standard->rpppCurve->setVisible(false);
 
     QwtPlotCurve *ourCurve = NULL, *thereCurve = NULL;
     QwtPlotCurve *ourCurve2 = NULL, *thereCurve2 = NULL;
@@ -3323,6 +3604,49 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         }
         break;
 
+    case RideFile::lpco:
+    case RideFile::rpco:
+        {
+        ourCurve = standard->lpcoCurve;
+        ourCurve2 = standard->rpcoCurve;
+        thereCurve = referencePlot->standard->lpcoCurve;
+        thereCurve2 = referencePlot->standard->rpcoCurve;
+        title = tr("Left/Right Pedal Center Offset");
+        }
+        break;
+
+    case RideFile::ltdc:
+        {
+        ourICurve = standard->ldcCurve;
+        thereICurve = referencePlot->standard->ldcCurve;
+        title = tr("Left Power Phase");
+        }
+        break;
+
+    case RideFile::rtdc:
+        {
+        ourICurve = standard->rdcCurve;
+        thereICurve = referencePlot->standard->rdcCurve;
+        title = tr("Right Power Phase");
+        }
+        break;
+
+    case RideFile::ltppp:
+        {
+        ourICurve = standard->lpppCurve;
+        thereICurve = referencePlot->standard->lpppCurve;
+        title = tr("Left Peak Power Phase");
+        }
+        break;
+
+    case RideFile::rtppp:
+        {
+        ourICurve = standard->rpppCurve;
+        thereICurve = referencePlot->standard->rpppCurve;
+        title = tr("Right Peak Power Phase");
+        }
+        break;
+
     case RideFile::lrbalance:
         {
         ourCurve = standard->balanceLCurve;
@@ -3568,6 +3892,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->rteCurve->detach();
     standard->lpsCurve->detach();
     standard->rpsCurve->detach();
+    standard->lpcoCurve->detach();
+    standard->rpcoCurve->detach();
+    standard->ldcCurve->detach();
+    standard->rdcCurve->detach();
+    standard->lpppCurve->detach();
+    standard->rpppCurve->detach();
 
     standard->wCurve->setVisible(false);
     standard->mCurve->setVisible(false);
@@ -3605,6 +3935,12 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     standard->rteCurve->setVisible(false);
     standard->lpsCurve->setVisible(false);
     standard->rpsCurve->setVisible(false);
+    standard->lpcoCurve->setVisible(false);
+    standard->rpcoCurve->setVisible(false);
+    standard->ldcCurve->setVisible(false);
+    standard->rdcCurve->setVisible(false);
+    standard->lpppCurve->setVisible(false);
+    standard->rpppCurve->setVisible(false);
 
     // clear previous curves
     foreach(QwtPlotCurve *prior, compares) {
@@ -3930,6 +4266,55 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->rteCurve;
                 title = tr("Right Torque Efficiency");
+                }
+                break;
+
+            case RideFile::rpco:
+            case RideFile::lpco:
+                {
+                ourCurve = new QwtPlotCurve(tr("Left Pedal Center Offset"));
+                ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve = referencePlot->standard->lpcoCurve;
+                ourCurve2 = new QwtPlotCurve(tr("Right Pedal Center Offset"));
+                ourCurve2->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
+                thereCurve2 = referencePlot->standard->rpcoCurve;
+                title = tr("Left/Right Pedal Center Offset");
+                }
+                break;
+
+            case RideFile::ltdc:
+            case RideFile::lbdc:
+                {
+                ourICurve = new QwtPlotIntervalCurve(tr("Left Power Phase"));
+                thereICurve = referencePlot->standard->ldcCurve;
+                title = tr("Left Power Phase");
+                }
+                break;
+
+            case RideFile::rtdc:
+            case RideFile::rbdc:
+                {
+                ourICurve = new QwtPlotIntervalCurve(tr("Right Power Phase"));
+                thereICurve = referencePlot->standard->rdcCurve;
+                title = tr("Right Power Phase");
+                }
+                break;
+
+            case RideFile::ltppp:
+            case RideFile::lbppp:
+                {
+                ourICurve = new QwtPlotIntervalCurve(tr("Left Peak Power Phase"));
+                thereICurve = referencePlot->standard->lpppCurve;
+                title = tr("Left Peak Power Phase");
+                }
+                break;
+
+            case RideFile::rtppp:
+            case RideFile::rbppp:
+                {
+                ourICurve = new QwtPlotIntervalCurve(tr("Right Peak Power Phase"));
+                thereICurve = referencePlot->standard->rpppCurve;
+                title = tr("Right Peak Power Phase");
                 }
                 break;
 
@@ -4453,6 +4838,39 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
         standard->rpsCurve->setVisible(true);
     }
 
+    if (!object->lpcoArray.empty()) {
+        standard->lpcoCurve->setSamples(xaxis.data(), object->smoothLPCO.data(), totalPoints);
+        standard->rpcoCurve->setSamples(xaxis.data(), object->smoothRPCO.data(), totalPoints);
+        standard->lpcoCurve->attach(this);
+        standard->lpcoCurve->setVisible(true);
+        standard->rpcoCurve->attach(this);
+        standard->rpcoCurve->setVisible(true);
+    }
+
+    if (!object->ltdcArray.empty()) {
+        standard->ldcCurve->setSamples(new QwtIntervalSeriesData(object->smoothLDC));
+        standard->ldcCurve->attach(this);
+        standard->ldcCurve->setVisible(true);
+    }
+
+    if (!object->rtdcArray.empty()) {
+        standard->rdcCurve->setSamples(new QwtIntervalSeriesData(object->smoothRDC));
+        standard->rdcCurve->attach(this);
+        standard->rdcCurve->setVisible(true);
+    }
+
+    if (!object->ltpppArray.empty()) {
+        standard->lpppCurve->setSamples(new QwtIntervalSeriesData(object->smoothLPPP));
+        standard->lpppCurve->attach(this);
+        standard->lpppCurve->setVisible(true);
+    }
+
+    if (!object->rtpppArray.empty()) {
+        standard->rpppCurve->setSamples(new QwtIntervalSeriesData(object->smoothRPPP));
+        standard->rpppCurve->attach(this);
+        standard->rpppCurve->setVisible(true);
+    }
+
     // to the max / min
     standard->grid->detach();
 
@@ -4493,6 +4911,12 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     standard->rteCurve->setVisible(referencePlot->showTE);
     standard->lpsCurve->setVisible(referencePlot->showPS);
     standard->rpsCurve->setVisible(referencePlot->showPS);
+    standard->lpcoCurve->setVisible(referencePlot->showPCO);
+    standard->rpcoCurve->setVisible(referencePlot->showPCO);
+    standard->ldcCurve->setVisible(referencePlot->showDC);
+    standard->rdcCurve->setVisible(referencePlot->showDC);
+    standard->lpppCurve->setVisible(referencePlot->showPPP);
+    standard->rpppCurve->setVisible(referencePlot->showPPP);
 
     // set xaxis -- but not min/max as we get called during smoothing
     //              and massively quicker to reuse data and replot
@@ -4586,6 +5010,16 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rteArray.resize(dataPresent->rte ? npoints : 0);
         here->lpsArray.resize(dataPresent->lps ? npoints : 0);
         here->rpsArray.resize(dataPresent->rps ? npoints : 0);
+        here->lpcoArray.resize(dataPresent->lpco ? npoints : 0);
+        here->rpcoArray.resize(dataPresent->rpco ? npoints : 0);
+        here->ltdcArray.resize(dataPresent->ltdc ? npoints : 0);
+        here->rtdcArray.resize(dataPresent->rtdc ? npoints : 0);
+        here->lbdcArray.resize(dataPresent->lbdc ? npoints : 0);
+        here->rbdcArray.resize(dataPresent->rbdc ? npoints : 0);
+        here->ltpppArray.resize(dataPresent->ltppp ? npoints : 0);
+        here->rtpppArray.resize(dataPresent->rtppp ? npoints : 0);
+        here->lbpppArray.resize(dataPresent->lbppp ? npoints : 0);
+        here->rbpppArray.resize(dataPresent->rbppp ? npoints : 0);
         here->timeArray.resize(npoints);
         here->distanceArray.resize(npoints);
 
@@ -4626,6 +5060,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rteCurve->detach();
         here->lpsCurve->detach();
         here->rpsCurve->detach();
+        here->lpcoCurve->detach();
+        here->rpcoCurve->detach();
+        here->ldcCurve->detach();
+        here->rdcCurve->detach();
+        here->lpppCurve->detach();
+        here->rpppCurve->detach();
 
         if (!here->altArray.empty()) {
             here->altCurve->attach(this);
@@ -4676,6 +5116,18 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             here->balanceLCurve->attach(this);
             here->balanceRCurve->attach(this);
         }
+        if (!here->lpcoArray.empty()) {
+            here->lpcoCurve->attach(this);
+            here->rpcoCurve->attach(this);
+        }
+        if (!here->ltdcArray.empty()) {
+            here->ldcCurve->attach(this);
+            here->rdcCurve->attach(this);
+        }
+        if (!here->ltpppArray.empty()) {
+            here->lpppCurve->attach(this);
+            here->rpppCurve->attach(this);
+        }
 
         here->wCurve->setVisible(dataPresent->watts && showW);
         here->mCurve->setVisible(dataPresent->watts && showW);
@@ -4708,6 +5160,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rpsCurve->setVisible(dataPresent->rps && showPS);
         here->balanceLCurve->setVisible(dataPresent->lrbalance && showBalance);
         here->balanceRCurve->setVisible(dataPresent->lrbalance && showBalance);
+        here->lpcoCurve->setVisible(dataPresent->lpco && showPCO);
+        here->rpcoCurve->setVisible(dataPresent->rpco && showPCO);
+        here->ldcCurve->setVisible(dataPresent->ltdc && showDC);
+        here->rdcCurve->setVisible(dataPresent->rtdc && showDC);
+        here->lpppCurve->setVisible(dataPresent->ltppp && showPPP);
+        here->rpppCurve->setVisible(dataPresent->rtppp && showPPP);
 
         // deltas
         here->accelCurve->setVisible(dataPresent->kph && showAccel);
@@ -4787,6 +5245,16 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
             if (!here->rteArray.empty()) here->rteArray[arrayLength] = point->rte;
             if (!here->lpsArray.empty()) here->lpsArray[arrayLength] = point->lps;
             if (!here->rpsArray.empty()) here->rpsArray[arrayLength] = point->rps;
+            if (!here->lpcoArray.empty()) here->lpcoArray[arrayLength] = point->lpco;
+            if (!here->rpcoArray.empty()) here->rpcoArray[arrayLength] = point->rpco;
+            if (!here->ltdcArray.empty()) here->ltdcArray[arrayLength] = point->ltdc;
+            if (!here->rtdcArray.empty()) here->rtdcArray[arrayLength] = point->rtdc;
+            if (!here->lbdcArray.empty()) here->lbdcArray[arrayLength] = point->lbdc;
+            if (!here->rbdcArray.empty()) here->rbdcArray[arrayLength] = point->rbdc;
+            if (!here->ltpppArray.empty()) here->ltpppArray[arrayLength] = point->ltppp;
+            if (!here->rtpppArray.empty()) here->rtpppArray[arrayLength] = point->rtppp;
+            if (!here->lbpppArray.empty()) here->lbpppArray[arrayLength] = point->lbppp;
+            if (!here->rbpppArray.empty()) here->rbpppArray[arrayLength] = point->rbppp;
 
             here->distanceArray[arrayLength] = max(0,
                                              (context->athlete->useMetricUnits
@@ -4841,6 +5309,12 @@ AllPlot::setDataFromRideFile(RideFile *ride, AllPlotObject *here)
         here->rpsCurve->detach();
         here->balanceLCurve->detach();
         here->balanceRCurve->detach();
+        here->lpcoCurve->detach();
+        here->rpcoCurve->detach();
+        here->ldcCurve->detach();
+        here->rdcCurve->detach();
+        here->lpppCurve->detach();
+        here->rpppCurve->detach();
 
         foreach(QwtPlotMarker *mrk, here->d_mrk)
             delete mrk;
@@ -4914,6 +5388,9 @@ AllPlot::setShow(RideFile::SeriesType type, bool state)
         setShowBalance(false);
         setShowTE(false);
         setShowPS(false);
+        setShowPCO(false);
+        setShowDC(false);
+        setShowPPP(false);
         break;
 
     case RideFile::secs: 
@@ -4991,6 +5468,22 @@ AllPlot::setShow(RideFile::SeriesType type, bool state)
     case RideFile::lps: 
     case RideFile::rps: 
         setShowPS(state);
+        break;
+    case RideFile::lpco:
+    case RideFile::rpco:
+        setShowPCO(state);
+        break;
+    case RideFile::ltdc:
+    case RideFile::rtdc:
+    case RideFile::lbdc:
+    case RideFile::rbdc:
+        setShowDC(state);
+        break;
+    case RideFile::ltppp:
+    case RideFile::rtppp:
+    case RideFile::lbppp:
+    case RideFile::rbppp:
+        setShowPPP(state);
         break;
     case RideFile::interval: 
         break;
@@ -5472,6 +5965,48 @@ AllPlot::setShowPS(bool show)
 }
 
 void
+AllPlot::setShowDC(bool show)
+{
+    showDC = show;
+    standard->ldcCurve->setVisible(show);
+    standard->rdcCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowPPP(bool show)
+{
+    showPPP = show;
+    standard->lpppCurve->setVisible(show);
+    standard->rpppCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
+AllPlot::setShowPCO(bool show)
+{
+    showPCO = show;
+    standard->lpcoCurve->setVisible(show);
+    standard->rpcoCurve->setVisible(show);
+    setYMax();
+
+    // remember the curves and colors
+    isolation = false;
+    curveColors->saveState();
+    replot();
+}
+
+void
 AllPlot::setShowGrid(bool show)
 {
     standard->grid->setVisible(show);
@@ -5590,6 +6125,25 @@ AllPlot::setPaintBrush(int state)
         p = standard->rpsCurve->pen().color();
         p.setAlpha(64);
         standard->rpsCurve->setBrush(QBrush(p));
+        p = standard->lpcoCurve->pen().color();
+        p.setAlpha(64);
+        standard->lpcoCurve->setBrush(QBrush(p));
+        p = standard->rpcoCurve->pen().color();
+        p.setAlpha(64);
+        standard->rpcoCurve->setBrush(QBrush(p));
+        p = standard->ldcCurve->pen().color();
+        p.setAlpha(64);
+        standard->ldcCurve->setBrush(QBrush(p));
+        p = standard->rdcCurve->pen().color();
+        p.setAlpha(64);
+        standard->rdcCurve->setBrush(QBrush(p));
+        p = standard->lpppCurve->pen().color();
+        p.setAlpha(64);
+        standard->lpppCurve->setBrush(QBrush(p));
+
+        p = standard->rpppCurve->pen().color();
+        p.setAlpha(64);
+        standard->rpppCurve->setBrush(QBrush(p));
 
         p = standard->slopeCurve->pen().color();
         p.setAlpha(64);
@@ -5636,6 +6190,12 @@ AllPlot::setPaintBrush(int state)
         standard->rteCurve->setBrush(Qt::NoBrush);
         standard->lpsCurve->setBrush(Qt::NoBrush);
         standard->rpsCurve->setBrush(Qt::NoBrush);
+        standard->lpcoCurve->setBrush(Qt::NoBrush);
+        standard->rpcoCurve->setBrush(Qt::NoBrush);
+        standard->ldcCurve->setBrush(Qt::NoBrush);
+        standard->rdcCurve->setBrush(Qt::NoBrush);
+        standard->lpppCurve->setBrush(Qt::NoBrush);
+        standard->rpppCurve->setBrush(Qt::NoBrush);
         standard->slopeCurve->setBrush(Qt::NoBrush);
         //standard->altSlopeCurve->setBrush(Qt::NoBrush);
         //standard->balanceLCurve->setBrush(Qt::NoBrush);

@@ -126,7 +126,11 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
                                       kph, nm, watts, alt,
                                       0.0, 0.0, 0.0, 0.0,
                                       RideFile::NoTemp, 0.0, 
-                                      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                      0.0, 0.0, 0.0, 0.0,
+                                      0.0, 0.0, // pedal platform offset
+                                      0.0, 0.0, 0.0, 0.0, //pedal top and bottom death center
+                                      0.0, 0.0, 0.0, 0.0, //pedal peak power phase
+                                      0.0, 0.0,
                                       0.0, 0.0, 0.0, // running dynamics
                                       interval);
                 QMap<QString,QString> bsm;

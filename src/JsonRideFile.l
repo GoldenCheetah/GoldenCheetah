@@ -135,6 +135,16 @@ void JsonRideFilefree (void * ptr , yyscan_t /*scanner*/)
 \"RTE\"             return RTE;
 \"LPS\"             return LPS;
 \"RPS\"             return RPS;
+\"LPCO\"            return LPCO;
+\"RPCO\"            return RPCO;
+\"LTDC\"            return LTDC;
+\"RTDC\"            return RTDC;
+\"LBDC\"            return LBDC;
+\"RBDC\"            return RBDC;
+\"LTPPP\"           return LTPPP;
+\"RTPPP\"           return RTPPP;
+\"LBPPP\"           return LBPPP;
+\"RBPPP\"           return RBPPP;
 \"SMO2\"            return SMO2;
 \"THB\"             return THB;
 \"RCON\"            return RCON;

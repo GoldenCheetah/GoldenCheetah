@@ -946,7 +946,9 @@ RideSummaryWindow::htmlSummary()
                         break;
                     f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                                 p->watts, p->alt, p->lon, p->lat, p->headwind,
-                                p->slope, p->temp, p->lrbalance, p->lte, p->rte, p->lps, p->rps, 
+                                p->slope, p->temp, p->lrbalance,
+                                p->lte, p->rte, p->lps, p->rps,
+                                p->lpco, p->rpco, p->ltdc, p->rtdc, p->lbdc, p->rbdc, p->ltppp, p->rtppp, p->lbppp, p->rbppp,
                                 p->smo2, p->thb, p->rvert, p->rcad, p->rcontact, 0);
 
                     // derived data

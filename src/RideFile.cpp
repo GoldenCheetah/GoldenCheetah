@@ -175,6 +175,16 @@ RideFile::seriesName(SeriesType series)
     case RideFile::rte: return QString(tr("Right Torque Efficiency"));
     case RideFile::lps: return QString(tr("Left Pedal Smoothness"));
     case RideFile::rps: return QString(tr("Righ Pedal Smoothness"));
+    case RideFile::lpco: return QString(tr("Left Platform Center Offset"));
+    case RideFile::rpco: return QString(tr("Right Platform Center Offset"));
+    case RideFile::ltdc: return QString(tr("Left Top Dead Center"));
+    case RideFile::rtdc: return QString(tr("Right Top Dead Center"));
+    case RideFile::lbdc: return QString(tr("Left Bottom Dead Center"));
+    case RideFile::rbdc: return QString(tr("Right Bottom Dead Center"));
+    case RideFile::ltppp: return QString(tr("Left Peak Power Phase Start"));
+    case RideFile::rtppp: return QString(tr("Right Peak Power Phase Start"));
+    case RideFile::lbppp: return QString(tr("Left Peak Power Phase End"));
+    case RideFile::rbppp: return QString(tr("Right Peak Power Phase End"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("VAM"));
     case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
@@ -218,6 +228,16 @@ RideFile::colorFor(SeriesType series)
     case RideFile::rte: return GColor(CRTE);
     case RideFile::lps: return GColor(CLPS);
     case RideFile::rps: return GColor(CRPS);
+    case RideFile::lpco: return GColor(CLPS);
+    case RideFile::rpco: return GColor(CRPS);
+    case RideFile::ltdc: return GColor(CLPS);
+    case RideFile::rtdc: return GColor(CRPS);
+    case RideFile::lbdc: return GColor(CLPS);
+    case RideFile::rbdc: return GColor(CRPS);
+    case RideFile::ltppp: return GColor(CLPS);
+    case RideFile::rtppp: return GColor(CRPS);
+    case RideFile::lbppp: return GColor(CLPS);
+    case RideFile::rbppp: return GColor(CRPS);
     case RideFile::interval: return QColor(Qt::white);
     case RideFile::wattsKg: return GColor(CPOWER);
     case RideFile::wprime: return GColor(CWBAL);
@@ -272,7 +292,17 @@ RideFile::unitName(SeriesType series, Context *context)
     case RideFile::lte: return QString(tr("%"));
     case RideFile::rte: return QString(tr("%"));
     case RideFile::lps: return QString(tr("%"));
-    case RideFile::rps: return QString(tr("%"));
+    case RideFile::rps: return QString(tr("%"));      
+    case RideFile::lpco: return QString(tr("mm"));
+    case RideFile::rpco: return QString(tr("mm"));
+    case RideFile::ltdc: return QString(tr("°"));
+    case RideFile::rtdc: return QString(tr("°"));
+    case RideFile::lbdc: return QString(tr("°"));
+    case RideFile::rbdc: return QString(tr("°"));
+    case RideFile::ltppp: return QString(tr("°"));
+    case RideFile::rtppp: return QString(tr("°"));
+    case RideFile::lbppp: return QString(tr("°"));
+    case RideFile::rbppp: return QString(tr("°"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("meters per hour"));
     case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/kg")); // always kg !
@@ -637,6 +667,26 @@ void RideFile::updateMin(RideFilePoint* point)
        minPoint->rps = point->rps;
     if (minPoint->lrbalance == 0 || point->lrbalance<minPoint->lrbalance)
        minPoint->lrbalance = point->lrbalance;
+    if (point->lpco<minPoint->lpco)
+       minPoint->lpco = point->lpco;
+    if (point->rpco<minPoint->rpco)
+       minPoint->rpco = point->rpco;
+    if (minPoint->ltdc == 0 || point->ltdc<minPoint->ltdc)
+       minPoint->ltdc = point->ltdc;
+    if (minPoint->rtdc == 0 || point->rtdc<minPoint->rtdc)
+       minPoint->rtdc = point->rtdc;
+    if (minPoint->lbdc == 0 || point->lbdc<minPoint->lbdc)
+       minPoint->lbdc = point->ltdc;
+    if (minPoint->rbdc == 0 || point->rbdc<minPoint->rbdc)
+       minPoint->rbdc = point->rbdc;
+    if (minPoint->ltppp == 0 || point->ltppp<minPoint->ltppp)
+       minPoint->ltppp = point->ltppp;
+    if (minPoint->rtppp == 0 || point->rtppp<minPoint->rtppp)
+       minPoint->rtppp = point->rtppp;
+    if (minPoint->lbppp == 0 || point->lbppp<minPoint->lbppp)
+       minPoint->lbppp = point->ltppp;
+    if (minPoint->rbppp == 0 || point->rbppp<minPoint->rbppp)
+       minPoint->rbppp = point->rbppp;
     if (minPoint->smo2 == 0 || point->smo2<minPoint->smo2)
        minPoint->smo2 = point->smo2;
     if (minPoint->o2hb == 0 || point->o2hb<minPoint->o2hb)
@@ -694,6 +744,26 @@ void RideFile::updateMax(RideFilePoint* point)
        maxPoint->rps = point->rps;
     if (point->lrbalance>maxPoint->lrbalance)
        maxPoint->lrbalance = point->lrbalance;
+    if (point->lpco>maxPoint->lpco)
+       maxPoint->lpco = point->lpco;
+    if (point->rpco>maxPoint->rpco)
+       maxPoint->rpco = point->rpco;
+    if (point->ltdc>maxPoint->ltdc)
+       maxPoint->ltdc = point->ltdc;
+    if (point->rtdc>maxPoint->rtdc)
+       maxPoint->rtdc = point->rtdc;
+    if (point->lbdc>maxPoint->lbdc)
+       maxPoint->lbdc = point->ltdc;
+    if (point->rbdc>maxPoint->rbdc)
+       maxPoint->rbdc = point->rbdc;
+    if (point->ltppp>maxPoint->ltppp)
+       maxPoint->ltppp = point->ltppp;
+    if (point->rtppp>maxPoint->rtppp)
+       maxPoint->rtppp = point->rtppp;
+    if (point->lbppp>maxPoint->lbppp)
+       maxPoint->lbppp = point->ltppp;
+    if (point->rbppp>maxPoint->rbppp)
+       maxPoint->rbppp = point->rbppp;
     if (point->smo2>maxPoint->smo2)
        maxPoint->smo2 = point->smo2;
     if (point->thb>maxPoint->thb)
@@ -733,6 +803,15 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->lps += point->lps;
     totalPoint->rps += point->rps;
     totalPoint->lrbalance += point->lrbalance;
+    totalPoint->lpco += point->lpco;
+    totalPoint->rpco += point->rpco;
+    totalPoint->ltdc += point->ltdc;
+    totalPoint->rtdc += point->rtdc;
+    totalPoint->rbdc += point->rbdc;
+    totalPoint->ltppp += point->ltppp;
+    totalPoint->rtppp += point->rtppp;
+    totalPoint->lbppp += point->lbppp;
+    totalPoint->rbppp += point->rbppp;
     totalPoint->smo2 += point->smo2;
     totalPoint->thb += point->thb;
     totalPoint->o2hb += point->o2hb;
@@ -764,6 +843,16 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rte = totalPoint->rte/totalCount;
     avgPoint->lps = totalPoint->lps/totalCount;
     avgPoint->rps = totalPoint->rps/totalCount;
+    avgPoint->lpco = totalPoint->lpco/totalCount;
+    avgPoint->rpco = totalPoint->rpco/totalCount;
+    avgPoint->ltdc = totalPoint->ltdc/totalCount;
+    avgPoint->rtdc = totalPoint->rtdc/totalCount;
+    avgPoint->lbdc = totalPoint->lbdc/totalCount;
+    avgPoint->rbdc = totalPoint->rbdc/totalCount;
+    avgPoint->ltppp = totalPoint->ltppp/totalCount;
+    avgPoint->rtppp = totalPoint->rtppp/totalCount;
+    avgPoint->lbppp = totalPoint->lbppp/totalCount;
+    avgPoint->rbppp = totalPoint->rbppp/totalCount;
     avgPoint->smo2 = totalPoint->smo2/totalCount;
     avgPoint->thb = totalPoint->thb/totalCount;
     avgPoint->o2hb = totalPoint->o2hb/totalCount;
@@ -779,6 +868,9 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double lon, double lat, double headwind,
                            double slope, double temp, double lrbalance, 
                            double lte, double rte, double lps, double rps,
+                           double lpco, double rpco,
+                           double ltdc, double rtdc, double lbdc, double rbdc,
+                           double ltppp, double rtppp, double lbppp, double rbppp,
                            double smo2, double thb,
                            double rvert, double rcad, double rcontact,
                            int interval)
@@ -797,6 +889,14 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!std::isfinite(rps) || rps<0) rps=0;
     if (!std::isfinite(lte) || lte<0) lte=0;
     if (!std::isfinite(rte) || rte<0) rte=0;
+    if (!std::isfinite(ltdc) || ltdc<0) ltdc=0;
+    if (!std::isfinite(rtdc) || rtdc<0) rtdc=0;
+    if (!std::isfinite(lbdc) || lbdc<0) lbdc=0;
+    if (!std::isfinite(rbdc) || rbdc<0) rbdc=0;
+    if (!std::isfinite(ltppp) || ltppp<0) ltppp=0;
+    if (!std::isfinite(rtppp) || rtppp<0) rtppp=0;
+    if (!std::isfinite(lbppp) || lbppp<0) lbppp=0;
+    if (!std::isfinite(rbppp) || rbppp<0) rbppp=0;
     if (!std::isfinite(smo2) || smo2<0) smo2=0;
     if (!std::isfinite(thb) || thb<0) thb=0;
     if (!std::isfinite(rvert) || rvert<0) rvert=0;
@@ -809,7 +909,12 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (alt > RideFile::maximumFor(RideFile::alt)) alt = RideFile::maximumFor(RideFile::alt);
 
     RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, 
-                                             headwind, slope, temp, lrbalance, lte, rte, lps, rps,
+                                             headwind, slope, temp,
+                                             lrbalance,
+                                             lte, rte, lps, rps,
+                                             lpco, rpco,
+                                             ltdc, rtdc, lbdc, rbdc,
+                                             ltppp, rtppp, lbppp, rbppp,
                                              smo2, thb,
                                              rvert, rcad, rcontact,
                                              interval);
@@ -833,6 +938,16 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.rte      |= (rte != 0);
     dataPresent.lps      |= (lps != 0);
     dataPresent.rps      |= (rps != 0);
+    dataPresent.lpco     |= (lpco != 0);
+    dataPresent.rpco     |= (rpco != 0);
+    dataPresent.ltdc     |= (ltdc != 0);
+    dataPresent.rtdc     |= (rtdc != 0);
+    dataPresent.lbdc     |= (lbdc != 0);
+    dataPresent.rbdc     |= (rbdc != 0);
+    dataPresent.ltppp    |= (ltppp != 0);
+    dataPresent.rtppp    |= (rtppp != 0);
+    dataPresent.lbppp    |= (lbppp != 0);
+    dataPresent.rbppp    |= (rbppp != 0);
     dataPresent.smo2     |= (smo2 != 0);
     dataPresent.thb      |= (thb != 0);
     dataPresent.rvert    |= (rvert != 0);
@@ -851,6 +966,9 @@ void RideFile::appendPoint(const RideFilePoint &point)
                 point.nm,point.watts,point.alt,point.lon,point.lat,
                 point.headwind, point.slope, point.temp, point.lrbalance,
                 point.lte, point.rte, point.lps, point.rps,
+                point.lpco, point.rpco,
+                point.ltdc, point.rtdc, point.lbdc, point.rbdc,
+                point.ltppp, point.rtppp, point.lbppp, point.rbppp,
                 point.smo2, point.thb,
                 point.rvert, point.rcad, point.rcontact,
                 point.interval);
@@ -878,6 +996,16 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case rte : dataPresent.rte = value; break;
         case lps : dataPresent.lps = value; break;
         case rps : dataPresent.rps = value; break;
+        case lpco : dataPresent.lpco = value; break;
+        case rpco : dataPresent.rpco = value; break;
+        case ltdc : dataPresent.ltdc = value; break;
+        case rtdc : dataPresent.rtdc = value; break;
+        case lbdc : dataPresent.lbdc = value; break;
+        case rbdc : dataPresent.rbdc = value; break;
+        case ltppp : dataPresent.ltppp = value; break;
+        case rtppp : dataPresent.rtppp = value; break;
+        case lbppp : dataPresent.lbppp = value; break;
+        case rbppp : dataPresent.rbppp = value; break;
         case smo2 : dataPresent.smo2 = value; break;
         case thb : dataPresent.thb = value; break;
         case o2hb : dataPresent.o2hb = value; break;
@@ -918,6 +1046,16 @@ RideFile::isDataPresent(SeriesType series)
         case rps : return dataPresent.rps; break;
         case lte : return dataPresent.lte; break;
         case rte : return dataPresent.rte; break;
+        case lpco : return dataPresent.lpco; break;
+        case rpco : return dataPresent.rpco; break;
+        case ltdc : return dataPresent.ltdc; break;
+        case rtdc : return dataPresent.rtdc; break;
+        case lbdc : return dataPresent.lbdc; break;
+        case rbdc : return dataPresent.rbdc; break;
+        case ltppp : return dataPresent.ltppp; break;
+        case rtppp : return dataPresent.rtppp; break;
+        case lbppp : return dataPresent.lbppp; break;
+        case rbppp : return dataPresent.rbppp; break;
         case smo2 : return dataPresent.smo2; break;
         case thb : return dataPresent.thb; break;
         case o2hb : return dataPresent.o2hb; break;
@@ -954,6 +1092,16 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case rte : dataPoints_[index]->rte = value; break;
         case lps : dataPoints_[index]->lps = value; break;
         case rps : dataPoints_[index]->rps = value; break;
+        case lpco : dataPoints_[index]->lpco = value; break;
+        case rpco : dataPoints_[index]->rpco = value; break;
+        case ltdc : dataPoints_[index]->ltdc = value; break;
+        case rtdc : dataPoints_[index]->rtdc = value; break;
+        case lbdc : dataPoints_[index]->lbdc = value; break;
+        case rbdc : dataPoints_[index]->rbdc = value; break;
+        case ltppp : dataPoints_[index]->ltppp = value; break;
+        case rtppp : dataPoints_[index]->rtppp = value; break;
+        case lbppp : dataPoints_[index]->lbppp = value; break;
+        case rbppp : dataPoints_[index]->rbppp = value; break;
         case smo2 : dataPoints_[index]->smo2 = value; break;
         case thb : dataPoints_[index]->thb = value; break;
         case o2hb : dataPoints_[index]->o2hb = value; break;
@@ -995,6 +1143,16 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::lps : return lps; break;
         case RideFile::rps : return rps; break;
         case RideFile::thb : return thb; break;
+        case RideFile::lpco : return lpco; break;
+        case RideFile::rpco : return rpco; break;
+        case RideFile::ltdc : return ltdc; break;
+        case RideFile::rtdc : return rtdc; break;
+        case RideFile::lbdc : return lbdc; break;
+        case RideFile::rbdc : return rbdc; break;
+        case RideFile::ltppp : return ltppp; break;
+        case RideFile::rtppp : return rtppp; break;
+        case RideFile::lbppp : return lbppp; break;
+        case RideFile::rbppp : return rbppp; break;
         case RideFile::smo2 : return smo2; break;
         case RideFile::o2hb : return o2hb; break;
         case RideFile::hhb : return hhb; break;
@@ -1043,6 +1201,16 @@ RideFilePoint::setValue(RideFile::SeriesType series, double value)
         case RideFile::lps : lps = value; break;
         case RideFile::rps : rps = value; break;
         case RideFile::thb : thb = value; break;
+        case RideFile::lpco : lpco = value; break;
+        case RideFile::rpco : rpco = value; break;
+        case RideFile::ltdc : ltdc = value; break;
+        case RideFile::rtdc : rtdc = value; break;
+        case RideFile::lbdc : lbdc = value; break;
+        case RideFile::rbdc : rbdc = value; break;
+        case RideFile::ltppp : ltppp = value; break;
+        case RideFile::rtppp : rtppp = value; break;
+        case RideFile::lbppp : lbppp = value; break;
+        case RideFile::rbppp : rbppp = value; break;
         case RideFile::smo2 : smo2 = value; break;
         case RideFile::o2hb : o2hb = value; break;
         case RideFile::hhb : hhb = value; break;
@@ -1132,6 +1300,16 @@ RideFile::decimalsFor(SeriesType series)
         case rps :
         case lte :
         case rte : return 0; break;
+        case lpco :
+        case rpco :
+        case ltdc :
+        case rtdc :
+        case lbdc :
+        case rbdc :
+        case ltppp :
+        case rtppp :
+        case lbppp :
+        case rbppp : return 0; break;
         case smo2 : return 0; break;
         case thb : return 2; break;
         case o2hb : return 2; break;
@@ -1177,6 +1355,16 @@ RideFile::maximumFor(SeriesType series)
         case lte :
         case rte :
         case lrbalance : return 100; break;
+        case lpco :
+        case rpco : return 100; break;
+        case ltdc :
+        case rtdc :
+        case lbdc :
+        case rbdc :
+        case ltppp :
+        case rtppp :
+        case lbppp :
+        case rbppp : return 360; break;
         case smo2 : return 100; break;
         case thb : return 20; break;
         case o2hb : return 20; break;
@@ -1222,6 +1410,16 @@ RideFile::minimumFor(SeriesType series)
         case lps :
         case rps :
         case lrbalance : return 0; break;
+        case lpco :
+        case rpco : return -100; break;
+        case ltdc :
+        case rtdc :
+        case lbdc :
+        case rbdc :
+        case ltppp :
+        case rtppp :
+        case lbppp :
+        case rbppp : return 0; break;
         case smo2 : return 0; break;
         case thb : return 0; break;
         case o2hb : return 0; break;
@@ -1292,7 +1490,11 @@ void RideFile::appendReference(const RideFilePoint &point)
     referencePoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,
                                               point.watts,point.alt,point.lon,point.lat,
                                               point.headwind, point.slope, point.temp, point.lrbalance, 
-                                              point.lte, point.rte, point.lps, point.rps, point.smo2, point.thb, 
+                                              point.lte, point.rte, point.lps, point.rps,
+                                              point.lpco, point.rpco,
+                                              point.ltdc, point.rtdc, point.lbdc, point.rbdc,
+                                              point.ltppp, point.rtppp, point.lbppp, point.rbppp,
+                                              point.smo2, point.thb,
                                               point.rvert, point.rcad, point.rcontact,
                                               point.interval));
 }

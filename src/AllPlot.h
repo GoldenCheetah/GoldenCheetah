@@ -371,6 +371,12 @@ class AllPlotObject : public QObject
     QwtPlotCurve *rteCurve;
     QwtPlotCurve *lpsCurve;
     QwtPlotCurve *rpsCurve;
+    QwtPlotCurve *lpcoCurve;
+    QwtPlotCurve *rpcoCurve;
+    QwtPlotIntervalCurve *ldcCurve;
+    QwtPlotIntervalCurve *rdcCurve;
+    QwtPlotIntervalCurve *lpppCurve;
+    QwtPlotIntervalCurve *rpppCurve;
 
     // source data
     QVector<double> match;
@@ -415,6 +421,16 @@ class AllPlotObject : public QObject
     QVector<double> rteArray;
     QVector<double> lpsArray;
     QVector<double> rpsArray;
+    QVector<double> lpcoArray;
+    QVector<double> rpcoArray;
+    QVector<double> ltdcArray;
+    QVector<double> rtdcArray;
+    QVector<double> lbdcArray;
+    QVector<double> rbdcArray;
+    QVector<double> ltpppArray;
+    QVector<double> rtpppArray;
+    QVector<double> lbpppArray;
+    QVector<double> rbpppArray;
 
     // smoothed data
     QVector<double> smoothWatts;
@@ -452,6 +468,12 @@ class AllPlotObject : public QObject
     QVector<double> smoothRTE;
     QVector<double> smoothLPS;
     QVector<double> smoothRPS;
+    QVector<double> smoothLPCO;
+    QVector<double> smoothRPCO;
+    QVector<QwtIntervalSample> smoothLDC;
+    QVector<QwtIntervalSample> smoothRDC;
+    QVector<QwtIntervalSample> smoothLPPP;
+    QVector<QwtIntervalSample> smoothRPPP;
     QVector<QwtIntervalSample> smoothRelSpeed;
 
     // highlighting intervals
@@ -554,6 +576,9 @@ class AllPlot : public QwtPlot
         void setShowBalance(bool show);
         void setShowTE(bool show);
         void setShowPS(bool show);
+        void setShowPCO(bool show);
+        void setShowDC(bool show);
+        void setShowPPP(bool show);
         void setShowGrid(bool show);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -606,6 +631,9 @@ class AllPlot : public QwtPlot
         bool showBalance;
         bool showTE;
         bool showPS;
+        bool showPCO;
+        bool showDC;
+        bool showPPP;
         bool showRV;
         bool showRGCT;
         bool showRCad;

@@ -169,6 +169,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             rideFile->appendPoint(secs, cadence, hr, distance, speed, torque,
                                   power, alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
                                   0.0,0.0,0.0,0.0,0.0,0.0,
+                                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                   0.0,rcad,0.0, // no running dynamics in the schema ?
                                   lap);
 
@@ -195,7 +196,9 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                 // no smart recording, or delta exceeds HW treshold, just insert the data
                 rideFile->appendPoint(secs, cadence, hr, distance, speed, torque, power,
                                       alt, lon, lat, headwind, 0.0, RideFile::NoTemp, 0.0, 
-                                      0.0,0.0,0.0,0.0,0.0,0.0,
+                                      0.0,0.0,0.0,0.0,
+                                      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                      0.0,0.0,
                                       0.0, // vertical oscillation
                                       rcad, // run cadence
                                       0.0, // gct
@@ -229,6 +232,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           RideFile::NoTemp,
                                           0.0,
                                           0.0,0.0,0.0,0.0,
+                                          0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                           0.0,0.0,
                                           0.0, // vertical oscillation
                                           prevPoint->rcad + (deltarcad * weight),// run cadence
