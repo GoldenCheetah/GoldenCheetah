@@ -88,10 +88,10 @@ void Leaf::print(Leaf *leaf, int level)
 {
     qDebug()<<"LEVEL"<<level;
     switch(leaf->type) {
-    case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f; break;
-    case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i; break;
-    case Leaf::String : qDebug()<<"string"<<*leaf->lvalue.s; break;
-    case Leaf::Symbol : qDebug()<<"symbol"<<*leaf->lvalue.n; break;
+    case Leaf::Float : qDebug()<<"float"<<leaf->lvalue.f<<leaf->dynamic; break;
+    case Leaf::Integer : qDebug()<<"integer"<<leaf->lvalue.i<<leaf->dynamic; break;
+    case Leaf::String : qDebug()<<"string"<<*leaf->lvalue.s<<leaf->dynamic; break;
+    case Leaf::Symbol : qDebug()<<"symbol"<<*leaf->lvalue.n<<leaf->dynamic; break;
     case Leaf::Logical  : qDebug()<<"lop"<<leaf->op;
                     leaf->print(leaf->lvalue.l, level+1);
                     if (leaf->op) // nonzero ?
@@ -205,7 +205,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
                     DataFiltererrors << QString(QObject::tr("%1 is unknown")).arg(symbol);
 
                 if (symbol.compare("Current", Qt::CaseInsensitive))
-                    dynamic = true;
+                    leaf->dynamic = true;
             }
         }
         break;
