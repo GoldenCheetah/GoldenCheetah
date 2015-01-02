@@ -125,6 +125,7 @@ void PMCData::refresh()
         lts_.resize(days_);
         sts_.resize(days_);
         sb_.resize(days_+1); // for SB tomorrow!
+        rr_.resize(days_); // for SB tomorrow!
 
     } else {
 
@@ -136,6 +137,7 @@ void PMCData::refresh()
         lts_.resize(0);
         sts_.resize(0);
         sb_.resize(0);
+        rr_.resize(0);
 
         // give up
         return;
@@ -154,6 +156,7 @@ void PMCData::refresh()
     lts_.fill(0);
     sts_.fill(0);
     sb_.fill(0);
+    rr_.fill(0);
 
     // add the seeded values from seasons
     foreach(Season x, context->athlete->seasons->seasons) {
@@ -176,10 +179,12 @@ void PMCData::refresh()
     }
 
     //
-    // STEP THREE Calculate sts/lts and sb
+    // STEP THREE Calculate sts/lts, sb and rr
     //
     double lastLTS=0.0f;
     double lastSTS=0.0f;
+
+    double rollingStress=0;
 
     for(int day=0; day < days_; day++) {
 
@@ -198,6 +203,17 @@ void PMCData::refresh()
 
             lts_[day] *= -1;
             sts_[day] *= -1;
+        }
+
+        // rolling stress for STS days
+        if (day && day <= stsDays_) {
+            // just starting out
+            rollingStress += lts_[day] - lts_[day-1];
+            rr_[day] = rollingStress;
+        } else if (day) {
+            rollingStress += lts_[day] - lts_[day-1];
+            rollingStress -= lts_[day-stsDays_] - lts_[day-stsDays_-1];
+            rr_[day] = rollingStress;
         }
 
         // SB (stress balance)  long term - short term
@@ -263,4 +279,14 @@ PMCData::sb(QDate date)
     int index=indexOf(date);
     if (index == -1) return 0.0f;
     else return sb_[index];
+}
+
+double
+PMCData::rr(QDate date)
+{
+    refresh();
+
+    int index=indexOf(date);
+    if (index == -1) return 0.0f;
+    else return rr_[index];
 }

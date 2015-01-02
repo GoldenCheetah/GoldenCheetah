@@ -49,6 +49,7 @@
 [Ll][Tt][Ss]                               strcpy(DataFilterlval.function, "lts"); return LTS;
 [Ss][Tt][Ss]                               strcpy(DataFilterlval.function, "sts"); return STS;
 [Ss][Bb]                                   strcpy(DataFilterlval.function, "sb"); return SB;
+[Rr][Rr]                                   strcpy(DataFilterlval.function, "rr"); return RR;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;

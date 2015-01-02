@@ -63,6 +63,7 @@ class PMCData : public QObject {
         QVector<double> &lts() { return lts_; }
         QVector<double> &sts() { return sts_; }
         QVector<double> &sb() { return sb_; }
+        QVector<double> &rr() { return rr_; }
 
         // index into the arrays
         int indexOf(QDate) ;
@@ -72,6 +73,7 @@ class PMCData : public QObject {
         double sts(QDate);
         double stress(QDate);
         double sb(QDate);
+        double rr(QDate);
 
     public slots:
 
@@ -95,7 +97,7 @@ class PMCData : public QObject {
         // data
         QDate start_, end_;
         int days_;
-        QVector<double> stress_, lts_, sts_, sb_;
+        QVector<double> stress_, lts_, sts_, sb_, rr_;
 
         bool isstale; // needs refreshing
 };
