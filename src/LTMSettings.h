@@ -57,6 +57,7 @@ class RideBest;
 #define METRIC_MEASURE   4 // DEPRECATED DO NOT USE
 #define METRIC_BEST      5
 #define METRIC_ESTIMATE  6
+#define METRIC_STRESS    7
 
 // type of estimate
 #define ESTIMATE_WPRIME  0
@@ -66,12 +67,18 @@ class RideBest;
 #define ESTIMATE_BEST    4
 #define ESTIMATE_EI      5
 
+// type of stress
+#define STRESS_STS       0
+#define STRESS_LTS       1
+#define STRESS_SB        2
+#define STRESS_RR        3
+
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), stack(false), model(""), name(""), metric(NULL), smooth(false), 
-                     trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
+    MetricDetail() : type(METRIC_DB), stack(false), model(""), name(""), metric(NULL), stressType(0),
+                     smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false) {}
@@ -97,6 +104,9 @@ class MetricDetail {
     int duration;       // n x units below for seconds
     int duration_units; // 1=secs, 60=mins, 3600=hours
     RideFile::SeriesType series; // what series are we doing the peak for
+
+    // for STRESS
+    int stressType;     // 0-LTS 1-STS 2-SB 3-RR
 
     // GENERAL SETTINGS FOR A METRIC
     QString uname, uunits; // user specified name and units (axis choice)

@@ -184,9 +184,9 @@ class EditMetricDetailDialog : public QDialog
         LTMTool *ltmTool;
         MetricDetail *metricDetail;
 
-        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate;
+        QRadioButton *chooseMetric, *chooseBest, *chooseEstimate, *chooseStress;
         QButtonGroup *group;
-        QWidget *bestWidget, *estimateWidget;
+        QWidget *metricWidget, *bestWidget, *estimateWidget, *stressWidget;
         QStackedWidget *typeStack;
 
         // bests
@@ -206,6 +206,9 @@ class EditMetricDetailDialog : public QDialog
         QDoubleSpinBox *estimateDuration;
         QComboBox *estimateDurationUnits;
         QRadioButton *abs, *wpk;
+
+        // stress
+        QComboBox *stressTypeSelect; // STS, LTS, SB, RR et al
 
         QComboBox *curveStyle,
                   *curveSymbol;

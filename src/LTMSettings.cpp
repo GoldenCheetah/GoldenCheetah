@@ -171,7 +171,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field1;
     out<<settings.field2;
     out<<int(-1);
-    out<<int(11); // version 10
+    out<<int(12); 
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         bool discard = false;
@@ -211,6 +211,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.estimateDuration;
         out<<metric.estimateDuration_units;
         out<<metric.wpk;
+        out<<metric.stressType;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -317,6 +318,9 @@ while(counter-- && !in.atEnd()) {
         }
         if (version >= 11) {
             in >> m.wpk;
+        }
+        if (version >= 12) {
+            in >> m.stressType;
         }
 
         bool keep=true;
