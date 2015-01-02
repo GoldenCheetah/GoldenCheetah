@@ -2286,7 +2286,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
     if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         createMetricData(context, settings, metricDetail, x,y,n, forceZero);
         return;
-    } else if (metricDetail.type == METRIC_PM) {
+    } else if (metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_PM) {
         createPMCData(context, settings, metricDetail, x,y,n, forceZero);
         return;
     } else if (metricDetail.type == METRIC_BEST) {
@@ -2615,31 +2615,49 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     QString scoreType;
+    int stressType = STRESS_LTS;
 
     // create a custom set of summary metric data!
-    if (metricDetail.symbol.startsWith("skiba")) {
-        scoreType = "skiba_bike_score";
-    } else if (metricDetail.symbol.startsWith("antiss")) {
-        scoreType = "antiss_score";
-    } else if (metricDetail.symbol.startsWith("atiss")) {
-        scoreType = "atiss_score";
-    } else if (metricDetail.symbol.startsWith("coggan")) {
-        scoreType = "coggan_tss";
-    } else if (metricDetail.symbol.startsWith("daniels")) {
-        scoreType = "daniels_points";
-    } else if (metricDetail.symbol.startsWith("trimp")) {
-        scoreType = "trimp_points";
-    } else if (metricDetail.symbol.startsWith("work")) {
-        scoreType = "total_work";
-    } else if (metricDetail.symbol.startsWith("cp_")) {
-        scoreType = "skiba_cp_exp";
-    } else if (metricDetail.symbol.startsWith("wprime")) {
-        scoreType = "skiba_wprime_exp";
-    } else if (metricDetail.symbol.startsWith("distance")) {
-        scoreType = "total_distance";
-    } else if (metricDetail.symbol.startsWith("govss")) {
-        scoreType = "govss";
+    if (metricDetail.type == METRIC_PM) {
+
+        if (metricDetail.symbol.startsWith("skiba")) {
+            scoreType = "skiba_bike_score";
+        } else if (metricDetail.symbol.startsWith("antiss")) {
+            scoreType = "antiss_score";
+        } else if (metricDetail.symbol.startsWith("atiss")) {
+            scoreType = "atiss_score";
+        } else if (metricDetail.symbol.startsWith("coggan")) {
+            scoreType = "coggan_tss";
+        } else if (metricDetail.symbol.startsWith("daniels")) {
+            scoreType = "daniels_points";
+        } else if (metricDetail.symbol.startsWith("trimp")) {
+            scoreType = "trimp_points";
+        } else if (metricDetail.symbol.startsWith("work")) {
+            scoreType = "total_work";
+        } else if (metricDetail.symbol.startsWith("cp_")) {
+            scoreType = "skiba_cp_exp";
+        } else if (metricDetail.symbol.startsWith("wprime")) {
+            scoreType = "skiba_wprime_exp";
+        } else if (metricDetail.symbol.startsWith("distance")) {
+            scoreType = "total_distance";
+        } else if (metricDetail.symbol.startsWith("govss")) {
+            scoreType = "govss";
+        }
+
+        stressType = STRESS_LTS; // if in doubt
+        if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl")) 
+            stressType = STRESS_LTS;
+        else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl")) 
+            stressType = STRESS_STS;
+        else if (metricDetail.symbol.endsWith("sb")) 
+            stressType = STRESS_SB;
+
+    } else {
+
+        scoreType = metricDetail.symbol; // just use the selected metric
+        stressType = metricDetail.stressType;
     }
+
 
     PMCData *athletePMC = NULL;
     PMCData *localPMC = NULL;
@@ -2678,9 +2696,21 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
 
         // value for day
         double value = 0.0f;
-        if (metricDetail.symbol.endsWith("lts") || metricDetail.symbol.endsWith("ctl")) value = pmcData->lts(date);
-        else if (metricDetail.symbol.endsWith("sts") || metricDetail.symbol.endsWith("atl")) value = pmcData->sts(date);
-        else if (metricDetail.symbol.endsWith("sb")) value = pmcData->sb(date);
+
+        switch (stressType) {
+        case STRESS_LTS:
+            value = pmcData->lts(date);
+            break;
+        case STRESS_STS:
+            value = pmcData->sts(date);
+            break;
+        case STRESS_SB:
+            value = pmcData->sb(date);
+            break;
+        default:
+            value = 0;
+            break;
+        }
         
         if (value || wantZero) {
             unsigned long seconds = 1;
