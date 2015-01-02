@@ -572,6 +572,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot->setFixedHeight(100);
     fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     fullPlot->setHighlightIntervals(false);
+    fullPlot->setPaintBrush(0);
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->setWantAxis(false);
     fullPlot->setContentsMargins(0,0,0,0);
