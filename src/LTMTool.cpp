@@ -1219,13 +1219,15 @@ LTMTool::refreshCustomTable()
     foreach (MetricDetail metricDetail, settings->metrics) {
 
         QTableWidgetItem *t = new QTableWidgetItem();
-        if (metricDetail.type != 5 && metricDetail.type != 6)
+        if (metricDetail.type < 5)
             t->setText(tr("Metric")); // only metrics .. for now ..
         else if (metricDetail.type == 5)
             t->setText(tr("Peak"));
-        else
+        else if (metricDetail.type == 6)
             t->setText(tr("Estimate"));
-        
+        else if (metricDetail.type == 7)
+            t->setText(tr("Stress"));
+
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
         customTable->setItem(i,0,t);
 
