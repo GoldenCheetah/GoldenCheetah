@@ -26,6 +26,11 @@
 // use stc strtod to bypass Qt toDouble() issues
 #include <stdlib.h>
 
+// TCX XML Structure uses the following 2 Schema Definitions
+// -- main schema http://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd
+// -- extension schema http://www8.garmin.com/xmlschemas/ActivityExtensionv2.xsd
+
+
 TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(rideFile), rides(rides)
 {
     isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
@@ -100,11 +105,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         secs = start_time.secsTo(time);
 
     } else if (qName == "DistanceMeters") { distance = buffer.toDouble() / 1000; }
-    else if (qName == "Watts" || qName == "ns3:Watts") { power = buffer.toDouble(); }
-    else if (qName == "Speed" || qName == "ns3:Speed") { speed = buffer.toDouble() * 3.6; }
+    else if (qName == "Watts" || qName.endsWith( ":Watts")) { power = buffer.toDouble(); }          //TCX Extension Fields may use a namespace prefix
+    else if (qName == "Speed" || qName.endsWith(":Speed")) { speed = buffer.toDouble() * 3.6; }     //TCX Extension Fields may use a namespace prefix
+    else if (qName == "RunCadence" || qName.endsWith( ":RunCadence")) { rcad = buffer.toDouble(); } //TCX Extension Fields may use a namespace prefix
     else if (qName == "Value") { hr = buffer.toDouble(); }
     else if (qName == "Cadence") { cadence = buffer.toDouble(); }
-    else if (qName == "RunCadence") { rcad = buffer.toDouble(); }
     else if (qName == "AltitudeMeters") {
         // on Suunto TCX files there are lots of 0 values between valid ones, skip these
         if (buffer.toDouble() != 0) {
