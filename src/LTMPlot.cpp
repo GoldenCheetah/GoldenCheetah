@@ -2651,6 +2651,8 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             stressType = STRESS_STS;
         else if (metricDetail.symbol.endsWith("sb")) 
             stressType = STRESS_SB;
+        else if (metricDetail.symbol.endsWith("lr")) 
+            stressType = STRESS_RR;
 
     } else {
 
@@ -2706,6 +2708,9 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
             break;
         case STRESS_SB:
             value = pmcData->sb(date);
+            break;
+        case STRESS_RR:
+            value = pmcData->rr(date);
             break;
         default:
             value = 0;

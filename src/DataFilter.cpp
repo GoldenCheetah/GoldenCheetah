@@ -217,7 +217,7 @@ void Leaf::validateFilter(DataFilter *df, Leaf *leaf)
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
             QString symbol = *(leaf->series->lvalue.n); 
 
-            if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb") {
+            if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
 
                 // does the symbol exist though ?
                 QString lookup = df->lookupMap.value(symbol, "");
@@ -423,7 +423,7 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
         double duration;
 
         // pmc data ...
-        if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb") {
+        if (leaf->function == "sts" || leaf->function == "lts" || leaf->function == "sb" || leaf->function == "rr") {
 
                 // get metric technical name
                 QString symbol = *(leaf->series->lvalue.n); 
@@ -433,6 +433,7 @@ double Leaf::eval(Context *context, DataFilter *df, Leaf *leaf, RideItem *m)
                 if (leaf->function == "sts") return pmcData->sts(m->dateTime.date());
                 if (leaf->function == "lts") return pmcData->lts(m->dateTime.date());
                 if (leaf->function == "sb") return pmcData->sb(m->dateTime.date());
+                if (leaf->function == "rr") return pmcData->rr(m->dateTime.date());
         }
 
 
