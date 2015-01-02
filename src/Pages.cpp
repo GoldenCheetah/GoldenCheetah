@@ -4172,7 +4172,7 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/pace.zones");
+    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones.fileName());
     if (zonesFile.exists()) {
         zones.read(zonesFile);
         zonesFile.close();
@@ -4199,7 +4199,7 @@ PaceZonePage::saveClicked()
     zones.write(context->athlete->home->config());
 
     // reread Pace zones
-    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/pace.zones");
+    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_->fileName());
     context->athlete->pacezones_->read(pacezonesFile);
 
     // did we change ?
@@ -4633,8 +4633,8 @@ CVPage::rangeSelectionChanged()
             QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
             loedit->setMinimum(0);
             loedit->setMaximum(1000);
-            loedit->setSingleStep(1.0);
-            loedit->setDecimals(0);
+            loedit->setSingleStep(0.1);
+            loedit->setDecimals(1);
             loedit->setValue(current.zones[i].lo);
             zones->setItemWidget(add, 2, loedit);
             connect(loedit, SIGNAL(valueChanged(double)), this, SLOT(zonesChanged()));
