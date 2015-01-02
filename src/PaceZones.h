@@ -96,7 +96,7 @@ class PaceZones : public QObject
         QList<PaceZoneRange> ranges;
 
         // utility
-        QString err, warning;
+        QString err, warning, fileName_;
         void setZonesFromCV(PaceZoneRange &range);
 
     public:
@@ -116,7 +116,7 @@ class PaceZones : public QObject
         QString getDefaultZoneDesc(int z) const;
 
         // set zone parameters to either user-specified defaults
-        // or to defaults using Coggan's coefficients
+        // or to defaults using Skiba's coefficients
         void initializeZoneParameters();
 
         //
@@ -150,6 +150,7 @@ class PaceZones : public QObject
         //
         bool read(QFile &file);
         void write(QDir home);
+        const QString &fileName() const { return fileName_; }
         const QString &errorString() const { return err; }
         const QString &warningString() const { return warning; }
 

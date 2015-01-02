@@ -112,7 +112,7 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Pace Zones
     pacezones_ = new PaceZones;
-    QFile pacezonesFile(home->config().canonicalPath() + "/pace.zones");
+    QFile pacezonesFile(home->config().canonicalPath() + "/" + pacezones_->fileName());
     if (pacezonesFile.exists()) {
         if (!pacezones_->read(pacezonesFile)) {
             QMessageBox::critical(context->mainWindow, tr("Pace Zones File Error"), pacezones_->errorString());

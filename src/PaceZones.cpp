@@ -40,6 +40,7 @@ static const QDate date_infinity(9999,12,31);
 // initialize default static zone parameters
 void PaceZones::initializeZoneParameters()
 {
+    fileName_ = "pace.zones";
     // these default zones are based upon the Skiba pace zones 
     // but expressed as a percentage of Critical Velocity in km/h
     // rather than as a percentage of LT Pace in minutes/mile
@@ -109,7 +110,7 @@ bool PaceZones::read(QFile &file)
 
     // read using text mode takes care of end-lines
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        err = "can't open file";
+        err = tr("can't open file");
         return false;
     }
     QTextStream fileStream(&file);
@@ -161,13 +162,13 @@ bool PaceZones::read(QFile &file)
 
             // defaults are allowed only at the beginning of the file
             if (ranges.size()) {
-                err = "Zone defaults must be specified at head of pace.zones file";
+                err = tr("Zone defaults must be specified at head of %1 file").arg(fileName_);
                 return false;
             }
 
             // only one set of defaults is allowed
             if (scheme.nzones_default) {
-                err = "Only one set of zone defaults may be specified in pace.zones file";
+                err = tr("Only one set of zone defaults may be specified in %1 file").arg(fileName_);
                 return false;
             }
 
@@ -419,7 +420,7 @@ next_line: {}
         if (ranges[nr].cv <= 0) {
 
             err = tr("CV must be greater than zero in zone "
-                     "range %1 of pace.zones").arg(nr + 1);
+                     "range %1 of %2").arg(nr + 1).arg(fileName_);
             return false;
         }
 
@@ -780,7 +781,7 @@ void PaceZones::write(QDir home)
 #endif
     }
 
-    QFile file(home.canonicalPath() + "/pace.zones");
+    QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
