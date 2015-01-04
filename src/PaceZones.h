@@ -88,6 +88,9 @@ class PaceZones : public QObject
 
     private:
 
+        // Sport
+        bool swim;
+
         // Scheme
         bool defaults_from_user;
         PaceZoneScheme scheme;
@@ -101,7 +104,7 @@ class PaceZones : public QObject
 
     public:
 
-        PaceZones() : defaults_from_user(false) {
+        PaceZones(bool swim=false) : swim(swim), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -201,6 +204,12 @@ class PaceZones : public QObject
         // can be more granular -- did the zone config for the date of
         // a particular ride change ?
         quint16 getFingerprint(QDate date) const;
+
+        // convert to/from Pace
+        double kphFromTime(QTimeEdit *cvedit, bool metric) const;
+        QString kphToPaceString(double kph, bool metric) const;
+        QString paceUnits(bool metric) const;
+        QString paceSetting() const;
 };
 
 QColor paceZoneColor(int zone, int num_zones);

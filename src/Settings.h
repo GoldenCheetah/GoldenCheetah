@@ -50,6 +50,7 @@
 #define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm"
 #define GC_UNIT                     "unit"
 #define GC_PACE                     "pace"
+#define GC_SWIMPACE                 "swimpace"
 #define GC_LANG                     "lang"
 #define GC_NICKNAME                 "nickname"
 #define GC_DOB                      "dob"
