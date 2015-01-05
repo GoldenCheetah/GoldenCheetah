@@ -207,6 +207,7 @@ class TrainSidebar : public GcWindow
         // update() - from a push device (quarqd ANT+)
         // Device->getRealtimeData() - from a pull device (Computrainer)
         double displayPower, displayHeartRate, displayCadence, displaySpeed;
+        double displayLRBalance, displayLTE, displayRTE, displayLPS, displayRPS;
         double displayDistance, displayWorkoutDistance;
         long load;
         double slope;

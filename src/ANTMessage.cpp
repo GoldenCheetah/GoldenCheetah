@@ -166,11 +166,14 @@
  * power         calibration_fail    None,channel,0x01,0xAF,uint8:autozero_status,None,None,None,uint16_le:calibration_data
  * power         torque_support      None,channel,0x01,0x12,uint8:sensor_configuration,sint16_le:raw_torque,
  *                                                     sint16_le:offset_torque,None
- * power         standard_power      0x4e,channel,0x10,uint8_diff:event_count,None,uint8:instant_cadence,
+ * power         standard_power      0x4e,channel,0x10,uint8_diff:event_count,uint8:pedal_power,uint8:instant_cadence,
  *                                                     uint16_le_diff:sum_power,uint16_le:instant_power
  * power         wheel_torque        0x4e,channel,0x11,uint8_diff:event_count,uint8:wheel_rev,uint8:instant_cadence,
  *                                                     uint16_le_diff:wheel_period,uint16_le_diff:torque
  * power         crank_torque        0x4e,channel,0x12,uint8_diff:event_count,uint8:crank_rev,uint8:instant_cadence,
+ *                                                     uint16_le_diff:crank_period,uint16_le_diff:torque
+ * power         te_and_ps           0x4e,channel,0x13,uint8_diff:event_count,uint8:left_torque_effectivness, uint8:right_torque_effectiveness,
+ *                                                     uint8:left_pedal_smoothness, uint8:right_pedal_smoothness
  *                                                     uint16_le_diff:crank_period,uint16_le_diff:torque
  * power         crank_SRM           0x4e,channel,0x20,uint8_diff:event_count,uint16_be:slope,uint16_be_diff:crank_period,
  *                                                     uint16_be_diff:torque
@@ -351,6 +354,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             //   0x10 - Standard Power Only - sent every 2 seconds, but not SRMs
             //   0x11 - Wheel torque (Powertap)
             //   0x12 - Crank Torque (Quarq)
+            //   0x13 - Torque Efficiency and Pedal Smoothness - optional extension to 0x10 Standard Power or 0x11/0x12 Wheel/Crank Torque
             //   0x20 - Crank Torque Frequency (SRM)
             //   0x50 - Manufacturer UD
             //   0x52 - Battery Voltage
@@ -395,7 +399,8 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 case ANT_STANDARD_POWER: // 0x10 - standard power
 
                     eventCount = message[5];
-                    pedalPower = message[6]; // left/right 0xFF = not used
+                    pedalPowerContribution = (( message[6] != 0xFF ) && ( message[6]&0x80) ) ; // left/right is defined if NOT 0xFF (= no Pedal Power) AND BIT 7 is set
+                    pedalPower = (message[6]&0x7F); // right pedalPower % - stored in bit 0-6
                     instantCadence = message[7];
                     sumPower = message[8] + (message[9]<<8);
                     instantPower = message[10] + (message[11]<<8);
@@ -415,6 +420,15 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                     instantCadence = message[7];
                     period = message[8] + (message[9]<<8);
                     torque = message[10] + (message[11]<<8);
+                    break;
+
+                case ANT_TE_AND_PS_POWER: // 0x13 - torque efficiency and pedal smoothness - extension to standard power
+
+                    eventCount = message[5];
+                    leftTorqueEffectiveness = message[6];
+                    rightTorqueEffectiveness = message[7];
+                    leftOrCombinedPedalSmoothness = message[8];
+                    rightPedalSmoothness = message[9];
                     break;
 
                 case ANT_CRANKSRM_POWER: // 0x20 - crank torque (SRM)
@@ -631,6 +645,10 @@ void ANTMessage::init()
     srmOffset = srmSlope = srmSerial = 0;
     calibrationID = ctfID = 0;
     autoZeroStatus = autoZeroEnable = 0;
+    pedalPowerContribution = false;
+    pedalPower = 0;
+    leftTorqueEffectiveness = rightTorqueEffectiveness = 0;
+    leftOrCombinedPedalSmoothness = rightPedalSmoothness = 0;
 }
 
 ANTMessage ANTMessage::resetSystem()

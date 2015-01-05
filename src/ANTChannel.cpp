@@ -468,12 +468,16 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         value2 = value = antMessage.instantPower;
                         parent->setCadence(antMessage.instantCadence); // cadence
+                        antMessage.pedalPowerContribution ? parent->setLRBalance(antMessage.pedalPower) : parent->setLRBalance(0);
                     } else {
                        stdNullCount++;
                        if (stdNullCount >= 6) { //6 for standard power according to specs
                            parent->setCadence(0);
                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
+                           parent->setLRBalance(0);
                            value2 = value = 0;
+                           parent->setTE(0,0);
+                           parent->setPS(0,0);
                        }
                     }
                     lastStdPwrMessage = antMessage;
@@ -481,6 +485,29 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 }
                 break;
 
+                case ANT_TE_AND_PS_POWER: // 0x13 - optional extension to standard power / event Count is defined to be in sync with 0x10 - so not seperate calculation
+                                          // and just take whatever is delivered - data may not be sent for every power reading - but minimum every 5th pwr message
+                {
+                    uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;
+                    if (events) {
+                        // provide valid values only
+                        if (antMessage.leftTorqueEffectiveness != 0xFF && antMessage.rightTorqueEffectiveness != 0xFF) {
+                            parent->setTE((antMessage.leftTorqueEffectiveness / 2),(antMessage.rightTorqueEffectiveness / 2));  // values are given in 1/2 %
+                        } else {
+                            parent->setTE(0,0);
+                        }
+                        // provide valid values only and handle single and combined PS option (which is allowed in 0x13)
+                        if (antMessage.leftOrCombinedPedalSmoothness != 0xFF && antMessage.rightTorqueEffectiveness != 0xFF) {
+                            if (antMessage.rightPedalSmoothness == 0xFE) {
+                                parent->setPS((antMessage.leftOrCombinedPedalSmoothness / 2), 0);
+                            } else {
+                                parent->setPS((antMessage.leftOrCombinedPedalSmoothness / 2), (antMessage.rightPedalSmoothness / 2)); // values are given in 1/2 %
+                            }
+                        }
+                    }
+                }
+
+                break;
 
                 //
                 // Quarq - Crank torque
