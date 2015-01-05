@@ -44,7 +44,7 @@ SpecialFields::SpecialFields()
     namesmap.insert("Filename", tr("Filename"));                     // set by the rideFile reader
     namesmap.insert("Year", tr("Year"));                             // set by the rideFile reader
     namesmap.insert("Change History", tr("Change History"));         // set by RideFileCommand
-    namesmap.insert("Calendar Text", tr("Calendar Text"));           // set by openRideFile and rideMetadata
+    namesmap.insert("Calendar Text", "Calendar Text");               // set by openRideFile and rideMetadata DO NOT TRANSLATE
     namesmap.insert("Data", tr("Data"));                             // set by openRideFile for areDataPresent
     namesmap.insert("Lean Mass", tr("Lean Mass"));                   // measure
     namesmap.insert("Fat Mass", tr("Fat Mass"));                     // measure
