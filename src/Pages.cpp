@@ -4172,13 +4172,15 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     QVBoxLayout *layout = new QVBoxLayout(this);
     QHBoxLayout *hlayout = new QHBoxLayout;
 
-    sportLabel = new QLabel(tr("Sport:"));
+    sportLabel = new QLabel(tr("Sport"));
     sportCombo = new QComboBox();
     sportCombo->addItem(tr("Run"));
     sportCombo->addItem(tr("Swim"));
     sportCombo->setCurrentIndex(0);
+    hlayout->addStretch();
     hlayout->addWidget(sportLabel);
-    hlayout->addWidget(sportCombo, Qt::AlignLeft);
+    hlayout->addWidget(sportCombo);
+    hlayout->addStretch();
     layout->addLayout(hlayout);
     connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport()));
     zones = NULL;
