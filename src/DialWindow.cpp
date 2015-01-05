@@ -195,11 +195,17 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::LRBalance:
         {
-            double tot = rtData.getWatts() + rtData.getAltWatts();
-            double left = rtData.getWatts() / tot * 100.00f;
-            double right = 100.00 - left;
-            if (tot < 0.1) left = right = 0;
-            valueLabel->setText(QString("%1 / %2").arg(left, 0, 'f', 0).arg(right, 0, 'f', 0));
+          double left = 0; double right = 0;
+          if (value == 0) { // no LR Balance provided - so use previous logic
+              double tot = rtData.getWatts() + rtData.getAltWatts();
+              left = rtData.getWatts() / tot * 100.00f;
+              right = 100.00 - left;
+              if (tot < 0.1) left = right = 0;
+          } else {
+              left = 100.00 - value; // value in ANT message is the "right" pedal portion
+              right = value;
+          }
+          valueLabel->setText(QString("%1 / %2").arg(left, 0, 'f', 0).arg(right, 0, 'f', 0));
         }
         break;
 
@@ -442,6 +448,16 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
+
+    case RealtimeData::LeftPedalSmoothness:
+    case RealtimeData::RightPedalSmoothness:
+    case RealtimeData::LeftTorqueEffectiveness:
+    case RealtimeData::RightTorqueEffectiveness:
+        {
+          valueLabel->setText(QString("%1").arg(value, 0, 'f', 0));
+        }
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -561,6 +577,23 @@ void DialWindow::seriesChanged()
     case RealtimeData::HHb:
             foreground = GColor(CHHB);
             break;
+
+    case RealtimeData::LeftPedalSmoothness:
+            foreground = GColor(CLPS);
+            break;
+
+    case RealtimeData::RightPedalSmoothness:
+            foreground = GColor(CRPS);
+            break;
+
+    case RealtimeData::LeftTorqueEffectiveness:
+            foreground = GColor(CLTE);
+            break;
+
+    case RealtimeData::RightTorqueEffectiveness:
+           foreground = GColor(CRTE);
+           break;
+
     }
 
     // ugh. we use style sheets because palettes don't work on labels

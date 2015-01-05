@@ -28,6 +28,7 @@ RealtimeData::RealtimeData()
 	cadence = distance = virtualSpeed = wbal = 0.0;
 	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
+    lrbalance = rte = lte = lps = rps = 0.0;
 
     memset(spinScan, 0, 24);
 }
@@ -93,6 +94,32 @@ void RealtimeData::setDistance(double x)
 {
     this->distance = x;
 }
+
+void RealtimeData::setLRBalance(double x)
+{
+    this->lrbalance = x;
+}
+
+void RealtimeData::setLTE(double x)
+{
+    this->lte = x;
+}
+
+void RealtimeData::setRTE(double x)
+{
+    this->rte = x;
+}
+
+void RealtimeData::setLPS(double x)
+{
+    this->lps = x;
+}
+
+void RealtimeData::setRPS(double x)
+{
+    this->rps = x;
+}
+
 const char *
 RealtimeData::getName() const
 {
@@ -150,6 +177,27 @@ double RealtimeData::getDistance() const
 {
     return distance;
 }
+double RealtimeData::getLRBalance() const
+{
+    return lrbalance;
+}
+double RealtimeData::getLTE() const
+{
+    return lte;
+}
+double RealtimeData::getRTE() const
+{
+    return rte;
+}
+double RealtimeData::getLPS() const
+{
+    return lps;
+}
+double RealtimeData::getRPS() const
+{
+    return rps;
+}
+
 
 double RealtimeData::value(DataSeries series) const
 {
@@ -201,6 +249,21 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case O2Hb: return o2hb;
+        break;
+
+    case LRBalance: return lrbalance;
+        break;
+
+    case LeftTorqueEffectiveness: return lte;
+        break;
+
+    case RightTorqueEffectiveness: return rte;
+        break;
+
+    case LeftPedalSmoothness: return lps;
+        break;
+
+    case RightPedalSmoothness: return rps;
         break;
 
     case None: 
@@ -255,6 +318,10 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << AltWatts;
         seriesList << LRBalance;
         seriesList << LapTimeRemaining;
+        seriesList << LeftTorqueEffectiveness;
+        seriesList << RightTorqueEffectiveness;
+        seriesList << LeftPedalSmoothness;
+        seriesList << RightPedalSmoothness;
     }
     return seriesList;
 }
@@ -370,6 +437,18 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case O2Hb: return tr("Oxy Hb");
+        break;
+
+    case LeftTorqueEffectiveness: return tr("Left Torque Effectiveness");
+        break;
+
+    case RightTorqueEffectiveness: return tr("Right Torque Effectiveness");
+        break;
+
+    case LeftPedalSmoothness: return tr("Left Pedal Smoothness");
+        break;
+
+    case RightPedalSmoothness: return tr("Right Pedal Smoothness");
         break;
     }
 }

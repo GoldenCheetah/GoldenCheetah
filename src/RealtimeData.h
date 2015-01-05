@@ -41,7 +41,9 @@ public:
                       SmO2, tHb, HHb, O2Hb,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
-                      VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining };
+                      VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
+                      LeftTorqueEffectiveness, RightTorqueEffectiveness,
+                      LeftPedalSmoothness, RightPedalSmoothness};
 
     typedef enum dataseries DataSeries;
     double value(DataSeries) const;
@@ -71,6 +73,11 @@ public:
     void setJoules(long);
     void setXPower(long);
     void setLap(long);
+    void setLRBalance(double);
+    void setLTE(double);
+    void setRTE(double);
+    void setLPS(double);
+    void setRPS(double);
 
     const char *getName() const;
 
@@ -96,6 +103,12 @@ public:
     long getLapMsecs() const;
     double getDistance() const;
     long getLap() const;
+    double getLRBalance() const;
+    double getLTE() const;
+    double getRTE() const;
+    double getLPS() const;
+    double getRPS() const;
+
 
     uint8_t spinScan[24];
 
@@ -103,9 +116,10 @@ private:
     char name[64];
 
     // realtime telemetry
-    double hr, watts, altWatts, speed, wheelRpm, load, slope;
+    double hr, watts, altWatts, speed, wheelRpm, load, slope, lrbalance;
     double cadence;      // in rpm
     double smo2, thb;
+    double lte, rte, lps, rps; // torque efficiency and pedal smoothness
 
     // derived data
     double distance;
