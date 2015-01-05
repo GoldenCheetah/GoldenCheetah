@@ -471,7 +471,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
         if (nofmt) result = QString("%1").arg(rvalue);
         else result = time_to_string(rvalue);
 
-    } else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
+    } else result = QString("%1").arg(rvalue, 0, 'f', metric->precision(useMetricUnits));
 
     // 0 temp from aggregate means no values 
     if ((metric->symbol() == "average_temp" || metric->symbol() == "max_temp") && result == "0.0") result = "-";

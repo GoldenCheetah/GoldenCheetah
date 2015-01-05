@@ -1013,7 +1013,7 @@ void IntervalNavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionV
             if (m->units(true) == "seconds" || m->units(true) == tr("seconds")) {
                 value = QTime(0,0,0,0).addSecs(metricValue).toString("hh:mm:ss");
             } else {
-                value = QString("%1").arg(metricValue, 0, 'f', m->precision());
+                value = QString("%1").arg(metricValue, 0, 'f', m->precision(intervalNavigator->context->athlete->useMetricUnits));
             }
 
         } else {

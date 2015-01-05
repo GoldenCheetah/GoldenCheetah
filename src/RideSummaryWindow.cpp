@@ -677,7 +677,7 @@ RideSummaryWindow::htmlSummary()
                     // get the value - from metrics or from data array
                     if (ridesummary) {
                             QString v = QString("%1").arg(rideItem->getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
-                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
+                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision(useMetricUnits));
 
                             // W' over 100% is not a good thing!
                             if (symbol == "skiba_wprime_max" && rideItem->getForSymbol(symbol) > 100) {
@@ -1047,7 +1047,7 @@ RideSummaryWindow::htmlSummary()
                         summary += s.arg(QTime(0,0,0,0).addSecs(pace*60).toString("mm:ss"));
 
                     } else {
-                        summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision());
+                        summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision(useMetricUnits));
                     }
                 }
 
@@ -1612,7 +1612,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                 + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
 
                     // use right precision
-                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
+                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
 
                     // or maybe its a duration (worry about local lang or translated)
                     if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
@@ -1632,7 +1632,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         // use right precision
                         QString strValue = QString("%1%2").arg(value >= 0 ? "+" : "") // - sign added anyway
-                                                        .arg(value, 0, 'f', m->precision());
+                                                        .arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
 
                         // or maybe its a duration (worry about local lang or translated)
                         if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
@@ -1880,7 +1880,7 @@ RideSummaryWindow::htmlCompareSummary() const
                                                                                  context->athlete->useMetricUnits, true).toDouble();
 
                     // use right precision
-                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
+                    QString strValue = QString("%1").arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
 
                     // or maybe its a duration (worry about local lang or translated)
                     if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
@@ -1900,7 +1900,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         // use right precision
                         QString strValue = QString("%1%2").arg(value >= 0 ? "+" : "") // - sign added anyway
-                                                        .arg(value, 0, 'f', m->precision());
+                                                        .arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
 
                         // or maybe its a duration (worry about local lang or translated)
                         if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))

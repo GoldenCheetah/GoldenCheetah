@@ -298,7 +298,7 @@ ComparePane::refreshTable()
                                 + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
 
                     // use right precision
-                    strValue = QString("%1").arg(value, 0, 'f', m->precision());
+                    strValue = QString("%1").arg(value, 0, 'f', m->precision(context->athlete->useMetricUnits));
     
                     // or maybe its a duration (worry about local lang or translated)
                     if (m->units(true) == "seconds" || m->units(true) == tr("seconds"))
