@@ -1869,19 +1869,19 @@ class AvgRPCO : public RideMetric {
 
 //////////////////////////////////////////////////////////////////////////////
 
-class AvgLTDC : public RideMetric {
+class AvgLTPP : public RideMetric {
 
-    Q_DECLARE_TR_FUNCTIONS(AvgLTDC)
+    Q_DECLARE_TR_FUNCTIONS(AvgLTPP)
 
     public:
 
-    AvgLTDC()
+    AvgLTPP()
     {
-        setSymbol("average_ltdc");
-        setInternalName("Average Left Top Death Center");
+        setSymbol("average_ltpp");
+        setInternalName("Average Left Power Phase Start");
     }
     void initialize() {
-        setName(tr("Average Left Top Death Center"));
+        setName(tr("Average Left Top Power Phase Start"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -1914,24 +1914,24 @@ class AvgLTDC : public RideMetric {
         }
     }
 
-    RideMetric *clone() const { return new AvgLTDC(*this); }
+    RideMetric *clone() const { return new AvgLTPP(*this); }
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-class AvgRTDC : public RideMetric {
+class AvgRTPP : public RideMetric {
 
-    Q_DECLARE_TR_FUNCTIONS(AvgRTDC)
+    Q_DECLARE_TR_FUNCTIONS(AvgRTPP)
 
     public:
 
-    AvgRTDC()
+    AvgRTPP()
     {
-        setSymbol("average_rtdc");
-        setInternalName("Average Right Top Death Center");
+        setSymbol("average_rtpp");
+        setInternalName("Average Right Power Phase Start");
     }
     void initialize() {
-        setName(tr("Average Right Top Death Center"));
+        setName(tr("Average Right Top Power Phase Start"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -1964,25 +1964,25 @@ class AvgRTDC : public RideMetric {
         }
     }
 
-    RideMetric *clone() const { return new AvgRTDC(*this); }
+    RideMetric *clone() const { return new AvgRTPP(*this); }
 };
 
 
 //////////////////////////////////////////////////////////////////////////////
 
-class AvgLBDC : public RideMetric {
+class AvgLBPP : public RideMetric {
 
-    Q_DECLARE_TR_FUNCTIONS(AvgLBDC)
+    Q_DECLARE_TR_FUNCTIONS(AvgLBPP)
 
     public:
 
-    AvgLBDC()
+    AvgLBPP()
     {
         setSymbol("average_lbdc");
-        setInternalName("Average Left Bottom Death Center");
+        setInternalName("Average Left Power Phase Stop");
     }
     void initialize() {
-        setName(tr("Average Left Bottom Death Center"));
+        setName(tr("Average Left Power Phase Stop"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -2015,24 +2015,24 @@ class AvgLBDC : public RideMetric {
         }
     }
 
-    RideMetric *clone() const { return new AvgLBDC(*this); }
+    RideMetric *clone() const { return new AvgLBPP(*this); }
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-class AvgRBDC : public RideMetric {
+class AvgRBPP : public RideMetric {
 
-    Q_DECLARE_TR_FUNCTIONS(AvgRBDC)
+    Q_DECLARE_TR_FUNCTIONS(AvgRBPP)
 
     public:
 
-    AvgRBDC()
+    AvgRBPP()
     {
         setSymbol("average_rbdc");
-        setInternalName("Average Right Bottom Death Center");
+        setInternalName("Average Right Power Phase Stop");
     }
     void initialize() {
-        setName(tr("Average Right Bottom Death Center"));
+        setName(tr("Average Right Power Phase Stop"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -2065,7 +2065,7 @@ class AvgRBDC : public RideMetric {
         }
     }
 
-    RideMetric *clone() const { return new AvgRBDC(*this); }
+    RideMetric *clone() const { return new AvgRBPP(*this); }
 };
 
 
@@ -2080,10 +2080,10 @@ class AvgLTPPP : public RideMetric {
     AvgLTPPP()
     {
         setSymbol("average_ltppp");
-        setInternalName("Average Left Top Peak Power Phase");
+        setInternalName("Average Left Peak Power Phase Start");
     }
     void initialize() {
-        setName(tr("Average Left Top Peak Power Phase"));
+        setName(tr("Average Left Peak Power Phase Start"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -2130,10 +2130,10 @@ class AvgRTPPP : public RideMetric {
     AvgRTPPP()
     {
         setSymbol("average_rtppp");
-        setInternalName("Average Right Top Peak Power Phase");
+        setInternalName("Average Right Peak Power Phase Start");
     }
     void initialize() {
-        setName(tr("Average Right Top Peak Power Phase"));
+        setName(tr("Average Right Peak Power Phase Start"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -2181,10 +2181,10 @@ class AvgLBPPP : public RideMetric {
     AvgLBPPP()
     {
         setSymbol("average_lbppp");
-        setInternalName("Average Left Bottom Peak Power Phase");
+        setInternalName("Average Left Peak Power Phase Stop");
     }
     void initialize() {
-        setName(tr("Average Left Bottom Peak Power Phase"));
+        setName(tr("Average Left Peak Power Phase Stop"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -2231,10 +2231,10 @@ class AvgRBPPP : public RideMetric {
     AvgRBPPP()
     {
         setSymbol("average_rbppp");
-        setInternalName("Average Right Bottom Peak Power Phase");
+        setInternalName("Average Right Peak Power Phase Stop");
     }
     void initialize() {
-        setName(tr("Average Right Bottom Peak Power Phase"));
+        setName(tr("Average Right Peak Power Phase Stop"));
         setMetricUnits(tr("°"));
         setType(RideMetric::Average);
         setPrecision(0);
@@ -2279,10 +2279,10 @@ static bool addLeftRight()
     RideMetricFactory::instance().addMetric(AvgRPS(), &deps);
     RideMetricFactory::instance().addMetric(AvgLPCO(), &deps);
     RideMetricFactory::instance().addMetric(AvgRPCO(), &deps);
-    RideMetricFactory::instance().addMetric(AvgLTDC(), &deps);
-    RideMetricFactory::instance().addMetric(AvgRTDC(), &deps);
-    RideMetricFactory::instance().addMetric(AvgLBDC(), &deps);
-    RideMetricFactory::instance().addMetric(AvgRBDC(), &deps);
+    RideMetricFactory::instance().addMetric(AvgLTPP(), &deps);
+    RideMetricFactory::instance().addMetric(AvgRTPP(), &deps);
+    RideMetricFactory::instance().addMetric(AvgLBPP(), &deps);
+    RideMetricFactory::instance().addMetric(AvgRBPP(), &deps);
     RideMetricFactory::instance().addMetric(AvgLTPPP(), &deps);
     RideMetricFactory::instance().addMetric(AvgRTPPP(), &deps);
     RideMetricFactory::instance().addMetric(AvgLBPPP(), &deps);
