@@ -59,6 +59,18 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
     // and sort out at the end
     QDateTime rideDate;
 
+    // we collect summary data but discard it for all
+    // bar manual ride files where this is all we are 
+    // gonna get !
+    double manualDuration = 0.00f;
+    double manualWork = 0.00f;
+    double manualTSS = 0.00f;
+    double manualHR = 0.00f;
+    double manualSpeed = 0.00f;
+    double manualPower = 0.00f;
+    double manualKM = 0.00f;
+    double manualElevation = 0.00f;
+
     int intervals = 0;
     int samples = 0;
 
@@ -257,8 +269,57 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                     add.interval);
 
 
-        // ignored for now
+        
         } else if (node.nodeName() == "summarydata") {
+
+            // get the summary data in case there are no samples
+            // this is when there is a manual entry, so we can
+            // set the overrides from this
+
+            //<summarydata xmlns="http://www.peaksware.com/PWX/1/0">
+            //<duration>600</duration>
+            //<work>514.632000296428</work>
+            //<tss>100</tss>
+            //<hr></hr>
+            //<spd></spd>
+            //<pwr></pwr>
+            //<dist>23000</dist>
+            //<climbingelevation>14</climbingelevation>
+            //</summarydata>
+
+            // duration
+            QDomElement off = node.firstChildElement("duration");
+            if (!off.isNull()) manualDuration = off.text().toDouble();
+
+            // work
+            off = node.firstChildElement("work");
+            if (!off.isNull()) manualWork = off.text().toDouble();
+
+            // tss
+            off = node.firstChildElement("tss");
+            if (!off.isNull()) manualTSS = off.text().toDouble();
+
+            // hr
+            off = node.firstChildElement("hr");
+            if (!off.isNull()) manualHR = off.text().toDouble();
+
+            // speed
+            off = node.firstChildElement("spd");
+            if (!off.isNull()) manualSpeed = off.text().toDouble();
+
+            // power
+            off = node.firstChildElement("pwr");
+            if (!off.isNull()) manualPower = off.text().toDouble();
+
+            // distance
+            off = node.firstChildElement("dist");
+            if (!off.isNull()) manualKM = off.text().toDouble();
+
+            // Elevation
+            off = node.firstChildElement("climbingelevation");
+            if (!off.isNull()) manualElevation = off.text().toDouble();
+
+
         } else if (node.nodeName() == "extension") {
         }
 
@@ -267,9 +328,70 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
 
     // post-process and check
     if (samples < 2) {
-        errors << "Not enough samples present";
-        delete rideFile;
-        return NULL;
+
+        // set to 1s, it really doesn't matter!
+        rideFile->setRecIntSecs(1.0f);
+
+        // we're creating a manual ride file so
+        // set the overrides from the supplied summarydata
+
+        // distance
+        if (manualKM) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualKM / 1000)); // its in meters
+            rideFile->metricOverrides.insert("total_distance", override);
+        }
+
+        // duration
+        if (manualDuration) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualDuration));
+            rideFile->metricOverrides.insert("workout_time", override);
+            rideFile->metricOverrides.insert("time_riding", override);
+        }
+
+        // work
+        if (manualWork) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualWork));
+            rideFile->metricOverrides.insert("total_work", override);
+        }
+
+        // TSS
+        if (manualTSS) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualTSS));
+            rideFile->metricOverrides.insert("coggan_tss", override);
+        }
+
+        // HR
+        if (manualHR) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualHR));
+            rideFile->metricOverrides.insert("average_hr", override);
+        }
+
+        // Speed
+        if (manualSpeed) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualSpeed));
+            rideFile->metricOverrides.insert("average_speed", override);
+        }
+
+        // Power
+        if (manualPower) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualPower));
+            rideFile->metricOverrides.insert("average_power", override);
+        }
+
+        // Elevation Gain
+        if (manualElevation) {
+            QMap<QString,QString> override;
+            override.insert("value", QString("%1").arg(manualElevation));
+            rideFile->metricOverrides.insert("elevation_gain", override);
+        }
+
     } else {
 
         // need to determine the recIntSecs - first - second sample?
