@@ -174,6 +174,7 @@ RideCacheModel::configChanged(qint32)
     // 5    bool isRun;
 
     columns_ = 5 + factory->metricCount() + metadata.count();
+    headings_.clear();
 
     for (int section=0; section<columns_; section++) {
 
@@ -206,10 +207,10 @@ RideCacheModel::configChanged(qint32)
         }
     }
 
+    headerDataChanged (Qt::Horizontal, 0, columns_-1);
+
     // all good
     endResetModel();
-
-    headerDataChanged (Qt::Horizontal, 0, columns_-1);
 }
 
 // catch ridecache refreshes
