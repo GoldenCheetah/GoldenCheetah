@@ -737,8 +737,16 @@ LTMPlot::setData(LTMSettings *set)
             QMap<double, int> sortedList;
 
             // copy the yvalues, retaining the offset
-            for(int i=0; i<ydata.count(); i++)
-                sortedList.insert(ydata[i], i);
+            for(int i=0; i<ydata.count(); i++) {
+                // pmc metrics we highlight TROUGHS
+                if (metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_PM) {
+                    if (i && i < (ydata.count()-1) // not at start/end
+                        && ((ydata[i-1] > ydata[i] && ydata[i+1] > ydata[i]) || // is a trough 
+                            (ydata[i-1] < ydata[i] && ydata[i+1] < ydata[i])))  // is a peak 
+                        sortedList.insert(ydata[i], i);
+                } else 
+                    sortedList.insert(ydata[i], i);
+            }
 
             // copy the top N values
             QVector<double> hxdata, hydata;
@@ -1749,9 +1757,17 @@ LTMPlot::setCompareData(LTMSettings *set)
 
                 QMap<double, int> sortedList;
 
-                // copy the yvalues, retaining the offset
-                for(int i=0; i<ydata.count(); i++)
-                    sortedList.insert(ydata[i], i);
+                for(int i=0; i<ydata.count(); i++) {
+                    // pmc metrics we highlight TROUGHS
+                    if (metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_PM) {
+                        if (i && i < (ydata.count()-1) // not at start/end
+                            && ((ydata[i-1] > ydata[i] && ydata[i+1] > ydata[i]) || // is a trough 
+                                (ydata[i-1] < ydata[i] && ydata[i+1] < ydata[i])))  // is a peak 
+                            sortedList.insert(ydata[i], i);
+                    } else 
+                        sortedList.insert(ydata[i], i);
+                }
+
 
                 // copy the top N values
                 QVector<double> hxdata, hydata;
