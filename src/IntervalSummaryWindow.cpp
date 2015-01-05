@@ -245,7 +245,7 @@ void IntervalSummaryWindow::summary(RideFile &f, QString name, QString &html)
             bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
             html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricPace)*60).toString("mm:ss"));
         } else
-            html += s.arg(m->value(metricUnits), 0, 'f', m->precision());
+            html += s.arg(m->value(metricUnits), 0, 'f', m->precision(metricUnits));
 
         html += "<td align=\"left\" valign=\"bottom\">";
         if (m->units(metricUnits) == "seconds" ||
@@ -323,7 +323,7 @@ void IntervalSummaryWindow::calcInterval(RideFileInterval interval, QString& htm
             bool metricPace = appsettings->value(this, GC_PACE, true).toBool();
             html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricPace)*60).toString("mm:ss"));
         } else
-            html += s.arg(m->value(metricUnits), 0, 'f', m->precision());
+            html += s.arg(m->value(metricUnits), 0, 'f', m->precision(metricUnits));
 
         html += "<td align=\"left\" valign=\"bottom\">";
         if (m->units(metricUnits) == "seconds" ||
