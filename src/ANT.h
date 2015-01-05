@@ -132,6 +132,7 @@ struct setChannelAtom {
 #define ANT_STANDARD_POWER     0x10
 #define ANT_WHEELTORQUE_POWER  0x11
 #define ANT_CRANKTORQUE_POWER  0x12
+#define ANT_TE_AND_PS_POWER    0x13
 #define ANT_CRANKSRM_POWER     0x20
 
 // ANT messages
@@ -398,6 +399,20 @@ public:
         telemetry.setAltWatts(x);
     }
     void setHb(double smo2, double thb);
+
+    void setLRBalance (double lrbalance) {
+        telemetry.setLRBalance(lrbalance);
+    }
+
+    void setTE(double lte, double rte) {
+        telemetry.setLTE(lte);
+        telemetry.setRTE(rte);
+    }
+
+    void setPS(double lps, double rps) {
+        telemetry.setLPS(lps);
+        telemetry.setRPS(rps);
+    }
 
     void setVortexData(int channel, int id);
 

@@ -116,7 +116,8 @@ class ANTMessage {
         uint8_t data_page, calibrationID, ctfID;
         uint16_t srmOffset, srmSlope, srmSerial;
         uint8_t eventCount;
-        uint8_t pedalPower;
+        bool pedalPowerContribution; // power - if true, right pedal power % of contribution is filled in "pedalPower"
+        uint8_t pedalPower; // power - if pedalPowerContribution is true, % contribution of right pedal
         uint16_t measurementTime, wheelMeasurementTime, crankMeasurementTime;
         uint8_t heartrateBeats, instantHeartrate; // heartrate
         uint16_t slope, period, torque; // power
@@ -127,10 +128,13 @@ class ANTMessage {
         bool utcTimeRequired; // moxy
         uint8_t moxyCapabilities; //moxy
         double tHb, oldsmo2, newsmo2; //moxy
+        uint8_t leftTorqueEffectiveness, rightTorqueEffectiveness; // power - TE&PS
+        uint8_t leftOrCombinedPedalSmoothness, rightPedalSmoothness; // power - TE&PS
         // tacx vortex fields - only what we care about now, for more check decoding
         uint16_t vortexId, vortexSpeed, vortexPower, vortexCadence;
         uint8_t vortexCalibration, vortexCalibrationState, vortexPage;
         uint8_t vortexUsingVirtualSpeed;
+
 
     private:
         void init();
