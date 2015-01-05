@@ -86,15 +86,9 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     QwtPlot(parent),
     bydist(false),
     context(context),
+    rideItem(NULL),
     groupMatch(false)
 {
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
-
-    QPalette pal = palette();
-    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
-    setPalette(pal);
-
     // tick draw
     //TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
     //tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -120,7 +114,19 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     connect(canvasPicker, SIGNAL(pointClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveClick(QwtPlotIntervalCurve*)));
     connect(canvasPicker, SIGNAL(pointDblClicked(QwtPlotIntervalCurve*,int)), this, SLOT(intervalCurveDblClick(QwtPlotIntervalCurve*)));
 
+    configChanged(CONFIG_APPEARANCE);
+}
 
+void
+AllPlotInterval::configChanged(qint32)
+{
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    setPalette(pal);
+    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
+    update();
+    replot();
 }
 
 void

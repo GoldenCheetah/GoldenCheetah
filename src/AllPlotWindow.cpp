@@ -795,6 +795,11 @@ AllPlotWindow::configChanged(qint32 state)
     fullPlot->configChanged(state);
     fullPlot->update();
 
+    intervalPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    intervalPlot->setPalette(palette);
+    intervalPlot->configChanged(state);
+    intervalPlot->update();
+
     // allPlot of course
     allPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     allPlot->setPalette(palette);

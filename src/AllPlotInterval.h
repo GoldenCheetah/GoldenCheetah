@@ -66,16 +66,14 @@ class AllPlotInterval : public QwtPlot
 
         bool bydist;
 
-
-
-
     public slots:
+
         void intervalHover(RideFileInterval chosen);
         void intervalCurveHover(QwtPlotIntervalCurve *); // for tooltip
         void intervalCurveClick(QwtPlotIntervalCurve *curve);
         void intervalCurveDblClick(QwtPlotIntervalCurve *curve);
 
-
+        void configChanged(qint32); // when colors change
 
     protected:
         void sortIntervals(QList<RideFileInterval> &intervals, QList<QList<RideFileInterval> > &intervalsGroups);
