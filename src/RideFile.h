@@ -34,7 +34,7 @@ class WPrime;
 class RideFile;
 struct RideFilePoint;
 struct RideFileDataPresent;
-struct RideFileInterval;
+class RideFileInterval;
 class EditorData;      // attached to a RideFile
 class RideFileCommand; // for manipulating ride data
 class Context;      // for context; cyclist, homedir
@@ -82,23 +82,27 @@ struct RideFileDataPresent
 
 };
 
-struct RideFileInterval
+class RideFileInterval
 {
-    double start, stop;
-    QString name;
-    RideFileInterval() : start(0.0), stop(0.0) {}
-    RideFileInterval(double start, double stop, QString name) :
-        start(start), stop(stop), name(name) {}
+    Q_DECLARE_TR_FUNCTIONS(RideFileInterval);
 
-    // order bu start time (and stop+name for QMap)
-    bool operator< (RideFileInterval right) const { return start < right.start ||
+    public:
+
+        double start, stop;
+        QString name;
+        RideFileInterval() : start(0.0), stop(0.0) {}
+        RideFileInterval(double start, double stop, QString name) : start(start), stop(stop), name(name) {}
+
+        // order bu start time (and stop+name for QMap)
+        bool operator< (RideFileInterval right) const { return start < right.start ||
                                                         (start == right.start && stop < right.stop) ||
                                                         (start == right.start && stop == right.stop && name < right.name); }
-    bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop && name == right.name; }
-    bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
+        bool operator== (RideFileInterval right) const { return start == right.start && stop == right.stop && name == right.name; }
+        bool operator!= (RideFileInterval right) const { return start != right.start || stop != right.stop; }
 
-    bool isPeak() const { return QRegExp("^(Peak *[0-9]*(s|min)|Entire workout|Find #[0-9]*) *\\([^)]*\\)$").exactMatch(name); }
-    bool isMatch() const { return QRegExp("^(Match ).*").exactMatch(name); }
+        bool isPeak() const;
+        bool isMatch() const;
+        bool isClimb() const;
 };
 
 struct RideFileCalibration

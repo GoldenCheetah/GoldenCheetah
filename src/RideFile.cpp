@@ -2090,3 +2090,26 @@ RideFile::getHeight()
 {
     return context->athlete->getHeight(this);
 }
+
+//
+// Intervals...
+//
+bool 
+RideFileInterval::isPeak() const 
+{ 
+    QString peak = QString("^(%1 *[0-9]*(s|min)|Entire workout|%2 #[0-9]*) *\\([^)]*\\)$").arg(tr("Peak")).arg(tr("Find"));
+    return QRegExp(peak).exactMatch(name);
+}
+
+bool 
+RideFileInterval::isMatch() const 
+{ 
+    QString match = QString("^(%1 ).*").arg(tr("Match"));
+    return QRegExp(match).exactMatch(name); 
+}
+bool 
+RideFileInterval::isClimb() const 
+{ 
+    QString climb = QString("^(%1 ).*").arg(tr("Climb"));
+    return QRegExp(climb).exactMatch(name); 
+}
