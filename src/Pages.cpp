@@ -4170,16 +4170,39 @@ LTPage::zonesChanged()
 PaceZonePage::PaceZonePage(Context *context) : context(context)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
+    QHBoxLayout *hlayout = new QHBoxLayout;
+
+    sportLabel = new QLabel(tr("Sport:"));
+    sportCombo = new QComboBox();
+    sportCombo->addItem(tr("Run"));
+    sportCombo->addItem(tr("Swim"));
+    sportCombo->setCurrentIndex(0);
+    hlayout->addWidget(sportLabel);
+    hlayout->addWidget(sportCombo, Qt::AlignLeft);
+    layout->addLayout(hlayout);
+    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport()));
+    zones = NULL;
+    tabs = NULL;
+    // finish setup for the default sport
+    changeSport();
+}
+
+void
+PaceZonePage::changeSport()
+{
+    delete zones;
+    zones = new PaceZones(sportCombo->currentIndex() > 0);
 
     // get current config by reading it in (leave mainwindow zones alone)
-    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/pace.zones");
+    QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones->fileName());
     if (zonesFile.exists()) {
-        zones.read(zonesFile);
+        zones->read(zonesFile);
         zonesFile.close();
-        b4Fingerprint = zones.getFingerprint(); // remember original state
+        b4Fingerprint = zones->getFingerprint(); // remember original state
     }
 
     // setup maintenance pages using current config
+    delete tabs; // schemePage & cvPage deleted by parent-child relationship
     schemePage = new PaceSchemePage(this);
     cvPage = new CVPage(this);
 
@@ -4187,23 +4210,23 @@ PaceZonePage::PaceZonePage(Context *context) : context(context)
     tabs->addTab(cvPage, tr("Critical Velocity"));
     tabs->addTab(schemePage, tr("Default"));
 
-    layout->addWidget(tabs);
+    layout()->addWidget(tabs);
 }
 
 qint32
 PaceZonePage::saveClicked()
 {
     // write it
-    appsettings->setValue(GC_PACE, cvPage->metric->isChecked());
-    zones.setScheme(schemePage->getScheme());
-    zones.write(context->athlete->home->config());
+    appsettings->setValue(zones->paceSetting(), cvPage->metric->isChecked());
+    zones->setScheme(schemePage->getScheme());
+    zones->write(context->athlete->home->config());
 
     // reread Pace zones
-    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/pace.zones");
+    QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_->fileName());
     context->athlete->pacezones_->read(pacezonesFile);
 
     // did we change ?
-    if (zones.getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
+    if (zones->getFingerprint() != b4Fingerprint) return CONFIG_ZONES;
     else return 0;
 }
 
@@ -4240,15 +4263,15 @@ PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
     //scheme->header()->resizeSection(2,80);
 
     // setup list
-    for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
+    for (int i=0; i< zonePage->zones->getScheme().nzones_default; i++) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
         // tab name
-        add->setText(0, zonePage->zones.getScheme().zone_default_name[i]);
+        add->setText(0, zonePage->zones->getScheme().zone_default_name[i]);
         // field name
-        add->setText(1, zonePage->zones.getScheme().zone_default_desc[i]);
+        add->setText(1, zonePage->zones->getScheme().zone_default_desc[i]);
 
         // low
         QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
@@ -4256,7 +4279,7 @@ PaceSchemePage::PaceSchemePage(PaceZonePage* zonePage) : zonePage(zonePage)
         loedit->setMaximum(1000);
         loedit->setSingleStep(1.0);
         loedit->setDecimals(0);
-        loedit->setValue(zonePage->zones.getScheme().zone_default[i]);
+        loedit->setValue(zonePage->zones->getScheme().zone_default[i]);
         scheme->setItemWidget(add, 2, loedit);
     }
 
@@ -4368,16 +4391,6 @@ PaceSchemePage::getScheme()
     return results;
 }
 
-static inline
-double kphFromTime(QTimeEdit *cvedit, bool isminmile)
-{
-    // get the value from a time edit and convert
-    // it to kph so we can store it in the zones file
-
-    double secs = cvedit->time().secsTo(QTime(0,0,0)) * -1;
-    return (isminmile ? KM_PER_MILE : 1.00f ) * (3600.00f / secs);
-}
-
 CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
 {
     active = false;
@@ -4426,9 +4439,8 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
 
     per = new QLabel(this);
     metric = new QCheckBox("Metric Pace");
-    metric->setChecked(appsettings->value(this, GC_PACE, true).toBool());
-    if (metric->isChecked()) per->setText("per km");
-    else per->setText("per mile");
+    metric->setChecked(appsettings->value(this, zonePage->zones->paceSetting(), true).toBool());
+    per->setText(zonePage->zones->paceUnits(metric->isChecked()));
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
@@ -4457,26 +4469,28 @@ CVPage::CVPage(PaceZonePage* zonePage) : zonePage(zonePage)
     //ranges->header()->resizeSection(0,180);
 
     // setup list of ranges
-    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
+    for (int i=0; i< zonePage->zones->getRangeSize(); i++) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
 
         // Embolden ranges with manually configured zones
         QFont font;
-        font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCV ?
+        font.setWeight(zonePage->zones->getZoneRange(i).zonesSetFromCV ?
                                         QFont::Normal : QFont::Black);
 
         // date
-        add->setText(0, zonePage->zones.getStartDate(i).toString(tr("MMM d, yyyy")));
+        add->setText(0, zonePage->zones->getStartDate(i).toString(tr("MMM d, yyyy")));
         add->setFont(0, font);
 
         // CV
-        double kph = zonePage->zones.getCV(i);
-        double minsPerKM = 60.00f / kph;
-        double minsPerMile = minsPerKM * KM_PER_MILE;
+        double kph = zonePage->zones->getCV(i);
 
-        add->setText(1, QString("%1 min/km %2 min/mile").arg(minsPerKM, 0, 'f', 2).arg(minsPerMile, 0, 'f', 2));
+        add->setText(1, QString("%1 %2 %3 %4")
+                    .arg(zonePage->zones->kphToPaceString(kph, true))
+                    .arg(zonePage->zones->paceUnits(true))
+                    .arg(zonePage->zones->kphToPaceString(kph, false))
+                    .arg(zonePage->zones->paceUnits(false)));
         add->setFont(1, font);
 
     }
@@ -4514,8 +4528,7 @@ void
 CVPage::metricChanged()
 {
     // need to switch between metric and imperial!
-    if (metric->isChecked()) per->setText("per km");
-    else per->setText("per mile");
+    per->setText(zonePage->zones->paceUnits(metric->isChecked()));
 
 }
 
@@ -4523,9 +4536,9 @@ void
 CVPage::addClicked()
 {
     // get current scheme
-    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+    zonePage->zones->setScheme(zonePage->schemePage->getScheme());
 
-    int cp = kphFromTime(cvEdit, !metric->isChecked());
+    int cp = zonePage->zones->kphFromTime(cvEdit, metric->isChecked());
     if( cp <= 0 ){
         QMessageBox err;
         err.setText(tr("CV must be > 0"));
@@ -4534,7 +4547,7 @@ CVPage::addClicked()
         return;
     }
 
-    int index = zonePage->zones.addZoneRange(dateEdit->date(), kphFromTime(cvEdit, !metric->isChecked()));
+    int index = zonePage->zones->addZoneRange(dateEdit->date(), zonePage->zones->kphFromTime(cvEdit, metric->isChecked()));
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -4544,12 +4557,14 @@ CVPage::addClicked()
     // date
     add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
 
-    // CP
-    double kph = kphFromTime(cvEdit, !metric->isChecked());
-    double minsPerKM = 60.00f / kph;
-    double minsPerMile = minsPerKM * KM_PER_MILE;
+    // CV
+    double kph = zonePage->zones->kphFromTime(cvEdit, metric->isChecked());
 
-    add->setText(1, QString("%1 min/km %2 min/mile").arg(minsPerKM, 0, 'f', 2).arg(minsPerMile, 0, 'f', 2));
+    add->setText(1, QString("%1 %2 %3 %4")
+            .arg(zonePage->zones->kphToPaceString(kph, true))
+            .arg(zonePage->zones->paceUnits(true))
+            .arg(zonePage->zones->kphToPaceString(kph, false))
+            .arg(zonePage->zones->paceUnits(false)));
 
 }
 
@@ -4559,7 +4574,7 @@ CVPage::deleteClicked()
     if (ranges->currentItem()) {
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
         delete ranges->invisibleRootItem()->takeChild(index);
-        zonePage->zones.deleteRange(index);
+        zonePage->zones->deleteRange(index);
     }
 }
 
@@ -4569,7 +4584,7 @@ CVPage::defaultClicked()
     if (ranges->currentItem()) {
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = zonePage->zones.getZoneRange(index);
+        PaceZoneRange current = zonePage->zones->getZoneRange(index);
 
         // unbold
         QFont font;
@@ -4580,8 +4595,8 @@ CVPage::defaultClicked()
 
 
         // set the range to use defaults on the scheme page
-        zonePage->zones.setScheme(zonePage->schemePage->getScheme());
-        zonePage->zones.setZonesFromCV(index);
+        zonePage->zones->setScheme(zonePage->schemePage->getScheme());
+        zonePage->zones->setZonesFromCV(index);
 
         // hide the default button since we are now using defaults
         defaultButton->hide();
@@ -4606,14 +4621,14 @@ CVPage::rangeSelectionChanged()
     if (ranges->currentItem()) {
 
         int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = zonePage->zones.getZoneRange(index);
+        PaceZoneRange current = zonePage->zones->getZoneRange(index);
 
         if (current.zonesSetFromCV) {
 
             // reapply the scheme in case it has been changed
-            zonePage->zones.setScheme(zonePage->schemePage->getScheme());
-            zonePage->zones.setZonesFromCV(index);
-            current = zonePage->zones.getZoneRange(index);
+            zonePage->zones->setScheme(zonePage->schemePage->getScheme());
+            zonePage->zones->setZonesFromCV(index);
+            current = zonePage->zones->getZoneRange(index);
 
             defaultButton->hide();
 
@@ -4633,8 +4648,8 @@ CVPage::rangeSelectionChanged()
             QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
             loedit->setMinimum(0);
             loedit->setMaximum(1000);
-            loedit->setSingleStep(1.0);
-            loedit->setDecimals(0);
+            loedit->setSingleStep(0.1);
+            loedit->setDecimals(1);
             loedit->setValue(current.zones[i].lo);
             zones->setItemWidget(add, 2, loedit);
             connect(loedit, SIGNAL(valueChanged(double)), this, SLOT(zonesChanged()));
@@ -4723,7 +4738,7 @@ CVPage::zonesChanged()
         if (ranges->currentItem()) {
 
             int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            PaceZoneRange current = zonePage->zones.getZoneRange(index);
+            PaceZoneRange current = zonePage->zones->getZoneRange(index);
 
             // embolden that range on the list to show it has been edited
             QFont font;
@@ -4761,7 +4776,7 @@ CVPage::zonesChanged()
             current.zones = zoneinfos;
 
             // now replace the current range struct
-            zonePage->zones.setZoneRange(index, current);
+            zonePage->zones->setZoneRange(index, current);
         }
     }
 }

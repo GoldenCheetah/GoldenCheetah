@@ -849,9 +849,10 @@ class PaceZonePage : public QWidget
     public:
 
         PaceZonePage(Context *);
+        ~PaceZonePage() { delete zones; }
         qint32 saveClicked();
 
-        PaceZones zones;
+        PaceZones* zones;
         quint16 b4Fingerprint; // how did it start ?
 
         // Children talk to each other
@@ -868,7 +869,14 @@ class PaceZonePage : public QWidget
 
         QTabWidget *tabs;
 
-        // local versions for modification
+    private:
+
+        QLabel *sportLabel;
+        QComboBox *sportCombo;
+
+    private slots:
+        void changeSport();
+
 };
 
 // Seasons
