@@ -674,8 +674,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                } else {
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
-                                          headwind, slope, temp, 0.0,
-                                          0.0, 0.0, 0.0, 0.0,
+                                          headwind, slope, temp, lrbalance,
+                                          lte, rte, lps, rps,
                                           0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,

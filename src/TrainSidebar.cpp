@@ -393,6 +393,7 @@ intensity->hide(); //XXX!!! temporary
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
+    displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -1055,6 +1056,11 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayHeartRate = rtData.getHr();
     displaySpeed = rtData.getSpeed();
     load = rtData.getLoad();
+    displayLRBalance = rtData.getLRBalance();
+    displayLTE = rtData.getLTE();
+    displayRTE = rtData.getRTE();
+    displayLPS = rtData.getLPS();
+    displayRPS = rtData.getRPS();
     // Gradient not supported
     return;
 }
@@ -1126,6 +1132,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (dev == wattsTelemetry) {
                     rtData.setWatts(local.getWatts());
                     rtData.setAltWatts(local.getAltWatts());
+                    rtData.setLRBalance(local.getLRBalance());
+                    rtData.setLTE(local.getLTE());
+                    rtData.setRTE(local.getRTE());
+                    rtData.setLPS(local.getLPS());
+                    rtData.setRPS(local.getRPS());
                 }
             }
 
@@ -1159,6 +1170,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displaySpeed = rtData.getSpeed();
             load = rtData.getLoad();
             slope = rtData.getSlope();
+            displayLRBalance = rtData.getLRBalance();
+            displayLTE = rtData.getLTE();
+            displayRTE = rtData.getRTE();
+            displayLPS = rtData.getLPS();
+            displayRPS = rtData.getRPS();
 
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces
@@ -1286,11 +1302,11 @@ void TrainSidebar::diskUpdate()
                         << "," // slope
                         << "," // temp
                         << "," << (displayLap + displayWorkoutLap)
-                        << "," // lrbalance
-                        << "," // lte
-                        << "," // rte
-                        << "," // lps
-                        << "," // rps
+                        << "," << displayLRBalance
+                        << "," << displayLTE
+                        << "," << displayRTE
+                        << "," << displayLPS
+                        << "," << displayRPS
                         << "," // smo2
                         << "," // thb
                         << "," // o2hb
