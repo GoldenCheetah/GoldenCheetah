@@ -40,7 +40,10 @@ static const QDate date_infinity(9999,12,31);
 // initialize default static zone parameters
 void PaceZones::initializeZoneParameters()
 {
-    // these default zones are based upon the Skiba pace zones 
+    int* initial_zone_default;
+    int initial_nzones_default;
+
+    // these default zones are based upon the Skiba run pace zones
     // but expressed as a percentage of Critical Velocity in km/h
     // rather than as a percentage of LT Pace in minutes/mile
     //
@@ -52,9 +55,41 @@ void PaceZones::initializeZoneParameters()
     // Vo2Max        94 - 84      105 - 119
     // Anaerobic       < 84         > 119
     //
-    static int initial_zone_default[] = {
+    static int initial_zone_default_run[] = {
         0, 80, 87, 95, 105, 119
     };
+
+    // these default zones are based upon the Skiba swim pace zones
+    // but expressed as a percentage of Critical Velocity in km/h
+    // rather than as a percentage of LT Pace in minutes/100yd
+    //
+    // Name         %LT Pace         %CV
+    // AR              > 107        0 - 93
+    // Endurance    107 - 103      93 - 97
+    // Tempo        103 - 101      97 - 99
+    // Threshold    101 - 98       99 - 102
+    // Vo2Max        98 - 92      102 - 109
+    // Anaerobic       < 92         > 109
+    //
+    static int initial_zone_default_swim[] = {
+        0, 93, 97, 99, 102, 109
+    };
+
+    if (swim) {
+        fileName_ = "swim-pace.zones";
+        initial_zone_default = initial_zone_default_swim;
+        initial_nzones_default =
+            sizeof(initial_zone_default_swim) /
+            sizeof(initial_zone_default_swim[0]);
+
+    } else {
+        fileName_ = "run-pace.zones";
+        initial_zone_default = initial_zone_default_run;
+        initial_nzones_default =
+            sizeof(initial_zone_default_run) /
+            sizeof(initial_zone_default_run[0]);
+    }
+
     static const QString initial_zone_default_desc[] = {
         tr("Active Recovery"), tr("Endurance"), tr("Tempo"), tr("Threshold"),
         tr("VO2Max"), tr("Anaerobic")
@@ -62,10 +97,6 @@ void PaceZones::initializeZoneParameters()
     static const char *initial_zone_default_name[] = {
         "Z1", "Z2", "Z3", "Z4", "Z5", "Z6"
     };
-
-    static int initial_nzones_default =
-        sizeof(initial_zone_default) /
-        sizeof(initial_zone_default[0]);
 
     scheme.zone_default.clear();
     scheme.zone_default_is_pct.clear();
@@ -109,7 +140,7 @@ bool PaceZones::read(QFile &file)
 
     // read using text mode takes care of end-lines
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        err = "can't open file";
+        err = tr("can't open file");
         return false;
     }
     QTextStream fileStream(&file);
@@ -161,13 +192,13 @@ bool PaceZones::read(QFile &file)
 
             // defaults are allowed only at the beginning of the file
             if (ranges.size()) {
-                err = "Zone defaults must be specified at head of pace.zones file";
+                err = tr("Zone defaults must be specified at head of %1 file").arg(fileName_);
                 return false;
             }
 
             // only one set of defaults is allowed
             if (scheme.nzones_default) {
-                err = "Only one set of zone defaults may be specified in pace.zones file";
+                err = tr("Only one set of zone defaults may be specified in %1 file").arg(fileName_);
                 return false;
             }
 
@@ -419,7 +450,7 @@ next_line: {}
         if (ranges[nr].cv <= 0) {
 
             err = tr("CV must be greater than zero in zone "
-                     "range %1 of pace.zones").arg(nr + 1);
+                     "range %1 of %2").arg(nr + 1).arg(fileName_);
             return false;
         }
 
@@ -654,15 +685,15 @@ QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor col
     // are we in metric or imperial ?
     bool metric = appsettings->value(this, GC_PACE, true).toBool();
     QString cvunit = metric ? "kph" : "mph";
-    QString paceunit = metric ? "min/km" : "min/mile";
     double cvfactor = metric ? 1.0f : KM_PER_MILE;
+    QString paceunit = this->paceUnits(metric);
 
     QString summary;
     if(range.cv > 0) {
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
         summary += "<tr><td align=\"center\">";
         summary += tr("Critical Velocity: %3%4 (%2%1)").arg(cvunit).arg(range.cv / cvfactor, 0, 'f', 2)
-                                                        .arg(kphToPace(range.cv, metric))
+                                                        .arg(this->kphToPaceString(range.cv, metric))
                                                         .arg(paceunit);
         summary += "</td></tr></table>";
     }
@@ -692,10 +723,10 @@ QString PaceZones::summarize(int rnum, QVector<double> &time_in_zone, QColor col
                 summary += "<tr bgcolor='" + color.name() + "'>"; else
                 summary += "<tr>"; summary += QString("<td align=\"center\">%1</td>").arg(name);
             summary += QString("<td align=\"center\">%1</td>").arg(desc);
-            summary += QString("<td align=\"center\">%1</td>").arg(kphToPace(lo, metric));
+            summary += QString("<td align=\"center\">%1</td>").arg(this->kphToPaceString(lo, metric));
             if (hi == INT_MAX)
                 summary += "<td align=\"center\">MAX</td>"; else
-                summary += QString("<td align=\"center\">%1</td>").arg(kphToPace(hi, metric));
+                summary += QString("<td align=\"center\">%1</td>").arg(this->kphToPaceString(hi, metric));
                 summary += QString("<td align=\"center\">%1</td>").arg(time_to_string((unsigned) round(time_in_zone[zone])));
             summary += QString("<td align=\"center\">%1</td>")
                        .arg((double)time_in_zone[zone]/duration * 100, 0, 'f', 0);
@@ -780,7 +811,7 @@ void PaceZones::write(QDir home)
 #endif
     }
 
-    QFile file(home.canonicalPath() + "/pace.zones");
+    QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
@@ -944,4 +975,41 @@ PaceZones::getFingerprint(QDate forDate) const
     QByteArray ba = QByteArray::number(x);
 
     return qChecksum(ba, ba.length()); 
+}
+
+double
+PaceZones::kphFromTime(QTimeEdit *cvedit, bool metric) const
+{
+    // get the value from a time edit and convert
+    // it to kph so we can store it in the zones file
+
+    double secs = cvedit->time().secsTo(QTime(0,0,0)) * -1;
+    if (swim)
+        return (metric ? 1.00f : METERS_PER_YARD ) * (360.00f / secs);
+    else
+        return (metric ? 1.00f : KM_PER_MILE ) * (3600.00f / secs);
+}
+
+QString
+PaceZones::kphToPaceString(double kph, bool metric) const
+{
+    if (swim)
+        return kphToPace(kph * 10.00f * (metric ? 1.00f : METERS_PER_YARD), true);
+    else
+        return kphToPace(kph, metric);
+}
+
+QString
+PaceZones::paceUnits(bool metric) const
+{
+    if (swim)
+        return metric ? tr("min/100m") : tr("min/100yd");
+    else
+        return metric ? tr("min/km") : tr("min/mile");
+}
+
+QString
+PaceZones::paceSetting() const
+{
+    return swim ? GC_SWIMPACE : GC_PACE;
 }
