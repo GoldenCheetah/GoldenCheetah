@@ -247,8 +247,9 @@ AllPlotInterval::setColorForIntervalCurve(QwtPlotIntervalCurve *intervalCurve, c
         color = Qt::lightGray;
     } else if (interval.isMatch()) {
         color = Qt::red;
-    }
-    else {
+    } else if (interval.isClimb()) {
+        color = Qt::darkGreen;
+    } else {
         color = GColor(CINTERVALHIGHLIGHTER);
     }
 
