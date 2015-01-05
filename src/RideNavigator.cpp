@@ -156,7 +156,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : context(contex
     setAcceptDrops(true);
 
     // lets go
-    configChanged(CONFIG_APPEARANCE | CONFIG_NOTECOLOR);
+    configChanged(CONFIG_APPEARANCE | CONFIG_NOTECOLOR | CONFIG_FIELDS);
 }
 
 RideNavigator::~RideNavigator()
@@ -166,7 +166,7 @@ RideNavigator::~RideNavigator()
 }
 
 void
-RideNavigator::configChanged(qint32)
+RideNavigator::configChanged(qint32 state)
 {
     ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();
@@ -194,6 +194,9 @@ RideNavigator::configChanged(qint32)
     }
 
 #endif
+
+    // if the fields changed we need to reset indexes etc
+    if (state & CONFIG_FIELDS) resetView();
 
     refresh();
 }
@@ -347,6 +350,9 @@ RideNavigator::resetView()
 
     // Select the current ride
     cursorRide();
+
+    // get height
+    tableView->doItemsLayout();
 
     columnsChanged();
 }
