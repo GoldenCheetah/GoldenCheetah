@@ -233,13 +233,13 @@ RideEditor::whatColumns()
          << tr("Right PS")
          << tr("Left Platform Center Offset")
          << tr("Right Platform Center Offset")
-         << tr("Left Top Dead Center")
-         << tr("Right Top Dead Center")
-         << tr("Left Bottom Dead Center")
-         << tr("Right Bottom Dead Center")
+         << tr("Left Power Phase Start")
+         << tr("Left Power Phase End")
+         << tr("Right Power Phase Start")
+         << tr("Right Power Phase End")
          << tr("Left Peak Power Phase Start")
-         << tr("Right Peak Power Phase Start")
          << tr("Left Peak Power Phase End")
+         << tr("Right Peak Power Phase Start")
          << tr("Right Peak Power Phase End")
          << tr("SmO2")
          << tr("tHb")
@@ -839,14 +839,14 @@ RideEditor::insColumn(QString name)
     if (name == tr("Right PS")) series = RideFile::rps;  
     if (name == tr("Left Platform Center Offset")) series = RideFile::lpco;
     if (name == tr("Right Platform Center Offset")) series = RideFile::rpco;
-    if (name == tr("Left Top Dead Center")) series = RideFile::ltdc;
-    if (name == tr("Right Top Dead Center")) series = RideFile::rtdc;
-    if (name == tr("Left Bottom Dead Center")) series = RideFile::lbdc;
-    if (name == tr("Right Bottom Dead Center")) series = RideFile::rbdc;
-    if (name == tr("Left Peak Power Phase Start")) series = RideFile::ltppp;
-    if (name == tr("Right Peak Power Phase Start")) series = RideFile::rtppp;
-    if (name == tr("Left Peak Power Phase End")) series = RideFile::lbppp;
-    if (name == tr("Right Peak Power Phase End")) series = RideFile::rbppp;
+    if (name == tr("Left Power Phase Start")) series = RideFile::lppb;
+    if (name == tr("Right Power Phase Start")) series = RideFile::rppb;
+    if (name == tr("Left Power Phase End")) series = RideFile::lppe;
+    if (name == tr("Right Power Phase End")) series = RideFile::rppe;
+    if (name == tr("Left Peak Power Phase Start")) series = RideFile::lpppb;
+    if (name == tr("Right Peak Power Phase Start")) series = RideFile::rpppb;
+    if (name == tr("Left Peak Power Phase End")) series = RideFile::lpppe;
+    if (name == tr("Right Peak Power Phase End")) series = RideFile::rpppe;
     if (name == tr("SmO2")) series = RideFile::smo2;
     if (name == tr("tHb")) series = RideFile::thb;
     if (name == tr("Vertical Oscillation")) series = RideFile::rvert;

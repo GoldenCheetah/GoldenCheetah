@@ -48,11 +48,12 @@ class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
     IntervalItem *intervalNum(int n) const;
     int intervalCount() const;
 
-    RideItem *rideItem;
     AllPlotInterval *plot;
     Context *context;
     int level;
     int max;
+
+    RideItem *rideItem;
     const RideFileInterval interval;
 
     virtual QwtIntervalSample sample(size_t i) const;

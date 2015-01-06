@@ -200,14 +200,14 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double rpsdelta = (point->rps - last->rps) / (double) count;
                 double lpcodelta = (point->lpco - last->lpco) / (double) count;
                 double rpcodelta = (point->rpco - last->rpco) / (double) count;
-                double ltdcdelta = (point->ltdc - last->ltdc) / (double) count;
-                double rtdcdelta = (point->rtdc - last->rtdc) / (double) count;
-                double lbdcdelta = (point->lbdc - last->lbdc) / (double) count;
-                double rbdcdelta = (point->rbdc - last->rbdc) / (double) count;
-                double ltpppdelta = (point->ltppp - last->ltppp) / (double) count;
-                double rtpppdelta = (point->rtppp - last->rtppp) / (double) count;
-                double lbpppdelta = (point->lbppp - last->lbppp) / (double) count;
-                double rbpppdelta = (point->rbppp - last->rbppp) / (double) count;
+                double lppbdelta = (point->lppb - last->lppb) / (double) count;
+                double rppbdelta = (point->rppb - last->rppb) / (double) count;
+                double lppedelta = (point->lppe - last->lppe) / (double) count;
+                double rppedelta = (point->rppe - last->rppe) / (double) count;
+                double lpppbdelta = (point->lpppb - last->lpppb) / (double) count;
+                double rpppbdelta = (point->rpppb - last->rpppb) / (double) count;
+                double lpppedelta = (point->lpppe - last->lpppe) / (double) count;
+                double rpppedelta = (point->rpppe - last->rpppe) / (double) count;
                 double smo2delta = (point->smo2 - last->smo2) / (double) count;
                 double thbdelta = (point->thb - last->thb) / (double) count;
                 double rcontactdelta = (point->rcontact - last->rcontact) / (double) count;
@@ -237,14 +237,14 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->rps + ((i+1)*rpsdelta),
                                                            last->lpco + ((i+1)*lpcodelta),
                                                            last->rpco + ((i+1)*rpcodelta),
-                                                           last->ltdc + ((i+1)*ltdcdelta),
-                                                           last->rtdc + ((i+1)*rtdcdelta),
-                                                           last->lbdc + ((i+1)*lbdcdelta),
-                                                           last->rbdc + ((i+1)*rbdcdelta),
-                                                           last->ltppp + ((i+1)*ltpppdelta),
-                                                           last->rtppp + ((i+1)*rtpppdelta),
-                                                           last->lbppp + ((i+1)*lbpppdelta),
-                                                           last->rbppp + ((i+1)*rbpppdelta),
+                                                           last->lppb + ((i+1)*lppbdelta),
+                                                           last->rppb + ((i+1)*rppbdelta),
+                                                           last->lppe + ((i+1)*lppedelta),
+                                                           last->rppe + ((i+1)*rppedelta),
+                                                           last->lpppb + ((i+1)*lpppbdelta),
+                                                           last->rpppb + ((i+1)*rpppbdelta),
+                                                           last->lpppe + ((i+1)*lpppedelta),
+                                                           last->rpppe + ((i+1)*rpppedelta),
                                                            last->smo2 + ((i+1)*smo2delta),
                                                            last->thb + ((i+1)*thbdelta),
                                                            last->rvert + ((i+1)*rvertdelta),
@@ -282,7 +282,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0.0, 0.0, 0.0, 0.0, //pedal torque / smoothness
                                                            0.0, 0.0, // pedal platform offset
-                                                           0.0, 0.0, 0.0, 0.0, //pedal top and bottom death center
+                                                           0.0, 0.0, 0.0, 0.0, //pedal power phase
                                                            0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                                                            0.0, 0.0, // smO2 / thb
                                                            0.0, 0.0, 0.0, // running dynamics

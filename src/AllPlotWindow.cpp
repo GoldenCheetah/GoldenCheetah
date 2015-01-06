@@ -230,7 +230,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showPCO->setCheckState(Qt::Unchecked);
     seriesRight->addRow(new QLabel(""), showPCO);
 
-    showDC = new QCheckBox(tr("Power Phase (Death Center)"), this);
+    showDC = new QCheckBox(tr("Power Phase"), this);
     showDC->setCheckState(Qt::Unchecked);
     seriesRight->addRow(new QLabel(""), showDC);
 
@@ -1084,12 +1084,12 @@ AllPlotWindow::compareChanged()
             s.one = RideFile::lpco; s.two = RideFile::rpco; wanted << s;
         }
         if (showDC->isChecked()) {
-            s.one = RideFile::ltdc; s.two = RideFile::lbdc; wanted << s;
-            s.one = RideFile::rtdc; s.two = RideFile::rbdc; wanted << s;
+            s.one = RideFile::lppb; s.two = RideFile::lppe; wanted << s;
+            s.one = RideFile::rppb; s.two = RideFile::rppe; wanted << s;
         }
         if (showPPP->isChecked()) {
-            s.one = RideFile::ltppp; s.two = RideFile::lbppp; wanted << s;
-            s.one = RideFile::rtppp; s.two = RideFile::rbppp; wanted << s;
+            s.one = RideFile::lpppb; s.two = RideFile::lpppe; wanted << s;
+            s.one = RideFile::rpppb; s.two = RideFile::rpppe; wanted << s;
         }*/
 
         // create blank and add to gui
@@ -3283,10 +3283,10 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showPS->isChecked() && rideItem->ride()->areDataPresent()->lps) { s.one = RideFile::lps; s.two = RideFile::none; serieslist << s;
          s.one = RideFile::rps; s.two = RideFile::none; serieslist << s; }
     if (showPCO->isChecked() && rideItem->ride()->areDataPresent()->lpco) { s.one = RideFile::lpco; s.two = RideFile::rpco; serieslist << s;}
-    if (showDC->isChecked() && rideItem->ride()->areDataPresent()->ltdc) { s.one = RideFile::ltdc; s.two = RideFile::lbdc; serieslist << s;
-         s.one = RideFile::rtdc; s.two = RideFile::rbdc; serieslist << s; }
-    if (showPPP->isChecked() && rideItem->ride()->areDataPresent()->ltppp) { s.one = RideFile::ltppp; s.two = RideFile::lbppp; serieslist << s;
-         s.one = RideFile::rtppp; s.two = RideFile::rbppp; serieslist << s; }
+    if (showDC->isChecked() && rideItem->ride()->areDataPresent()->lppb) { s.one = RideFile::lppb; s.two = RideFile::lppe; serieslist << s;
+         s.one = RideFile::rppb; s.two = RideFile::rppe; serieslist << s; }
+    if (showPPP->isChecked() && rideItem->ride()->areDataPresent()->lpppb) { s.one = RideFile::lpppb; s.two = RideFile::lpppe; serieslist << s;
+         s.one = RideFile::rpppb; s.two = RideFile::rpppe; serieslist << s; }
 
     bool first = true;
     foreach(SeriesWanted x, serieslist) {

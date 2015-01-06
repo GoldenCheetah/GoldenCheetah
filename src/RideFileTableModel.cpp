@@ -149,29 +149,29 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Right Platform Center Offset");
             headingsType << RideFile::rpco;
         }
-        if (series == RideFile::ltdc || ride->areDataPresent()->ltdc) {
+        if (series == RideFile::lppb || ride->areDataPresent()->lppb) {
             headings_ << tr("Left Top Dead Center");
-            headingsType << RideFile::ltdc;
+            headingsType << RideFile::lppb;
         }
-        if (series == RideFile::rtdc || ride->areDataPresent()->rtdc) {
+        if (series == RideFile::rppb || ride->areDataPresent()->rppb) {
             headings_ << tr("Right Top Dead Center");
-            headingsType << RideFile::rtdc;
+            headingsType << RideFile::rppb;
         }
-        if (series == RideFile::lbdc || ride->areDataPresent()->lbdc) {
+        if (series == RideFile::lppe || ride->areDataPresent()->lppe) {
             headings_ << tr("Left Bottom Dead Center");
-            headingsType << RideFile::lbdc;
+            headingsType << RideFile::lppe;
         }
-        if (series == RideFile::rbdc || ride->areDataPresent()->rbdc) {
+        if (series == RideFile::rppe || ride->areDataPresent()->rppe) {
             headings_ << tr("Right Bottom Dead Center");
-            headingsType << RideFile::rbdc;
+            headingsType << RideFile::rppe;
         }
-        if (series == RideFile::ltppp || ride->areDataPresent()->ltppp) {
+        if (series == RideFile::lpppb || ride->areDataPresent()->lpppb) {
             headings_ << tr("Left Peak Power Phase Start");
-            headingsType << RideFile::ltppp;
+            headingsType << RideFile::lpppb;
         }
-        if (series == RideFile::rtppp || ride->areDataPresent()->rtppp) {
+        if (series == RideFile::rpppb || ride->areDataPresent()->rpppb) {
             headings_ << tr("Right Peak Power Phase Start");
-            headingsType << RideFile::rtppp;
+            headingsType << RideFile::rpppb;
         }
         if (series == RideFile::smo2 || ride->areDataPresent()->smo2) {
             headings_ << tr("SmO2");

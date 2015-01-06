@@ -262,8 +262,8 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                     add.slope, add.temp, add.lrbalance,
                     add.lte, add.rte, add.lps, add.rps,
                     add.lpco, add.rpco,
-                    add.ltdc, add.rtdc, add.lbdc, add.rbdc,
-                    add.ltppp, add.rtppp, add.lbppp, add.rbppp,
+                    add.lppb, add.rppb, add.lppe, add.rppe,
+                    add.lpppb, add.rpppb, add.lpppe, add.rpppe,
                     add.smo2, add.thb,
                     add.rvert, add.rcad, add.rcontact,
                     add.interval);
