@@ -79,10 +79,10 @@ class Athlete : public QObject
         // zones
         const Zones *zones() const { return zones_; }
         const HrZones *hrZones() const { return hrzones_; }
-        const PaceZones *paceZones() const { return pacezones_; }
+        const PaceZones *paceZones(bool isSwim=false) const { return pacezones_[isSwim]; }
         Zones *zones_;
         HrZones *hrzones_;
-        PaceZones *pacezones_;
+        PaceZones *pacezones_[2];
         void setCriticalPower(int cp);
 
 #ifdef GC_HAVE_INTERVALS
