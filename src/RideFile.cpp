@@ -143,6 +143,13 @@ RideFile::isRun() const
            (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact);
 }
 
+bool
+RideFile::isSwim() const
+{
+    // for now we just look at Sport
+    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim"));
+}
+
 QString
 RideFile::seriesName(SeriesType series)
 {
@@ -1764,7 +1771,7 @@ RideFile::recalculateDerivedSeries(bool force)
 
         // can we derive gear ratio ?
         // needs speed and cadence
-        if (p->kph && p->cad && !isRun()) {
+        if (p->kph && p->cad && !isRun() && !isSwim()) {
 
             // need to say we got it
             setDataPresent(RideFile::gear, true);
