@@ -99,8 +99,9 @@
 // 93  26  Nov 2014 Mark Liversedge    Added Min, Max, Avg SmO2
 // 94  02  Dec 2014 Ale Martinez       Added xPace
 // 95  08  Dec 2014 Ale Martinez       Deprecated Measures table
+// 96  06  Jan 2015 Damien Grauser     Garmin Cycling Dynamics
 
-int DBSchemaVersion = 95;
+int DBSchemaVersion = 96;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
