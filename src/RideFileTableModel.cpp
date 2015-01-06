@@ -150,19 +150,19 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headingsType << RideFile::rpco;
         }
         if (series == RideFile::lppb || ride->areDataPresent()->lppb) {
-            headings_ << tr("Left Top Dead Center");
+            headings_ << tr("Left Power Phase Start");
             headingsType << RideFile::lppb;
         }
         if (series == RideFile::rppb || ride->areDataPresent()->rppb) {
-            headings_ << tr("Right Top Dead Center");
+            headings_ << tr("Right Power Phase Start");
             headingsType << RideFile::rppb;
         }
         if (series == RideFile::lppe || ride->areDataPresent()->lppe) {
-            headings_ << tr("Left Bottom Dead Center");
+            headings_ << tr("Left Power Phase End");
             headingsType << RideFile::lppe;
         }
         if (series == RideFile::rppe || ride->areDataPresent()->rppe) {
-            headings_ << tr("Right Bottom Dead Center");
+            headings_ << tr("Right Power Phase End");
             headingsType << RideFile::rppe;
         }
         if (series == RideFile::lpppb || ride->areDataPresent()->lpppb) {
