@@ -153,13 +153,13 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Left Power Phase Start");
             headingsType << RideFile::lppb;
         }
-        if (series == RideFile::rppb || ride->areDataPresent()->rppb) {
-            headings_ << tr("Right Power Phase Start");
-            headingsType << RideFile::rppb;
-        }
         if (series == RideFile::lppe || ride->areDataPresent()->lppe) {
             headings_ << tr("Left Power Phase End");
             headingsType << RideFile::lppe;
+        }
+        if (series == RideFile::rppb || ride->areDataPresent()->rppb) {
+            headings_ << tr("Right Power Phase Start");
+            headingsType << RideFile::rppb;
         }
         if (series == RideFile::rppe || ride->areDataPresent()->rppe) {
             headings_ << tr("Right Power Phase End");
@@ -169,9 +169,17 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Left Peak Power Phase Start");
             headingsType << RideFile::lpppb;
         }
-        if (series == RideFile::rpppb || ride->areDataPresent()->rpppb) {
+        if (series == RideFile::lpppe || ride->areDataPresent()->lpppe) {
+            headings_ << tr("Left Peak Power Phase End");
+            headingsType << RideFile::lpppe;
+        }
+        if (series == RideFile::lpppb || ride->areDataPresent()->rpppb) {
             headings_ << tr("Right Peak Power Phase Start");
-            headingsType << RideFile::rpppb;
+            headingsType << RideFile::lpppb;
+        }
+        if (series == RideFile::rpppe || ride->areDataPresent()->rpppe) {
+            headings_ << tr("Right Peak Power Phase End");
+            headingsType << RideFile::rpppe;
         }
         if (series == RideFile::smo2 || ride->areDataPresent()->smo2) {
             headings_ << tr("SmO2");
