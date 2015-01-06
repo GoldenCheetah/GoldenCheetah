@@ -373,8 +373,8 @@ class AllPlotObject : public QObject
     QwtPlotCurve *rpsCurve;
     QwtPlotCurve *lpcoCurve;
     QwtPlotCurve *rpcoCurve;
-    QwtPlotIntervalCurve *ldcCurve;
-    QwtPlotIntervalCurve *rdcCurve;
+    QwtPlotIntervalCurve *lppCurve;
+    QwtPlotIntervalCurve *rppCurve;
     QwtPlotIntervalCurve *lpppCurve;
     QwtPlotIntervalCurve *rpppCurve;
 
@@ -423,14 +423,14 @@ class AllPlotObject : public QObject
     QVector<double> rpsArray;
     QVector<double> lpcoArray;
     QVector<double> rpcoArray;
-    QVector<double> ltdcArray;
-    QVector<double> rtdcArray;
-    QVector<double> lbdcArray;
-    QVector<double> rbdcArray;
-    QVector<double> ltpppArray;
-    QVector<double> rtpppArray;
-    QVector<double> lbpppArray;
-    QVector<double> rbpppArray;
+    QVector<double> lppbArray;
+    QVector<double> rppbArray;
+    QVector<double> lppeArray;
+    QVector<double> rppeArray;
+    QVector<double> lpppbArray;
+    QVector<double> rpppbArray;
+    QVector<double> lpppeArray;
+    QVector<double> rpppeArray;
 
     // smoothed data
     QVector<double> smoothWatts;
@@ -470,8 +470,8 @@ class AllPlotObject : public QObject
     QVector<double> smoothRPS;
     QVector<double> smoothLPCO;
     QVector<double> smoothRPCO;
-    QVector<QwtIntervalSample> smoothLDC;
-    QVector<QwtIntervalSample> smoothRDC;
+    QVector<QwtIntervalSample> smoothLPP;
+    QVector<QwtIntervalSample> smoothRPP;
     QVector<QwtIntervalSample> smoothLPPP;
     QVector<QwtIntervalSample> smoothRPPP;
     QVector<QwtIntervalSample> smoothRelSpeed;

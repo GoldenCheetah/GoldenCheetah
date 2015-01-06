@@ -60,7 +60,7 @@ struct RideFileDataPresent
 {
     // basic (te = torqueeffectiveness, ps = pedal smoothness)
     bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
-    bool lrbalance, lte, rte, lps, rps, lpco, rpco, ltdc, rtdc, lbdc, rbdc, ltppp, rtppp, lbppp, rbppp;
+    bool lrbalance, lte, rte, lps, rps, lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe;
     bool smo2, thb, interval;
 
     // derived
@@ -75,7 +75,7 @@ struct RideFileDataPresent
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false),
-        lpco(false), rpco(false), ltdc(false), rtdc(false), lbdc(false), rbdc(false), ltppp(false), rtppp(false), lbppp(false), rbppp(false),
+        lpco(false), rpco(false), lppb(false), rppb(false), lppe(false), rppe(false), lpppb(false), rpppb(false), lpppe(false), rpppe(false),
         smo2(false), thb(false), interval(false),
         np(false), xp(false), apower(false), wprime(false), atiss(false), antiss(false),gear(false),hhb(false),o2hb(false),
         rvert(false), rcad(false), rcontact(false) {}
@@ -152,7 +152,7 @@ class RideFile : public QObject // QObject to emit signals
                           vam, wattsKg, lrbalance, lte, rte, lps, rps, 
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
-                          lpco, rpco, ltdc, rtdc, lbdc, rbdc, ltppp, rtppp, lbppp, rbppp,
+                          lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
                           none };
 
         enum specialValues { NoTemp = -255 };
@@ -183,8 +183,8 @@ class RideFile : public QObject // QObject to emit signals
                          double temperature, double lrbalance,
                          double lte, double rte, double lps, double rps,
                          double lpco, double rpco,
-                         double ltdc, double rtdc, double lbdc, double rbdc,
-                         double ltppp, double rtppp, double lbppp, double rbppp,
+                         double lppb, double rppb, double lppe, double rppe,
+                         double lpppb, double rpppb, double lpppe, double rpppe,
                          double smo2, double thb,
                          double rvert, double rcad, double rcontact,
                          int interval);
@@ -331,8 +331,8 @@ struct RideFilePoint
     // pedals
     double lrbalance, lte, rte, lps, rps;
     double lpco, rpco; // left and right platform center offset
-    double ltdc, rtdc, lbdc, rbdc; // left and right top and bottom death center
-    double ltppp, rtppp, lbppp, rbppp; // left and right top (start) and bottom (stop) peak power phase
+    double lppb, rppb, lppe, rppe; // left and right power phase begin/end
+    double lpppb, rpppb, lpppe, rpppe; // left and right begin and end peak power phase
 
     // oxy
     double smo2, thb;
@@ -356,8 +356,8 @@ struct RideFilePoint
                       lrbalance(0),
                       lte(0.0), rte(0.0), lps(0.0), rps(0.0),
                       lpco(0.0), rpco(0.0),
-                      ltdc(0.0), rtdc(0.0), lbdc(0.0), rbdc(0.0),
-                      ltppp(0.0), rtppp(0.0), lbppp(0.0), rbppp(0.0),
+                      lppb(0.0), rppb(0.0), lppe(0.0), rppe(0.0),
+                      lpppb(0.0), rpppb(0.0), lpppe(0.0), rpppe(0.0),
                       smo2(0.0), thb(0.0),
                       hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0),
                       rvert(0.0), rcad(0.0), rcontact(0.0),
@@ -371,8 +371,8 @@ struct RideFilePoint
                   double lrbalance,
                   double lte, double rte, double lps, double rps,
                   double lpco, double rpco,
-                  double ltdc, double rtdc, double lbdc, double rbdc,
-                  double ltppp, double rtppp, double lbppp, double rbppp,
+                  double lppb, double rppb, double lppe, double rppe,
+                  double lpppb, double rpppb, double lpppe, double rpppe,
                   double smo2, double thb, 
                   double rvert, double rcad, double rcontact,
                   int interval) :
@@ -382,8 +382,8 @@ struct RideFilePoint
         lrbalance(lrbalance),
         lte(lte), rte(rte), lps(lps), rps(rps),
         lpco(lpco), rpco(rpco),
-        ltdc(ltdc), rtdc(rtdc), lbdc(lbdc), rbdc(rbdc),
-        ltppp(ltppp), rtppp(rtppp), lbppp(lbppp), rbppp(rbppp),
+        lppb(lppb), rppb(rppb), lppe(lppe), rppe(rppe),
+        lpppb(lpppb), rpppb(rpppb), lpppe(lpppe), rpppe(rpppe),
         smo2(smo2), thb(thb),
         hrd(0.0), cadd(0.0), kphd(0.0), nmd(0.0), wattsd(0.0), 
         rvert(rvert), rcad(rcad), rcontact(rcontact), interval(interval), 

@@ -555,20 +555,20 @@ struct FitFileReaderState
                         rightPedalCenterOffset = value;
                         break;
                 case 69: // ? Left Power Phase (Top and Bottom Dead Center)  ?
-                        leftTopDeathCenter = value;
-                        leftBottomDeathCenter = value2;
+                        leftTopDeathCenter = round(value * 360.0/256);
+                        leftBottomDeathCenter = round(value2 * 360.0/256);
                         break;
                 case 70: // ? Left Peak Phase  ?
-                        leftTopPeakPowerPhase = value;
-                        leftBottomPeakPowerPhase = value2;
+                        leftTopPeakPowerPhase = round(value * 360.0/256);
+                        leftBottomPeakPowerPhase = round(value2 * 360.0/256);
                         break;
                 case 71: // ? Right Power Phase (Top and Bottom Dead Center)  ?
-                        rightTopDeathCenter = value;
-                        rightBottomDeathCenter = value2;
+                        rightTopDeathCenter = round(value * 360.0/256);
+                        rightBottomDeathCenter = round(value2 * 360.0/256);
                         break;
                 case 72: // ? Right Peak Phase  ?
-                        rightTopPeakPowerPhase = value;
-                        rightBottomPeakPowerPhase = value2;
+                        rightTopPeakPowerPhase = round(value * 360.0/256);
+                        rightBottomPeakPowerPhase = round(value2 * 360.0/256);
                         break;
 
 
@@ -646,14 +646,14 @@ struct FitFileReaderState
             double deltaRightPS = rightPedalSmooth - prevPoint->rps;
             double deltaLeftPedalCenterOffset = leftPedalCenterOffset - prevPoint->lpco;
             double deltaRightPedalCenterOffset = rightPedalCenterOffset - prevPoint->rpco;
-            double deltaLeftTopDeathCenter = leftTopDeathCenter - prevPoint->ltdc;
-            double deltaRightTopDeathCenter = rightTopDeathCenter - prevPoint->rtdc;
-            double deltaLeftBottomDeathCenter = leftBottomDeathCenter - prevPoint->lbdc;
-            double deltaRightBottomDeathCenter = rightBottomDeathCenter - prevPoint->rbdc;
-            double deltaLeftTopPeakPowerPhase = leftTopPeakPowerPhase - prevPoint->ltppp;
-            double deltaRightTopPeakPowerPhase = rightTopPeakPowerPhase - prevPoint->rtppp;
-            double deltaLeftBottomPeakPowerPhase = leftBottomPeakPowerPhase - prevPoint->lbppp;
-            double deltaRightBottomPeakPowerPhase = rightBottomPeakPowerPhase - prevPoint->rbppp;
+            double deltaLeftTopDeathCenter = leftTopDeathCenter - prevPoint->lppb;
+            double deltaRightTopDeathCenter = rightTopDeathCenter - prevPoint->rppb;
+            double deltaLeftBottomDeathCenter = leftBottomDeathCenter - prevPoint->lppe;
+            double deltaRightBottomDeathCenter = rightBottomDeathCenter - prevPoint->rppe;
+            double deltaLeftTopPeakPowerPhase = leftTopPeakPowerPhase - prevPoint->lpppb;
+            double deltaRightTopPeakPowerPhase = rightTopPeakPowerPhase - prevPoint->rpppb;
+            double deltaLeftBottomPeakPowerPhase = leftBottomPeakPowerPhase - prevPoint->lpppe;
+            double deltaRightBottomPeakPowerPhase = rightBottomPeakPowerPhase - prevPoint->rpppe;
             double deltaSmO2 = smO2 - prevPoint->smo2;
             double deltaTHb = tHb - prevPoint->thb;
             double deltarvert = rvert - prevPoint->rvert;
@@ -688,14 +688,14 @@ struct FitFileReaderState
                         prevPoint->rps + (deltaRightPS * weight),
                         prevPoint->lpco + (deltaLeftPedalCenterOffset * weight),
                         prevPoint->rpco + (deltaRightPedalCenterOffset * weight),
-                        prevPoint->ltdc + (deltaLeftTopDeathCenter * weight),
-                        prevPoint->rtdc + (deltaRightTopDeathCenter * weight),
-                        prevPoint->lbdc + (deltaLeftBottomDeathCenter * weight),
-                        prevPoint->rbdc + (deltaRightBottomDeathCenter * weight),
-                        prevPoint->ltppp + (deltaLeftTopPeakPowerPhase * weight),
-                        prevPoint->rtppp + (deltaRightTopPeakPowerPhase * weight),
-                        prevPoint->lbppp + (deltaLeftBottomPeakPowerPhase * weight),
-                        prevPoint->rbppp + (deltaRightBottomPeakPowerPhase * weight),
+                        prevPoint->lppb + (deltaLeftTopDeathCenter * weight),
+                        prevPoint->rppb + (deltaRightTopDeathCenter * weight),
+                        prevPoint->lppe + (deltaLeftBottomDeathCenter * weight),
+                        prevPoint->rppe + (deltaRightBottomDeathCenter * weight),
+                        prevPoint->lpppb + (deltaLeftTopPeakPowerPhase * weight),
+                        prevPoint->rpppb + (deltaRightTopPeakPowerPhase * weight),
+                        prevPoint->lpppe + (deltaLeftBottomPeakPowerPhase * weight),
+                        prevPoint->rpppe + (deltaRightBottomPeakPowerPhase * weight),
                         prevPoint->smo2 + (deltaSmO2 * weight),
                         prevPoint->thb + (deltaTHb * weight),
                         prevPoint->rvert + (deltarvert * weight),
@@ -714,6 +714,7 @@ struct FitFileReaderState
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
                      smO2, tHb, rvert, rcad, rcontact, interval);
+
         last_time = time;
         last_distance = km;
     }

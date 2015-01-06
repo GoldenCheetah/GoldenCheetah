@@ -250,7 +250,7 @@ bool
                 0,
                 0.0, 0.0, 0.0, 0.0, // pedal torque/smoothness
                 0.0, 0.0, // pedal platform offset
-                0.0, 0.0, 0.0, 0.0, //pedal top and bottom death center
+                0.0, 0.0, 0.0, 0.0, //pedal power phase
                 0.0, 0.0, 0.0, 0.0, //pedal peak power phase
                 0.0, 0.0, // SmO2 / tHb
                 0.0, 0.0, 0.0, // running dynamics
