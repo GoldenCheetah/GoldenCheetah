@@ -106,6 +106,9 @@ public:
     // when aggregating averages, should we include zeroes ? no by default
     virtual bool aggregateZero() const { return false; }
 
+    // is this metric relevant
+    virtual bool isRelevantForRide(const RideFile *) const { return true; }
+
     // Factor to multiple value to convert from metric to imperial
     virtual double conversion() const { return conversion_; }
     // And sum for example Fahrenheit from CentigradE
