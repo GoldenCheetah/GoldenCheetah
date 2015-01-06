@@ -1749,7 +1749,7 @@ class AvgRPS : public RideMetric {
                 }
             }
 
-            if (secs > 0.0f) setValue(total / secs);
+            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
             else setValue(0.0);
 
         } else {
@@ -1899,9 +1899,9 @@ class AvgLPPB : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad) {
+                if (point->cad) { //  && point->lppe > 0
                     secs += ride->recIntSecs();
-                    total += point->lppb + (point->rppb>180?-360:0);
+                    total += point->lppb + (point->lppb>180?-360:0);
                 }
             }
 
@@ -1949,7 +1949,7 @@ class AvgRPPB : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad) {
+                if (point->cad) { // && point->rppe > 0
                     secs += ride->recIntSecs();
                     total += point->rppb + (point->rppb>180?-360:0);
                 }
@@ -2000,7 +2000,7 @@ class AvgLPPE : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad && point->lppe>0) {
+                if (point->cad) {
                     secs += ride->recIntSecs();
                     total += point->lppe;
                 }
@@ -2050,7 +2050,7 @@ class AvgRPPE : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad && point->rppe>0) {
+                if (point->cad) {
                     secs += ride->recIntSecs();
                     total += point->rppe;
                 }
@@ -2101,7 +2101,7 @@ class AvgLPPPB : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad && point->lpppb>0) {
+                if (point->cad) { // && point->lpppe>0
                     secs += ride->recIntSecs();
                     total += point->lpppb + (point->lpppb>180?-360:0);
                 }
@@ -2151,7 +2151,7 @@ class AvgRPPPB : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad && point->rpppb>0) {
+                if (point->cad) { // && point->rpppe>0
                     secs += ride->recIntSecs();
                     total += point->rpppb + (point->rpppb>180?-360:0);
                 }
@@ -2202,7 +2202,7 @@ class AvgLPPPE : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad && point->lpppe>0) {
+                if (point->cad) {
                     secs += ride->recIntSecs();
                     total += point->lpppe;
                 }
@@ -2252,13 +2252,13 @@ class AvgRPPPE : public RideMetric {
 
             foreach (const RideFilePoint *point, ride->dataPoints()) {
 
-                if (point->cad && point->rpppe>0) {
+                if (point->cad) {
                     secs += ride->recIntSecs();
                     total += point->rpppe;
                 }
             }
 
-            if (total > 0.0f && secs > 0.0f) setValue(total / secs);
+            if (secs > 0.0f) setValue(total / secs);
             else setValue(0.0);
 
         } else {
