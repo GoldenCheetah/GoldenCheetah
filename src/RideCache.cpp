@@ -112,6 +112,9 @@ RideCache::configChanged(qint32 what)
     // will add more as they come
     qint32 want = CONFIG_ATHLETE | CONFIG_ZONES | CONFIG_NOTECOLOR | CONFIG_GENERAL;
     if (what & want) {
+
+        // restart !
+        cancel();
         refresh();
     }
 }
